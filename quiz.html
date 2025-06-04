@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mineral Quiz App</title>
+    <style>
+        /* CSS Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .topic-selection, .quiz-container, .result-container {
+            display: none;
+            padding: 20px;
+        }
+
+        .topic-selection.active, .quiz-container.active, .result-container.active {
+            display: block;
+        }
+
+        .topic-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .topic-btn:hover {
+            background: #2980b9;
+        }
+
+        .question {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .options {
+            margin-bottom: 20px;
+        }
+
+        .option {
+            display: block;
+            padding: 10px;
+            margin: 10px 0;
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .option:hover {
+            background: #d6eaf8;
+        }
+
+        .option.selected {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .result-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .restart-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .restart-btn:hover {
+            background: #27ae60;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            .question {
+                font-size: 16px;
+            }
+
+            .option {
+                padding: 8px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mineral Quiz App</h1>
+
+        <!-- Topic Selection Screen -->
+        <div class="topic-selection active">
+            <h2>Choose a Topic</h2>
+            <button class="topic-btn" data-topic="basic">Basic Mineralogy</button>
+            <button class="topic-btn" data-topic="tamilnadu">Minerals in Tamil Nadu</button>
+            <button class="topic-btn" data-topic="uses">Uses of Minerals</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="quiz-container">
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="navigation">
+                <button class="btn" id="prev-btn" disabled>Previous</button>
+                <button class="btn" id="next-btn">Next</button>
+                <button class="btn" id="submit-btn" style="display: none;">Submit</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="result-container">
+            <h2>Quiz Completed!</h2>
+            <div class="score" id="score"></div>
+            <button class="restart-btn">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        // Quiz Data
+        const quizData = {
+            basic: [
+                {
+                    question: "Which of the following is not a mineral?",
+                    options: ["Quartz", "Coal", "Petroleum", "Granite"],
+                    answer: "Granite"
+                },
+                {
+                    question: "The hardest mineral on the Mohs scale is:",
+                    options: ["Diamond", "Talc", "Quartz", "Feldspar"],
+                    answer: "Diamond"
+                },
+                {
+                    question: "Which mineral is known as 'Fool’s Gold'?",
+                    options: ["Pyrite", "Hematite", "Galena", "Chalcopyrite"],
+                    answer: "Pyrite"
+                },
+                {
+                    question: "The main ore of aluminium is:",
+                    options: ["Bauxite", "Hematite", "Magnetite", "Limonite"],
+                    answer: "Bauxite"
+                },
+                {
+                    question: "Which mineral is used in making cement?",
+                    options: ["Gypsum", "Graphite", "Mica", "Fluorite"],
+                    answer: "Gypsum"
+                }
+            ],
+            tamilnadu: [
+                {
+                    question: "Which district in Tamil Nadu is famous for lignite coal?",
+                    options: ["Salem", "Neyveli", "Madurai", "Coimbatore"],
+                    answer: "Neyveli"
+                },
+                {
+                    question: "The famous magnesite deposits in Tamil Nadu are found in:",
+                    options: ["Salem", "Tirunelveli", "Nilgiris", "Kancheepuram"],
+                    answer: "Salem"
+                },
+                {
+                    question: "Bauxite is mined in which Tamil Nadu district?",
+                    options: ["Thoothukudi", "Salem", "Krishnagiri", "Tiruvannamalai"],
+                    answer: "Krishnagiri"
+                },
+                {
+                    question: "Which mineral is not found in Tamil Nadu?",
+                    options: ["Limestone", "Gold", "Gypsum", "Uranium"],
+                    answer: "Uranium"
+                },
+                {
+                    question: "The major iron ore producing district in Tamil Nadu is:",
+                    options: ["Salem", "Tirunelveli", "Kancheepuram", "Coimbatore"],
+                    answer: "Salem"
+                }
+            ],
+            uses: [
+                {
+                    question: "Which mineral is used in pencils?",
+                    options: ["Graphite", "Mica", "Talc", "Quartz"],
+                    answer: "Graphite"
+                },
+                {
+                    question: "Mica is used in:",
+                    options: ["Electrical appliances", "Cement making", "Fuel", "Fertilizers"],
+                    answer: "Electrical appliances"
+                },
+                {
+                    question: "Limestone is a key raw material for:",
+                    options: ["Iron & steel industry", "Cement industry", "Glass industry", "Both b & c"],
+                    answer: "Both b & c"
+                },
+                {
+                    question: "Monazite sand contains:",
+                    options: ["Thorium", "Uranium", "Gold", "Platinum"],
+                    answer: "Thorium"
+                },
+                {
+                    question: "Silica sand is used in making:",
+                    options: ["Glass", "Ceramics", "Electronics", "All of the above"],
+                    answer: "All of the above"
+                }
+            ]
+        };
+
+        // DOM Elements
+        const topicSelection = document.querySelector('.topic-selection');
+        const quizContainer = document.querySelector('.quiz-container');
+        const resultContainer = document.querySelector('.result-container');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const scoreElement = document.getElementById('score');
+        const restartBtn = document.querySelector('.restart-btn');
+
+        // Quiz Variables
+        let currentTopic = '';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOptions = [];
+
+        // Event Listeners
+        document.querySelectorAll('.topic-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentTopic = btn.getAttribute('data-topic');
+                startQuiz();
+            });
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentQuestionIndex--;
+            showQuestion();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData[currentTopic].length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            }
+        });
+
+        submitBtn.addEventListener('click', showResult);
+
+        restartBtn.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedOptions = [];
+            topicSelection.classList.add('active');
+            quizContainer.classList.remove('active');
+            resultContainer.classList.remove('active');
+        });
+
+        // Functions
+        function startQuiz() {
+            topicSelection.classList.remove('active');
+            quizContainer.classList.add('active');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = quizData[currentTopic][currentQuestionIndex];
+            questionElement.textContent = question.question;
+            optionsElement.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.textContent = option;
+                optionElement.addEventListener('click', () => selectOption(option, index));
+                optionsElement.appendChild(optionElement);
+
+                if (selectedOptions[currentQuestionIndex] === option) {
+                    optionElement.classList.add('selected');
+                }
+            });
+
+            // Update navigation buttons
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.style.display = currentQuestionIndex === quizData[currentTopic].length - 1 ? 'none' : 'block';
+            submitBtn.style.display = currentQuestionIndex === quizData[currentTopic].length - 1 ? 'block' : 'none';
+        }
+
+        function selectOption(option, index) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            selectedOptions[currentQuestionIndex] = option;
+
+            // Check if the selected option is correct
+            if (option === quizData[currentTopic][currentQuestionIndex].answer) {
+                score++;
+            }
+        }
+
+        function showResult() {
+            quizContainer.classList.remove('active');
+            resultContainer.classList.add('active');
+            scoreElement.textContent = `You scored ${score} out of ${quizData[currentTopic].length}!`;
+        }
+    </script>
+</body>
+</html>
