@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Setup</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #ffffff;
+      font-size: 24px;
+    }
+
+    label {
+      font-size: 15px;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      color: #eaeaea;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.95);
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    select:focus {
+      outline: none;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 14px;
+      background-color: #ffffff;
+      color: #2575fc;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #f0f0f0;
+    }
+
+    @media (max-width: 400px) {
+      h2 {
+        font-size: 20px;
+      }
+
+      button {
+        font-size: 16px;
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🎓 Quiz Setup</h2>
+
+    <label for="topicSelect">📚 Topic</label>
+    <select id="topicSelect"></select>
+
+    <label for="subtopicSelect">📖 Subtopic</label>
+    <select id="subtopicSelect"></select>
+
+    <button id="startQuizBtn">▶️ Start Quiz</button>
+
+    <label for="languageSelect" style="margin-top: 30px;">🌐 Language</label>
+    <select id="languageSelect">
+      <option value="en">English</option>
+      <option value="ta">தமிழ்</option>
+    </select>
+  </div>
+
+  <script>
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vXYZ/pub?output=csv"; // Replace with your CSV sheet link
+
+    let quizData = [];
+
+    fetch(sheetURL)
+      .then(response => response.text())
+      .then(csv => {
+        const rows = csv.split("\n").map(row => row.split(","));
+        const headers = rows[0];
+        quizData = rows.slice(1).map(row => {
+          let obj = {};
+          headers.forEach((key, i) => obj[key.trim()] = row[i]?.trim());
+          return obj;
+        }).filter(q => q.Topic && q.Subtopic);
+        populateTopics();
+      });
+
+    function populateTopics() {
+      const topicSelect = document.getElementById("topicSelect");
+      const topics = [...new Set(quizData.map(q => q.Topic))];
+      topicSelect.innerHTML = "";
+      topics.forEach(topic => {
+        const option = document.createElement("option");
+        option.value = topic;
+        option.textContent = topic;
+        topicSelect.appendChild(option);
+      });
+      topicSelect.addEventListener("change", populateSubtopics);
+      populateSubtopics();
+    }
+
+    function populateSubtopics() {
+      const selectedTopic = document.getElementById("topicSelect").value;
+      const subtopicSelect = document.getElementById("subtopicSelect");
+      const filtered = quizData.filter(q => q.Topic === selectedTopic);
+      const subtopics = [...new Set(filtered.map(q => q.Subtopic))];
+      subtopicSelect.innerHTML = "";
+      subtopics.forEach(sub => {
+        const option = document.createElement("option");
+        option.value = sub;
+        option.textContent = sub;
+        subtopicSelect.appendChild(option);
+      });
+    }
+
+    document.getElementById("startQuizBtn").addEventListener("click", function () {
+      const lang = document.getElementById("languageSelect").value;
+      const topic = document.getElementById("topicSelect").value;
+      const subtopic = document.getElementById("subtopicSelect").value;
+      alert(`Starting quiz:\nLanguage: ${lang}\nTopic: ${topic}\nSubtopic: ${subtopic}`);
+      // Future: Load questions from quizData here
+    });
+  </script>
+
+</body>
+</html>
