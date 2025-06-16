@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClearExams</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: #fff;
+      color: #000;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      border-radius: 20px;
+      padding: 38px 30px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      border: 1.5px solid #000;
+    }
+    .logo {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 10px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #000;
+      color: #fff;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 12px;
+      color: #000;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    label {
+      font-size: 15px;
+      margin-bottom: 6px;
+      color: #222;
+      font-weight: 500;
+    }
+    select {
+      width: 100%;
+      padding: 13px 12px;
+      border: 1.5px solid #000;
+      border-radius: 12px;
+      font-size: 16px;
+      background-color: #fff;
+      color: #000;
+      margin-bottom: 6px;
+      appearance: none;
+    }
+    select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #000;
+    }
+    button {
+      margin-top: 25px;
+      padding: 16px 0;
+      background: #fff;
+      color: #000;
+      border: 2px solid #000;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background: #000;
+      color: #fff;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    button:disabled:hover {
+      background: #fff;
+      color: #000;
+    }
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0,0,0,0.3);
+      border-radius: 50%;
+      border-top-color: #000;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error-message {
+      color: #ff3333;
+      background: rgba(255,0,0,0.05);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255,0,0,0.1);
+      display: none;
+    }
+    @media (max-width: 500px) {
+      .container {
+        padding: 20px 15px;
+      }
+      h2 {
+        font-size: 22px;
+      }
+      button {
+        font-size: 16px;
+        padding: 14px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">CE</div>
+    <h2>ClearExams</h2>
+    
+    <div class="error-message" id="errorMessage"></div>
+    
+    <label for="topicSelect">Topic</label>
+    <select id="topicSelect" disabled>
+      <option value="">Loading topics...</option>
+    </select>
+    
+    <label for="subtopicSelect">Subtopic</label>
+    <select id="subtopicSelect" disabled>
+      <option value="">Select a topic first</option>
+    </select>
+    
+    <button id="startQuizBtn" disabled>
+      <span id="buttonText">Start Quiz</span>
+      <span id="buttonLoader" class="loading" style="display: none;"></span>
+    </button>
+  </div>
+
+  <script>
+    // Main configuration
+    const config = {
+      googleSheetUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHZc4XKsA7NeFUs9YppeBSchqG01tWIzVrCnvbydr1t-qqUnd8RlOe-EypAn8m4trcvaQ0OR-4WzEN/pub?gid=0&single=true&output=csv",
+      corsProxyUrl: "https://api.allorigins.win/raw?url=",
+      fallbackData: `Topics,Subtopics,Question,OptionA,OptionB,OptionC,OptionD
+Science,Physics,What is Newton's First Law?,An object at rest stays at rest,An object in motion stays in motion,For every action there is an equal reaction,Energy cannot be created or destroyed
+History,India,When did India gain independence?,1945,1947,1950,1935
+Maths,Algebra,What is 2+2?,3,4,5,6`
+    };
+
+    // DOM elements
+    const elements = {
+      errorMessage: document.getElementById('errorMessage'),
+      topicSelect: document.getElementById('topicSelect'),
+      subtopicSelect: document.getElementById('subtopicSelect'),
+      startQuizBtn: document.getElementById('startQuizBtn'),
+      buttonText: document.getElementById('buttonText'),
+      buttonLoader: document.getElementById('buttonLoader')
+    };
+
+    // Quiz data store
+    let quizData = [];
+
+    // Initialize the application
+    function init() {
+      setupEventListeners();
+      loadQuizData();
+    }
+
+    // Set up event listeners
+    function setupEventListeners() {
+      elements.topicSelect.addEventListener('change', populateSubtopics);
+      elements.subtopicSelect.addEventListener('change', updateStartButtonState);
+      elements.startQuizBtn.addEventListener('click', startQuiz);
+    }
+
+    // Load quiz data with fallback mechanisms
+    async function loadQuizData() {
+      showLoading(true, "Loading quiz data...");
+      
+      try {
+        // Try loading from Google Sheets via CORS proxy
+        const response = await fetch(`${config.corsProxyUrl}${encodeURIComponent(config.googleSheetUrl)}`);
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const csv = await response.text();
+        processQuizData(csv);
+      } catch (error) {
+        console.error("Failed to load from Google Sheets:", error);
+        
+        // Fallback to local data
+        try {
+          processQuizData(config.fallbackData);
+          elements.errorMessage.textContent = "Using sample data (couldn't connect to server)";
+          elements.errorMessage.style.display = 'block';
+        } catch (fallbackError) {
+          console.error("Failed to process fallback data:", fallbackError);
+          showError("Failed to load quiz data. Please check your connection.");
+        }
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Process CSV data into quiz format
+    function processQuizData(csv) {
+      const rows = parseCSV(csv);
+      const headers = rows[0].map(header => header.trim());
+      
+      quizData = rows.slice(1)
+        .map(row => {
+          const question = {};
+          headers.forEach((header, index) => {
+            question[header.toLowerCase()] = (row[index] || '').trim();
+          });
+          return question;
+        })
+        .filter(q => q.topics && q.subtopics && q.question);
+      
+      if (quizData.length === 0) {
+        throw new Error('No valid questions found in the data');
+      }
+      
+      populateTopics();
+    }
+
+    // Improved CSV parser
+    function parseCSV(csv) {
+      const rows = [];
+      let currentRow = [];
+      let inQuotes = false;
+      let currentValue = '';
+      
+      for (let i = 0; i < csv.length; i++) {
+        const char = csv[i];
+        
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          currentRow.push(currentValue);
+          currentValue = '';
+        } else if (char === '\n' && !inQuotes) {
+          currentRow.push(currentValue);
+          rows.push(currentRow);
+          currentRow = [];
+          currentValue = '';
+        } else {
+          currentValue += char;
+        }
+      }
+      
+      // Add the last row
+      if (currentValue || currentRow.length) {
+        currentRow.push(currentValue);
+        rows.push(currentRow);
+      }
+      
+      return rows;
+    }
+
+    // Populate topics dropdown
+    function populateTopics() {
+      elements.topicSelect.innerHTML = '';
+      
+      // Add default option
+      addOption(elements.topicSelect, '', '-- Select Topic --', true);
+      
+      // Get unique topics
+      const topics = [...new Set(quizData.map(q => q.topics))].sort();
+      
+      // Add topic options
+      topics.forEach(topic => {
+        addOption(elements.topicSelect, topic, topic);
+      });
+      
+      // Enable topic select
+      elements.topicSelect.disabled = false;
+      updateStartButtonState();
+    }
+
+    // Populate subtopics based on selected topic
+    function populateSubtopics() {
+      const selectedTopic = elements.topicSelect.value;
+      elements.subtopicSelect.innerHTML = '';
+      
+      // Add default option
+      addOption(
+        elements.subtopicSelect, 
+        '', 
+        selectedTopic ? '-- Select Subtopic --' : '-- Select Topic First --',
+        true
+      );
+      
+      if (selectedTopic) {
+        // Get unique subtopics for selected topic
+        const subtopics = [...new Set(
+          quizData
+            .filter(q => q.topics === selectedTopic)
+            .map(q => q.subtopics)
+        )].sort();
+        
+        // Add subtopic options
+        subtopics.forEach(subtopic => {
+          addOption(elements.subtopicSelect, subtopic, subtopic);
+        });
+      }
+      
+      elements.subtopicSelect.disabled = !selectedTopic;
+      updateStartButtonState();
+    }
+
+    // Helper to add options to select elements
+    function addOption(selectElement, value, text, disabled = false) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = text;
+      option.disabled = disabled;
+      option.selected = disabled;
+      selectElement.appendChild(option);
+    }
+
+    // Update start button state based on selections
+    function updateStartButtonState() {
+      elements.startQuizBtn.disabled = !(
+        elements.topicSelect.value && 
+        elements.subtopicSelect.value
+      );
+    }
+
+    // Start the quiz
+    function startQuiz() {
+      const topic = elements.topicSelect.value;
+      const subtopic = elements.subtopicSelect.value;
+      
+      // Validate selections
+      if (!topic || !subtopic) {
+        showError("Please select both a topic and subtopic");
+        return;
+      }
+      
+      // Filter questions for selected topic/subtopic
+      const questions = quizData.filter(q => 
+        q.topics === topic && 
+        q.subtopics === subtopic
+      );
+      
+      if (questions.length === 0) {
+        showError("No questions found for this selection");
+        return;
+      }
+      
+      showLoading(true, "Preparing quiz...");
+      
+      // Store questions for the quiz page
+      localStorage.setItem('quizQuestions', JSON.stringify(questions));
+      localStorage.setItem('quizSettings', JSON.stringify({
+        topic,
+        subtopic,
+        timestamp: new Date().toISOString()
+      }));
+      
+      // Simulate loading before redirect
+      setTimeout(() => {
+        showLoading(false);
+        window.location.href = "quiz.html";
+        // In a complete implementation, uncomment this:
+        // window.location.href = "quiz.html";
+      }, 1000);
+    }
+
+    // Show loading state
+    function showLoading(isLoading, message = "Loading...") {
+      if (isLoading) {
+        elements.buttonText.textContent = message;
+        elements.buttonLoader.style.display = 'inline-block';
+        elements.startQuizBtn.disabled = true;
+      } else {
+        elements.buttonText.textContent = "Start Quiz";
+        elements.buttonLoader.style.display = 'none';
+        updateStartButtonState();
+      }
+    }
+
+    // Show error message
+    function showError(message) {
+      elements.errorMessage.textContent = message;
+      elements.errorMessage.style.display = 'block';
+      setTimeout(() => {
+        elements.errorMessage.style.display = 'none';
+      }, 5000);
+    }
+
+    // Start the application
+    init();
+  </script>
+</body>
+</html>

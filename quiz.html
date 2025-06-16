@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+      color: #333;
+    }
+    .quiz-container {
+      background: #fff;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    .option {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      background: #eee;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .option:hover {
+      background: #ddd;
+    }
+    .selected {
+      background: #cce5ff;
+    }
+    .button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .button:disabled {
+      background: #999;
+    }
+    .score {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <h2 id="questionText">Loading...</h2>
+  <div id="optionsContainer"></div>
+  <button id="nextBtn" class="button" disabled>Next</button>
+  <div id="scoreContainer" class="score"></div>
+</div>
+
+<script>
+  const questions = JSON.parse(localStorage.getItem("quizQuestions")) || [];
+  let current = 0;
+  let score = 0;
+  let selectedOption = null;
+
+  const questionText = document.getElementById("questionText");
+  const optionsContainer = document.getElementById("optionsContainer");
+  const nextBtn = document.getElementById("nextBtn");
+  const scoreContainer = document.getElementById("scoreContainer");
+
+  function showQuestion() {
+    nextBtn.disabled = true;
+    selectedOption = null;
+    scoreContainer.textContent = "";
+
+    const q = questions[current];
+    questionText.textContent = `Q${current + 1}: ${q.question}`;
+    
+    optionsContainer.innerHTML = "";
+
+    ["optiona", "optionb", "optionc", "optiond"].forEach(key => {
+      const btn = document.createElement("div");
+      btn.className = "option";
+      btn.textContent = q[key];
+      btn.onclick = () => {
+        document.querySelectorAll(".option").forEach(opt => opt.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedOption = q[key];
+        nextBtn.disabled = false;
+      };
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  nextBtn.onclick = () => {
+    const correct = questions[current].optionb; // You can change this logic to match correct answer tracking
+    if (selectedOption === correct) score++;
+
+    current++;
+    if (current < questions.length) {
+      showQuestion();
+    } else {
+      questionText.textContent = "Quiz Completed!";
+      optionsContainer.innerHTML = "";
+      nextBtn.style.display = "none";
+      scoreContainer.textContent = `Your score: ${score} / ${questions.length}`;
+    }
+  };
+
+  if (questions.length > 0) {
+    showQuestion();
+  } else {
+    questionText.textContent = "No quiz data found.";
+  }
+</script>
+
+</body>
+</html>
