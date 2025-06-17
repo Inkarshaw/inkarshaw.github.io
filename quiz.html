@@ -117,11 +117,12 @@
   // Get quiz data from localStorage
   const quizData = JSON.parse(localStorage.getItem("quizQuestions")) || [];
   const quizSettings = JSON.parse(localStorage.getItem("quizSettings")) || {};
-  
+
   let currentQuestionIndex = 0;
   let score = 0;
   let selectedOption = null;
   let userAnswers = [];
+  let answered = false; // Track if current question has been answered
 
   // DOM elements
   const questionText = document.getElementById("questionText");
@@ -138,23 +139,23 @@
       showError("No quiz questions found. Please return to the main page.");
       return;
     }
-    
+
     // Display quiz topic info
     if (quizSettings.topic && quizSettings.subtopic) {
       document.title = `${quizSettings.topic} - ${quizSettings.subtopic} Quiz`;
     }
-    
+
     showQuestion();
   }
 
   // Display current question
   function showQuestion() {
     resetQuestionState();
-    
+
     const question = quizData[currentQuestionIndex];
     progressText.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
     questionText.textContent = question.question;
-    
+
     // Create option buttons
     ['optiona', 'optionb', 'optionc', 'optiond'].forEach((key, index) => {
       const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
@@ -162,7 +163,7 @@
       btn.className = "option";
       btn.dataset.option = optionLetter;
       btn.innerHTML = `<strong>${optionLetter}:</strong> ${question[key]}`;
-      
+
       btn.onclick = () => selectOption(btn, optionLetter, question[key]);
       optionsContainer.appendChild(btn);
     });
@@ -174,97 +175,57 @@
     document.querySelectorAll(".option").forEach(opt => {
       opt.classList.remove("selected");
     });
-    
+
     // Select clicked option
     btn.classList.add("selected");
     selectedOption = optionLetter;
     nextBtn.disabled = false;
   }
 
-  // Move to next question or show results
+  // Handle next button (check answer or go to next)
   function nextQuestion() {
-    let answered = false;
+    if (!answered) {
+      // First click: check answer
+      const question = quizData[currentQuestionIndex];
+      const isCorrect = selectedOption === question.correctanswer?.toUpperCase();
 
-function nextQuestion() {
-  if (!answered) {
-    // First click: check answer
-    const question = quizData[currentQuestionIndex];
-    const isCorrect = selectedOption === question.correctanswer?.toUpperCase();
+      userAnswers.push({
+        question: question.question,
+        selected: selectedOption,
+        correct: question.correctanswer,
+        isCorrect,
+        explanation: question.explanation
+      });
 
-    userAnswers.push({
-      question: question.question,
-      selected: selectedOption,
-      correct: question.correctanswer,
-      isCorrect,
-      explanation: question.explanation
-    });
+      if (isCorrect) score++;
 
-    if (isCorrect) score++;
+      // Show feedback
+      document.querySelectorAll(".option").forEach(opt => {
+        opt.style.pointerEvents = "none";
+        if (opt.dataset.option === question.correctanswer?.toUpperCase()) {
+          opt.classList.add("correct-answer");
+        } else if (opt.dataset.option === selectedOption && !isCorrect) {
+          opt.classList.add("incorrect-answer");
+        }
+      });
 
-    showAnswerFeedback(isCorrect, question);
-
-    document.querySelectorAll(".option").forEach(opt => {
-      opt.style.pointerEvents = "none";
-      if (opt.dataset.option === question.correctanswer?.toUpperCase()) {
-        opt.classList.add("correct-answer");
-      } else if (opt.dataset.option === selectedOption && !isCorrect) {
-        opt.classList.add("incorrect-answer");
+      // Show explanation if available
+      if (question.explanation) {
+        explanationContainer.textContent = question.explanation;
+        explanationContainer.style.display = "block";
       }
-    });
 
-    if (question.explanation) {
-      explanationContainer.textContent = question.explanation;
-      explanationContainer.style.display = "block";
-    }
-
-    nextBtn.textContent = currentQuestionIndex < quizData.length - 1 ? "Next" : "See Results";
-    answered = true;
-  } else {
-    // Second click: go to next question
-    currentQuestionIndex++;
-    if (currentQuestionIndex < quizData.length) {
-      showQuestion();
-      answered = false;
+      nextBtn.textContent = currentQuestionIndex < quizData.length - 1 ? "Next" : "See Results";
+      answered = true;
     } else {
-      showResults();
-    }
-  }
-}
-    
-    // Store user answer
-    userAnswers.push({
-      question: question.question,
-      selected: selectedOption,
-      correct: question.correctanswer,
-      isCorrect,
-      explanation: question.explanation
-    });
-    
-    // Update score if correct
-    if (isCorrect) score++;
-    
-    // Show feedback
-    showAnswerFeedback(isCorrect, question);
-    
-    // Disable options and show explanation
-    document.querySelectorAll(".option").forEach(opt => {
-      opt.style.pointerEvents = "none";
-      if (opt.dataset.option === question.correctanswer?.toUpperCase()) {
-        opt.classList.add("correct-answer");
-      } else if (opt.dataset.option === selectedOption && !isCorrect) {
-        opt.classList.add("incorrect-answer");
+      // Second click: go to next question or results
+      currentQuestionIndex++;
+      if (currentQuestionIndex < quizData.length) {
+        showQuestion();
+      } else {
+        showResults();
       }
-    });
-    
-    // Show explanation if available
-    if (question.explanation) {
-      explanationContainer.textContent = question.explanation;
-      explanationContainer.style.display = "block";
     }
-    
-    // Update button text
-    nextBtn.textContent = currentQuestionIndex < quizData.length - 1 ? "Next" : "See Results";
-    nextBtn.onclick = currentQuestionIndex < quizData.length - 1 ? nextQuestion : showResults;
   }
 
   // Show final results
@@ -274,13 +235,13 @@ function nextQuestion() {
     optionsContainer.innerHTML = "";
     explanationContainer.style.display = "none";
     nextBtn.style.display = "none";
-    
+
     const percentage = Math.round((score / quizData.length) * 100);
     scoreContainer.innerHTML = `
       Your score: <strong>${score} / ${quizData.length}</strong> (${percentage}%)<br><br>
       <small>Topic: ${quizSettings.topic || 'Unknown'} - ${quizSettings.subtopic || 'Unknown'}</small>
     `;
-    
+
     restartBtn.style.display = "block";
   }
 
@@ -293,6 +254,7 @@ function nextQuestion() {
     nextBtn.textContent = "Next";
     nextBtn.onclick = nextQuestion;
     selectedOption = null;
+    answered = false;
   }
 
   // Show error message
