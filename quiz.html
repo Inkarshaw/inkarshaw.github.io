@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz</title>
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+      color: #333;
+    }
+    .quiz-container {
+      background: #fff;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border: 1.5px solid #000;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #000;
+      font-size: 1.5rem;
+    }
+    .option {
+      display: block;
+      margin: 10px 0;
+      padding: 12px 15px;
+      background: #fff;
+      border: 1.5px solid #000;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .option:hover {
+      background: #f0f0f0;
+    }
+    .selected {
+      background: #000;
+      color: #fff;
+    }
+    .correct-answer {
+      background: #4CAF50;
+      color: white;
+      border-color: #4CAF50;
+    }
+    .incorrect-answer {
+      background: #f44336;
+      color: white;
+      border-color: #f44336;
+    }
+    .button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    .button:hover {
+      opacity: 0.9;
+    }
+    .button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+    .score {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .progress {
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+    .explanation {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f8f8f8;
+      border-radius: 8px;
+      border-left: 4px solid #000;
+      display: none;
+    }
+    .restart-btn {
+      background: #fff;
+      color: #000;
+      border: 2px solid #000;
+      margin-top: 30px;
+    }
+    .restart-btn:hover {
+      background: #000;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <div class="progress" id="progressText">Question 1 of 10</div>
+  <h2 id="questionText">Loading question...</h2>
+  <div id="optionsContainer"></div>
+  <div id="explanationContainer" class="explanation"></div>
+  <button id="nextBtn" class="button" disabled>Next</button>
+  <div id="scoreContainer" class="score"></div>
+  <button id="restartBtn" class="button restart-btn" style="display: none;">Restart Quiz</button>
+</div>
+
+<script>
+  // Get quiz data from localStorage
+  const quizData = JSON.parse(localStorage.getItem("quizQuestions")) || [];
+  const quizSettings = JSON.parse(localStorage.getItem("quizSettings")) || {};
+  
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let selectedOption = null;
+  let userAnswers = [];
+
+  // DOM elements
+  const questionText = document.getElementById("questionText");
+  const optionsContainer = document.getElementById("optionsContainer");
+  const nextBtn = document.getElementById("nextBtn");
+  const scoreContainer = document.getElementById("scoreContainer");
+  const progressText = document.getElementById("progressText");
+  const explanationContainer = document.getElementById("explanationContainer");
+  const restartBtn = document.getElementById("restartBtn");
+
+  // Initialize the quiz
+  function initQuiz() {
+    if (quizData.length === 0) {
+      showError("No quiz questions found. Please return to the main page.");
+      return;
+    }
+    
+    // Display quiz topic info
+    if (quizSettings.topic && quizSettings.subtopic) {
+      document.title = `${quizSettings.topic} - ${quizSettings.subtopic} Quiz`;
+    }
+    
+    showQuestion();
+  }
+
+  // Display current question
+  function showQuestion() {
+    resetQuestionState();
+    
+    const question = quizData[currentQuestionIndex];
+    progressText.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+    questionText.textContent = question.question;
+    
+    // Create option buttons
+    ['optiona', 'optionb', 'optionc', 'optiond'].forEach((key, index) => {
+      const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
+      const btn = document.createElement("div");
+      btn.className = "option";
+      btn.dataset.option = optionLetter;
+      btn.innerHTML = `<strong>${optionLetter}:</strong> ${question[key]}`;
+      
+      btn.onclick = () => selectOption(btn, optionLetter, question[key]);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  // Handle option selection
+  function selectOption(btn, optionLetter, optionText) {
+    // Deselect all options first
+    document.querySelectorAll(".option").forEach(opt => {
+      opt.classList.remove("selected");
+    });
+    
+    // Select clicked option
+    btn.classList.add("selected");
+    selectedOption = optionLetter;
+    nextBtn.disabled = false;
+  }
+
+  // Move to next question or show results
+  function nextQuestion() {
+    const question = quizData[currentQuestionIndex];
+    const isCorrect = selectedOption === question.correctanswer?.toUpperCase();
+    
+    // Store user answer
+    userAnswers.push({
+      question: question.question,
+      selected: selectedOption,
+      correct: question.correctanswer,
+      isCorrect,
+      explanation: question.explanation
+    });
+    
+    // Update score if correct
+    if (isCorrect) score++;
+    
+    // Show feedback
+    showAnswerFeedback(isCorrect, question);
+    
+    // Disable options and show explanation
+    document.querySelectorAll(".option").forEach(opt => {
+      opt.style.pointerEvents = "none";
+      if (opt.dataset.option === question.correctanswer?.toUpperCase()) {
+        opt.classList.add("correct-answer");
+      } else if (opt.dataset.option === selectedOption && !isCorrect) {
+        opt.classList.add("incorrect-answer");
+      }
+    });
+    
+    // Show explanation if available
+    if (question.explanation) {
+      explanationContainer.textContent = question.explanation;
+      explanationContainer.style.display = "block";
+    }
+    
+    // Update button text
+    nextBtn.textContent = currentQuestionIndex < quizData.length - 1 ? "Next" : "See Results";
+    nextBtn.onclick = currentQuestionIndex < quizData.length - 1 ? nextQuestion : showResults;
+  }
+
+  // Show final results
+  function showResults() {
+    questionText.textContent = "Quiz Completed!";
+    progressText.textContent = "";
+    optionsContainer.innerHTML = "";
+    explanationContainer.style.display = "none";
+    nextBtn.style.display = "none";
+    
+    const percentage = Math.round((score / quizData.length) * 100);
+    scoreContainer.innerHTML = `
+      Your score: <strong>${score} / ${quizData.length}</strong> (${percentage}%)<br><br>
+      <small>Topic: ${quizSettings.topic || 'Unknown'} - ${quizSettings.subtopic || 'Unknown'}</small>
+    `;
+    
+    restartBtn.style.display = "block";
+  }
+
+  // Reset question state
+  function resetQuestionState() {
+    optionsContainer.innerHTML = "";
+    explanationContainer.style.display = "none";
+    explanationContainer.textContent = "";
+    nextBtn.disabled = true;
+    nextBtn.textContent = "Next";
+    nextBtn.onclick = nextQuestion;
+    selectedOption = null;
+  }
+
+  // Show error message
+  function showError(message) {
+    questionText.textContent = message;
+    optionsContainer.innerHTML = `
+      <button class="button" onclick="window.location.href='index.html'">Return to Main Page</button>
+    `;
+    nextBtn.style.display = "none";
+  }
+
+  // Restart quiz
+  restartBtn.onclick = () => {
+    currentQuestionIndex = 0;
+    score = 0;
+    userAnswers = [];
+    showQuestion();
+    scoreContainer.textContent = "";
+    restartBtn.style.display = "none";
+    nextBtn.style.display = "block";
+  };
+
+  // Start the quiz
+  initQuiz();
+</script>
+
+</body>
+</html>
