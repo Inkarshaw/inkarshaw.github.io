@@ -10,6 +10,11 @@
       padding: 20px;
       background: #f7f7f7;
       color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.night-mode {
+      background: #121212;
+      color: #e0e0e0;
     }
     .quiz-container {
       background: #fff;
@@ -19,11 +24,20 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       border: 1.5px solid #000;
+      transition: all 0.3s;
+    }
+    .night-mode .quiz-container {
+      background: #1e1e1e;
+      border-color: #444;
     }
     h2 {
       margin-bottom: 20px;
       color: #000;
       font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+    .night-mode h2 {
+      color: #e0e0e0;
     }
     .option {
       display: block;
@@ -35,12 +49,22 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+    .night-mode .option {
+      background: #2d2d2d;
+      border-color: #444;
+    }
     .option:hover {
       background: #f0f0f0;
+    }
+    .night-mode .option:hover {
+      background: #333;
     }
     .selected {
       background: #000;
       color: #fff;
+    }
+    .night-mode .selected {
+      background: #444;
     }
     .correct-answer {
       background: #4CAF50;
@@ -63,6 +87,9 @@
       font-weight: bold;
       font-size: 1rem;
       transition: all 0.3s;
+    }
+    .night-mode .button {
+      background: #444;
     }
     .button:hover {
       opacity: 0.9;
@@ -88,6 +115,11 @@
       border-radius: 8px;
       border-left: 4px solid #000;
       display: none;
+      transition: all 0.3s;
+    }
+    .night-mode .explanation {
+      background: #2d2d2d;
+      border-left-color: #444;
     }
     .restart-btn {
       background: #fff;
@@ -95,20 +127,36 @@
       border: 2px solid #000;
       margin-top: 30px;
     }
+    .night-mode .restart-btn {
+      background: #2d2d2d;
+      color: #e0e0e0;
+      border-color: #444;
+    }
     .restart-btn:hover {
       background: #000;
       color: #fff;
+    }
+    .night-mode .restart-btn:hover {
+      background: #444;
     }
     .review-container {
       margin-top: 30px;
       border-top: 1px solid #ddd;
       padding-top: 20px;
+      transition: border-color 0.3s;
+    }
+    .night-mode .review-container {
+      border-top-color: #444;
     }
     .review-item {
       margin-bottom: 20px;
       padding: 15px;
       border-radius: 8px;
       background: #f9f9f9;
+      transition: all 0.3s;
+    }
+    .night-mode .review-item {
+      background: #2d2d2d;
     }
     .review-question {
       font-weight: bold;
@@ -123,10 +171,25 @@
     .incorrect {
       color: #f44336;
     }
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #000;
+      transition: color 0.3s;
+    }
+    .night-mode .theme-toggle {
+      color: #e0e0e0;
+    }
   </style>
 </head>
 <body>
 
+<button class="theme-toggle" id="themeToggle">🌓</button>
 <div class="quiz-container">
   <div class="progress" id="progressText">Question 1 of 10</div>
   <h2 id="questionText">Loading question...</h2>
@@ -155,6 +218,8 @@
   const progressText = document.getElementById("progressText");
   const reviewContainer = document.getElementById("reviewContainer");
   const restartBtn = document.getElementById("restartBtn");
+  const themeToggle = document.getElementById("themeToggle");
+  const body = document.body;
 
   // Initialize the quiz
   function initQuiz() {
@@ -166,7 +231,30 @@
     if (quizSettings.topic && quizSettings.subtopic) {
       document.title = `${quizSettings.topic} - ${quizSettings.subtopic} Quiz`;
     }
+    loadThemePreference();
+    setupEventListeners();
     showQuestion();
+  }
+
+  // Theme management
+  function loadThemePreference() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'night-mode') {
+      body.classList.add('night-mode');
+    }
+  }
+
+  function toggleTheme() {
+    body.classList.toggle('night-mode');
+    const isNightMode = body.classList.contains('night-mode');
+    localStorage.setItem('theme', isNightMode ? 'night-mode' : 'light-mode');
+  }
+
+  // Set up event listeners
+  function setupEventListeners() {
+    nextBtn.addEventListener("click", nextQuestion);
+    restartBtn.addEventListener("click", restartQuiz);
+    themeToggle.addEventListener("click", toggleTheme);
   }
 
   // Display current question
@@ -294,7 +382,7 @@
   }
 
   // Restart quiz
-  restartBtn.onclick = () => {
+  function restartQuiz() {
     currentQuestionIndex = 0;
     score = 0;
     userAnswers = [];
@@ -304,10 +392,7 @@
     reviewContainer.innerHTML = "";
     restartBtn.style.display = "none";
     nextBtn.style.display = "block";
-  };
-
-  // Set up event listeners
-  nextBtn.addEventListener("click", nextQuestion);
+  }
 
   // Start the quiz
   initQuiz();
