@@ -20,6 +20,11 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.night-mode {
+      background: #121212;
+      color: #e0e0e0;
     }
     .container {
       background: #fff;
@@ -32,6 +37,11 @@
       flex-direction: column;
       gap: 18px;
       border: 1.5px solid #000;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .night-mode .container {
+      background: #1e1e1e;
+      border-color: #444;
     }
     .logo {
       width: 54px;
@@ -45,6 +55,10 @@
       color: #fff;
       font-size: 2rem;
       font-weight: bold;
+      transition: background 0.3s;
+    }
+    .night-mode .logo {
+      background: #444;
     }
     h2 {
       text-align: center;
@@ -52,12 +66,20 @@
       color: #000;
       font-size: 26px;
       font-weight: 600;
+      transition: color 0.3s;
+    }
+    .night-mode h2 {
+      color: #e0e0e0;
     }
     label {
       font-size: 15px;
       margin-bottom: 6px;
       color: #222;
       font-weight: 500;
+      transition: color 0.3s;
+    }
+    .night-mode label {
+      color: #bbb;
     }
     select {
       width: 100%;
@@ -69,10 +91,19 @@
       color: #000;
       margin-bottom: 6px;
       appearance: none;
+      transition: all 0.3s;
+    }
+    .night-mode select {
+      background-color: #2d2d2d;
+      color: #e0e0e0;
+      border-color: #444;
     }
     select:focus {
       outline: none;
       box-shadow: 0 0 0 2px #000;
+    }
+    .night-mode select:focus {
+      box-shadow: 0 0 0 2px #666;
     }
     button {
       margin-top: 25px;
@@ -86,8 +117,17 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
+    .night-mode button {
+      background: #2d2d2d;
+      color: #e0e0e0;
+      border-color: #444;
+    }
     button:hover {
       background: #000;
+      color: #fff;
+    }
+    .night-mode button:hover {
+      background: #444;
       color: #fff;
     }
     button:disabled {
@@ -97,6 +137,10 @@
     button:disabled:hover {
       background: #fff;
       color: #000;
+    }
+    .night-mode button:disabled:hover {
+      background: #2d2d2d;
+      color: #e0e0e0;
     }
     .loading {
       display: inline-block;
@@ -108,9 +152,10 @@
       animation: spin 1s ease-in-out infinite;
       margin-left: 10px;
       vertical-align: middle;
+      transition: border-color 0.3s;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .night-mode .loading {
+      border-top-color: #e0e0e0;
     }
     .error-message {
       color: #ff3333;
@@ -121,6 +166,26 @@
       margin-bottom: 10px;
       border: 1px solid rgba(255,0,0,0.1);
       display: none;
+    }
+    .night-mode .error-message {
+      background: rgba(255,0,0,0.1);
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #000;
+      transition: color 0.3s;
+    }
+    .night-mode .theme-toggle {
+      color: #e0e0e0;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
     @media (max-width: 500px) {
       .container {
@@ -137,6 +202,7 @@
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle">🌓</button>
   <div class="container">
     <div class="logo">CE</div>
     <h2>ClearExams</h2>
@@ -177,7 +243,9 @@ Maths,Algebra,What is 2+2?,3,4,5,6`
       subtopicSelect: document.getElementById('subtopicSelect'),
       startQuizBtn: document.getElementById('startQuizBtn'),
       buttonText: document.getElementById('buttonText'),
-      buttonLoader: document.getElementById('buttonLoader')
+      buttonLoader: document.getElementById('buttonLoader'),
+      themeToggle: document.getElementById('themeToggle'),
+      body: document.body
     };
 
     // Quiz data store
@@ -187,6 +255,7 @@ Maths,Algebra,What is 2+2?,3,4,5,6`
     function init() {
       setupEventListeners();
       loadQuizData();
+      loadThemePreference();
     }
 
     // Set up event listeners
@@ -194,6 +263,21 @@ Maths,Algebra,What is 2+2?,3,4,5,6`
       elements.topicSelect.addEventListener('change', populateSubtopics);
       elements.subtopicSelect.addEventListener('change', updateStartButtonState);
       elements.startQuizBtn.addEventListener('click', startQuiz);
+      elements.themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    // Theme management
+    function loadThemePreference() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'night-mode') {
+        elements.body.classList.add('night-mode');
+      }
+    }
+
+    function toggleTheme() {
+      elements.body.classList.toggle('night-mode');
+      const isNightMode = elements.body.classList.contains('night-mode');
+      localStorage.setItem('theme', isNightMode ? 'night-mode' : 'light-mode');
     }
 
     // Load quiz data with fallback mechanisms
@@ -386,8 +470,6 @@ Maths,Algebra,What is 2+2?,3,4,5,6`
       setTimeout(() => {
         showLoading(false);
         window.location.href = "quiz.html";
-        // In a complete implementation, uncomment this:
-        // window.location.href = "quiz.html";
       }, 1000);
     }
 
