@@ -99,6 +99,30 @@
       background: #000;
       color: #fff;
     }
+    .review-container {
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+    }
+    .review-item {
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+    .review-question {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .review-answer {
+      margin-left: 15px;
+    }
+    .correct {
+      color: #4CAF50;
+    }
+    .incorrect {
+      color: #f44336;
+    }
   </style>
 </head>
 <body>
@@ -107,9 +131,9 @@
   <div class="progress" id="progressText">Question 1 of 10</div>
   <h2 id="questionText">Loading question...</h2>
   <div id="optionsContainer"></div>
-  <div id="explanationContainer" class="explanation"></div>
   <button id="nextBtn" class="button" disabled>Next</button>
   <div id="scoreContainer" class="score"></div>
+  <div id="reviewContainer" class="review-container" style="display: none;"></div>
   <button id="restartBtn" class="button restart-btn" style="display: none;">Restart Quiz</button>
 </div>
 
@@ -122,7 +146,6 @@
   let score = 0;
   let selectedOption = null;
   let userAnswers = [];
-  let answered = false; // Important for correct next-question logic
 
   // DOM elements
   const questionText = document.getElementById("questionText");
@@ -130,7 +153,7 @@
   const nextBtn = document.getElementById("nextBtn");
   const scoreContainer = document.getElementById("scoreContainer");
   const progressText = document.getElementById("progressText");
-  const explanationContainer = document.getElementById("explanationContainer");
+  const reviewContainer = document.getElementById("reviewContainer");
   const restartBtn = document.getElementById("restartBtn");
 
   // Initialize the quiz
@@ -159,13 +182,13 @@
       btn.className = "option";
       btn.dataset.option = optionLetter;
       btn.innerHTML = `<strong>${optionLetter}:</strong> ${question[key]}`;
-      btn.onclick = () => selectOption(btn, optionLetter, question[key]);
+      btn.onclick = () => selectOption(btn, optionLetter);
       optionsContainer.appendChild(btn);
     });
   }
 
   // Handle option selection
-  function selectOption(btn, optionLetter, optionText) {
+  function selectOption(btn, optionLetter) {
     document.querySelectorAll(".option").forEach(opt => {
       opt.classList.remove("selected");
     });
@@ -174,70 +197,91 @@
     nextBtn.disabled = false;
   }
 
-  // Handle next button (check answer or go to next)
+  // Handle next button
   function nextQuestion() {
-    if (!answered) {
-      // First click: check answer and give feedback
-      const question = quizData[currentQuestionIndex];
-      const isCorrect = selectedOption === question.correctanswer?.toUpperCase();
-      userAnswers.push({
-        question: question.question,
-        selected: selectedOption,
-        correct: question.correctanswer,
-        isCorrect,
-        explanation: question.explanation
-      });
-      if (isCorrect) score++;
-      document.querySelectorAll(".option").forEach(opt => {
-        opt.style.pointerEvents = "none";
-        if (opt.dataset.option === question.correctanswer?.toUpperCase()) {
-          opt.classList.add("correct-answer");
-        } else if (opt.dataset.option === selectedOption && !isCorrect) {
-          opt.classList.add("incorrect-answer");
-        }
-      });
-      if (question.explanation) {
-        explanationContainer.textContent = question.explanation;
-        explanationContainer.style.display = "block";
+    // Record the answer
+    const question = quizData[currentQuestionIndex];
+    const isCorrect = selectedOption === question.correctanswer?.toUpperCase();
+    
+    userAnswers.push({
+      question: question.question,
+      selected: selectedOption,
+      correct: question.correctanswer,
+      isCorrect,
+      explanation: question.explanation,
+      options: {
+        a: question.optiona,
+        b: question.optionb,
+        c: question.optionc,
+        d: question.optiond
       }
-      nextBtn.textContent = currentQuestionIndex < quizData.length - 1 ? "Next" : "See Results";
-      answered = true;
+    });
+    
+    if (isCorrect) score++;
+    
+    // Move to next question or show results
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.length) {
+      showQuestion();
     } else {
-      // Second click: go to next question or results
-      currentQuestionIndex++;
-      if (currentQuestionIndex < quizData.length) {
-        showQuestion();
-      } else {
-        showResults();
-      }
+      showResults();
     }
   }
 
-  // Show final results
+  // Show final results with answer review
   function showResults() {
     questionText.textContent = "Quiz Completed!";
     progressText.textContent = "";
     optionsContainer.innerHTML = "";
-    explanationContainer.style.display = "none";
     nextBtn.style.display = "none";
+    
     const percentage = Math.round((score / quizData.length) * 100);
     scoreContainer.innerHTML = `
       Your score: <strong>${score} / ${quizData.length}</strong> (${percentage}%)<br><br>
       <small>Topic: ${quizSettings.topic || 'Unknown'} - ${quizSettings.subtopic || 'Unknown'}</small>
     `;
+    
+    // Show review of all questions and answers
+    reviewContainer.style.display = "block";
+    reviewContainer.innerHTML = "<h3>Review Answers:</h3>";
+    
+    userAnswers.forEach((answer, index) => {
+      const reviewItem = document.createElement("div");
+      reviewItem.className = "review-item";
+      
+      const questionDiv = document.createElement("div");
+      questionDiv.className = "review-question";
+      questionDiv.textContent = `${index + 1}. ${answer.question}`;
+      
+      const selectedDiv = document.createElement("div");
+      selectedDiv.className = `review-answer ${answer.isCorrect ? 'correct' : 'incorrect'}`;
+      selectedDiv.textContent = `Your answer: ${answer.selected} (${answer.options[answer.selected.toLowerCase()]})`;
+      
+      const correctDiv = document.createElement("div");
+      correctDiv.className = "review-answer correct";
+      correctDiv.textContent = `Correct answer: ${answer.correct} (${answer.options[answer.correct.toLowerCase()]})`;
+      
+      if (answer.explanation) {
+        const explanationDiv = document.createElement("div");
+        explanationDiv.className = "review-answer";
+        explanationDiv.textContent = `Explanation: ${answer.explanation}`;
+        reviewItem.appendChild(explanationDiv);
+      }
+      
+      reviewItem.appendChild(questionDiv);
+      reviewItem.appendChild(selectedDiv);
+      reviewItem.appendChild(correctDiv);
+      reviewContainer.appendChild(reviewItem);
+    });
+    
     restartBtn.style.display = "block";
   }
 
   // Reset question state
   function resetQuestionState() {
     optionsContainer.innerHTML = "";
-    explanationContainer.style.display = "none";
-    explanationContainer.textContent = "";
     nextBtn.disabled = true;
-    nextBtn.textContent = "Next";
-    nextBtn.onclick = nextQuestion;
     selectedOption = null;
-    answered = false;
   }
 
   // Show error message
@@ -256,9 +300,14 @@
     userAnswers = [];
     showQuestion();
     scoreContainer.textContent = "";
+    reviewContainer.style.display = "none";
+    reviewContainer.innerHTML = "";
     restartBtn.style.display = "none";
     nextBtn.style.display = "block";
   };
+
+  // Set up event listeners
+  nextBtn.addEventListener("click", nextQuestion);
 
   // Start the quiz
   initQuiz();
