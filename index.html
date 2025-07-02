@@ -246,6 +246,7 @@ Maths,Algebra,What is 2+2?,3,4,5,6`
       errorMessage: document.getElementById('errorMessage'),
       topicSelect: document.getElementById('topicSelect'),
       subtopicSelect: document.getElementById('subtopicSelect'),
+      questionCountSelect: document.getElementById('questionCountSelect'),
       startQuizBtn: document.getElementById('startQuizBtn'),
       buttonText: document.getElementById('buttonText'),
       buttonLoader: document.getElementById('buttonLoader'),
@@ -429,6 +430,15 @@ Maths,Algebra,What is 2+2?,3,4,5,6`
       option.disabled = disabled;
       option.selected = disabled;
       selectElement.appendChild(option);
+    }
+    
+    function populateTopics() {
+    elements.topicSelect.innerHTML = '';
+    addOption(elements.topicSelect, '', '-- Select Topic --', true);
+    const topics = [...new Set(quizData.map(q => q.topics))].sort();
+    topics.forEach(topic => addOption(elements.topicSelect, topic, topic));
+    elements.topicSelect.disabled = false;
+    updateStartButtonState();
     }
 
     // Update start button state based on selections
