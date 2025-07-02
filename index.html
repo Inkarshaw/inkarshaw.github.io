@@ -440,6 +440,51 @@ Maths,Algebra,What is 2+2?,3,4,5,6`
     elements.topicSelect.disabled = false;
     updateStartButtonState();
     }
+    function populateSubtopics() {
+    const selectedTopic = elements.topicSelect.value;
+    elements.subtopicSelect.innerHTML = '';
+    addOption(elements.subtopicSelect, '', selectedTopic ? '-- Select Subtopic --' : '-- Select Topic First --', true);
+    if (selectedTopic) {
+      const subtopics = [...new Set(
+        quizData.filter(q => q.topics === selectedTopic).map(q => q.subtopics)
+      )].sort();
+      subtopics.forEach(subtopic => addOption(elements.subtopicSelect, subtopic, subtopic));
+    }
+    elements.subtopicSelect.disabled = !selectedTopic;
+    populateQuestionCounts();
+    updateStartButtonState();
+  }
+
+  function populateQuestionCounts() {
+    const selectedTopic = elements.topicSelect.value;
+    const selectedSubtopic = elements.subtopicSelect.value;
+    elements.questionCountSelect.innerHTML = '';
+    if (selectedTopic && selectedSubtopic) {
+      const filtered = quizData.filter(q => q.topics === selectedTopic && q.subtopics === selectedSubtopic);
+      const count = filtered.length;
+      if (count === 0) {
+        addOption(elements.questionCountSelect, '', 'No questions available', true);
+        elements.questionCountSelect.disabled = true;
+      } else {
+        for (let i = 1; i <= count; i++) {
+          addOption(elements.questionCountSelect, i, `${i} question${i > 1 ? 's' : ''}`);
+        }
+        elements.questionCountSelect.disabled = false;
+      }
+    } else {
+      addOption(elements.questionCountSelect, '', 'Select a subtopic first', true);
+      elements.questionCountSelect.disabled = true;
+    }
+    updateStartButtonState();
+  }
+
+  function updateStartButtonState() {
+    elements.startQuizBtn.disabled = !(
+      elements.topicSelect.value &&
+      elements.subtopicSelect.value &&
+      elements.questionCountSelect.value
+    );
+  }
 
     // Update start button state based on selections
     function updateStartButtonState() {
