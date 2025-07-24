@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tnpsc Quiz Platform</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-  <!-- Chart.js for analytics -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --primary-color: #4e73df;
@@ -16,9 +12,6 @@
       --success-color: #28a745;
       --danger-color: #dc3545;
       --warning-color: #ffc107;
-      --dark-bg: #121212;
-      --dark-card: #1e1e1e;
-      --dark-text: #f8f9fa;
     }
     
     body {
@@ -26,15 +19,8 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
       padding-top: 60px;
-      transition: background-color 0.3s, color 0.3s;
     }
     
-    body.dark-mode {
-      background-color: var(--dark-bg);
-      color: var(--dark-text);
-    }
-    
-    /* Navbar styles */
     .navbar {
       background-color: var(--primary-color);
       padding: 10px 20px;
@@ -64,117 +50,6 @@
       margin: 0;
     }
     
-    /* Side menu styles */
-    .side-menu {
-      position: fixed;
-      top: 0;
-      left: -300px;
-      width: 300px;
-      height: 100vh;
-      background-color: white;
-      z-index: 1001;
-      transition: left 0.3s ease;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-      padding: 20px;
-      overflow-y: auto;
-    }
-    
-    .dark-mode .side-menu {
-      background-color: var(--dark-card);
-      color: var(--dark-text);
-    }
-    
-    .side-menu.active {
-      left: 0;
-    }
-    
-    .menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0,0,0,0.5);
-      z-index: 1000;
-      display: none;
-    }
-    
-    .menu-overlay.active {
-      display: block;
-    }
-    
-    .menu-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .dark-mode .menu-header {
-      border-bottom-color: #444;
-    }
-    
-    .close-menu {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    
-    .menu-links {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .menu-links li {
-      margin-bottom: 10px;
-    }
-    
-    .menu-links a {
-      display: block;
-      padding: 10px;
-      color: #333;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-    
-    .dark-mode .menu-links a {
-      color: var(--dark-text);
-    }
-    
-    .menu-links a:hover {
-      background-color: #f0f0f0;
-    }
-    
-    .dark-mode .menu-links a:hover {
-      background-color: #333;
-    }
-    
-    /* Accessibility */
-    .skip-link {
-      position: absolute;
-      top: -40px;
-      left: 0;
-      background: #000;
-      color: white;
-      padding: 8px;
-      z-index: 100;
-    }
-    
-    .skip-link:focus {
-      top: 0;
-    }
-    
-    :focus {
-      outline: 2px solid var(--primary-color);
-      outline-offset: 2px;
-    }
-    
-    /* Main content styles */
     .card {
       transition: transform 0.3s, box-shadow 0.3s;
       border: none;
@@ -184,19 +59,9 @@
       height: 100%;
     }
     
-    .dark-mode .card {
-      background-color: var(--dark-card);
-      color: var(--dark-text);
-    }
-    
     .card:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    }
-    
-    .card-img-top {
-      height: 180px;
-      object-fit: cover;
     }
     
     .btn-primary {
@@ -219,11 +84,6 @@
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
     
-    .dark-mode .quiz-container {
-      background-color: var(--dark-card);
-      box-shadow: 0 0 20px rgba(255,255,255,0.1);
-    }
-    
     .option {
       text-align: left;
       margin-bottom: 10px;
@@ -234,17 +94,9 @@
       border: 1px solid #dee2e6;
     }
     
-    .dark-mode .option {
-      border-color: #444;
-    }
-    
     .option:hover:not(.selected) {
       background-color: #f8f9fa;
       border-color: var(--primary-color);
-    }
-    
-    .dark-mode .option:hover:not(.selected) {
-      background-color: #333;
     }
     
     .selected {
@@ -291,10 +143,6 @@
       font-weight: bold;
     }
     
-    .dark-mode .timer {
-      background-color: #333;
-    }
-    
     .result-card {
       text-align: center;
       padding: 30px;
@@ -322,10 +170,6 @@
       padding: 15px;
       background: #f8f9fa;
       border-radius: 10px;
-    }
-    
-    .dark-mode .question-count-selector {
-      background-color: #333;
     }
     
     .question-count-options {
@@ -388,10 +232,6 @@
       background-color: #f8f9fa;
     }
     
-    .dark-mode .answer-item {
-      background-color: #333;
-    }
-    
     .correct-answer {
       color: var(--success-color);
       font-weight: bold;
@@ -421,20 +261,10 @@
       border: 1px solid #dee2e6;
     }
     
-    .dark-mode .answer-option {
-      border-color: #444;
-    }
-    
     .correct-option {
       background-color: #d4edda;
       border-color: #c3e6cb;
       color: #155724;
-    }
-    
-    .dark-mode .correct-option {
-      background-color: #155724;
-      border-color: #1e7d34;
-      color: white;
     }
     
     .user-selected {
@@ -443,69 +273,13 @@
       color: #721c24;
     }
     
-    .dark-mode .user-selected {
-      background-color: #721c24;
-      border-color: #8f2a37;
-      color: white;
-    }
-    
     .user-correct {
       background-color: #d4edda;
       border-color: #c3e6cb;
       color: #155724;
     }
     
-    .dark-mode .user-correct {
-      background-color: #155724;
-      border-color: #1e7d34;
-      color: white;
-    }
-    
-    /* Micro-interactions */
-    .btn {
-      transition: all 0.2s ease;
-      transform: scale(1);
-    }
-    
-    .btn:active {
-      transform: scale(0.98);
-    }
-    
-    @keyframes correctAnswer {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    
-    .correct {
-      animation: correctAnswer 0.5s ease;
-    }
-    
-    /* Modal styles */
-    .modal-content {
-      border-radius: 10px;
-    }
-    
-    .dark-mode .modal-content {
-      background-color: var(--dark-card);
-      color: var(--dark-text);
-    }
-    
-    /* Social sharing */
-    .social-sharing {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    
-    /* Responsive styles */
     @media (max-width: 768px) {
-      .card-img-top {
-        height: 120px;
-      }
-      
       .quiz-container {
         padding: 20px;
       }
@@ -519,57 +293,56 @@
         height: 35px;
         font-size: 0.9rem;
       }
-      
-      .side-menu {
-        width: 250px;
-      }
+    }
+
+    /* Loading placeholders */
+    .loading-placeholder {
+      position: relative;
+      overflow: hidden;
+      background-color: #e9ecef;
+      border-radius: 4px;
+    }
+
+    .loading-placeholder::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+                  rgba(255,255,255,0) 0%, 
+                  rgba(255,255,255,0.5) 50%, 
+                  rgba(255,255,255,0) 100%);
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .card.loading {
+      min-height: 150px;
+    }
+
+    .topic-placeholder {
+      height: 100px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <!-- Skip to content link for accessibility -->
-  <a href="#main-content" class="skip-link visually-hidden">Skip to content</a>
-  
   <!-- Navigation Bar -->
   <nav class="navbar">
-    <button class="menu-btn" id="menuBtn" aria-label="Open menu">
-      <i class="bi bi-list" aria-hidden="true"></i>
+    <button class="menu-btn" id="menuBtn">
+      <i class="bi bi-list"></i>
     </button>
     <h1 class="app-title">QuizMaster</h1>
-    <div class="form-check form-switch ms-auto">
-      <input class="form-check-input" type="checkbox" id="darkModeToggle">
-      <label class="form-check-label text-white" for="darkModeToggle">Dark Mode</label>
-    </div>
   </nav>
-  
-  <!-- Side Menu -->
-  <div class="side-menu" id="sideMenu">
-    <div class="menu-header">
-      <h3>Menu</h3>
-      <button class="close-menu" id="closeMenu" aria-label="Close menu">
-        <i class="bi bi-x"></i>
-      </button>
-    </div>
-    <ul class="menu-links">
-      <li><a href="#" id="menuHome"><i class="bi bi-house-door"></i> Home</a></li>
-      <li><a href="#" id="menuTopics"><i class="bi bi-book"></i> Topics</a></li>
-      <li class="d-none" id="userProfileItem">
-        <div class="d-flex align-items-center p-2">
-          <img src="https://via.placeholder.com/30" class="rounded-circle me-2" width="30" alt="Profile">
-          <span id="usernameDisplay">User</span>
-        </div>
-      </li>
-      <li><a href="#" id="menuLogin"><i class="bi bi-box-arrow-in-right"></i> Login/Signup</a></li>
-      <li><a href="#" id="menuStats"><i class="bi bi-graph-up"></i> Your Statistics</a></li>
-      <li><a href="#" id="menuAbout"><i class="bi bi-info-circle"></i> About</a></li>
-      <li><a href="#" id="menuContact"><i class="bi bi-envelope"></i> Contact</a></li>
-    </ul>
-  </div>
-  
-  <div class="menu-overlay" id="menuOverlay"></div>
 
   <!-- Main Content -->
-  <div class="container py-5" id="main-content">
+  <div class="container py-5">
     <!-- Loading Indicator -->
     <div id="loading">
       <div class="spinner-border text-primary" role="status">
@@ -582,7 +355,39 @@
     <div id="topic-selection" class="text-center">
       <h1 class="mb-4">Welcome to QuizMaster</h1>
       <p class="lead mb-5">Select a topic to begin your quiz</p>
-      <div class="row g-4" id="topics-container"></div>
+      <div class="row g-4" id="topics-container">
+        <!-- Loading placeholders -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 loading">
+            <div class="card-body d-flex flex-column">
+              <div class="topic-placeholder loading-placeholder"></div>
+              <div class="loading-placeholder" style="height: 24px; width: 80%; margin-bottom: 10px;"></div>
+              <div class="loading-placeholder" style="height: 16px; width: 60%;"></div>
+              <div class="loading-placeholder mt-auto" style="height: 38px; width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 loading">
+            <div class="card-body d-flex flex-column">
+              <div class="topic-placeholder loading-placeholder"></div>
+              <div class="loading-placeholder" style="height: 24px; width: 80%; margin-bottom: 10px;"></div>
+              <div class="loading-placeholder" style="height: 16px; width: 60%;"></div>
+              <div class="loading-placeholder mt-auto" style="height: 38px; width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 loading">
+            <div class="card-body d-flex flex-column">
+              <div class="topic-placeholder loading-placeholder"></div>
+              <div class="loading-placeholder" style="height: 24px; width: 80%; margin-bottom: 10px;"></div>
+              <div class="loading-placeholder" style="height: 16px; width: 60%;"></div>
+              <div class="loading-placeholder mt-auto" style="height: 38px; width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- Subtopic Selection -->
@@ -596,13 +401,12 @@
     
     <!-- Question Count Selection -->
     <div id="question-count-selection" class="text-center d-none">
-      <h2 id="question-count-heading" class="mb-4">Select Quiz Mode</h2>
+      <h2 id="question-count-heading" class="mb-4">Select Number of Questions</h2>
       <button class="btn btn-outline-secondary mb-4" id="back-to-subtopics-from-count">
         <i class="bi bi-arrow-left"></i> Back to Subtopics
       </button>
       <div class="question-count-selector">
-        <div class="row g-3" id="mode-options"></div>
-        <p class="mt-3">How many questions would you like in your quiz?</p>
+        <p>How many questions would you like in your quiz?</p>
         <div class="question-count-options" id="question-count-options"></div>
       </div>
     </div>
@@ -633,109 +437,19 @@
     </div>
   </div>
 
-  <!-- Stats Modal -->
-  <div class="modal fade" id="statsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Your Progress</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-md-6">
-              <h6>Topic Mastery</h6>
-              <canvas id="topicChart"></canvas>
-            </div>
-            <div class="col-md-6">
-              <h6>Recent Performance</h6>
-              <canvas id="performanceChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Login Modal -->
-  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Login / Sign Up</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="loginForm">
-            <div class="mb-3">
-              <label for="loginEmail" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="loginEmail" required>
-            </div>
-            <div class="mb-3">
-              <label for="loginPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="loginPassword" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-          </form>
-          <div class="text-center mt-3">
-            <p>Don't have an account? <a href="#" id="showSignup">Sign up</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Signup Modal -->
-  <div class="modal fade" id="signupModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Create Account</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="signupForm">
-            <div class="mb-3">
-              <label for="signupName" class="form-label">Full Name</label>
-              <input type="text" class="form-control" id="signupName" required>
-            </div>
-            <div class="mb-3">
-              <label for="signupEmail" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="signupEmail" required>
-            </div>
-            <div class="mb-3">
-              <label for="signupPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="signupPassword" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Sign Up</button>
-          </form>
-          <div class="text-center mt-3">
-            <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap JS Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
   
   <script>
     // Configuration
     const config = {
       googleSheetUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHZc4XKsA7NeFUs9YppeBSchqG01tWIzVrCnvbydr1t-qqUnd8RlOe-EypAn8m4trcvaQ0OR-4WzEN/pub?output=csv",
       corsProxyUrl: "https://api.allorigins.win/raw?url=",
-      fallbackData: `Topics,Subtopics,Question,OptionA,OptionB,OptionC,OptionD,CorrectAnswer,Explanation,ImageUrl,MultipleCorrect
-Science,Physics,What is Newton's First Law?,An object at rest stays at rest,An object in motion stays in motion,For every action there is an equal reaction,Energy cannot be created or destroyed,A,Newton's First Law is also called the Law of Inertia,,
-History,India,When did India gain independence?,1945,1947,1950,1935,B,India gained independence from British rule on August 15, 1947,https://raw.githubusercontent.com/Inkarshaw/inkarshaw.github.io/main/History.png,
-Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum,,
-Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,Eagle,Bat,"A,D","Whales and bats are mammals, while sharks are fish and eagles are birds",,true`,
-      questionCountOptions: [5, 10, 15, 20],
-      quizModes: {
-        timed: { name: "Timed Mode", description: "Answer quickly with a time limit per question" },
-        marathon: { name: "Marathon Mode", description: "Answer all questions at your own pace" },
-        learning: { name: "Learning Mode", description: "See explanations immediately after answering" }
-      }
+      fallbackData: `Topics,Subtopics,Question,OptionA,OptionB,OptionC,OptionD,CorrectAnswer,Explanation
+Science,Physics,What is Newton's First Law?,An object at rest stays at rest,An object in motion stays in motion,For every action there is an equal reaction,Energy cannot be created or destroyed,A,Newton's First Law is also called the Law of Inertia
+History,India,When did India gain independence?,1945,1947,1950,1935,B,India gained independence from British rule on August 15, 1947
+Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
+      questionCountOptions: [5, 10, 15, 20]
     };
 
     // DOM Elements
@@ -754,31 +468,7 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
     const quizTimer = document.getElementById('quiz-timer');
     const nextQuestionBtn = document.getElementById('next-question');
     const questionNavigation = document.getElementById('question-navigation');
-    const modeOptions = document.getElementById('mode-options');
-
-    // Menu Elements
     const menuBtn = document.getElementById('menuBtn');
-    const closeMenu = document.getElementById('closeMenu');
-    const sideMenu = document.getElementById('sideMenu');
-    const menuOverlay = document.getElementById('menuOverlay');
-    const menuHome = document.getElementById('menuHome');
-    const menuTopics = document.getElementById('menuTopics');
-    const menuLogin = document.getElementById('menuLogin');
-    const menuStats = document.getElementById('menuStats');
-    const userProfileItem = document.getElementById('userProfileItem');
-    const usernameDisplay = document.getElementById('usernameDisplay');
-
-    // Modal Elements
-    const statsModal = new bootstrap.Modal(document.getElementById('statsModal'));
-    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-    const signupModal = new bootstrap.Modal(document.getElementById('signupModal'));
-    const showSignup = document.getElementById('showSignup');
-    const showLogin = document.getElementById('showLogin');
-    const loginForm = document.getElementById('loginForm');
-    const signupForm = document.getElementById('signupForm');
-
-    // Dark Mode Toggle
-    const darkModeToggle = document.getElementById('darkModeToggle');
 
     // State
     let quizData = [];
@@ -794,55 +484,10 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
     let secondsElapsed = 0;
     let quizStartTime = null;
     let userAnswers = [];
-    let selectedMode = 'marathon';
-    let quizHistory = JSON.parse(localStorage.getItem('quizHistory')) || [];
-    let userStats = JSON.parse(localStorage.getItem('userStats')) || {};
-    let auth = {
-      currentUser: JSON.parse(localStorage.getItem('currentUser')),
-      login(email, password) {
-        // In a real app, this would call your authentication API
-        this.currentUser = { 
-          name: "Premium User", 
-          email,
-          joinDate: new Date().toISOString()
-        };
-        localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
-        updateUI();
-        return true;
-      },
-      signup(name, email, password) {
-        // In a real app, this would call your authentication API
-        this.currentUser = { 
-          name, 
-          email,
-          joinDate: new Date().toISOString()
-        };
-        localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
-        
-        // Initialize user stats
-        if (!userStats[email]) {
-          userStats[email] = {
-            quizzesTaken: 0,
-            averageScore: 0,
-            topics: {}
-          };
-          localStorage.setItem('userStats', JSON.stringify(userStats));
-        }
-        
-        updateUI();
-        return true;
-      },
-      logout() {
-        this.currentUser = null;
-        localStorage.removeItem('currentUser');
-        updateUI();
-      }
-    };
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
       await loadQuizData();
-      updateUI();
       
       // Navigation handlers
       document.getElementById('back-to-topics').addEventListener('click', () => {
@@ -864,161 +509,59 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
       
       nextQuestionBtn.addEventListener('click', nextQuestion);
       
-      // Menu handlers
+      // Menu button handler
       menuBtn.addEventListener('click', () => {
-        sideMenu.classList.add('active');
-        menuOverlay.classList.add('active');
+        alert("Menu functionality will be added in future updates");
       });
-      
-      closeMenu.addEventListener('click', () => {
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-      });
-      
-      menuOverlay.addEventListener('click', () => {
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-      });
-      
-      // Menu navigation
-      menuHome.addEventListener('click', (e) => {
-        e.preventDefault();
-        resetToHomeScreen();
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-      });
-      
-      menuTopics.addEventListener('click', (e) => {
-        e.preventDefault();
-        topicSelection.classList.remove('d-none');
-        subtopicSelection.classList.add('d-none');
-        questionCountSelection.classList.add('d-none');
-        quizArea.classList.add('d-none');
-        resetQuizState();
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-      });
-      
-      menuLogin.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (auth.currentUser) {
-          auth.logout();
-        } else {
-          loginModal.show();
-        }
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-      });
-      
-      menuStats.addEventListener('click', (e) => {
-        e.preventDefault();
-        showUserStats();
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-      });
-      
-      // Auth handlers
-      showSignup.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginModal.hide();
-        signupModal.show();
-      });
-      
-      showLogin.addEventListener('click', (e) => {
-        e.preventDefault();
-        signupModal.hide();
-        loginModal.show();
-      });
-      
-      loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        
-        if (auth.login(email, password)) {
-          loginModal.hide();
-          showMessage(`Welcome back, ${auth.currentUser.name}!`, 'success');
-        } else {
-          showMessage('Invalid email or password', 'danger');
-        }
-      });
-      
-      signupForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('signupName').value;
-        const email = document.getElementById('signupEmail').value;
-        const password = document.getElementById('signupPassword').value;
-        
-        if (auth.signup(name, email, password)) {
-          signupModal.hide();
-          showMessage(`Welcome to QuizMaster, ${name}!`, 'success');
-        } else {
-          showMessage('Error creating account', 'danger');
-        }
-      });
-      
-      // Dark mode toggle
-      darkModeToggle.addEventListener('change', (e) => {
-        if (e.target.checked) {
-          document.body.classList.add('dark-mode');
-          localStorage.setItem('darkMode', 'enabled');
-        } else {
-          document.body.classList.remove('dark-mode');
-          localStorage.setItem('darkMode', 'disabled');
-        }
-      });
-      
-      // Check for saved dark mode preference
-      if (localStorage.getItem('darkMode') === 'enabled') {
-        darkModeToggle.checked = true;
-        document.body.classList.add('dark-mode');
-      }
     });
-
-    function updateUI() {
-      if (auth.currentUser) {
-        userProfileItem.classList.remove('d-none');
-        menuLogin.classList.add('d-none');
-        menuLogin.textContent = 'Logout';
-        usernameDisplay.textContent = auth.currentUser.name;
-      } else {
-        userProfileItem.classList.add('d-none');
-        menuLogin.classList.remove('d-none');
-        menuLogin.textContent = 'Login/Signup';
-      }
-    }
 
     async function loadQuizData() {
       showLoading();
       
       try {
-        // First try local cache
+        // First try local cache with timestamp check
         const cachedData = localStorage.getItem('quizData');
-        if (cachedData) {
+        const lastUpdated = localStorage.getItem('quizDataLastUpdated');
+        
+        // Only use cache if it's less than 24 hours old
+        if (cachedData && lastUpdated && (Date.now() - parseInt(lastUpdated)) < 86400000) {
           processQuizData(cachedData);
+          hideLoading();
+          return true;
         }
         
-        // Then try network
-        const response = await fetch(`${config.corsProxyUrl}${encodeURIComponent(config.googleSheetUrl)}`);
+        // Try network with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch(`${config.corsProxyUrl}${encodeURIComponent(config.googleSheetUrl)}`, {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
         
         if (!response.ok) throw new Error('Network response was not ok');
         
         const csv = await response.text();
         processQuizData(csv);
+        
+        // Cache the data with timestamp
         localStorage.setItem('quizData', csv);
+        localStorage.setItem('quizDataLastUpdated', Date.now());
         
       } catch (error) {
         console.error("Error loading quiz data:", error);
         
-        if (!localStorage.getItem('quizData')) {
-          try {
-            processQuizData(config.fallbackData);
-            showMessage("Using sample data (couldn't connect to server)", 'warning');
-          } catch (fallbackError) {
-            console.error("Fallback data error:", fallbackError);
-            showMessage("Failed to load quiz data. Please check your connection.", 'danger');
-            return false;
-          }
+        // Fallback to any cached data even if stale
+        const cachedData = localStorage.getItem('quizData');
+        if (cachedData) {
+          processQuizData(cachedData);
+          showMessage("Using cached data (connection issue)", 'warning');
+        } 
+        // Fallback to built-in data
+        else {
+          processQuizData(config.fallbackData);
+          showMessage("Using sample data (connection issue)", 'warning');
         }
       } finally {
         hideLoading();
@@ -1048,10 +591,6 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
           if (question.correctanswer) {
             question.correctanswer = question.correctanswer.toUpperCase();
           }
-          // Handle multiple correct answers
-          if (question.multiplecorrect && question.multiplecorrect.toLowerCase() === 'true') {
-            question.multipleCorrect = true;
-          }
           return question;
         })
         .filter(q => q.topics && q.subtopics && q.question);
@@ -1062,38 +601,34 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
       
       populateTopics();
       setupQuestionCountOptions();
-      setupModeSelection();
     }
 
     function parseCSV(csv) {
       const rows = [];
-      let currentRow = [];
-      let currentValue = '';
+      let currentRow = [''];
       let inQuotes = false;
       
       for (let i = 0; i < csv.length; i++) {
         const char = csv[i];
+        const nextChar = csv[i + 1];
         
-        if (char === '"') {
+        if (char === '"' && nextChar === '"' && inQuotes) {
+          currentRow[currentRow.length - 1] += '"';
+          i++; // Skip next quote
+        } else if (char === '"') {
           inQuotes = !inQuotes;
         } else if (char === ',' && !inQuotes) {
-          currentRow.push(currentValue);
-          currentValue = '';
+          currentRow.push('');
         } else if (char === '\n' && !inQuotes) {
-          currentRow.push(currentValue);
           rows.push(currentRow);
-          currentRow = [];
-          currentValue = '';
+          currentRow = [''];
         } else {
-          currentValue += char;
+          currentRow[currentRow.length - 1] += char;
         }
       }
       
       // Add the last row
-      if (currentValue || currentRow.length) {
-        currentRow.push(currentValue);
-        rows.push(currentRow);
-      }
+      rows.push(currentRow);
       
       return rows;
     }
@@ -1114,25 +649,14 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
       topicsContainer.innerHTML = '';
       
       topics.forEach(topic => {
-        // Find first question with this topic to get sample data
-        const sampleQuestion = quizData.find(q => q.topics === topic);
         const subtopics = [...new Set(
           quizData.filter(q => q.topics === topic).map(q => q.subtopics)
         )];
-        
-        // Use History.png from GitHub for History topic
-        let imageUrl;
-        if (topic.toLowerCase() === 'history') {
-          imageUrl = 'https://raw.githubusercontent.com/Inkarshaw/inkarshaw.github.io/main/History.png';
-        } else {
-          imageUrl = `https://via.placeholder.com/300x150?text=${encodeURIComponent(topic)}`;
-        }
         
         const topicCard = document.createElement('div');
         topicCard.className = 'col-md-4 col-sm-6';
         topicCard.innerHTML = `
           <div class="card h-100">
-            <img src="${imageUrl}" class="card-img-top" alt="${topic}">
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">${topic}</h5>
               <p class="card-text">${subtopics.length} subtopics available</p>
@@ -1157,40 +681,12 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
       });
     }
 
-    function setupModeSelection() {
-      modeOptions.innerHTML = '';
-      
-      Object.entries(config.quizModes).forEach(([key, mode]) => {
-        const option = document.createElement('div');
-        option.className = 'col-md-4';
-        option.innerHTML = `
-          <div class="card h-100">
-            <div class="card-body">
-              <h5>${mode.name}</h5>
-              <p>${mode.description}</p>
-              <button class="btn btn-outline-primary select-mode" data-mode="${key}">
-                ${selectedMode === key ? '<i class="bi bi-check-circle"></i> Selected' : 'Select'}
-              </button>
-            </div>
-          </div>
-        `;
-        modeOptions.appendChild(option);
-      });
-      
-      document.querySelectorAll('.select-mode').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          selectedMode = e.target.dataset.mode;
-          setupModeSelection(); // Refresh UI
-        });
-      });
-    }
-
     function setupQuestionCountOptions() {
       questionCountOptions.innerHTML = '';
       
       config.questionCountOptions.forEach(count => {
         const btn = document.createElement('button');
-        btn.className = `btn btn-outline-primary question-count-btn ${selectedQuestionCount === count ? 'active' : ''}`;
+        btn.className = 'btn btn-outline-primary question-count-btn';
         btn.textContent = count;
         btn.dataset.count = count;
         questionCountOptions.appendChild(btn);
@@ -1259,7 +755,7 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
           await loadQuestions(currentTopic, currentSubtopic);
           subtopicSelection.classList.add('d-none');
           questionCountSelection.classList.remove('d-none');
-          questionCountHeading.textContent = `${currentTopicName} - ${currentSubtopic} - Select Quiz Mode`;
+          questionCountHeading.textContent = `${currentTopicName} - ${currentSubtopic} - Select Question Count`;
         });
       });
     }
@@ -1348,15 +844,6 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
         </div>
       `;
       
-      // Add image if available
-      if (question.imageurl) {
-        questionContainer.innerHTML += `
-          <div class="text-center my-3">
-            <img src="${question.imageurl}" class="img-fluid" style="max-height: 200px" alt="Question image">
-          </div>
-        `;
-      }
-      
       optionsContainer.innerHTML = '';
       
       // Create options
@@ -1365,32 +852,25 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
         { text: question.optionb, value: 'B' },
         { text: question.optionc, value: 'C' },
         { text: question.optiond, value: 'D' }
-      ].filter(opt => opt.text); // Only show if option exists
+      ];
       
       options.forEach((option) => {
-        const optionElement = document.createElement('div');
-        optionElement.className = 'option';
-        optionElement.textContent = option.text;
-        optionElement.dataset.value = option.value;
-        
-        // Check if this option was previously selected
-        if (userAnswers[currentQuestionIndex] === option.value) {
-          optionElement.classList.add('selected');
-          nextQuestionBtn.disabled = false;
+        if (option.text) { // Only show if option exists
+          const optionElement = document.createElement('div');
+          optionElement.className = 'option';
+          optionElement.textContent = option.text;
+          optionElement.dataset.value = option.value;
+          
+          // Check if this option was previously selected
+          if (userAnswers[currentQuestionIndex] === option.value) {
+            optionElement.classList.add('selected');
+            nextQuestionBtn.disabled = false;
+          }
+          
+          optionElement.addEventListener('click', () => selectOption(optionElement));
+          optionsContainer.appendChild(optionElement);
         }
-        
-        optionElement.addEventListener('click', () => selectOption(optionElement));
-        optionsContainer.appendChild(optionElement);
       });
-      
-      // Show multiple correct indicator if needed
-      if (question.multipleCorrect) {
-        optionsContainer.innerHTML += `
-          <div class="alert alert-info mt-3">
-            <i class="bi bi-info-circle"></i> Select all that apply
-          </div>
-        `;
-      }
       
       updateQuestionNavigation();
     }
@@ -1407,35 +887,7 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
       userAnswers[currentQuestionIndex] = selectedOption;
       nextQuestionBtn.disabled = false;
       
-      // In learning mode, show explanation immediately
-      if (selectedMode === 'learning') {
-        showAnswerFeedback();
-      }
-      
       updateQuestionNavigation();
-    }
-
-    function showAnswerFeedback() {
-      const question = quizQuestions[currentQuestionIndex];
-      const isCorrect = userAnswers[currentQuestionIndex] === question.correctanswer;
-      
-      // Highlight correct and incorrect answers
-      document.querySelectorAll('.option').forEach(opt => {
-        if (opt.dataset.value === question.correctanswer) {
-          opt.classList.add('correct');
-        } else if (opt.dataset.value === userAnswers[currentQuestionIndex] && !isCorrect) {
-          opt.classList.add('incorrect');
-        }
-      });
-      
-      // Show explanation if available
-      if (question.explanation) {
-        optionsContainer.innerHTML += `
-          <div class="alert ${isCorrect ? 'alert-success' : 'alert-danger'} mt-3">
-            <strong>${isCorrect ? 'Correct!' : 'Incorrect'}</strong> ${question.explanation}
-          </div>
-        `;
-      }
     }
 
     function nextQuestion() {
@@ -1465,9 +917,6 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
       const resultMessage = getPerformanceMessage(percentage);
       const timeSpent = formatTime(secondsElapsed);
       
-      // Save quiz results
-      saveQuizResults(score, percentage);
-      
       questionContainer.innerHTML = `
         <div class="card result-card">
           <i class="bi bi-trophy-fill result-icon text-warning"></i>
@@ -1475,23 +924,7 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
           <div class="score-display">${score}/${quizQuestions.length}</div>
           <div class="performance-message">${resultMessage}</div>
           <p>Time spent: ${timeSpent}</p>
-          <div class="social-sharing mt-4">
-            <button class="btn btn-outline-primary me-2" id="shareTwitter">
-              <i class="bi bi-twitter"></i> Share
-            </button>
-            <button class="btn btn-outline-primary me-2" id="shareFacebook">
-              <i class="bi bi-facebook"></i> Share
-            </button>
-            <div class="d-inline-block position-relative">
-              <button class="btn btn-primary" id="leaderboardBtn">
-                <i class="bi bi-trophy"></i> Leaderboard
-              </button>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                New
-              </span>
-            </div>
-          </div>
-          <button id="restart-quiz" class="btn btn-primary mt-3">
+          <button id="restart-quiz" class="btn btn-primary">
             <i class="bi bi-arrow-repeat"></i> Try Again
           </button>
           <button id="show-answers" class="btn btn-outline-primary mt-2">
@@ -1507,7 +940,6 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
       nextQuestionBtn.style.display = 'none';
       questionNavigation.innerHTML = '';
       
-      // Add event listeners for new buttons
       document.getElementById('restart-quiz').addEventListener('click', () => {
         prepareQuizQuestions();
         quizArea.classList.remove('d-none');
@@ -1522,220 +954,6 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
         questionCountSelection.classList.remove('d-none');
         resetQuizState();
       });
-      
-      document.getElementById('shareTwitter').addEventListener('click', () => {
-        const text = `I scored ${score}/${quizQuestions.length} on the ${currentTopic} quiz! Try it yourself at ${window.location.href}`;
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
-      });
-      
-      document.getElementById('shareFacebook').addEventListener('click', () => {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
-      });
-      
-      document.getElementById('leaderboardBtn').addEventListener('click', () => {
-        showLeaderboard();
-      });
-    }
-
-    function saveQuizResults(score, percentage) {
-      const quizResult = {
-        date: new Date().toISOString(),
-        topic: currentTopic,
-        subtopic: currentSubtopic,
-        score,
-        totalQuestions: quizQuestions.length,
-        percentage,
-        timeSpent: secondsElapsed,
-        mode: selectedMode
-      };
-      
-      quizHistory.push(quizResult);
-      localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
-      
-      // Update user stats if logged in
-      if (auth.currentUser) {
-        const userEmail = auth.currentUser.email;
-        if (!userStats[userEmail]) {
-          userStats[userEmail] = {
-            quizzesTaken: 0,
-            averageScore: 0,
-            topics: {}
-          };
-        }
-        
-        // Update overall stats
-        userStats[userEmail].quizzesTaken += 1;
-        userStats[userEmail].averageScore = 
-          ((userStats[userEmail].averageScore * (userStats[userEmail].quizzesTaken - 1)) + percentage) / 
-          userStats[userEmail].quizzesTaken;
-        
-        // Update topic stats
-        if (!userStats[userEmail].topics[currentTopic]) {
-          userStats[userEmail].topics[currentTopic] = {
-            quizzesTaken: 0,
-            averageScore: 0,
-            subtopics: {}
-          };
-        }
-        
-        userStats[userEmail].topics[currentTopic].quizzesTaken += 1;
-        userStats[userEmail].topics[currentTopic].averageScore = 
-          ((userStats[userEmail].topics[currentTopic].averageScore * 
-           (userStats[userEmail].topics[currentTopic].quizzesTaken - 1)) + percentage) / 
-          userStats[userEmail].topics[currentTopic].quizzesTaken;
-        
-        // Update subtopic stats
-        if (!userStats[userEmail].topics[currentTopic].subtopics[currentSubtopic]) {
-          userStats[userEmail].topics[currentTopic].subtopics[currentSubtopic] = {
-            quizzesTaken: 0,
-            averageScore: 0
-          };
-        }
-        
-        userStats[userEmail].topics[currentTopic].subtopics[currentSubtopic].quizzesTaken += 1;
-        userStats[userEmail].topics[currentTopic].subtopics[currentSubtopic].averageScore = 
-          ((userStats[userEmail].topics[currentTopic].subtopics[currentSubtopic].averageScore * 
-           (userStats[userEmail].topics[currentTopic].subtopics[currentSubtopic].quizzesTaken - 1)) + percentage) / 
-          userStats[userEmail].topics[currentTopic].subtopics[currentSubtopic].quizzesTaken;
-        
-        localStorage.setItem('userStats', JSON.stringify(userStats));
-      }
-    }
-
-    function showUserStats() {
-      if (!auth.currentUser) {
-        loginModal.show();
-        return;
-      }
-      
-      const userEmail = auth.currentUser.email;
-      const stats = userStats[userEmail] || {
-        quizzesTaken: 0,
-        averageScore: 0,
-        topics: {}
-      };
-      
-      // Prepare data for charts
-      const topicsData = Object.entries(stats.topics).map(([topic, data]) => ({
-        topic,
-        score: Math.round(data.averageScore * 100)
-      }));
-      
-      const recentQuizzes = quizHistory
-        .filter(q => q.topic && q.subtopic)
-        .slice(-5)
-        .reverse();
-      
-      // Update modal content
-      document.getElementById('statsModal').querySelector('.modal-title').textContent = 
-        `${auth.currentUser.name}'s Progress`;
-      
-      // Create charts
-      createTopicChart(topicsData);
-      createPerformanceChart(recentQuizzes);
-      
-      statsModal.show();
-    }
-
-    function createTopicChart(topicsData) {
-      const ctx = document.getElementById('topicChart').getContext('2d');
-      
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: topicsData.map(item => item.topic),
-          datasets: [{
-            label: 'Mastery Score (%)',
-            data: topicsData.map(item => item.score),
-            backgroundColor: topicsData.map((_, i) => 
-              `hsl(${(i * 360 / topicsData.length)}, 70%, 50%)`),
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100
-            }
-          }
-        }
-      });
-    }
-
-    function createPerformanceChart(quizzes) {
-      const ctx = document.getElementById('performanceChart').getContext('2d');
-      
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: quizzes.map((_, i) => `Quiz ${i + 1}`),
-          datasets: [{
-            label: 'Score (%)',
-            data: quizzes.map(q => Math.round(q.percentage * 100)),
-            borderColor: '#4e73df',
-            backgroundColor: 'rgba(78, 115, 223, 0.05)',
-            fill: true,
-            tension: 0.1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100
-            }
-          }
-        }
-      });
-    }
-
-    function showLeaderboard() {
-      // In a real app, this would fetch from a server
-      const leaderboard = [
-        { name: "Top Scorer", score: "95%", quizzes: 12 },
-        { name: "Quiz Master", score: "92%", quizzes: 8 },
-        { name: "Fast Learner", score: "89%", quizzes: 5 },
-        { name: "New Challenger", score: "85%", quizzes: 3 },
-        { name: "Beginner", score: "78%", quizzes: 2 }
-      ];
-      
-      questionContainer.innerHTML = `
-        <div class="card">
-          <div class="card-body">
-            <h2 class="card-title mb-4">Leaderboard</h2>
-            <div class="table-responsive">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Rank</th>
-                    <th>Name</th>
-                    <th>Average Score</th>
-                    <th>Quizzes Taken</th>
-                  </tr>
-                </thead>
-                <tbody id="leaderboardBody">
-                  ${leaderboard.map((user, i) => `
-                    <tr ${i === 0 ? 'class="table-warning"' : ''}>
-                      <td>${i + 1}</td>
-                      <td>${user.name}</td>
-                      <td>${user.score}</td>
-                      <td>${user.quizzes}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-            <button id="back-to-results" class="btn btn-primary mt-3">
-              <i class="bi bi-arrow-left"></i> Back to Results
-            </button>
-          </div>
-        </div>
-      `;
-      
-      document.getElementById('back-to-results').addEventListener('click', endQuiz);
     }
 
     function showAnswers() {
@@ -1819,14 +1037,6 @@ Science,Biology,Which of these are mammals? (Select all that apply),Whale,Shark,
       quizTimer.textContent = '00:00';
       nextQuestionBtn.style.display = 'block';
       nextQuestionBtn.disabled = true;
-    }
-
-    function resetToHomeScreen() {
-      topicSelection.classList.remove('d-none');
-      subtopicSelection.classList.add('d-none');
-      questionCountSelection.classList.add('d-none');
-      quizArea.classList.add('d-none');
-      resetQuizState();
     }
 
     function showLoading() {
