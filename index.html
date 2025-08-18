@@ -330,6 +330,18 @@
       height: 100px;
       margin-bottom: 10px;
     }
+
+    /* Added styles for clickable topic names */
+    .topic-name {
+      cursor: pointer;
+      padding: 10px;
+      transition: all 0.2s;
+    }
+
+    .topic-name:hover {
+      color: var(--primary-color);
+      transform: scale(1.02);
+    }
   </style>
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MWBY9ZRY9D"></script>
@@ -663,18 +675,16 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
         topicCard.innerHTML = `
           <div class="card h-100">
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title">${topic}</h5>
-              <button class="btn btn-primary select-topic mt-auto" data-topic="${topic}">
-                Select Topic <i class="bi bi-arrow-right"></i>
-              </button>
+              <h5 class="card-title topic-name" data-topic="${topic}">${topic}</h5>
             </div>
           </div>
         `;
         topicsContainer.appendChild(topicCard);
       });
       
-      document.querySelectorAll('.select-topic').forEach(button => {
-        button.addEventListener('click', async (e) => {
+      // Add click event to topic names
+      document.querySelectorAll('.topic-name').forEach(topicName => {
+        topicName.addEventListener('click', async (e) => {
           currentTopic = e.target.getAttribute('data-topic');
           currentTopicName = currentTopic;
           await loadSubtopics(currentTopic);
