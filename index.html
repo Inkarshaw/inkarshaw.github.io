@@ -279,6 +279,33 @@
       color: #155724;
     }
     
+    .range-selector {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    
+    .range-inputs {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    
+    .range-input {
+      width: 100px;
+      text-align: center;
+    }
+    
+    .range-info {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+    
     @media (max-width: 768px) {
       .quiz-container {
         padding: 20px;
@@ -292,6 +319,11 @@
         width: 35px;
         height: 35px;
         font-size: 0.9rem;
+      }
+      
+      .range-inputs {
+        flex-direction: column;
+        gap: 10px;
       }
     }
 
@@ -430,6 +462,26 @@
         <p>How many questions would you like in your quiz?</p>
         <div class="question-count-options" id="question-count-options"></div>
       </div>
+      
+      <!-- Range Selection -->
+      <div class="range-selector">
+        <p>Or select a specific range of questions:</p>
+        <div class="range-inputs">
+          <div>
+            <label for="range-from" class="form-label">From</label>
+            <input type="number" class="form-control range-input" id="range-from" min="1" value="1">
+          </div>
+          <div>
+            <label for="range-to" class="form-label">To</label>
+            <input type="number" class="form-control range-input" id="range-to" min="1" value="10">
+          </div>
+          <div>
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-primary" id="apply-range">Apply Range</button>
+          </div>
+        </div>
+        <div class="range-info" id="range-info">Total available questions: <span id="total-questions">0</span></div>
+      </div>
     </div>
     
     <!-- Quiz Area -->
@@ -490,6 +542,11 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
     const nextQuestionBtn = document.getElementById('next-question');
     const questionNavigation = document.getElementById('question-navigation');
     const menuBtn = document.getElementById('menuBtn');
+    const rangeFromInput = document.getElementById('range-from');
+    const rangeToInput = document.getElementById('range-to');
+    const applyRangeBtn = document.getElementById('apply-range');
+    const rangeInfo = document.getElementById('range-info');
+    const totalQuestionsSpan = document.getElementById('total-questions');
 
     // State
     let quizData = [];
@@ -505,6 +562,9 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
     let secondsElapsed = 0;
     let quizStartTime = null;
     let userAnswers = [];
+    let useRangeSelection = false;
+    let rangeFrom = 1;
+    let rangeTo = 10;
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
@@ -529,6 +589,13 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
       });
       
       nextQuestionBtn.addEventListener('click', nextQuestion);
+      
+      // Range selection handler
+      applyRangeBtn.addEventListener('click', applyRangeSelection);
+      
+      // Range input validation
+      rangeFromInput.addEventListener('change', validateRangeInputs);
+      rangeToInput.addEventListener('change', validateRangeInputs);
       
       // Menu button handler
       menuBtn.addEventListener('click', () => {
@@ -708,6 +775,7 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
       
       document.querySelectorAll('.question-count-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          useRangeSelection = false;
           selectedQuestionCount = parseInt(e.target.dataset.count);
           prepareQuizQuestions();
           questionCountSelection.classList.add('d-none');
@@ -776,6 +844,13 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
         q.subtopics === subtopic
       );
       
+      // Update range inputs based on available questions
+      rangeFromInput.value = 1;
+      rangeToInput.value = Math.min(10, availableQuestions.length);
+      rangeFromInput.max = availableQuestions.length;
+      rangeToInput.max = availableQuestions.length;
+      totalQuestionsSpan.textContent = availableQuestions.length;
+      
       hideLoading();
       
       if (!availableQuestions || availableQuestions.length === 0) {
@@ -786,10 +861,62 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
       }
     }
 
+    function applyRangeSelection() {
+      rangeFrom = parseInt(rangeFromInput.value);
+      rangeTo = parseInt(rangeToInput.value);
+      
+      if (validateRangeInputs()) {
+        useRangeSelection = true;
+        prepareQuizQuestions();
+        questionCountSelection.classList.add('d-none');
+        quizArea.classList.remove('d-none');
+        startQuiz();
+      }
+    }
+
+    function validateRangeInputs() {
+      const from = parseInt(rangeFromInput.value);
+      const to = parseInt(rangeToInput.value);
+      const maxQuestions = availableQuestions.length;
+      
+      if (isNaN(from) || isNaN(to)) {
+        showMessage("Please enter valid numbers for the range", "danger");
+        return false;
+      }
+      
+      if (from < 1) {
+        rangeFromInput.value = 1;
+        showMessage("Starting question cannot be less than 1", "warning");
+        return false;
+      }
+      
+      if (to > maxQuestions) {
+        rangeToInput.value = maxQuestions;
+        showMessage(`Ending question cannot be more than ${maxQuestions}`, "warning");
+        return false;
+      }
+      
+      if (from > to) {
+        rangeFromInput.value = to;
+        showMessage("Starting question cannot be greater than ending question", "warning");
+        return false;
+      }
+      
+      return true;
+    }
+
     function prepareQuizQuestions() {
-      // Shuffle available questions and select the requested count
-      const shuffledQuestions = shuffleArray([...availableQuestions]);
-      quizQuestions = shuffledQuestions.slice(0, Math.min(selectedQuestionCount, shuffledQuestions.length));
+      if (useRangeSelection) {
+        // Use the selected range
+        const startIndex = rangeFrom - 1; // Convert to 0-based index
+        const endIndex = rangeTo; // Convert to 0-based index (exclusive)
+        quizQuestions = availableQuestions.slice(startIndex, endIndex);
+        selectedQuestionCount = quizQuestions.length;
+      } else {
+        // Use random selection (original behavior)
+        const shuffledQuestions = shuffleArray([...availableQuestions]);
+        quizQuestions = shuffledQuestions.slice(0, Math.min(selectedQuestionCount, shuffledQuestions.length));
+      }
       
       currentQuestionIndex = 0;
       secondsElapsed = 0;
@@ -820,7 +947,14 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
       quizQuestions.forEach((_, index) => {
         const btn = document.createElement('button');
         btn.className = `question-nav-btn ${userAnswers[index] !== null ? 'answered' : 'unanswered'} ${index === currentQuestionIndex ? 'current' : ''}`;
-        btn.textContent = index + 1;
+        
+        // Show actual question numbers when using range selection
+        if (useRangeSelection) {
+          btn.textContent = rangeFrom + index;
+        } else {
+          btn.textContent = index + 1;
+        }
+        
         btn.addEventListener('click', () => {
           currentQuestionIndex = index;
           displayQuestion();
@@ -844,10 +978,16 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
       const progressPercent = (currentQuestionIndex / quizQuestions.length) * 100;
       document.getElementById('quiz-progress').style.width = `${progressPercent}%`;
       
+      // Show question number with range info if applicable
+      let questionNumber = currentQuestionIndex + 1;
+      if (useRangeSelection) {
+        questionNumber = rangeFrom + currentQuestionIndex;
+      }
+      
       questionContainer.innerHTML = `
         <div class="card">
           <div class="card-body">
-            <h3 class="card-title">${question.question}</h3>
+            <h3 class="card-title">Question ${questionNumber}: ${question.question}</h3>
           </div>
         </div>
       `;
@@ -983,6 +1123,12 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
         const answerItem = document.createElement('div');
         answerItem.className = 'answer-item';
         
+        // Show question number with range info if applicable
+        let questionNumber = index + 1;
+        if (useRangeSelection) {
+          questionNumber = rangeFrom + index;
+        }
+        
         // Create options display
         const optionsHtml = ['A', 'B', 'C', 'D'].map(option => {
           if (!question['option' + option.toLowerCase()]) return '';
@@ -1006,7 +1152,7 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
         }).join('');
         
         answerItem.innerHTML = `
-          <h5>Question ${index + 1}: ${question.question}</h5>
+          <h5>Question ${questionNumber}: ${question.question}</h5>
           <div class="answer-options">
             ${optionsHtml}
           </div>
@@ -1045,6 +1191,7 @@ Maths,Algebra,What is 2+2?,3,4,5,6,B,Basic arithmetic sum`,
       quizTimer.textContent = '00:00';
       nextQuestionBtn.style.display = 'block';
       nextQuestionBtn.disabled = true;
+      useRangeSelection = false;
     }
 
     function showLoading() {
