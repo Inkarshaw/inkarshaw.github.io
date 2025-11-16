@@ -125,6 +125,7 @@
         
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
         
         label {
@@ -353,7 +354,7 @@
             justify-content: center;
             margin: 8px 0;
             gap: 0;
-            min-height: 24px; /* Ensure consistent height */
+            min-height: 24px;
         }
         
         .time-field {
@@ -526,7 +527,24 @@
         }
         
         .officer-container-preview {
-            margin-bottom: 10px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 1px;
+        }        
+        .officer-number {
+            min-width: 1px;
+            margin-top: 0;
+        }
+
+        .officer-designation,
+        .officer-name {
+            margin-top: 0;
+            margin-bottom: 2px;
+        }
+        
+        .officer-details-preview {
+            flex: 1;
         }
         
         .officer-top-line {
@@ -538,11 +556,6 @@
         
         .officer-designation {
             min-width: 80px;
-            flex-shrink: 0;
-        }
-        
-        .officer-number {
-            min-width: 60px;
             flex-shrink: 0;
         }
         
@@ -572,53 +585,11 @@
             box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
         }
         
-        .transfer-fields {
-            display: none;
-            background-color: #f0f9ff;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .transfer-fields.active {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; max-height: 0; }
-            to { opacity: 1; max-height: 500px; }
-        }
-        
-        .fir-fields {
-            display: none;
-            background-color: #fff5f5;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .fir-fields.active {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-        
-        .visera-fields {
-            display: none;
-            background-color: #f0f9ff;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .visera-fields.active {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-        
+        .transfer-fields,
+        .pt-warrant-fields,
+        .formal-arrest-fields,
+        .fir-fields,
+        .visera-fields,
         .lab-report-fields {
             display: none;
             background-color: #f0f9ff;
@@ -628,9 +599,19 @@
             border: 1px solid var(--border-color);
         }
         
+        .transfer-fields.active,
+        .pt-warrant-fields.active,
+        .formal-arrest-fields.active,
+        .fir-fields.active,
+        .visera-fields.active,
         .lab-report-fields.active {
             display: block;
             animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 500px; }
         }
         
         @media print {
@@ -779,7 +760,6 @@
             filter: none !important;
         }
 
-        /* Ensure empty time field is white in PDF */
         #document-to-print.pdf-mode .time-field.empty,
         #document-to-print.pdf-mode .time-field.empty:before {
             color: #ffffff !important;
@@ -850,6 +830,27 @@
                     <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
                 </div>
                 
+                <!-- PT Warrant Fields -->
+                <div class="pt-warrant-fields" id="pt-warrant-fields">
+                    <h3 class="section-title"><i class="fas fa-gavel"></i> PT Warrant Details</h3>
+                    <div class="form-group">
+                        <label for="scNumber" class="required">SC Number</label>
+                        <input type="text" id="scNumber" placeholder="Enter SC Number (e.g., 97/2023)">
+                        <div class="error-message" id="scNumber-error">Please enter SC Number</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="prcNumber" class="required">PRC Number</label>
+                        <input type="text" id="prcNumber" placeholder="Enter PRC Number (e.g., 156/2021)">
+                        <div class="error-message" id="prcNumber-error">Please enter PRC Number</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="centralPrison" class="required">Central Prison</label>
+                        <input type="text" id="centralPrison" placeholder="Enter central prison name" value="Puzhal Central Prison, Chennai">
+                        <div class="error-message" id="centralPrison-error">Please enter central prison name</div>
+                    </div>
+                </div>
+                
+                <!-- Transfer Passport Fields -->
                 <div class="transfer-fields" id="transfer-fields">
                     <h3 class="section-title"><i class="fas fa-exchange-alt"></i> Transfer Details</h3>
                     <div class="form-group">
@@ -867,9 +868,20 @@
                         <input type="text" id="transferReason" placeholder="Enter transfer reason">
                         <div class="error-message" id="transferReason-error">Please enter transfer reason</div>
                     </div>
+                    <div class="form-group">
+                        <label for="transferOrderNumber" class="required">Transfer Order Number</label>
+                        <input type="text" id="transferOrderNumber" placeholder="Enter transfer order number" value="RC.No.Estt/EZ/2389/82/2023 EZO.No.485/2023">
+                        <div class="error-message" id="transferOrderNumber-error">Please enter transfer order number</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="transferOrderDate" class="required">Transfer Order Date</label>
+                        <input type="text" id="transferOrderDate" placeholder="Enter transfer order date (DD/MM/YYYY)" value="13/06/2023">
+                        <div class="error-message" id="transferOrderDate-error">Please enter a valid transfer order date</div>
+                    </div>
                 </div>
                 
-                <div class="fir-fields conditional-section" id="fir-fields">
+                <!-- FIR Filing Fields -->
+                <div class="fir-fields" id="fir-fields">
                     <h3 class="section-title"><i class="fas fa-file-alt"></i> FIR Details</h3>
                     <div class="form-group">
                         <label for="complainantName" class="required">Complainant Name</label>
@@ -899,6 +911,7 @@
                     </div>
                 </div>
                 
+                <!-- Visera Report Fields -->
                 <div class="visera-fields" id="visera-fields">
                     <h3 class="section-title"><i class="fas fa-flask"></i> Visera Report Details</h3>
                     <div class="form-group">
@@ -928,6 +941,7 @@
                     </div>
                 </div>
                 
+                <!-- Lab Report Fields -->
                 <div class="lab-report-fields" id="lab-report-fields">
                     <h3 class="section-title"><i class="fas fa-file-medical"></i> Lab Report Details</h3>
                     <div class="form-group">
@@ -939,6 +953,21 @@
                         <label for="narDate" class="required">NAR Date</label>
                         <input type="text" id="narDate" placeholder="Enter NAR date in DD/MM/YYYY format">
                         <div class="error-message" id="narDate-error">Please enter a valid NAR date</div>
+                    </div>
+                </div>
+                
+                <!-- Formal Arrest Fields -->
+                <div class="formal-arrest-fields" id="formal-arrest-fields">
+                    <h3 class="section-title"><i class="fas fa-handcuffs"></i> Formal Arrest Details</h3>
+                    <div class="form-group">
+                        <label for="arrestPrison" class="required">Prison Name</label>
+                        <input type="text" id="arrestPrison" placeholder="Enter prison name" value="Puzhal Central Prison, Chennai">
+                        <div class="error-message" id="arrestPrison-error">Please enter prison name</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="arrestType" class="required">Arrest Type</label>
+                        <input type="text" id="arrestType" placeholder="Enter arrest type" value="Formal Arrest">
+                        <div class="error-message" id="arrestType-error">Please enter arrest type</div>
                     </div>
                 </div>
                 
@@ -957,11 +986,17 @@
                     </div>
                 </div>
                 
-                <div class="form-group conditional-section" id="mm-section">
-                    <label for="mm" class="required">MM</label>
-                    <input type="text" id="mm" placeholder="Enter MM (e.g., 1, 2, 3)">
-                    <div class="error-message" id="mm-error">Please enter a valid MM number</div>
-                    <div class="help-text">Enter the Metropolitan Magistrate number</div>
+                <div class="form-group conditional-section" id="court-section">
+                    <label for="court" class="required">Court</label>
+                    <select id="court">
+                        <option value="">Select Court</option>
+                        <option value="MM">MM (Metropolitan Magistrate)</option>
+                        <option value="CMM">CMM (Chief Metropolitan Magistrate)</option>
+                        <option value="PJ">PJ (Principal Judge)</option>
+                        <option value="NDPS">NDPS (Narcotic Drugs and Psychotropic Substances)</option>
+                    </select>
+                    <div class="error-message" id="court-error">Please select a court</div>
+                    <div class="help-text">Select the court type</div>
                 </div>
                 
                 <div class="form-group">
@@ -1027,11 +1062,11 @@
                                 
                                 <div class="language-content active" id="tamil-content">
                                     <div class="content-text" id="escort-tamil-content" style="display: none;">
-                                        ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-tamil" placeholder="Police Station"></span> காவல் நிலைய குற்ற எண். <span class="embedded-field empty" id="crime-no-field-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-tamil" placeholder="Section"></span> என்ற வழக்கில் சம்மந்தப்பட்ட எதிரி <span id="accused-list-tamil"></span> என்பவரை கனம் <span class="embedded-field empty" id="mm-field-tamil" placeholder="MM"></span>-வது பெருநகர குற்றவியல் நடுவர் அவர்களிடம் ஆஜர்படுத்தி உத்தரவுபடி நடந்து அத்தாட்சி பெற்று நிலையம் வரவும்.
+                                        ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-tamil" placeholder="Police Station"></span> காவல் நிலைய குற்ற எண். <span class="embedded-field empty" id="crime-no-field-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-tamil" placeholder="Section"></span> என்ற வழக்கில் சம்மந்தப்பட்ட எதிரி <span id="accused-list-tamil"></span> என்பவரை கனம் <span class="embedded-field empty" id="court-field-tamil" placeholder="Court"></span> அவர்களிடம் ஆஜர்படுத்தி உத்தரவுபடி நடந்து அத்தாட்சி பெற்று நிலையம் வரவும்.
                                     </div>
                                     
                                     <div class="content-text" id="pt-warrant-tamil-content" style="display: none;">
-                                        ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-pt-tamil" placeholder="Police Station"></span> கா.நி. கு. எண். <span class="embedded-field empty" id="crime-no-field-pt-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-pt-tamil" placeholder="Section"></span> (ளுஊ.ழே. <span class="embedded-field empty" id="sc-no-field-tamil" placeholder="SC No."></span> P.Nழு. <span class="embedded-field empty" id="prc-no-field-tamil" placeholder="PRC No."></span> ) என்ற வழக்கில் சம்மந்தப்பட்ட எதிரி <span id="accused-list-pt-tamil"></span> என்பவருக்கு கனம் <span class="embedded-field empty" id="mm-field-pt-tamil" placeholder="MM"></span>-வது டுதல் அமர்வு நீதிமன்ற நீதிபதி அவர்களால் வழங்கப்பட்ட PT Warrant-ஐ <span class="embedded-field empty" id="central-prison-field-tamil" placeholder="Central Prison"></span> மத்திய சிறை கண்காணிப்பாளர் சென்னை அவர்களிடம் சார்வு செய்து அத்தாட்சி பெற்று நிலையம் வரவும்.
+                                        ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-pt-tamil" placeholder="Police Station"></span> கா.நி. கு. எண். <span class="embedded-field empty" id="crime-no-field-pt-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-pt-tamil" placeholder="Section"></span> (SC No. <span class="embedded-field empty" id="sc-no-field-tamil" placeholder="SC No."></span> PRC No. <span class="embedded-field empty" id="prc-no-field-tamil" placeholder="PRC No."></span> ) என்ற வழக்கில் சம்மந்தப்பட்ட எதிரி <span id="accused-list-pt-tamil"></span> என்பவருக்கு கனம் <span class="embedded-field empty" id="court-field-pt-tamil" placeholder="Court"></span> அவர்களால் வழங்கப்பட்ட PT Warrant-ஐ <span class="embedded-field empty" id="central-prison-field-tamil" placeholder="Central Prison"></span> மத்திய சிறை கண்காணிப்பாளர் சென்னை அவர்களிடம் சார்வு செய்து அத்தாட்சி பெற்று நிலையம் வரவும்.
                                     </div>
                                     
                                     <div class="content-text" id="sick-passport-tamil-content" style="display: none;">
@@ -1039,11 +1074,11 @@
                                     </div>
                                     
                                     <div class="content-text" id="transfer-passport-tamil-content" style="display: none;">
-                                        ஆகிய நீவிர் கிழக்கு மண்டல காவல் துணை ஆய்வாளர் அவர்களின் RC.No.Estt/EZ/2389/82/2023 EZO.No.485/2023, தேதி: 13.06.2023 உத்தரவின் படி G3 கில்பauk L&O காவல் நிலைய ஆய்வாளர் அவர்களிடம் உடனடியாக ஆஜர்படுத்தி அத்தாட்சி பெற்று நிலையம் வரவும்.
+                                        ஆகிய நீவிர் <span class="embedded-field empty" id="from-station-field-tamil" placeholder="From Station"></span> காவல் நிலையத்தில் இருந்து <span class="embedded-field empty" id="to-station-field-tamil" placeholder="To Station"></span> காவல் நிலையத்திற்கு <span class="embedded-field empty" id="transfer-reason-field-tamil" placeholder="Transfer Reason"></span> காரணத்திற்காக <span class="embedded-field empty" id="transfer-order-number-field-tamil" placeholder="Transfer Order Number"></span> உத்தரவு எண். <span class="embedded-field empty" id="transfer-order-date-field-tamil" placeholder="Transfer Order Date"></span> தேதியின் படி மாற்றம் செய்யப்பட்டுள்ளீர்கள். உடனடியாக ஆஜர்படுத்தி அத்தாட்சி பெற்று நிலையம் வரவும்.
                                     </div>
                                     
                                     <div class="content-text" id="fir-filing-tamil-content" style="display: none;">
-                                        ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-fir-tamil" placeholder="Police Station"></span> காவல்நிலைய குற்ற எண். <span class="embedded-field empty" id="crime-no-field-fir-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-fir-tamil" placeholder="Section"></span> என்ற வழக்கின் முதல் தகவல் அறிக்கையை கனம் <span class="embedded-field empty" id="mm-field-fir-tamil" placeholder="MM"></span>வது பெருநகர குற்றவியல் நடுவர் நீதிமன்றத்தில் தாக்கல் செய்து அத்தாட்சி பெற்று நிலையம் வரவும்.
+                                        ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-fir-tamil" placeholder="Police Station"></span> காவல்நிலைய குற்ற எண். <span class="embedded-field empty" id="crime-no-field-fir-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-fir-tamil" placeholder="Section"></span> என்ற வழக்கின் முதல் தகவல் அறிக்கையை கனம் <span class="embedded-field empty" id="court-field-fir-tamil" placeholder="Court"></span> நீதிமன்றத்தில் தாக்கல் செய்து அத்தாட்சி பெற்று நிலையம் வரவும்.
                                     </div>
                                     
                                     <div class="content-text" id="visera-report-tamil-content" style="display: none;">
@@ -1055,17 +1090,17 @@
                                     </div>
                                     
                                     <div class="content-text" id="formal-arrest-tamil-content" style="display: none;">
-                                        ஆகிய நீவிர் சேத்துப்பட்டு கா.நி கு.எண். <span class="embedded-field empty" id="crime-no-field-formal-arrest-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-formal-arrest-tamil" placeholder="Section"></span> என்ற வழக்கில் சம்மந்தப்பட்ட எதிரி <span id="accused-list-formal-arrest-tamil"></span> என்பவருக்கு சம்பிரதாய கைது (Formal Arrest) ஐ சிறை கண்காணிப்பாளர் பஜர்ல் மத்திய சிறை, சென்னை அவர்களிடம் சார்வை செய்து அத்தாட்சி பெற்று நிலையம் வரவும்.
+                                        ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-formal-arrest-tamil" placeholder="Police Station"></span> கா.நி கு.எண். <span class="embedded-field empty" id="crime-no-field-formal-arrest-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-formal-arrest-tamil" placeholder="Section"></span> என்ற வழக்கில் சம்மந்தப்பட்ட எதிரி <span id="accused-list-formal-arrest-tamil"></span> என்பவருக்கு சம்பிரதாய கைது (<span class="embedded-field empty" id="arrest-type-field-tamil" placeholder="Arrest Type"></span>) ஐ <span class="embedded-field empty" id="arrest-prison-field-tamil" placeholder="Prison Name"></span> கண்காணிப்பாளர் அவர்களிடம் சார்வை செய்து அத்தாட்சி பெற்று நிலையம் வரவும்.
                                     </div>
                                 </div>
                                 
                                 <div class="language-content" id="english-content">
                                     <div class="content-text" id="escort-english-content" style="display: none;">
-                                        You are hereby directed to produce the accused <span id="accused-list-english"></span> involved in <span class="embedded-field empty" id="police-station-content-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-english" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-english" placeholder="Section"></span> before the <span class="embedded-field empty" id="mm-field-english" placeholder="MM"></span> Metropolitan Magistrate, obtain orders and return to the station with acknowledgement.
+                                        You are hereby directed to produce the accused <span id="accused-list-english"></span> involved in <span class="embedded-field empty" id="police-station-content-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-english" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-english" placeholder="Section"></span> before the <span class="embedded-field empty" id="court-field-english" placeholder="Court"></span>, obtain orders and return to the station with acknowledgement.
                                     </div>
                                     
                                     <div class="content-text" id="pt-warrant-english-content" style="display: none;">
-                                        You are hereby directed to execute the PT Warrant issued by the Hon'ble <span class="embedded-field empty" id="mm-field-pt-english" placeholder="MM"></span> Metropolitan Magistrate to the accused <span id="accused-list-pt-english"></span> involved in <span class="embedded-field empty" id="police-station-content-pt-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-pt-english" placeholder="Cr. No."></span> U/S <span class="embedded-field empty" id="section-field-pt-english" placeholder="Section"></span> NDPS Act (SC.NO.<span class="embedded-field empty" id="sc-no-field-english" placeholder="SC No."></span>, PRC.NO. <span class="embedded-field empty" id="prc-no-field-english" placeholder="PRC No."></span>) before the Central Prison Superintendent, Chennai and return to the station with acknowledgement.
+                                        You are hereby directed to execute the PT Warrant issued by the Hon'ble <span class="embedded-field empty" id="court-field-pt-english" placeholder="Court"></span> to the accused <span id="accused-list-pt-english"></span> involved in <span class="embedded-field empty" id="police-station-content-pt-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-pt-english" placeholder="Cr. No."></span> U/S <span class="embedded-field empty" id="section-field-pt-english" placeholder="Section"></span> NDPS Act (SC.NO.<span class="embedded-field empty" id="sc-no-field-english" placeholder="SC No."></span>, PRC.NO. <span class="embedded-field empty" id="prc-no-field-english" placeholder="PRC No."></span>) before the Superintendent of <span class="embedded-field empty" id="central-prison-field-english" placeholder="Central Prison"></span> and return to the station with acknowledgement.
                                     </div>
                                     
                                     <div class="content-text" id="sick-passport-english-content" style="display: none;">
@@ -1073,11 +1108,11 @@
                                     </div>
                                     
                                     <div class="content-text" id="transfer-passport-english-content" style="display: none;">
-                                        You are hereby instructed to report before the Inspector of Police G3 Kilpauk L&O PS as per the JCOP East Zone order RC.No.Estt/EZ/2389/82/2023 EZO.No.485/2023, Dt:13.06.2023 immediately and return to the station with acknowledgement.
+                                        You are hereby instructed to report before the Inspector of Police <span class="embedded-field empty" id="to-station-field-english" placeholder="To Station"></span> Police Station as per the transfer order <span class="embedded-field empty" id="transfer-order-number-field-english" placeholder="Transfer Order Number"></span> dated <span class="embedded-field empty" id="transfer-order-date-field-english" placeholder="Transfer Order Date"></span> due to <span class="embedded-field empty" id="transfer-reason-field-english" placeholder="Transfer Reason"></span> from <span class="embedded-field empty" id="from-station-field-english" placeholder="From Station"></span> Police Station immediately and return to the station with acknowledgement.
                                     </div>
                                     
                                     <div class="content-text" id="fir-filing-english-content" style="display: none;">
-                                        You are hereby directed to file the FIR in <span class="embedded-field empty" id="police-station-content-fir-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-fir-english" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-fir-english" placeholder="Section"></span> before the <span class="embedded-field empty" id="mm-field-fir-english" placeholder="MM"></span> Metropolitan Magistrate and return to the station with acknowledgement.
+                                        You are hereby directed to file the FIR in <span class="embedded-field empty" id="police-station-content-fir-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-fir-english" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-fir-english" placeholder="Section"></span> before the <span class="embedded-field empty" id="court-field-fir-english" placeholder="Court"></span> and return to the station with acknowledgement.
                                     </div>
                                     
                                     <div class="content-text" id="visera-report-english-content" style="display: none;">
@@ -1089,7 +1124,7 @@
                                     </div>
                                     
                                     <div class="content-text" id="formal-arrest-english-content" style="display: none;">
-                                        You are hereby directed to produce the accused <span id="accused-list-formal-arrest-english"></span> involved in Crime No. <span class="embedded-field empty" id="crime-no-field-formal-arrest-english" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-formal-arrest-english" placeholder="Section"></span> for Formal Arrest before the Central Prison Superintendent, Puzhal Central Prison, Chennai and return to the station with acknowledgement.
+                                        You are hereby directed to produce the accused <span id="accused-list-formal-arrest-english"></span> involved in <span class="embedded-field empty" id="police-station-content-formal-arrest-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-formal-arrest-english" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-formal-arrest-english" placeholder="Section"></span> for <span class="embedded-field empty" id="arrest-type-field-english" placeholder="Arrest Type"></span> before the Superintendent of <span class="embedded-field empty" id="arrest-prison-field-english" placeholder="Prison Name"></span> and return to the station with acknowledgement.
                                     </div>
                                 </div>
                             </td>
@@ -1131,11 +1166,13 @@
             const contentStatus = document.getElementById('content-status');
             const contentStatusText = document.getElementById('content-status-text');
             const accusedSection = document.getElementById('accused-section');
-            const mmSection = document.getElementById('mm-section');
+            const courtSection = document.getElementById('court-section');
             const transferFields = document.getElementById('transfer-fields');
             const firFields = document.getElementById('fir-fields');
             const viseraFields = document.getElementById('visera-fields');
             const labReportFields = document.getElementById('lab-report-fields');
+            const ptWarrantFields = document.getElementById('pt-warrant-fields');
+            const formalArrestFields = document.getElementById('formal-arrest-fields');
             const timeContainer = document.getElementById('time-container');
             const timeSuffix = document.getElementById('time-suffix');
             
@@ -1227,7 +1264,7 @@
             }
             
             function isValidTime(timeString) {
-                if (!timeString || timeString.trim() === '') return true; // Time is optional
+                if (!timeString || timeString.trim() === '') return true;
                 const regex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
                 return regex.test(timeString);
             }
@@ -1256,7 +1293,6 @@
                 const value = this.value.trim();
                 
                 if (fieldId === 'time' || fieldId === 'incidentTime') {
-                    // Time fields are optional, only validate if they have content
                     if (value && !isValidTime(value)) {
                         showError(fieldId, 'Please enter a valid time in HH:MM format or leave blank');
                         return false;
@@ -1283,16 +1319,16 @@
                     }
                 }
                 
-                if (fieldId === 'date' || fieldId === 'incidentDate' || fieldId === 'pmDate' || fieldId === 'narDate') {
+                if (fieldId === 'date' || fieldId === 'incidentDate' || fieldId === 'pmDate' || fieldId === 'narDate' || fieldId === 'transferOrderDate') {
                     if (!isValidDate(value)) {
                         showError(fieldId, 'Please enter a valid date in DD/MM/YYYY format');
                         return false;
                     }
                 }
                 
-                if (fieldId === 'mm') {
-                    if (isNaN(value) || value < 1) {
-                        showError(fieldId, 'Please enter a valid MM number');
+                if (fieldId === 'court') {
+                    if (!value) {
+                        showError(fieldId, 'Please select a court');
                         return false;
                     }
                 }
@@ -1308,55 +1344,97 @@
                 return true;
             }
             
-            function toggleTransferFields() {
+            function updateContentVisibility() {
                 const passportType = passportTypeSelect.value;
                 
+                // Hide all conditional fields first
+                transferFields.classList.remove('active');
+                firFields.classList.remove('active');
+                viseraFields.classList.remove('active');
+                labReportFields.classList.remove('active');
+                ptWarrantFields.classList.remove('active');
+                formalArrestFields.classList.remove('active');
+                
+                // Show relevant fields based on passport type
                 if (passportType === 'Transfer Passport') {
                     transferFields.classList.add('active');
-                } else {
-                    transferFields.classList.remove('active');
-                }
-            }
-            
-            function toggleFIRFields() {
-                const passportType = passportTypeSelect.value;
-                
-                if (passportType === 'FIR Filing Passport') {
+                } else if (passportType === 'FIR Filing Passport') {
                     firFields.classList.add('active');
-                } else {
-                    firFields.classList.remove('active');
-                }
-            }
-            
-            function toggleViseraFields() {
-                const passportType = passportTypeSelect.value;
-                
-                if (passportType === 'Visera Report') {
+                } else if (passportType === 'Visera Report') {
                     viseraFields.classList.add('active');
-                } else {
-                    viseraFields.classList.remove('active');
-                }
-            }
-            
-            function toggleLabReportFields() {
-                const passportType = passportTypeSelect.value;
-                
-                if (passportType === 'Lab Report') {
+                } else if (passportType === 'Lab Report') {
                     labReportFields.classList.add('active');
-                } else {
-                    labReportFields.classList.remove('active');
+                } else if (passportType === 'PT warrant') {
+                    ptWarrantFields.classList.add('active');
+                } else if (passportType === 'Formal Arrest') {
+                    formalArrestFields.classList.add('active');
+                }
+                
+                // Update content templates
+                updateContentTemplates();
+            }
+            
+            function updateContentTemplates() {
+                const passportType = passportTypeSelect.value;
+                
+                document.querySelectorAll('.content-text').forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                contentPlaceholder.style.display = 'block';
+                
+                if (!passportType) return;
+                
+                contentPlaceholder.style.display = 'none';
+                
+                if (currentLanguage === 'tamil') {
+                    if (passportType === 'Escort') {
+                        document.getElementById('escort-tamil-content').style.display = 'block';
+                    } else if (passportType === 'PT warrant') {
+                        document.getElementById('pt-warrant-tamil-content').style.display = 'block';
+                    } else if (passportType === 'Sick Passport') {
+                        document.getElementById('sick-passport-tamil-content').style.display = 'block';
+                    } else if (passportType === 'Transfer Passport') {
+                        document.getElementById('transfer-passport-tamil-content').style.display = 'block';
+                    } else if (passportType === 'FIR Filing Passport') {
+                        document.getElementById('fir-filing-tamil-content').style.display = 'block';
+                    } else if (passportType === 'Visera Report') {
+                        document.getElementById('visera-report-tamil-content').style.display = 'block';
+                    } else if (passportType === 'Lab Report') {
+                        document.getElementById('lab-report-tamil-content').style.display = 'block';
+                    } else if (passportType === 'Formal Arrest') {
+                        document.getElementById('formal-arrest-tamil-content').style.display = 'block';
+                    }
+                } else if (currentLanguage === 'english') {
+                    if (passportType === 'Escort') {
+                        document.getElementById('escort-english-content').style.display = 'block';
+                    } else if (passportType === 'PT warrant') {
+                        document.getElementById('pt-warrant-english-content').style.display = 'block';
+                    } else if (passportType === 'Sick Passport') {
+                        document.getElementById('sick-passport-english-content').style.display = 'block';
+                    } else if (passportType === 'Transfer Passport') {
+                        document.getElementById('transfer-passport-english-content').style.display = 'block';
+                    } else if (passportType === 'FIR Filing Passport') {
+                        document.getElementById('fir-filing-english-content').style.display = 'block';
+                    } else if (passportType === 'Visera Report') {
+                        document.getElementById('visera-report-english-content').style.display = 'block';
+                    } else if (passportType === 'Lab Report') {
+                        document.getElementById('lab-report-english-content').style.display = 'block';
+                    } else if (passportType === 'Formal Arrest') {
+                        document.getElementById('formal-arrest-english-content').style.display = 'block';
+                    }
                 }
             }
             
-            function toggleMMSection() {
+            function toggleCourtSection() {
                 const passportType = passportTypeSelect.value;
                 
                 if (passportType === 'Lab Report') {
-                    mmSection.classList.add('hidden');
-                    document.getElementById('mm').removeAttribute('required');
+                    courtSection.classList.add('hidden');
+                    document.getElementById('court').removeAttribute('required');
                 } else {
-                    mmSection.classList.remove('hidden');
-                    document.getElementById('mm').setAttribute('required', 'required');
+                    courtSection.classList.remove('hidden');
+                    document.getElementById('court').setAttribute('required', 'required');
                 }
             }
             
@@ -1453,8 +1531,10 @@
                 officerContainer.id = `police-officer-${index}`;
                 
                 officerContainer.innerHTML = `
-                    <div class="preview-field compact-field officer-designation empty" id="designation-field-${index}" placeholder="Designation with Number"></div>
-                    <div class="preview-field compact-field officer-name empty" id="full-name-field-${index}" placeholder="Full Name"></div>
+                    <div class="officer-details-preview">
+                        <div class="preview-field compact-field officer-designation empty" id="designation-field-${index}" placeholder="Designation with Number"></div>
+                        <div class="preview-field compact-field officer-name empty" id="full-name-field-${index}" placeholder="Full Name"></div>
+                    </div>
                 `;
                 
                 return officerContainer;
@@ -1561,7 +1641,7 @@
                 ];
                 
                 if (passportTypeSelect.value !== 'Lab Report') {
-                    mainFields.push('mm');
+                    mainFields.push('court');
                 }
                 
                 mainFields.forEach(fieldId => {
@@ -1571,14 +1651,13 @@
                     }
                 });
                 
-                // Validate time field (optional)
                 const timeField = document.getElementById('time');
                 if (!validateField.call(timeField)) {
                     isValid = false;
                 }
                 
                 if (passportTypeSelect.value === 'Transfer Passport') {
-                    const transferFields = ['fromStation', 'toStation', 'transferReason'];
+                    const transferFields = ['fromStation', 'toStation', 'transferReason', 'transferOrderNumber', 'transferOrderDate'];
                     transferFields.forEach(fieldId => {
                         const field = document.getElementById(fieldId);
                         if (!validateField.call(field)) {
@@ -1587,7 +1666,7 @@
                     });
                 }
                 
-                if (passportTypeSelect.value === 'FIR Filing Passport' && !firFields.classList.contains('hidden')) {
+                if (passportTypeSelect.value === 'FIR Filing Passport') {
                     const firFieldsToValidate = ['complainantName', 'complainantAddress', 'incidentDate', 'incidentPlace'];
                     firFieldsToValidate.forEach(fieldId => {
                         const field = document.getElementById(fieldId);
@@ -1595,7 +1674,6 @@
                             isValid = false;
                         }
                     });
-                    // Incident time is optional
                     const incidentTimeField = document.getElementById('incidentTime');
                     if (!validateField.call(incidentTimeField)) {
                         isValid = false;
@@ -1615,6 +1693,26 @@
                 if (passportTypeSelect.value === 'Lab Report') {
                     const labReportFields = ['narNumber', 'narDate'];
                     labReportFields.forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (!validateField.call(field)) {
+                            isValid = false;
+                        }
+                    });
+                }
+                
+                if (passportTypeSelect.value === 'PT warrant') {
+                    const ptWarrantFields = ['scNumber', 'prcNumber', 'centralPrison'];
+                    ptWarrantFields.forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (!validateField.call(field)) {
+                            isValid = false;
+                        }
+                    });
+                }
+
+                if (passportTypeSelect.value === 'Formal Arrest') {
+                    const formalArrestFields = ['arrestPrison', 'arrestType'];
+                    formalArrestFields.forEach(fieldId => {
                         const field = document.getElementById(fieldId);
                         if (!validateField.call(field)) {
                             isValid = false;
@@ -1655,7 +1753,7 @@
                         policeStation: document.getElementById('policeStation').value,
                         crimeNumber: document.getElementById('crimeNumber').value,
                         section: document.getElementById('section').value,
-                        mm: document.getElementById('mm').value,
+                        court: document.getElementById('court').value,
                         date: document.getElementById('date').value,
                         time: document.getElementById('time').value,
                         officerCount: officerCounter,
@@ -1682,7 +1780,7 @@
                     document.getElementById('policeStation').value = formData.policeStation || '';
                     document.getElementById('crimeNumber').value = formData.crimeNumber || '';
                     document.getElementById('section').value = formData.section || '';
-                    document.getElementById('mm').value = formData.mm || '';
+                    document.getElementById('court').value = formData.court || '';
                     document.getElementById('date').value = formData.date || '';
                     document.getElementById('time').value = formData.time || '';
                     
@@ -1703,11 +1801,7 @@
                     }
                     
                     updateContentVisibility();
-                    toggleTransferFields();
-                    toggleFIRFields();
-                    toggleViseraFields();
-                    toggleLabReportFields();
-                    toggleMMSection();
+                    toggleCourtSection();
                     toggleAccusedSection();
                     updateContentStatus();
                     
@@ -1722,59 +1816,7 @@
                 
                 document.getElementById(`${currentLanguage}-content`).classList.add('active');
                 
-                updateContentVisibility();
-            }
-            
-            function updateContentVisibility() {
-                const passportType = passportTypeSelect.value;
-                
-                document.querySelectorAll('.content-text').forEach(el => {
-                    el.style.display = 'none';
-                });
-                
-                contentPlaceholder.style.display = 'block';
-                
-                if (!passportType) return;
-                
-                contentPlaceholder.style.display = 'none';
-                
-                if (currentLanguage === 'tamil') {
-                    if (passportType === 'Escort') {
-                        document.getElementById('escort-tamil-content').style.display = 'block';
-                    } else if (passportType === 'PT warrant') {
-                        document.getElementById('pt-warrant-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Sick Passport') {
-                        document.getElementById('sick-passport-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Transfer Passport') {
-                        document.getElementById('transfer-passport-tamil-content').style.display = 'block';
-                    } else if (passportType === 'FIR Filing Passport') {
-                        document.getElementById('fir-filing-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Visera Report') {
-                        document.getElementById('visera-report-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Lab Report') {
-                        document.getElementById('lab-report-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Formal Arrest') {
-                        document.getElementById('formal-arrest-tamil-content').style.display = 'block';
-                    }
-                } else if (currentLanguage === 'english') {
-                    if (passportType === 'Escort') {
-                        document.getElementById('escort-english-content').style.display = 'block';
-                    } else if (passportType === 'PT warrant') {
-                        document.getElementById('pt-warrant-english-content').style.display = 'block';
-                    } else if (passportType === 'Sick Passport') {
-                        document.getElementById('sick-passport-english-content').style.display = 'block';
-                    } else if (passportType === 'Transfer Passport') {
-                        document.getElementById('transfer-passport-english-content').style.display = 'block';
-                    } else if (passportType === 'FIR Filing Passport') {
-                        document.getElementById('fir-filing-english-content').style.display = 'block';
-                    } else if (passportType === 'Visera Report') {
-                        document.getElementById('visera-report-english-content').style.display = 'block';
-                    } else if (passportType === 'Lab Report') {
-                        document.getElementById('lab-report-english-content').style.display = 'block';
-                    } else if (passportType === 'Formal Arrest') {
-                        document.getElementById('formal-arrest-english-content').style.display = 'block';
-                    }
-                }
+                updateContentTemplates();
             }
             
             function initializeApp() {
@@ -1782,6 +1824,7 @@
                 updateAccusedPersons();
                 loadSavedData();
                 updateContentStatus();
+                updateContentVisibility();
             }
             
             initializeApp();
@@ -1793,11 +1836,7 @@
             
             passportTypeSelect.addEventListener('change', function() {
                 updateContentVisibility();
-                toggleTransferFields();
-                toggleFIRFields();
-                toggleViseraFields();
-                toggleLabReportFields();
-                toggleMMSection();
+                toggleCourtSection();
                 toggleAccusedSection();
                 updateContentStatus();
                 autoSave();
@@ -1832,11 +1871,12 @@
                 field.addEventListener('blur', validateField);
             });
             
-            // Add validation for optional time fields
             document.getElementById('time').addEventListener('blur', validateField);
             document.getElementById('incidentTime').addEventListener('blur', validateField);
             
             fillFormBtn.addEventListener('click', function() {
+                console.log("Generate Document button clicked");
+                
                 if (!validateForm()) {
                     showNotification('Please fix the errors in the form before generating the document', 'error');
                     return;
@@ -1856,24 +1896,27 @@
                 const date = document.getElementById('date').value;
                 const crimeNumber = document.getElementById('crimeNumber').value;
                 const section = document.getElementById('section').value;
-                const mm = document.getElementById('mm').value;
+                const court = document.getElementById('court').value;
                 
+                const scNumber = document.getElementById('scNumber')?.value || '';
+                const prcNumber = document.getElementById('prcNumber')?.value || '';
+                const centralPrison = document.getElementById('centralPrison')?.value || '';
                 const fromStation = document.getElementById('fromStation')?.value || '';
                 const toStation = document.getElementById('toStation')?.value || '';
                 const transferReason = document.getElementById('transferReason')?.value || '';
-                
+                const transferOrderNumber = document.getElementById('transferOrderNumber')?.value || '';
+                const transferOrderDate = document.getElementById('transferOrderDate')?.value || '';
                 const deceasedName = document.getElementById('deceasedName')?.value || '';
                 const deceasedAge = document.getElementById('deceasedAge')?.value || '';
                 const deceasedFatherName = document.getElementById('deceasedFatherName')?.value || '';
                 const pmNumber = document.getElementById('pmNumber')?.value || '';
                 const pmDate = document.getElementById('pmDate')?.value || '';
-                
                 const narNumber = document.getElementById('narNumber')?.value || '';
                 const narDate = document.getElementById('narDate')?.value || '';
+                const arrestPrison = document.getElementById('arrestPrison')?.value || '';
+                const arrestType = document.getElementById('arrestType')?.value || '';
                 
-                const mmNumber = parseInt(mm);
-                const mmWithSuffix = getOrdinalSuffix(mmNumber);
-                
+                console.log("Updating police officers in preview");
                 for (let i = 1; i <= policeCount; i++) {
                     const designation = document.getElementById(`designation${i}`).value;
                     const fullName = document.getElementById(`fullName${i}`).value;
@@ -1891,7 +1934,6 @@
                 document.getElementById('police-station-field').textContent = policeStation;
                 document.getElementById('police-station-field').classList.remove('empty');
                 
-                // Handle time field - keep space vacant when time is not provided
                 if (time && time.trim() !== '') {
                     document.getElementById('time-field').textContent = time;
                     document.getElementById('time-field').classList.remove('empty');
@@ -1909,8 +1951,6 @@
                 let accusedListEnglish = '';
                 let accusedListPtTamil = '';
                 let accusedListPtEnglish = '';
-                let accusedListTransferTamil = '';
-                let accusedListTransferEnglish = '';
                 let accusedListFormalArrestTamil = '';
                 let accusedListFormalArrestEnglish = '';
                 
@@ -1923,31 +1963,28 @@
                         if (currentLanguage === 'tamil') {
                             accusedListTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
                             accusedListPtTamil += `${accusedName}, பெ-வ ${age}, த/பெ ${fatherName}`;
-                            accusedListTransferTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
                             accusedListFormalArrestTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
                             
                             if (i < accusedCount) {
                                 accusedListTamil += ', ';
                                 accusedListPtTamil += ', ';
-                                accusedListTransferTamil += ', ';
                                 accusedListFormalArrestTamil += ', ';
                             }
                         } else {
                             accusedListEnglish += `${accusedName} aged ${age} years, S/o ${fatherName}`;
                             accusedListPtEnglish += `${accusedName} aged ${age} years, S/o ${fatherName}`;
-                            accusedListTransferEnglish += `${accusedName} aged ${age} years, S/o ${fatherName}`;
                             accusedListFormalArrestEnglish += `${accusedName} aged ${age} years, S/o ${fatherName}`;
                             
                             if (i < accusedCount) {
                                 accusedListEnglish += ', ';
                                 accusedListPtEnglish += ', ';
-                                accusedListTransferEnglish += ', ';
                                 accusedListFormalArrestEnglish += ', ';
                             }
                         }
                     }
                 }
                 
+                console.log("Updating document content for language:", currentLanguage);
                 if (currentLanguage === 'tamil') {
                     if (passportType === 'Escort' || passportType === 'PT warrant' || passportType === 'Transfer Passport' || passportType === 'FIR Filing Passport' || passportType === 'Visera Report' || passportType === 'Lab Report' || passportType === 'Formal Arrest') {
                         document.getElementById('police-station-content-tamil').textContent = policeStation;
@@ -1962,8 +1999,8 @@
                         document.getElementById('accused-list-tamil').textContent = accusedListTamil;
                         
                         if (passportType !== 'Lab Report') {
-                            document.getElementById('mm-field-tamil').textContent = mm;
-                            document.getElementById('mm-field-tamil').classList.remove('empty');
+                            document.getElementById('court-field-tamil').textContent = court;
+                            document.getElementById('court-field-tamil').classList.remove('empty');
                         }
                     }
                     if (passportType === 'PT warrant') {
@@ -1978,19 +2015,33 @@
                         
                         document.getElementById('accused-list-pt-tamil').textContent = accusedListPtTamil;
                         
-                        document.getElementById('mm-field-pt-tamil').textContent = mm;
-                        document.getElementById('mm-field-pt-tamil').classList.remove('empty');
+                        document.getElementById('court-field-pt-tamil').textContent = court;
+                        document.getElementById('court-field-pt-tamil').classList.remove('empty');
                         
-                        document.getElementById('sc-no-field-tamil').textContent = '97/2023';
+                        document.getElementById('sc-no-field-tamil').textContent = scNumber;
                         document.getElementById('sc-no-field-tamil').classList.remove('empty');
                         
-                        document.getElementById('prc-no-field-tamil').textContent = '156/2021';
+                        document.getElementById('prc-no-field-tamil').textContent = prcNumber;
                         document.getElementById('prc-no-field-tamil').classList.remove('empty');
                         
-                        document.getElementById('central-prison-field-tamil').textContent = 'மத்திய சிறை';
+                        document.getElementById('central-prison-field-tamil').textContent = centralPrison;
                         document.getElementById('central-prison-field-tamil').classList.remove('empty');
                     }
                     if (passportType === 'Transfer Passport') {
+                        document.getElementById('from-station-field-tamil').textContent = fromStation;
+                        document.getElementById('from-station-field-tamil').classList.remove('empty');
+                        
+                        document.getElementById('to-station-field-tamil').textContent = toStation;
+                        document.getElementById('to-station-field-tamil').classList.remove('empty');
+                        
+                        document.getElementById('transfer-reason-field-tamil').textContent = transferReason;
+                        document.getElementById('transfer-reason-field-tamil').classList.remove('empty');
+                        
+                        document.getElementById('transfer-order-number-field-tamil').textContent = transferOrderNumber;
+                        document.getElementById('transfer-order-number-field-tamil').classList.remove('empty');
+                        
+                        document.getElementById('transfer-order-date-field-tamil').textContent = transferOrderDate;
+                        document.getElementById('transfer-order-date-field-tamil').classList.remove('empty');
                     }
                     if (passportType === 'FIR Filing Passport') {
                         document.getElementById('police-station-content-fir-tamil').textContent = policeStation;
@@ -2002,10 +2053,8 @@
                         document.getElementById('section-field-fir-tamil').textContent = section;
                         document.getElementById('section-field-fir-tamil').classList.remove('empty');
                         
-                        document.getElementById('accused-list-fir-tamil').textContent = '';
-                        
-                        document.getElementById('mm-field-fir-tamil').textContent = mm;
-                        document.getElementById('mm-field-fir-tamil').classList.remove('empty');
+                        document.getElementById('court-field-fir-tamil').textContent = court;
+                        document.getElementById('court-field-fir-tamil').classList.remove('empty');
                     }
                     if (passportType === 'Visera Report') {
                         document.getElementById('police-station-content-visera-tamil').textContent = policeStation;
@@ -2052,6 +2101,9 @@
                         document.getElementById('nar-date-field-tamil').classList.remove('empty');
                     }
                     if (passportType === 'Formal Arrest') {
+                        document.getElementById('police-station-content-formal-arrest-tamil').textContent = policeStation;
+                        document.getElementById('police-station-content-formal-arrest-tamil').classList.remove('empty');
+                        
                         document.getElementById('crime-no-field-formal-arrest-tamil').textContent = crimeNumber;
                         document.getElementById('crime-no-field-formal-arrest-tamil').classList.remove('empty');
                         
@@ -2059,6 +2111,12 @@
                         document.getElementById('section-field-formal-arrest-tamil').classList.remove('empty');
                         
                         document.getElementById('accused-list-formal-arrest-tamil').textContent = accusedListFormalArrestTamil;
+                        
+                        document.getElementById('arrest-type-field-tamil').textContent = arrestType;
+                        document.getElementById('arrest-type-field-tamil').classList.remove('empty');
+                        
+                        document.getElementById('arrest-prison-field-tamil').textContent = arrestPrison;
+                        document.getElementById('arrest-prison-field-tamil').classList.remove('empty');
                     }
                 } else if (currentLanguage === 'english') {
                     if (passportType === 'Escort' || passportType === 'PT warrant' || passportType === 'Transfer Passport' || passportType === 'FIR Filing Passport' || passportType === 'Visera Report' || passportType === 'Lab Report' || passportType === 'Formal Arrest') {
@@ -2074,8 +2132,8 @@
                         document.getElementById('accused-list-english').textContent = accusedListEnglish;
                         
                         if (passportType !== 'Lab Report') {
-                            document.getElementById('mm-field-english').textContent = mmWithSuffix || mm;
-                            document.getElementById('mm-field-english').classList.remove('empty');
+                            document.getElementById('court-field-english').textContent = court;
+                            document.getElementById('court-field-english').classList.remove('empty');
                         }
                     }
                     if (passportType === 'PT warrant') {
@@ -2090,16 +2148,33 @@
                         
                         document.getElementById('accused-list-pt-english').textContent = accusedListPtEnglish;
                         
-                        document.getElementById('mm-field-pt-english').textContent = mmWithSuffix || mm;
-                        document.getElementById('mm-field-pt-english').classList.remove('empty');
+                        document.getElementById('court-field-pt-english').textContent = court;
+                        document.getElementById('court-field-pt-english').classList.remove('empty');
                         
-                        document.getElementById('sc-no-field-english').textContent = '97/2023';
+                        document.getElementById('sc-no-field-english').textContent = scNumber;
                         document.getElementById('sc-no-field-english').classList.remove('empty');
                         
-                        document.getElementById('prc-no-field-english').textContent = '156/2021';
+                        document.getElementById('prc-no-field-english').textContent = prcNumber;
                         document.getElementById('prc-no-field-english').classList.remove('empty');
+                        
+                        document.getElementById('central-prison-field-english').textContent = centralPrison;
+                        document.getElementById('central-prison-field-english').classList.remove('empty');
                     }
                     if (passportType === 'Transfer Passport') {
+                        document.getElementById('from-station-field-english').textContent = fromStation;
+                        document.getElementById('from-station-field-english').classList.remove('empty');
+                        
+                        document.getElementById('to-station-field-english').textContent = toStation;
+                        document.getElementById('to-station-field-english').classList.remove('empty');
+                        
+                        document.getElementById('transfer-reason-field-english').textContent = transferReason;
+                        document.getElementById('transfer-reason-field-english').classList.remove('empty');
+                        
+                        document.getElementById('transfer-order-number-field-english').textContent = transferOrderNumber;
+                        document.getElementById('transfer-order-number-field-english').classList.remove('empty');
+                        
+                        document.getElementById('transfer-order-date-field-english').textContent = transferOrderDate;
+                        document.getElementById('transfer-order-date-field-english').classList.remove('empty');
                     }
                     if (passportType === 'FIR Filing Passport') {
                         document.getElementById('police-station-content-fir-english').textContent = policeStation;
@@ -2111,10 +2186,8 @@
                         document.getElementById('section-field-fir-english').textContent = section;
                         document.getElementById('section-field-fir-english').classList.remove('empty');
                         
-                        document.getElementById('accused-list-fir-english').textContent = '';
-                        
-                        document.getElementById('mm-field-fir-english').textContent = mmWithSuffix || mm;
-                        document.getElementById('mm-field-fir-english').classList.remove('empty');
+                        document.getElementById('court-field-fir-english').textContent = court;
+                        document.getElementById('court-field-fir-english').classList.remove('empty');
                     }
                     if (passportType === 'Visera Report') {
                         document.getElementById('police-station-content-visera-english').textContent = policeStation;
@@ -2161,6 +2234,9 @@
                         document.getElementById('nar-date-field-english').classList.remove('empty');
                     }
                     if (passportType === 'Formal Arrest') {
+                        document.getElementById('police-station-content-formal-arrest-english').textContent = policeStation;
+                        document.getElementById('police-station-content-formal-arrest-english').classList.remove('empty');
+                        
                         document.getElementById('crime-no-field-formal-arrest-english').textContent = crimeNumber;
                         document.getElementById('crime-no-field-formal-arrest-english').classList.remove('empty');
                         
@@ -2168,10 +2244,16 @@
                         document.getElementById('section-field-formal-arrest-english').classList.remove('empty');
                         
                         document.getElementById('accused-list-formal-arrest-english').textContent = accusedListFormalArrestEnglish;
+                        
+                        document.getElementById('arrest-type-field-english').textContent = arrestType;
+                        document.getElementById('arrest-type-field-english').classList.remove('empty');
+                        
+                        document.getElementById('arrest-prison-field-english').textContent = arrestPrison;
+                        document.getElementById('arrest-prison-field-english').classList.remove('empty');
                     }
                 }
                 
-                updateContentVisibility();
+                updateContentTemplates();
                 
                 showNotification('Document generated successfully!', 'success');
             });
@@ -2200,15 +2282,11 @@
                 const previewElement = document.getElementById('document-to-print');
                 previewElement.classList.add('pdf-mode');
                 
-                // Remove the placeholder text completely for PDF generation
                 const timeField = document.getElementById('time-field');
                 if (timeField.classList.contains('empty')) {
-                    // Store the original placeholder
                     const originalPlaceholder = timeField.getAttribute('placeholder');
                     timeField.setAttribute('data-original-placeholder', originalPlaceholder);
-                    // Remove the placeholder attribute to prevent the ::before content from showing
                     timeField.removeAttribute('placeholder');
-                    // Clear any text content
                     timeField.textContent = '';
                 }
                 
@@ -2252,7 +2330,6 @@
                                     el.style.backgroundColor = '#FFFFFF';
                                 });
                                 
-                                // Remove placeholder from cloned document too
                                 const clonedTimeField = clonedDoc.getElementById('time-field');
                                 if (clonedTimeField && clonedTimeField.classList.contains('empty')) {
                                     const originalPlaceholder = clonedTimeField.getAttribute('data-original-placeholder');
@@ -2298,7 +2375,6 @@
                             }
                         });
                         
-                        // Restore the placeholder after PDF generation
                         if (timeField.classList.contains('empty')) {
                             const originalPlaceholder = timeField.getAttribute('data-original-placeholder');
                             if (originalPlaceholder) {
