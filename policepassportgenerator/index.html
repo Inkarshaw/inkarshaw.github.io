@@ -135,7 +135,7 @@
             color: var(--secondary-color);
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid var(--border-color);
@@ -144,7 +144,12 @@
             transition: var(--transition);
         }
         
-        input:focus, select:focus {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
@@ -315,6 +320,7 @@
             vertical-align: top;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            font-size: 13px !important;
         }
         
         .document-table .left-column {
@@ -328,6 +334,10 @@
         
         .document-table .right-column {
             width: 50%;
+            text-align: justify;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
         
         .preview-field {
@@ -338,7 +348,7 @@
             background: transparent;
             color: #000000 !important;
             box-sizing: border-box;
-            font-size: 14px;
+            font-size: 13px !important;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
@@ -364,7 +374,7 @@
             background: transparent;
             color: #000000 !important;
             box-sizing: border-box;
-            font-size: 14px;
+            font-size: 13px !important;
             text-align: center;
             margin: 0;
             border: none;
@@ -382,7 +392,7 @@
         .time-suffix {
             color: #000000 !important;
             white-space: nowrap;
-            font-size: 14px;
+            font-size: 13px !important;
             margin-left: 2px;
             display: inline;
             height: auto;
@@ -392,10 +402,12 @@
         .content-text {
             text-align: justify;
             line-height: 1.6;
-            font-size: 14px;
+            font-size: 13px !important;
             color: #000000 !important;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            hyphens: auto;
+            text-justify: inter-word;
         }
         
         .embedded-field {
@@ -404,8 +416,12 @@
             padding: 0 2px;
             margin: 0;
             background: transparent;
-            white-space: nowrap;
+            white-space: normal;
             color: #000000 !important;
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-size: 13px !important;
         }
         
         .embedded-field.empty:before {
@@ -590,7 +606,10 @@
         .formal-arrest-fields,
         .fir-fields,
         .visera-fields,
-        .lab-report-fields {
+        .lab-report-fields,
+        .sick-passport-fields,
+        .property-lab-fields,
+        .ml-passport-fields {
             display: none;
             background-color: #f0f9ff;
             padding: 15px;
@@ -604,7 +623,10 @@
         .formal-arrest-fields.active,
         .fir-fields.active,
         .visera-fields.active,
-        .lab-report-fields.active {
+        .lab-report-fields.active,
+        .sick-passport-fields.active,
+        .property-lab-fields.active,
+        .ml-passport-fields.active {
             display: block;
             animation: slideDown 0.3s ease;
         }
@@ -711,6 +733,52 @@
             color: white;
         }
 
+        /* Enhanced PDF styling */
+        .pdf-optimized {
+            transform: scale(1) !important;
+            transform-origin: top left !important;
+            width: 595px !important;
+            height: 842px !important;
+            background: white !important;
+            box-shadow: none !important;
+            border: 1px solid #000 !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+        }
+        
+        .pdf-optimized .document-table {
+            border: 2px solid #000000 !important;
+            background: white !important;
+        }
+        
+        .pdf-optimized .document-table td {
+            border: 1px solid #000000 !important;
+            background: white !important;
+            color: #000000 !important;
+            font-size: 13px !important;
+            line-height: 1.4 !important;
+        }
+        
+        .pdf-optimized .content-text,
+        .pdf-optimized .preview-field,
+        .pdf-optimized .embedded-field,
+        .pdf-optimized .time-field,
+        .pdf-optimized .time-suffix {
+            color: #000000 !important;
+            background: transparent !important;
+            font-weight: normal !important;
+            text-shadow: none !important;
+        }
+        
+        .pdf-optimized .preview-field.empty:before,
+        .pdf-optimized .embedded-field.empty:before,
+        .pdf-optimized .time-field.empty:before {
+            color: #000000 !important;
+            opacity: 0.5 !important;
+        }
+
+        /* FIXED CSS FOR PDF TEXT COLOR ISSUE */
         #document-to-print,
         #document-to-print .document-table,
         #document-to-print .document-table td,
@@ -732,6 +800,7 @@
         #document-to-print.pdf-mode .time-suffix {
             color: #000000 !important;
             font-weight: normal !important;
+            text-align: justify !important;
         }
 
         #document-to-print.pdf-mode {
@@ -763,6 +832,67 @@
         #document-to-print.pdf-mode .time-field.empty,
         #document-to-print.pdf-mode .time-field.empty:before {
             color: #ffffff !important;
+        }
+
+        /* FIX FOR RIGHT COLUMN GREY TEXT IN PDF */
+        #document-to-print.pdf-mode .right-column,
+        #document-to-print.pdf-mode .right-column .content-text,
+        #document-to-print.pdf-mode .right-column .embedded-field,
+        #document-to-print.pdf-mode .right-column .preview-field {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: justify !important;
+        }
+
+        #document-to-print.pdf-mode .right-column * {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+        }
+
+        /* Remove grey placeholder styling for PDF mode */
+        #document-to-print.pdf-mode .right-column .preview-field.empty:before,
+        #document-to-print.pdf-mode .right-column .embedded-field.empty:before {
+            color: #000000 !important;
+            opacity: 0 !important;
+            display: none !important;
+        }
+
+        .court-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .court-input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Ensure proper spacing between paragraphs */
+        .content-text + .content-text {
+            margin-top: 10px;
+        }
+        
+        /* Fix for long text wrapping in embedded fields */
+        .embedded-field.long-text {
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            display: inline-block;
+            max-width: 100%;
+        }
+        
+        .date-range-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .date-range-group {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -809,30 +939,101 @@
                     </select>
                 </div>
                 
-                <div class="form-group">
-                    <label for="policeStation" class="required">Police Station</label>
-                    <input type="text" id="policeStation" placeholder="Enter police station name">
-                    <div class="error-message" id="policeStation-error">Please enter a police station</div>
-                    <div class="help-text">This will be used in the document content</div>
+                <!-- ML Passport Fields -->
+                <div class="ml-passport-fields" id="ml-passport-fields">
+                    <h3 class="section-title"><i class="fas fa-file-medical-alt"></i> Medical Leave Details</h3>
+                    <div class="form-group">
+                        <label for="mlPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="mlPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="mlPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveDays" class="required">Number of Leave Days</label>
+                        <input type="text" id="leaveDays" placeholder="Enter number of days (e.g., 5, 10, 15)">
+                        <div class="error-message" id="leaveDays-error">Please enter number of leave days</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveStartDate" class="required">Leave Start Date</label>
+                        <input type="text" id="leaveStartDate" placeholder="Enter start date in DD/MM/YYYY format">
+                        <div class="error-message" id="leaveStartDate-error">Please enter a valid start date</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveEndDate" class="required">Leave End Date</label>
+                        <input type="text" id="leaveEndDate" placeholder="Enter end date in DD/MM/YYYY format">
+                        <div class="error-message" id="leaveEndDate-error">Please enter a valid end date</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportBackDate" class="required">Report Back Date</label>
+                        <input type="text" id="reportBackDate" placeholder="Enter report back date in DD/MM/YYYY format">
+                        <div class="error-message" id="reportBackDate-error">Please enter a valid report back date</div>
+                        <div class="help-text">Date when the officer should report back for duty</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="session" class="required">Session</label>
+                        <select id="session">
+                            <option value="F.N">F.N (Forenoon)</option>
+                            <option value="A.N">A.N (Afternoon)</option>
+                        </select>
+                        <div class="error-message" id="session-error">Please select session</div>
+                        <div class="help-text">Select F.N for Forenoon or A.N for Afternoon</div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="crimeNumber" class="required">Crime Number</label>
-                    <input type="text" id="crimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
-                    <div class="error-message" id="crimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
-                    <div class="format-example">Format: number/year (e.g., 123/2024)</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="section" class="required">Section</label>
-                    <input type="text" id="section" placeholder="Enter section">
-                    <div class="error-message" id="section-error">Please enter a section</div>
-                    <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
+                <!-- Property to Lab Fields -->
+                <div class="property-lab-fields" id="property-lab-fields">
+                    <h3 class="section-title"><i class="fas fa-flask"></i> Property to Lab Details</h3>
+                    <div class="form-group">
+                        <label for="propertyPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="propertyPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="propertyPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyCrimeNumber" class="required">Crime Number</label>
+                        <input type="text" id="propertyCrimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
+                        <div class="error-message" id="propertyCrimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
+                        <div class="format-example">Format: number/year (e.g., 123/2024)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertySection" class="required">Section</label>
+                        <input type="text" id="propertySection" placeholder="Enter section">
+                        <div class="error-message" id="propertySection-error">Please enter a section</div>
+                        <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyDescription" class="required">Property Description</label>
+                        <textarea id="propertyDescription" placeholder="Enter property description (e.g., mobile phone, documents, etc.)" rows="3"></textarea>
+                        <div class="error-message" id="propertyDescription-error">Please enter property description</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertySeizedDate" class="required">Property Seized Date</label>
+                        <input type="text" id="propertySeizedDate" placeholder="Enter property seized date in DD/MM/YYYY format">
+                        <div class="error-message" id="propertySeizedDate-error">Please enter a valid property seized date</div>
+                    </div>
                 </div>
                 
                 <!-- PT Warrant Fields -->
                 <div class="pt-warrant-fields" id="pt-warrant-fields">
                     <h3 class="section-title"><i class="fas fa-gavel"></i> PT Warrant Details</h3>
+                    <div class="form-group">
+                        <label for="ptPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="ptPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="ptPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ptCrimeNumber" class="required">Crime Number</label>
+                        <input type="text" id="ptCrimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
+                        <div class="error-message" id="ptCrimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
+                        <div class="format-example">Format: number/year (e.g., 123/2024)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ptSection" class="required">Section</label>
+                        <input type="text" id="ptSection" placeholder="Enter section">
+                        <div class="error-message" id="ptSection-error">Please enter a section</div>
+                        <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
+                    </div>
                     <div class="form-group">
                         <label for="scNumber" class="required">SC Number</label>
                         <input type="text" id="scNumber" placeholder="Enter SC Number (e.g., 97/2023)">
@@ -853,6 +1054,24 @@
                 <!-- Transfer Passport Fields -->
                 <div class="transfer-fields" id="transfer-fields">
                     <h3 class="section-title"><i class="fas fa-exchange-alt"></i> Transfer Details</h3>
+                    <div class="form-group">
+                        <label for="transferPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="transferPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="transferPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="transferCrimeNumber" class="required">Crime Number</label>
+                        <input type="text" id="transferCrimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
+                        <div class="error-message" id="transferCrimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
+                        <div class="format-example">Format: number/year (e.g., 123/2024)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="transferSection" class="required">Section</label>
+                        <input type="text" id="transferSection" placeholder="Enter section">
+                        <div class="error-message" id="transferSection-error">Please enter a section</div>
+                        <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
+                    </div>
                     <div class="form-group">
                         <label for="fromStation" class="required">From Station</label>
                         <input type="text" id="fromStation" placeholder="Enter from station">
@@ -884,36 +1103,46 @@
                 <div class="fir-fields" id="fir-fields">
                     <h3 class="section-title"><i class="fas fa-file-alt"></i> FIR Details</h3>
                     <div class="form-group">
-                        <label for="complainantName" class="required">Complainant Name</label>
-                        <input type="text" id="complainantName" placeholder="Enter complainant name">
-                        <div class="error-message" id="complainantName-error">Please enter complainant name</div>
+                        <label for="firPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="firPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="firPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
                     </div>
                     <div class="form-group">
-                        <label for="complainantAddress" class="required">Complainant Address</label>
-                        <input type="text" id="complainantAddress" placeholder="Enter complainant address">
-                        <div class="error-message" id="complainantAddress-error">Please enter complainant address</div>
+                        <label for="firCrimeNumber" class="required">Crime Number</label>
+                        <input type="text" id="firCrimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
+                        <div class="error-message" id="firCrimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
+                        <div class="format-example">Format: number/year (e.g., 123/2024)</div>
                     </div>
                     <div class="form-group">
-                        <label for="incidentDate" class="required">Incident Date</label>
-                        <input type="text" id="incidentDate" placeholder="Enter incident date in DD/MM/YYYY format">
-                        <div class="error-message" id="incidentDate-error">Please enter a valid incident date</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="incidentTime">Incident Time</label>
-                        <input type="text" id="incidentTime" placeholder="Enter incident time in HH:MM format">
-                        <div class="error-message" id="incidentTime-error">Please enter a valid incident time</div>
-                        <div class="help-text">Optional field</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="incidentPlace" class="required">Incident Place</label>
-                        <input type="text" id="incidentPlace" placeholder="Enter incident place">
-                        <div class="error-message" id="incidentPlace-error">Please enter incident place</div>
+                        <label for="firSection" class="required">Section</label>
+                        <input type="text" id="firSection" placeholder="Enter section">
+                        <div class="error-message" id="firSection-error">Please enter a section</div>
+                        <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
                     </div>
                 </div>
                 
                 <!-- Visera Report Fields -->
                 <div class="visera-fields" id="visera-fields">
                     <h3 class="section-title"><i class="fas fa-flask"></i> Visera Report Details</h3>
+                    <div class="form-group">
+                        <label for="viseraPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="viseraPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="viseraPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="viseraCrimeNumber" class="required">Crime Number</label>
+                        <input type="text" id="viseraCrimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
+                        <div class="error-message" id="viseraCrimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
+                        <div class="format-example">Format: number/year (e.g., 123/2024)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="viseraSection" class="required">Section</label>
+                        <input type="text" id="viseraSection" placeholder="Enter section">
+                        <div class="error-message" id="viseraSection-error">Please enter a section</div>
+                        <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
+                    </div>
                     <div class="form-group">
                         <label for="deceasedName" class="required">Deceased Name</label>
                         <input type="text" id="deceasedName" placeholder="Enter deceased name">
@@ -945,6 +1174,24 @@
                 <div class="lab-report-fields" id="lab-report-fields">
                     <h3 class="section-title"><i class="fas fa-file-medical"></i> Lab Report Details</h3>
                     <div class="form-group">
+                        <label for="labPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="labPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="labPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="labCrimeNumber" class="required">Crime Number</label>
+                        <input type="text" id="labCrimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
+                        <div class="error-message" id="labCrimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
+                        <div class="format-example">Format: number/year (e.g., 123/2024)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="labSection" class="required">Section</label>
+                        <input type="text" id="labSection" placeholder="Enter section">
+                        <div class="error-message" id="labSection-error">Please enter a section</div>
+                        <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
+                    </div>
+                    <div class="form-group">
                         <label for="narNumber" class="required">NAR Number</label>
                         <input type="text" id="narNumber" placeholder="Enter NAR Number">
                         <div class="error-message" id="narNumber-error">Please enter NAR Number</div>
@@ -960,6 +1207,24 @@
                 <div class="formal-arrest-fields" id="formal-arrest-fields">
                     <h3 class="section-title"><i class="fas fa-handcuffs"></i> Formal Arrest Details</h3>
                     <div class="form-group">
+                        <label for="arrestPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="arrestPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="arrestPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="arrestCrimeNumber" class="required">Crime Number</label>
+                        <input type="text" id="arrestCrimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
+                        <div class="error-message" id="arrestCrimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
+                        <div class="format-example">Format: number/year (e.g., 123/2024)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="arrestSection" class="required">Section</label>
+                        <input type="text" id="arrestSection" placeholder="Enter section">
+                        <div class="error-message" id="arrestSection-error">Please enter a section</div>
+                        <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
+                    </div>
+                    <div class="form-group">
                         <label for="arrestPrison" class="required">Prison Name</label>
                         <input type="text" id="arrestPrison" placeholder="Enter prison name" value="Puzhal Central Prison, Chennai">
                         <div class="error-message" id="arrestPrison-error">Please enter prison name</div>
@@ -971,6 +1236,57 @@
                     </div>
                 </div>
                 
+                <!-- Sick Passport Fields - Simplified (No case details, accused, court, crime number, or section) -->
+                <div class="sick-passport-fields" id="sick-passport-fields">
+                    <h3 class="section-title"><i class="fas fa-stethoscope"></i> Sick Passport Details</h3>
+                    <div class="form-group">
+                        <label for="sickPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="sickPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="sickPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    
+                    <!-- Date and Time Fields moved here for Sick Passport -->
+                    <div class="form-group">
+                        <label for="date" class="required">Date</label>
+                        <input type="text" id="date" placeholder="Enter date in DD/MM/YYYY format">
+                        <div class="error-message" id="date-error">Please enter a valid date in DD/MM/YYYY format</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="text" id="time" placeholder="Enter time in HH:MM format">
+                        <div class="error-message" id="time-error">Please enter a valid time in HH:MM format</div>
+                        <div class="help-text">Optional field - leave blank to keep space vacant in document</div>
+                    </div>
+                    
+                    <div class="help-text">Sick Passport requires only police station information for identification purposes</div>
+                </div>
+                
+                <!-- Default fields for Escort -->
+                <div class="form-group" id="escort-fields">
+                    <h3 class="section-title"><i class="fas fa-shield-alt"></i> Case Details</h3>
+                    <div class="form-group">
+                        <label for="escortPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="escortPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="escortPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="escortCrimeNumber" class="required">Crime Number</label>
+                        <input type="text" id="escortCrimeNumber" placeholder="Enter crime number (e.g., 123/2024)">
+                        <div class="error-message" id="escortCrimeNumber-error">Please enter a valid crime number in format: number/year (e.g., 123/2024)</div>
+                        <div class="format-example">Format: number/year (e.g., 123/2024)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="escortSection" class="required">Section</label>
+                        <input type="text" id="escortSection" placeholder="Enter section">
+                        <div class="error-message" id="escortSection-error">Please enter a section</div>
+                        <div class="help-text">Enter the relevant IPC section (e.g., 302, 420)</div>
+                    </div>
+                </div>
+                
+                <!-- Accused Persons Section (Hidden for ML Passport and Sick Passport) -->
                 <div class="conditional-section" id="accused-section">
                     <h3 class="section-title"><i class="fas fa-user"></i> Accused Persons</h3>
                     
@@ -986,26 +1302,36 @@
                     </div>
                 </div>
                 
+                <!-- Court Section (Hidden for ML Passport and Sick Passport) -->
                 <div class="form-group conditional-section" id="court-section">
                     <label for="court" class="required">Court</label>
-                    <select id="court">
-                        <option value="">Select Court</option>
-                        <option value="MM">MM (Metropolitan Magistrate)</option>
-                        <option value="CMM">CMM (Chief Metropolitan Magistrate)</option>
-                        <option value="PJ">PJ (Principal Judge)</option>
-                        <option value="NDPS">NDPS (Narcotic Drugs and Psychotropic Substances)</option>
-                    </select>
-                    <div class="error-message" id="court-error">Please select a court</div>
-                    <div class="help-text">Select the court type</div>
+                    <div class="court-input-group">
+                        <div>
+                            <select id="court">
+                                <option value="">Select Court</option>
+                                <option value="MM">MM (Metropolitan Magistrate)</option>
+                                <option value="CMM">CMM (Chief Metropolitan Magistrate)</option>
+                                <option value="PJ">PJ (Principal Judge)</option>
+                                <option value="NDPS">NDPS (Narcotic Drugs and Psychotropic Substances)</option>
+                            </select>
+                            <div class="error-message" id="court-error">Please select a court</div>
+                        </div>
+                        <div>
+                            <input type="text" id="courtNumber" placeholder="Enter court number (e.g., 1, 2, 3)">
+                            <div class="error-message" id="courtNumber-error">Please enter a valid court number</div>
+                            <div class="help-text">Enter the court number</div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
+                <!-- Date and Time Fields (Hidden when Sick Passport is selected) -->
+                <div class="form-group conditional-section" id="date-time-section">
                     <label for="date" class="required">Date</label>
                     <input type="text" id="date" placeholder="Enter date in DD/MM/YYYY format">
                     <div class="error-message" id="date-error">Please enter a valid date in DD/MM/YYYY format</div>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group conditional-section" id="time-section">
                     <label for="time">Time</label>
                     <input type="text" id="time" placeholder="Enter time in HH:MM format">
                     <div class="error-message" id="time-error">Please enter a valid time in HH:MM format</div>
@@ -1061,6 +1387,16 @@
                                 </div>
                                 
                                 <div class="language-content active" id="tamil-content">
+                                    <!-- ML Passport Tamil Content -->
+                                    <div class="content-text" id="ml-passport-tamil-content" style="display: none;">
+                                        காவல் மருத்துவமனையின் மருத்துவ அதிகாரியால் பரிந்துரைக்கப்பட்ட <span class="embedded-field empty" id="leave-days-field-tamil" placeholder="Number of Days"></span> நாட்கள் மருத்துவ விடுப்பு <span class="embedded-field empty" id="leave-start-date-field-tamil" placeholder="Start Date"></span> முதல் <span class="embedded-field empty" id="leave-end-date-field-tamil" placeholder="End Date"></span> வரை வழங்கப்பட்டுள்ளது. <span class="embedded-field empty" id="report-back-date-field-tamil" placeholder="Report Back Date"></span> அன்று <span class="embedded-field empty" id="session-field-tamil" placeholder="Session"></span> உடல் நலமானதாக உள்ளது என்ற அத்தாட்சிப் பத்திரத்துடன் பணிக்குத் திரும்ப வேண்டும்.
+                                    </div>
+                                    
+                                    <!-- Property to Lab Tamil Content -->
+                                    <div class="content-text" id="property-lab-tamil-content" style="display: none;">
+                                        ஆகிய நீவிர் மயிலாப்பூரில் உள்ள தடயவியல் அறிவியல் ஆய்வகத்திற்கு சென்று <span class="embedded-field empty" id="police-station-content-property-tamil" placeholder="Police Station"></span> காவல் நிலைய குற்ற எண்: <span class="embedded-field empty" id="crime-no-field-property-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-property-tamil" placeholder="Section"></span> என்ற வழக்கில் பறிமுதல் செய்யப்பட்ட <span class="embedded-field empty" id="property-description-field-tamil" placeholder="Property Description"></span> சொத்தை (பறிமுதல் தேதி: <span class="embedded-field empty" id="property-seized-date-field-tamil" placeholder="Property Seized Date"></span>) ஆய்வக பரிசோதனைக்காக சமர்ப்பித்து, ஆய்வறிக்கையை பெற்று அத்தாட்சி பெற்று நிலையம் வரவும்.
+                                    </div>
+                                    
                                     <div class="content-text" id="escort-tamil-content" style="display: none;">
                                         ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-tamil" placeholder="Police Station"></span> காவல் நிலைய குற்ற எண். <span class="embedded-field empty" id="crime-no-field-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-tamil" placeholder="Section"></span> என்ற வழக்கில் சம்மந்தப்பட்ட எதிரி <span id="accused-list-tamil"></span> என்பவரை கனம் <span class="embedded-field empty" id="court-field-tamil" placeholder="Court"></span> அவர்களிடம் ஆஜர்படுத்தி உத்தரவுபடி நடந்து அத்தாட்சி பெற்று நிலையம் வரவும்.
                                     </div>
@@ -1095,6 +1431,16 @@
                                 </div>
                                 
                                 <div class="language-content" id="english-content">
+                                    <!-- ML Passport English Content -->
+                                    <div class="content-text" id="ml-passport-english-content" style="display: none;">
+                                        You are passported to avail <span class="embedded-field empty" id="leave-days-field-english" placeholder="Number of Days"></span> days Medical leave as recommended by medical officer of Police Hospital with effect from <span class="embedded-field empty" id="leave-start-date-field-english" placeholder="Start Date"></span> to <span class="embedded-field empty" id="leave-end-date-field-english" placeholder="End Date"></span> and you should report back for duty on <span class="embedded-field empty" id="report-back-date-field-english" placeholder="Report Back Date"></span> <span class="embedded-field empty" id="session-field-english" placeholder="Session"></span> with fitness certificate.
+                                    </div>
+                                    
+                                    <!-- Property to Lab English Content -->
+                                    <div class="content-text" id="property-lab-english-content" style="display: none;">
+                                        You are directed to report to the Forensic Science Laboratory at Mylapore and submit the property <span class="embedded-field empty" id="property-description-field-english" placeholder="Property Description"></span> seized in <span class="embedded-field empty" id="police-station-content-property-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-property-english" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-property-english" placeholder="Section"></span> (Seized on: <span class="embedded-field empty" id="property-seized-date-field-english" placeholder="Property Seized Date"></span>) for laboratory examination, obtain the test report and return to the station with acknowledgement.
+                                    </div>
+                                    
                                     <div class="content-text" id="escort-english-content" style="display: none;">
                                         You are hereby directed to produce the accused <span id="accused-list-english"></span> involved in <span class="embedded-field empty" id="police-station-content-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-english" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-english" placeholder="Section"></span> before the <span class="embedded-field empty" id="court-field-english" placeholder="Court"></span>, obtain orders and return to the station with acknowledgement.
                                     </div>
@@ -1150,8 +1496,6 @@
             const fillFormBtn = document.getElementById('fill-form');
             const passportTypeSelect = document.getElementById('passportType');
             const languageSelect = document.getElementById('language');
-            const crimeNumberInput = document.getElementById('crimeNumber');
-            const policeStationInput = document.getElementById('policeStation');
             const notification = document.getElementById('notification');
             const officerCountInput = document.getElementById('officer-count');
             const addOfficerBtn = document.getElementById('add-officer');
@@ -1173,8 +1517,18 @@
             const labReportFields = document.getElementById('lab-report-fields');
             const ptWarrantFields = document.getElementById('pt-warrant-fields');
             const formalArrestFields = document.getElementById('formal-arrest-fields');
+            const sickPassportFields = document.getElementById('sick-passport-fields');
+            const propertyLabFields = document.getElementById('property-lab-fields');
+            const mlPassportFields = document.getElementById('ml-passport-fields');
+            const escortFields = document.getElementById('escort-fields');
             const timeContainer = document.getElementById('time-container');
             const timeSuffix = document.getElementById('time-suffix');
+            const courtSelect = document.getElementById('court');
+            const courtNumberInput = document.getElementById('courtNumber');
+            
+            // Date and time sections for conditional display
+            const dateTimeSection = document.getElementById('date-time-section');
+            const timeSection = document.getElementById('time-section');
             
             let officerCounter = 1;
             let accusedCounter = 1;
@@ -1187,9 +1541,9 @@
                 'Escort': true,
                 'Visera Report': true,
                 'Releaving Passport': false,
-                'Property to lab': false,
+                'Property to lab': true,
                 'Sick Passport': true,
-                'ML Passport': false,
+                'ML Passport': true,
                 'Formal Arrest': true,
                 'Transfer Passport': true,
                 'FIR Filing Passport': true
@@ -1292,7 +1646,7 @@
                 const fieldId = this.id;
                 const value = this.value.trim();
                 
-                if (fieldId === 'time' || fieldId === 'incidentTime') {
+                if (fieldId === 'time') {
                     if (value && !isValidTime(value)) {
                         showError(fieldId, 'Please enter a valid time in HH:MM format or leave blank');
                         return false;
@@ -1312,14 +1666,14 @@
                     }
                 }
                 
-                if (fieldId === 'crimeNumber') {
+                if (fieldId.includes('CrimeNumber')) {
                     if (!isValidCrimeNumber(value)) {
                         showError(fieldId, 'Please enter a valid crime number in format: number/year (e.g., 123/2024)');
                         return false;
                     }
                 }
                 
-                if (fieldId === 'date' || fieldId === 'incidentDate' || fieldId === 'pmDate' || fieldId === 'narDate' || fieldId === 'transferOrderDate') {
+                if (fieldId === 'date' || fieldId === 'pmDate' || fieldId === 'narDate' || fieldId === 'transferOrderDate' || fieldId === 'propertySeizedDate' || fieldId === 'leaveStartDate' || fieldId === 'leaveEndDate' || fieldId === 'reportBackDate') {
                     if (!isValidDate(value)) {
                         showError(fieldId, 'Please enter a valid date in DD/MM/YYYY format');
                         return false;
@@ -1333,9 +1687,23 @@
                     }
                 }
                 
+                if (fieldId === 'courtNumber') {
+                    if (courtSelect.value && (!value || isNaN(value) || value < 1)) {
+                        showError(fieldId, 'Please enter a valid court number');
+                        return false;
+                    }
+                }
+                
                 if (fieldId.includes('age') || fieldId === 'deceasedAge') {
                     if (isNaN(value) || value < 1 || value > 120) {
                         showError(fieldId, 'Please enter a valid age');
+                        return false;
+                    }
+                }
+                
+                if (fieldId === 'leaveDays') {
+                    if (isNaN(value) || value < 1 || value > 365) {
+                        showError(fieldId, 'Please enter a valid number of days (1-365)');
                         return false;
                     }
                 }
@@ -1354,24 +1722,66 @@
                 labReportFields.classList.remove('active');
                 ptWarrantFields.classList.remove('active');
                 formalArrestFields.classList.remove('active');
+                sickPassportFields.classList.remove('active');
+                propertyLabFields.classList.remove('active');
+                mlPassportFields.classList.remove('active');
+                
+                // Hide date/time sections by default
+                dateTimeSection.classList.add('hidden');
+                timeSection.classList.add('hidden');
+                escortFields.classList.add('hidden');
                 
                 // Show relevant fields based on passport type
                 if (passportType === 'Transfer Passport') {
                     transferFields.classList.add('active');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
                 } else if (passportType === 'FIR Filing Passport') {
                     firFields.classList.add('active');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
                 } else if (passportType === 'Visera Report') {
                     viseraFields.classList.add('active');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
                 } else if (passportType === 'Lab Report') {
                     labReportFields.classList.add('active');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
                 } else if (passportType === 'PT warrant') {
                     ptWarrantFields.classList.add('active');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
                 } else if (passportType === 'Formal Arrest') {
                     formalArrestFields.classList.add('active');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
+                } else if (passportType === 'Sick Passport') {
+                    sickPassportFields.classList.add('active');
+                    // Date and time fields are already inside sick passport section
+                } else if (passportType === 'Property to lab') {
+                    propertyLabFields.classList.add('active');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
+                } else if (passportType === 'ML Passport') {
+                    mlPassportFields.classList.add('active');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
+                } else if (passportType === 'Escort') {
+                    escortFields.classList.remove('hidden');
+                    dateTimeSection.classList.remove('hidden');
+                    timeSection.classList.remove('hidden');
                 }
                 
                 // Update content templates
                 updateContentTemplates();
+                
+                // Toggle accused and court sections based on passport type
+                toggleAccusedSection();
+                toggleCourtSection();
+                
+                // Update content status
+                updateContentStatus();
             }
             
             function updateContentTemplates() {
@@ -1404,6 +1814,10 @@
                         document.getElementById('lab-report-tamil-content').style.display = 'block';
                     } else if (passportType === 'Formal Arrest') {
                         document.getElementById('formal-arrest-tamil-content').style.display = 'block';
+                    } else if (passportType === 'Property to lab') {
+                        document.getElementById('property-lab-tamil-content').style.display = 'block';
+                    } else if (passportType === 'ML Passport') {
+                        document.getElementById('ml-passport-tamil-content').style.display = 'block';
                     }
                 } else if (currentLanguage === 'english') {
                     if (passportType === 'Escort') {
@@ -1422,6 +1836,10 @@
                         document.getElementById('lab-report-english-content').style.display = 'block';
                     } else if (passportType === 'Formal Arrest') {
                         document.getElementById('formal-arrest-english-content').style.display = 'block';
+                    } else if (passportType === 'Property to lab') {
+                        document.getElementById('property-lab-english-content').style.display = 'block';
+                    } else if (passportType === 'ML Passport') {
+                        document.getElementById('ml-passport-english-content').style.display = 'block';
                     }
                 }
             }
@@ -1429,19 +1847,21 @@
             function toggleCourtSection() {
                 const passportType = passportTypeSelect.value;
                 
-                if (passportType === 'Lab Report') {
+                if (passportType === 'Lab Report' || passportType === 'Sick Passport' || passportType === 'Property to lab' || passportType === 'ML Passport') {
                     courtSection.classList.add('hidden');
                     document.getElementById('court').removeAttribute('required');
+                    document.getElementById('courtNumber').removeAttribute('required');
                 } else {
                     courtSection.classList.remove('hidden');
                     document.getElementById('court').setAttribute('required', 'required');
+                    document.getElementById('courtNumber').setAttribute('required', 'required');
                 }
             }
             
             function toggleAccusedSection() {
                 const passportType = passportTypeSelect.value;
                 
-                if (passportType === 'FIR Filing Passport' || passportType === 'Visera Report' || passportType === 'Lab Report') {
+                if (passportType === 'FIR Filing Passport' || passportType === 'Visera Report' || passportType === 'Lab Report' || passportType === 'Sick Passport' || passportType === 'Property to lab' || passportType === 'ML Passport') {
                     accusedSection.classList.add('hidden');
                 } else {
                     accusedSection.classList.remove('hidden');
@@ -1456,7 +1876,7 @@
                     return;
                 }
                 
-                const hasContent = availablePassportTypes[selectedType] || false;
+                const hasContent = availablePassportTypes[selectedType];
                 
                 if (hasContent) {
                     contentStatus.className = 'content-status available';
@@ -1637,11 +2057,11 @@
                 let isValid = true;
                 
                 const mainFields = [
-                    'passportType', 'policeStation', 'crimeNumber', 'section', 'date'
+                    'passportType', 'date'
                 ];
                 
-                if (passportTypeSelect.value !== 'Lab Report') {
-                    mainFields.push('court');
+                if (passportTypeSelect.value !== 'Lab Report' && passportTypeSelect.value !== 'Sick Passport' && passportTypeSelect.value !== 'Property to lab' && passportTypeSelect.value !== 'ML Passport') {
+                    mainFields.push('court', 'courtNumber');
                 }
                 
                 mainFields.forEach(fieldId => {
@@ -1656,6 +2076,32 @@
                     isValid = false;
                 }
                 
+                // Validate fields based on active section
+                const activeFields = document.querySelector('.active');
+                if (activeFields) {
+                    const policeStation = activeFields.querySelector('input[id$="PoliceStation"]');
+                    
+                    if (policeStation && !validateField.call(policeStation)) isValid = false;
+                    
+                    // Only validate crime number and section if they exist (not for Sick Passport)
+                    const crimeNumber = activeFields.querySelector('input[id$="CrimeNumber"]');
+                    const section = activeFields.querySelector('input[id$="Section"]');
+                    
+                    if (crimeNumber && !validateField.call(crimeNumber)) isValid = false;
+                    if (section && !validateField.call(section)) isValid = false;
+                }
+                
+                // For Escort type, validate the escort-specific fields
+                if (passportTypeSelect.value === 'Escort') {
+                    const escortFields = ['escortPoliceStation', 'escortCrimeNumber', 'escortSection'];
+                    escortFields.forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (!validateField.call(field)) {
+                            isValid = false;
+                        }
+                    });
+                }
+                
                 if (passportTypeSelect.value === 'Transfer Passport') {
                     const transferFields = ['fromStation', 'toStation', 'transferReason', 'transferOrderNumber', 'transferOrderDate'];
                     transferFields.forEach(fieldId => {
@@ -1664,20 +2110,6 @@
                             isValid = false;
                         }
                     });
-                }
-                
-                if (passportTypeSelect.value === 'FIR Filing Passport') {
-                    const firFieldsToValidate = ['complainantName', 'complainantAddress', 'incidentDate', 'incidentPlace'];
-                    firFieldsToValidate.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (field && !validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
-                    const incidentTimeField = document.getElementById('incidentTime');
-                    if (!validateField.call(incidentTimeField)) {
-                        isValid = false;
-                    }
                 }
                 
                 if (passportTypeSelect.value === 'Visera Report') {
@@ -1720,6 +2152,26 @@
                     });
                 }
                 
+                if (passportTypeSelect.value === 'Property to lab') {
+                    const propertyLabFields = ['propertyDescription', 'propertySeizedDate'];
+                    propertyLabFields.forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (!validateField.call(field)) {
+                            isValid = false;
+                        }
+                    });
+                }
+                
+                if (passportTypeSelect.value === 'ML Passport') {
+                    const mlPassportFields = ['leaveDays', 'leaveStartDate', 'leaveEndDate', 'reportBackDate', 'session'];
+                    mlPassportFields.forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (!validateField.call(field)) {
+                            isValid = false;
+                        }
+                    });
+                }
+                
                 for (let i = 1; i <= officerCounter; i++) {
                     const designationField = document.getElementById(`designation${i}`);
                     const fullNameField = document.getElementById(`fullName${i}`);
@@ -1729,7 +2181,7 @@
                     }
                 }
                 
-                if (passportTypeSelect.value !== 'FIR Filing Passport' && passportTypeSelect.value !== 'Visera Report' && passportTypeSelect.value !== 'Lab Report') {
+                if (passportTypeSelect.value !== 'FIR Filing Passport' && passportTypeSelect.value !== 'Visera Report' && passportTypeSelect.value !== 'Lab Report' && passportTypeSelect.value !== 'Sick Passport' && passportTypeSelect.value !== 'Property to lab' && passportTypeSelect.value !== 'ML Passport') {
                     for (let i = 1; i <= accusedCounter; i++) {
                         const accusedNameField = document.getElementById(`accusedName${i}`);
                         const ageField = document.getElementById(`age${i}`);
@@ -1750,16 +2202,31 @@
                 autoSaveTimeout = setTimeout(() => {
                     const formData = {
                         passportType: document.getElementById('passportType').value,
-                        policeStation: document.getElementById('policeStation').value,
-                        crimeNumber: document.getElementById('crimeNumber').value,
-                        section: document.getElementById('section').value,
-                        court: document.getElementById('court').value,
                         date: document.getElementById('date').value,
                         time: document.getElementById('time').value,
                         officerCount: officerCounter,
                         accusedCount: accusedCounter,
                         language: currentLanguage
                     };
+                    
+                    // Save police station data based on active section
+                    const activeFields = document.querySelector('.active');
+                    if (activeFields) {
+                        const policeStation = activeFields.querySelector('input[id$="PoliceStation"]');
+                        const crimeNumber = activeFields.querySelector('input[id$="CrimeNumber"]');
+                        const section = activeFields.querySelector('input[id$="Section"]');
+                        
+                        if (policeStation) formData.policeStation = policeStation.value;
+                        if (crimeNumber) formData.crimeNumber = crimeNumber.value;
+                        if (section) formData.section = section.value;
+                    }
+                    
+                    // Save escort fields if they exist
+                    if (document.getElementById('escortPoliceStation')) {
+                        formData.escortPoliceStation = document.getElementById('escortPoliceStation').value;
+                        formData.escortCrimeNumber = document.getElementById('escortCrimeNumber').value;
+                        formData.escortSection = document.getElementById('escortSection').value;
+                    }
                     
                     localStorage.setItem('policePassportFormData', JSON.stringify(formData));
                     
@@ -1777,10 +2244,6 @@
                     const formData = JSON.parse(savedData);
                     
                     document.getElementById('passportType').value = formData.passportType || '';
-                    document.getElementById('policeStation').value = formData.policeStation || '';
-                    document.getElementById('crimeNumber').value = formData.crimeNumber || '';
-                    document.getElementById('section').value = formData.section || '';
-                    document.getElementById('court').value = formData.court || '';
                     document.getElementById('date').value = formData.date || '';
                     document.getElementById('time').value = formData.time || '';
                     
@@ -1800,12 +2263,16 @@
                         updateLanguageContent();
                     }
                     
-                    updateContentVisibility();
-                    toggleCourtSection();
-                    toggleAccusedSection();
-                    updateContentStatus();
+                    // Load escort fields if they exist
+                    if (formData.escortPoliceStation && document.getElementById('escortPoliceStation')) {
+                        document.getElementById('escortPoliceStation').value = formData.escortPoliceStation;
+                        document.getElementById('escortCrimeNumber').value = formData.escortCrimeNumber;
+                        document.getElementById('escortSection').value = formData.escortSection;
+                    }
                     
-                    showNotification('Previous form data restored', 'success');
+                    updateContentVisibility();
+                    
+                    showNotification('Previous form data loaded successfully', 'success');
                 }
             }
             
@@ -1819,577 +2286,514 @@
                 updateContentTemplates();
             }
             
-            function initializeApp() {
-                updatePoliceOfficers();
-                updateAccusedPersons();
-                loadSavedData();
-                updateContentStatus();
-                updateContentVisibility();
-            }
-            
-            initializeApp();
-            
-            crimeNumberInput.addEventListener('input', function() {
-                formatCrimeNumber(this);
-                autoSave();
-            });
-            
-            passportTypeSelect.addEventListener('change', function() {
-                updateContentVisibility();
-                toggleCourtSection();
-                toggleAccusedSection();
-                updateContentStatus();
-                autoSave();
-            });
-            
-            languageSelect.addEventListener('change', function() {
-                currentLanguage = this.value;
-                updateLanguageContent();
-                updateContentStatus();
-                autoSave();
-            });
-            
-            officerCountInput.addEventListener('change', updatePoliceOfficers);
-            officerCountInput.addEventListener('input', updatePoliceOfficers);
-            
-            accusedCountInput.addEventListener('change', updateAccusedPersons);
-            accusedCountInput.addEventListener('input', updateAccusedPersons);
-            
-            addOfficerBtn.addEventListener('click', addPoliceOfficer);
-            
-            addAccusedBtn.addEventListener('click', addAccusedPerson);
-            
-            document.querySelectorAll('input, select').forEach(element => {
-                if (element.id !== 'crimeNumber') {
-                    element.addEventListener('input', function() {
-                        autoSave();
-                    });
-                }
-            });
-            
-            document.querySelectorAll('input[required], select[required]').forEach(field => {
-                field.addEventListener('blur', validateField);
-            });
-            
-            document.getElementById('time').addEventListener('blur', validateField);
-            document.getElementById('incidentTime').addEventListener('blur', validateField);
-            
-            fillFormBtn.addEventListener('click', function() {
-                console.log("Generate Document button clicked");
-                
+            function fillDocumentPreview() {
                 if (!validateForm()) {
                     showNotification('Please fix the errors in the form before generating the document', 'error');
                     return;
                 }
                 
-                const selectedType = passportTypeSelect.value;
-                if (!availablePassportTypes[selectedType]) {
-                    showNotification(`No content template available for ${selectedType}. Please select a different passport type.`, 'error');
-                    return;
-                }
+                const passportType = passportTypeSelect.value;
                 
-                const passportType = document.getElementById('passportType').value;
-                const policeCount = parseInt(officerCountInput.value) || 1;
-                const accusedCount = parseInt(accusedCountInput.value) || 1;
-                const policeStation = document.getElementById('policeStation').value;
-                const time = document.getElementById('time').value;
-                const date = document.getElementById('date').value;
-                const crimeNumber = document.getElementById('crimeNumber').value;
-                const section = document.getElementById('section').value;
-                const court = document.getElementById('court').value;
-                
-                const scNumber = document.getElementById('scNumber')?.value || '';
-                const prcNumber = document.getElementById('prcNumber')?.value || '';
-                const centralPrison = document.getElementById('centralPrison')?.value || '';
-                const fromStation = document.getElementById('fromStation')?.value || '';
-                const toStation = document.getElementById('toStation')?.value || '';
-                const transferReason = document.getElementById('transferReason')?.value || '';
-                const transferOrderNumber = document.getElementById('transferOrderNumber')?.value || '';
-                const transferOrderDate = document.getElementById('transferOrderDate')?.value || '';
-                const deceasedName = document.getElementById('deceasedName')?.value || '';
-                const deceasedAge = document.getElementById('deceasedAge')?.value || '';
-                const deceasedFatherName = document.getElementById('deceasedFatherName')?.value || '';
-                const pmNumber = document.getElementById('pmNumber')?.value || '';
-                const pmDate = document.getElementById('pmDate')?.value || '';
-                const narNumber = document.getElementById('narNumber')?.value || '';
-                const narDate = document.getElementById('narDate')?.value || '';
-                const arrestPrison = document.getElementById('arrestPrison')?.value || '';
-                const arrestType = document.getElementById('arrestType')?.value || '';
-                
-                console.log("Updating police officers in preview");
-                for (let i = 1; i <= policeCount; i++) {
+                // Update police officers in preview
+                for (let i = 1; i <= officerCounter; i++) {
                     const designation = document.getElementById(`designation${i}`).value;
                     const fullName = document.getElementById(`fullName${i}`).value;
                     
                     const designationField = document.getElementById(`designation-field-${i}`);
                     const fullNameField = document.getElementById(`full-name-field-${i}`);
                     
-                    designationField.textContent = designation;
-                    designationField.classList.remove('empty');
+                    if (designation) {
+                        designationField.textContent = designation;
+                        designationField.classList.remove('empty');
+                    } else {
+                        designationField.textContent = '';
+                        designationField.classList.add('empty');
+                    }
                     
-                    fullNameField.textContent = fullName;
-                    fullNameField.classList.remove('empty');
+                    if (fullName) {
+                        fullNameField.textContent = fullName;
+                        fullNameField.classList.remove('empty');
+                    } else {
+                        fullNameField.textContent = '';
+                        fullNameField.classList.add('empty');
+                    }
                 }
                 
-                document.getElementById('police-station-field').textContent = policeStation;
-                document.getElementById('police-station-field').classList.remove('empty');
+                // Update police station field
+                let policeStationValue = '';
+                if (passportType === 'Escort') {
+                    policeStationValue = document.getElementById('escortPoliceStation').value;
+                } else {
+                    const activeFields = document.querySelector('.active');
+                    if (activeFields) {
+                        const policeStation = activeFields.querySelector('input[id$="PoliceStation"]');
+                        if (policeStation) policeStationValue = policeStation.value;
+                    }
+                }
                 
-                if (time && time.trim() !== '') {
-                    document.getElementById('time-field').textContent = time;
-                    document.getElementById('time-field').classList.remove('empty');
+                const policeStationField = document.getElementById('police-station-field');
+                if (policeStationValue) {
+                    policeStationField.textContent = policeStationValue;
+                    policeStationField.classList.remove('empty');
+                } else {
+                    policeStationField.textContent = '';
+                    policeStationField.classList.add('empty');
+                }
+                
+                // Update date and time
+                const dateValue = document.getElementById('date').value;
+                const timeValue = document.getElementById('time').value;
+                
+                const dateField = document.getElementById('date-field');
+                if (dateValue) {
+                    dateField.textContent = dateValue;
+                    dateField.classList.remove('empty');
+                } else {
+                    dateField.textContent = '';
+                    dateField.classList.add('empty');
+                }
+                
+                const timeField = document.getElementById('time-field');
+                if (timeValue) {
+                    timeField.textContent = timeValue;
+                    timeField.classList.remove('empty');
                     timeSuffix.style.display = 'inline';
                 } else {
-                    document.getElementById('time-field').textContent = '';
-                    document.getElementById('time-field').classList.add('empty');
+                    timeField.textContent = '';
+                    timeField.classList.add('empty');
                     timeSuffix.style.display = 'none';
                 }
                 
-                document.getElementById('date-field').textContent = date;
-                document.getElementById('date-field').classList.remove('empty');
-                
-                let accusedListTamil = '';
-                let accusedListEnglish = '';
-                let accusedListPtTamil = '';
-                let accusedListPtEnglish = '';
-                let accusedListFormalArrestTamil = '';
-                let accusedListFormalArrestEnglish = '';
-                
-                if (passportType !== 'FIR Filing Passport' && passportType !== 'Visera Report' && passportType !== 'Lab Report') {
-                    for (let i = 1; i <= accusedCount; i++) {
+                // Update accused list for relevant passport types
+                if (passportType !== 'FIR Filing Passport' && passportType !== 'Visera Report' && passportType !== 'Lab Report' && passportType !== 'Sick Passport' && passportType !== 'Property to lab' && passportType !== 'ML Passport') {
+                    let accusedListTamil = '';
+                    let accusedListEnglish = '';
+                    let accusedListPtTamil = '';
+                    let accusedListPtEnglish = '';
+                    let accusedListFormalArrestTamil = '';
+                    let accusedListFormalArrestEnglish = '';
+                    
+                    for (let i = 1; i <= accusedCounter; i++) {
                         const accusedName = document.getElementById(`accusedName${i}`).value;
                         const age = document.getElementById(`age${i}`).value;
                         const fatherName = document.getElementById(`fatherName${i}`).value;
                         
-                        if (currentLanguage === 'tamil') {
-                            accusedListTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
-                            accusedListPtTamil += `${accusedName}, பெ-வ ${age}, த/பெ ${fatherName}`;
-                            accusedListFormalArrestTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
-                            
-                            if (i < accusedCount) {
+                        if (accusedName && age && fatherName) {
+                            if (i > 1) {
                                 accusedListTamil += ', ';
-                                accusedListPtTamil += ', ';
-                                accusedListFormalArrestTamil += ', ';
-                            }
-                        } else {
-                            accusedListEnglish += `${accusedName} aged ${age} years, S/o ${fatherName}`;
-                            accusedListPtEnglish += `${accusedName} aged ${age} years, S/o ${fatherName}`;
-                            accusedListFormalArrestEnglish += `${accusedName} aged ${age} years, S/o ${fatherName}`;
-                            
-                            if (i < accusedCount) {
                                 accusedListEnglish += ', ';
+                                accusedListPtTamil += ', ';
                                 accusedListPtEnglish += ', ';
+                                accusedListFormalArrestTamil += ', ';
                                 accusedListFormalArrestEnglish += ', ';
                             }
+                            
+                            accusedListTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
+                            accusedListEnglish += `${accusedName} S/o ${fatherName} aged ${age}`;
+                            accusedListPtTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
+                            accusedListPtEnglish += `${accusedName} S/o ${fatherName} aged ${age}`;
+                            accusedListFormalArrestTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
+                            accusedListFormalArrestEnglish += `${accusedName} S/o ${fatherName} aged ${age}`;
                         }
                     }
+                    
+                    document.getElementById('accused-list-tamil').innerHTML = accusedListTamil || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
+                    document.getElementById('accused-list-english').innerHTML = accusedListEnglish || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
+                    document.getElementById('accused-list-pt-tamil').innerHTML = accusedListPtTamil || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
+                    document.getElementById('accused-list-pt-english').innerHTML = accusedListPtEnglish || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
+                    document.getElementById('accused-list-formal-arrest-tamil').innerHTML = accusedListFormalArrestTamil || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
+                    document.getElementById('accused-list-formal-arrest-english').innerHTML = accusedListFormalArrestEnglish || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
                 }
                 
-                console.log("Updating document content for language:", currentLanguage);
-                if (currentLanguage === 'tamil') {
-                    if (passportType === 'Escort' || passportType === 'PT warrant' || passportType === 'Transfer Passport' || passportType === 'FIR Filing Passport' || passportType === 'Visera Report' || passportType === 'Lab Report' || passportType === 'Formal Arrest') {
-                        document.getElementById('police-station-content-tamil').textContent = policeStation;
-                        document.getElementById('police-station-content-tamil').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-tamil').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('section-field-tamil').textContent = section;
-                        document.getElementById('section-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('accused-list-tamil').textContent = accusedListTamil;
-                        
-                        if (passportType !== 'Lab Report') {
-                            document.getElementById('court-field-tamil').textContent = court;
-                            document.getElementById('court-field-tamil').classList.remove('empty');
-                        }
-                    }
-                    if (passportType === 'PT warrant') {
-                        document.getElementById('police-station-content-pt-tamil').textContent = policeStation;
-                        document.getElementById('police-station-content-pt-tamil').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-pt-tamil').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-pt-tamil').classList.remove('empty');
-                        
-                        document.getElementById('section-field-pt-tamil').textContent = section;
-                        document.getElementById('section-field-pt-tamil').classList.remove('empty');
-                        
-                        document.getElementById('accused-list-pt-tamil').textContent = accusedListPtTamil;
-                        
-                        document.getElementById('court-field-pt-tamil').textContent = court;
-                        document.getElementById('court-field-pt-tamil').classList.remove('empty');
-                        
-                        document.getElementById('sc-no-field-tamil').textContent = scNumber;
-                        document.getElementById('sc-no-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('prc-no-field-tamil').textContent = prcNumber;
-                        document.getElementById('prc-no-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('central-prison-field-tamil').textContent = centralPrison;
-                        document.getElementById('central-prison-field-tamil').classList.remove('empty');
-                    }
-                    if (passportType === 'Transfer Passport') {
-                        document.getElementById('from-station-field-tamil').textContent = fromStation;
-                        document.getElementById('from-station-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('to-station-field-tamil').textContent = toStation;
-                        document.getElementById('to-station-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('transfer-reason-field-tamil').textContent = transferReason;
-                        document.getElementById('transfer-reason-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('transfer-order-number-field-tamil').textContent = transferOrderNumber;
-                        document.getElementById('transfer-order-number-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('transfer-order-date-field-tamil').textContent = transferOrderDate;
-                        document.getElementById('transfer-order-date-field-tamil').classList.remove('empty');
-                    }
-                    if (passportType === 'FIR Filing Passport') {
-                        document.getElementById('police-station-content-fir-tamil').textContent = policeStation;
-                        document.getElementById('police-station-content-fir-tamil').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-fir-tamil').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-fir-tamil').classList.remove('empty');
-                        
-                        document.getElementById('section-field-fir-tamil').textContent = section;
-                        document.getElementById('section-field-fir-tamil').classList.remove('empty');
-                        
-                        document.getElementById('court-field-fir-tamil').textContent = court;
-                        document.getElementById('court-field-fir-tamil').classList.remove('empty');
-                    }
-                    if (passportType === 'Visera Report') {
-                        document.getElementById('police-station-content-visera-tamil').textContent = policeStation;
-                        document.getElementById('police-station-content-visera-tamil').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-visera-tamil').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-visera-tamil').classList.remove('empty');
-                        
-                        document.getElementById('section-field-visera-tamil').textContent = section;
-                        document.getElementById('section-field-visera-tamil').classList.remove('empty');
-                        
-                        document.getElementById('deceased-name-field-tamil').textContent = deceasedName;
-                        document.getElementById('deceased-name-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('deceased-age-field-tamil').textContent = deceasedAge;
-                        document.getElementById('deceased-age-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('deceased-father-name-field-tamil').textContent = deceasedFatherName;
-                        document.getElementById('deceased-father-name-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('pm-number-field-tamil').textContent = pmNumber;
-                        document.getElementById('pm-number-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('pm-date-field-tamil').textContent = pmDate;
-                        document.getElementById('pm-date-field-tamil').classList.remove('empty');
-                    }
-                    if (passportType === 'Lab Report') {
-                        document.getElementById('police-station-content-lab-tamil').textContent = policeStation;
-                        document.getElementById('police-station-content-lab-tamil').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-lab-tamil').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-lab-tamil').classList.remove('empty');
-                        
-                        document.getElementById('section-field-lab-tamil').textContent = section;
-                        document.getElementById('section-field-lab-tamil').classList.remove('empty');
-                        
-                        document.getElementById('date-field-lab-tamil').textContent = date;
-                        document.getElementById('date-field-lab-tamil').classList.remove('empty');
-                        
-                        document.getElementById('nar-no-field-tamil').textContent = narNumber;
-                        document.getElementById('nar-no-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('nar-date-field-tamil').textContent = narDate;
-                        document.getElementById('nar-date-field-tamil').classList.remove('empty');
-                    }
-                    if (passportType === 'Formal Arrest') {
-                        document.getElementById('police-station-content-formal-arrest-tamil').textContent = policeStation;
-                        document.getElementById('police-station-content-formal-arrest-tamil').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-formal-arrest-tamil').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-formal-arrest-tamil').classList.remove('empty');
-                        
-                        document.getElementById('section-field-formal-arrest-tamil').textContent = section;
-                        document.getElementById('section-field-formal-arrest-tamil').classList.remove('empty');
-                        
-                        document.getElementById('accused-list-formal-arrest-tamil').textContent = accusedListFormalArrestTamil;
-                        
-                        document.getElementById('arrest-type-field-tamil').textContent = arrestType;
-                        document.getElementById('arrest-type-field-tamil').classList.remove('empty');
-                        
-                        document.getElementById('arrest-prison-field-tamil').textContent = arrestPrison;
-                        document.getElementById('arrest-prison-field-tamil').classList.remove('empty');
-                    }
-                } else if (currentLanguage === 'english') {
-                    if (passportType === 'Escort' || passportType === 'PT warrant' || passportType === 'Transfer Passport' || passportType === 'FIR Filing Passport' || passportType === 'Visera Report' || passportType === 'Lab Report' || passportType === 'Formal Arrest') {
-                        document.getElementById('police-station-content-english').textContent = policeStation;
-                        document.getElementById('police-station-content-english').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-english').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-english').classList.remove('empty');
-                        
-                        document.getElementById('section-field-english').textContent = section;
-                        document.getElementById('section-field-english').classList.remove('empty');
-                        
-                        document.getElementById('accused-list-english').textContent = accusedListEnglish;
-                        
-                        if (passportType !== 'Lab Report') {
-                            document.getElementById('court-field-english').textContent = court;
-                            document.getElementById('court-field-english').classList.remove('empty');
-                        }
-                    }
-                    if (passportType === 'PT warrant') {
-                        document.getElementById('police-station-content-pt-english').textContent = policeStation;
-                        document.getElementById('police-station-content-pt-english').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-pt-english').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-pt-english').classList.remove('empty');
-                        
-                        document.getElementById('section-field-pt-english').textContent = section;
-                        document.getElementById('section-field-pt-english').classList.remove('empty');
-                        
-                        document.getElementById('accused-list-pt-english').textContent = accusedListPtEnglish;
-                        
-                        document.getElementById('court-field-pt-english').textContent = court;
-                        document.getElementById('court-field-pt-english').classList.remove('empty');
-                        
-                        document.getElementById('sc-no-field-english').textContent = scNumber;
-                        document.getElementById('sc-no-field-english').classList.remove('empty');
-                        
-                        document.getElementById('prc-no-field-english').textContent = prcNumber;
-                        document.getElementById('prc-no-field-english').classList.remove('empty');
-                        
-                        document.getElementById('central-prison-field-english').textContent = centralPrison;
-                        document.getElementById('central-prison-field-english').classList.remove('empty');
-                    }
-                    if (passportType === 'Transfer Passport') {
-                        document.getElementById('from-station-field-english').textContent = fromStation;
-                        document.getElementById('from-station-field-english').classList.remove('empty');
-                        
-                        document.getElementById('to-station-field-english').textContent = toStation;
-                        document.getElementById('to-station-field-english').classList.remove('empty');
-                        
-                        document.getElementById('transfer-reason-field-english').textContent = transferReason;
-                        document.getElementById('transfer-reason-field-english').classList.remove('empty');
-                        
-                        document.getElementById('transfer-order-number-field-english').textContent = transferOrderNumber;
-                        document.getElementById('transfer-order-number-field-english').classList.remove('empty');
-                        
-                        document.getElementById('transfer-order-date-field-english').textContent = transferOrderDate;
-                        document.getElementById('transfer-order-date-field-english').classList.remove('empty');
-                    }
-                    if (passportType === 'FIR Filing Passport') {
-                        document.getElementById('police-station-content-fir-english').textContent = policeStation;
-                        document.getElementById('police-station-content-fir-english').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-fir-english').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-fir-english').classList.remove('empty');
-                        
-                        document.getElementById('section-field-fir-english').textContent = section;
-                        document.getElementById('section-field-fir-english').classList.remove('empty');
-                        
-                        document.getElementById('court-field-fir-english').textContent = court;
-                        document.getElementById('court-field-fir-english').classList.remove('empty');
-                    }
-                    if (passportType === 'Visera Report') {
-                        document.getElementById('police-station-content-visera-english').textContent = policeStation;
-                        document.getElementById('police-station-content-visera-english').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-visera-english').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-visera-english').classList.remove('empty');
-                        
-                        document.getElementById('section-field-visera-english').textContent = section;
-                        document.getElementById('section-field-visera-english').classList.remove('empty');
-                        
-                        document.getElementById('deceased-name-field-english').textContent = deceasedName;
-                        document.getElementById('deceased-name-field-english').classList.remove('empty');
-                        
-                        document.getElementById('deceased-age-field-english').textContent = deceasedAge;
-                        document.getElementById('deceased-age-field-english').classList.remove('empty');
-                        
-                        document.getElementById('deceased-father-name-field-english').textContent = deceasedFatherName;
-                        document.getElementById('deceased-father-name-field-english').classList.remove('empty');
-                        
-                        document.getElementById('pm-number-field-english').textContent = pmNumber;
-                        document.getElementById('pm-number-field-english').classList.remove('empty');
-                        
-                        document.getElementById('pm-date-field-english').textContent = pmDate;
-                        document.getElementById('pm-date-field-english').classList.remove('empty');
-                    }
-                    if (passportType === 'Lab Report') {
-                        document.getElementById('police-station-content-lab-english').textContent = policeStation;
-                        document.getElementById('police-station-content-lab-english').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-lab-english').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-lab-english').classList.remove('empty');
-                        
-                        document.getElementById('section-field-lab-english').textContent = section;
-                        document.getElementById('section-field-lab-english').classList.remove('empty');
-                        
-                        document.getElementById('date-field-lab-english').textContent = date;
-                        document.getElementById('date-field-lab-english').classList.remove('empty');
-                        
-                        document.getElementById('nar-no-field-english').textContent = narNumber;
-                        document.getElementById('nar-no-field-english').classList.remove('empty');
-                        
-                        document.getElementById('nar-date-field-english').textContent = narDate;
-                        document.getElementById('nar-date-field-english').classList.remove('empty');
-                    }
-                    if (passportType === 'Formal Arrest') {
-                        document.getElementById('police-station-content-formal-arrest-english').textContent = policeStation;
-                        document.getElementById('police-station-content-formal-arrest-english').classList.remove('empty');
-                        
-                        document.getElementById('crime-no-field-formal-arrest-english').textContent = crimeNumber;
-                        document.getElementById('crime-no-field-formal-arrest-english').classList.remove('empty');
-                        
-                        document.getElementById('section-field-formal-arrest-english').textContent = section;
-                        document.getElementById('section-field-formal-arrest-english').classList.remove('empty');
-                        
-                        document.getElementById('accused-list-formal-arrest-english').textContent = accusedListFormalArrestEnglish;
-                        
-                        document.getElementById('arrest-type-field-english').textContent = arrestType;
-                        document.getElementById('arrest-type-field-english').classList.remove('empty');
-                        
-                        document.getElementById('arrest-prison-field-english').textContent = arrestPrison;
-                        document.getElementById('arrest-prison-field-english').classList.remove('empty');
-                    }
+                // Update court information
+                const courtValue = document.getElementById('court').value;
+                const courtNumberValue = document.getElementById('courtNumber').value;
+                
+                let courtDisplayValue = '';
+                if (courtValue && courtNumberValue) {
+                    courtDisplayValue = `${courtValue} ${getOrdinalSuffix(parseInt(courtNumberValue))}`;
+                } else if (courtValue) {
+                    courtDisplayValue = courtValue;
                 }
                 
-                updateContentTemplates();
+                // Update embedded fields based on passport type
+                if (passportType === 'Escort') {
+                    updateEscortFields(courtDisplayValue);
+                } else if (passportType === 'PT warrant') {
+                    updatePtWarrantFields(courtDisplayValue);
+                } else if (passportType === 'Transfer Passport') {
+                    updateTransferFields();
+                } else if (passportType === 'FIR Filing Passport') {
+                    updateFirFields(courtDisplayValue);
+                } else if (passportType === 'Visera Report') {
+                    updateViseraFields();
+                } else if (passportType === 'Lab Report') {
+                    updateLabReportFields();
+                } else if (passportType === 'Formal Arrest') {
+                    updateFormalArrestFields(courtDisplayValue);
+                } else if (passportType === 'Property to lab') {
+                    updatePropertyLabFields();
+                } else if (passportType === 'ML Passport') {
+                    updateMLPassportFields();
+                }
                 
-                showNotification('Document generated successfully!', 'success');
-            });
-
-            printBtn.addEventListener('click', function() {
-                const printContent = document.getElementById('document-to-print').innerHTML;
-                const originalContent = document.body.innerHTML;
+                showNotification('Document preview updated successfully', 'success');
+            }
+            
+            function updateEscortFields(courtDisplayValue) {
+                const policeStation = document.getElementById('escortPoliceStation').value;
+                const crimeNumber = document.getElementById('escortCrimeNumber').value;
+                const section = document.getElementById('escortSection').value;
                 
-                document.body.innerHTML = printContent;
+                updateField('police-station-content-tamil', policeStation);
+                updateField('crime-no-field-tamil', crimeNumber);
+                updateField('section-field-tamil', section);
+                updateField('court-field-tamil', courtDisplayValue);
+                
+                updateField('police-station-content-english', policeStation);
+                updateField('crime-no-field-english', crimeNumber);
+                updateField('section-field-english', section);
+                updateField('court-field-english', courtDisplayValue);
+            }
+            
+            function updatePtWarrantFields(courtDisplayValue) {
+                const policeStation = document.getElementById('ptPoliceStation').value;
+                const crimeNumber = document.getElementById('ptCrimeNumber').value;
+                const section = document.getElementById('ptSection').value;
+                const scNumber = document.getElementById('scNumber').value;
+                const prcNumber = document.getElementById('prcNumber').value;
+                const centralPrison = document.getElementById('centralPrison').value;
+                
+                updateField('police-station-content-pt-tamil', policeStation);
+                updateField('crime-no-field-pt-tamil', crimeNumber);
+                updateField('section-field-pt-tamil', section);
+                updateField('sc-no-field-tamil', scNumber);
+                updateField('prc-no-field-tamil', prcNumber);
+                updateField('central-prison-field-tamil', centralPrison);
+                updateField('court-field-pt-tamil', courtDisplayValue);
+                
+                updateField('police-station-content-pt-english', policeStation);
+                updateField('crime-no-field-pt-english', crimeNumber);
+                updateField('section-field-pt-english', section);
+                updateField('sc-no-field-english', scNumber);
+                updateField('prc-no-field-english', prcNumber);
+                updateField('central-prison-field-english', centralPrison);
+                updateField('court-field-pt-english', courtDisplayValue);
+            }
+            
+            function updateTransferFields() {
+                const fromStation = document.getElementById('fromStation').value;
+                const toStation = document.getElementById('toStation').value;
+                const transferReason = document.getElementById('transferReason').value;
+                const transferOrderNumber = document.getElementById('transferOrderNumber').value;
+                const transferOrderDate = document.getElementById('transferOrderDate').value;
+                
+                updateField('from-station-field-tamil', fromStation);
+                updateField('to-station-field-tamil', toStation);
+                updateField('transfer-reason-field-tamil', transferReason);
+                updateField('transfer-order-number-field-tamil', transferOrderNumber);
+                updateField('transfer-order-date-field-tamil', transferOrderDate);
+                
+                updateField('from-station-field-english', fromStation);
+                updateField('to-station-field-english', toStation);
+                updateField('transfer-reason-field-english', transferReason);
+                updateField('transfer-order-number-field-english', transferOrderNumber);
+                updateField('transfer-order-date-field-english', transferOrderDate);
+            }
+            
+            function updateFirFields(courtDisplayValue) {
+                const policeStation = document.getElementById('firPoliceStation').value;
+                const crimeNumber = document.getElementById('firCrimeNumber').value;
+                const section = document.getElementById('firSection').value;
+                
+                updateField('police-station-content-fir-tamil', policeStation);
+                updateField('crime-no-field-fir-tamil', crimeNumber);
+                updateField('section-field-fir-tamil', section);
+                updateField('court-field-fir-tamil', courtDisplayValue);
+                
+                updateField('police-station-content-fir-english', policeStation);
+                updateField('crime-no-field-fir-english', crimeNumber);
+                updateField('section-field-fir-english', section);
+                updateField('court-field-fir-english', courtDisplayValue);
+            }
+            
+            function updateViseraFields() {
+                const policeStation = document.getElementById('viseraPoliceStation').value;
+                const crimeNumber = document.getElementById('viseraCrimeNumber').value;
+                const section = document.getElementById('viseraSection').value;
+                const deceasedName = document.getElementById('deceasedName').value;
+                const deceasedAge = document.getElementById('deceasedAge').value;
+                const deceasedFatherName = document.getElementById('deceasedFatherName').value;
+                const pmNumber = document.getElementById('pmNumber').value;
+                const pmDate = document.getElementById('pmDate').value;
+                
+                updateField('police-station-content-visera-tamil', policeStation);
+                updateField('crime-no-field-visera-tamil', crimeNumber);
+                updateField('section-field-visera-tamil', section);
+                updateField('deceased-name-field-tamil', deceasedName);
+                updateField('deceased-age-field-tamil', deceasedAge);
+                updateField('deceased-father-name-field-tamil', deceasedFatherName);
+                updateField('pm-number-field-tamil', pmNumber);
+                updateField('pm-date-field-tamil', pmDate);
+                
+                updateField('police-station-content-visera-english', policeStation);
+                updateField('crime-no-field-visera-english', crimeNumber);
+                updateField('section-field-visera-english', section);
+                updateField('deceased-name-field-english', deceasedName);
+                updateField('deceased-age-field-english', deceasedAge);
+                updateField('deceased-father-name-field-english', deceasedFatherName);
+                updateField('pm-number-field-english', pmNumber);
+                updateField('pm-date-field-english', pmDate);
+            }
+            
+            function updateLabReportFields() {
+                const policeStation = document.getElementById('labPoliceStation').value;
+                const crimeNumber = document.getElementById('labCrimeNumber').value;
+                const section = document.getElementById('labSection').value;
+                const dateValue = document.getElementById('date').value;
+                const narNumber = document.getElementById('narNumber').value;
+                const narDate = document.getElementById('narDate').value;
+                
+                updateField('police-station-content-lab-tamil', policeStation);
+                updateField('crime-no-field-lab-tamil', crimeNumber);
+                updateField('section-field-lab-tamil', section);
+                updateField('date-field-lab-tamil', dateValue);
+                updateField('nar-no-field-tamil', narNumber);
+                updateField('nar-date-field-tamil', narDate);
+                
+                updateField('police-station-content-lab-english', policeStation);
+                updateField('crime-no-field-lab-english', crimeNumber);
+                updateField('section-field-lab-english', section);
+                updateField('date-field-lab-english', dateValue);
+                updateField('nar-no-field-english', narNumber);
+                updateField('nar-date-field-english', narDate);
+            }
+            
+            function updateFormalArrestFields(courtDisplayValue) {
+                const policeStation = document.getElementById('arrestPoliceStation').value;
+                const crimeNumber = document.getElementById('arrestCrimeNumber').value;
+                const section = document.getElementById('arrestSection').value;
+                const prison = document.getElementById('arrestPrison').value;
+                const arrestType = document.getElementById('arrestType').value;
+                
+                updateField('police-station-content-formal-arrest-tamil', policeStation);
+                updateField('crime-no-field-formal-arrest-tamil', crimeNumber);
+                updateField('section-field-formal-arrest-tamil', section);
+                updateField('arrest-prison-field-tamil', prison);
+                updateField('arrest-type-field-tamil', arrestType);
+                
+                updateField('police-station-content-formal-arrest-english', policeStation);
+                updateField('crime-no-field-formal-arrest-english', crimeNumber);
+                updateField('section-field-formal-arrest-english', section);
+                updateField('arrest-prison-field-english', prison);
+                updateField('arrest-type-field-english', arrestType);
+            }
+            
+            function updatePropertyLabFields() {
+                const policeStation = document.getElementById('propertyPoliceStation').value;
+                const crimeNumber = document.getElementById('propertyCrimeNumber').value;
+                const section = document.getElementById('propertySection').value;
+                const propertyDescription = document.getElementById('propertyDescription').value;
+                const propertySeizedDate = document.getElementById('propertySeizedDate').value;
+                
+                updateField('police-station-content-property-tamil', policeStation);
+                updateField('crime-no-field-property-tamil', crimeNumber);
+                updateField('section-field-property-tamil', section);
+                updateField('property-description-field-tamil', propertyDescription);
+                updateField('property-seized-date-field-tamil', propertySeizedDate);
+                
+                updateField('police-station-content-property-english', policeStation);
+                updateField('crime-no-field-property-english', crimeNumber);
+                updateField('section-field-property-english', section);
+                updateField('property-description-field-english', propertyDescription);
+                updateField('property-seized-date-field-english', propertySeizedDate);
+            }
+            
+            function updateMLPassportFields() {
+                const policeStation = document.getElementById('mlPoliceStation').value;
+                const leaveDays = document.getElementById('leaveDays').value;
+                const leaveStartDate = document.getElementById('leaveStartDate').value;
+                const leaveEndDate = document.getElementById('leaveEndDate').value;
+                const reportBackDate = document.getElementById('reportBackDate').value;
+                const session = document.getElementById('session').value;
+                
+                updateField('leave-days-field-tamil', leaveDays);
+                updateField('leave-start-date-field-tamil', leaveStartDate);
+                updateField('leave-end-date-field-tamil', leaveEndDate);
+                updateField('report-back-date-field-tamil', reportBackDate);
+                updateField('session-field-tamil', session);
+                
+                updateField('leave-days-field-english', leaveDays);
+                updateField('leave-start-date-field-english', leaveStartDate);
+                updateField('leave-end-date-field-english', leaveEndDate);
+                updateField('report-back-date-field-english', reportBackDate);
+                updateField('session-field-english', session);
+            }
+            
+            function updateField(fieldId, value) {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    if (value) {
+                        field.textContent = value;
+                        field.classList.remove('empty');
+                    } else {
+                        field.textContent = '';
+                        field.classList.add('empty');
+                    }
+                }
+            }
+            
+            function printDocument() {
+                const printContent = document.getElementById('document-to-print');
+                const originalContents = document.body.innerHTML;
+                
+                document.body.innerHTML = printContent.outerHTML;
                 window.print();
-                document.body.innerHTML = originalContent;
+                document.body.innerHTML = originalContents;
                 
-                window.location.reload();
-            });
-
-            generateBtn.addEventListener('click', function() {
-                const firstDesignation = document.getElementById('designation-field-1').textContent;
-                if (!firstDesignation || firstDesignation === 'Designation with Number') {
-                    showNotification('Please generate the document first using the "Generate Document" button', 'error');
+                // Re-attach event listeners
+                initializeEventListeners();
+                
+                showNotification('Document sent to printer', 'success');
+            }
+            
+            async function generatePDF() {
+                if (!validateForm()) {
+                    showNotification('Please fix the errors in the form before generating PDF', 'error');
                     return;
                 }
                 
-                generateBtn.disabled = true;
                 generateBtn.innerHTML = '<span class="spinner"></span> Generating PDF...';
+                generateBtn.disabled = true;
                 
-                const previewElement = document.getElementById('document-to-print');
-                previewElement.classList.add('pdf-mode');
-                
-                const timeField = document.getElementById('time-field');
-                if (timeField.classList.contains('empty')) {
-                    const originalPlaceholder = timeField.getAttribute('placeholder');
-                    timeField.setAttribute('data-original-placeholder', originalPlaceholder);
-                    timeField.removeAttribute('placeholder');
-                    timeField.textContent = '';
-                }
-                
-                const originalStyles = {
-                    width: previewElement.style.width,
-                    height: previewElement.style.height,
-                    boxShadow: previewElement.style.boxShadow
-                };
-                
-                previewElement.style.width = '595px';
-                previewElement.style.height = '842px';
-                previewElement.style.boxShadow = 'none';
-                
-                const allTextElements = previewElement.querySelectorAll('*');
-                const originalColors = [];
-                
-                allTextElements.forEach((el, index) => {
-                    originalColors[index] = {
-                        color: el.style.color,
-                        backgroundColor: el.style.backgroundColor
-                    };
+                try {
+                    const element = document.getElementById('document-to-print');
                     
-                    el.style.color = '#000000';
-                    el.style.backgroundColor = '#FFFFFF';
-                });
-                
-                setTimeout(() => {
-                    html2canvas(previewElement, {
+                    // Add PDF mode class for styling
+                    element.classList.add('pdf-mode', 'pdf-optimized');
+                    
+                    const canvas = await html2canvas(element, {
                         scale: 2,
                         useCORS: true,
                         logging: false,
-                        backgroundColor: '#FFFFFF',
-                        width: 595,
-                        height: 842,
+                        backgroundColor: '#ffffff',
                         onclone: function(clonedDoc) {
                             const clonedElement = clonedDoc.getElementById('document-to-print');
                             if (clonedElement) {
-                                const clonedTextElements = clonedElement.querySelectorAll('*');
-                                clonedTextElements.forEach(el => {
-                                    el.style.color = '#000000';
-                                    el.style.backgroundColor = '#FFFFFF';
-                                });
-                                
-                                const clonedTimeField = clonedDoc.getElementById('time-field');
-                                if (clonedTimeField && clonedTimeField.classList.contains('empty')) {
-                                    const originalPlaceholder = clonedTimeField.getAttribute('data-original-placeholder');
-                                    if (!originalPlaceholder) {
-                                        clonedTimeField.setAttribute('data-original-placeholder', clonedTimeField.getAttribute('placeholder'));
-                                    }
-                                    clonedTimeField.removeAttribute('placeholder');
-                                    clonedTimeField.textContent = '';
-                                }
+                                clonedElement.classList.add('pdf-mode', 'pdf-optimized');
                             }
                         }
-                    }).then(canvas => {
-                        const imgData = canvas.toDataURL('image/png');
-                        const pdf = new jsPDF({
-                            orientation: 'portrait',
-                            unit: 'px',
-                            format: 'a4'
-                        });
-                        
-                        const pdfWidth = pdf.internal.pageSize.getWidth();
-                        const pdfHeight = pdf.internal.pageSize.getHeight();
-                        
-                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                        
-                        const passportType = document.getElementById('passportType').value.replace(/\s+/g, '_');
-                        const dateString = new Date().toISOString().split('T')[0];
-                        const crimeNumber = document.getElementById('crimeNumber').value.replace(/\//g, '-');
-                        
-                        pdf.save(`Police_Passport_${passportType}_${crimeNumber}_${dateString}.pdf`);
-                        
-                    }).catch(error => {
-                        console.error('PDF generation error:', error);
-                        showNotification('Error generating PDF: ' + error.message, 'error');
-                    }).finally(() => {
-                        previewElement.style.width = originalStyles.width;
-                        previewElement.style.height = originalStyles.height;
-                        previewElement.style.boxShadow = originalStyles.boxShadow;
-                        
-                        allTextElements.forEach((el, index) => {
-                            if (originalColors[index]) {
-                                el.style.color = originalColors[index].color;
-                                el.style.backgroundColor = originalColors[index].backgroundColor;
-                            }
-                        });
-                        
-                        if (timeField.classList.contains('empty')) {
-                            const originalPlaceholder = timeField.getAttribute('data-original-placeholder');
-                            if (originalPlaceholder) {
-                                timeField.setAttribute('placeholder', originalPlaceholder);
-                                timeField.removeAttribute('data-original-placeholder');
-                            }
-                        }
-                        
-                        previewElement.classList.remove('pdf-mode');
-                        generateBtn.disabled = false;
-                        generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Generate PDF';
-                        showNotification('PDF generated successfully!', 'success');
                     });
-                }, 100);
-            });
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210;
+                    const pageHeight = 295;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    const fileName = `Police_Passport_${passportTypeSelect.value.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
+                    pdf.save(fileName);
+                    
+                    // Remove PDF mode class
+                    element.classList.remove('pdf-mode', 'pdf-optimized');
+                    
+                    showNotification('PDF generated successfully', 'success');
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    showNotification('Error generating PDF. Please try again.', 'error');
+                    
+                    // Remove PDF mode class in case of error
+                    const element = document.getElementById('document-to-print');
+                    element.classList.remove('pdf-mode', 'pdf-optimized');
+                } finally {
+                    generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Generate PDF';
+                    generateBtn.disabled = false;
+                }
+            }
+            
+            function initializeEventListeners() {
+                // Event listeners for form fields
+                passportTypeSelect.addEventListener('change', function() {
+                    updateContentVisibility();
+                    autoSave();
+                });
+                
+                languageSelect.addEventListener('change', function() {
+                    currentLanguage = this.value;
+                    updateLanguageContent();
+                    autoSave();
+                });
+                
+                officerCountInput.addEventListener('change', updatePoliceOfficers);
+                addOfficerBtn.addEventListener('click', addPoliceOfficer);
+                
+                accusedCountInput.addEventListener('change', updateAccusedPersons);
+                addAccusedBtn.addEventListener('click', addAccusedPerson);
+                
+                fillFormBtn.addEventListener('click', fillDocumentPreview);
+                printBtn.addEventListener('click', printDocument);
+                generateBtn.addEventListener('click', generatePDF);
+                
+                // Add event listeners to all input fields for validation and auto-save
+                const allInputs = document.querySelectorAll('input, select, textarea');
+                allInputs.forEach(input => {
+                    input.addEventListener('input', autoSave);
+                    input.addEventListener('blur', validateField);
+                });
+                
+                // Add specific event listeners for crime number formatting
+                const crimeNumberInputs = document.querySelectorAll('input[id$="CrimeNumber"]');
+                crimeNumberInputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        formatCrimeNumber(this);
+                    });
+                });
+                
+                // Add event listener for court number validation when court is selected
+                courtSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        document.getElementById('courtNumber').setAttribute('required', 'required');
+                    } else {
+                        document.getElementById('courtNumber').removeAttribute('required');
+                    }
+                    validateField.call(this);
+                });
+                
+                courtNumberInput.addEventListener('input', function() {
+                    if (courtSelect.value) {
+                        this.setAttribute('required', 'required');
+                    } else {
+                        this.removeAttribute('required');
+                    }
+                    validateField.call(this);
+                });
+            }
+            
+            // Initialize the application
+            function init() {
+                updatePoliceOfficers();
+                updateAccusedPersons();
+                updateContentVisibility();
+                initializeEventListeners();
+                loadSavedData();
+                
+                showNotification('Police Passport Document Generator is ready!', 'success');
+            }
+            
+            // Start the application
+            init();
         });
     </script>
 </body>
