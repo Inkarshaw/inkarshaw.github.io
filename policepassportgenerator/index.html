@@ -778,7 +778,7 @@
             opacity: 0.5 !important;
         }
 
-        /* FIXED CSS FOR PDF TEXT COLOR ISSUE */
+        /* FIXED CSS FOR PDF TEXT COLOR ISSUE - IMPLEMENTED SOLUTION */
         #document-to-print,
         #document-to-print .document-table,
         #document-to-print .document-table td,
@@ -793,14 +793,36 @@
         }
 
         #document-to-print.pdf-mode .right-column,
-        #document-to-print.pdf-mode .content-text,
-        #document-to-print.pdf-mode .embedded-field,
-        #document-to-print.pdf-mode .preview-field,
-        #document-to-print.pdf-mode .time-field,
-        #document-to-print.pdf-mode .time-suffix {
+        #document-to-print.pdf-mode .right-column *,
+        #document-to-print.pdf-mode .right-column .preview-field,
+        #document-to-print.pdf-mode .right-column .content-text,
+        #document-to-print.pdf-mode .right-column .embedded-field {
             color: #000000 !important;
-            font-weight: normal !important;
-            text-align: justify !important;
+            background: #ffffff !important;
+            text-shadow: none !important;
+            -webkit-text-fill-color: #000 !important;
+            filter: none !important;
+        }
+
+        #document-to-print.pdf-mode .right-column .preview-field.empty:before,
+        #document-to-print.pdf-mode .right-column .embedded-field.empty:before {
+            color: #000000 !important;
+            opacity: 0 !important;
+            display: none !important;
+        }
+
+        #document-to-print.pdf-mode .right-column * {
+            color: #000000 !important;
+            background: transparent !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-shadow: none !important;
+            filter: none !important;
+        }
+
+        #document-to-print,
+        #document-to-print * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         #document-to-print.pdf-mode {
