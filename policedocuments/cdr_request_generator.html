@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDR Request Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        .form-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .form-section h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.3rem;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #444;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .add-row-btn {
+            background-color: #2ecc71;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+        .add-row-btn:hover {
+            background-color: #27ae60;
+        }
+        .remove-row-btn {
+            background-color: #e74c3c;
+            padding: 8px 16px;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .remove-row-btn:hover {
+            background-color: #c0392b;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .checkbox-group input {
+            width: auto;
+            margin-top: 4px;
+        }
+        .instructions {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .instructions ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        .date-right {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .date-right label {
+            margin-bottom: 0;
+            margin-right: 10px;
+        }
+        .date-right input {
+            width: auto;
+            min-width: 180px;
+        }
+        .date-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .date-input-container {
+            position: relative;
+        }
+        .till-date-display {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            background-color: #f8fff8;
+            color: #2e7d32;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+        .till-date-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .till-date-checkbox input {
+            width: auto;
+        }
+        .till-date-checkbox label {
+            margin-bottom: 0;
+            font-weight: normal;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #3498db;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .crime-number-sections {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .crime-number-sections input {
+            text-align: center;
+        }
+        .section-divider {
+            font-weight: bold;
+            color: #666;
+        }
+        .section-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        .section-container {
+            flex: 1;
+        }
+        .input-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        .address-field {
+            height: 80px;
+            resize: vertical;
+        }
+        .mobile-telecom-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .mobile-number-input {
+            width: 100%;
+        }
+        .telecom-select {
+            width: 100%;
+        }
+        .telecom-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        .receiver-title-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .receiver-title-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        
+        /* Vertical mobile numbers layout */
+        .mobile-numbers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .mobile-number-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .mobile-number-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .mobile-number-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        .mobile-number-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .mobile-number-full-width {
+            grid-column: 1 / -1;
+        }
+        .date-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        /* Same for all checkbox styles */
+        .same-for-all-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .same-for-all-checkbox {
+            width: auto;
+        }
+        .same-for-all-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        .field-with-checkbox {
+            position: relative;
+        }
+        @media (max-width: 768px) {
+            .mobile-number-fields {
+                grid-template-columns: 1fr;
+            }
+            .date-fields {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CDR Request Generator</h1>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ul>
+                <li>Fill in all the required fields below</li>
+                <li>Add multiple mobile numbers using the "Add Another Mobile Number" button</li>
+                <li>Use "Same for all" checkboxes to automatically apply values to new numbers</li>
+                <li>Use "Till Date" checkbox to show "Till Date" in the date field</li>
+                <li>Check both declaration boxes before generating the PDF</li>
+                <li>Click "Generate PDF" to create and download your CDR request</li>
+            </ul>
+        </div>
+        
+        <form id="cdrForm">
+            <div class="form-section">
+                <h2>Sender Information</h2>
+                <div class="form-group date-right">
+                    <label for="fromDate">Date:</label>
+                    <input type="date" id="fromDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="policeStation">Name of the Police Station:</label>
+                    <input type="text" id="policeStation" placeholder="Enter police station name (e.g., G7 Chetpet)" required>
+                    <div class="input-hint">"Police Station" will be automatically added in the PDF</div>
+                </div>
+                <div class="form-group">
+                    <label for="senderAddress">Full Address:</label>
+                    <textarea id="senderAddress" class="address-field" placeholder="Enter complete address with city, state, and PIN code" required></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Receiver's Information</h2>
+                <div class="form-group">
+                    <label for="receiverTitle">Receiver's Title:</label>
+                    <div class="receiver-title-container">
+                        <select id="receiverTitle" required>
+                            <option value="">Select Receiver's Title</option>
+                            <option value="The Superintendent of Police">The Superintendent of Police</option>
+                            <option value="The Deputy Commissioner of Police">The Deputy Commissioner of Police</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="receiverAddress">Full Address:</label>
+                    <textarea id="receiverAddress" class="address-field" placeholder="Enter complete address with city, state, and PIN code" required></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Case Information</h2>
+                <div class="form-group">
+                    <label for="crimeNumber">Crime Number:</label>
+                    <div class="crime-number-sections">
+                        <div class="section-container">
+                            <div class="section-label">Cr.No.</div>
+                            <input type="text" id="crimeCrNo" placeholder="Cr.No." maxlength="6" required pattern="[0-9]{1,6}">
+                        </div>
+                        <div class="section-divider">/</div>
+                        <div class="section-container">
+                            <div class="section-label">Year</div>
+                            <input type="text" id="crimeYear" placeholder="YYYY" maxlength="4" required pattern="[0-9]{4}">
+                        </div>
+                        <div class="section-divider">U/s</div>
+                        <div class="section-container">
+                            <div class="section-label">Section</div>
+                            <input type="text" id="crimeSection" placeholder="Sec" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Mobile Numbers Information</h2>
+                
+                <div class="mobile-numbers-container" id="mobileNumbersContainer">
+                    <div class="mobile-number-card" data-index="0">
+                        <div class="mobile-number-header">
+                            <div class="mobile-number-title">Mobile Number #1</div>
+                        </div>
+                        <div class="mobile-number-fields">
+                            <div class="mobile-number-full-width">
+                                <label for="mobileNumber0">Mobile/IMEI Number:</label>
+                                <input type="text" id="mobileNumber0" class="mobile-number" placeholder="Enter mobile or IMEI number" required>
+                            </div>
+                            <div class="mobile-number-full-width">
+                                <label for="telecomProvider0">Telecom Provider:</label>
+                                <select id="telecomProvider0" class="telecom-provider" required>
+                                    <option value="">Select Telecom Provider</option>
+                                    <option value="Airtel">Airtel</option>
+                                    <option value="Jio">Jio</option>
+                                    <option value="Vodafone Idea">Vodafone Idea</option>
+                                    <option value="BSNL">BSNL</option>
+                                    <option value="MTNL">MTNL</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="date-fields">
+                                <div class="field-with-checkbox">
+                                    <label for="fromDate0">From Date:</label>
+                                    <input type="date" id="fromDate0" class="from-date" required>
+                                    <div class="same-for-all-container">
+                                        <input type="checkbox" id="sameFromDate" class="same-for-all-checkbox">
+                                        <label for="sameFromDate" class="same-for-all-label">Same for all</label>
+                                    </div>
+                                </div>
+                                <div class="field-with-checkbox">
+                                    <label for="toDate0">To Date:</label>
+                                    <div class="date-container">
+                                        <div class="date-input-container">
+                                            <input type="date" id="toDate0" class="to-date">
+                                            <div class="till-date-display">Till Date</div>
+                                        </div>
+                                        <div class="till-date-checkbox">
+                                            <input type="checkbox" id="tillDate0" class="till-date-check">
+                                            <label for="tillDate0">Till Date</label>
+                                        </div>
+                                    </div>
+                                    <div class="same-for-all-container">
+                                        <input type="checkbox" id="sameToDate" class="same-for-all-checkbox">
+                                        <label for="sameToDate" class="same-for-all-label">Same for all</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mobile-number-full-width field-with-checkbox">
+                                <label for="relation0">Whose/How related:</label>
+                                <input type="text" id="relation0" class="relation" placeholder="Enter relationship (e.g., Suspect, Victim, Witness)" required>
+                                <div class="same-for-all-container">
+                                    <input type="checkbox" id="sameRelation" class="same-for-all-checkbox">
+                                    <label for="sameRelation" class="same-for-all-label">Same for all</label>
+                                </div>
+                            </div>
+                            <div class="mobile-number-full-width">
+                                <button type="button" class="remove-row-btn" disabled>Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add button moved below the first mobile number -->
+                <button type="button" class="add-row-btn" id="addRowBtn">Add Another Mobile Number</button>
+            </div>
+            
+            <div class="form-section">
+                <h2>Declaration</h2>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="subscriberIdentity" required>
+                    <label for="subscriberIdentity">The subscriber identity has been ascertained and it is ensured that the person in question is not someone whose call details are of a sensitive nature.</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="notMPMLA" required>
+                    <label for="notMPMLA">The number is not subscribed in the name of a sitting MP/MLA.</label>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button type="button" id="generatePdfBtn">Generate PDF</button>
+                <div class="loading" id="loadingMessage">Generating PDF... Please wait</div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addRowBtn = document.getElementById('addRowBtn');
+            const mobileNumbersContainer = document.getElementById('mobileNumbersContainer');
+            const generatePdfBtn = document.getElementById('generatePdfBtn');
+            const loadingMessage = document.getElementById('loadingMessage');
+            
+            // Set default date values
+            const today = new Date().toISOString().split('T')[0];
+            const currentYear = new Date().getFullYear().toString();
+            document.getElementById('fromDate').value = today;
+            document.getElementById('crimeYear').value = currentYear;
+            
+            // Set default "From" date in the mobile number cards
+            const fromDateInputs = document.querySelectorAll('.from-date');
+            fromDateInputs.forEach(input => {
+                input.value = today;
+            });
+            
+            // Auto-advance crime number sections
+            const crimeInputs = ['crimeCrNo', 'crimeYear', 'crimeSection'];
+            crimeInputs.forEach((id, index) => {
+                const input = document.getElementById(id);
+                input.addEventListener('input', function() {
+                    // Only auto-advance for the first two fields (Cr.No. and Year)
+                    if (index < 2 && this.value.length === this.maxLength && index < crimeInputs.length - 1) {
+                        document.getElementById(crimeInputs[index + 1]).focus();
+                    }
+                });
+                
+                // Allow backspace to go to previous field
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                        document.getElementById(crimeInputs[index - 1]).focus();
+                    }
+                });
+            });
+            
+            // Function to handle Till Date checkbox changes
+            function handleTillDateChange(tillDateCheck, toDateInput, tillDateDisplay) {
+                if (tillDateCheck.checked) {
+                    toDateInput.style.display = 'none';
+                    tillDateDisplay.style.display = 'block';
+                    toDateInput.value = today; // Set actual value for PDF generation
+                } else {
+                    toDateInput.style.display = 'block';
+                    tillDateDisplay.style.display = 'none';
+                    toDateInput.value = ''; // Clear the value
+                }
+            }
+            
+            // Function to apply "Same for all" values to existing cards
+            function applySameForAll() {
+                const cards = document.querySelectorAll('.mobile-number-card');
+                if (cards.length === 0) return;
+                
+                const firstCard = cards[0];
+                
+                // From Date
+                if (document.getElementById('sameFromDate').checked) {
+                    const firstFromDate = firstCard.querySelector('.from-date').value;
+                    cards.forEach(card => {
+                        card.querySelector('.from-date').value = firstFromDate;
+                    });
+                }
+                
+                // To Date and Till Date
+                if (document.getElementById('sameToDate').checked) {
+                    const firstToDate = firstCard.querySelector('.to-date').value;
+                    const firstTillDateCheck = firstCard.querySelector('.till-date-check').checked;
+                    
+                    cards.forEach(card => {
+                        const toDateInput = card.querySelector('.to-date');
+                        const tillDateCheck = card.querySelector('.till-date-check');
+                        const tillDateDisplay = card.querySelector('.till-date-display');
+                        
+                        toDateInput.value = firstToDate;
+                        tillDateCheck.checked = firstTillDateCheck;
+                        handleTillDateChange(tillDateCheck, toDateInput, tillDateDisplay);
+                    });
+                }
+                
+                // Relation
+                if (document.getElementById('sameRelation').checked) {
+                    const firstRelation = firstCard.querySelector('.relation').value;
+                    cards.forEach(card => {
+                        card.querySelector('.relation').value = firstRelation;
+                    });
+                }
+            }
+            
+            // Add event listeners to "Same for all" checkboxes
+            document.getElementById('sameFromDate').addEventListener('change', applySameForAll);
+            document.getElementById('sameToDate').addEventListener('change', applySameForAll);
+            document.getElementById('sameRelation').addEventListener('change', applySameForAll);
+            
+            // Add row functionality with "Same for all" feature
+            addRowBtn.addEventListener('click', function() {
+                const cardCount = mobileNumbersContainer.children.length;
+                const newIndex = cardCount;
+                
+                const newCard = document.createElement('div');
+                newCard.className = 'mobile-number-card';
+                newCard.setAttribute('data-index', newIndex);
+                
+                newCard.innerHTML = `
+                    <div class="mobile-number-header">
+                        <div class="mobile-number-title">Mobile Number #${newIndex + 1}</div>
+                    </div>
+                    <div class="mobile-number-fields">
+                        <div class="mobile-number-full-width">
+                            <label for="mobileNumber${newIndex}">Mobile/IMEI Number:</label>
+                            <input type="text" id="mobileNumber${newIndex}" class="mobile-number" placeholder="Enter mobile or IMEI number" required>
+                        </div>
+                        <div class="mobile-number-full-width">
+                            <label for="telecomProvider${newIndex}">Telecom Provider:</label>
+                            <select id="telecomProvider${newIndex}" class="telecom-provider" required>
+                                <option value="">Select Telecom Provider</option>
+                                <option value="Airtel">Airtel</option>
+                                <option value="Jio">Jio</option>
+                                <option value="Vodafone Idea">Vodafone Idea</option>
+                                <option value="BSNL">BSNL</option>
+                                <option value="MTNL">MTNL</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="date-fields">
+                            <div class="field-with-checkbox">
+                                <label for="fromDate${newIndex}">From Date:</label>
+                                <input type="date" id="fromDate${newIndex}" class="from-date" required>
+                            </div>
+                            <div class="field-with-checkbox">
+                                <label for="toDate${newIndex}">To Date:</label>
+                                <div class="date-container">
+                                    <div class="date-input-container">
+                                        <input type="date" id="toDate${newIndex}" class="to-date">
+                                        <div class="till-date-display">Till Date</div>
+                                    </div>
+                                    <div class="till-date-checkbox">
+                                        <input type="checkbox" id="tillDate${newIndex}" class="till-date-check">
+                                        <label for="tillDate${newIndex}">Till Date</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mobile-number-full-width">
+                            <label for="relation${newIndex}">Whose/How related:</label>
+                            <input type="text" id="relation${newIndex}" class="relation" placeholder="Enter relationship (e.g., Suspect, Victim, Witness)" required>
+                        </div>
+                        <div class="mobile-number-full-width">
+                            <button type="button" class="remove-row-btn">Remove</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Apply "Same for all" values if checkboxes are checked
+                const firstCard = document.querySelector('.mobile-number-card');
+                if (firstCard) {
+                    // From Date
+                    if (document.getElementById('sameFromDate').checked) {
+                        const firstFromDate = firstCard.querySelector('.from-date').value;
+                        newCard.querySelector('.from-date').value = firstFromDate;
+                    } else {
+                        newCard.querySelector('.from-date').value = today;
+                    }
+                    
+                    // To Date and Till Date
+                    if (document.getElementById('sameToDate').checked) {
+                        const firstToDate = firstCard.querySelector('.to-date').value;
+                        const firstTillDateCheck = firstCard.querySelector('.till-date-check').checked;
+                        
+                        const toDateInput = newCard.querySelector('.to-date');
+                        const tillDateCheck = newCard.querySelector('.till-date-check');
+                        const tillDateDisplay = newCard.querySelector('.till-date-display');
+                        
+                        toDateInput.value = firstToDate;
+                        tillDateCheck.checked = firstTillDateCheck;
+                        handleTillDateChange(tillDateCheck, toDateInput, tillDateDisplay);
+                    }
+                    
+                    // Relation
+                    if (document.getElementById('sameRelation').checked) {
+                        const firstRelation = firstCard.querySelector('.relation').value;
+                        newCard.querySelector('.relation').value = firstRelation;
+                    }
+                }
+                
+                // Add event listener to the new remove button
+                newCard.querySelector('.remove-row-btn').addEventListener('click', function() {
+                    mobileNumbersContainer.removeChild(newCard);
+                    updateCardNumbers();
+                });
+                
+                // Add event listener to the new Till Date checkbox
+                const tillDateCheck = newCard.querySelector('.till-date-check');
+                const toDateInput = newCard.querySelector('.to-date');
+                const tillDateDisplay = newCard.querySelector('.till-date-display');
+                
+                tillDateCheck.addEventListener('change', function() {
+                    handleTillDateChange(tillDateCheck, toDateInput, tillDateDisplay);
+                });
+                
+                mobileNumbersContainer.appendChild(newCard);
+                
+                // Enable remove button on the first card if there's more than one
+                if (mobileNumbersContainer.children.length > 1) {
+                    document.querySelector('.mobile-number-card .remove-row-btn').disabled = false;
+                }
+            });
+            
+            // Add event listener to the initial Till Date checkbox
+            const initialTillDateCheck = document.querySelector('.till-date-check');
+            const initialToDateInput = document.querySelector('.to-date');
+            const initialTillDateDisplay = document.querySelector('.till-date-display');
+            
+            if (initialTillDateCheck && initialToDateInput && initialTillDateDisplay) {
+                initialTillDateCheck.addEventListener('change', function() {
+                    handleTillDateChange(initialTillDateCheck, initialToDateInput, initialTillDateDisplay);
+                });
+            }
+            
+            // Update card numbers when cards are removed
+            function updateCardNumbers() {
+                const cards = mobileNumbersContainer.children;
+                for (let i = 0; i < cards.length; i++) {
+                    const card = cards[i];
+                    card.setAttribute('data-index', i);
+                    card.querySelector('.mobile-number-title').textContent = `Mobile Number #${i + 1}`;
+                    
+                    // Update IDs and labels
+                    const inputs = card.querySelectorAll('input, select');
+                    inputs.forEach(input => {
+                        const oldId = input.id;
+                        const newId = oldId.replace(/\d+$/, i);
+                        input.id = newId;
+                        
+                        // Update corresponding label
+                        const label = document.querySelector(`label[for="${oldId}"]`);
+                        if (label) {
+                            label.setAttribute('for', newId);
+                        }
+                    });
+                }
+                
+                // Disable remove button if only one card remains
+                if (cards.length === 1) {
+                    cards[0].querySelector('.remove-row-btn').disabled = true;
+                }
+            }
+            
+            // Generate PDF functionality
+            generatePdfBtn.addEventListener('click', function() {
+                // Show loading message
+                loadingMessage.style.display = 'block';
+                generatePdfBtn.disabled = true;
+                
+                // Small delay to show loading message
+                setTimeout(function() {
+                    try {
+                        // Validate form
+                        if (!document.getElementById('cdrForm').checkValidity()) {
+                            alert('Please fill in all required fields and check both declaration boxes.');
+                            loadingMessage.style.display = 'none';
+                            generatePdfBtn.disabled = false;
+                            return;
+                        }
+                        
+                        // Collect form data
+                        const formData = {
+                            fromDate: document.getElementById('fromDate').value,
+                            policeStation: document.getElementById('policeStation').value,
+                            senderAddress: document.getElementById('senderAddress').value,
+                            receiverTitle: document.getElementById('receiverTitle').value,
+                            receiverAddress: document.getElementById('receiverAddress').value,
+                            crimeNumber: `${document.getElementById('crimeCrNo').value}/${document.getElementById('crimeYear').value} U/s ${document.getElementById('crimeSection').value}`,
+                            mobileNumbers: [],
+                            subscriberIdentity: document.getElementById('subscriberIdentity').checked,
+                            notMPMLA: document.getElementById('notMPMLA').checked
+                        };
+                        
+                        // Collect mobile numbers data
+                        const cards = document.querySelectorAll('.mobile-number-card');
+                        for (let i = 0; i < cards.length; i++) {
+                            const card = cards[i];
+                            const toDateInput = card.querySelector('.to-date');
+                            const tillDateCheck = card.querySelector('.till-date-check');
+                            
+                            let toDateValue = toDateInput.value;
+                            let isTillDate = tillDateCheck.checked;
+                            
+                            // If Till Date is checked but no date is set, use today's date
+                            if (isTillDate && !toDateValue) {
+                                toDateValue = today;
+                            }
+                            
+                            formData.mobileNumbers.push({
+                                mobileNumber: card.querySelector('.mobile-number').value,
+                                telecomProvider: card.querySelector('.telecom-provider').value,
+                                fromDate: card.querySelector('.from-date').value,
+                                toDate: toDateValue,
+                                relation: card.querySelector('.relation').value,
+                                isTillDate: isTillDate
+                            });
+                        }
+                        
+                        // Generate PDF
+                        generatePDF(formData);
+                        
+                    } catch (error) {
+                        console.error('Error generating PDF:', error);
+                        alert('Error generating PDF. Please check the console for details.');
+                    } finally {
+                        // Hide loading message and re-enable button
+                        loadingMessage.style.display = 'none';
+                        generatePdfBtn.disabled = false;
+                    }
+                }, 100);
+            });
+            
+            function generatePDF(data) {
+                try {
+                    // Check if jsPDF is available
+                    if (typeof window.jspdf === 'undefined') {
+                        throw new Error('PDF library not loaded. Please check your internet connection.');
+                    }
+                    
+                    // Create a new jsPDF instance with A4 dimensions
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    // Set A4 margins (standard 1 inch/25.4mm margins on all sides)
+                    const leftMargin = 25.4; // 1 inch in mm
+                    const rightMargin = 25.4;
+                    const topMargin = 25.4;
+                    const pageWidth = doc.internal.pageSize.width;
+                    const contentWidth = pageWidth - leftMargin - rightMargin;
+                    
+                    // Set font and size
+                    doc.setFont('helvetica');
+                    doc.setFontSize(12);
+                    
+                    // Add content to PDF with proper margins
+                    let yPosition = topMargin;
+                    
+                    // Date - positioned at the right margin (without "From")
+                    const dateText = `Date: ${formatDate(data.fromDate)}`;
+                    const dateWidth = doc.getTextWidth(dateText);
+                    doc.text(dateText, pageWidth - rightMargin - dateWidth, yPosition);
+                    yPosition += 10;
+                    
+                    // From section with indentation
+                    const indentAmount = 10; // mm indentation
+                    doc.text('From', leftMargin, yPosition);
+                    yPosition += 7;
+                    doc.text('Inspector of Police,', leftMargin + indentAmount, yPosition);
+                    yPosition += 7;
+                    // Add "Police Station" after the police station name
+                    doc.text(data.policeStation + ' Police Station,', leftMargin + indentAmount, yPosition);
+                    yPosition += 7;
+                    
+                    // Split sender address into multiple lines if needed
+                    const senderAddressLines = doc.splitTextToSize(data.senderAddress, contentWidth - indentAmount);
+                    for (let i = 0; i < senderAddressLines.length; i++) {
+                        doc.text(senderAddressLines[i], leftMargin + indentAmount, yPosition);
+                        yPosition += 7;
+                    }
+                    
+                    yPosition += 10; // Reduced from 15 to 10
+                    
+                    // To section with indentation - Updated with receiver's information
+                    doc.text('To', leftMargin, yPosition);
+                    yPosition += 7;
+                    // Add receiver title as the first line (no name field anymore)
+                    doc.text(data.receiverTitle + ',', leftMargin + indentAmount, yPosition);
+                    yPosition += 7;
+                    
+                    // Split receiver address into multiple lines if needed
+                    const receiverAddressLines = doc.splitTextToSize(data.receiverAddress, contentWidth - indentAmount);
+                    for (let i = 0; i < receiverAddressLines.length; i++) {
+                        doc.text(receiverAddressLines[i], leftMargin + indentAmount, yPosition);
+                        yPosition += 7;
+                    }
+                    
+                    yPosition += 10; // Reduced from 15 to 10
+                    
+                    // Salutation
+                    doc.text('Respected Sir,', leftMargin, yPosition);
+                    yPosition += 7; // Reduced from 10 to 7
+                    
+                    // Subject with indentation
+                    doc.text('Sub: Request -- CDR and SDR of Cell number -- Regarding', leftMargin + indentAmount, yPosition);
+                    yPosition += 7; // Reduced from 10 to 7
+                    
+                    // Reference with indentation
+                    doc.text(`Ref : Cr.No: ${data.crimeNumber}`, leftMargin + indentAmount, yPosition);
+                    yPosition += 10; // Reduced from 15 to 10
+                    
+                    // Body text - Only the first line indented
+                    const bodyText = [
+                        "It is kindly submitted that the above reference cited, please provide the Call Detail Records of the following Cell number for investigation purpose."
+                    ];
+                    
+                    // Split text into lines that fit within content width
+                    const splitText = doc.splitTextToSize(bodyText[0], contentWidth);
+                    
+                    // Add each line of justified text - only first line indented
+                    for (let i = 0; i < splitText.length; i++) {
+                        if (i === 0) {
+                            // First line indented
+                            doc.text(splitText[i], leftMargin + indentAmount, yPosition, { align: 'justify' });
+                        } else {
+                            // Subsequent lines aligned with left margin
+                            doc.text(splitText[i], leftMargin, yPosition, { align: 'justify' });
+                        }
+                        yPosition += 7;
+                    }
+                    
+                    yPosition += 7; // Reduced from 10 to 7
+                    
+                    // Table header - Adjusted to fit within margins
+                    const tableHeaders = ['S.No.', 'Mobile/IMEI Number', 'From', 'To', 'Whose/How related'];
+                    
+                    // Calculate column widths based on content width
+                    const columnWidths = [
+                        12,  // S.No. - smaller
+                        65,  // Mobile/IMEI Number - increased width
+                        25,  // From - smaller for dates
+                        25,  // To - smaller for dates
+                        43   // Whose/How related - adjusted to balance
+                    ];
+                    
+                    // Draw table header with bold text
+                    let xPosition = leftMargin;
+                    doc.setFont(undefined, 'bold'); // Set font to bold for headers
+                    for (let i = 0; i < tableHeaders.length; i++) {
+                        doc.rect(xPosition, yPosition, columnWidths[i], 10);
+                        doc.text(tableHeaders[i], xPosition + 2, yPosition + 7);
+                        xPosition += columnWidths[i];
+                    }
+                    doc.setFont(undefined, 'normal'); // Reset to normal font for table content
+                    yPosition += 10;
+                    
+                    // Draw table rows
+                    for (let i = 0; i < data.mobileNumbers.length; i++) {
+                        const mobileData = data.mobileNumbers[i];
+                        xPosition = leftMargin;
+                        
+                        // S.No.
+                        doc.rect(xPosition, yPosition, columnWidths[0], 10);
+                        doc.text((i + 1).toString(), xPosition + 5, yPosition + 7);
+                        xPosition += columnWidths[0];
+                        
+                        // Mobile/IMEI Number & Telecom Provider
+                        const mobileText = `${mobileData.mobileNumber} (${mobileData.telecomProvider})`;
+                        const splitMobile = doc.splitTextToSize(mobileText, columnWidths[1] - 4);
+                        doc.rect(xPosition, yPosition, columnWidths[1], 10);
+                        doc.text(splitMobile[0], xPosition + 2, yPosition + 7);
+                        xPosition += columnWidths[1];
+                        
+                        // From
+                        doc.rect(xPosition, yPosition, columnWidths[2], 10);
+                        doc.text(formatDate(mobileData.fromDate), xPosition + 2, yPosition + 7);
+                        xPosition += columnWidths[2];
+                        
+                        // To - show "Till Date" if checkbox is checked
+                        let toDateText = formatDate(mobileData.toDate);
+                        if (mobileData.isTillDate) {
+                            toDateText = "Till Date";
+                        }
+                        doc.rect(xPosition, yPosition, columnWidths[3], 10);
+                        doc.text(toDateText, xPosition + 2, yPosition + 7);
+                        xPosition += columnWidths[3];
+                        
+                        // Whose/How related - handle long text
+                        const relationText = mobileData.relation;
+                        const splitRelation = doc.splitTextToSize(relationText, columnWidths[4] - 4);
+                        doc.rect(xPosition, yPosition, columnWidths[4], 10);
+                        doc.text(splitRelation[0], xPosition + 2, yPosition + 7);
+                        
+                        yPosition += 10;
+                        
+                        // Add new page if needed
+                        if (yPosition > 270) { // A4 height is 297mm, leaving bottom margin
+                            doc.addPage();
+                            yPosition = topMargin;
+                        }
+                    }
+                    
+                    yPosition += 10; // Reduced from 15 to 10
+                    
+                    // Declaration points
+                    const declaration1 = "1. The subscriber identity has been ascertained and it is ensured that the person in question is not someone whose call details are of a sensitive nature.";
+                    const declaration2 = "2. The number is not subscribed in the name of a sitting MP/MLA.";
+                    
+                    // Split declaration text to fit within content width
+                    const splitDecl1 = doc.splitTextToSize(declaration1, contentWidth);
+                    const splitDecl2 = doc.splitTextToSize(declaration2, contentWidth);
+                    
+                    // Add declaration with justified alignment
+                    for (let i = 0; i < splitDecl1.length; i++) {
+                        doc.text(splitDecl1[i], leftMargin, yPosition, { align: 'justify' });
+                        yPosition += 7;
+                    }
+                    
+                    yPosition += 7;
+                    
+                    for (let i = 0; i < splitDecl2.length; i++) {
+                        doc.text(splitDecl2[i], leftMargin, yPosition, { align: 'justify' });
+                        yPosition += 7;
+                    }
+                    
+                    // Save the PDF
+                    doc.save('CDR_Request.pdf');
+                    
+                } catch (error) {
+                    console.error('PDF generation error:', error);
+                    throw error;
+                }
+            }
+            
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+            }
+        });
+    </script>
+</body>
+</html>
