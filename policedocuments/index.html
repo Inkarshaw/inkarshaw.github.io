@@ -150,6 +150,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            text-decoration: none; /* Remove underline from links */
         }
         
         .btn-download {
@@ -261,6 +262,11 @@
             font-size: 0.9rem;
             color: #b0c4de;
         }
+        
+        /* Remove underline from all links in the document actions */
+        .doc-actions a {
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -272,7 +278,7 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value">24</div>
+                <div class="stat-value">25</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
@@ -294,6 +300,17 @@
             <div class="card">
                 <h2><i>📋</i> Download Forms</h2>
                 <ul class="document-list">
+                    <li class="document-item">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Arrest Intimation</div>
+                            <div class="doc-desc">Form for notifying relevant parties about an arrest</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://clearexams.online/policedocuments/arrest_intimation.pdf" target="_blank" class="btn btn-download">
+                                <i>⬇️</i> Download
+                            </a>
+                        </div>
+                    </li>
                     <li class="document-item">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Incident Report Form</div>
@@ -458,6 +475,16 @@
         
         document.querySelector('.search-box input').addEventListener('blur', function() {
             this.parentElement.style.transform = 'scale(1)';
+        });
+        
+        // Special handling for Arrest Intimation download
+        document.addEventListener('DOMContentLoaded', function() {
+            const arrestIntimationBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/arrest_intimation.pdf"]');
+            if (arrestIntimationBtn) {
+                arrestIntimationBtn.addEventListener('click', function() {
+                    showNotification('Opening Arrest Intimation PDF...');
+                });
+            }
         });
     </script>
 </body>
