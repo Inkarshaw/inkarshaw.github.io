@@ -114,24 +114,6 @@
             width: auto;
             margin-top: 4px;
         }
-        .instructions {
-            background-color: #e8f4fd;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border-left: 4px solid #3498db;
-        }
-        .instructions h3 {
-            margin-top: 0;
-            color: #2c3e50;
-        }
-        .instructions ul {
-            margin-bottom: 0;
-            padding-left: 20px;
-        }
-        .instructions li {
-            margin-bottom: 8px;
-        }
         .date-right {
             display: flex;
             justify-content: flex-end;
@@ -232,16 +214,6 @@
             color: #666;
             margin-bottom: 2px;
         }
-        .receiver-title-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .receiver-title-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 2px;
-        }
         
         /* Vertical mobile numbers layout */
         .mobile-numbers-container {
@@ -303,6 +275,28 @@
         .field-with-checkbox {
             position: relative;
         }
+        .police-station-select {
+            width: 100%;
+        }
+        .address-preview {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .address-preview h4 {
+            margin: 0 0 8px 0;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        .address-preview p {
+            margin: 4px 0;
+            color: #555;
+            white-space: pre-line;
+        }
         @media (max-width: 768px) {
             .mobile-number-fields {
                 grid-template-columns: 1fr;
@@ -317,18 +311,6 @@
     <div class="container">
         <h1>CDR Request Generator</h1>
         
-        <div class="instructions">
-            <h3>Instructions:</h3>
-            <ul>
-                <li>Fill in all the required fields below</li>
-                <li>Add multiple mobile numbers using the "Add Another Mobile Number" button</li>
-                <li>Use "Same for all" checkboxes to automatically apply values to new numbers</li>
-                <li>Use "Till Date" checkbox to show "Till Date" in the date field</li>
-                <li>Check both declaration boxes before generating the PDF</li>
-                <li>Click "Generate PDF" to create and download your CDR request</li>
-            </ul>
-        </div>
-        
         <form id="cdrForm">
             <div class="form-section">
                 <h2>Sender Information</h2>
@@ -337,31 +319,30 @@
                     <input type="date" id="fromDate" required>
                 </div>
                 <div class="form-group">
-                    <label for="policeStation">Name of the Police Station:</label>
-                    <input type="text" id="policeStation" placeholder="Enter police station name (e.g., G7 Chetpet)" required>
-                    <div class="input-hint">"Police Station" will be automatically added in the PDF</div>
+                    <label for="policeStation">Select Police Station:</label>
+                    <select id="policeStation" class="police-station-select" required>
+                        <option value="">Select Police Station</option>
+                        <option value="G7 Chetpet PS(L&O)">G7 Chetpet PS(L&O)</option>
+                        <option value="G5 Secretariat Colony PS">G5 Secretariat Colony PS</option>
+                        <option value="Other">Other Police Station</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label for="senderAddress">Full Address:</label>
-                    <textarea id="senderAddress" class="address-field" placeholder="Enter complete address with city, state, and PIN code" required></textarea>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h2>Receiver's Information</h2>
-                <div class="form-group">
-                    <label for="receiverTitle">Receiver's Title:</label>
-                    <div class="receiver-title-container">
-                        <select id="receiverTitle" required>
-                            <option value="">Select Receiver's Title</option>
-                            <option value="The Superintendent of Police">The Superintendent of Police</option>
-                            <option value="The Deputy Commissioner of Police">The Deputy Commissioner of Police</option>
-                        </select>
+                    <label>Address Preview:</label>
+                    <div class="address-preview">
+                        <h4>From Address:</h4>
+                        <p id="fromAddressPreview">Select a police station to preview address</p>
+                        <h4>To Address:</h4>
+                        <p id="toAddressPreview">Select a police station to preview address</p>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="receiverAddress">Full Address:</label>
-                    <textarea id="receiverAddress" class="address-field" placeholder="Enter complete address with city, state, and PIN code" required></textarea>
+                <div class="form-group" id="customPoliceStationGroup" style="display: none;">
+                    <label for="customPoliceStation">Custom Police Station Name:</label>
+                    <input type="text" id="customPoliceStation" placeholder="Enter police station name">
+                </div>
+                <div class="form-group" id="customAddressGroup" style="display: none;">
+                    <label for="senderAddress">Full Address:</label>
+                    <textarea id="senderAddress" class="address-field" placeholder="Enter complete address with city, state, and PIN code"></textarea>
                 </div>
             </div>
             
@@ -484,6 +465,27 @@
             const mobileNumbersContainer = document.getElementById('mobileNumbersContainer');
             const generatePdfBtn = document.getElementById('generatePdfBtn');
             const loadingMessage = document.getElementById('loadingMessage');
+            const policeStationSelect = document.getElementById('policeStation');
+            const customPoliceStationGroup = document.getElementById('customPoliceStationGroup');
+            const customAddressGroup = document.getElementById('customAddressGroup');
+            const fromAddressPreview = document.getElementById('fromAddressPreview');
+            const toAddressPreview = document.getElementById('toAddressPreview');
+            
+            // Police station data
+            const policeStations = {
+                'G7 Chetpet PS(L&O)': {
+                    fromAddress: 'Inspector of Police,\nG7 Chetpet PS (L&O),\nChetpet, Chennai – 31.',
+                    toAddress: 'The Deputy Commissioner of Police,\nKilpauk District,\nChennai – 600010.'
+                },
+                'G5 Secretariat Colony PS': {
+                    fromAddress: 'Inspector of Police,\nG5 Secretariat Colony PS,\nKilpauk, Chennai.',
+                    toAddress: 'The Deputy Commissioner of Police,\nKilpauk District,\nChennai – 600010.'
+                },
+                'Other': {
+                    fromAddress: 'Custom address will be entered below',
+                    toAddress: 'The Deputy Commissioner of Police,\nKilpauk District,\nChennai – 600010.'
+                }
+            };
             
             // Set default date values
             const today = new Date().toISOString().split('T')[0];
@@ -495,6 +497,39 @@
             const fromDateInputs = document.querySelectorAll('.from-date');
             fromDateInputs.forEach(input => {
                 input.value = today;
+            });
+            
+            // Police station selection handler
+            policeStationSelect.addEventListener('change', function() {
+                const selectedStation = this.value;
+                
+                if (selectedStation && policeStations[selectedStation]) {
+                    const stationData = policeStations[selectedStation];
+                    
+                    // Update address preview
+                    fromAddressPreview.textContent = stationData.fromAddress;
+                    toAddressPreview.textContent = stationData.toAddress;
+                    
+                    // Show/hide custom input fields
+                    if (selectedStation === 'Other') {
+                        customPoliceStationGroup.style.display = 'block';
+                        customAddressGroup.style.display = 'block';
+                        // Make custom fields required
+                        document.getElementById('customPoliceStation').required = true;
+                        document.getElementById('senderAddress').required = true;
+                    } else {
+                        customPoliceStationGroup.style.display = 'none';
+                        customAddressGroup.style.display = 'none';
+                        // Remove required from custom fields
+                        document.getElementById('customPoliceStation').required = false;
+                        document.getElementById('senderAddress').required = false;
+                    }
+                } else {
+                    fromAddressPreview.textContent = 'Select a police station to preview address';
+                    toAddressPreview.textContent = 'Select a police station to preview address';
+                    customPoliceStationGroup.style.display = 'none';
+                    customAddressGroup.style.display = 'none';
+                }
             });
             
             // Auto-advance crime number sections
@@ -745,13 +780,33 @@
                             return;
                         }
                         
+                        const selectedStation = policeStationSelect.value;
+                        let policeStationName, senderAddress, receiverAddress;
+                        
+                        if (selectedStation === 'Other') {
+                            policeStationName = document.getElementById('customPoliceStation').value;
+                            senderAddress = document.getElementById('senderAddress').value;
+                            receiverAddress = policeStations['Other'].toAddress;
+                            
+                            // Validate custom fields
+                            if (!policeStationName || !senderAddress) {
+                                alert('Please fill in all custom police station fields.');
+                                loadingMessage.style.display = 'none';
+                                generatePdfBtn.disabled = false;
+                                return;
+                            }
+                        } else {
+                            policeStationName = selectedStation;
+                            senderAddress = policeStations[selectedStation].fromAddress;
+                            receiverAddress = policeStations[selectedStation].toAddress;
+                        }
+                        
                         // Collect form data
                         const formData = {
                             fromDate: document.getElementById('fromDate').value,
-                            policeStation: document.getElementById('policeStation').value,
-                            senderAddress: document.getElementById('senderAddress').value,
-                            receiverTitle: document.getElementById('receiverTitle').value,
-                            receiverAddress: document.getElementById('receiverAddress').value,
+                            policeStation: policeStationName,
+                            senderAddress: senderAddress,
+                            receiverAddress: receiverAddress,
                             crimeNumber: `${document.getElementById('crimeCrNo').value}/${document.getElementById('crimeYear').value} U/s ${document.getElementById('crimeSection').value}`,
                             mobileNumbers: [],
                             subscriberIdentity: document.getElementById('subscriberIdentity').checked,
@@ -783,14 +838,14 @@
                             });
                         }
                         
+                        console.log('Form Data:', formData); // Debug log
+                        
                         // Generate PDF
                         generatePDF(formData);
                         
                     } catch (error) {
                         console.error('Error generating PDF:', error);
-                        alert('Error generating PDF. Please check the console for details.');
-                    } finally {
-                        // Hide loading message and re-enable button
+                        alert('Error generating PDF: ' + error.message);
                         loadingMessage.style.display = 'none';
                         generatePdfBtn.disabled = false;
                     }
@@ -799,6 +854,8 @@
             
             function generatePDF(data) {
                 try {
+                    console.log('Starting PDF generation with data:', data);
+                    
                     // Check if jsPDF is available
                     if (typeof window.jspdf === 'undefined') {
                         throw new Error('PDF library not loaded. Please check your internet connection.');
@@ -832,11 +889,6 @@
                     const indentAmount = 10; // mm indentation
                     doc.text('From', leftMargin, yPosition);
                     yPosition += 7;
-                    doc.text('Inspector of Police,', leftMargin + indentAmount, yPosition);
-                    yPosition += 7;
-                    // Add "Police Station" after the police station name
-                    doc.text(data.policeStation + ' Police Station,', leftMargin + indentAmount, yPosition);
-                    yPosition += 7;
                     
                     // Split sender address into multiple lines if needed
                     const senderAddressLines = doc.splitTextToSize(data.senderAddress, contentWidth - indentAmount);
@@ -845,13 +897,10 @@
                         yPosition += 7;
                     }
                     
-                    yPosition += 10; // Reduced from 15 to 10
+                    yPosition += 10;
                     
-                    // To section with indentation - Updated with receiver's information
+                    // To section with indentation
                     doc.text('To', leftMargin, yPosition);
-                    yPosition += 7;
-                    // Add receiver title as the first line (no name field anymore)
-                    doc.text(data.receiverTitle + ',', leftMargin + indentAmount, yPosition);
                     yPosition += 7;
                     
                     // Split receiver address into multiple lines if needed
@@ -861,19 +910,19 @@
                         yPosition += 7;
                     }
                     
-                    yPosition += 10; // Reduced from 15 to 10
+                    yPosition += 10;
                     
                     // Salutation
                     doc.text('Respected Sir,', leftMargin, yPosition);
-                    yPosition += 7; // Reduced from 10 to 7
+                    yPosition += 10;
                     
                     // Subject with indentation
                     doc.text('Sub: Request -- CDR and SDR of Cell number -- Regarding', leftMargin + indentAmount, yPosition);
-                    yPosition += 7; // Reduced from 10 to 7
+                    yPosition += 10;
                     
                     // Reference with indentation
                     doc.text(`Ref : Cr.No: ${data.crimeNumber}`, leftMargin + indentAmount, yPosition);
-                    yPosition += 10; // Reduced from 15 to 10
+                    yPosition += 15;
                     
                     // Body text - Only the first line indented
                     const bodyText = [
@@ -895,7 +944,7 @@
                         yPosition += 7;
                     }
                     
-                    yPosition += 7; // Reduced from 10 to 7
+                    yPosition += 10;
                     
                     // Table header - Adjusted to fit within margins
                     const tableHeaders = ['S.No.', 'Mobile/IMEI Number', 'From', 'To', 'Whose/How related'];
@@ -966,7 +1015,7 @@
                         }
                     }
                     
-                    yPosition += 10; // Reduced from 15 to 10
+                    yPosition += 15;
                     
                     // Declaration points
                     const declaration1 = "1. The subscriber identity has been ascertained and it is ensured that the person in question is not someone whose call details are of a sensitive nature.";
@@ -992,8 +1041,17 @@
                     // Save the PDF
                     doc.save('CDR_Request.pdf');
                     
+                    // Hide loading message and re-enable button
+                    loadingMessage.style.display = 'none';
+                    generatePdfBtn.disabled = false;
+                    
+                    console.log('PDF generated successfully');
+                    
                 } catch (error) {
                     console.error('PDF generation error:', error);
+                    alert('Error generating PDF: ' + error.message);
+                    loadingMessage.style.display = 'none';
+                    generatePdfBtn.disabled = false;
                     throw error;
                 }
             }
