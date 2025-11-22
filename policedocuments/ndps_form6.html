@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Court NDPS Form 6 Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', serif;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+            color: #000;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .form-header h1 {
+            font-size: 19px; /* Increased from 18px to 19px */
+            font-weight: bold;
+            margin-bottom: 2px;
+            text-decoration: underline;
+        }
+        .form-header h2 {
+            font-size: 17px; /* Increased from 16px to 17px */
+            font-style: italic;
+            margin-bottom: 3px;
+        }
+        .form-header h2:last-child {
+            margin-bottom: 10px;
+        }
+        .organization-text {
+            text-align: left;
+            margin-bottom: 8px;
+            padding: 3px;
+            font-weight: bold;
+            line-height: 1.3;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .section-heading {
+            text-align: center;
+            margin: 8px 0;
+            font-weight: bold;
+            font-size: 17px; /* Increased from 16px to 17px */
+        }
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid #000;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .form-table th, .form-table td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: left;
+            vertical-align: top;
+            line-height: 1.2;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .form-table th {
+            font-weight: bold;
+            width: 35px;
+            text-align: center;
+            background-color: white;
+            padding: 3px;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .form-table td:first-child {
+            width: 35px;
+        }
+        .form-table td:nth-child(2) {
+            width: 320px; /* Increased from 280px to 320px */
+            font-weight: bold;
+        }
+        .form-table td:nth-child(3) {
+            width: auto; /* Reduced right column width */
+        }
+        .form-section {
+            margin-bottom: 20px;
+            border: 1px solid #000;
+            padding: 12px;
+        }
+        .form-section h3 {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 17px; /* Increased from 16px to 17px */
+            text-decoration: underline;
+        }
+        .form-row {
+            display: flex;
+            margin-bottom: 6px;
+            align-items: flex-start;
+        }
+        .form-row label {
+            width: 280px;
+            font-weight: bold;
+            margin-right: 8px;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .form-row input, .form-row textarea {
+            flex: 1;
+            padding: 3px;
+            border: 1px solid #000;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .form-row textarea {
+            height: 50px;
+            resize: vertical;
+        }
+        /* Make Officer Address & Rank input same height as Address textarea */
+        #officerAddress {
+            height: 50px;
+            resize: vertical;
+        }
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 15px; /* Increased from 14px to 15px */
+            margin: 3px 2px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #preview {
+            margin-top: 30px;
+            border: 1px solid #000;
+            padding: 15px;
+            background-color: white;
+            page-break-after: always;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .hidden {
+            display: none;
+        }
+        .forwarding-officer-signature {
+            text-align: right;
+            margin-top: 20px;
+            font-weight: bold;
+            padding-right: 40px;
+            line-height: 1.3;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .chemist-signature {
+            text-align: right;
+            margin-top: 20px;
+            font-weight: bold;
+            padding-right: 40px;
+            line-height: 1.2;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        .section-divider {
+            border-top: 1px solid #000;
+            margin: 15px 0;
+        }
+        .no-print {
+            display: block;
+        }
+        
+        /* Increased row height for forwarding officer signature */
+        .signature-row {
+            height: 80px; /* Increased from default height */
+            vertical-align: bottom;
+        }
+        .signature-row td {
+            padding-top: 40px; /* Added top padding to push content down */
+        }
+        
+        /* Increased row height for chemist signature */
+        .chemist-signature-row {
+            height: 80px; /* Increased from default height */
+            vertical-align: bottom;
+        }
+        .chemist-signature-row td {
+            padding-top: 40px; /* Added top padding to push content down */
+        }
+        
+        /* Increased row height for facsimile seal - content at top */
+        .facsimile-row {
+            height: 60px; /* Increased height for seal facsimile */
+            vertical-align: top;
+        }
+        .facsimile-row td {
+            padding: 8px 4px; /* Normal top padding to keep content at top */
+            vertical-align: top;
+        }
+        
+        /* PDF-specific font sizes - Increased by 1px from base */
+        .pdf-normal-text {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        .pdf-normal-text * {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        .pdf-normal-text .form-header h1 {
+            font-size: 19px !important; /* Increased from 18px to 19px */
+        }
+        .pdf-normal-text .form-header h2 {
+            font-size: 17px !important; /* Increased from 16px to 17px */
+        }
+        .pdf-normal-text .organization-text {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        .pdf-normal-text .section-heading {
+            font-size: 17px !important; /* Increased from 16px to 17px */
+            margin: 6px 0 !important;
+        }
+        .pdf-normal-text .form-table {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        .pdf-normal-text .form-table th,
+        .pdf-normal-text .form-table td {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        .pdf-normal-text .form-section h3 {
+            font-size: 17px !important; /* Increased from 16px to 17px */
+        }
+        .pdf-normal-text .form-row label {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        .pdf-normal-text .form-row input,
+        .pdf-normal-text .form-row textarea {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        .pdf-normal-text .forwarding-officer-signature,
+        .pdf-normal-text .chemist-signature {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        .pdf-normal-text button {
+            font-size: 15px !important; /* Increased from 14px to 15px */
+        }
+        
+        /* PDF Generation Container - Increased left and right margins */
+        #pdf-container {
+            width: 210mm; /* A4 width */
+            min-height: 297mm; /* A4 height */
+            padding: 10mm 15mm; /* Increased left/right margins from 10mm to 15mm */
+            background-color: white;
+            box-sizing: border-box;
+            margin: 0 auto;
+            position: relative;
+            font-size: 15px; /* Increased from 14px to 15px */
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+            #preview {
+                border: none;
+                padding: 0;
+                margin-top: 0;
+            }
+        }
+        
+        /* Mobile-specific adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .form-row {
+                flex-direction: column;
+                margin-bottom: 10px;
+            }
+            .form-row label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .form-section {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-header">
+            <h1>FORM 6</h1>
+            <h2>[See rule 13 (2)]</h2>
+            <h2>TEST MEMO</h2>
+        </div>
+        
+        <div class="form-section no-print">
+            <h3>ENTER CASE DETAILS</h3>
+            <div class="form-row">
+                <label for="crimeNumber">Crime Number:</label>
+                <input type="text" id="crimeNumber" placeholder="e.g., 266/2025">
+            </div>
+            <div class="form-row">
+                <label for="officerName">Name of Officer:</label>
+                <input type="text" id="officerName" placeholder="e.g., Tr.Inkarshaw Bell Abraham">
+            </div>
+            <div class="form-row">
+                <label for="officerAddress">Officer Address & Rank:</label>
+                <textarea id="officerAddress" placeholder="e.g., SI of police, G7 L&O Police station, Chetpet"></textarea>
+            </div>
+            <div class="form-row">
+                <label for="accusedName">Name of Accused:</label>
+                <input type="text" id="accusedName" placeholder="e.g., Anto @ Antony">
+            </div>
+            <div class="form-row">
+                <label for="accusedAge">Age:</label>
+                <input type="text" id="accusedAge" placeholder="e.g., M/a.35">
+            </div>
+            <div class="form-row">
+                <label for="accusedParent">Parent/Guardian:</label>
+                <input type="text" id="accusedParent" placeholder="e.g., S/o. Prabhu">
+            </div>
+            <div class="form-row">
+                <label for="accusedAddress">Address:</label>
+                <textarea id="accusedAddress" placeholder="Full address of the accused"></textarea>
+            </div>
+            <div class="form-row">
+                <label for="drugDescription">Description & Weight:</label>
+                <input type="text" id="drugDescription" placeholder="e.g., P1S1 : 3.20 grams">
+            </div>
+            <div class="form-row">
+                <label for="seizureDate">Date & Time of Seizure:</label>
+                <input type="text" id="seizureDate" placeholder="e.g., P1S1 : 17.09.2025 @ 15.30 Hrs">
+            </div>
+            <div class="form-row">
+                <label for="seizurePlace">Place of Seizure:</label>
+                <textarea id="seizurePlace" placeholder="Detailed location of seizure"></textarea>
+            </div>
+            <div class="form-row">
+                <label for="sampleDrawDate">Date of Draw of Sample:</label>
+                <input type="text" id="sampleDrawDate" placeholder="e.g., P1S1 : 13.09.2025 @ 16.00 Hrs">
+            </div>
+            <div class="form-row">
+                <label for="sampleMarking">Sample Marking & Identification:</label>
+                <input type="text" id="sampleMarking" placeholder="e.g., Methamphetamine">
+            </div>
+            <div class="form-row">
+                <label for="sealDescription">Description of Seal:</label>
+                <input type="text" id="sealDescription" placeholder="e.g., CMO Seal">
+            </div>
+            <div class="form-row">
+                <label for="sealCount">Number of Seals:</label>
+                <input type="text" id="sealCount" placeholder="Number of seals put on sample">
+            </div>
+            <div class="form-row">
+                <label for="sealFacsimile">Facsimile of the Seal:</label>
+                <input type="text" id="sealFacsimile" placeholder="e.g., CMO Seal">
+            </div>
+        </div>
+        
+        <div class="button-container no-print">
+            <button id="previewBtn">Preview Form</button>
+            <button id="printBtn" class="hidden">Print Form</button>
+            <button id="generatePdfBtn" class="hidden" style="background-color: #2196F3;">Generate PDF</button>
+        </div>
+        
+        <!-- Preview section WITH form header -->
+        <div id="preview" class="hidden">
+            <!-- Added form header back to preview -->
+            <div class="form-header">
+                <h1>FORM 6</h1>
+                <h2>[See rule 13 (2)]</h2>
+                <h2>TEST MEMO</h2>
+            </div>
+            
+            <div class="organization-text">
+                Name and address of<br>
+                the seizure organization
+            </div>
+            
+            <div class="section-heading">
+                SECTION I (For use by the Seizing Officer)
+            </div>
+            
+            <table class="form-table">
+                <tr>
+                    <th>1</th>
+                    <td>Crime Number</td>
+                    <td id="previewCrimeNumber"></td>
+                </tr>
+                <tr>
+                    <th>2</th>
+                    <td>Name and address of the officer & Drawing sample:</td>
+                    <td>
+                        <div id="previewOfficerName"></div>
+                        <div id="previewOfficerAddress"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>3</th>
+                    <td>Name and address of the accused</td>
+                    <td>
+                        <div id="previewAccusedDetails"></div>
+                        <div id="previewAccusedParent"></div>
+                        <div id="previewAccusedAddress"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>4</th>
+                    <td>Alleged description of drug and weight of sample (net weight)</td>
+                    <td id="previewDrugDescription"></td>
+                </tr>
+                <tr>
+                    <th>5</th>
+                    <td>Date and time of Seizure</td>
+                    <td id="previewSeizureDate"></td>
+                </tr>
+                <tr>
+                    <th>6</th>
+                    <td>Place of Seizure</td>
+                    <td id="previewSeizurePlace"></td>
+                </tr>
+                <tr>
+                    <th>7</th>
+                    <td>Date of Draw of sample</td>
+                    <td id="previewSampleDrawDate"></td>
+                </tr>
+                <tr>
+                    <th>8</th>
+                    <td>No of sample and Marking on each of them for identification</td>
+                    <td id="previewSampleMarking"></td>
+                </tr>
+                <tr>
+                    <th>9</th>
+                    <td>
+                        (a) Description of Seal :<br>
+                        (b) No of Seal put on sample :
+                    </td>
+                    <td>
+                        <div id="previewSealDescription"></div>
+                        <div id="previewSealCount"></div>
+                    </td>
+                </tr>
+                <!-- Increased height for facsimile seal row - content at top -->
+                <tr class="facsimile-row">
+                    <th>10</th>
+                    <td>Facsimile of the seal :</td>
+                    <td id="previewSealFacsimile" style="vertical-align: top;"></td>
+                </tr>
+                <!-- Increased height for forwarding officer signature row -->
+                <tr class="signature-row">
+                    <td colspan="3" style="text-align: right; padding: 40px 12px 12px 12px;">
+                        <div class="forwarding-officer-signature">Name and Signature<br>of the Forwarding Officer</div>
+                    </td>
+                </tr>
+            </table>
+            
+            <div class="section-divider"></div>
+            
+            <table class="form-table">
+                <tr>
+                    <td colspan="3" style="text-align: center; font-weight: bold; padding: 6px;">
+                        SECTION II FOR USE IN THE LABORATORY
+                    </td>
+                </tr>
+                <tr>
+                    <th>1</th>
+                    <td>Date of receipt in the laboratory</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>2</th>
+                    <td>Weight (net weight) as found in the laboratory</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>3</th>
+                    <td>Date of Conducting result of</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>(a) Qualitative test:</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>(b) Qualitative test:</td>
+                    <td></td>
+                </tr>
+                <!-- Removed the empty row and number 4, directly added General Observation -->
+                <tr>
+                    <td></td>
+                    <td>General Observation of the Chemist:</td>
+                    <td></td>
+                </tr>
+                <!-- Increased height for chemist signature row -->
+                <tr class="chemist-signature-row">
+                    <td colspan="3" style="text-align: right; padding: 40px 12px 12px 12px;">
+                        <div class="chemist-signature">Name and Signature of the Chemist</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- Hidden container for PDF generation with increased margins -->
+        <div id="pdf-container" class="hidden">
+            <div class="form-header">
+                <h1>FORM 6</h1>
+                <h2>[See rule 13 (2)]</h2>
+                <h2>TEST MEMO</h2>
+            </div>
+            
+            <div class="organization-text">
+                Name and address of<br>
+                the seizure organization
+            </div>
+            
+            <div class="section-heading">
+                SECTION I (For use by the Seizing Officer)
+            </div>
+            
+            <table class="form-table">
+                <tr>
+                    <th>1</th>
+                    <td>Crime Number</td>
+                    <td id="pdfCrimeNumber"></td>
+                </tr>
+                <tr>
+                    <th>2</th>
+                    <td>Name and address of the officer & Drawing sample:</td>
+                    <td>
+                        <div id="pdfOfficerName"></div>
+                        <div id="pdfOfficerAddress"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>3</th>
+                    <td>Name and address of the accused</td>
+                    <td>
+                        <div id="pdfAccusedDetails"></div>
+                        <div id="pdfAccusedParent"></div>
+                        <div id="pdfAccusedAddress"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>4</th>
+                    <td>Alleged description of drug and weight of sample (net weight)</td>
+                    <td id="pdfDrugDescription"></td>
+                </tr>
+                <tr>
+                    <th>5</th>
+                    <td>Date and time of Seizure</td>
+                    <td id="pdfSeizureDate"></td>
+                </tr>
+                <tr>
+                    <th>6</th>
+                    <td>Place of Seizure</td>
+                    <td id="pdfSeizurePlace"></td>
+                </tr>
+                <tr>
+                    <th>7</th>
+                    <td>Date of Draw of sample</td>
+                    <td id="pdfSampleDrawDate"></td>
+                </tr>
+                <tr>
+                    <th>8</th>
+                    <td>No of sample and Marking on each of them for identification</td>
+                    <td id="pdfSampleMarking"></td>
+                </tr>
+                <tr>
+                    <th>9</th>
+                    <td>
+                        (a) Description of Seal :<br>
+                        (b) No of Seal put on sample :
+                    </td>
+                    <td>
+                        <div id="pdfSealDescription"></div>
+                        <div id="pdfSealCount"></div>
+                    </td>
+                </tr>
+                <!-- Increased height for facsimile seal row - content at top -->
+                <tr class="facsimile-row">
+                    <th>10</th>
+                    <td>Facsimile of the seal :</td>
+                    <td id="pdfSealFacsimile" style="vertical-align: top;"></td>
+                </tr>
+                <!-- Increased height for forwarding officer signature row -->
+                <tr class="signature-row">
+                    <td colspan="3" style="text-align: right; padding: 40px 12px 12px 12px;">
+                        <div class="forwarding-officer-signature">Name and Signature<br>of the Forwarding Officer</div>
+                    </td>
+                </tr>
+            </table>
+            
+            <div class="section-divider"></div>
+            
+            <table class="form-table">
+                <tr>
+                    <td colspan="3" style="text-align: center; font-weight: bold; padding: 6px;">
+                        SECTION II FOR USE IN THE LABORATORY
+                    </td>
+                </tr>
+                <tr>
+                    <th>1</th>
+                    <td>Date of receipt in the laboratory</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>2</th>
+                    <td>Weight (net weight) as found in the laboratory</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>3</th>
+                    <td>Date of Conducting result of</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>(a) Qualitative test:</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>(b) Qualitative test:</td>
+                    <td></td>
+                </tr>
+                <!-- Removed the empty row and number 4, directly added General Observation -->
+                <tr>
+                    <td></td>
+                    <td>General Observation of the Chemist:</td>
+                    <td></td>
+                </tr>
+                <!-- Increased height for chemist signature row -->
+                <tr class="chemist-signature-row">
+                    <td colspan="3" style="text-align: right; padding: 40px 12px 12px 12px;">
+                        <div class="chemist-signature">Name and Signature of the Chemist</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, attaching event listeners');
+            
+            // Preview button event listener
+            document.getElementById('previewBtn').addEventListener('click', function() {
+                console.log('Preview button clicked');
+                
+                // Update preview with form data
+                document.getElementById('previewCrimeNumber').textContent = document.getElementById('crimeNumber').value;
+                document.getElementById('previewOfficerName').textContent = document.getElementById('officerName').value;
+                document.getElementById('previewOfficerAddress').textContent = document.getElementById('officerAddress').value;
+                
+                // Combine accused name and age in one line separated by comma
+                const accusedName = document.getElementById('accusedName').value;
+                const accusedAge = document.getElementById('accusedAge').value;
+                const accusedDetails = accusedName + (accusedAge ? ', ' + accusedAge : '');
+                document.getElementById('previewAccusedDetails').textContent = accusedDetails;
+                
+                document.getElementById('previewAccusedParent').textContent = document.getElementById('accusedParent').value;
+                document.getElementById('previewAccusedAddress').textContent = document.getElementById('accusedAddress').value;
+                document.getElementById('previewDrugDescription').textContent = document.getElementById('drugDescription').value;
+                document.getElementById('previewSeizureDate').textContent = document.getElementById('seizureDate').value;
+                document.getElementById('previewSeizurePlace').textContent = document.getElementById('seizurePlace').value;
+                document.getElementById('previewSampleDrawDate').textContent = document.getElementById('sampleDrawDate').value;
+                document.getElementById('previewSampleMarking').textContent = document.getElementById('sampleMarking').value;
+                document.getElementById('previewSealDescription').textContent = document.getElementById('sealDescription').value;
+                document.getElementById('previewSealCount').textContent = document.getElementById('sealCount').value;
+                document.getElementById('previewSealFacsimile').textContent = document.getElementById('sealFacsimile').value;
+                
+                // Show preview and print button
+                document.getElementById('preview').classList.remove('hidden');
+                document.getElementById('printBtn').classList.remove('hidden');
+                document.getElementById('generatePdfBtn').classList.remove('hidden');
+                
+                // Scroll to preview
+                document.getElementById('preview').scrollIntoView({ behavior: 'smooth' });
+                
+                console.log('Preview updated and shown');
+            });
+
+            // Print button event listener
+            document.getElementById('printBtn').addEventListener('click', function() {
+                console.log('Print button clicked');
+                window.print();
+            });
+
+            // Generate PDF button event listener
+            document.getElementById('generatePdfBtn').addEventListener('click', function() {
+                console.log('Generate PDF button clicked');
+                generatePDF();
+            });
+
+            function generatePDF() {
+                console.log('Starting PDF generation');
+                const { jsPDF } = window.jspdf;
+                
+                // Update PDF container with form data
+                document.getElementById('pdfCrimeNumber').textContent = document.getElementById('crimeNumber').value;
+                document.getElementById('pdfOfficerName').textContent = document.getElementById('officerName').value;
+                document.getElementById('pdfOfficerAddress').textContent = document.getElementById('officerAddress').value;
+                
+                // Combine accused name and age in one line separated by comma for PDF
+                const accusedName = document.getElementById('accusedName').value;
+                const accusedAge = document.getElementById('accusedAge').value;
+                const accusedDetails = accusedName + (accusedAge ? ', ' + accusedAge : '');
+                document.getElementById('pdfAccusedDetails').textContent = accusedDetails;
+                
+                document.getElementById('pdfAccusedParent').textContent = document.getElementById('accusedParent').value;
+                document.getElementById('pdfAccusedAddress').textContent = document.getElementById('accusedAddress').value;
+                document.getElementById('pdfDrugDescription').textContent = document.getElementById('drugDescription').value;
+                document.getElementById('pdfSeizureDate').textContent = document.getElementById('seizureDate').value;
+                document.getElementById('pdfSeizurePlace').textContent = document.getElementById('seizurePlace').value;
+                document.getElementById('pdfSampleDrawDate').textContent = document.getElementById('sampleDrawDate').value;
+                document.getElementById('pdfSampleMarking').textContent = document.getElementById('sampleMarking').value;
+                document.getElementById('pdfSealDescription').textContent = document.getElementById('sealDescription').value;
+                document.getElementById('pdfSealCount').textContent = document.getElementById('sealCount').value;
+                document.getElementById('pdfSealFacsimile').textContent = document.getElementById('sealFacsimile').value;
+                
+                // Get the PDF container element
+                const element = document.getElementById('pdf-container');
+                
+                // Add PDF-specific normal text class (increased by 1px)
+                element.classList.add('pdf-normal-text');
+                
+                // Show the PDF container temporarily
+                element.classList.remove('hidden');
+                
+                console.log('Starting HTML2Canvas conversion');
+                
+                // Use html2canvas to capture the PDF container as an image
+                html2canvas(element, {
+                    scale: 2, // Higher scale for better quality
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    width: element.scrollWidth,
+                    height: element.scrollHeight,
+                    windowWidth: element.scrollWidth,
+                    onclone: function(clonedDoc) {
+                        // Ensure the cloned element has the same styling
+                        const clonedElement = clonedDoc.getElementById('pdf-container');
+                        clonedElement.classList.add('pdf-normal-text');
+                    }
+                }).then(canvas => {
+                    console.log('HTML2Canvas conversion completed');
+                    
+                    // Hide the PDF container again
+                    element.classList.add('hidden');
+                    
+                    // Remove PDF-specific normal text class
+                    element.classList.remove('pdf-normal-text');
+                    
+                    // Create PDF in millimeters for proper A4 size
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    
+                    // Calculate dimensions to fit the content properly with increased margins
+                    const imgWidth = pdfWidth - 30; // 15mm margin on each side (increased from 20)
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    // Add image to PDF with increased margins
+                    pdf.addImage(canvas, 'PNG', 15, 10, imgWidth, imgHeight); // Left margin increased from 10 to 15
+                    
+                    // Generate crime number for filename
+                    const crimeNumber = document.getElementById('crimeNumber').value || 'NDPS_Form6';
+                    
+                    // Save the PDF
+                    pdf.save(`${crimeNumber}_NDPS_Form6.pdf`);
+                    console.log('PDF saved successfully');
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    // Hide the PDF container in case of error
+                    element.classList.add('hidden');
+                    element.classList.remove('pdf-normal-text');
+                    alert('Error generating PDF. Please try again.');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
