@@ -10,9 +10,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <!-- Add timepicker -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -146,6 +143,11 @@
             padding: 3px;
             border: 1px solid #000;
             font-size: 15px;
+        }
+        /* Make time inputs editable */
+        .time-input {
+            background-color: white;
+            cursor: text;
         }
         .button-container {
             text-align: center;
@@ -287,13 +289,10 @@
             font-size: 15px;
         }
         
-        /* Custom styles for datepicker and timepicker */
+        /* Custom styles for datepicker */
         .ui-datepicker {
             font-size: 14px;
             z-index: 1000 !important;
-        }
-        .ui-timepicker-wrapper {
-            z-index: 1001 !important;
         }
         
         @media print {
@@ -384,7 +383,7 @@
                 <label for="seizureDate">Date & Time of Seizure:</label>
                 <div class="datetime-group">
                     <input type="text" id="seizureDateInput" placeholder="Select date" readonly>
-                    <input type="text" id="seizureTimeInput" placeholder="Select time" readonly>
+                    <input type="text" id="seizureTimeInput" placeholder="HH:MM" class="time-input">
                 </div>
             </div>
             <div class="form-row">
@@ -395,7 +394,7 @@
                 <label for="sampleDrawDate">Date of Draw of Sample:</label>
                 <div class="datetime-group">
                     <input type="text" id="sampleDrawDateInput" placeholder="Select date" readonly>
-                    <input type="text" id="sampleDrawTimeInput" placeholder="Select time" readonly>
+                    <input type="text" id="sampleDrawTimeInput" placeholder="HH:MM" class="time-input">
                 </div>
             </div>
             <div class="form-row">
@@ -721,31 +720,6 @@
                 showButtonPanel: true
             });
             
-            // Initialize timepickers
-            $('#seizureTimeInput').timepicker({
-                timeFormat: 'HH:mm',
-                interval: 15,
-                minTime: '00:00',
-                maxTime: '23:45',
-                defaultTime: 'now',
-                startTime: '00:00',
-                dynamic: false,
-                dropdown: true,
-                scrollbar: true
-            });
-            
-            $('#sampleDrawTimeInput').timepicker({
-                timeFormat: 'HH:mm',
-                interval: 15,
-                minTime: '00:00',
-                maxTime: '23:45',
-                defaultTime: 'now',
-                startTime: '00:00',
-                dynamic: false,
-                dropdown: true,
-                scrollbar: true
-            });
-            
             // Set current date and time as default
             const now = new Date();
             const todayFormatted = $.datepicker.formatDate('dd.mm.yy', now);
@@ -757,6 +731,23 @@
             $('#seizureTimeInput').val(currentTime);
             $('#sampleDrawDateInput').val(todayFormatted);
             $('#sampleDrawTimeInput').val(currentTime);
+            
+            // Add input validation for time fields (optional)
+            document.getElementById('seizureTimeInput').addEventListener('blur', function(e) {
+                validateTimeFormat(e.target);
+            });
+            
+            document.getElementById('sampleDrawTimeInput').addEventListener('blur', function(e) {
+                validateTimeFormat(e.target);
+            });
+            
+            function validateTimeFormat(input) {
+                const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+                if (input.value && !timeRegex.test(input.value)) {
+                    alert('Please enter time in HH:MM format (24-hour format)');
+                    input.focus();
+                }
+            }
             
             // Preview button event listener
             document.getElementById('previewBtn').addEventListener('click', function() {
