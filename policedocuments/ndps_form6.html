@@ -6,13 +6,20 @@
     <title>Court NDPS Form 6 Generator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Add jQuery and jQuery UI for datepicker -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <!-- Add timepicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.min.css">
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Times New Roman', serif;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         body {
             background-color: #f5f5f5;
@@ -31,13 +38,13 @@
             margin-bottom: 15px;
         }
         .form-header h1 {
-            font-size: 19px; /* Increased from 18px to 19px */
+            font-size: 19px;
             font-weight: bold;
             margin-bottom: 2px;
             text-decoration: underline;
         }
         .form-header h2 {
-            font-size: 17px; /* Increased from 16px to 17px */
+            font-size: 17px;
             font-style: italic;
             margin-bottom: 3px;
         }
@@ -50,20 +57,20 @@
             padding: 3px;
             font-weight: bold;
             line-height: 1.3;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         .section-heading {
             text-align: center;
             margin: 8px 0;
             font-weight: bold;
-            font-size: 17px; /* Increased from 16px to 17px */
+            font-size: 17px;
         }
         .form-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
             border: 1px solid #000;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         .form-table th, .form-table td {
             border: 1px solid #000;
@@ -71,7 +78,7 @@
             text-align: left;
             vertical-align: top;
             line-height: 1.2;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         .form-table th {
             font-weight: bold;
@@ -79,17 +86,17 @@
             text-align: center;
             background-color: white;
             padding: 3px;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         .form-table td:first-child {
             width: 35px;
         }
         .form-table td:nth-child(2) {
-            width: 320px; /* Increased from 280px to 320px */
+            width: 320px;
             font-weight: bold;
         }
         .form-table td:nth-child(3) {
-            width: auto; /* Reduced right column width */
+            width: auto;
         }
         .form-section {
             margin-bottom: 20px;
@@ -99,7 +106,7 @@
         .form-section h3 {
             text-align: center;
             margin-bottom: 12px;
-            font-size: 17px; /* Increased from 16px to 17px */
+            font-size: 17px;
             text-decoration: underline;
         }
         .form-row {
@@ -111,13 +118,13 @@
             width: 280px;
             font-weight: bold;
             margin-right: 8px;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
-        .form-row input, .form-row textarea {
+        .form-row input, .form-row textarea, .form-row select {
             flex: 1;
             padding: 3px;
             border: 1px solid #000;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         .form-row textarea {
             height: 50px;
@@ -127,6 +134,18 @@
         #officerAddress {
             height: 50px;
             resize: vertical;
+        }
+        /* Date and time input styling */
+        .datetime-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .datetime-group input[type="text"] {
+            flex: 1;
+            padding: 3px;
+            border: 1px solid #000;
+            font-size: 15px;
         }
         .button-container {
             text-align: center;
@@ -140,7 +159,7 @@
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
             margin: 3px 2px;
             cursor: pointer;
             border-radius: 3px;
@@ -154,7 +173,7 @@
             padding: 15px;
             background-color: white;
             page-break-after: always;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         .hidden {
             display: none;
@@ -165,7 +184,7 @@
             font-weight: bold;
             padding-right: 40px;
             line-height: 1.3;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         .chemist-signature {
             text-align: right;
@@ -173,7 +192,7 @@
             font-weight: bold;
             padding-right: 40px;
             line-height: 1.2;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
         }
         .section-divider {
             border-top: 1px solid #000;
@@ -185,87 +204,96 @@
         
         /* Increased row height for forwarding officer signature */
         .signature-row {
-            height: 80px; /* Increased from default height */
+            height: 80px;
             vertical-align: bottom;
         }
         .signature-row td {
-            padding-top: 40px; /* Added top padding to push content down */
+            padding-top: 40px;
         }
         
         /* Increased row height for chemist signature */
         .chemist-signature-row {
-            height: 80px; /* Increased from default height */
+            height: 80px;
             vertical-align: bottom;
         }
         .chemist-signature-row td {
-            padding-top: 40px; /* Added top padding to push content down */
+            padding-top: 40px;
         }
         
         /* Increased row height for facsimile seal - content at top */
         .facsimile-row {
-            height: 60px; /* Increased height for seal facsimile */
+            height: 60px;
             vertical-align: top;
         }
         .facsimile-row td {
-            padding: 8px 4px; /* Normal top padding to keep content at top */
+            padding: 8px 4px;
             vertical-align: top;
         }
         
         /* PDF-specific font sizes - Increased by 1px from base */
         .pdf-normal-text {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         .pdf-normal-text * {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         .pdf-normal-text .form-header h1 {
-            font-size: 19px !important; /* Increased from 18px to 19px */
+            font-size: 19px !important;
         }
         .pdf-normal-text .form-header h2 {
-            font-size: 17px !important; /* Increased from 16px to 17px */
+            font-size: 17px !important;
         }
         .pdf-normal-text .organization-text {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         .pdf-normal-text .section-heading {
-            font-size: 17px !important; /* Increased from 16px to 17px */
+            font-size: 17px !important;
             margin: 6px 0 !important;
         }
         .pdf-normal-text .form-table {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         .pdf-normal-text .form-table th,
         .pdf-normal-text .form-table td {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         .pdf-normal-text .form-section h3 {
-            font-size: 17px !important; /* Increased from 16px to 17px */
+            font-size: 17px !important;
         }
         .pdf-normal-text .form-row label {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         .pdf-normal-text .form-row input,
         .pdf-normal-text .form-row textarea {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         .pdf-normal-text .forwarding-officer-signature,
         .pdf-normal-text .chemist-signature {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         .pdf-normal-text button {
-            font-size: 15px !important; /* Increased from 14px to 15px */
+            font-size: 15px !important;
         }
         
         /* PDF Generation Container - Increased left and right margins */
         #pdf-container {
-            width: 210mm; /* A4 width */
-            min-height: 297mm; /* A4 height */
-            padding: 10mm 15mm; /* Increased left/right margins from 10mm to 15mm */
+            width: 210mm;
+            min-height: 297mm;
+            padding: 10mm 15mm;
             background-color: white;
             box-sizing: border-box;
             margin: 0 auto;
             position: relative;
-            font-size: 15px; /* Increased from 14px to 15px */
+            font-size: 15px;
+        }
+        
+        /* Custom styles for datepicker and timepicker */
+        .ui-datepicker {
+            font-size: 14px;
+            z-index: 1000 !important;
+        }
+        .ui-timepicker-wrapper {
+            z-index: 1001 !important;
         }
         
         @media print {
@@ -302,6 +330,10 @@
             }
             .form-section {
                 padding: 8px;
+            }
+            .datetime-group {
+                flex-direction: column;
+                gap: 4px;
             }
         }
     </style>
@@ -350,7 +382,10 @@
             </div>
             <div class="form-row">
                 <label for="seizureDate">Date & Time of Seizure:</label>
-                <input type="text" id="seizureDate" placeholder="e.g., P1S1 : 17.09.2025 @ 15.30 Hrs">
+                <div class="datetime-group">
+                    <input type="text" id="seizureDateInput" placeholder="Select date" readonly>
+                    <input type="text" id="seizureTimeInput" placeholder="Select time" readonly>
+                </div>
             </div>
             <div class="form-row">
                 <label for="seizurePlace">Place of Seizure:</label>
@@ -358,7 +393,10 @@
             </div>
             <div class="form-row">
                 <label for="sampleDrawDate">Date of Draw of Sample:</label>
-                <input type="text" id="sampleDrawDate" placeholder="e.g., P1S1 : 13.09.2025 @ 16.00 Hrs">
+                <div class="datetime-group">
+                    <input type="text" id="sampleDrawDateInput" placeholder="Select date" readonly>
+                    <input type="text" id="sampleDrawTimeInput" placeholder="Select time" readonly>
+                </div>
             </div>
             <div class="form-row">
                 <label for="sampleMarking">Sample Marking & Identification:</label>
@@ -370,7 +408,7 @@
             </div>
             <div class="form-row">
                 <label for="sealCount">Number of Seals:</label>
-                <input type="text" id="sealCount" placeholder="Number of seals put on sample">
+                <input type="number" id="sealCount" placeholder="Number of seals put on sample" min="1">
             </div>
             <div class="form-row">
                 <label for="sealFacsimile">Facsimile of the Seal:</label>
@@ -666,6 +704,60 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, attaching event listeners');
             
+            // Initialize datepickers
+            $('#seizureDateInput').datepicker({
+                dateFormat: 'dd.mm.yy',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: '-5:+1',
+                showButtonPanel: true
+            });
+            
+            $('#sampleDrawDateInput').datepicker({
+                dateFormat: 'dd.mm.yy',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: '-5:+1',
+                showButtonPanel: true
+            });
+            
+            // Initialize timepickers
+            $('#seizureTimeInput').timepicker({
+                timeFormat: 'HH:mm',
+                interval: 15,
+                minTime: '00:00',
+                maxTime: '23:45',
+                defaultTime: 'now',
+                startTime: '00:00',
+                dynamic: false,
+                dropdown: true,
+                scrollbar: true
+            });
+            
+            $('#sampleDrawTimeInput').timepicker({
+                timeFormat: 'HH:mm',
+                interval: 15,
+                minTime: '00:00',
+                maxTime: '23:45',
+                defaultTime: 'now',
+                startTime: '00:00',
+                dynamic: false,
+                dropdown: true,
+                scrollbar: true
+            });
+            
+            // Set current date and time as default
+            const now = new Date();
+            const todayFormatted = $.datepicker.formatDate('dd.mm.yy', now);
+            const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
+                               now.getMinutes().toString().padStart(2, '0');
+            
+            // Set default values for date and time inputs
+            $('#seizureDateInput').val(todayFormatted);
+            $('#seizureTimeInput').val(currentTime);
+            $('#sampleDrawDateInput').val(todayFormatted);
+            $('#sampleDrawTimeInput').val(currentTime);
+            
             // Preview button event listener
             document.getElementById('previewBtn').addEventListener('click', function() {
                 console.log('Preview button clicked');
@@ -684,9 +776,23 @@
                 document.getElementById('previewAccusedParent').textContent = document.getElementById('accusedParent').value;
                 document.getElementById('previewAccusedAddress').textContent = document.getElementById('accusedAddress').value;
                 document.getElementById('previewDrugDescription').textContent = document.getElementById('drugDescription').value;
-                document.getElementById('previewSeizureDate').textContent = document.getElementById('seizureDate').value;
+                
+                // Format date and time for seizure
+                const seizureDate = document.getElementById('seizureDateInput').value;
+                const seizureTime = document.getElementById('seizureTimeInput').value;
+                const formattedSeizureDateTime = seizureDate && seizureTime ? 
+                    `${seizureDate} @ ${seizureTime} Hrs` : '';
+                document.getElementById('previewSeizureDate').textContent = formattedSeizureDateTime;
+                
                 document.getElementById('previewSeizurePlace').textContent = document.getElementById('seizurePlace').value;
-                document.getElementById('previewSampleDrawDate').textContent = document.getElementById('sampleDrawDate').value;
+                
+                // Format date and time for sample draw
+                const sampleDrawDate = document.getElementById('sampleDrawDateInput').value;
+                const sampleDrawTime = document.getElementById('sampleDrawTimeInput').value;
+                const formattedSampleDrawDateTime = sampleDrawDate && sampleDrawTime ? 
+                    `${sampleDrawDate} @ ${sampleDrawTime} Hrs` : '';
+                document.getElementById('previewSampleDrawDate').textContent = formattedSampleDrawDateTime;
+                
                 document.getElementById('previewSampleMarking').textContent = document.getElementById('sampleMarking').value;
                 document.getElementById('previewSealDescription').textContent = document.getElementById('sealDescription').value;
                 document.getElementById('previewSealCount').textContent = document.getElementById('sealCount').value;
@@ -733,9 +839,23 @@
                 document.getElementById('pdfAccusedParent').textContent = document.getElementById('accusedParent').value;
                 document.getElementById('pdfAccusedAddress').textContent = document.getElementById('accusedAddress').value;
                 document.getElementById('pdfDrugDescription').textContent = document.getElementById('drugDescription').value;
-                document.getElementById('pdfSeizureDate').textContent = document.getElementById('seizureDate').value;
+                
+                // Format date and time for seizure for PDF
+                const seizureDate = document.getElementById('seizureDateInput').value;
+                const seizureTime = document.getElementById('seizureTimeInput').value;
+                const formattedSeizureDateTime = seizureDate && seizureTime ? 
+                    `${seizureDate} @ ${seizureTime} Hrs` : '';
+                document.getElementById('pdfSeizureDate').textContent = formattedSeizureDateTime;
+                
                 document.getElementById('pdfSeizurePlace').textContent = document.getElementById('seizurePlace').value;
-                document.getElementById('pdfSampleDrawDate').textContent = document.getElementById('sampleDrawDate').value;
+                
+                // Format date and time for sample draw for PDF
+                const sampleDrawDate = document.getElementById('sampleDrawDateInput').value;
+                const sampleDrawTime = document.getElementById('sampleDrawTimeInput').value;
+                const formattedSampleDrawDateTime = sampleDrawDate && sampleDrawTime ? 
+                    `${sampleDrawDate} @ ${sampleDrawTime} Hrs` : '';
+                document.getElementById('pdfSampleDrawDate').textContent = formattedSampleDrawDateTime;
+                
                 document.getElementById('pdfSampleMarking').textContent = document.getElementById('sampleMarking').value;
                 document.getElementById('pdfSealDescription').textContent = document.getElementById('sealDescription').value;
                 document.getElementById('pdfSealCount').textContent = document.getElementById('sealCount').value;
