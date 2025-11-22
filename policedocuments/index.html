@@ -241,6 +241,20 @@
             border-color: #5fa8e0;
         }
         
+        .search-box button {
+            padding: 0 20px;
+            background: #2a4d69;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .search-box button:hover {
+            background: #3a6d9a;
+        }
+        
         .stats {
             display: flex;
             justify-content: space-around;
@@ -267,6 +281,26 @@
         .doc-actions a {
             text-decoration: none;
         }
+        
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #8b949e;
+            font-style: italic;
+        }
+        
+        .search-highlight {
+            background-color: rgba(255, 255, 0, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .search-info {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #a0c4e0;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -282,7 +316,7 @@
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">1,248</div>
+                <div class="stat-value">1,249</div>
                 <div class="stat-label">PDFs Generated</div>
             </div>
             <div class="stat-item">
@@ -292,15 +326,16 @@
         </div>
         
         <div class="search-box">
-            <input type="text" placeholder="Search for documents, forms, or reports...">
-            <button class="btn btn-download">Search</button>
+            <input type="text" id="searchInput" placeholder="Search for documents, forms, or reports...">
+            <button id="searchButton">Search</button>
         </div>
         
         <div class="content">
             <div class="card">
                 <h2><i>📋</i> Download Forms</h2>
-                <ul class="document-list">
-                    <li class="document-item">
+                <div class="search-info" id="downloadFormsInfo"></div>
+                <ul class="document-list" id="downloadFormsList">
+                    <li class="document-item" data-title="Arrest Intimation" data-desc="Form for notifying relevant parties about an arrest">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Arrest Intimation</div>
                             <div class="doc-desc">Form for notifying relevant parties about an arrest</div>
@@ -311,7 +346,7 @@
                             </a>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Incident Report Form" data-desc="Standard form for documenting incidents and criminal activities">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Incident Report Form</div>
                             <div class="doc-desc">Standard form for documenting incidents and criminal activities</div>
@@ -322,7 +357,7 @@
                             </button>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Arrest Report" data-desc="Documentation for arrest procedures and suspect information">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Arrest Report</div>
                             <div class="doc-desc">Documentation for arrest procedures and suspect information</div>
@@ -333,7 +368,7 @@
                             </button>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Evidence Log Sheet" data-desc="Chain of custody documentation for collected evidence">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-pending"></span>Evidence Log Sheet</div>
                             <div class="doc-desc">Chain of custody documentation for collected evidence</div>
@@ -344,7 +379,7 @@
                             </button>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Witness Statement Form" data-desc="Standardized form for recording witness testimonies">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Witness Statement Form</div>
                             <div class="doc-desc">Standardized form for recording witness testimonies</div>
@@ -355,7 +390,7 @@
                             </button>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Vehicle Search Form" data-desc="Documentation for vehicle searches and inventory">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-archived"></span>Vehicle Search Form</div>
                             <div class="doc-desc">Documentation for vehicle searches and inventory</div>
@@ -371,8 +406,9 @@
             
             <div class="card">
                 <h2><i>📄</i> Generate PDF Documents</h2>
-                <ul class="document-list">
-                    <li class="document-item">
+                <div class="search-info" id="generatePDFsInfo"></div>
+                <ul class="document-list" id="generatePDFsList">
+                    <li class="document-item" data-title="CDR Request" data-desc="Generate Call Detail Records request for telecom providers">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>CDR Request</div>
                             <div class="doc-desc">Generate Call Detail Records request for telecom providers</div>
@@ -383,7 +419,18 @@
                             </a>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="NDPS Form 6" data-desc="Generate official NDPS Form 6 for narcotics case documentation">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>NDPS Form 6</div>
+                            <div class="doc-desc">Generate official NDPS Form 6 for narcotics case documentation</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/ndps_form6.html" target="_blank" class="btn btn-generate">
+                                <i>🔄</i> Generate
+                            </a>
+                        </div>
+                    </li>
+                    <li class="document-item" data-title="Case Summary Report" data-desc="Generate comprehensive case summary with all related documents">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Case Summary Report</div>
                             <div class="doc-desc">Generate comprehensive case summary with all related documents</div>
@@ -394,7 +441,7 @@
                             </button>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Monthly Activity Report" data-desc="Compile monthly officer activity and statistics">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Monthly Activity Report</div>
                             <div class="doc-desc">Compile monthly officer activity and statistics</div>
@@ -405,7 +452,7 @@
                             </button>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Warrant Application" data-desc="Create PDF warrant applications for judge review">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Warrant Application</div>
                             <div class="doc-desc">Create PDF warrant applications for judge review</div>
@@ -416,7 +463,7 @@
                             </button>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Evidence Report" data-desc="Generate detailed evidence analysis and findings report">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-pending"></span>Evidence Report</div>
                             <div class="doc-desc">Generate detailed evidence analysis and findings report</div>
@@ -427,7 +474,7 @@
                             </button>
                         </div>
                     </li>
-                    <li class="document-item">
+                    <li class="document-item" data-title="Subpoena Document" data-desc="Create official subpoena documents for court proceedings">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Subpoena Document</div>
                             <div class="doc-desc">Create official subpoena documents for court proceedings</div>
@@ -453,6 +500,26 @@
     </div>
 
     <script>
+        // Document data for search functionality
+        const documents = [
+            // Download Forms
+            { title: "Arrest Intimation", desc: "Form for notifying relevant parties about an arrest", type: "download", element: null },
+            { title: "Incident Report Form", desc: "Standard form for documenting incidents and criminal activities", type: "download", element: null },
+            { title: "Arrest Report", desc: "Documentation for arrest procedures and suspect information", type: "download", element: null },
+            { title: "Evidence Log Sheet", desc: "Chain of custody documentation for collected evidence", type: "download", element: null },
+            { title: "Witness Statement Form", desc: "Standardized form for recording witness testimonies", type: "download", element: null },
+            { title: "Vehicle Search Form", desc: "Documentation for vehicle searches and inventory", type: "download", element: null },
+            
+            // Generate PDFs
+            { title: "CDR Request", desc: "Generate Call Detail Records request for telecom providers", type: "generate", element: null },
+            { title: "NDPS Form 6", desc: "Generate official NDPS Form 6 for narcotics case documentation", type: "generate", element: null },
+            { title: "Case Summary Report", desc: "Generate comprehensive case summary with all related documents", type: "generate", element: null },
+            { title: "Monthly Activity Report", desc: "Compile monthly officer activity and statistics", type: "generate", element: null },
+            { title: "Warrant Application", desc: "Create PDF warrant applications for judge review", type: "generate", element: null },
+            { title: "Evidence Report", desc: "Generate detailed evidence analysis and findings report", type: "generate", element: null },
+            { title: "Subpoena Document", desc: "Create official subpoena documents for court proceedings", type: "generate", element: null }
+        ];
+
         function downloadDocument(docName) {
             showNotification(`Downloading "${docName}"...`);
             // In a real application, this would trigger an actual download
@@ -479,17 +546,105 @@
             }, 3000);
         }
         
+        // Search functionality
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const downloadFormsList = document.getElementById('downloadFormsList');
+            const generatePDFsList = document.getElementById('generatePDFsList');
+            const downloadFormsInfo = document.getElementById('downloadFormsInfo');
+            const generatePDFsInfo = document.getElementById('generatePDFsInfo');
+            
+            let downloadFormsFound = 0;
+            let generatePDFsFound = 0;
+            
+            // Search through download forms
+            const downloadItems = downloadFormsList.querySelectorAll('.document-item');
+            downloadItems.forEach(item => {
+                const title = item.getAttribute('data-title').toLowerCase();
+                const desc = item.getAttribute('data-desc').toLowerCase();
+                
+                if (searchTerm === '' || title.includes(searchTerm) || desc.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                    
+                    // Highlight search term in title and description
+                    if (searchTerm !== '') {
+                        const titleElement = item.querySelector('.doc-title');
+                        const descElement = item.querySelector('.doc-desc');
+                        
+                        titleElement.innerHTML = highlightText(titleElement.textContent, searchTerm);
+                        descElement.innerHTML = highlightText(descElement.textContent, searchTerm);
+                    }
+                    
+                    downloadFormsFound++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Search through generate PDFs
+            const generateItems = generatePDFsList.querySelectorAll('.document-item');
+            generateItems.forEach(item => {
+                const title = item.getAttribute('data-title').toLowerCase();
+                const desc = item.getAttribute('data-desc').toLowerCase();
+                
+                if (searchTerm === '' || title.includes(searchTerm) || desc.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                    
+                    // Highlight search term in title and description
+                    if (searchTerm !== '') {
+                        const titleElement = item.querySelector('.doc-title');
+                        const descElement = item.querySelector('.doc-desc');
+                        
+                        titleElement.innerHTML = highlightText(titleElement.textContent, searchTerm);
+                        descElement.innerHTML = highlightText(descElement.textContent, searchTerm);
+                    }
+                    
+                    generatePDFsFound++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Update search info
+            if (searchTerm === '') {
+                downloadFormsInfo.textContent = '';
+                generatePDFsInfo.textContent = '';
+            } else {
+                downloadFormsInfo.textContent = downloadFormsFound > 0 ? 
+                    `${downloadFormsFound} form${downloadFormsFound !== 1 ? 's' : ''} found` : 
+                    'No forms found';
+                
+                generatePDFsInfo.textContent = generatePDFsFound > 0 ? 
+                    `${generatePDFsFound} document${generatePDFsFound !== 1 ? 's' : ''} found` : 
+                    'No documents found';
+            }
+        }
+        
+        // Highlight search terms in text
+        function highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+            
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight">$1</span>');
+        }
+        
         // Add some interactivity to the search box
-        document.querySelector('.search-box input').addEventListener('focus', function() {
-            this.parentElement.style.transform = 'scale(1.02)';
-        });
-        
-        document.querySelector('.search-box input').addEventListener('blur', function() {
-            this.parentElement.style.transform = 'scale(1)';
-        });
-        
-        // Special handling for Arrest Intimation download
         document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            
+            searchInput.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+            
+            searchInput.addEventListener('input', performSearch);
+            searchButton.addEventListener('click', performSearch);
+            
+            // Special handling for Arrest Intimation download
             const arrestIntimationBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/arrest_intimation.pdf"]');
             if (arrestIntimationBtn) {
                 arrestIntimationBtn.addEventListener('click', function() {
@@ -502,6 +657,14 @@
             if (cdrRequestBtn) {
                 cdrRequestBtn.addEventListener('click', function() {
                     showNotification('Opening CDR Request Generator...');
+                });
+            }
+            
+            // Special handling for NDPS Form 6
+            const ndpsForm6Btn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/ndps_form6.html"]');
+            if (ndpsForm6Btn) {
+                ndpsForm6Btn.addEventListener('click', function() {
+                    showNotification('Opening NDPS Form 6 Generator...');
                 });
             }
         });
