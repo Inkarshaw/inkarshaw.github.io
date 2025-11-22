@@ -312,11 +312,11 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value">25</div>
+                <div class="stat-value">26</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">1,249</div>
+                <div class="stat-value">1,251</div>
                 <div class="stat-label">PDFs Generated</div>
             </div>
             <div class="stat-item">
@@ -342,6 +342,17 @@
                         </div>
                         <div class="doc-actions">
                             <a href="https://clearexams.online/policedocuments/arrest_intimation.pdf" target="_blank" class="btn btn-download">
+                                <i>⬇️</i> Download
+                            </a>
+                        </div>
+                    </li>
+                    <li class="document-item" data-title="NDPS Form 5" data-desc="Official NDPS Form 5 for narcotics case documentation">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>NDPS Form 5</div>
+                            <div class="doc-desc">Official NDPS Form 5 for narcotics case documentation</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/ndps_form5.pdf" target="_blank" class="btn btn-download">
                                 <i>⬇️</i> Download
                             </a>
                         </div>
@@ -430,6 +441,28 @@
                             </a>
                         </div>
                     </li>
+                    <li class="document-item" data-title="NDPS Form 4" data-desc="Generate official NDPS Form 4 for narcotics case documentation">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>NDPS Form 4</div>
+                            <div class="doc-desc">Generate official NDPS Form 4 for narcotics case documentation</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/ndps_form4.html" target="_blank" class="btn btn-generate">
+                                <i>🔄</i> Generate
+                            </a>
+                        </div>
+                    </li>
+                    <li class="document-item" data-title="Police Passport" data-desc="Generate police passport verification and clearance documents">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Police Passport</div>
+                            <div class="doc-desc">Generate police passport verification and clearance documents</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/police_passport.html" target="_blank" class="btn btn-generate">
+                                <i>🔄</i> Generate
+                            </a>
+                        </div>
+                    </li>
                     <li class="document-item" data-title="Case Summary Report" data-desc="Generate comprehensive case summary with all related documents">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Case Summary Report</div>
@@ -504,6 +537,7 @@
         const documents = [
             // Download Forms
             { title: "Arrest Intimation", desc: "Form for notifying relevant parties about an arrest", type: "download", element: null },
+            { title: "NDPS Form 5", desc: "Official NDPS Form 5 for narcotics case documentation", type: "download", element: null },
             { title: "Incident Report Form", desc: "Standard form for documenting incidents and criminal activities", type: "download", element: null },
             { title: "Arrest Report", desc: "Documentation for arrest procedures and suspect information", type: "download", element: null },
             { title: "Evidence Log Sheet", desc: "Chain of custody documentation for collected evidence", type: "download", element: null },
@@ -513,6 +547,8 @@
             // Generate PDFs
             { title: "CDR Request", desc: "Generate Call Detail Records request for telecom providers", type: "generate", element: null },
             { title: "NDPS Form 6", desc: "Generate official NDPS Form 6 for narcotics case documentation", type: "generate", element: null },
+            { title: "NDPS Form 4", desc: "Generate official NDPS Form 4 for narcotics case documentation", type: "generate", element: null },
+            { title: "Police Passport", desc: "Generate police passport verification and clearance documents", type: "generate", element: null },
             { title: "Case Summary Report", desc: "Generate comprehensive case summary with all related documents", type: "generate", element: null },
             { title: "Monthly Activity Report", desc: "Compile monthly officer activity and statistics", type: "generate", element: null },
             { title: "Warrant Application", desc: "Create PDF warrant applications for judge review", type: "generate", element: null },
@@ -652,6 +688,14 @@
                 });
             }
             
+            // Special handling for NDPS Form 5 download
+            const ndpsForm5Btn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/ndps_form5.pdf"]');
+            if (ndpsForm5Btn) {
+                ndpsForm5Btn.addEventListener('click', function() {
+                    showNotification('Opening NDPS Form 5 PDF...');
+                });
+            }
+            
             // Special handling for CDR Request
             const cdrRequestBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/cdr_request_generator.html"]');
             if (cdrRequestBtn) {
@@ -665,6 +709,22 @@
             if (ndpsForm6Btn) {
                 ndpsForm6Btn.addEventListener('click', function() {
                     showNotification('Opening NDPS Form 6 Generator...');
+                });
+            }
+            
+            // Special handling for NDPS Form 4
+            const ndpsForm4Btn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/ndps_form4.html"]');
+            if (ndpsForm4Btn) {
+                ndpsForm4Btn.addEventListener('click', function() {
+                    showNotification('Opening NDPS Form 4 Generator...');
+                });
+            }
+            
+            // Special handling for Police Passport
+            const policePassportBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/police_passport.html"]');
+            if (policePassportBtn) {
+                policePassportBtn.addEventListener('click', function() {
+                    showNotification('Opening Police Passport Generator...');
                 });
             }
         });
