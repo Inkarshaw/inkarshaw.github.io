@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seized Material Inventory - PDF Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            margin: 15px;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin: 15px 0 25px 0;
+            font-size: 22px;
+        }
+        
+        .form-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section h2 {
+            font-size: 17px;
+            color: #444;
+            margin-bottom: 12px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+            margin-right: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .form-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            font-size: 14px;
+            min-height: 20px;
+        }
+        
+        .label-text {
+            min-width: 220px;
+            text-align: right;
+            padding-right: 8px;
+        }
+        
+        .colon {
+            width: 10px;
+            text-align: center;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 7px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            height: 70px;
+            resize: vertical;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 18px;
+            font-size: 13px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+            word-wrap: break-word;
+            font-size: 13px;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .btn-container {
+            text-align: center;
+            margin-top: 25px;
+        }
+        
+        button {
+            padding: 9px 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            margin: 0 10px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        #resetBtn {
+            background-color: #f44336;
+        }
+        
+        #resetBtn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .signature-section {
+            margin-top: 25px;
+            padding-top: 18px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .signature-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 18px;
+        }
+        
+        .signature-box {
+            width: 48%;
+            text-align: right;
+        }
+        
+        .signature-box label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            min-height: 20px;
+            justify-content: flex-end;
+        }
+        
+        .signature-box input {
+            width: 100%;
+            padding: 7px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        .certification-section {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            font-size: 14px;
+        }
+        
+        .certification-section h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .certification-text {
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            text-align: justify;
+        }
+        
+        /* Table column width adjustments */
+        .col-sno { width: 5%; }
+        .col-desc { width: 18%; }
+        .col-quality { width: 9%; }
+        .col-quantity { width: 9%; }
+        .col-packing { width: 14%; }
+        .col-mark { width: 10%; }
+        .col-particulars { width: 18%; }
+        .col-origin { width: 9%; }
+        .col-remarks { width: 8%; }
+        
+        input.table-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 4px;
+            font-size: 12px;
+        }
+        
+        input.table-input:focus {
+            outline: 1px solid #4CAF50;
+            background-color: #f9f9f9;
+        }
+        
+        #addRowBtn {
+            font-size: 14px;
+            padding: 7px 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Seized Material Inventory Form</h1>
+        
+        <form id="inventoryForm">
+            <!-- Case Information Section -->
+            <div class="form-section">
+                <h2>Case Information</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <span class="label-text">Case No</span>
+                            <span class="colon">:</span>
+                        </label>
+                        <input type="text" id="caseNo" name="caseNo" value="CR.NO: 49/2025">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <span class="label-text">Seizing Agency</span>
+                            <span class="colon">:</span>
+                        </label>
+                        <input type="text" id="seizingAgency" name="seizingAgency" value="G-7 Chetpet police station">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Seizure Details Section -->
+            <div class="form-section">
+                <h2>Seizure Details</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <span class="label-text">Seizing Officer</span>
+                            <span class="colon">:</span>
+                        </label>
+                        <input type="text" id="seizingOfficer" name="seizingOfficer" value="SI Tr.Inkersha Bell Abraham">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <span class="label-text">Date of Seizure</span>
+                            <span class="colon">:</span>
+                        </label>
+                        <input type="date" id="dateOfSeizure" name="dateOfSeizure" value="2025-03-20">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <span class="label-text">Place of Seizure</span>
+                            <span class="colon">:</span>
+                        </label>
+                        <input type="text" id="placeOfSeizure" name="placeOfSeizure" value="Brindavanam 5th Street Chetpet Railway Track">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <span class="label-text">Name and Designation of Officer Preparing Inventory</span>
+                            <span class="colon">:</span>
+                        </label>
+                        <input type="text" id="preparingOfficer" name="preparingOfficer" value="Mr. A.Ramamoorthy, Inspector of Police G-7 Chetpet PS, Chennai-31">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Seized Items Table -->
+            <div class="form-section">
+                <h2>Seized Items</h2>
+                <div class="table-container">
+                    <table id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th class="col-sno">S.No</th>
+                                <th class="col-desc">Description of the items seized</th>
+                                <th class="col-quality">Quality</th>
+                                <th class="col-quantity">Quantity</th>
+                                <th class="col-packing">Mode of packing</th>
+                                <th class="col-mark">Mark and numbers</th>
+                                <th class="col-particulars">Other particulars identifying seized items or packing</th>
+                                <th class="col-origin">Country of Origin</th>
+                                <th class="col-remarks">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" name="itemDesc" class="table-input"></td>
+                                <td><input type="text" name="quality" class="table-input"></td>
+                                <td><input type="text" name="quantity" class="table-input"></td>
+                                <td><input type="text" name="packingMode" class="table-input" value="Packing with lite green cover with a label"></td>
+                                <td><input type="text" name="markNumbers" class="table-input"></td>
+                                <td><input type="text" name="otherParticulars" class="table-input"></td>
+                                <td><input type="text" name="countryOrigin" class="table-input"></td>
+                                <td><input type="text" name="remarks" class="table-input"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" id="addRowBtn">Add Another Item</button>
+            </div>
+            
+            <!-- Signature Section -->
+            <div class="signature-section">
+                <div class="signature-row">
+                    <div class="signature-box">
+                        <label>
+                            <span class="label-text">Signature, name and designation of the officer</span>
+                            <span class="colon">:</span>
+                        </label>
+                        <input type="text" id="officerSignature" name="officerSignature">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Certification Section -->
+            <div class="certification-section">
+                <h3>Certification by the Magistrate</h3>
+                <p class="certification-text">
+                    Whereas the above officer applied to me under sub-section (2) section 52A of the Narcotic Drugs and Psychotropic Substances Act, 1985 to certify the above inventory and sub-section (3) of that section requires any Magistrate to whom an application is made to allow the application as soon as may be, 1, having been satisfied that the above Inventory is as per the seizure documents and the consignments of seized materials to the case presented before me, certify the correctness of the above inventory.
+                </p>
+                <div class="signature-row">
+                    <div class="signature-box">
+                        <label>
+                            <span class="label-text">Signature, name and designation of the Magistrate</span>
+                            <span class="colon">:</span>
+                        </label>
+                        <input type="text" id="magistrateSignature" name="magistrateSignature">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="btn-container">
+                <button type="button" id="generatePdfBtn">Generate PDF</button>
+                <button type="button" id="resetBtn">Reset Form</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add row functionality
+            document.getElementById('addRowBtn').addEventListener('click', function() {
+                const table = document.getElementById('itemsTable').getElementsByTagName('tbody')[0];
+                const newRow = table.insertRow();
+                const rowCount = table.rows.length;
+                
+                newRow.innerHTML = `
+                    <td>${rowCount}</td>
+                    <td><input type="text" name="itemDesc" class="table-input"></td>
+                    <td><input type="text" name="quality" class="table-input"></td>
+                    <td><input type="text" name="quantity" class="table-input"></td>
+                    <td><input type="text" name="packingMode" class="table-input"></td>
+                    <td><input type="text" name="markNumbers" class="table-input"></td>
+                    <td><input type="text" name="otherParticulars" class="table-input"></td>
+                    <td><input type="text" name="countryOrigin" class="table-input"></td>
+                    <td><input type="text" name="remarks" class="table-input"></td>
+                `;
+            });
+            
+            // Reset form functionality
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
+                    document.getElementById('inventoryForm').reset();
+                    
+                    // Reset table to just one row
+                    const table = document.getElementById('itemsTable').getElementsByTagName('tbody')[0];
+                    while (table.rows.length > 1) {
+                        table.deleteRow(1);
+                    }
+                }
+            });
+            
+            // Generate PDF functionality
+            document.getElementById('generatePdfBtn').addEventListener('click', function() {
+                // Create a new jsPDF instance with moderate margins
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Set moderate margins (15mm on all sides)
+                const margin = 15;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const contentWidth = pageWidth - (2 * margin);
+                let yPosition = margin;
+                
+                // Fixed colon position for vertical alignment
+                const colonPosition = 55; // Fixed position for all colons
+                
+                // Add title
+                doc.setFontSize(16);
+                doc.setFont(undefined, 'bold');
+                doc.text("FORM 4", pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 10;
+                
+                // Add subtitle
+                doc.setFontSize(12);
+                doc.text("INVENTORY OF SEIZED MATERIAL", pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 8;
+                
+                // Add legal reference
+                doc.setFontSize(10);
+                doc.text("[Under sub-section (2) of Section 52A of the Narcotic Drugs and", pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 5;
+                doc.text("Psychotropic Substances Act, 1985]", pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 12;
+                
+                // Add case information with vertically aligned colons
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'normal');
+                
+                // Case No
+                doc.text("Case No", margin, yPosition);
+                doc.text(":", colonPosition, yPosition);
+                const caseNoText = doc.splitTextToSize(document.getElementById('caseNo').value, contentWidth - colonPosition - 5);
+                doc.text(caseNoText, colonPosition + 5, yPosition);
+                yPosition += (caseNoText.length * 7);
+                
+                // Seizing Agency
+                doc.text("Seizing Agency", margin, yPosition);
+                doc.text(":", colonPosition, yPosition);
+                const agencyText = doc.splitTextToSize(document.getElementById('seizingAgency').value, contentWidth - colonPosition - 5);
+                doc.text(agencyText, colonPosition + 5, yPosition);
+                yPosition += (agencyText.length * 7);
+                
+                // Seizing Officer
+                doc.text("Seizing Officer", margin, yPosition);
+                doc.text(":", colonPosition, yPosition);
+                const officerText = doc.splitTextToSize(document.getElementById('seizingOfficer').value, contentWidth - colonPosition - 5);
+                doc.text(officerText, colonPosition + 5, yPosition);
+                yPosition += (officerText.length * 7);
+                
+                // Date of Seizure
+                const dateValue = document.getElementById('dateOfSeizure').value;
+                const formattedDate = dateValue ? new Date(dateValue).toLocaleDateString('en-GB') : '';
+                doc.text("Date of Seizure", margin, yPosition);
+                doc.text(":", colonPosition, yPosition);
+                doc.text(formattedDate, colonPosition + 5, yPosition);
+                yPosition += 7;
+                
+                // Place of Seizure
+                doc.text("Place of Seizure", margin, yPosition);
+                doc.text(":", colonPosition, yPosition);
+                const placeText = doc.splitTextToSize(document.getElementById('placeOfSeizure').value, contentWidth - colonPosition - 5);
+                doc.text(placeText, colonPosition + 5, yPosition);
+                yPosition += (placeText.length * 7);
+                
+                // Officer Preparing Inventory - FIXED COLON POSITION
+                const preparingLabel = "Name and Designation of the Officer Preparing this Inventory";
+                const preparingLabelLines = doc.splitTextToSize(preparingLabel, colonPosition - margin - 5);
+                
+                // Draw the label with proper line breaks
+                let labelY = yPosition;
+                for (let i = 0; i < preparingLabelLines.length; i++) {
+                    doc.text(preparingLabelLines[i], margin, labelY);
+                    labelY += 7;
+                }
+                
+                // Draw colon at the fixed position on the first line
+                doc.text(":", colonPosition, yPosition);
+                
+                const preparingText = doc.splitTextToSize(document.getElementById('preparingOfficer').value, contentWidth - colonPosition - 5);
+                doc.text(preparingText, colonPosition + 5, yPosition);
+                
+                // Move to next position based on whichever is longer - label or value
+                yPosition += (Math.max(preparingLabelLines.length, preparingText.length) * 7) + 5;
+                
+                // Prepare table data
+                const tableHeaders = [
+                    "S.No", 
+                    "Description of the items seized", 
+                    "Quality", 
+                    "Quantity", 
+                    "Mode of packing", 
+                    "Mark and numbers", 
+                    "Other particulars identifying seized items or packing", 
+                    "Country of Origin", 
+                    "Remarks"
+                ];
+                
+                // Get table data
+                const tableData = [];
+                const table = document.getElementById('itemsTable');
+                const rows = table.getElementsByTagName('tbody')[0].rows;
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const cells = row.cells;
+                    const rowData = [];
+                    
+                    for (let j = 0; j < cells.length; j++) {
+                        const input = cells[j].querySelector('input');
+                        if (input) {
+                            rowData.push(input.value);
+                        } else {
+                            rowData.push(cells[j].textContent.trim());
+                        }
+                    }
+                    
+                    tableData.push(rowData);
+                }
+                
+                // Define column widths for the table (moderate margins)
+                const columnStyles = {
+                    0: { cellWidth: 10 },  // S.No
+                    1: { cellWidth: 32 }, // Description
+                    2: { cellWidth: 18 }, // Quality
+                    3: { cellWidth: 18 }, // Quantity
+                    4: { cellWidth: 24 }, // Mode of packing
+                    5: { cellWidth: 20 }, // Mark and numbers
+                    6: { cellWidth: 32 }, // Other particulars
+                    7: { cellWidth: 20 }, // Country of Origin
+                    8: { cellWidth: 16 }  // Remarks
+                };
+                
+                // Create the table using autoTable with moderate margins
+                doc.autoTable({
+                    startY: yPosition,
+                    head: [tableHeaders],
+                    body: tableData,
+                    theme: 'grid',
+                    styles: { 
+                        fontSize: 8, 
+                        cellPadding: 2,
+                        lineColor: [0, 0, 0],
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [220, 220, 220], 
+                        textColor: 0, 
+                        fontStyle: 'bold',
+                        lineWidth: 0.1
+                    },
+                    columnStyles: columnStyles,
+                    margin: { left: margin, right: margin },
+                    tableWidth: 'auto'
+                });
+                
+                // Update yPosition after the table
+                yPosition = doc.lastAutoTable.finalY + 12;
+                
+                // Add officer signature with RIGHT ALIGNMENT
+                const officerSigLabel = "Signature, name and designation of the officer:";
+                const officerSigLabelWidth = doc.getTextWidth(officerSigLabel);
+                doc.text(officerSigLabel, pageWidth - margin - officerSigLabelWidth, yPosition);
+                const officerSigText = doc.splitTextToSize(document.getElementById('officerSignature').value, contentWidth / 2);
+                doc.text(officerSigText, pageWidth - margin, yPosition, { align: 'right' });
+                yPosition += (officerSigText.length * 7) + 8;
+                
+                // Add certification section with CENTERED HEADER
+                doc.setFont(undefined, 'bold');
+                
+                // First line of certification header - CENTERED
+                const certLine1 = "Certification by the Magistrate under sub-section (3) of section 52A of the";
+                doc.text(certLine1, pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 6;
+                
+                // Second line of certification header - CENTERED
+                const certLine2 = "Narcotic Drugs and Psychotropic Substances Act, 1985";
+                doc.text(certLine2, pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 8;
+                
+                // Add certification text with JUSTIFIED ALIGNMENT
+                doc.setFont(undefined, 'normal');
+                const certificationText = "Whereas the above officer applied to me under sub-section (2) section 52A of the Narcotic Drugs and Psychotropic Substances Act, 1985 to certify the above inventory and sub-section (3) of that section requires any Magistrate to whom an application is made to allow the application as soon as may be, 1, having been satisfied that the above Inventory is as per the seizure documents and the consignments of seized materials to the case presented before me, certify the correctness of the above inventory.";
+                
+                // For justified text, we need to manually handle each line
+                const certificationLines = doc.splitTextToSize(certificationText, contentWidth);
+                
+                // Draw each line with justified alignment manually
+                for (let i = 0; i < certificationLines.length; i++) {
+                    const line = certificationLines[i];
+                    
+                    // For justified text, we need to calculate spacing
+                    if (i < certificationLines.length - 1) {
+                        // Justify all lines except the last one
+                        const words = line.split(' ');
+                        if (words.length > 1) {
+                            const totalWordsWidth = words.reduce((sum, word) => sum + doc.getTextWidth(word + ' '), 0) - doc.getTextWidth(' ');
+                            const spaceWidth = (contentWidth - totalWordsWidth) / (words.length - 1);
+                            
+                            let currentX = margin;
+                            for (let j = 0; j < words.length; j++) {
+                                doc.text(words[j], currentX, yPosition);
+                                currentX += doc.getTextWidth(words[j] + ' ') + (j < words.length - 1 ? spaceWidth : 0);
+                            }
+                        } else {
+                            doc.text(line, margin, yPosition);
+                        }
+                    } else {
+                        // Last line - left aligned (standard for justified text)
+                        doc.text(line, margin, yPosition);
+                    }
+                    yPosition += 5;
+                }
+                
+                yPosition += 8;
+                
+                // Add magistrate signature with RIGHT ALIGNMENT
+                const magistrateSigLabel = "Signature, name and designation of the Magistrate:";
+                const magistrateSigLabelWidth = doc.getTextWidth(magistrateSigLabel);
+                doc.text(magistrateSigLabel, pageWidth - margin - magistrateSigLabelWidth, yPosition);
+                const magistrateSigText = doc.splitTextToSize(document.getElementById('magistrateSignature').value, contentWidth / 2);
+                doc.text(magistrateSigText, pageWidth - margin, yPosition, { align: 'right' });
+                
+                // Save the PDF
+                doc.save('Seized_Material_Inventory.pdf');
+            });
+        });
+    </script>
+</body>
+</html>
