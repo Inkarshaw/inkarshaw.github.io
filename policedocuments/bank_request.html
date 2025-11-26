@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Request Document Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 2.2rem;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 992px) {
+            .content-wrapper {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            width: 100%;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-generate {
+            background: #2ecc71;
+        }
+        
+        .btn-generate:hover {
+            background: #27ae60;
+        }
+        
+        .btn-reset {
+            background: #e74c3c;
+        }
+        
+        .btn-reset:hover {
+            background: #c0392b;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        .document-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .document-preview {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        
+        .document {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 25mm;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            margin: 0 auto;
+        }
+        
+        .document h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            text-decoration: underline;
+            border: none;
+            color: black;
+            padding: 0;
+            font-size: 14pt;
+        }
+        
+        .document .header-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .document .section-heading {
+            text-align: center;
+            margin-bottom: 5px;
+            text-decoration: underline;
+            font-size: 14pt;
+        }
+        
+        .document .subsection {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 12pt;
+        }
+        
+        .document .date-container {
+            text-align: right;
+            margin: -20px 0 30px 0;
+        }
+        
+        .document .to-line {
+            margin: 0 0 5px 0;
+        }
+        
+        .document .salutation {
+            margin-top: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .document .subject {
+            margin: 10px 0;
+            text-align: left;
+            text-indent: 40px;
+        }
+        
+        .document .reference {
+            margin: 10px 0;
+            text-align: left;
+            text-indent: 40px;
+        }
+        
+        .document .asterisk-line {
+            text-align: center;
+            margin: 20px 0;
+            color: black;
+            font-weight: bold;
+        }
+        
+        .document .table-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        
+        .document table {
+            width: 80%;
+            border-collapse: collapse;
+            font-size: 11pt;
+        }
+        
+        .document table, .document th, .document td {
+            border: 1px solid black;
+        }
+        
+        .document th, .document td {
+            padding: 8px;
+        }
+        
+        .document .account-details-header {
+            text-align: center;
+        }
+        
+        .document .account-details {
+            text-align: center;
+        }
+        
+        .document .signature {
+            text-align: right;
+            margin-top: 60px;
+        }
+        
+        .document .content {
+            margin: 15px 0;
+            text-align: justify;
+            text-justify: inter-word;
+        }
+        
+        .document .indented-paragraph {
+            text-indent: 40px;
+            text-align: justify;
+            text-justify: inter-word;
+        }
+        
+        .document ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        .document li {
+            margin-bottom: 8px;
+        }
+        
+        .document p {
+            text-align: justify;
+            text-justify: inter-word;
+        }
+        
+        .document .to-address {
+            margin: 10px 0;
+            padding-left: 40px;
+        }
+        
+        .document .numbered-item {
+            margin-bottom: 12px;
+        }
+        
+        .document .numbered-item .item-number {
+            display: inline-block;
+            width: 25px;
+            font-weight: bold;
+        }
+        
+        .document .numbered-item .item-content {
+            display: inline-block;
+            width: calc(100% - 30px);
+            vertical-align: top;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 25px;
+            border-left: 4px solid #3498db;
+            font-size: 0.9rem;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .preview-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .input-error {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .form-row {
+                flex-direction: row;
+            }
+            
+            .form-row .form-group {
+                flex: 1;
+            }
+        }
+        
+        .document-status {
+            background-color: #e8f4fd;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .document, .document * {
+                visibility: visible;
+            }
+            .document {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                margin: 0;
+                padding: 25mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bank Request Document Generator</h1>
+        
+        <div class="content-wrapper">
+            <div class="panel">
+                <h2>Document Details</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Date: <span class="tooltip">ℹ️
+                            <span class="tooltiptext">Select the date for the document</span>
+                        </span></label>
+                        <input type="date" id="date" value="2025-02-09">
+                        <div class="error-message" id="dateError">Please select a valid date</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="startDate">Statement Start Date: <span class="tooltip">ℹ️
+                            <span class="tooltiptext">Select the start date for the bank statement</span>
+                        </span></label>
+                        <input type="date" id="startDate" value="2024-06-01">
+                        <div class="error-message" id="startDateError">Please select a valid start date</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="caseType">Case Type:</label>
+                    <input type="text" id="caseType" value="NDPS" placeholder="Enter case type">
+                    <div class="error-message" id="caseTypeError">Please enter a case type</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crimeNumber">Crime Number:</label>
+                    <input type="text" id="crimeNumber" value="17/2025" placeholder="Enter crime number">
+                    <div class="error-message" id="crimeNumberError">Please enter a crime number</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sections">Sections:</label>
+                    <input type="text" id="sections" value="8(c) r/w 20 (b) (II) (A), 22 (b), 25, 29 (1) of NDPS Act" placeholder="Enter sections">
+                    <div class="error-message" id="sectionsError">Please enter sections</div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chennaiCity" checked>
+                    <label for="chennaiCity">Include Chennai City</label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="district">District:</label>
+                    <input type="text" id="district" value="Kilpauk District" placeholder="Enter district">
+                    <div class="error-message" id="districtError">Please enter a district</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="policeStation">Police Station:</label>
+                    <input type="text" id="policeStation" value="G7 Chetpet PS" placeholder="Enter police station">
+                    <div class="error-message" id="policeStationError">Please enter a police station</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bankName">Bank Name:</label>
+                    <input type="text" id="bankName" value="State Bank of India" placeholder="Enter bank name">
+                    <div class="error-message" id="bankNameError">Please enter a bank name</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="accountNumber">Account Number:</label>
+                    <input type="text" id="accountNumber" value="38625685574" placeholder="Enter account number">
+                    <div class="error-message" id="accountNumberError">Please enter an account number</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email ID for Statement:</label>
+                    <input type="email" id="email" value="g7chetpetps@gmail.com" placeholder="Enter email address">
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+                
+                <div class="success-message" id="successMessage">
+                    Document generated successfully!
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" id="previewBtn">Preview Document</button>
+                    <button class="btn btn-reset" id="resetBtn">Reset Form</button>
+                </div>
+                
+                <div class="instructions">
+                    <h3>Instructions:</h3>
+                    <ul>
+                        <li>Fill in all the required fields</li>
+                        <li>Check/uncheck "Include Chennai City" to add/remove Chennai City from the document</li>
+                        <li>Click "Preview Document" to see how your document will look</li>
+                        <li>Click "Generate PDF" below the preview to download the document as PDF</li>
+                        <li>Use "Reset Form" to clear all fields</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="document-container">
+                <h2>Document Preview</h2>
+                
+                <div class="document-status">
+                    <span>📄</span>
+                    <span>Document preview is updated in real-time</span>
+                </div>
+                
+                <div class="document-preview">
+                    <div class="document" id="document">
+                        <!-- Document content will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="loading" id="loadingIndicator">
+                    Generating PDF... Please wait
+                </div>
+                
+                <div class="preview-actions">
+                    <button class="btn btn-generate" id="generatePdfBtn">Generate PDF</button>
+                    <button class="btn" id="printBtn">Print Document</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default dates
+            setDefaultDates();
+            
+            // Add event listeners
+            document.getElementById('previewBtn').addEventListener('click', updateDocument);
+            document.getElementById('generatePdfBtn').addEventListener('click', generatePDF);
+            document.getElementById('resetBtn').addEventListener('click', resetForm);
+            document.getElementById('printBtn').addEventListener('click', printDocument);
+            
+            // Add input event listeners for real-time validation and preview
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    validateField(this.id);
+                    updateDocument(); // Update preview in real-time
+                });
+            });
+            
+            // Initialize the document preview
+            updateDocument();
+        });
+        
+        function setDefaultDates() {
+            const today = new Date();
+            const formattedToday = today.toISOString().split('T')[0];
+            
+            // Set default date to today if not already set
+            if (!document.getElementById('date').value) {
+                document.getElementById('date').value = formattedToday;
+            }
+            
+            // Set default start date to 6 months ago if not already set
+            if (!document.getElementById('startDate').value) {
+                const sixMonthsAgo = new Date();
+                sixMonthsAgo.setMonth(today.getMonth() - 6);
+                document.getElementById('startDate').value = sixMonthsAgo.toISOString().split('T')[0];
+            }
+        }
+        
+        function validateField(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+            
+            // Reset error state
+            field.classList.remove('input-error');
+            errorElement.style.display = 'none';
+            
+            // Validate based on field type
+            let isValid = true;
+            
+            switch(fieldId) {
+                case 'date':
+                case 'startDate':
+                    isValid = field.value !== '';
+                    if (isValid && fieldId === 'startDate') {
+                        const dateValue = new Date(document.getElementById('date').value);
+                        const startDateValue = new Date(field.value);
+                        isValid = startDateValue <= dateValue;
+                        if (!isValid) {
+                            errorElement.textContent = 'Start date cannot be after document date';
+                        }
+                    }
+                    break;
+                case 'email':
+                    isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value);
+                    break;
+                case 'accountNumber':
+                    isValid = /^\d+$/.test(field.value.trim());
+                    if (!isValid) {
+                        errorElement.textContent = 'Account number must contain only numbers';
+                    }
+                    break;
+                default:
+                    isValid = field.value.trim() !== '';
+            }
+            
+            if (!isValid) {
+                field.classList.add('input-error');
+                errorElement.style.display = 'block';
+            }
+            
+            return isValid;
+        }
+        
+        function validateForm() {
+            let isValid = true;
+            
+            // Validate all fields
+            const fields = [
+                'date', 'caseType', 'crimeNumber', 'sections', 
+                'district', 'policeStation', 'bankName', 
+                'accountNumber', 'email', 'startDate'
+            ];
+            
+            fields.forEach(fieldId => {
+                if (!validateField(fieldId)) {
+                    isValid = false;
+                }
+            });
+            
+            return isValid;
+        }
+        
+        function updateDocument() {
+            if (!validateForm()) {
+                return;
+            }
+            
+            const documentElement = document.getElementById('document');
+            const date = document.getElementById('date').value;
+            const caseType = document.getElementById('caseType').value;
+            const crimeNumber = document.getElementById('crimeNumber').value;
+            const sections = document.getElementById('sections').value;
+            const includeChennaiCity = document.getElementById('chennaiCity').checked;
+            const district = document.getElementById('district').value;
+            const policeStation = document.getElementById('policeStation').value;
+            const bankName = document.getElementById('bankName').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const email = document.getElementById('email').value;
+            const startDate = document.getElementById('startDate').value;
+            
+            // Format dates for display
+            const formattedDate = new Date(date).toLocaleDateString('en-GB', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+            
+            const formattedStartDate = new Date(startDate).toLocaleDateString('en-GB', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+            
+            // Generate case details with template - conditionally include Chennai City
+            const cityText = includeChennaiCity ? `${district}, Chennai City` : district;
+            const caseDetails = `I am enquiring the case mentioned in the above reference, ${caseType} case was registered at ${policeStation}, ${cityText} and we found below mentioned ${bankName} Bank account was involved in this case.
+
+Hence I request you to furnish the details of below mentioned bank account for further investigation purpose.`;
+            
+            documentElement.innerHTML = `
+                <div class="header-section">
+                    <h2 class="section-heading">POLICE DEPARTMENT</h2>
+                    <p class="subsection">(U/S.94 BNSS)</p>
+                </div>
+                
+                <div class="date-container">
+                    <p>Date: ${formattedDate}</p>
+                </div>
+                
+                <p class="to-line">To</p>
+                <div class="to-address">
+                    <p>The Branch Manager<br>
+                    ${bankName}</p>
+                </div>
+                
+                <p class="salutation">Sir/Madam,</p>
+                
+                <p class="subject">Sub: Chennai Police -- ${district} -- Cyber Crime Team -- Request to furnish the transaction details of account numbers -- Reg.</p>
+                
+                <p class="reference">Ref: ${policeStation} Cr.No.${crimeNumber}, U/s. ${sections}</p>
+                
+                <p class="asterisk-line">*****</p>
+                
+                <div class="content">
+                    <p class="indented-paragraph">${caseDetails.replace(/\n/g, '</p><p class="indented-paragraph">')}</p>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <tr>
+                            <th style="width: 15%">Sl.no</th>
+                            <th style="width: 85%" class="account-details-header">Account Details</th>
+                        </tr>
+                        <tr>
+                            <td style="width: 15%">1</td>
+                            <td style="width: 85%" class="account-details">
+                                <strong>${bankName}</strong><br>
+                                <strong>A/c No: ${accountNumber}</strong>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <p><strong>Further you are directed to:</strong></p>
+                <div class="numbered-list">
+                    <div class="numbered-item">
+                        <span class="item-number">1.</span>
+                        <span class="item-content">Furnish the Beneficiary <strong>(KYC)</strong> name and address, IP Details, Email ID, Merchant ID, other contact details of Beneficiary</span>
+                    </div>
+                    <div class="numbered-item">
+                        <span class="item-number">2.</span>
+                        <span class="item-content"><strong>Provide the account statement from ${formattedStartDate} to till date through the Email id: ${email}</strong></span>
+                    </div>
+                    <div class="numbered-item">
+                        <span class="item-number">3.</span>
+                        <span class="item-content">Furnish the Contact details of acquiring bank details and E-mail id.</span>
+                    </div>
+                </div>
+                
+                <div class="signature">
+                    With Regards
+                </div>
+            `;
+        }
+
+        function generatePDF() {
+            if (!validateForm()) {
+                alert('Please fix the errors in the form before generating PDF.');
+                return;
+            }
+            
+            // Show loading indicator
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const generateBtn = document.getElementById('generatePdfBtn');
+            
+            loadingIndicator.classList.add('show');
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            
+            // Ensure the document is updated
+            updateDocument();
+            
+            // Get the document element
+            const element = document.getElementById('document');
+            
+            // Configure PDF options
+            const options = {
+                margin: 0,
+                filename: 'bank_request_document.pdf',
+                image: { 
+                    type: 'jpeg', 
+                    quality: 0.98 
+                },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait'
+                }
+            };
+            
+            // Generate PDF directly from the element
+            html2pdf()
+                .set(options)
+                .from(element)
+                .save()
+                .then(() => {
+                    // Show success message
+                    const successMessage = document.getElementById('successMessage');
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                    
+                    // Re-enable button and hide loading indicator
+                    loadingIndicator.classList.remove('show');
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Generate PDF';
+                })
+                .catch((error) => {
+                    console.error('PDF generation failed:', error);
+                    alert('Failed to generate PDF. Please try again.');
+                    
+                    // Re-enable button and hide loading indicator
+                    loadingIndicator.classList.remove('show');
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Generate PDF';
+                });
+        }
+        
+        function printDocument() {
+            if (!validateForm()) {
+                alert('Please fix the errors in the form before printing.');
+                return;
+            }
+            
+            updateDocument();
+            window.print();
+        }
+        
+        function resetForm() {
+            // Clear all fields
+            document.getElementById('date').value = '';
+            document.getElementById('caseType').value = '';
+            document.getElementById('crimeNumber').value = '';
+            document.getElementById('sections').value = '';
+            document.getElementById('chennaiCity').checked = true;
+            document.getElementById('district').value = '';
+            document.getElementById('policeStation').value = '';
+            document.getElementById('bankName').value = '';
+            document.getElementById('accountNumber').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('startDate').value = '';
+            
+            // Set default dates
+            setDefaultDates();
+            
+            // Clear error states
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.classList.remove('input-error');
+            });
+            
+            updateDocument();
+        }
+    </script>
+</body>
+</html>
