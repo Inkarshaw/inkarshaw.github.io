@@ -61,9 +61,15 @@
         
         .content {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 30px;
             margin-top: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr 1fr;
+            }
         }
         
         @media (max-width: 768px) {
@@ -169,6 +175,15 @@
         
         .btn-generate:hover {
             background: #5a9b6a;
+        }
+        
+        .btn-misc {
+            background: #6d4c7a;
+            color: white;
+        }
+        
+        .btn-misc:hover {
+            background: #7d5c8a;
         }
         
         .status-indicator {
@@ -312,7 +327,7 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value">28</div>
+                <div class="stat-value">29</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
@@ -553,6 +568,24 @@
                     </li>
                 </ul>
             </div>
+
+            <div class="card">
+                <h2><i>📂</i> Misc</h2>
+                <div class="search-info" id="miscInfo"></div>
+                <ul class="document-list" id="miscList">
+                    <li class="document-item" data-title="TN PSO" data-desc="Tamil Nadu Police Standing Orders documentation">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>TN PSO</div>
+                            <div class="doc-desc">Tamil Nadu Police Standing Orders documentation</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/pdf.pdf" target="_blank" class="btn btn-misc">
+                                <i>📄</i> View
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
         
         <footer>
@@ -589,7 +622,10 @@
             { title: "Monthly Activity Report", desc: "Compile monthly officer activity and statistics", type: "generate", element: null },
             { title: "Warrant Application", desc: "Create PDF warrant applications for judge review", type: "generate", element: null },
             { title: "Evidence Report", desc: "Generate detailed evidence analysis and findings report", type: "generate", element: null },
-            { title: "Subpoena Document", desc: "Create official subpoena documents for court proceedings", type: "generate", element: null }
+            { title: "Subpoena Document", desc: "Create official subpoena documents for court proceedings", type: "generate", element: null },
+            
+            // Misc
+            { title: "TN PSO", desc: "Tamil Nadu Police Standing Orders documentation", type: "misc", element: null }
         ];
 
         function downloadDocument(docName) {
@@ -623,11 +659,14 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const downloadFormsList = document.getElementById('downloadFormsList');
             const generatePDFsList = document.getElementById('generatePDFsList');
+            const miscList = document.getElementById('miscList');
             const downloadFormsInfo = document.getElementById('downloadFormsInfo');
             const generatePDFsInfo = document.getElementById('generatePDFsInfo');
+            const miscInfo = document.getElementById('miscInfo');
             
             let downloadFormsFound = 0;
             let generatePDFsFound = 0;
+            let miscFound = 0;
             
             // Search through download forms
             const downloadItems = downloadFormsList.querySelectorAll('.document-item');
@@ -677,10 +716,35 @@
                 }
             });
             
+            // Search through misc
+            const miscItems = miscList.querySelectorAll('.document-item');
+            miscItems.forEach(item => {
+                const title = item.getAttribute('data-title').toLowerCase();
+                const desc = item.getAttribute('data-desc').toLowerCase();
+                
+                if (searchTerm === '' || title.includes(searchTerm) || desc.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                    
+                    // Highlight search term in title and description
+                    if (searchTerm !== '') {
+                        const titleElement = item.querySelector('.doc-title');
+                        const descElement = item.querySelector('.doc-desc');
+                        
+                        titleElement.innerHTML = highlightText(titleElement.textContent, searchTerm);
+                        descElement.innerHTML = highlightText(descElement.textContent, searchTerm);
+                    }
+                    
+                    miscFound++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
             // Update search info
             if (searchTerm === '') {
                 downloadFormsInfo.textContent = '';
                 generatePDFsInfo.textContent = '';
+                miscInfo.textContent = '';
             } else {
                 downloadFormsInfo.textContent = downloadFormsFound > 0 ? 
                     `${downloadFormsFound} form${downloadFormsFound !== 1 ? 's' : ''} found` : 
@@ -689,6 +753,10 @@
                 generatePDFsInfo.textContent = generatePDFsFound > 0 ? 
                     `${generatePDFsFound} document${generatePDFsFound !== 1 ? 's' : ''} found` : 
                     'No documents found';
+                
+                miscInfo.textContent = miscFound > 0 ? 
+                    `${miscFound} item${miscFound !== 1 ? 's' : ''} found` : 
+                    'No items found';
             }
         }
         
@@ -785,6 +853,14 @@
             if (bankRequestBtn) {
                 bankRequestBtn.addEventListener('click', function() {
                     showNotification('Opening Bank Request Generator...');
+                });
+            }
+            
+            // Special handling for TN PSO
+            const tnPsoBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/pdf.pdf"]');
+            if (tnPsoBtn) {
+                tnPsoBtn.addEventListener('click', function() {
+                    showNotification('Opening TN PSO Document...');
                 });
             }
         });
