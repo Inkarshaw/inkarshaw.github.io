@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Warrant Document Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1100px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .form-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .preview-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .image-upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background-color: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .image-upload-area:hover {
+            background-color: #ecf7ff;
+            border-color: #2980b9;
+        }
+        
+        .image-upload-area i {
+            font-size: 48px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .image-preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background-color: white;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-info {
+            background-color: #9b59b6;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #8e44ad;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        /* Document Preview Styling */
+        .document-preview {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.4;
+            color: #000;
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            position: relative;
+            width: 794px; /* A4 width in pixels (210mm * 3.78) */
+            min-height: 1123px; /* A4 height in pixels (297mm * 3.78) */
+            margin: 0 auto;
+            transform-origin: top left;
+            transform: scale(0.7);
+        }
+        
+        /* For screen preview */
+        .preview-container {
+            width: 100%;
+            overflow: auto;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .document-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .document-subtitle {
+            font-size: 12px;
+            text-align: right;
+            margin-bottom: 15px;
+        }
+        
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 12px;
+        }
+        
+        .document-table td, .document-table th {
+            border: 1px solid #000;
+            padding: 3px 5px;
+            vertical-align: top;
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .document-footer {
+            margin-top: 80px;
+            text-align: right;
+        }
+        
+        .signature-line {
+            width: 250px;
+            border-top: 1px solid #000;
+            margin: 40px auto 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .preview-size-info {
+            text-align: center;
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+        
+        .preview-size-info i {
+            margin-right: 8px;
+        }
+        
+        #pdf-hidden {
+            position: fixed;
+            left: -9999px;
+            top: -9999px;
+            width: 794px;
+            min-height: 1123px;
+            background: white;
+            padding: 40px;
+            font-family: 'Times New Roman', serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-contract"></i> Legal Warrant Document Generator</h1>
+            <p>Fill in the form to generate a detention order in PDF format. All fields are required unless marked optional.</p>
+        </div>
+        
+        <div class="form-section">
+            <h2 class="section-title"><i class="fas fa-edit"></i> Document Details</h2>
+            
+            <div class="form-group">
+                <label for="caseNumber" class="required">Case Number</label>
+                <input type="text" id="caseNumber" placeholder="e.g., G7 PS Cr No. 226/2025" value="G7 PS Cr No. 226/2025">
+            </div>
+            
+            <div class="form-group">
+                <label for="policeStation" class="required">Police Station</label>
+                <input type="text" id="policeStation" placeholder="e.g., G7 Chetpet L&O" value="G7 Chetpet L&O">
+            </div>
+            
+            <div class="form-group">
+                <label for="accusedName" class="required">Accused Name</label>
+                <input type="text" id="accusedName" placeholder="e.g., Ruswell" value="Ruswell">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="accusedAge" class="required">Age</label>
+                    <input type="number" id="accusedAge" placeholder="e.g., 22" value="22">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fatherName" class="required">Father's Name</label>
+                    <input type="text" id="fatherName" placeholder="e.g., Sabu" value="Sabu">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="maritalStatus" class="required">Marital Status</label>
+                    <select id="maritalStatus">
+                        <option value="Un Married">Un Married</option>
+                        <option value="Married">Married</option>
+                        <option value="Divorced">Divorced</option>
+                        <option value="Widowed">Widowed</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="religion" class="required">Religion</label>
+                    <input type="text" id="religion" placeholder="e.g., Christian" value="Christian">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="caste" class="required">Caste</label>
+                <input type="text" id="caste" placeholder="e.g., BC" value="BC">
+            </div>
+            
+            <div class="form-group">
+                <label for="occupation" class="required">Occupation</label>
+                <input type="text" id="occupation" placeholder="e.g., Medical Billing" value="Medical Billing">
+            </div>
+            
+            <div class="form-group">
+                <label for="offenseSection" class="required">Offense Section</label>
+                <input type="text" id="offenseSection" placeholder="e.g., section 8(C) r/w 22(b) NDPS Act" value="section 8(C) r/w 22(b) NDPS Act">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="detentionDays" class="required">Detention Days</label>
+                    <input type="number" id="detentionDays" placeholder="e.g., 15" value="15">
+                </div>
+                
+                <div class="form-group">
+                    <label for="productionDay" class="required">Production Day</label>
+                    <input type="number" id="productionDay" placeholder="e.g., 16" value="16">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="productionMonth" class="required">Production Month</label>
+                    <select id="productionMonth">
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July" selected>July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="courtName" class="required">Court Name</label>
+                    <input type="text" id="courtName" placeholder="e.g., NDPS PJ Court / Chennai" value="NDPS PJ Court / Chennai">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="prisonPlace" class="required">Prison Location</label>
+                <input type="text" id="prisonPlace" placeholder="e.g., Puzhal, Chennai" value="Puzhal, Chennai">
+            </div>
+            
+            <div class="form-group">
+                <label for="descriptiveMarks" class="required">Descriptive Marks</label>
+                <textarea id="descriptiveMarks" rows="4">1) tyJ cs;s';ifapy; xU[ kr;rk;
+2) KJfpd; eLgFjpapy; xU kr;rk;
+3) tyJ fhy; ghj;jpy; xU kr;rk;</textarea>
+            </div>
+            
+            <h3 class="section-title"><i class="fas fa-image"></i> Accused Photograph</h3>
+            
+            <div class="form-group">
+                <label for="imageUpload">Upload Accused Image (Optional)</label>
+                <div class="image-upload-area" id="imageUploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click to upload or drag and drop</p>
+                    <p>JPG, PNG or GIF (Max. 2MB)</p>
+                    <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                </div>
+                <div class="image-preview" id="imagePreview"></div>
+                <div class="error-message" id="imageError"></div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="downloadPdfBtn">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+                <button class="btn btn-info" id="printBtn">
+                    <i class="fas fa-print"></i> Print Document
+                </button>
+                <button class="btn btn-secondary" id="previewBtn">
+                    <i class="fas fa-eye"></i> Update Preview
+                </button>
+                <button class="btn btn-danger" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset Form
+                </button>
+            </div>
+            
+            <div class="error-message" id="formError"></div>
+        </div>
+        
+        <div class="preview-section">
+            <h2 class="section-title"><i class="fas fa-file-alt"></i> Document Preview (A4 Size)</h2>
+            <div class="preview-size-info">
+                <i class="fas fa-info-circle"></i> This preview shows the exact A4 size (210mm × 297mm) layout
+            </div>
+            <div class="preview-container">
+                <div class="document-preview" id="documentPreview">
+                    <!-- Preview will be generated here -->
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>This preview shows exactly how the document will appear when printed or saved as PDF in A4 format.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden div for PDF generation -->
+    <div id="pdf-hidden"></div>
+
+    <script>
+        // DOM elements
+        const caseNumberInput = document.getElementById('caseNumber');
+        const policeStationInput = document.getElementById('policeStation');
+        const accusedNameInput = document.getElementById('accusedName');
+        const accusedAgeInput = document.getElementById('accusedAge');
+        const fatherNameInput = document.getElementById('fatherName');
+        const maritalStatusInput = document.getElementById('maritalStatus');
+        const religionInput = document.getElementById('religion');
+        const casteInput = document.getElementById('caste');
+        const occupationInput = document.getElementById('occupation');
+        const offenseSectionInput = document.getElementById('offenseSection');
+        const detentionDaysInput = document.getElementById('detentionDays');
+        const productionDayInput = document.getElementById('productionDay');
+        const productionMonthInput = document.getElementById('productionMonth');
+        const courtNameInput = document.getElementById('courtName');
+        const prisonPlaceInput = document.getElementById('prisonPlace'); // NEW
+        const descriptiveMarksInput = document.getElementById('descriptiveMarks');
+        const imageUploadInput = document.getElementById('imageUpload');
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageError = document.getElementById('imageError');
+        const formError = document.getElementById('formError');
+        
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        const printBtn = document.getElementById('printBtn');
+        const previewBtn = document.getElementById('previewBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const documentPreview = document.getElementById('documentPreview');
+        const pdfHidden = document.getElementById('pdf-hidden');
+        
+        // Store uploaded image as base64
+        let uploadedImage = null;
+        
+        // Event listeners
+        imageUploadArea.addEventListener('click', () => imageUploadInput.click());
+        imageUploadInput.addEventListener('change', handleImageUpload);
+        previewBtn.addEventListener('click', updatePreview);
+        downloadPdfBtn.addEventListener('click', downloadPDF);
+        printBtn.addEventListener('click', printDocument);
+        resetBtn.addEventListener('click', resetForm);
+        
+        // Initialize preview on page load
+        document.addEventListener('DOMContentLoaded', updatePreview);
+        
+        // Handle image upload
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            imageError.textContent = '';
+            
+            if (!file) return;
+            
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                imageError.textContent = 'Please upload a valid image file (JPG, PNG, or GIF)';
+                return;
+            }
+            
+            // Validate file size (2MB max)
+            if (file.size > 2 * 1024 * 1024) {
+                imageError.textContent = 'File size must be less than 2MB';
+                return;
+            }
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedImage = e.target.result;
+                imagePreview.innerHTML = `<img src="${uploadedImage}" alt="Accused Photograph">`;
+                updatePreview(); // Update preview with new image
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Function to get ordinal suffix (st, nd, rd, th)
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return 'th'; // 11th, 12th, 13th, etc.
+            switch (day % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        }
+        
+        // Format date with ordinal suffix
+        function formatDateWithOrdinal(day, month, year) {
+            return `${day}${getOrdinalSuffix(day)} of ${month} ${year}`;
+        }
+        
+        // Create document HTML for preview
+        function createPreviewHTML() {
+            // Get current date
+            const now = new Date();
+            const currentDay = now.getDate();
+            const currentMonth = now.toLocaleString('default', { month: 'long' });
+            const currentYear = now.getFullYear();
+            
+            // Format date with correct ordinal suffix
+            const formattedDate = formatDateWithOrdinal(currentDay, currentMonth, currentYear);
+            
+            return `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 14px; text-decoration: underline;">Judicial Form No.14</div>
+                    <div style="font-size: 12px;">(Sec Rule 6(8))</div>
+                </div>
+                
+                <div class="document-title">FORM OF ORDER FOR THE DETENTION IN CUSTODY OF AN ACCUSED PERSON</div>
+                <div style="text-align: center; font-size: 12px; margin-bottom: 15px;">(SECTION 187(ii) BNSS)</div>
+                
+                <table class="document-table">
+                    <tr>
+                        <td width="70%">${caseNumberInput.value}<br>Police Station: ${policeStationInput.value}</td>
+                        <td width="30%"></td>
+                    </tr>
+                </table>
+                
+                <p><strong>To</strong><br>
+                The Superintendent Central Prison, ${prisonPlaceInput.value}</p>
+                
+                <p style="text-align: justify; text-justify: inter-word; margin: 20px 0; line-height: 1.5;">
+                    Whereas it appears that a Charge against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> of an offence under ${offenseSectionInput.value} under investigation the police under the provision of Chapter XIII of the Bharathiya Nagarik Suraksha Sanhitha 2023, that such investigation cannot be completed within that period of 24 hours fixed by section 58 and that there are grounds of before that the accusation/information against the said person is well and the accused having been dully forwarded to this court, this authorize you to detain them against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> In custody for <strong>${detentionDaysInput.value}</strong> days and cause him to be produced before the ${courtNameInput.value} on the <strong>${productionDayInput.value}</strong> day of <strong>${productionMonthInput.value}</strong> ${currentYear} at 10.00 'o' clock.
+                </p>
+                
+                <div class="document-title">DESCRIPTIVE ROLL</div>
+                
+                <table class="document-table">
+                    <tr>
+                        <td width="30%">Name</td>
+                        <td width="40%"><strong>${accusedNameInput.value}</strong></td>
+                        <td rowspan="6" width="30%" style="text-align: center; vertical-align: middle; padding: 1px;">
+                            <div style="width: 100%; height: 160px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0; margin: 0;">
+                                ${uploadedImage ? `<img src="${uploadedImage}" class="preview-image" alt="Accused Photograph">` : '<div style="color: #888; font-style: italic; padding: 5px;">[Photograph]</div>'}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Father's Name</td>
+                        <td><strong>${fatherNameInput.value}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Sex, Married or single</td>
+                        <td><strong>${maritalStatusInput.value}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Race, Religion and Caste</td>
+                        <td><strong>${religionInput.value}<br>${casteInput.value}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Previous Occupation</td>
+                        <td><strong>${occupationInput.value}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Aged</td>
+                        <td><strong>${accusedAgeInput.value}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Descriptive Mark's</td>
+                        <td colspan="2">${descriptiveMarksInput.value.replace(/\n/g, '<br>')}</td>
+                    </tr>
+                </table>
+                
+                <div class="document-footer">
+                    <p>Given under my hand and the seal of the Court this ${formattedDate}</p>
+                    <div class="signature-line"></div>
+                    <p>Court Seal</p>
+                    <p><strong>II METROPOLITAN MAGISTRATE</strong><br>
+                    EGMORE, CHENNAI-08</p>
+                </div>
+            `;
+        }
+        
+        // Create document HTML for PDF (with optimized styling)
+        function createPDFHTML() {
+            // Get current date
+            const now = new Date();
+            const currentDay = now.getDate();
+            const currentMonth = now.toLocaleString('default', { month: 'long' });
+            const currentYear = now.getFullYear();
+            
+            // Format date with correct ordinal suffix
+            const formattedDate = formatDateWithOrdinal(currentDay, currentMonth, currentYear);
+            
+            return `
+                <div style="font-family: 'Times New Roman', serif; line-height: 1.4; color: #000; padding: 40px; width: 100%;">
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <div style="font-size: 16px; text-decoration: underline; font-weight: bold;">Judicial Form No.14</div>
+                        <div style="font-size: 14px;">(Sec Rule 6(8))</div>
+                    </div>
+                    
+                    <div style="text-align: center; font-size: 20px; font-weight: bold; text-decoration: underline; margin-bottom: 20px; text-transform: uppercase;">
+                        FORM OF ORDER FOR THE DETENTION IN CUSTODY OF AN ACCUSED PERSON
+                    </div>
+                    <div style="text-align: center; font-size: 14px; margin-bottom: 25px;">
+                        (SECTION 187(ii) BNSS)
+                    </div>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; border: 1px solid #000;">
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 6px; width: 70%;">${caseNumberInput.value}<br>Police Station: ${policeStationInput.value}</td>
+                            <td style="border: 1px solid #000; padding: 4px 6px; width: 30%;"></td>
+                        </tr>
+                    </table>
+                    
+                    <p><strong>To</strong><br>
+                    The Superintendent Central Prison, ${prisonPlaceInput.value}</p>
+                    
+                    <p style="text-align: justify; text-justify: inter-word; margin: 25px 0; line-height: 1.5; font-size: 13px;">
+                        Whereas it appears that a Charge against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> of an offence under ${offenseSectionInput.value} under investigation the police under the provision of Chapter XIII of the Bharathiya Nagarik Suraksha Sanhitha 2023, that such investigation cannot be completed within that period of 24 hours fixed by section 58 and that there are grounds of before that the accusation/information against the said person is well and the accused having been dully forwarded to this court, this authorize you to detain them against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> In custody for <strong>${detentionDaysInput.value}</strong> days and cause him to be produced before the ${courtNameInput.value} on the <strong>${productionDayInput.value}</strong> day of <strong>${productionMonthInput.value}</strong> ${currentYear} at 10.00 'o' clock.
+                    </p>
+                    
+                    <div style="text-align: center; font-size: 20px; font-weight: bold; text-decoration: underline; margin: 40px 0 25px 0; text-transform: uppercase;">
+                        DESCRIPTIVE ROLL
+                    </div>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 13px; border: 1px solid #000;">
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 6px; width: 30%; height: 28px;">Name</td>
+                            <td style="border: 1px solid #000; padding: 4px 6px; width: 40%; height: 28px;"><strong>${accusedNameInput.value}</strong></td>
+                            <td rowspan="6" style="border: 1px solid #000; width: 30%; text-align: center; vertical-align: middle; padding: 0;">
+                                <div style="width: 100%; height: 168px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0; margin: 0;">
+                                    ${uploadedImage ? `<img src="${uploadedImage}" style="width: 100%; height: 100%; object-fit: fill;" alt="Accused Photograph">` : '<div style="color: #888; font-style: italic; padding: 5px;">[Photograph]</div>'}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Father's Name</td>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${fatherNameInput.value}</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Sex, Married or single</td>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${maritalStatusInput.value}</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Race, Religion and Caste</td>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${religionInput.value}<br>${casteInput.value}</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Previous Occupation</td>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${occupationInput.value}</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Aged</td>
+                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${accusedAgeInput.value}</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 6px 8px;">Descriptive Mark's</td>
+                            <td colspan="2" style="border: 1px solid #000; padding: 6px 8px;">${descriptiveMarksInput.value.replace(/\n/g, '<br>')}</td>
+                        </tr>
+                    </table>
+                    
+                    <div style="margin-top: 80px; text-align: right;">
+                        <p>Given under my hand and the seal of the Court this ${formattedDate}</p>
+                        <div style="width: 250px; border-top: 1px solid #000; margin: 40px auto 10px;"></div>
+                        <p>Court Seal</p>
+                        <p><strong>II METROPOLITAN MAGISTRATE</strong><br>
+                        EGMORE, CHENNAI-08</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Update the preview
+        function updatePreview() {
+            // Validate required fields
+            const errors = validateForm();
+            if (errors.length > 0) {
+                formError.textContent = 'Please fill in all required fields: ' + errors.join(', ');
+                return;
+            }
+            
+            formError.textContent = '';
+            
+            // Update preview
+            documentPreview.innerHTML = createPreviewHTML();
+        }
+        
+        // Validate form
+        function validateForm() {
+            const errors = [];
+            const requiredFields = [
+                { input: caseNumberInput, name: 'Case Number' },
+                { input: policeStationInput, name: 'Police Station' },
+                { input: accusedNameInput, name: 'Accused Name' },
+                { input: accusedAgeInput, name: 'Age' },
+                { input: fatherNameInput, name: 'Father\'s Name' },
+                { input: offenseSectionInput, name: 'Offense Section' },
+                { input: detentionDaysInput, name: 'Detention Days' },
+                { input: productionDayInput, name: 'Production Day' },
+                { input: courtNameInput, name: 'Court Name' },
+                { input: prisonPlaceInput, name: 'Prison Place' }, // NEW
+                { input: descriptiveMarksInput, name: 'Descriptive Marks' }
+            ];
+            
+            requiredFields.forEach(field => {
+                if (!field.input.value.trim()) {
+                    errors.push(field.name);
+                }
+            });
+            
+            return errors;
+        }
+        
+        // Download PDF function
+        async function downloadPDF() {
+            // Validate form first
+            const errors = validateForm();
+            if (errors.length > 0) {
+                formError.textContent = 'Please fill in all required fields: ' + errors.join(', ');
+                return;
+            }
+            
+            formError.textContent = '';
+            
+            // Show loading state
+            const originalText = downloadPdfBtn.innerHTML;
+            downloadPdfBtn.innerHTML = '<div class="loading"></div> Creating PDF...';
+            downloadPdfBtn.disabled = true;
+            
+            try {
+                // Update hidden div with PDF content
+                pdfHidden.innerHTML = createPDFHTML();
+                
+                // Use html2canvas to capture the content
+                const canvas = await html2canvas(pdfHidden, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    width: 794, // A4 width in pixels
+                    height: pdfHidden.scrollHeight
+                });
+                
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Calculate dimensions
+                const imgWidth = 210; // A4 width in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                // Add image to PDF
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                
+                // Save PDF
+                const fileName = `Warrant_${caseNumberInput.value.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+                pdf.save(fileName);
+                
+                // Restore button state
+                downloadPdfBtn.innerHTML = originalText;
+                downloadPdfBtn.disabled = false;
+                
+                // Show success message
+                showSuccessMessage('PDF downloaded successfully!');
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                downloadPdfBtn.innerHTML = originalText;
+                downloadPdfBtn.disabled = false;
+                formError.textContent = 'Error generating PDF. Please try again.';
+                
+                // Fallback: Open print dialog
+                setTimeout(() => {
+                    if (confirm('PDF generation failed. Would you like to print the document instead?')) {
+                        printDocument();
+                    }
+                }, 100);
+            }
+        }
+        
+        // Print document function
+        function printDocument() {
+            // Validate form first
+            const errors = validateForm();
+            if (errors.length > 0) {
+                formError.textContent = 'Please fill in all required fields: ' + errors.join(', ');
+                return;
+            }
+            
+            formError.textContent = '';
+            
+            // Show loading state
+            const originalText = printBtn.innerHTML;
+            printBtn.innerHTML = '<div class="loading"></div> Preparing...';
+            printBtn.disabled = true;
+            
+            // Create print window
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                printBtn.innerHTML = originalText;
+                printBtn.disabled = false;
+                formError.textContent = 'Popup blocked. Please allow popups for printing.';
+                return;
+            }
+            
+            // Create print document
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Legal Warrant Document</title>
+                    <style>
+                        @media print {
+                            @page {
+                                size: A4;
+                                margin: 20mm;
+                            }
+                            body {
+                                font-family: 'Times New Roman', serif;
+                                line-height: 1.4;
+                                margin: 0;
+                                padding: 0;
+                            }
+                        }
+                        body {
+                            font-family: 'Times New Roman', serif;
+                            line-height: 1.4;
+                            padding: 30px;
+                            max-width: 210mm;
+                            margin: 0 auto;
+                        }
+                        .document-title {
+                            text-align: center;
+                            font-size: 18px;
+                            font-weight: bold;
+                            text-decoration: underline;
+                            margin-bottom: 20px;
+                            text-transform: uppercase;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 20px 0;
+                            font-size: 13px;
+                        }
+                        td, th {
+                            border: 1px solid #000;
+                            padding: 4px 6px;
+                            vertical-align: top;
+                        }
+                        .justify-text {
+                            text-align: justify;
+                            text-justify: inter-word;
+                            margin: 20px 0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${createPDFHTML()}
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.open();
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load, then print
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.onafterprint = function() {
+                        printWindow.close();
+                        printBtn.innerHTML = originalText;
+                        printBtn.disabled = false;
+                        showSuccessMessage('Document sent to printer!');
+                    };
+                }, 500);
+            };
+        }
+        
+        // Show success message
+        function showSuccessMessage(message) {
+            const successMsg = document.createElement('div');
+            successMsg.innerHTML = `<div style="background-color:#2ecc71; color:white; padding:10px; border-radius:5px; margin-top:15px; text-align:center;">
+                <i class="fas fa-check-circle"></i> ${message}
+            </div>`;
+            formError.parentNode.insertBefore(successMsg, formError.nextSibling);
+            
+            // Remove message after 3 seconds
+            setTimeout(() => successMsg.remove(), 3000);
+        }
+        
+        // Reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to reset all fields?')) {
+                caseNumberInput.value = 'G7 PS Cr No. 226/2025';
+                policeStationInput.value = 'G7 Chetpet L&O';
+                accusedNameInput.value = 'Ruswell';
+                accusedAgeInput.value = '22';
+                fatherNameInput.value = 'Sabu';
+                maritalStatusInput.value = 'Un Married';
+                religionInput.value = 'Christian';
+                casteInput.value = 'BC';
+                occupationInput.value = 'Medical Billing';
+                offenseSectionInput.value = 'section 8(C) r/w 22(b) NDPS Act';
+                detentionDaysInput.value = '15';
+                productionDayInput.value = '16';
+                productionMonthInput.value = 'July';
+                courtNameInput.value = 'NDPS PJ Court / Chennai';
+                prisonPlaceInput.value = 'Puzhal, Chennai'; // Reset to default
+                descriptiveMarksInput.value = `1) tyJ cs;s';ifapy; xU[ kr;rk;
+2) KJfpd; eLgFjpapy; xU kr;rk;
+3) tyJ fhy; ghj;jpy; xU kr;rk;`;
+                
+                // Clear image
+                uploadedImage = null;
+                imagePreview.innerHTML = '';
+                imageUploadInput.value = '';
+                imageError.textContent = '';
+                formError.textContent = '';
+                
+                // Update preview
+                updatePreview();
+            }
+        }
+    </script>
+</body>
+</html>
