@@ -212,6 +212,18 @@
             background-color: #2f855a;
         }
         
+        .btn-link {
+            background-color: var(--success-color);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-link:hover {
+            background-color: #2f855a;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
         .status-badge {
             display: inline-block;
             padding: 4px 10px;
@@ -282,134 +294,6 @@
         .no-results p {
             color: var(--secondary-color);
         }
-        
-        /* Quick Preview Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background-color: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: modalFadeIn 0.3s ease;
-        }
-        
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--secondary-color);
-            transition: var(--transition);
-        }
-        
-        .close-modal:hover {
-            color: var(--danger-color);
-        }
-        
-        .modal-body {
-            padding: 20px 0;
-        }
-        
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #1a202c;
-        }
-        
-        .external-link-btn {
-            background-color: var(--success-color);
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 25px;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-        }
-        
-        .external-link-btn:hover {
-            background-color: #2f855a;
-            transform: translateY(-2px);
-            color: white;
-        }
-        
-        .preview-info {
-            background-color: var(--light-color);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--accent-color);
-        }
-        
-        .preview-info h4 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-        
-        .preview-info p {
-            color: var(--secondary-color);
-            margin-bottom: 5px;
-        }
     </style>
 </head>
 <body>
@@ -458,7 +342,7 @@
                 <a href="pt-warrant.html" class="btn btn-success">Create Document</a>
             </div>
             
-            <!-- ESCORT PASSPORT CARD WITH EXTERNAL LINK -->
+            <!-- ESCORT PASSPORT CARD WITH DIRECT EXTERNAL LINK -->
             <div class="passport-card" data-search="escort accused persons" id="escortPassportCard">
                 <div class="passport-icon">
                     <i class="fas fa-shield-alt"></i>
@@ -466,7 +350,9 @@
                 <h3 class="passport-title">Escort Passport</h3>
                 <p class="passport-description">Passport for escorting accused persons</p>
                 <div class="status-badge status-available">Available</div>
-                <button class="btn btn-success" id="escortPassportBtn">Create Document</button>
+                <a href="https://www.clearexams.online/policepassportgenerator/escort_passport.html" class="btn btn-success" target="_blank">
+                    Create Document
+                </a>
             </div>
             
             <div class="passport-card" data-search="sick passport personnel">
@@ -532,42 +418,6 @@
         
         <div id="notification" class="notification"></div>
     </div>
-    
-    <!-- QUICK PREVIEW MODAL FOR ESCORT PASSPORT -->
-    <div class="modal-overlay" id="previewModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title"><i class="fas fa-external-link-alt"></i> External Escort Passport</h2>
-                <button class="close-modal" id="closePreviewModal">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="preview-info">
-                    <h4>About Escort Passport</h4>
-                    <p>The Escort Passport is used for safely transporting accused persons between locations.</p>
-                    <p><strong>Features:</strong></p>
-                    <p>• Officer and accused details</p>
-                    <p>• Route information (from/to locations)</p>
-                    <p>• Escort team details</p>
-                    <p>• Vehicle information</p>
-                    <p>• Special instructions</p>
-                </div>
-                
-                <p>You are about to be redirected to the external Escort Passport Generator. This tool provides advanced features for creating professional escort documents.</p>
-                
-                <div class="preview-info">
-                    <p><strong>Note:</strong> Your current form data will be saved automatically before redirecting.</p>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn btn-secondary" id="cancelRedirect">Cancel</button>
-                <a href="https://www.clearexams.online/policepassportgenerator/escort_passport.html" target="_blank" class="external-link-btn" id="confirmRedirect">
-                    <i class="fas fa-external-link-alt"></i> Go to Escort Passport Generator
-                </a>
-            </div>
-        </div>
-    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -576,13 +426,6 @@
             const clearSearch = document.getElementById('clearSearch');
             const passportCards = document.querySelectorAll('.passport-card');
             const passportContainer = document.getElementById('passportContainer');
-            
-            // Preview Modal Elements
-            const previewModal = document.getElementById('previewModal');
-            const escortPassportBtn = document.getElementById('escortPassportBtn');
-            const closePreviewModalBtn = document.getElementById('closePreviewModal');
-            const cancelRedirectBtn = document.getElementById('cancelRedirect');
-            const confirmRedirectLink = document.getElementById('confirmRedirect');
             
             function showNotification(message, type) {
                 notification.textContent = message;
@@ -633,106 +476,13 @@
                 }
             }
             
-            // Event listeners for search
+            // Event listeners
             searchInput.addEventListener('input', filterPassports);
             
             clearSearch.addEventListener('click', function() {
                 searchInput.value = '';
                 filterPassports();
                 searchInput.focus();
-            });
-            
-            // Escort Passport External Link Functionality
-            function openPreviewModal() {
-                previewModal.style.display = 'flex';
-                // Save any existing form data before redirecting
-                saveCurrentFormData();
-            }
-            
-            function closePreviewModal() {
-                previewModal.style.display = 'none';
-            }
-            
-            // Save current form data to localStorage for continuity
-            function saveCurrentFormData() {
-                // Check if there's any form data to save from other pages
-                const existingData = localStorage.getItem('policePassportFormData');
-                if (existingData) {
-                    try {
-                        const formData = JSON.parse(existingData);
-                        if (formData.passportType) {
-                            // Create a backup before redirecting
-                            localStorage.setItem('policePassportFormData_backup', existingData);
-                            console.log('Form data backed up before redirecting to external page');
-                        }
-                    } catch (e) {
-                        console.error('Error parsing saved form data:', e);
-                    }
-                }
-                
-                // Also save the redirect information
-                const redirectInfo = {
-                    lastRedirect: new Date().toISOString(),
-                    destination: 'escort_passport.html',
-                    source: 'main_dashboard'
-                };
-                localStorage.setItem('lastRedirectInfo', JSON.stringify(redirectInfo));
-            }
-            
-            // Check for returning users from external page
-            function checkForReturningUser() {
-                const redirectInfo = localStorage.getItem('lastRedirectInfo');
-                if (redirectInfo) {
-                    try {
-                        const info = JSON.parse(redirectInfo);
-                        const now = new Date();
-                        const redirectTime = new Date(info.lastRedirect);
-                        const timeDiff = Math.abs(now - redirectTime) / 1000 / 60; // Difference in minutes
-                        
-                        // If user returned within 10 minutes, show welcome back message
-                        if (timeDiff < 10 && info.destination === 'escort_passport.html') {
-                            showNotification('Welcome back from the Escort Passport Generator!', 'success');
-                            
-                            // Check if there's backup data to restore
-                            const backupData = localStorage.getItem('policePassportFormData_backup');
-                            if (backupData) {
-                                localStorage.setItem('policePassportFormData', backupData);
-                                localStorage.removeItem('policePassportFormData_backup');
-                            }
-                        }
-                        
-                        // Clear redirect info after checking
-                        localStorage.removeItem('lastRedirectInfo');
-                    } catch (e) {
-                        console.error('Error parsing redirect info:', e);
-                    }
-                }
-            }
-            
-            // Event listeners for escort passport
-            escortPassportBtn.addEventListener('click', openPreviewModal);
-            closePreviewModalBtn.addEventListener('click', closePreviewModal);
-            cancelRedirectBtn.addEventListener('click', closePreviewModal);
-            
-            // Close modal when clicking outside
-            previewModal.addEventListener('click', function(e) {
-                if (e.target === previewModal) {
-                    closePreviewModal();
-                }
-            });
-            
-            // Add click tracking to the external link
-            confirmRedirectLink.addEventListener('click', function() {
-                // Track the click in localStorage
-                const clickData = {
-                    timestamp: new Date().toISOString(),
-                    action: 'external_redirect',
-                    destination: 'escort_passport.html'
-                };
-                localStorage.setItem('externalRedirect', JSON.stringify(clickData));
-                
-                // Show notification
-                showNotification('Redirecting to Escort Passport Generator...', 'success');
             });
             
             // Check if user came from a specific passport page
@@ -754,8 +504,22 @@
                 }
             }
             
-            // Check for returning users from external pages
-            checkForReturningUser();
+            // Add click tracking for the Escort Passport link
+            const escortLink = document.querySelector('#escortPassportCard .btn');
+            if (escortLink) {
+                escortLink.addEventListener('click', function(e) {
+                    // Track the click
+                    const clickData = {
+                        timestamp: new Date().toISOString(),
+                        action: 'external_redirect',
+                        destination: 'escort_passport.html'
+                    };
+                    localStorage.setItem('externalRedirect', JSON.stringify(clickData));
+                    
+                    // Optional: Show a brief notification (commented out as per request)
+                    // showNotification('Opening Escort Passport Generator...', 'success');
+                });
+            }
             
             // Add keyboard shortcuts
             document.addEventListener('keydown', function(e) {
@@ -763,11 +527,6 @@
                 if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
                     e.preventDefault();
                     searchInput.focus();
-                }
-                
-                // Escape to close modal
-                if (e.key === 'Escape' && previewModal.style.display === 'flex') {
-                    closePreviewModal();
                 }
                 
                 // Enter to submit search
@@ -786,22 +545,6 @@
                 card.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0)';
                     this.style.borderColor = 'transparent';
-                });
-            });
-            
-            // Add click tracking for analytics
-            document.querySelectorAll('.passport-card a, .passport-card button').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const card = this.closest('.passport-card');
-                    const title = card.querySelector('.passport-title').textContent;
-                    
-                    const clickData = {
-                        timestamp: new Date().toISOString(),
-                        passportType: title,
-                        action: this.tagName === 'A' ? 'internal_link' : 'external_modal'
-                    };
-                    
-                    localStorage.setItem('passportClick_' + Date.now(), JSON.stringify(clickData));
                 });
             });
         });
