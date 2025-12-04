@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tnpsc General Science - ClearExams.online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f9ff;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+            border-bottom: 3px solid #0ea5e9;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        
+        .logo-text .tagline {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .back-btn {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: #bae6fd;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, #0284c7, #0ea5e9);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 50px;
+        }
+        
+        .page-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .page-header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        /* Subtopics Grid */
+        .subtopics-section {
+            padding: 30px 0 80px;
+        }
+        
+        .section-title {
+            font-size: 2.2rem;
+            color: #1e293b;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .subtopics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .subtopic-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 5px solid #0ea5e9;
+        }
+        
+        .subtopic-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .subtopic-icon {
+            width: 70px;
+            height: 70px;
+            background-color: #e0f2fe;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: #0284c7;
+            font-size: 1.8rem;
+        }
+        
+        .subtopic-card h3 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+        
+        .subtopic-card p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        
+        .study-materials {
+            background-color: #f0f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .study-materials h4 {
+            color: #0369a1;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .materials-list {
+            list-style: none;
+        }
+        
+        .materials-list li {
+            padding: 10px 0;
+            color: #475569;
+            border-bottom: 1px solid #bae6fd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .materials-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .materials-list li i {
+            color: #0ea5e9;
+        }
+        
+        .practice-btn {
+            display: inline-block;
+            background-color: #0ea5e9;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        
+        .practice-btn:hover {
+            background-color: #0284c7;
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            padding: 40px 0;
+            margin-top: 60px;
+            text-align: center;
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0 40px;
+            color: #64748b;
+        }
+        
+        .breadcrumb a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .page-header p {
+                font-size: 1.1rem;
+                padding: 0 15px;
+            }
+            
+            .subtopics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>ClearExams.online</h1>
+                    <div class="tagline">tnpsc General Science</div>
+                </div>
+            </a>
+            <button class="back-btn" onclick="window.location.href='tnpsc-topics.html'">
+                <i class="fas fa-arrow-left"></i> Back to Topics
+            </button>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>General Science</h1>
+            <p>Complete coverage of Physical, Human, Economic General Science of India and World, Environmental Issues, and Disaster Management for tnpsc Civil Services Examination.</p>
+        </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="index.html">Home</a> <i class="fas fa-chevron-right"></i>
+            <a href="tnpsc-topics.html">tnpsc Topics</a> <i class="fas fa-chevron-right"></i>
+            <span>General Science</span>
+        </div>
+    </div>
+
+    <!-- Subtopics Section -->
+    <section class="subtopics-section">
+        <div class="container">
+            <h2 class="section-title">Detailed Subtopics</h2>
+            <div class="subtopics-grid">
+                <!-- Physical General Science -->
+                <div class="subtopic-card">
+                    <div class="subtopic-icon">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <h3>Physical General Science</h3>
+                    <p>Geomorphology, Climatology, Oceanography, BioGeneral Science, and Environmental General Science.</p>
+                    
+                    <div class="study-materials">
+                        <h4>Study Materials:</h4>
+                        <ul class="materials-list">
+                            <li><i class="fas fa-file-pdf"></i> Complete Notes PDF</li>
+                            <li><i class="fas fa-video"></i> Video Lectures (12 hours)</li>
+                            <li><i class="fas fa-map"></i> Physical Features Maps</li>
+                            <li><i class="fas fa-book"></i> NCERT Based Notes</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="#" class="practice-btn">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </a>
+                </div>
+
+                <!-- Indian General Science -->
+                <div class="subtopic-card">
+                    <div class="subtopic-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3>Indian General Science</h3>
+                    <p>Physical features, climate, soil, vegetation, agriculture, minerals, and industries of India.</p>
+                    
+                    <div class="study-materials">
+                        <h4>Study Materials:</h4>
+                        <ul class="materials-list">
+                            <li><i class="fas fa-file-pdf"></i> Complete Notes PDF</li>
+                            <li><i class="fas fa-video"></i> Video Lectures (10 hours)</li>
+                            <li><i class="fas fa-map"></i> State-wise Analysis</li>
+                            <li><i class="fas fa-book"></i> Resource Distribution</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="#" class="practice-btn">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </a>
+                </div>
+
+                <!-- World General Science -->
+                <div class="subtopic-card">
+                    <div class="subtopic-icon">
+                        <i class="fas fa-globe-asia"></i>
+                    </div>
+                    <h3>World General Science</h3>
+                    <p>Major physical features, climate zones, resources, and geographical phenomena worldwide.</p>
+                    
+                    <div class="study-materials">
+                        <h4>Study Materials:</h4>
+                        <ul class="materials-list">
+                            <li><i class="fas fa-file-pdf"></i> Complete Notes PDF</li>
+                            <li><i class="fas fa-video"></i> Video Lectures (8 hours)</li>
+                            <li><i class="fas fa-map"></i> World Maps & Atlases</li>
+                            <li><i class="fas fa-book"></i> Continent-wise Analysis</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="#" class="practice-btn">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </a>
+                </div>
+
+                <!-- Human General Science -->
+                <div class="subtopic-card">
+                    <div class="subtopic-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Human General Science</h3>
+                    <p>Population, migration, settlements, urbanization, and cultural General Science patterns.</p>
+                    
+                    <div class="study-materials">
+                        <h4>Study Materials:</h4>
+                        <ul class="materials-list">
+                            <li><i class="fas fa-file-pdf"></i> Complete Notes PDF</li>
+                            <li><i class="fas fa-video"></i> Video Lectures (6 hours)</li>
+                            <li><i class="fas fa-chart-bar"></i> Demographic Data</li>
+                            <li><i class="fas fa-book"></i> Settlement Patterns</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="#" class="practice-btn">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </a>
+                </div>
+
+                <!-- Economic General Science -->
+                <div class="subtopic-card">
+                    <div class="subtopic-icon">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <h3>Economic General Science</h3>
+                    <p>Agriculture, industries, transportation, trade, and regional development patterns.</p>
+                    
+                    <div class="study-materials">
+                        <h4>Study Materials:</h4>
+                        <ul class="materials-list">
+                            <li><i class="fas fa-file-pdf"></i> Complete Notes PDF</li>
+                            <li><i class="fas fa-video"></i> Video Lectures (7 hours)</li>
+                            <li><i class="fas fa-chart-line"></i> Economic Zones</li>
+                            <li><i class="fas fa-book"></i> Industrial Corridors</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="#" class="practice-btn">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </a>
+                </div>
+
+                <!-- Revision & Practice -->
+                <div class="subtopic-card">
+                    <div class="subtopic-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Revision & Practice</h3>
+                    <p>Previous year questions, mock tests, and revision notes specifically for General Science section.</p>
+                    
+                    <div class="study-materials">
+                        <h4>Practice Resources:</h4>
+                        <ul class="materials-list">
+                            <li><i class="fas fa-file-alt"></i> PYQs (2013-2023)</li>
+                            <li><i class="fas fa-clipboard-check"></i> Mock Tests (20 sets)</li>
+                            <li><i class="fas fa-lightbulb"></i> Quick Revision Notes</li>
+                            <li><i class="fas fa-chart-bar"></i> Performance Analytics</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="#" class="practice-btn">
+                        <i class="fas fa-play-circle"></i> Start Revision
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Study Resources -->
+    <section class="resources-section" style="background-color: #f0f9ff; padding: 60px 0; border-radius: 20px; margin: 60px 0;">
+        <div class="container">
+            <h2 class="section-title">Study Resources</h2>
+            <div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; margin-top: 40px;">
+                <div class="resource-card" style="background-color: white; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);">
+                    <div class="resource-icon" style="width: 60px; height: 60px; background-color: #e0f2fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #0284c7; font-size: 1.5rem;">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Video Lectures</h3>
+                    <p>45+ hours of comprehensive video lectures by experts</p>
+                </div>
+                
+                <div class="resource-card" style="background-color: white; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);">
+                    <div class="resource-icon" style="width: 60px; height: 60px; background-color: #e0f2fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #0284c7; font-size: 1.5rem;">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h3>PDF Notes</h3>
+                    <p>Detailed notes, maps, diagrams, and revision materials</p>
+                </div>
+                
+                <div class="resource-card" style="background-color: white; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);">
+                    <div class="resource-icon" style="width: 60px; height: 60px; background-color: #e0f2fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #0284c7; font-size: 1.5rem;">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3>Practice Questions</h3>
+                    <p>550+ topic-wise questions with detailed solutions</p>
+                </div>
+                
+                <div class="resource-card" style="background-color: white; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);">
+                    <div class="resource-icon" style="width: 60px; height: 60px; background-color: #e0f2fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #0284c7; font-size: 1.5rem;">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Mock Tests</h3>
+                    <p>Full-length and sectional tests with analysis</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 ClearExams.online. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #94a3b8;">tnpsc General Science</p>
+        </div>
+    </footer>
+
+    <script>
+        // Back button functionality
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.location.href = 'tnpsc-topics.html';
+        });
+        
+        // Practice button click handlers
+        document.querySelectorAll('.practice-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const subtopicName = this.parentElement.querySelector('h3').textContent;
+                alert(`Starting "${subtopicName}" practice session. In a real application, this would open practice materials.`);
+            });
+        });
+    </script>
+</body>
+</html>
