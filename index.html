@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClearExams.online - Ace Competitive Exams</title>
+    <title>ClearExams.online</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         
         body {
-            background-color: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
+            background-color: #ffffff;
+            color: #111827;
+            line-height: 1.5;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
         
         .container {
@@ -27,15 +26,14 @@
             padding: 0 20px;
         }
         
-        /* Header Styles */
+        /* Header */
         header {
             background-color: #ffffff;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
             z-index: 100;
-            padding: 15px 0;
-            border-bottom: 3px solid #3b82f6;
+            padding: 20px 0;
+            border-bottom: 1px solid #e5e7eb;
         }
         
         .header-content {
@@ -52,443 +50,232 @@
         }
         
         .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            background-color: #111827;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.8rem;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
-        }
-        
-        .logo-text {
-            display: flex;
-            flex-direction: column;
+            font-size: 1.2rem;
         }
         
         .logo-text h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #1e293b;
-            line-height: 1.2;
-        }
-        
-        .logo-text .tagline {
-            font-size: 0.9rem;
-            color: #64748b;
-            font-weight: 500;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #111827;
         }
         
         .domain {
-            color: #3b82f6;
-            font-weight: 700;
+            color: #4f46e5;
         }
         
         .nav-links {
             display: flex;
-            gap: 25px;
+            gap: 30px;
             align-items: center;
         }
         
         .nav-links a {
             text-decoration: none;
-            color: #475569;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: color 0.3s;
-            padding: 8px 0;
-            position: relative;
+            color: #4b5563;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s;
         }
         
         .nav-links a:hover {
-            color: #3b82f6;
+            color: #111827;
         }
         
-        .nav-links a:hover::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #3b82f6;
-        }
-        
-        /* Hero Section */
-        .hero {
-            padding: 80px 0 60px;
-            text-align: center;
-        }
-        
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .hero h2 {
-            font-size: 2.8rem;
-            color: #1e293b;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-        
-        .hero h2 span {
-            color: #3b82f6;
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            color: #64748b;
-            margin-bottom: 40px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 60px;
-            flex-wrap: wrap;
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #3b82f6;
-            line-height: 1;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #64748b;
-            font-weight: 600;
-            margin-top: 5px;
-        }
-        
-        /* Exam Buttons Section */
-        .exam-section {
-            padding: 30px 0 80px;
+        /* Main Content */
+        .main-content {
+            padding: 80px 0;
         }
         
         .section-title {
             text-align: center;
             font-size: 2rem;
-            color: #1e293b;
-            margin-bottom: 50px;
-            position: relative;
+            color: #111827;
+            margin-bottom: 60px;
+            font-weight: 600;
         }
         
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background-color: #3b82f6;
-            border-radius: 2px;
+        .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
         
-        .exam-buttons {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 40px;
-        }
-        
-        .exam-btn {
-            background-color: white;
-            border-radius: 16px;
+        .exam-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
             padding: 40px 30px;
-            width: 320px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            transition: all 0.4s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
-            border: 2px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
         }
         
-        .exam-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-        }
-        
-        .exam-btn.upsc::before {
-            background: linear-gradient(90deg, #1e40af, #3b82f6);
-        }
-        
-        .exam-btn.tnpsc::before {
-            background: linear-gradient(90deg, #0f766e, #14b8a6);
-        }
-        
-        .exam-btn:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border-color: #cbd5e1;
+        .exam-card:hover {
+            border-color: #4f46e5;
+            transform: translateY(-2px);
         }
         
         .exam-icon {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-            font-size: 2.5rem;
-            color: white;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-        
-        .upsc-icon {
-            background: linear-gradient(135deg, #1e40af, #3b82f6);
-        }
-        
-        .tnpsc-icon {
-            background: linear-gradient(135deg, #0f766e, #14b8a6);
-        }
-        
-        .exam-btn h3 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            color: #1e293b;
-        }
-        
-        .exam-btn p {
-            color: #64748b;
-            margin-bottom: 30px;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        
-        .btn-start {
-            display: inline-block;
-            padding: 14px 32px;
-            background-color: #3b82f6;
-            color: white;
-            border-radius: 8px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s;
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
-        }
-        
-        .btn-start:hover {
-            background-color: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
-        }
-        
-        .btn-start.tnpsc {
-            background-color: #0f766e;
-            box-shadow: 0 4px 6px rgba(15, 118, 110, 0.2);
-        }
-        
-        .btn-start.tnpsc:hover {
-            background-color: #0d9488;
-            box-shadow: 0 6px 12px rgba(15, 118, 110, 0.3);
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 80px 0;
-            background-color: white;
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.03);
-        }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .feature-card {
-            background-color: #f8fafc;
-            padding: 30px;
-            border-radius: 12px;
-            border-left: 4px solid #3b82f6;
-            transition: all 0.3s;
-            height: 100%;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            background-color: #f1f5f9;
-        }
-        
-        .feature-icon {
             width: 60px;
             height: 60px;
-            background-color: #dbeafe;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            color: #3b82f6;
+            margin: 0 auto 24px;
             font-size: 1.5rem;
+            color: white;
         }
         
-        .feature-card h4 {
+        .upsc-icon {
+            background-color: #4f46e5;
+        }
+        
+        .tnpsc-icon {
+            background-color: #059669;
+        }
+        
+        .tnusrb-icon {
+            background-color: #dc2626;
+        }
+        
+        .exam-card h3 {
             font-size: 1.4rem;
-            color: #1e293b;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            color: #111827;
+            font-weight: 600;
+        }
+        
+        .exam-card p {
+            color: #6b7280;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .exam-link {
+            display: inline-block;
+            padding: 10px 24px;
+            background-color: #111827;
+            color: white;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        
+        .exam-link:hover {
+            background-color: #374151;
         }
         
         /* Footer */
         footer {
-            background-color: #1e293b;
-            color: #cbd5e1;
-            padding: 50px 0 30px;
+            background-color: #111827;
+            color: #d1d5db;
+            padding: 40px 0 24px;
+            margin-top: 40px;
         }
         
         .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-logo {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: flex-start;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 40px;
         }
         
-        .footer-logo .logo-icon {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 15px;
-        }
-        
-        .footer-logo h3 {
-            font-size: 1.5rem;
+        .footer-section h4 {
             color: white;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .footer-links h4 {
-            color: white;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-        }
-        
-        .footer-links ul {
+        .footer-section ul {
             list-style: none;
         }
         
-        .footer-links li {
-            margin-bottom: 12px;
+        .footer-section li {
+            margin-bottom: 8px;
         }
         
-        .footer-links a {
-            color: #cbd5e1;
+        .footer-section a {
+            color: #9ca3af;
             text-decoration: none;
-            transition: color 0.3s;
+            font-size: 0.9rem;
+            transition: color 0.2s;
         }
         
-        .footer-links a:hover {
-            color: #3b82f6;
+        .footer-section a:hover {
+            color: white;
         }
         
         .copyright {
             text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid #334155;
-            color: #94a3b8;
-            font-size: 0.9rem;
+            padding-top: 24px;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+            font-size: 0.8rem;
         }
         
-        /* Responsive Styles */
+        /* Responsive */
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
-                gap: 15px;
+                gap: 16px;
             }
             
             .nav-links {
-                gap: 15px;
+                gap: 20px;
             }
             
-            .hero h2 {
-                font-size: 2.2rem;
+            .main-content {
+                padding: 60px 0;
             }
             
-            .hero p {
-                font-size: 1.1rem;
-                padding: 0 10px;
+            .section-title {
+                font-size: 1.8rem;
+                margin-bottom: 40px;
             }
             
-            .stats {
-                gap: 30px;
+            .exam-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
             }
             
-            .stat-number {
-                font-size: 2rem;
+            .exam-card {
+                padding: 32px 24px;
             }
             
-            .exam-buttons {
-                gap: 25px;
-            }
-            
-            .exam-btn {
-                width: 100%;
-                max-width: 350px;
-                padding: 30px 20px;
+            .footer-content {
+                flex-direction: column;
+                gap: 32px;
             }
         }
         
         @media (max-width: 480px) {
-            .hero {
-                padding: 60px 0 40px;
-            }
-            
-            .hero h2 {
-                font-size: 1.8rem;
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 16px;
             }
             
             .section-title {
                 font-size: 1.6rem;
-            }
-            
-            .feature-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            
-            .footer-logo {
-                align-items: center;
             }
         }
     </style>
@@ -499,217 +286,117 @@
         <div class="container header-content">
             <a href="#" class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-check-double"></i>
+                    <i class="fas fa-check"></i>
                 </div>
                 <div class="logo-text">
                     <h1>ClearExams<span class="domain">.online</span></h1>
-                    <div class="tagline">Your Path to Success</div>
                 </div>
             </a>
             
             <nav class="nav-links">
-                <a href="#"><i class="fas fa-home"></i> Home</a>
-                <a href="#"><i class="fas fa-book"></i> Study Materials</a>
-                <a href="#"><i class="fas fa-chart-bar"></i> Analysis</a>
-                <a href="#"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="#">UPSC</a>
+                <a href="https://www.clearexams.online/tnpsc.html">TNPSC</a>
+                <a href="#">TNUSRB</a>
+                <a href="#">Resources</a>
             </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container hero-content">
-            <h2>Ace Your <span>Competitive Exams</span> with Confidence</h2>
-            <p>ClearExams.online provides comprehensive preparation resources, mock tests, and performance analytics for UPSC, TNPSC, and other major competitive exams in India.</p>
-            
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-number">50K+</div>
-                    <div class="stat-label">Successful Students</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">10K+</div>
-                    <div class="stat-label">Practice Questions</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">98%</div>
-                    <div class="stat-label">Satisfaction Rate</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">Accessibility</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Exam Buttons Section -->
-    <section class="exam-section">
+    <!-- Main Content -->
+    <main class="main-content">
         <div class="container">
-            <h2 class="section-title">Choose Your Exam Category</h2>
-            <div class="exam-buttons">
-                <!-- UPSC Button -->
-                <div class="exam-btn upsc" id="upsc-btn">
+            <h2 class="section-title">Select Your Exam</h2>
+            
+            <div class="exam-grid">
+                <!-- UPSC -->
+                <div class="exam-card" id="upsc-card">
                     <div class="exam-icon upsc-icon">
                         <i class="fas fa-landmark"></i>
                     </div>
                     <h3>UPSC</h3>
-                    <p>Prepare for India's premier Civil Services Examination (CSE) including IAS, IPS, IFS, and other central services. Access comprehensive study materials, mock tests, and previous year papers.</p>
-                    <button class="btn-start">Start UPSC Preparation</button>
+                    <p>Comprehensive preparation for Civil Services Examination including IAS, IPS, IFS, and other central services.</p>
+                    <a href="#" class="exam-link">Start Preparation</a>
                 </div>
                 
-                <!-- TNPSC Button -->
-                <div class="exam-btn tnpsc" id="tnpsc-btn">
+                <!-- TNPSC -->
+                <div class="exam-card" id="tnpsc-card">
                     <div class="exam-icon tnpsc-icon">
                         <i class="fas fa-trophy"></i>
                     </div>
                     <h3>TNPSC</h3>
-                    <p>Get ready for Tamil Nadu Public Service Commission exams including Group I, II, IV and other state services. Specialized resources with Tamil Nadu focus and regional language support.</p>
-                    <a href="https://www.clearexams.online/tnpsc.html" class="btn-start tnpsc">Start TNPSC Preparation</a>
+                    <p>Specialized resources for Tamil Nadu Public Service Commission exams with regional focus.</p>
+                    <a href="https://www.clearexams.online/tnpsc.html" class="exam-link">Start Preparation</a>
+                </div>
+                
+                <!-- TNUSRB -->
+                <div class="exam-card" id="tnusrb-card">
+                    <div class="exam-icon tnusrb-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>TNUSRB</h3>
+                    <p>Preparation for Tamil Nadu Uniformed Services Recruitment Board police and law enforcement exams.</p>
+                    <a href="#" class="exam-link">Start Preparation</a>
                 </div>
             </div>
         </div>
-    </section>
-    
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title">Why ClearExams.online?</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h4>Adaptive Learning</h4>
-                    <p>Our AI-powered platform adapts to your learning pace and focuses on your weak areas for maximum improvement.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-file-invoice"></i>
-                    </div>
-                    <h4>Previous Year Papers</h4>
-                    <p>Access 10+ years of solved question papers with detailed explanations for both UPSC and TNPSC exams.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-stopwatch"></i>
-                    </div>
-                    <h4>Timed Mock Tests</h4>
-                    <p>Simulate the actual exam environment with full-length mock tests and detailed performance analysis.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-pie"></i>
-                    </div>
-                    <h4>Detailed Analytics</h4>
-                    <p>Track your progress with comprehensive analytics, rank predictors, and personalized recommendations.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    </main>
 
     <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-check-double"></i>
-                    </div>
-                    <h3>ClearExams.online</h3>
-                    <p>Your trusted partner for competitive exam preparation since 2018.</p>
-                </div>
-                
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
+                <div class="footer-section">
+                    <h4>Exams</h4>
                     <ul>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> Home</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> UPSC Preparation</a></li>
-                        <li><a href="https://www.clearexams.online/tnpsc.html"><i class="fas fa-chevron-right"></i> TNPSC Preparation</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> Mock Tests</a></li>
+                        <li><a href="#">UPSC</a></li>
+                        <li><a href="https://www.clearexams.online/tnpsc.html">TNPSC</a></li>
+                        <li><a href="#">TNUSRB</a></li>
                     </ul>
                 </div>
                 
-                <div class="footer-links">
+                <div class="footer-section">
                     <h4>Resources</h4>
                     <ul>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> Study Materials</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> Previous Year Papers</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> Current Affairs</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> Exam Calendar</a></li>
+                        <li><a href="#">Study Materials</a></li>
+                        <li><a href="#">Mock Tests</a></li>
+                        <li><a href="#">Previous Papers</a></li>
                     </ul>
                 </div>
                 
-                <div class="footer-links">
-                    <h4>Contact Us</h4>
+                <div class="footer-section">
+                    <h4>Contact</h4>
                     <ul>
-                        <li><i class="fas fa-envelope"></i> support@clearexams.online</li>
-                        <li><i class="fas fa-phone"></i> +91-9876543210</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Chennai, Tamil Nadu</li>
+                        <li>support@clearexams.online</li>
+                        <li>+91-9876543210</li>
+                        <li>Chennai, Tamil Nadu</li>
                     </ul>
                 </div>
             </div>
             
             <div class="copyright">
-                &copy; 2023 ClearExams.online. All rights reserved. | Designed for aspirants, by experts
+                &copy; 2023 ClearExams.online
             </div>
         </div>
     </footer>
 
     <script>
-        // Add interactivity to the exam buttons
-        document.getElementById('upsc-btn').addEventListener('click', function() {
-            // In a real website, this would navigate to the UPSC page
-            window.location.href = '#';
-            alert('Redirecting to UPSC Preparation Section. All UPSC resources would be accessible here.');
+        // Card click handlers
+        document.getElementById('upsc-card').addEventListener('click', function(e) {
+            if (e.target.tagName !== 'A') {
+                window.location.href = '#';
+            }
         });
         
-        document.getElementById('tnpsc-btn').addEventListener('click', function(e) {
-            // Only navigate if the click wasn't on the button itself
-            if (e.target.tagName !== 'A' && !e.target.classList.contains('btn-start')) {
+        document.getElementById('tnpsc-card').addEventListener('click', function(e) {
+            if (e.target.tagName !== 'A') {
                 window.location.href = 'https://www.clearexams.online/tnpsc.html';
             }
         });
         
-        // Update the UPSC button to be a link as well for consistency
-        const upscBtn = document.querySelector('#upsc-btn .btn-start');
-        upscBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            window.location.href = '#'; // Replace with actual UPSC link when available
-            alert('Starting UPSC preparation! You would be redirected to the UPSC dashboard.');
-        });
-        
-        // Update TNPSC button in footer to link correctly
-        const tnpscFooterLink = document.querySelector('a[href="https://www.clearexams.online/tnpsc.html"]');
-        if (tnpscFooterLink) {
-            tnpscFooterLink.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // Link is already set in href, so it will navigate automatically
-            });
-        }
-        
-        // Simple animation for feature cards on scroll
-        document.addEventListener('DOMContentLoaded', function() {
-            const featureCards = document.querySelectorAll('.feature-card');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, { threshold: 0.1 });
-            
-            featureCards.forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'opacity 0.5s, transform 0.5s';
-                observer.observe(card);
-            });
+        document.getElementById('tnusrb-card').addEventListener('click', function(e) {
+            if (e.target.tagName !== 'A') {
+                window.location.href = '#';
+            }
         });
     </script>
 </body>
