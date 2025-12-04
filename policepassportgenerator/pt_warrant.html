@@ -338,6 +338,11 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
+            color: #000000 !important;
+        }
+        
+        .document-table .right-column * {
+            color: #000000 !important;
         }
         
         .preview-field {
@@ -440,7 +445,7 @@
         }
         
         .hidden {
-            display: none;
+            display: none !important;
         }
         
         .language-selector {
@@ -654,6 +659,18 @@
             font-style: italic;
         }
         
+        .court-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .court-input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         /* Enhanced PDF styling */
         .pdf-mode {
             transform: scale(1) !important;
@@ -681,135 +698,173 @@
             line-height: 1.4 !important;
         }
         
-        .pdf-mode .content-text,
-        .pdf-mode .preview-field,
-        .pdf-mode .embedded-field,
-        .pdf-mode .time-field,
-        .pdf-mode .time-suffix {
+        /* FIX FOR THIRD COLUMN TEXT COLOR - MORE DIRECT APPROACH */
+        .pdf-mode .right-column,
+        .pdf-mode .right-column *,
+        .pdf-mode .right-column .content-text,
+        .pdf-mode .right-column .embedded-field,
+        .pdf-mode .right-column .preview-field,
+        .pdf-mode .right-column .time-field,
+        .pdf-mode .right-column .time-suffix {
             color: #000000 !important;
-            background: transparent !important;
-            font-weight: normal !important;
-            text-shadow: none !important;
-        }
-        
-        .pdf-mode .preview-field.empty:before,
-        .pdf-mode .embedded-field.empty:before,
-        .pdf-mode .time-field.empty:before {
-            color: #000000 !important;
-            opacity: 0.5 !important;
-        }
-
-        /* FIXED CSS FOR PDF TEXT COLOR ISSUE - IMPLEMENTED SOLUTION */
-        #document-to-print,
-        #document-to-print .document-table,
-        #document-to-print .document-table td,
-        #document-to-print .content-text,
-        #document-to-print .embedded-field,
-        #document-to-print .preview-field,
-        #document-to-print .time-field,
-        #document-to-print .time-suffix {
-            color: #000000 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        #document-to-print.pdf-mode .right-column,
-        #document-to-print.pdf-mode .right-column *,
-        #document-to-print.pdf-mode .right-column .preview-field,
-        #document-to-print.pdf-mode .right-column .content-text,
-        #document-to-print.pdf-mode .right-column .embedded-field {
-            color: #000000 !important;
-            background: #ffffff !important;
-            text-shadow: none !important;
-            -webkit-text-fill-color: #000 !important;
-            filter: none !important;
-        }
-
-        #document-to-print.pdf-mode .right-column .preview-field.empty:before,
-        #document-to-print.pdf-mode .right-column .embedded-field.empty:before {
-            color: #000000 !important;
-            opacity: 0 !important;
-            display: none !important;
-        }
-
-        #document-to-print.pdf-mode .right-column * {
-            color: #000000 !important;
-            background: transparent !important;
             -webkit-text-fill-color: #000000 !important;
             text-shadow: none !important;
             filter: none !important;
-        }
-
-        #document-to-print,
-        #document-to-print * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        #document-to-print.pdf-mode {
+            background: transparent !important;
             opacity: 1 !important;
-            background: #FFFFFF !important;
         }
-
-        #document-to-print.pdf-mode,
-        #document-to-print.pdf-mode * {
+        
+        /* Remove any placeholder styling in PDF mode */
+        .pdf-mode .right-column .preview-field.empty:before,
+        .pdf-mode .right-column .embedded-field.empty:before {
             color: #000000 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+            opacity: 0.3 !important;
         }
-
+        
+        /* Ensure all text in the entire document is black */
+        #document-to-print.pdf-mode,
+        #document-to-print.pdf-mode *,
+        #document-to-print.pdf-mode .document-table,
+        #document-to-print.pdf-mode .document-table *,
         #document-to-print.pdf-mode .content-text,
         #document-to-print.pdf-mode .embedded-field,
         #document-to-print.pdf-mode .preview-field,
         #document-to-print.pdf-mode .time-field,
         #document-to-print.pdf-mode .time-suffix {
-            opacity: 1 !important;
-            filter: none !important;
+            color: #000000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            background: #ffffff !important;
         }
-
-        #document-to-print.pdf-mode * {
-            text-shadow: none !important;
-            filter: none !important;
-        }
-
-        #document-to-print.pdf-mode .time-field.empty,
-        #document-to-print.pdf-mode .time-field.empty:before {
-            color: #ffffff !important;
-        }
-
-        /* FIX FOR RIGHT COLUMN GREY TEXT IN PDF */
-        #document-to-print.pdf-mode .right-column,
-        #document-to-print.pdf-mode .right-column .content-text,
-        #document-to-print.pdf-mode .right-column .embedded-field,
-        #document-to-print.pdf-mode .right-column .preview-field {
+        
+        /* Specifically target the content text in right column */
+        #document-to-print.pdf-mode .right-column .content-text {
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             text-align: justify !important;
         }
-
-        #document-to-print.pdf-mode .right-column * {
+        
+        /* Remove any inherited colors */
+        #document-to-print.pdf-mode .right-column span,
+        #document-to-print.pdf-mode .right-column div,
+        #document-to-print.pdf-mode .right-column p {
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
         }
-
-        /* Remove grey placeholder styling for PDF mode */
-        #document-to-print.pdf-mode .right-column .preview-field.empty:before,
-        #document-to-print.pdf-mode .right-column .embedded-field.empty:before {
-            color: #000000 !important;
-            opacity: 0 !important;
-            display: none !important;
-        }
-
-        .court-input-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        
+        /* Ensure all PDF content has black text */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            #document-to-print,
+            #document-to-print * {
+                color: #000000 !important;
+                -webkit-text-fill-color: #000000 !important;
+                background: #ffffff !important;
+            }
+            
+            .right-column,
+            .right-column *,
+            .right-column span,
+            .right-column div,
+            .right-column p {
+                color: #000000 !important;
+                -webkit-text-fill-color: #000000 !important;
+            }
+            
+            .embedded-field,
+            .content-text,
+            .preview-field,
+            .time-field,
+            .time-suffix {
+                color: #000000 !important;
+                -webkit-text-fill-color: #000000 !important;
+            }
         }
         
-        @media (max-width: 600px) {
-            .court-input-group {
-                grid-template-columns: 1fr;
-            }
+        /* Additional fix for PDF text color */
+        .pdf-mode .document-table *,
+        .pdf-mode .right-column * {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            opacity: 1 !important;
+            filter: none !important;
+        }
+        
+        /* Specific fix for embedded fields in right column */
+        .pdf-mode .right-column .embedded-field {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+        }
+        
+        /* Remove placeholder styling in PDF mode */
+        .pdf-mode .empty:before {
+            color: #000000 !important;
+            opacity: 0.3 !important;
+        }
+        
+        /* PDF mode height and overflow fixes */
+        #document-to-print.pdf-mode,
+        #document-to-print.pdf-mode .document-preview {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        
+        #document-to-print.pdf-mode .document-table td,
+        #document-to-print.pdf-mode .right-column,
+        #document-to-print.pdf-mode .right-column * {
+            overflow: visible !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+        }
+        
+        .content-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .content-status.available {
+            background-color: #f0fff4;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .content-status.unavailable {
+            background-color: #fff5f5;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+        
+        .content-status-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .content-status.available .content-status-icon {
+            background-color: #38a169;
+            color: white;
+        }
+        
+        .content-status.unavailable .content-status-icon {
+            background-color: #e53e3e;
+            color: white;
         }
         
         /* Ensure proper spacing between paragraphs */
@@ -982,13 +1037,13 @@
                                 </div>
                                 
                                 <div class="language-content active" id="tamil-content">
-                                    <div class="content-text" id="pt-warrant-tamil-content" style="display: none;">
+                                    <div class="content-text" id="pt-warrant-tamil-content">
                                         ஆகிய நீவிர் <span class="embedded-field empty" id="police-station-content-pt-tamil" placeholder="Police Station"></span> கா.நி. கு. எண். <span class="embedded-field empty" id="crime-no-field-pt-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="section-field-pt-tamil" placeholder="Section"></span> (SC No. <span class="embedded-field empty" id="sc-no-field-tamil" placeholder="SC No."></span> PRC No. <span class="embedded-field empty" id="prc-no-field-tamil" placeholder="PRC No."></span> ) என்ற வழக்கில் சம்மந்தப்பட்ட எதிரி <span id="accused-list-pt-tamil"></span> என்பவருக்கு கனம் <span class="embedded-field empty" id="court-field-pt-tamil" placeholder="Court"></span> அவர்களால் வழங்கப்பட்ட PT Warrant-ஐ <span class="embedded-field empty" id="central-prison-field-tamil" placeholder="Central Prison"></span> மத்திய சிறை கண்காணிப்பாளர் சென்னை அவர்களிடம் சார்வு செய்து அத்தாட்சி பெற்று நிலையம் வரவும்.
                                     </div>
                                 </div>
                                 
                                 <div class="language-content" id="english-content">
-                                    <div class="content-text" id="pt-warrant-english-content" style="display: none;">
+                                    <div class="content-text" id="pt-warrant-english-content">
                                         You are hereby directed to execute the PT Warrant issued by the Hon'ble <span class="embedded-field empty" id="court-field-pt-english" placeholder="Court"></span> to the accused <span id="accused-list-pt-english"></span> involved in <span class="embedded-field empty" id="police-station-content-pt-english" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-no-field-pt-english" placeholder="Cr. No."></span> U/S <span class="embedded-field empty" id="section-field-pt-english" placeholder="Section"></span> NDPS Act (SC.NO.<span class="embedded-field empty" id="sc-no-field-english" placeholder="SC No."></span>, PRC.NO. <span class="embedded-field empty" id="prc-no-field-english" placeholder="PRC No."></span>) before the Superintendent of <span class="embedded-field empty" id="central-prison-field-english" placeholder="Central Prison"></span> and return to the station with acknowledgement.
                                     </div>
                                 </div>
@@ -1467,13 +1522,13 @@
                 document.getElementById(`${currentLanguage}-content`).classList.add('active');
                 
                 // Show PT warrant content for the selected language
-                document.getElementById('content-placeholder').style.display = 'none';
+                contentPlaceholder.classList.add('hidden');
                 if (currentLanguage === 'tamil') {
-                    document.getElementById('pt-warrant-tamil-content').style.display = 'block';
-                    document.getElementById('pt-warrant-english-content').style.display = 'none';
+                    document.getElementById('pt-warrant-tamil-content').classList.remove('hidden');
+                    document.getElementById('pt-warrant-english-content').classList.add('hidden');
                 } else {
-                    document.getElementById('pt-warrant-tamil-content').style.display = 'none';
-                    document.getElementById('pt-warrant-english-content').style.display = 'block';
+                    document.getElementById('pt-warrant-tamil-content').classList.add('hidden');
+                    document.getElementById('pt-warrant-english-content').classList.remove('hidden');
                 }
             }
             
@@ -1643,10 +1698,54 @@
                 try {
                     const element = document.getElementById('document-to-print');
                     
-                    // Add PDF mode class for styling
-                    element.classList.add('pdf-mode', 'pdf-optimized');
+                    // Save current state
+                    const currentHtml = element.innerHTML;
                     
-                    const canvas = await html2canvas(element, {
+                    // Create a clean copy for PDF generation
+                    const tempElement = element.cloneNode(true);
+                    
+                    // Remove hidden class from all elements in the clone
+                    tempElement.querySelectorAll('.hidden').forEach(el => {
+                        el.classList.remove('hidden');
+                        el.style.display = 'block';
+                    });
+                    
+                    // Apply PDF styling to the clone
+                    tempElement.classList.add('pdf-mode');
+                    
+                    // Force black text in all elements immediately
+                    tempElement.querySelectorAll('*').forEach(el => {
+                        el.style.color = '#000000';
+                        el.style.fill = '#000000';
+                        el.style.stroke = '#000000';
+                        
+                        // Remove any inherited colors
+                        if (el.classList.contains('right-column') || el.closest('.right-column')) {
+                            el.style.color = '#000000';
+                            el.style.webkitTextFillColor = '#000000';
+                            el.style.webkitTextStrokeColor = '#000000';
+                        }
+                    });
+                    
+                    // Specifically target text elements in the right column
+                    const rightColumn = tempElement.querySelector('.right-column');
+                    if (rightColumn) {
+                        rightColumn.style.color = '#000000';
+                        rightColumn.style.webkitTextFillColor = '#000000';
+                        
+                        const textElements = rightColumn.querySelectorAll('span, div, p, .embedded-field, .content-text');
+                        textElements.forEach(el => {
+                            el.style.color = '#000000';
+                            el.style.webkitTextFillColor = '#000000';
+                            el.style.textShadow = 'none';
+                            el.style.filter = 'none';
+                        });
+                    }
+                    
+                    // Temporarily replace the element
+                    element.parentNode.replaceChild(tempElement, element);
+                    
+                    const canvas = await html2canvas(tempElement, {
                         scale: 2,
                         useCORS: true,
                         logging: false,
@@ -1654,43 +1753,45 @@
                         onclone: function(clonedDoc) {
                             const clonedElement = clonedDoc.getElementById('document-to-print');
                             if (clonedElement) {
-                                clonedElement.classList.add('pdf-mode', 'pdf-optimized');
+                                clonedElement.classList.add('pdf-mode');
+                                
+                                // Remove hidden class from all elements
+                                clonedElement.querySelectorAll('.hidden').forEach(el => {
+                                    el.classList.remove('hidden');
+                                    el.style.display = 'block';
+                                });
+                                
+                                // Apply black text to all elements in clone
+                                const clonedAllElements = clonedElement.querySelectorAll('*');
+                                clonedAllElements.forEach(el => {
+                                    el.style.color = '#000000';
+                                    el.style.webkitTextFillColor = '#000000';
+                                    el.style.textShadow = 'none';
+                                    el.style.filter = 'none';
+                                });
                             }
                         }
                     });
+                    
+                    // Restore original element
+                    tempElement.parentNode.replaceChild(element, tempElement);
                     
                     const imgData = canvas.toDataURL('image/png');
                     const pdf = new jsPDF('p', 'mm', 'a4');
                     const imgWidth = 210;
                     const pageHeight = 295;
                     const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let heightLeft = imgHeight;
                     let position = 0;
                     
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                    
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
-                    }
                     
                     const fileName = `PT_Warrant_Passport_${new Date().toISOString().slice(0, 10)}.pdf`;
                     pdf.save(fileName);
-                    
-                    // Remove PDF mode class
-                    element.classList.remove('pdf-mode', 'pdf-optimized');
                     
                     showNotification('PDF generated successfully', 'success');
                 } catch (error) {
                     console.error('Error generating PDF:', error);
                     showNotification('Error generating PDF. Please try again.', 'error');
-                    
-                    // Remove PDF mode class in case of error
-                    const element = document.getElementById('document-to-print');
-                    element.classList.remove('pdf-mode', 'pdf-optimized');
                 } finally {
                     generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Generate PDF';
                     generateBtn.disabled = false;
