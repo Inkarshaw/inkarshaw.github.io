@@ -565,7 +565,7 @@
                     </div>
                     <h3>TNPSC</h3>
                     <p>Get ready for Tamil Nadu Public Service Commission exams including Group I, II, IV and other state services. Specialized resources with Tamil Nadu focus and regional language support.</p>
-                    <button class="btn-start tnpsc">Start TNPSC Preparation</button>
+                    <a href="https://www.clearexams.online/tnpsc.html" class="btn-start tnpsc">Start TNPSC Preparation</a>
                 </div>
             </div>
         </div>
@@ -628,7 +628,7 @@
                     <ul>
                         <li><a href="#"><i class="fas fa-chevron-right"></i> Home</a></li>
                         <li><a href="#"><i class="fas fa-chevron-right"></i> UPSC Preparation</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> TNPSC Preparation</a></li>
+                        <li><a href="https://www.clearexams.online/tnpsc.html"><i class="fas fa-chevron-right"></i> TNPSC Preparation</a></li>
                         <li><a href="#"><i class="fas fa-chevron-right"></i> Mock Tests</a></li>
                     </ul>
                 </div>
@@ -667,20 +667,29 @@
             alert('Redirecting to UPSC Preparation Section. All UPSC resources would be accessible here.');
         });
         
-        document.getElementById('tnpsc-btn').addEventListener('click', function() {
-            // In a real website, this would navigate to the TNPSC page
-            window.location.href = '#';
-            alert('Redirecting to TNPSC Preparation Section. All TNPSC resources would be accessible here.');
+        document.getElementById('tnpsc-btn').addEventListener('click', function(e) {
+            // Only navigate if the click wasn't on the button itself
+            if (e.target.tagName !== 'A' && !e.target.classList.contains('btn-start')) {
+                window.location.href = 'https://www.clearexams.online/tnpsc.html';
+            }
         });
         
-        // Add click events to all start buttons
-        document.querySelectorAll('.btn-start').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent triggering the parent div click
-                const examType = this.classList.contains('tnpsc') ? 'TNPSC' : 'UPSC';
-                alert(`Starting ${examType} preparation! You would be redirected to the dashboard.`);
-            });
+        // Update the UPSC button to be a link as well for consistency
+        const upscBtn = document.querySelector('#upsc-btn .btn-start');
+        upscBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            window.location.href = '#'; // Replace with actual UPSC link when available
+            alert('Starting UPSC preparation! You would be redirected to the UPSC dashboard.');
         });
+        
+        // Update TNPSC button in footer to link correctly
+        const tnpscFooterLink = document.querySelector('a[href="https://www.clearexams.online/tnpsc.html"]');
+        if (tnpscFooterLink) {
+            tnpscFooterLink.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Link is already set in href, so it will navigate automatically
+            });
+        }
         
         // Simple animation for feature cards on scroll
         document.addEventListener('DOMContentLoaded', function() {
