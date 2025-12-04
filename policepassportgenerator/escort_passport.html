@@ -835,6 +835,77 @@
             --secondary-color: #000000 !important;
             color: #000000 !important;
         }
+        
+        /* Ensure all PDF content has black text */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            #document-to-print,
+            #document-to-print * {
+                color: #000000 !important;
+                -webkit-text-fill-color: #000000 !important;
+                background: #ffffff !important;
+            }
+            
+            .right-column,
+            .right-column *,
+            .right-column span,
+            .right-column div,
+            .right-column p {
+                color: #000000 !important;
+                -webkit-text-fill-color: #000000 !important;
+            }
+            
+            .embedded-field,
+            .content-text,
+            .preview-field,
+            .time-field,
+            .time-suffix {
+                color: #000000 !important;
+                -webkit-text-fill-color: #000000 !important;
+            }
+        }
+        
+        /* Additional fix for PDF text color */
+        .pdf-mode .document-table *,
+        .pdf-mode .right-column * {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            opacity: 1 !important;
+            filter: none !important;
+        }
+        
+        /* Specific fix for embedded fields in right column */
+        .pdf-mode .right-column .embedded-field {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+        }
+        
+        /* Remove placeholder styling in PDF mode */
+        .pdf-mode .empty:before {
+            color: #000000 !important;
+            opacity: 0.3 !important;
+        }
+        
+        /* PDF mode height and overflow fixes */
+        #document-to-print.pdf-mode,
+        #document-to-print.pdf-mode .document-preview {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        
+        #document-to-print.pdf-mode .document-table td,
+        #document-to-print.pdf-mode .right-column,
+        #document-to-print.pdf-mode .right-column * {
+            overflow: visible !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+        }
     </style>
 </head>
 <body>
@@ -1632,26 +1703,32 @@
                     // Apply PDF styling to the clone
                     tempElement.classList.add('pdf-mode');
                     
-                    // Force black text in all elements
-                    const allElements = tempElement.querySelectorAll('*');
-                    allElements.forEach(el => {
+                    // Force black text in all elements immediately
+                    tempElement.querySelectorAll('*').forEach(el => {
                         el.style.color = '#000000';
-                        el.style.webkitTextFillColor = '#000000';
-                        el.style.textShadow = 'none';
-                        el.style.filter = 'none';
-                        el.style.background = 'transparent';
+                        el.style.fill = '#000000';
+                        el.style.stroke = '#000000';
+                        
+                        // Remove any inherited colors
+                        if (el.classList.contains('right-column') || el.closest('.right-column')) {
+                            el.style.color = '#000000';
+                            el.style.webkitTextFillColor = '#000000';
+                            el.style.webkitTextStrokeColor = '#000000';
+                        }
                     });
                     
-                    // Specifically fix right column text
+                    // Specifically target text elements in the right column
                     const rightColumn = tempElement.querySelector('.right-column');
                     if (rightColumn) {
                         rightColumn.style.color = '#000000';
                         rightColumn.style.webkitTextFillColor = '#000000';
-                        const rightColumnChildren = rightColumn.querySelectorAll('*');
-                        rightColumnChildren.forEach(el => {
+                        
+                        const textElements = rightColumn.querySelectorAll('span, div, p, .embedded-field, .content-text');
+                        textElements.forEach(el => {
                             el.style.color = '#000000';
                             el.style.webkitTextFillColor = '#000000';
                             el.style.textShadow = 'none';
+                            el.style.filter = 'none';
                         });
                     }
                     
