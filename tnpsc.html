@@ -470,7 +470,7 @@
                     </div>
                     <h3>Indian Polity</h3>
                     <p>Constitution, governance, political system, center-state relations</p>
-                    <a href="#" class="topic-btn">Start Learning</a>
+                    <a href="https://www.clearexams.online/tnpsc/indian_polity.html" class="topic-btn">Start Learning</a>
                 </div>
                 
                 <!-- Group I Specific -->
@@ -644,9 +644,13 @@
         // Topic button click handler
         document.querySelectorAll('.topic-btn').forEach(button => {
             button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const topicName = this.parentElement.querySelector('h3').textContent;
-                alert(`Starting preparation for "${topicName}". In a real application, this would open the study materials for this topic.`);
+                // Check if the href is just "#" or empty
+                if (this.getAttribute('href') === '#' || !this.getAttribute('href')) {
+                    e.preventDefault();
+                    const topicName = this.parentElement.querySelector('h3').textContent;
+                    alert(`Starting preparation for "${topicName}". In a real application, this would open the study materials for this topic.`);
+                }
+                // If it has a real link (like Indian Polity), allow it to navigate naturally
             });
         });
         
