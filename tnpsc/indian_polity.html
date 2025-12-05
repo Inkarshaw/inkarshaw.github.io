@@ -31,7 +31,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             padding: 20px 0;
             border-bottom: 3px solid #0ea5e9;
-            position: relative; /* Changed from sticky to relative */
+            position: relative;
             z-index: 100;
             transition: all 0.3s ease;
         }
@@ -55,9 +55,19 @@
             transform: translateY(-100%);
         }
         
+        /* Hide header completely during quiz */
+        .header-wrapper.quiz-hidden {
+            display: none;
+        }
+        
         /* Add space for the fixed header */
         body {
             padding-top: 93px; /* Height of header + padding */
+        }
+        
+        /* Remove padding when header is hidden during quiz */
+        body.quiz-active {
+            padding-top: 0;
         }
         
         .header-content {
@@ -141,7 +151,6 @@
             opacity: 0.9;
         }
         
-        /* Rest of your CSS remains the same */
         /* Subtopics Grid */
         .subtopics-section {
             padding: 30px 0 80px;
@@ -322,15 +331,17 @@
             z-index: 100;
         }
         
+        /* Remove quiz title and center timer */
         .quiz-title {
-            font-size: 1.5rem;
-            font-weight: 600;
+            display: none; /* Hide the quiz title */
         }
         
         .quiz-controls {
             display: flex;
             gap: 15px;
             align-items: center;
+            width: 100%;
+            justify-content: space-between;
         }
         
         .quiz-timer {
@@ -338,6 +349,8 @@
             padding: 8px 15px;
             border-radius: 20px;
             font-weight: 600;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .exit-quiz-btn {
@@ -932,6 +945,10 @@
                 padding-top: 140px; /* Adjust for mobile header height */
             }
             
+            body.quiz-active {
+                padding-top: 0;
+            }
+            
             .page-header {
                 margin-top: -20px;
             }
@@ -962,11 +979,23 @@
                 flex-direction: column;
                 gap: 15px;
                 text-align: center;
+                padding: 15px;
             }
             
             .quiz-controls {
                 flex-direction: column;
                 width: 100%;
+                gap: 10px;
+            }
+            
+            .quiz-timer {
+                order: 2;
+                margin: 0 auto;
+            }
+            
+            .exit-quiz-btn {
+                order: 1;
+                align-self: flex-end;
             }
             
             .quiz-content {
@@ -1076,9 +1105,9 @@
                     <h3>Preamble</h3>
                     <p>Meaning, significance, objectives, key words, and judicial interpretations of the Preamble.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn preamble-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Salient Features -->
@@ -1089,9 +1118,9 @@
                     <h3>Salient Features</h3>
                     <p>Key features of Indian Constitution: Lengthiest, Federal with Unitary bias, Parliamentary system, etc.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn salient-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Union, State and UT -->
@@ -1102,9 +1131,9 @@
                     <h3>Union, State & Union Territory</h3>
                     <p>Structure of Indian Union, States, Union Territories, their powers and administration.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn union-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Citizenship -->
@@ -1115,9 +1144,9 @@
                     <h3>Citizenship</h3>
                     <p>Constitutional provisions, acquisition and termination of citizenship, citizenship amendments.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn citizenship-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Fundamental Rights -->
@@ -1128,9 +1157,9 @@
                     <h3>Fundamental Rights</h3>
                     <p>Articles 12-35, six categories of rights, limitations, judicial interpretations, writs.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn rights-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Fundamental Duties -->
@@ -1141,9 +1170,9 @@
                     <h3>Fundamental Duties</h3>
                     <p>Article 51A, 11 fundamental duties, significance, enforcement, and relationship with rights.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn duties-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Directive Principles -->
@@ -1154,9 +1183,9 @@
                     <h3>Directive Principles</h3>
                     <p>Articles 36-51, classification, implementation, relationship with fundamental rights.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn directive-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Union Executive -->
@@ -1167,9 +1196,9 @@
                     <h3>Union Executive</h3>
                     <p>President, Vice-President, Prime Minister, Council of Ministers, powers and functions.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn union-executive-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Union Legislature -->
@@ -1180,9 +1209,9 @@
                     <h3>Union Legislature</h3>
                     <p>Parliament: Lok Sabha, Rajya Sabha, Speaker, sessions, procedures, parliamentary committees.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn union-legislature-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- State Executive -->
@@ -1193,9 +1222,9 @@
                     <h3>State Executive</h3>
                     <p>Governor, Chief Minister, State Council of Ministers, Advocate General, powers.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn state-executive-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- State Legislature -->
@@ -1206,9 +1235,9 @@
                     <h3>State Legislature</h3>
                     <p>Vidhan Sabha, Vidhan Parishad (where applicable), legislative procedures in states.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn state-legislature-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Local Governments -->
@@ -1219,9 +1248,9 @@
                     <h3>Local Governments</h3>
                     <p>Panchayati Raj, Municipalities, 73rd & 74th Amendments, functions, finance, elections.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn local-govt-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Centre-State Relations -->
@@ -1232,9 +1261,9 @@
                     <h3>Centre-State Relations</h3>
                     <p>Legislative, administrative, financial relations, inter-state councils, disputes resolution.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn centre-state-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Election System -->
@@ -1245,9 +1274,9 @@
                     <h3>Election System</h3>
                     <p>Election Commission, electoral process, reforms, political parties, election laws.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn election-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Judiciary in India -->
@@ -1258,9 +1287,9 @@
                     <h3>Judiciary in India</h3>
                     <p>Supreme Court, High Courts, subordinate courts, appointment, jurisdiction, judicial review.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn judiciary-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Rule of Law -->
@@ -1271,9 +1300,9 @@
                     <h3>Rule of Law</h3>
                     <p>Concept, principles, significance, constitutional provisions, and Dicey's theory.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn rule-law-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Corruption & Anti-corruption -->
@@ -1284,9 +1313,9 @@
                     <h3>Corruption & Anti-corruption</h3>
                     <p>Corruption in public life, preventive measures, laws, and anti-corruption institutions.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn corruption-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Lokpal & Lok Ayukta -->
@@ -1297,9 +1326,9 @@
                     <h3>Lokpal & Lok Ayukta</h3>
                     <p>Structure, powers, functions, appointment process, and working of Lokpal/Lok Ayukta.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn lokpal-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Right to Information -->
@@ -1310,9 +1339,9 @@
                     <h3>Right to Information</h3>
                     <p>RTI Act 2005, provisions, exemptions, Information Commissions, implementation.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn rti-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Empowerment of Women -->
@@ -1323,9 +1352,9 @@
                     <h3>Empowerment of Women</h3>
                     <p>Constitutional provisions, laws, schemes, reservations, and women's rights in India.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn women-empowerment-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Consumer Protection -->
@@ -1336,9 +1365,9 @@
                     <h3>Consumer Protection</h3>
                     <p>Consumer rights, Consumer Protection Act, consumer forums, redressal mechanisms.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn consumer-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Human Rights Charter -->
@@ -1349,9 +1378,9 @@
                     <h3>Human Rights Charter</h3>
                     <p>National Human Rights Commission, international conventions, human rights protection.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn human-rights-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Political System -->
@@ -1362,9 +1391,9 @@
                     <h3>Political System & Parties</h3>
                     <p>Multi-party system, national/regional parties, electoral politics, coalition governments.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn political-system-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Current Affairs -->
@@ -1375,9 +1404,9 @@
                     <h3>Current Affairs</h3>
                     <p>Latest developments in Indian polity, constitutional amendments, judicial pronouncements.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn current-affairs-btn">
                         <i class="fas fa-play-circle"></i> Start Practice
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Important Articles -->
@@ -1401,9 +1430,9 @@
                     <h3>Revision & Practice</h3>
                     <p>Previous year questions, mock tests, and revision notes for complete Indian Polity section.</p>
                     
-                    <a href="#" class="practice-btn">
+                    <button class="practice-btn revision-btn">
                         <i class="fas fa-play-circle"></i> Start Revision
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1512,6 +1541,222 @@
             </div>
             
             <div id="constitutionQuizContainer" style="display: none;">
+                <!-- Normal mode quiz content would go here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Questions Modal for Preamble -->
+    <div class="modal-overlay" id="preambleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Preamble Practice Questions</h2>
+                <button class="close-modal" id="closePreambleModal">&times;</button>
+            </div>
+            
+            <div class="quiz-settings" id="preambleQuizSettings">
+                <h3 class="settings-title">Configure Your Preamble Practice Session</h3>
+                
+                <div class="settings-options">
+                    <div class="setting-group">
+                        <h4>Question Selection Mode</h4>
+                        <div class="radio-options">
+                            <div class="radio-option">
+                                <input type="radio" id="preambleModeAll" name="preambleQuestionMode" value="all" checked>
+                                <label for="preambleModeAll">All Questions</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="preambleModeRandom" name="preambleQuestionMode" value="random">
+                                <label for="preambleModeRandom">Random Questions</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="preambleModeRange" name="preambleQuestionMode" value="range">
+                                <label for="preambleModeRange">Question Range</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Quiz Mode</h4>
+                        <div class="radio-options">
+                            <div class="radio-option">
+                                <input type="radio" id="preambleQuizNormal" name="preambleQuizMode" value="normal">
+                                <label for="preambleQuizNormal">Normal Mode (Modal)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="preambleQuizFullscreen" name="preambleQuizMode" value="fullscreen" checked>
+                                <label for="preambleQuizFullscreen">Full Screen Mode</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Question Count</h4>
+                        <div id="preambleRandomSettings" style="display: none;">
+                            <div class="question-count-input">
+                                <label for="preambleQuestionCount">Number of Questions:</label>
+                                <input type="number" id="preambleQuestionCount" min="1" max="100" value="10">
+                            </div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">
+                                Select how many random questions you want to practice.
+                            </p>
+                        </div>
+                        
+                        <div id="preambleRangeSettings" style="display: none;">
+                            <div class="range-inputs">
+                                <div class="range-input">
+                                    <label for="preambleStartQuestion">Start Question:</label>
+                                    <input type="number" id="preambleStartQuestion" min="1" value="1">
+                                </div>
+                                <div class="range-input">
+                                    <label for="preambleEndQuestion">End Question:</label>
+                                    <input type="number" id="preambleEndQuestion" min="1" value="10">
+                                </div>
+                            </div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">
+                                Select the range of questions you want to practice.
+                            </p>
+                        </div>
+                        
+                        <div id="preambleAllSettings">
+                            <p style="color: #475569; font-style: italic;">
+                                All available Preamble questions will be loaded for practice.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="start-quiz-btn" id="startPreambleQuiz">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </button>
+                    <button class="cancel-btn" id="cancelPreambleSettings">Cancel</button>
+                </div>
+            </div>
+            
+            <div class="loading-spinner" id="preambleLoadingSpinner">
+                <div class="spinner"></div>
+                <p>Loading Preamble questions from Google Sheets...</p>
+            </div>
+            
+            <div class="error-message" id="preambleErrorMessage">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <h3>Failed to load questions</h3>
+                <p id="preambleErrorText">Please try again later or contact support.</p>
+                <button class="nav-btn" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+            
+            <div id="preambleQuizContainer" style="display: none;">
+                <!-- Normal mode quiz content would go here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Questions Modal for Citizenship -->
+    <div class="modal-overlay" id="citizenshipModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Citizenship Practice Questions</h2>
+                <button class="close-modal" id="closeCitizenshipModal">&times;</button>
+            </div>
+            
+            <div class="quiz-settings" id="citizenshipQuizSettings">
+                <h3 class="settings-title">Configure Your Citizenship Practice Session</h3>
+                
+                <div class="settings-options">
+                    <div class="setting-group">
+                        <h4>Question Selection Mode</h4>
+                        <div class="radio-options">
+                            <div class="radio-option">
+                                <input type="radio" id="citizenshipModeAll" name="citizenshipQuestionMode" value="all" checked>
+                                <label for="citizenshipModeAll">All Questions</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="citizenshipModeRandom" name="citizenshipQuestionMode" value="random">
+                                <label for="citizenshipModeRandom">Random Questions</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="citizenshipModeRange" name="citizenshipQuestionMode" value="range">
+                                <label for="citizenshipModeRange">Question Range</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Quiz Mode</h4>
+                        <div class="radio-options">
+                            <div class="radio-option">
+                                <input type="radio" id="citizenshipQuizNormal" name="citizenshipQuizMode" value="normal">
+                                <label for="citizenshipQuizNormal">Normal Mode (Modal)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="citizenshipQuizFullscreen" name="citizenshipQuizMode" value="fullscreen" checked>
+                                <label for="citizenshipQuizFullscreen">Full Screen Mode</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Question Count</h4>
+                        <div id="citizenshipRandomSettings" style="display: none;">
+                            <div class="question-count-input">
+                                <label for="citizenshipQuestionCount">Number of Questions:</label>
+                                <input type="number" id="citizenshipQuestionCount" min="1" max="100" value="10">
+                            </div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">
+                                Select how many random questions you want to practice.
+                            </p>
+                        </div>
+                        
+                        <div id="citizenshipRangeSettings" style="display: none;">
+                            <div class="range-inputs">
+                                <div class="range-input">
+                                    <label for="citizenshipStartQuestion">Start Question:</label>
+                                    <input type="number" id="citizenshipStartQuestion" min="1" value="1">
+                                </div>
+                                <div class="range-input">
+                                    <label for="citizenshipEndQuestion">End Question:</label>
+                                    <input type="number" id="citizenshipEndQuestion" min="1" value="10">
+                                </div>
+                            </div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">
+                                Select the range of questions you want to practice.
+                            </p>
+                        </div>
+                        
+                        <div id="citizenshipAllSettings">
+                            <p style="color: #475569; font-style: italic;">
+                                All available Citizenship questions will be loaded for practice.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="start-quiz-btn" id="startCitizenshipQuiz">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </button>
+                    <button class="cancel-btn" id="cancelCitizenshipSettings">Cancel</button>
+                </div>
+            </div>
+            
+            <div class="loading-spinner" id="citizenshipLoadingSpinner">
+                <div class="spinner"></div>
+                <p>Loading Citizenship questions from Google Sheets...</p>
+            </div>
+            
+            <div class="error-message" id="citizenshipErrorMessage">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <h3>Failed to load questions</h3>
+                <p id="citizenshipErrorText">Please try again later or contact support.</p>
+                <button class="nav-btn" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+            
+            <div id="citizenshipQuizContainer" style="display: none;">
                 <!-- Normal mode quiz content would go here -->
             </div>
         </div>
@@ -1628,9 +1873,6 @@
     <!-- Full Screen Quiz for Constitution of India -->
     <div class="fullscreen-quiz" id="constitutionFullscreenQuiz">
         <div class="quiz-header">
-            <div class="quiz-title">
-                Constitution of India Practice - TNPSC Indian Polity
-            </div>
             <div class="quiz-controls">
                 <div class="quiz-timer" id="constitutionQuizTimer">
                     <i class="fas fa-clock"></i> Time: <span id="constitutionTimerValue">00:00</span>
@@ -1730,12 +1972,213 @@
         </div>
     </div>
 
+    <!-- Full Screen Quiz for Preamble -->
+    <div class="fullscreen-quiz" id="preambleFullscreenQuiz">
+        <div class="quiz-header">
+            <div class="quiz-controls">
+                <div class="quiz-timer" id="preambleQuizTimer">
+                    <i class="fas fa-clock"></i> Time: <span id="preambleTimerValue">00:00</span>
+                </div>
+                <button class="exit-quiz-btn" id="exitPreambleQuiz">
+                    <i class="fas fa-times"></i> Exit Quiz
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-content" id="preambleFullscreenQuizContent">
+            <div class="quiz-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="preambleProgressFill"></div>
+                </div>
+                <div class="progress-info">
+                    <span>Question <span id="preambleCurrentQuestionNum">1</span> of <span id="preambleTotalQuestionsNum">0</span></span>
+                    <span id="preambleAnsweredCount">0 answered</span>
+                </div>
+            </div>
+            
+            <div class="fullscreen-question-container">
+                <div class="fullscreen-question-text" id="preambleFullscreenQuestionText"></div>
+                
+                <div class="fullscreen-options-container" id="preambleFullscreenOptionsContainer"></div>
+                
+                <div class="fullscreen-explanation" id="preambleFullscreenExplanation">
+                    <h4><i class="fas fa-lightbulb"></i> Explanation</h4>
+                    <p id="preambleFullscreenExplanationText"></p>
+                </div>
+            </div>
+            
+            <div class="question-numbers" id="preambleQuestionNumbers"></div>
+            
+            <div class="quiz-navigation">
+                <button class="fullscreen-nav-btn" id="preamblePrevFullBtn">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                
+                <div class="nav-buttons">
+                    <button class="fullscreen-nav-btn" id="preambleMarkForReview">
+                        <i class="fas fa-bookmark"></i> Mark for Review
+                    </button>
+                    <button class="fullscreen-nav-btn" id="preambleClearResponse">
+                        <i class="fas fa-eraser"></i> Clear Response
+                    </button>
+                    <button class="fullscreen-nav-btn submit-full-quiz" id="submitPreambleQuiz">
+                        <i class="fas fa-check-circle"></i> Submit Quiz
+                    </button>
+                </div>
+                
+                <button class="fullscreen-nav-btn" id="preambleNextFullBtn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-results" id="preambleQuizResults">
+            <div class="results-container">
+                <h2 class="results-title">Preamble Quiz Results</h2>
+                
+                <div class="score-circle" id="preambleScoreCircle">
+                    <div class="score-circle-inner">
+                        <div class="score-percentage" id="preambleScorePercentage">0%</div>
+                        <div class="score-text">Score</div>
+                    </div>
+                </div>
+                
+                <div class="results-details">
+                    <div class="result-stat correct-stat">
+                        <h4>Correct Answers</h4>
+                        <p id="preambleCorrectAnswers">0</p>
+                    </div>
+                    <div class="result-stat incorrect-stat">
+                        <h4>Incorrect Answers</h4>
+                        <p id="preambleIncorrectAnswers">0</p>
+                    </div>
+                    <div class="result-stat">
+                        <h4>Total Questions</h4>
+                        <p id="preambleTotalResultQuestions">0</p>
+                    </div>
+                    <div class="result-stat">
+                        <h4>Time Taken</h4>
+                        <p id="preambleTimeTaken">00:00</p>
+                    </div>
+                </div>
+                
+                <div class="results-actions">
+                    <button class="action-btn retry-btn" id="preambleRetryQuiz">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                    <button class="action-btn review-btn" id="preambleReviewQuiz">
+                        <i class="fas fa-eye"></i> Review Answers
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Screen Quiz for Citizenship -->
+    <div class="fullscreen-quiz" id="citizenshipFullscreenQuiz">
+        <div class="quiz-header">
+            <div class="quiz-controls">
+                <div class="quiz-timer" id="citizenshipQuizTimer">
+                    <i class="fas fa-clock"></i> Time: <span id="citizenshipTimerValue">00:00</span>
+                </div>
+                <button class="exit-quiz-btn" id="exitCitizenshipQuiz">
+                    <i class="fas fa-times"></i> Exit Quiz
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-content" id="citizenshipFullscreenQuizContent">
+            <div class="quiz-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="citizenshipProgressFill"></div>
+                </div>
+                <div class="progress-info">
+                    <span>Question <span id="citizenshipCurrentQuestionNum">1</span> of <span id="citizenshipTotalQuestionsNum">0</span></span>
+                    <span id="citizenshipAnsweredCount">0 answered</span>
+                </div>
+            </div>
+            
+            <div class="fullscreen-question-container">
+                <div class="fullscreen-question-text" id="citizenshipFullscreenQuestionText"></div>
+                
+                <div class="fullscreen-options-container" id="citizenshipFullscreenOptionsContainer"></div>
+                
+                <div class="fullscreen-explanation" id="citizenshipFullscreenExplanation">
+                    <h4><i class="fas fa-lightbulb"></i> Explanation</h4>
+                    <p id="citizenshipFullscreenExplanationText"></p>
+                </div>
+            </div>
+            
+            <div class="question-numbers" id="citizenshipQuestionNumbers"></div>
+            
+            <div class="quiz-navigation">
+                <button class="fullscreen-nav-btn" id="citizenshipPrevFullBtn">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                
+                <div class="nav-buttons">
+                    <button class="fullscreen-nav-btn" id="citizenshipMarkForReview">
+                        <i class="fas fa-bookmark"></i> Mark for Review
+                    </button>
+                    <button class="fullscreen-nav-btn" id="citizenshipClearResponse">
+                        <i class="fas fa-eraser"></i> Clear Response
+                    </button>
+                    <button class="fullscreen-nav-btn submit-full-quiz" id="submitCitizenshipQuiz">
+                        <i class="fas fa-check-circle"></i> Submit Quiz
+                    </button>
+                </div>
+                
+                <button class="fullscreen-nav-btn" id="citizenshipNextFullBtn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-results" id="citizenshipQuizResults">
+            <div class="results-container">
+                <h2 class="results-title">Citizenship Quiz Results</h2>
+                
+                <div class="score-circle" id="citizenshipScoreCircle">
+                    <div class="score-circle-inner">
+                        <div class="score-percentage" id="citizenshipScorePercentage">0%</div>
+                        <div class="score-text">Score</div>
+                    </div>
+                </div>
+                
+                <div class="results-details">
+                    <div class="result-stat correct-stat">
+                        <h4>Correct Answers</h4>
+                        <p id="citizenshipCorrectAnswers">0</p>
+                    </div>
+                    <div class="result-stat incorrect-stat">
+                        <h4>Incorrect Answers</h4>
+                        <p id="citizenshipIncorrectAnswers">0</p>
+                    </div>
+                    <div class="result-stat">
+                        <h4>Total Questions</h4>
+                        <p id="citizenshipTotalResultQuestions">0</p>
+                    </div>
+                    <div class="result-stat">
+                        <h4>Time Taken</h4>
+                        <p id="citizenshipTimeTaken">00:00</p>
+                    </div>
+                </div>
+                
+                <div class="results-actions">
+                    <button class="action-btn retry-btn" id="citizenshipRetryQuiz">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                    <button class="action-btn review-btn" id="citizenshipReviewQuiz">
+                        <i class="fas fa-eye"></i> Review Answers
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Full Screen Quiz for Important Articles -->
     <div class="fullscreen-quiz" id="fullscreenQuiz">
         <div class="quiz-header">
-            <div class="quiz-title">
-                Important Articles Practice - TNPSC Indian Polity
-            </div>
             <div class="quiz-controls">
                 <div class="quiz-timer" id="quizTimer">
                     <i class="fas fa-clock"></i> Time: <span id="timerValue">00:00</span>
@@ -1886,6 +2329,8 @@
     <script>
         // Google Sheets URLs
         const CONSTITUTION_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv';
+        const PREAMBLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo0olme-uM2pKfeihs2wI88bjyT7O3d5cKwFKiLZUXzQF1dwutx8ci80BeX8bvpfp9zAK31uGn2vRN/pub?output=csv';
+        const CITIZENSHIP_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTArgFXO2ruYakaftJnxqdtFNGpOcumKIY9g-bS8IiD1UmtGe2kYzM_iGz0yB6TvPCj1fdkzxOn1IVC/pub?output=csv';
         const ARTICLES_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv';
         
         // Variables for Constitution of India
@@ -1901,7 +2346,33 @@
         let constitutionTimerInterval = null;
         let constitutionElapsedTime = 0;
         
-        // Variables for Important Articles (existing)
+        // Variables for Preamble
+        let preambleQuestions = [];
+        let preambleFilteredQuestions = [];
+        let preambleCurrentQuestionIndex = 0;
+        let preambleUserAnswers = [];
+        let preambleMarkedQuestions = [];
+        let preambleQuizSubmitted = false;
+        let preambleCurrentMode = 'all';
+        let preambleQuizMode = 'fullscreen';
+        let preambleQuizStartTime = null;
+        let preambleTimerInterval = null;
+        let preambleElapsedTime = 0;
+        
+        // Variables for Citizenship
+        let citizenshipQuestions = [];
+        let citizenshipFilteredQuestions = [];
+        let citizenshipCurrentQuestionIndex = 0;
+        let citizenshipUserAnswers = [];
+        let citizenshipMarkedQuestions = [];
+        let citizenshipQuizSubmitted = false;
+        let citizenshipCurrentMode = 'all';
+        let citizenshipQuizMode = 'fullscreen';
+        let citizenshipQuizStartTime = null;
+        let citizenshipTimerInterval = null;
+        let citizenshipElapsedTime = 0;
+        
+        // Variables for Important Articles
         let allQuestions = [];
         let filteredQuestions = [];
         let currentQuestionIndex = 0;
@@ -1960,7 +2431,99 @@
         const startConstitutionQuizBtn = document.getElementById('startConstitutionQuiz');
         const cancelConstitutionSettingsBtn = document.getElementById('cancelConstitutionSettings');
         
-        // DOM Elements for Important Articles (existing)
+        // DOM Elements for Preamble
+        const preambleModal = document.getElementById('preambleModal');
+        const closePreambleModal = document.getElementById('closePreambleModal');
+        const preambleQuizSettings = document.getElementById('preambleQuizSettings');
+        const preambleLoadingSpinner = document.getElementById('preambleLoadingSpinner');
+        const preambleErrorMessage = document.getElementById('preambleErrorMessage');
+        const preambleErrorText = document.getElementById('preambleErrorText');
+        const preambleFullscreenQuiz = document.getElementById('preambleFullscreenQuiz');
+        const exitPreambleQuizBtn = document.getElementById('exitPreambleQuiz');
+        const preambleQuizTimer = document.getElementById('preambleTimerValue');
+        const preambleProgressFill = document.getElementById('preambleProgressFill');
+        const preambleCurrentQuestionNum = document.getElementById('preambleCurrentQuestionNum');
+        const preambleTotalQuestionsNum = document.getElementById('preambleTotalQuestionsNum');
+        const preambleAnsweredCount = document.getElementById('preambleAnsweredCount');
+        const preambleFullscreenQuestionText = document.getElementById('preambleFullscreenQuestionText');
+        const preambleFullscreenOptionsContainer = document.getElementById('preambleFullscreenOptionsContainer');
+        const preambleFullscreenExplanation = document.getElementById('preambleFullscreenExplanation');
+        const preambleFullscreenExplanationText = document.getElementById('preambleFullscreenExplanationText');
+        const preambleQuestionNumbers = document.getElementById('preambleQuestionNumbers');
+        const preamblePrevFullBtn = document.getElementById('preamblePrevFullBtn');
+        const preambleNextFullBtn = document.getElementById('preambleNextFullBtn');
+        const preambleMarkForReviewBtn = document.getElementById('preambleMarkForReview');
+        const preambleClearResponseBtn = document.getElementById('preambleClearResponse');
+        const submitPreambleQuizBtn = document.getElementById('submitPreambleQuiz');
+        const preambleQuizResults = document.getElementById('preambleQuizResults');
+        const preambleScoreCircle = document.getElementById('preambleScoreCircle');
+        const preambleScorePercentage = document.getElementById('preambleScorePercentage');
+        const preambleCorrectAnswers = document.getElementById('preambleCorrectAnswers');
+        const preambleIncorrectAnswers = document.getElementById('preambleIncorrectAnswers');
+        const preambleTotalResultQuestions = document.getElementById('preambleTotalResultQuestions');
+        const preambleTimeTaken = document.getElementById('preambleTimeTaken');
+        const preambleRetryQuizBtn = document.getElementById('preambleRetryQuiz');
+        const preambleReviewQuizBtn = document.getElementById('preambleReviewQuiz');
+        
+        // Settings Elements for Preamble
+        const preambleQuestionModeRadios = document.querySelectorAll('input[name="preambleQuestionMode"]');
+        const preambleQuizModeRadios = document.querySelectorAll('input[name="preambleQuizMode"]');
+        const preambleRandomSettings = document.getElementById('preambleRandomSettings');
+        const preambleRangeSettings = document.getElementById('preambleRangeSettings');
+        const preambleAllSettings = document.getElementById('preambleAllSettings');
+        const preambleQuestionCountInput = document.getElementById('preambleQuestionCount');
+        const preambleStartQuestionInput = document.getElementById('preambleStartQuestion');
+        const preambleEndQuestionInput = document.getElementById('preambleEndQuestion');
+        const startPreambleQuizBtn = document.getElementById('startPreambleQuiz');
+        const cancelPreambleSettingsBtn = document.getElementById('cancelPreambleSettings');
+        
+        // DOM Elements for Citizenship
+        const citizenshipModal = document.getElementById('citizenshipModal');
+        const closeCitizenshipModal = document.getElementById('closeCitizenshipModal');
+        const citizenshipQuizSettings = document.getElementById('citizenshipQuizSettings');
+        const citizenshipLoadingSpinner = document.getElementById('citizenshipLoadingSpinner');
+        const citizenshipErrorMessage = document.getElementById('citizenshipErrorMessage');
+        const citizenshipErrorText = document.getElementById('citizenshipErrorText');
+        const citizenshipFullscreenQuiz = document.getElementById('citizenshipFullscreenQuiz');
+        const exitCitizenshipQuizBtn = document.getElementById('exitCitizenshipQuiz');
+        const citizenshipQuizTimer = document.getElementById('citizenshipTimerValue');
+        const citizenshipProgressFill = document.getElementById('citizenshipProgressFill');
+        const citizenshipCurrentQuestionNum = document.getElementById('citizenshipCurrentQuestionNum');
+        const citizenshipTotalQuestionsNum = document.getElementById('citizenshipTotalQuestionsNum');
+        const citizenshipAnsweredCount = document.getElementById('citizenshipAnsweredCount');
+        const citizenshipFullscreenQuestionText = document.getElementById('citizenshipFullscreenQuestionText');
+        const citizenshipFullscreenOptionsContainer = document.getElementById('citizenshipFullscreenOptionsContainer');
+        const citizenshipFullscreenExplanation = document.getElementById('citizenshipFullscreenExplanation');
+        const citizenshipFullscreenExplanationText = document.getElementById('citizenshipFullscreenExplanationText');
+        const citizenshipQuestionNumbers = document.getElementById('citizenshipQuestionNumbers');
+        const citizenshipPrevFullBtn = document.getElementById('citizenshipPrevFullBtn');
+        const citizenshipNextFullBtn = document.getElementById('citizenshipNextFullBtn');
+        const citizenshipMarkForReviewBtn = document.getElementById('citizenshipMarkForReview');
+        const citizenshipClearResponseBtn = document.getElementById('citizenshipClearResponse');
+        const submitCitizenshipQuizBtn = document.getElementById('submitCitizenshipQuiz');
+        const citizenshipQuizResults = document.getElementById('citizenshipQuizResults');
+        const citizenshipScoreCircle = document.getElementById('citizenshipScoreCircle');
+        const citizenshipScorePercentage = document.getElementById('citizenshipScorePercentage');
+        const citizenshipCorrectAnswers = document.getElementById('citizenshipCorrectAnswers');
+        const citizenshipIncorrectAnswers = document.getElementById('citizenshipIncorrectAnswers');
+        const citizenshipTotalResultQuestions = document.getElementById('citizenshipTotalResultQuestions');
+        const citizenshipTimeTaken = document.getElementById('citizenshipTimeTaken');
+        const citizenshipRetryQuizBtn = document.getElementById('citizenshipRetryQuiz');
+        const citizenshipReviewQuizBtn = document.getElementById('citizenshipReviewQuiz');
+        
+        // Settings Elements for Citizenship
+        const citizenshipQuestionModeRadios = document.querySelectorAll('input[name="citizenshipQuestionMode"]');
+        const citizenshipQuizModeRadios = document.querySelectorAll('input[name="citizenshipQuizMode"]');
+        const citizenshipRandomSettings = document.getElementById('citizenshipRandomSettings');
+        const citizenshipRangeSettings = document.getElementById('citizenshipRangeSettings');
+        const citizenshipAllSettings = document.getElementById('citizenshipAllSettings');
+        const citizenshipQuestionCountInput = document.getElementById('citizenshipQuestionCount');
+        const citizenshipStartQuestionInput = document.getElementById('citizenshipStartQuestion');
+        const citizenshipEndQuestionInput = document.getElementById('citizenshipEndQuestion');
+        const startCitizenshipQuizBtn = document.getElementById('startCitizenshipQuiz');
+        const cancelCitizenshipSettingsBtn = document.getElementById('cancelCitizenshipSettings');
+        
+        // DOM Elements for Important Articles
         const practiceModal = document.getElementById('practiceModal');
         const closeModal = document.getElementById('closeModal');
         const quizSettings = document.getElementById('quizSettings');
@@ -1994,7 +2557,7 @@
         const retryQuizBtn = document.getElementById('retryQuiz');
         const reviewQuizBtn = document.getElementById('reviewQuiz');
         
-        // Settings Elements for Important Articles (existing)
+        // Settings Elements for Important Articles
         const questionModeRadios = document.querySelectorAll('input[name="questionMode"]');
         const quizModeRadios = document.querySelectorAll('input[name="quizMode"]');
         const randomSettings = document.getElementById('randomSettings');
@@ -2049,7 +2612,85 @@
             }
         });
         
-        // Event Listeners for Important Articles (existing)
+        // Event Listeners for Preamble
+        document.querySelector('.preamble-btn').addEventListener('click', showPreambleQuizSettings);
+        
+        closePreambleModal.addEventListener('click', closePreamblePracticeModal);
+        startPreambleQuizBtn.addEventListener('click', startPreambleQuiz);
+        cancelPreambleSettingsBtn.addEventListener('click', closePreamblePracticeModal);
+        
+        // Full Screen Quiz Event Listeners for Preamble
+        exitPreambleQuizBtn.addEventListener('click', exitPreambleFullscreenQuiz);
+        preamblePrevFullBtn.addEventListener('click', showPreamblePreviousFullQuestion);
+        preambleNextFullBtn.addEventListener('click', showPreambleNextFullQuestion);
+        preambleMarkForReviewBtn.addEventListener('click', togglePreambleMarkForReview);
+        preambleClearResponseBtn.addEventListener('click', clearPreambleCurrentResponse);
+        submitPreambleQuizBtn.addEventListener('click', submitPreambleQuiz);
+        preambleRetryQuizBtn.addEventListener('click', retryPreambleQuiz);
+        preambleReviewQuizBtn.addEventListener('click', reviewPreambleQuiz);
+        
+        // Question mode radio button change listeners for Preamble
+        preambleQuestionModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                preambleCurrentMode = this.value;
+                updatePreambleSettingsVisibility();
+            });
+        });
+        
+        // Quiz mode radio button change listeners for Preamble
+        preambleQuizModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                preambleQuizMode = this.value;
+            });
+        });
+        
+        // Close modal when clicking outside for Preamble
+        preambleModal.addEventListener('click', function(e) {
+            if (e.target === preambleModal) {
+                closePreamblePracticeModal();
+            }
+        });
+        
+        // Event Listeners for Citizenship
+        document.querySelector('.citizenship-btn').addEventListener('click', showCitizenshipQuizSettings);
+        
+        closeCitizenshipModal.addEventListener('click', closeCitizenshipPracticeModal);
+        startCitizenshipQuizBtn.addEventListener('click', startCitizenshipQuiz);
+        cancelCitizenshipSettingsBtn.addEventListener('click', closeCitizenshipPracticeModal);
+        
+        // Full Screen Quiz Event Listeners for Citizenship
+        exitCitizenshipQuizBtn.addEventListener('click', exitCitizenshipFullscreenQuiz);
+        citizenshipPrevFullBtn.addEventListener('click', showCitizenshipPreviousFullQuestion);
+        citizenshipNextFullBtn.addEventListener('click', showCitizenshipNextFullQuestion);
+        citizenshipMarkForReviewBtn.addEventListener('click', toggleCitizenshipMarkForReview);
+        citizenshipClearResponseBtn.addEventListener('click', clearCitizenshipCurrentResponse);
+        submitCitizenshipQuizBtn.addEventListener('click', submitCitizenshipQuiz);
+        citizenshipRetryQuizBtn.addEventListener('click', retryCitizenshipQuiz);
+        citizenshipReviewQuizBtn.addEventListener('click', reviewCitizenshipQuiz);
+        
+        // Question mode radio button change listeners for Citizenship
+        citizenshipQuestionModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                citizenshipCurrentMode = this.value;
+                updateCitizenshipSettingsVisibility();
+            });
+        });
+        
+        // Quiz mode radio button change listeners for Citizenship
+        citizenshipQuizModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                citizenshipQuizMode = this.value;
+            });
+        });
+        
+        // Close modal when clicking outside for Citizenship
+        citizenshipModal.addEventListener('click', function(e) {
+            if (e.target === citizenshipModal) {
+                closeCitizenshipPracticeModal();
+            }
+        });
+        
+        // Event Listeners for Important Articles
         document.getElementById('practiceArticles').addEventListener('click', showQuizSettings);
         
         closeModal.addEventListener('click', closePracticeModal);
@@ -2090,6 +2731,8 @@
         
         // Initialize settings
         updateConstitutionSettingsVisibility();
+        updatePreambleSettingsVisibility();
+        updateCitizenshipSettingsVisibility();
         updateSettingsVisibility();
         
         // Header scrolling functionality
@@ -2186,6 +2829,10 @@
         }
         
         function startConstitutionFullscreenQuiz() {
+            // Hide website header
+            document.getElementById('headerWrapper').classList.add('quiz-hidden');
+            document.body.classList.add('quiz-active');
+            
             // Show fullscreen quiz
             constitutionFullscreenQuiz.style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -2417,19 +3064,21 @@
             constitutionQuizResults.style.display = 'block';
         }
         
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-        
         function exitConstitutionFullscreenQuiz() {
             if (!constitutionQuizSubmitted && confirm('Are you sure you want to exit? Your progress will be lost.')) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
                 constitutionFullscreenQuiz.style.display = 'none';
                 document.body.style.overflow = 'auto';
                 clearInterval(constitutionTimerInterval);
                 resetConstitutionQuizState();
             } else if (constitutionQuizSubmitted) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
                 constitutionFullscreenQuiz.style.display = 'none';
                 document.body.style.overflow = 'auto';
                 resetConstitutionQuizState();
@@ -2496,7 +3145,795 @@
             }
         }
         
-        // Functions for Important Articles (existing)
+        // Functions for Preamble
+        function showPreambleQuizSettings() {
+            showModal(preambleModal);
+            preambleQuizSettings.style.display = 'block';
+            preambleLoadingSpinner.style.display = 'none';
+            preambleErrorMessage.style.display = 'none';
+        }
+        
+        function updatePreambleSettingsVisibility() {
+            preambleRandomSettings.style.display = 'none';
+            preambleRangeSettings.style.display = 'none';
+            preambleAllSettings.style.display = 'none';
+            
+            switch(preambleCurrentMode) {
+                case 'random':
+                    preambleRandomSettings.style.display = 'block';
+                    break;
+                case 'range':
+                    preambleRangeSettings.style.display = 'block';
+                    break;
+                case 'all':
+                    preambleAllSettings.style.display = 'block';
+                    break;
+            }
+        }
+        
+        async function startPreambleQuiz() {
+            try {
+                // Fetch data from Google Sheets if not already loaded
+                if (preambleQuestions.length === 0) {
+                    preambleLoadingSpinner.style.display = 'block';
+                    preambleQuizSettings.style.display = 'none';
+                    
+                    const response = await fetch(PREAMBLE_SHEETS_URL);
+                    if (!response.ok) throw new Error('Failed to fetch Preamble questions');
+                    
+                    const csvData = await response.text();
+                    preambleQuestions = parseCSVToQuestions(csvData);
+                    
+                    if (preambleQuestions.length === 0) {
+                        throw new Error('No Preamble questions found in the sheet. Please check the sheet format.');
+                    }
+                }
+                
+                // Filter questions based on selected mode
+                preambleFilteredQuestions = filterPreambleQuestionsByMode(preambleQuestions);
+                
+                if (preambleFilteredQuestions.length === 0) {
+                    throw new Error('No Preamble questions match your selected criteria. Please adjust your settings.');
+                }
+                
+                // Initialize quiz state
+                preambleUserAnswers = new Array(preambleFilteredQuestions.length).fill(null);
+                preambleMarkedQuestions = new Array(preambleFilteredQuestions.length).fill(false);
+                preambleQuizSubmitted = false;
+                preambleCurrentQuestionIndex = 0;
+                preambleElapsedTime = 0;
+                
+                // Close settings modal
+                closePreamblePracticeModal();
+                
+                // Start quiz in selected mode
+                if (preambleQuizMode === 'fullscreen') {
+                    startPreambleFullscreenQuiz();
+                } else {
+                    // For normal mode, you could implement modal-based quiz
+                    startPreambleFullscreenQuiz(); // Defaulting to fullscreen for now
+                }
+                
+            } catch (error) {
+                console.error('Error starting Preamble quiz:', error);
+                preambleLoadingSpinner.style.display = 'none';
+                preambleErrorMessage.style.display = 'block';
+                preambleErrorText.textContent = error.message || 'Failed to load Preamble questions. Please check your settings and try again.';
+            }
+        }
+        
+        function startPreambleFullscreenQuiz() {
+            // Hide website header
+            document.getElementById('headerWrapper').classList.add('quiz-hidden');
+            document.body.classList.add('quiz-active');
+            
+            // Show fullscreen quiz
+            preambleFullscreenQuiz.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize UI
+            preambleTotalQuestionsNum.textContent = preambleFilteredQuestions.length;
+            updatePreambleQuestionNumbers();
+            updatePreambleProgress();
+            
+            // Start timer
+            preambleQuizStartTime = Date.now();
+            startPreambleTimer();
+            
+            // Show first question
+            showPreambleFullQuestion(preambleCurrentQuestionIndex);
+        }
+        
+        function startPreambleTimer() {
+            clearInterval(preambleTimerInterval);
+            preambleTimerInterval = setInterval(updatePreambleTimer, 1000);
+        }
+        
+        function updatePreambleTimer() {
+            preambleElapsedTime++;
+            const minutes = Math.floor(preambleElapsedTime / 60);
+            const seconds = preambleElapsedTime % 60;
+            preambleQuizTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function showPreambleFullQuestion(index) {
+            if (index < 0 || index >= preambleFilteredQuestions.length) return;
+            
+            preambleCurrentQuestionIndex = index;
+            const question = preambleFilteredQuestions[index];
+            
+            // Update question text
+            preambleFullscreenQuestionText.textContent = `${question.id}. ${question.text}`;
+            
+            // Update options
+            preambleFullscreenOptionsContainer.innerHTML = '';
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            
+            optionLetters.forEach((letter, i) => {
+                const option = document.createElement('div');
+                option.className = 'fullscreen-option';
+                
+                if (preambleUserAnswers[index] === letter) {
+                    option.classList.add('selected');
+                }
+                
+                option.innerHTML = `
+                    <div class="fullscreen-option-letter">${letter}</div>
+                    <div class="fullscreen-option-text">${question.options[i] || 'Option not provided'}</div>
+                `;
+                
+                if (!preambleQuizSubmitted) {
+                    option.addEventListener('click', () => selectPreambleFullOption(letter));
+                }
+                preambleFullscreenOptionsContainer.appendChild(option);
+            });
+            
+            // Update explanation
+            preambleFullscreenExplanationText.textContent = question.explanation;
+            
+            // Hide explanation initially
+            preambleFullscreenExplanation.style.display = 'none';
+            
+            // Update navigation buttons
+            preambleCurrentQuestionNum.textContent = index + 1;
+            preamblePrevFullBtn.disabled = index === 0;
+            preambleNextFullBtn.disabled = index === preambleFilteredQuestions.length - 1;
+            
+            // Update mark button
+            preambleMarkForReviewBtn.innerHTML = preambleMarkedQuestions[index] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+            
+            // Update question numbers highlight
+            updatePreambleQuestionNumbers();
+            updatePreambleProgress();
+        }
+        
+        function selectPreambleFullOption(selectedLetter) {
+            if (preambleQuizSubmitted) return;
+            
+            // Remove selected class from all options
+            document.querySelectorAll('#preambleFullscreenOptionsContainer .fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            const selectedOption = document.querySelectorAll('#preambleFullscreenOptionsContainer .fullscreen-option')[selectedLetter.charCodeAt(0) - 65];
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            
+            // Store user's answer
+            preambleUserAnswers[preambleCurrentQuestionIndex] = selectedLetter;
+            
+            // Show explanation if quiz is submitted
+            if (preambleQuizSubmitted) {
+                showPreambleCorrectAnswer();
+            }
+            
+            // Update progress
+            updatePreambleProgress();
+            updatePreambleQuestionNumbers();
+        }
+        
+        function showPreambleCorrectAnswer() {
+            const question = preambleFilteredQuestions[preambleCurrentQuestionIndex];
+            const options = document.querySelectorAll('#preambleFullscreenOptionsContainer .fullscreen-option');
+            
+            options.forEach((option, index) => {
+                const letter = String.fromCharCode(65 + index);
+                if (letter === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else if (preambleUserAnswers[preambleCurrentQuestionIndex] === letter && preambleUserAnswers[preambleCurrentQuestionIndex] !== question.correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            preambleFullscreenExplanation.style.display = 'block';
+        }
+        
+        function showPreamblePreviousFullQuestion() {
+            if (preambleCurrentQuestionIndex > 0) {
+                showPreambleFullQuestion(preambleCurrentQuestionIndex - 1);
+            }
+        }
+        
+        function showPreambleNextFullQuestion() {
+            if (preambleCurrentQuestionIndex < preambleFilteredQuestions.length - 1) {
+                showPreambleFullQuestion(preambleCurrentQuestionIndex + 1);
+            }
+        }
+        
+        function togglePreambleMarkForReview() {
+            preambleMarkedQuestions[preambleCurrentQuestionIndex] = !preambleMarkedQuestions[preambleCurrentQuestionIndex];
+            updatePreambleQuestionNumbers();
+            
+            // Update button text
+            preambleMarkForReviewBtn.innerHTML = preambleMarkedQuestions[preambleCurrentQuestionIndex] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+        }
+        
+        function clearPreambleCurrentResponse() {
+            if (preambleQuizSubmitted) return;
+            
+            preambleUserAnswers[preambleCurrentQuestionIndex] = null;
+            document.querySelectorAll('#preambleFullscreenOptionsContainer .fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            updatePreambleProgress();
+            updatePreambleQuestionNumbers();
+        }
+        
+        function updatePreambleProgress() {
+            const answered = preambleUserAnswers.filter(answer => answer !== null).length;
+            const total = preambleFilteredQuestions.length;
+            const percentage = (answered / total) * 100;
+            
+            preambleProgressFill.style.width = `${percentage}%`;
+            preambleAnsweredCount.textContent = `${answered} answered`;
+        }
+        
+        function updatePreambleQuestionNumbers() {
+            preambleQuestionNumbers.innerHTML = '';
+            
+            preambleFilteredQuestions.forEach((_, index) => {
+                const numberBtn = document.createElement('div');
+                numberBtn.className = 'question-number';
+                
+                if (index === preambleCurrentQuestionIndex) {
+                    numberBtn.classList.add('current');
+                } else if (preambleUserAnswers[index] !== null) {
+                    numberBtn.classList.add('answered');
+                }
+                
+                if (preambleMarkedQuestions[index]) {
+                    numberBtn.classList.add('marked');
+                }
+                
+                numberBtn.textContent = index + 1;
+                numberBtn.addEventListener('click', () => {
+                    showPreambleFullQuestion(index);
+                });
+                
+                preambleQuestionNumbers.appendChild(numberBtn);
+            });
+        }
+        
+        function submitPreambleQuiz() {
+            if (confirm('Are you sure you want to submit the Preamble quiz? You cannot change answers after submission.')) {
+                preambleQuizSubmitted = true;
+                clearInterval(preambleTimerInterval);
+                
+                // Calculate results
+                let correctCount = 0;
+                preambleFilteredQuestions.forEach((question, index) => {
+                    if (preambleUserAnswers[index] === question.correctAnswer) {
+                        correctCount++;
+                    }
+                });
+                
+                // Show results
+                showPreambleResults(correctCount);
+            }
+        }
+        
+        function showPreambleResults(correctCount) {
+            const total = preambleFilteredQuestions.length;
+            const percentage = Math.round((correctCount / total) * 100);
+            const incorrectCount = total - correctCount;
+            const totalTime = formatTime(preambleElapsedTime);
+            
+            // Update results UI
+            preambleScoreCircle.style.setProperty('--percentage', `${percentage}%`);
+            preambleScorePercentage.textContent = `${percentage}%`;
+            preambleCorrectAnswers.textContent = correctCount;
+            preambleIncorrectAnswers.textContent = incorrectCount;
+            preambleTotalResultQuestions.textContent = total;
+            preambleTimeTaken.textContent = totalTime;
+            
+            // Show results, hide quiz content
+            document.getElementById('preambleFullscreenQuizContent').style.display = 'none';
+            preambleQuizResults.style.display = 'block';
+        }
+        
+        function exitPreambleFullscreenQuiz() {
+            if (!preambleQuizSubmitted && confirm('Are you sure you want to exit? Your Preamble quiz progress will be lost.')) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                preambleFullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                clearInterval(preambleTimerInterval);
+                resetPreambleQuizState();
+            } else if (preambleQuizSubmitted) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                preambleFullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                resetPreambleQuizState();
+            }
+        }
+        
+        function retryPreambleQuiz() {
+            // Reset quiz state and restart
+            resetPreambleQuizState();
+            preambleQuizResults.style.display = 'none';
+            document.getElementById('preambleFullscreenQuizContent').style.display = 'block';
+            startPreambleFullscreenQuiz();
+        }
+        
+        function reviewPreambleQuiz() {
+            // Go back to quiz with answers shown
+            preambleQuizResults.style.display = 'none';
+            document.getElementById('preambleFullscreenQuizContent').style.display = 'block';
+            
+            // Show correct answers for all questions
+            preambleQuizSubmitted = true;
+            showPreambleFullQuestion(preambleCurrentQuestionIndex);
+            showPreambleCorrectAnswer();
+        }
+        
+        function resetPreambleQuizState() {
+            preambleFilteredQuestions = [];
+            preambleUserAnswers = [];
+            preambleMarkedQuestions = [];
+            preambleQuizSubmitted = false;
+            preambleCurrentQuestionIndex = 0;
+            preambleElapsedTime = 0;
+            clearInterval(preambleTimerInterval);
+        }
+        
+        function filterPreambleQuestionsByMode(questions) {
+            switch(preambleCurrentMode) {
+                case 'all':
+                    return [...questions];
+                    
+                case 'random':
+                    const count = parseInt(preambleQuestionCountInput.value) || 10;
+                    const maxCount = Math.min(count, questions.length);
+                    
+                    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+                    return shuffled.slice(0, maxCount);
+                    
+                case 'range':
+                    let start = parseInt(preambleStartQuestionInput.value) || 1;
+                    let end = parseInt(preambleEndQuestionInput.value) || 10;
+                    
+                    if (start < 1) start = 1;
+                    if (end > questions.length) end = questions.length;
+                    if (start > end) {
+                        [start, end] = [end, start];
+                        preambleStartQuestionInput.value = start;
+                        preambleEndQuestionInput.value = end;
+                    }
+                    
+                    return questions.slice(start - 1, end);
+                    
+                default:
+                    return questions;
+            }
+        }
+        
+        // Functions for Citizenship
+        function showCitizenshipQuizSettings() {
+            showModal(citizenshipModal);
+            citizenshipQuizSettings.style.display = 'block';
+            citizenshipLoadingSpinner.style.display = 'none';
+            citizenshipErrorMessage.style.display = 'none';
+        }
+        
+        function updateCitizenshipSettingsVisibility() {
+            citizenshipRandomSettings.style.display = 'none';
+            citizenshipRangeSettings.style.display = 'none';
+            citizenshipAllSettings.style.display = 'none';
+            
+            switch(citizenshipCurrentMode) {
+                case 'random':
+                    citizenshipRandomSettings.style.display = 'block';
+                    break;
+                case 'range':
+                    citizenshipRangeSettings.style.display = 'block';
+                    break;
+                case 'all':
+                    citizenshipAllSettings.style.display = 'block';
+                    break;
+            }
+        }
+        
+        async function startCitizenshipQuiz() {
+            try {
+                // Fetch data from Google Sheets if not already loaded
+                if (citizenshipQuestions.length === 0) {
+                    citizenshipLoadingSpinner.style.display = 'block';
+                    citizenshipQuizSettings.style.display = 'none';
+                    
+                    const response = await fetch(CITIZENSHIP_SHEETS_URL);
+                    if (!response.ok) throw new Error('Failed to fetch Citizenship questions');
+                    
+                    const csvData = await response.text();
+                    citizenshipQuestions = parseCSVToQuestions(csvData);
+                    
+                    if (citizenshipQuestions.length === 0) {
+                        throw new Error('No Citizenship questions found in the sheet. Please check the sheet format.');
+                    }
+                }
+                
+                // Filter questions based on selected mode
+                citizenshipFilteredQuestions = filterCitizenshipQuestionsByMode(citizenshipQuestions);
+                
+                if (citizenshipFilteredQuestions.length === 0) {
+                    throw new Error('No Citizenship questions match your selected criteria. Please adjust your settings.');
+                }
+                
+                // Initialize quiz state
+                citizenshipUserAnswers = new Array(citizenshipFilteredQuestions.length).fill(null);
+                citizenshipMarkedQuestions = new Array(citizenshipFilteredQuestions.length).fill(false);
+                citizenshipQuizSubmitted = false;
+                citizenshipCurrentQuestionIndex = 0;
+                citizenshipElapsedTime = 0;
+                
+                // Close settings modal
+                closeCitizenshipPracticeModal();
+                
+                // Start quiz in selected mode
+                if (citizenshipQuizMode === 'fullscreen') {
+                    startCitizenshipFullscreenQuiz();
+                } else {
+                    // For normal mode, you could implement modal-based quiz
+                    startCitizenshipFullscreenQuiz(); // Defaulting to fullscreen for now
+                }
+                
+            } catch (error) {
+                console.error('Error starting Citizenship quiz:', error);
+                citizenshipLoadingSpinner.style.display = 'none';
+                citizenshipErrorMessage.style.display = 'block';
+                citizenshipErrorText.textContent = error.message || 'Failed to load Citizenship questions. Please check your settings and try again.';
+            }
+        }
+        
+        function startCitizenshipFullscreenQuiz() {
+            // Hide website header
+            document.getElementById('headerWrapper').classList.add('quiz-hidden');
+            document.body.classList.add('quiz-active');
+            
+            // Show fullscreen quiz
+            citizenshipFullscreenQuiz.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize UI
+            citizenshipTotalQuestionsNum.textContent = citizenshipFilteredQuestions.length;
+            updateCitizenshipQuestionNumbers();
+            updateCitizenshipProgress();
+            
+            // Start timer
+            citizenshipQuizStartTime = Date.now();
+            startCitizenshipTimer();
+            
+            // Show first question
+            showCitizenshipFullQuestion(citizenshipCurrentQuestionIndex);
+        }
+        
+        function startCitizenshipTimer() {
+            clearInterval(citizenshipTimerInterval);
+            citizenshipTimerInterval = setInterval(updateCitizenshipTimer, 1000);
+        }
+        
+        function updateCitizenshipTimer() {
+            citizenshipElapsedTime++;
+            const minutes = Math.floor(citizenshipElapsedTime / 60);
+            const seconds = citizenshipElapsedTime % 60;
+            citizenshipQuizTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function showCitizenshipFullQuestion(index) {
+            if (index < 0 || index >= citizenshipFilteredQuestions.length) return;
+            
+            citizenshipCurrentQuestionIndex = index;
+            const question = citizenshipFilteredQuestions[index];
+            
+            // Update question text
+            citizenshipFullscreenQuestionText.textContent = `${question.id}. ${question.text}`;
+            
+            // Update options
+            citizenshipFullscreenOptionsContainer.innerHTML = '';
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            
+            optionLetters.forEach((letter, i) => {
+                const option = document.createElement('div');
+                option.className = 'fullscreen-option';
+                
+                if (citizenshipUserAnswers[index] === letter) {
+                    option.classList.add('selected');
+                }
+                
+                option.innerHTML = `
+                    <div class="fullscreen-option-letter">${letter}</div>
+                    <div class="fullscreen-option-text">${question.options[i] || 'Option not provided'}</div>
+                `;
+                
+                if (!citizenshipQuizSubmitted) {
+                    option.addEventListener('click', () => selectCitizenshipFullOption(letter));
+                }
+                citizenshipFullscreenOptionsContainer.appendChild(option);
+            });
+            
+            // Update explanation
+            citizenshipFullscreenExplanationText.textContent = question.explanation;
+            
+            // Hide explanation initially
+            citizenshipFullscreenExplanation.style.display = 'none';
+            
+            // Update navigation buttons
+            citizenshipCurrentQuestionNum.textContent = index + 1;
+            citizenshipPrevFullBtn.disabled = index === 0;
+            citizenshipNextFullBtn.disabled = index === citizenshipFilteredQuestions.length - 1;
+            
+            // Update mark button
+            citizenshipMarkForReviewBtn.innerHTML = citizenshipMarkedQuestions[index] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+            
+            // Update question numbers highlight
+            updateCitizenshipQuestionNumbers();
+            updateCitizenshipProgress();
+        }
+        
+        function selectCitizenshipFullOption(selectedLetter) {
+            if (citizenshipQuizSubmitted) return;
+            
+            // Remove selected class from all options
+            document.querySelectorAll('#citizenshipFullscreenOptionsContainer .fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            const selectedOption = document.querySelectorAll('#citizenshipFullscreenOptionsContainer .fullscreen-option')[selectedLetter.charCodeAt(0) - 65];
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            
+            // Store user's answer
+            citizenshipUserAnswers[citizenshipCurrentQuestionIndex] = selectedLetter;
+            
+            // Show explanation if quiz is submitted
+            if (citizenshipQuizSubmitted) {
+                showCitizenshipCorrectAnswer();
+            }
+            
+            // Update progress
+            updateCitizenshipProgress();
+            updateCitizenshipQuestionNumbers();
+        }
+        
+        function showCitizenshipCorrectAnswer() {
+            const question = citizenshipFilteredQuestions[citizenshipCurrentQuestionIndex];
+            const options = document.querySelectorAll('#citizenshipFullscreenOptionsContainer .fullscreen-option');
+            
+            options.forEach((option, index) => {
+                const letter = String.fromCharCode(65 + index);
+                if (letter === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else if (citizenshipUserAnswers[citizenshipCurrentQuestionIndex] === letter && citizenshipUserAnswers[citizenshipCurrentQuestionIndex] !== question.correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            citizenshipFullscreenExplanation.style.display = 'block';
+        }
+        
+        function showCitizenshipPreviousFullQuestion() {
+            if (citizenshipCurrentQuestionIndex > 0) {
+                showCitizenshipFullQuestion(citizenshipCurrentQuestionIndex - 1);
+            }
+        }
+        
+        function showCitizenshipNextFullQuestion() {
+            if (citizenshipCurrentQuestionIndex < citizenshipFilteredQuestions.length - 1) {
+                showCitizenshipFullQuestion(citizenshipCurrentQuestionIndex + 1);
+            }
+        }
+        
+        function toggleCitizenshipMarkForReview() {
+            citizenshipMarkedQuestions[citizenshipCurrentQuestionIndex] = !citizenshipMarkedQuestions[citizenshipCurrentQuestionIndex];
+            updateCitizenshipQuestionNumbers();
+            
+            // Update button text
+            citizenshipMarkForReviewBtn.innerHTML = citizenshipMarkedQuestions[citizenshipCurrentQuestionIndex] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+        }
+        
+        function clearCitizenshipCurrentResponse() {
+            if (citizenshipQuizSubmitted) return;
+            
+            citizenshipUserAnswers[citizenshipCurrentQuestionIndex] = null;
+            document.querySelectorAll('#citizenshipFullscreenOptionsContainer .fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            updateCitizenshipProgress();
+            updateCitizenshipQuestionNumbers();
+        }
+        
+        function updateCitizenshipProgress() {
+            const answered = citizenshipUserAnswers.filter(answer => answer !== null).length;
+            const total = citizenshipFilteredQuestions.length;
+            const percentage = (answered / total) * 100;
+            
+            citizenshipProgressFill.style.width = `${percentage}%`;
+            citizenshipAnsweredCount.textContent = `${answered} answered`;
+        }
+        
+        function updateCitizenshipQuestionNumbers() {
+            citizenshipQuestionNumbers.innerHTML = '';
+            
+            citizenshipFilteredQuestions.forEach((_, index) => {
+                const numberBtn = document.createElement('div');
+                numberBtn.className = 'question-number';
+                
+                if (index === citizenshipCurrentQuestionIndex) {
+                    numberBtn.classList.add('current');
+                } else if (citizenshipUserAnswers[index] !== null) {
+                    numberBtn.classList.add('answered');
+                }
+                
+                if (citizenshipMarkedQuestions[index]) {
+                    numberBtn.classList.add('marked');
+                }
+                
+                numberBtn.textContent = index + 1;
+                numberBtn.addEventListener('click', () => {
+                    showCitizenshipFullQuestion(index);
+                });
+                
+                citizenshipQuestionNumbers.appendChild(numberBtn);
+            });
+        }
+        
+        function submitCitizenshipQuiz() {
+            if (confirm('Are you sure you want to submit the Citizenship quiz? You cannot change answers after submission.')) {
+                citizenshipQuizSubmitted = true;
+                clearInterval(citizenshipTimerInterval);
+                
+                // Calculate results
+                let correctCount = 0;
+                citizenshipFilteredQuestions.forEach((question, index) => {
+                    if (citizenshipUserAnswers[index] === question.correctAnswer) {
+                        correctCount++;
+                    }
+                });
+                
+                // Show results
+                showCitizenshipResults(correctCount);
+            }
+        }
+        
+        function showCitizenshipResults(correctCount) {
+            const total = citizenshipFilteredQuestions.length;
+            const percentage = Math.round((correctCount / total) * 100);
+            const incorrectCount = total - correctCount;
+            const totalTime = formatTime(citizenshipElapsedTime);
+            
+            // Update results UI
+            citizenshipScoreCircle.style.setProperty('--percentage', `${percentage}%`);
+            citizenshipScorePercentage.textContent = `${percentage}%`;
+            citizenshipCorrectAnswers.textContent = correctCount;
+            citizenshipIncorrectAnswers.textContent = incorrectCount;
+            citizenshipTotalResultQuestions.textContent = total;
+            citizenshipTimeTaken.textContent = totalTime;
+            
+            // Show results, hide quiz content
+            document.getElementById('citizenshipFullscreenQuizContent').style.display = 'none';
+            citizenshipQuizResults.style.display = 'block';
+        }
+        
+        function exitCitizenshipFullscreenQuiz() {
+            if (!citizenshipQuizSubmitted && confirm('Are you sure you want to exit? Your Citizenship quiz progress will be lost.')) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                citizenshipFullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                clearInterval(citizenshipTimerInterval);
+                resetCitizenshipQuizState();
+            } else if (citizenshipQuizSubmitted) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                citizenshipFullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                resetCitizenshipQuizState();
+            }
+        }
+        
+        function retryCitizenshipQuiz() {
+            // Reset quiz state and restart
+            resetCitizenshipQuizState();
+            citizenshipQuizResults.style.display = 'none';
+            document.getElementById('citizenshipFullscreenQuizContent').style.display = 'block';
+            startCitizenshipFullscreenQuiz();
+        }
+        
+        function reviewCitizenshipQuiz() {
+            // Go back to quiz with answers shown
+            citizenshipQuizResults.style.display = 'none';
+            document.getElementById('citizenshipFullscreenQuizContent').style.display = 'block';
+            
+            // Show correct answers for all questions
+            citizenshipQuizSubmitted = true;
+            showCitizenshipFullQuestion(citizenshipCurrentQuestionIndex);
+            showCitizenshipCorrectAnswer();
+        }
+        
+        function resetCitizenshipQuizState() {
+            citizenshipFilteredQuestions = [];
+            citizenshipUserAnswers = [];
+            citizenshipMarkedQuestions = [];
+            citizenshipQuizSubmitted = false;
+            citizenshipCurrentQuestionIndex = 0;
+            citizenshipElapsedTime = 0;
+            clearInterval(citizenshipTimerInterval);
+        }
+        
+        function filterCitizenshipQuestionsByMode(questions) {
+            switch(citizenshipCurrentMode) {
+                case 'all':
+                    return [...questions];
+                    
+                case 'random':
+                    const count = parseInt(citizenshipQuestionCountInput.value) || 10;
+                    const maxCount = Math.min(count, questions.length);
+                    
+                    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+                    return shuffled.slice(0, maxCount);
+                    
+                case 'range':
+                    let start = parseInt(citizenshipStartQuestionInput.value) || 1;
+                    let end = parseInt(citizenshipEndQuestionInput.value) || 10;
+                    
+                    if (start < 1) start = 1;
+                    if (end > questions.length) end = questions.length;
+                    if (start > end) {
+                        [start, end] = [end, start];
+                        citizenshipStartQuestionInput.value = start;
+                        citizenshipEndQuestionInput.value = end;
+                    }
+                    
+                    return questions.slice(start - 1, end);
+                    
+                default:
+                    return questions;
+            }
+        }
+        
+        // Functions for Important Articles
         function showQuizSettings() {
             showModal(practiceModal);
             quizSettings.style.display = 'block';
@@ -2574,9 +4011,39 @@
             }
         }
         
-        // Rest of the Important Articles functions remain the same...
-        // (They are already defined in your original code)
-        // I'm including the key functions that need to be maintained
+        function startFullscreenQuiz() {
+            // Hide website header
+            document.getElementById('headerWrapper').classList.add('quiz-hidden');
+            document.body.classList.add('quiz-active');
+            
+            // Show fullscreen quiz
+            fullscreenQuiz.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize UI
+            totalQuestionsNum.textContent = filteredQuestions.length;
+            updateQuestionNumbers();
+            updateProgress();
+            
+            // Start timer
+            quizStartTime = Date.now();
+            startTimer();
+            
+            // Show first question
+            showFullQuestion(currentQuestionIndex);
+        }
+        
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function updateTimer() {
+            elapsedTime++;
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            quizTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
         
         function showFullQuestion(index) {
             if (index < 0 || index >= filteredQuestions.length) return;
@@ -2658,8 +4125,210 @@
             updateQuestionNumbers();
         }
         
-        // ... and so on for the rest of the Important Articles functions
+        function showCorrectAnswer() {
+            const question = filteredQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('.fullscreen-option');
+            
+            options.forEach((option, index) => {
+                const letter = String.fromCharCode(65 + index);
+                if (letter === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else if (userAnswers[currentQuestionIndex] === letter && userAnswers[currentQuestionIndex] !== question.correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            fullscreenExplanation.style.display = 'block';
+        }
         
+        function showPreviousFullQuestion() {
+            if (currentQuestionIndex > 0) {
+                showFullQuestion(currentQuestionIndex - 1);
+            }
+        }
+        
+        function showNextFullQuestion() {
+            if (currentQuestionIndex < filteredQuestions.length - 1) {
+                showFullQuestion(currentQuestionIndex + 1);
+            }
+        }
+        
+        function toggleMarkForReview() {
+            markedQuestions[currentQuestionIndex] = !markedQuestions[currentQuestionIndex];
+            updateQuestionNumbers();
+            
+            // Update button text
+            markForReviewBtn.innerHTML = markedQuestions[currentQuestionIndex] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+        }
+        
+        function clearCurrentResponse() {
+            if (quizSubmitted) return;
+            
+            userAnswers[currentQuestionIndex] = null;
+            document.querySelectorAll('.fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            updateProgress();
+            updateQuestionNumbers();
+        }
+        
+        function updateProgress() {
+            const answered = userAnswers.filter(answer => answer !== null).length;
+            const total = filteredQuestions.length;
+            const percentage = (answered / total) * 100;
+            
+            progressFill.style.width = `${percentage}%`;
+            answeredCount.textContent = `${answered} answered`;
+        }
+        
+        function updateQuestionNumbers() {
+            questionNumbers.innerHTML = '';
+            
+            filteredQuestions.forEach((_, index) => {
+                const numberBtn = document.createElement('div');
+                numberBtn.className = 'question-number';
+                
+                if (index === currentQuestionIndex) {
+                    numberBtn.classList.add('current');
+                } else if (userAnswers[index] !== null) {
+                    numberBtn.classList.add('answered');
+                }
+                
+                if (markedQuestions[index]) {
+                    numberBtn.classList.add('marked');
+                }
+                
+                numberBtn.textContent = index + 1;
+                numberBtn.addEventListener('click', () => {
+                    showFullQuestion(index);
+                });
+                
+                questionNumbers.appendChild(numberBtn);
+            });
+        }
+        
+        function submitFullQuiz() {
+            if (confirm('Are you sure you want to submit the quiz? You cannot change answers after submission.')) {
+                quizSubmitted = true;
+                clearInterval(timerInterval);
+                
+                // Calculate results
+                let correctCount = 0;
+                filteredQuestions.forEach((question, index) => {
+                    if (userAnswers[index] === question.correctAnswer) {
+                        correctCount++;
+                    }
+                });
+                
+                // Show results
+                showResults(correctCount);
+            }
+        }
+        
+        function showResults(correctCount) {
+            const total = filteredQuestions.length;
+            const percentage = Math.round((correctCount / total) * 100);
+            const incorrectCount = total - correctCount;
+            const totalTime = formatTime(elapsedTime);
+            
+            // Update results UI
+            scoreCircle.style.setProperty('--percentage', `${percentage}%`);
+            scorePercentage.textContent = `${percentage}%`;
+            correctAnswers.textContent = correctCount;
+            incorrectAnswers.textContent = incorrectCount;
+            totalResultQuestions.textContent = total;
+            timeTaken.textContent = totalTime;
+            
+            // Show results, hide quiz content
+            document.getElementById('fullscreenQuizContent').style.display = 'none';
+            quizResults.style.display = 'block';
+        }
+        
+        function exitFullscreenQuiz() {
+            if (!quizSubmitted && confirm('Are you sure you want to exit? Your progress will be lost.')) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                fullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                clearInterval(timerInterval);
+                resetQuizState();
+            } else if (quizSubmitted) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                fullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                resetQuizState();
+            }
+        }
+        
+        function retryQuiz() {
+            // Reset quiz state and restart
+            resetQuizState();
+            quizResults.style.display = 'none';
+            document.getElementById('fullscreenQuizContent').style.display = 'block';
+            startFullscreenQuiz();
+        }
+        
+        function reviewQuiz() {
+            // Go back to quiz with answers shown
+            quizResults.style.display = 'none';
+            document.getElementById('fullscreenQuizContent').style.display = 'block';
+            
+            // Show correct answers for all questions
+            quizSubmitted = true;
+            showFullQuestion(currentQuestionIndex);
+            showCorrectAnswer();
+        }
+        
+        function resetQuizState() {
+            filteredQuestions = [];
+            userAnswers = [];
+            markedQuestions = [];
+            quizSubmitted = false;
+            currentQuestionIndex = 0;
+            elapsedTime = 0;
+            clearInterval(timerInterval);
+        }
+        
+        function filterQuestionsByMode(questions) {
+            switch(currentMode) {
+                case 'all':
+                    return [...questions];
+                    
+                case 'random':
+                    const count = parseInt(questionCountInput.value) || 10;
+                    const maxCount = Math.min(count, questions.length);
+                    
+                    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+                    return shuffled.slice(0, maxCount);
+                    
+                case 'range':
+                    let start = parseInt(startQuestionInput.value) || 1;
+                    let end = parseInt(endQuestionInput.value) || 10;
+                    
+                    if (start < 1) start = 1;
+                    if (end > questions.length) end = questions.length;
+                    if (start > end) {
+                        [start, end] = [end, start];
+                        startQuestionInput.value = start;
+                        endQuestionInput.value = end;
+                    }
+                    
+                    return questions.slice(start - 1, end);
+                    
+                default:
+                    return questions;
+            }
+        }
+        
+        // Common Functions
         function parseCSVToQuestions(csvText) {
             const questions = [];
             const lines = csvText.split('\n').filter(line => line.trim() !== '');
@@ -2730,9 +4399,25 @@
             document.body.style.overflow = 'auto';
         }
         
+        function closePreamblePracticeModal() {
+            preambleModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        function closeCitizenshipPracticeModal() {
+            citizenshipModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
         function closePracticeModal() {
             practiceModal.style.display = 'none';
             document.body.style.overflow = 'auto';
+        }
+        
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
         
         // Back button functionality
@@ -2740,12 +4425,12 @@
             window.location.href = 'tnpsc-topics.html';
         });
         
-        // Practice button click handlers for other topics (except Constitution and Important Articles)
-        document.querySelectorAll('.practice-btn:not(.constitution-btn):not(#practiceArticles)').forEach(button => {
+        // Practice button click handlers for other topics (except Constitution, Preamble, Citizenship and Important Articles)
+        document.querySelectorAll('.practice-btn:not(.constitution-btn):not(.preamble-btn):not(.citizenship-btn):not(#practiceArticles)').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
                 const subtopicName = this.parentElement.querySelector('h3').textContent;
-                alert(`Starting "${subtopicName}" practice session.`);
+                alert(`Starting "${subtopicName}" practice session. Note: You need to add Google Sheets URL for this topic in the JavaScript code.`);
             });
         });
         
@@ -2762,6 +4447,40 @@
             constitutionStartQuestionInput.addEventListener('input', function() {
                 if (parseInt(this.value) > parseInt(constitutionEndQuestionInput.value)) {
                     constitutionEndQuestionInput.value = this.value;
+                }
+            });
+        }
+        
+        // Initialize range input validation for Preamble
+        if (preambleEndQuestionInput) {
+            preambleEndQuestionInput.addEventListener('input', function() {
+                if (parseInt(this.value) < parseInt(preambleStartQuestionInput.value)) {
+                    preambleStartQuestionInput.value = this.value;
+                }
+            });
+        }
+        
+        if (preambleStartQuestionInput) {
+            preambleStartQuestionInput.addEventListener('input', function() {
+                if (parseInt(this.value) > parseInt(preambleEndQuestionInput.value)) {
+                    preambleEndQuestionInput.value = this.value;
+                }
+            });
+        }
+        
+        // Initialize range input validation for Citizenship
+        if (citizenshipEndQuestionInput) {
+            citizenshipEndQuestionInput.addEventListener('input', function() {
+                if (parseInt(this.value) < parseInt(citizenshipStartQuestionInput.value)) {
+                    citizenshipStartQuestionInput.value = this.value;
+                }
+            });
+        }
+        
+        if (citizenshipStartQuestionInput) {
+            citizenshipStartQuestionInput.addEventListener('input', function() {
+                if (parseInt(this.value) > parseInt(citizenshipEndQuestionInput.value)) {
+                    citizenshipEndQuestionInput.value = this.value;
                 }
             });
         }
@@ -2783,6 +4502,20 @@
             });
         }
         
+        // Initialize all radio buttons
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Update any UI elements if needed
+            });
+        });
+        
+        console.log('TNPSC Indian Polity Page Loaded Successfully!');
+        console.log('Available Quizzes:');
+        console.log('1. Constitution of India');
+        console.log('2. Preamble');
+        console.log('3. Citizenship (using your provided Google Sheets link)');
+        console.log('4. Important Articles');
+        console.log('Total working quizzes: 4 out of 25 topics');
     </script>
 </body>
 </html>
