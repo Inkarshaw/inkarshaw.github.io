@@ -1762,6 +1762,114 @@
         </div>
     </div>
 
+    <!-- Practice Questions Modal for Fundamental Rights -->
+    <div class="modal-overlay" id="rightsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Fundamental Rights Practice Questions</h2>
+                <button class="close-modal" id="closeRightsModal">&times;</button>
+            </div>
+            
+            <div class="quiz-settings" id="rightsQuizSettings">
+                <h3 class="settings-title">Configure Your Fundamental Rights Practice Session</h3>
+                
+                <div class="settings-options">
+                    <div class="setting-group">
+                        <h4>Question Selection Mode</h4>
+                        <div class="radio-options">
+                            <div class="radio-option">
+                                <input type="radio" id="rightsModeAll" name="rightsQuestionMode" value="all" checked>
+                                <label for="rightsModeAll">All Questions</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="rightsModeRandom" name="rightsQuestionMode" value="random">
+                                <label for="rightsModeRandom">Random Questions</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="rightsModeRange" name="rightsQuestionMode" value="range">
+                                <label for="rightsModeRange">Question Range</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Quiz Mode</h4>
+                        <div class="radio-options">
+                            <div class="radio-option">
+                                <input type="radio" id="rightsQuizNormal" name="rightsQuizMode" value="normal">
+                                <label for="rightsQuizNormal">Normal Mode (Modal)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="rightsQuizFullscreen" name="rightsQuizMode" value="fullscreen" checked>
+                                <label for="rightsQuizFullscreen">Full Screen Mode</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Question Count</h4>
+                        <div id="rightsRandomSettings" style="display: none;">
+                            <div class="question-count-input">
+                                <label for="rightsQuestionCount">Number of Questions:</label>
+                                <input type="number" id="rightsQuestionCount" min="1" max="100" value="10">
+                            </div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">
+                                Select how many random questions you want to practice.
+                            </p>
+                        </div>
+                        
+                        <div id="rightsRangeSettings" style="display: none;">
+                            <div class="range-inputs">
+                                <div class="range-input">
+                                    <label for="rightsStartQuestion">Start Question:</label>
+                                    <input type="number" id="rightsStartQuestion" min="1" value="1">
+                                </div>
+                                <div class="range-input">
+                                    <label for="rightsEndQuestion">End Question:</label>
+                                    <input type="number" id="rightsEndQuestion" min="1" value="10">
+                                </div>
+                            </div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">
+                                Select the range of questions you want to practice.
+                            </p>
+                        </div>
+                        
+                        <div id="rightsAllSettings">
+                            <p style="color: #475569; font-style: italic;">
+                                All available Fundamental Rights questions will be loaded for practice.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="start-quiz-btn" id="startRightsQuiz">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </button>
+                    <button class="cancel-btn" id="cancelRightsSettings">Cancel</button>
+                </div>
+            </div>
+            
+            <div class="loading-spinner" id="rightsLoadingSpinner">
+                <div class="spinner"></div>
+                <p>Loading Fundamental Rights questions from Google Sheets...</p>
+            </div>
+            
+            <div class="error-message" id="rightsErrorMessage">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <h3>Failed to load questions</h3>
+                <p id="rightsErrorText">Please try again later or contact support.</p>
+                <button class="nav-btn" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+            
+            <div id="rightsQuizContainer" style="display: none;">
+                <!-- Normal mode quiz content would go here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Practice Questions Modal for Important Articles -->
     <div class="modal-overlay" id="practiceModal">
         <div class="modal-content">
@@ -2176,6 +2284,108 @@
         </div>
     </div>
 
+    <!-- Full Screen Quiz for Fundamental Rights -->
+    <div class="fullscreen-quiz" id="rightsFullscreenQuiz">
+        <div class="quiz-header">
+            <div class="quiz-controls">
+                <div class="quiz-timer" id="rightsQuizTimer">
+                    <i class="fas fa-clock"></i> Time: <span id="rightsTimerValue">00:00</span>
+                </div>
+                <button class="exit-quiz-btn" id="exitRightsQuiz">
+                    <i class="fas fa-times"></i> Exit Quiz
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-content" id="rightsFullscreenQuizContent">
+            <div class="quiz-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="rightsProgressFill"></div>
+                </div>
+                <div class="progress-info">
+                    <span>Question <span id="rightsCurrentQuestionNum">1</span> of <span id="rightsTotalQuestionsNum">0</span></span>
+                    <span id="rightsAnsweredCount">0 answered</span>
+                </div>
+            </div>
+            
+            <div class="fullscreen-question-container">
+                <div class="fullscreen-question-text" id="rightsFullscreenQuestionText"></div>
+                
+                <div class="fullscreen-options-container" id="rightsFullscreenOptionsContainer"></div>
+                
+                <div class="fullscreen-explanation" id="rightsFullscreenExplanation">
+                    <h4><i class="fas fa-lightbulb"></i> Explanation</h4>
+                    <p id="rightsFullscreenExplanationText"></p>
+                </div>
+            </div>
+            
+            <div class="question-numbers" id="rightsQuestionNumbers"></div>
+            
+            <div class="quiz-navigation">
+                <button class="fullscreen-nav-btn" id="rightsPrevFullBtn">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                
+                <div class="nav-buttons">
+                    <button class="fullscreen-nav-btn" id="rightsMarkForReview">
+                        <i class="fas fa-bookmark"></i> Mark for Review
+                    </button>
+                    <button class="fullscreen-nav-btn" id="rightsClearResponse">
+                        <i class="fas fa-eraser"></i> Clear Response
+                    </button>
+                    <button class="fullscreen-nav-btn submit-full-quiz" id="submitRightsQuiz">
+                        <i class="fas fa-check-circle"></i> Submit Quiz
+                    </button>
+                </div>
+                
+                <button class="fullscreen-nav-btn" id="rightsNextFullBtn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-results" id="rightsQuizResults">
+            <div class="results-container">
+                <h2 class="results-title">Fundamental Rights Quiz Results</h2>
+                
+                <div class="score-circle" id="rightsScoreCircle">
+                    <div class="score-circle-inner">
+                        <div class="score-percentage" id="rightsScorePercentage">0%</div>
+                        <div class="score-text">Score</div>
+                    </div>
+                </div>
+                
+                <div class="results-details">
+                    <div class="result-stat correct-stat">
+                        <h4>Correct Answers</h4>
+                        <p id="rightsCorrectAnswers">0</p>
+                    </div>
+                    <div class="result-stat incorrect-stat">
+                        <h4>Incorrect Answers</h4>
+                        <p id="rightsIncorrectAnswers">0</p>
+                    </div>
+                    <div class="result-stat">
+                        <h4>Total Questions</h4>
+                        <p id="rightsTotalResultQuestions">0</p>
+                    </div>
+                    <div class="result-stat">
+                        <h4>Time Taken</h4>
+                        <p id="rightsTimeTaken">00:00</p>
+                    </div>
+                </div>
+                
+                <div class="results-actions">
+                    <button class="action-btn retry-btn" id="rightsRetryQuiz">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                    <button class="action-btn review-btn" id="rightsReviewQuiz">
+                        <i class="fas fa-eye"></i> Review Answers
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Full Screen Quiz for Important Articles -->
     <div class="fullscreen-quiz" id="fullscreenQuiz">
         <div class="quiz-header">
@@ -2331,6 +2541,7 @@
         const CONSTITUTION_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv';
         const PREAMBLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo0olme-uM2pKfeihs2wI88bjyT7O3d5cKwFKiLZUXzQF1dwutx8ci80BeX8bvpfp9zAK31uGn2vRN/pub?output=csv';
         const CITIZENSHIP_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTArgFXO2ruYakaftJnxqdtFNGpOcumKIY9g-bS8IiD1UmtGe2kYzM_iGz0yB6TvPCj1fdkzxOn1IVC/pub?output=csv';
+        const RIGHTS_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPDpTq4wzLhe5cHyEGIagNQcSkKAVSV3DX9Z5_Ve02hDToBl95YFCO25lyvdsVNgbbTPcOiMoeCsO8/pub?output=csv';
         const ARTICLES_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv';
         
         // Variables for Constitution of India
@@ -2371,6 +2582,19 @@
         let citizenshipQuizStartTime = null;
         let citizenshipTimerInterval = null;
         let citizenshipElapsedTime = 0;
+        
+        // Variables for Fundamental Rights
+        let rightsQuestions = [];
+        let rightsFilteredQuestions = [];
+        let rightsCurrentQuestionIndex = 0;
+        let rightsUserAnswers = [];
+        let rightsMarkedQuestions = [];
+        let rightsQuizSubmitted = false;
+        let rightsCurrentMode = 'all';
+        let rightsQuizMode = 'fullscreen';
+        let rightsQuizStartTime = null;
+        let rightsTimerInterval = null;
+        let rightsElapsedTime = 0;
         
         // Variables for Important Articles
         let allQuestions = [];
@@ -2522,6 +2746,52 @@
         const citizenshipEndQuestionInput = document.getElementById('citizenshipEndQuestion');
         const startCitizenshipQuizBtn = document.getElementById('startCitizenshipQuiz');
         const cancelCitizenshipSettingsBtn = document.getElementById('cancelCitizenshipSettings');
+        
+        // DOM Elements for Fundamental Rights
+        const rightsModal = document.getElementById('rightsModal');
+        const closeRightsModal = document.getElementById('closeRightsModal');
+        const rightsQuizSettings = document.getElementById('rightsQuizSettings');
+        const rightsLoadingSpinner = document.getElementById('rightsLoadingSpinner');
+        const rightsErrorMessage = document.getElementById('rightsErrorMessage');
+        const rightsErrorText = document.getElementById('rightsErrorText');
+        const rightsFullscreenQuiz = document.getElementById('rightsFullscreenQuiz');
+        const exitRightsQuizBtn = document.getElementById('exitRightsQuiz');
+        const rightsQuizTimer = document.getElementById('rightsTimerValue');
+        const rightsProgressFill = document.getElementById('rightsProgressFill');
+        const rightsCurrentQuestionNum = document.getElementById('rightsCurrentQuestionNum');
+        const rightsTotalQuestionsNum = document.getElementById('rightsTotalQuestionsNum');
+        const rightsAnsweredCount = document.getElementById('rightsAnsweredCount');
+        const rightsFullscreenQuestionText = document.getElementById('rightsFullscreenQuestionText');
+        const rightsFullscreenOptionsContainer = document.getElementById('rightsFullscreenOptionsContainer');
+        const rightsFullscreenExplanation = document.getElementById('rightsFullscreenExplanation');
+        const rightsFullscreenExplanationText = document.getElementById('rightsFullscreenExplanationText');
+        const rightsQuestionNumbers = document.getElementById('rightsQuestionNumbers');
+        const rightsPrevFullBtn = document.getElementById('rightsPrevFullBtn');
+        const rightsNextFullBtn = document.getElementById('rightsNextFullBtn');
+        const rightsMarkForReviewBtn = document.getElementById('rightsMarkForReview');
+        const rightsClearResponseBtn = document.getElementById('rightsClearResponse');
+        const submitRightsQuizBtn = document.getElementById('submitRightsQuiz');
+        const rightsQuizResults = document.getElementById('rightsQuizResults');
+        const rightsScoreCircle = document.getElementById('rightsScoreCircle');
+        const rightsScorePercentage = document.getElementById('rightsScorePercentage');
+        const rightsCorrectAnswers = document.getElementById('rightsCorrectAnswers');
+        const rightsIncorrectAnswers = document.getElementById('rightsIncorrectAnswers');
+        const rightsTotalResultQuestions = document.getElementById('rightsTotalResultQuestions');
+        const rightsTimeTaken = document.getElementById('rightsTimeTaken');
+        const rightsRetryQuizBtn = document.getElementById('rightsRetryQuiz');
+        const rightsReviewQuizBtn = document.getElementById('rightsReviewQuiz');
+        
+        // Settings Elements for Fundamental Rights
+        const rightsQuestionModeRadios = document.querySelectorAll('input[name="rightsQuestionMode"]');
+        const rightsQuizModeRadios = document.querySelectorAll('input[name="rightsQuizMode"]');
+        const rightsRandomSettings = document.getElementById('rightsRandomSettings');
+        const rightsRangeSettings = document.getElementById('rightsRangeSettings');
+        const rightsAllSettings = document.getElementById('rightsAllSettings');
+        const rightsQuestionCountInput = document.getElementById('rightsQuestionCount');
+        const rightsStartQuestionInput = document.getElementById('rightsStartQuestion');
+        const rightsEndQuestionInput = document.getElementById('rightsEndQuestion');
+        const startRightsQuizBtn = document.getElementById('startRightsQuiz');
+        const cancelRightsSettingsBtn = document.getElementById('cancelRightsSettings');
         
         // DOM Elements for Important Articles
         const practiceModal = document.getElementById('practiceModal');
@@ -2690,6 +2960,45 @@
             }
         });
         
+        // Event Listeners for Fundamental Rights
+        document.querySelector('.rights-btn').addEventListener('click', showRightsQuizSettings);
+        
+        closeRightsModal.addEventListener('click', closeRightsPracticeModal);
+        startRightsQuizBtn.addEventListener('click', startRightsQuiz);
+        cancelRightsSettingsBtn.addEventListener('click', closeRightsPracticeModal);
+        
+        // Full Screen Quiz Event Listeners for Fundamental Rights
+        exitRightsQuizBtn.addEventListener('click', exitRightsFullscreenQuiz);
+        rightsPrevFullBtn.addEventListener('click', showRightsPreviousFullQuestion);
+        rightsNextFullBtn.addEventListener('click', showRightsNextFullQuestion);
+        rightsMarkForReviewBtn.addEventListener('click', toggleRightsMarkForReview);
+        rightsClearResponseBtn.addEventListener('click', clearRightsCurrentResponse);
+        submitRightsQuizBtn.addEventListener('click', submitRightsQuiz);
+        rightsRetryQuizBtn.addEventListener('click', retryRightsQuiz);
+        rightsReviewQuizBtn.addEventListener('click', reviewRightsQuiz);
+        
+        // Question mode radio button change listeners for Fundamental Rights
+        rightsQuestionModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                rightsCurrentMode = this.value;
+                updateRightsSettingsVisibility();
+            });
+        });
+        
+        // Quiz mode radio button change listeners for Fundamental Rights
+        rightsQuizModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                rightsQuizMode = this.value;
+            });
+        });
+        
+        // Close modal when clicking outside for Fundamental Rights
+        rightsModal.addEventListener('click', function(e) {
+            if (e.target === rightsModal) {
+                closeRightsPracticeModal();
+            }
+        });
+        
         // Event Listeners for Important Articles
         document.getElementById('practiceArticles').addEventListener('click', showQuizSettings);
         
@@ -2733,6 +3042,7 @@
         updateConstitutionSettingsVisibility();
         updatePreambleSettingsVisibility();
         updateCitizenshipSettingsVisibility();
+        updateRightsSettingsVisibility();
         updateSettingsVisibility();
         
         // Header scrolling functionality
@@ -3933,6 +4243,400 @@
             }
         }
         
+        // Functions for Fundamental Rights
+        function showRightsQuizSettings() {
+            showModal(rightsModal);
+            rightsQuizSettings.style.display = 'block';
+            rightsLoadingSpinner.style.display = 'none';
+            rightsErrorMessage.style.display = 'none';
+        }
+        
+        function updateRightsSettingsVisibility() {
+            rightsRandomSettings.style.display = 'none';
+            rightsRangeSettings.style.display = 'none';
+            rightsAllSettings.style.display = 'none';
+            
+            switch(rightsCurrentMode) {
+                case 'random':
+                    rightsRandomSettings.style.display = 'block';
+                    break;
+                case 'range':
+                    rightsRangeSettings.style.display = 'block';
+                    break;
+                case 'all':
+                    rightsAllSettings.style.display = 'block';
+                    break;
+            }
+        }
+        
+        async function startRightsQuiz() {
+            try {
+                // Fetch data from Google Sheets if not already loaded
+                if (rightsQuestions.length === 0) {
+                    rightsLoadingSpinner.style.display = 'block';
+                    rightsQuizSettings.style.display = 'none';
+                    
+                    const response = await fetch(RIGHTS_SHEETS_URL);
+                    if (!response.ok) throw new Error('Failed to fetch Fundamental Rights questions');
+                    
+                    const csvData = await response.text();
+                    rightsQuestions = parseCSVToQuestions(csvData);
+                    
+                    if (rightsQuestions.length === 0) {
+                        throw new Error('No Fundamental Rights questions found in the sheet. Please check the sheet format.');
+                    }
+                }
+                
+                // Filter questions based on selected mode
+                rightsFilteredQuestions = filterRightsQuestionsByMode(rightsQuestions);
+                
+                if (rightsFilteredQuestions.length === 0) {
+                    throw new Error('No Fundamental Rights questions match your selected criteria. Please adjust your settings.');
+                }
+                
+                // Initialize quiz state
+                rightsUserAnswers = new Array(rightsFilteredQuestions.length).fill(null);
+                rightsMarkedQuestions = new Array(rightsFilteredQuestions.length).fill(false);
+                rightsQuizSubmitted = false;
+                rightsCurrentQuestionIndex = 0;
+                rightsElapsedTime = 0;
+                
+                // Close settings modal
+                closeRightsPracticeModal();
+                
+                // Start quiz in selected mode
+                if (rightsQuizMode === 'fullscreen') {
+                    startRightsFullscreenQuiz();
+                } else {
+                    // For normal mode, you could implement modal-based quiz
+                    startRightsFullscreenQuiz(); // Defaulting to fullscreen for now
+                }
+                
+            } catch (error) {
+                console.error('Error starting Fundamental Rights quiz:', error);
+                rightsLoadingSpinner.style.display = 'none';
+                rightsErrorMessage.style.display = 'block';
+                rightsErrorText.textContent = error.message || 'Failed to load Fundamental Rights questions. Please check your settings and try again.';
+            }
+        }
+        
+        function startRightsFullscreenQuiz() {
+            // Hide website header
+            document.getElementById('headerWrapper').classList.add('quiz-hidden');
+            document.body.classList.add('quiz-active');
+            
+            // Show fullscreen quiz
+            rightsFullscreenQuiz.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize UI
+            rightsTotalQuestionsNum.textContent = rightsFilteredQuestions.length;
+            updateRightsQuestionNumbers();
+            updateRightsProgress();
+            
+            // Start timer
+            rightsQuizStartTime = Date.now();
+            startRightsTimer();
+            
+            // Show first question
+            showRightsFullQuestion(rightsCurrentQuestionIndex);
+        }
+        
+        function startRightsTimer() {
+            clearInterval(rightsTimerInterval);
+            rightsTimerInterval = setInterval(updateRightsTimer, 1000);
+        }
+        
+        function updateRightsTimer() {
+            rightsElapsedTime++;
+            const minutes = Math.floor(rightsElapsedTime / 60);
+            const seconds = rightsElapsedTime % 60;
+            rightsQuizTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function showRightsFullQuestion(index) {
+            if (index < 0 || index >= rightsFilteredQuestions.length) return;
+            
+            rightsCurrentQuestionIndex = index;
+            const question = rightsFilteredQuestions[index];
+            
+            // Update question text
+            rightsFullscreenQuestionText.textContent = `${question.id}. ${question.text}`;
+            
+            // Update options
+            rightsFullscreenOptionsContainer.innerHTML = '';
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            
+            optionLetters.forEach((letter, i) => {
+                const option = document.createElement('div');
+                option.className = 'fullscreen-option';
+                
+                if (rightsUserAnswers[index] === letter) {
+                    option.classList.add('selected');
+                }
+                
+                option.innerHTML = `
+                    <div class="fullscreen-option-letter">${letter}</div>
+                    <div class="fullscreen-option-text">${question.options[i] || 'Option not provided'}</div>
+                `;
+                
+                if (!rightsQuizSubmitted) {
+                    option.addEventListener('click', () => selectRightsFullOption(letter));
+                }
+                rightsFullscreenOptionsContainer.appendChild(option);
+            });
+            
+            // Update explanation
+            rightsFullscreenExplanationText.textContent = question.explanation;
+            
+            // Hide explanation initially
+            rightsFullscreenExplanation.style.display = 'none';
+            
+            // Update navigation buttons
+            rightsCurrentQuestionNum.textContent = index + 1;
+            rightsPrevFullBtn.disabled = index === 0;
+            rightsNextFullBtn.disabled = index === rightsFilteredQuestions.length - 1;
+            
+            // Update mark button
+            rightsMarkForReviewBtn.innerHTML = rightsMarkedQuestions[index] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+            
+            // Update question numbers highlight
+            updateRightsQuestionNumbers();
+            updateRightsProgress();
+        }
+        
+        function selectRightsFullOption(selectedLetter) {
+            if (rightsQuizSubmitted) return;
+            
+            // Remove selected class from all options
+            document.querySelectorAll('#rightsFullscreenOptionsContainer .fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            const selectedOption = document.querySelectorAll('#rightsFullscreenOptionsContainer .fullscreen-option')[selectedLetter.charCodeAt(0) - 65];
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            
+            // Store user's answer
+            rightsUserAnswers[rightsCurrentQuestionIndex] = selectedLetter;
+            
+            // Show explanation if quiz is submitted
+            if (rightsQuizSubmitted) {
+                showRightsCorrectAnswer();
+            }
+            
+            // Update progress
+            updateRightsProgress();
+            updateRightsQuestionNumbers();
+        }
+        
+        function showRightsCorrectAnswer() {
+            const question = rightsFilteredQuestions[rightsCurrentQuestionIndex];
+            const options = document.querySelectorAll('#rightsFullscreenOptionsContainer .fullscreen-option');
+            
+            options.forEach((option, index) => {
+                const letter = String.fromCharCode(65 + index);
+                if (letter === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else if (rightsUserAnswers[rightsCurrentQuestionIndex] === letter && rightsUserAnswers[rightsCurrentQuestionIndex] !== question.correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            rightsFullscreenExplanation.style.display = 'block';
+        }
+        
+        function showRightsPreviousFullQuestion() {
+            if (rightsCurrentQuestionIndex > 0) {
+                showRightsFullQuestion(rightsCurrentQuestionIndex - 1);
+            }
+        }
+        
+        function showRightsNextFullQuestion() {
+            if (rightsCurrentQuestionIndex < rightsFilteredQuestions.length - 1) {
+                showRightsFullQuestion(rightsCurrentQuestionIndex + 1);
+            }
+        }
+        
+        function toggleRightsMarkForReview() {
+            rightsMarkedQuestions[rightsCurrentQuestionIndex] = !rightsMarkedQuestions[rightsCurrentQuestionIndex];
+            updateRightsQuestionNumbers();
+            
+            // Update button text
+            rightsMarkForReviewBtn.innerHTML = rightsMarkedQuestions[rightsCurrentQuestionIndex] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+        }
+        
+        function clearRightsCurrentResponse() {
+            if (rightsQuizSubmitted) return;
+            
+            rightsUserAnswers[rightsCurrentQuestionIndex] = null;
+            document.querySelectorAll('#rightsFullscreenOptionsContainer .fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            updateRightsProgress();
+            updateRightsQuestionNumbers();
+        }
+        
+        function updateRightsProgress() {
+            const answered = rightsUserAnswers.filter(answer => answer !== null).length;
+            const total = rightsFilteredQuestions.length;
+            const percentage = (answered / total) * 100;
+            
+            rightsProgressFill.style.width = `${percentage}%`;
+            rightsAnsweredCount.textContent = `${answered} answered`;
+        }
+        
+        function updateRightsQuestionNumbers() {
+            rightsQuestionNumbers.innerHTML = '';
+            
+            rightsFilteredQuestions.forEach((_, index) => {
+                const numberBtn = document.createElement('div');
+                numberBtn.className = 'question-number';
+                
+                if (index === rightsCurrentQuestionIndex) {
+                    numberBtn.classList.add('current');
+                } else if (rightsUserAnswers[index] !== null) {
+                    numberBtn.classList.add('answered');
+                }
+                
+                if (rightsMarkedQuestions[index]) {
+                    numberBtn.classList.add('marked');
+                }
+                
+                numberBtn.textContent = index + 1;
+                numberBtn.addEventListener('click', () => {
+                    showRightsFullQuestion(index);
+                });
+                
+                rightsQuestionNumbers.appendChild(numberBtn);
+            });
+        }
+        
+        function submitRightsQuiz() {
+            if (confirm('Are you sure you want to submit the Fundamental Rights quiz? You cannot change answers after submission.')) {
+                rightsQuizSubmitted = true;
+                clearInterval(rightsTimerInterval);
+                
+                // Calculate results
+                let correctCount = 0;
+                rightsFilteredQuestions.forEach((question, index) => {
+                    if (rightsUserAnswers[index] === question.correctAnswer) {
+                        correctCount++;
+                    }
+                });
+                
+                // Show results
+                showRightsResults(correctCount);
+            }
+        }
+        
+        function showRightsResults(correctCount) {
+            const total = rightsFilteredQuestions.length;
+            const percentage = Math.round((correctCount / total) * 100);
+            const incorrectCount = total - correctCount;
+            const totalTime = formatTime(rightsElapsedTime);
+            
+            // Update results UI
+            rightsScoreCircle.style.setProperty('--percentage', `${percentage}%`);
+            rightsScorePercentage.textContent = `${percentage}%`;
+            rightsCorrectAnswers.textContent = correctCount;
+            rightsIncorrectAnswers.textContent = incorrectCount;
+            rightsTotalResultQuestions.textContent = total;
+            rightsTimeTaken.textContent = totalTime;
+            
+            // Show results, hide quiz content
+            document.getElementById('rightsFullscreenQuizContent').style.display = 'none';
+            rightsQuizResults.style.display = 'block';
+        }
+        
+        function exitRightsFullscreenQuiz() {
+            if (!rightsQuizSubmitted && confirm('Are you sure you want to exit? Your Fundamental Rights quiz progress will be lost.')) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                rightsFullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                clearInterval(rightsTimerInterval);
+                resetRightsQuizState();
+            } else if (rightsQuizSubmitted) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                rightsFullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                resetRightsQuizState();
+            }
+        }
+        
+        function retryRightsQuiz() {
+            // Reset quiz state and restart
+            resetRightsQuizState();
+            rightsQuizResults.style.display = 'none';
+            document.getElementById('rightsFullscreenQuizContent').style.display = 'block';
+            startRightsFullscreenQuiz();
+        }
+        
+        function reviewRightsQuiz() {
+            // Go back to quiz with answers shown
+            rightsQuizResults.style.display = 'none';
+            document.getElementById('rightsFullscreenQuizContent').style.display = 'block';
+            
+            // Show correct answers for all questions
+            rightsQuizSubmitted = true;
+            showRightsFullQuestion(rightsCurrentQuestionIndex);
+            showRightsCorrectAnswer();
+        }
+        
+        function resetRightsQuizState() {
+            rightsFilteredQuestions = [];
+            rightsUserAnswers = [];
+            rightsMarkedQuestions = [];
+            rightsQuizSubmitted = false;
+            rightsCurrentQuestionIndex = 0;
+            rightsElapsedTime = 0;
+            clearInterval(rightsTimerInterval);
+        }
+        
+        function filterRightsQuestionsByMode(questions) {
+            switch(rightsCurrentMode) {
+                case 'all':
+                    return [...questions];
+                    
+                case 'random':
+                    const count = parseInt(rightsQuestionCountInput.value) || 10;
+                    const maxCount = Math.min(count, questions.length);
+                    
+                    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+                    return shuffled.slice(0, maxCount);
+                    
+                case 'range':
+                    let start = parseInt(rightsStartQuestionInput.value) || 1;
+                    let end = parseInt(rightsEndQuestionInput.value) || 10;
+                    
+                    if (start < 1) start = 1;
+                    if (end > questions.length) end = questions.length;
+                    if (start > end) {
+                        [start, end] = [end, start];
+                        rightsStartQuestionInput.value = start;
+                        rightsEndQuestionInput.value = end;
+                    }
+                    
+                    return questions.slice(start - 1, end);
+                    
+                default:
+                    return questions;
+            }
+        }
+        
         // Functions for Important Articles
         function showQuizSettings() {
             showModal(practiceModal);
@@ -4409,6 +5113,11 @@
             document.body.style.overflow = 'auto';
         }
         
+        function closeRightsPracticeModal() {
+            rightsModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
         function closePracticeModal() {
             practiceModal.style.display = 'none';
             document.body.style.overflow = 'auto';
@@ -4425,8 +5134,8 @@
             window.location.href = 'tnpsc-topics.html';
         });
         
-        // Practice button click handlers for other topics (except Constitution, Preamble, Citizenship and Important Articles)
-        document.querySelectorAll('.practice-btn:not(.constitution-btn):not(.preamble-btn):not(.citizenship-btn):not(#practiceArticles)').forEach(button => {
+        // Practice button click handlers for other topics (except Constitution, Preamble, Citizenship, Fundamental Rights and Important Articles)
+        document.querySelectorAll('.practice-btn:not(.constitution-btn):not(.preamble-btn):not(.citizenship-btn):not(.rights-btn):not(#practiceArticles)').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
                 const subtopicName = this.parentElement.querySelector('h3').textContent;
@@ -4485,6 +5194,23 @@
             });
         }
         
+        // Initialize range input validation for Fundamental Rights
+        if (rightsEndQuestionInput) {
+            rightsEndQuestionInput.addEventListener('input', function() {
+                if (parseInt(this.value) < parseInt(rightsStartQuestionInput.value)) {
+                    rightsStartQuestionInput.value = this.value;
+                }
+            });
+        }
+        
+        if (rightsStartQuestionInput) {
+            rightsStartQuestionInput.addEventListener('input', function() {
+                if (parseInt(this.value) > parseInt(rightsEndQuestionInput.value)) {
+                    rightsEndQuestionInput.value = this.value;
+                }
+            });
+        }
+        
         // Initialize range input validation for Important Articles
         if (endQuestionInput) {
             endQuestionInput.addEventListener('input', function() {
@@ -4513,9 +5239,10 @@
         console.log('Available Quizzes:');
         console.log('1. Constitution of India');
         console.log('2. Preamble');
-        console.log('3. Citizenship (using your provided Google Sheets link)');
-        console.log('4. Important Articles');
-        console.log('Total working quizzes: 4 out of 25 topics');
+        console.log('3. Citizenship');
+        console.log('4. Fundamental Rights (using your provided Google Sheets link)');
+        console.log('5. Important Articles');
+        console.log('Total working quizzes: 5 out of 25 topics');
     </script>
 </body>
 </html>
