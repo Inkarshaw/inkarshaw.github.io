@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil PDF Generator - Font Selection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Import multiple Tamil fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;700&family=Tiro+Tamil&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .input-section, .preview-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title svg {
+            color: #3498db;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            transition: border-color 0.3s;
+            line-height: 1.8;
+            text-align: left;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        /* Justify alignment classes */
+        .text-left {
+            text-align: left;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-justify {
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+        }
+        
+        /* Font classes */
+        .font-sakal-bharati {
+            font-family: 'Noto Sans Tamil', sans-serif;
+        }
+        
+        .font-tiro-tamil {
+            font-family: 'Tiro Tamil', serif;
+        }
+        
+        .font-latha {
+            font-family: 'Latha', 'Noto Sans Tamil', sans-serif;
+        }
+        
+        .font-arial-unicode {
+            font-family: 'Arial Unicode MS', 'Noto Sans Tamil', sans-serif;
+        }
+        
+        .font-verdana {
+            font-family: Verdana, 'Noto Sans Tamil', sans-serif;
+        }
+        
+        .heading-font {
+            font-family: inherit;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        button#generatePdf {
+            background-color: #2ecc71;
+        }
+        
+        button#generatePdf:hover {
+            background-color: #27ae60;
+        }
+        
+        button#resetBtn {
+            background-color: #e74c3c;
+        }
+        
+        button#resetBtn:hover {
+            background-color: #c0392b;
+        }
+        
+        .instructions {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .note {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin-top: 15px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .char-count {
+            text-align: right;
+            margin-top: 10px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .font-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .font-info span {
+            color: #e74c3c;
+            font-family: 'Noto Sans Tamil', sans-serif;
+        }
+        
+        .pdf-options {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        select, input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .alignment-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .align-btn {
+            padding: 8px 15px;
+            background-color: #f1f1f1;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: normal;
+            transition: all 0.2s;
+        }
+        
+        .align-btn:hover {
+            background-color: #e0e0e0;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .align-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        
+        .sample-text {
+            margin-top: 15px;
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+        
+        .sample-text:hover {
+            color: #2980b9;
+        }
+        
+        .tamil-example {
+            font-family: 'Noto Sans Tamil', sans-serif;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        /* Heading input styles */
+        .heading-input-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .heading-input-group h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .heading-input-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .heading-input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .heading-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .heading-size-select {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .heading-format-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .heading-align-controls {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .heading-format-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .heading-format-btn {
+            padding: 6px 12px;
+            background-color: #f1f1f1;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .heading-format-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .heading-format-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        
+        .heading-align-btn {
+            padding: 6px 12px;
+            background-color: #f1f1f1;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .heading-align-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .heading-align-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            button {
+                justify-content: center;
+            }
+            
+            .alignment-controls, .heading-align-controls, .heading-format-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .heading-options {
+                flex-direction: column;
+            }
+            
+            .heading-size-select {
+                width: 100%;
+            }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .justify-info {
+            background-color: #e8f4fc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+        
+        .preview-content {
+            margin-top: 20px;
+        }
+        
+        .toggle-heading-btn {
+            background-color: #9b59b6;
+            margin-top: 10px;
+        }
+        
+        .toggle-heading-btn:hover {
+            background-color: #8e44ad;
+        }
+        
+        .font-size-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+        
+        .format-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        /* Text formatting styles */
+        .text-bold {
+            font-weight: bold;
+        }
+        
+        .text-underline {
+            text-decoration: underline;
+        }
+        
+        .text-bold-underline {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        
+        .format-preview {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .format-example {
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+            font-size: 0.9rem;
+            border: 1px solid #ddd;
+        }
+        
+        /* Zoomable preview styles */
+        .preview-container {
+            height: 400px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+        
+        .preview-image-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            position: relative;
+        }
+        
+        #previewImage {
+            display: block;
+            max-width: none;
+            transform-origin: 0 0;
+            transition: transform 0.1s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .zoom-btn:hover {
+            background-color: #2980b9;
+            transform: scale(1.1);
+        }
+        
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .zoom-level {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2c3e50;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .preview-instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1rem;
+            z-index: 1;
+        }
+        
+        .preview-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #3498db;
+            font-weight: 600;
+            z-index: 2;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .preview-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .drag-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .page-outline {
+            position: absolute;
+            border: 1px dashed #3498db;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        /* Font selection styles */
+        .font-selection {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .font-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .font-option {
+            flex: 1;
+            min-width: 180px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .font-option:hover {
+            border-color: #3498db;
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
+        
+        .font-option.active {
+            border-color: #2ecc71;
+            background-color: #f0f9f0;
+            box-shadow: 0 3px 10px rgba(46, 204, 113, 0.2);
+        }
+        
+        .font-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        
+        .font-sample {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .font-description {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .font-tamil-name {
+            font-size: 0.9rem;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        /* Font examples in Tamil example area */
+        .font-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .font-example-item {
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .font-example-item:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-1px);
+        }
+    </style>
+    
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Include html2canvas for better rendering -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Tamil PDF Generator</h1>
+            <p class="subtitle">Create A4 PDF documents with multiple Tamil font options</p>
+            <div class="font-info">Selected Font: <span id="currentFontName">சகல் பாரதி (Sakal Bharati)</span></div>
+        </header>
+        
+        <div class="font-selection">
+            <h3>Font Selection</h3>
+            <p style="color: #7f8c8d; margin-bottom: 15px;">Choose a font for your Tamil document. Each font has a different style and character.</p>
+            
+            <div class="font-options">
+                <div class="font-option active" data-font="sakal-bharati">
+                    <div class="font-name">Sakal Bharati</div>
+                    <div class="font-tamil-name">சகல் பாரதி</div>
+                    <div class="font-sample font-sakal-bharati">
+                        தமிழ் மொழி உலகின் பழமையான மொழி
+                    </div>
+                    <div class="font-description">
+                        Clean, modern Tamil font. Great for digital documents and readability.
+                    </div>
+                </div>
+                
+                <div class="font-option" data-font="tiro-tamil">
+                    <div class="font-name">Tiro Tamil</div>
+                    <div class="font-tamil-name">திரோ தமிழ்</div>
+                    <div class="font-sample font-tiro-tamil">
+                        தமிழ் மொழி உலகின் பழமையான மொழி
+                    </div>
+                    <div class="font-description">
+                        Elegant serif font. Traditional style perfect for formal documents.
+                    </div>
+                </div>
+                
+                <div class="font-option" data-font="latha">
+                    <div class="font-name">Latha</div>
+                    <div class="font-tamil-name">லாதா</div>
+                    <div class="font-sample font-latha">
+                        தமிழ் மொழி உலகின் பழமையான மொழி
+                    </div>
+                    <div class="font-description">
+                        Classic Windows Tamil font. Familiar and widely compatible.
+                    </div>
+                </div>
+                
+                <div class="font-option" data-font="arial-unicode">
+                    <div class="font-name">Arial Unicode</div>
+                    <div class="font-tamil-name">ஏரியல் யூனிகோட்</div>
+                    <div class="font-sample font-arial-unicode">
+                        தமிழ் மொழி உலகின் பழமையான மொழி
+                    </div>
+                    <div class="font-description">
+                        Universal font with excellent language support. Clean and professional.
+                    </div>
+                </div>
+                
+                <div class="font-option" data-font="verdana">
+                    <div class="font-name">Verdana</div>
+                    <div class="font-tamil-name">வெர்டானா</div>
+                    <div class="font-sample font-verdana">
+                        தமிழ் மொழி உலகின் பழமையான மொழி
+                    </div>
+                    <div class="font-description">
+                        Clear, highly readable font. Excellent for longer documents.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pdf-options">
+            <h3>PDF Options</h3>
+            <div class="options-grid">
+                <div class="option-group">
+                    <label for="pageSize">Page Size:</label>
+                    <select id="pageSize">
+                        <option value="a4" selected>A4 (210 × 297 mm)</option>
+                        <option value="letter">Letter (8.5 × 11 in)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="orientation">Orientation:</label>
+                    <select id="orientation">
+                        <option value="portrait" selected>Portrait</option>
+                        <option value="landscape">Landscape</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="fontSize">Body Font Size:</label>
+                    <select id="fontSize">
+                        <option value="12">Small (12px)</option>
+                        <option value="14">Medium (14px)</option>
+                        <option value="16" selected>Large (16px)</option>
+                        <option value="18">Extra Large (18px)</option>
+                        <option value="20">XXL (20px)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="fileName">File Name:</label>
+                    <input type="text" id="fileName" value="tamil-document" placeholder="Enter file name">
+                </div>
+            </div>
+            
+            <div class="option-group" style="margin-top: 15px;">
+                <label>Body Text Alignment:</label>
+                <div class="alignment-controls">
+                    <div class="align-btn active" data-align="left" title="Left Align">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </div>
+                    <div class="align-btn" data-align="center" title="Center Align">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M4 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </div>
+                    <div class="align-btn" data-align="right" title="Right Align">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M6 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm4-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </div>
+                    <div class="align-btn" data-align="justify" title="Justify Align">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="justify-info">
+                    <strong>Justify alignment</strong> creates clean, even edges on both sides of your text, giving a professional appearance similar to books and newspapers.
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <section class="input-section">
+                <div class="heading-input-group">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8.5 2.687v9.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V2.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                            <path d="M13.5 4.687v7.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V4.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                        </svg>
+                        Document Heading
+                    </h3>
+                    <input type="text" id="headingInput" placeholder="Enter document title/heading..." value="தமிழ் மொழி பற்றிய கட்டுரை">
+                    <div class="heading-options">
+                        <div class="option-group heading-size-select">
+                            <label for="headingSize">Heading Size:</label>
+                            <select id="headingSize">
+                                <option value="14">Small (14px)</option>
+                                <option value="16">Medium (16px)</option>
+                                <option value="18" selected>Large (18px)</option>
+                                <option value="20">Extra Large (20px)</option>
+                                <option value="24">XXL (24px)</option>
+                                <option value="28">Huge (28px)</option>
+                                <option value="32">Giant (32px)</option>
+                                <option value="36">Massive (36px)</option>
+                            </select>
+                            <div class="font-size-info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                </svg>
+                                Smaller sizes (14-20px) work well for subheadings
+                            </div>
+                        </div>
+                        <div class="option-group">
+                            <div class="heading-format-controls">
+                                <div class="format-label">Heading Format:</div>
+                                <div class="heading-format-buttons">
+                                    <div class="heading-format-btn active" data-format="bold" title="Bold">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 0 0 1.852-2.14c0-1.51-1.162-2.46-3.014-2.46H3.843V13H8.21zM5.908 4.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908V4.673zm0 6.788V8.598h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="heading-format-btn" data-format="underline" title="Underline">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M5.313 3.136h-1.23V9.54c0 2.105 1.47 3.623 3.917 3.623s3.917-1.518 3.917-3.623V3.136h-1.23v6.323c0 1.49-.978 2.57-2.687 2.57-1.709 0-2.687-1.08-2.687-2.57V3.136zM12.5 15h-9v-1h9v1z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="heading-format-btn" data-format="bold-underline" title="Bold & Underline">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M5.313 3.136h-1.23V9.54c0 2.105 1.47 3.623 3.917 3.623s3.917-1.518 3.917-3.623V3.136h-1.23v6.323c0 1.49-.978 2.57-2.687 2.57-1.709 0-2.687-1.08-2.687-2.57V3.136zM8.5 1.5v.938l.94-.938h.878l-.94.94.94.937h-.939l-.938-.938v.938H7V1.5h1.5zm-3.5 12.5h9v-1h-9v1z"/>
+                                            <path d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 0 0 1.852-2.14c0-1.51-1.162-2.46-3.014-2.46H5.908V4.673h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908v2.748h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907V13z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="heading-format-btn" data-format="normal" title="Normal Text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M10.5 15a.5.5 0 0 1-.5-.5V2H9v12.5a.5.5 0 0 1-1 0V2H7v12.5a.5.5 0 0 1-1 0V2H5v12.5a.5.5 0 0 1-1 0V2H2.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1H11v12.5a.5.5 0 0 1-.5.5z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="format-preview">
+                                    <div class="format-example text-bold">Bold</div>
+                                    <div class="format-example text-underline">Underline</div>
+                                    <div class="format-example text-bold-underline">Bold & Underline</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="option-group">
+                            <div class="heading-format-controls">
+                                <div class="format-label">Heading Alignment:</div>
+                                <div class="heading-align-controls">
+                                    <div class="heading-align-btn active" data-halign="left" title="Left Align">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="heading-align-btn" data-halign="center" title="Center Align">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M4 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="heading-align-btn" data-halign="right" title="Right Align">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M6 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm4-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="font-size-info">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                    </svg>
+                                    Center alignment is commonly used for main titles
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="toggle-heading-btn" id="toggleHeadingBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8.5 2.687v9.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V2.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                            <path d="M13.5 4.687v7.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V4.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                        </svg>
+                        Remove Heading
+                    </button>
+                </div>
+                
+                <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    Enter Tamil Text
+                </h2>
+                <textarea id="tamilInput" placeholder="Type or paste your Tamil text here...">தமிழ் மொழி உலகின் பழமையான மொழிகளில் ஒன்றாகும். இது தென்னிந்தியாவில் பேசப்படும் திராவிட மொழிகளில் முக்கியமானதாகும். தமிழ்நாடு மாநிலத்தின் அதிகாரப்பூர்வ மொழியாக தமிழ் விளங்குகிறது.
+
+தமிழில் மூன்று வகையான இலக்கண நூல்கள் உள்ளன. அவை: எழுத்ததிகாரம், சொல்லதிகாரம், பொருளதிகாரம் என்பனவாகும். தொல்காப்பியம் என்னும் இலக்கண நூல் மிகவும் பழமையானதாகும்.
+
+தமிழ் இலக்கியத்தின் வளர்ச்சி சங்க காலம், இடைக்காலம், நவீன காலம் என மூன்று காலகட்டங்களாகப் பிரிக்கப்படுகிறது. சங்க இலக்கியங்கள் கி.மு. 300 முதல் கி.பி. 300 வரையிலான காலத்தைச் சேர்ந்தவை.
+
+தமிழ் எழுத்துகள் தமிழ் பிராமி எழுத்தில் இருந்து உருவானவை. இன்று பயன்பாட்டில் உள்ள தமிழ் எழுத்துகள் 12 உயிரெழுத்துகள், 18 மெய்யெழுத்துகள், 1 ஆய்த எழுத்து, 216 உயிர்மெய் எழுத்துகள் ஆகியவற்றைக் கொண்டுள்ளது.</textarea>
+                <div class="char-count">Characters: <span id="charCount">0</span></div>
+                <div class="sample-text" id="loadSample">Load Sample Tamil Text</div>
+                <div class="sample-text" id="clearText">Clear Text</div>
+            </section>
+            
+            <section class="preview-section">
+                <div class="preview-toolbar">
+                    <h2 class="section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                        </svg>
+                        PDF Preview (Zoomable)
+                    </h2>
+                    <div class="char-count">Font: <span id="currentFontLabel">Sakal Bharati</span> | Alignment: <span id="alignmentLabel">Justify</span> | Heading: <span id="formatLabel">Bold</span></div>
+                </div>
+                
+                <div class="preview-container">
+                    <div class="preview-image-wrapper" id="previewWrapper">
+                        <img id="previewImage" src="" alt="PDF Preview">
+                        <div class="preview-instructions" id="previewInstructions">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#7f8c8d" viewBox="0 0 16 16" style="margin-bottom: 10px;">
+                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                            </svg>
+                            <p>Click "Update Preview" to generate a preview image</p>
+                            <p>Use mouse wheel or buttons to zoom in/out</p>
+                            <p>Drag to pan around the preview</p>
+                        </div>
+                        <div class="preview-loading" id="previewLoading" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>Generating preview...</p>
+                        </div>
+                        <div class="page-outline" id="pageOutline"></div>
+                    </div>
+                    
+                    <div class="zoom-level" id="zoomLevel">100%</div>
+                    <div class="drag-hint">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#7f8c8d" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                        Drag to pan
+                    </div>
+                    <div class="zoom-controls">
+                        <button class="zoom-btn" id="zoomOut" title="Zoom Out">-</button>
+                        <button class="zoom-btn" id="zoomReset" title="Reset Zoom">100%</button>
+                        <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
+                    </div>
+                </div>
+                
+                <div class="tamil-example">
+                    <div class="font-examples">
+                        <strong>Quick Font Test:</strong> 
+                        <div class="font-example-item font-sakal-bharati" data-font="sakal-bharati">சகல் பாரதி</div>
+                        <div class="font-example-item font-tiro-tamil" data-font="tiro-tamil">திரோ தமிழ்</div>
+                        <div class="font-example-item font-latha" data-font="latha">லாதா</div>
+                        <div class="font-example-item font-arial-unicode" data-font="arial-unicode">ஏரியல்</div>
+                        <div class="font-example-item font-verdana" data-font="verdana">வெர்டானா</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating PDF...</p>
+        </div>
+        
+        <div class="controls">
+            <button id="previewBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                </svg>
+                Update Preview
+            </button>
+            <button id="generatePdf">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Generate PDF
+            </button>
+            <button id="resetBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                </svg>
+                Reset All
+            </button>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to Use:</h3>
+            <ul>
+                <li><strong>Select Font:</strong> Choose from 5 Tamil fonts - each has a unique style and purpose</li>
+                <li><strong>Sakal Bharati:</strong> Modern, clean font perfect for digital documents</li>
+                <li><strong>Tiro Tamil:</strong> Elegant serif font for formal and traditional documents</li>
+                <li><strong>Latha:</strong> Classic Windows Tamil font with wide compatibility</li>
+                <li><strong>Arial Unicode:</strong> Universal font with excellent language support</li>
+                <li><strong>Verdana:</strong> Highly readable font ideal for longer documents</li>
+                <li><strong>Update Preview:</strong> Click to generate a zoomable image preview with selected font</li>
+                <li><strong>Generate PDF:</strong> Create and download your A4 PDF with chosen font</li>
+            </ul>
+            <div class="note">
+                <strong>Font Selection Tips:</strong> Sakal Bharati is recommended for most uses. Tiro Tamil works well for formal documents. Latha has the best compatibility across systems. Arial Unicode and Verdana are excellent for readability.
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 Tamil PDF Generator | Multiple Font Support | Zoomable Preview</p>
+            <p>This tool uses jsPDF and html2canvas libraries</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const tamilInput = document.getElementById('tamilInput');
+        const previewImage = document.getElementById('previewImage');
+        const previewWrapper = document.getElementById('previewWrapper');
+        const previewInstructions = document.getElementById('previewInstructions');
+        const previewLoading = document.getElementById('previewLoading');
+        const pageOutline = document.getElementById('pageOutline');
+        const previewBtn = document.getElementById('previewBtn');
+        const generatePdfBtn = document.getElementById('generatePdf');
+        const resetBtn = document.getElementById('resetBtn');
+        const charCount = document.getElementById('charCount');
+        const loadSample = document.getElementById('loadSample');
+        const clearText = document.getElementById('clearText');
+        const loadingElement = document.getElementById('loading');
+        const pageSizeSelect = document.getElementById('pageSize');
+        const orientationSelect = document.getElementById('orientation');
+        const fontSizeSelect = document.getElementById('fontSize');
+        const fileNameInput = document.getElementById('fileName');
+        const alignmentButtons = document.querySelectorAll('.align-btn');
+        const alignmentLabel = document.getElementById('alignmentLabel');
+        const formatLabel = document.getElementById('formatLabel');
+        const zoomLevel = document.getElementById('zoomLevel');
+        const zoomOutBtn = document.getElementById('zoomOut');
+        const zoomResetBtn = document.getElementById('zoomReset');
+        const zoomInBtn = document.getElementById('zoomIn');
+        const currentFontName = document.getElementById('currentFontName');
+        const currentFontLabel = document.getElementById('currentFontLabel');
+        
+        // Heading elements
+        const headingInput = document.getElementById('headingInput');
+        const headingSizeSelect = document.getElementById('headingSize');
+        const headingAlignButtons = document.querySelectorAll('.heading-align-btn');
+        const headingFormatButtons = document.querySelectorAll('.heading-format-btn');
+        const toggleHeadingBtn = document.getElementById('toggleHeadingBtn');
+        
+        // Font selection elements
+        const fontOptions = document.querySelectorAll('.font-option');
+        const fontExampleItems = document.querySelectorAll('.font-example-item');
+        
+        // Current settings
+        let currentAlignment = 'justify';
+        let currentHeadingAlignment = 'left';
+        let currentHeadingFormat = 'bold'; // 'bold', 'underline', 'bold-underline', 'normal'
+        let headingEnabled = true;
+        let currentFont = 'sakal-bharati'; // Default font
+        
+        // Zoom and pan variables
+        let scale = 1;
+        let posX = 0;
+        let posY = 0;
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+        
+        // Sample Tamil text with longer paragraphs for justify testing
+        const sampleText = `தமிழ் மொழி உலகின் பழமையான மொழிகளில் ஒன்றாகும். இது தென்னிந்தியாவில் பேசப்படும் திராவிட மொழிகளில் முக்கியமானதாகும். தமிழ்நாடு மாநிலத்தின் அதிகாரப்பூர்வ மொழியாக தமிழ் விளங்குகிறது.
+
+தமிழில் மூன்று வகையான இலக்கண நூல்கள் உள்ளன. அவை: எழுத்ததிகாரம், சொல்லதிகாரம், பொருளதிகாரம் என்பனவாகும். தொல்காப்பியம் என்னும் இலக்கண நூல் மிகவும் பழமையானதாகும்.
+
+தமிழ் இலக்கியத்தின் வளர்ச்சி சங்க காலம், இடைக்காலம், நவீன காலம் என மூன்று காலகட்டங்களாகப் பிரிக்கப்படுகிறது. சங்க இலக்கியங்கள் கி.மு. 300 முதல் கி.பி. 300 வரையிலான காலத்தைச் சேர்ந்தவை.
+
+தமிழ் எழுத்துகள் தமிழ் பிராமி எழுத்தில் இருந்து உருவானவை. இன்று பயன்பாட்டில் உள்ள தமிழ் எழுத்துகள் 12 உயிரெழுத்துகள், 18 மெய்யெழுத்துகள், 1 ஆய்த எழுத்து, 216 உயிர்மெய் எழுத்துகள் ஆகியவற்றைக் கொண்டுள்ளது.
+
+தமிழ் மொழியைப் பேசும் மக்கள் தமிழர்கள் என்று அழைக்கப்படுகிறார்கள். உலகம் முழுவதும் சுமார் 80 மில்லியன் மக்கள் தமிழ் பேசுகின்றனர். தமிழ் இலங்கை, சிங்கப்பூர் ஆகிய நாடுகளில் அதிகாரப்பூர்வ மொழியாக உள்ளது.`;
+        
+        // Initialize with sample text
+        tamilInput.value = sampleText;
+        updateCharCount();
+        
+        // Event listeners
+        previewBtn.addEventListener('click', generatePreview);
+        generatePdfBtn.addEventListener('click', generatePdf);
+        resetBtn.addEventListener('click', resetAll);
+        loadSample.addEventListener('click', loadSampleText);
+        clearText.addEventListener('click', clearInput);
+        tamilInput.addEventListener('input', updateCharCount);
+        fontSizeSelect.addEventListener('change', () => {
+            // Auto-update preview when font size changes
+            if (previewImage.src) {
+                generatePreview();
+            }
+        });
+        
+        // Font selection event listeners
+        fontOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove active class from all font options
+                fontOptions.forEach(opt => opt.classList.remove('active'));
+                // Add active class to clicked option
+                option.classList.add('active');
+                // Update current font
+                currentFont = option.dataset.font;
+                updateFontLabels();
+                
+                // Update preview if it exists
+                if (previewImage.src) {
+                    generatePreview();
+                }
+            });
+        });
+        
+        // Font example item click handlers
+        fontExampleItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const font = item.dataset.font;
+                
+                // Remove active class from all font options
+                fontOptions.forEach(opt => opt.classList.remove('active'));
+                // Add active class to corresponding font option
+                document.querySelector(`.font-option[data-font="${font}"]`).classList.add('active');
+                // Update current font
+                currentFont = font;
+                updateFontLabels();
+                
+                // Update preview if it exists
+                if (previewImage.src) {
+                    generatePreview();
+                }
+            });
+        });
+        
+        // Zoom controls
+        zoomOutBtn.addEventListener('click', () => zoom(-0.1));
+        zoomResetBtn.addEventListener('click', resetZoom);
+        zoomInBtn.addEventListener('click', () => zoom(0.1));
+        
+        // Mouse wheel zoom
+        previewWrapper.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            zoom(delta, e.offsetX, e.offsetY);
+        });
+        
+        // Drag to pan
+        previewWrapper.addEventListener('mousedown', (e) => {
+            if (!previewImage.src) return;
+            
+            isDragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            previewWrapper.style.cursor = 'grabbing';
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !previewImage.src) return;
+            
+            const deltaX = e.clientX - lastX;
+            const deltaY = e.clientY - lastY;
+            
+            posX += deltaX;
+            posY += deltaY;
+            
+            lastX = e.clientX;
+            lastY = e.clientY;
+            
+            updateTransform();
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                previewWrapper.style.cursor = 'grab';
+            }
+        });
+        
+        // Heading event listeners
+        headingInput.addEventListener('input', () => {
+            if (previewImage.src) {
+                generatePreview();
+            }
+        });
+        headingSizeSelect.addEventListener('change', () => {
+            if (previewImage.src) {
+                generatePreview();
+            }
+        });
+        toggleHeadingBtn.addEventListener('click', toggleHeading);
+        
+        // Alignment button event listeners
+        alignmentButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                alignmentButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                // Update current alignment
+                currentAlignment = button.dataset.align;
+                // Update alignment label
+                alignmentLabel.textContent = button.dataset.align.charAt(0).toUpperCase() + button.dataset.align.slice(1);
+                // Update preview if it exists
+                if (previewImage.src) {
+                    generatePreview();
+                }
+            });
+        });
+        
+        // Heading alignment button event listeners
+        headingAlignButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                headingAlignButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                // Update current heading alignment
+                currentHeadingAlignment = button.dataset.halign;
+                // Update preview if it exists
+                if (previewImage.src) {
+                    generatePreview();
+                }
+            });
+        });
+        
+        // Heading format button event listeners
+        headingFormatButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                headingFormatButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                // Update current heading format
+                currentHeadingFormat = button.dataset.format;
+                
+                // Update format label
+                let formatText = '';
+                switch(currentHeadingFormat) {
+                    case 'bold':
+                        formatText = 'Bold';
+                        break;
+                    case 'underline':
+                        formatText = 'Underline';
+                        break;
+                    case 'bold-underline':
+                        formatText = 'Bold & Underline';
+                        break;
+                    case 'normal':
+                        formatText = 'Normal';
+                        break;
+                }
+                formatLabel.textContent = formatText;
+                
+                // Update preview if it exists
+                if (previewImage.src) {
+                    generatePreview();
+                }
+            });
+        });
+        
+        // Update font labels
+        function updateFontLabels() {
+            let fontName = '';
+            let fontLabel = '';
+            
+            switch(currentFont) {
+                case 'sakal-bharati':
+                    fontName = 'சகல் பாரதி (Sakal Bharati)';
+                    fontLabel = 'Sakal Bharati';
+                    break;
+                case 'tiro-tamil':
+                    fontName = 'திரோ தமிழ் (Tiro Tamil)';
+                    fontLabel = 'Tiro Tamil';
+                    break;
+                case 'latha':
+                    fontName = 'லாதா (Latha)';
+                    fontLabel = 'Latha';
+                    break;
+                case 'arial-unicode':
+                    fontName = 'ஏரியல் யூனிகோட் (Arial Unicode)';
+                    fontLabel = 'Arial Unicode';
+                    break;
+                case 'verdana':
+                    fontName = 'வெர்டானா (Verdana)';
+                    fontLabel = 'Verdana';
+                    break;
+            }
+            
+            currentFontName.textContent = fontName;
+            currentFontLabel.textContent = fontLabel;
+        }
+        
+        // Update character count
+        function updateCharCount() {
+            const text = tamilInput.value;
+            charCount.textContent = text.length;
+        }
+        
+        // Toggle heading visibility
+        function toggleHeading() {
+            headingEnabled = !headingEnabled;
+            
+            if (headingEnabled) {
+                toggleHeadingBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8.5 2.687v9.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V2.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                        <path d="M13.5 4.687v7.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V4.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                    </svg>
+                    Remove Heading
+                `;
+                toggleHeadingBtn.style.backgroundColor = '#9b59b6';
+            } else {
+                toggleHeadingBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8.5 2.687v9.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V2.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                        <path d="M13.5 4.687v7.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V4.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                    </svg>
+                    Add Heading
+                `;
+                toggleHeadingBtn.style.backgroundColor = '#2ecc71';
+            }
+            
+            // Update preview if it exists
+            if (previewImage.src) {
+                generatePreview();
+            }
+        }
+        
+        // Zoom function
+        function zoom(delta, mouseX = null, mouseY = null) {
+            if (!previewImage.src) return;
+            
+            const oldScale = scale;
+            scale += delta;
+            scale = Math.max(0.1, Math.min(5, scale)); // Limit zoom between 10% and 500%
+            
+            // If mouse coordinates provided, zoom towards mouse position
+            if (mouseX !== null && mouseY !== null) {
+                const rect = previewWrapper.getBoundingClientRect();
+                const relativeX = mouseX - rect.left;
+                const relativeY = mouseY - rect.top;
+                
+                // Calculate new position to zoom towards mouse
+                posX = relativeX - (relativeX - posX) * (scale / oldScale);
+                posY = relativeY - (relativeY - posY) * (scale / oldScale);
+            }
+            
+            updateTransform();
+        }
+        
+        // Reset zoom
+        function resetZoom() {
+            if (!previewImage.src) return;
+            
+            scale = 1;
+            posX = 0;
+            posY = 0;
+            updateTransform();
+        }
+        
+        // Update transform and zoom level display
+        function updateTransform() {
+            previewImage.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+            
+            const zoomPercent = Math.round(scale * 100);
+            zoomLevel.textContent = `${zoomPercent}%`;
+        }
+        
+        // Get font family based on selected font
+        function getFontFamily() {
+            switch(currentFont) {
+                case 'sakal-bharati':
+                    return "'Noto Sans Tamil', sans-serif";
+                case 'tiro-tamil':
+                    return "'Tiro Tamil', serif";
+                case 'latha':
+                    return "'Latha', 'Noto Sans Tamil', sans-serif";
+                case 'arial-unicode':
+                    return "'Arial Unicode MS', 'Noto Sans Tamil', sans-serif";
+                case 'verdana':
+                    return "Verdana, 'Noto Sans Tamil', sans-serif";
+                default:
+                    return "'Noto Sans Tamil', sans-serif";
+            }
+        }
+        
+        // Generate preview image
+        async function generatePreview() {
+            const text = tamilInput.value.trim();
+            
+            if (!text) {
+                alert('Please enter Tamil text to generate a preview.');
+                return;
+            }
+            
+            try {
+                // Show loading indicator
+                previewLoading.style.display = 'block';
+                previewInstructions.style.display = 'none';
+                previewBtn.disabled = true;
+                previewBtn.innerHTML = 'Generating Preview...';
+                
+                // Get user preferences for preview
+                const fontSize = parseInt(fontSizeSelect.value);
+                const alignment = currentAlignment;
+                const headingText = headingInput.value.trim();
+                const headingSize = parseInt(headingSizeSelect.value);
+                const headingAlignment = currentHeadingAlignment;
+                const headingFormat = currentHeadingFormat;
+                const fontFamily = getFontFamily();
+                
+                // Create a temporary div with the Tamil text for conversion
+                const tempDiv = document.createElement('div');
+                
+                // For preview, we want a smaller scale to fit in the preview area
+                // but maintain proportions similar to A4
+                const previewWidth = 600; // Fixed width for preview
+                const previewHeight = previewWidth * 1.414; // A4 ratio
+                
+                tempDiv.style.width = `${previewWidth}px`;
+                tempDiv.style.height = `${previewHeight}px`;
+                tempDiv.style.padding = '50px 40px 40px 40px'; // Proportional padding
+                tempDiv.style.fontFamily = fontFamily;
+                tempDiv.style.color = '#000';
+                tempDiv.style.backgroundColor = '#fff';
+                tempDiv.style.boxSizing = 'border-box';
+                tempDiv.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+                
+                // Format text with paragraphs
+                const paragraphs = text.split('\n\n');
+                let formattedContent = '';
+                
+                paragraphs.forEach(paragraph => {
+                    if (paragraph.trim()) {
+                        // Replace single newlines with spaces for proper paragraph flow
+                        const paragraphText = paragraph.replace(/\n/g, ' ');
+                        formattedContent += `<p style="margin-bottom: 1.5em; font-size: ${fontSize}px; line-height: 1.8; text-align: ${alignment};">${paragraphText}</p>`;
+                    }
+                });
+                
+                // Add heading if enabled and not empty
+                let headingHTML = '';
+                if (headingEnabled && headingText) {
+                    // Apply formatting styles based on selection
+                    let fontWeight = 'normal';
+                    let textDecoration = 'none';
+                    
+                    switch(headingFormat) {
+                        case 'bold':
+                            fontWeight = 'bold';
+                            textDecoration = 'none';
+                            break;
+                        case 'underline':
+                            fontWeight = 'normal';
+                            textDecoration = 'underline';
+                            break;
+                        case 'bold-underline':
+                            fontWeight = 'bold';
+                            textDecoration = 'underline';
+                            break;
+                        case 'normal':
+                            fontWeight = 'normal';
+                            textDecoration = 'none';
+                            break;
+                    }
+                    
+                    headingHTML = `
+                        <h1 style="font-size: ${headingSize}px; text-align: ${headingAlignment}; margin-bottom: 30px; color: #2c3e50; font-weight: ${fontWeight}; text-decoration: ${textDecoration};">
+                            ${headingText}
+                        </h1>
+                    `;
+                }
+                
+                // Create preview content
+                tempDiv.innerHTML = `
+                    ${headingHTML}
+                    <div style="margin-top: ${headingEnabled && headingText ? '0' : '30'}px;">
+                        ${formattedContent}
+                    </div>
+                `;
+                
+                document.body.appendChild(tempDiv);
+                
+                // Use html2canvas to convert the div to an image
+                const canvas = await html2canvas(tempDiv, {
+                    scale: 1,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    width: tempDiv.offsetWidth,
+                    height: tempDiv.offsetHeight
+                });
+                
+                document.body.removeChild(tempDiv);
+                
+                // Convert canvas to data URL
+                const imgData = canvas.toDataURL('image/png', 0.9);
+                
+                // Set the image source
+                previewImage.src = imgData;
+                previewImage.style.display = 'block';
+                previewImage.style.cursor = 'grab';
+                
+                // Reset zoom and position
+                resetZoom();
+                
+                // Update cursor for dragging
+                previewWrapper.style.cursor = 'grab';
+                
+                // Show page outline
+                pageOutline.style.display = 'block';
+                pageOutline.style.width = `${canvas.width}px`;
+                pageOutline.style.height = `${canvas.height}px`;
+                
+                // Hide loading indicator
+                previewLoading.style.display = 'none';
+                previewBtn.disabled = false;
+                previewBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                    </svg>
+                    Update Preview
+                `;
+                
+            } catch (error) {
+                console.error('Preview generation error:', error);
+                alert('Error generating preview. Please try again.');
+                
+                // Hide loading indicator
+                previewLoading.style.display = 'none';
+                previewInstructions.style.display = 'block';
+                previewBtn.disabled = false;
+                previewBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                    </svg>
+                    Update Preview
+                `;
+            }
+        }
+        
+        // Load sample text
+        function loadSampleText() {
+            tamilInput.value = sampleText;
+            headingInput.value = 'தமிழ் மொழி பற்றிய கட்டுரை';
+            headingEnabled = true;
+            headingSizeSelect.value = '18';
+            toggleHeadingBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8.5 2.687v9.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V2.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                    <path d="M13.5 4.687v7.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V4.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                </svg>
+                Remove Heading
+            `;
+            toggleHeadingBtn.style.backgroundColor = '#9b59b6';
+            
+            updateCharCount();
+            
+            // Auto-generate preview when loading sample
+            setTimeout(() => {
+                generatePreview();
+            }, 500);
+        }
+        
+        // Clear input
+        function clearInput() {
+            tamilInput.value = '';
+            updateCharCount();
+            // Clear preview
+            previewImage.src = '';
+            previewImage.style.display = 'none';
+            previewInstructions.style.display = 'block';
+            pageOutline.style.display = 'none';
+        }
+        
+        // Reset all settings
+        function resetAll() {
+            tamilInput.value = '';
+            headingInput.value = 'தமிழ் மொழி பற்றிய கட்டுரை';
+            pageSizeSelect.value = 'a4';
+            orientationSelect.value = 'portrait';
+            fontSizeSelect.value = '16';
+            headingSizeSelect.value = '18';
+            fileNameInput.value = 'tamil-document';
+            headingEnabled = true;
+            
+            // Reset font to Sakal Bharati
+            fontOptions.forEach(opt => opt.classList.remove('active'));
+            document.querySelector('.font-option[data-font="sakal-bharati"]').classList.add('active');
+            currentFont = 'sakal-bharati';
+            updateFontLabels();
+            
+            // Reset alignment to justify
+            alignmentButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.align-btn[data-align="justify"]').classList.add('active');
+            currentAlignment = 'justify';
+            alignmentLabel.textContent = 'Justify';
+            
+            // Reset heading alignment to left
+            headingAlignButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.heading-align-btn[data-halign="left"]').classList.add('active');
+            currentHeadingAlignment = 'left';
+            
+            // Reset heading format to bold
+            headingFormatButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.heading-format-btn[data-format="bold"]').classList.add('active');
+            currentHeadingFormat = 'bold';
+            formatLabel.textContent = 'Bold';
+            
+            toggleHeadingBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8.5 2.687v9.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V2.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                    <path d="M13.5 4.687v7.746c0 .1-.092.18-.205.18l-4.59-.01c-.113 0-.205-.08-.205-.18V4.687c0-.1.092-.18.205-.18l4.59.01c.113 0 .205.08.205.18z"/>
+                </svg>
+                Remove Heading
+            `;
+            toggleHeadingBtn.style.backgroundColor = '#9b59b6';
+            
+            updateCharCount();
+            
+            // Clear preview
+            previewImage.src = '';
+            previewImage.style.display = 'none';
+            previewInstructions.style.display = 'block';
+            pageOutline.style.display = 'none';
+            resetZoom();
+        }
+        
+        // Generate PDF
+        async function generatePdf() {
+            const text = tamilInput.value.trim();
+            
+            if (!text) {
+                alert('Please enter Tamil text to generate a PDF.');
+                return;
+            }
+            
+            try {
+                // Show loading indicator
+                loadingElement.style.display = 'block';
+                generatePdfBtn.disabled = true;
+                generatePdfBtn.innerHTML = 'Generating...';
+                
+                // Get user preferences
+                const pageSize = pageSizeSelect.value;
+                const orientation = orientationSelect.value;
+                const fontSize = parseInt(fontSizeSelect.value);
+                const fileName = fileNameInput.value || 'tamil-document';
+                const alignment = currentAlignment;
+                const headingText = headingInput.value.trim();
+                const headingSize = parseInt(headingSizeSelect.value);
+                const headingAlignment = currentHeadingAlignment;
+                const headingFormat = currentHeadingFormat;
+                const fontFamily = getFontFamily();
+                
+                // Define page dimensions (in mm)
+                let pageWidth, pageHeight;
+                if (pageSize === 'a4') {
+                    pageWidth = 210; // A4 width in mm
+                    pageHeight = 297; // A4 height in mm
+                } else {
+                    pageWidth = 215.9; // Letter width in mm (8.5 in)
+                    pageHeight = 279.4; // Letter height in mm (11 in)
+                }
+                
+                // Swap dimensions for landscape
+                if (orientation === 'landscape') {
+                    [pageWidth, pageHeight] = [pageHeight, pageWidth];
+                }
+                
+                // Create a temporary div with the Tamil text for conversion
+                const tempDiv = document.createElement('div');
+                tempDiv.style.width = `${pageWidth}mm`;
+                tempDiv.style.minHeight = `${pageHeight}mm`;
+                tempDiv.style.padding = '25mm 20mm 20mm 20mm'; // Top padding 25mm, others 20mm
+                tempDiv.style.fontFamily = fontFamily;
+                tempDiv.style.color = '#000';
+                tempDiv.style.backgroundColor = '#fff';
+                tempDiv.style.boxSizing = 'border-box';
+                
+                // Format text with paragraphs
+                const paragraphs = text.split('\n\n');
+                let formattedContent = '';
+                
+                paragraphs.forEach(paragraph => {
+                    if (paragraph.trim()) {
+                        // Replace single newlines with spaces for proper paragraph flow
+                        const paragraphText = paragraph.replace(/\n/g, ' ');
+                        formattedContent += `<p style="margin-bottom: 1.5em; font-size: ${fontSize}px; line-height: 1.8; text-align: ${alignment};">${paragraphText}</p>`;
+                    }
+                });
+                
+                // Add heading if enabled and not empty
+                let headingHTML = '';
+                if (headingEnabled && headingText) {
+                    // Apply formatting styles based on selection
+                    let fontWeight = 'normal';
+                    let textDecoration = 'none';
+                    
+                    switch(headingFormat) {
+                        case 'bold':
+                            fontWeight = 'bold';
+                            textDecoration = 'none';
+                            break;
+                        case 'underline':
+                            fontWeight = 'normal';
+                            textDecoration = 'underline';
+                            break;
+                        case 'bold-underline':
+                            fontWeight = 'bold';
+                            textDecoration = 'underline';
+                            break;
+                        case 'normal':
+                            fontWeight = 'normal';
+                            textDecoration = 'none';
+                            break;
+                    }
+                    
+                    headingHTML = `
+                        <h1 style="font-size: ${headingSize}px; text-align: ${headingAlignment}; margin-bottom: 25px; color: #2c3e50; font-weight: ${fontWeight}; text-decoration: ${textDecoration};">
+                            ${headingText}
+                        </h1>
+                    `;
+                }
+                
+                // Clean version - no "Created on" details, no generator info
+                tempDiv.innerHTML = `
+                    ${headingHTML}
+                    <div style="margin-top: ${headingEnabled && headingText ? '0' : '20'}px;">
+                        ${formattedContent}
+                    </div>
+                `;
+                
+                document.body.appendChild(tempDiv);
+                
+                // Use html2canvas to convert the div to an image
+                const canvas = await html2canvas(tempDiv, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    width: tempDiv.offsetWidth,
+                    height: tempDiv.offsetHeight
+                });
+                
+                document.body.removeChild(tempDiv);
+                
+                // Calculate image dimensions to fit page
+                const margin = 10; // 10mm margin
+                const imgWidth = pageWidth - (2 * margin);
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: orientation,
+                    unit: 'mm',
+                    format: pageSize
+                });
+                
+                // Add the image to PDF
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+                
+                // Save the PDF
+                pdf.save(`${fileName}.pdf`);
+                
+                // Hide loading indicator
+                loadingElement.style.display = 'none';
+                generatePdfBtn.disabled = false;
+                generatePdfBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                    </svg>
+                    Generate PDF
+                `;
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                alert('Error generating PDF. Please try again.');
+                
+                // Hide loading indicator
+                loadingElement.style.display = 'none';
+                generatePdfBtn.disabled = false;
+                generatePdfBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                    </svg>
+                    Generate PDF
+                `;
+            }
+        }
+        
+        // Initialize
+        updateCharCount();
+        updateFontLabels();
+    </script>
+</body>
+</html>
