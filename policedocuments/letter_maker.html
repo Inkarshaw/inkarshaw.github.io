@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formal Leave Letter Generator</title>
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .preview-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        label.required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .address-textarea {
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button i {
+            font-size: 18px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .preview-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .letter-preview {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            min-height: 500px;
+            line-height: 1.8;
+            white-space: pre-line;
+            overflow-wrap: break-word;
+            text-align: left;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        input.error-border, textarea.error-border, select.error-border {
+            border-color: #e74c3c;
+        }
+
+        .character-count {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+        
+        .date-position-note {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .address-format-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .from-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .from-label i {
+            color: #667eea;
+        }
+        
+        .salutation-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .salutation-select {
+            width: 120px;
+        }
+        
+        .recipient-title-select {
+            width: 140px;
+        }
+        
+        .salutation-preview {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .salutation-preview strong {
+            color: #333;
+        }
+        
+        .font-settings-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .font-settings-group .form-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        
+        .font-settings-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555;
+        }
+        
+        .font-settings-group label i {
+            color: #667eea;
+        }
+        
+        .font-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f2f5;
+            border-radius: 6px;
+            border-left: 3px solid #764ba2;
+        }
+        
+        .font-preview-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.9em;
+        }
+        
+        .font-preview-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666;
+        }
+        
+        .font-size-select {
+            width: 100%;
+        }
+        
+        .font-select {
+            width: 100%;
+        }
+        
+        .preview-font-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .preview-font-info i {
+            color: #667eea;
+        }
+        
+        .ref-note {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+    </style>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts for additional font options -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Merriweather:wght@400;700&family=Source+Serif+Pro:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-pdf"></i> Formal Leave Letter Generator</h1>
+            <p>Create professional leave letters in PDF format instantly</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Form Section -->
+            <div class="form-container">
+                <form id="leaveForm">
+                    <!-- Font Settings Section -->
+                    <div class="font-settings-group">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-font"></i>
+                                Font Family:
+                            </label>
+                            <select id="fontFamily" class="font-select">
+                                <option value="Times New Roman" selected>Times New Roman (Formal)</option>
+                                <option value="Arial">Arial (Modern)</option>
+                                <option value="Helvetica">Helvetica (Professional)</option>
+                                <option value="Georgia">Georgia (Elegant)</option>
+                                <option value="Garamond">Garamond (Classic)</option>
+                                <option value="Merriweather">Merriweather (Serif)</option>
+                                <option value="Roboto">Roboto (Clean)</option>
+                                <option value="Open Sans">Open Sans (Readable)</option>
+                                <option value="Lato">Lato (Corporate)</option>
+                                <option value="Montserrat">Montserrat (Modern)</option>
+                                <option value="Source Serif Pro">Source Serif Pro (Professional)</option>
+                                <option value="Playfair Display">Playfair Display (Elegant)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-text-height"></i>
+                                Font Size:
+                            </label>
+                            <select id="fontSize" class="font-size-select">
+                                <option value="10">10px (Small)</option>
+                                <option value="11" selected>11px (Standard)</option>
+                                <option value="12">12px (Medium)</option>
+                                <option value="13">13px (Large)</option>
+                                <option value="14">14px (Extra Large)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="font-preview">
+                        <div class="font-preview-title">Font Preview:</div>
+                        <div class="font-preview-text" id="fontPreviewText">
+                            This is how your letter will appear with the selected font and size.
+                        </div>
+                        <div class="preview-font-info">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Selected: <strong id="selectedFontInfo">Times New Roman, 11px</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Date:</label>
+                        <input type="date" id="applicationDate" required>
+                        <div class="error" id="dateError">Please select a date</div>
+                        <div class="date-position-note">Will appear at top right corner, with "From" and "To" contents indented</div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="from-label">
+                            <i class="fas fa-user"></i>
+                            <label class="required">From (Your Details):</label>
+                        </div>
+                        <textarea class="address-textarea" id="fromDetails" placeholder="Enter your complete details:
+John Smith
+Senior Marketing Executive
+Marketing Department
+ABC Corporation
+123 Business Street
+New York, NY 10001
+Phone: (123) 456-7890
+Email: john.smith@abccorp.com
+Employee ID: EMP12345" required>John Smith
+Senior Marketing Executive
+Marketing Department
+ABC Corporation
+123 Business Street
+New York, NY 10001
+Phone: (123) 456-7890
+Email: john.smith@abccorp.com
+Employee ID: EMP12345</textarea>
+                        <div class="address-format-hint">Enter each detail on a new line. Include your name, designation, department, company, address, and contact information.</div>
+                        <div class="error" id="fromError">Please enter your details</div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="from-label">
+                            <i class="fas fa-user-tie"></i>
+                            <label class="required">To (Receiver Details):</label>
+                        </div>
+                        <textarea class="address-textarea" id="toDetails" placeholder="Enter receiver's complete details:
+Ms. Sarah Johnson
+Head of Marketing
+XYZ Corporation
+456 Corporate Avenue
+Chicago, IL 60601" required>Ms. Sarah Johnson
+Head of Marketing
+XYZ Corporation
+456 Corporate Avenue
+Chicago, IL 60601</textarea>
+                        <div class="address-format-hint">Enter each detail on a new line. Include recipient's name, designation, company, and address.</div>
+                        <div class="error" id="toError">Please enter receiver details</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ref (Optional Reference Number):</label>
+                        <input type="text" id="reference" placeholder="e.g., HR/2024/1234 or EMP12345/LEAVE/2024">
+                        <div class="ref-note">Optional reference number for tracking purposes</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Sub:</label>
+                        <input type="text" id="subject" placeholder="Application for Sick Leave" required>
+                        <div class="error" id="subjectError">Please enter subject</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Salutation:</label>
+                        <div class="salutation-group">
+                            <select id="salutationType" class="salutation-select" required>
+                                <option value="Dear">Dear</option>
+                                <option value="Respected">Respected</option>
+                            </select>
+                            <select id="recipientTitle" class="recipient-title-select" required>
+                                <option value="name">Use Name</option>
+                                <option value="sir">Sir</option>
+                                <option value="madam">Madam</option>
+                                <option value="sirmadam">Sir/Madam</option>
+                            </select>
+                        </div>
+                        <div class="salutation-preview">
+                            Preview: <strong id="salutationPreview">Dear Sarah,</strong>
+                        </div>
+                        <div class="error" id="salutationError">Please select salutation</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Letter Body:</label>
+                        <textarea id="letterBody" placeholder="Write your leave application letter here..." required>I am writing to formally request sick leave as I have been diagnosed with a medical condition that requires immediate attention and rest.
+
+My doctor has advised complete rest during this period to ensure proper recovery. I have attached the medical certificate for your reference and verification.
+
+During my absence, I have arranged for my colleague, Michael Chen, to handle my urgent responsibilities. All necessary files and project information have been shared with them. I will remain accessible via email for any critical matters that may require my immediate attention.
+
+I have completed all pending assignments and updated the project tracker accordingly. Upon my return, I will ensure a smooth transition back to my duties.
+
+Thank you for your understanding and consideration of my request.</textarea>
+                        <div class="character-count">
+                            <span id="charCount">0</span> characters
+                        </div>
+                        <div class="error" id="bodyError">Please write your letter</div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-primary" id="generatePdf">
+                            <i class="fas fa-file-download"></i> Generate & Download PDF
+                        </button>
+                        <button type="button" class="btn-secondary" id="previewLetter">
+                            <i class="fas fa-eye"></i> Preview Letter
+                        </button>
+                        <button type="button" class="btn-secondary" id="clearForm">
+                            <i class="fas fa-trash"></i> Clear Form
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Generating PDF...</p>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-container">
+                <div class="preview-title">
+                    <i class="fas fa-file-alt"></i> Letter Preview
+                </div>
+                <div class="letter-preview" id="letterPreview">
+                    Your letter preview will appear here...
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Formal Leave Letter Generator | All fields marked with * are required</p>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <i class="fas fa-check-circle"></i> PDF Generated Successfully!
+    </div>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+
+        // DOM Elements
+        const form = document.getElementById('leaveForm');
+        const letterPreview = document.getElementById('letterPreview');
+        const generateBtn = document.getElementById('generatePdf');
+        const previewBtn = document.getElementById('previewLetter');
+        const clearBtn = document.getElementById('clearForm');
+        const charCount = document.getElementById('charCount');
+        const letterBody = document.getElementById('letterBody');
+        const fromDetails = document.getElementById('fromDetails');
+        const toDetails = document.getElementById('toDetails');
+        const salutationType = document.getElementById('salutationType');
+        const recipientTitle = document.getElementById('recipientTitle');
+        const salutationPreview = document.getElementById('salutationPreview');
+        const successMessage = document.getElementById('successMessage');
+        const loading = document.getElementById('loading');
+        const fontFamilySelect = document.getElementById('fontFamily');
+        const fontSizeSelect = document.getElementById('fontSize');
+        const fontPreviewText = document.getElementById('fontPreviewText');
+        const selectedFontInfo = document.getElementById('selectedFontInfo');
+        const referenceInput = document.getElementById('reference');
+        const subjectInput = document.getElementById('subject');
+
+        // Font options mapping for jsPDF
+        const fontMapping = {
+            'Times New Roman': 'times',
+            'Arial': 'helvetica',
+            'Helvetica': 'helvetica',
+            'Georgia': 'times',
+            'Garamond': 'times',
+            'Merriweather': 'times',
+            'Roboto': 'helvetica',
+            'Open Sans': 'helvetica',
+            'Lato': 'helvetica',
+            'Montserrat': 'helvetica',
+            'Source Serif Pro': 'times',
+            'Playfair Display': 'times'
+        };
+
+        // Initialize date fields
+        function initializeDates() {
+            const today = new Date();
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            document.getElementById('applicationDate').value = formatDate(today);
+        }
+
+        // Update font preview
+        function updateFontPreview() {
+            const selectedFont = fontFamilySelect.value;
+            const selectedSize = fontSizeSelect.value;
+            
+            // Update preview text styling
+            fontPreviewText.style.fontFamily = selectedFont;
+            fontPreviewText.style.fontSize = `${selectedSize}px`;
+            
+            // Update font info display
+            selectedFontInfo.textContent = `${selectedFont}, ${selectedSize}px`;
+            
+            // Update letter preview styling
+            updatePreviewStyling();
+        }
+
+        // Update preview styling
+        function updatePreviewStyling() {
+            const selectedFont = fontFamilySelect.value;
+            const selectedSize = fontSizeSelect.value;
+            
+            letterPreview.style.fontFamily = selectedFont;
+            letterPreview.style.fontSize = `${selectedSize}px`;
+        }
+
+        // Update character count
+        function updateCharCount() {
+            charCount.textContent = letterBody.value.length;
+        }
+
+        // Parse address lines
+        function parseAddressLines(text) {
+            return text.split('\n').filter(line => line.trim() !== '');
+        }
+
+        // Extract name from address (first non-empty line)
+        function extractNameFromAddress(text) {
+            const lines = parseAddressLines(text);
+            return lines.length > 0 ? lines[0].trim() : '';
+        }
+
+        // Extract first name for salutation
+        function extractFirstName(fullName) {
+            if (!fullName) return '';
+            // Remove titles like Mr., Ms., Mrs., Dr.
+            const name = fullName.replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s*/i, '');
+            return name.split(' ')[0];
+        }
+
+        // Get recipient title text
+        function getRecipientTitleText(titleType, recipientFirstName) {
+            switch(titleType) {
+                case 'sir':
+                    return 'Sir';
+                case 'madam':
+                    return 'Madam';
+                case 'sirmadam':
+                    return 'Sir/Madam';
+                case 'name':
+                default:
+                    return recipientFirstName || 'Sir/Madam';
+            }
+        }
+
+        // Add single indent to address lines
+        function addIndentToAddressLines(text) {
+            const lines = parseAddressLines(text);
+            return lines.map(line => `    ${line}`).join('\n');
+        }
+
+        // Format date for display
+        function formatDisplayDate(dateString) {
+            if (!dateString) return '[Date]';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // Validate form
+        function validateForm() {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            // Reset errors
+            document.querySelectorAll('.error').forEach(error => {
+                error.classList.remove('active');
+            });
+            document.querySelectorAll('.error-border').forEach(field => {
+                field.classList.remove('error-border');
+            });
+
+            // Check each required field
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('error-border');
+                    const errorId = field.id + 'Error';
+                    const errorElement = document.getElementById(errorId);
+                    if (errorElement) {
+                        errorElement.classList.add('active');
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        // Generate preview
+        function generatePreview() {
+            if (!validateForm()) {
+                alert('Please fill all required fields correctly');
+                return;
+            }
+
+            const formData = {
+                fromDetails: fromDetails.value,
+                applicationDate: formatDisplayDate(document.getElementById('applicationDate').value),
+                toDetails: toDetails.value,
+                reference: referenceInput.value,
+                subject: subjectInput.value,
+                salutationType: salutationType.value,
+                recipientTitle: recipientTitle.value,
+                letterBody: letterBody.value
+            };
+
+            // Get recipient name for salutation
+            const recipientFullName = extractNameFromAddress(formData.toDetails);
+            const recipientFirstName = extractFirstName(recipientFullName);
+            const titleText = getRecipientTitleText(formData.recipientTitle, recipientFirstName);
+
+            // Add indent to From and To addresses
+            const fromWithIndent = addIndentToAddressLines(formData.fromDetails);
+            const toWithIndent = addIndentToAddressLines(formData.toDetails);
+
+            // Generate preview text with Ref: and Sub:
+            let preview = `                                                                                                Date: ${formData.applicationDate}
+
+From:
+${fromWithIndent}
+
+To:
+${toWithIndent}
+
+`;
+            
+            // Add Ref: if provided
+            if (formData.reference.trim()) {
+                preview += `        Ref:  ${formData.reference}\n`;
+            }
+            
+            // Add Sub: WITHOUT EXTRA SPACE AFTER COLON
+            preview += `        Sub: ${formData.subject}
+
+${formData.salutationType} ${titleText},
+
+${formData.letterBody}
+
+                                                                                                Sincerely,
+
+${extractNameFromAddress(formData.fromDetails)}
+${parseAddressLines(formData.fromDetails).slice(1, 3).join('\n')}`;
+
+            letterPreview.textContent = preview;
+            updatePreviewStyling();
+        }
+
+        // Generate PDF
+        function generatePDF() {
+            if (!validateForm()) {
+                alert('Please fill all required fields correctly');
+                return;
+            }
+
+            loading.classList.add('active');
+            generateBtn.disabled = true;
+
+            setTimeout(() => {
+                try {
+                    const formData = {
+                        fromDetails: fromDetails.value,
+                        applicationDate: formatDisplayDate(document.getElementById('applicationDate').value),
+                        toDetails: toDetails.value,
+                        reference: referenceInput.value,
+                        subject: subjectInput.value,
+                        salutationType: salutationType.value,
+                        recipientTitle: recipientTitle.value,
+                        letterBody: letterBody.value,
+                        fontFamily: fontFamilySelect.value,
+                        fontSize: parseInt(fontSizeSelect.value)
+                    };
+
+                    // Parse address details
+                    const fromLines = parseAddressLines(formData.fromDetails);
+                    const toLines = parseAddressLines(formData.toDetails);
+                    const recipientFullName = extractNameFromAddress(formData.toDetails);
+                    const recipientFirstName = extractFirstName(recipientFullName);
+                    const senderName = extractNameFromAddress(formData.fromDetails);
+                    const titleText = getRecipientTitleText(formData.recipientTitle, recipientFirstName);
+
+                    // Get mapped font for jsPDF
+                    const pdfFont = fontMapping[formData.fontFamily] || 'times';
+                    
+                    // Create PDF
+                    const doc = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+
+                    // Set document properties
+                    doc.setProperties({
+                        title: `Leave Application - ${senderName}`,
+                        subject: formData.subject,
+                        author: senderName,
+                        creator: 'Formal Leave Letter Generator'
+                    });
+
+                    // Set font based on selection
+                    doc.setFont(pdfFont, "normal");
+                    doc.setFontSize(formData.fontSize);
+                    
+                    // DATE AT TOP RIGHT CORNER - RIGHT ALIGNED
+                    let yPos = 25; // Starting position
+                    doc.text(`Date: ${formData.applicationDate}`, 160, yPos, { align: 'right' });
+                    
+                    // Move down one line for "From:" section
+                    yPos += 10;
+                    
+                    // "From:" label below the date (starts at 20mm)
+                    doc.text('From:', 20, yPos);
+                    
+                    // Sender details below "From:" label WITH SINGLE INDENT (30mm instead of 20mm)
+                    yPos += 7;
+                    fromLines.forEach((line) => {
+                        doc.text(line, 30, yPos); // Indented by 10mm (30 instead of 20)
+                        yPos += 5;
+                    });
+
+                    // Space after "From" section
+                    yPos += 10;
+
+                    // "To:" label
+                    doc.text('To:', 20, yPos);
+                    yPos += 7;
+                    
+                    // Display each line of recipient details WITH SINGLE INDENT
+                    toLines.forEach((line) => {
+                        doc.text(line, 30, yPos); // Indented by 10mm (30 instead of 20)
+                        yPos += 5;
+                    });
+                    
+                    // Space after "To" section
+                    yPos += 5;
+                    
+                    // Add Ref: line if reference is provided
+                    if (formData.reference.trim()) {
+                        // Combine "Ref:" and reference into one line
+                        const refText = `Ref: ${formData.reference}`;
+                        const refLines = doc.splitTextToSize(refText, 140); // Single line width
+                        doc.text(refLines, 40, yPos); // Start at X=40 (double indent)
+                        yPos += (refLines.length * (formData.fontSize / 3)) + 5;
+                    }
+                    
+                    // Sub: line - COMBINE LABEL AND CONTENT ON SAME LINE
+                    const subText = `Sub: ${formData.subject}`;
+                    const subLines = doc.splitTextToSize(subText, 140); // Single line width
+                    doc.text(subLines, 40, yPos); // Start at X=40 (double indent)
+                    yPos += (subLines.length * (formData.fontSize / 3)) + 10;
+
+                    // Salutation (starts at 20mm, not indented)
+                    const salutation = `${formData.salutationType} ${titleText},`;
+                    doc.text(salutation, 20, yPos);
+                    yPos += 10;
+
+                    // Letter Body - LEFT ALIGNED (starts at 20mm, not indented)
+                    const bodyLines = doc.splitTextToSize(formData.letterBody, 170);
+                    let bodyY = yPos;
+                    const lineHeight = formData.fontSize / 2.5;
+                    
+                    bodyLines.forEach((line, index) => {
+                        // Left aligned, starts at 20mm
+                        doc.text(line, 20, bodyY, { maxWidth: 170 });
+                        bodyY += lineHeight;
+                    });
+                    yPos = bodyY + 20; // More space after body
+
+                    // Closing - MOVED TO RIGHT SIDE with alignment
+                    doc.text('Sincerely,', 160, yPos, { align: 'right' });
+                    
+                    // Space for signature
+                    yPos += 20;
+                    
+                    // Signature line on right side
+                    doc.setLineWidth(0.5);
+                    doc.line(120, yPos, 170, yPos);
+                    
+                    // Sender signature details on right side
+                    yPos += 10;
+                    doc.text(senderName, 160, yPos, { align: 'right' });
+                    
+                    // Add next lines from sender details on right side
+                    yPos += 6;
+                    fromLines.slice(1, 3).forEach(line => {
+                        doc.text(line, 160, yPos, { align: 'right' });
+                        yPos += 6;
+                    });
+
+                    // Save PDF
+                    const fileName = `Leave_Application_${senderName.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+                    doc.save(fileName);
+
+                    // Show success message
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    alert('Error generating PDF. Please try again.');
+                } finally {
+                    loading.classList.remove('active');
+                    generateBtn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        // Clear form
+        function clearForm() {
+            if (confirm('Are you sure you want to clear all fields?')) {
+                form.reset();
+                initializeDates();
+                
+                // Reset font settings to defaults
+                fontFamilySelect.value = 'Times New Roman';
+                fontSizeSelect.value = '11';
+                updateFontPreview();
+                
+                // Reset textareas to default values
+                fromDetails.value = `John Smith
+Senior Marketing Executive
+Marketing Department
+ABC Corporation
+123 Business Street
+New York, NY 10001
+Phone: (123) 456-7890
+Email: john.smith@abccorp.com
+Employee ID: EMP12345`;
+                
+                toDetails.value = `Ms. Sarah Johnson
+Head of Marketing
+XYZ Corporation
+456 Corporate Avenue
+Chicago, IL 60601`;
+                
+                // Clear reference field
+                referenceInput.value = '';
+                
+                // Reset salutation to defaults
+                salutationType.value = "Dear";
+                recipientTitle.value = "name";
+                updateSalutationPreview();
+                
+                letterPreview.textContent = 'Your letter preview will appear here...';
+                document.querySelectorAll('.error').forEach(error => {
+                    error.classList.remove('active');
+                });
+                document.querySelectorAll('.error-border').forEach(field => {
+                    field.classList.remove('error-border');
+                });
+                updateCharCount();
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDates();
+            updateCharCount();
+            updateSalutationPreview();
+            updateFontPreview();
+            
+            // Generate initial preview
+            generatePreview();
+        });
+
+        // Font change listeners
+        fontFamilySelect.addEventListener('change', function() {
+            updateFontPreview();
+            generatePreview();
+        });
+        
+        fontSizeSelect.addEventListener('change', function() {
+            updateFontPreview();
+            generatePreview();
+        });
+
+        letterBody.addEventListener('input', updateCharCount);
+        
+        // Update salutation preview when any salutation field changes
+        salutationType.addEventListener('change', function() {
+            updateSalutationPreview();
+            generatePreview();
+        });
+        
+        recipientTitle.addEventListener('change', function() {
+            updateSalutationPreview();
+            generatePreview();
+        });
+        
+        toDetails.addEventListener('input', function() {
+            updateSalutationPreview();
+            generatePreview();
+        });
+
+        // Update preview when form fields change
+        fromDetails.addEventListener('input', generatePreview);
+        document.getElementById('applicationDate').addEventListener('change', generatePreview);
+        referenceInput.addEventListener('input', generatePreview);
+        subjectInput.addEventListener('input', generatePreview);
+        letterBody.addEventListener('input', generatePreview);
+
+        previewBtn.addEventListener('click', generatePreview);
+        generateBtn.addEventListener('click', generatePDF);
+        clearBtn.addEventListener('click', clearForm);
+
+        // Auto-save form data to localStorage
+        form.addEventListener('input', function() {
+            const formData = {
+                fromDetails: fromDetails.value,
+                toDetails: toDetails.value,
+                reference: referenceInput.value,
+                subject: subjectInput.value,
+                salutationType: salutationType.value,
+                recipientTitle: recipientTitle.value,
+                letterBody: document.getElementById('letterBody').value,
+                fontFamily: fontFamilySelect.value,
+                fontSize: fontSizeSelect.value
+            };
+            localStorage.setItem('leaveFormData', JSON.stringify(formData));
+        });
+
+        // Load saved data
+        const savedData = localStorage.getItem('leaveFormData');
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) element.value = data[key];
+                });
+                updateCharCount();
+                updateSalutationPreview();
+                updateFontPreview();
+                generatePreview();
+            } catch (e) {
+                console.log('No saved data found');
+            }
+        }
+    </script>
+</body>
+</html>
