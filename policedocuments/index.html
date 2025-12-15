@@ -478,6 +478,19 @@
                 <h2><i>📄</i> Generate PDF Documents</h2>
                 <div class="search-info" id="generatePDFsInfo"></div>
                 <ul class="document-list" id="generatePDFsList">
+                    <!-- New Formal Letter Generator Entry -->
+                    <li class="document-item" data-title="Formal Letter Generator" data-desc="Generate formal letters for official police correspondence">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Formal Letter Generator</div>
+                            <div class="doc-desc">Generate formal letters for official police correspondence</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/formal_letter_generator.html" target="_blank" class="btn btn-generate">
+                                <i>🔄</i> Generate
+                            </a>
+                        </div>
+                    </li>
+                    
                     <li class="document-item" data-title="CDR Request" data-desc="Generate Call Detail Records request for telecom providers">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>CDR Request</div>
@@ -687,7 +700,7 @@
     </div>
 
     <script>
-        // Document data for search functionality
+        // Document data for search functionality - Updated with Formal Letter Generator
         const documents = [
             // Download Forms
             { title: "Arrest Intimation", desc: "Form for notifying relevant parties about an arrest", type: "download", element: null },
@@ -702,7 +715,8 @@
             { title: "Witness Statement Form", desc: "Standardized form for recording witness testimonies", type: "download", element: null },
             { title: "Vehicle Search Form", desc: "Documentation for vehicle searches and inventory", type: "download", element: null },
             
-            // Generate PDFs
+            // Generate PDFs - Added Formal Letter Generator
+            { title: "Formal Letter Generator", desc: "Generate formal letters for official police correspondence", type: "generate", element: null },
             { title: "CDR Request", desc: "Generate Call Detail Records request for telecom providers", type: "generate", element: null },
             { title: "NDPS Form 6", desc: "Generate official NDPS Form 6 for narcotics case documentation", type: "generate", element: null },
             { title: "NDPS Form 4", desc: "Generate official NDPS Form 4 for narcotics case documentation", type: "generate", element: null },
@@ -879,6 +893,14 @@
             
             searchInput.addEventListener('input', performSearch);
             searchButton.addEventListener('click', performSearch);
+            
+            // Special handling for Formal Letter Generator
+            const formalLetterBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/formal_letter_generator.pdf"]');
+            if (formalLetterBtn) {
+                formalLetterBtn.addEventListener('click', function() {
+                    showNotification('Opening Formal Letter Generator...');
+                });
+            }
             
             // Special handling for Arrest Intimation download
             const arrestIntimationBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/arrest_intimation.pdf"]');
