@@ -697,93 +697,132 @@
             z-index: 5;
         }
         
-        /* Font selection styles */
-        .font-selection {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .font-options {
+        /* Voice typing button */
+        .voice-input-container {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
             gap: 10px;
             margin-top: 15px;
         }
         
-        .font-option {
-            flex: 1;
-            min-width: 180px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+        .voice-btn {
+            padding: 10px 20px;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        .font-option:hover {
-            border-color: #3498db;
-            background-color: #f8f9fa;
+        .voice-btn:hover {
+            background-color: #8e44ad;
             transform: translateY(-2px);
         }
         
-        .font-option.active {
-            border-color: #2ecc71;
-            background-color: #f0f9f0;
-            box-shadow: 0 3px 10px rgba(46, 204, 113, 0.2);
+        .voice-btn.listening {
+            background-color: #e74c3c;
+            animation: pulse 1.5s infinite;
         }
         
-        .font-name {
-            font-weight: 700;
-            font-size: 1.1rem;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
+        .voice-status {
             color: #2c3e50;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
         
-        .font-sample {
+        .voice-status.listening {
+            color: #e74c3c;
+        }
+        
+        /* Font dropdown styles */
+        .font-dropdown-container {
+            margin-bottom: 20px;
+        }
+        
+        .font-dropdown {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        
+        .font-dropdown:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .font-preview-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            display: none;
+        }
+        
+        .font-preview-box.show {
+            display: block;
+        }
+        
+        .font-preview-text {
             font-size: 1.2rem;
-            line-height: 1.6;
+            line-height: 1.8;
             min-height: 60px;
             display: flex;
             align-items: center;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid #eee;
         }
         
-        .font-description {
-            font-size: 0.85rem;
-            color: #7f8c8d;
-            margin-top: 5px;
+        .font-preview-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
         
         .font-tamil-name {
-            font-size: 0.9rem;
             color: #e74c3c;
             font-weight: 600;
-        }
-        
-        /* Font examples in Tamil example area */
-        .font-examples {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .font-example-item {
-            padding: 5px 10px;
-            border-radius: 4px;
-            background-color: #f1f1f1;
             font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
         }
         
-        .font-example-item:hover {
-            background-color: #e0e0e0;
-            transform: translateY(-1px);
+        /* Text input toolbar */
+        .input-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .input-toolbar button {
+            flex: 1;
+            min-width: 120px;
         }
     </style>
     
@@ -800,64 +839,26 @@
             <div class="font-info">Selected Font: <span id="currentFontName">சகல் பாரதி (Sakal Bharati)</span></div>
         </header>
         
-        <div class="font-selection">
+        <!-- Font Selection Dropdown (REPLACED THE CARD LAYOUT) -->
+        <div class="font-dropdown-container">
             <h3>Font Selection</h3>
             <p style="color: #7f8c8d; margin-bottom: 15px;">Choose a font for your Tamil document. Each font has a different style and character.</p>
             
-            <div class="font-options">
-                <div class="font-option active" data-font="sakal-bharati">
-                    <div class="font-name">Sakal Bharati</div>
-                    <div class="font-tamil-name">சகல் பாரதி</div>
-                    <div class="font-sample font-sakal-bharati">
-                        தமிழ் மொழி உலகின் பழமையான மொழி
-                    </div>
-                    <div class="font-description">
-                        Clean, modern Tamil font. Great for digital documents and readability.
-                    </div>
+            <select id="fontDropdown" class="font-dropdown">
+                <option value="sakal-bharati" selected>Sakal Bharati (சகல் பாரதி) - Modern, clean font for digital documents</option>
+                <option value="tiro-tamil">Tiro Tamil (திரோ தமிழ்) - Elegant serif font for formal documents</option>
+                <option value="latha">Latha (லாதா) - Classic Windows Tamil font with wide compatibility</option>
+                <option value="arial-unicode">Arial Unicode (ஏரியல் யூனிகோட்) - Universal font with excellent language support</option>
+                <option value="verdana">Verdana (வெர்டானா) - Highly readable font ideal for longer documents</option>
+            </select>
+            
+            <div class="font-preview-box" id="fontPreviewBox">
+                <div class="font-preview-label">
+                    <strong>Font Preview:</strong>
+                    <span class="font-tamil-name" id="previewTamilName">சகல் பாரதி</span>
                 </div>
-                
-                <div class="font-option" data-font="tiro-tamil">
-                    <div class="font-name">Tiro Tamil</div>
-                    <div class="font-tamil-name">திரோ தமிழ்</div>
-                    <div class="font-sample font-tiro-tamil">
-                        தமிழ் மொழி உலகின் பழமையான மொழி
-                    </div>
-                    <div class="font-description">
-                        Elegant serif font. Traditional style perfect for formal documents.
-                    </div>
-                </div>
-                
-                <div class="font-option" data-font="latha">
-                    <div class="font-name">Latha</div>
-                    <div class="font-tamil-name">லாதா</div>
-                    <div class="font-sample font-latha">
-                        தமிழ் மொழி உலகின் பழமையான மொழி
-                    </div>
-                    <div class="font-description">
-                        Classic Windows Tamil font. Familiar and widely compatible.
-                    </div>
-                </div>
-                
-                <div class="font-option" data-font="arial-unicode">
-                    <div class="font-name">Arial Unicode</div>
-                    <div class="font-tamil-name">ஏரியல் யூனிகோட்</div>
-                    <div class="font-sample font-arial-unicode">
-                        தமிழ் மொழி உலகின் பழமையான மொழி
-                    </div>
-                    <div class="font-description">
-                        Universal font with excellent language support. Clean and professional.
-                    </div>
-                </div>
-                
-                <div class="font-option" data-font="verdana">
-                    <div class="font-name">Verdana</div>
-                    <div class="font-tamil-name">வெர்டானா</div>
-                    <div class="font-sample font-verdana">
-                        தமிழ் மொழி உலகின் பழமையான மொழி
-                    </div>
-                    <div class="font-description">
-                        Clear, highly readable font. Excellent for longer documents.
-                    </div>
+                <div class="font-preview-text" id="fontPreviewText">
+                    தமிழ் மொழி உலகின் பழமையான மொழி
                 </div>
             </div>
         </div>
@@ -1036,7 +1037,20 @@
                     </svg>
                     Enter Tamil Text
                 </h2>
-                <textarea id="tamilInput" placeholder="Type or paste your Tamil text here...">தமிழ் மொழி உலகின் பழமையான மொழிகளில் ஒன்றாகும். இது தென்னிந்தியாவில் பேசப்படும் திராவிட மொழிகளில் முக்கியமானதாகும். தமிழ்நாடு மாநிலத்தின் அதிகாரப்பூர்வ மொழியாக தமிழ் விளங்குகிறது.
+                
+                <!-- Voice Input Container -->
+                <div class="voice-input-container">
+                    <button class="voice-btn" id="voiceInputBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>
+                        </svg>
+                        Voice Input
+                    </button>
+                    <div class="voice-status" id="voiceStatus">Click to start voice typing in Tamil</div>
+                </div>
+                
+                <textarea id="tamilInput" placeholder="Type or paste your Tamil text here, or use voice input...">தமிழ் மொழி உலகின் பழமையான மொழிகளில் ஒன்றாகும். இது தென்னிந்தியாவில் பேசப்படும் திராவிட மொழிகளில் முக்கியமானதாகும். தமிழ்நாடு மாநிலத்தின் அதிகாரப்பூர்வ மொழியாக தமிழ் விளங்குகிறது.
 
 தமிழில் மூன்று வகையான இலக்கண நூல்கள் உள்ளன. அவை: எழுத்ததிகாரம், சொல்லதிகாரம், பொருளதிகாரம் என்பனவாகும். தொல்காப்பியம் என்னும் இலக்கண நூல் மிகவும் பழமையானதாகும்.
 
@@ -1044,8 +1058,10 @@
 
 தமிழ் எழுத்துகள் தமிழ் பிராமி எழுத்தில் இருந்து உருவானவை. இன்று பயன்பாட்டில் உள்ள தமிழ் எழுத்துகள் 12 உயிரெழுத்துகள், 18 மெய்யெழுத்துகள், 1 ஆய்த எழுத்து, 216 உயிர்மெய் எழுத்துகள் ஆகியவற்றைக் கொண்டுள்ளது.</textarea>
                 <div class="char-count">Characters: <span id="charCount">0</span></div>
-                <div class="sample-text" id="loadSample">Load Sample Tamil Text</div>
-                <div class="sample-text" id="clearText">Clear Text</div>
+                <div class="input-toolbar">
+                    <div class="sample-text" id="loadSample">Load Sample Tamil Text</div>
+                    <div class="sample-text" id="clearText">Clear Text</div>
+                </div>
             </section>
             
             <section class="preview-section">
@@ -1095,14 +1111,12 @@
                 </div>
                 
                 <div class="tamil-example">
-                    <div class="font-examples">
-                        <strong>Quick Font Test:</strong> 
-                        <div class="font-example-item font-sakal-bharati" data-font="sakal-bharati">சகல் பாரதி</div>
-                        <div class="font-example-item font-tiro-tamil" data-font="tiro-tamil">திரோ தமிழ்</div>
-                        <div class="font-example-item font-latha" data-font="latha">லாதா</div>
-                        <div class="font-example-item font-arial-unicode" data-font="arial-unicode">ஏரியல்</div>
-                        <div class="font-example-item font-verdana" data-font="verdana">வெர்டானா</div>
-                    </div>
+                    <strong>Quick Font Test:</strong> 
+                    <span class="font-sakal-bharati">சகல் பாரதி</span> | 
+                    <span class="font-tiro-tamil">திரோ தமிழ்</span> | 
+                    <span class="font-latha">லாதா</span> | 
+                    <span class="font-arial-unicode">ஏரியல்</span> | 
+                    <span class="font-verdana">வெர்டானா</span>
                 </div>
             </section>
         </div>
@@ -1139,7 +1153,8 @@
         <div class="instructions">
             <h3>How to Use:</h3>
             <ul>
-                <li><strong>Select Font:</strong> Choose from 5 Tamil fonts - each has a unique style and purpose</li>
+                <li><strong>Select Font:</strong> Choose from 5 Tamil fonts using the dropdown menu</li>
+                <li><strong>Voice Input:</strong> Click the Voice Input button to speak Tamil text (requires microphone permission)</li>
                 <li><strong>Sakal Bharati:</strong> Modern, clean font perfect for digital documents</li>
                 <li><strong>Tiro Tamil:</strong> Elegant serif font for formal and traditional documents</li>
                 <li><strong>Latha:</strong> Classic Windows Tamil font with wide compatibility</li>
@@ -1149,12 +1164,12 @@
                 <li><strong>Generate PDF:</strong> Create and download your A4 PDF with chosen font</li>
             </ul>
             <div class="note">
-                <strong>Font Selection Tips:</strong> Sakal Bharati is recommended for most uses. Tiro Tamil works well for formal documents. Latha has the best compatibility across systems. Arial Unicode and Verdana are excellent for readability.
+                <strong>Voice Input Tip:</strong> Speak clearly in Tamil. The browser's speech recognition will convert your speech to text. Works best in Chrome/Edge browsers.
             </div>
         </div>
         
         <div class="footer">
-            <p>© 2023 Tamil PDF Generator | Multiple Font Support | Zoomable Preview</p>
+            <p>© 2023 Tamil PDF Generator | Multiple Font Support | Zoomable Preview | Voice Input</p>
             <p>This tool uses jsPDF and html2canvas libraries</p>
         </div>
     </div>
@@ -1195,9 +1210,15 @@
         const headingFormatButtons = document.querySelectorAll('.heading-format-btn');
         const toggleHeadingBtn = document.getElementById('toggleHeadingBtn');
         
-        // Font selection elements
-        const fontOptions = document.querySelectorAll('.font-option');
-        const fontExampleItems = document.querySelectorAll('.font-example-item');
+        // Font dropdown elements
+        const fontDropdown = document.getElementById('fontDropdown');
+        const fontPreviewBox = document.getElementById('fontPreviewBox');
+        const fontPreviewText = document.getElementById('fontPreviewText');
+        const previewTamilName = document.getElementById('previewTamilName');
+        
+        // Voice input elements
+        const voiceInputBtn = document.getElementById('voiceInputBtn');
+        const voiceStatus = document.getElementById('voiceStatus');
         
         // Current settings
         let currentAlignment = 'justify';
@@ -1205,6 +1226,10 @@
         let currentHeadingFormat = 'bold'; // 'bold', 'underline', 'bold-underline', 'normal'
         let headingEnabled = true;
         let currentFont = 'sakal-bharati'; // Default font
+        
+        // Voice recognition
+        let recognition = null;
+        let isListening = false;
         
         // Zoom and pan variables
         let scale = 1;
@@ -1229,6 +1254,9 @@
         tamilInput.value = sampleText;
         updateCharCount();
         
+        // Initialize speech recognition
+        initSpeechRecognition();
+        
         // Event listeners
         previewBtn.addEventListener('click', generatePreview);
         generatePdfBtn.addEventListener('click', generatePdf);
@@ -1243,43 +1271,26 @@
             }
         });
         
-        // Font selection event listeners
-        fontOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                // Remove active class from all font options
-                fontOptions.forEach(opt => opt.classList.remove('active'));
-                // Add active class to clicked option
-                option.classList.add('active');
-                // Update current font
-                currentFont = option.dataset.font;
-                updateFontLabels();
-                
-                // Update preview if it exists
-                if (previewImage.src) {
-                    generatePreview();
-                }
-            });
+        // Font dropdown event listener
+        fontDropdown.addEventListener('change', () => {
+            currentFont = fontDropdown.value;
+            updateFontLabels();
+            updateFontPreview();
+            
+            // Show font preview box
+            fontPreviewBox.classList.add('show');
+            
+            // Update preview if it exists
+            if (previewImage.src) {
+                generatePreview();
+            }
         });
         
-        // Font example item click handlers
-        fontExampleItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const font = item.dataset.font;
-                
-                // Remove active class from all font options
-                fontOptions.forEach(opt => opt.classList.remove('active'));
-                // Add active class to corresponding font option
-                document.querySelector(`.font-option[data-font="${font}"]`).classList.add('active');
-                // Update current font
-                currentFont = font;
-                updateFontLabels();
-                
-                // Update preview if it exists
-                if (previewImage.src) {
-                    generatePreview();
-                }
-            });
-        });
+        // Initialize font preview on page load
+        updateFontPreview();
+        
+        // Voice input button event listener
+        voiceInputBtn.addEventListener('click', toggleVoiceInput);
         
         // Zoom controls
         zoomOutBtn.addEventListener('click', () => zoom(-0.1));
@@ -1406,6 +1417,164 @@
                 }
             });
         });
+        
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                voiceInputBtn.disabled = true;
+                voiceStatus.textContent = "Voice input not supported in this browser";
+                voiceStatus.style.color = "#e74c3c";
+                return;
+            }
+            
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'ta-IN'; // Tamil (India)
+            
+            recognition.onstart = function() {
+                isListening = true;
+                voiceInputBtn.classList.add('listening');
+                voiceStatus.textContent = "Listening... Speak in Tamil";
+                voiceStatus.classList.add('listening');
+                voiceInputBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M10.5 8a2.5 2.5 0 0 1-5 0V3a2.5 2.5 0 0 1 5 0v5zM8 1a3.5 3.5 0 0 0-3.5 3.5v5a3.5 3.5 0 1 0 7 0v-5A3.5 3.5 0 0 0 8 1z"/>
+                    </svg>
+                    Stop Listening
+                `;
+            };
+            
+            recognition.onresult = function(event) {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                // Update textarea with the recognized text
+                if (finalTranscript) {
+                    // Append to existing text
+                    const currentText = tamilInput.value;
+                    tamilInput.value = currentText + (currentText ? ' ' : '') + finalTranscript;
+                    updateCharCount();
+                }
+                
+                // Show interim results in status
+                if (interimTranscript) {
+                    voiceStatus.textContent = "Listening... Heard: " + interimTranscript;
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                stopVoiceInput();
+                
+                if (event.error === 'not-allowed') {
+                    voiceStatus.textContent = "Microphone access denied. Please allow microphone access.";
+                } else {
+                    voiceStatus.textContent = "Error: " + event.error;
+                }
+                voiceStatus.style.color = "#e74c3c";
+            };
+            
+            recognition.onend = function() {
+                if (isListening) {
+                    // Restart recognition if it ended unexpectedly
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        stopVoiceInput();
+                    }
+                }
+            };
+        }
+        
+        // Toggle voice input
+        function toggleVoiceInput() {
+            if (!recognition) {
+                alert("Speech recognition is not supported in your browser. Please use Chrome or Edge.");
+                return;
+            }
+            
+            if (isListening) {
+                stopVoiceInput();
+            } else {
+                startVoiceInput();
+            }
+        }
+        
+        // Start voice input
+        function startVoiceInput() {
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Failed to start speech recognition:", e);
+                voiceStatus.textContent = "Failed to start voice input. Please check microphone permissions.";
+                voiceStatus.style.color = "#e74c3c";
+            }
+        }
+        
+        // Stop voice input
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                recognition.stop();
+            }
+            
+            voiceInputBtn.classList.remove('listening');
+            voiceStatus.textContent = "Click to start voice typing in Tamil";
+            voiceStatus.classList.remove('listening');
+            voiceStatus.style.color = "";
+            voiceInputBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>
+                </svg>
+                Voice Input
+            `;
+        }
+        
+        // Update font preview
+        function updateFontPreview() {
+            let tamilName = '';
+            let previewText = 'தமிழ் மொழி உலகின் பழமையான மொழி';
+            
+            switch(currentFont) {
+                case 'sakal-bharati':
+                    tamilName = 'சகல் பாரதி';
+                    fontPreviewText.className = 'font-preview-text font-sakal-bharati';
+                    break;
+                case 'tiro-tamil':
+                    tamilName = 'திரோ தமிழ்';
+                    fontPreviewText.className = 'font-preview-text font-tiro-tamil';
+                    break;
+                case 'latha':
+                    tamilName = 'லாதா';
+                    fontPreviewText.className = 'font-preview-text font-latha';
+                    break;
+                case 'arial-unicode':
+                    tamilName = 'ஏரியல் யூனிகோட்';
+                    fontPreviewText.className = 'font-preview-text font-arial-unicode';
+                    break;
+                case 'verdana':
+                    tamilName = 'வெர்டானா';
+                    fontPreviewText.className = 'font-preview-text font-verdana';
+                    break;
+            }
+            
+            previewTamilName.textContent = tamilName;
+            fontPreviewText.textContent = previewText;
+        }
         
         // Update font labels
         function updateFontLabels() {
@@ -1735,10 +1904,11 @@
             headingEnabled = true;
             
             // Reset font to Sakal Bharati
-            fontOptions.forEach(opt => opt.classList.remove('active'));
-            document.querySelector('.font-option[data-font="sakal-bharati"]').classList.add('active');
+            fontDropdown.value = 'sakal-bharati';
             currentFont = 'sakal-bharati';
             updateFontLabels();
+            updateFontPreview();
+            fontPreviewBox.classList.add('show');
             
             // Reset alignment to justify
             alignmentButtons.forEach(btn => btn.classList.remove('active'));
@@ -1765,6 +1935,11 @@
                 Remove Heading
             `;
             toggleHeadingBtn.style.backgroundColor = '#9b59b6';
+            
+            // Stop voice input if active
+            if (isListening) {
+                stopVoiceInput();
+            }
             
             updateCharCount();
             
