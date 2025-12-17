@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Evidence Certificate - A4 PDF Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            overflow: hidden;
+            padding: 25px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #1a237e;
+        }
+        
+        h1 {
+            color: #1a237e;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #283593;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 900px) {
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-section {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .part-a {
+            border-left-color: #1976d2;
+            background: linear-gradient(to right, #f8fafc, #e3f2fd);
+        }
+        
+        .part-b {
+            border-left-color: #388e3c;
+            background: linear-gradient(to right, #f8fafc, #e8f5e9);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #1a237e;
+            font-size: 18px;
+            font-weight: 700;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(26, 35, 126, 0.1);
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #1a237e;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        label.required::after {
+            content: " *";
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e6ed;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1a237e;
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+            background: #fff;
+        }
+        
+        .device-checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .device-checkbox-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #e0e6ed;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .device-checkbox-item:hover {
+            border-color: #1a237e;
+            background: #f8fafc;
+        }
+        
+        .device-checkbox-item input {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .device-checkbox-item label {
+            margin-bottom: 0;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .device-checkbox-item .tick-icon {
+            color: #1a237e;
+            font-size: 14px;
+            margin-left: 5px;
+            display: none;
+        }
+        
+        .device-checkbox-item.selected {
+            border-color: #1a237e;
+            background: #e3f2fd;
+        }
+        
+        .device-checkbox-item.selected .tick-icon {
+            display: inline;
+        }
+        
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 8px 10px;
+            border-radius: 5px;
+            border: 1px solid #e0e6ed;
+            transition: all 0.2s;
+        }
+        
+        .radio-item:hover {
+            border-color: #1a237e;
+            background: #f8fafc;
+        }
+        
+        .radio-item input {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        .timestamp {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e6ed;
+        }
+        
+        @media (max-width: 600px) {
+            .timestamp {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid #e0e6ed;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            min-width: 180px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-generate {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 35, 126, 0.4);
+            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
+        }
+        
+        .btn-preview {
+            background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(56, 142, 60, 0.3);
+        }
+        
+        .btn-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(56, 142, 60, 0.4);
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #c62828 0%, #d32f2f 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+        
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(211, 47, 47, 0.4);
+            background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+        }
+        
+        .preview-container {
+            background: white;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            display: none;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1a237e;
+        }
+        
+        .preview-title {
+            color: #1a237e;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .preview-content {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 450px;
+            overflow-y: auto;
+            border: 1px solid #e0e6ed;
+        }
+        
+        .instructions {
+            background: linear-gradient(135deg, #e8eaf6 0%, #e3f2fd 100%);
+            border-left: 4px solid #1a237e;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        
+        .instructions h3 {
+            color: #1a237e;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        
+        .instructions p {
+            color: #1a237e;
+            line-height: 1.6;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .hash-algorithm {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .relation-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 12px;
+        }
+        
+        .residing-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .relation-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .residing-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .device-checkbox-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .btn {
+                min-width: 150px;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+        
+        .page-indicator {
+            display: inline-block;
+            background: #1a237e;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 5px;
+            border: 1px solid #e0e6ed;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #1a237e;
+        }
+        
+        .status-icon {
+            font-size: 16px;
+        }
+        
+        .status-complete {
+            color: #388e3c;
+        }
+        
+        .status-pending {
+            color: #ff9800;
+        }
+        
+        .feature-note {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #388e3c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .page-break-notice {
+            background: #fff3e0;
+            color: #ef6c00;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #ff9800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tickbox-notice {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #1976d2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .justify-notice {
+            background: #e8eaf6;
+            color: #3949ab;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #5c6bc0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .margin-notice {
+            background: #ffebee;
+            color: #c62828;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #d32f2f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .identifier-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .identifier-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .identifier-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .identifier-type {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .identifier-type label {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        
+        .identifier-display {
+            font-family: 'Courier New', monospace;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border: 2px solid #e0e6ed;
+            border-radius: 6px;
+            font-size: 13px;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            color: #1a237e;
+            font-weight: 500;
+        }
+        
+        .identifier-display.empty {
+            color: #999;
+            font-style: italic;
+            font-weight: normal;
+        }
+        
+        .identifier-placeholder {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DIGITAL EVIDENCE CERTIFICATE</h1>
+            <p class="subtitle">Schedule under section 63(4)(c) - A4 PDF Generator <span class="page-indicator">Justified Text</span></p>
+        </header>
+        
+        <div class="status-bar">
+            <div class="status-item" id="statusPartA">
+                <i class="fas fa-user-circle status-icon"></i>
+                <span>Part A: <span id="partAStatus">Pending</span></span>
+            </div>
+            <div class="status-item" id="statusPartB">
+                <i class="fas fa-user-tie status-icon"></i>
+                <span>Part B: <span id="partBStatus">Pending</span></span>
+            </div>
+            <div class="status-item" id="statusPDF">
+                <i class="fas fa-file-pdf status-icon"></i>
+                <span>PDF: <span id="pdfStatus">Ready</span></span>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> Important Instructions</h3>
+            <p>• Fill out all required fields in both Part A (Party) and Part B (Expert)</p>
+            <p>• Click "Preview Certificate" to review the content</p>
+            <p>• Click "Generate A4 PDF" to create a properly formatted PDF</p>
+            <p>• All fields marked with * are required</p>
+        </div>
+        
+        <div class="margin-notice">
+            <i class="fas fa-arrows-alt-h"></i> All text in PDF will stay within 20mm margins on all sides (A4 safe zone)
+        </div>
+        
+        <div class="justify-notice">
+            <i class="fas fa-align-justify"></i> Paragraphs will be justified (aligned to both left and right margins)
+        </div>
+        
+        <div class="feature-note">
+            <i class="fas fa-check-circle"></i> Part A header will be centered in the generated PDF as per official format
+        </div>
+        
+        <div class="page-break-notice">
+            <i class="fas fa-file-alt"></i> Important: Part B will start on a new page in the generated PDF
+        </div>
+        
+        <div class="tickbox-notice">
+            <i class="fas fa-check-square"></i> Device/Digital Record Source now has proper tick boxes with names
+        </div>
+        
+        <div class="form-container">
+            <!-- Part A -->
+            <div class="form-section part-a">
+                <div class="section-title">
+                    <i class="fas fa-user-circle"></i>
+                    PART A (To be filled by the Party)
+                </div>
+                
+                <div class="form-group">
+                    <label for="partyName" class="required">Full Name</label>
+                    <input type="text" id="partyName" placeholder="Enter your full name" oninput="updateStatus('partA')">
+                </div>
+                
+                <div class="form-group">
+                    <label for="partyRelation" class="required">Son/daughter/spouse of</label>
+                    <div class="relation-row">
+                        <select id="partyRelationType" onchange="updateStatus('partA')">
+                            <option value="">Select</option>
+                            <option value="Son">Son</option>
+                            <option value="Daughter">Daughter</option>
+                            <option value="Spouse">Spouse</option>
+                        </select>
+                        <input type="text" id="partyRelationName" placeholder="Father's/Spouse's name" oninput="updateStatus('partA')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="partyAddress" class="required">Residing/employed at</label>
+                    <div class="residing-row">
+                        <select id="partyAddressType" onchange="updateStatus('partA')">
+                            <option value="">Select</option>
+                            <option value="Residing at">Residing at</option>
+                            <option value="Employed at">Employed at</option>
+                        </select>
+                        <input type="text" id="partyAddressDetails" placeholder="Address or workplace details" oninput="updateStatus('partA')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Device/Digital Record Source (tick mark):—</label>
+                    <div class="device-checkbox-grid" id="partyDeviceGroup">
+                        <!-- Will be populated by JS -->
+                    </div>
+                    <div class="checkbox-info">✓ Selected devices will show check marks in PDF</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="partyOtherDevice">Other (specify)</label>
+                    <input type="text" id="partyOtherDevice" placeholder="Specify other device" oninput="updateStatus('partA')">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="partyMakeModel">Make & Model</label>
+                        <input type="text" id="partyMakeModel" placeholder="Device make & model" oninput="updateStatus('partA')">
+                    </div>
+                    <div class="form-group">
+                        <label for="partyColor">Color</label>
+                        <input type="text" id="partyColor" placeholder="Device color" oninput="updateStatus('partA')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Serial Number</label>
+                    <input type="text" id="partySerial" placeholder="Device serial number" oninput="updateStatus('partA')">
+                </div>
+                
+                <div class="form-group">
+                    <label>IMEI/UIN/UID/MAC/Cloud ID</label>
+                    <div class="identifier-container">
+                        <div class="identifier-row">
+                            <div class="identifier-type">
+                                <label for="partyIdType">Select Identifier Type</label>
+                                <select id="partyIdType" onchange="updatePartyIdentifier()">
+                                    <option value="">Select Type</option>
+                                    <option value="IMEI">IMEI</option>
+                                    <option value="UIN">UIN</option>
+                                    <option value="UID">UID</option>
+                                    <option value="MAC">MAC Address</option>
+                                    <option value="Cloud ID">Cloud ID</option>
+                                </select>
+                            </div>
+                            <div class="identifier-type">
+                                <label for="partyIdValue">Identifier Value</label>
+                                <input type="text" id="partyIdValue" placeholder="Enter identifier value" oninput="updatePartyIdentifier()">
+                            </div>
+                        </div>
+                        <div class="identifier-display" id="partyIdDisplay">
+                            <span class="identifier-placeholder">Selected identifier will appear here</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="partyOtherInfo">Any other relevant information</label>
+                    <textarea id="partyOtherInfo" rows="2" placeholder="Additional information about device/digital record" oninput="updateStatus('partA')"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">The digital device is:</label>
+                    <div class="radio-group" id="partyControlGroup">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="partyHashValue" class="required">Hash value/s of electronic/digital record/s</label>
+                    <input type="text" id="partyHashValue" placeholder="Enter hash value" oninput="updateStatus('partA')">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Hash algorithm used:</label>
+                    <div class="hash-algorithm" id="partyAlgorithmGroup">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="partyOtherAlgorithm">Other algorithm (specify)</label>
+                    <input type="text" id="partyOtherAlgorithm" placeholder="Specify other algorithm" oninput="updateStatus('partA')">
+                </div>
+                
+                <div class="timestamp">
+                    <div class="form-group">
+                        <label for="partyDate" class="required">Date</label>
+                        <input type="date" id="partyDate" onchange="updateStatus('partA')">
+                    </div>
+                    <div class="form-group">
+                        <label for="partyTime" class="required">Time (IST, 24h)</label>
+                        <input type="time" id="partyTime" onchange="updateStatus('partA')">
+                    </div>
+                    <div class="form-group">
+                        <label for="partyPlace" class="required">Place</label>
+                        <input type="text" id="partyPlace" placeholder="City, State" oninput="updateStatus('partA')">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Part B -->
+            <div class="form-section part-b">
+                <div class="section-title">
+                    <i class="fas fa-user-tie"></i>
+                    PART B (To be filled by the Expert)
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertName" class="required">Full Name</label>
+                    <input type="text" id="expertName" placeholder="Enter expert's full name" oninput="updateStatus('partB')">
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertRelation" class="required">Son/daughter/spouse of</label>
+                    <div class="relation-row">
+                        <select id="expertRelationType" onchange="updateStatus('partB')">
+                            <option value="">Select</option>
+                            <option value="Son">Son</option>
+                            <option value="Daughter">Daughter</option>
+                            <option value="Spouse">Spouse</option>
+                        </select>
+                        <input type="text" id="expertRelationName" placeholder="Father's/Spouse's name" oninput="updateStatus('partB')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertAddress" class="required">Residing/employed at</label>
+                    <div class="residing-row">
+                        <select id="expertAddressType" onchange="updateStatus('partB')">
+                            <option value="">Select</option>
+                            <option value="Residing at">Residing at</option>
+                            <option value="Employed at">Employed at</option>
+                        </select>
+                        <input type="text" id="expertAddressDetails" placeholder="Address or workplace details" oninput="updateStatus('partB')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertDesignation" class="required">Designation</label>
+                    <input type="text" id="expertDesignation" placeholder="Expert's designation" oninput="updateStatus('partB')">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Device/Digital Record Source (tick mark):</label>
+                    <div class="device-checkbox-grid" id="expertDeviceGroup">
+                        <!-- Will be populated by JS -->
+                    </div>
+                    <div class="checkbox-info">✓ Selected devices will show check marks in PDF</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertOtherDevice">Other (specify)</label>
+                    <input type="text" id="expertOtherDevice" placeholder="Specify other device" oninput="updateStatus('partB')">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expertMakeModel">Make & Model</label>
+                        <input type="text" id="expertMakeModel" placeholder="Device make & model" oninput="updateStatus('partB')">
+                    </div>
+                    <div class="form-group">
+                        <label for="expertColor">Color</label>
+                        <input type="text" id="expertColor" placeholder="Device color" oninput="updateStatus('partB')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Serial Number</label>
+                    <input type="text" id="expertSerial" placeholder="Device serial number" oninput="updateStatus('partB')">
+                </div>
+                
+                <div class="form-group">
+                    <label>IMEI/UIN/UID/MAC/Cloud ID</label>
+                    <div class="identifier-container">
+                        <div class="identifier-row">
+                            <div class="identifier-type">
+                                <label for="expertIdType">Select Identifier Type</label>
+                                <select id="expertIdType" onchange="updateExpertIdentifier()">
+                                    <option value="">Select Type</option>
+                                    <option value="IMEI">IMEI</option>
+                                    <option value="UIN">UIN</option>
+                                    <option value="UID">UID</option>
+                                    <option value="MAC">MAC Address</option>
+                                    <option value="Cloud ID">Cloud ID</option>
+                                </select>
+                            </div>
+                            <div class="identifier-type">
+                                <label for="expertIdValue">Identifier Value</label>
+                                <input type="text" id="expertIdValue" placeholder="Enter identifier value" oninput="updateExpertIdentifier()">
+                            </div>
+                        </div>
+                        <div class="identifier-display" id="expertIdDisplay">
+                            <span class="identifier-placeholder">Selected identifier will appear here</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertOtherInfo">Any other relevant information</label>
+                    <textarea id="expertOtherInfo" rows="2" placeholder="Additional information about device/digital record" oninput="updateStatus('partB')"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertHashValue" class="required">Hash value/s of electronic/digital record/s</label>
+                    <input type="text" id="expertHashValue" placeholder="Enter hash value" oninput="updateStatus('partB')">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Hash algorithm used:</label>
+                    <div class="hash-algorithm" id="expertAlgorithmGroup">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertOtherAlgorithm">Other algorithm (specify)</label>
+                    <input type="text" id="expertOtherAlgorithm" placeholder="Specify other algorithm" oninput="updateStatus('partB')">
+                </div>
+                
+                <div class="timestamp">
+                    <div class="form-group">
+                        <label for="expertDate" class="required">Date</label>
+                        <input type="date" id="expertDate" onchange="updateStatus('partB')">
+                    </div>
+                    <div class="form-group">
+                        <label for="expertTime" class="required">Time (IST, 24h)</label>
+                        <input type="time" id="expertTime" onchange="updateStatus('partB')">
+                    </div>
+                    <div class="form-group">
+                        <label for="expertPlace" class="required">Place</label>
+                        <input type="text" id="expertPlace" placeholder="City, State" oninput="updateStatus('partB')">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-preview" id="previewBtn">
+                <i class="fas fa-eye"></i> Preview Certificate
+            </button>
+            <button class="btn btn-generate" id="generateBtn">
+                <i class="fas fa-file-pdf"></i> Generate A4 PDF
+            </button>
+            <button class="btn btn-reset" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset Form
+            </button>
+        </div>
+        
+        <div class="preview-container" id="previewContainer">
+            <div class="preview-header">
+                <div class="preview-title">Certificate Preview</div>
+                <button class="btn btn-generate" id="generateFromPreview">
+                    <i class="fas fa-file-pdf"></i> Generate A4 PDF
+                </button>
+            </div>
+            <div class="preview-content" id="previewContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data for dynamic form elements
+        const deviceOptions = [
+            "Computer / Storage Media",
+            "DVR",
+            "Mobile",
+            "FlashDrive",
+            "CD/DVD",
+            "Server",
+            "Cloud",
+            "Other"
+        ];
+        
+        const controlOptions = [
+            "Owned",
+            "Maintained",
+            "Managed",
+            "Operated"
+        ];
+        
+        const algorithmOptions = [
+            "SHA1",
+            "SHA256",
+            "MD5",
+            "Other"
+        ];
+        
+        const identifierTypes = [
+            "IMEI",
+            "UIN",
+            "UID",
+            "MAC Address",
+            "Cloud ID"
+        ];
+        
+        // Residing/Employed options
+        const addressTypeOptions = [
+            { value: "Residing at", label: "Residing at" },
+            { value: "Employed at", label: "Employed at" }
+        ];
+        
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('partyDate').value = today;
+            document.getElementById('expertDate').value = today;
+            
+            // Set default times
+            const now = new Date();
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            document.getElementById('partyTime').value = timeString;
+            document.getElementById('expertTime').value = timeString;
+            
+            // Populate device checkboxes for Part A
+            populateDeviceCheckboxGroup('partyDeviceGroup', deviceOptions, 'partyDevice');
+            
+            // Populate device checkboxes for Part B
+            populateDeviceCheckboxGroup('expertDeviceGroup', deviceOptions, 'expertDevice');
+            
+            // Populate control radio buttons for Part A
+            populateRadioGroup('partyControlGroup', controlOptions, 'partyControl');
+            
+            // Populate algorithm checkboxes for Part A
+            populateCheckboxGroup('partyAlgorithmGroup', algorithmOptions, 'partyAlgorithm');
+            
+            // Populate algorithm checkboxes for Part B
+            populateCheckboxGroup('expertAlgorithmGroup', algorithmOptions, 'expertAlgorithm');
+            
+            // Set default selections
+            document.querySelector('#partyDevice_ComputerStorageMedia').checked = true;
+            document.querySelector('#expertDevice_ComputerStorageMedia').checked = true;
+            document.querySelector('#partyAlgorithm_SHA256').checked = true;
+            document.querySelector('#expertAlgorithm_SHA256').checked = true;
+            document.querySelector('#partyControl_Owned').checked = true;
+            
+            // Set default relation types
+            document.getElementById('partyRelationType').value = 'Son';
+            document.getElementById('expertRelationType').value = 'Son';
+            
+            // Set default address types
+            document.getElementById('partyAddressType').value = 'Residing at';
+            document.getElementById('expertAddressType').value = 'Residing at';
+            
+            // Set default identifier types
+            document.getElementById('partyIdType').value = 'IMEI';
+            document.getElementById('expertIdType').value = 'IMEI';
+            
+            // Update identifier displays
+            updatePartyIdentifier();
+            updateExpertIdentifier();
+            
+            // Update visual state of selected checkboxes
+            updateCheckboxVisualState();
+            
+            // Add change listeners to checkboxes and radios
+            addChangeListeners();
+            
+            // Add event listeners
+            document.getElementById('previewBtn').addEventListener('click', previewCertificate);
+            document.getElementById('generateBtn').addEventListener('click', generatePDF);
+            document.getElementById('resetBtn').addEventListener('click', resetForm);
+            document.getElementById('generateFromPreview').addEventListener('click', generatePDF);
+            
+            // Initialize status
+            updateStatus('partA');
+            updateStatus('partB');
+        });
+        
+        // Helper functions
+        function populateDeviceCheckboxGroup(containerId, options, prefix) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            options.forEach(option => {
+                const id = option.replace(/[\/\s]/g, '');
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'device-checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" id="${prefix}_${id}" value="${option}" onchange="handleCheckboxChange(this)">
+                    <label for="${prefix}_${id}">${option}</label>
+                    <span class="tick-icon"><i class="fas fa-check"></i></span>
+                `;
+                container.appendChild(checkboxItem);
+            });
+        }
+        
+        function populateCheckboxGroup(containerId, options, prefix) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            options.forEach(option => {
+                const id = option.replace(/[\/\s]/g, '');
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" id="${prefix}_${id}" value="${option}" onchange="updateStatus('${prefix.includes('party') ? 'partA' : 'partB'}')">
+                    <label for="${prefix}_${id}">${option}</label>
+                `;
+                container.appendChild(checkboxItem);
+            });
+        }
+        
+        function populateRadioGroup(containerId, options, name) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            options.forEach(option => {
+                const id = option.replace(/\s+/g, '');
+                const radioItem = document.createElement('div');
+                radioItem.className = 'radio-item';
+                radioItem.innerHTML = `
+                    <input type="radio" id="${name}_${id}" name="${name}" value="${option}" onchange="updateStatus('partA')">
+                    <label for="${name}_${id}">${option}</label>
+                `;
+                container.appendChild(radioItem);
+            });
+        }
+        
+        function handleCheckboxChange(checkbox) {
+            const item = checkbox.closest('.device-checkbox-item');
+            if (checkbox.checked) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+            
+            const isParty = checkbox.id.includes('party');
+            updateStatus(isParty ? 'partA' : 'partB');
+        }
+        
+        function updateCheckboxVisualState() {
+            document.querySelectorAll('.device-checkbox-item input[type="checkbox"]').forEach(checkbox => {
+                const item = checkbox.closest('.device-checkbox-item');
+                if (checkbox.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+        
+        function addChangeListeners() {
+            // Add change listeners to all checkboxes and radios
+            document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => {
+                if (!el.onchange) {
+                    const isParty = el.id.includes('party') || (el.name && el.name.includes('party'));
+                    el.addEventListener('change', function() {
+                        updateStatus(isParty ? 'partA' : 'partB');
+                    });
+                }
+            });
+        }
+        
+        function getSelectedCheckboxValues(prefix) {
+            const checkboxes = document.querySelectorAll(`input[type="checkbox"][id^="${prefix}"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+        
+        function getSelectedRadioValue(name) {
+            const radio = document.querySelector(`input[type="radio"][name="${name}"]:checked`);
+            return radio ? radio.value : '';
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        function formatTime(timeString) {
+            if (!timeString) return '';
+            const [hours, minutes] = timeString.split(':');
+            return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')} hours`;
+        }
+        
+        function updatePartyIdentifier() {
+            const idType = document.getElementById('partyIdType').value;
+            const idValue = document.getElementById('partyIdValue').value;
+            const displayElement = document.getElementById('partyIdDisplay');
+            
+            if (idType && idValue) {
+                displayElement.innerHTML = `<strong>${idType}:</strong> ${idValue}`;
+                displayElement.classList.remove('empty');
+            } else if (idType) {
+                displayElement.innerHTML = `<strong>${idType}:</strong> <span class="identifier-placeholder">[Enter value]</span>`;
+                displayElement.classList.remove('empty');
+            } else if (idValue) {
+                displayElement.innerHTML = `<span class="identifier-placeholder">[Select type]</span>: ${idValue}`;
+                displayElement.classList.remove('empty');
+            } else {
+                displayElement.innerHTML = '<span class="identifier-placeholder">Selected identifier will appear here</span>';
+                displayElement.classList.add('empty');
+            }
+            
+            updateStatus('partA');
+        }
+        
+        function updateExpertIdentifier() {
+            const idType = document.getElementById('expertIdType').value;
+            const idValue = document.getElementById('expertIdValue').value;
+            const displayElement = document.getElementById('expertIdDisplay');
+            
+            if (idType && idValue) {
+                displayElement.innerHTML = `<strong>${idType}:</strong> ${idValue}`;
+                displayElement.classList.remove('empty');
+            } else if (idType) {
+                displayElement.innerHTML = `<strong>${idType}:</strong> <span class="identifier-placeholder">[Enter value]</span>`;
+                displayElement.classList.remove('empty');
+            } else if (idValue) {
+                displayElement.innerHTML = `<span class="identifier-placeholder">[Select type]</span>: ${idValue}`;
+                displayElement.classList.remove('empty');
+            } else {
+                displayElement.innerHTML = '<span class="identifier-placeholder">Selected identifier will appear here</span>';
+                displayElement.classList.add('empty');
+            }
+            
+            updateStatus('partB');
+        }
+        
+        function getPartyRelation() {
+            const relationType = document.getElementById('partyRelationType').value;
+            const relationName = document.getElementById('partyRelationName').value;
+            
+            if (relationType && relationName) {
+                return `${relationType} of ${relationName}`;
+            } else if (relationName) {
+                return relationName;
+            } else {
+                return '[Not Specified]';
+            }
+        }
+        
+        function getExpertRelation() {
+            const relationType = document.getElementById('expertRelationType').value;
+            const relationName = document.getElementById('expertRelationName').value;
+            
+            if (relationType && relationName) {
+                return `${relationType} of ${relationName}`;
+            } else if (relationName) {
+                return relationName;
+            } else {
+                return '[Not Specified]';
+            }
+        }
+        
+        function getPartyAddress() {
+            const addressType = document.getElementById('partyAddressType').value;
+            const addressDetails = document.getElementById('partyAddressDetails').value;
+            
+            if (addressType && addressDetails) {
+                return `${addressType} ${addressDetails}`;
+            } else if (addressDetails) {
+                return addressDetails;
+            } else {
+                return '[Not Specified]';
+            }
+        }
+        
+        function getExpertAddress() {
+            const addressType = document.getElementById('expertAddressType').value;
+            const addressDetails = document.getElementById('expertAddressDetails').value;
+            
+            if (addressType && addressDetails) {
+                return `${addressType} ${addressDetails}`;
+            } else if (addressDetails) {
+                return addressDetails;
+            } else {
+                return '[Not Specified]';
+            }
+        }
+        
+        function getPartyIdentifier() {
+            const idType = document.getElementById('partyIdType').value;
+            const idValue = document.getElementById('partyIdValue').value;
+            
+            if (idType && idValue) {
+                return `${idType}: ${idValue}`;
+            } else if (idValue) {
+                return idValue;
+            } else if (idType) {
+                return `${idType}: [Not Specified]`;
+            } else {
+                return '[Not Specified]';
+            }
+        }
+        
+        function getExpertIdentifier() {
+            const idType = document.getElementById('expertIdType').value;
+            const idValue = document.getElementById('expertIdValue').value;
+            
+            if (idType && idValue) {
+                return `${idType}: ${idValue}`;
+            } else if (idValue) {
+                return idValue;
+            } else if (idType) {
+                return `${idType}: [Not Specified]`;
+            } else {
+                return '[Not Specified]';
+            }
+        }
+        
+        function updateStatus(part) {
+            let isComplete = false;
+            
+            if (part === 'partA') {
+                const requiredFields = [
+                    'partyName', 'partyHashValue', 'partyPlace'
+                ];
+                
+                const relationName = document.getElementById('partyRelationName').value;
+                const relationType = document.getElementById('partyRelationType').value;
+                const addressDetails = document.getElementById('partyAddressDetails').value;
+                const addressType = document.getElementById('partyAddressType').value;
+                
+                isComplete = requiredFields.every(id => {
+                    const value = document.getElementById(id).value;
+                    return value && value.trim() !== '';
+                }) && getSelectedRadioValue('partyControl') !== '' 
+                    && relationName && relationName.trim() !== ''
+                    && relationType && relationType.trim() !== ''
+                    && addressDetails && addressDetails.trim() !== ''
+                    && addressType && addressType.trim() !== '';
+                
+                document.getElementById('partAStatus').textContent = isComplete ? 'Complete' : 'Pending';
+                document.getElementById('partAStatus').className = isComplete ? 'status-complete' : 'status-pending';
+                document.getElementById('statusPartA').querySelector('.status-icon').className = 
+                    `fas fa-${isComplete ? 'check-circle' : 'clock'} status-icon ${isComplete ? 'status-complete' : 'status-pending'}`;
+            } else if (part === 'partB') {
+                const requiredFields = [
+                    'expertName', 'expertDesignation', 'expertHashValue', 'expertPlace'
+                ];
+                
+                const relationName = document.getElementById('expertRelationName').value;
+                const relationType = document.getElementById('expertRelationType').value;
+                const addressDetails = document.getElementById('expertAddressDetails').value;
+                const addressType = document.getElementById('expertAddressType').value;
+                
+                isComplete = requiredFields.every(id => {
+                    const value = document.getElementById(id).value;
+                    return value && value.trim() !== '';
+                }) && relationName && relationName.trim() !== ''
+                    && relationType && relationType.trim() !== ''
+                    && addressDetails && addressDetails.trim() !== ''
+                    && addressType && addressType.trim() !== '';
+                
+                document.getElementById('partBStatus').textContent = isComplete ? 'Complete' : 'Pending';
+                document.getElementById('partBStatus').className = isComplete ? 'status-complete' : 'status-pending';
+                document.getElementById('statusPartB').querySelector('.status-icon').className = 
+                    `fas fa-${isComplete ? 'check-circle' : 'clock'} status-icon ${isComplete ? 'status-complete' : 'status-pending'}`;
+            }
+            
+            // Update PDF status
+            const partAComplete = document.getElementById('partAStatus').textContent === 'Complete';
+            const partBComplete = document.getElementById('partBStatus').textContent === 'Complete';
+            const pdfReady = partAComplete && partBComplete;
+            
+            document.getElementById('pdfStatus').textContent = pdfReady ? 'Ready' : 'Waiting';
+            document.getElementById('pdfStatus').className = pdfReady ? 'status-complete' : 'status-pending';
+            document.getElementById('statusPDF').querySelector('.status-icon').className = 
+                `fas fa-${pdfReady ? 'file-pdf' : 'hourglass-half'} status-icon ${pdfReady ? 'status-complete' : 'status-pending'}`;
+            
+            return isComplete;
+        }
+        
+        // Main functions
+        function previewCertificate() {
+            // Gather form data
+            const formData = gatherFormData();
+            
+            // Generate preview
+            const preview = generateCertificateText(formData);
+            document.getElementById('previewContent').textContent = preview;
+            document.getElementById('previewContainer').style.display = 'block';
+            
+            // Scroll to preview
+            document.getElementById('previewContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function gatherFormData() {
+            return {
+                // Part A Data
+                partyName: document.getElementById('partyName').value || '[Not Specified]',
+                partyRelation: getPartyRelation(),
+                partyAddress: getPartyAddress(),
+                partyDevices: getSelectedCheckboxValues('partyDevice'),
+                partyOtherDevice: document.getElementById('partyOtherDevice').value || '',
+                partyMakeModel: document.getElementById('partyMakeModel').value || '',
+                partyColor: document.getElementById('partyColor').value || '',
+                partySerial: document.getElementById('partySerial').value || '',
+                partyIdentifier: getPartyIdentifier(),
+                partyOtherInfo: document.getElementById('partyOtherInfo').value || '',
+                partyControl: getSelectedRadioValue('partyControl') || '[Not Specified]',
+                partyHashValue: document.getElementById('partyHashValue').value || '[Not Specified]',
+                partyAlgorithms: getSelectedCheckboxValues('partyAlgorithm'),
+                partyOtherAlgorithm: document.getElementById('partyOtherAlgorithm').value || '',
+                partyDate: formatDate(document.getElementById('partyDate').value),
+                partyTime: formatTime(document.getElementById('partyTime').value),
+                partyPlace: document.getElementById('partyPlace').value || '[Not Specified]',
+                
+                // Part B Data
+                expertName: document.getElementById('expertName').value || '[Not Specified]',
+                expertRelation: getExpertRelation(),
+                expertAddress: getExpertAddress(),
+                expertDesignation: document.getElementById('expertDesignation').value || '[Not Specified]',
+                expertDevices: getSelectedCheckboxValues('expertDevice'),
+                expertOtherDevice: document.getElementById('expertOtherDevice').value || '',
+                expertMakeModel: document.getElementById('expertMakeModel').value || '',
+                expertColor: document.getElementById('expertColor').value || '',
+                expertSerial: document.getElementById('expertSerial').value || '',
+                expertIdentifier: getExpertIdentifier(),
+                expertOtherInfo: document.getElementById('expertOtherInfo').value || '',
+                expertHashValue: document.getElementById('expertHashValue').value || '[Not Specified]',
+                expertAlgorithms: getSelectedCheckboxValues('expertAlgorithm'),
+                expertOtherAlgorithm: document.getElementById('expertOtherAlgorithm').value || '',
+                expertDate: formatDate(document.getElementById('expertDate').value),
+                expertTime: formatTime(document.getElementById('expertTime').value),
+                expertPlace: document.getElementById('expertPlace').value || '[Not Specified]'
+            };
+        }
+        
+        function generateCertificateText(data) {
+            // Format devices with tick marks
+            const partyDeviceText = data.partyDevices.length > 0 
+                ? data.partyDevices.map(d => ` [✓] ${d}`).join('\n')
+                : '[No device selected]';
+            
+            const expertDeviceText = data.expertDevices.length > 0 
+                ? data.expertDevices.map(d => ` [✓] ${d}`).join('\n')
+                : '[No device selected]';
+            
+            // Format algorithms
+            const partyAlgoText = data.partyAlgorithms.length > 0
+                ? data.partyAlgorithms.map(a => ` ${a}:`).join('\n')
+                : '[No algorithm selected]';
+            
+            const expertAlgoText = data.expertAlgorithms.length > 0
+                ? data.expertAlgorithms.map(a => ` ${a}:`).join('\n')
+                : '[No algorithm selected]';
+            
+            return `THE SCHEDULE
+[See section 63(4)(c)]
+
+CERTIFICATE 
+                                 PART A
+                       (To be filled by the Party)
+                       
+
+I, ${data.partyName}, ${data.partyRelation} ${data.partyAddress} do hereby solemnly affirm and sincerely state and submit as follows:—
+
+I have produced electronic record/output of the digital record taken from the following device/digital record source (tick mark):—
+${partyDeviceText}
+${data.partyOtherDevice ? `Other: ${data.partyOtherDevice}` : ''}                             
+Make & Model: ${data.partyMakeModel || '[Not Specified]'}         Color: ${data.partyColor || '[Not Specified]'}                        
+Serial Number: ${data.partySerial || '[Not Specified]'}  
+${data.partyIdentifier}                 (as applicable)
+and any other relevant information, if any, about the device/digital record: ${data.partyOtherInfo || '[None specified]'}
+
+The digital device or the digital record source was under the lawful control for regularly creating, storing or processing information for the purposes of carrying out regular activities and during this period, the computer or the communication device was working properly and the relevant information was regularly fed into the computer during the ordinary course of business. If the computer/digital device at any point of time was not working properly or out of operation, then it has not affected the electronic/digital record or its accuracy. The digital device or the source of the digital record is ${data.partyControl} by me (select as applicable).
+
+I state that the HASH value/s of the electronic/digital record/s is ${data.partyHashValue}, obtained through the following algorithm:—
+${partyAlgoText}
+${data.partyOtherAlgorithm ? `Other: ${data.partyOtherAlgorithm}` : ''} 
+(Legally acceptable standard)
+(Hash report to be enclosed with the certificate)
+
+
+                                                                                                                                    (${data.partyName})
+Date (DD/MM/YYYY): ${data.partyDate}      
+Time (IST): ${data.partyTime} (In 24 hours format) 
+Place: ${data.partyPlace}
+
+--- PAGE BREAK ---
+
+PART B
+(To be filled by the Expert)
+
+I, ${data.expertName}, ${data.expertRelation} ${data.expertAddress} do hereby solemnly affirm and sincerely state and submit as follows:—
+
+The produced electronic record/output of the digital record are obtained from the following device/digital record source (tick mark):
+${expertDeviceText}
+${data.expertOtherDevice ? `Other: ${data.expertOtherDevice}` : ''}          
+Make & Model: ${data.expertMakeModel || '[Not Specified]'}     Color: ${data.expertColor || '[Not Specified]'}             Serial Number: ${data.expertSerial || '[Not Specified]'}             
+${data.expertIdentifier} (as applicable)
+and any other relevant information, if any, about the device/digital record: ${data.expertOtherInfo || '[None specified]'}
+
+I state that the HASH value/s of the electronic/digital record/s is ${data.expertHashValue}, obtained through the following algorithm:—
+${expertAlgoText}
+${data.expertOtherAlgorithm ? `Other: ${data.expertOtherAlgorithm}` : ''} 
+(Legally acceptable standard)
+(Hash report to be enclosed with the certificate)
+
+
+                                                                                                                        (${data.expertName}, ${data.expertDesignation})
+Date (DD/MM/YYYY): ${data.expertDate}          
+Time (IST): ${data.expertTime} (In 24 hours format) 
+Place: ${data.expertPlace}`;
+        }
+        
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Gather form data
+            const formData = gatherFormData();
+            
+            // Set document properties
+            doc.setProperties({
+                title: 'Digital Evidence Certificate',
+                subject: 'Certificate under section 63(4)(c)',
+                author: 'Digital Evidence Certificate Generator',
+                creator: 'Official Certificate Generator'
+            });
+            
+            // ====================== PAGE 1 - PART A ONLY ======================
+            // Set safe margins for A4 (20mm on all sides)
+            const leftMargin = 20;
+            const rightMargin = 20;
+            const topMargin = 20;
+            const pageWidth = 210; // A4 width in mm
+            const contentWidth = pageWidth - leftMargin - rightMargin; // 170mm
+            
+            // Add header
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('THE SCHEDULE', pageWidth/2, topMargin, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('[See section 63(4)(c)]', pageWidth/2, topMargin + 5, { align: 'center' });
+            
+            // Add title
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CERTIFICATE', pageWidth/2, topMargin + 15, { align: 'center' });
+            
+            // Add Part A header - CENTERED with moderate spacing
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PART A', pageWidth/2, topMargin + 25, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'italic');
+            doc.text('(To be filled by the Party)', pageWidth/2, topMargin + 30, { align: 'center' });
+            
+            // Part A content - ALL TEXT STAYS WITHIN 20mm MARGINS
+            doc.setFont('helvetica', 'normal');
+            let yPos = topMargin + 40;
+            
+            // Declaration text - JUSTIFIED
+            const declarationA = `I, ${formData.partyName}, ${formData.partyRelation} ${formData.partyAddress} do hereby solemnly affirm and sincerely state and submit as follows:—`;
+            const linesA = doc.splitTextToSize(declarationA, contentWidth);
+            linesA.forEach(line => {
+                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
+                yPos += 5;
+            });
+            yPos += 8;
+            
+            // Device information - JUSTIFIED
+            const deviceTextA = 'I have produced electronic record/output of the digital record taken from the following device/digital record source (tick mark):—';
+            const deviceLinesA = doc.splitTextToSize(deviceTextA, contentWidth);
+            deviceLinesA.forEach(line => {
+                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
+                yPos += 5;
+            });
+            yPos += 5;
+            
+            // List devices with tick marks - left aligned (not justified)
+            formData.partyDevices.forEach(device => {
+                const deviceLine = `✓ ${device}`;
+                const deviceLineSplit = doc.splitTextToSize(deviceLine, contentWidth - 5);
+                deviceLineSplit.forEach(line => {
+                    doc.text(line, leftMargin + 5, yPos);
+                    yPos += 5;
+                });
+            });
+            
+            if (formData.partyOtherDevice) {
+                const otherLine = `Other: ${formData.partyOtherDevice}`;
+                const otherLineSplit = doc.splitTextToSize(otherLine, contentWidth - 5);
+                otherLineSplit.forEach(line => {
+                    doc.text(line, leftMargin + 5, yPos);
+                    yPos += 5;
+                });
+            }
+            
+            // If no devices selected, show placeholder - left aligned
+            if (formData.partyDevices.length === 0 && !formData.partyOtherDevice) {
+                doc.text('[No device selected]', leftMargin + 5, yPos);
+                yPos += 5;
+            }
+            
+            // Device details - split to stay within margins (left aligned)
+            const makeModelLine = `Make & Model: ${formData.partyMakeModel || '[Not Specified]'}`;
+            const colorLine = `Color: ${formData.partyColor || '[Not Specified]'}`;
+            
+            // Check if both can fit on one line
+            const combinedLength = doc.getStringUnitWidth(makeModelLine + "   " + colorLine) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+            
+            if (combinedLength < contentWidth) {
+                doc.text(makeModelLine, leftMargin, yPos);
+                doc.text(colorLine, leftMargin + contentWidth/2, yPos);
+            } else {
+                // Split into two lines
+                doc.text(makeModelLine, leftMargin, yPos);
+                yPos += 5;
+                doc.text(colorLine, leftMargin, yPos);
+            }
+            yPos += 6;
+            
+            const serialLine = `Serial Number: ${formData.partySerial || '[Not Specified]'}`;
+            const serialSplit = doc.splitTextToSize(serialLine, contentWidth);
+            serialSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos);
+                yPos += 5;
+            });
+            
+            const identifierLine = `${formData.partyIdentifier} (as applicable)`;
+            const identifierSplit = doc.splitTextToSize(identifierLine, contentWidth);
+            identifierSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos);
+                yPos += 5;
+            });
+            
+            const otherInfoLine = `and any other relevant information: ${formData.partyOtherInfo || '[None specified]'}`;
+            const otherInfoSplit = doc.splitTextToSize(otherInfoLine, contentWidth);
+            otherInfoSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos);
+                yPos += 5;
+            });
+            yPos += 5;
+            
+            // Standard paragraph - FULLY JUSTIFIED (aligned to both margins)
+            const standardText = `The digital device or the digital record source was under the lawful control for regularly creating, storing or processing information for the purposes of carrying out regular activities and during this period, the computer or the communication device was working properly and the relevant information was regularly fed into the computer during the ordinary course of business. If the computer/digital device at any point of time was not working properly or out of operation, then it has not affected the electronic/digital record or its accuracy. The digital device or the source of the digital record is ${formData.partyControl} by me.`;
+            const standardLines = doc.splitTextToSize(standardText, contentWidth);
+            
+            standardLines.forEach(line => {
+                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
+                yPos += 5;
+            });
+            yPos += 5;
+            
+            // Hash information - JUSTIFIED
+            const hashLine = `I state that the HASH value/s of the electronic/digital record/s is ${formData.partyHashValue}, obtained through the following algorithm:—`;
+            const hashSplit = doc.splitTextToSize(hashLine, contentWidth);
+            hashSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
+                yPos += 5;
+            });
+            yPos += 5;
+            
+            // Algorithms list - left aligned (not justified)
+            formData.partyAlgorithms.forEach(algo => {
+                const algoLine = `${algo}:`;
+                doc.text(algoLine, leftMargin + 5, yPos);
+                yPos += 5;
+            });
+            
+            if (formData.partyOtherAlgorithm) {
+                const otherAlgoLine = `Other: ${formData.partyOtherAlgorithm}`;
+                const otherAlgoSplit = doc.splitTextToSize(otherAlgoLine, contentWidth - 5);
+                otherAlgoSplit.forEach(line => {
+                    doc.text(line, leftMargin + 5, yPos);
+                    yPos += 5;
+                });
+            }
+            
+            doc.text('(Legally acceptable standard)', leftMargin, yPos);
+            doc.text('(Hash report to be enclosed with the certificate)', leftMargin, yPos + 5);
+            yPos += 12;
+            
+            // Signature - aligned to right margin
+            doc.text(`(${formData.partyName})`, leftMargin + contentWidth, yPos, { align: 'right' });
+            yPos += 10;
+            
+            // Date, time, place - left aligned
+            const dateLine = `Date (DD/MM/YYYY): ${formData.partyDate}`;
+            const timeLine = `Time (IST): ${formData.partyTime}`;
+            
+            doc.text(dateLine, leftMargin, yPos);
+            doc.text(timeLine, leftMargin + contentWidth/2, yPos);
+            yPos += 6;
+            
+            const placeLine = `Place: ${formData.partyPlace}`;
+            const placeSplit = doc.splitTextToSize(placeLine, contentWidth);
+            placeSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos);
+                yPos += 5;
+            });
+            
+            // ====================== PAGE BREAK ======================
+            // PAGE 2 - PART B ONLY (NEW PAGE)
+            doc.addPage();
+            
+            // Reset text color
+            doc.setTextColor(0, 0, 0);
+            
+            // Add header for page 2 - stays within margins
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('THE SCHEDULE', pageWidth/2, topMargin, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('[See section 63(4)(c)]', pageWidth/2, topMargin + 5, { align: 'center' });
+            
+            // Add title for page 2
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CERTIFICATE (Continued)', pageWidth/2, topMargin + 15, { align: 'center' });
+            
+            // Add Part B header - CENTERED on new page
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PART B', pageWidth/2, topMargin + 25, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'italic');
+            doc.text('(To be filled by the Expert)', pageWidth/2, topMargin + 30, { align: 'center' });
+            
+            // Part B content - ALL TEXT STAYS WITHIN 20mm MARGINS
+            doc.setFont('helvetica', 'normal');
+            yPos = topMargin + 40;
+            
+            // Expert declaration - JUSTIFIED
+            const declarationB = `I, ${formData.expertName}, ${formData.expertRelation} ${formData.expertAddress} do hereby solemnly affirm and sincerely state and submit as follows:—`;
+            const linesB = doc.splitTextToSize(declarationB, contentWidth);
+            linesB.forEach(line => {
+                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
+                yPos += 5;
+            });
+            yPos += 8;
+            
+            // Expert device information - JUSTIFIED
+            const deviceTextB = 'The produced electronic record/output of the digital record are obtained from the following device/digital record source (tick mark):';
+            const deviceLinesB = doc.splitTextToSize(deviceTextB, contentWidth);
+            deviceLinesB.forEach(line => {
+                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
+                yPos += 5;
+            });
+            yPos += 5;
+            
+            // List expert devices with tick marks - left aligned (not justified)
+            formData.expertDevices.forEach(device => {
+                const deviceLine = `✓ ${device}`;
+                const deviceLineSplit = doc.splitTextToSize(deviceLine, contentWidth - 5);
+                deviceLineSplit.forEach(line => {
+                    doc.text(line, leftMargin + 5, yPos);
+                    yPos += 5;
+                });
+            });
+            
+            if (formData.expertOtherDevice) {
+                const otherLine = `Other: ${formData.expertOtherDevice}`;
+                const otherLineSplit = doc.splitTextToSize(otherLine, contentWidth - 5);
+                otherLineSplit.forEach(line => {
+                    doc.text(line, leftMargin + 5, yPos);
+                    yPos += 5;
+                });
+            }
+            
+            // If no devices selected, show placeholder - left aligned
+            if (formData.expertDevices.length === 0 && !formData.expertOtherDevice) {
+                doc.text('[No device selected]', leftMargin + 5, yPos);
+                yPos += 5;
+            }
+            
+            // Expert device details - split to stay within margins (left aligned)
+            const expertMakeModelLine = `Make & Model: ${formData.expertMakeModel || '[Not Specified]'}`;
+            const expertColorLine = `Color: ${formData.expertColor || '[Not Specified]'}`;
+            
+            // Check if both can fit on one line
+            const expertCombinedLength = doc.getStringUnitWidth(expertMakeModelLine + "   " + expertColorLine) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+            
+            if (expertCombinedLength < contentWidth) {
+                doc.text(expertMakeModelLine, leftMargin, yPos);
+                doc.text(expertColorLine, leftMargin + contentWidth/2, yPos);
+            } else {
+                // Split into two lines
+                doc.text(expertMakeModelLine, leftMargin, yPos);
+                yPos += 5;
+                doc.text(expertColorLine, leftMargin, yPos);
+            }
+            yPos += 6;
+            
+            const expertSerialLine = `Serial Number: ${formData.expertSerial || '[Not Specified]'}`;
+            const expertSerialSplit = doc.splitTextToSize(expertSerialLine, contentWidth);
+            expertSerialSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos);
+                yPos += 5;
+            });
+            
+            const expertIdentifierLine = `${formData.expertIdentifier} (as applicable)`;
+            const expertIdentifierSplit = doc.splitTextToSize(expertIdentifierLine, contentWidth);
+            expertIdentifierSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos);
+                yPos += 5;
+            });
+            
+            const expertOtherInfoLine = `and any other relevant information: ${formData.expertOtherInfo || '[None specified]'}`;
+            const expertOtherInfoSplit = doc.splitTextToSize(expertOtherInfoLine, contentWidth);
+            expertOtherInfoSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos);
+                yPos += 5;
+            });
+            yPos += 8;
+            
+            // Expert hash information - JUSTIFIED
+            const expertHashLine = `I state that the HASH value/s of the electronic/digital record/s is ${formData.expertHashValue}, obtained through the following algorithm:—`;
+            const expertHashSplit = doc.splitTextToSize(expertHashLine, contentWidth);
+            expertHashSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
+                yPos += 5;
+            });
+            yPos += 5;
+            
+            // Expert algorithms list - left aligned (not justified)
+            formData.expertAlgorithms.forEach(algo => {
+                const algoLine = `${algo}:`;
+                doc.text(algoLine, leftMargin + 5, yPos);
+                yPos += 5;
+            });
+            
+            if (formData.expertOtherAlgorithm) {
+                const otherAlgoLine = `Other: ${formData.expertOtherAlgorithm}`;
+                const otherAlgoSplit = doc.splitTextToSize(otherAlgoLine, contentWidth - 5);
+                otherAlgoSplit.forEach(line => {
+                    doc.text(line, leftMargin + 5, yPos);
+                    yPos += 5;
+                });
+            }
+            
+            doc.text('(Legally acceptable standard)', leftMargin, yPos);
+            doc.text('(Hash report to be enclosed with the certificate)', leftMargin, yPos + 5);
+            yPos += 12;
+            
+            // Expert signature - aligned to right margin
+            doc.text(`(${formData.expertName}, ${formData.expertDesignation})`, leftMargin + contentWidth, yPos, { align: 'right' });
+            yPos += 10;
+            
+            // Expert date, time, place - left aligned
+            const expertDateLine = `Date (DD/MM/YYYY): ${formData.expertDate}`;
+            const expertTimeLine = `Time (IST): ${formData.expertTime}`;
+            
+            doc.text(expertDateLine, leftMargin, yPos);
+            doc.text(expertTimeLine, leftMargin + contentWidth/2, yPos);
+            yPos += 6;
+            
+            const expertPlaceLine = `Place: ${formData.expertPlace}`;
+            const expertPlaceSplit = doc.splitTextToSize(expertPlaceLine, contentWidth);
+            expertPlaceSplit.forEach(line => {
+                doc.text(line, leftMargin, yPos);
+                yPos += 5;
+            });
+            
+            // Save PDF
+            doc.save('Digital_Evidence_Certificate.pdf');
+        }
+        
+        function resetForm() {
+            if (confirm('Are you sure you want to reset all form fields? All entered data will be lost.')) {
+                // Reset all form elements
+                document.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], textarea, select').forEach(el => {
+                    if (el.tagName === 'SELECT') {
+                        el.value = '';
+                    } else {
+                        el.value = '';
+                    }
+                });
+                
+                document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => {
+                    el.checked = false;
+                });
+                
+                // Reset to default values
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('partyDate').value = today;
+                document.getElementById('expertDate').value = today;
+                
+                const now = new Date();
+                const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                document.getElementById('partyTime').value = timeString;
+                document.getElementById('expertTime').value = timeString;
+                
+                // Set default selections
+                document.querySelector('#partyDevice_ComputerStorageMedia').checked = true;
+                document.querySelector('#expertDevice_ComputerStorageMedia').checked = true;
+                document.querySelector('#partyAlgorithm_SHA256').checked = true;
+                document.querySelector('#expertAlgorithm_SHA256').checked = true;
+                document.querySelector('#partyControl_Owned').checked = true;
+                
+                // Set default relation types
+                document.getElementById('partyRelationType').value = 'Son';
+                document.getElementById('expertRelationType').value = 'Son';
+                
+                // Set default address types
+                document.getElementById('partyAddressType').value = 'Residing at';
+                document.getElementById('expertAddressType').value = 'Residing at';
+                
+                // Set default identifier types
+                document.getElementById('partyIdType').value = 'IMEI';
+                document.getElementById('expertIdType').value = 'IMEI';
+                
+                // Update identifier displays
+                updatePartyIdentifier();
+                updateExpertIdentifier();
+                
+                // Update visual state
+                updateCheckboxVisualState();
+                
+                // Hide preview
+                document.getElementById('previewContainer').style.display = 'none';
+                
+                // Reset status
+                updateStatus('partA');
+                updateStatus('partB');
+                
+                alert('Form has been reset successfully.');
+            }
+        }
+    </script>
+</body>
+</html>
