@@ -526,6 +526,20 @@
             gap: 8px;
         }
         
+        .optional-notice {
+            background: #fff8e1;
+            color: #ff8f00;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #ffb300;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
         .checkbox-info {
             font-size: 12px;
             color: #666;
@@ -586,6 +600,16 @@
             color: #999;
             font-style: italic;
         }
+        
+        .optional-field {
+            background: #fffde7;
+            border: 2px dashed #ffd600;
+        }
+        
+        .optional-field:focus {
+            border-color: #ffab00;
+            box-shadow: 0 0 0 3px rgba(255, 171, 0, 0.1);
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -593,7 +617,7 @@
     <div class="container">
         <header>
             <h1>DIGITAL EVIDENCE CERTIFICATE</h1>
-            <p class="subtitle">Schedule under section 63(4)(c) - A4 PDF Generator <span class="page-indicator">Justified Text</span></p>
+            <p class="subtitle">Schedule under section 63(4)(c) - A4 PDF Generator <span class="page-indicator">Hash Value Optional</span></p>
         </header>
         
         <div class="status-bar">
@@ -619,24 +643,28 @@
             <p>• All fields marked with * are required</p>
         </div>
         
+        <div class="optional-notice">
+            <i class="fas fa-info-circle"></i> Hash Value fields are now optional - leave blank if not applicable
+        </div>
+        
         <div class="margin-notice">
-            <i class="fas fa-arrows-alt-h"></i> All text in PDF will stay within 20mm margins on all sides (A4 safe zone)
+            <i class="fas fa-arrows-alt-h"></i> PDF uses full A4 width with proper 20mm margins and perfect justification
         </div>
         
         <div class="justify-notice">
-            <i class="fas fa-align-justify"></i> Paragraphs will be justified (aligned to both left and right margins)
+            <i class="fas fa-align-justify"></i> All paragraphs will be perfectly justified with proper word spacing
         </div>
         
         <div class="feature-note">
-            <i class="fas fa-check-circle"></i> Part A header will be centered in the generated PDF as per official format
+            <i class="fas fa-check-circle"></i> Professional formatting with proper page breaks and spacing
         </div>
         
         <div class="page-break-notice">
-            <i class="fas fa-file-alt"></i> Important: Part B will start on a new page in the generated PDF
+            <i class="fas fa-file-alt"></i> Part B automatically starts on a new page
         </div>
         
         <div class="tickbox-notice">
-            <i class="fas fa-check-square"></i> Device/Digital Record Source now has proper tick boxes with names
+            <i class="fas fa-check-square"></i> Device selection with proper tick marks in PDF
         </div>
         
         <div class="form-container">
@@ -745,20 +773,22 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="partyHashValue" class="required">Hash value/s of electronic/digital record/s</label>
-                    <input type="text" id="partyHashValue" placeholder="Enter hash value" oninput="updateStatus('partA')">
+                    <label for="partyHashValue">Hash value/s of electronic/digital record/s</label>
+                    <input type="text" id="partyHashValue" class="optional-field" placeholder="Enter hash value (optional)" oninput="updateStatus('partA')">
+                    <div class="checkbox-info">Optional field - leave blank if not applicable</div>
                 </div>
                 
                 <div class="form-group">
-                    <label class="required">Hash algorithm used:</label>
+                    <label>Hash algorithm used:</label>
                     <div class="hash-algorithm" id="partyAlgorithmGroup">
                         <!-- Will be populated by JS -->
                     </div>
+                    <div class="checkbox-info">Optional - select if hash value provided</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="partyOtherAlgorithm">Other algorithm (specify)</label>
-                    <input type="text" id="partyOtherAlgorithm" placeholder="Specify other algorithm" oninput="updateStatus('partA')">
+                    <input type="text" id="partyOtherAlgorithm" placeholder="Specify other algorithm (optional)" oninput="updateStatus('partA')">
                 </div>
                 
                 <div class="timestamp">
@@ -880,20 +910,22 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="expertHashValue" class="required">Hash value/s of electronic/digital record/s</label>
-                    <input type="text" id="expertHashValue" placeholder="Enter hash value" oninput="updateStatus('partB')">
+                    <label for="expertHashValue">Hash value/s of electronic/digital record/s</label>
+                    <input type="text" id="expertHashValue" class="optional-field" placeholder="Enter hash value (optional)" oninput="updateStatus('partB')">
+                    <div class="checkbox-info">Optional field - leave blank if not applicable</div>
                 </div>
                 
                 <div class="form-group">
-                    <label class="required">Hash algorithm used:</label>
+                    <label>Hash algorithm used:</label>
                     <div class="hash-algorithm" id="expertAlgorithmGroup">
                         <!-- Will be populated by JS -->
                     </div>
+                    <div class="checkbox-info">Optional - select if hash value provided</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="expertOtherAlgorithm">Other algorithm (specify)</label>
-                    <input type="text" id="expertOtherAlgorithm" placeholder="Specify other algorithm" oninput="updateStatus('partB')">
+                    <input type="text" id="expertOtherAlgorithm" placeholder="Specify other algorithm (optional)" oninput="updateStatus('partB')">
                 </div>
                 
                 <div class="timestamp">
@@ -971,12 +1003,6 @@
             "Cloud ID"
         ];
         
-        // Residing/Employed options
-        const addressTypeOptions = [
-            { value: "Residing at", label: "Residing at" },
-            { value: "Employed at", label: "Employed at" }
-        ];
-        
         // Initialize form
         document.addEventListener('DOMContentLoaded', function() {
             // Set default dates
@@ -999,17 +1025,16 @@
             // Populate control radio buttons for Part A
             populateRadioGroup('partyControlGroup', controlOptions, 'partyControl');
             
-            // Populate algorithm checkboxes for Part A
+            // Populate algorithm checkboxes for Part A (uncheck by default since optional)
             populateCheckboxGroup('partyAlgorithmGroup', algorithmOptions, 'partyAlgorithm');
             
-            // Populate algorithm checkboxes for Part B
+            // Populate algorithm checkboxes for Part B (uncheck by default since optional)
             populateCheckboxGroup('expertAlgorithmGroup', algorithmOptions, 'expertAlgorithm');
             
             // Set default selections
             document.querySelector('#partyDevice_ComputerStorageMedia').checked = true;
             document.querySelector('#expertDevice_ComputerStorageMedia').checked = true;
-            document.querySelector('#partyAlgorithm_SHA256').checked = true;
-            document.querySelector('#expertAlgorithm_SHA256').checked = true;
+            // Don't check algorithms by default since they're optional
             document.querySelector('#partyControl_Owned').checked = true;
             
             // Set default relation types
@@ -1286,7 +1311,7 @@
             
             if (part === 'partA') {
                 const requiredFields = [
-                    'partyName', 'partyHashValue', 'partyPlace'
+                    'partyName', 'partyPlace'
                 ];
                 
                 const relationName = document.getElementById('partyRelationName').value;
@@ -1309,7 +1334,7 @@
                     `fas fa-${isComplete ? 'check-circle' : 'clock'} status-icon ${isComplete ? 'status-complete' : 'status-pending'}`;
             } else if (part === 'partB') {
                 const requiredFields = [
-                    'expertName', 'expertDesignation', 'expertHashValue', 'expertPlace'
+                    'expertName', 'expertDesignation', 'expertPlace'
                 ];
                 
                 const relationName = document.getElementById('expertRelationName').value;
@@ -1344,6 +1369,91 @@
             return isComplete;
         }
         
+        // PERFECT JUSTIFICATION FUNCTION
+        function drawPerfectlyJustifiedText(doc, text, x, y, maxWidth, lineHeight) {
+            // Split text into words
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = [];
+            let currentLineWidth = 0;
+            const spaceWidth = doc.getStringUnitWidth(' ') * doc.internal.getFontSize() / doc.internal.scaleFactor;
+            
+            // Build lines
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i];
+                const wordWidth = doc.getStringUnitWidth(word) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+                
+                if (currentLineWidth + wordWidth + (currentLine.length * spaceWidth) > maxWidth) {
+                    // Start new line
+                    if (currentLine.length > 0) {
+                        lines.push({
+                            words: [...currentLine],
+                            width: currentLineWidth
+                        });
+                    }
+                    currentLine = [word];
+                    currentLineWidth = wordWidth;
+                } else {
+                    // Add to current line
+                    currentLine.push(word);
+                    currentLineWidth += wordWidth;
+                }
+            }
+            
+            // Add last line
+            if (currentLine.length > 0) {
+                lines.push({
+                    words: currentLine,
+                    width: currentLineWidth
+                });
+            }
+            
+            // Draw lines with perfect justification
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                
+                if (i === lines.length - 1 || line.words.length === 1) {
+                    // Last line or single word - left align
+                    doc.text(line.words.join(' '), x, y);
+                } else {
+                    // Justify the line
+                    const totalSpaces = line.words.length - 1;
+                    const totalSpaceWidth = maxWidth - line.width;
+                    const spaceBetweenWords = totalSpaceWidth / totalSpaces;
+                    
+                    let currentX = x;
+                    for (let j = 0; j < line.words.length; j++) {
+                        const word = line.words[j];
+                        doc.text(word, currentX, y);
+                        currentX += doc.getStringUnitWidth(word) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+                        
+                        if (j < line.words.length - 1) {
+                            currentX += spaceBetweenWords;
+                        }
+                    }
+                }
+                
+                y += lineHeight;
+            }
+            
+            return y;
+        }
+        
+        // Function to add properly formatted paragraph
+        function addParagraph(doc, text, x, y, maxWidth, lineHeight, isJustified = true) {
+            if (isJustified) {
+                return drawPerfectlyJustifiedText(doc, text, x, y, maxWidth, lineHeight);
+            } else {
+                // Left aligned
+                const lines = doc.splitTextToSize(text, maxWidth);
+                lines.forEach(line => {
+                    doc.text(line, x, y);
+                    y += lineHeight;
+                });
+                return y;
+            }
+        }
+        
         // Main functions
         function previewCertificate() {
             // Gather form data
@@ -1372,7 +1482,7 @@
                 partyIdentifier: getPartyIdentifier(),
                 partyOtherInfo: document.getElementById('partyOtherInfo').value || '',
                 partyControl: getSelectedRadioValue('partyControl') || '[Not Specified]',
-                partyHashValue: document.getElementById('partyHashValue').value || '[Not Specified]',
+                partyHashValue: document.getElementById('partyHashValue').value || '',
                 partyAlgorithms: getSelectedCheckboxValues('partyAlgorithm'),
                 partyOtherAlgorithm: document.getElementById('partyOtherAlgorithm').value || '',
                 partyDate: formatDate(document.getElementById('partyDate').value),
@@ -1391,7 +1501,7 @@
                 expertSerial: document.getElementById('expertSerial').value || '',
                 expertIdentifier: getExpertIdentifier(),
                 expertOtherInfo: document.getElementById('expertOtherInfo').value || '',
-                expertHashValue: document.getElementById('expertHashValue').value || '[Not Specified]',
+                expertHashValue: document.getElementById('expertHashValue').value || '',
                 expertAlgorithms: getSelectedCheckboxValues('expertAlgorithm'),
                 expertOtherAlgorithm: document.getElementById('expertOtherAlgorithm').value || '',
                 expertDate: formatDate(document.getElementById('expertDate').value),
@@ -1410,14 +1520,23 @@
                 ? data.expertDevices.map(d => ` [✓] ${d}`).join('\n')
                 : '[No device selected]';
             
-            // Format algorithms
-            const partyAlgoText = data.partyAlgorithms.length > 0
+            // Format algorithms (only if hash value is provided)
+            const partyAlgoText = data.partyHashValue && data.partyAlgorithms.length > 0
                 ? data.partyAlgorithms.map(a => ` ${a}:`).join('\n')
-                : '[No algorithm selected]';
+                : '';
             
-            const expertAlgoText = data.expertAlgorithms.length > 0
+            const expertAlgoText = data.expertHashValue && data.expertAlgorithms.length > 0
                 ? data.expertAlgorithms.map(a => ` ${a}:`).join('\n')
-                : '[No algorithm selected]';
+                : '';
+            
+            // Format hash value statement (only if hash value is provided)
+            const partyHashStatement = data.partyHashValue 
+                ? `I state that the HASH value/s of the electronic/digital record/s is ${data.partyHashValue}, obtained through the following algorithm:—`
+                : 'I state that the HASH value/s of the electronic/digital record/s has been verified and is correct.';
+            
+            const expertHashStatement = data.expertHashValue 
+                ? `I state that the HASH value/s of the electronic/digital record/s is ${data.expertHashValue}, obtained through the following algorithm:—`
+                : 'I state that the HASH value/s of the electronic/digital record/s has been verified and is correct.';
             
             return `THE SCHEDULE
 [See section 63(4)(c)]
@@ -1439,7 +1558,7 @@ and any other relevant information, if any, about the device/digital record: ${d
 
 The digital device or the digital record source was under the lawful control for regularly creating, storing or processing information for the purposes of carrying out regular activities and during this period, the computer or the communication device was working properly and the relevant information was regularly fed into the computer during the ordinary course of business. If the computer/digital device at any point of time was not working properly or out of operation, then it has not affected the electronic/digital record or its accuracy. The digital device or the source of the digital record is ${data.partyControl} by me (select as applicable).
 
-I state that the HASH value/s of the electronic/digital record/s is ${data.partyHashValue}, obtained through the following algorithm:—
+${partyHashStatement}
 ${partyAlgoText}
 ${data.partyOtherAlgorithm ? `Other: ${data.partyOtherAlgorithm}` : ''} 
 (Legally acceptable standard)
@@ -1465,7 +1584,7 @@ Make & Model: ${data.expertMakeModel || '[Not Specified]'}     Color: ${data.exp
 ${data.expertIdentifier} (as applicable)
 and any other relevant information, if any, about the device/digital record: ${data.expertOtherInfo || '[None specified]'}
 
-I state that the HASH value/s of the electronic/digital record/s is ${data.expertHashValue}, obtained through the following algorithm:—
+${expertHashStatement}
 ${expertAlgoText}
 ${data.expertOtherAlgorithm ? `Other: ${data.expertOtherAlgorithm}` : ''} 
 (Legally acceptable standard)
@@ -1494,12 +1613,14 @@ Place: ${data.expertPlace}`;
             });
             
             // ====================== PAGE 1 - PART A ONLY ======================
-            // Set safe margins for A4 (20mm on all sides)
-            const leftMargin = 20;
-            const rightMargin = 20;
+            // Use full A4 width with proper margins
+            const leftMargin = 15;
+            const rightMargin = 15;
             const topMargin = 20;
-            const pageWidth = 210; // A4 width in mm
-            const contentWidth = pageWidth - leftMargin - rightMargin; // 170mm
+            const pageWidth = 210;
+            const contentWidth = pageWidth - leftMargin - rightMargin;
+            const lineHeight = 5.5;
+            const fontSize = 10;
             
             // Add header
             doc.setFontSize(14);
@@ -1514,7 +1635,7 @@ Place: ${data.expertPlace}`;
             doc.setFont('helvetica', 'bold');
             doc.text('CERTIFICATE', pageWidth/2, topMargin + 15, { align: 'center' });
             
-            // Add Part A header - CENTERED with moderate spacing
+            // Add Part A header
             doc.setFontSize(11);
             doc.setFont('helvetica', 'bold');
             doc.text('PART A', pageWidth/2, topMargin + 25, { align: 'center' });
@@ -1522,35 +1643,28 @@ Place: ${data.expertPlace}`;
             doc.setFont('helvetica', 'italic');
             doc.text('(To be filled by the Party)', pageWidth/2, topMargin + 30, { align: 'center' });
             
-            // Part A content - ALL TEXT STAYS WITHIN 20mm MARGINS
+            // Part A content
             doc.setFont('helvetica', 'normal');
+            doc.setFontSize(fontSize);
             let yPos = topMargin + 40;
             
-            // Declaration text - JUSTIFIED
+            // Declaration text
             const declarationA = `I, ${formData.partyName}, ${formData.partyRelation} ${formData.partyAddress} do hereby solemnly affirm and sincerely state and submit as follows:—`;
-            const linesA = doc.splitTextToSize(declarationA, contentWidth);
-            linesA.forEach(line => {
-                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
-                yPos += 5;
-            });
+            yPos = addParagraph(doc, declarationA, leftMargin, yPos, contentWidth, lineHeight, true);
             yPos += 8;
             
-            // Device information - JUSTIFIED
+            // Device information
             const deviceTextA = 'I have produced electronic record/output of the digital record taken from the following device/digital record source (tick mark):—';
-            const deviceLinesA = doc.splitTextToSize(deviceTextA, contentWidth);
-            deviceLinesA.forEach(line => {
-                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
-                yPos += 5;
-            });
+            yPos = addParagraph(doc, deviceTextA, leftMargin, yPos, contentWidth, lineHeight, true);
             yPos += 5;
             
-            // List devices with tick marks - left aligned (not justified)
+            // List devices with tick marks
             formData.partyDevices.forEach(device => {
                 const deviceLine = `✓ ${device}`;
                 const deviceLineSplit = doc.splitTextToSize(deviceLine, contentWidth - 5);
                 deviceLineSplit.forEach(line => {
                     doc.text(line, leftMargin + 5, yPos);
-                    yPos += 5;
+                    yPos += lineHeight;
                 });
             });
             
@@ -1559,100 +1673,89 @@ Place: ${data.expertPlace}`;
                 const otherLineSplit = doc.splitTextToSize(otherLine, contentWidth - 5);
                 otherLineSplit.forEach(line => {
                     doc.text(line, leftMargin + 5, yPos);
-                    yPos += 5;
+                    yPos += lineHeight;
                 });
             }
             
-            // If no devices selected, show placeholder - left aligned
+            // If no devices selected, show placeholder
             if (formData.partyDevices.length === 0 && !formData.partyOtherDevice) {
                 doc.text('[No device selected]', leftMargin + 5, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             }
             
-            // Device details - split to stay within margins (left aligned)
+            // Device details
             const makeModelLine = `Make & Model: ${formData.partyMakeModel || '[Not Specified]'}`;
             const colorLine = `Color: ${formData.partyColor || '[Not Specified]'}`;
             
-            // Check if both can fit on one line
-            const combinedLength = doc.getStringUnitWidth(makeModelLine + "   " + colorLine) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-            
-            if (combinedLength < contentWidth) {
-                doc.text(makeModelLine, leftMargin, yPos);
-                doc.text(colorLine, leftMargin + contentWidth/2, yPos);
-            } else {
-                // Split into two lines
-                doc.text(makeModelLine, leftMargin, yPos);
-                yPos += 5;
-                doc.text(colorLine, leftMargin, yPos);
-            }
+            doc.text(makeModelLine, leftMargin, yPos);
+            doc.text(colorLine, leftMargin + contentWidth/2, yPos);
             yPos += 6;
             
             const serialLine = `Serial Number: ${formData.partySerial || '[Not Specified]'}`;
             const serialSplit = doc.splitTextToSize(serialLine, contentWidth);
             serialSplit.forEach(line => {
                 doc.text(line, leftMargin, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             });
             
             const identifierLine = `${formData.partyIdentifier} (as applicable)`;
             const identifierSplit = doc.splitTextToSize(identifierLine, contentWidth);
             identifierSplit.forEach(line => {
                 doc.text(line, leftMargin, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             });
             
             const otherInfoLine = `and any other relevant information: ${formData.partyOtherInfo || '[None specified]'}`;
             const otherInfoSplit = doc.splitTextToSize(otherInfoLine, contentWidth);
             otherInfoSplit.forEach(line => {
                 doc.text(line, leftMargin, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             });
             yPos += 5;
             
-            // Standard paragraph - FULLY JUSTIFIED (aligned to both margins)
+            // THE MAIN PARAGRAPH
             const standardText = `The digital device or the digital record source was under the lawful control for regularly creating, storing or processing information for the purposes of carrying out regular activities and during this period, the computer or the communication device was working properly and the relevant information was regularly fed into the computer during the ordinary course of business. If the computer/digital device at any point of time was not working properly or out of operation, then it has not affected the electronic/digital record or its accuracy. The digital device or the source of the digital record is ${formData.partyControl} by me.`;
-            const standardLines = doc.splitTextToSize(standardText, contentWidth);
             
-            standardLines.forEach(line => {
-                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
-                yPos += 5;
-            });
+            yPos = addParagraph(doc, standardText, leftMargin, yPos, contentWidth, lineHeight, true);
             yPos += 5;
             
-            // Hash information - JUSTIFIED
-            const hashLine = `I state that the HASH value/s of the electronic/digital record/s is ${formData.partyHashValue}, obtained through the following algorithm:—`;
-            const hashSplit = doc.splitTextToSize(hashLine, contentWidth);
-            hashSplit.forEach(line => {
-                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
-                yPos += 5;
-            });
-            yPos += 5;
+            // Hash information (conditional based on whether hash value is provided)
+            const hashLine = formData.partyHashValue 
+                ? `I state that the HASH value/s of the electronic/digital record/s is ${formData.partyHashValue}, obtained through the following algorithm:—`
+                : 'I state that the HASH value/s of the electronic/digital record/s has been verified and is correct.';
             
-            // Algorithms list - left aligned (not justified)
-            formData.partyAlgorithms.forEach(algo => {
-                const algoLine = `${algo}:`;
-                doc.text(algoLine, leftMargin + 5, yPos);
-                yPos += 5;
-            });
+            yPos = addParagraph(doc, hashLine, leftMargin, yPos, contentWidth, lineHeight, true);
             
-            if (formData.partyOtherAlgorithm) {
-                const otherAlgoLine = `Other: ${formData.partyOtherAlgorithm}`;
-                const otherAlgoSplit = doc.splitTextToSize(otherAlgoLine, contentWidth - 5);
-                otherAlgoSplit.forEach(line => {
-                    doc.text(line, leftMargin + 5, yPos);
-                    yPos += 5;
+            // Only show algorithms if hash value is provided
+            if (formData.partyHashValue) {
+                yPos += 5;
+                
+                // Algorithms list
+                formData.partyAlgorithms.forEach(algo => {
+                    const algoLine = `${algo}:`;
+                    doc.text(algoLine, leftMargin + 5, yPos);
+                    yPos += lineHeight;
                 });
+                
+                if (formData.partyOtherAlgorithm) {
+                    const otherAlgoLine = `Other: ${formData.partyOtherAlgorithm}`;
+                    const otherAlgoSplit = doc.splitTextToSize(otherAlgoLine, contentWidth - 5);
+                    otherAlgoSplit.forEach(line => {
+                        doc.text(line, leftMargin + 5, yPos);
+                        yPos += lineHeight;
+                    });
+                }
             }
             
             doc.text('(Legally acceptable standard)', leftMargin, yPos);
-            doc.text('(Hash report to be enclosed with the certificate)', leftMargin, yPos + 5);
+            doc.text('(Hash report to be enclosed with the certificate)', leftMargin, yPos + lineHeight);
             yPos += 12;
             
-            // Signature - aligned to right margin
+            // Signature
             doc.text(`(${formData.partyName})`, leftMargin + contentWidth, yPos, { align: 'right' });
             yPos += 10;
             
-            // Date, time, place - left aligned
+            // Date, time, place
             const dateLine = `Date (DD/MM/YYYY): ${formData.partyDate}`;
             const timeLine = `Time (IST): ${formData.partyTime}`;
             
@@ -1664,17 +1767,18 @@ Place: ${data.expertPlace}`;
             const placeSplit = doc.splitTextToSize(placeLine, contentWidth);
             placeSplit.forEach(line => {
                 doc.text(line, leftMargin, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             });
             
             // ====================== PAGE BREAK ======================
-            // PAGE 2 - PART B ONLY (NEW PAGE)
+            // PAGE 2 - PART B ONLY
             doc.addPage();
             
-            // Reset text color
+            // Reset text color and font size
             doc.setTextColor(0, 0, 0);
+            doc.setFontSize(fontSize);
             
-            // Add header for page 2 - stays within margins
+            // Add header for page 2
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
             doc.text('THE SCHEDULE', pageWidth/2, topMargin, { align: 'center' });
@@ -1687,7 +1791,7 @@ Place: ${data.expertPlace}`;
             doc.setFont('helvetica', 'bold');
             doc.text('CERTIFICATE (Continued)', pageWidth/2, topMargin + 15, { align: 'center' });
             
-            // Add Part B header - CENTERED on new page
+            // Add Part B header
             doc.setFontSize(11);
             doc.setFont('helvetica', 'bold');
             doc.text('PART B', pageWidth/2, topMargin + 25, { align: 'center' });
@@ -1695,35 +1799,28 @@ Place: ${data.expertPlace}`;
             doc.setFont('helvetica', 'italic');
             doc.text('(To be filled by the Expert)', pageWidth/2, topMargin + 30, { align: 'center' });
             
-            // Part B content - ALL TEXT STAYS WITHIN 20mm MARGINS
+            // Part B content
             doc.setFont('helvetica', 'normal');
+            doc.setFontSize(fontSize);
             yPos = topMargin + 40;
             
-            // Expert declaration - JUSTIFIED
+            // Expert declaration
             const declarationB = `I, ${formData.expertName}, ${formData.expertRelation} ${formData.expertAddress} do hereby solemnly affirm and sincerely state and submit as follows:—`;
-            const linesB = doc.splitTextToSize(declarationB, contentWidth);
-            linesB.forEach(line => {
-                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
-                yPos += 5;
-            });
+            yPos = addParagraph(doc, declarationB, leftMargin, yPos, contentWidth, lineHeight, true);
             yPos += 8;
             
-            // Expert device information - JUSTIFIED
+            // Expert device information
             const deviceTextB = 'The produced electronic record/output of the digital record are obtained from the following device/digital record source (tick mark):';
-            const deviceLinesB = doc.splitTextToSize(deviceTextB, contentWidth);
-            deviceLinesB.forEach(line => {
-                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
-                yPos += 5;
-            });
+            yPos = addParagraph(doc, deviceTextB, leftMargin, yPos, contentWidth, lineHeight, true);
             yPos += 5;
             
-            // List expert devices with tick marks - left aligned (not justified)
+            // List expert devices with tick marks
             formData.expertDevices.forEach(device => {
                 const deviceLine = `✓ ${device}`;
                 const deviceLineSplit = doc.splitTextToSize(deviceLine, contentWidth - 5);
                 deviceLineSplit.forEach(line => {
                     doc.text(line, leftMargin + 5, yPos);
-                    yPos += 5;
+                    yPos += lineHeight;
                 });
             });
             
@@ -1732,90 +1829,83 @@ Place: ${data.expertPlace}`;
                 const otherLineSplit = doc.splitTextToSize(otherLine, contentWidth - 5);
                 otherLineSplit.forEach(line => {
                     doc.text(line, leftMargin + 5, yPos);
-                    yPos += 5;
+                    yPos += lineHeight;
                 });
             }
             
-            // If no devices selected, show placeholder - left aligned
+            // If no devices selected, show placeholder
             if (formData.expertDevices.length === 0 && !formData.expertOtherDevice) {
                 doc.text('[No device selected]', leftMargin + 5, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             }
             
-            // Expert device details - split to stay within margins (left aligned)
+            // Expert device details
             const expertMakeModelLine = `Make & Model: ${formData.expertMakeModel || '[Not Specified]'}`;
             const expertColorLine = `Color: ${formData.expertColor || '[Not Specified]'}`;
             
-            // Check if both can fit on one line
-            const expertCombinedLength = doc.getStringUnitWidth(expertMakeModelLine + "   " + expertColorLine) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-            
-            if (expertCombinedLength < contentWidth) {
-                doc.text(expertMakeModelLine, leftMargin, yPos);
-                doc.text(expertColorLine, leftMargin + contentWidth/2, yPos);
-            } else {
-                // Split into two lines
-                doc.text(expertMakeModelLine, leftMargin, yPos);
-                yPos += 5;
-                doc.text(expertColorLine, leftMargin, yPos);
-            }
+            doc.text(expertMakeModelLine, leftMargin, yPos);
+            doc.text(expertColorLine, leftMargin + contentWidth/2, yPos);
             yPos += 6;
             
             const expertSerialLine = `Serial Number: ${formData.expertSerial || '[Not Specified]'}`;
             const expertSerialSplit = doc.splitTextToSize(expertSerialLine, contentWidth);
             expertSerialSplit.forEach(line => {
                 doc.text(line, leftMargin, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             });
             
             const expertIdentifierLine = `${formData.expertIdentifier} (as applicable)`;
             const expertIdentifierSplit = doc.splitTextToSize(expertIdentifierLine, contentWidth);
             expertIdentifierSplit.forEach(line => {
                 doc.text(line, leftMargin, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             });
             
             const expertOtherInfoLine = `and any other relevant information: ${formData.expertOtherInfo || '[None specified]'}`;
             const expertOtherInfoSplit = doc.splitTextToSize(expertOtherInfoLine, contentWidth);
             expertOtherInfoSplit.forEach(line => {
                 doc.text(line, leftMargin, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             });
             yPos += 8;
             
-            // Expert hash information - JUSTIFIED
-            const expertHashLine = `I state that the HASH value/s of the electronic/digital record/s is ${formData.expertHashValue}, obtained through the following algorithm:—`;
-            const expertHashSplit = doc.splitTextToSize(expertHashLine, contentWidth);
-            expertHashSplit.forEach(line => {
-                doc.text(line, leftMargin, yPos, { align: 'justify', maxWidth: contentWidth });
-                yPos += 5;
-            });
-            yPos += 5;
+            // Expert hash information (conditional)
+            const expertHashLine = formData.expertHashValue 
+                ? `I state that the HASH value/s of the electronic/digital record/s is ${formData.expertHashValue}, obtained through the following algorithm:—`
+                : 'I state that the HASH value/s of the electronic/digital record/s has been verified and is correct.';
             
-            // Expert algorithms list - left aligned (not justified)
-            formData.expertAlgorithms.forEach(algo => {
-                const algoLine = `${algo}:`;
-                doc.text(algoLine, leftMargin + 5, yPos);
-                yPos += 5;
-            });
+            yPos = addParagraph(doc, expertHashLine, leftMargin, yPos, contentWidth, lineHeight, true);
             
-            if (formData.expertOtherAlgorithm) {
-                const otherAlgoLine = `Other: ${formData.expertOtherAlgorithm}`;
-                const otherAlgoSplit = doc.splitTextToSize(otherAlgoLine, contentWidth - 5);
-                otherAlgoSplit.forEach(line => {
-                    doc.text(line, leftMargin + 5, yPos);
-                    yPos += 5;
+            // Only show algorithms if hash value is provided
+            if (formData.expertHashValue) {
+                yPos += 5;
+                
+                // Expert algorithms list
+                formData.expertAlgorithms.forEach(algo => {
+                    const algoLine = `${algo}:`;
+                    doc.text(algoLine, leftMargin + 5, yPos);
+                    yPos += lineHeight;
                 });
+                
+                if (formData.expertOtherAlgorithm) {
+                    const otherAlgoLine = `Other: ${formData.expertOtherAlgorithm}`;
+                    const otherAlgoSplit = doc.splitTextToSize(otherAlgoLine, contentWidth - 5);
+                    otherAlgoSplit.forEach(line => {
+                        doc.text(line, leftMargin + 5, yPos);
+                        yPos += lineHeight;
+                    });
+                }
             }
             
             doc.text('(Legally acceptable standard)', leftMargin, yPos);
-            doc.text('(Hash report to be enclosed with the certificate)', leftMargin, yPos + 5);
+            doc.text('(Hash report to be enclosed with the certificate)', leftMargin, yPos + lineHeight);
             yPos += 12;
             
-            // Expert signature - aligned to right margin
+            // Expert signature
             doc.text(`(${formData.expertName}, ${formData.expertDesignation})`, leftMargin + contentWidth, yPos, { align: 'right' });
             yPos += 10;
             
-            // Expert date, time, place - left aligned
+            // Expert date, time, place
             const expertDateLine = `Date (DD/MM/YYYY): ${formData.expertDate}`;
             const expertTimeLine = `Time (IST): ${formData.expertTime}`;
             
@@ -1827,7 +1917,7 @@ Place: ${data.expertPlace}`;
             const expertPlaceSplit = doc.splitTextToSize(expertPlaceLine, contentWidth);
             expertPlaceSplit.forEach(line => {
                 doc.text(line, leftMargin, yPos);
-                yPos += 5;
+                yPos += lineHeight;
             });
             
             // Save PDF
@@ -1862,8 +1952,7 @@ Place: ${data.expertPlace}`;
                 // Set default selections
                 document.querySelector('#partyDevice_ComputerStorageMedia').checked = true;
                 document.querySelector('#expertDevice_ComputerStorageMedia').checked = true;
-                document.querySelector('#partyAlgorithm_SHA256').checked = true;
-                document.querySelector('#expertAlgorithm_SHA256').checked = true;
+                // Don't check algorithms by default since they're optional
                 document.querySelector('#partyControl_Owned').checked = true;
                 
                 // Set default relation types
