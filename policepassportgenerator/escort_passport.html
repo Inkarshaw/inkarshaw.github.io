@@ -7,6 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add date picker CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         :root {
             --primary-color: #1a365d;
@@ -153,6 +155,25 @@
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+        }
+        
+        /* Date picker specific styles */
+        .flatpickr-input {
+            background-color: white !important;
+            cursor: pointer;
+        }
+        
+        .date-input-wrapper {
+            position: relative;
+        }
+        
+        .date-input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            pointer-events: none;
         }
         
         .btn {
@@ -567,6 +588,20 @@
         .officer-details-preview {
             flex: 1;
         }
+        
+        /* Time picker container */
+        .time-input-wrapper {
+            position: relative;
+        }
+        
+        .time-input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -648,13 +683,20 @@
                 <!-- Date and Time Fields -->
                 <div class="form-group">
                     <label for="date" class="required">Date</label>
-                    <input type="text" id="date" placeholder="Enter date in DD/MM/YYYY format">
-                    <div class="error-message" id="date-error">Please enter a valid date in DD/MM/YYYY format</div>
+                    <div class="date-input-wrapper">
+                        <input type="text" id="date" placeholder="Click to select date" class="flatpickr-input">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="error-message" id="date-error">Please select a valid date</div>
+                    <div class="help-text">Click the calendar icon or input field to select a date</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="time">Time</label>
-                    <input type="text" id="time" placeholder="Enter time in HH:MM format">
+                    <div class="time-input-wrapper">
+                        <input type="text" id="time" placeholder="Enter time in HH:MM format">
+                        <i class="fas fa-clock"></i>
+                    </div>
                     <div class="error-message" id="time-error">Please enter a valid time in HH:MM format</div>
                     <div class="help-text">Optional field - leave blank to keep space vacant in document</div>
                 </div>
@@ -734,6 +776,9 @@
 
     <div class="auto-save" id="auto-save-indicator"><i class="fas fa-check-circle"></i> Auto-saved</div>
 
+    <!-- Add date picker JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const { jsPDF } = window.jspdf;
@@ -755,15 +800,19 @@
             const courtSelect = document.getElementById('court');
             const courtNumberInput = document.getElementById('courtNumber');
             const previewElement = document.getElementById('document-to-print');
+            const dateInput = document.getElementById('date');
+            const timeInput = document.getElementById('time');
             
             // Application State
             let officerCounter = 1;
             let accusedCounter = 1;
             let currentLanguage = 'tamil';
             let autoSaveTimeout;
+            let flatpickrInstance = null;
             
             // Initialize the application
             function init() {
+                initializeDatePicker();
                 updatePoliceOfficers();
                 updateAccusedPersons();
                 updateLanguageContent();
@@ -771,6 +820,25 @@
                 loadSavedData();
                 
                 showNotification('Escort Passport Document Generator is ready!', 'success');
+            }
+            
+            // Initialize date picker
+            function initializeDatePicker() {
+                flatpickrInstance = flatpickr("#date", {
+                    dateFormat: "d/m/Y",
+                    defaultDate: "today",
+                    maxDate: "today",
+                    onChange: function(selectedDates, dateStr, instance) {
+                        // Trigger validation
+                        validateField.call(dateInput);
+                        autoSave();
+                        
+                        // Update preview if date is valid
+                        if (isValidDate(dateStr)) {
+                            fillDocumentPreview();
+                        }
+                    }
+                });
             }
             
             // Notification system
@@ -791,6 +859,9 @@
             }
             
             function isValidDate(dateString) {
+                if (!dateString) return false;
+                
+                // Check if it matches DD/MM/YYYY format
                 const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
                 if (!regex.test(dateString)) return false;
                 
@@ -837,6 +908,17 @@
                     return true;
                 };
                 
+                // Date validation
+                if (fieldId === 'date') {
+                    if (!value) {
+                        return showError('Please select a date');
+                    }
+                    if (!isValidDate(value)) {
+                        return showError('Please select a valid date in DD/MM/YYYY format');
+                    }
+                    return hideError();
+                }
+                
                 // Time validation (optional)
                 if (fieldId === 'time') {
                     if (value && !isValidTime(value)) {
@@ -853,10 +935,6 @@
                 // Special validations
                 if (fieldId === 'crimeNumber' && value && !isValidCrimeNumber(value)) {
                     return showError('Please enter a valid crime number in format: number/year (e.g., 123/2024)');
-                }
-                
-                if (fieldId === 'date' && value && !isValidDate(value)) {
-                    return showError('Please enter a valid date in DD/MM/YYYY format');
                 }
                 
                 if (fieldId === 'court' && !value && field.hasAttribute('required')) {
@@ -1485,6 +1563,13 @@
                     input.addEventListener('blur', validateField);
                 });
                 
+                // Date field click handler
+                dateInput.addEventListener('click', function() {
+                    if (flatpickrInstance) {
+                        flatpickrInstance.open();
+                    }
+                });
+                
                 // Crime number formatting
                 const crimeNumberInput = document.getElementById('crimeNumber');
                 crimeNumberInput.addEventListener('input', function() {
@@ -1508,6 +1593,15 @@
                         this.removeAttribute('required');
                     }
                     validateField.call(this);
+                });
+                
+                // Time input format helper
+                timeInput.addEventListener('input', function(e) {
+                    let value = this.value.replace(/[^\d:]/g, '');
+                    if (value.length === 2 && !value.includes(':')) {
+                        value = value + ':';
+                    }
+                    this.value = value.substring(0, 5);
                 });
             }
             
