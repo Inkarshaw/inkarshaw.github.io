@@ -1870,6 +1870,114 @@
         </div>
     </div>
 
+    <!-- Practice Questions Modal for Fundamental Duties -->
+    <div class="modal-overlay" id="dutiesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Fundamental Duties Practice Questions</h2>
+                <button class="close-modal" id="closeDutiesModal">&times;</button>
+            </div>
+            
+            <div class="quiz-settings" id="dutiesQuizSettings">
+                <h3 class="settings-title">Configure Your Fundamental Duties Practice Session</h3>
+                
+                <div class="settings-options">
+                    <div class="setting-group">
+                        <h4>Question Selection Mode</h4>
+                        <div class="radio-options">
+                            <div class="radio-option">
+                                <input type="radio" id="dutiesModeAll" name="dutiesQuestionMode" value="all" checked>
+                                <label for="dutiesModeAll">All Questions</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="dutiesModeRandom" name="dutiesQuestionMode" value="random">
+                                <label for="dutiesModeRandom">Random Questions</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="dutiesModeRange" name="dutiesQuestionMode" value="range">
+                                <label for="dutiesModeRange">Question Range</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Quiz Mode</h4>
+                        <div class="radio-options">
+                            <div class="radio-option">
+                                <input type="radio" id="dutiesQuizNormal" name="dutiesQuizMode" value="normal">
+                                <label for="dutiesQuizNormal">Normal Mode (Modal)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="dutiesQuizFullscreen" name="dutiesQuizMode" value="fullscreen" checked>
+                                <label for="dutiesQuizFullscreen">Full Screen Mode</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Question Count</h4>
+                        <div id="dutiesRandomSettings" style="display: none;">
+                            <div class="question-count-input">
+                                <label for="dutiesQuestionCount">Number of Questions:</label>
+                                <input type="number" id="dutiesQuestionCount" min="1" max="100" value="10">
+                            </div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">
+                                Select how many random questions you want to practice.
+                            </p>
+                        </div>
+                        
+                        <div id="dutiesRangeSettings" style="display: none;">
+                            <div class="range-inputs">
+                                <div class="range-input">
+                                    <label for="dutiesStartQuestion">Start Question:</label>
+                                    <input type="number" id="dutiesStartQuestion" min="1" value="1">
+                                </div>
+                                <div class="range-input">
+                                    <label for="dutiesEndQuestion">End Question:</label>
+                                    <input type="number" id="dutiesEndQuestion" min="1" value="10">
+                                </div>
+                            </div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">
+                                Select the range of questions you want to practice.
+                            </p>
+                        </div>
+                        
+                        <div id="dutiesAllSettings">
+                            <p style="color: #475569; font-style: italic;">
+                                All available Fundamental Duties questions will be loaded for practice.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="start-quiz-btn" id="startDutiesQuiz">
+                        <i class="fas fa-play-circle"></i> Start Practice
+                    </button>
+                    <button class="cancel-btn" id="cancelDutiesSettings">Cancel</button>
+                </div>
+            </div>
+            
+            <div class="loading-spinner" id="dutiesLoadingSpinner">
+                <div class="spinner"></div>
+                <p>Loading Fundamental Duties questions from Google Sheets...</p>
+            </div>
+            
+            <div class="error-message" id="dutiesErrorMessage">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <h3>Failed to load questions</h3>
+                <p id="dutiesErrorText">Please try again later or contact support.</p>
+                <button class="nav-btn" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+            
+            <div id="dutiesQuizContainer" style="display: none;">
+                <!-- Normal mode quiz content would go here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Practice Questions Modal for Important Articles -->
     <div class="modal-overlay" id="practiceModal">
         <div class="modal-content">
@@ -2386,6 +2494,108 @@
         </div>
     </div>
 
+    <!-- Full Screen Quiz for Fundamental Duties -->
+    <div class="fullscreen-quiz" id="dutiesFullscreenQuiz">
+        <div class="quiz-header">
+            <div class="quiz-controls">
+                <div class="quiz-timer" id="dutiesQuizTimer">
+                    <i class="fas fa-clock"></i> Time: <span id="dutiesTimerValue">00:00</span>
+                </div>
+                <button class="exit-quiz-btn" id="exitDutiesQuiz">
+                    <i class="fas fa-times"></i> Exit Quiz
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-content" id="dutiesFullscreenQuizContent">
+            <div class="quiz-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="dutiesProgressFill"></div>
+                </div>
+                <div class="progress-info">
+                    <span>Question <span id="dutiesCurrentQuestionNum">1</span> of <span id="dutiesTotalQuestionsNum">0</span></span>
+                    <span id="dutiesAnsweredCount">0 answered</span>
+                </div>
+            </div>
+            
+            <div class="fullscreen-question-container">
+                <div class="fullscreen-question-text" id="dutiesFullscreenQuestionText"></div>
+                
+                <div class="fullscreen-options-container" id="dutiesFullscreenOptionsContainer"></div>
+                
+                <div class="fullscreen-explanation" id="dutiesFullscreenExplanation">
+                    <h4><i class="fas fa-lightbulb"></i> Explanation</h4>
+                    <p id="dutiesFullscreenExplanationText"></p>
+                </div>
+            </div>
+            
+            <div class="question-numbers" id="dutiesQuestionNumbers"></div>
+            
+            <div class="quiz-navigation">
+                <button class="fullscreen-nav-btn" id="dutiesPrevFullBtn">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                
+                <div class="nav-buttons">
+                    <button class="fullscreen-nav-btn" id="dutiesMarkForReview">
+                        <i class="fas fa-bookmark"></i> Mark for Review
+                    </button>
+                    <button class="fullscreen-nav-btn" id="dutiesClearResponse">
+                        <i class="fas fa-eraser"></i> Clear Response
+                    </button>
+                    <button class="fullscreen-nav-btn submit-full-quiz" id="submitDutiesQuiz">
+                        <i class="fas fa-check-circle"></i> Submit Quiz
+                    </button>
+                </div>
+                
+                <button class="fullscreen-nav-btn" id="dutiesNextFullBtn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-results" id="dutiesQuizResults">
+            <div class="results-container">
+                <h2 class="results-title">Fundamental Duties Quiz Results</h2>
+                
+                <div class="score-circle" id="dutiesScoreCircle">
+                    <div class="score-circle-inner">
+                        <div class="score-percentage" id="dutiesScorePercentage">0%</div>
+                        <div class="score-text">Score</div>
+                    </div>
+                </div>
+                
+                <div class="results-details">
+                    <div class="result-stat correct-stat">
+                        <h4>Correct Answers</h4>
+                        <p id="dutiesCorrectAnswers">0</p>
+                    </div>
+                    <div class="result-stat incorrect-stat">
+                        <h4>Incorrect Answers</h4>
+                        <p id="dutiesIncorrectAnswers">0</p>
+                    </div>
+                    <div class="result-stat">
+                        <h4>Total Questions</h4>
+                        <p id="dutiesTotalResultQuestions">0</p>
+                    </div>
+                    <div class="result-stat">
+                        <h4>Time Taken</h4>
+                        <p id="dutiesTimeTaken">00:00</p>
+                    </div>
+                </div>
+                
+                <div class="results-actions">
+                    <button class="action-btn retry-btn" id="dutiesRetryQuiz">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                    <button class="action-btn review-btn" id="dutiesReviewQuiz">
+                        <i class="fas fa-eye"></i> Review Answers
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Full Screen Quiz for Important Articles -->
     <div class="fullscreen-quiz" id="fullscreenQuiz">
         <div class="quiz-header">
@@ -2542,6 +2752,7 @@
         const PREAMBLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo0olme-uM2pKfeihs2wI88bjyT7O3d5cKwFKiLZUXzQF1dwutx8ci80BeX8bvpfp9zAK31uGn2vRN/pub?output=csv';
         const CITIZENSHIP_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTArgFXO2ruYakaftJnxqdtFNGpOcumKIY9g-bS8IiD1UmtGe2kYzM_iGz0yB6TvPCj1fdkzxOn1IVC/pub?output=csv';
         const RIGHTS_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPDpTq4wzLhe5cHyEGIagNQcSkKAVSV3DX9Z5_Ve02hDToBl95YFCO25lyvdsVNgbbTPcOiMoeCsO8/pub?output=csv';
+        const DUTIES_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgJ7FjnJ5ytSOmICT26JxYIn3WVtBkZCpsn5m74bx0AUbn3uWWKt5d9hLNfRj3YIz5viw3rNWw_54D/pub?output=csv';
         const ARTICLES_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv';
         
         // Variables for Constitution of India
@@ -2595,6 +2806,19 @@
         let rightsQuizStartTime = null;
         let rightsTimerInterval = null;
         let rightsElapsedTime = 0;
+        
+        // Variables for Fundamental Duties
+        let dutiesQuestions = [];
+        let dutiesFilteredQuestions = [];
+        let dutiesCurrentQuestionIndex = 0;
+        let dutiesUserAnswers = [];
+        let dutiesMarkedQuestions = [];
+        let dutiesQuizSubmitted = false;
+        let dutiesCurrentMode = 'all';
+        let dutiesQuizMode = 'fullscreen';
+        let dutiesQuizStartTime = null;
+        let dutiesTimerInterval = null;
+        let dutiesElapsedTime = 0;
         
         // Variables for Important Articles
         let allQuestions = [];
@@ -2792,6 +3016,52 @@
         const rightsEndQuestionInput = document.getElementById('rightsEndQuestion');
         const startRightsQuizBtn = document.getElementById('startRightsQuiz');
         const cancelRightsSettingsBtn = document.getElementById('cancelRightsSettings');
+        
+        // DOM Elements for Fundamental Duties
+        const dutiesModal = document.getElementById('dutiesModal');
+        const closeDutiesModal = document.getElementById('closeDutiesModal');
+        const dutiesQuizSettings = document.getElementById('dutiesQuizSettings');
+        const dutiesLoadingSpinner = document.getElementById('dutiesLoadingSpinner');
+        const dutiesErrorMessage = document.getElementById('dutiesErrorMessage');
+        const dutiesErrorText = document.getElementById('dutiesErrorText');
+        const dutiesFullscreenQuiz = document.getElementById('dutiesFullscreenQuiz');
+        const exitDutiesQuizBtn = document.getElementById('exitDutiesQuiz');
+        const dutiesQuizTimer = document.getElementById('dutiesTimerValue');
+        const dutiesProgressFill = document.getElementById('dutiesProgressFill');
+        const dutiesCurrentQuestionNum = document.getElementById('dutiesCurrentQuestionNum');
+        const dutiesTotalQuestionsNum = document.getElementById('dutiesTotalQuestionsNum');
+        const dutiesAnsweredCount = document.getElementById('dutiesAnsweredCount');
+        const dutiesFullscreenQuestionText = document.getElementById('dutiesFullscreenQuestionText');
+        const dutiesFullscreenOptionsContainer = document.getElementById('dutiesFullscreenOptionsContainer');
+        const dutiesFullscreenExplanation = document.getElementById('dutiesFullscreenExplanation');
+        const dutiesFullscreenExplanationText = document.getElementById('dutiesFullscreenExplanationText');
+        const dutiesQuestionNumbers = document.getElementById('dutiesQuestionNumbers');
+        const dutiesPrevFullBtn = document.getElementById('dutiesPrevFullBtn');
+        const dutiesNextFullBtn = document.getElementById('dutiesNextFullBtn');
+        const dutiesMarkForReviewBtn = document.getElementById('dutiesMarkForReview');
+        const dutiesClearResponseBtn = document.getElementById('dutiesClearResponse');
+        const submitDutiesQuizBtn = document.getElementById('submitDutiesQuiz');
+        const dutiesQuizResults = document.getElementById('dutiesQuizResults');
+        const dutiesScoreCircle = document.getElementById('dutiesScoreCircle');
+        const dutiesScorePercentage = document.getElementById('dutiesScorePercentage');
+        const dutiesCorrectAnswers = document.getElementById('dutiesCorrectAnswers');
+        const dutiesIncorrectAnswers = document.getElementById('dutiesIncorrectAnswers');
+        const dutiesTotalResultQuestions = document.getElementById('dutiesTotalResultQuestions');
+        const dutiesTimeTaken = document.getElementById('dutiesTimeTaken');
+        const dutiesRetryQuizBtn = document.getElementById('dutiesRetryQuiz');
+        const dutiesReviewQuizBtn = document.getElementById('dutiesReviewQuiz');
+        
+        // Settings Elements for Fundamental Duties
+        const dutiesQuestionModeRadios = document.querySelectorAll('input[name="dutiesQuestionMode"]');
+        const dutiesQuizModeRadios = document.querySelectorAll('input[name="dutiesQuizMode"]');
+        const dutiesRandomSettings = document.getElementById('dutiesRandomSettings');
+        const dutiesRangeSettings = document.getElementById('dutiesRangeSettings');
+        const dutiesAllSettings = document.getElementById('dutiesAllSettings');
+        const dutiesQuestionCountInput = document.getElementById('dutiesQuestionCount');
+        const dutiesStartQuestionInput = document.getElementById('dutiesStartQuestion');
+        const dutiesEndQuestionInput = document.getElementById('dutiesEndQuestion');
+        const startDutiesQuizBtn = document.getElementById('startDutiesQuiz');
+        const cancelDutiesSettingsBtn = document.getElementById('cancelDutiesSettings');
         
         // DOM Elements for Important Articles
         const practiceModal = document.getElementById('practiceModal');
@@ -2999,6 +3269,45 @@
             }
         });
         
+        // Event Listeners for Fundamental Duties
+        document.querySelector('.duties-btn').addEventListener('click', showDutiesQuizSettings);
+        
+        closeDutiesModal.addEventListener('click', closeDutiesPracticeModal);
+        startDutiesQuizBtn.addEventListener('click', startDutiesQuiz);
+        cancelDutiesSettingsBtn.addEventListener('click', closeDutiesPracticeModal);
+        
+        // Full Screen Quiz Event Listeners for Fundamental Duties
+        exitDutiesQuizBtn.addEventListener('click', exitDutiesFullscreenQuiz);
+        dutiesPrevFullBtn.addEventListener('click', showDutiesPreviousFullQuestion);
+        dutiesNextFullBtn.addEventListener('click', showDutiesNextFullQuestion);
+        dutiesMarkForReviewBtn.addEventListener('click', toggleDutiesMarkForReview);
+        dutiesClearResponseBtn.addEventListener('click', clearDutiesCurrentResponse);
+        submitDutiesQuizBtn.addEventListener('click', submitDutiesQuiz);
+        dutiesRetryQuizBtn.addEventListener('click', retryDutiesQuiz);
+        dutiesReviewQuizBtn.addEventListener('click', reviewDutiesQuiz);
+        
+        // Question mode radio button change listeners for Fundamental Duties
+        dutiesQuestionModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                dutiesCurrentMode = this.value;
+                updateDutiesSettingsVisibility();
+            });
+        });
+        
+        // Quiz mode radio button change listeners for Fundamental Duties
+        dutiesQuizModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                dutiesQuizMode = this.value;
+            });
+        });
+        
+        // Close modal when clicking outside for Fundamental Duties
+        dutiesModal.addEventListener('click', function(e) {
+            if (e.target === dutiesModal) {
+                closeDutiesPracticeModal();
+            }
+        });
+        
         // Event Listeners for Important Articles
         document.getElementById('practiceArticles').addEventListener('click', showQuizSettings);
         
@@ -3043,6 +3352,7 @@
         updatePreambleSettingsVisibility();
         updateCitizenshipSettingsVisibility();
         updateRightsSettingsVisibility();
+        updateDutiesSettingsVisibility();
         updateSettingsVisibility();
         
         // Header scrolling functionality
@@ -3125,9 +3435,7 @@
                 if (constitutionQuizMode === 'fullscreen') {
                     startConstitutionFullscreenQuiz();
                 } else {
-                    // For normal mode, you could implement modal-based quiz
-                    // For now, we'll default to fullscreen
-                    startConstitutionFullscreenQuiz();
+                    startConstitutionFullscreenQuiz(); // Defaulting to fullscreen for now
                 }
                 
             } catch (error) {
@@ -3520,7 +3828,6 @@
                 if (preambleQuizMode === 'fullscreen') {
                     startPreambleFullscreenQuiz();
                 } else {
-                    // For normal mode, you could implement modal-based quiz
                     startPreambleFullscreenQuiz(); // Defaulting to fullscreen for now
                 }
                 
@@ -3914,7 +4221,6 @@
                 if (citizenshipQuizMode === 'fullscreen') {
                     startCitizenshipFullscreenQuiz();
                 } else {
-                    // For normal mode, you could implement modal-based quiz
                     startCitizenshipFullscreenQuiz(); // Defaulting to fullscreen for now
                 }
                 
@@ -4308,7 +4614,6 @@
                 if (rightsQuizMode === 'fullscreen') {
                     startRightsFullscreenQuiz();
                 } else {
-                    // For normal mode, you could implement modal-based quiz
                     startRightsFullscreenQuiz(); // Defaulting to fullscreen for now
                 }
                 
@@ -4637,6 +4942,399 @@
             }
         }
         
+        // Functions for Fundamental Duties
+        function showDutiesQuizSettings() {
+            showModal(dutiesModal);
+            dutiesQuizSettings.style.display = 'block';
+            dutiesLoadingSpinner.style.display = 'none';
+            dutiesErrorMessage.style.display = 'none';
+        }
+        
+        function updateDutiesSettingsVisibility() {
+            dutiesRandomSettings.style.display = 'none';
+            dutiesRangeSettings.style.display = 'none';
+            dutiesAllSettings.style.display = 'none';
+            
+            switch(dutiesCurrentMode) {
+                case 'random':
+                    dutiesRandomSettings.style.display = 'block';
+                    break;
+                case 'range':
+                    dutiesRangeSettings.style.display = 'block';
+                    break;
+                case 'all':
+                    dutiesAllSettings.style.display = 'block';
+                    break;
+            }
+        }
+        
+        async function startDutiesQuiz() {
+            try {
+                // Fetch data from Google Sheets if not already loaded
+                if (dutiesQuestions.length === 0) {
+                    dutiesLoadingSpinner.style.display = 'block';
+                    dutiesQuizSettings.style.display = 'none';
+                    
+                    const response = await fetch(DUTIES_SHEETS_URL);
+                    if (!response.ok) throw new Error('Failed to fetch Fundamental Duties questions');
+                    
+                    const csvData = await response.text();
+                    dutiesQuestions = parseCSVToQuestions(csvData);
+                    
+                    if (dutiesQuestions.length === 0) {
+                        throw new Error('No Fundamental Duties questions found in the sheet. Please check the sheet format.');
+                    }
+                }
+                
+                // Filter questions based on selected mode
+                dutiesFilteredQuestions = filterDutiesQuestionsByMode(dutiesQuestions);
+                
+                if (dutiesFilteredQuestions.length === 0) {
+                    throw new Error('No Fundamental Duties questions match your selected criteria. Please adjust your settings.');
+                }
+                
+                // Initialize quiz state
+                dutiesUserAnswers = new Array(dutiesFilteredQuestions.length).fill(null);
+                dutiesMarkedQuestions = new Array(dutiesFilteredQuestions.length).fill(false);
+                dutiesQuizSubmitted = false;
+                dutiesCurrentQuestionIndex = 0;
+                dutiesElapsedTime = 0;
+                
+                // Close settings modal
+                closeDutiesPracticeModal();
+                
+                // Start quiz in selected mode
+                if (dutiesQuizMode === 'fullscreen') {
+                    startDutiesFullscreenQuiz();
+                } else {
+                    startDutiesFullscreenQuiz(); // Defaulting to fullscreen for now
+                }
+                
+            } catch (error) {
+                console.error('Error starting Fundamental Duties quiz:', error);
+                dutiesLoadingSpinner.style.display = 'none';
+                dutiesErrorMessage.style.display = 'block';
+                dutiesErrorText.textContent = error.message || 'Failed to load Fundamental Duties questions. Please check your settings and try again.';
+            }
+        }
+        
+        function startDutiesFullscreenQuiz() {
+            // Hide website header
+            document.getElementById('headerWrapper').classList.add('quiz-hidden');
+            document.body.classList.add('quiz-active');
+            
+            // Show fullscreen quiz
+            dutiesFullscreenQuiz.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize UI
+            dutiesTotalQuestionsNum.textContent = dutiesFilteredQuestions.length;
+            updateDutiesQuestionNumbers();
+            updateDutiesProgress();
+            
+            // Start timer
+            dutiesQuizStartTime = Date.now();
+            startDutiesTimer();
+            
+            // Show first question
+            showDutiesFullQuestion(dutiesCurrentQuestionIndex);
+        }
+        
+        function startDutiesTimer() {
+            clearInterval(dutiesTimerInterval);
+            dutiesTimerInterval = setInterval(updateDutiesTimer, 1000);
+        }
+        
+        function updateDutiesTimer() {
+            dutiesElapsedTime++;
+            const minutes = Math.floor(dutiesElapsedTime / 60);
+            const seconds = dutiesElapsedTime % 60;
+            dutiesQuizTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function showDutiesFullQuestion(index) {
+            if (index < 0 || index >= dutiesFilteredQuestions.length) return;
+            
+            dutiesCurrentQuestionIndex = index;
+            const question = dutiesFilteredQuestions[index];
+            
+            // Update question text
+            dutiesFullscreenQuestionText.textContent = `${question.id}. ${question.text}`;
+            
+            // Update options
+            dutiesFullscreenOptionsContainer.innerHTML = '';
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            
+            optionLetters.forEach((letter, i) => {
+                const option = document.createElement('div');
+                option.className = 'fullscreen-option';
+                
+                if (dutiesUserAnswers[index] === letter) {
+                    option.classList.add('selected');
+                }
+                
+                option.innerHTML = `
+                    <div class="fullscreen-option-letter">${letter}</div>
+                    <div class="fullscreen-option-text">${question.options[i] || 'Option not provided'}</div>
+                `;
+                
+                if (!dutiesQuizSubmitted) {
+                    option.addEventListener('click', () => selectDutiesFullOption(letter));
+                }
+                dutiesFullscreenOptionsContainer.appendChild(option);
+            });
+            
+            // Update explanation
+            dutiesFullscreenExplanationText.textContent = question.explanation;
+            
+            // Hide explanation initially
+            dutiesFullscreenExplanation.style.display = 'none';
+            
+            // Update navigation buttons
+            dutiesCurrentQuestionNum.textContent = index + 1;
+            dutiesPrevFullBtn.disabled = index === 0;
+            dutiesNextFullBtn.disabled = index === dutiesFilteredQuestions.length - 1;
+            
+            // Update mark button
+            dutiesMarkForReviewBtn.innerHTML = dutiesMarkedQuestions[index] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+            
+            // Update question numbers highlight
+            updateDutiesQuestionNumbers();
+            updateDutiesProgress();
+        }
+        
+        function selectDutiesFullOption(selectedLetter) {
+            if (dutiesQuizSubmitted) return;
+            
+            // Remove selected class from all options
+            document.querySelectorAll('#dutiesFullscreenOptionsContainer .fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            const selectedOption = document.querySelectorAll('#dutiesFullscreenOptionsContainer .fullscreen-option')[selectedLetter.charCodeAt(0) - 65];
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            
+            // Store user's answer
+            dutiesUserAnswers[dutiesCurrentQuestionIndex] = selectedLetter;
+            
+            // Show explanation if quiz is submitted
+            if (dutiesQuizSubmitted) {
+                showDutiesCorrectAnswer();
+            }
+            
+            // Update progress
+            updateDutiesProgress();
+            updateDutiesQuestionNumbers();
+        }
+        
+        function showDutiesCorrectAnswer() {
+            const question = dutiesFilteredQuestions[dutiesCurrentQuestionIndex];
+            const options = document.querySelectorAll('#dutiesFullscreenOptionsContainer .fullscreen-option');
+            
+            options.forEach((option, index) => {
+                const letter = String.fromCharCode(65 + index);
+                if (letter === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else if (dutiesUserAnswers[dutiesCurrentQuestionIndex] === letter && dutiesUserAnswers[dutiesCurrentQuestionIndex] !== question.correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            dutiesFullscreenExplanation.style.display = 'block';
+        }
+        
+        function showDutiesPreviousFullQuestion() {
+            if (dutiesCurrentQuestionIndex > 0) {
+                showDutiesFullQuestion(dutiesCurrentQuestionIndex - 1);
+            }
+        }
+        
+        function showDutiesNextFullQuestion() {
+            if (dutiesCurrentQuestionIndex < dutiesFilteredQuestions.length - 1) {
+                showDutiesFullQuestion(dutiesCurrentQuestionIndex + 1);
+            }
+        }
+        
+        function toggleDutiesMarkForReview() {
+            dutiesMarkedQuestions[dutiesCurrentQuestionIndex] = !dutiesMarkedQuestions[dutiesCurrentQuestionIndex];
+            updateDutiesQuestionNumbers();
+            
+            // Update button text
+            dutiesMarkForReviewBtn.innerHTML = dutiesMarkedQuestions[dutiesCurrentQuestionIndex] 
+                ? '<i class="fas fa-bookmark"></i> Unmark' 
+                : '<i class="fas fa-bookmark"></i> Mark for Review';
+        }
+        
+        function clearDutiesCurrentResponse() {
+            if (dutiesQuizSubmitted) return;
+            
+            dutiesUserAnswers[dutiesCurrentQuestionIndex] = null;
+            document.querySelectorAll('#dutiesFullscreenOptionsContainer .fullscreen-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            updateDutiesProgress();
+            updateDutiesQuestionNumbers();
+        }
+        
+        function updateDutiesProgress() {
+            const answered = dutiesUserAnswers.filter(answer => answer !== null).length;
+            const total = dutiesFilteredQuestions.length;
+            const percentage = (answered / total) * 100;
+            
+            dutiesProgressFill.style.width = `${percentage}%`;
+            dutiesAnsweredCount.textContent = `${answered} answered`;
+        }
+        
+        function updateDutiesQuestionNumbers() {
+            dutiesQuestionNumbers.innerHTML = '';
+            
+            dutiesFilteredQuestions.forEach((_, index) => {
+                const numberBtn = document.createElement('div');
+                numberBtn.className = 'question-number';
+                
+                if (index === dutiesCurrentQuestionIndex) {
+                    numberBtn.classList.add('current');
+                } else if (dutiesUserAnswers[index] !== null) {
+                    numberBtn.classList.add('answered');
+                }
+                
+                if (dutiesMarkedQuestions[index]) {
+                    numberBtn.classList.add('marked');
+                }
+                
+                numberBtn.textContent = index + 1;
+                numberBtn.addEventListener('click', () => {
+                    showDutiesFullQuestion(index);
+                });
+                
+                dutiesQuestionNumbers.appendChild(numberBtn);
+            });
+        }
+        
+        function submitDutiesQuiz() {
+            if (confirm('Are you sure you want to submit the Fundamental Duties quiz? You cannot change answers after submission.')) {
+                dutiesQuizSubmitted = true;
+                clearInterval(dutiesTimerInterval);
+                
+                // Calculate results
+                let correctCount = 0;
+                dutiesFilteredQuestions.forEach((question, index) => {
+                    if (dutiesUserAnswers[index] === question.correctAnswer) {
+                        correctCount++;
+                    }
+                });
+                
+                // Show results
+                showDutiesResults(correctCount);
+            }
+        }
+        
+        function showDutiesResults(correctCount) {
+            const total = dutiesFilteredQuestions.length;
+            const percentage = Math.round((correctCount / total) * 100);
+            const incorrectCount = total - correctCount;
+            const totalTime = formatTime(dutiesElapsedTime);
+            
+            // Update results UI
+            dutiesScoreCircle.style.setProperty('--percentage', `${percentage}%`);
+            dutiesScorePercentage.textContent = `${percentage}%`;
+            dutiesCorrectAnswers.textContent = correctCount;
+            dutiesIncorrectAnswers.textContent = incorrectCount;
+            dutiesTotalResultQuestions.textContent = total;
+            dutiesTimeTaken.textContent = totalTime;
+            
+            // Show results, hide quiz content
+            document.getElementById('dutiesFullscreenQuizContent').style.display = 'none';
+            dutiesQuizResults.style.display = 'block';
+        }
+        
+        function exitDutiesFullscreenQuiz() {
+            if (!dutiesQuizSubmitted && confirm('Are you sure you want to exit? Your Fundamental Duties quiz progress will be lost.')) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                dutiesFullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                clearInterval(dutiesTimerInterval);
+                resetDutiesQuizState();
+            } else if (dutiesQuizSubmitted) {
+                // Show website header again
+                document.getElementById('headerWrapper').classList.remove('quiz-hidden');
+                document.body.classList.remove('quiz-active');
+                
+                dutiesFullscreenQuiz.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                resetDutiesQuizState();
+            }
+        }
+        
+        function retryDutiesQuiz() {
+            // Reset quiz state and restart
+            resetDutiesQuizState();
+            dutiesQuizResults.style.display = 'none';
+            document.getElementById('dutiesFullscreenQuizContent').style.display = 'block';
+            startDutiesFullscreenQuiz();
+        }
+        
+        function reviewDutiesQuiz() {
+            // Go back to quiz with answers shown
+            dutiesQuizResults.style.display = 'none';
+            document.getElementById('dutiesFullscreenQuizContent').style.display = 'block';
+            
+            // Show correct answers for all questions
+            dutiesQuizSubmitted = true;
+            showDutiesFullQuestion(dutiesCurrentQuestionIndex);
+            showDutiesCorrectAnswer();
+        }
+        
+        function resetDutiesQuizState() {
+            dutiesFilteredQuestions = [];
+            dutiesUserAnswers = [];
+            dutiesMarkedQuestions = [];
+            dutiesQuizSubmitted = false;
+            dutiesCurrentQuestionIndex = 0;
+            dutiesElapsedTime = 0;
+            clearInterval(dutiesTimerInterval);
+        }
+        
+        function filterDutiesQuestionsByMode(questions) {
+            switch(dutiesCurrentMode) {
+                case 'all':
+                    return [...questions];
+                    
+                case 'random':
+                    const count = parseInt(dutiesQuestionCountInput.value) || 10;
+                    const maxCount = Math.min(count, questions.length);
+                    
+                    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+                    return shuffled.slice(0, maxCount);
+                    
+                case 'range':
+                    let start = parseInt(dutiesStartQuestionInput.value) || 1;
+                    let end = parseInt(dutiesEndQuestionInput.value) || 10;
+                    
+                    if (start < 1) start = 1;
+                    if (end > questions.length) end = questions.length;
+                    if (start > end) {
+                        [start, end] = [end, start];
+                        dutiesStartQuestionInput.value = start;
+                        dutiesEndQuestionInput.value = end;
+                    }
+                    
+                    return questions.slice(start - 1, end);
+                    
+                default:
+                    return questions;
+            }
+        }
+        
         // Functions for Important Articles
         function showQuizSettings() {
             showModal(practiceModal);
@@ -4702,9 +5400,7 @@
                 if (quizMode === 'fullscreen') {
                     startFullscreenQuiz();
                 } else {
-                    // For normal mode, you could implement modal-based quiz
-                    // For now, we'll default to fullscreen
-                    startFullscreenQuiz();
+                    startFullscreenQuiz(); // Defaulting to fullscreen for now
                 }
                 
             } catch (error) {
@@ -5118,6 +5814,11 @@
             document.body.style.overflow = 'auto';
         }
         
+        function closeDutiesPracticeModal() {
+            dutiesModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
         function closePracticeModal() {
             practiceModal.style.display = 'none';
             document.body.style.overflow = 'auto';
@@ -5134,8 +5835,8 @@
             window.location.href = 'tnpsc-topics.html';
         });
         
-        // Practice button click handlers for other topics (except Constitution, Preamble, Citizenship, Fundamental Rights and Important Articles)
-        document.querySelectorAll('.practice-btn:not(.constitution-btn):not(.preamble-btn):not(.citizenship-btn):not(.rights-btn):not(#practiceArticles)').forEach(button => {
+        // Practice button click handlers for other topics
+        document.querySelectorAll('.practice-btn:not(.constitution-btn):not(.preamble-btn):not(.citizenship-btn):not(.rights-btn):not(.duties-btn):not(#practiceArticles)').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
                 const subtopicName = this.parentElement.querySelector('h3').textContent;
@@ -5211,6 +5912,23 @@
             });
         }
         
+        // Initialize range input validation for Fundamental Duties
+        if (dutiesEndQuestionInput) {
+            dutiesEndQuestionInput.addEventListener('input', function() {
+                if (parseInt(this.value) < parseInt(dutiesStartQuestionInput.value)) {
+                    dutiesStartQuestionInput.value = this.value;
+                }
+            });
+        }
+        
+        if (dutiesStartQuestionInput) {
+            dutiesStartQuestionInput.addEventListener('input', function() {
+                if (parseInt(this.value) > parseInt(dutiesEndQuestionInput.value)) {
+                    dutiesEndQuestionInput.value = this.value;
+                }
+            });
+        }
+        
         // Initialize range input validation for Important Articles
         if (endQuestionInput) {
             endQuestionInput.addEventListener('input', function() {
@@ -5228,21 +5946,15 @@
             });
         }
         
-        // Initialize all radio buttons
-        document.querySelectorAll('input[type="radio"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                // Update any UI elements if needed
-            });
-        });
-        
         console.log('TNPSC Indian Polity Page Loaded Successfully!');
         console.log('Available Quizzes:');
         console.log('1. Constitution of India');
         console.log('2. Preamble');
         console.log('3. Citizenship');
-        console.log('4. Fundamental Rights (using your provided Google Sheets link)');
-        console.log('5. Important Articles');
-        console.log('Total working quizzes: 5 out of 25 topics');
+        console.log('4. Fundamental Rights');
+        console.log('5. Fundamental Duties (using your provided Google Sheets link)');
+        console.log('6. Important Articles');
+        console.log('Total working quizzes: 6 out of 25 topics');
     </script>
 </body>
 </html>
