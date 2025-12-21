@@ -283,6 +283,7 @@
             border: 1px solid #feb2b2;
         }
         
+        /* PREVIEW STYLES - ALL TEXT BLACK */
         .document-preview {
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -303,19 +304,19 @@
             text-decoration: underline;
             margin-bottom: 20px;
             font-size: 1.5rem;
-            color: var(--primary-color);
+            color: #000000 !important;
         }
         
         .document-table {
             width: 100%;
             border-collapse: collapse;
-            border: 2px solid var(--primary-color);
+            border: 2px solid #000000 !important;
             table-layout: fixed;
             margin-bottom: 20px;
         }
         
         .document-table td {
-            border: 1px solid var(--primary-color);
+            border: 1px solid #000000 !important;
             padding: 12px;
             vertical-align: top;
             word-wrap: break-word;
@@ -338,10 +339,11 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
-            color: #000000 !important;
         }
         
-        .document-table .right-column * {
+        /* FORCE ALL TEXT BLACK IN PREVIEW */
+        .document-preview,
+        .document-preview * {
             color: #000000 !important;
         }
         
@@ -360,7 +362,7 @@
         
         .preview-field.empty:before {
             content: attr(placeholder);
-            color: #a0aec0;
+            color: #a0aec0 !important;
         }
         
         .time-container {
@@ -383,10 +385,6 @@
             text-align: center;
             margin: 0;
             border: none;
-        }
-        
-        .time-field.empty {
-            color: #ffffff !important;
         }
         
         .time-field.empty:before {
@@ -431,7 +429,7 @@
         
         .embedded-field.empty:before {
             content: attr(placeholder);
-            color: #a0aec0;
+            color: #a0aec0 !important;
         }
         
         .action-buttons {
@@ -442,10 +440,6 @@
         
         .action-buttons .btn {
             flex: 1;
-        }
-        
-        .hidden {
-            display: none;
         }
         
         .language-selector {
@@ -472,12 +466,6 @@
         
         .language-content.active {
             display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
         
         .help-text {
@@ -489,104 +477,6 @@
         .required:after {
             content: ' *';
             color: var(--danger-color);
-        }
-        
-        .designation-select {
-            width: 100%;
-        }
-        
-        .officer-details {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        
-        @media (max-width: 600px) {
-            .officer-details {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .accused-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        @media (max-width: 600px) {
-            .accused-details {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .pdf-mode .preview-field,
-        .pdf-mode .embedded-field,
-        .pdf-mode .time-field {
-            border-bottom: none !important;
-        }
-        
-        .document-table td {
-            overflow: hidden;
-        }
-        
-        .compact-line {
-            margin-bottom: 5px;
-            line-height: 1.3;
-        }
-        
-        .compact-field {
-            margin: 3px 0;
-            min-height: 18px;
-        }
-        
-        .middle-column-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
-        
-        .officer-container-preview {
-            margin-bottom: 4px;
-            display: flex;
-            align-items: flex-start;
-            gap: 1px;
-        }        
-        .officer-number {
-            min-width: 1px;
-            margin-top: 0;
-        }
-
-        .officer-designation,
-        .officer-name {
-            margin-top: 0;
-            margin-bottom: 2px;
-        }
-        
-        .officer-details-preview {
-            flex: 1;
-        }
-        
-        .officer-top-line {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 2px;
-        }
-        
-        .officer-designation {
-            min-width: 80px;
-            flex-shrink: 0;
-        }
-        
-        .officer-name {
-            width: 100%;
-            margin-top: 2px;
-        }
-        
-        .hidden-field {
-            display: none !important;
         }
         
         .error-message {
@@ -604,22 +494,6 @@
         .input-success {
             border-color: var(--success-color);
             box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
-        }
-        
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #document-to-print, #document-to-print * {
-                visibility: visible;
-            }
-            #document-to-print {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-            }
         }
         
         .spinner {
@@ -649,7 +523,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             display: none;
             z-index: 1000;
-            animation: slideIn 0.5s ease;
         }
         
         .format-example {
@@ -657,50 +530,6 @@
             color: #718096;
             margin-top: 5px;
             font-style: italic;
-        }
-        
-        .content-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 10px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        
-        .content-status.available {
-            background-color: #f0fff4;
-            color: #22543d;
-            border: 1px solid #9ae6b4;
-        }
-        
-        .content-status.unavailable {
-            background-color: #fff5f5;
-            color: #742a2a;
-            border: 1px solid #feb2b2;
-        }
-        
-        .content-status-icon {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-        
-        .content-status.available .content-status-icon {
-            background-color: #38a169;
-            color: white;
-        }
-        
-        .content-status.unavailable .content-status-icon {
-            background-color: #e53e3e;
-            color: white;
         }
         
         .court-input-group {
@@ -715,196 +544,28 @@
             }
         }
         
-        /* Ensure proper spacing between paragraphs */
-        .content-text + .content-text {
-            margin-top: 10px;
+        .compact-field {
+            margin: 3px 0;
+            min-height: 18px;
         }
         
-        /* Fix for long text wrapping in embedded fields */
-        .embedded-field.long-text {
-            white-space: normal;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            display: inline-block;
-            max-width: 100%;
-        }
-        
-        /* Auto-calculation indicator */
-        .auto-calculation {
+        .middle-column-content {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            margin-top: 5px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            background-color: #f0f9ff;
-            color: #1a365d;
-            border: 1px solid #bee3f8;
+            justify-content: center;
+            height: 100%;
         }
         
-        .auto-calculation i {
-            color: #3182ce;
-        }
-
-        /* Enhanced PDF styling */
-        .pdf-mode {
-            transform: scale(1) !important;
-            transform-origin: top left !important;
-            width: 595px !important;
-            height: 842px !important;
-            background: white !important;
-            box-shadow: none !important;
-            border: 1px solid #000 !important;
-            margin: 0 !important;
-            padding: 20px !important;
-            box-sizing: border-box !important;
+        .officer-container-preview {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 1px;
         }
         
-        .pdf-mode .document-table {
-            border: 2px solid #000000 !important;
-            background: white !important;
-        }
-        
-        .pdf-mode .document-table td {
-            border: 1px solid #000000 !important;
-            background: white !important;
-            color: #000000 !important;
-            font-size: 13px !important;
-            line-height: 1.4 !important;
-        }
-        
-        /* FIX FOR THIRD COLUMN TEXT COLOR - MORE DIRECT APPROACH */
-        .pdf-mode .right-column,
-        .pdf-mode .right-column *,
-        .pdf-mode .right-column .content-text,
-        .pdf-mode .right-column .embedded-field,
-        .pdf-mode .right-column .preview-field,
-        .pdf-mode .right-column .time-field,
-        .pdf-mode .right-column .time-suffix {
-            color: #000000 !important;
-            -webkit-text-fill-color: #000000 !important;
-            text-shadow: none !important;
-            filter: none !important;
-            background: transparent !important;
-            opacity: 1 !important;
-        }
-        
-        /* Remove any placeholder styling in PDF mode */
-        .pdf-mode .right-column .preview-field.empty:before,
-        .pdf-mode .right-column .embedded-field.empty:before {
-            color: #000000 !important;
-            opacity: 0.3 !important;
-        }
-        
-        /* Ensure all text in the entire document is black */
-        #document-to-print.pdf-mode,
-        #document-to-print.pdf-mode *,
-        #document-to-print.pdf-mode .document-table,
-        #document-to-print.pdf-mode .document-table *,
-        #document-to-print.pdf-mode .content-text,
-        #document-to-print.pdf-mode .embedded-field,
-        #document-to-print.pdf-mode .preview-field,
-        #document-to-print.pdf-mode .time-field,
-        #document-to-print.pdf-mode .time-suffix {
-            color: #000000 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            background: #ffffff !important;
-        }
-        
-        /* Specifically target the content text in right column */
-        #document-to-print.pdf-mode .right-column .content-text {
-            color: #000000 !important;
-            -webkit-text-fill-color: #000000 !important;
-            text-align: justify !important;
-        }
-        
-        /* Remove any inherited colors */
-        #document-to-print.pdf-mode .right-column span,
-        #document-to-print.pdf-mode .right-column div,
-        #document-to-print.pdf-mode .right-column p {
-            color: #000000 !important;
-            -webkit-text-fill-color: #000000 !important;
-        }
-        
-        /* Override any CSS variable colors */
-        #document-to-print.pdf-mode .right-column,
-        #document-to-print.pdf-mode .right-column * {
-            --primary-color: #000000 !important;
-            --secondary-color: #000000 !important;
-            color: #000000 !important;
-        }
-        
-        /* Ensure all PDF content has black text */
-        @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            #document-to-print,
-            #document-to-print * {
-                color: #000000 !important;
-                -webkit-text-fill-color: #000000 !important;
-                background: #ffffff !important;
-            }
-            
-            .right-column,
-            .right-column *,
-            .right-column span,
-            .right-column div,
-            .right-column p {
-                color: #000000 !important;
-                -webkit-text-fill-color: #000000 !important;
-            }
-            
-            .embedded-field,
-            .content-text,
-            .preview-field,
-            .time-field,
-            .time-suffix {
-                color: #000000 !important;
-                -webkit-text-fill-color: #000000 !important;
-            }
-        }
-        
-        /* Additional fix for PDF text color */
-        .pdf-mode .document-table *,
-        .pdf-mode .right-column * {
-            color: #000000 !important;
-            -webkit-text-fill-color: #000000 !important;
-            opacity: 1 !important;
-            filter: none !important;
-        }
-        
-        /* Specific fix for embedded fields in right column */
-        .pdf-mode .right-column .embedded-field {
-            color: #000000 !important;
-            -webkit-text-fill-color: #000000 !important;
-        }
-        
-        /* Remove placeholder styling in PDF mode */
-        .pdf-mode .empty:before {
-            color: #000000 !important;
-            opacity: 0.3 !important;
-        }
-        
-        /* PDF mode height and overflow fixes */
-        #document-to-print.pdf-mode,
-        #document-to-print.pdf-mode .document-preview {
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-        }
-        
-        #document-to-print.pdf-mode .document-table td,
-        #document-to-print.pdf-mode .right-column,
-        #document-to-print.pdf-mode .right-column * {
-            overflow: visible !important;
-            white-space: normal !important;
-            word-break: break-word !important;
+        .officer-details-preview {
+            flex: 1;
         }
     </style>
 </head>
@@ -1076,6 +737,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const { jsPDF } = window.jspdf;
+            
+            // DOM Elements
             const generateBtn = document.getElementById('generate-pdf');
             const printBtn = document.getElementById('print-document');
             const fillFormBtn = document.getElementById('fill-form');
@@ -1088,19 +751,29 @@
             const policeOfficersContainer = document.getElementById('police-officers-container');
             const accusedPersonsContainer = document.getElementById('accused-persons-container');
             const policeOfficersList = document.getElementById('police-officers-list');
-            const languageContents = document.querySelectorAll('.language-content');
-            const contentPlaceholder = document.getElementById('content-placeholder');
             const autoSaveIndicator = document.getElementById('auto-save-indicator');
-            const timeContainer = document.getElementById('time-container');
-            const timeSuffix = document.getElementById('time-suffix');
             const courtSelect = document.getElementById('court');
             const courtNumberInput = document.getElementById('courtNumber');
+            const previewElement = document.getElementById('document-to-print');
             
+            // Application State
             let officerCounter = 1;
             let accusedCounter = 1;
             let currentLanguage = 'tamil';
             let autoSaveTimeout;
             
+            // Initialize the application
+            function init() {
+                updatePoliceOfficers();
+                updateAccusedPersons();
+                updateLanguageContent();
+                initializeEventListeners();
+                loadSavedData();
+                
+                showNotification('Escort Passport Document Generator is ready!', 'success');
+            }
+            
+            // Notification system
             function showNotification(message, type) {
                 notification.textContent = message;
                 notification.className = 'notification ' + type;
@@ -1111,42 +784,10 @@
                 }, 5000);
             }
             
+            // Validation functions
             function isValidCrimeNumber(crimeNumber) {
                 const regex = /^\d+\/\d{4}$/;
                 return regex.test(crimeNumber);
-            }
-            
-            function formatCrimeNumber(input) {
-                let value = input.value.replace(/[^\d\/]/g, '');
-                
-                const parts = value.split('/');
-                if (parts.length > 2) {
-                    value = parts[0] + '/' + parts.slice(1).join('');
-                }
-                
-                if (value.length >= 4 && !value.includes('/')) {
-                    value = value.substring(0, value.length - 4) + '/' + value.substring(value.length - 4);
-                }
-                
-                input.value = value;
-            }
-            
-            function getOrdinalSuffix(num) {
-                if (!num || isNaN(num)) return '';
-                
-                const j = num % 10;
-                const k = num % 100;
-                
-                if (j === 1 && k !== 11) {
-                    return num + "st";
-                }
-                if (j === 2 && k !== 12) {
-                    return num + "nd";
-                }
-                if (j === 3 && k !== 13) {
-                    return num + "rd";
-                }
-                return num + "th";
             }
             
             function isValidDate(dateString) {
@@ -1161,7 +802,6 @@
                 if (year < 1000 || year > 3000 || month === 0 || month > 12) return false;
                 
                 const monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-                
                 if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) {
                     monthLength[1] = 29;
                 }
@@ -1175,157 +815,136 @@
                 return regex.test(timeString);
             }
             
-            function showError(inputId, message) {
-                const input = document.getElementById(inputId);
-                const errorElement = document.getElementById(`${inputId}-error`);
-                
-                input.classList.add('input-error');
-                input.classList.remove('input-success');
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-            }
-            
-            function hideError(inputId) {
-                const input = document.getElementById(inputId);
-                const errorElement = document.getElementById(`${inputId}-error`);
-                
-                input.classList.remove('input-error');
-                input.classList.add('input-success');
-                errorElement.style.display = 'none';
-            }
-            
+            // Form field validation
             function validateField() {
                 const fieldId = this.id;
                 const value = this.value.trim();
+                const field = document.getElementById(fieldId);
+                const errorElement = document.getElementById(`${fieldId}-error`);
                 
+                const showError = (message) => {
+                    field.classList.add('input-error');
+                    field.classList.remove('input-success');
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                    return false;
+                };
+                
+                const hideError = () => {
+                    field.classList.remove('input-error');
+                    field.classList.add('input-success');
+                    errorElement.style.display = 'none';
+                    return true;
+                };
+                
+                // Time validation (optional)
                 if (fieldId === 'time') {
                     if (value && !isValidTime(value)) {
-                        showError(fieldId, 'Please enter a valid time in HH:MM format or leave blank');
-                        return false;
-                    } else {
-                        hideError(fieldId);
-                        return true;
+                        return showError('Please enter a valid time in HH:MM format or leave blank');
                     }
+                    return hideError();
                 }
                 
-                if (!value) {
-                    if (this.hasAttribute('required')) {
-                        showError(fieldId, 'This field is required');
-                        return false;
-                    } else {
-                        hideError(fieldId);
-                        return true;
-                    }
+                // Required field check
+                if (!value && field.hasAttribute('required')) {
+                    return showError('This field is required');
                 }
                 
-                if (fieldId === 'crimeNumber') {
-                    if (!isValidCrimeNumber(value)) {
-                        showError(fieldId, 'Please enter a valid crime number in format: number/year (e.g., 123/2024)');
-                        return false;
-                    }
+                // Special validations
+                if (fieldId === 'crimeNumber' && value && !isValidCrimeNumber(value)) {
+                    return showError('Please enter a valid crime number in format: number/year (e.g., 123/2024)');
                 }
                 
-                if (fieldId === 'date') {
-                    if (!isValidDate(value)) {
-                        showError(fieldId, 'Please enter a valid date in DD/MM/YYYY format');
-                        return false;
-                    }
+                if (fieldId === 'date' && value && !isValidDate(value)) {
+                    return showError('Please enter a valid date in DD/MM/YYYY format');
                 }
                 
-                if (fieldId === 'court') {
-                    if (!value) {
-                        showError(fieldId, 'Please select a court');
-                        return false;
-                    }
+                if (fieldId === 'court' && !value && field.hasAttribute('required')) {
+                    return showError('Please select a court');
                 }
                 
-                if (fieldId === 'courtNumber') {
-                    if (courtSelect.value && (!value || isNaN(value) || value < 1)) {
-                        showError(fieldId, 'Please enter a valid court number');
-                        return false;
-                    }
+                if (fieldId === 'courtNumber' && courtSelect.value && (!value || isNaN(value) || value < 1)) {
+                    return showError('Please enter a valid court number');
                 }
                 
-                if (fieldId.includes('age')) {
-                    if (isNaN(value) || value < 1 || value > 120) {
-                        showError(fieldId, 'Please enter a valid age');
-                        return false;
-                    }
+                if (fieldId.includes('age') && value && (isNaN(value) || value < 1 || value > 120)) {
+                    return showError('Please enter a valid age');
                 }
                 
-                hideError(fieldId);
-                return true;
+                return hideError();
             }
             
+            // Format crime number
+            function formatCrimeNumber(input) {
+                let value = input.value.replace(/[^\d\/]/g, '');
+                const parts = value.split('/');
+                if (parts.length > 2) {
+                    value = parts[0] + '/' + parts.slice(1).join('');
+                }
+                if (value.length >= 4 && !value.includes('/')) {
+                    value = value.substring(0, value.length - 4) + '/' + value.substring(value.length - 4);
+                }
+                input.value = value;
+            }
+            
+            // Get ordinal suffix for court number
+            function getOrdinalSuffix(num) {
+                if (!num || isNaN(num)) return '';
+                const j = num % 10;
+                const k = num % 100;
+                if (j === 1 && k !== 11) return num + "st";
+                if (j === 2 && k !== 12) return num + "nd";
+                if (j === 3 && k !== 13) return num + "rd";
+                return num + "th";
+            }
+            
+            // Officer management
             function createPoliceOfficerForm(index) {
-                const officerDiv = document.createElement('div');
-                officerDiv.className = 'officer-container';
-                officerDiv.id = `officer-${index}`;
-                
-                officerDiv.innerHTML = `
-                    <h4>Police Officer ${index}</h4>
-                    <div class="officer-details">
-                        <div class="form-group">
-                            <label for="designation${index}" class="required">Designation with Number</label>
-                            <input type="text" id="designation${index}" placeholder="Enter designation with number (e.g., SI 1234, HC 5678)">
-                            <div class="error-message" id="designation${index}-error">Please enter designation with number</div>
-                            <div class="help-text">Enter designation followed by number (e.g., SI 1234, HC 5678, PC 8901)</div>
+                return `
+                    <div class="officer-container" id="officer-${index}">
+                        <h4>Police Officer ${index}</h4>
+                        <div class="officer-details">
+                            <div class="form-group">
+                                <label for="designation${index}" class="required">Designation with Number</label>
+                                <input type="text" id="designation${index}" placeholder="Enter designation with number (e.g., SI 1234, HC 5678)">
+                                <div class="error-message" id="designation${index}-error">Please enter designation with number</div>
+                                <div class="help-text">Enter designation followed by number (e.g., SI 1234, HC 5678, PC 8901)</div>
+                            </div>
                         </div>
+                        <div class="form-group">
+                            <label for="fullName${index}" class="required">Full Name</label>
+                            <input type="text" id="fullName${index}" placeholder="Enter full name">
+                            <div class="error-message" id="fullName${index}-error">Please enter a full name</div>
+                        </div>
+                        ${index > 1 ? `<button type="button" class="remove-officer" data-index="${index}">Remove Officer</button>` : ''}
                     </div>
-                    <div class="form-group">
-                        <label for="fullName${index}" class="required">Full Name</label>
-                        <input type="text" id="fullName${index}" placeholder="Enter full name">
-                        <div class="error-message" id="fullName${index}-error">Please enter a full name</div>
-                    </div>
-                    ${index > 1 ? `<button type="button" class="remove-officer" data-index="${index}">Remove Officer</button>` : ''}
                 `;
-                
-                return officerDiv;
             }
             
             function createAccusedForm(index) {
-                const accusedDiv = document.createElement('div');
-                accusedDiv.className = 'accused-container';
-                accusedDiv.id = `accused-${index}`;
-                
-                accusedDiv.innerHTML = `
-                    <h4>Accused Person ${index}</h4>
-                    <div class="accused-details">
-                        <div class="form-group">
-                            <label for="accusedName${index}" class="required">Name</label>
-                            <input type="text" id="accusedName${index}" placeholder="Enter accused name">
-                            <div class="error-message" id="accusedName${index}-error">Please enter an accused name</div>
+                return `
+                    <div class="accused-container" id="accused-${index}">
+                        <h4>Accused Person ${index}</h4>
+                        <div class="accused-details">
+                            <div class="form-group">
+                                <label for="accusedName${index}" class="required">Name</label>
+                                <input type="text" id="accusedName${index}" placeholder="Enter accused name">
+                                <div class="error-message" id="accusedName${index}-error">Please enter an accused name</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="age${index}" class="required">Age</label>
+                                <input type="text" id="age${index}" placeholder="Enter age">
+                                <div class="error-message" id="age${index}-error">Please enter a valid age</div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="age${index}" class="required">Age</label>
-                            <input type="text" id="age${index}" placeholder="Enter age">
-                            <div class="error-message" id="age${index}-error">Please enter a valid age</div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="fatherName${index}" class="required">Father Name</label>
-                        <input type="text" id="fatherName${index}" placeholder="Enter father's name">
+                            <label for="fatherName${index}" class="required">Father Name</label>
+                            <input type="text" id="fatherName${index}" placeholder="Enter father's name">
                             <div class="error-message" id="fatherName${index}-error">Please enter a father name</div>
-                    </div>
-                    ${index > 1 ? `<button type="button" class="remove-accused" data-index="${index}">Remove Accused</button>` : ''}
-                `;
-                
-                return accusedDiv;
-            }
-            
-            function createPoliceOfficerDocumentField(index) {
-                const officerContainer = document.createElement('div');
-                officerContainer.className = 'officer-container-preview';
-                officerContainer.id = `police-officer-${index}`;
-                
-                officerContainer.innerHTML = `
-                    <div class="officer-details-preview">
-                        <div class="preview-field compact-field officer-designation empty" id="designation-field-${index}" placeholder="Designation with Number"></div>
-                        <div class="preview-field compact-field officer-name empty" id="full-name-field-${index}" placeholder="Full Name"></div>
+                        </div>
+                        ${index > 1 ? `<button type="button" class="remove-accused" data-index="${index}">Remove Accused</button>` : ''}
                     </div>
                 `;
-                
-                return officerContainer;
             }
             
             function updatePoliceOfficers() {
@@ -1342,22 +961,22 @@
                 }
                 
                 policeOfficersContainer.innerHTML = '';
-                for (let i = 1; i <= count; i++) {
-                    policeOfficersContainer.appendChild(createPoliceOfficerForm(i));
-                }
-                officerCounter = count;
-                
                 policeOfficersList.innerHTML = '';
+                
                 for (let i = 1; i <= count; i++) {
-                    policeOfficersList.appendChild(createPoliceOfficerDocumentField(i));
+                    policeOfficersContainer.insertAdjacentHTML('beforeend', createPoliceOfficerForm(i));
+                    policeOfficersList.insertAdjacentHTML('beforeend', 
+                        `<div class="officer-container-preview" id="police-officer-${i}">
+                            <div class="officer-details-preview">
+                                <div class="preview-field compact-field officer-designation empty" id="designation-field-${i}" placeholder="Designation with Number"></div>
+                                <div class="preview-field compact-field officer-name empty" id="full-name-field-${i}" placeholder="Full Name"></div>
+                            </div>
+                        </div>`
+                    );
                 }
                 
-                document.querySelectorAll('.remove-officer').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        removePoliceOfficer(index);
-                    });
-                });
+                officerCounter = count;
+                attachRemoveListeners('.remove-officer', removePoliceOfficer);
             }
             
             function updateAccusedPersons() {
@@ -1374,29 +993,22 @@
                 }
                 
                 accusedPersonsContainer.innerHTML = '';
-                for (let i = 1; i <= count; i++) {
-                    accusedPersonsContainer.appendChild(createAccusedForm(i));
-                }
-                accusedCounter = count;
                 
-                document.querySelectorAll('.remove-accused').forEach(button => {
+                for (let i = 1; i <= count; i++) {
+                    accusedPersonsContainer.insertAdjacentHTML('beforeend', createAccusedForm(i));
+                }
+                
+                accusedCounter = count;
+                attachRemoveListeners('.remove-accused', removeAccusedPerson);
+            }
+            
+            function attachRemoveListeners(selector, handler) {
+                document.querySelectorAll(selector).forEach(button => {
                     button.addEventListener('click', function() {
                         const index = parseInt(this.getAttribute('data-index'));
-                        removeAccusedPerson(index);
+                        handler(index);
                     });
                 });
-            }
-            
-            function addPoliceOfficer() {
-                officerCounter++;
-                officerCountInput.value = officerCounter;
-                updatePoliceOfficers();
-            }
-            
-            function addAccusedPerson() {
-                accusedCounter++;
-                accusedCountInput.value = accusedCounter;
-                updateAccusedPersons();
             }
             
             function removePoliceOfficer(index) {
@@ -1421,6 +1033,7 @@
                 updateAccusedPersons();
             }
             
+            // Form validation
             function validateForm() {
                 let isValid = true;
                 
@@ -1459,140 +1072,30 @@
                 return isValid;
             }
             
-            function autoSave() {
-                clearTimeout(autoSaveTimeout);
-                
-                autoSaveTimeout = setTimeout(() => {
-                    const formData = {
-                        officerCount: officerCounter,
-                        accusedCount: accusedCounter,
-                        language: currentLanguage,
-                        date: document.getElementById('date').value,
-                        time: document.getElementById('time').value,
-                        policeStation: document.getElementById('policeStation').value,
-                        crimeNumber: document.getElementById('crimeNumber').value,
-                        section: document.getElementById('section').value,
-                        court: document.getElementById('court').value,
-                        courtNumber: document.getElementById('courtNumber').value
-                    };
-                    
-                    localStorage.setItem('escortPassportFormData', JSON.stringify(formData));
-                    
-                    autoSaveIndicator.style.display = 'block';
-                    setTimeout(() => {
-                        autoSaveIndicator.style.display = 'none';
-                    }, 2000);
-                }, 1000);
-            }
-            
-            function loadSavedData() {
-                const savedData = localStorage.getItem('escortPassportFormData');
-                
-                if (savedData) {
-                    const formData = JSON.parse(savedData);
-                    
-                    document.getElementById('date').value = formData.date || '';
-                    document.getElementById('time').value = formData.time || '';
-                    document.getElementById('policeStation').value = formData.policeStation || '';
-                    document.getElementById('crimeNumber').value = formData.crimeNumber || '';
-                    document.getElementById('section').value = formData.section || '';
-                    document.getElementById('court').value = formData.court || '';
-                    document.getElementById('courtNumber').value = formData.courtNumber || '';
-                    
-                    if (formData.officerCount) {
-                        officerCountInput.value = formData.officerCount;
-                        updatePoliceOfficers();
-                    }
-                    
-                    if (formData.accusedCount) {
-                        accusedCountInput.value = formData.accusedCount;
-                        updateAccusedPersons();
-                    }
-                    
-                    if (formData.language) {
-                        currentLanguage = formData.language;
-                        languageSelect.value = currentLanguage;
-                        updateLanguageContent();
-                    }
-                    
-                    showNotification('Previous form data loaded successfully', 'success');
-                }
-            }
-            
-            function updateLanguageContent() {
-                languageContents.forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                document.getElementById(`${currentLanguage}-content`).classList.add('active');
-                
-                // Show escort content for the selected language
-                document.getElementById('content-placeholder').style.display = 'none';
-                if (currentLanguage === 'tamil') {
-                    document.getElementById('escort-tamil-content').style.display = 'block';
-                    document.getElementById('escort-english-content').style.display = 'none';
-                } else {
-                    document.getElementById('escort-tamil-content').style.display = 'none';
-                    document.getElementById('escort-english-content').style.display = 'block';
-                }
-            }
-            
+            // Update document preview
             function fillDocumentPreview() {
                 if (!validateForm()) {
                     showNotification('Please fix the errors in the form before generating the document', 'error');
                     return;
                 }
                 
-                // Update police officers in preview
+                // Update police officers
                 for (let i = 1; i <= officerCounter; i++) {
-                    const designation = document.getElementById(`designation${i}`).value;
-                    const fullName = document.getElementById(`fullName${i}`).value;
-                    
-                    const designationField = document.getElementById(`designation-field-${i}`);
-                    const fullNameField = document.getElementById(`full-name-field-${i}`);
-                    
-                    if (designation) {
-                        designationField.textContent = designation;
-                        designationField.classList.remove('empty');
-                    } else {
-                        designationField.textContent = '';
-                        designationField.classList.add('empty');
-                    }
-                    
-                    if (fullName) {
-                        fullNameField.textContent = fullName;
-                        fullNameField.classList.remove('empty');
-                    } else {
-                        fullNameField.textContent = '';
-                        fullNameField.classList.add('empty');
-                    }
+                    updatePreviewField(`designation-field-${i}`, document.getElementById(`designation${i}`).value);
+                    updatePreviewField(`full-name-field-${i}`, document.getElementById(`fullName${i}`).value);
                 }
                 
-                // Update police station field
-                const policeStationValue = document.getElementById('policeStation').value;
-                const policeStationField = document.getElementById('police-station-field');
-                if (policeStationValue) {
-                    policeStationField.textContent = policeStationValue;
-                    policeStationField.classList.remove('empty');
-                } else {
-                    policeStationField.textContent = '';
-                    policeStationField.classList.add('empty');
-                }
+                // Update police station
+                updatePreviewField('police-station-field', document.getElementById('policeStation').value);
                 
                 // Update date and time
                 const dateValue = document.getElementById('date').value;
                 const timeValue = document.getElementById('time').value;
                 
-                const dateField = document.getElementById('date-field');
-                if (dateValue) {
-                    dateField.textContent = dateValue;
-                    dateField.classList.remove('empty');
-                } else {
-                    dateField.textContent = '';
-                    dateField.classList.add('empty');
-                }
+                updatePreviewField('date-field', dateValue);
                 
                 const timeField = document.getElementById('time-field');
+                const timeSuffix = document.getElementById('time-suffix');
                 if (timeValue) {
                     timeField.textContent = timeValue;
                     timeField.classList.remove('empty');
@@ -1627,10 +1130,10 @@
                 document.getElementById('accused-list-english').innerHTML = accusedListEnglish || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
                 
                 // Update court information
-                const courtValue = document.getElementById('court').value;
-                const courtNumberValue = document.getElementById('courtNumber').value;
-                
+                const courtValue = courtSelect.value;
+                const courtNumberValue = courtNumberInput.value;
                 let courtDisplayValue = '';
+                
                 if (courtValue && courtNumberValue) {
                     courtDisplayValue = `${courtValue} ${getOrdinalSuffix(parseInt(courtNumberValue))}`;
                 } else if (courtValue) {
@@ -1642,20 +1145,20 @@
                 const crimeNumber = document.getElementById('crimeNumber').value;
                 const section = document.getElementById('section').value;
                 
-                updateField('police-station-content-tamil', policeStation);
-                updateField('crime-no-field-tamil', crimeNumber);
-                updateField('section-field-tamil', section);
-                updateField('court-field-tamil', courtDisplayValue);
+                updateEmbeddedField('police-station-content-tamil', policeStation);
+                updateEmbeddedField('crime-no-field-tamil', crimeNumber);
+                updateEmbeddedField('section-field-tamil', section);
+                updateEmbeddedField('court-field-tamil', courtDisplayValue);
                 
-                updateField('police-station-content-english', policeStation);
-                updateField('crime-no-field-english', crimeNumber);
-                updateField('section-field-english', section);
-                updateField('court-field-english', courtDisplayValue);
+                updateEmbeddedField('police-station-content-english', policeStation);
+                updateEmbeddedField('crime-no-field-english', crimeNumber);
+                updateEmbeddedField('section-field-english', section);
+                updateEmbeddedField('court-field-english', courtDisplayValue);
                 
                 showNotification('Document preview updated successfully', 'success');
             }
             
-            function updateField(fieldId, value) {
+            function updatePreviewField(fieldId, value) {
                 const field = document.getElementById(fieldId);
                 if (field) {
                     if (value) {
@@ -1668,111 +1171,207 @@
                 }
             }
             
-            function printDocument() {
-                const printContent = document.getElementById('document-to-print');
-                const originalContents = document.body.innerHTML;
-                
-                document.body.innerHTML = printContent.outerHTML;
-                window.print();
-                document.body.innerHTML = originalContents;
-                
-                // Re-attach event listeners
-                initializeEventListeners();
-                
-                showNotification('Document sent to printer', 'success');
+            function updateEmbeddedField(fieldId, value) {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    if (value) {
+                        field.textContent = value;
+                        field.classList.remove('empty');
+                    } else {
+                        field.textContent = '';
+                        field.classList.add('empty');
+                    }
+                }
             }
             
+            // Language management
+            function updateLanguageContent() {
+                document.querySelectorAll('.language-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                document.getElementById(`${currentLanguage}-content`).classList.add('active');
+                
+                document.getElementById('content-placeholder').style.display = 'none';
+                if (currentLanguage === 'tamil') {
+                    document.getElementById('escort-tamil-content').style.display = 'block';
+                    document.getElementById('escort-english-content').style.display = 'none';
+                } else {
+                    document.getElementById('escort-tamil-content').style.display = 'none';
+                    document.getElementById('escort-english-content').style.display = 'block';
+                }
+            }
+            
+            // Auto-save functionality
+            function autoSave() {
+                clearTimeout(autoSaveTimeout);
+                
+                autoSaveTimeout = setTimeout(() => {
+                    const formData = {
+                        officerCount: officerCounter,
+                        accusedCount: accusedCounter,
+                        language: currentLanguage,
+                        date: document.getElementById('date').value,
+                        time: document.getElementById('time').value,
+                        policeStation: document.getElementById('policeStation').value,
+                        crimeNumber: document.getElementById('crimeNumber').value,
+                        section: document.getElementById('section').value,
+                        court: courtSelect.value,
+                        courtNumber: courtNumberInput.value
+                    };
+                    
+                    localStorage.setItem('escortPassportFormData', JSON.stringify(formData));
+                    
+                    autoSaveIndicator.style.display = 'block';
+                    setTimeout(() => {
+                        autoSaveIndicator.style.display = 'none';
+                    }, 2000);
+                }, 1000);
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('escortPassportFormData');
+                
+                if (savedData) {
+                    const formData = JSON.parse(savedData);
+                    
+                    document.getElementById('date').value = formData.date || '';
+                    document.getElementById('time').value = formData.time || '';
+                    document.getElementById('policeStation').value = formData.policeStation || '';
+                    document.getElementById('crimeNumber').value = formData.crimeNumber || '';
+                    document.getElementById('section').value = formData.section || '';
+                    courtSelect.value = formData.court || '';
+                    courtNumberInput.value = formData.courtNumber || '';
+                    
+                    if (formData.officerCount) {
+                        officerCountInput.value = formData.officerCount;
+                        updatePoliceOfficers();
+                    }
+                    
+                    if (formData.accusedCount) {
+                        accusedCountInput.value = formData.accusedCount;
+                        updateAccusedPersons();
+                    }
+                    
+                    if (formData.language) {
+                        currentLanguage = formData.language;
+                        languageSelect.value = currentLanguage;
+                        updateLanguageContent();
+                    }
+                    
+                    showNotification('Previous form data loaded successfully', 'success');
+                }
+            }
+            
+            // SIMPLE AND RELIABLE PDF GENERATION
             async function generatePDF() {
+                console.log('Generate PDF button clicked');
+                
                 if (!validateForm()) {
                     showNotification('Please fix the errors in the form before generating PDF', 'error');
                     return;
                 }
                 
-                generateBtn.innerHTML = '<span class="spinner"></span> Generating PDF...';
+                // First ensure preview is updated
+                fillDocumentPreview();
+                
+                generateBtn.innerHTML = '<span class="spinner"></span> Creating PDF...';
                 generateBtn.disabled = true;
                 
                 try {
-                    const element = document.getElementById('document-to-print');
+                    // Create a clean copy of the preview
+                    const element = previewElement.cloneNode(true);
                     
-                    // Save current state
-                    const currentHtml = element.innerHTML;
+                    // Apply PDF-friendly styles
+                    element.style.cssText = `
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 595px;
+                        height: 842px;
+                        padding: 20px;
+                        background: white;
+                        border: none;
+                        box-shadow: none;
+                        box-sizing: border-box;
+                    `;
                     
-                    // Create a clean copy for PDF generation
-                    const tempElement = element.cloneNode(true);
-                    
-                    // Apply PDF styling to the clone
-                    tempElement.classList.add('pdf-mode');
-                    
-                    // Force black text in all elements immediately
-                    tempElement.querySelectorAll('*').forEach(el => {
+                    // Force all text to be black
+                    const allElements = element.querySelectorAll('*');
+                    allElements.forEach(el => {
                         el.style.color = '#000000';
-                        el.style.fill = '#000000';
-                        el.style.stroke = '#000000';
-                        
-                        // Remove any inherited colors
-                        if (el.classList.contains('right-column') || el.closest('.right-column')) {
-                            el.style.color = '#000000';
-                            el.style.webkitTextFillColor = '#000000';
-                            el.style.webkitTextStrokeColor = '#000000';
-                        }
+                        el.style.webkitTextFillColor = '#000000';
                     });
                     
-                    // Specifically target text elements in the right column
-                    const rightColumn = tempElement.querySelector('.right-column');
-                    if (rightColumn) {
-                        rightColumn.style.color = '#000000';
-                        rightColumn.style.webkitTextFillColor = '#000000';
-                        
-                        const textElements = rightColumn.querySelectorAll('span, div, p, .embedded-field, .content-text');
-                        textElements.forEach(el => {
-                            el.style.color = '#000000';
-                            el.style.webkitTextFillColor = '#000000';
-                            el.style.textShadow = 'none';
-                            el.style.filter = 'none';
-                        });
-                    }
+                    // Create a temporary container
+                    const tempContainer = document.createElement('div');
+                    tempContainer.style.cssText = `
+                        position: fixed;
+                        left: 0;
+                        top: 0;
+                        width: 595px;
+                        height: 842px;
+                        background: white;
+                        z-index: 9999;
+                        overflow: hidden;
+                    `;
+                    tempContainer.appendChild(element);
+                    document.body.appendChild(tempContainer);
                     
-                    // Temporarily replace the element
-                    element.parentNode.replaceChild(tempElement, element);
+                    // Wait for rendering
+                    await new Promise(resolve => setTimeout(resolve, 100));
                     
-                    const canvas = await html2canvas(tempElement, {
+                    // Capture with html2canvas
+                    const canvas = await html2canvas(element, {
                         scale: 2,
                         useCORS: true,
-                        logging: false,
                         backgroundColor: '#ffffff',
-                        onclone: function(clonedDoc) {
-                            const clonedElement = clonedDoc.getElementById('document-to-print');
-                            if (clonedElement) {
-                                clonedElement.classList.add('pdf-mode');
-                                
-                                // Apply black text to all elements in clone
-                                const clonedAllElements = clonedElement.querySelectorAll('*');
-                                clonedAllElements.forEach(el => {
-                                    el.style.color = '#000000';
-                                    el.style.webkitTextFillColor = '#000000';
-                                    el.style.textShadow = 'none';
-                                    el.style.filter = 'none';
-                                });
-                            }
+                        width: 595,
+                        height: 842,
+                        logging: false,
+                        onclone: (clonedDoc, clonedElement) => {
+                            // Apply styles to cloned element
+                            clonedElement.style.width = '595px';
+                            clonedElement.style.height = '842px';
+                            clonedElement.style.background = 'white';
+                            
+                            // Force black text
+                            const clonedAll = clonedElement.querySelectorAll('*');
+                            clonedAll.forEach(el => {
+                                el.style.color = '#000000';
+                                el.style.webkitTextFillColor = '#000000';
+                            });
                         }
                     });
                     
-                    // Restore original element
-                    tempElement.parentNode.replaceChild(element, tempElement);
+                    // Remove temporary container
+                    document.body.removeChild(tempContainer);
                     
+                    // Create PDF
+                    const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+                    
+                    // Convert canvas to image
                     const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const imgWidth = 210;
-                    const pageHeight = 295;
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let position = 0;
                     
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    // Calculate dimensions for A4
+                    const imgWidth = 210; // A4 width in mm
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
                     
-                    const fileName = `Escort_Passport_${new Date().toISOString().slice(0, 10)}.pdf`;
+                    // Add image to PDF
+                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    
+                    // Save PDF
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+                    const fileName = `Escort_Passport_${timestamp}.pdf`;
+                    
                     pdf.save(fileName);
                     
-                    showNotification('PDF generated successfully', 'success');
+                    showNotification('PDF generated successfully!', 'success');
+                    
                 } catch (error) {
                     console.error('Error generating PDF:', error);
                     showNotification('Error generating PDF. Please try again.', 'error');
@@ -1782,42 +1381,122 @@
                 }
             }
             
+            // Print document
+            function printDocument() {
+                // First update the preview to ensure it's current
+                fillDocumentPreview();
+                
+                // Create a print-friendly version
+                const printContent = previewElement.cloneNode(true);
+                printContent.style.cssText = `
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: white;
+                    padding: 20px;
+                    box-sizing: border-box;
+                    box-shadow: none;
+                    border: none;
+                `;
+                
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Print - Escort Passport</title>
+                        <style>
+                            @media print {
+                                body { margin: 0; padding: 0; }
+                                .document-preview { 
+                                    box-shadow: none !important; 
+                                    border: none !important;
+                                    margin: 0 !important;
+                                    padding: 20px !important;
+                                }
+                                .document-preview,
+                                .document-preview * {
+                                    color: #000000 !important;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${printContent.outerHTML}
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                setTimeout(function() {
+                                    window.close();
+                                }, 100);
+                            }
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                
+                showNotification('Document sent to printer', 'success');
+            }
+            
+            // Initialize event listeners - FIXED VERSION
             function initializeEventListeners() {
+                console.log('Initializing event listeners...');
+                
+                // Language selection
                 languageSelect.addEventListener('change', function() {
                     currentLanguage = this.value;
                     updateLanguageContent();
                     autoSave();
                 });
                 
+                // Officer controls
                 officerCountInput.addEventListener('change', updatePoliceOfficers);
-                addOfficerBtn.addEventListener('click', addPoliceOfficer);
+                addOfficerBtn.addEventListener('click', function() {
+                    officerCounter++;
+                    officerCountInput.value = officerCounter;
+                    updatePoliceOfficers();
+                });
                 
+                // Accused controls
                 accusedCountInput.addEventListener('change', updateAccusedPersons);
-                addAccusedBtn.addEventListener('click', addAccusedPerson);
+                addAccusedBtn.addEventListener('click', function() {
+                    accusedCounter++;
+                    accusedCountInput.value = accusedCounter;
+                    updateAccusedPersons();
+                });
                 
+                // Main actions
                 fillFormBtn.addEventListener('click', fillDocumentPreview);
                 printBtn.addEventListener('click', printDocument);
-                generateBtn.addEventListener('click', generatePDF);
                 
-                // Add event listeners to all input fields for validation and auto-save
-                const allInputs = document.querySelectorAll('input, select, textarea');
-                allInputs.forEach(input => {
+                // FIX: Direct event listener for PDF generation
+                generateBtn.addEventListener('click', function(e) {
+                    console.log('PDF button clicked via direct listener');
+                    e.preventDefault();
+                    generatePDF();
+                });
+                
+                // Add event listeners to all input fields
+                document.querySelectorAll('input, select, textarea').forEach(input => {
                     input.addEventListener('input', autoSave);
                     input.addEventListener('blur', validateField);
                 });
                 
-                // Add specific event listener for crime number formatting
+                // Crime number formatting
                 const crimeNumberInput = document.getElementById('crimeNumber');
                 crimeNumberInput.addEventListener('input', function() {
                     formatCrimeNumber(this);
                 });
                 
-                // Add event listener for court number validation when court is selected
+                // Court validation
                 courtSelect.addEventListener('change', function() {
                     if (this.value) {
-                        document.getElementById('courtNumber').setAttribute('required', 'required');
+                        courtNumberInput.setAttribute('required', 'required');
                     } else {
-                        document.getElementById('courtNumber').removeAttribute('required');
+                        courtNumberInput.removeAttribute('required');
                     }
                     validateField.call(this);
                 });
@@ -1830,17 +1509,6 @@
                     }
                     validateField.call(this);
                 });
-            }
-            
-            // Initialize the application
-            function init() {
-                updatePoliceOfficers();
-                updateAccusedPersons();
-                updateLanguageContent();
-                initializeEventListeners();
-                loadSavedData();
-                
-                showNotification('Escort Passport Document Generator is ready!', 'success');
             }
             
             // Start the application
