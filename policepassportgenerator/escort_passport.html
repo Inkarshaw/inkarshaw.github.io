@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escort Passport Document Generator</title>
+    <!-- Load jsPDF from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Add date picker CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
+        /* All your CSS styles remain the same as before */
         :root {
             --primary-color: #1a365d;
             --secondary-color: #2d3748;
@@ -433,15 +435,6 @@
             text-align-last: left;
         }
         
-        /* Smart hyphenation - only when necessary */
-        .content-text.hyphenate {
-            hyphens: auto;
-            -webkit-hyphens: auto;
-            -moz-hyphens: auto;
-            -ms-hyphens: auto;
-            word-break: break-word;
-        }
-        
         .embedded-field {
             display: inline;
             min-width: 60px;
@@ -610,16 +603,6 @@
             color: var(--accent-color);
             pointer-events: none;
         }
-        
-        /* PDF Generation Status */
-        .pdf-status {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 6px;
-            background-color: #f0f9ff;
-            border: 1px solid var(--accent-color);
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -784,8 +767,6 @@
                     </table>
                 </div>
                 
-                <div id="pdf-status" class="pdf-status"></div>
-                
                 <div class="action-buttons">
                     <button id="print-document" class="btn btn-warning"><i class="fas fa-print"></i> Print Document</button>
                     <button id="generate-pdf" class="btn btn-success"><i class="fas fa-file-pdf"></i> Generate PDF</button>
@@ -801,8 +782,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const { jsPDF } = window.jspdf;
-            
             // DOM Elements
             const generateBtn = document.getElementById('generate-pdf');
             const printBtn = document.getElementById('print-document');
@@ -822,7 +801,6 @@
             const previewElement = document.getElementById('document-to-print');
             const dateInput = document.getElementById('date');
             const timeInput = document.getElementById('time');
-            const pdfStatus = document.getElementById('pdf-status');
             
             // Application State
             let officerCounter = 1;
@@ -850,11 +828,8 @@
                     defaultDate: "today",
                     maxDate: "today",
                     onChange: function(selectedDates, dateStr, instance) {
-                        // Trigger validation
                         validateField.call(dateInput);
                         autoSave();
-                        
-                        // Update preview if date is valid
                         if (isValidDate(dateStr)) {
                             fillDocumentPreview();
                         }
@@ -873,24 +848,6 @@
                 }, 5000);
             }
             
-            // Update PDF status
-            function updatePdfStatus(message, type = 'info') {
-                pdfStatus.textContent = message;
-                pdfStatus.style.display = 'block';
-                pdfStatus.style.backgroundColor = type === 'error' ? '#fed7d7' : 
-                                                 type === 'success' ? '#c6f6d5' : 
-                                                 '#f0f9ff';
-                pdfStatus.style.borderColor = type === 'error' ? '#e53e3e' : 
-                                             type === 'success' ? '#38a169' : 
-                                             '#3182ce';
-                
-                if (type === 'success' || type === 'error') {
-                    setTimeout(() => {
-                        pdfStatus.style.display = 'none';
-                    }, 3000);
-                }
-            }
-            
             // Validation functions
             function isValidCrimeNumber(crimeNumber) {
                 const regex = /^\d+\/\d{4}$/;
@@ -899,8 +856,6 @@
             
             function isValidDate(dateString) {
                 if (!dateString) return false;
-                
-                // Check if it matches DD/MM/YYYY format
                 const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
                 if (!regex.test(dateString)) return false;
                 
@@ -947,18 +902,12 @@
                     return true;
                 };
                 
-                // Date validation
                 if (fieldId === 'date') {
-                    if (!value) {
-                        return showError('Please select a date');
-                    }
-                    if (!isValidDate(value)) {
-                        return showError('Please select a valid date in DD/MM/YYYY format');
-                    }
+                    if (!value) return showError('Please select a date');
+                    if (!isValidDate(value)) return showError('Please select a valid date in DD/MM/YYYY format');
                     return hideError();
                 }
                 
-                // Time validation (optional)
                 if (fieldId === 'time') {
                     if (value && !isValidTime(value)) {
                         return showError('Please enter a valid time in HH:MM format (24-hour) or leave blank');
@@ -966,12 +915,10 @@
                     return hideError();
                 }
                 
-                // Required field check
                 if (!value && field.hasAttribute('required')) {
                     return showError('This field is required');
                 }
                 
-                // Special validations
                 if (fieldId === 'crimeNumber' && value && !isValidCrimeNumber(value)) {
                     return showError('Please enter a valid crime number in format: number/year (e.g., 123/2024)');
                 }
@@ -1189,46 +1136,6 @@
                 return isValid;
             }
             
-            // Smart word breaking - only when necessary
-            function smartWordBreak(text) {
-                // Return text as is - let CSS handle justification
-                // Only add soft hyphens to very long words that might overflow
-                const words = text.split(' ');
-                const processedWords = words.map(word => {
-                    // Only add soft hyphens to words longer than 15 characters
-                    if (word.length > 15) {
-                        // Add soft hyphens at logical break points
-                        return word.replace(/([a-z])([A-Z])/g, '$1­$2')
-                                   .replace(/([aeiou])([^aeiou]{2,})/gi, '$1­$2')
-                                   .replace(/­­/g, '­'); // Remove double hyphens
-                    }
-                    return word;
-                });
-                return processedWords.join(' ');
-            }
-            
-            // Check if text needs hyphenation
-            function needsHyphenation(text, elementWidth) {
-                if (!text || text.length < 20) return false;
-                
-                // Create a temporary span to measure text width
-                const tempSpan = document.createElement('span');
-                tempSpan.style.cssText = `
-                    position: absolute;
-                    visibility: hidden;
-                    white-space: nowrap;
-                    font-family: inherit;
-                    font-size: 13px;
-                `;
-                tempSpan.textContent = text;
-                document.body.appendChild(tempSpan);
-                const textWidth = tempSpan.offsetWidth;
-                document.body.removeChild(tempSpan);
-                
-                // If text width is significantly larger than container width, may need hyphenation
-                return textWidth > elementWidth * 1.5;
-            }
-            
             // Update document preview
             function fillDocumentPreview() {
                 if (!validateForm()) {
@@ -1238,16 +1145,12 @@
                 
                 // Update police officers
                 for (let i = 1; i <= officerCounter; i++) {
-                    const designation = document.getElementById(`designation${i}`).value;
-                    const fullName = document.getElementById(`fullName${i}`).value;
-                    
-                    updatePreviewField(`designation-field-${i}`, designation);
-                    updatePreviewField(`full-name-field-${i}`, fullName);
+                    updatePreviewField(`designation-field-${i}`, document.getElementById(`designation${i}`).value);
+                    updatePreviewField(`full-name-field-${i}`, document.getElementById(`fullName${i}`).value);
                 }
                 
                 // Update police station
-                const policeStation = document.getElementById('policeStation').value;
-                updatePreviewField('police-station-field', policeStation);
+                updatePreviewField('police-station-field', document.getElementById('policeStation').value);
                 
                 // Update date and time
                 const dateValue = document.getElementById('date').value;
@@ -1282,30 +1185,13 @@
                             accusedListEnglish += ', ';
                         }
                         
-                        // Apply smart word breaking only if needed
                         accusedListTamil += `${accusedName} ஆ/வ ${age} த/பெ ${fatherName}`;
                         accusedListEnglish += `${accusedName} S/o ${fatherName} aged ${age}`;
                     }
                 }
                 
-                const accusedListTamilElement = document.getElementById('accused-list-tamil');
-                const accusedListEnglishElement = document.getElementById('accused-list-english');
-                
-                if (accusedListTamil) {
-                    accusedListTamilElement.innerHTML = accusedListTamil;
-                    accusedListTamilElement.classList.remove('empty');
-                } else {
-                    accusedListTamilElement.innerHTML = '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
-                    accusedListTamilElement.classList.add('empty');
-                }
-                
-                if (accusedListEnglish) {
-                    accusedListEnglishElement.innerHTML = accusedListEnglish;
-                    accusedListEnglishElement.classList.remove('empty');
-                } else {
-                    accusedListEnglishElement.innerHTML = '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
-                    accusedListEnglishElement.classList.add('empty');
-                }
+                document.getElementById('accused-list-tamil').innerHTML = accusedListTamil || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
+                document.getElementById('accused-list-english').innerHTML = accusedListEnglish || '<span class="embedded-field empty" placeholder="Accused Details">Accused Details</span>';
                 
                 // Update court information
                 const courtValue = courtSelect.value;
@@ -1319,24 +1205,19 @@
                 }
                 
                 // Update embedded fields
+                const policeStation = document.getElementById('policeStation').value;
                 const crimeNumber = document.getElementById('crimeNumber').value;
                 const section = document.getElementById('section').value;
                 
-                // Apply smart word breaking only to very long police station names
-                const processedPoliceStation = smartWordBreak(policeStation);
-                
-                updateEmbeddedField('police-station-content-tamil', processedPoliceStation);
+                updateEmbeddedField('police-station-content-tamil', policeStation);
                 updateEmbeddedField('crime-no-field-tamil', crimeNumber);
                 updateEmbeddedField('section-field-tamil', section);
                 updateEmbeddedField('court-field-tamil', courtDisplayValue);
                 
-                updateEmbeddedField('police-station-content-english', processedPoliceStation);
+                updateEmbeddedField('police-station-content-english', policeStation);
                 updateEmbeddedField('crime-no-field-english', crimeNumber);
                 updateEmbeddedField('section-field-english', section);
                 updateEmbeddedField('court-field-english', courtDisplayValue);
-                
-                // Apply smart hyphenation to content text
-                applySmartHyphenation();
                 
                 showNotification('Document preview updated successfully', 'success');
             }
@@ -1345,9 +1226,7 @@
                 const field = document.getElementById(fieldId);
                 if (field) {
                     if (value) {
-                        // Apply smart word breaking
-                        const processedValue = smartWordBreak(value);
-                        field.textContent = processedValue;
+                        field.textContent = value;
                         field.classList.remove('empty');
                     } else {
                         field.textContent = '';
@@ -1360,37 +1239,13 @@
                 const field = document.getElementById(fieldId);
                 if (field) {
                     if (value) {
-                        // Apply smart word breaking
-                        const processedValue = smartWordBreak(value);
-                        field.textContent = processedValue;
+                        field.textContent = value;
                         field.classList.remove('empty');
                     } else {
                         field.textContent = '';
                         field.classList.add('empty');
                     }
                 }
-            }
-            
-            // Apply smart hyphenation only when necessary
-            function applySmartHyphenation() {
-                const contentElements = document.querySelectorAll('.content-text');
-                const rightColumn = document.querySelector('.right-column');
-                const columnWidth = rightColumn ? rightColumn.offsetWidth : 250; // Default width
-                
-                contentElements.forEach(element => {
-                    if (element.textContent && element.textContent.trim() !== '') {
-                        const text = element.textContent;
-                        
-                        // Check if text needs hyphenation
-                        if (needsHyphenation(text, columnWidth)) {
-                            element.classList.add('hyphenate');
-                            const processedText = smartWordBreak(text);
-                            element.textContent = processedText;
-                        } else {
-                            element.classList.remove('hyphenate');
-                        }
-                    }
-                });
             }
             
             // Language management
@@ -1472,7 +1327,7 @@
                 }
             }
             
-            // SIMPLE AND RELIABLE PDF GENERATION
+            // SIMPLIFIED AND WORKING PDF GENERATION
             async function generatePDF() {
                 console.log('Generate PDF function called');
                 
@@ -1488,85 +1343,23 @@
                 const originalText = generateBtn.innerHTML;
                 generateBtn.innerHTML = '<span class="spinner"></span> Creating PDF...';
                 generateBtn.disabled = true;
-                updatePdfStatus('Preparing PDF document...', 'info');
                 
                 try {
+                    // Use the global jsPDF from the CDN
+                    const { jsPDF } = window.jspdf;
+                    
                     // Create a clean copy of the preview
-                    const element = previewElement.cloneNode(true);
+                    const element = document.getElementById('document-to-print');
                     
-                    // Apply PDF-friendly styles
-                    element.style.cssText = `
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 595px;
-                        height: 842px;
-                        padding: 20px;
-                        background: white;
-                        border: none;
-                        box-shadow: none;
-                        box-sizing: border-box;
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    `;
-                    
-                    // Force all text to be black
-                    const allElements = element.querySelectorAll('*');
-                    allElements.forEach(el => {
-                        el.style.color = '#000000';
-                        el.style.webkitTextFillColor = '#000000';
-                        el.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-                    });
-                    
-                    // Create a temporary container
-                    const tempContainer = document.createElement('div');
-                    tempContainer.style.cssText = `
-                        position: fixed;
-                        left: -9999px;
-                        top: -9999px;
-                        width: 595px;
-                        height: 842px;
-                        background: white;
-                        z-index: 9999;
-                        overflow: hidden;
-                    `;
-                    tempContainer.appendChild(element);
-                    document.body.appendChild(tempContainer);
-                    
-                    updatePdfStatus('Capturing document image...', 'info');
-                    
-                    // Wait for rendering
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    
-                    // Capture with html2canvas
+                    // Use html2canvas to capture the element
                     const canvas = await html2canvas(element, {
                         scale: 2,
                         useCORS: true,
                         backgroundColor: '#ffffff',
-                        width: 595,
-                        height: 842,
-                        logging: false,
-                        allowTaint: true,
-                        onclone: (clonedDoc, clonedElement) => {
-                            // Apply styles to cloned element
-                            clonedElement.style.width = '595px';
-                            clonedElement.style.height = '842px';
-                            clonedElement.style.background = 'white';
-                            clonedElement.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-                            
-                            // Force black text
-                            const clonedAll = clonedElement.querySelectorAll('*');
-                            clonedAll.forEach(el => {
-                                el.style.color = '#000000';
-                                el.style.webkitTextFillColor = '#000000';
-                                el.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-                            });
-                        }
+                        width: element.offsetWidth,
+                        height: element.offsetHeight,
+                        logging: false
                     });
-                    
-                    // Remove temporary container
-                    document.body.removeChild(tempContainer);
-                    
-                    updatePdfStatus('Creating PDF file...', 'info');
                     
                     // Create PDF
                     const pdf = new jsPDF({
@@ -1580,7 +1373,6 @@
                     
                     // Calculate dimensions for A4 (210mm x 297mm)
                     const imgWidth = 210; // A4 width in mm
-                    const pageHeight = 297; // A4 height in mm
                     const imgHeight = (canvas.height * imgWidth) / canvas.width;
                     
                     // Add image to PDF
@@ -1592,12 +1384,10 @@
                     
                     pdf.save(fileName);
                     
-                    updatePdfStatus('PDF generated successfully!', 'success');
                     showNotification('PDF generated successfully!', 'success');
                     
                 } catch (error) {
                     console.error('Error generating PDF:', error);
-                    updatePdfStatus('Error generating PDF. Please try again.', 'error');
                     showNotification('Error generating PDF. Please try again.', 'error');
                 } finally {
                     // Restore button state
@@ -1644,11 +1434,6 @@
                                 .document-preview,
                                 .document-preview * {
                                     color: #000000 !important;
-                                }
-                                .content-text {
-                                    text-align: justify !important;
-                                    text-justify: inter-word !important;
-                                    text-align-last: left !important;
                                 }
                             }
                         </style>
@@ -1759,21 +1544,10 @@
                 
                 // PDF Generation - SIMPLE DIRECT EVENT LISTENER
                 generateBtn.addEventListener('click', function(e) {
-                    console.log('Generate PDF button clicked - direct listener');
+                    console.log('Generate PDF button clicked');
                     e.preventDefault();
-                    e.stopPropagation();
                     generatePDF();
-                    return false;
                 });
-                
-                // Also add as onclick handler for good measure
-                generateBtn.onclick = function(e) {
-                    console.log('Generate PDF button clicked - onclick handler');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    generatePDF();
-                    return false;
-                };
                 
                 // Add event listeners to all input fields
                 document.querySelectorAll('input, select, textarea').forEach(input => {
@@ -1822,7 +1596,7 @@
                     }
                     
                     // Allow digits and colon
-                    if (!/[0-9:]/.test(e.key) && e.keyCode !== 229) { // 229 for IME input
+                    if (!/[0-9:]/.test(e.key) && e.keyCode !== 229) {
                         e.preventDefault();
                     }
                 });
@@ -1839,10 +1613,6 @@
             
             // Start the application
             init();
-            
-            // Debug: Check if generate button exists and has listeners
-            console.log('Generate button exists:', !!generateBtn);
-            console.log('Generate button ID:', generateBtn.id);
         });
     </script>
 </body>
