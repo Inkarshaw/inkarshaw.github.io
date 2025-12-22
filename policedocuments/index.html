@@ -478,6 +478,19 @@
                 <h2><i>📄</i> Generate PDF Documents</h2>
                 <div class="search-info" id="generatePDFsInfo"></div>
                 <ul class="document-list" id="generatePDFsList">
+                    <!-- New Tahsildar Letter Entry - ADDED HERE -->
+                    <li class="document-item" data-title="Tahsildar Letter" data-desc="Generate official letters to Tahsildar for land records and revenue matters">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Tahsildar Letter</div>
+                            <div class="doc-desc">Generate official letters to Tahsildar for land records and revenue matters</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/tahsildar_letter.html" target="_blank" class="btn btn-generate">
+                                <i>🔄</i> Generate
+                            </a>
+                        </div>
+                    </li>
+                    
                     <!-- New Digital Evidence Certificate Entry -->
                     <li class="document-item" data-title="Digital Evidence Certificate" data-desc="Generate digital evidence chain of custody certificates">
                         <div class="doc-info">
@@ -726,7 +739,7 @@
     </div>
 
     <script>
-        // Document data for search functionality - Updated with Digital Evidence Certificate and Head Constable SSI IO GO
+        // Document data for search functionality - Updated with Tahsildar Letter
         const documents = [
             // Download Forms
             { title: "Arrest Intimation", desc: "Form for notifying relevant parties about an arrest", type: "download", element: null },
@@ -741,7 +754,8 @@
             { title: "Witness Statement Form", desc: "Standardized form for recording witness testimonies", type: "download", element: null },
             { title: "Vehicle Search Form", desc: "Documentation for vehicle searches and inventory", type: "download", element: null },
             
-            // Generate PDFs - Added Digital Evidence Certificate
+            // Generate PDFs - Added Tahsildar Letter
+            { title: "Tahsildar Letter", desc: "Generate official letters to Tahsildar for land records and revenue matters", type: "generate", element: null },
             { title: "Digital Evidence Certificate", desc: "Generate digital evidence chain of custody certificates", type: "generate", element: null },
             { title: "Formal Letter Generator", desc: "Generate formal letters for official police correspondence", type: "generate", element: null },
             { title: "CDR Request", desc: "Generate Call Detail Records request for telecom providers", type: "generate", element: null },
@@ -921,6 +935,14 @@
             
             searchInput.addEventListener('input', performSearch);
             searchButton.addEventListener('click', performSearch);
+            
+            // Special handling for Tahsildar Letter - ADDED HERE
+            const tahsildarLetterBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/tahsildar_letter.html"]');
+            if (tahsildarLetterBtn) {
+                tahsildarLetterBtn.addEventListener('click', function() {
+                    showNotification('Opening Tahsildar Letter Generator...');
+                });
+            }
             
             // Special handling for Head Constable and SSI IO GO
             const headConstableSSIBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/head_constable_ssi_io.pdf"]');
