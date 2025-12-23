@@ -794,6 +794,11 @@
             color: white;
         }
         
+        .question-number.wrong {
+            background-color: #ef4444;
+            color: white;
+        }
+        
         .nav-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -1932,7 +1937,7 @@
             
             articles: [
                 {
-                    id: 'article-1',
+                    id: 'article-1-4',
                     title: 'Article 1-4: Union & Territory',
                     description: 'Name and territory of the Union, admission or establishment of new States, formation of new States.',
                     icon: 'fas fa-map',
@@ -2306,6 +2311,7 @@
                 this.timerInterval = null;
                 this.modal = null;
                 this.fullscreenQuiz = null;
+                this.wrongAnswers = []; // Track wrong answers
                 
                 this.setupModal();
                 this.setupFullscreenQuiz();
@@ -2457,6 +2463,7 @@
                     // Initialize quiz state
                     this.userAnswers = new Array(this.filteredQuestions.length).fill(null);
                     this.markedQuestions = new Array(this.filteredQuestions.length).fill(false);
+                    this.wrongAnswers = new Array(this.filteredQuestions.length).fill(false);
                     this.quizSubmitted = false;
                     this.currentQuestionIndex = 0;
                     this.elapsedTime = 0;
@@ -2568,8 +2575,9 @@
                 this.currentQuestionIndex = index;
                 const question = this.filteredQuestions[index];
                 
-                // Update question text
-                this.fullscreenQuiz.querySelector('#fullscreenQuestionText').textContent = `${question.id}. ${question.text}`;
+                // Update question text - FIXED: Always use sequential numbering (index + 1)
+                const questionNumber = index + 1;
+                this.fullscreenQuiz.querySelector('#fullscreenQuestionText').textContent = `${questionNumber}. ${question.text}`;
                 
                 // Update options
                 const optionsContainer = this.fullscreenQuiz.querySelector('#fullscreenOptionsContainer');
@@ -2709,14 +2717,27 @@
                 const numbersContainer = this.fullscreenQuiz.querySelector('#questionNumbers');
                 numbersContainer.innerHTML = '';
                 
-                this.filteredQuestions.forEach((_, index) => {
+                this.filteredQuestions.forEach((question, index) => {
                     const numberBtn = document.createElement('div');
                     numberBtn.className = 'question-number';
                     
                     if (index === this.currentQuestionIndex) {
                         numberBtn.classList.add('current');
                     } else if (this.userAnswers[index] !== null) {
-                        numberBtn.classList.add('answered');
+                        // Check if answer is correct or wrong
+                        const isCorrect = this.userAnswers[index] === question.correctAnswer;
+                        
+                        if (this.quizSubmitted) {
+                            // During review, show wrong answers in red
+                            if (!isCorrect && this.userAnswers[index] !== null) {
+                                numberBtn.classList.add('wrong');
+                            } else {
+                                numberBtn.classList.add('answered');
+                            }
+                        } else {
+                            // During quiz, just show as answered
+                            numberBtn.classList.add('answered');
+                        }
                     }
                     
                     if (this.markedQuestions[index]) {
@@ -2737,11 +2758,15 @@
                     this.quizSubmitted = true;
                     clearInterval(this.timerInterval);
                     
-                    // Calculate results
+                    // Calculate results and track wrong answers
                     let correctCount = 0;
                     this.filteredQuestions.forEach((question, index) => {
-                        if (this.userAnswers[index] === question.correctAnswer) {
+                        const isCorrect = this.userAnswers[index] === question.correctAnswer;
+                        if (isCorrect) {
                             correctCount++;
+                            this.wrongAnswers[index] = false;
+                        } else {
+                            this.wrongAnswers[index] = true;
                         }
                     });
                     
@@ -2806,12 +2831,16 @@
                 this.quizSubmitted = true;
                 this.showFullQuestion(this.currentQuestionIndex);
                 this.showCorrectAnswer();
+                
+                // Update question numbers to show wrong answers in red
+                this.updateQuestionNumbers();
             }
             
             resetQuizState() {
                 this.filteredQuestions = [];
                 this.userAnswers = [];
                 this.markedQuestions = [];
+                this.wrongAnswers = [];
                 this.quizSubmitted = false;
                 this.currentQuestionIndex = 0;
                 this.elapsedTime = 0;
