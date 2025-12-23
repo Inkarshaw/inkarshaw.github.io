@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSR Generator - PDF Download</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #2c3e50;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+        
+        .tabs-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .tab {
+            padding: 8px 15px;
+            background-color: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background-color: #d5dbdb;
+        }
+        
+        .tab.active {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            background-color: #34495e;
+            color: white;
+            padding: 8px 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin: 0 5px;
+        }
+        
+        .btn:hover {
+            background-color: #1a252f;
+        }
+        
+        .btn-generate {
+            background-color: #27ae60;
+        }
+        
+        .btn-generate:hover {
+            background-color: #219653;
+        }
+        
+        .btn-reset {
+            background-color: #e74c3c;
+        }
+        
+        .btn-reset:hover {
+            background-color: #c0392b;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .preview-section {
+            margin-top: 40px;
+            display: none;
+        }
+        
+        .preview-container {
+            width: 100%;
+            height: 700px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: auto;
+            background-color: white;
+            padding: 20px;
+        }
+        
+        .preview-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .toggle-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .toggle-btn {
+            padding: 8px 20px;
+            background-color: #ddd;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .toggle-btn.active {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        .help-text {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
+        
+        .compact-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        .compact-table th {
+            background-color: #34495e;
+            color: white;
+            padding: 6px;
+            text-align: left;
+            font-size: 0.85em;
+        }
+        
+        .compact-table td {
+            padding: 6px;
+            border: 1px solid #ddd;
+            font-size: 0.85em;
+        }
+        
+        .add-row-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+            margin-right: 5px;
+        }
+        
+        .remove-row-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .preview-section, .preview-section * {
+                visibility: visible;
+            }
+            .preview-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+            }
+        }
+        
+        .station-details {
+            background-color: #e8f4f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .stat-zero {
+            background-color: #95a5a6;
+        }
+        
+        .stat-positive {
+            background-color: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .table-section {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: white;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table-title {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1em;
+        }
+        
+        .case-count {
+            background-color: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .auto-create-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        
+        .info-message {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin: 2px;
+        }
+        
+        .status-ui {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .status-closed {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .status-pending {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .pdf-button {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .pdf-button:hover {
+            background-color: #c0392b;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading-spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .download-success {
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Include html2canvas for capturing HTML as image -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DAILY SITUATION REPORT (DSR) GENERATOR</h1>
+            <p class="subtitle">Complete DSR with PDF Download Functionality</p>
+        </header>
+        
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="openTab(event, 'basic')">Basic Info</button>
+                <button class="tab" onclick="openTab(event, 'crimeStats')">Crime Statistics</button>
+                <button class="tab" onclick="openTab(event, 'caseDetails')">Case Details</button>
+                <button class="tab" onclick="openTab(event, 'misc')">Miscellaneous</button>
+                <button class="tab" onclick="openTab(event, 'dutyRoster')">Duty Roster</button>
+            </div>
+            
+            <form id="reportForm">
+                <!-- BASIC INFO TAB -->
+                <div id="basic" class="tab-content active">
+                    <div class="form-section">
+                        <div class="section-title">Basic Information</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reportDate" class="required">Report Date</label>
+                                <input type="date" id="reportDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="policeStation" class="required">Police Station</label>
+                                <input type="text" id="policeStation" value="G7 PS" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="rangeName" class="required">Range Name</label>
+                                <input type="text" id="rangeName" value="KILPAUK RANGE" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="district">District</label>
+                                <input type="text" id="district" value="Chennai">
+                            </div>
+                            <div class="form-group">
+                                <label for="zone">Zone</label>
+                                <input type="text" id="zone" value="Central Zone">
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <input type="text" id="state" value="Tamil Nadu">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CRIME STATISTICS TAB -->
+                <div id="crimeStats" class="tab-content">
+                    <div class="form-section">
+                        <div class="section-title">Crime Statistics - All DSR Heads</div>
+                        <div class="station-details">
+                            <strong>Station:</strong> <span id="stationDisplay">G7 PS</span> | 
+                            <strong>Date:</strong> <span id="dateDisplay"></span> |
+                            <strong>Active Tables:</strong> <span id="tableCount">0</span>
+                        </div>
+                        
+                        <div class="info-message">
+                            <strong>Note:</strong> When you enter values ≥ 1 in the fields below, corresponding case detail tables will automatically appear in the "Case Details" tab.
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ndpsAct">NDPS Act</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="ndpsIndicator"></span>
+                                    <input type="number" id="ndpsAct" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Narcotic Drugs and Psychotropic Substances Act</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bnss194">194 BNSS</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="bnss194Indicator"></span>
+                                    <input type="number" id="bnss194" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Bharatiya Nyaya Sanhita Section 194</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="csr">CSR</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="csrIndicator"></span>
+                                    <input type="number" id="csr" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Community Service Report</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cpAct75">75 CP Act</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="cpAct75Indicator"></span>
+                                    <input type="number" id="cpAct75" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">City Police Act Section 75</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bnss129">129 BNSS</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="bnss129Indicator"></span>
+                                    <input type="number" id="bnss129" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Bharatiya Nyaya Sanhita Section 129</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="hsOpen">HS Open</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="hsOpenIndicator"></span>
+                                    <input type="number" id="hsOpen" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">History Sheeter Open Cases</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ccNo">CC No.</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="ccNoIndicator"></span>
+                                    <input type="number" id="ccNo" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Court Case Number</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="dd">DD</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="ddIndicator"></span>
+                                    <input type="number" id="dd" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Daily Diary</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="eFiling">E-Filing Charge sheet</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="eFilingIndicator"></span>
+                                    <input type="number" id="eFiling" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bindOver">Bind over</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="bindOverIndicator"></span>
+                                    <input type="number" id="bindOver" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="disposalCase">Disposal Case</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="disposalCaseIndicator"></span>
+                                    <input type="number" id="disposalCase" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="chargeSheetPrepared">Charge Sheet prepared</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="chargeSheetPreparedIndicator"></span>
+                                    <input type="number" id="chargeSheetPrepared" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ndpsChargeSheet">NDPS Charge sheet Prepared</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="ndpsChargeSheetIndicator"></span>
+                                    <input type="number" id="ndpsChargeSheet" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="nbwRecall">NBW Recall</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="nbwRecallIndicator"></span>
+                                    <input type="number" id="nbwRecall" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Non-Bailable Warrant Recall</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="freshSummon">Fresh summon served</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="freshSummonIndicator"></span>
+                                    <input type="number" id="freshSummon" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="forecast">Forecast</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="forecastIndicator"></span>
+                                    <input type="number" id="forecast" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="hospitalIntimation">HOSPITAL INTIMATION</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="hospitalIntimationIndicator"></span>
+                                    <input type="number" id="hospitalIntimation" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="hundredCalls">100 Calls</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="hundredCallsIndicator"></span>
+                                    <input type="number" id="hundredCalls" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="todayHSChecked">Today HS Checked</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="todayHSCheckedIndicator"></span>
+                                    <input type="number" id="todayHSChecked" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="highCourtMsg">High Court Message</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="highCourtMsgIndicator"></span>
+                                    <input type="number" id="highCourtMsg" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="frs">FRS – Day – 12.00 am to Night 12.00 pm</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="frsIndicator"></span>
+                                    <input type="number" id="frs" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">First Response System</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="prPending">PR Pending details</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="prPendingIndicator"></span>
+                                    <input type="number" id="prPending" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Pending Report Details</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bailCancellation">Bail cancellation</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="bailCancellationIndicator"></span>
+                                    <input type="number" id="bailCancellation" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="currentPaperClosed">Current Paper Closed</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="currentPaperClosedIndicator"></span>
+                                    <input type="number" id="currentPaperClosed" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="goondasPending">Goondas Proposal pending</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="goondasPendingIndicator"></span>
+                                    <input type="number" id="goondasPending" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="otherHeads">Other Heads</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="stat-indicator stat-zero" id="otherHeadsIndicator"></span>
+                                    <input type="number" id="otherHeads" min="0" value="0" onchange="checkCrimeStats()">
+                                </div>
+                                <div class="help-text">Additional DSR heads if any</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CASE DETAILS TAB -->
+                <div id="caseDetails" class="tab-content">
+                    <div class="form-section">
+                        <div class="section-title">Case Detail Tables - All Crime Heads</div>
+                        <div class="info-message">
+                            <strong>Note:</strong> Tables appear here automatically when you enter values ≥ 1 in the Crime Statistics tab. Each crime head gets its own table.
+                        </div>
+                        
+                        <!-- Dynamic table sections will be inserted here -->
+                        <div id="dynamicTablesContainer">
+                            <!-- Tables will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MISCELLANEOUS TAB -->
+                <div id="misc" class="tab-content">
+                    <div class="form-section">
+                        <div class="section-title">100 Calls Details</div>
+                        <button type="button" class="add-row-btn" onclick="addCallRow()">+ Add 100 Call Entry</button>
+                        <table class="compact-table" id="callsTable">
+                            <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>PS</th>
+                                    <th>Date & Time</th>
+                                    <th>Caller Name & Number</th>
+                                    <th>SOC</th>
+                                    <th>Type of Problem</th>
+                                    <th>Action Taken</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="callsTableBody">
+                                <!-- Rows will be added dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="section-title">HS Checked Details</div>
+                        <button type="button" class="add-row-btn" onclick="addHsRow()">+ Add HS Checked Entry</button>
+                        <table class="compact-table" id="hsTable">
+                            <thead>
+                                <tr>
+                                    <th>S.NO</th>
+                                    <th>PS</th>
+                                    <th>HS Name</th>
+                                    <th>Present/OV/JAIL</th>
+                                    <th>Category</th>
+                                    <th>Checking officer name & Rank no</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hsTableBody">
+                                <!-- Rows will be added dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="section-title">Forecast Details</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="forecastDetails">Forecast Information</label>
+                                <textarea id="forecastDetails" placeholder="Enter forecast details for tomorrow"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DUTY ROSTER TAB -->
+                <div id="dutyRoster" class="tab-content">
+                    <div class="form-section">
+                        <div class="section-title">Duty Roster Information</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dutyDate">Duty Date</label>
+                                <input type="date" id="dutyDate">
+                            </div>
+                            <div class="form-group">
+                                <label for="stationHO">Station House Officer</label>
+                                <input type="text" id="stationHO" value="Inspr.Tr.A.Ramamoorthy">
+                            </div>
+                            <div class="form-group">
+                                <label for="contactNo">Contact Number</label>
+                                <input type="text" id="contactNo" value="98406 69372">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="totalStrength">Total Strength</label>
+                                <input type="number" id="totalStrength" min="0" value="76">
+                            </div>
+                            <div class="form-group">
+                                <label for="actualStrength">Actual Strength</label>
+                                <input type="number" id="actualStrength" min="0" value="47">
+                            </div>
+                            <div class="form-group">
+                                <label for="absentees">Absentees Count</label>
+                                <input type="number" id="absentees" min="0" value="0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dutySI">Duty Sub-Inspector</label>
+                                <input type="text" id="dutySI" value="SI Tr.Inkarshaw Bell Abraham">
+                            </div>
+                            <div class="form-group">
+                                <label for="patrolVehicle">Patrol Vehicle</label>
+                                <input type="text" id="patrolVehicle" value="TN 21 G 0995">
+                            </div>
+                            <div class="form-group">
+                                <label for="gypsyVehicle">Gypsy Vehicle</label>
+                                <input type="text" id="gypsyVehicle" value="TN 01 G 6649">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sectorA">Sector A Vehicle</label>
+                                <input type="text" id="sectorA" value="TN 01 G 6864">
+                            </div>
+                            <div class="form-group">
+                                <label for="sectorB">Sector B Vehicle</label>
+                                <input type="text" id="sectorB" value="TN 01 G 6913">
+                            </div>
+                            <div class="form-group">
+                                <label for="sectorC">Sector C Vehicle</label>
+                                <input type="text" id="sectorC" value="Harrington Special Patrol TN 01 G 7084">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="courtDuty">Court Duty Personnel</label>
+                                <textarea id="courtDuty" placeholder="Enter court duty personnel details">HC 26133 Tr.Ramesh, GrI 50837 Tr.Vanchinathan, GrI 30283. Tr. Karthik.</textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="miscDuty">Miscellaneous Duty</label>
+                                <textarea id="miscDuty" placeholder="Enter miscellaneous duty details">Receptionist Shift 10.00 hrs to 17.00 HRS: DEO Tmt.Banumathi</textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="casualties">Casualties Details</label>
+                                <textarea id="casualties" placeholder="Enter ML, Deserter, L/P, EL details">ML -06, Deserter - 01, L/P-01, EL-03</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="btn btn-generate" onclick="generateReport()">Generate Complete DSR</button>
+                    <button type="button" class="btn btn-reset" onclick="resetForm()">Reset All Data</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="preview-section" id="previewSection">
+            <div class="preview-title">
+                <h2>DAILY SITUATION REPORT - PREVIEW</h2>
+                <p>Complete DSR with all heads. Verify data before downloading PDF.</p>
+            </div>
+            
+            <div class="toggle-buttons">
+                <button class="toggle-btn active" onclick="showPreview()">Report Preview</button>
+                <button class="toggle-btn" onclick="showHTML()">HTML Code</button>
+                <button class="btn" onclick="printReport()">Print Report</button>
+                <button class="btn" onclick="downloadReportPDF()" style="background-color: #e74c3c;">Download PDF</button>
+                <button class="btn" onclick="downloadReportTXT()" style="background-color: #3498db;">Download TXT</button>
+            </div>
+            
+            <div class="preview-container" id="previewContainer"></div>
+            
+            <div id="downloadSuccess" class="download-success">
+                PDF downloaded successfully! Check your downloads folder.
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay for PDF generation -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div style="color: white; margin-top: 20px; font-size: 18px;">Generating PDF...</div>
+    </div>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Initialize date displays
+        const today = new Date();
+        document.getElementById('reportDate').valueAsDate = today;
+        document.getElementById('dutyDate').valueAsDate = today;
+        document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-GB');
+        
+        // Update station display when changed
+        document.getElementById('policeStation').addEventListener('input', function() {
+            document.getElementById('stationDisplay').textContent = this.value;
+        });
+        
+        // Update date display when changed
+        document.getElementById('reportDate').addEventListener('change', function() {
+            const date = new Date(this.value);
+            document.getElementById('dateDisplay').textContent = date.toLocaleDateString('en-GB');
+        });
+        
+        // Tab navigation
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            const tablinks = document.getElementsByClassName("tab");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.className += " active";
+        }
+        
+        // Table definitions for ALL crime heads
+        const tableDefinitions = {
+            'ndpsAct': {
+                title: 'NDPS Act Cases',
+                headers: ['Sl.No', 'Cr.No Sec', 'D/O, D/R & SOC', 'Complainant', 'Accused', 'Property', 'I.O', 'Status'],
+                sampleData: (index, date) => [
+                    index + 1,
+                    `${114 + index}/2025 U/s 8(c) r/w 20(b)(II)(B) NDPS Act`,
+                    `${date} at 11.00 Hrs\n${date} at 13.30 Hrs\nApparav Garden Koovam Near`,
+                    'SI.Tr.Inkarshaw Bell Abraham',
+                    'Sugu @ Sugumar M/a. 34 S/o.Anbarasu\nNo. 1039, Muthumariyamman Kovil Street, Chennai\nPh: 98419 35507',
+                    '1. Kanja - 1.400 gram\nVld.Rs. 14000/-',
+                    'INS Tr. A Ramamoorthy',
+                    'UI'
+                ]
+            },
+            'bnss194': {
+                title: '194 BNSS Cases',
+                headers: ['Sl. No', 'Cr.No Sec', 'D/O, D/R & SOC', 'Complainant', 'Deceased', 'I.O', 'Status'],
+                sampleData: (index, date) => [
+                    index + 1,
+                    `G7 PS Cr.No. ${113 + index}/2025 U/s 194 BNSS`,
+                    `D/O: ${date} at 20.30 pm\nD/R: ${date} at 09.00 hrs\nSOC: pillayar Koil Street`,
+                    'Tr. ArunKumar M/a. 33\nS/o. Murali Munusamy Naidu\nNo.74, pillayar Koil Street, Chennai 30',
+                    'Tr. Murali Munusamy Naidu M/a. 22\nS/o. Munusamy Naidu\nNo.74, pillayar Koil Street, Chennai 30',
+                    'SI, Tr. Anbarasan',
+                    'UI'
+                ]
+            },
+            'csr': {
+                title: 'CSR Cases',
+                headers: ['S.No', 'CSR NO', 'D/O, D/R & SOC', 'Petitioner', 'Counter Petitioner', 'GIST of the Case', 'I.O', 'Status'],
+                sampleData: (index, date) => [
+                    index + 1,
+                    `CSR-${100 + index}/2025`,
+                    `${date} at 14:00 hrs\nMain Road`,
+                    'Rajesh Kumar\nS/o. Ramesh Kumar',
+                    'Mohan Singh\nS/o. Hari Singh',
+                    'Property dispute between neighbors regarding boundary wall',
+                    'SI Tr. Rajendran',
+                    'Pending'
+                ]
+            },
+            'cpAct75': {
+                title: '75 CP Act Cases',
+                headers: ['Sl No', 'Stn. Cr. No', 'Sec', 'D/O & D/R', 'SOC', 'Complainant', 'Accused', 'IO', 'Status'],
+                sampleData: (index, date) => [
+                    index + 1,
+                    `G7 Cr.No. ${200 + index}/2025`,
+                    '75 CP Act',
+                    `${date} at 16:30 hrs`,
+                    'Market Street',
+                    'Shopkeeper - Ravi\nMobile: 9876543210',
+                    'Unknown person creating nuisance',
+                    'HC 12345 Tr. Kumar',
+                    'Closed'
+                ]
+            },
+            'bnss129': {
+                title: '129 BNSS Cases',
+                headers: ['Sl No', 'Cr.No Sec', 'D/O, D/R & SOC', 'Complainant', 'Accused', 'Property', 'I.O', 'Status'],
+                sampleData: (index, date) => [
+                    index + 1,
+                    `G7 Cr.No. ${150 + index}/2025 U/s 129 BNSS`,
+                    `${date} at 19:00 hrs\nResidential Area`,
+                    'Mrs. Geetha\nW/o. Ramesh',
+                    'Unknown persons',
+                    'Mobile Phone - Rs. 15,000/-',
+                    'WSI Tmt. Lakshmi',
+                    'UI'
+                ]
+            }
+        };
+        
+        // Store active tables
+        let activeTables = {};
+        
+        // Check crime statistics and create/remove tables
+        function checkCrimeStats() {
+            const crimeStats = [
+                {id: 'ndpsAct', name: 'NDPS Act'},
+                {id: 'bnss194', name: '194 BNSS'},
+                {id: 'csr', name: 'CSR'},
+                {id: 'cpAct75', name: '75 CP Act'},
+                {id: 'bnss129', name: '129 BNSS'},
+                {id: 'hsOpen', name: 'HS Open'},
+                {id: 'ccNo', name: 'CC No.'},
+                {id: 'dd', name: 'DD'},
+                {id: 'eFiling', name: 'E-Filing Charge sheet'},
+                {id: 'bindOver', name: 'Bind over'},
+                {id: 'disposalCase', name: 'Disposal Case'},
+                {id: 'chargeSheetPrepared', name: 'Charge Sheet prepared'},
+                {id: 'ndpsChargeSheet', name: 'NDPS Charge sheet Prepared'},
+                {id: 'nbwRecall', name: 'NBW Recall'},
+                {id: 'freshSummon', name: 'Fresh summon served'},
+                {id: 'forecast', name: 'Forecast'},
+                {id: 'hospitalIntimation', name: 'HOSPITAL INTIMATION'},
+                {id: 'hundredCalls', name: '100 Calls'},
+                {id: 'todayHSChecked', name: 'Today HS Checked'},
+                {id: 'highCourtMsg', name: 'High Court Message'},
+                {id: 'frs', name: 'FRS'},
+                {id: 'prPending', name: 'PR Pending details'},
+                {id: 'bailCancellation', name: 'Bail cancellation'},
+                {id: 'currentPaperClosed', name: 'Current Paper Closed'},
+                {id: 'goondasPending', name: 'Goondas Proposal pending'},
+                {id: 'otherHeads', name: 'Other Heads'}
+            ];
+            
+            const container = document.getElementById('dynamicTablesContainer');
+            const reportDate = document.getElementById('reportDate').value;
+            let tableCount = 0;
+            
+            crimeStats.forEach(stat => {
+                const value = parseInt(document.getElementById(stat.id).value) || 0;
+                const indicator = document.getElementById(`${stat.id}Indicator`);
+                
+                if (indicator) {
+                    if (value > 0) {
+                        indicator.className = 'stat-indicator stat-positive';
+                        
+                        if (!activeTables[stat.id] && tableDefinitions[stat.id]) {
+                            createCaseTable(stat.id, stat.name, value, reportDate);
+                            tableCount++;
+                        } else if (activeTables[stat.id]) {
+                            updateTableCount(stat.id, value);
+                            tableCount++;
+                        }
+                    } else {
+                        indicator.className = 'stat-indicator stat-zero';
+                        
+                        if (activeTables[stat.id]) {
+                            removeCaseTable(stat.id);
+                        }
+                    }
+                }
+            });
+            
+            document.getElementById('tableCount').textContent = tableCount;
+            
+            if (tableCount === 0) {
+                container.innerHTML = '<div class="info-message">No case detail tables required. Enter values ≥ 1 in Crime Statistics tab to create tables.</div>';
+            }
+        }
+        
+        // Create a case detail table
+        function createCaseTable(tableId, tableName, caseCount, reportDate) {
+            const container = document.getElementById('dynamicTablesContainer');
+            const tableDef = tableDefinitions[tableId] || getDefaultTableDef(tableId, tableName);
+            
+            const tableSection = document.createElement('div');
+            tableSection.className = 'table-section';
+            tableSection.id = `tableSection_${tableId}`;
+            
+            const tableHeader = document.createElement('div');
+            tableHeader.className = 'table-header';
+            
+            const tableTitle = document.createElement('div');
+            tableTitle.className = 'table-title';
+            tableTitle.textContent = `${tableName} Cases: ${caseCount}`;
+            
+            const buttonContainer = document.createElement('div');
+            
+            const autoCreateBtn = document.createElement('button');
+            autoCreateBtn.type = 'button';
+            autoCreateBtn.className = 'auto-create-btn';
+            autoCreateBtn.textContent = 'Auto-Create';
+            autoCreateBtn.onclick = () => autoPopulateTable(tableId, caseCount, reportDate);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-row-btn';
+            removeBtn.textContent = 'Remove Table';
+            removeBtn.onclick = () => {
+                removeCaseTable(tableId);
+                document.getElementById(tableId).value = 0;
+                checkCrimeStats();
+            };
+            
+            buttonContainer.appendChild(autoCreateBtn);
+            buttonContainer.appendChild(removeBtn);
+            
+            tableHeader.appendChild(tableTitle);
+            tableHeader.appendChild(buttonContainer);
+            
+            const table = document.createElement('table');
+            table.className = 'compact-table';
+            table.id = `table_${tableId}`;
+            
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            
+            tableDef.headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            
+            const actionTh = document.createElement('th');
+            actionTh.textContent = 'Action';
+            headerRow.appendChild(actionTh);
+            
+            thead.appendChild(headerRow);
+            
+            const tbody = document.createElement('tbody');
+            tbody.id = `tbody_${tableId}`;
+            
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            
+            const addRowBtn = document.createElement('button');
+            addRowBtn.type = 'button';
+            addRowBtn.className = 'add-row-btn';
+            addRowBtn.textContent = `+ Add ${tableName} Entry`;
+            addRowBtn.onclick = () => addRowToTable(tableId, tableDef, reportDate);
+            
+            tableSection.appendChild(tableHeader);
+            tableSection.appendChild(addRowBtn);
+            tableSection.appendChild(table);
+            
+            container.appendChild(tableSection);
+            
+            activeTables[tableId] = {
+                element: tableSection,
+                count: caseCount,
+                definition: tableDef,
+                name: tableName
+            };
+        }
+        
+        // Get default table definition
+        function getDefaultTableDef(tableId, tableName) {
+            return {
+                title: `${tableName} Cases`,
+                headers: ['Sl.No', 'Details', 'Date/Time', 'Location/Parties', 'Description', 'Status', 'Officer', 'Remarks'],
+                sampleData: (index, date) => [
+                    index + 1,
+                    `${tableName}-${100 + index}/2025`,
+                    `${date} at 10:00 hrs`,
+                    'Various',
+                    `${tableName} case details`,
+                    'Under Process',
+                    'Concerned Officer',
+                    'Pending'
+                ]
+            };
+        }
+        
+        // Update table count display
+        function updateTableCount(tableId, newCount) {
+            if (activeTables[tableId]) {
+                const tableSection = document.getElementById(`tableSection_${tableId}`);
+                if (tableSection) {
+                    const titleElement = tableSection.querySelector('.table-title');
+                    if (titleElement) {
+                        titleElement.textContent = `${activeTables[tableId].name} Cases: ${newCount}`;
+                    }
+                    activeTables[tableId].count = newCount;
+                }
+            }
+        }
+        
+        // Remove a case table
+        function removeCaseTable(tableId) {
+            const tableSection = document.getElementById(`tableSection_${tableId}`);
+            if (tableSection) {
+                tableSection.remove();
+                delete activeTables[tableId];
+            }
+        }
+        
+        // Add row to a specific table
+        function addRowToTable(tableId, tableDef, reportDate) {
+            const tbody = document.getElementById(`tbody_${tableId}`);
+            if (!tbody) return;
+            
+            const rowCount = tbody.querySelectorAll('tr').length;
+            const rowData = tableDef.sampleData ? 
+                tableDef.sampleData(rowCount, reportDate) : 
+                Array(tableDef.headers.length).fill('');
+            
+            const row = document.createElement('tr');
+            
+            rowData.forEach((data, index) => {
+                const td = document.createElement('td');
+                
+                if (index === 0) {
+                    td.textContent = rowCount + 1;
+                } else if (data.includes('\n')) {
+                    const textarea = document.createElement('textarea');
+                    textarea.style.width = '100%';
+                    textarea.style.border = 'none';
+                    textarea.style.background = 'transparent';
+                    textarea.style.height = '60px';
+                    textarea.value = data;
+                    td.appendChild(textarea);
+                } else {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.style.width = '100%';
+                    input.style.border = 'none';
+                    input.style.background = 'transparent';
+                    input.value = data;
+                    td.appendChild(input);
+                }
+                
+                row.appendChild(td);
+            });
+            
+            const actionTd = document.createElement('td');
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-row-btn';
+            removeBtn.textContent = 'Remove';
+            removeBtn.onclick = function() {
+                this.parentElement.parentElement.remove();
+                updateSerialNumbers(tableId);
+            };
+            actionTd.appendChild(removeBtn);
+            row.appendChild(actionTd);
+            
+            tbody.appendChild(row);
+        }
+        
+        // Auto-populate table with sample data
+        function autoPopulateTable(tableId, caseCount, reportDate) {
+            const tbody = document.getElementById(`tbody_${tableId}`);
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            for (let i = 0; i < caseCount; i++) {
+                addRowToTable(tableId, tableDefinitions[tableId] || getDefaultTableDef(tableId, tableId), reportDate);
+            }
+        }
+        
+        // Update serial numbers in a table
+        function updateSerialNumbers(tableId) {
+            const tbody = document.getElementById(`tbody_${tableId}`);
+            if (!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                const firstCell = row.querySelector('td:first-child');
+                if (firstCell) {
+                    firstCell.textContent = index + 1;
+                }
+            });
+        }
+        
+        // Get table data for report generation
+        function getTableData(tableId) {
+            const tbody = document.getElementById(`tbody_${tableId}`);
+            if (!tbody) return [];
+            
+            const rows = tbody.querySelectorAll('tr');
+            const data = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                
+                cells.forEach((cell, index) => {
+                    if (index === cells.length - 1) return;
+                    
+                    if (cell.querySelector('input')) {
+                        rowData.push(cell.querySelector('input').value);
+                    } else if (cell.querySelector('textarea')) {
+                        rowData.push(cell.querySelector('textarea').value);
+                    } else {
+                        rowData.push(cell.textContent.trim());
+                    }
+                });
+                
+                data.push(rowData);
+            });
+            
+            return data;
+        }
+        
+        // Initialize with sample data
+        window.onload = function() {
+            document.getElementById('ndpsAct').value = '1';
+            document.getElementById('bnss194').value = '1';
+            document.getElementById('csr').value = '2';
+            document.getElementById('hundredCalls').value = '3';
+            document.getElementById('todayHSChecked').value = '2';
+            
+            setTimeout(() => {
+                checkCrimeStats();
+                
+                setTimeout(() => {
+                    const tablesToAutoCreate = ['ndpsAct', 'bnss194', 'csr'];
+                    tablesToAutoCreate.forEach(tableId => {
+                        if (activeTables[tableId]) {
+                            const count = parseInt(document.getElementById(tableId).value) || 0;
+                            autoPopulateTable(tableId, count, document.getElementById('reportDate').value);
+                        }
+                    });
+                }, 500);
+            }, 100);
+        };
+        
+        // Format date function
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+        
+        // Generate complete report (Updated to remove Prepared By/Approved By)
+        function generateReport() {
+            const reportDate = document.getElementById('reportDate').value;
+            const policeStation = document.getElementById('policeStation').value;
+            const rangeName = document.getElementById('rangeName').value;
+            const district = document.getElementById('district').value;
+            const zone = document.getElementById('zone').value;
+            const state = document.getElementById('state').value;
+            
+            const reportDateFormatted = formatDate(reportDate);
+            
+            const stats = {};
+            const statIds = ['ndpsAct', 'bnss194', 'csr', 'cpAct75', 'bnss129', 'hsOpen', 'ccNo', 'dd', 
+                           'eFiling', 'bindOver', 'disposalCase', 'chargeSheetPrepared', 'ndpsChargeSheet',
+                           'nbwRecall', 'freshSummon', 'forecast', 'hospitalIntimation', 'hundredCalls',
+                           'todayHSChecked', 'highCourtMsg', 'frs', 'prPending', 'bailCancellation',
+                           'currentPaperClosed', 'goondasPending', 'otherHeads'];
+            
+            statIds.forEach(id => {
+                stats[id] = document.getElementById(id).value;
+            });
+            
+            const dynamicTableData = {};
+            Object.keys(activeTables).forEach(tableId => {
+                dynamicTableData[tableId] = {
+                    name: activeTables[tableId].name,
+                    data: getTableData(tableId)
+                };
+            });
+            
+            const callsData = getStaticTableData('callsTable');
+            const hsData = getStaticTableData('hsTable');
+            
+            const forecastDetails = document.getElementById('forecastDetails').value;
+            
+            const dutyDate = document.getElementById('dutyDate').value;
+            const dutyDateFormatted = formatDate(dutyDate);
+            const stationHO = document.getElementById('stationHO').value;
+            const contactNo = document.getElementById('contactNo').value;
+            const totalStrength = document.getElementById('totalStrength').value;
+            const actualStrength = document.getElementById('actualStrength').value;
+            const absentees = document.getElementById('absentees').value;
+            const dutySI = document.getElementById('dutySI').value;
+            const patrolVehicle = document.getElementById('patrolVehicle').value;
+            const gypsyVehicle = document.getElementById('gypsyVehicle').value;
+            const sectorA = document.getElementById('sectorA').value;
+            const sectorB = document.getElementById('sectorB').value;
+            const sectorC = document.getElementById('sectorC').value;
+            const courtDuty = document.getElementById('courtDuty').value;
+            const miscDuty = document.getElementById('miscDuty').value;
+            const casualties = document.getElementById('casualties').value;
+            
+            // Build the report HTML
+            let reportHTML = `
+                <div style="font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.2; padding: 20px;">
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 15px;">
+                        <h1 style="text-decoration: underline; margin-bottom: 5px; font-size: 16pt; color: #000;">${rangeName} DAILY SITUATION REPORT</h1>
+                        <h2 style="margin-top: 0; font-size: 14pt; color: #333;">ON ${reportDateFormatted}</h2>
+                        <p style="font-size: 10pt; margin-top: 5px;">
+                            <strong>Police Station:</strong> ${policeStation} | 
+                            <strong>District:</strong> ${district} | 
+                            <strong>Zone:</strong> ${zone} | 
+                            <strong>State:</strong> ${state}
+                        </p>
+                    </div>
+                    
+                    <!-- Main Statistics Table -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="background-color: #2c3e50; color: white; padding: 8px; font-size: 12pt; margin-bottom: 10px;">CRIME STATISTICS</h3>
+                        <table border="1" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 9pt;">
+                            <tr>
+                                <th width="5%" style="padding: 5px; background-color: #34495e; color: white; text-align: center;"><b>S. No.</b></th>
+                                <th width="45%" style="padding: 5px; background-color: #34495e; color: white;"><b>Head of offences</b></th>
+                                <th width="15%" style="padding: 5px; background-color: #34495e; color: white; text-align: center;"><b>Total</b></th>
+                                <th width="35%" style="padding: 5px; background-color: #34495e; color: white; text-align: center;"><b>${policeStation}</b></th>
+                            </tr>
+            `;
+            
+            const dsrHeads = [
+                { id: 'ndpsAct', label: 'NDPS Act' },
+                { id: 'bnss194', label: '194 BNSS' },
+                { id: 'csr', label: 'CSR' },
+                { id: 'cpAct75', label: '75 CP act' },
+                { id: 'bnss129', label: '129 BNSS' },
+                { id: 'hsOpen', label: 'HS Open' },
+                { id: 'ccNo', label: 'CC No.' },
+                { id: 'dd', label: 'DD' },
+                { id: 'eFiling', label: 'E-Filing Charge sheet' },
+                { id: 'bindOver', label: 'Bind over' },
+                { id: 'disposalCase', label: 'Disposal Case' },
+                { id: 'chargeSheetPrepared', label: 'Charge Sheet prepared' },
+                { id: 'ndpsChargeSheet', label: 'NDPS Charge sheet Prepared' },
+                { id: 'nbwRecall', label: 'NBW Recall' },
+                { id: 'freshSummon', label: 'Fresh summon served' },
+                { id: 'forecast', label: 'Forecast' },
+                { id: 'hospitalIntimation', label: 'HOSPITAL INTIMATION' },
+                { id: 'hundredCalls', label: '100 Calls' },
+                { id: 'todayHSChecked', label: 'Today HS Checked' },
+                { id: 'highCourtMsg', label: 'High Court Message' },
+                { id: 'frs', label: 'FRS' },
+                { id: 'prPending', label: 'PR Pending details' },
+                { id: 'bailCancellation', label: 'Bail cancellation' },
+                { id: 'currentPaperClosed', label: 'Current Paper Closed' },
+                { id: 'goondasPending', label: 'Goondas Proposal pending' }
+            ];
+            
+            let counter = 1;
+            dsrHeads.forEach(head => {
+                const value = stats[head.id] === '0' ? '-' : stats[head.id].padStart(2, '0');
+                const bgColor = counter % 2 === 0 ? '#f9f9f9' : '#ffffff';
+                reportHTML += `
+                    <tr style="background-color: ${bgColor};">
+                        <td style="padding: 4px; text-align: center; border: 1px solid #ddd;">${counter++}.</td>
+                        <td style="padding: 4px; border: 1px solid #ddd;"><b>${head.label}</b></td>
+                        <td style="padding: 4px; text-align: center; border: 1px solid #ddd;"><b>${value}</b></td>
+                        <td style="padding: 4px; text-align: center; border: 1px solid #ddd;"><b>${value}</b></td>
+                    </tr>
+                `;
+            });
+            
+            reportHTML += `
+                        </table>
+                    </div>
+            `;
+            
+            // Add dynamic tables to report
+            Object.keys(dynamicTableData).forEach(tableId => {
+                const tableInfo = dynamicTableData[tableId];
+                if (tableInfo.data.length > 0) {
+                    const tableDef = tableDefinitions[tableId] || getDefaultTableDef(tableId, tableInfo.name);
+                    
+                    reportHTML += `
+                        <div style="margin-bottom: 25px; page-break-inside: avoid;">
+                            <h3 style="background-color: #2c3e50; color: white; padding: 8px; font-size: 12pt; margin-bottom: 10px;">${tableInfo.name.toUpperCase()}: ${stats[tableId] || tableInfo.data.length}</h3>
+                    `;
+                    
+                    if (tableInfo.data.length > 0) {
+                        reportHTML += `
+                            <table border="1" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+                                <tr>
+                        `;
+                        
+                        tableDef.headers.forEach(header => {
+                            reportHTML += `<th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd;"><b>${header}</b></th>`;
+                        });
+                        
+                        reportHTML += `
+                                </tr>
+                        `;
+                        
+                        tableInfo.data.forEach((rowData, rowIndex) => {
+                            const rowBgColor = rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9';
+                            reportHTML += `<tr style="background-color: ${rowBgColor};">`;
+                            rowData.forEach((cellData, cellIndex) => {
+                                const cellContent = cellData ? cellData.toString().replace(/\n/g, '<br>') : '';
+                                reportHTML += `<td style="padding: 4px; border: 1px solid #ddd; vertical-align: top;">${cellContent}</td>`;
+                            });
+                            reportHTML += `</tr>`;
+                        });
+                        
+                        reportHTML += `
+                            </table>
+                        `;
+                    } else {
+                        reportHTML += `<p style="font-size: 9pt; color: #666; padding: 10px; text-align: center;">No case details entered.</p>`;
+                    }
+                    
+                    reportHTML += `</div>`;
+                }
+            });
+            
+            // Add 100 Calls details
+            if (callsData.length > 0 && stats.hundredCalls !== '0') {
+                reportHTML += `
+                    <div style="margin-bottom: 25px; page-break-inside: avoid;">
+                        <h3 style="background-color: #2c3e50; color: white; padding: 8px; font-size: 12pt; margin-bottom: 10px;">100 CALLS: ${stats.hundredCalls}</h3>
+                        <table border="1" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+                            <tr>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 5%;"><b>S.No</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 10%;"><b>PS</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 15%;"><b>Date & Time</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 20%;"><b>Caller Name & Number</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 15%;"><b>SOC</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 15%;"><b>Type of Problem</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 20%;"><b>Action Taken</b></th>
+                            </tr>
+                `;
+                
+                callsData.forEach((row, index) => {
+                    const rowBgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
+                    reportHTML += `<tr style="background-color: ${rowBgColor};">`;
+                    row.forEach((cellData, cellIndex) => {
+                        const cellContent = cellData ? cellData.toString().replace(/\n/g, '<br>') : '';
+                        reportHTML += `<td style="padding: 4px; border: 1px solid #ddd; vertical-align: top;">${cellContent}</td>`;
+                    });
+                    reportHTML += `</tr>`;
+                });
+                
+                reportHTML += `
+                        </table>
+                    </div>
+                `;
+            }
+            
+            // Add HS Checked details
+            if (hsData.length > 0 && stats.todayHSChecked !== '0') {
+                reportHTML += `
+                    <div style="margin-bottom: 25px; page-break-inside: avoid;">
+                        <h3 style="background-color: #2c3e50; color: white; padding: 8px; font-size: 12pt; margin-bottom: 10px;">HS CHECKED DETAILS: ${stats.todayHSChecked}</h3>
+                        <table border="1" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+                            <tr>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 5%;"><b>S.NO</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 10%;"><b>PS</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 20%;"><b>HS Name</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 15%;"><b>Present/OV/JAIL</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 15%;"><b>Category</b></th>
+                                <th style="padding: 4px; background-color: #ecf0f1; border: 1px solid #ddd; width: 35%;"><b>Checking officer name & Rank no</b></th>
+                            </tr>
+                `;
+                
+                hsData.forEach((row, index) => {
+                    const rowBgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
+                    reportHTML += `<tr style="background-color: ${rowBgColor};">`;
+                    row.forEach((cellData, cellIndex) => {
+                        const cellContent = cellData ? cellData.toString().replace(/\n/g, '<br>') : '';
+                        reportHTML += `<td style="padding: 4px; border: 1px solid #ddd; vertical-align: top;">${cellContent}</td>`;
+                    });
+                    reportHTML += `</tr>`;
+                });
+                
+                reportHTML += `
+                        </table>
+                    </div>
+                `;
+            }
+            
+            // Add Duty Roster
+            reportHTML += `
+                    <div style="margin-bottom: 25px; page-break-inside: avoid;">
+                        <h3 style="background-color: #2c3e50; color: white; padding: 8px; font-size: 12pt; margin-bottom: 10px;">ROUGH DUTY ROSTER</h3>
+                        <table border="1" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 9pt;">
+                            <tr style="background-color: #ecf0f1;">
+                                <td colspan="2" style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 10pt;">${policeStation} (LAW & ORDER)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #ddd; width: 50%;"><b>Date:</b> ${dutyDateFormatted}</td>
+                                <td style="padding: 6px; border: 1px solid #ddd; width: 50%;"><b>SHO:</b> ${stationHO} (${contactNo})</td>
+                            </tr>
+                            <tr style="background-color: #f9f9f9;">
+                                <td style="padding: 6px; border: 1px solid #ddd;"><b>Duty SI:</b> ${dutySI}</td>
+                                <td style="padding: 6px; border: 1px solid #ddd;"><b>Patrol Vehicle:</b> ${patrolVehicle}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #ddd;"><b>Gypsy Vehicle:</b> ${gypsyVehicle}</td>
+                                <td style="padding: 6px; border: 1px solid #ddd;"><b>Sector Vehicles:</b> ${sectorA}, ${sectorB}, ${sectorC}</td>
+                            </tr>
+                            <tr style="background-color: #f9f9f9;">
+                                <td style="padding: 6px; border: 1px solid #ddd;"><b>Total Strength:</b> ${totalStrength}</td>
+                                <td style="padding: 6px; border: 1px solid #ddd;"><b>Actual Strength:</b> ${actualStrength}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #ddd;"><b>Absentees:</b> ${absentees}</td>
+                                <td style="padding: 6px; border: 1px solid #ddd;"><b>Casualties:</b> ${casualties || 'Nil'}</td>
+                            </tr>
+                        </table>
+                    </div>
+            `;
+            
+            // Add forecast if provided
+            if (forecastDetails) {
+                reportHTML += `
+                    <div style="margin-bottom: 25px; page-break-inside: avoid;">
+                        <h3 style="background-color: #2c3e50; color: white; padding: 8px; font-size: 12pt; margin-bottom: 10px;">FORECAST DETAILS</h3>
+                        <div style="background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
+                            <p style="font-size: 10pt; white-space: pre-line; margin: 0;">${forecastDetails}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add footer without Prepared By/Approved By
+            reportHTML += `
+                    <div style="margin-top: 30px; border-top: 2px solid #000; padding-top: 15px; font-size: 9pt; color: #666;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top;">
+                                    <p><b>Police Station:</b><br>${policeStation}</p>
+                                    <p><b>Range:</b><br>${rangeName}</p>
+                                </td>
+                                <td style="width: 50%; vertical-align: top; text-align: right;">
+                                    <p><b>District:</b><br>${district}</p>
+                                    <p><b>Zone:</b><br>${zone}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="padding-top: 10px; border-top: 1px solid #ddd; text-align: center;">
+                                    <p><b>Report Date:</b> ${reportDateFormatted}</p>
+                                    <p><b>Generation Date/Time:</b> ${new Date().toLocaleString()}</p>
+                                    <p><b>Total Active Case Tables:</b> ${Object.keys(dynamicTableData).length}</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            // Display preview
+            document.getElementById('previewContainer').innerHTML = reportHTML;
+            document.getElementById('previewSection').style.display = 'block';
+            showPreview();
+            
+            // Scroll to preview
+            document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Helper function to get static table data
+        function getStaticTableData(tableId) {
+            const tbody = document.getElementById(`${tableId}Body`);
+            if (!tbody) return [];
+            
+            const rows = tbody.querySelectorAll('tr');
+            const data = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                
+                cells.forEach((cell, index) => {
+                    if (index === cells.length - 1) return;
+                    
+                    if (cell.querySelector('input')) {
+                        rowData.push(cell.querySelector('input').value);
+                    } else if (cell.querySelector('textarea')) {
+                        rowData.push(cell.querySelector('textarea').value);
+                    } else if (cell.querySelector('select')) {
+                        rowData.push(cell.querySelector('select').value);
+                    } else {
+                        rowData.push(cell.textContent.trim());
+                    }
+                });
+                
+                data.push(rowData);
+            });
+            
+            return data;
+        }
+        
+        // Show preview
+        function showPreview() {
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.toggle-btn')[0].classList.add('active');
+        }
+        
+        // Show HTML code
+        function showHTML() {
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.toggle-btn')[1].classList.add('active');
+            const previewContainer = document.getElementById('previewContainer');
+            const htmlContent = previewContainer.innerHTML;
+            previewContainer.textContent = htmlContent;
+            previewContainer.style.whiteSpace = 'pre-wrap';
+            previewContainer.style.fontFamily = 'monospace';
+            previewContainer.style.fontSize = '9pt';
+        }
+        
+        // Print report
+        function printReport() {
+            window.print();
+        }
+        
+        // Download PDF using jsPDF
+        async function downloadReportPDF() {
+            try {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                
+                // Get report content
+                const reportContent = document.getElementById('previewContainer').innerHTML;
+                
+                // Create a temporary div for html2canvas
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.width = '210mm'; // A4 width
+                tempDiv.style.padding = '20px';
+                tempDiv.style.fontFamily = 'Arial, sans-serif';
+                tempDiv.style.fontSize = '11pt';
+                tempDiv.style.backgroundColor = 'white';
+                tempDiv.innerHTML = reportContent;
+                document.body.appendChild(tempDiv);
+                
+                // Use html2canvas to capture the content
+                const canvas = await html2canvas(tempDiv, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+                
+                // Remove temporary div
+                document.body.removeChild(tempDiv);
+                
+                // Create PDF
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Calculate dimensions
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                // Add image to PDF
+                pdf.addImage(canvas, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                // Add additional pages if content is too long
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(canvas, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                // Get filename
+                const reportDate = document.getElementById('reportDate').value;
+                const policeStation = document.getElementById('policeStation').value;
+                const filename = `DSR_${policeStation}_${reportDate}.pdf`;
+                
+                // Save PDF
+                pdf.save(filename);
+                
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                // Show success message
+                const successMsg = document.getElementById('downloadSuccess');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                alert('Error generating PDF. Please try again or use the Print option instead.');
+            }
+        }
+        
+        // Download TXT file
+        function downloadReportTXT() {
+            const content = document.getElementById('previewContainer').textContent;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            const reportDate = document.getElementById('reportDate').value;
+            const policeStation = document.getElementById('policeStation').value;
+            a.download = `DSR_${policeStation}_${reportDate}.txt`;
+            a.href = url;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to reset all data? This will clear all entries.')) {
+                document.getElementById('reportForm').reset();
+                document.getElementById('reportDate').valueAsDate = new Date();
+                document.getElementById('dutyDate').valueAsDate = new Date();
+                
+                Object.keys(activeTables).forEach(tableId => {
+                    removeCaseTable(tableId);
+                });
+                activeTables = {};
+                
+                document.getElementById('callsTableBody').innerHTML = '';
+                document.getElementById('hsTableBody').innerHTML = '';
+                
+                document.getElementById('previewSection').style.display = 'none';
+                
+                const tabcontent = document.getElementsByClassName("tab-content");
+                for (let i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].classList.remove("active");
+                }
+                
+                const tablinks = document.getElementsByClassName("tab");
+                for (let i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                
+                document.getElementById('basic').classList.add("active");
+                tablinks[0].className += " active";
+                
+                const indicators = document.querySelectorAll('.stat-indicator');
+                indicators.forEach(indicator => {
+                    indicator.className = 'stat-indicator stat-zero';
+                });
+                
+                document.getElementById('tableCount').textContent = '0';
+                
+                alert('Form has been reset. You can start entering new data.');
+            }
+        }
+    </script>
+</body>
+</html>
