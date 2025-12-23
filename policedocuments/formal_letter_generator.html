@@ -550,6 +550,31 @@
         .form-section-title i {
             font-size: 18px;
         }
+        
+        /* Recipient name input field */
+        .recipient-name-group {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .recipient-name-group.active {
+            display: block;
+        }
+        
+        .recipient-name-input {
+            margin-top: 8px;
+        }
+        
+        .recipient-name-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
     </style>
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -651,18 +676,12 @@ Senior Marketing Executive
 Marketing Department
 ABC Corporation
 123 Business Street
-New York, NY 10001
-Phone: (123) 456-7890
-Email: john.smith@abccorp.com
-Employee ID: EMP12345" required>John Smith
+New York, NY 10001" required>John Smith
 Senior Marketing Executive
 Marketing Department
 ABC Corporation
 123 Business Street
-New York, NY 10001
-Phone: (123) 456-7890
-Email: john.smith@abccorp.com
-Employee ID: EMP12345</textarea>
+New York, NY 10001</textarea>
                         <div class="address-format-hint">Enter each detail on a new line</div>
                         <div class="error" id="fromError">Please enter your details</div>
                     </div>
@@ -720,6 +739,18 @@ Chicago, IL 60601</textarea>
                                 <option value="sirmadam">Sir/Madam</option>
                             </select>
                         </div>
+                        
+                        <!-- Recipient Name Input (only shown when "Use Name" is selected) -->
+                        <div class="recipient-name-group" id="recipientNameGroup">
+                            <div class="from-label">
+                                <i class="fas fa-user-circle"></i>
+                                <label class="required">Recipient Name:</label>
+                            </div>
+                            <input type="text" id="recipientName" class="recipient-name-input" placeholder="Enter recipient's name (e.g., Sarah or Sarah Johnson)">
+                            <div class="recipient-name-hint">Enter the name to use in the salutation. If left empty, will use name from Receiver Details.</div>
+                            <div class="error" id="recipientNameError">Please enter recipient name</div>
+                        </div>
+                        
                         <div class="salutation-preview">
                             Preview: <strong id="salutationPreview">Dear Sarah,</strong>
                         </div>
@@ -816,7 +847,7 @@ Thank you for your understanding and consideration of my request.</textarea>
         // Initialize jsPDF
         const { jsPDF } = window.jspdf;
 
-        // DOM Elements - FIXED: Properly declare variables
+        // DOM Elements
         const form = document.getElementById('leaveForm');
         const letterPreview = document.getElementById('letterPreview');
         const mobileLetterPreview = document.getElementById('mobileLetterPreview');
@@ -845,6 +876,9 @@ Thank you for your understanding and consideration of my request.</textarea>
         const closeMobilePreview = document.getElementById('closeMobilePreview');
         const scrollToTop = document.getElementById('scrollToTop');
         const applicationDateInput = document.getElementById('applicationDate');
+        const recipientNameGroup = document.getElementById('recipientNameGroup');
+        const recipientNameInput = document.getElementById('recipientName');
+        const recipientNameError = document.getElementById('recipientNameError');
 
         // Font options mapping for jsPDF
         const fontMapping = {
@@ -874,6 +908,33 @@ Thank you for your understanding and consideration of my request.</textarea>
             if (applicationDateInput) {
                 applicationDateInput.value = formatDate(today);
             }
+        }
+
+        // Show/hide recipient name input based on selection
+        function toggleRecipientNameInput() {
+            if (recipientTitle.value === 'name') {
+                if (recipientNameGroup) {
+                    recipientNameGroup.classList.add('active');
+                }
+                if (recipientNameInput) {
+                    recipientNameInput.required = true;
+                }
+            } else {
+                if (recipientNameGroup) {
+                    recipientNameGroup.classList.remove('active');
+                }
+                if (recipientNameInput) {
+                    recipientNameInput.required = false;
+                    // Clear error if any
+                    if (recipientNameError) {
+                        recipientNameError.classList.remove('active');
+                    }
+                    if (recipientNameInput) {
+                        recipientNameInput.classList.remove('error-border');
+                    }
+                }
+            }
+            updateSalutationPreview();
         }
 
         // Update font preview
@@ -946,7 +1007,7 @@ Thank you for your understanding and consideration of my request.</textarea>
         }
 
         // Get recipient title text
-        function getRecipientTitleText(titleType, recipientFirstName) {
+        function getRecipientTitleText(titleType, recipientFirstName, customName) {
             switch(titleType) {
                 case 'sir':
                     return 'Sir';
@@ -956,6 +1017,10 @@ Thank you for your understanding and consideration of my request.</textarea>
                     return 'Sir/Madam';
                 case 'name':
                 default:
+                    // Use custom name if provided, otherwise use extracted name
+                    if (customName && customName.trim()) {
+                        return customName.trim();
+                    }
                     return recipientFirstName || 'Sir/Madam';
             }
         }
@@ -966,7 +1031,8 @@ Thank you for your understanding and consideration of my request.</textarea>
             
             const recipientFullName = extractNameFromAddress(toDetails.value);
             const recipientFirstName = extractFirstName(recipientFullName);
-            const titleText = getRecipientTitleText(recipientTitle.value, recipientFirstName);
+            const customName = recipientNameInput ? recipientNameInput.value : '';
+            const titleText = getRecipientTitleText(recipientTitle.value, recipientFirstName, customName);
             salutationPreview.textContent = `${salutationType.value} ${titleText},`;
         }
 
@@ -1009,6 +1075,17 @@ Thank you for your understanding and consideration of my request.</textarea>
                 }
             });
 
+            // Special validation for recipient name when "Use Name" is selected
+            if (recipientTitle && recipientTitle.value === 'name' && recipientNameInput && !recipientNameInput.value.trim()) {
+                isValid = false;
+                if (recipientNameInput) {
+                    recipientNameInput.classList.add('error-border');
+                }
+                if (recipientNameError) {
+                    recipientNameError.classList.add('active');
+                }
+            }
+
             return isValid;
         }
 
@@ -1027,13 +1104,14 @@ Thank you for your understanding and consideration of my request.</textarea>
                 subject: subjectInput.value,
                 salutationType: salutationType.value,
                 recipientTitle: recipientTitle.value,
+                recipientName: recipientNameInput ? recipientNameInput.value : '',
                 letterBody: letterBody.value
             };
 
             // Get recipient name for salutation
             const recipientFullName = extractNameFromAddress(formData.toDetails);
             const recipientFirstName = extractFirstName(recipientFullName);
-            const titleText = getRecipientTitleText(formData.recipientTitle, recipientFirstName);
+            const titleText = getRecipientTitleText(formData.recipientTitle, recipientFirstName, formData.recipientName);
 
             // Generate preview text with proper formatting
             let preview = `Date: ${formData.applicationDate}\n\n`;
@@ -1042,11 +1120,11 @@ Thank you for your understanding and consideration of my request.</textarea>
             
             preview += `${formData.salutationType} ${titleText},\n\n`;
             
-            // Reference and Subject appear here (after salutation)
+            // Reference and Subject appear here (after salutation) with indentation
             if (formData.reference.trim()) {
-                preview += `Ref: ${formData.reference}\n`;
+                preview += `        Ref: ${formData.reference}\n`;
             }
-            preview += `Sub: ${formData.subject}\n\n`;
+            preview += `        Sub: ${formData.subject}\n\n`;
             
             // Letter body
             preview += formData.letterBody;
@@ -1062,7 +1140,7 @@ Thank you for your understanding and consideration of my request.</textarea>
             updatePreviewStyling();
         }
 
-        // Generate PDF - FIXED: Added proper error handling and debugging
+        // Generate PDF - UPDATED: Added indentation for Ref and Sub
         function generatePDF() {
             console.log('generatePDF function called');
             
@@ -1075,7 +1153,6 @@ Thank you for your understanding and consideration of my request.</textarea>
             if (generateBtn) generateBtn.disabled = true;
             if (generateBtnMobile) generateBtnMobile.disabled = true;
 
-            // Use setTimeout to allow UI to update
             setTimeout(() => {
                 try {
                     console.log('Starting PDF generation...');
@@ -1088,6 +1165,7 @@ Thank you for your understanding and consideration of my request.</textarea>
                         subject: subjectInput.value,
                         salutationType: salutationType.value,
                         recipientTitle: recipientTitle.value,
+                        recipientName: recipientNameInput ? recipientNameInput.value : '',
                         letterBody: letterBody.value,
                         fontFamily: fontFamilySelect.value,
                         fontSize: parseInt(fontSizeSelect.value)
@@ -1101,10 +1179,12 @@ Thank you for your understanding and consideration of my request.</textarea>
                     const recipientFullName = extractNameFromAddress(formData.toDetails);
                     const recipientFirstName = extractFirstName(recipientFullName);
                     const senderName = extractNameFromAddress(formData.fromDetails);
-                    const titleText = getRecipientTitleText(formData.recipientTitle, recipientFirstName);
+                    const titleText = getRecipientTitleText(formData.recipientTitle, recipientFirstName, formData.recipientName);
 
                     console.log('Sender name:', senderName);
                     console.log('Recipient:', recipientFullName);
+                    console.log('Custom name:', formData.recipientName);
+                    console.log('Title text:', titleText);
 
                     // Get mapped font for jsPDF
                     const pdfFont = fontMapping[formData.fontFamily] || 'times';
@@ -1168,27 +1248,27 @@ Thank you for your understanding and consideration of my request.</textarea>
                     doc.text(salutation, 20, yPos);
                     yPos += 10;
                     
-                    // Add Ref: line if reference is provided (AFTER salutation)
+                    // Add Ref: line if reference is provided (AFTER salutation) WITH INDENT
                     if (formData.reference.trim()) {
                         const refText = `Ref: ${formData.reference}`;
                         const refLines = doc.splitTextToSize(refText, 140);
-                        doc.text(refLines, 20, yPos);
+                        doc.text(refLines, 30, yPos); // CHANGED: 30mm instead of 20mm for indentation
                         yPos += (refLines.length * (formData.fontSize / 3)) + 5;
                     }
                     
-                    // Sub: line (AFTER salutation)
+                    // Sub: line (AFTER salutation) WITH INDENT
                     const subText = `Sub: ${formData.subject}`;
                     const subLines = doc.splitTextToSize(subText, 140);
-                    doc.text(subLines, 20, yPos);
+                    doc.text(subLines, 30, yPos); // CHANGED: 30mm instead of 20mm for indentation
                     yPos += (subLines.length * (formData.fontSize / 3)) + 10;
 
-                    // Letter Body
+                    // Letter Body (starts at 20mm, not indented)
                     const bodyLines = doc.splitTextToSize(formData.letterBody, 170);
                     let bodyY = yPos;
                     const lineHeight = formData.fontSize / 2.5;
                     
                     bodyLines.forEach((line, index) => {
-                        doc.text(line, 20, bodyY, { maxWidth: 170 });
+                        doc.text(line, 20, bodyY, { maxWidth: 170 }); // 20mm for body (no indent)
                         bodyY += lineHeight;
                     });
                     yPos = bodyY + 20;
@@ -1237,7 +1317,7 @@ Thank you for your understanding and consideration of my request.</textarea>
                     if (generateBtn) generateBtn.disabled = false;
                     if (generateBtnMobile) generateBtnMobile.disabled = false;
                 }
-            }, 500); // Reduced timeout for better UX
+            }, 500);
         }
 
         // Clear form
@@ -1258,10 +1338,7 @@ Senior Marketing Executive
 Marketing Department
 ABC Corporation
 123 Business Street
-New York, NY 10001
-Phone: (123) 456-7890
-Email: john.smith@abccorp.com
-Employee ID: EMP12345`;
+New York, NY 10001`;
                 }
                 
                 if (toDetails) {
@@ -1278,7 +1355,8 @@ Chicago, IL 60601`;
                 // Reset salutation to defaults
                 if (salutationType) salutationType.value = "Dear";
                 if (recipientTitle) recipientTitle.value = "name";
-                updateSalutationPreview();
+                if (recipientNameInput) recipientNameInput.value = "";
+                toggleRecipientNameInput();
                 
                 // Update previews
                 if (letterPreview) {
@@ -1339,12 +1417,13 @@ Chicago, IL 60601`;
             });
         }
 
-        // Event Listeners - FIXED: Added proper event listeners
+        // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing...');
             
             initializeDates();
             updateCharCount();
+            toggleRecipientNameInput(); // Initialize the recipient name field
             updateSalutationPreview();
             updateFontPreview();
             
@@ -1363,6 +1442,7 @@ Chicago, IL 60601`;
                 letterBody,
                 salutationType,
                 recipientTitle,
+                recipientNameInput,
                 toDetails,
                 fromDetails,
                 applicationDateInput,
@@ -1375,6 +1455,9 @@ Chicago, IL 60601`;
                     field.addEventListener('input', function() {
                         if (field === fontFamilySelect || field === fontSizeSelect) {
                             updateFontPreview();
+                        }
+                        if (field === recipientTitle) {
+                            toggleRecipientNameInput();
                         }
                         generatePreview();
                         saveFormData();
@@ -1437,6 +1520,7 @@ Chicago, IL 60601`;
                 subject: subjectInput ? subjectInput.value : '',
                 salutationType: salutationType ? salutationType.value : 'Dear',
                 recipientTitle: recipientTitle ? recipientTitle.value : 'name',
+                recipientName: recipientNameInput ? recipientNameInput.value : '',
                 letterBody: letterBody ? letterBody.value : '',
                 fontFamily: fontFamilySelect ? fontFamilySelect.value : 'Times New Roman',
                 fontSize: fontSizeSelect ? fontSizeSelect.value : '11',
@@ -1458,6 +1542,7 @@ Chicago, IL 60601`;
                         }
                     });
                     updateCharCount();
+                    toggleRecipientNameInput();
                     updateSalutationPreview();
                     updateFontPreview();
                     generatePreview();
