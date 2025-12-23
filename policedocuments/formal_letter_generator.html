@@ -772,7 +772,7 @@ Thank you for your understanding and consideration of my request.</textarea>
             const fromWithIndent = addIndentToAddressLines(formData.fromDetails);
             const toWithIndent = addIndentToAddressLines(formData.toDetails);
 
-            // Generate preview text with Ref: and Sub:
+            // Generate preview text with right-aligned date
             let preview = `                                                                                                Date: ${formData.applicationDate}
 
 From:
@@ -785,20 +785,15 @@ ${toWithIndent}
             
             // Add Ref: if provided
             if (formData.reference.trim()) {
-                preview += `        Ref:  ${formData.reference}\n`;
+                preview += `        Ref: ${formData.reference}\n`;
             }
             
-            // Add Sub: WITHOUT EXTRA SPACE AFTER COLON
+            // Add Sub:
             preview += `        Sub: ${formData.subject}
 
 ${formData.salutationType} ${titleText},
 
-${formData.letterBody}
-
-                                                                                                Sincerely,
-
-${extractNameFromAddress(formData.fromDetails)}
-${parseAddressLines(formData.fromDetails).slice(1, 3).join('\n')}`;
+${formData.letterBody}`;
 
             letterPreview.textContent = preview;
             updatePreviewStyling();
@@ -859,14 +854,14 @@ ${parseAddressLines(formData.fromDetails).slice(1, 3).join('\n')}`;
                     doc.setFont(pdfFont, "normal");
                     doc.setFontSize(formData.fontSize);
                     
-                    // DATE AT TOP RIGHT CORNER - RIGHT ALIGNED
+                    // DATE AT TOP RIGHT - RIGHT ALIGNED
                     let yPos = 25; // Starting position
                     doc.text(`Date: ${formData.applicationDate}`, 160, yPos, { align: 'right' });
                     
-                    // Move down one line for "From:" section
+                    // Space after date
                     yPos += 10;
                     
-                    // "From:" label below the date (starts at 20mm)
+                    // "From:" label
                     doc.text('From:', 20, yPos);
                     
                     // Sender details below "From:" label WITH SINGLE INDENT (30mm instead of 20mm)
