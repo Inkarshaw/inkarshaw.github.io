@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM Request - PDF Maker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a3a8f 0%, #2c5aa0 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+        }
+        
+        .form-section {
+            flex: 1;
+            min-width: 350px;
+            padding: 25px;
+            border-right: 1px solid #eee;
+        }
+        
+        .preview-section {
+            flex: 1;
+            min-width: 350px;
+            padding: 25px;
+            background-color: #f9f9f9;
+        }
+        
+        .section-title {
+            color: #1a3a8f;
+            border-bottom: 2px solid #1a3a8f;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #1a3a8f;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 58, 143, 0.2);
+        }
+        
+        #firstColumnLabel {
+            height: 100px;
+            min-height: 100px;
+            resize: vertical;
+            font-size: 16px;
+            line-height: 1.5;
+            padding: 15px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #1a3a8f;
+            color: white;
+            flex: 2;
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            flex: 1;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary:hover {
+            background-color: #15317a;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .document-preview {
+            background-color: white;
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 500px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12px;
+            line-height: 1.4;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .tamil-text {
+            font-family: 'Bamini', 'Latha', 'Arial Unicode MS', sans-serif;
+        }
+        
+        .english-text {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .preview-header h2 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .document-line {
+            margin-bottom: 8px;
+        }
+        
+        .from-section, .to-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-heading {
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-decoration: underline;
+            font-size: 12px;
+        }
+        
+        .table-container {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            align-items: flex-start;
+        }
+        
+        .single-column-table {
+            width: 28%;
+            border-collapse: collapse;
+        }
+        
+        .single-column-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            vertical-align: top;
+            font-size: 11px;
+        }
+        
+        .document-table {
+            width: 70%;
+            border-collapse: collapse;
+        }
+        
+        .document-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            vertical-align: top;
+            font-size: 11px;
+        }
+        
+        .document-table .label {
+            font-weight: bold;
+            width: 22%;
+            font-size: 11px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            border-left: 4px solid #1a3a8f;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .instructions h4 {
+            color: #1a3a8f;
+            margin-bottom: 10px;
+        }
+        
+        .font-size-control {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .font-size-control label {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        
+        .font-size-control select {
+            width: auto;
+            padding: 5px 10px;
+        }
+        
+        .alignment-notice {
+            background-color: #e8f4fd;
+            border: 1px solid #b6d4fe;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #0c5460;
+        }
+        
+        .font-notice {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #856404;
+        }
+        
+        .table-width-control {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .table-width-control label {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        
+        .table-width-control select {
+            width: auto;
+            padding: 5px 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .form-section {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .table-container {
+                flex-direction: column;
+            }
+            
+            .single-column-table,
+            .document-table {
+                width: 100%;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+    
+    <!-- Alternative Tamil font - Latha (Windows Tamil font) -->
+    <style>
+        @font-face {
+            font-family: 'Latha';
+            src: local('Latha'),
+                 url('https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2') format('woff2'),
+                 url('https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts@master/unhinted/ttf/NotoSansTamil/NotoSansTamil-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        /* Use Latha as primary Tamil font instead of Bamini */
+        .tamil-text {
+            font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-pdf"></i> PM Request - PDF Maker</h1>
+            <p>Fill out the form below to generate a PDF with Tamil font</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-edit"></i> Document Details</h2>
+                
+                <div class="font-notice">
+                    <i class="fas fa-font"></i> <strong>Using Latha Tamil Font:</strong> All Tamil text will use Latha font (standard Windows Tamil font). Non-Tamil text uses Times New Roman.
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentNumber">Document Number/Reference</label>
+                    <input type="text" id="documentNumber" placeholder="e.g., G7 fhty; epiya Fw;w vz; 216-2025">
+                </div>
+                
+                <div class="form-group">
+                    <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        <i class="fas fa-paper-plane"></i> From (Sender) - Single Field
+                    </h3>
+                    <div class="form-group">
+                        <label for="fromDetails">From Details (Office, Address, Additional Info)</label>
+                        <textarea id="fromDetails" rows="5" placeholder="Enter all From details here, each on a new line">G7 nrj;Jg;gl;L fhty; epiyak;
+nrj;Jg;gl;L. brd;id-31
+mDg;g[eh;
+bgWeh;
+nguhrpupau; mtu;fs;
+rl;lk; rhh;e;j kUj;Jtj;Jiw</textarea>
+                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Enter each piece of information on a new line
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        <i class="fas fa-envelope"></i> To (Recipient) - Single Field
+                    </h3>
+                    <div class="form-group">
+                        <label for="toDetails">To Details (Office, Address, Additional Info)</label>
+                        <textarea id="toDetails" rows="4" placeholder="Enter all To details here, each on a new line">fPH;g;ghf;fk; kUj;Jtf;fy;Y}hp kUj;Jtkid
+brd;id-10</textarea>
+                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Enter each piece of information on a new line
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        <i class="fas fa-columns"></i> Deceased Details Section
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="firstColumnLabel">Deceased Details Label & Information</label>
+                        <textarea id="firstColumnLabel" rows="6" placeholder="Enter deceased details label and information" style="height: 90px;">இறந்தவர்:
+Name, M/A 54
+j-bg fhsg;gd;
+vz;/107. ntk;g[ypak;kd; nfhapy; njhl;lk;. b&dha; efu;. brd;id/31</textarea>
+                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Enter the label (e.g., "இறந்தவர்:") followed by deceased details
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">Subject (பொருள்)</label>
+                    <textarea id="subject" rows="2" placeholder="Enter the subject of the document">இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதத்தின் பிரேத பரிசோதனை டாக்டர் அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reference">Reference (பார்வை)</label>
+                    <textarea id="reference" rows="2" placeholder="Enter reference details">G7 fhty; epiya Fw;w vz; 216-2025
+
+U/S 194 BNSS</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deceasedDetails">Deceased Details (விளக்க விபரங்கள்)</label>
+                    <textarea id="deceasedDetails" rows="3" placeholder="Detailed description of deceased person">இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதம்; கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடப்பில் உள்ளது. மேற்படி பிரேதத்தை பி-7 செத்துப்பட்டு காவல் நிலைய முதல் நிலை காவலர் 43606 திரு. திருமுருகன் என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="investigatorName">Investigator Name (விசாரணை அலுவலர் பெயர்)</label>
+                    <input type="text" id="investigatorName" placeholder="e.g., fhty; cjtp Ma;thsh;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="investigatorOffice">Investigator Office (விசாரணை அலுவலர் அலுவலகம்)</label>
+                    <input type="text" id="investigatorOffice" placeholder="e.g., G7 nrj;Jg;gl;L fhty; epiyak;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="salutationAlignment">Salutation ("ஐயா,") Alignment</label>
+                    <select id="salutationAlignment">
+                        <option value="left" selected>Left Aligned</option>
+                        <option value="center">Center Aligned</option>
+                    </select>
+                    <div class="alignment-notice">
+                        <i class="fas fa-info-circle"></i> "ஐயா," is left-aligned by default (official document format)
+                    </div>
+                </div>
+                
+                <div class="table-width-control">
+                    <label for="leftTableWidth">Left Table Width:</label>
+                    <select id="leftTableWidth">
+                        <option value="25">Narrow (25%)</option>
+                        <option value="28" selected>Medium (28%)</option>
+                        <option value="30">Wide (30%)</option>
+                    </select>
+                </div>
+                
+                <div class="font-size-control">
+                    <label for="fontSize">PDF Font Size:</label>
+                    <select id="fontSize">
+                        <option value="10">Small (10pt)</option>
+                        <option value="11" selected>Medium (11pt)</option>
+                        <option value="12">Large (12pt)</option>
+                    </select>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-primary" id="generatePdf">
+                        <i class="fas fa-file-pdf"></i> Download PDF (Latha Font)
+                    </button>
+                    <button class="btn btn-secondary" id="resetForm">
+                        <i class="fas fa-redo"></i> Reset Form
+                    </button>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-success" id="printDocument">
+                        <i class="fas fa-print"></i> Print Document
+                    </button>
+                    <button class="btn btn-secondary" id="downloadHtml">
+                        <i class="fas fa-file-code"></i> Download HTML for Print
+                    </button>
+                </div>
+                
+                <div class="instructions">
+                    <h4><i class="fas fa-info-circle"></i> Font Information:</h4>
+                    <p><strong>Tamil Text:</strong> Uses Latha font (standard Windows Tamil font)</p>
+                    <p><strong>English Text:</strong> Uses Times New Roman for English/non-Tamil text</p>
+                    <p><strong>Compact Tables:</strong> Left table width reduced for better balance</p>
+                    <p><strong>Clean title:</strong> No underline below "கோரிக்கை மனு"</p>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2 class="section-title"><i class="fas fa-eye"></i> Document Preview</h2>
+                <div class="document-preview" id="documentPreview">
+                    <!-- Document preview will be generated here -->
+                </div>
+                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 14px;">
+                    <i class="fas fa-info-circle"></i> Preview shows mixed fonts: Latha for Tamil, Times New Roman for English
+                </p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>PM Request PDF Maker &copy; 2023 | Uses Latha Tamil font with English text in Times New Roman</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const formInputs = document.querySelectorAll('input, textarea, select');
+        const documentPreview = document.getElementById('documentPreview');
+        const generatePdfBtn = document.getElementById('generatePdf');
+        const resetFormBtn = document.getElementById('resetForm');
+        const printDocumentBtn = document.getElementById('printDocument');
+        const downloadHtmlBtn = document.getElementById('downloadHtml');
+        const fontSizeSelect = document.getElementById('fontSize');
+        const alignmentSelect = document.getElementById('salutationAlignment');
+        const leftTableWidthSelect = document.getElementById('leftTableWidth');
+        
+        // Default values
+        const defaultValues = {
+            documentNumber: 'G7 fhty; epiya Fw;w vz; 216-2025',
+            fromDetails: 'G7 nrj;Jg;gl;L fhty; epiyak;\nnrj;Jg;gl;L. brd;id-31\nmDg;g[eh;\nbgWeh;\nnguhrpupau; mtu;fs;\nrl;lk; rhh;e;j kUj;Jtj;Jiw',
+            toDetails: 'fPH;g;ghf;fk; kUj;Jtf;fy;Y}hp kUj;Jtkid\nbrd;id-10',
+            firstColumnLabel: 'இறந்தவர்:\nName, M/A 54\nj-bg fhsg;gd;\nvz;/107. ntk;g[ypak;kd; nfhapy; njhl;lk;. b&dha; efu;. brd;id/31',
+            subject: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதத்தின் பிரேத பரிசோதனை டாக்டர் அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.',
+            reference: 'G7 fhty; epiya Fw;w vz; 216-2025\n\nU/S 194 BNSS',
+            deceasedDetails: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதம்; கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடப்பில் உள்ளது. மேற்படி பிரேதத்தை பி-7 செத்துப்பட்டு காவல் நிலைய முதல் நிலை காவலர் 43606 திரு. திருமுருகன் என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.',
+            investigatorName: 'fhty; cjtp Ma;thsh;',
+            investigatorOffice: 'G7 nrj;Jg;gl;L fhty; epiyak;'
+        };
+        
+        // Initialize form
+        function initializeForm() {
+            document.getElementById('documentNumber').value = defaultValues.documentNumber;
+            document.getElementById('fromDetails').value = defaultValues.fromDetails;
+            document.getElementById('toDetails').value = defaultValues.toDetails;
+            document.getElementById('firstColumnLabel').value = defaultValues.firstColumnLabel;
+            document.getElementById('subject').value = defaultValues.subject;
+            document.getElementById('reference').value = defaultValues.reference;
+            document.getElementById('deceasedDetails').value = defaultValues.deceasedDetails;
+            document.getElementById('investigatorName').value = defaultValues.investigatorName;
+            document.getElementById('investigatorOffice').value = defaultValues.investigatorOffice;
+            
+            updatePreview();
+        }
+        
+        // Get selected font size
+        function getFontSize() {
+            return parseInt(fontSizeSelect.value) || 11;
+        }
+        
+        // Get selected alignment
+        function getAlignment() {
+            return alignmentSelect.value || 'left';
+        }
+        
+        // Get left table width
+        function getLeftTableWidth() {
+            return parseInt(leftTableWidthSelect.value) || 28;
+        }
+        
+        // Get right table width (calculated)
+        function getRightTableWidth() {
+            const leftWidth = getLeftTableWidth();
+            return 100 - leftWidth - 2; // 2% for gap
+        }
+        
+        // Calculate line height based on font size
+        function getLineHeight(fontSize) {
+            return fontSize * 1.4;
+        }
+        
+        // Check if text contains Tamil characters
+        function containsTamil(text) {
+            // Tamil Unicode range: U+0B80 to U+0BFF
+            const tamilRegex = /[\u0B80-\u0BFF]/;
+            return tamilRegex.test(text);
+        }
+        
+        // Force all Tamil text to use Tamil font
+        function forceTamilFont(text) {
+            if (containsTamil(text)) {
+                return 'tamil-text';
+            }
+            return 'english-text';
+        }
+        
+        // Update preview with proper font separation
+        function updatePreview() {
+            const fontSize = getFontSize();
+            const lineHeight = getLineHeight(fontSize) / 12;
+            const alignment = getAlignment();
+            const leftTableWidth = getLeftTableWidth();
+            const rightTableWidth = getRightTableWidth();
+            const salutationStyle = alignment === 'center' ? 'text-align: center;' : 'text-align: left;';
+            
+            const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
+            const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
+            const firstColumnLabel = document.getElementById('firstColumnLabel').value || defaultValues.firstColumnLabel;
+            const subject = document.getElementById('subject').value || defaultValues.subject;
+            const reference = document.getElementById('reference').value || defaultValues.reference;
+            const deceasedDetails = document.getElementById('deceasedDetails').value || defaultValues.deceasedDetails;
+            const investigatorName = document.getElementById('investigatorName').value || defaultValues.investigatorName;
+            const investigatorOffice = document.getElementById('investigatorOffice').value || defaultValues.investigatorOffice;
+            const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
+            
+            // Process From details - ALL text in Tamil font for consistency
+            const fromDetailsLines = fromDetails.split('\n').map(line => 
+                `<div class="document-line left tamil-text" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
+            ).join('');
+            
+            // Process To details - ALL text in Tamil font for consistency
+            const toDetailsLines = toDetails.split('\n').map(line => 
+                `<div class="document-line left tamil-text" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
+            ).join('');
+            
+            // Process reference - check each line
+            const referenceLines = reference.split('\n').map(line => {
+                const fontClass = containsTamil(line) ? 'tamil-text' : 'english-text';
+                return `<div class="${fontClass}" style="font-size: ${fontSize - 1}px; margin-bottom: 2px;">${line}</div>`;
+            }).join('');
+            
+            const previewHTML = `
+                <div class="preview-header" style="font-size: ${fontSize + 4}px; margin-bottom: 15px;">
+                    <h2 class="tamil-text" style="font-size: ${fontSize + 4}px; margin-bottom: 5px; font-weight: bold;">கோரிக்கை மனு</h2>
+                </div>
+                
+                <div class="from-section" style="margin-bottom: 15px;">
+                    <div class="section-heading english-text" style="font-size: ${fontSize}px; margin-bottom: 5px;">From:</div>
+                    ${fromDetailsLines}
+                </div>
+                
+                <div class="to-section" style="margin-bottom: 15px;">
+                    <div class="section-heading english-text" style="font-size: ${fontSize}px; margin-bottom: 5px;">To:</div>
+                    ${toDetailsLines}
+                </div>
+                
+                <div class="document-line tamil-text" style="margin: 15px 0; font-size: ${fontSize + 1}px; ${salutationStyle}">
+                    ஐயா,
+                </div>
+                
+                <div class="table-container" style="gap: 10px; margin: 10px 0;">
+                    <table class="single-column-table" style="width: ${leftTableWidth}%;">
+                        <tr>
+                            <td class="tamil-text" style="padding: 4px; font-size: ${fontSize - 1}px;">
+                                ${firstColumnLabel.replace(/\n/g, '<br>')}
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <table class="document-table" style="width: ${rightTableWidth}%;">
+                        <tr>
+                            <td class="label tamil-text" style="width: 22%; padding: 4px; font-size: ${fontSize - 1}px;">பொருள்:</td>
+                            <td class="tamil-text document-line justify" style="padding: 4px; font-size: ${fontSize - 1}px;">${subject}</td>
+                        </tr>
+                        <tr>
+                            <td class="label tamil-text" style="padding: 4px; font-size: ${fontSize - 1}px;">பார்வை:</td>
+                            <td style="padding: 4px; font-size: ${fontSize - 1}px;">
+                                ${referenceLines}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="document-line tamil-text justify" style="margin-top: 15px; text-align: justify; font-size: ${fontSize}px; line-height: ${lineHeight}em;">
+                    ${deceasedDetails}
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <div class="document-line tamil-text" style="font-size: ${fontSize}px; margin-bottom: 4px;">
+                        ${investigatorName}
+                    </div>
+                    
+                    <div class="document-line tamil-text" style="font-size: ${fontSize}px; margin-bottom: 4px;">
+                        ${investigatorOffice}
+                    </div>
+                    
+                    <div class="document-line english-text" style="font-size: ${fontSize}px; margin-bottom: 4px;">
+                        ${fromDetails.split('\n')[1] || ''}
+                    </div>
+                </div>
+                
+                ${documentNumber ? `<div class="document-line english-text" style="text-align: center; margin-top: 20px; font-size: ${fontSize - 2}px; color: #555;">${documentNumber}</div>` : ''}
+            `;
+            
+            documentPreview.innerHTML = previewHTML;
+            documentPreview.style.fontSize = fontSize + 'px';
+            documentPreview.style.lineHeight = lineHeight + 'em';
+        }
+        
+        // Generate PDF with Latha font
+        function generatePDF() {
+            const originalText = generatePdfBtn.innerHTML;
+            generatePdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating PDF...';
+            generatePdfBtn.disabled = true;
+            
+            try {
+                // Get form values
+                const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
+                const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
+                const firstColumnLabel = document.getElementById('firstColumnLabel').value || defaultValues.firstColumnLabel;
+                const subject = document.getElementById('subject').value || defaultValues.subject;
+                const reference = document.getElementById('reference').value || defaultValues.reference;
+                const deceasedDetails = document.getElementById('deceasedDetails').value || defaultValues.deceasedDetails;
+                const investigatorName = document.getElementById('investigatorName').value || defaultValues.investigatorName;
+                const investigatorOffice = document.getElementById('investigatorOffice').value || defaultValues.investigatorOffice;
+                const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
+                const fontSize = getFontSize();
+                const lineHeight = fontSize * 1.2;
+                const alignment = getAlignment();
+                const leftTableWidth = getLeftTableWidth();
+                const rightTableWidth = getRightTableWidth();
+                const salutationStyle = alignment === 'center' ? 'text-align: center;' : 'text-align: left;';
+                
+                // Create a temporary div for PDF content
+                const tempDiv = document.createElement('div');
+                tempDiv.style.cssText = `
+                    position: absolute;
+                    left: -10000px;
+                    top: -10000px;
+                    width: 210mm;
+                    min-height: 297mm;
+                    padding: 15mm;
+                    background: white;
+                    font-family: 'Times New Roman', Times, serif;
+                    font-size: ${fontSize}pt;
+                    line-height: ${lineHeight}pt;
+                    box-sizing: border-box;
+                `;
+                
+                // Generate HTML with Latha font for ALL Tamil text
+                tempDiv.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <h1 style="font-size: ${fontSize + 2}pt; margin-bottom: 5px; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-weight: bold;">கோரிக்கை மனு</h1>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-weight: bold; margin-bottom: 6px; text-decoration: underline; font-size: ${fontSize}pt; font-family: 'Times New Roman', Times, serif;">From:</div>
+                        ${fromDetails.split('\n').map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${line}</div>`).join('')}
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-weight: bold; margin-bottom: 6px; text-decoration: underline; font-size: ${fontSize}pt; font-family: 'Times New Roman', Times, serif;">To:</div>
+                        ${toDetails.split('\n').map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${line}</div>`).join('')}
+                    </div>
+                    
+                    <div style="margin: 15px 0; font-size: ${fontSize + 1}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif; ${salutationStyle}">
+                        ஐயா,
+                    </div>
+                    
+                    <div style="display: flex; width: 100%; margin: 15px 0; gap: 10px;">
+                        <div style="width: ${leftTableWidth}%; border: 1px solid #000; padding: 5px; min-height: 50px; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-size: ${fontSize}pt;">
+                            ${firstColumnLabel.replace(/\n/g, '<br>')}
+                        </div>
+                        
+                        <div style="width: ${rightTableWidth}%; border: 1px solid #000;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: ${fontSize}pt;">
+                                <tr>
+                                    <td style="width: 22%; border: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பொருள்:</td>
+                                    <td style="border: 1px solid #000; padding: 5px; vertical-align: top; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${subject}</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பார்வை:</td>
+                                    <td style="border: 1px solid #000; padding: 5px; vertical-align: top;">
+                                        ${reference.split('\n').map(line => {
+                                            const fontFamily = containsTamil(line) ? "'Latha', 'Arial Unicode MS', sans-serif" : "'Times New Roman', Times, serif";
+                                            return `<div style="font-family: ${fontFamily};">${line}</div>`;
+                                        }).join('')}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 15px 0; text-align: justify; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-size: ${fontSize}pt; line-height: ${lineHeight}pt;">
+                        ${deceasedDetails}
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${investigatorName}</div>
+                        <div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${investigatorOffice}</div>
+                        <div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Times New Roman', Times, serif;">${fromDetails.split('\n')[1] || ''}</div>
+                    </div>
+                    
+                    ${documentNumber ? `<div style="text-align: center; margin-top: 20px; font-size: ${fontSize - 2}pt; color: #555; font-family: 'Times New Roman', Times, serif;">${documentNumber}</div>` : ''}
+                `;
+                
+                document.body.appendChild(tempDiv);
+                
+                // Use html2canvas to convert to image
+                if (typeof html2canvas !== 'undefined') {
+                    // Preload Latha font
+                    const fontLink = document.createElement('link');
+                    fontLink.href = 'https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2';
+                    fontLink.rel = 'preload';
+                    fontLink.as = 'font';
+                    fontLink.type = 'font/woff2';
+                    fontLink.crossOrigin = 'anonymous';
+                    document.head.appendChild(fontLink);
+                    
+                    // Wait for font to load
+                    setTimeout(() => {
+                        html2canvas(tempDiv, {
+                            scale: 2,
+                            useCORS: true,
+                            logging: false,
+                            allowTaint: true,
+                            fontFamily: "'Latha', 'Times New Roman', serif"
+                        }).then(canvas => {
+                            const imgData = canvas.toDataURL('image/png');
+                            const { jsPDF } = window.jspdf;
+                            const pdf = new jsPDF('p', 'mm', 'a4');
+                            
+                            const imgWidth = 210;
+                            const imgHeight = canvas.height * imgWidth / canvas.width;
+                            
+                            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                            pdf.save(`PM_Request_${leftTableWidth}%_${fontSize}pt_${alignment}.pdf`);
+                            
+                            document.body.removeChild(tempDiv);
+                            document.head.removeChild(fontLink);
+                            
+                            generatePdfBtn.innerHTML = '<i class="fas fa-check"></i> PDF Downloaded!';
+                            setTimeout(() => {
+                                generatePdfBtn.innerHTML = originalText;
+                                generatePdfBtn.disabled = false;
+                            }, 3000);
+                        }).catch(error => {
+                            console.error('html2canvas error:', error);
+                            document.head.removeChild(fontLink);
+                            downloadHTMLForPrint();
+                        });
+                    }, 2000); // Wait 2 seconds for font to load
+                } else {
+                    // Load html2canvas library dynamically
+                    const script = document.createElement('script');
+                    script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+                    script.onload = () => {
+                        generatePDF();
+                    };
+                    script.onerror = () => {
+                        downloadHTMLForPrint();
+                    };
+                    document.head.appendChild(script);
+                }
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                downloadHTMLForPrint();
+                
+                generatePdfBtn.innerHTML = originalText;
+                generatePdfBtn.disabled = false;
+            }
+        }
+        
+        // Print document with Latha font
+        function printDocument() {
+            const printWindow = window.open('', '_blank');
+            const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
+            const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
+            const firstColumnLabel = document.getElementById('firstColumnLabel').value || defaultValues.firstColumnLabel;
+            const subject = document.getElementById('subject').value || defaultValues.subject;
+            const reference = document.getElementById('reference').value || defaultValues.reference;
+            const deceasedDetails = document.getElementById('deceasedDetails').value || defaultValues.deceasedDetails;
+            const investigatorName = document.getElementById('investigatorName').value || defaultValues.investigatorName;
+            const investigatorOffice = document.getElementById('investigatorOffice').value || defaultValues.investigatorOffice;
+            const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
+            const fontSize = getFontSize();
+            const lineHeight = fontSize * 1.2;
+            const alignment = getAlignment();
+            const leftTableWidth = getLeftTableWidth();
+            const rightTableWidth = getRightTableWidth();
+            const salutationStyle = alignment === 'center' ? 'text-align: center;' : 'text-align: left;';
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>PM Request Document</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 15mm;
+                        }
+                        @font-face {
+                            font-family: 'Latha';
+                            src: url('https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2') format('woff2');
+                            font-display: swap;
+                        }
+                        body {
+                            font-family: 'Times New Roman', Times, serif;
+                            font-size: ${fontSize}pt;
+                            line-height: ${lineHeight}pt;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .tamil {
+                            font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
+                        }
+                        .english {
+                            font-family: 'Times New Roman', Times, serif;
+                        }
+                        .document-container {
+                            width: 210mm;
+                            min-height: 297mm;
+                            padding: 15mm;
+                            margin: 0 auto;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 15px;
+                        }
+                        .header h1 {
+                            font-size: ${fontSize + 2}pt;
+                            margin-bottom: 5px;
+                            font-weight: bold;
+                        }
+                        .section {
+                            margin-bottom: 15px;
+                        }
+                        .section-heading {
+                            font-weight: bold;
+                            margin-bottom: 6px;
+                            text-decoration: underline;
+                        }
+                        .content-line {
+                            margin-bottom: 4px;
+                        }
+                        .salutation {
+                            margin: 15px 0;
+                            font-size: ${fontSize + 1}pt;
+                            ${salutationStyle}
+                        }
+                        .table-container {
+                            display: flex;
+                            width: 100%;
+                            margin: 15px 0;
+                            gap: 10px;
+                        }
+                        .left-table {
+                            width: ${leftTableWidth}%;
+                            border: 1px solid #000;
+                            padding: 5px;
+                            min-height: 50px;
+                        }
+                        .right-table {
+                            width: ${rightTableWidth}%;
+                            border: 1px solid #000;
+                        }
+                        .right-table table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        .right-table td {
+                            border: 1px solid #000;
+                            padding: 5px;
+                            vertical-align: top;
+                        }
+                        .right-table .label {
+                            width: 22%;
+                            font-weight: bold;
+                        }
+                        .details {
+                            margin: 15px 0;
+                            text-align: justify;
+                        }
+                        .signature {
+                            margin-top: 30px;
+                        }
+                        .signature-line {
+                            margin-bottom: 4px;
+                        }
+                        .document-number {
+                            text-align: center;
+                            margin-top: 20px;
+                            font-size: ${fontSize - 2}pt;
+                            color: #555;
+                        }
+                        @media print {
+                            body {
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                            .document-container {
+                                padding: 0;
+                                margin: 0;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="document-container">
+                        <div class="header">
+                            <h1 class="tamil">கோரிக்கை மனு</h1>
+                        </div>
+                        
+                        <div class="section">
+                            <div class="section-heading english">From:</div>
+                            ${fromDetails.split('\n').map(line => 
+                                `<div class="content-line tamil">${line}</div>`
+                            ).join('')}
+                        </div>
+                        
+                        <div class="section">
+                            <div class="section-heading english">To:</div>
+                            ${toDetails.split('\n').map(line => 
+                                `<div class="content-line tamil">${line}</div>`
+                            ).join('')}
+                        </div>
+                        
+                        <div class="salutation tamil">
+                            ஐயா,
+                        </div>
+                        
+                        <div class="table-container">
+                            <div class="left-table tamil">
+                                ${firstColumnLabel.replace(/\n/g, '<br>')}
+                            </div>
+                            
+                            <div class="right-table">
+                                <table>
+                                    <tr>
+                                        <td class="label tamil">பொருள்:</td>
+                                        <td class="tamil">${subject}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label tamil">பார்வை:</td>
+                                        <td>
+                                            ${reference.split('\n').map(line => {
+                                                const fontClass = /[\u0B80-\u0BFF]/.test(line) ? 'tamil' : 'english';
+                                                return `<div class="${fontClass}">${line}</div>`;
+                                            }).join('')}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="details tamil">
+                            ${deceasedDetails}
+                        </div>
+                        
+                        <div class="signature">
+                            <div class="signature-line tamil">${investigatorName}</div>
+                            <div class="signature-line tamil">${investigatorOffice}</div>
+                            <div class="signature-line english">${fromDetails.split('\n')[1] || ''}</div>
+                        </div>
+                        
+                        ${documentNumber ? `<div class="document-number english">${documentNumber}</div>` : ''}
+                    </div>
+                    
+                    <script>
+                        window.onload = function() {
+                            window.focus();
+                            setTimeout(function() {
+                                window.print();
+                            }, 1500); // Wait for font to load
+                            
+                            window.onafterprint = function() {
+                                setTimeout(function() {
+                                    window.close();
+                                }, 500);
+                            };
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        // Download HTML for printing with Latha font
+        function downloadHTMLForPrint() {
+            const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
+            const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
+            const firstColumnLabel = document.getElementById('firstColumnLabel').value || defaultValues.firstColumnLabel;
+            const subject = document.getElementById('subject').value || defaultValues.subject;
+            const reference = document.getElementById('reference').value || defaultValues.reference;
+            const deceasedDetails = document.getElementById('deceasedDetails').value || defaultValues.deceasedDetails;
+            const investigatorName = document.getElementById('investigatorName').value || defaultValues.investigatorName;
+            const investigatorOffice = document.getElementById('investigatorOffice').value || defaultValues.investigatorOffice;
+            const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
+            const fontSize = getFontSize();
+            const lineHeight = fontSize * 1.2;
+            const alignment = getAlignment();
+            const leftTableWidth = getLeftTableWidth();
+            const rightTableWidth = getRightTableWidth();
+            const salutationStyle = alignment === 'center' ? 'text-align: center;' : 'text-align: left;';
+            
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PM Request Document</title>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        @font-face {
+            font-family: 'Latha';
+            src: url('https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2') format('woff2');
+            font-display: swap;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: ${fontSize}pt;
+            line-height: ${lineHeight}pt;
+            margin: 0;
+            padding: 0;
+        }
+        .tamil {
+            font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
+        }
+        .english {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .document-container {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .header h1 {
+            font-size: ${fontSize + 2}pt;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 15px;
+        }
+        .section-heading {
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-decoration: underline;
+        }
+        .content-line {
+            margin-bottom: 4px;
+        }
+        .salutation {
+            margin: 15px 0;
+            font-size: ${fontSize + 1}pt;
+            ${salutationStyle}
+        }
+        .table-container {
+            display: flex;
+            width: 100%;
+            margin: 15px 0;
+            gap: 10px;
+        }
+        .left-table {
+            width: ${leftTableWidth}%;
+            border: 1px solid #000;
+            padding: 5px;
+            min-height: 50px;
+        }
+        .right-table {
+            width: ${rightTableWidth}%;
+            border: 1px solid #000;
+        }
+        .right-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .right-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            vertical-align: top;
+        }
+        .right-table .label {
+            width: 22%;
+            font-weight: bold;
+        }
+        .details {
+            margin: 15px 0;
+            text-align: justify;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+        .signature-line {
+            margin-bottom: 4px;
+        }
+        .document-number {
+            text-align: center;
+            margin-top: 20px;
+            font-size: ${fontSize - 2}pt;
+            color: #555;
+        }
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .document-container {
+                padding: 0;
+                margin: 0;
+            }
+        }
+        .instructions {
+            background: #f0f0f0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-size: ${fontSize - 1}pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="document-container">
+        <div class="header">
+            <h1 class="tamil">கோரிக்கை மனு</h1>
+        </div>
+        
+        <div class="section">
+            <div class="section-heading english">From:</div>
+            ${fromDetails.split('\n').map(line => 
+                `<div class="content-line tamil">${line}</div>`
+            ).join('')}
+        </div>
+        
+        <div class="section">
+            <div class="section-heading english">To:</div>
+            ${toDetails.split('\n').map(line => 
+                `<div class="content-line tamil">${line}</div>`
+            ).join('')}
+        </div>
+        
+        <div class="salutation tamil">
+            ஐயா,
+        </div>
+        
+        <div class="table-container">
+            <div class="left-table tamil">
+                ${firstColumnLabel.replace(/\n/g, '<br>')}
+            </div>
+            
+            <div class="right-table">
+                <table>
+                    <tr>
+                        <td class="label tamil">பொருள்:</td>
+                        <td class="tamil">${subject}</td>
+                    </tr>
+                    <tr>
+                        <td class="label tamil">பார்வை:</td>
+                        <td>
+                            ${reference.split('\n').map(line => {
+                                const fontClass = /[\u0B80-\u0BFF]/.test(line) ? 'tamil' : 'english';
+                                return `<div class="${fontClass}">${line}</div>`;
+                            }).join('')}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="details tamil">
+            ${deceasedDetails}
+        </div>
+        
+        <div class="signature">
+            <div class="signature-line tamil">${investigatorName}</div>
+            <div class="signature-line tamil">${investigatorOffice}</div>
+            <div class="signature-line english">${fromDetails.split('\n')[1] || ''}</div>
+        </div>
+        
+        ${documentNumber ? `<div class="document-number english">${documentNumber}</div>` : ''}
+        
+        <div class="instructions">
+            <h3>How to save as PDF:</h3>
+            <ol>
+                <li>Press <strong>Ctrl+P</strong> (or <strong>Cmd+P</strong> on Mac)</li>
+                <li>In the printer selection, choose <strong>"Save as PDF"</strong></li>
+                <li>Click <strong>"Save"</strong></li>
+                <li>Choose where to save the PDF file</li>
+            </ol>
+            <p><strong>Font Settings:</strong> Tamil text uses Latha font, English uses Times New Roman</p>
+            <p><strong>Layout:</strong> Left Table: ${leftTableWidth}%, Font Size: ${fontSize}pt, Salutation: ${alignment}-aligned</p>
+        </div>
+    </div>
+</body>
+</html>`;
+            
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PM_Request_${leftTableWidth}%_${fontSize}pt_${alignment}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`HTML file downloaded with Latha font (${leftTableWidth}% left table). Open it and press Ctrl+P → Save as PDF.`);
+        }
+        
+        // Reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to reset all fields to default values?')) {
+                initializeForm();
+            }
+        }
+        
+        // Event Listeners
+        formInputs.forEach(input => {
+            input.addEventListener('input', updatePreview);
+        });
+        
+        fontSizeSelect.addEventListener('change', updatePreview);
+        alignmentSelect.addEventListener('change', updatePreview);
+        leftTableWidthSelect.addEventListener('change', updatePreview);
+        generatePdfBtn.addEventListener('click', generatePDF);
+        resetFormBtn.addEventListener('click', resetForm);
+        printDocumentBtn.addEventListener('click', printDocument);
+        downloadHtmlBtn.addEventListener('click', downloadHTMLForPrint);
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializeForm);
+    </script>
+    
+    <!-- Load html2canvas library -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+</html>
