@@ -107,7 +107,7 @@
             box-shadow: 0 0 0 2px rgba(26, 58, 143, 0.2);
         }
         
-        #firstColumnLabel {
+        #deceasedDetailsInput {
             height: 100px;
             min-height: 100px;
             resize: vertical;
@@ -189,7 +189,7 @@
         }
         
         .tamil-text {
-            font-family: 'Bamini', 'Latha', 'Arial Unicode MS', sans-serif;
+            font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
         }
         
         .english-text {
@@ -218,7 +218,6 @@
         .section-heading {
             font-weight: bold;
             margin-bottom: 8px;
-            text-decoration: underline;
             font-size: 12px;
         }
         
@@ -229,13 +228,15 @@
             align-items: flex-start;
         }
         
+        /* Single border table styles */
         .single-column-table {
             width: 28%;
+            border: 1px solid #000;
             border-collapse: collapse;
         }
         
         .single-column-table td {
-            border: 1px solid #000;
+            border: none;
             padding: 5px;
             vertical-align: top;
             font-size: 11px;
@@ -243,20 +244,32 @@
         
         .document-table {
             width: 70%;
+            border: 1px solid #000;
             border-collapse: collapse;
         }
         
         .document-table td {
-            border: 1px solid #000;
+            border: none;
+            border-bottom: 1px solid #000;
+            border-right: 1px solid #000;
             padding: 5px;
             vertical-align: top;
             font-size: 11px;
+        }
+        
+        .document-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .document-table td:last-child {
+            border-right: none;
         }
         
         .document-table .label {
             font-weight: bold;
             width: 22%;
             font-size: 11px;
+            border-right: 1px solid #000;
         }
         
         .button-group {
@@ -368,7 +381,7 @@
         }
     </style>
     
-    <!-- Alternative Tamil font - Latha (Windows Tamil font) -->
+    <!-- Tamil font - Latha -->
     <style>
         @font-face {
             font-family: 'Latha';
@@ -380,7 +393,6 @@
             font-display: swap;
         }
         
-        /* Use Latha as primary Tamil font instead of Bamini */
         .tamil-text {
             font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
         }
@@ -408,13 +420,16 @@
                 
                 <div class="form-group">
                     <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <i class="fas fa-paper-plane"></i> From (Sender) - Single Field
+                        <i class="fas fa-paper-plane"></i> Sender (அனுப்புநர்) - Single Field
                     </h3>
                     <div class="form-group">
-                        <label for="fromDetails">From Details (Office, Address, Additional Info)</label>
-                        <textarea id="fromDetails" rows="5" placeholder="Enter all From details here, each on a new line">காவல் ஆய்வாளர்,
-G7 சேத்துப்பட்டு காவல் நிலையம்,
-சேத்துப்பட்டு, சென்னை-31</textarea>
+                        <label for="fromDetails">Sender Details (Office, Address, Additional Info)</label>
+                        <textarea id="fromDetails" rows="5" placeholder="Enter all sender details here, each on a new line">G7 nrj;Jg;gl;L fhty; epiyak;
+nrj;Jg;gl;L. brd;id-31
+mDg;g[eh;
+bgWeh;
+nguhrpupau; mtu;fs;
+rl;lk; rhh;e;j kUj;Jtj;Jiw</textarea>
                         <p style="font-size: 14px; color: #666; margin-top: 5px;">
                             <i class="fas fa-info-circle"></i> Enter each piece of information on a new line
                         </p>
@@ -423,11 +438,11 @@ G7 சேத்துப்பட்டு காவல் நிலையம்
                 
                 <div class="form-group">
                     <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <i class="fas fa-envelope"></i> To (Recipient) - Single Field
+                        <i class="fas fa-envelope"></i> Receiver (பெறுநர்) - Single Field
                     </h3>
                     <div class="form-group">
-                        <label for="toDetails">To Details (Office, Address, Additional Info)</label>
-                        <textarea id="toDetails" rows="4" placeholder="Enter all To details here, each on a new line">fPH;g;ghf;fk; kUj;Jtf;fy;Y}hp kUj;Jtkid
+                        <label for="toDetails">Receiver Details (Office, Address, Additional Info)</label>
+                        <textarea id="toDetails" rows="4" placeholder="Enter all receiver details here, each on a new line">fPH;g;ghf;fk; kUj;Jtf;fy;Y}hp kUj;Jtkid
 brd;id-10</textarea>
                         <p style="font-size: 14px; color: #666; margin-top: 5px;">
                             <i class="fas fa-info-circle"></i> Enter each piece of information on a new line
@@ -441,11 +456,12 @@ brd;id-10</textarea>
                     </h3>
                     
                     <div class="form-group">
-                        <label for="firstColumnLabel">Deceased Details Label & Information</label>
-                        <textarea id="firstColumnLabel" rows="6" placeholder="Enter deceased details label and information" style="height: 90px;">இறந்தவர்:
-பெயர் விலாசம் தெரியாத சுமார் 70 வயது மதிக்கத்தக்க ஆண்</textarea>
+                        <label for="deceasedDetailsInput">Deceased Details Information (without "இறந்தவர்:")</label>
+                        <textarea id="deceasedDetailsInput" rows="6" placeholder="Enter deceased details information only (without 'இறந்தவர்:')" style="height: 90px;">Name, M/A 54
+j-bg fhsg;gd;
+vz;/107. ntk;g[ypak;kd; nfhapy; njhl;lk;. b&dha; efu;. brd;id/31</textarea>
                         <p style="font-size: 14px; color: #666; margin-top: 5px;">
-                            <i class="fas fa-info-circle"></i> Enter the label (e.g., "இறந்தவர்:") followed by deceased details
+                            <i class="fas fa-info-circle"></i> <strong>"இறந்தவர்:" is automatically included and cannot be deleted.</strong> Just enter the deceased details below it.
                         </p>
                     </div>
                 </div>
@@ -463,29 +479,37 @@ U/S 194 BNSS</textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="deceasedDetails">Deceased Details (விளக்க விபரங்கள்)</label>
-                    <textarea id="deceasedDetails" rows="3" placeholder="Detailed description of deceased person">இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதம்; கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடப்பில் உள்ளது. மேற்படி பிரேதத்தை பி-7 செத்துப்பட்டு காவல் நிலைய முதல் நிலை காவலர் 43606 திரு. திருமுருகன் என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="investigatorName">Investigator Name (விசாரணை அலுவலர் பெயர்)</label>
-                    <input type="text" id="investigatorName" placeholder="e.g., fhty; cjtp Ma;thsh;">
-                </div>
-                
-                <div class="form-group">
-                    <label for="investigatorOffice">Investigator Office (விசாரணை அலுவலர் அலுவலகம்)</label>
-                    <input type="text" id="investigatorOffice" placeholder="e.g., G7 nrj;Jg;gl;L fhty; epiyak;">
-                </div>
-                
-                <div class="form-group">
-                    <label for="salutationAlignment">Salutation ("ஐயா,") Alignment</label>
-                    <select id="salutationAlignment">
-                        <option value="left" selected>Left Aligned</option>
-                        <option value="center">Center Aligned</option>
-                    </select>
-                    <div class="alignment-notice">
-                        <i class="fas fa-info-circle"></i> "ஐயா," is left-aligned by default (official document format)
+                    <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        <i class="fas fa-file-alt"></i> Deceased Description
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="deceasedDescription">Deceased Description (விளக்க விபரங்கள்)</label>
+                        <textarea id="deceasedDescription" rows="3" placeholder="Detailed description of deceased person">இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதம்; கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடப்பில் உள்ளது. மேற்படி பிரேதத்தை</textarea>
+                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> First part of the deceased description
+                        </p>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="policeOfficerDetails">Police Officer Details (முதல் நிலை காவலர் விவரங்கள்)</label>
+                        <input type="text" id="policeOfficerDetails" placeholder="Enter police officer details" value="முதல் நிலை காவலர் 43606 திரு. திருமுருகன்">
+                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Police officer details (editable)
+                        </p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deceasedDescriptionEnd">Deceased Description End (முடிவு பகுதி)</label>
+                        <textarea id="deceasedDescriptionEnd" rows="2" placeholder="End part of deceased description">என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.</textarea>
+                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> End part of the deceased description
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="alignment-notice">
+                    <i class="fas fa-info-circle"></i> <strong>Salutation ("ஐயா,") is always left-aligned</strong> as per official document format.
                 </div>
                 
                 <div class="table-width-control">
@@ -519,17 +543,20 @@ U/S 194 BNSS</textarea>
                     <button class="btn btn-success" id="printDocument">
                         <i class="fas fa-print"></i> Print Document
                     </button>
-                    <button class="btn btn-secondary" id="downloadHtml">
-                        <i class="fas fa-file-code"></i> Download HTML for Print
-                    </button>
                 </div>
                 
                 <div class="instructions">
-                    <h4><i class="fas fa-info-circle"></i> Font Information:</h4>
+                    <h4><i class="fas fa-info-circle"></i> Formatting Information:</h4>
+                    <p><strong>"இறந்தவர்:"</strong> - Automatically included in bold format (cannot be deleted)</p>
+                    <p><strong>"ஐயா,"</strong> - Always left-aligned (official document format)</p>
+                    <p><strong>"அனுப்புநர்:"</strong> - Used instead of "From:" (Tamil sender heading)</p>
+                    <p><strong>"பெறுநர்:"</strong> - Used instead of "To:" (Tamil receiver heading)</p>
+                    <p><strong>Police Officer Details</strong> - Editable field for "முதல் நிலை காவலர்" details</p>
+                    <p><strong>Signature</strong> - Automatically generated from "அனுப்புநர்" details</p>
                     <p><strong>Tamil Text:</strong> Uses Latha font (standard Windows Tamil font)</p>
                     <p><strong>English Text:</strong> Uses Times New Roman for English/non-Tamil text</p>
-                    <p><strong>Compact Tables:</strong> Left table width reduced for better balance</p>
-                    <p><strong>Clean title:</strong> No underline below "கோரிக்கை மனு"</p>
+                    <p><strong>Single Borders:</strong> Tables have single outer borders with internal dividers</p>
+                    <p><strong>No Underlines:</strong> Headings appear without underlines</p>
                 </div>
             </div>
             
@@ -539,7 +566,7 @@ U/S 194 BNSS</textarea>
                     <!-- Document preview will be generated here -->
                 </div>
                 <p style="text-align: center; margin-top: 15px; color: #666; font-size: 14px;">
-                    <i class="fas fa-info-circle"></i> Preview shows mixed fonts: Latha for Tamil, Times New Roman for English
+                    <i class="fas fa-info-circle"></i> Preview shows Tamil headings: "அனுப்புநர்", "பெறுநர்", "இறந்தவர்:" in bold, and "ஐயா," left-aligned
                 </p>
             </div>
         </div>
@@ -556,9 +583,7 @@ U/S 194 BNSS</textarea>
         const generatePdfBtn = document.getElementById('generatePdf');
         const resetFormBtn = document.getElementById('resetForm');
         const printDocumentBtn = document.getElementById('printDocument');
-        const downloadHtmlBtn = document.getElementById('downloadHtml');
         const fontSizeSelect = document.getElementById('fontSize');
-        const alignmentSelect = document.getElementById('salutationAlignment');
         const leftTableWidthSelect = document.getElementById('leftTableWidth');
         
         // Default values
@@ -566,12 +591,12 @@ U/S 194 BNSS</textarea>
             documentNumber: 'G7 fhty; epiya Fw;w vz; 216-2025',
             fromDetails: 'G7 nrj;Jg;gl;L fhty; epiyak;\nnrj;Jg;gl;L. brd;id-31\nmDg;g[eh;\nbgWeh;\nnguhrpupau; mtu;fs;\nrl;lk; rhh;e;j kUj;Jtj;Jiw',
             toDetails: 'fPH;g;ghf;fk; kUj;Jtf;fy;Y}hp kUj;Jtkid\nbrd;id-10',
-            firstColumnLabel: 'இறந்தவர்:\nName, M/A 54\nj-bg fhsg;gd;\nvz;/107. ntk;g[ypak;kd; nfhapy; njhl;lk;. b&dha; efu;. brd;id/31',
+            deceasedDetailsInput: 'Name, M/A 54\nj-bg fhsg;gd;\nvz;/107. ntk;g[ypak;kd; nfhapy; njhl;lk;. b&dha; efu;. brd;id/31',
             subject: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதத்தின் பிரேத பரிசோதனை டாக்டர் அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.',
             reference: 'G7 fhty; epiya Fw;w vz; 216-2025\n\nU/S 194 BNSS',
-            deceasedDetails: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதம்; கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடப்பில் உள்ளது. மேற்படி பிரேதத்தை பி-7 செத்துப்பட்டு காவல் நிலைய முதல் நிலை காவலர் 43606 திரு. திருமுருகன் என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.',
-            investigatorName: 'fhty; cjtp Ma;thsh;',
-            investigatorOffice: 'G7 nrj;Jg;gl;L fhty; epiyak;'
+            deceasedDescription: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதம்; கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடப்பில் உள்ளது. மேற்படி பிரேதத்தை',
+            policeOfficerDetails: 'முதல் நிலை காவலர் 43606 திரு. திருமுருகன்',
+            deceasedDescriptionEnd: 'என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.'
         };
         
         // Initialize form
@@ -579,12 +604,12 @@ U/S 194 BNSS</textarea>
             document.getElementById('documentNumber').value = defaultValues.documentNumber;
             document.getElementById('fromDetails').value = defaultValues.fromDetails;
             document.getElementById('toDetails').value = defaultValues.toDetails;
-            document.getElementById('firstColumnLabel').value = defaultValues.firstColumnLabel;
+            document.getElementById('deceasedDetailsInput').value = defaultValues.deceasedDetailsInput;
             document.getElementById('subject').value = defaultValues.subject;
             document.getElementById('reference').value = defaultValues.reference;
-            document.getElementById('deceasedDetails').value = defaultValues.deceasedDetails;
-            document.getElementById('investigatorName').value = defaultValues.investigatorName;
-            document.getElementById('investigatorOffice').value = defaultValues.investigatorOffice;
+            document.getElementById('deceasedDescription').value = defaultValues.deceasedDescription;
+            document.getElementById('policeOfficerDetails').value = defaultValues.policeOfficerDetails;
+            document.getElementById('deceasedDescriptionEnd').value = defaultValues.deceasedDescriptionEnd;
             
             updatePreview();
         }
@@ -592,11 +617,6 @@ U/S 194 BNSS</textarea>
         // Get selected font size
         function getFontSize() {
             return parseInt(fontSizeSelect.value) || 11;
-        }
-        
-        // Get selected alignment
-        function getAlignment() {
-            return alignmentSelect.value || 'left';
         }
         
         // Get left table width
@@ -617,53 +637,118 @@ U/S 194 BNSS</textarea>
         
         // Check if text contains Tamil characters
         function containsTamil(text) {
-            // Tamil Unicode range: U+0B80 to U+0BFF
             const tamilRegex = /[\u0B80-\u0BFF]/;
             return tamilRegex.test(text);
         }
         
-        // Force all Tamil text to use Tamil font
-        function forceTamilFont(text) {
-            if (containsTamil(text)) {
-                return 'tamil-text';
-            }
-            return 'english-text';
+        // Generate the formatted first column content with "இறந்தவர்:" always included
+        function generateFirstColumnContent() {
+            const deceasedDetails = document.getElementById('deceasedDetailsInput').value || defaultValues.deceasedDetailsInput;
+            
+            // Always start with "இறந்தவர்:" in bold, then add user input
+            const lines = deceasedDetails.split('\n');
+            
+            // Create formatted content with "இறந்தவர்:" in bold as first line
+            const formattedLines = [`<strong>இறந்தவர்:</strong>`];
+            
+            // Add all user input lines
+            lines.forEach(line => {
+                if (line.trim()) {
+                    formattedLines.push(line);
+                }
+            });
+            
+            return formattedLines.join('<br>');
         }
         
-        // Update preview with proper font separation
+        // Generate the first column content for text-based output (without HTML)
+        function generateFirstColumnText() {
+            const deceasedDetails = document.getElementById('deceasedDetailsInput').value || defaultValues.deceasedDetailsInput;
+            
+            // Always start with "இறந்தவர்:", then add user input
+            const lines = deceasedDetails.split('\n');
+            
+            // Create text content with "இறந்தவர்:" as first line
+            const formattedLines = ['இறந்தவர்:'];
+            
+            // Add all user input lines
+            lines.forEach(line => {
+                if (line.trim()) {
+                    formattedLines.push(line);
+                }
+            });
+            
+            return formattedLines.join('\n');
+        }
+        
+        // Generate the complete deceased description with editable police officer details
+        function generateDeceasedDescription() {
+            const deceasedDescription = document.getElementById('deceasedDescription').value || defaultValues.deceasedDescription;
+            const policeOfficerDetails = document.getElementById('policeOfficerDetails').value || defaultValues.policeOfficerDetails;
+            const deceasedDescriptionEnd = document.getElementById('deceasedDescriptionEnd').value || defaultValues.deceasedDescriptionEnd;
+            
+            // Combine all parts
+            return `${deceasedDescription} ${policeOfficerDetails} ${deceasedDescriptionEnd}`;
+        }
+        
+        // Generate signature lines from "அனுப்புநர்" details
+        function generateSignatureLines() {
+            const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
+            const lines = fromDetails.split('\n');
+            
+            // Return the first 3 lines from "அனுப்புநர்" details for signature
+            const signatureLines = [];
+            
+            // Add lines 0, 1, and 2 (if they exist)
+            if (lines.length > 0) signatureLines.push(lines[0]);
+            if (lines.length > 1) signatureLines.push(lines[1]);
+            if (lines.length > 2) signatureLines.push(lines[2]);
+            
+            return signatureLines;
+        }
+        
+        // Update preview with all editable fields and auto-generated signature
         function updatePreview() {
             const fontSize = getFontSize();
             const lineHeight = getLineHeight(fontSize) / 12;
-            const alignment = getAlignment();
             const leftTableWidth = getLeftTableWidth();
             const rightTableWidth = getRightTableWidth();
-            const salutationStyle = alignment === 'center' ? 'text-align: center;' : 'text-align: left;';
             
             const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
             const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
-            const firstColumnLabel = document.getElementById('firstColumnLabel').value || defaultValues.firstColumnLabel;
             const subject = document.getElementById('subject').value || defaultValues.subject;
             const reference = document.getElementById('reference').value || defaultValues.reference;
-            const deceasedDetails = document.getElementById('deceasedDetails').value || defaultValues.deceasedDetails;
-            const investigatorName = document.getElementById('investigatorName').value || defaultValues.investigatorName;
-            const investigatorOffice = document.getElementById('investigatorOffice').value || defaultValues.investigatorOffice;
             const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
             
-            // Process From details - ALL text in Tamil font for consistency
+            // Generate formatted first column content with "இறந்தவர்:" automatically included
+            const firstColumnContent = generateFirstColumnContent();
+            
+            // Generate complete deceased description
+            const deceasedDescription = generateDeceasedDescription();
+            
+            // Generate signature lines from "அனுப்புநர்" details
+            const signatureLines = generateSignatureLines();
+            
+            // Process Sender (அனுப்புநர்) details
             const fromDetailsLines = fromDetails.split('\n').map(line => 
                 `<div class="document-line left tamil-text" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
             ).join('');
             
-            // Process To details - ALL text in Tamil font for consistency
+            // Process Receiver (பெறுநர்) details
             const toDetailsLines = toDetails.split('\n').map(line => 
                 `<div class="document-line left tamil-text" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
             ).join('');
             
-            // Process reference - check each line
+            // Process reference
             const referenceLines = reference.split('\n').map(line => {
                 const fontClass = containsTamil(line) ? 'tamil-text' : 'english-text';
                 return `<div class="${fontClass}" style="font-size: ${fontSize - 1}px; margin-bottom: 2px;">${line}</div>`;
             }).join('');
+            
+            // Generate signature HTML
+            const signatureHTML = signatureLines.map(line => 
+                `<div class="document-line tamil-text" style="font-size: ${fontSize}px; margin-bottom: 4px;">${line}</div>`
+            ).join('');
             
             const previewHTML = `
                 <div class="preview-header" style="font-size: ${fontSize + 4}px; margin-bottom: 15px;">
@@ -671,36 +756,36 @@ U/S 194 BNSS</textarea>
                 </div>
                 
                 <div class="from-section" style="margin-bottom: 15px;">
-                    <div class="section-heading english-text" style="font-size: ${fontSize}px; margin-bottom: 5px;">From:</div>
+                    <div class="section-heading tamil-text" style="font-size: ${fontSize}px; margin-bottom: 5px; font-weight: bold;">அனுப்புநர்:</div>
                     ${fromDetailsLines}
                 </div>
                 
                 <div class="to-section" style="margin-bottom: 15px;">
-                    <div class="section-heading english-text" style="font-size: ${fontSize}px; margin-bottom: 5px;">To:</div>
+                    <div class="section-heading tamil-text" style="font-size: ${fontSize}px; margin-bottom: 5px; font-weight: bold;">பெறுநர்:</div>
                     ${toDetailsLines}
                 </div>
                 
-                <div class="document-line tamil-text" style="margin: 15px 0; font-size: ${fontSize + 1}px; ${salutationStyle}">
+                <div class="document-line tamil-text" style="margin: 15px 0; font-size: ${fontSize + 1}px; text-align: left;">
                     ஐயா,
                 </div>
                 
                 <div class="table-container" style="gap: 10px; margin: 10px 0;">
-                    <table class="single-column-table" style="width: ${leftTableWidth}%;">
+                    <table class="single-column-table" style="width: ${leftTableWidth}%; border: 1px solid #000;">
                         <tr>
                             <td class="tamil-text" style="padding: 4px; font-size: ${fontSize - 1}px;">
-                                ${firstColumnLabel.replace(/\n/g, '<br>')}
+                                ${firstColumnContent}
                             </td>
                         </tr>
                     </table>
                     
-                    <table class="document-table" style="width: ${rightTableWidth}%;">
+                    <table class="document-table" style="width: ${rightTableWidth}%; border: 1px solid #000;">
                         <tr>
-                            <td class="label tamil-text" style="width: 22%; padding: 4px; font-size: ${fontSize - 1}px;">பொருள்:</td>
+                            <td class="label tamil-text" style="width: 22%; padding: 4px; font-size: ${fontSize - 1}px; border-right: 1px solid #000;">பொருள்:</td>
                             <td class="tamil-text document-line justify" style="padding: 4px; font-size: ${fontSize - 1}px;">${subject}</td>
                         </tr>
                         <tr>
-                            <td class="label tamil-text" style="padding: 4px; font-size: ${fontSize - 1}px;">பார்வை:</td>
-                            <td style="padding: 4px; font-size: ${fontSize - 1}px;">
+                            <td class="label tamil-text" style="padding: 4px; font-size: ${fontSize - 1}px; border-right: 1px solid #000; border-bottom: 1px solid #000;">பார்வை:</td>
+                            <td style="padding: 4px; font-size: ${fontSize - 1}px; border-bottom: 1px solid #000;">
                                 ${referenceLines}
                             </td>
                         </tr>
@@ -708,21 +793,11 @@ U/S 194 BNSS</textarea>
                 </div>
                 
                 <div class="document-line tamil-text justify" style="margin-top: 15px; text-align: justify; font-size: ${fontSize}px; line-height: ${lineHeight}em;">
-                    ${deceasedDetails}
+                    ${deceasedDescription}
                 </div>
                 
                 <div style="margin-top: 30px;">
-                    <div class="document-line tamil-text" style="font-size: ${fontSize}px; margin-bottom: 4px;">
-                        ${investigatorName}
-                    </div>
-                    
-                    <div class="document-line tamil-text" style="font-size: ${fontSize}px; margin-bottom: 4px;">
-                        ${investigatorOffice}
-                    </div>
-                    
-                    <div class="document-line english-text" style="font-size: ${fontSize}px; margin-bottom: 4px;">
-                        ${fromDetails.split('\n')[1] || ''}
-                    </div>
+                    ${signatureHTML}
                 </div>
                 
                 ${documentNumber ? `<div class="document-line english-text" style="text-align: center; margin-top: 20px; font-size: ${fontSize - 2}px; color: #555;">${documentNumber}</div>` : ''}
@@ -733,29 +808,31 @@ U/S 194 BNSS</textarea>
             documentPreview.style.lineHeight = lineHeight + 'em';
         }
         
-        // Generate PDF with Latha font
+        // Generate PDF with all editable fields and auto-generated signature
         function generatePDF() {
             const originalText = generatePdfBtn.innerHTML;
             generatePdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating PDF...';
             generatePdfBtn.disabled = true;
             
             try {
-                // Get form values
                 const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
                 const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
-                const firstColumnLabel = document.getElementById('firstColumnLabel').value || defaultValues.firstColumnLabel;
                 const subject = document.getElementById('subject').value || defaultValues.subject;
                 const reference = document.getElementById('reference').value || defaultValues.reference;
-                const deceasedDetails = document.getElementById('deceasedDetails').value || defaultValues.deceasedDetails;
-                const investigatorName = document.getElementById('investigatorName').value || defaultValues.investigatorName;
-                const investigatorOffice = document.getElementById('investigatorOffice').value || defaultValues.investigatorOffice;
                 const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
                 const fontSize = getFontSize();
                 const lineHeight = fontSize * 1.2;
-                const alignment = getAlignment();
                 const leftTableWidth = getLeftTableWidth();
                 const rightTableWidth = getRightTableWidth();
-                const salutationStyle = alignment === 'center' ? 'text-align: center;' : 'text-align: left;';
+                
+                // Generate first column text with "இறந்தவர்:" automatically included
+                const firstColumnText = generateFirstColumnText();
+                
+                // Generate complete deceased description
+                const deceasedDescription = generateDeceasedDescription();
+                
+                // Generate signature lines from "அனுப்புநர்" details
+                const signatureLines = generateSignatureLines();
                 
                 // Create a temporary div for PDF content
                 const tempDiv = document.createElement('div');
@@ -773,40 +850,45 @@ U/S 194 BNSS</textarea>
                     box-sizing: border-box;
                 `;
                 
-                // Generate HTML with Latha font for ALL Tamil text
+                // Generate signature HTML for PDF
+                const signatureHTML = signatureLines.map(line => 
+                    `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${line}</div>`
+                ).join('');
+                
+                // Generate HTML with all editable fields
                 tempDiv.innerHTML = `
                     <div style="text-align: center; margin-bottom: 15px;">
                         <h1 style="font-size: ${fontSize + 2}pt; margin-bottom: 5px; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-weight: bold;">கோரிக்கை மனு</h1>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 6px; text-decoration: underline; font-size: ${fontSize}pt; font-family: 'Times New Roman', Times, serif;">From:</div>
+                        <div style="font-weight: bold; margin-bottom: 6px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">அனுப்புநர்:</div>
                         ${fromDetails.split('\n').map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${line}</div>`).join('')}
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 6px; text-decoration: underline; font-size: ${fontSize}pt; font-family: 'Times New Roman', Times, serif;">To:</div>
+                        <div style="font-weight: bold; margin-bottom: 6px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பெறுநர்:</div>
                         ${toDetails.split('\n').map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${line}</div>`).join('')}
                     </div>
                     
-                    <div style="margin: 15px 0; font-size: ${fontSize + 1}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif; ${salutationStyle}">
+                    <div style="margin: 15px 0; font-size: ${fontSize + 1}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif; text-align: left;">
                         ஐயா,
                     </div>
                     
                     <div style="display: flex; width: 100%; margin: 15px 0; gap: 10px;">
                         <div style="width: ${leftTableWidth}%; border: 1px solid #000; padding: 5px; min-height: 50px; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-size: ${fontSize}pt;">
-                            ${firstColumnLabel.replace(/\n/g, '<br>')}
+                            ${firstColumnText.replace(/\n/g, '<br>').replace('இறந்தவர்:', '<span style="font-weight: bold;">இறந்தவர்:</span>')}
                         </div>
                         
                         <div style="width: ${rightTableWidth}%; border: 1px solid #000;">
                             <table style="width: 100%; border-collapse: collapse; font-size: ${fontSize}pt;">
                                 <tr>
-                                    <td style="width: 22%; border: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பொருள்:</td>
-                                    <td style="border: 1px solid #000; padding: 5px; vertical-align: top; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${subject}</td>
+                                    <td style="width: 22%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பொருள்:</td>
+                                    <td style="border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${subject}</td>
                                 </tr>
                                 <tr>
-                                    <td style="border: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பார்வை:</td>
-                                    <td style="border: 1px solid #000; padding: 5px; vertical-align: top;">
+                                    <td style="border-right: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பார்வை:</td>
+                                    <td style="padding: 5px; vertical-align: top;">
                                         ${reference.split('\n').map(line => {
                                             const fontFamily = containsTamil(line) ? "'Latha', 'Arial Unicode MS', sans-serif" : "'Times New Roman', Times, serif";
                                             return `<div style="font-family: ${fontFamily};">${line}</div>`;
@@ -818,13 +900,11 @@ U/S 194 BNSS</textarea>
                     </div>
                     
                     <div style="margin: 15px 0; text-align: justify; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-size: ${fontSize}pt; line-height: ${lineHeight}pt;">
-                        ${deceasedDetails}
+                        ${deceasedDescription}
                     </div>
                     
                     <div style="margin-top: 30px;">
-                        <div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${investigatorName}</div>
-                        <div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${investigatorOffice}</div>
-                        <div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Times New Roman', Times, serif;">${fromDetails.split('\n')[1] || ''}</div>
+                        ${signatureHTML}
                     </div>
                     
                     ${documentNumber ? `<div style="text-align: center; margin-top: 20px; font-size: ${fontSize - 2}pt; color: #555; font-family: 'Times New Roman', Times, serif;">${documentNumber}</div>` : ''}
@@ -860,7 +940,7 @@ U/S 194 BNSS</textarea>
                             const imgHeight = canvas.height * imgWidth / canvas.width;
                             
                             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                            pdf.save(`PM_Request_${leftTableWidth}%_${fontSize}pt_${alignment}.pdf`);
+                            pdf.save(`PM_Request_${leftTableWidth}%_${fontSize}pt.pdf`);
                             
                             document.body.removeChild(tempDiv);
                             document.head.removeChild(fontLink);
@@ -873,49 +953,51 @@ U/S 194 BNSS</textarea>
                         }).catch(error => {
                             console.error('html2canvas error:', error);
                             document.head.removeChild(fontLink);
-                            downloadHTMLForPrint();
+                            fallbackToPrint();
                         });
-                    }, 2000); // Wait 2 seconds for font to load
+                    }, 2000);
                 } else {
-                    // Load html2canvas library dynamically
-                    const script = document.createElement('script');
-                    script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
-                    script.onload = () => {
-                        generatePDF();
-                    };
-                    script.onerror = () => {
-                        downloadHTMLForPrint();
-                    };
-                    document.head.appendChild(script);
+                    fallbackToPrint();
                 }
                 
             } catch (error) {
                 console.error('PDF generation error:', error);
-                downloadHTMLForPrint();
+                fallbackToPrint();
                 
                 generatePdfBtn.innerHTML = originalText;
                 generatePdfBtn.disabled = false;
             }
         }
         
-        // Print document with Latha font
+        // Fallback to print if PDF generation fails
+        function fallbackToPrint() {
+            alert('PDF generation failed. Opening print dialog instead.');
+            printDocument();
+            generatePdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF (Latha Font)';
+            generatePdfBtn.disabled = false;
+        }
+        
+        // Print document with all editable fields and auto-generated signature
         function printDocument() {
             const printWindow = window.open('', '_blank');
             const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
             const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
-            const firstColumnLabel = document.getElementById('firstColumnLabel').value || defaultValues.firstColumnLabel;
             const subject = document.getElementById('subject').value || defaultValues.subject;
             const reference = document.getElementById('reference').value || defaultValues.reference;
-            const deceasedDetails = document.getElementById('deceasedDetails').value || defaultValues.deceasedDetails;
-            const investigatorName = document.getElementById('investigatorName').value || defaultValues.investigatorName;
-            const investigatorOffice = document.getElementById('investigatorOffice').value || defaultValues.investigatorOffice;
             const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
             const fontSize = getFontSize();
             const lineHeight = fontSize * 1.2;
-            const alignment = getAlignment();
             const leftTableWidth = getLeftTableWidth();
             const rightTableWidth = getRightTableWidth();
-            const salutationStyle = alignment === 'center' ? 'text-align: center;' : 'text-align: left;';
+            
+            // Generate first column text with "இறந்தவர்:" automatically included
+            const firstColumnText = generateFirstColumnText();
+            
+            // Generate complete deceased description
+            const deceasedDescription = generateDeceasedDescription();
+            
+            // Generate signature lines from "அனுப்புநர்" details
+            const signatureLines = generateSignatureLines();
             
             printWindow.document.write(`
                 <!DOCTYPE html>
@@ -967,7 +1049,7 @@ U/S 194 BNSS</textarea>
                         .section-heading {
                             font-weight: bold;
                             margin-bottom: 6px;
-                            text-decoration: underline;
+                            font-family: 'Latha', 'Arial Unicode MS', sans-serif;
                         }
                         .content-line {
                             margin-bottom: 4px;
@@ -975,7 +1057,7 @@ U/S 194 BNSS</textarea>
                         .salutation {
                             margin: 15px 0;
                             font-size: ${fontSize + 1}pt;
-                            ${salutationStyle}
+                            text-align: left;
                         }
                         .table-container {
                             display: flex;
@@ -996,15 +1078,23 @@ U/S 194 BNSS</textarea>
                         .right-table table {
                             width: 100%;
                             border-collapse: collapse;
+                            border: 1px solid #000;
                         }
                         .right-table td {
-                            border: 1px solid #000;
                             padding: 5px;
                             vertical-align: top;
                         }
                         .right-table .label {
                             width: 22%;
                             font-weight: bold;
+                            border-right: 1px solid #000;
+                            border-bottom: 1px solid #000;
+                        }
+                        .right-table tr:last-child .label {
+                            border-bottom: 1px solid #000;
+                        }
+                        .right-table tr:last-child td:last-child {
+                            border-bottom: none;
                         }
                         .details {
                             margin: 15px 0;
@@ -1021,6 +1111,9 @@ U/S 194 BNSS</textarea>
                             margin-top: 20px;
                             font-size: ${fontSize - 2}pt;
                             color: #555;
+                        }
+                        .bold {
+                            font-weight: bold;
                         }
                         @media print {
                             body {
@@ -1041,14 +1134,14 @@ U/S 194 BNSS</textarea>
                         </div>
                         
                         <div class="section">
-                            <div class="section-heading english">From:</div>
+                            <div class="section-heading tamil">அனுப்புநர்:</div>
                             ${fromDetails.split('\n').map(line => 
                                 `<div class="content-line tamil">${line}</div>`
                             ).join('')}
                         </div>
                         
                         <div class="section">
-                            <div class="section-heading english">To:</div>
+                            <div class="section-heading tamil">பெறுநர்:</div>
                             ${toDetails.split('\n').map(line => 
                                 `<div class="content-line tamil">${line}</div>`
                             ).join('')}
@@ -1060,14 +1153,14 @@ U/S 194 BNSS</textarea>
                         
                         <div class="table-container">
                             <div class="left-table tamil">
-                                ${firstColumnLabel.replace(/\n/g, '<br>')}
+                                ${firstColumnText.replace(/\n/g, '<br>').replace('இறந்தவர்:', '<span class="bold">இறந்தவர்:</span>')}
                             </div>
                             
                             <div class="right-table">
                                 <table>
                                     <tr>
                                         <td class="label tamil">பொருள்:</td>
-                                        <td class="tamil">${subject}</td>
+                                        <td class="tamil" style="border-bottom: 1px solid #000;">${subject}</td>
                                     </tr>
                                     <tr>
                                         <td class="label tamil">பார்வை:</td>
@@ -1083,13 +1176,13 @@ U/S 194 BNSS</textarea>
                         </div>
                         
                         <div class="details tamil">
-                            ${deceasedDetails}
+                            ${deceasedDescription}
                         </div>
                         
                         <div class="signature">
-                            <div class="signature-line tamil">${investigatorName}</div>
-                            <div class="signature-line tamil">${investigatorOffice}</div>
-                            <div class="signature-line english">${fromDetails.split('\n')[1] || ''}</div>
+                            ${signatureLines.map(line => 
+                                `<div class="signature-line tamil">${line}</div>`
+                            ).join('')}
                         </div>
                         
                         ${documentNumber ? `<div class="document-number english">${documentNumber}</div>` : ''}
@@ -1100,7 +1193,7 @@ U/S 194 BNSS</textarea>
                             window.focus();
                             setTimeout(function() {
                                 window.print();
-                            }, 1500); // Wait for font to load
+                            }, 1500);
                             
                             window.onafterprint = function() {
                                 setTimeout(function() {
@@ -1113,236 +1206,6 @@ U/S 194 BNSS</textarea>
                 </html>
             `);
             printWindow.document.close();
-        }
-        
-        // Download HTML for printing with Latha font
-        function downloadHTMLForPrint() {
-            const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
-            const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
-            const firstColumnLabel = document.getElementById('firstColumnLabel').value || defaultValues.firstColumnLabel;
-            const subject = document.getElementById('subject').value || defaultValues.subject;
-            const reference = document.getElementById('reference').value || defaultValues.reference;
-            const deceasedDetails = document.getElementById('deceasedDetails').value || defaultValues.deceasedDetails;
-            const investigatorName = document.getElementById('investigatorName').value || defaultValues.investigatorName;
-            const investigatorOffice = document.getElementById('investigatorOffice').value || defaultValues.investigatorOffice;
-            const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
-            const fontSize = getFontSize();
-            const lineHeight = fontSize * 1.2;
-            const alignment = getAlignment();
-            const leftTableWidth = getLeftTableWidth();
-            const rightTableWidth = getRightTableWidth();
-            const salutationStyle = alignment === 'center' ? 'text-align: center;' : 'text-align: left;';
-            
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>PM Request Document</title>
-    <meta charset="UTF-8">
-    <style>
-        @page {
-            size: A4;
-            margin: 15mm;
-        }
-        @font-face {
-            font-family: 'Latha';
-            src: url('https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2') format('woff2');
-            font-display: swap;
-        }
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: ${fontSize}pt;
-            line-height: ${lineHeight}pt;
-            margin: 0;
-            padding: 0;
-        }
-        .tamil {
-            font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
-        }
-        .english {
-            font-family: 'Times New Roman', Times, serif;
-        }
-        .document-container {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 15mm;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .header h1 {
-            font-size: ${fontSize + 2}pt;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .section {
-            margin-bottom: 15px;
-        }
-        .section-heading {
-            font-weight: bold;
-            margin-bottom: 6px;
-            text-decoration: underline;
-        }
-        .content-line {
-            margin-bottom: 4px;
-        }
-        .salutation {
-            margin: 15px 0;
-            font-size: ${fontSize + 1}pt;
-            ${salutationStyle}
-        }
-        .table-container {
-            display: flex;
-            width: 100%;
-            margin: 15px 0;
-            gap: 10px;
-        }
-        .left-table {
-            width: ${leftTableWidth}%;
-            border: 1px solid #000;
-            padding: 5px;
-            min-height: 50px;
-        }
-        .right-table {
-            width: ${rightTableWidth}%;
-            border: 1px solid #000;
-        }
-        .right-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .right-table td {
-            border: 1px solid #000;
-            padding: 5px;
-            vertical-align: top;
-        }
-        .right-table .label {
-            width: 22%;
-            font-weight: bold;
-        }
-        .details {
-            margin: 15px 0;
-            text-align: justify;
-        }
-        .signature {
-            margin-top: 30px;
-        }
-        .signature-line {
-            margin-bottom: 4px;
-        }
-        .document-number {
-            text-align: center;
-            margin-top: 20px;
-            font-size: ${fontSize - 2}pt;
-            color: #555;
-        }
-        @media print {
-            body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            .document-container {
-                padding: 0;
-                margin: 0;
-            }
-        }
-        .instructions {
-            background: #f0f0f0;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-            font-size: ${fontSize - 1}pt;
-        }
-    </style>
-</head>
-<body>
-    <div class="document-container">
-        <div class="header">
-            <h1 class="tamil">கோரிக்கை மனு</h1>
-        </div>
-        
-        <div class="section">
-            <div class="section-heading english">From:</div>
-            ${fromDetails.split('\n').map(line => 
-                `<div class="content-line tamil">${line}</div>`
-            ).join('')}
-        </div>
-        
-        <div class="section">
-            <div class="section-heading english">To:</div>
-            ${toDetails.split('\n').map(line => 
-                `<div class="content-line tamil">${line}</div>`
-            ).join('')}
-        </div>
-        
-        <div class="salutation tamil">
-            ஐயா,
-        </div>
-        
-        <div class="table-container">
-            <div class="left-table tamil">
-                ${firstColumnLabel.replace(/\n/g, '<br>')}
-            </div>
-            
-            <div class="right-table">
-                <table>
-                    <tr>
-                        <td class="label tamil">பொருள்:</td>
-                        <td class="tamil">${subject}</td>
-                    </tr>
-                    <tr>
-                        <td class="label tamil">பார்வை:</td>
-                        <td>
-                            ${reference.split('\n').map(line => {
-                                const fontClass = /[\u0B80-\u0BFF]/.test(line) ? 'tamil' : 'english';
-                                return `<div class="${fontClass}">${line}</div>`;
-                            }).join('')}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        
-        <div class="details tamil">
-            ${deceasedDetails}
-        </div>
-        
-        <div class="signature">
-            <div class="signature-line tamil">${investigatorName}</div>
-            <div class="signature-line tamil">${investigatorOffice}</div>
-            <div class="signature-line english">${fromDetails.split('\n')[1] || ''}</div>
-        </div>
-        
-        ${documentNumber ? `<div class="document-number english">${documentNumber}</div>` : ''}
-        
-        <div class="instructions">
-            <h3>How to save as PDF:</h3>
-            <ol>
-                <li>Press <strong>Ctrl+P</strong> (or <strong>Cmd+P</strong> on Mac)</li>
-                <li>In the printer selection, choose <strong>"Save as PDF"</strong></li>
-                <li>Click <strong>"Save"</strong></li>
-                <li>Choose where to save the PDF file</li>
-            </ol>
-            <p><strong>Font Settings:</strong> Tamil text uses Latha font, English uses Times New Roman</p>
-            <p><strong>Layout:</strong> Left Table: ${leftTableWidth}%, Font Size: ${fontSize}pt, Salutation: ${alignment}-aligned</p>
-        </div>
-    </div>
-</body>
-</html>`;
-            
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `PM_Request_${leftTableWidth}%_${fontSize}pt_${alignment}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            alert(`HTML file downloaded with Latha font (${leftTableWidth}% left table). Open it and press Ctrl+P → Save as PDF.`);
         }
         
         // Reset form
@@ -1358,12 +1221,10 @@ U/S 194 BNSS</textarea>
         });
         
         fontSizeSelect.addEventListener('change', updatePreview);
-        alignmentSelect.addEventListener('change', updatePreview);
         leftTableWidthSelect.addEventListener('change', updatePreview);
         generatePdfBtn.addEventListener('click', generatePDF);
         resetFormBtn.addEventListener('click', resetForm);
         printDocumentBtn.addEventListener('click', printDocument);
-        downloadHtmlBtn.addEventListener('click', downloadHTMLForPrint);
         
         // Initialize on load
         document.addEventListener('DOMContentLoaded', initializeForm);
