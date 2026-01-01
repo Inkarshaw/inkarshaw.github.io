@@ -167,11 +167,12 @@
             border: 2px solid #e2e8f0;
             border-radius: 12px;
             padding: 25px;
-            text-decoration: none;
             color: inherit;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            display: block;
         }
 
         .year-card:hover {
@@ -249,6 +250,7 @@
 
         .stat {
             text-align: center;
+            flex: 1;
         }
 
         .stat-value {
@@ -278,7 +280,7 @@
 
         .card-btn {
             flex: 1;
-            padding: 10px 15px;
+            padding: 12px 8px;
             border: none;
             border-radius: 8px;
             font-size: 0.9rem;
@@ -291,6 +293,20 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+            min-height: 44px;
+            min-width: 0;
+        }
+
+        .card-btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-btn svg {
+            flex-shrink: 0;
+            width: 14px;
+            height: 14px;
         }
 
         .card-btn.download {
@@ -558,6 +574,40 @@
 
             .year-buttons {
                 flex-direction: column;
+                gap: 12px;
+            }
+            
+            .card-btn {
+                padding: 14px 12px;
+                width: 100%;
+            }
+            
+            .year-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .year-grid {
+                gap: 15px;
+            }
+            
+            .card-btn {
+                font-size: 0.85rem;
+                padding: 12px 10px;
+            }
+            
+            .card-btn svg {
+                width: 12px;
+                height: 12px;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
             }
         }
 
@@ -585,6 +635,29 @@
         .coming-soon p {
             color: #64748b;
             margin-bottom: 20px;
+        }
+        
+        /* Button loading animation */
+        .card-btn.loading {
+            opacity: 0.7;
+            cursor: wait;
+            position: relative;
+        }
+
+        .card-btn.loading::after {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -629,7 +702,7 @@
 
                 <div class="year-grid">
                     <!-- 2023 -->
-                    <a href="#" class="year-card si">
+                    <div class="year-card si">
                         <div class="difficulty hard">Hard</div>
                         <div class="year-header">
                             <div class="year-badge">2023</div>
@@ -672,10 +745,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2022 -->
-                    <a href="#" class="year-card si">
+                    <div class="year-card si">
                         <div class="difficulty medium">Medium</div>
                         <div class="year-header">
                             <div class="year-badge">2022</div>
@@ -718,10 +791,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2021 -->
-                    <a href="#" class="year-card si">
+                    <div class="year-card si">
                         <div class="difficulty easy">Easy</div>
                         <div class="year-header">
                             <div class="year-badge">2021</div>
@@ -764,10 +837,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2020 -->
-                    <a href="#" class="year-card si">
+                    <div class="year-card si">
                         <div class="difficulty medium">Medium</div>
                         <div class="year-header">
                             <div class="year-badge">2020</div>
@@ -810,10 +883,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2019 -->
-                    <a href="#" class="year-card si">
+                    <div class="year-card si">
                         <div class="difficulty easy">Easy</div>
                         <div class="year-header">
                             <div class="year-badge">2019</div>
@@ -856,10 +929,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2018 -->
-                    <a href="#" class="year-card si">
+                    <div class="year-card si">
                         <div class="difficulty medium">Medium</div>
                         <div class="year-header">
                             <div class="year-badge">2018</div>
@@ -902,7 +975,7 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
 
                 <!-- Subject Statistics -->
@@ -959,7 +1032,7 @@
 
                 <div class="year-grid">
                     <!-- 2023 -->
-                    <a href="#" class="year-card pc">
+                    <div class="year-card pc">
                         <div class="difficulty medium">Medium</div>
                         <div class="year-header">
                             <div class="year-badge">2023</div>
@@ -1002,10 +1075,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2022 -->
-                    <a href="#" class="year-card pc">
+                    <div class="year-card pc">
                         <div class="difficulty easy">Easy</div>
                         <div class="year-header">
                             <div class="year-badge">2022</div>
@@ -1048,10 +1121,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2021 -->
-                    <a href="#" class="year-card pc">
+                    <div class="year-card pc">
                         <div class="difficulty hard">Hard</div>
                         <div class="year-header">
                             <div class="year-badge">2021</div>
@@ -1094,10 +1167,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2020 -->
-                    <a href="#" class="year-card pc">
+                    <div class="year-card pc">
                         <div class="difficulty medium">Medium</div>
                         <div class="year-header">
                             <div class="year-badge">2020</div>
@@ -1140,10 +1213,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2018 -->
-                    <a href="#" class="year-card pc">
+                    <div class="year-card pc">
                         <div class="difficulty medium">Medium</div>
                         <div class="year-header">
                             <div class="year-badge">2018</div>
@@ -1186,10 +1259,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- 2017 - NEWLY ADDED -->
-                    <a href="#" class="year-card pc">
+                    <div class="year-card pc">
                         <div class="difficulty hard">Hard</div>
                         <div class="year-header">
                             <div class="year-badge">2017</div>
@@ -1232,7 +1305,7 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
 
                 <!-- Subject Statistics -->
@@ -1388,12 +1461,27 @@
         document.querySelectorAll('.card-btn.download').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                e.stopPropagation(); // Prevent triggering the card click
+                e.stopPropagation();
                 
                 const year = this.getAttribute('data-year');
                 const examType = this.getAttribute('data-type').toUpperCase();
                 
-                alert(`Downloading ${examType} ${year} Question Paper...\n\nThis would download a PDF file of the ${year} ${examType} question paper with answer key.`);
+                // Show loading state
+                const originalText = this.innerHTML;
+                this.classList.add('loading');
+                this.innerHTML = 'Downloading...';
+                
+                // Simulate download delay
+                setTimeout(() => {
+                    this.classList.remove('loading');
+                    this.innerHTML = originalText;
+                    
+                    // Show success message
+                    alert(`Download complete: ${examType} ${year} Question Paper\n\nIn the actual implementation, this would download a PDF file.`);
+                    
+                    // In actual implementation, you would trigger file download:
+                    // window.location.href = `downloads/${examType.toLowerCase()}_${year}.pdf`;
+                }, 1500);
             });
         });
 
@@ -1401,7 +1489,7 @@
         document.querySelectorAll('.year-card').forEach(card => {
             card.addEventListener('click', function(e) {
                 // Don't trigger if clicking on buttons or links
-                if (e.target.closest('.card-btn') || e.target.closest('a')) {
+                if (e.target.closest('.card-btn') || e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'SVG' || e.target.tagName === 'PATH') {
                     return;
                 }
                 
@@ -1409,7 +1497,14 @@
                 const examType = this.querySelector('.exam-type').textContent;
                 const section = this.classList.contains('si') ? 'SI' : 'PC';
 
-                alert(`Loading ${section} ${year} Previous Year Paper...\n\nNote: This is a demo. In the actual implementation, this would open the complete question paper with solutions.`);
+                // Optional: Redirect to the first test link in the card
+                const testLink = this.querySelector('.start-test');
+                if (testLink) {
+                    // Show confirmation
+                    if (confirm(`Open ${section} ${year} Previous Year Paper in new tab?`)) {
+                        window.open(testLink.href, '_blank');
+                    }
+                }
             });
         });
 
@@ -1419,13 +1514,23 @@
                 e.preventDefault();
                 const text = this.textContent.trim();
 
-                if (text.includes('SI Papers')) {
-                    alert('Downloading SI Previous Year Papers (2018-2023)...\n\nThis would download a PDF file containing all SI question papers in the actual implementation.');
-                } else if (text.includes('PC Papers')) {
-                    alert('Downloading PC Previous Year Papers (2017-2023)...\n\nThis would download a PDF file containing all PC question papers in the actual implementation.');
-                } else {
-                    alert('Downloading Complete Set (SI + PC Papers)...\n\nThis would download a ZIP file containing all previous year papers in the actual implementation.');
-                }
+                // Show loading state
+                const originalText = this.innerHTML;
+                this.innerHTML = 'Processing...';
+                this.style.opacity = '0.8';
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.opacity = '1';
+                    
+                    if (text.includes('SI Papers')) {
+                        alert('Downloading SI Previous Year Papers (2018-2023)...\n\nThis would download a ZIP file containing all SI question papers in the actual implementation.');
+                    } else if (text.includes('PC Papers')) {
+                        alert('Downloading PC Previous Year Papers (2017-2023)...\n\nThis would download a ZIP file containing all PC question papers in the actual implementation.');
+                    } else {
+                        alert('Downloading Complete Set (SI + PC Papers)...\n\nThis would download a ZIP file containing all previous year papers in the actual implementation.');
+                    }
+                }, 1000);
             });
         });
 
@@ -1457,6 +1562,13 @@
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
+            });
+        });
+
+        // Add hover effect for better UX
+        document.querySelectorAll('.year-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.cursor = 'pointer';
             });
         });
     </script>
