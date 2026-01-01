@@ -346,7 +346,7 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value">28</div>
+                <div class="stat-value">29</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
@@ -377,6 +377,19 @@
                         </div>
                         <div class="doc-actions">
                             <a href="https://www.clearexams.online/policedocuments/pm_form.pdf" target="_blank" class="btn btn-download">
+                                <i>⬇️</i> Download
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- Arrest Card Entry - NEWLY ADDED -->
+                    <li class="document-item" data-title="Arrest Card" data-desc="Standard arrest card for documenting suspect apprehension details">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Arrest Card</div>
+                            <div class="doc-desc">Standard arrest card for documenting suspect apprehension details</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.pdf" target="_blank" class="btn btn-download">
                                 <i>⬇️</i> Download
                             </a>
                         </div>
@@ -991,10 +1004,11 @@
     </div>
 
     <script>
-        // Document data for search functionality - Updated with new juvenile forms
+        // Document data for search functionality - Updated with new Arrest Card
         const documents = [
             // Download Forms
             { title: "PM Form", desc: "Post Mortem form for autopsy and forensic examination documentation", type: "download", element: null },
+            { title: "Arrest Card", desc: "Standard arrest card for documenting suspect apprehension details", type: "download", element: null }, // NEWLY ADDED
             { title: "Arrest Intimation", desc: "Form for notifying relevant parties about an arrest", type: "download", element: null },
             { title: "NDPS Form 5", desc: "Official NDPS Form 5 for narcotics case documentation", type: "download", element: null },
             { title: "PM Death Report", desc: "Post Mortem death report form for forensic documentation", type: "download", element: null },
@@ -1237,6 +1251,18 @@
             
             searchInput.addEventListener('input', performSearch);
             searchButton.addEventListener('click', performSearch);
+            
+            // Add click handler for Arrest Card
+            const arrestCardBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.pdf"]');
+            if (arrestCardBtn) {
+                arrestCardBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification('Opening Arrest Card PDF...');
+                    setTimeout(() => {
+                        window.open(this.href, '_blank');
+                    }, 500);
+                });
+            }
             
             // Add click handlers for all the new juvenile forms in juvenileremandforms folder
             const juvenileForms = [
