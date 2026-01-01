@@ -1,679 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClearExams.online</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-        
-        body {
-            background-color: #ffffff;
-            color: #111827;
-            line-height: 1.5;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Header */
-        header {
-            background-color: #ffffff;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 20px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-        
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background-color: #111827;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
-        
-        .logo-text h1 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #111827;
-        }
-        
-        .domain {
-            color: #4f46e5;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-        
-        .nav-links a {
-            text-decoration: none;
-            color: #4b5563;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-        
-        .nav-links a:hover {
-            color: #111827;
-        }
-        
-        /* Main Content */
-        .main-content {
-            padding: 60px 0;
-        }
-        
-        .section-title {
-            text-align: center;
-            font-size: 2rem;
-            color: #111827;
-            margin-bottom: 40px;
-            font-weight: 600;
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #6b7280;
-            margin-bottom: 60px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        /* Quiz Sections - NOW FIRST SECTION */
-        .quiz-section {
-            margin-bottom: 80px;
-        }
-        
-        .quiz-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-top: 40px;
-        }
-        
-        .quiz-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 32px 24px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .quiz-card:hover {
-            border-color: #4f46e5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
-        }
-        
-        .quiz-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            color: white;
-        }
-        
-        .topic-icon {
-            background-color: #3b82f6;
-        }
-        
-        .syllabus-icon {
-            background-color: #8b5cf6;
-        }
-        
-        .yojana-icon {
-            background-color: #10b981;
-        }
-        
-        .current-icon {
-            background-color: #f59e0b;
-        }
-        
-        .static-icon {
-            background-color: #ef4444;
-        }
-        
-        .mock-icon {
-            background-color: #6366f1;
-        }
-        
-        .quiz-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 12px;
-            color: #111827;
-            font-weight: 600;
-        }
-        
-        .quiz-card p {
-            color: #6b7280;
-            margin-bottom: 24px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            flex-grow: 1;
-        }
-        
-        .quiz-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
-        }
-        
-        .quiz-count {
-            font-size: 0.85rem;
-            color: #4f46e5;
-            font-weight: 500;
-        }
-        
-        .quiz-link {
-            display: inline-block;
-            padding: 8px 16px;
-            background-color: #f3f4f6;
-            color: #111827;
-            border-radius: 6px;
-            font-weight: 500;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-        
-        .quiz-link:hover {
-            background-color: #e5e7eb;
-        }
-        
-        /* Exam Selection - NOW SECOND SECTION */
-        .exam-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            max-width: 1000px;
-            margin: 0 auto 80px;
-        }
-        
-        .exam-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 40px 30px;
-            text-align: center;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        
-        .exam-card:hover {
-            border-color: #4f46e5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
-        }
-        
-        .exam-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 1.5rem;
-            color: white;
-        }
-        
-        .upsc-icon {
-            background-color: #4f46e5;
-        }
-        
-        .tnpsc-icon {
-            background-color: #059669;
-        }
-        
-        .tnusrb-icon {
-            background-color: #dc2626;
-        }
-        
-        .exam-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 16px;
-            color: #111827;
-            font-weight: 600;
-        }
-        
-        .exam-card p {
-            color: #6b7280;
-            margin-bottom: 24px;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        
-        .exam-link {
-            display: inline-block;
-            padding: 10px 24px;
-            background-color: #111827;
-            color: white;
-            border-radius: 6px;
-            font-weight: 500;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
-        }
-        
-        .exam-link:hover {
-            background-color: #374151;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: #111827;
-            color: #d1d5db;
-            padding: 40px 0 24px;
-            margin-top: 60px;
-        }
-        
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            gap: 40px;
-        }
-        
-        .footer-section h4 {
-            color: white;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .footer-section ul {
-            list-style: none;
-        }
-        
-        .footer-section li {
-            margin-bottom: 8px;
-        }
-        
-        .footer-section a {
-            color: #9ca3af;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-        
-        .footer-section a:hover {
-            color: white;
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 24px;
-            border-top: 1px solid #374151;
-            color: #9ca3af;
-            font-size: 0.8rem;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 16px;
-            }
-            
-            .nav-links {
-                gap: 20px;
-            }
-            
-            .main-content {
-                padding: 40px 0;
-            }
-            
-            .section-title {
-                font-size: 1.8rem;
-                margin-bottom: 30px;
-            }
-            
-            .section-subtitle {
-                font-size: 1rem;
-                margin-bottom: 40px;
-                padding: 0 20px;
-            }
-            
-            .exam-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                margin-bottom: 60px;
-            }
-            
-            .exam-card {
-                padding: 32px 24px;
-            }
-            
-            .quiz-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .footer-content {
-                flex-direction: column;
-                gap: 32px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 16px;
-            }
-            
-            .section-title {
-                font-size: 1.6rem;
-            }
-            
-            .quiz-card {
-                padding: 24px 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Preparation Quiz</title>
+
+  <!-- Google Font (Tamil + English) -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Noto Sans Tamil', sans-serif;
+      background: #f5f7fb;
+      color: #333;
+    }
+
+    header {
+      background: #1e40af;
+      color: #fff;
+      padding: 16px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .lang-toggle {
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .container {
+      padding: 15px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin: 20px 0 10px;
+      font-weight: 700;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card h3 {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    .daily-quiz {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .daily-quiz button {
+      background: #fff;
+      color: #16a34a;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 20px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .ad-box {
+      background: #e5e7eb;
+      text-align: center;
+      padding: 20px;
+      margin: 25px 0;
+      font-size: 14px;
+      color: #555;
+      border-radius: 8px;
+    }
+
+    footer {
+      background: #111827;
+      color: #d1d5db;
+      padding: 15px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    footer a {
+      color: #93c5fd;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+  </style>
 </head>
+
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container header-content">
-            <a href="#" class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>ClearExams<span class="domain">.online</span></h1>
-                </div>
-            </a>
-            
-            <nav class="nav-links">
-                <a href="#">UPSC</a>
-                <a href="https://www.clearexams.online/tnpsc.html">TNPSC</a>
-                <a href="https://www.clearexams.online/tnusrb.html">TNUSRB</a>
-                <a href="#">Resources</a>
-            </nav>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <!-- Practice Quizzes - NOW FIRST SECTION -->
-            <div class="quiz-section">
-                <h2 class="section-title">Practice Quizzes</h2>
-                <p class="section-subtitle">Enhance your preparation with our specialized quiz categories designed for comprehensive exam coverage</p>
-                
-                <!-- Quiz Grid -->
-                <div class="quiz-grid">
-                    <!-- Topic-wise Quiz -->
-                    <div class="quiz-card">
-                        <div class="quiz-icon topic-icon">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <h3>Topic-wise Quiz</h3>
-                        <p>Practice specific topics like History, Geography, Polity, Economy, Science & Technology with detailed explanations.</p>
-                        <div class="quiz-meta">
-                            <span class="quiz-count">500+ Questions</span>
-                            <a href="#" class="quiz-link">Start Quiz</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Syllabus-wise Quiz -->
-                    <div class="quiz-card">
-                        <div class="quiz-icon syllabus-icon">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
-                        <h3>Syllabus-wise Quiz</h3>
-                        <p>Complete syllabus coverage quizzes organized as per official exam patterns and weightage distribution.</p>
-                        <div class="quiz-meta">
-                            <span class="quiz-count">By Exam Pattern</span>
-                            <a href="#" class="quiz-link">Start Quiz</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Yojanas/Schemes Quiz -->
-                    <div class="quiz-card">
-                        <div class="quiz-icon yojana-icon">
-                            <i class="fas fa-hand-holding-heart"></i>
-                        </div>
-                        <h3>Yojanas/Schemes Quiz</h3>
-                        <p>Test your knowledge of Government schemes, welfare programs, and initiatives at Central & State levels.</p>
-                        <div class="quiz-meta">
-                            <span class="quiz-count">200+ Schemes</span>
-                            <a href="#" class="quiz-link">Start Quiz</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Current Affairs Quiz -->
-                    <div class="quiz-card">
-                        <div class="quiz-icon current-icon">
-                            <i class="fas fa-newspaper"></i>
-                        </div>
-                        <h3>Current Affairs Quiz</h3>
-                        <p>Daily, Weekly, and Monthly current affairs quizzes covering national and international events.</p>
-                        <div class="quiz-meta">
-                            <span class="quiz-count">Daily Updates</span>
-                            <a href="#" class="quiz-link">Start Quiz</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Static GK Quiz -->
-                    <div class="quiz-card">
-                        <div class="quiz-icon static-icon">
-                            <i class="fas fa-database"></i>
-                        </div>
-                        <h3>Static GK Quiz</h3>
-                        <p>Important facts, dates, personalities, awards, and general knowledge essential for all competitive exams.</p>
-                        <div class="quiz-meta">
-                            <span class="quiz-count">1000+ Facts</span>
-                            <a href="#" class="quiz-link">Start Quiz</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Mock Test Series -->
-                    <div class="quiz-card">
-                        <div class="quiz-icon mock-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <h3>Mock Test Series</h3>
-                        <p>Full-length simulated exams with timer, performance analysis, and rank prediction for actual exam experience.</p>
-                        <div class="quiz-meta">
-                            <span class="quiz-count">50+ Tests</span>
-                            <a href="#" class="quiz-link">Start Test</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Previous Year Papers -->
-                    <div class="quiz-card">
-                        <div class="quiz-icon topic-icon">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <h3>PYQ Practice</h3>
-                        <p>Solve actual previous year questions with solutions and understand exam trends and important topics.</p>
-                        <div class="quiz-meta">
-                            <span class="quiz-count">10+ Years</span>
-                            <a href="#" class="quiz-link">Start Practice</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Subject-wise Mastery -->
-                    <div class="quiz-card">
-                        <div class="quiz-icon syllabus-icon">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
-                        <h3>Subject Mastery Quiz</h3>
-                        <p>Advanced level quizzes for optional subjects and in-depth understanding of core subjects.</p>
-                        <div class="quiz-meta">
-                            <span class="quiz-count">By Difficulty</span>
-                            <a href="#" class="quiz-link">Start Quiz</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<header>
+  <h1>📘 Exam Preparation Quiz</h1>
+  <div class="lang-toggle">தமிழ் | English</div>
+</header>
 
-            <!-- Exam Selection - NOW SECOND SECTION -->
-            <h2 class="section-title">Select Your Exam</h2>
-            <p class="section-subtitle">Choose your target exam to access specialized preparation resources, study materials, and practice quizzes</p>
-            
-            <div class="exam-grid">
-                <!-- UPSC -->
-                <div class="exam-card" id="upsc-card">
-                    <div class="exam-icon upsc-icon">
-                        <i class="fas fa-landmark"></i>
-                    </div>
-                    <h3>UPSC</h3>
-                    <p>Comprehensive preparation for Civil Services Examination including IAS, IPS, IFS, and other central services.</p>
-                    <a href="#" class="exam-link">Start Preparation</a>
-                </div>
-                
-                <!-- TNPSC -->
-                <div class="exam-card" id="tnpsc-card">
-                    <div class="exam-icon tnpsc-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <h3>TNPSC</h3>
-                    <p>Specialized resources for Tamil Nadu Public Service Commission exams with regional focus.</p>
-                    <a href="https://www.clearexams.online/tnpsc.html" class="exam-link">Start Preparation</a>
-                </div>
-                
-                <!-- TNUSRB -->
-                <div class="exam-card" id="tnusrb-card">
-                    <div class="exam-icon tnusrb-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>TNUSRB</h3>
-                    <p>Preparation for Tamil Nadu Uniformed Services Recruitment Board police and law enforcement exams.</p>
-                    <a href="https://www.clearexams.online/tnusrb.html" class="exam-link">Start Preparation</a>
-                </div>
-            </div>
-        </div>
-    </main>
+<div class="container">
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Exams</h4>
-                    <ul>
-                        <li><a href="#">UPSC</a></li>
-                        <li><a href="https://www.clearexams.online/tnpsc.html">TNPSC</a></li>
-                        <li><a href="https://www.clearexams.online/tnusrb.html">TNUSRB</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Quiz Categories</h4>
-                    <ul>
-                        <li><a href="#">Topic-wise Quiz</a></li>
-                        <li><a href="#">Current Affairs</a></li>
-                        <li><a href="#">Mock Tests</a></li>
-                        <li><a href="#">PYQ Practice</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="#">Study Materials</a></li>
-                        <li><a href="#">Mock Tests</a></li>
-                        <li><a href="#">Previous Papers</a></li>
-                        <li><a href="#">Yojana Summaries</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <ul>
-                        <li>support@clearexams.online</li>
-                        <li>+91-0000000000</li>
-                        <li>Chennai, Tamil Nadu</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                &copy; 2023 ClearExams.online
-            </div>
-        </div>
-    </footer>
+  <!-- Daily Quiz -->
+  <div class="daily-quiz">
+    <h2>🔥 Today’s Quiz</h2>
+    <p>10 Important Questions for Exam Practice</p>
+    <button>Start Quiz</button>
+  </div>
 
-    <script>
-        // Card click handlers
-        document.getElementById('upsc-card').addEventListener('click', function(e) {
-            if (e.target.tagName !== 'A') {
-                window.location.href = '#';
-            }
-        });
-        
-        document.getElementById('tnpsc-card').addEventListener('click', function(e) {
-            if (e.target.tagName !== 'A') {
-                window.location.href = 'https://www.clearexams.online/tnpsc.html';
-            }
-        });
-        
-        document.getElementById('tnusrb-card').addEventListener('click', function(e) {
-            if (e.target.tagName !== 'A') {
-                window.location.href = 'https://www.clearexams.online/tnusrb.html';
-            }
-        });
+  <!-- Ad Space -->
+  <div class="ad-box">
+    Advertisement Space
+  </div>
 
-        // Quiz card click handlers
-        document.querySelectorAll('.quiz-card').forEach(card => {
-            card.addEventListener('click', function(e) {
-                if (e.target.tagName !== 'A' && !e.target.classList.contains('quiz-link')) {
-                    const link = this.querySelector('.quiz-link');
-                    if (link) {
-                        window.location.href = link.href;
-                    }
-                }
-            });
-        });
-    </script>
+  <!-- Subjects Section -->
+  <div class="section-title">Practice by Subject</div>
+  <div class="card-grid">
+    <div class="card"><h3>Indian Polity</h3></div>
+    <div class="card"><h3>History</h3></div>
+    <div class="card"><h3>Geography</h3></div>
+    <div class="card"><h3>Economy</h3></div>
+    <div class="card"><h3>Science</h3></div>
+    <div class="card"><h3>Current Affairs</h3></div>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Exam Quiz |
+  <a href="#">About</a>
+  <a href="#">Privacy</a>
+  <a href="#">Contact</a>
+</footer>
+
 </body>
 </html>
