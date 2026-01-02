@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Quiz</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f5f7fb;
+  margin:0;
+}
+header{
+  background:#1e40af;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+}
+.container{
+  max-width:800px;
+  margin:auto;
+  padding:15px;
+}
+.question-box{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.options label{
+  display:block;
+  background:#f1f5f9;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  cursor:pointer;
+}
+.options input{
+  margin-right:8px;
+}
+button{
+  margin-top:15px;
+  background:#16a34a;
+  color:#fff;
+  border:none;
+  padding:10px 20px;
+  border-radius:20px;
+  font-size:15px;
+  cursor:pointer;
+}
+button:disabled{
+  background:#9ca3af;
+}
+.explanation{
+  margin-top:15px;
+  background:#ecfeff;
+  padding:12px;
+  border-left:4px solid #06b6d4;
+  display:none;
+}
+.score{
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>Exam Practice Quiz</h2>
+</header>
+
+<div class="container">
+
+  <div class="question-box">
+    <div id="question">Loading question...</div>
+
+    <div class="options" id="options"></div>
+
+    <button id="submitBtn">Submit</button>
+
+    <div class="explanation" id="explanation"></div>
+  </div>
+
+  <div class="score" id="scoreBox"></div>
+
+</div>
+
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
+
+let quizData = [];
+let current = 0;
+let score = 0;
+
+fetch(sheetURL)
+  .then(res => res.text())
+  .then(csv => {
+    const rows = csv.trim().split("\n").slice(1);
+    quizData = rows.map(row => {
+      const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+      return {
+        question: cols[0],
+        options: [cols[1], cols[2], cols[3], cols[4]],
+        answer: cols[5].trim(),
+        explanation: cols[6]
+      };
+    });
+    loadQuestion();
+  });
+
+function loadQuestion(){
+  if(current >= quizData.length){
+    document.querySelector(".question-box").innerHTML =
+      `<h3>Quiz Completed</h3>
+       <p>Your Score: ${score} / ${quizData.length}</p>`;
+    return;
+  }
+
+  const q = quizData[current];
+  document.getElementById("question").innerHTML =
+    `<h3>Q${current+1}. ${q.question}</h3>`;
+
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  q.options.forEach(opt => {
+    optionsDiv.innerHTML += `
+      <label>
+        <input type="radio" name="option" value="${opt}">
+        ${opt}
+      </label>
+    `;
+  });
+
+  document.getElementById("explanation").style.display = "none";
+  document.getElementById("submitBtn").disabled = false;
+}
+
+document.getElementById("submitBtn").addEventListener("click", () => {
+  const selected = document.querySelector('input[name="option"]:checked');
+  if(!selected) return alert("Please select an answer");
+
+  const correct = quizData[current].answer;
+  const explanation = quizData[current].explanation;
+
+  if(selected.value === correct){
+    score++;
+  }
+
+  document.getElementById("explanation").innerHTML =
+    `<strong>Correct Answer:</strong> ${correct}<br><br>
+     <strong>Explanation:</strong> ${explanation}`;
+
+  document.getElementById("explanation").style.display = "block";
+  document.getElementById("submitBtn").disabled = true;
+
+  setTimeout(() => {
+    current++;
+    loadQuestion();
+  }, 2500);
+});
+</script>
+
+</body>
+</html>
