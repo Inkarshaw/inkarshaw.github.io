@@ -2,14 +2,62 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>Indian Polity – Constitution of India Quiz</title>
 
 <style>
-body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
-header{background:#1e40af;color:#fff;padding:15px;text-align:center}
-.container{max-width:1000px;margin:auto;padding:15px}
-.box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
+body{
+  font-family:Arial,sans-serif;
+  background:#f5f7fb;
+  margin:0;
+  -webkit-tap-highlight-color: transparent;
+}
+header{
+  background:#1e40af;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+}
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:15px;
+}
+.box{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:15px;
+}
+
+/* SETTINGS */
+.settings-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  margin-bottom:15px;
+}
+.setting{
+  flex:1;
+  min-width:200px;
+}
+.setting label{
+  font-weight:bold;
+  font-size:14px;
+}
+.setting small{
+  display:block;
+  font-size:12px;
+  color:#555;
+}
+.setting input,.setting select{
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #cbd5e1;
+}
 
 /* OPTIONS */
 .options label{
@@ -32,45 +80,14 @@ button{
 .next{background:#2563eb;color:#fff}
 .submit{background:#dc2626;color:#fff;margin-left:10px}
 
-/* STATUS */
-.correct{color:green;font-weight:bold}
-.wrong{color:red;font-weight:bold}
-.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
-
-/* BREADCRUMB */
-.breadcrumb{font-size:14px;margin-bottom:10px}
-.breadcrumb a{color:#2563eb;text-decoration:none}
-.breadcrumb span{color:#555}
-
-/* 🔹 SETTINGS UI */
-.settings-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:15px;
-  margin-bottom:15px;
-}
-.setting{
-  flex:1;
-  min-width:200px;
-}
-.setting label{
-  font-size:14px;
+/* TIMER */
+.timer{
   font-weight:bold;
-  display:block;
-  margin-bottom:5px;
-}
-.setting small{
-  color:#555;
-  font-size:12px;
-}
-.setting input,.setting select{
-  width:100%;
-  padding:8px;
-  border-radius:6px;
-  border:1px solid #cbd5e1;
+  color:#dc2626;
+  margin-bottom:10px;
 }
 
-/* 🔹 HORIZONTAL PALETTE */
+/* PALETTE */
 .palette-wrapper{
   border:1px solid #e5e7eb;
   border-radius:8px;
@@ -92,6 +109,10 @@ button{
 }
 .palette .visited{background:#93c5fd}
 .palette .answered{background:#86efac}
+
+/* REVIEW */
+.correct{color:green;font-weight:bold}
+.wrong{color:red;font-weight:bold}
 </style>
 </head>
 
@@ -102,14 +123,6 @@ button{
 </header>
 
 <div class="container">
-
-<!-- BREADCRUMB -->
-<div class="breadcrumb">
-  <a href="https://www.clearexams.online">Home</a> &gt;
-  <a href="https://www.clearexams.online/exam/indian_polity.html">Indian Polity</a> &gt;
-  <a href="https://www.clearexams.online/exam/indian_polity/constitution_of_india.html">Constitution of India</a> &gt;
-  <span>Quiz</span>
-</div>
 
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
@@ -124,25 +137,24 @@ button{
         <option value="20">20</option>
         <option value="all">All</option>
       </select>
-      <small>Select how many questions to attempt</small>
+      <small>Select number of questions</small>
     </div>
 
     <div class="setting">
-      <label>Time Limit (Minutes)</label>
+      <label>Time (Minutes)</label>
       <input type="number" id="timeLimit" value="10">
-      <small>Timer starts once quiz begins</small>
+      <small>Auto-submit on time end</small>
     </div>
   </div>
 
   <div class="settings-row">
     <div class="setting">
       <label>Question Range</label>
-      <input type="number" id="rangeFrom" placeholder="From">
+      <input type="number" id="rangeFrom">
     </div>
-
     <div class="setting">
       <label>&nbsp;</label>
-      <input type="number" id="rangeTo" placeholder="To">
+      <input type="number" id="rangeTo">
     </div>
   </div>
 
@@ -150,8 +162,7 @@ button{
 
   <label>
     <input type="checkbox" id="randomize"> Randomize Questions
-  </label>
-  <br><br>
+  </label><br><br>
 
   <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
@@ -168,7 +179,7 @@ button{
   <div class="options" id="options"></div>
 
   <button class="next" onclick="nextQ()">Next</button>
-  <button class="submit" onclick="confirmSubmit()">Submit Quiz</button>
+  <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
 <!-- REVIEW -->
@@ -177,7 +188,163 @@ button{
 </div>
 
 <script>
-/* YOUR EXISTING SCRIPT – UNCHANGED */
+const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
+
+let allQuestions=[],quiz=[],index=0,userAnswers=[];
+let timerInterval,timeLeft;
+
+/* LOAD QUESTIONS */
+fetch(sheetURL).then(r=>r.text()).then(t=>{
+  const rows=t.trim().split("\n").slice(1);
+  allQuestions=rows.map(r=>{
+    const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+    return{q:c[0],opts:c.slice(1,5),ans:c[5].trim().toUpperCase(),exp:c[6]};
+  });
+  rangeFrom.max=rangeTo.max=allQuestions.length;
+  rangeFrom.value=1;
+  rangeTo.value=allQuestions.length;
+  rangeInfo.innerText=`Available questions: 1 to ${allQuestions.length}`;
+});
+
+/* START */
+function startQuiz(){
+  let count=questionCount.value;
+  let from=parseInt(rangeFrom.value);
+  let to=parseInt(rangeTo.value);
+  let random=randomize.checked;
+  let minutes=parseInt(timeLimit.value)||10;
+
+  quiz=[...allQuestions].slice(from-1,to);
+  if(random) quiz.sort(()=>Math.random()-0.5);
+  if(count!=="all") quiz=quiz.slice(0,parseInt(count));
+
+  index=0;
+  userAnswers=new Array(quiz.length).fill(null);
+
+  settingsBox.style.display="none";
+  quizBox.style.display="block";
+
+  createPalette();
+  startTimer(minutes*60);
+  loadQ();
+}
+
+/* TIMER (AUTO SUBMIT) */
+function startTimer(sec){
+  timeLeft=sec;
+  timerInterval=setInterval(()=>{
+    let m=Math.floor(timeLeft/60);
+    let s=timeLeft%60;
+    timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
+    if(timeLeft--<=0){
+      clearInterval(timerInterval);
+      submitQuiz(); // AUTO SUBMIT
+    }
+  },1000);
+}
+
+/* PALETTE */
+function createPalette(){
+  palette.innerHTML="";
+  quiz.forEach((_,i)=>{
+    let d=document.createElement("div");
+    d.innerText=i+1;
+    d.onclick=()=>jumpQ(i);
+    palette.appendChild(d);
+  });
+}
+function updatePalette(){
+  document.querySelectorAll(".palette div").forEach((d,i)=>{
+    d.className="";
+    if(userAnswers[i]) d.classList.add("answered");
+    else if(i===index) d.classList.add("visited");
+  });
+}
+
+/* QUESTIONS */
+function loadQ(){
+  let q=quiz[index];
+  question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
+  options.innerHTML="";
+  q.opts.forEach((opt,i)=>{
+    let letter=String.fromCharCode(65+i);
+    options.innerHTML+=`
+    <label>
+      <input type="radio" name="opt" value="${letter}"
+      ${userAnswers[index]==letter?"checked":""}>
+      <b>${letter}.</b> ${opt}
+    </label>`;
+  });
+  updatePalette();
+}
+
+/* NAV */
+function saveAnswer(){
+  let sel=document.querySelector('input[name="opt"]:checked');
+  userAnswers[index]=sel?sel.value:null;
+}
+function nextQ(){saveAnswer();if(index<quiz.length-1){index++;loadQ();}}
+function jumpQ(i){saveAnswer();index=i;loadQ();}
+
+/* SUBMIT */
+function confirmSubmit(){
+  saveAnswer();
+  if(confirm("Are you sure you want to submit?")){
+    submitQuiz();
+  }
+}
+function submitQuiz(){
+  clearInterval(timerInterval);
+  quizBox.style.display="none";
+  showReview();
+}
+
+/* REVIEW + ANALYTICS */
+function showReview(){
+  let score=0,attempted=0;
+  let html=`<div class="box"><h2>📊 Result Analytics</h2>`;
+
+  quiz.forEach((q,i)=>{
+    if(!userAnswers[i]) return;
+    attempted++;
+    let right=userAnswers[i]===q.ans;
+    if(right) score++;
+    let ua=userAnswers[i].charCodeAt(0)-65;
+    let ca=q.ans.charCodeAt(0)-65;
+    html+=`
+    <hr>
+    <p><b>Q${i+1}. ${q.q}</b></p>
+    <p>Your Answer: ${q.opts[ua]}</p>
+    <p>Correct Answer: ${q.opts[ca]}</p>
+    <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
+    <p><b>Explanation:</b> ${q.exp}</p>`;
+  });
+
+  let unattempted=quiz.length-attempted;
+  let percent=((score/quiz.length)*100).toFixed(2);
+  let accuracy=attempted?((score/attempted)*100).toFixed(2):0;
+
+  html+=`
+  <hr>
+  <h3>Score: ${score}/${quiz.length}</h3>
+  <h3>Attempted: ${attempted}</h3>
+  <h3>Unattempted: ${unattempted}</h3>
+  <h3>Percentage: ${percent}%</h3>
+  <h3>Accuracy: ${accuracy}%</h3>
+  </div>`;
+
+  reviewBox.innerHTML=html;
+}
+
+/* ANDROID BACK BUTTON SAFETY */
+history.pushState(null,null,location.href);
+window.onpopstate=function(){
+  if(confirm("Exit quiz? Your progress will be lost.")){
+    history.back();
+  }else{
+    history.pushState(null,null,location.href);
+  }
+};
 </script>
 
 </body>
