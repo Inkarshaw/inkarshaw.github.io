@@ -906,6 +906,19 @@
                 <h2><i>📂</i> Misc</h2>
                 <div class="search-info" id="miscInfo"></div>
                 <ul class="document-list" id="miscList">
+                    <!-- MO Classification Entry - NEWLY ADDED -->
+                    <li class="document-item" data-title="MO Classification" data-desc="Modus Operandi classification guide for criminal investigation">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>MO Classification</div>
+                            <div class="doc-desc">Modus Operandi classification guide for criminal investigation</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/mo_classification.pdf" target="_blank" class="btn btn-misc">
+                                <i>📄</i> View
+                            </a>
+                        </div>
+                    </li>
+                    
                     <!-- TN Govt Employees Marriage Advance Entry -->
                     <li class="document-item" data-title="TN Govt Employees Marriage Advance" data-desc="Government order for marriage advance for Tamil Nadu government employees">
                         <div class="doc-info">
@@ -1004,11 +1017,11 @@
     </div>
 
     <script>
-        // Document data for search functionality - Updated with new Arrest Card
+        // Document data for search functionality - Updated with new MO Classification
         const documents = [
             // Download Forms
             { title: "PM Form", desc: "Post Mortem form for autopsy and forensic examination documentation", type: "download", element: null },
-            { title: "Arrest Card", desc: "Standard arrest card for documenting suspect apprehension details", type: "download", element: null }, // NEWLY ADDED
+            { title: "Arrest Card", desc: "Standard arrest card for documenting suspect apprehension details", type: "download", element: null },
             { title: "Arrest Intimation", desc: "Form for notifying relevant parties about an arrest", type: "download", element: null },
             { title: "NDPS Form 5", desc: "Official NDPS Form 5 for narcotics case documentation", type: "download", element: null },
             { title: "PM Death Report", desc: "Post Mortem death report form for forensic documentation", type: "download", element: null },
@@ -1054,7 +1067,8 @@
             { title: "Juvenile Bail Application Form", desc: "Bail application form specifically designed for juvenile offenders", type: "juvenile", element: null },
             { title: "Juvenile Justice Act Checklist", desc: "Compliance checklist for procedures under Juvenile Justice Act", type: "juvenile", element: null },
             
-            // Misc
+            // Misc - Updated with MO Classification
+            { title: "MO Classification", desc: "Modus Operandi classification guide for criminal investigation", type: "misc", element: null },
             { title: "TN Govt Employees Marriage Advance", desc: "Government order for marriage advance for Tamil Nadu government employees", type: "misc", element: null },
             { title: "Fortnight Off for SI", desc: "Guidelines for fortnight off leave for Sub-Inspectors", type: "misc", element: null },
             { title: "Head Constable and SSI IO GO", desc: "Government Order regarding Head Constable and Sub-Inspector Investigation Officer duties", type: "misc", element: null },
@@ -1252,6 +1266,18 @@
             searchInput.addEventListener('input', performSearch);
             searchButton.addEventListener('click', performSearch);
             
+            // Add click handler for MO Classification
+            const moClassificationBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/mo_classification.pdf"]');
+            if (moClassificationBtn) {
+                moClassificationBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification('Opening MO Classification PDF...');
+                    setTimeout(() => {
+                        window.open(this.href, '_blank');
+                    }, 500);
+                });
+            }
+            
             // Add click handler for Arrest Card
             const arrestCardBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.pdf"]');
             if (arrestCardBtn) {
@@ -1320,9 +1346,6 @@
                     });
                 }
             });
-            
-            // Existing document handlers (kept for completeness)
-            // ... (all the existing click handlers remain here)
             
             // Special handling for PM Form
             const pmFormBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/pm_form.pdf"]');
