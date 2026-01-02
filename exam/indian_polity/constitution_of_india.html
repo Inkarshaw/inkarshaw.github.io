@@ -39,42 +39,38 @@ button{
 .breadcrumb a{color:#2563eb;text-decoration:none}
 .breadcrumb span{color:#555}
 
-/* INTRO */
+/* Intro */
 .intro{
   background:#eef2ff;
   border-left:5px solid #1e40af;
 }
 .intro ul{font-size:14px;margin-left:18px}
 
-/* PALETTE */
+/* 🔹 HORIZONTAL PALETTE */
 .palette-wrapper{
   border:1px solid #e5e7eb;
   border-radius:8px;
-  margin-bottom:15px;
-}
-.palette-toggle{
-  background:#f1f5f9;
   padding:8px;
-  font-weight:bold;
-  cursor:pointer;
-  text-align:center;
-  border-bottom:1px solid #e5e7eb;
+  margin-bottom:15px;
+  overflow-x:auto;      /* ✅ horizontal scroll */
 }
+
 .palette{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,40px);
-  gap:6px;
-  padding:10px;
-  max-height:180px;        /* 🔒 height limited */
-  overflow-y:auto;         /* 🔁 scroll */
+  display:flex;         /* ✅ single row */
+  flex-wrap:nowrap;     /* ❌ no wrapping */
+  gap:8px;
 }
+
 .palette div{
+  min-width:40px;
   padding:8px;
   text-align:center;
   border-radius:6px;
   cursor:pointer;
   background:#e5e7eb;
+  flex-shrink:0;        /* prevents shrinking */
 }
+
 .palette .visited{background:#93c5fd}
 .palette .answered{background:#86efac}
 </style>
@@ -101,10 +97,9 @@ button{
   <h3>📘 Quiz Introduction</h3>
   <ul>
     <li>MCQs with options A, B, C, D</li>
-    <li>Select number of questions, range & timer</li>
-    <li>Use question palette to jump between questions</li>
-    <li>Once submitted, answers cannot be changed</li>
-    <li>Review shows only attempted questions</li>
+    <li>Swipe question numbers left/right to navigate</li>
+    <li>Timer starts once quiz begins</li>
+    <li>Only attempted questions shown in review</li>
   </ul>
 </div>
 
@@ -138,10 +133,8 @@ button{
 
   <div class="timer" id="timer"></div>
 
+  <!-- 🔹 HORIZONTAL PALETTE -->
   <div class="palette-wrapper">
-    <div class="palette-toggle" onclick="togglePalette()">
-      📌 Question Palette (Show / Hide)
-    </div>
     <div class="palette" id="palette"></div>
   </div>
 
@@ -213,9 +206,6 @@ function startTimer(sec){
 }
 
 /* PALETTE */
-function togglePalette(){
-  palette.style.display = palette.style.display==="none"?"grid":"none";
-}
 function createPalette(){
   palette.innerHTML="";
   quiz.forEach((_,i)=>{
@@ -229,7 +219,7 @@ function updatePalette(){
   document.querySelectorAll(".palette div").forEach((d,i)=>{
     d.className="";
     if(userAnswers[i]) d.classList.add("answered");
-    else if(i<=index) d.classList.add("visited");
+    else if(i===index) d.classList.add("visited");
   });
 }
 
