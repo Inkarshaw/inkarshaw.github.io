@@ -3,20 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Online Quiz</title>
+<title>Exam Quiz</title>
 
 <style>
 body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
 header{background:#1e40af;color:#fff;padding:15px;text-align:center}
-.container{max-width:800px;margin:auto;padding:15px}
-.question-box{background:#fff;padding:20px;border-radius:10px}
-.options label{display:block;background:#f1f5f9;padding:10px;margin:8px 0;border-radius:6px;cursor:pointer}
-button{margin-top:15px;padding:10px 20px;border:none;border-radius:20px;font-size:15px;cursor:pointer}
+.container{max-width:1000px;margin:auto;padding:15px}
+.box{background:#fff;padding:20px;border-radius:10px;margin-bottom:15px}
+.options label{display:block;background:#f1f5f9;padding:10px;margin:8px 0;border-radius:6px}
+button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:pointer}
+.start{background:#16a34a;color:#fff}
 .next{background:#2563eb;color:#fff}
-.submit{background:#16a34a;color:#fff;margin-left:10px}
-.review{background:#fff;padding:15px;border-radius:10px;margin-top:15px}
+.submit{background:#dc2626;color:#fff;margin-left:10px}
 .correct{color:green;font-weight:bold}
 .wrong{color:red;font-weight:bold}
+
+.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
+
+.palette{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,40px);
+  gap:6px;
+  margin-bottom:15px;
+}
+.palette div{
+  padding:8px;
+  text-align:center;
+  border-radius:6px;
+  cursor:pointer;
+  background:#e5e7eb;
+}
+.palette .visited{background:#93c5fd}
+.palette .answered{background:#86efac}
 </style>
 </head>
 
@@ -28,15 +46,48 @@ button{margin-top:15px;padding:10px 20px;border:none;border-radius:20px;font-siz
 
 <div class="container">
 
-  <div class="question-box" id="quizBox">
-    <div id="question">Loading...</div>
-    <div class="options" id="options"></div>
+<!-- SETTINGS -->
+<div class="box" id="settingsBox">
+  <h3>Quiz Settings</h3>
 
-    <button class="next" id="nextBtn">Next</button>
-    <button class="submit" id="submitBtn">Submit Quiz</button>
-  </div>
+  <label>No. of Questions</label>
+  <select id="questionCount">
+    <option value="5">5</option>
+    <option value="10" selected>10</option>
+    <option value="20">20</option>
+    <option value="all">All</option>
+  </select><br><br>
 
-  <div id="reviewBox"></div>
+  <label>Question Range (optional)</label><br>
+  From <input type="number" id="rangeFrom" style="width:60px">
+  To <input type="number" id="rangeTo" style="width:60px"><br><br>
+
+  <label>
+    <input type="checkbox" id="randomize"> Random Questions
+  </label><br><br>
+
+  <label>Time (minutes)</label>
+  <input type="number" id="timeLimit" value="10" style="width:60px"><br><br>
+
+  <button class="start" onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<!-- QUIZ -->
+<div class="box" id="quizBox" style="display:none">
+
+  <div class="timer" id="timer">Time Left: --:--</div>
+
+  <div class="palette" id="palette"></div>
+
+  <div id="question"></div>
+  <div class="options" id="options"></div>
+
+  <button class="next" onclick="nextQ()">Next</button>
+  <button class="submit" onclick="submitQuiz()">Submit Quiz</button>
+</div>
+
+<!-- REVIEW -->
+<div id="reviewBox"></div>
 
 </div>
 
@@ -44,97 +95,127 @@ button{margin-top:15px;padding:10px 20px;border:none;border-radius:20px;font-siz
 const sheetURL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
 
-let quiz = [];
-let index = 0;
-let userAnswers = [];
+let allQuestions=[], quiz=[], index=0, userAnswers=[];
+let timeLeft, timerInterval;
 
-fetch(sheetURL)
-.then(r => r.text())
-.then(text => {
-  const rows = text.trim().split("\n").slice(1);
-  quiz = rows.map(r => {
-    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-    return {
-      q: c[0],
-      opts: c.slice(1,5),
-      ans: c[5].trim(),
-      exp: c[6]
-    };
+// Load sheet
+fetch(sheetURL).then(r=>r.text()).then(t=>{
+  const rows=t.trim().split("\n").slice(1);
+  allQuestions=rows.map(r=>{
+    const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+    return {q:c[0],opts:c.slice(1,5),ans:c[5].trim(),exp:c[6]};
   });
-  loadQ();
 });
 
-function loadQ(){
-  const q = quiz[index];
-  document.getElementById("question").innerHTML =
-    `<h3>Q${index+1}. ${q.q}</h3>`;
+function startQuiz(){
+  let count=document.getElementById("questionCount").value;
+  let from=parseInt(document.getElementById("rangeFrom").value);
+  let to=parseInt(document.getElementById("rangeTo").value);
+  let random=document.getElementById("randomize").checked;
+  let minutes=parseInt(document.getElementById("timeLimit").value)||10;
 
-  const o = document.getElementById("options");
-  o.innerHTML = "";
-  q.opts.forEach(opt=>{
-    o.innerHTML += `
-      <label>
-        <input type="radio" name="opt" value="${opt}">
-        ${opt}
-      </label>`;
+  quiz=[...allQuestions];
+  if(from&&to) quiz=quiz.slice(from-1,to);
+  if(random) quiz.sort(()=>Math.random()-0.5);
+  if(count!=="all") quiz=quiz.slice(0,parseInt(count));
+
+  index=0;
+  userAnswers=new Array(quiz.length).fill(null);
+
+  document.getElementById("settingsBox").style.display="none";
+  document.getElementById("quizBox").style.display="block";
+
+  createPalette();
+  startTimer(minutes*60);
+  loadQ();
+}
+
+function startTimer(seconds){
+  timeLeft=seconds;
+  timerInterval=setInterval(()=>{
+    let m=Math.floor(timeLeft/60);
+    let s=timeLeft%60;
+    document.getElementById("timer").innerText=
+      `Time Left: ${m}:${s.toString().padStart(2,"0")}`;
+    if(timeLeft--<=0){
+      clearInterval(timerInterval);
+      alert("Time Over!");
+      submitQuiz();
+    }
+  },1000);
+}
+
+function createPalette(){
+  const p=document.getElementById("palette");
+  p.innerHTML="";
+  quiz.forEach((_,i)=>{
+    const d=document.createElement("div");
+    d.innerText=i+1;
+    d.onclick=()=>jumpQ(i);
+    p.appendChild(d);
   });
 }
 
-document.getElementById("nextBtn").onclick = () => {
-  const sel = document.querySelector('input[name="opt"]:checked');
-  userAnswers[index] = sel ? sel.value : null;
+function updatePalette(){
+  document.querySelectorAll(".palette div").forEach((d,i)=>{
+    d.className="";
+    if(userAnswers[i]) d.classList.add("answered");
+    else if(i<=index) d.classList.add("visited");
+  });
+}
 
-  index++;
-  if(index < quiz.length){
-    loadQ();
-  } else {
-    alert("You have reached last question. Click Submit Quiz.");
-  }
-};
+function loadQ(){
+  const q=quiz[index];
+  document.getElementById("question").innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
+  const o=document.getElementById("options");
+  o.innerHTML="";
+  q.opts.forEach(opt=>{
+    o.innerHTML+=`
+      <label>
+        <input type="radio" name="opt" value="${opt}" ${userAnswers[index]==opt?"checked":""}>
+        ${opt}
+      </label>`;
+  });
+  updatePalette();
+}
 
-document.getElementById("submitBtn").onclick = () => {
+function nextQ(){
+  const sel=document.querySelector('input[name="opt"]:checked');
+  userAnswers[index]=sel?sel.value:null;
+  if(index<quiz.length-1){index++;loadQ();}
+}
+
+function jumpQ(i){
+  const sel=document.querySelector('input[name="opt"]:checked');
+  userAnswers[index]=sel?sel.value:null;
+  index=i; loadQ();
+}
+
+function submitQuiz(){
+  clearInterval(timerInterval);
   document.getElementById("quizBox").style.display="none";
   showReview();
-};
+}
+
 function showReview(){
-  let score = 0;
-  let attempted = 0;
-  let html = `<div class="review"><h2>Quiz Review</h2>`;
-
-  quiz.forEach((q, i) => {
-
-    // ❌ Skip unattempted questions
-    if(userAnswers[i] === null || userAnswers[i] === undefined){
-      return;
-    }
-
+  let score=0,attempted=0;
+  let html=`<div class="box"><h2>Quiz Review</h2>`;
+  quiz.forEach((q,i)=>{
+    if(!userAnswers[i]) return;
     attempted++;
-
-    const user = userAnswers[i];
-    const correct = q.ans;
-    const right = user === correct;
-
+    const right=userAnswers[i]==q.ans;
     if(right) score++;
-
-    html += `
+    html+=`
       <hr>
       <p><b>Q${i+1}. ${q.q}</b></p>
-      <p>Your Answer: ${user}</p>
-      <p>Correct Answer: ${correct}</p>
-      <p class="${right ? 'correct' : 'wrong'}">
-        ${right ? '✔ Correct' : '✖ Wrong'}
-      </p>
-      <p><b>Explanation:</b> ${q.exp}</p>
-    `;
+      <p>Your Answer: ${userAnswers[i]}</p>
+      <p>Correct Answer: ${q.ans}</p>
+      <p class="${right?"correct":"wrong"}">${right?"✔ Correct":"✖ Wrong"}</p>
+      <p><b>Explanation:</b> ${q.exp}</p>`;
   });
-
-  html += `
-    <hr>
-    <h3>Attempted: ${attempted} / ${quiz.length}</h3>
-    <h3>Score: ${score} / ${attempted}</h3>
-  </div>`;
-
-  document.getElementById("reviewBox").innerHTML = html;
+  html+=`<h3>Attempted: ${attempted}/${quiz.length}</h3>
+         <h3>Score: ${score}/${attempted}</h3></div>`;
+  document.getElementById("reviewBox").innerHTML=html;
 }
 </script>
 
