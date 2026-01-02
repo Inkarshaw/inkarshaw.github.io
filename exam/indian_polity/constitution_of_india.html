@@ -65,13 +65,6 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
   <span>Quiz</span>
 </div>
 
-<!-- BACK BUTTON -->
-<div class="box" style="padding:10px">
-  <button onclick="goBack()" style="background:#374151;color:#fff">
-    ⬅ Clear Exams – Indian Polity – Constitution of India
-  </button>
-</div>
-
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
   <h3>Quiz Settings</h3>
@@ -89,7 +82,9 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
   To <input type="number" id="rangeTo" style="width:60px">
   <p id="rangeInfo" style="font-size:13px;color:#555"></p>
 
-  <label><input type="checkbox" id="randomize"> Random Questions</label><br><br>
+  <label>
+    <input type="checkbox" id="randomize"> Random Questions
+  </label><br><br>
 
   Time (minutes)<br>
   <input type="number" id="timeLimit" value="10" style="width:60px"><br><br>
@@ -101,10 +96,12 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 <div class="box" id="quizBox" style="display:none">
   <div class="timer" id="timer"></div>
   <div class="palette" id="palette"></div>
+
   <div id="question"></div>
   <div class="options" id="options"></div>
+
   <button class="next" onclick="nextQ()">Next</button>
-  <button class="submit" onclick="submitQuiz()">Submit Quiz</button>
+  <button class="submit" onclick="confirmSubmit()">Submit Quiz</button>
 </div>
 
 <!-- REVIEW -->
@@ -118,12 +115,6 @@ const sheetURL =
 
 let allQuestions=[], quiz=[], index=0, userAnswers=[];
 let timerInterval, timeLeft;
-
-// BACK
-function goBack(){
-  window.location.href =
-  "https://www.clearexams.online/exam/indian_polity/constitution_of_india.html";
-}
 
 // LOAD QUESTIONS
 fetch(sheetURL).then(r=>r.text()).then(t=>{
@@ -175,7 +166,11 @@ function startTimer(sec){
     let m=Math.floor(timeLeft/60);
     let s=timeLeft%60;
     timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
-    if(timeLeft--<=0){clearInterval(timerInterval);submitQuiz();}
+    if(timeLeft--<=0){
+      clearInterval(timerInterval);
+      alert("Time Over! Quiz will be submitted.");
+      submitQuiz();
+    }
   },1000);
 }
 
@@ -197,7 +192,7 @@ function updatePalette(){
   });
 }
 
-// LOAD Q
+// LOAD QUESTION
 function loadQ(){
   const q=quiz[index];
   question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
@@ -214,13 +209,21 @@ function loadQ(){
   updatePalette();
 }
 
-// NAV
+// NAVIGATION
 function saveAnswer(){
   const sel=document.querySelector('input[name="opt"]:checked');
   userAnswers[index]=sel?sel.value:null;
 }
 function nextQ(){saveAnswer();if(index<quiz.length-1){index++;loadQ();}}
 function jumpQ(i){saveAnswer();index=i;loadQ();}
+
+// SUBMIT CONFIRMATION
+function confirmSubmit(){
+  saveAnswer();
+  if(confirm("⚠️ Are you sure you want to submit the quiz?\nYou cannot change answers after submission.")){
+    submitQuiz();
+  }
+}
 
 // SUBMIT
 function submitQuiz(){
@@ -229,7 +232,7 @@ function submitQuiz(){
   showReview();
 }
 
-// REVIEW
+// REVIEW (ATTEMPTED ONLY)
 function showReview(){
   let score=0,attempted=0;
   let html=`<div class="box"><h2>Quiz Review</h2>`;
@@ -240,16 +243,22 @@ function showReview(){
     if(right) score++;
     const uaIndex=userAnswers[i].charCodeAt(0)-65;
     const caIndex=q.ans.charCodeAt(0)-65;
+
     html+=`
       <hr>
       <p><b>Q${i+1}. ${q.q}</b></p>
       <p>Your Answer: <b>${userAnswers[i]}</b>. ${q.opts[uaIndex]}</p>
       <p>Correct Answer: <b>${q.ans}</b>. ${q.opts[caIndex]}</p>
       <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
-      <p><b>Explanation:</b> ${q.exp}</p>`;
+      <p><b>Explanation:</b> ${q.exp}</p>
+    `;
   });
-  html+=`<h3>Attempted: ${attempted}/${quiz.length}</h3>
-         <h3>Score: ${score}/${attempted}</h3></div>`;
+
+  html+=`
+    <h3>Attempted: ${attempted}/${quiz.length}</h3>
+    <h3>Score: ${score}/${attempted}</h3>
+  </div>`;
+
   reviewBox.innerHTML=html;
 }
 </script>
