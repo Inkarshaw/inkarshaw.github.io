@@ -10,32 +10,63 @@ body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
 header{background:#1e40af;color:#fff;padding:15px;text-align:center}
 .container{max-width:1000px;margin:auto;padding:15px}
 .box{background:#fff;padding:20px;border-radius:10px;margin-bottom:15px}
-.options label{display:block;background:#f1f5f9;padding:10px;margin:8px 0;border-radius:6px}
-button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:pointer}
+
+.options label{
+  display:block;
+  background:#f1f5f9;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+}
+
+button{
+  padding:8px 15px;
+  border:none;
+  border-radius:20px;
+  font-size:14px;
+  cursor:pointer;
+}
 .start{background:#16a34a;color:#fff}
 .next{background:#2563eb;color:#fff}
 .submit{background:#dc2626;color:#fff;margin-left:10px}
+
 .correct{color:green;font-weight:bold}
 .wrong{color:red;font-weight:bold}
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
 /* Breadcrumb */
-.breadcrumb{
-  font-size:14px;
-  margin-bottom:10px;
-}
-.breadcrumb a{
-  color:#2563eb;
-  text-decoration:none;
-}
+.breadcrumb{font-size:14px;margin-bottom:10px}
+.breadcrumb a{color:#2563eb;text-decoration:none}
 .breadcrumb span{color:#555}
 
-/* Palette */
+/* INTRO */
+.intro{
+  background:#eef2ff;
+  border-left:5px solid #1e40af;
+}
+.intro ul{font-size:14px;margin-left:18px}
+
+/* PALETTE */
+.palette-wrapper{
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+.palette-toggle{
+  background:#f1f5f9;
+  padding:8px;
+  font-weight:bold;
+  cursor:pointer;
+  text-align:center;
+  border-bottom:1px solid #e5e7eb;
+}
 .palette{
   display:grid;
   grid-template-columns:repeat(auto-fill,40px);
   gap:6px;
-  margin-bottom:15px;
+  padding:10px;
+  max-height:180px;        /* 🔒 height limited */
+  overflow-y:auto;         /* 🔁 scroll */
 }
 .palette div{
   padding:8px;
@@ -65,6 +96,18 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
   <span>Quiz</span>
 </div>
 
+<!-- INTRO -->
+<div class="box intro">
+  <h3>📘 Quiz Introduction</h3>
+  <ul>
+    <li>MCQs with options A, B, C, D</li>
+    <li>Select number of questions, range & timer</li>
+    <li>Use question palette to jump between questions</li>
+    <li>Once submitted, answers cannot be changed</li>
+    <li>Review shows only attempted questions</li>
+  </ul>
+</div>
+
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
   <h3>Quiz Settings</h3>
@@ -82,9 +125,7 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
   To <input type="number" id="rangeTo" style="width:60px">
   <p id="rangeInfo" style="font-size:13px;color:#555"></p>
 
-  <label>
-    <input type="checkbox" id="randomize"> Random Questions
-  </label><br><br>
+  <label><input type="checkbox" id="randomize"> Random Questions</label><br><br>
 
   Time (minutes)<br>
   <input type="number" id="timeLimit" value="10" style="width:60px"><br><br>
@@ -94,8 +135,15 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 
 <!-- QUIZ -->
 <div class="box" id="quizBox" style="display:none">
+
   <div class="timer" id="timer"></div>
-  <div class="palette" id="palette"></div>
+
+  <div class="palette-wrapper">
+    <div class="palette-toggle" onclick="togglePalette()">
+      📌 Question Palette (Show / Hide)
+    </div>
+    <div class="palette" id="palette"></div>
+  </div>
 
   <div id="question"></div>
   <div class="options" id="options"></div>
@@ -116,27 +164,20 @@ const sheetURL =
 let allQuestions=[], quiz=[], index=0, userAnswers=[];
 let timerInterval, timeLeft;
 
-// LOAD QUESTIONS
+/* LOAD QUESTIONS */
 fetch(sheetURL).then(r=>r.text()).then(t=>{
   const rows=t.trim().split("\n").slice(1);
   allQuestions=rows.map(r=>{
     const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-    return {
-      q:c[0],
-      opts:c.slice(1,5),
-      ans:c[5].trim().toUpperCase(), // A/B/C/D
-      exp:c[6]
-    };
+    return {q:c[0],opts:c.slice(1,5),ans:c[5].trim().toUpperCase(),exp:c[6]};
   });
-
-  const total=allQuestions.length;
-  rangeFrom.max=rangeTo.max=total;
+  rangeFrom.max=rangeTo.max=allQuestions.length;
   rangeFrom.value=1;
-  rangeTo.value=total;
-  rangeInfo.innerText=`Available questions: 1 to ${total}`;
+  rangeTo.value=allQuestions.length;
+  rangeInfo.innerText=`Available questions: 1 to ${allQuestions.length}`;
 });
 
-// START QUIZ
+/* START QUIZ */
 function startQuiz(){
   let count=questionCount.value;
   let from=parseInt(rangeFrom.value);
@@ -152,6 +193,7 @@ function startQuiz(){
   userAnswers=new Array(quiz.length).fill(null);
 
   settingsBox.style.display="none";
+  document.querySelector(".intro").style.display="none";
   quizBox.style.display="block";
 
   createPalette();
@@ -159,22 +201,21 @@ function startQuiz(){
   loadQ();
 }
 
-// TIMER
+/* TIMER */
 function startTimer(sec){
   timeLeft=sec;
   timerInterval=setInterval(()=>{
     let m=Math.floor(timeLeft/60);
     let s=timeLeft%60;
     timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
-    if(timeLeft--<=0){
-      clearInterval(timerInterval);
-      alert("Time Over! Quiz will be submitted.");
-      submitQuiz();
-    }
+    if(timeLeft--<=0){clearInterval(timerInterval);submitQuiz();}
   },1000);
 }
 
-// PALETTE
+/* PALETTE */
+function togglePalette(){
+  palette.style.display = palette.style.display==="none"?"grid":"none";
+}
 function createPalette(){
   palette.innerHTML="";
   quiz.forEach((_,i)=>{
@@ -192,7 +233,7 @@ function updatePalette(){
   });
 }
 
-// LOAD QUESTION
+/* QUESTIONS */
 function loadQ(){
   const q=quiz[index];
   question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
@@ -209,7 +250,7 @@ function loadQ(){
   updatePalette();
 }
 
-// NAVIGATION
+/* NAV */
 function saveAnswer(){
   const sel=document.querySelector('input[name="opt"]:checked');
   userAnswers[index]=sel?sel.value:null;
@@ -217,22 +258,20 @@ function saveAnswer(){
 function nextQ(){saveAnswer();if(index<quiz.length-1){index++;loadQ();}}
 function jumpQ(i){saveAnswer();index=i;loadQ();}
 
-// SUBMIT CONFIRMATION
+/* SUBMIT */
 function confirmSubmit(){
   saveAnswer();
   if(confirm("⚠️ Are you sure you want to submit the quiz?\nYou cannot change answers after submission.")){
     submitQuiz();
   }
 }
-
-// SUBMIT
 function submitQuiz(){
   clearInterval(timerInterval);
   quizBox.style.display="none";
   showReview();
 }
 
-// REVIEW (ATTEMPTED ONLY)
+/* REVIEW */
 function showReview(){
   let score=0,attempted=0;
   let html=`<div class="box"><h2>Quiz Review</h2>`;
@@ -241,24 +280,18 @@ function showReview(){
     attempted++;
     const right=userAnswers[i]===q.ans;
     if(right) score++;
-    const uaIndex=userAnswers[i].charCodeAt(0)-65;
-    const caIndex=q.ans.charCodeAt(0)-65;
-
+    const ua=userAnswers[i].charCodeAt(0)-65;
+    const ca=q.ans.charCodeAt(0)-65;
     html+=`
       <hr>
       <p><b>Q${i+1}. ${q.q}</b></p>
-      <p>Your Answer: <b>${userAnswers[i]}</b>. ${q.opts[uaIndex]}</p>
-      <p>Correct Answer: <b>${q.ans}</b>. ${q.opts[caIndex]}</p>
+      <p>Your Answer: <b>${userAnswers[i]}</b>. ${q.opts[ua]}</p>
+      <p>Correct Answer: <b>${q.ans}</b>. ${q.opts[ca]}</p>
       <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
-      <p><b>Explanation:</b> ${q.exp}</p>
-    `;
+      <p><b>Explanation:</b> ${q.exp}</p>`;
   });
-
-  html+=`
-    <h3>Attempted: ${attempted}/${quiz.length}</h3>
-    <h3>Score: ${score}/${attempted}</h3>
-  </div>`;
-
+  html+=`<h3>Attempted: ${attempted}/${quiz.length}</h3>
+         <h3>Score: ${score}/${attempted}</h3></div>`;
   reviewBox.innerHTML=html;
 }
 </script>
