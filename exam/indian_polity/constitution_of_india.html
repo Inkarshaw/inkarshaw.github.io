@@ -50,7 +50,7 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 <div class="box" id="settingsBox">
   <h3>Quiz Settings</h3>
 
-  <label>No. of Questions</label>
+  <label>No. of Questions</label><br>
   <select id="questionCount">
     <option value="5">5</option>
     <option value="10" selected>10</option>
@@ -58,25 +58,24 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
     <option value="all">All</option>
   </select><br><br>
 
-  <label>Question Range (optional)</label><br>
-  From <input type="number" id="rangeFrom" style="width:60px">
-  To <input type="number" id="rangeTo" style="width:60px"><br><br>
+  <label>Question Range</label><br>
+  From <input type="number" id="rangeFrom" min="1" style="width:70px">
+  To <input type="number" id="rangeTo" min="1" style="width:70px">
+  <p id="rangeInfo" style="font-size:13px;color:#555"></p>
 
   <label>
     <input type="checkbox" id="randomize"> Random Questions
   </label><br><br>
 
-  <label>Time (minutes)</label>
-  <input type="number" id="timeLimit" value="10" style="width:60px"><br><br>
+  <label>Time (minutes)</label><br>
+  <input type="number" id="timeLimit" value="10" min="1" style="width:70px"><br><br>
 
   <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
 <!-- QUIZ -->
 <div class="box" id="quizBox" style="display:none">
-
-  <div class="timer" id="timer">Time Left: --:--</div>
-
+  <div class="timer" id="timer"></div>
   <div class="palette" id="palette"></div>
 
   <div id="question"></div>
@@ -96,17 +95,29 @@ const sheetURL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
 
 let allQuestions=[], quiz=[], index=0, userAnswers=[];
-let timeLeft, timerInterval;
+let timerInterval, timeLeft;
 
-// Load sheet
-fetch(sheetURL).then(r=>r.text()).then(t=>{
+// LOAD SHEET
+fetch(sheetURL)
+.then(r=>r.text())
+.then(t=>{
   const rows=t.trim().split("\n").slice(1);
   allQuestions=rows.map(r=>{
     const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
     return {q:c[0],opts:c.slice(1,5),ans:c[5].trim(),exp:c[6]};
   });
+
+  // SET RANGE LIMITS
+  const total=allQuestions.length;
+  document.getElementById("rangeFrom").max=total;
+  document.getElementById("rangeTo").max=total;
+  document.getElementById("rangeFrom").value=1;
+  document.getElementById("rangeTo").value=total;
+  document.getElementById("rangeInfo").innerText=
+    `Available questions: 1 to ${total}`;
 });
 
+// START QUIZ
 function startQuiz(){
   let count=document.getElementById("questionCount").value;
   let from=parseInt(document.getElementById("rangeFrom").value);
@@ -114,8 +125,17 @@ function startQuiz(){
   let random=document.getElementById("randomize").checked;
   let minutes=parseInt(document.getElementById("timeLimit").value)||10;
 
-  quiz=[...allQuestions];
-  if(from&&to) quiz=quiz.slice(from-1,to);
+  const total=allQuestions.length;
+
+  if(from<1) from=1;
+  if(to>total) to=total;
+  if(from>to){
+    alert("Invalid range selection");
+    return;
+  }
+
+  quiz=[...allQuestions].slice(from-1,to);
+
   if(random) quiz.sort(()=>Math.random()-0.5);
   if(count!=="all") quiz=quiz.slice(0,parseInt(count));
 
@@ -130,6 +150,7 @@ function startQuiz(){
   loadQ();
 }
 
+// TIMER
 function startTimer(seconds){
   timeLeft=seconds;
   timerInterval=setInterval(()=>{
@@ -145,6 +166,7 @@ function startTimer(seconds){
   },1000);
 }
 
+// PALETTE
 function createPalette(){
   const p=document.getElementById("palette");
   p.innerHTML="";
@@ -164,57 +186,77 @@ function updatePalette(){
   });
 }
 
+// LOAD QUESTION
 function loadQ(){
   const q=quiz[index];
-  document.getElementById("question").innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
+  document.getElementById("question").innerHTML=
+    `<h3>Q${index+1}. ${q.q}</h3>`;
   const o=document.getElementById("options");
   o.innerHTML="";
   q.opts.forEach(opt=>{
     o.innerHTML+=`
       <label>
-        <input type="radio" name="opt" value="${opt}" ${userAnswers[index]==opt?"checked":""}>
+        <input type="radio" name="opt" value="${opt}"
+        ${userAnswers[index]==opt?"checked":""}>
         ${opt}
       </label>`;
   });
   updatePalette();
 }
 
+// NAVIGATION
 function nextQ(){
-  const sel=document.querySelector('input[name="opt"]:checked');
-  userAnswers[index]=sel?sel.value:null;
+  saveAnswer();
   if(index<quiz.length-1){index++;loadQ();}
 }
 
 function jumpQ(i){
-  const sel=document.querySelector('input[name="opt"]:checked');
-  userAnswers[index]=sel?sel.value:null;
-  index=i; loadQ();
+  saveAnswer();
+  index=i;
+  loadQ();
 }
 
+function saveAnswer(){
+  const sel=document.querySelector('input[name="opt"]:checked');
+  userAnswers[index]=sel?sel.value:null;
+}
+
+// SUBMIT
 function submitQuiz(){
   clearInterval(timerInterval);
   document.getElementById("quizBox").style.display="none";
   showReview();
 }
 
+// REVIEW (ATTEMPTED ONLY)
 function showReview(){
   let score=0,attempted=0;
   let html=`<div class="box"><h2>Quiz Review</h2>`;
+
   quiz.forEach((q,i)=>{
     if(!userAnswers[i]) return;
     attempted++;
-    const right=userAnswers[i]==q.ans;
+    const right=userAnswers[i]===q.ans;
     if(right) score++;
+
     html+=`
       <hr>
       <p><b>Q${i+1}. ${q.q}</b></p>
       <p>Your Answer: ${userAnswers[i]}</p>
       <p>Correct Answer: ${q.ans}</p>
-      <p class="${right?"correct":"wrong"}">${right?"✔ Correct":"✖ Wrong"}</p>
-      <p><b>Explanation:</b> ${q.exp}</p>`;
+      <p class="${right?'correct':'wrong'}">
+        ${right?'✔ Correct':'✖ Wrong'}
+      </p>
+      <p><b>Explanation:</b> ${q.exp}</p>
+    `;
   });
-  html+=`<h3>Attempted: ${attempted}/${quiz.length}</h3>
-         <h3>Score: ${score}/${attempted}</h3></div>`;
+
+  html+=`
+    <hr>
+    <h3>Attempted: ${attempted}/${quiz.length}</h3>
+    <h3>Score: ${score}/${attempted}</h3>
+  </div>`;
+
   document.getElementById("reviewBox").innerHTML=html;
 }
 </script>
