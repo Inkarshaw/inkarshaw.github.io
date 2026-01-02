@@ -9,10 +9,30 @@
 body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
 header{background:#1e40af;color:#fff;padding:15px;text-align:center}
 .container{max-width:1000px;margin:auto;padding:15px}
+.box{background:#fff;padding:20px;border-radius:10px;margin-bottom:15px}
 
-/* Common box */
-.box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
-h3{margin-top:0}
+.options label{
+  display:block;
+  background:#f1f5f9;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+}
+
+button{
+  padding:8px 15px;
+  border:none;
+  border-radius:20px;
+  font-size:14px;
+  cursor:pointer;
+}
+.start{background:#16a34a;color:#fff}
+.next{background:#2563eb;color:#fff}
+.submit{background:#dc2626;color:#fff;margin-left:10px}
+
+.correct{color:green;font-weight:bold}
+.wrong{color:red;font-weight:bold}
+.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
 /* Breadcrumb */
 .breadcrumb{font-size:14px;margin-bottom:10px}
@@ -20,67 +40,37 @@ h3{margin-top:0}
 .breadcrumb span{color:#555}
 
 /* Intro */
-.intro{background:#eef2ff;border-left:5px solid #1e40af}
-.intro ul{margin-left:18px;font-size:14px}
-
-/* SETTINGS UI */
-.settings-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:15px;
-  margin-top:10px;
+.intro{
+  background:#eef2ff;
+  border-left:5px solid #1e40af;
 }
-.setting-card{
+.intro ul{font-size:14px;margin-left:18px}
+
+/* 🔹 HORIZONTAL PALETTE */
+.palette-wrapper{
   border:1px solid #e5e7eb;
-  border-radius:10px;
-  padding:15px;
-  background:#f9fafb;
-}
-.setting-card label{
-  font-weight:bold;
-  font-size:14px;
-}
-.setting-card small{
-  display:block;
-  color:#555;
-  font-size:12px;
-  margin-top:4px;
-}
-.setting-card select,
-.setting-card input{
-  width:100%;
+  border-radius:8px;
   padding:8px;
-  margin-top:8px;
-  border-radius:6px;
-  border:1px solid #d1d5db;
-}
-
-/* Buttons */
-button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:pointer}
-.start{background:#16a34a;color:#fff;margin-top:15px}
-.next{background:#2563eb;color:#fff}
-.submit{background:#dc2626;color:#fff;margin-left:10px}
-
-/* Quiz */
-.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
-.options label{display:block;background:#f1f5f9;padding:10px;margin:8px 0;border-radius:6px}
-.correct{color:green;font-weight:bold}
-.wrong{color:red;font-weight:bold}
-
-/* Palette */
-.palette{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,40px);
-  gap:6px;
   margin-bottom:15px;
+  overflow-x:auto;      /* ✅ horizontal scroll */
 }
+
+.palette{
+  display:flex;         /* ✅ single row */
+  flex-wrap:nowrap;     /* ❌ no wrapping */
+  gap:8px;
+}
+
 .palette div{
+  min-width:40px;
   padding:8px;
   text-align:center;
   border-radius:6px;
   cursor:pointer;
   background:#e5e7eb;
+  flex-shrink:0;        /* prevents shrinking */
 }
+
 .palette .visited{background:#93c5fd}
 .palette .answered{background:#86efac}
 </style>
@@ -94,7 +84,7 @@ button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:po
 
 <div class="container">
 
-<!-- Breadcrumb -->
+<!-- BREADCRUMB -->
 <div class="breadcrumb">
   <a href="https://www.clearexams.online">Home</a> &gt;
   <a href="https://www.clearexams.online/exam/indian_polity.html">Indian Polity</a> &gt;
@@ -102,65 +92,55 @@ button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:po
   <span>Quiz</span>
 </div>
 
-<!-- Intro -->
+<!-- INTRO -->
 <div class="box intro">
-  <h3>📘 Quiz Instructions</h3>
+  <h3>📘 Quiz Introduction</h3>
   <ul>
     <li>MCQs with options A, B, C, D</li>
-    <li>Timer starts after clicking Start Quiz</li>
-    <li>You can navigate using question palette</li>
-    <li>Only attempted questions appear in review</li>
-    <li>Submission is final</li>
+    <li>Swipe question numbers left/right to navigate</li>
+    <li>Timer starts once quiz begins</li>
+    <li>Only attempted questions shown in review</li>
   </ul>
 </div>
 
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
-  <h3>⚙️ Quiz Settings</h3>
+  <h3>Quiz Settings</h3>
 
-  <div class="settings-grid">
+  No. of Questions<br>
+  <select id="questionCount">
+    <option value="5">5</option>
+    <option value="10" selected>10</option>
+    <option value="20">20</option>
+    <option value="all">All</option>
+  </select><br><br>
 
-    <div class="setting-card">
-      <label>Number of Questions</label>
-      <select id="questionCount">
-        <option value="5">5</option>
-        <option value="10" selected>10</option>
-        <option value="20">20</option>
-        <option value="all">All</option>
-      </select>
-      <small>Select how many questions you want</small>
-    </div>
+  Question Range<br>
+  From <input type="number" id="rangeFrom" style="width:60px">
+  To <input type="number" id="rangeTo" style="width:60px">
+  <p id="rangeInfo" style="font-size:13px;color:#555"></p>
 
-    <div class="setting-card">
-      <label>Question Range</label>
-      <input type="number" id="rangeFrom" placeholder="From">
-      <input type="number" id="rangeTo" placeholder="To" style="margin-top:6px">
-      <small id="rangeInfo"></small>
-    </div>
+  <label><input type="checkbox" id="randomize"> Random Questions</label><br><br>
 
-    <div class="setting-card">
-      <label>Random Order</label>
-      <input type="checkbox" id="randomize"> Shuffle questions
-      <small>Questions will appear randomly</small>
-    </div>
+  Time (minutes)<br>
+  <input type="number" id="timeLimit" value="10" style="width:60px"><br><br>
 
-    <div class="setting-card">
-      <label>Time Limit (minutes)</label>
-      <input type="number" id="timeLimit" value="10" min="1">
-      <small>Quiz auto-submits when time is over</small>
-    </div>
-
-  </div>
-
-  <button class="start" onclick="startQuiz()">🚀 Start Quiz</button>
+  <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
 <!-- QUIZ -->
 <div class="box" id="quizBox" style="display:none">
+
   <div class="timer" id="timer"></div>
-  <div class="palette" id="palette"></div>
+
+  <!-- 🔹 HORIZONTAL PALETTE -->
+  <div class="palette-wrapper">
+    <div class="palette" id="palette"></div>
+  </div>
+
   <div id="question"></div>
   <div class="options" id="options"></div>
+
   <button class="next" onclick="nextQ()">Next</button>
   <button class="submit" onclick="confirmSubmit()">Submit Quiz</button>
 </div>
@@ -171,11 +151,13 @@ button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:po
 </div>
 
 <script>
-/* JS LOGIC – UNCHANGED FROM YOUR LAST VERSION */
-const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
-let allQuestions=[],quiz=[],index=0,userAnswers=[],timerInterval,timeLeft;
+const sheetURL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
 
-/* Load sheet */
+let allQuestions=[], quiz=[], index=0, userAnswers=[];
+let timerInterval, timeLeft;
+
+/* LOAD QUESTIONS */
 fetch(sheetURL).then(r=>r.text()).then(t=>{
   const rows=t.trim().split("\n").slice(1);
   allQuestions=rows.map(r=>{
@@ -183,11 +165,12 @@ fetch(sheetURL).then(r=>r.text()).then(t=>{
     return {q:c[0],opts:c.slice(1,5),ans:c[5].trim().toUpperCase(),exp:c[6]};
   });
   rangeFrom.max=rangeTo.max=allQuestions.length;
-  rangeFrom.value=1; rangeTo.value=allQuestions.length;
+  rangeFrom.value=1;
+  rangeTo.value=allQuestions.length;
   rangeInfo.innerText=`Available questions: 1 to ${allQuestions.length}`;
 });
 
-/* Start quiz */
+/* START QUIZ */
 function startQuiz(){
   let count=questionCount.value;
   let from=parseInt(rangeFrom.value);
@@ -201,13 +184,17 @@ function startQuiz(){
 
   index=0;
   userAnswers=new Array(quiz.length).fill(null);
+
   settingsBox.style.display="none";
   document.querySelector(".intro").style.display="none";
   quizBox.style.display="block";
-  createPalette(); startTimer(minutes*60); loadQ();
+
+  createPalette();
+  startTimer(minutes*60);
+  loadQ();
 }
 
-/* Timer */
+/* TIMER */
 function startTimer(sec){
   timeLeft=sec;
   timerInterval=setInterval(()=>{
@@ -218,7 +205,7 @@ function startTimer(sec){
   },1000);
 }
 
-/* Palette */
+/* PALETTE */
 function createPalette(){
   palette.innerHTML="";
   quiz.forEach((_,i)=>{
@@ -232,26 +219,28 @@ function updatePalette(){
   document.querySelectorAll(".palette div").forEach((d,i)=>{
     d.className="";
     if(userAnswers[i]) d.classList.add("answered");
-    else if(i<=index) d.classList.add("visited");
+    else if(i===index) d.classList.add("visited");
   });
 }
 
-/* Load question */
+/* QUESTIONS */
 function loadQ(){
   const q=quiz[index];
   question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
   options.innerHTML="";
   q.opts.forEach((opt,i)=>{
-    const L=String.fromCharCode(65+i);
+    const letter=String.fromCharCode(65+i);
     options.innerHTML+=`
       <label>
-        <input type="radio" name="opt" value="${L}"
-        ${userAnswers[index]==L?"checked":""}>
-        <b>${L}.</b> ${opt}
+        <input type="radio" name="opt" value="${letter}"
+        ${userAnswers[index]==letter?"checked":""}>
+        <b>${letter}.</b> ${opt}
       </label>`;
   });
   updatePalette();
 }
+
+/* NAV */
 function saveAnswer(){
   const sel=document.querySelector('input[name="opt"]:checked');
   userAnswers[index]=sel?sel.value:null;
@@ -259,18 +248,23 @@ function saveAnswer(){
 function nextQ(){saveAnswer();if(index<quiz.length-1){index++;loadQ();}}
 function jumpQ(i){saveAnswer();index=i;loadQ();}
 
-/* Submit */
+/* SUBMIT */
 function confirmSubmit(){
   saveAnswer();
-  if(confirm("Are you sure you want to submit the quiz?")) submitQuiz();
+  if(confirm("⚠️ Are you sure you want to submit the quiz?\nYou cannot change answers after submission.")){
+    submitQuiz();
+  }
 }
 function submitQuiz(){
   clearInterval(timerInterval);
   quizBox.style.display="none";
   showReview();
 }
+
+/* REVIEW */
 function showReview(){
-  let score=0,attempted=0,html=`<div class="box"><h2>Quiz Review</h2>`;
+  let score=0,attempted=0;
+  let html=`<div class="box"><h2>Quiz Review</h2>`;
   quiz.forEach((q,i)=>{
     if(!userAnswers[i]) return;
     attempted++;
@@ -278,14 +272,16 @@ function showReview(){
     if(right) score++;
     const ua=userAnswers[i].charCodeAt(0)-65;
     const ca=q.ans.charCodeAt(0)-65;
-    html+=`<hr><p><b>Q${i+1}. ${q.q}</b></p>
-    <p>Your Answer: ${userAnswers[i]}. ${q.opts[ua]}</p>
-    <p>Correct Answer: ${q.ans}. ${q.opts[ca]}</p>
-    <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
-    <p><b>Explanation:</b> ${q.exp}</p>`;
+    html+=`
+      <hr>
+      <p><b>Q${i+1}. ${q.q}</b></p>
+      <p>Your Answer: <b>${userAnswers[i]}</b>. ${q.opts[ua]}</p>
+      <p>Correct Answer: <b>${q.ans}</b>. ${q.opts[ca]}</p>
+      <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
+      <p><b>Explanation:</b> ${q.exp}</p>`;
   });
   html+=`<h3>Attempted: ${attempted}/${quiz.length}</h3>
-  <h3>Score: ${score}/${attempted}</h3></div>`;
+         <h3>Score: ${score}/${attempted}</h3></div>`;
   reviewBox.innerHTML=html;
 }
 </script>
