@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exam Quiz</title>
+<title>Indian Polity – Constitution of India Quiz</title>
 
 <style>
 body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
@@ -19,6 +19,18 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 .wrong{color:red;font-weight:bold}
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
+/* Breadcrumb */
+.breadcrumb{
+  font-size:14px;
+  margin-bottom:10px;
+}
+.breadcrumb a{
+  color:#2563eb;
+  text-decoration:none;
+}
+.breadcrumb span{color:#555}
+
+/* Palette */
 .palette{
   display:grid;
   grid-template-columns:repeat(auto-fill,40px);
@@ -45,17 +57,17 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 
 <div class="container">
 
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="https://www.clearexams.online">Home</a> &gt;
+  <a href="https://www.clearexams.online/exam/indian_polity.html">Indian Polity</a> &gt;
+  <a href="https://www.clearexams.online/exam/indian_polity/constitution_of_india.html">Constitution of India</a> &gt;
+  <span>Quiz</span>
+</div>
+
 <!-- BACK BUTTON -->
 <div class="box" style="padding:10px">
-  <button onclick="goBack()" style="
-    background:#374151;
-    color:#fff;
-    border:none;
-    padding:8px 15px;
-    border-radius:20px;
-    font-size:14px;
-    cursor:pointer;
-  ">
+  <button onclick="goBack()" style="background:#374151;color:#fff">
     ⬅ Clear Exams – Indian Polity – Constitution of India
   </button>
 </div>
@@ -64,7 +76,7 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 <div class="box" id="settingsBox">
   <h3>Quiz Settings</h3>
 
-  <label>No. of Questions</label><br>
+  No. of Questions<br>
   <select id="questionCount">
     <option value="5">5</option>
     <option value="10" selected>10</option>
@@ -72,17 +84,15 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
     <option value="all">All</option>
   </select><br><br>
 
-  <label>Question Range</label><br>
-  From <input type="number" id="rangeFrom" min="1" style="width:70px">
-  To <input type="number" id="rangeTo" min="1" style="width:70px">
+  Question Range<br>
+  From <input type="number" id="rangeFrom" style="width:60px">
+  To <input type="number" id="rangeTo" style="width:60px">
   <p id="rangeInfo" style="font-size:13px;color:#555"></p>
 
-  <label>
-    <input type="checkbox" id="randomize"> Random Questions
-  </label><br><br>
+  <label><input type="checkbox" id="randomize"> Random Questions</label><br><br>
 
-  <label>Time (minutes)</label><br>
-  <input type="number" id="timeLimit" value="10" min="1" style="width:70px"><br><br>
+  Time (minutes)<br>
+  <input type="number" id="timeLimit" value="10" style="width:60px"><br><br>
 
   <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
@@ -91,10 +101,8 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 <div class="box" id="quizBox" style="display:none">
   <div class="timer" id="timer"></div>
   <div class="palette" id="palette"></div>
-
   <div id="question"></div>
   <div class="options" id="options"></div>
-
   <button class="next" onclick="nextQ()">Next</button>
   <button class="submit" onclick="submitQuiz()">Submit Quiz</button>
 </div>
@@ -111,42 +119,39 @@ const sheetURL =
 let allQuestions=[], quiz=[], index=0, userAnswers=[];
 let timerInterval, timeLeft;
 
-// BACK BUTTON FUNCTION
+// BACK
 function goBack(){
   window.location.href =
-    "https://www.clearexams.online/exam/indian_polity/constitution_of_india.html";
+  "https://www.clearexams.online/exam/indian_polity/constitution_of_india.html";
 }
 
 // LOAD QUESTIONS
-fetch(sheetURL)
-.then(r=>r.text())
-.then(t=>{
+fetch(sheetURL).then(r=>r.text()).then(t=>{
   const rows=t.trim().split("\n").slice(1);
   allQuestions=rows.map(r=>{
     const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-    return {q:c[0],opts:c.slice(1,5),ans:c[5].trim(),exp:c[6]};
+    return {
+      q:c[0],
+      opts:c.slice(1,5),
+      ans:c[5].trim().toUpperCase(), // A/B/C/D
+      exp:c[6]
+    };
   });
 
   const total=allQuestions.length;
-  document.getElementById("rangeFrom").max=total;
-  document.getElementById("rangeTo").max=total;
-  document.getElementById("rangeFrom").value=1;
-  document.getElementById("rangeTo").value=total;
-  document.getElementById("rangeInfo").innerText=
-    `Available questions: 1 to ${total}`;
+  rangeFrom.max=rangeTo.max=total;
+  rangeFrom.value=1;
+  rangeTo.value=total;
+  rangeInfo.innerText=`Available questions: 1 to ${total}`;
 });
 
 // START QUIZ
 function startQuiz(){
-  let count=document.getElementById("questionCount").value;
-  let from=parseInt(document.getElementById("rangeFrom").value);
-  let to=parseInt(document.getElementById("rangeTo").value);
-  let random=document.getElementById("randomize").checked;
-  let minutes=parseInt(document.getElementById("timeLimit").value)||10;
-
-  if(from<1) from=1;
-  if(to>allQuestions.length) to=allQuestions.length;
-  if(from>to){alert("Invalid range");return;}
+  let count=questionCount.value;
+  let from=parseInt(rangeFrom.value);
+  let to=parseInt(rangeTo.value);
+  let random=randomize.checked;
+  let minutes=parseInt(timeLimit.value)||10;
 
   quiz=[...allQuestions].slice(from-1,to);
   if(random) quiz.sort(()=>Math.random()-0.5);
@@ -155,8 +160,8 @@ function startQuiz(){
   index=0;
   userAnswers=new Array(quiz.length).fill(null);
 
-  document.getElementById("settingsBox").style.display="none";
-  document.getElementById("quizBox").style.display="block";
+  settingsBox.style.display="none";
+  quizBox.style.display="block";
 
   createPalette();
   startTimer(minutes*60);
@@ -164,33 +169,26 @@ function startQuiz(){
 }
 
 // TIMER
-function startTimer(seconds){
-  timeLeft=seconds;
+function startTimer(sec){
+  timeLeft=sec;
   timerInterval=setInterval(()=>{
     let m=Math.floor(timeLeft/60);
     let s=timeLeft%60;
-    document.getElementById("timer").innerText=
-      `Time Left: ${m}:${s.toString().padStart(2,"0")}`;
-    if(timeLeft--<=0){
-      clearInterval(timerInterval);
-      alert("Time Over!");
-      submitQuiz();
-    }
+    timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
+    if(timeLeft--<=0){clearInterval(timerInterval);submitQuiz();}
   },1000);
 }
 
 // PALETTE
 function createPalette(){
-  const p=document.getElementById("palette");
-  p.innerHTML="";
+  palette.innerHTML="";
   quiz.forEach((_,i)=>{
     const d=document.createElement("div");
     d.innerText=i+1;
     d.onclick=()=>jumpQ(i);
-    p.appendChild(d);
+    palette.appendChild(d);
   });
 }
-
 function updatePalette(){
   document.querySelectorAll(".palette div").forEach((d,i)=>{
     d.className="";
@@ -199,25 +197,24 @@ function updatePalette(){
   });
 }
 
-// LOAD QUESTION
+// LOAD Q
 function loadQ(){
   const q=quiz[index];
-  document.getElementById("question").innerHTML=
-    `<h3>Q${index+1}. ${q.q}</h3>`;
-  const o=document.getElementById("options");
-  o.innerHTML="";
-  q.opts.forEach(opt=>{
-    o.innerHTML+=`
+  question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
+  options.innerHTML="";
+  q.opts.forEach((opt,i)=>{
+    const letter=String.fromCharCode(65+i);
+    options.innerHTML+=`
       <label>
-        <input type="radio" name="opt" value="${opt}"
-        ${userAnswers[index]==opt?"checked":""}>
-        ${opt}
+        <input type="radio" name="opt" value="${letter}"
+        ${userAnswers[index]==letter?"checked":""}>
+        <b>${letter}.</b> ${opt}
       </label>`;
   });
   updatePalette();
 }
 
-// NAVIGATION
+// NAV
 function saveAnswer(){
   const sel=document.querySelector('input[name="opt"]:checked');
   userAnswers[index]=sel?sel.value:null;
@@ -228,7 +225,7 @@ function jumpQ(i){saveAnswer();index=i;loadQ();}
 // SUBMIT
 function submitQuiz(){
   clearInterval(timerInterval);
-  document.getElementById("quizBox").style.display="none";
+  quizBox.style.display="none";
   showReview();
 }
 
@@ -241,17 +238,19 @@ function showReview(){
     attempted++;
     const right=userAnswers[i]===q.ans;
     if(right) score++;
+    const uaIndex=userAnswers[i].charCodeAt(0)-65;
+    const caIndex=q.ans.charCodeAt(0)-65;
     html+=`
       <hr>
       <p><b>Q${i+1}. ${q.q}</b></p>
-      <p>Your Answer: ${userAnswers[i]}</p>
-      <p>Correct Answer: ${q.ans}</p>
+      <p>Your Answer: <b>${userAnswers[i]}</b>. ${q.opts[uaIndex]}</p>
+      <p>Correct Answer: <b>${q.ans}</b>. ${q.opts[caIndex]}</p>
       <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
       <p><b>Explanation:</b> ${q.exp}</p>`;
   });
   html+=`<h3>Attempted: ${attempted}/${quiz.length}</h3>
          <h3>Score: ${score}/${attempted}</h3></div>`;
-  document.getElementById("reviewBox").innerHTML=html;
+  reviewBox.innerHTML=html;
 }
 </script>
 
