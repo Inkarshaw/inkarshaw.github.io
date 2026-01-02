@@ -17,7 +17,6 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 .submit{background:#dc2626;color:#fff;margin-left:10px}
 .correct{color:green;font-weight:bold}
 .wrong{color:red;font-weight:bold}
-
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
 .palette{
@@ -45,6 +44,21 @@ button{padding:8px 15px;border:none;border-radius:20px;font-size:14px;cursor:poi
 </header>
 
 <div class="container">
+
+<!-- BACK BUTTON -->
+<div class="box" style="padding:10px">
+  <button onclick="goBack()" style="
+    background:#374151;
+    color:#fff;
+    border:none;
+    padding:8px 15px;
+    border-radius:20px;
+    font-size:14px;
+    cursor:pointer;
+  ">
+    ⬅ Clear Exams – Indian Polity – Constitution of India
+  </button>
+</div>
 
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
@@ -97,7 +111,13 @@ const sheetURL =
 let allQuestions=[], quiz=[], index=0, userAnswers=[];
 let timerInterval, timeLeft;
 
-// LOAD SHEET
+// BACK BUTTON FUNCTION
+function goBack(){
+  window.location.href =
+    "https://www.clearexams.online/exam/indian_polity/constitution_of_india.html";
+}
+
+// LOAD QUESTIONS
 fetch(sheetURL)
 .then(r=>r.text())
 .then(t=>{
@@ -107,7 +127,6 @@ fetch(sheetURL)
     return {q:c[0],opts:c.slice(1,5),ans:c[5].trim(),exp:c[6]};
   });
 
-  // SET RANGE LIMITS
   const total=allQuestions.length;
   document.getElementById("rangeFrom").max=total;
   document.getElementById("rangeTo").max=total;
@@ -125,17 +144,11 @@ function startQuiz(){
   let random=document.getElementById("randomize").checked;
   let minutes=parseInt(document.getElementById("timeLimit").value)||10;
 
-  const total=allQuestions.length;
-
   if(from<1) from=1;
-  if(to>total) to=total;
-  if(from>to){
-    alert("Invalid range selection");
-    return;
-  }
+  if(to>allQuestions.length) to=allQuestions.length;
+  if(from>to){alert("Invalid range");return;}
 
   quiz=[...allQuestions].slice(from-1,to);
-
   if(random) quiz.sort(()=>Math.random()-0.5);
   if(count!=="all") quiz=quiz.slice(0,parseInt(count));
 
@@ -205,21 +218,12 @@ function loadQ(){
 }
 
 // NAVIGATION
-function nextQ(){
-  saveAnswer();
-  if(index<quiz.length-1){index++;loadQ();}
-}
-
-function jumpQ(i){
-  saveAnswer();
-  index=i;
-  loadQ();
-}
-
 function saveAnswer(){
   const sel=document.querySelector('input[name="opt"]:checked');
   userAnswers[index]=sel?sel.value:null;
 }
+function nextQ(){saveAnswer();if(index<quiz.length-1){index++;loadQ();}}
+function jumpQ(i){saveAnswer();index=i;loadQ();}
 
 // SUBMIT
 function submitQuiz(){
@@ -228,35 +232,25 @@ function submitQuiz(){
   showReview();
 }
 
-// REVIEW (ATTEMPTED ONLY)
+// REVIEW
 function showReview(){
   let score=0,attempted=0;
   let html=`<div class="box"><h2>Quiz Review</h2>`;
-
   quiz.forEach((q,i)=>{
     if(!userAnswers[i]) return;
     attempted++;
     const right=userAnswers[i]===q.ans;
     if(right) score++;
-
     html+=`
       <hr>
       <p><b>Q${i+1}. ${q.q}</b></p>
       <p>Your Answer: ${userAnswers[i]}</p>
       <p>Correct Answer: ${q.ans}</p>
-      <p class="${right?'correct':'wrong'}">
-        ${right?'✔ Correct':'✖ Wrong'}
-      </p>
-      <p><b>Explanation:</b> ${q.exp}</p>
-    `;
+      <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
+      <p><b>Explanation:</b> ${q.exp}</p>`;
   });
-
-  html+=`
-    <hr>
-    <h3>Attempted: ${attempted}/${quiz.length}</h3>
-    <h3>Score: ${score}/${attempted}</h3>
-  </div>`;
-
+  html+=`<h3>Attempted: ${attempted}/${quiz.length}</h3>
+         <h3>Score: ${score}/${attempted}</h3></div>`;
   document.getElementById("reviewBox").innerHTML=html;
 }
 </script>
