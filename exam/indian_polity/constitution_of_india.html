@@ -96,15 +96,24 @@ document.getElementById("submitBtn").onclick = () => {
   document.getElementById("quizBox").style.display="none";
   showReview();
 };
-
 function showReview(){
   let score = 0;
+  let attempted = 0;
   let html = `<div class="review"><h2>Quiz Review</h2>`;
 
-  quiz.forEach((q,i)=>{
-    const user = userAnswers[i] || "Not Answered";
+  quiz.forEach((q, i) => {
+
+    // ❌ Skip unattempted questions
+    if(userAnswers[i] === null || userAnswers[i] === undefined){
+      return;
+    }
+
+    attempted++;
+
+    const user = userAnswers[i];
     const correct = q.ans;
     const right = user === correct;
+
     if(right) score++;
 
     html += `
@@ -112,14 +121,19 @@ function showReview(){
       <p><b>Q${i+1}. ${q.q}</b></p>
       <p>Your Answer: ${user}</p>
       <p>Correct Answer: ${correct}</p>
-      <p class="${right ? 'correct':'wrong'}">
-        ${right ? '✔ Correct':'✖ Wrong'}
+      <p class="${right ? 'correct' : 'wrong'}">
+        ${right ? '✔ Correct' : '✖ Wrong'}
       </p>
       <p><b>Explanation:</b> ${q.exp}</p>
     `;
   });
 
-  html += `<h3>Final Score: ${score} / ${quiz.length}</h3></div>`;
+  html += `
+    <hr>
+    <h3>Attempted: ${attempted} / ${quiz.length}</h3>
+    <h3>Score: ${score} / ${attempted}</h3>
+  </div>`;
+
   document.getElementById("reviewBox").innerHTML = html;
 }
 </script>
