@@ -471,6 +471,46 @@
             return officeMatch ? officeMatch[1] + " வட்டாட்சியர் அலுவலகம்" : "வட்டாட்சியர் அலுவலகம்";
         }
 
+        // Function to get pincode based on வட்டாட்சியர் selection
+        function getPincodeForCollector(collectorName) {
+            const pincodeMap = {
+                "சென்னை (வடக்கு) வட்டாட்சியர்": "600001",
+                "திருவொற்றியூர் வட்டாட்சியர்": "600019",
+                "புறாவாக்கம் வட்டாட்சியர்": "600087",
+                "பெரம்பூர் வட்டாட்சியர்": "600011",
+                "மாதவரம் வட்டாட்சியர்": "600060",
+                "ஆயிரம் விளக்கு வட்டாட்சியர்": "600004",
+                "வில்லிவாக்கம் வட்டாட்சியர்": "600049",
+                "அம்பத்தூர் வட்டாட்சியர்": "600053",
+                "எக்மூர் வட்டாட்சியர்": "600031",
+                "மாதுராவோயல் வட்டாட்சியர்": "600095",
+                "மாம்பழம் வட்டாட்சியர்": "600033",
+                "மயிலாப்பூர் வட்டாட்சியர்": "600004",
+                "வேளச்சேரி வட்டாட்சியர்": "600042",
+                "தி.நகர் வட்டாட்சியர்": "600017",
+                "அளந்தூர் வட்டாட்சியர்": "600032",
+                "சோழிங்கநல்லூர் வட்டாட்சியர்": "600119",
+                "வட்டாட்சியர் அவர்கள்": "600031" // Default
+            };
+            
+            return pincodeMap[collectorName] || "600031";
+        }
+
+        // Function to get location name for the third line
+        function getLocationForCollector(collectorName) {
+            // For திருவொற்றியூர், show "திருவொற்றியூர்"
+            if (collectorName === "திருவொற்றியூர் வட்டாட்சியர்") {
+                return "திருவொற்றியூர்";
+            }
+            // For others, extract the location name
+            const match = collectorName.match(/^(.*?)\s+வட்டாட்சியர்$/);
+            if (match && match[1] !== "வட்டாட்சியர் அவர்கள்") {
+                return match[1];
+            }
+            // Default to "சேத்துப்பட்டு"
+            return "சேத்துப்பட்டு";
+        }
+
         // Function to update preview with form values
         function updatePreview() {
             // Get form values
@@ -493,6 +533,12 @@
             
             // Get the Tahsildar office for the second line
             const tahsildarOffice = getTahsildarOffice(collectorSelection);
+            
+            // Get pincode based on collector selection
+            const receiverPincode = getPincodeForCollector(collectorSelection);
+            
+            // Get location name for third line
+            const receiverLocation = getLocationForCollector(collectorSelection);
 
             // Get சாட்சி எண்
             const witnessNumber = document.getElementById('witnessNumber').value || 'PW 1';
@@ -563,7 +609,7 @@
                         <div style="line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif;">
                             <div>${receiverFirstLine}</div>
                             <div>${tahsildarOffice}</div>
-                            <div>சேத்துப்பட்டு, சென்னை 600031</div>
+                            <div>${receiverLocation}, சென்னை ${receiverPincode}</div>
                         </div>
                     </div>
                 </div>
