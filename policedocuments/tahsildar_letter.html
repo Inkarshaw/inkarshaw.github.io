@@ -154,6 +154,20 @@
             flex: 1;
         }
 
+        /* Small label for age and father fields */
+        .small-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        /* District selector */
+        .district-selector {
+            margin-bottom: 15px;
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
             .main-content {
@@ -196,112 +210,27 @@
             <div class="input-panel no-print">
                 <h5 class="mb-4">ஆவண விவரங்களை நிரப்புக</h5>
 
+                <!-- District Selector -->
+                <div class="mb-3 district-selector">
+                    <label class="form-label">மாவட்டத்தை தேர்ந்தெடுக்கவும்:</label>
+                    <select class="form-select" id="districtSelect" onchange="filterPoliceStations()">
+                        <option value="chennai" selected>சென்னை</option>
+                        <option value="other">பிற மாவட்டங்கள்</option>
+                    </select>
+                </div>
+
                 <!-- Form Fields -->
                 <div class="mb-3">
                     <label class="form-label">காவல் நிலையத்தின் பெயர்:</label>
                     <select class="form-select" id="policeStation" onchange="updatePreview()">
-                        <!-- Greater Chennai Police - Zone Wise Listing -->
-                        <!-- Central Zone -->
-                        <optgroup label="மத்திய மண்டலம்">
-                            <option value="G1 - சேத்துப்பட்டு காவல் நிலையம்">G1 - சேத்துப்பட்டு காவல் நிலையம்</option>
-                            <option value="G2 - கொத்தவால்சாவடி காவல் நிலையம்">G2 - கொத்தவால்சாவடி காவல் நிலையம்</option>
-                            <option value="G3 - ராயப்பேட்டை காவல் நிலையம்">G3 - ராயப்பேட்டை காவல் நிலையம்</option>
-                            <option value="G4 - ஜார்ஜ் டவுன் காவல் நிலையம்">G4 - ஜார்ஜ் டவுன் காவல் நிலையம்</option>
-                            <option value="G5 - பட்டினம் காவல் நிலையம்">G5 - பட்டினம் காவல் நிலையம்</option>
-                            <option value="G6 - வடகலைப்பாளையம் காவல் நிலையம்">G6 - வடகலைப்பாளையம் காவல் நிலையம்</option>
-                            <option value="G7 - எழும்பூர் காவல் நிலையம்">G7 - எழும்பூர் காவல் நிலையம்</option>
-                            <option value="G8 - கீழ்ப்பாக்கம் காவல் நிலையம்">G8 - கீழ்ப்பாக்கம் காவல் நிலையம்</option>
-                            <option value="G9 - சூளை காவல் நிலையம்">G9 - சூளை காவல் நிலையம்</option>
-                            <option value="G10 - சென்ட்ரல் காவல் நிலையம்">G10 - சென்ட்ரல் காவல் நிலையம்</option>
-                            <option value="G11 - மவுண்ட் ரோடு காவல் நிலையம்">G11 - மவுண்ட் ரோடு காவல் நிலையம்</option>
+                        <!-- Chennai Police Stations (Default) -->
+                        <optgroup label="சென்னை காவல் நிலையங்கள்" id="chennaiStations">
+                            <!-- These will be populated dynamically -->
                         </optgroup>
                         
-                        <!-- North Zone -->
-                        <optgroup label="வட மண்டலம்">
-                            <option value="P1 - மாதவரம் காவல் நிலையம்">P1 - மாதவரம் காவல் நிலையம்</option>
-                            <option value="P2 - அம்பத்தூர் காவல் நிலையம்">P2 - அம்பத்தூர் காவல் நிலையம்</option>
-                            <option value="P3 - ஆலந்தூர் காவல் நிலையம்">P3 - ஆலந்தூர் காவல் நிலையம்</option>
-                            <option value="P4 - செங்கல்பட்டு காவல் நிலையம்">P4 - செங்கல்பட்டு காவல் நிலையம்</option>
-                            <option value="P5 - பூந்தமல்லி காவல் நிலையம்">P5 - பூந்தமல்லி காவல் நிலையம்</option>
-                            <option value="P6 - அயனாவரம் காவல் நிலையம்">P6 - அயனாவரம் காவல் நிலையம்</option>
-                            <option value="P7 - வள்ளலார் நகர் காவல் நிலையம்">P7 - வள்ளலார் நகர் காவல் நிலையம்</option>
-                            <option value="P8 - சொய்சா நகர் காவல் நிலையம்">P8 - சொய்சா நகர் காவல் நிலையம்</option>
-                            <option value="P9 - பழவந்தாங்கல் காவல் நிலையம்">P9 - பழவந்தாங்கல் காவல் நிலையம்</option>
-                        </optgroup>
-                        
-                        <!-- South Zone -->
-                        <optgroup label="தென் மண்டலம்">
-                            <option value="M1 - மயிலாப்பூர் காவல் நிலையம்">M1 - மயிலாப்பூர் காவல் நிலையம்</option>
-                            <option value="M2 - ஆயிரம் விளக்கு காவல் நிலையம்">M2 - ஆயிரம் விளக்கு காவல் நிலையம்</option>
-                            <option value="M3 - அடையாறு காவல் நிலையம்">M3 - அடையாறு காவல் நிலையம்</option>
-                            <option value="M4 - பசுமைநகர் காவல் நிலையம்">M4 - பசுமைநகர் காவல் நிலையம்</option>
-                            <option value="M5 - கொளத்தூர் காவல் நிலையம்">M5 - கொளத்தூர் காவல் நிலையம்</option>
-                            <option value="M6 - சைதாப்பேட்டை காவல் நிலையம்">M6 - சைதாப்பேட்டை காவல் நிலையம்</option>
-                            <option value="M7 - கோட்டூர்புரம் காவல் நிலையம்">M7 - கோட்டூர்புரம் காவல் நிலையம்</option>
-                            <option value="M8 - ஆவடி காவல் நிலையம்">M8 - ஆவடி காவல் நிலையம்</option>
-                        </optgroup>
-                        
-                        <!-- West Zone -->
-                        <optgroup label="மேற்கு மண்டலம்">
-                            <option value="K1 - கோயம்பேடு காவல் நிலையம்">K1 - கோயம்பேடு காவல் நிலையம்</option>
-                            <option value="K2 - பெரம்பூர் காவல் நிலையம்">K2 - பெரம்பூர் காவல் நிலையம்</option>
-                            <option value="K3 - செனாய்நகர் காவல் நிலையம்">K3 - செனாய்நகர் காவல் நிலையம்</option>
-                            <option value="K4 - காந்தி நகர் காவல் நிலையம்">K4 - காந்தி நகர் காவல் நிலையம்</option>
-                            <option value="K5 - சவுகார் காவல் நிலையம்">K5 - சவுகார் காவல் நிலையம்</option>
-                            <option value="K6 - வேப்பேரி காவல் நிலையம்">K6 - வேப்பேரி காவல் நிலையம்</option>
-                            <option value="K7 - அமைந்தவரம் காவல் நிலையம்">K7 - அமைந்தவரம் காவல் நிலையம்</option>
-                            <option value="K8 - அண்ணா நகர் காவல் நிலையம்">K8 - அண்ணா நகர் காவல் நிலையம்</option>
-                        </optgroup>
-                        
-                        <!-- East Zone -->
-                        <optgroup label="கிழக்கு மண்டலம்">
-                            <option value="W1 - வேளச்சேரி காவல் நிலையம்">W1 - வேளச்சேரி காவல் நிலையம்</option>
-                            <option value="W2 - கடலூர் காவல் நிலையம்">W2 - கடலூர் காவல் நிலையம்</option>
-                            <option value="W3 - வண்ணாரப்பேட்டை காவல் நிலையம்">W3 - வண்ணாரப்பேட்டை காவல் நிலையம்</option>
-                            <option value="W4 - பள்ளிக்கரணை காவல் நிலையம்">W4 - பள்ளிக்கரணை காவல் நிலையம்</option>
-                            <option value="W5 - வில்லிவாக்கம் காவல் நிலையம்">W5 - வில்லிவாக்கம் காவல் நிலையம்</option>
-                            <option value="W6 - கொடுங்கையூர் காவல் நிலையம்">W6 - கொடுங்கையூர் காவல் நிலையம்</option>
-                            <option value="W7 - மீனம்பாக்கம் காவல் நிலையம்">W7 - மீனம்பாக்கம் காவல் நிலையம்</option>
-                            <option value="W8 - நேவல் பேஸ் காவல் நிலையம்">W8 - நேவல் பேஸ் காவல் நிலையம்</option>
-                        </optgroup>
-                        
-                        <!-- Other Important Police Stations -->
-                        <optgroup label="பிற முக்கிய காவல் நிலையங்கள்">
-                            <option value="T1 - தி.நகர் காவல் நிலையம்">T1 - தி.நகர் காவல் நிலையம்</option>
-                            <option value="T2 - மாம்பலம் காவல் நிலையம்">T2 - மாம்பலம் காவல் நிலையம்</option>
-                            <option value="T3 - நுங்கம்பாக்கம் காவல் நிலையம்">T3 - நுங்கம்பாக்கம் காவல் நிலையம்</option>
-                            <option value="T4 - திருவான்மியூர் காவல் நிலையம்">T4 - திருவான்மியூர் காவல் நிலையம்</option>
-                            <option value="T5 - வடபழநி காவல் நிலையம்">T5 - வடபழநி காவல் நிலையம்</option>
-                            <option value="T6 - இராயபுரம் காவல் நிலையம்">T6 - இராயபுரம் காவல் நிலையம்</option>
-                            <option value="C1 - சிதம்பரம் நகர் காவல் நிலையம்">C1 - சிதம்பரம் நகர் காவல் நிலையம்</option>
-                            <option value="C2 - கன்னிகாபுரம் காவல் நிலையம்">C2 - கன்னிகாபுரம் காவல் நிலையம்</option>
-                            <option value="C3 - சாஸ்திரி நகர் காவல் நிலையம்">C3 - சாஸ்திரி நகர் காவல் நிலையம்</option>
-                            <option value="C4 - திரு.வி.க நகர் காவல் நிலையம்">C4 - திரு.வி.க நகர் காவல் நிலையம்</option>
-                            <option value="C5 - எம்.ஜி.ஆர் நகர் காவல் நிலையம்">C5 - எம்.ஜி.ஆர் நகர் காவல் நிலையம்</option>
-                        </optgroup>
-                        
-                        <!-- Special Police Stations -->
-                        <optgroup label="சிறப்பு காவல் நிலையங்கள்">
-                            <option value="SP1 - எழும்பூர் ரயில்வே காவல் நிலையம்">SP1 - எழும்பூர் ரயில்வே காவல் நிலையம்</option>
-                            <option value="SP2 - வான்போக்கி பிரிவு காவல் நிலையம்">SP2 - வான்போக்கி பிரிவு காவல் நிலையம்</option>
-                            <option value="SP3 - அணுஉலை காவல் நிலையம்">SP3 - அணுஉலை காவல் நிலையம்</option>
-                            <option value="SP4 - பெண்கள் காவல் நிலையம்">SP4 - பெண்கள் காவல் நிலையம்</option>
-                            <option value="SP5 - மருத்துவக் கல்லூரி காவல் நிலையம்">SP5 - மருத்துவக் கல்லூரி காவல் நிலையம்</option>
-                            <option value="SP6 - கடலோர காவல் நிலையம்">SP6 - கடலோர காவல் நிலையம்</option>
-                            <option value="SP7 - ரயில்வே சிறப்பு காவல் நிலையம்">SP7 - ரயில்வே சிறப்பு காவல் நிலையம்</option>
-                            <option value="SP8 - சட்டம் ஒழுங்கு காவல் நிலையம்">SP8 - சட்டம் ஒழுங்கு காவல் நிலையம்</option>
-                            <option value="SP9 - விமான நிலையம் காவல் நிலையம்">SP9 - விமான நிலையம் காவல் நிலையம்</option>
-                            <option value="SP10 - பேருந்து நிலையம் காவல் நிலையம்">SP10 - பேருந்து நிலையம் காவல் நிலையம்</option>
-                            <option value="SP11 - காவல் ஆணையர் அலுவலகம்">SP11 - காவல் ஆணையர் அலுவலகம்</option>
-                            <option value="SP12 - திருவல்லிக்கேணி காவல் நிலையம்">SP12 - திருவல்லிக்கேணி காவல் நிலையம்</option>
-                            <option value="SP13 - சென்னை சிறை காவல் நிலையம்">SP13 - சென்னை சிறை காவல் நிலையம்</option>
-                        </optgroup>
-                        
-                        <!-- New Stations -->
-                        <optgroup label="புதிய காவல் நிலையங்கள்">
-                            <option value="N1 - அசோக் நகர் காவல் நிலையம்">N1 - அசோக் நகர் காவல் நிலையம்</option>
-                            <option value="N2 - விசாலக்ஷி நகர் காவல் நிலையம்">N2 - விசாலக்ஷி நகர் காவல் நிலையம்</option>
-                            <option value="N3 - அண்ணா சாலை காவல் நிலையம்">N3 - அண்ணா சாலை காவல் நிலையம்</option>
+                        <!-- Other Police Stations (Hidden by default) -->
+                        <optgroup label="பிற காவல் நிலையங்கள்" id="otherStations" style="display: none;">
+                            <!-- These will be populated dynamically from the same Chennai list -->
                         </optgroup>
                     </select>
                 </div>
@@ -346,14 +275,16 @@
                             <option value="செல்வி.">செல்வி.</option>
                             <option value="">(இல்லை)</option>
                         </select>
-                        <input type="text" class="form-control name-input" id="witnessName" value="மாலதி" oninput="updatePreview()">
+                        <input type="text" class="form-control name-input" id="witnessName" value="மாலதி" oninput="updatePreview()" placeholder="முழுப் பெயர்">
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <input type="text" class="form-control" id="witnessAge" placeholder="வயது" value="31" oninput="updatePreview()">
+                            <label class="small-label">வயது:</label>
+                            <input type="text" class="form-control" id="witnessAge" value="31" oninput="updatePreview()" placeholder="எ.கா: 31">
                         </div>
                         <div class="col-6">
-                            <input type="text" class="form-control" id="witnessFather" placeholder="தந்தை பெயர்" value="டி. சந்திரன்" oninput="updatePreview()">
+                            <label class="small-label">தந்தை பெயர்:</label>
+                            <input type="text" class="form-control" id="witnessFather" value="டி. சந்திரன்" oninput="updatePreview()" placeholder="எ.கா: டி. சந்திரன்">
                         </div>
                     </div>
                 </div>
@@ -370,17 +301,17 @@
 
                 <div class="mb-3">
                     <label class="form-label">குற்ற எண்:</label>
-                    <input type="text" class="form-control" id="caseNumber" value="1249/2012" oninput="updatePreview()">
+                    <input type="text" class="form-control" id="caseNumber" value="1249/2012" oninput="updatePreview()" placeholder="எ.கா: 1249/2012">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">குற்ற விதிகள்:</label>
-                    <input type="text" class="form-control" id="caseSections" value="452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC" oninput="updatePreview()">
+                    <input type="text" class="form-control" id="caseSections" value="452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC" oninput="updatePreview()" placeholder="எ.கா: 452, 326 IPC">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">கூடுதல் விளக்கம்:</label>
-                    <textarea class="form-control" id="additionalInfo" rows="3" oninput="updatePreview()">பார்வையில் கண்ட பு7 செத்துப்பட்டு காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் 1 (Pறு-1) திருமதி மாலதி, வயது 31, தந்தை டி. சந்திரன், எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031 என்பவரை நீதிமன்ற விசாரணைக்கு அழைக்க பலமுறை முயற்சித்தும் அவர் முன்பு விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. முன்பு நபரை பற்றி எந்த தகவலும் இல்லை.</textarea>
+                    <textarea class="form-control" id="additionalInfo" rows="3" oninput="updatePreview()" placeholder="கூடுதல் விளக்கங்களை இங்கே உள்ளிடவும்...">பார்வையில் கண்ட பு7 செத்துப்பட்டு காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் 1 (Pறு-1) திருமதி மாலதி, வயது 31, தந்தை டி. சந்திரன், எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031 என்பவரை நீதிமன்ற விசாரணைக்கு அழைக்க பலமுறை முயற்சித்தும் அவர் முன்பு விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. முன்பு நபரை பற்றி எந்த தகவலும் இல்லை.</textarea>
                 </div>
 
                 <!-- Controls -->
@@ -434,6 +365,397 @@
         // Initialize jsPDF
         const { jsPDF } = window.jspdf;
 
+        // Chennai Police Stations Data (Tamil names) with area-wise pincode mapping
+        const chennaiPoliceStations = [
+            "AWPS பேரவள்ளூர்",
+            "B1 வடக்குக் கடற்கரை காவல் நிலையம்",
+            "B2 எஸ்பிளனேட் காவல் நிலையம்",
+            "B3 கோட்டை செயின்ட் ஜார்ஜ் காவல் நிலையம்",
+            "B4 உயர்நீதிமன்ற காவல் நிலையம்",
+            "C1 பூக்கடை காவல் நிலையம்",
+            "C2 எலிபெண்ட் கேட் காவல் நிலையம்",
+            "C3 செவன் வெல்ஸ் காவல் நிலையம்",
+            "C4 அரசு பொது மருத்துவமனை அவுட்போஸ்ட்",
+            "C5 கொத்தவால் சாவடி காவல் நிலையம்",
+            "D1 திருப்பள்ளிக்கேணி காவல் நிலையம்",
+            "D2 அண்ணா சாலை காவல் நிலையம்",
+            "D3 ஐஸ் ஹவுஸ் காவல் நிலையம்",
+            "D4 ஜாம் பஜார் காவல் நிலையம்",
+            "D5 மெரினா காவல் நிலையம்",
+            "D6 அண்ணா சதுக்கம் காவல் நிலையம்",
+            "D6 அண்ணா சதுக்கம் போக்குவரத்து விசாரணை",
+            "D7 அரசு எஸ்டேட் காவல் நிலையம்",
+            "D8 கஸ்தூரிபாய் காந்தி மருத்துவமனை காவல் நிலையம்",
+            "E1 மயிலாப்பூர் காவல் நிலையம்",
+            "E2 ராயப்பேட்டை காவல் நிலையம்",
+            "E3 தேனாம்பேட்டை காவல் நிலையம்",
+            "E4 அபிராமபுரம் காவல் நிலையம்",
+            "E5 பட்டினப்பாக்கம் காவல் நிலையம்",
+            "F1 சிந்தாதிரிப்பேட்டை காவல் நிலையம்",
+            "F2 எழும்பூர் காவல் நிலையம்",
+            "F3 நுங்கம்பாக்கம் காவல் நிலையம்",
+            "F4 தௌசண்ட் லைட்ஸ் காவல் நிலையம்",
+            "F5 சேத்துப்பட்டு காவல் நிலையம்",
+            "F6 மியூசியம் காவல் நிலையம்",
+            "F7 அரசு மகளிர் குழந்தைகள் மருத்துவமனை காவல் நிலையம்",
+            "G1 வேப்பேரி காவல் நிலையம்",
+            "G2 பெரியமேடு காவல் நிலையம்",
+            "G3 கிளிப்பாக் காவல் நிலையம்",
+            "G3 கிளிப்பாக் போக்குவரத்து விசாரணை",
+            "G4 மனநல மருத்துவமனை அவுட்போஸ்ட்",
+            "G5 செயலக காலனி காவல் நிலையம்",
+            "G6 கிளிப்பாக் மருத்துவக் கல்லூரி காவல் நிலையம்",
+            "G7 சேத்துபட்டு காவல் நிலையம்",
+            "H1 பழைய வண்ணாரப்பேட்டை காவல் நிலையம்",
+            "H2 ஸ்டான்லி மருத்துவமனை அவுட்போஸ்ட்",
+            "H3 தொண்டையார்பேட்டை காவல் நிலையம்",
+            "H4 கொருக்குப்பேட்டை காவல் நிலையம்",
+            "H5 புதிய வண்ணாரப்பேட்டை காவல் நிலையம்",
+            "H6 டாக்டர் ராதாகிருஷ்ணன் நகர்",
+            "H8 திருவொற்றியூர் காவல் நிலையம்",
+            "J13 தரமணி காவல் நிலையம்",
+            "J1 சைதாப்பேட்டை காவல் நிலையம்",
+            "J2 அடையாறு காவல் நிலையம்",
+            "J3 கிண்டி காவல் நிலையம்",
+            "J4 கொட்டூர்புரம் காவல் நிலையம்",
+            "J5 சாஸ்திரி நகர் காவல் நிலையம்",
+            "J6 திருவான்மியூர் காவல் நிலையம்",
+            "J7 வேளச்சேரி காவல் நிலையம்",
+            "J8 நீலாங்கரை காவல் நிலையம்",
+            "J9 துரைப்பாக்கம் காவல் நிலையம்",
+            "K10 கோயம்பேடு காவல் நிலையம்",
+            "K10 TIW கோயம்பேடு",
+            "K11 CMBT காவல் நிலையம்",
+            "K1 செம்பியம் காவல் நிலையம்",
+            "K2 அயனாவரம் காவல் நிலையம்",
+            "K3 அமைஞ்சிக்கரை காவல் நிலையம்",
+            "K4 அண்ணா நகர் காவல் நிலையம்",
+            "K4 TIW அண்ணா நகர்",
+            "K5 பேரவள்ளூர் காவல் நிலையம்",
+            "K6 டிபி சத்திரம் காவல் நிலையம்",
+            "K7 ICF காவல் நிலையம்",
+            "K8 அரும்பாக்கம் காவல் நிலையம்",
+            "K9 திரு வி க நகர் காவல் நிலையம்",
+            "M1 ஹார்பர் காவல் நிலையம்",
+            "M2 வாட்டர் பிரோன் காவல் நிலையம்",
+            "N1 ராயபுரம் காவல் நிலையம்",
+            "N2 காசிமேடு காவல் நிலையம்",
+            "N3 முத்தியால்பேட்டை காவல் நிலையம்",
+            "N4 மீன்பிடி துறைமுக காவல் நிலையம்",
+            "N5 RSRM மருத்துவமனை காவல் நிலையம்",
+            "P1 புளியந்தோப்பு காவல் நிலையம்",
+            "P2 ஒட்டேரி காவல் நிலையம்",
+            "P3 வியாசர்பாடி காவல் நிலையம்",
+            "P4 பேசின் பிரிட்ஜ் காவல் நிலையம்",
+            "P5 MKB நகர் காவல் நிலையம்",
+            "P6 கொடுங்கையூர் காவல் நிலையம்",
+            "R10 எம்ஜிஆர் நகர் காவல் நிலையம்",
+            "R1 மாம்பலம் காவல் நிலையம்",
+            "R2 கோடம்பாக்கம் காவல் நிலையம்",
+            "R3 அசோக் நகர் காவல் நிலையம்",
+            "R4 பாண்டி பஜார் காவல் நிலையம்",
+            "R4 TIW பாண்டி பஜார்",
+            "R5 சூளைமேடு காவல் நிலையம்",
+            "R6 குமரன் காலனி காவல் நிலையம்",
+            "R7 கேகே நகர் காவல் நிலையம்",
+            "R9 வளசரவாக்கம் காவல் நிலையம்",
+            "V1 வில்லிவாக்கம் காவல் நிலையம்",
+            "V2 விருகம்பாக்கம் காவல் நிலையம்",
+            "V3 ஜே ஜே நகர் காவல் நிலையம்",
+            "V4 ராஜமங்கலம் காவல் நிலையம்",
+            "V5 திருமங்கலம் காவல் நிலையம்",
+            "V5 TIW திருமங்கலம்",
+            "V6 கொளத்தூர் காவல் நிலையம்",
+            "W10 அனைத்து மகளிர் காவல் நிலையம் பூக்கடை",
+            "W11 அனைத்து மகளிர் காவல் நிலையம் உயர்நீதிமன்றம்",
+            "W12 அனைத்து மகளிர் காவல் நிலையம் ஹார்பர்",
+            "W13 அனைத்து மகளிர் காவல் நிலையம் வண்ணாரப்பேட்டை",
+            "W14 அனைத்து மகளிர் காவல் நிலையம் திருவொற்றியூர்",
+            "W15 அனைத்து மகளிர் காவல் நிலையம் ராயபுரம்",
+            "W16 அனைத்து மகளிர் காவல் நிலையம் புளியந்தோப்பு",
+            "W18 அனைத்து மகளிர் காவல் நிலையம் MKB நகர்",
+            "W19 அனைத்து மகளிர் காவல் நிலையம் அடையாறு",
+            "W1 அனைத்து மகளிர் காவல் நிலையம் தௌசண்ட் லைட்ஸ்",
+            "W20 அனைத்து மகளிர் காவல் நிலையம் சைதாப்பேட்டை",
+            "W21 அனைத்து மகளிர் காவல் நிலையம் கிண்டி",
+            "W22 அனைத்து மகளிர் காவல் நிலையம் மயிலாப்பூர்",
+            "W23 அனைத்து மகளிர் காவல் நிலையம் ராயப்பேட்டை",
+            "W24 அனைத்து மகளிர் காவல் நிலையம் தேனாம்பேட்டை",
+            "W25 அனைத்து மகளிர் காவல் நிலையம் தி நகர்",
+            "W26 அனைத்து மகளிர் காவல் நிலையம் அசோக் நகர்",
+            "W27 அனைத்து மகளிர் காவல் நிலையம் வடபழனி",
+            "W2 அனைத்து மகளிர் காவல் நிலையம் அடையாறு",
+            "W2 AWPS திருப்பள்ளிக்கேணி",
+            "W35 கோயம்பேடு AWPS",
+            "W38 கொளத்தூர் AWPS",
+            "W4 அனைத்து மகளிர் காவல் நிலையம் கிளிப்பாக்",
+            "W5 அனைத்து மகளிர் காவல் நிலையம் வேப்பேரி",
+            "W6 அனைத்து மகளிர் காவல் நிலையம் அயனாவரம்",
+            "W7 AWPS அண்ணா நகர்",
+            "W8 அனைத்து மகளிர் காவல் நிலையம் திருமங்கலம்",
+            "W9 அனைத்து மகளிர் காவல் நிலையம் வில்லிவாக்கம்"
+        ];
+
+        // Chennai Area Pincode Mapping based on station codes/names
+        const chennaiAreaPincodes = {
+            // B Series - George Town, North Beach, Fort Area
+            "B1": "600001",  // வடக்குக் கடற்கரை - North Beach
+            "B2": "600001",  // எஸ்பிளனேட் - Esplanade
+            "B3": "600001",  // கோட்டை செயின்ட் ஜார்ஜ் - Fort St. George
+            "B4": "600001",  // உயர்நீதிமன்ற - High Court
+            
+            // C Series - Broadway, Parrys, Flower Bazaar
+            "C1": "600001",  // பூக்கடை - Flower Bazaar
+            "C2": "600001",  // எலிபெண்ட் கேட் - Elephant Gate
+            "C3": "600001",  // செவன் வெல்ஸ் - Seven Wells
+            "C4": "600001",  // அரசு பொது மருத்துவமனை - Govt General Hospital
+            "C5": "600001",  // கொத்தவால் சாவடி - Kothaval Chavadi
+            
+            // D Series - Triplicane, Anna Salai, Marina
+            "D1": "600005",  // திருப்பள்ளிக்கேணி - Triplicane
+            "D2": "600002",  // அண்ணா சாலை - Anna Salai
+            "D3": "600004",  // ஐஸ் ஹவுஸ் - Ice House
+            "D4": "600001",  // ஜாம் பஜார் - Zam Bazaar
+            "D5": "600005",  // மெரினா - Marina
+            "D6": "600002",  // அண்ணா சதுக்கம் - Anna Square
+            "D7": "600002",  // அரசு எஸ்டேட் - Government Estate
+            "D8": "600005",  // கஸ்தூரிபாய் காந்தி மருத்துவமனை - Kasturba Gandhi Hospital
+            
+            // E Series - Mylapore, Royapettah, Teynampet
+            "E1": "600004",  // மயிலாப்பூர் - Mylapore
+            "E2": "600014",  // ராயப்பேட்டை - Royapettah
+            "E3": "600018",  // தேனாம்பேட்டை - Teynampet
+            "E4": "600018",  // அபிராமபுரம் - Abiramapuram
+            "E5": "600004",  // பட்டினப்பாக்கம் - Pattinappakkam
+            
+            // F Series - Chintadripet, Egmore, Nungambakkam
+            "F1": "600002",  // சிந்தாதிரிப்பேட்டை - Chintadripet
+            "F2": "600008",  // எழும்பூர் - Egmore
+            "F3": "600034",  // நுங்கம்பாக்கம் - Nungambakkam
+            "F4": "600006",  // தௌசண்ட் லைட்ஸ் - Thousand Lights
+            "F5": "600031",  // சேத்துப்பட்டு - Chetput
+            "F6": "600008",  // மியூசியம் - Museum
+            "F7": "600008",  // அரசு மகளிர் குழந்தைகள் மருத்துவமனை - Govt Women Children Hospital
+            
+            // G Series - Vepery, Periamet, Kilpauk
+            "G1": "600007",  // வேப்பேரி - Vepery
+            "G2": "600003",  // பெரியமேடு - Periamet
+            "G3": "600010",  // கிளிப்பாக் - Kilpauk
+            "G4": "600010",  // மனநல மருத்துவமனை - Mental Hospital
+            "G5": "600035",  // செயலக காலனி - Secretariat Colony
+            "G6": "600010",  // கிளிப்பாக் மருத்துவக் கல்லூரி - Kilpauk Medical College
+            "G7": "600031",  // சேத்துபட்டு - Chetpet
+            
+            // H Series - Washermanpet, Tondiarpet, Korukkupet
+            "H1": "600021",  // பழைய வண்ணாரப்பேட்டை - Old Washermanpet
+            "H2": "600001",  // ஸ்டான்லி மருத்துவமனை - Stanley Hospital
+            "H3": "600021",  // தொண்டையார்பேட்டை - Tondiarpet
+            "H4": "600021",  // கொருக்குப்பேட்டை - Korukkupet
+            "H5": "600021",  // புதிய வண்ணாரப்பேட்டை - New Washermanpet
+            "H6": "600012",  // டாக்டர் ராதாகிருஷ்ணன் நகர் - Dr. Radhakrishnan Nagar
+            "H8": "600019",  // திருவொற்றியூர் - Thiruvottiyur
+            
+            // J Series - Saidapet, Adyar, Guindy
+            "J1": "600015",  // சைதாப்பேட்டை - Saidapet
+            "J2": "600020",  // அடையாறு - Adyar
+            "J3": "600032",  // கிண்டி - Guindy
+            "J4": "600085",  // கொட்டூர்புரம் - Kotturpuram
+            "J5": "600020",  // சாஸ்திரி நகர் - Sastri Nagar
+            "J6": "600041",  // திருவான்மியூர் - Thiruvanmiyur
+            "J7": "600042",  // வேளச்சேரி - Velachery
+            "J8": "600041",  // நீலாங்கரை - Neelankarai
+            "J9": "600096",  // துரைப்பாக்கம் - Thuraipakkam
+            "J13": "600113", // தரமணி - Tharamani
+            
+            // K Series - Sembium, Ayanavaram, Anna Nagar
+            "K1": "600011",  // செம்பியம் - Sembium
+            "K2": "600023",  // அயனாவரம் - Ayanavaram
+            "K3": "600029",  // அமைஞ்சிக்கரை - Aminjikarai
+            "K4": "600040",  // அண்ணா நகர் - Anna Nagar
+            "K5": "600082",  // பேரவள்ளூர் - Peravallur
+            "K6": "600021",  // டிபி சத்திரம் - T.P. Chatram
+            "K7": "600038",  // ICF - Integral Coach Factory
+            "K8": "600106",  // அரும்பாக்கம் - Arumbakkam
+            "K9": "600039",  // திரு வி க நகர் - Thiru Vi Ka Nagar
+            "K10": "600107", // கோயம்பேடு - Koyambedu
+            "K11": "600092", // CMBT - Chennai Mofussil Bus Terminus
+            
+            // M Series - Harbour
+            "M1": "600001",  // ஹார்பர் - Harbour
+            "M2": "600001",  // வாட்டர் பிரோன் - Water Brone
+            
+            // N Series - Royapuram, Kasimedu
+            "N1": "600013",  // ராயபுரம் - Royapuram
+            "N2": "600001",  // காசிமேடு - Kasimedu
+            "N3": "600001",  // முத்தியால்பேட்டை - Muthialpet
+            "N4": "600001",  // மீன்பிடி துறைமுக - Fishing Harbour
+            "N5": "600013",  // RSRM மருத்துவமனை - R.S.R.M. Hospital
+            
+            // P Series - Pulianthope, Otteri, Vyasarpadi
+            "P1": "600012",  // புளியந்தோப்பு - Pulianthope
+            "P2": "600012",  // ஒட்டேரி - Otteri
+            "P3": "600039",  // வியாசர்பாடி - Vyasarpadi
+            "P4": "600012",  // பேசின் பிரிட்ஜ் - Basin Bridge
+            "P5": "600039",  // MKB நகர் - M.K.B. Nagar
+            "P6": "600118",  // கொடுங்கையூர் - Kodungaiyur
+            
+            // R Series - Mambalam, Kodambakkam, T.Nagar
+            "R1": "600017",  // மாம்பலம் - Mambalam
+            "R2": "600024",  // கோடம்பாக்கம் - Kodambakkam
+            "R3": "600083",  // அசோக் நகர் - Ashok Nagar
+            "R4": "600017",  // பாண்டி பஜார் - Pondy Bazaar
+            "R5": "600094",  // சூளைமேடு - Choolaimedu
+            "R6": "600024",  // குமரன் காலனி - Kumaran Colony
+            "R7": "600078",  // கேகே நகர் - K.K. Nagar
+            "R9": "600087",  // வளசரவாக்கம் - Valasaravakkam
+            "R10": "600095", // எம்ஜிஆர் நகர் - M.G.R. Nagar
+            
+            // V Series - Villivakkam, Virugambakkam
+            "V1": "600049",  // வில்லிவாக்கம் - Villivakkam
+            "V2": "600092",  // விருகம்பாக்கம் - Virugambakkam
+            "V3": "600078",  // ஜே ஜே நகர் - J.J. Nagar
+            "V4": "600048",  // ராஜமங்கலம் - Rajamangalam
+            "V5": "600040",  // திருமங்கலம் - Thirumangalam
+            "V6": "600099",  // கொளத்தூர் - Kolathur
+            
+            // W Series - Women Police Stations (use same pincode as corresponding area)
+            "W1": "600006",  // தௌசண்ட் லைட்ஸ் - Thousand Lights
+            "W2": "600020",  // அடையாறு - Adyar
+            "W4": "600010",  // கிளிப்பாக் - Kilpauk
+            "W5": "600007",  // வேப்பேரி - Vepery
+            "W6": "600023",  // அயனாவரம் - Ayanavaram
+            "W7": "600040",  // அண்ணா நகர் - Anna Nagar
+            "W8": "600040",  // திருமங்கலம் - Thirumangalam
+            "W9": "600049",  // வில்லிவாக்கம் - Villivakkam
+            "W10": "600001", // பூக்கடை - Flower Bazaar
+            "W11": "600001", // உயர்நீதிமன்றம் - High Court
+            "W12": "600001", // ஹார்பர் - Harbour
+            "W13": "600021", // வண்ணாரப்பேட்டை - Washermenpet
+            "W14": "600019", // திருவொற்றியூர் - Thiruvottiyur
+            "W15": "600013", // ராயபுரம் - Royapuram
+            "W16": "600012", // புளியந்தோப்பு - Pulianthope
+            "W18": "600039", // MKB நகர் - M.K.B. Nagar
+            "W19": "600020", // அடையாறு - Adyar
+            "W20": "600015", // சைதாப்பேட்டை - Saidapet
+            "W21": "600032", // கிண்டி - Guindy
+            "W22": "600004", // மயிலாப்பூர் - Mylapore
+            "W23": "600014", // ராயப்பேட்டை - Royapettah
+            "W24": "600018", // தேனாம்பேட்டை - Teynampet
+            "W25": "600017", // தி நகர் - T. Nagar
+            "W26": "600083", // அசோக் நகர் - Ashok Nagar
+            "W27": "600026", // வடபழனி - Vadapalani
+            "W35": "600107", // கோயம்பேடு - Koyambedu
+            "W38": "600099", // கொளத்தூர் - Kolathur
+            
+            // Default for AWPS and others
+            "AWPS": "600082", // பேரவள்ளூர் - Peravallur
+        };
+
+        // Function to get pincode for police station
+        function getPincodeForPoliceStation(stationFullName) {
+            // Extract the station code
+            const stationCode = extractStationCode(stationFullName);
+            
+            // Check if we have a pincode for this station code
+            if (stationCode && chennaiAreaPincodes[stationCode]) {
+                return chennaiAreaPincodes[stationCode];
+            }
+            
+            // Check for AWPS stations
+            if (stationFullName.includes("AWPS")) {
+                // Try to extract code from AWPS name
+                const awpsMatch = stationFullName.match(/(W\d+)/);
+                if (awpsMatch && chennaiAreaPincodes[awpsMatch[1]]) {
+                    return chennaiAreaPincodes[awpsMatch[1]];
+                }
+                return chennaiAreaPincodes["AWPS"] || "600082";
+            }
+            
+            // Check for TIW stations
+            if (stationFullName.includes("TIW")) {
+                const tiwMatch = stationFullName.match(/([A-Z]\d+)\s+TIW/);
+                if (tiwMatch && chennaiAreaPincodes[tiwMatch[1]]) {
+                    return chennaiAreaPincodes[tiwMatch[1]];
+                }
+            }
+            
+            // Default pincode for Chennai
+            return "600031";
+        }
+
+        // Function to get area/location name for display
+        function getLocationForPoliceStation(stationFullName) {
+            const stationCode = extractStationCode(stationFullName);
+            const stationName = extractStationName(stationFullName);
+            
+            // Extract the main location from the station name
+            // Remove "காவல் நிலையம்" and any other suffixes
+            let location = stationName
+                .replace(/காவல் நிலையம்/g, '')
+                .replace(/அவுட்போஸ்ட்/g, '')
+                .replace(/போக்குவரத்து விசாரணை/g, '')
+                .replace(/அனைத்து மகளிர்/g, '')
+                .replace(/AWPS/g, '')
+                .replace(/TIW/g, '')
+                .trim();
+            
+            // For women police stations, add the main area
+            if (stationFullName.includes("அனைத்து மகளிர்")) {
+                const areaMatch = location.match(/(.+?)\s+காவல்/);
+                if (areaMatch) {
+                    location = areaMatch[1].trim();
+                }
+            }
+            
+            // If location is empty or too short, use station code area
+            if (!location || location.length < 3) {
+                switch(stationCode) {
+                    case 'B1': case 'B2': case 'B3': case 'B4': return 'சென்னை';
+                    case 'C1': case 'C2': case 'C3': case 'C4': case 'C5': return 'சென்னை';
+                    case 'D1': return 'திருப்பள்ளிக்கேணி';
+                    case 'D2': case 'D6': case 'D7': return 'அண்ணா சாலை';
+                    case 'D3': case 'E1': case 'E5': return 'மயிலாப்பூர்';
+                    case 'D5': return 'மெரினா';
+                    case 'E2': return 'ராயப்பேட்டை';
+                    case 'E3': case 'E4': return 'தேனாம்பேட்டை';
+                    case 'F2': case 'F6': case 'F7': return 'எழும்பூர்';
+                    case 'F3': return 'நுங்கம்பாக்கம்';
+                    case 'F4': return 'தௌசண்ட் லைட்ஸ்';
+                    case 'F5': case 'G7': return 'சேத்துப்பட்டு';
+                    case 'G1': return 'வேப்பேரி';
+                    case 'G2': return 'பெரியமேடு';
+                    case 'G3': case 'G4': case 'G6': return 'கிளிப்பாக்';
+                    case 'H1': case 'H3': case 'H4': case 'H5': return 'வண்ணாரப்பேட்டை';
+                    case 'H8': return 'திருவொற்றியூர்';
+                    case 'J1': return 'சைதாப்பேட்டை';
+                    case 'J2': case 'J5': return 'அடையாறு';
+                    case 'J3': return 'கிண்டி';
+                    case 'J6': return 'திருவான்மியூர்';
+                    case 'J7': return 'வேளச்சேரி';
+                    case 'K1': return 'செம்பியம்';
+                    case 'K2': return 'அயனாவரம்';
+                    case 'K3': return 'அமைஞ்சிக்கரை';
+                    case 'K4': case 'K9': return 'அண்ணா நகர்';
+                    case 'K10': return 'கோயம்பேடு';
+                    case 'K8': return 'அரும்பாக்கம்';
+                    case 'N1': return 'ராயபுரம்';
+                    case 'P1': case 'P2': case 'P4': return 'புளியந்தோப்பு';
+                    case 'P3': return 'வியாசர்பாடி';
+                    case 'R1': case 'R4': return 'மாம்பலம்';
+                    case 'R2': case 'R6': return 'கோடம்பாக்கம்';
+                    case 'R3': return 'அசோக் நகர்';
+                    case 'R7': return 'கேகே நகர்';
+                    case 'V1': return 'வில்லிவாக்கம்';
+                    case 'V2': return 'விருகம்பாக்கம்';
+                    case 'V5': return 'திருமங்கலம்';
+                    case 'V6': return 'கொளத்தூர்';
+                    default: return 'சென்னை';
+                }
+            }
+            
+            return location;
+        }
+
         // Function to get full name with title (for witness only)
         function getFullName(title, name) {
             if (!title || title === '(இல்லை)') {
@@ -444,8 +766,8 @@
 
         // Function to extract police station name without code and "காவல் நிலையம்"
         function extractStationName(fullText) {
-            // Remove code (everything before " - ")
-            const withoutCode = fullText.replace(/^[A-Z0-9]+\s*-\s*/, '');
+            // Remove code (everything before first space)
+            const withoutCode = fullText.replace(/^[A-Z0-9]+\s*/, '');
             
             // Remove "காவல் நிலையம்" at the end
             const withoutStationSuffix = withoutCode.replace(/\s*காவல் நிலையம்\s*$/, '');
@@ -455,9 +777,27 @@
 
         // Function to extract police station code
         function extractStationCode(fullText) {
-            // Extract code (everything before " - ")
-            const match = fullText.match(/^([A-Z0-9]+)\s*-\s*/);
+            // Extract code (everything before first space)
+            const match = fullText.match(/^([A-Z0-9]+)\s*/);
             return match ? match[1] : '';
+        }
+
+        // Function to extract station name without "காவல் நிலையம்" for use in letter body
+        function getStationNameForLetterBody(fullText) {
+            const stationCode = extractStationCode(fullText);
+            const stationName = extractStationName(fullText);
+            
+            // For G7 station, we want to show "G7 சேத்துப்பட்டு" in the body
+            if (stationCode === 'G7') {
+                return 'G7 சேத்துப்பட்டு';
+            }
+            
+            // For other stations, use the code + name without "காவல் நிலையம்"
+            if (stationCode && stationName) {
+                return `${stationCode} ${stationName}`;
+            }
+            
+            return stationName || 'சேத்துப்பட்டு';
         }
 
         // Function to extract Tahsildar office from selection
@@ -496,7 +836,7 @@
             return pincodeMap[collectorName] || "600031";
         }
 
-        // Function to get location name for the third line
+        // Function to get location name for the third line (for collector)
         function getLocationForCollector(collectorName) {
             // For திருவொற்றியூர், show "திருவொற்றியூர்"
             if (collectorName === "திருவொற்றியூர் வட்டாட்சியர்") {
@@ -511,10 +851,72 @@
             return "சேத்துப்பட்டு";
         }
 
+        // Function to populate Chennai police stations
+        function populateChennaiStations() {
+            const chennaiStationsGroup = document.getElementById('chennaiStations');
+            chennaiStationsGroup.innerHTML = '';
+            
+            chennaiPoliceStations.forEach(station => {
+                const option = document.createElement('option');
+                option.value = station;
+                option.textContent = station;
+                chennaiStationsGroup.appendChild(option);
+            });
+            
+            // Set default selection
+            if (chennaiPoliceStations.length > 0) {
+                document.getElementById('policeStation').value = chennaiPoliceStations[0];
+            }
+        }
+
+        // Function to populate other stations (same as Chennai for now)
+        function populateOtherStations() {
+            const otherStationsGroup = document.getElementById('otherStations');
+            otherStationsGroup.innerHTML = '';
+            
+            chennaiPoliceStations.forEach(station => {
+                const option = document.createElement('option');
+                option.value = station;
+                option.textContent = station;
+                otherStationsGroup.appendChild(option);
+            });
+        }
+
+        // Function to filter police stations based on district selection
+        function filterPoliceStations() {
+            const district = document.getElementById('districtSelect').value;
+            const chennaiStationsGroup = document.getElementById('chennaiStations');
+            const otherStationsGroup = document.getElementById('otherStations');
+            const policeStationSelect = document.getElementById('policeStation');
+            
+            if (district === 'chennai') {
+                // Show Chennai stations, hide others
+                chennaiStationsGroup.style.display = '';
+                otherStationsGroup.style.display = 'none';
+                
+                // Set default selection
+                if (chennaiPoliceStations.length > 0) {
+                    policeStationSelect.value = chennaiPoliceStations[0];
+                }
+            } 
+            else if (district === 'other') {
+                // Show other stations, hide Chennai
+                chennaiStationsGroup.style.display = 'none';
+                otherStationsGroup.style.display = '';
+                
+                // Set default selection
+                if (chennaiPoliceStations.length > 0) {
+                    policeStationSelect.value = chennaiPoliceStations[0];
+                }
+            }
+            
+            updatePreview();
+        }
+
         // Function to update preview with form values
         function updatePreview() {
             // Get form values
-            const policeStationFull = document.getElementById('policeStation').value || 'G1 - சேத்துப்பட்டு காவல் நிலையம்';
+            const policeStationFull = document.getElementById('policeStation').value || chennaiPoliceStations[0] || 'AWPS பேரவள்ளூர்';
             
             // Extract just the station name without code and "காவல் நிலையம்"
             const policeStationName = extractStationName(policeStationFull);
@@ -522,8 +924,17 @@
             // Extract the police station code
             const policeStationCode = extractStationCode(policeStationFull);
             
-            // Get the full station name with code for display in the station line
+            // Get the full station name for display in the station line
             const policeStationFullName = policeStationFull;
+            
+            // Get station name for letter body (without "காவல் நிலையம்")
+            const stationNameForBody = getStationNameForLetterBody(policeStationFull);
+            
+            // Get pincode for the selected police station
+            const stationPincode = getPincodeForPoliceStation(policeStationFull);
+            
+            // Get location name for the police station
+            const stationLocation = getLocationForPoliceStation(policeStationFull);
 
             // Get வட்டாட்சியர் - FROM DROPDOWN
             const collectorSelection = document.getElementById('collectorName').value || 'வட்டாட்சியர் அவர்கள்';
@@ -537,7 +948,7 @@
             // Get pincode based on collector selection
             const receiverPincode = getPincodeForCollector(collectorSelection);
             
-            // Get location name for third line
+            // Get location name for third line (for collector)
             const receiverLocation = getLocationForCollector(collectorSelection);
 
             // Get சாட்சி எண்
@@ -564,23 +975,11 @@
                 formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}.${(dateObj.getMonth()+1).toString().padStart(2, '0')}.${dateObj.getFullYear()}`;
             }
 
-            // Create the police station reference - KEEP ENGLISH CODE
-            const stationReference = `${policeStationCode} ${policeStationName}`;
-            
             // Update additional info with the selected police station
-            // Replace "பு7 செத்துப்பட்டு" with the English code and station name
-            // First, try to replace the Tamil pattern "பு7 செத்துப்பட்டு"
-            const tamilPattern = /பு\d+\s+செத்துப்பட்டு/g;
-            additionalInfo = additionalInfo.replace(tamilPattern, stationReference);
-            
-            // Also replace "பு7" alone if it exists
-            const tamilCodePattern = /பு\d+/g;
-            additionalInfo = additionalInfo.replace(tamilCodePattern, policeStationCode);
-            
-            // Replace "செத்துப்பட்டு காவல் நிலைய" with the selected station
-            additionalInfo = additionalInfo.replace(/செத்துப்பட்டு காவல் நிலைய/g, `${policeStationName} காவல் நிலைய`);
-            
-            // Replace "செத்துப்பட்டு" if it appears alone
+            // Replace "பு7 செத்துப்பட்டு" with the station name for body
+            additionalInfo = additionalInfo.replace(/பு7 செத்துப்பட்டு/g, stationNameForBody);
+            additionalInfo = additionalInfo.replace(/பு7/g, policeStationCode || '');
+            additionalInfo = additionalInfo.replace(/செத்துப்பட்டு காவல் நிலைய/g, `${stationNameForBody}`);
             additionalInfo = additionalInfo.replace(/செத்துப்பட்டு/g, policeStationName);
 
             // Create preview HTML
@@ -599,7 +998,7 @@
                         <div style="line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif;">
                             <div>காவல் ஆய்வாளர்</div>
                             <div>${policeStationFullName}</div>
-                            <div>${policeStationName}, சென்னை 600031</div>
+                            <div>${stationLocation}, சென்னை ${stationPincode}</div>
                         </div>
                     </div>
                     
@@ -671,7 +1070,8 @@
 
         // Function to reset form
         function resetForm() {
-            document.getElementById('policeStation').value = 'G1 - சேத்துப்பட்டு காவல் நிலையம்';
+            document.getElementById('districtSelect').value = 'chennai';
+            filterPoliceStations();
             
             // வட்டாட்சியர் - RESET TO DEFAULT
             document.getElementById('collectorName').value = 'வட்டாட்சியர் அவர்கள்';
@@ -825,6 +1225,14 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Populate both station lists with Chennai stations
+            populateChennaiStations();
+            populateOtherStations();
+            
+            // Set default district to Chennai
+            document.getElementById('districtSelect').value = 'chennai';
+            
+            // Initialize the form
             updatePreview();
 
             // Add CSS for animation
