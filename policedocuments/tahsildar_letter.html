@@ -121,6 +121,14 @@
             min-height: 60px;
         }
 
+        /* Text input fields for other districts */
+        .other-district-input {
+            font-size: 14px;
+            padding: 12px;
+            min-height: 80px;
+            resize: vertical;
+        }
+
         /* Controls */
         .controls {
             margin-top: 20px;
@@ -154,7 +162,7 @@
             flex: 1;
         }
 
-        /* Small label for age and father fields */
+        /* Small label for age and father/husband fields */
         .small-label {
             font-size: 12px;
             font-weight: bold;
@@ -166,6 +174,39 @@
         /* District selector */
         .district-selector {
             margin-bottom: 15px;
+        }
+
+        /* Relationship selector */
+        .relationship-selector {
+            margin-bottom: 15px;
+        }
+
+        .relationship-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .relationship-btn {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+
+        .relationship-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .relationship-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
         }
 
         /* Responsive */
@@ -213,7 +254,7 @@
                 <!-- District Selector -->
                 <div class="mb-3 district-selector">
                     <label class="form-label">மாவட்டத்தை தேர்ந்தெடுக்கவும்:</label>
-                    <select class="form-select" id="districtSelect" onchange="filterPoliceStations()">
+                    <select class="form-select" id="districtSelect" onchange="toggleDistrictFields()">
                         <option value="chennai" selected>சென்னை</option>
                         <option value="other">பிற மாவட்டங்கள்</option>
                     </select>
@@ -222,41 +263,59 @@
                 <!-- Form Fields -->
                 <div class="mb-3">
                     <label class="form-label">காவல் நிலையத்தின் பெயர்:</label>
-                    <select class="form-select" id="policeStation" onchange="updatePreview()">
-                        <!-- Chennai Police Stations (Default) -->
-                        <optgroup label="சென்னை காவல் நிலையங்கள்" id="chennaiStations">
-                            <!-- These will be populated dynamically -->
-                        </optgroup>
-                        
-                        <!-- Other Police Stations (Hidden by default) -->
-                        <optgroup label="பிற காவல் நிலையங்கள்" id="otherStations" style="display: none;">
-                            <!-- These will be populated dynamically from the same Chennai list -->
-                        </optgroup>
-                    </select>
+                    
+                    <!-- Chennai District - Dropdown -->
+                    <div id="chennaiPoliceStationContainer">
+                        <select class="form-select" id="policeStationDropdown" onchange="updatePreview()">
+                            <option value="" selected>-- தேர்ந்தெடுக்கவும் --</option>
+                            <!-- Chennai Police Stations (Default) -->
+                            <optgroup label="சென்னை காவல் நிலையங்கள்" id="chennaiStations">
+                                <!-- These will be populated dynamically -->
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <!-- Other Districts - Text Input -->
+                    <div id="otherPoliceStationContainer" style="display: none;">
+                        <textarea class="form-control other-district-input" id="policeStationText" 
+                                  placeholder="காவல் நிலையத்தின் முழுப் பெயரை உள்ளிடவும்..." 
+                                  oninput="updatePreview()"></textarea>
+                    </div>
                 </div>
 
                 <!-- வட்டாட்சியர் - SELECTABLE DROPDOWN -->
                 <div class="mb-3">
                     <label class="form-label">எழும்புர் வட்டாட்சியர்:</label>
-                    <select class="form-select" id="collectorName" onchange="updatePreview()">
-                        <option value="வட்டாட்சியர் அவர்கள்">-- தேர்ந்தெடுக்கவும் --</option>
-                        <option value="சென்னை (வடக்கு) வட்டாட்சியர்">சென்னை (வடக்கு) வட்டாட்சியர்</option>
-                        <option value="திருவொற்றியூர் வட்டாட்சியர்">திருவொற்றியூர் வட்டாட்சியர்</option>
-                        <option value="புறாவாக்கம் வட்டாட்சியர்">புறாவாக்கம் வட்டாட்சியர்</option>
-                        <option value="பெரம்பூர் வட்டாட்சியர்">பெரம்பூர் வட்டாட்சியர்</option>
-                        <option value="மாதவரம் வட்டாட்சியர்">மாதவரம் வட்டாட்சியர்</option>
-                        <option value="ஆயிரம் விளக்கு வட்டாட்சியர்">ஆயிரம் விளக்கு வட்டாட்சியர்</option>
-                        <option value="வில்லிவாக்கம் வட்டாட்சியர்">வில்லிவாக்கம் வட்டாட்சியர்</option>
-                        <option value="அம்பத்தூர் வட்டாட்சியர்">அம்பத்தூர் வட்டாட்சியர்</option>
-                        <option value="எழும்பூர் வட்டாட்சியர்">எழும்பூர் வட்டாட்சியர்</option>
-                        <option value="மதுரவோயல் வட்டாட்சியர்">மதுரவோயல் வட்டாட்சியர்</option>
-                        <option value="மாம்பழம் வட்டாட்சியர்">மாம்பழம் வட்டாட்சியர்</option>
-                        <option value="மயிலாப்பூர் வட்டாட்சியர்">மயிலாப்பூர் வட்டாட்சியர்</option>
-                        <option value="வேளச்சேரி வட்டாட்சியர்">வேளச்சேரி வட்டாட்சியர்</option>
-                        <option value="தி.நகர் வட்டாட்சியர்">தி.நகர் வட்டாட்சியர்</option>
-                        <option value="அலந்தூர் வட்டாட்சியர்">அலந்தூர் வட்டாட்சியர்</option>
-                        <option value="சோழிங்கநல்லூர் வட்டாட்சியர்">சோழிங்கநல்லூர் வட்டாட்சியர்</option>
-                    </select>
+                    
+                    <!-- Chennai District - Dropdown -->
+                    <div id="chennaiCollectorContainer">
+                        <select class="form-select" id="collectorNameDropdown" onchange="updatePreview()">
+                            <option value="வட்டாட்சியர் அவர்கள்" selected>-- தேர்ந்தெடுக்கவும் --</option>
+                            <option value="சென்னை (வடக்கு) வட்டாட்சியர்">சென்னை (வடக்கு) வட்டாட்சியர்</option>
+                            <option value="திருவொற்றியூர் வட்டாட்சியர்">திருவொற்றியூர் வட்டாட்சியர்</option>
+                            <option value="புறாவாக்கம் வட்டாட்சியர்">புறாவாக்கம் வட்டாட்சியர்</option>
+                            <option value="பெரம்பூர் வட்டாட்சியர்">பெரம்பூர் வட்டாட்சியர்</option>
+                            <option value="மாதவரம் வட்டாட்சியர்">மாதவரம் வட்டாட்சியர்</option>
+                            <option value="ஆயிரம் விளக்கு வட்டாட்சியர்">ஆயிரம் விளக்கு வட்டாட்சியர்</option>
+                            <option value="வில்லிவாக்கம் வட்டாட்சியர்">வில்லிவாக்கம் வட்டாட்சியர்</option>
+                            <option value="அம்பத்தூர் வட்டாட்சியர்">அம்பத்தூர் வட்டாட்சியர்</option>
+                            <option value="எழும்பூர் வட்டாட்சியர்">எழும்பூர் வட்டாட்சியர்</option>
+                            <option value="மதுரவோயல் வட்டாட்சியர்">மதுரவோயல் வட்டாட்சியர்</option>
+                            <option value="மாம்பழம் வட்டாட்சியர்">மாம்பழம் வட்டாட்சியர்</option>
+                            <option value="மயிலாப்பூர் வட்டாட்சியர்">மயிலாப்பூர் வட்டாட்சியர்</option>
+                            <option value="வேளச்சேரி வட்டாட்சியர்">வேளச்சேரி வட்டாட்சியர்</option>
+                            <option value="தி.நகர் வட்டாட்சியர்">தி.நகர் வட்டாட்சியர்</option>
+                            <option value="அலந்தூர் வட்டாட்சியர்">அலந்தூர் வட்டாட்சியர்</option>
+                            <option value="சோழிங்கநல்லூர் வட்டாட்சியர்">சோழிங்கநல்லூர் வட்டாட்சியர்</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Other Districts - Text Input -->
+                    <div id="otherCollectorContainer" style="display: none;">
+                        <textarea class="form-control other-district-input" id="collectorNameText" 
+                                  placeholder="வட்டாட்சியர் அலுவலகத்தின் முழுப் பெயரை உள்ளிடவும்..." 
+                                  oninput="updatePreview()"></textarea>
+                    </div>
                 </div>
 
                 <!-- சாட்சி எண் -->
@@ -283,8 +342,16 @@
                             <input type="text" class="form-control" id="witnessAge" value="31" oninput="updatePreview()" placeholder="எ.கா: 31">
                         </div>
                         <div class="col-6">
-                            <label class="small-label">தந்தை பெயர்:</label>
-                            <input type="text" class="form-control" id="witnessFather" value="டி. சந்திரன்" oninput="updatePreview()" placeholder="எ.கா: டி. சந்திரன்">
+                            <!-- Relationship Selector -->
+                            <div class="relationship-selector">
+                                <label class="small-label">தொடர்பு:</label>
+                                <div class="relationship-buttons">
+                                    <div class="relationship-btn active" id="fatherBtn" onclick="selectRelationship('father')">தந்தை பெயர்</div>
+                                    <div class="relationship-btn" id="husbandBtn" onclick="selectRelationship('husband')">கணவர் பெயர்</div>
+                                </div>
+                                <input type="text" class="form-control" id="witnessRelationship" value="டி. சந்திரன்" oninput="updatePreview()" placeholder="தந்தை/கணவர் பெயர்">
+                                <input type="hidden" id="relationshipType" value="father">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -311,7 +378,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">கூடுதல் விளக்கம்:</label>
-                    <textarea class="form-control" id="additionalInfo" rows="3" oninput="updatePreview()" placeholder="கூடுதல் விளக்கங்களை இங்கே உள்ளிடவும்...">பார்வையில் கண்ட பு7 செத்துப்பட்டு காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் திருமதி மாலதி, வயது 31, த/பெ டி. சந்திரன், எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031 என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.</textarea>
+                    <textarea class="form-control" id="additionalInfo" rows="3" oninput="updatePreview()" placeholder="கூடுதல் விளக்கங்களை இங்கே உள்ளிடவும்...">பார்வையில் கண்ட AWPS பேரவள்ளூர் காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் திருமதி மாலதி, வயது 31, த/பெ டி. சந்திரன், எண் 7, வள்ளுவர் சாலை, பேரவள்ளூர், சென்னை 600031 என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.</textarea>
                 </div>
 
                 <!-- Controls -->
@@ -496,264 +563,31 @@
             "W9 அனைத்து மகளிர் காவல் நிலையம் வில்லிவாக்கம்"
         ];
 
-        // Chennai Area Pincode Mapping based on station codes/names
-        const chennaiAreaPincodes = {
-            // B Series - George Town, North Beach, Fort Area
-            "B1": "600001",  // வடக்குக் கடற்கரை - North Beach
-            "B2": "600001",  // எஸ்பிளனேட் - Esplanade
-            "B3": "600001",  // கோட்டை செயின்ட் ஜார்ஜ் - Fort St. George
-            "B4": "600001",  // உயர்நீதிமன்ற - High Court
+        // Function to select relationship type
+        function selectRelationship(type) {
+            const fatherBtn = document.getElementById('fatherBtn');
+            const husbandBtn = document.getElementById('husbandBtn');
+            const relationshipInput = document.getElementById('witnessRelationship');
             
-            // C Series - Broadway, Parrys, Flower Bazaar
-            "C1": "600001",  // பூக்கடை - Flower Bazaar
-            "C2": "600001",  // எலிபெண்ட் கேட் - Elephant Gate
-            "C3": "600001",  // செவன் வெல்ஸ் - Seven Wells
-            "C4": "600001",  // அரசு பொது மருத்துவமனை - Govt General Hospital
-            "C5": "600001",  // கொத்தவால் சாவடி - Kothaval Chavadi
-            
-            // D Series - Triplicane, Anna Salai, Marina
-            "D1": "600005",  // திருப்பள்ளிக்கேணி - Triplicane
-            "D2": "600002",  // அண்ணா சாலை - Anna Salai
-            "D3": "600004",  // ஐஸ் ஹவுஸ் - Ice House
-            "D4": "600001",  // ஜாம் பஜார் - Zam Bazaar
-            "D5": "600005",  // மெரினா - Marina
-            "D6": "600002",  // அண்ணா சதுக்கம் - Anna Square
-            "D7": "600002",  // அரசு எஸ்டேட் - Government Estate
-            "D8": "600005",  // கஸ்தூரிபாய் காந்தி மருத்துவமனை - Kasturba Gandhi Hospital
-            
-            // E Series - Mylapore, Royapettah, Teynampet
-            "E1": "600004",  // மயிலாப்பூர் - Mylapore
-            "E2": "600014",  // ராயப்பேட்டை - Royapettah
-            "E3": "600018",  // தேனாம்பேட்டை - Teynampet
-            "E4": "600018",  // அபிராமபுரம் - Abiramapuram
-            "E5": "600004",  // பட்டினப்பாக்கம் - Pattinappakkam
-            
-            // F Series - Chintadripet, Egmore, Nungambakkam
-            "F1": "600002",  // சிந்தாதிரிப்பேட்டை - Chintadripet
-            "F2": "600008",  // எழும்பூர் - Egmore
-            "F3": "600034",  // நுங்கம்பாக்கம் - Nungambakkam
-            "F4": "600006",  // தௌசண்ட் லைட்ஸ் - Thousand Lights
-            "F5": "600031",  // சேத்துப்பட்டு - Chetput
-            "F6": "600008",  // மியூசியம் - Museum
-            "F7": "600008",  // அரசு மகளிர் குழந்தைகள் மருத்துவமனை - Govt Women Children Hospital
-            
-            // G Series - Vepery, Periamet, Kilpauk
-            "G1": "600007",  // வேப்பேரி - Vepery
-            "G2": "600003",  // பெரியமேடு - Periamet
-            "G3": "600010",  // கிளிப்பாக் - Kilpauk
-            "G4": "600010",  // மனநல மருத்துவமனை - Mental Hospital
-            "G5": "600035",  // செயலக காலனி - Secretariat Colony
-            "G6": "600010",  // கிளிப்பாக் மருத்துவக் கல்லூரி - Kilpauk Medical College
-            "G7": "600031",  // சேத்துபட்டு - Chetpet
-            
-            // H Series - Washermanpet, Tondiarpet, Korukkupet
-            "H1": "600021",  // பழைய வண்ணாரப்பேட்டை - Old Washermanpet
-            "H2": "600001",  // ஸ்டான்லி மருத்துவமனை - Stanley Hospital
-            "H3": "600021",  // தொண்டையார்பேட்டை - Tondiarpet
-            "H4": "600021",  // கொருக்குப்பேட்டை - Korukkupet
-            "H5": "600021",  // புதிய வண்ணாரப்பேட்டை - New Washermanpet
-            "H6": "600012",  // டாக்டர் ராதாகிருஷ்ணன் நகர் - Dr. Radhakrishnan Nagar
-            "H8": "600019",  // திருவொற்றியூர் - Thiruvottiyur
-            
-            // J Series - Saidapet, Adyar, Guindy
-            "J1": "600015",  // சைதாப்பேட்டை - Saidapet
-            "J2": "600020",  // அடையாறு - Adyar
-            "J3": "600032",  // கிண்டி - Guindy
-            "J4": "600085",  // கொட்டூர்புரம் - Kotturpuram
-            "J5": "600020",  // சாஸ்திரி நகர் - Sastri Nagar
-            "J6": "600041",  // திருவான்மியூர் - Thiruvanmiyur
-            "J7": "600042",  // வேளச்சேரி - Velachery
-            "J8": "600041",  // நீலாங்கரை - Neelankarai
-            "J9": "600096",  // துரைப்பாக்கம் - Thuraipakkam
-            "J13": "600113", // தரமணி - Tharamani
-            
-            // K Series - Sembium, Ayanavaram, Anna Nagar
-            "K1": "600011",  // செம்பியம் - Sembium
-            "K2": "600023",  // அயனாவரம் - Ayanavaram
-            "K3": "600029",  // அமைஞ்சிக்கரை - Aminjikarai
-            "K4": "600040",  // அண்ணா நகர் - Anna Nagar
-            "K5": "600082",  // பேரவள்ளூர் - Peravallur
-            "K6": "600021",  // டிபி சத்திரம் - T.P. Chatram
-            "K7": "600038",  // ICF - Integral Coach Factory
-            "K8": "600106",  // அரும்பாக்கம் - Arumbakkam
-            "K9": "600039",  // திரு வி க நகர் - Thiru Vi Ka Nagar
-            "K10": "600107", // கோயம்பேடு - Koyambedu
-            "K11": "600092", // CMBT - Chennai Mofussil Bus Terminus
-            
-            // M Series - Harbour
-            "M1": "600001",  // ஹார்பர் - Harbour
-            "M2": "600001",  // வாட்டர் பிரோன் - Water Brone
-            
-            // N Series - Royapuram, Kasimedu
-            "N1": "600013",  // ராயபுரம் - Royapuram
-            "N2": "600001",  // காசிமேடு - Kasimedu
-            "N3": "600001",  // முத்தியால்பேட்டை - Muthialpet
-            "N4": "600001",  // மீன்பிடி துறைமுக - Fishing Harbour
-            "N5": "600013",  // RSRM மருத்துவமனை - R.S.R.M. Hospital
-            
-            // P Series - Pulianthope, Otteri, Vyasarpadi
-            "P1": "600012",  // புளியந்தோப்பு - Pulianthope
-            "P2": "600012",  // ஒட்டேரி - Otteri
-            "P3": "600039",  // வியாசர்பாடி - Vyasarpadi
-            "P4": "600012",  // பேசின் பிரிட்ஜ் - Basin Bridge
-            "P5": "600039",  // MKB நகர் - M.K.B. Nagar
-            "P6": "600118",  // கொடுங்கையூர் - Kodungaiyur
-            
-            // R Series - Mambalam, Kodambakkam, T.Nagar
-            "R1": "600017",  // மாம்பலம் - Mambalam
-            "R2": "600024",  // கோடம்பாக்கம் - Kodambakkam
-            "R3": "600083",  // அசோக் நகர் - Ashok Nagar
-            "R4": "600017",  // பாண்டி பஜார் - Pondy Bazaar
-            "R5": "600094",  // சூளைமேடு - Choolaimedu
-            "R6": "600024",  // குமரன் காலனி - Kumaran Colony
-            "R7": "600078",  // கேகே நகர் - K.K. Nagar
-            "R9": "600087",  // வளசரவாக்கம் - Valasaravakkam
-            "R10": "600095", // எம்ஜிஆர் நகர் - M.G.R. Nagar
-            
-            // V Series - Villivakkam, Virugambakkam
-            "V1": "600049",  // வில்லிவாக்கம் - Villivakkam
-            "V2": "600092",  // விருகம்பாக்கம் - Virugambakkam
-            "V3": "600078",  // ஜே ஜே நகர் - J.J. Nagar
-            "V4": "600048",  // ராஜமங்கலம் - Rajamangalam
-            "V5": "600040",  // திருமங்கலம் - Thirumangalam
-            "V6": "600099",  // கொளத்தூர் - Kolathur
-            
-            // W Series - Women Police Stations (use same pincode as corresponding area)
-            "W1": "600006",  // தௌசண்ட் லைட்ஸ் - Thousand Lights
-            "W2": "600020",  // அடையாறு - Adyar
-            "W4": "600010",  // கிளிப்பாக் - Kilpauk
-            "W5": "600007",  // வேப்பேரி - Vepery
-            "W6": "600023",  // அயனாவரம் - Ayanavaram
-            "W7": "600040",  // அண்ணா நகர் - Anna Nagar
-            "W8": "600040",  // திருமங்கலம் - Thirumangalam
-            "W9": "600049",  // வில்லிவாக்கம் - Villivakkam
-            "W10": "600001", // பூக்கடை - Flower Bazaar
-            "W11": "600001", // உயர்நீதிமன்றம் - High Court
-            "W12": "600001", // ஹார்பர் - Harbour
-            "W13": "600021", // வண்ணாரப்பேட்டை - Washermenpet
-            "W14": "600019", // திருவொற்றியூர் - Thiruvottiyur
-            "W15": "600013", // ராயபுரம் - Royapuram
-            "W16": "600012", // புளியந்தோப்பு - Pulianthope
-            "W18": "600039", // MKB நகர் - M.K.B. Nagar
-            "W19": "600020", // அடையாறு - Adyar
-            "W20": "600015", // சைதாப்பேட்டை - Saidapet
-            "W21": "600032", // கிண்டி - Guindy
-            "W22": "600004", // மயிலாப்பூர் - Mylapore
-            "W23": "600014", // ராயப்பேட்டை - Royapettah
-            "W24": "600018", // தேனாம்பேட்டை - Teynampet
-            "W25": "600017", // தி நகர் - T. Nagar
-            "W26": "600083", // அசோக் நகர் - Ashok Nagar
-            "W27": "600026", // வடபழனி - Vadapalani
-            "W35": "600107", // கோயம்பேடு - Koyambedu
-            "W38": "600099", // கொளத்தூர் - Kolathur
-            
-            // Default for AWPS and others
-            "AWPS": "600082", // பேரவள்ளூர் - Peravallur
-        };
-
-        // Function to get pincode for police station
-        function getPincodeForPoliceStation(stationFullName) {
-            // Extract the station code
-            const stationCode = extractStationCode(stationFullName);
-            
-            // Check if we have a pincode for this station code
-            if (stationCode && chennaiAreaPincodes[stationCode]) {
-                return chennaiAreaPincodes[stationCode];
+            if (type === 'father') {
+                fatherBtn.classList.add('active');
+                husbandBtn.classList.remove('active');
+                document.getElementById('relationshipType').value = 'father';
+                relationshipInput.placeholder = 'தந்தை பெயர்';
+            } else if (type === 'husband') {
+                fatherBtn.classList.remove('active');
+                husbandBtn.classList.add('active');
+                document.getElementById('relationshipType').value = 'husband';
+                relationshipInput.placeholder = 'கணவர் பெயர்';
             }
             
-            // Check for AWPS stations
-            if (stationFullName.includes("AWPS")) {
-                // Try to extract code from AWPS name
-                const awpsMatch = stationFullName.match(/(W\d+)/);
-                if (awpsMatch && chennaiAreaPincodes[awpsMatch[1]]) {
-                    return chennaiAreaPincodes[awpsMatch[1]];
-                }
-                return chennaiAreaPincodes["AWPS"] || "600082";
-            }
-            
-            // Check for TIW stations
-            if (stationFullName.includes("TIW")) {
-                const tiwMatch = stationFullName.match(/([A-Z]\d+)\s+TIW/);
-                if (tiwMatch && chennaiAreaPincodes[tiwMatch[1]]) {
-                    return chennaiAreaPincodes[tiwMatch[1]];
-                }
-            }
-            
-            // Default pincode for Chennai
-            return "600031";
+            updatePreview();
         }
 
-        // Function to get area/location name for display
-        function getLocationForPoliceStation(stationFullName) {
-            const stationCode = extractStationCode(stationFullName);
-            const stationName = extractStationName(stationFullName);
-            
-            // Extract the main location from the station name
-            // Remove "காவல் நிலையம்" and any other suffixes
-            let location = stationName
-                .replace(/காவல் நிலையம்/g, '')
-                .replace(/அவுட்போஸ்ட்/g, '')
-                .replace(/போக்குவரத்து விசாரணை/g, '')
-                .replace(/அனைத்து மகளிர்/g, '')
-                .replace(/AWPS/g, '')
-                .replace(/TIW/g, '')
-                .trim();
-            
-            // For women police stations, add the main area
-            if (stationFullName.includes("அனைத்து மகளிர்")) {
-                const areaMatch = location.match(/(.+?)\s+காவல்/);
-                if (areaMatch) {
-                    location = areaMatch[1].trim();
-                }
-            }
-            
-            // If location is empty or too short, use station code area
-            if (!location || location.length < 3) {
-                switch(stationCode) {
-                    case 'B1': case 'B2': case 'B3': case 'B4': return 'சென்னை';
-                    case 'C1': case 'C2': case 'C3': case 'C4': case 'C5': return 'சென்னை';
-                    case 'D1': return 'திருப்பள்ளிக்கேணி';
-                    case 'D2': case 'D6': case 'D7': return 'அண்ணா சாலை';
-                    case 'D3': case 'E1': case 'E5': return 'மயிலாப்பூர்';
-                    case 'D5': return 'மெரினா';
-                    case 'E2': return 'ராயப்பேட்டை';
-                    case 'E3': case 'E4': return 'தேனாம்பேட்டை';
-                    case 'F2': case 'F6': case 'F7': return 'எழும்பூர்';
-                    case 'F3': return 'நுங்கம்பாக்கம்';
-                    case 'F4': return 'தௌசண்ட் லைட்ஸ்';
-                    case 'F5': case 'G7': return 'சேத்துப்பட்டு';
-                    case 'G1': return 'வேப்பேரி';
-                    case 'G2': return 'பெரியமேடு';
-                    case 'G3': case 'G4': case 'G6': return 'கிளிப்பாக்';
-                    case 'H1': case 'H3': case 'H4': case 'H5': return 'வண்ணாரப்பேட்டை';
-                    case 'H8': return 'திருவொற்றியூர்';
-                    case 'J1': return 'சைதாப்பேட்டை';
-                    case 'J2': case 'J5': return 'அடையாறு';
-                    case 'J3': return 'கிண்டி';
-                    case 'J6': return 'திருவான்மியூர்';
-                    case 'J7': return 'வேளச்சேரி';
-                    case 'K1': return 'செம்பியம்';
-                    case 'K2': return 'அயனாவரம்';
-                    case 'K3': return 'அமைஞ்சிக்கரை';
-                    case 'K4': case 'K9': return 'அண்ணா நகர்';
-                    case 'K10': return 'கோயம்பேடு';
-                    case 'K8': return 'அரும்பாக்கம்';
-                    case 'N1': return 'ராயபுரம்';
-                    case 'P1': case 'P2': case 'P4': return 'புளியந்தோப்பு';
-                    case 'P3': return 'வியாசர்பாடி';
-                    case 'R1': case 'R4': return 'மாம்பலம்';
-                    case 'R2': case 'R6': return 'கோடம்பாக்கம்';
-                    case 'R3': return 'அசோக் நகர்';
-                    case 'R7': return 'கேகே நகர்';
-                    case 'V1': return 'வில்லிவாக்கம்';
-                    case 'V2': return 'விருகம்பாக்கம்';
-                    case 'V5': return 'திருமங்கலம்';
-                    case 'V6': return 'கொளத்தூர்';
-                    default: return 'சென்னை';
-                }
-            }
-            
-            return location;
+        // Function to get relationship prefix
+        function getRelationshipPrefix() {
+            const type = document.getElementById('relationshipType').value;
+            return type === 'father' ? 'த/பெ' : 'க/பெ';
         }
 
         // Function to get full name with title (for witness only)
@@ -766,17 +600,25 @@
 
         // Function to extract police station name without code and "காவல் நிலையம்"
         function extractStationName(fullText) {
+            if (!fullText || fullText === "") {
+                return 'காவல் நிலையம்';
+            }
+            
             // Remove code (everything before first space)
             const withoutCode = fullText.replace(/^[A-Z0-9]+\s*/, '');
             
             // Remove "காவல் நிலையம்" at the end
             const withoutStationSuffix = withoutCode.replace(/\s*காவல் நிலையம்\s*$/, '');
             
-            return withoutStationSuffix.trim() || 'சேத்துப்பட்டு';
+            return withoutStationSuffix.trim() || 'காவல் நிலையம்';
         }
 
         // Function to extract police station code
         function extractStationCode(fullText) {
+            if (!fullText || fullText === "") {
+                return '';
+            }
+            
             // Extract code (everything before first space)
             const match = fullText.match(/^([A-Z0-9]+)\s*/);
             return match ? match[1] : '';
@@ -784,6 +626,10 @@
 
         // Function to extract station name without "காவல் நிலையம்" for use in letter body
         function getStationNameForLetterBody(fullText) {
+            if (!fullText || fullText === "") {
+                return 'காவல் நிலையம்';
+            }
+            
             const stationCode = extractStationCode(fullText);
             const stationName = extractStationName(fullText);
             
@@ -797,7 +643,7 @@
                 return `${stationCode} ${stationName}`;
             }
             
-            return stationName || 'சேத்துப்பட்டு';
+            return stationName || 'காவல் நிலையம்';
         }
 
         // Function to extract Tahsildar office from selection
@@ -822,13 +668,13 @@
                 "ஆயிரம் விளக்கு வட்டாட்சியர்": "600004",
                 "வில்லிவாக்கம் வட்டாட்சியர்": "600049",
                 "அம்பத்தூர் வட்டாட்சியர்": "600053",
-                "எக்மூர் வட்டாட்சியர்": "600031",
-                "மாதுராவோயல் வட்டாட்சியர்": "600095",
+                "எழும்பூர் வட்டாட்சியர்": "600031",
+                "மதுரவோயல் வட்டாட்சியர்": "600095",
                 "மாம்பழம் வட்டாட்சியர்": "600033",
                 "மயிலாப்பூர் வட்டாட்சியர்": "600004",
                 "வேளச்சேரி வட்டாட்சியர்": "600042",
                 "தி.நகர் வட்டாட்சியர்": "600017",
-                "அளந்தூர் வட்டாட்சியர்": "600032",
+                "அலந்தூர் வட்டாட்சியர்": "600032",
                 "சோழிங்கநல்லூர் வட்டாட்சியர்": "600119",
                 "வட்டாட்சியர் அவர்கள்": "600031" // Default
             };
@@ -863,51 +709,39 @@
                 chennaiStationsGroup.appendChild(option);
             });
             
-            // Set default selection
-            if (chennaiPoliceStations.length > 0) {
-                document.getElementById('policeStation').value = chennaiPoliceStations[0];
-            }
+            // Set default selection to "-- தேர்ந்தெடுக்கவும் --"
+            document.getElementById('policeStationDropdown').value = "";
         }
 
-        // Function to populate other stations (same as Chennai for now)
-        function populateOtherStations() {
-            const otherStationsGroup = document.getElementById('otherStations');
-            otherStationsGroup.innerHTML = '';
-            
-            chennaiPoliceStations.forEach(station => {
-                const option = document.createElement('option');
-                option.value = station;
-                option.textContent = station;
-                otherStationsGroup.appendChild(option);
-            });
-        }
-
-        // Function to filter police stations based on district selection
-        function filterPoliceStations() {
+        // Function to toggle between Chennai and Other district fields
+        function toggleDistrictFields() {
             const district = document.getElementById('districtSelect').value;
-            const chennaiStationsGroup = document.getElementById('chennaiStations');
-            const otherStationsGroup = document.getElementById('otherStations');
-            const policeStationSelect = document.getElementById('policeStation');
+            const chennaiPoliceStationContainer = document.getElementById('chennaiPoliceStationContainer');
+            const otherPoliceStationContainer = document.getElementById('otherPoliceStationContainer');
+            const chennaiCollectorContainer = document.getElementById('chennaiCollectorContainer');
+            const otherCollectorContainer = document.getElementById('otherCollectorContainer');
             
             if (district === 'chennai') {
-                // Show Chennai stations, hide others
-                chennaiStationsGroup.style.display = '';
-                otherStationsGroup.style.display = 'none';
+                // Show Chennai fields, hide Other district fields
+                chennaiPoliceStationContainer.style.display = 'block';
+                otherPoliceStationContainer.style.display = 'none';
+                chennaiCollectorContainer.style.display = 'block';
+                otherCollectorContainer.style.display = 'none';
                 
-                // Set default selection
-                if (chennaiPoliceStations.length > 0) {
-                    policeStationSelect.value = chennaiPoliceStations[0];
-                }
+                // Clear Other district fields
+                document.getElementById('policeStationText').value = '';
+                document.getElementById('collectorNameText').value = '';
             } 
             else if (district === 'other') {
-                // Show other stations, hide Chennai
-                chennaiStationsGroup.style.display = 'none';
-                otherStationsGroup.style.display = '';
+                // Show Other district fields, hide Chennai fields
+                chennaiPoliceStationContainer.style.display = 'none';
+                otherPoliceStationContainer.style.display = 'block';
+                chennaiCollectorContainer.style.display = 'none';
+                otherCollectorContainer.style.display = 'block';
                 
-                // Set default selection
-                if (chennaiPoliceStations.length > 0) {
-                    policeStationSelect.value = chennaiPoliceStations[0];
-                }
+                // Clear Chennai fields
+                document.getElementById('policeStationDropdown').value = "";
+                document.getElementById('collectorNameDropdown').value = "வட்டாட்சியர் அவர்கள்";
             }
             
             updatePreview();
@@ -915,8 +749,21 @@
 
         // Function to update preview with form values
         function updatePreview() {
-            // Get form values
-            const policeStationFull = document.getElementById('policeStation').value || chennaiPoliceStations[0] || 'AWPS பேரவள்ளூர்';
+            const district = document.getElementById('districtSelect').value;
+            
+            let policeStationFull = "";
+            let collectorSelection = "";
+            
+            if (district === 'chennai') {
+                // Get values from Chennai dropdowns
+                policeStationFull = document.getElementById('policeStationDropdown').value || "";
+                collectorSelection = document.getElementById('collectorNameDropdown').value || 'வட்டாட்சியர் அவர்கள்';
+            } 
+            else if (district === 'other') {
+                // Get values from Other district text inputs
+                policeStationFull = document.getElementById('policeStationText').value.trim() || "";
+                collectorSelection = document.getElementById('collectorNameText').value.trim() || "வட்டாட்சியர் அவர்கள்";
+            }
             
             // Extract just the station name without code and "காவல் நிலையம்"
             const policeStationName = extractStationName(policeStationFull);
@@ -925,19 +772,16 @@
             const policeStationCode = extractStationCode(policeStationFull);
             
             // Get the full station name for display in the station line
-            const policeStationFullName = policeStationFull;
+            const policeStationFullName = policeStationFull || "காவல் நிலையம்";
             
             // Get station name for letter body (without "காவல் நிலையம்")
             const stationNameForBody = getStationNameForLetterBody(policeStationFull);
             
-            // Get pincode for the selected police station
-            const stationPincode = getPincodeForPoliceStation(policeStationFull);
+            // Get pincode for the selected police station (default for other districts)
+            const stationPincode = district === 'chennai' ? "600031" : "";
             
             // Get location name for the police station
-            const stationLocation = getLocationForPoliceStation(policeStationFull);
-
-            // Get வட்டாட்சியர் - FROM DROPDOWN
-            const collectorSelection = document.getElementById('collectorName').value || 'வட்டாட்சியர் அவர்கள்';
+            const stationLocation = policeStationName || "காவல் நிலையம்";
             
             // Always show "வட்டாட்சியர் அவர்கள்" as the first line in பெறுநர்
             const receiverFirstLine = "வட்டாட்சியர் அவர்கள்";
@@ -945,8 +789,8 @@
             // Get the Tahsildar office for the second line
             const tahsildarOffice = getTahsildarOffice(collectorSelection);
             
-            // Get pincode based on collector selection
-            const receiverPincode = getPincodeForCollector(collectorSelection);
+            // Get pincode based on collector selection (default for other districts)
+            const receiverPincode = district === 'chennai' ? getPincodeForCollector(collectorSelection) : "";
             
             // Get location name for third line (for collector)
             const receiverLocation = getLocationForCollector(collectorSelection);
@@ -960,7 +804,8 @@
             const fullWitnessName = getFullName(witnessTitle, witnessName);
 
             const witnessAge = document.getElementById('witnessAge').value || 'வயது';
-            const witnessFather = document.getElementById('witnessFather').value || 'தந்தை பெயர்';
+            const witnessRelationship = document.getElementById('witnessRelationship').value || 'தந்தை/கணவர் பெயர்';
+            const relationshipPrefix = getRelationshipPrefix();
             const witnessAddress = document.getElementById('witnessAddress').value || 'முகவரி';
 
             const documentDate = document.getElementById('documentDate').value;
@@ -976,11 +821,17 @@
             }
 
             // Update additional info with the selected police station
-            // Replace "பு7 செத்துப்பட்டு" with the station name for body
-            additionalInfo = additionalInfo.replace(/பு7 செத்துப்பட்டு/g, stationNameForBody);
-            additionalInfo = additionalInfo.replace(/பு7/g, policeStationCode || '');
-            additionalInfo = additionalInfo.replace(/செத்துப்பட்டு காவல் நிலைய/g, `${stationNameForBody}`);
-            additionalInfo = additionalInfo.replace(/செத்துப்பட்டு/g, policeStationName);
+            // Replace "AWPS பேரவள்ளூர்" with the station name for body
+            additionalInfo = additionalInfo.replace(/AWPS பேரவள்ளூர்/g, stationNameForBody);
+            additionalInfo = additionalInfo.replace(/பேரவள்ளூர்/g, policeStationName);
+            
+            // Update witness details in additional info
+            const updatedAdditionalInfo = additionalInfo
+                .replace(/திருமதி மாலதி/g, fullWitnessName)
+                .replace(/வயது 31/g, `வயது ${witnessAge}`)
+                .replace(/டி. சந்திரன்/g, witnessRelationship)
+                .replace(/த\/பெ/g, relationshipPrefix)
+                .replace(/பேரவள்ளூர், சென்னை 600031/g, witnessAddress);
 
             // Create preview HTML
             const previewHTML = `
@@ -998,7 +849,7 @@
                         <div style="line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif;">
                             <div>காவல் ஆய்வாளர்</div>
                             <div>${policeStationFullName}</div>
-                            <div>${stationLocation}, சென்னை ${stationPincode}</div>
+                            <div>${stationLocation}${stationPincode ? ', சென்னை ' + stationPincode : ''}</div>
                         </div>
                     </div>
                     
@@ -1008,7 +859,7 @@
                         <div style="line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif;">
                             <div>${receiverFirstLine}</div>
                             <div>${tahsildarOffice}</div>
-                            <div>${receiverLocation}, சென்னை ${receiverPincode}</div>
+                            <div>${receiverLocation}${receiverPincode ? ', சென்னை ' + receiverPincode : ''}</div>
                         </div>
                     </div>
                 </div>
@@ -1040,10 +891,10 @@
                 
                 <!-- Main Content -->
                 <div style="margin-bottom: 25px;">
-                    <div style="text-align: justify; line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif; margin-bottom: 15px;">
-                        ${additionalInfo.replace('சாட்சி எண் 1', `சாட்சி எண் ${witnessNumber}`)}
+                    <div style="text-align: justify; line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif; margin-bottom: 15px; text-indent: 40px;">
+                        ${updatedAdditionalInfo.replace('சாட்சி எண்', `சாட்சி எண் ${witnessNumber}`)}
                     </div>
-                    <div style="text-align: justify; line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif;">
+                    <div style="text-align: justify; line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif; text-indent: 40px;">
                         எனவே பார்வையில் கண்ட வழக்கு தொடர்பாக நீதிமன்ற நடவடிக்கைக்கு மேற்படி நபரின் தற்போதைய விலாசம் பற்றி விசாரணை செய்து சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்ளப்படுகிறது.
                     </div>
                 </div>
@@ -1071,10 +922,15 @@
         // Function to reset form
         function resetForm() {
             document.getElementById('districtSelect').value = 'chennai';
-            filterPoliceStations();
+            toggleDistrictFields();
             
-            // வட்டாட்சியர் - RESET TO DEFAULT
-            document.getElementById('collectorName').value = 'வட்டாட்சியர் அவர்கள்';
+            // Clear Other district fields
+            document.getElementById('policeStationText').value = '';
+            document.getElementById('collectorNameText').value = '';
+            
+            // Reset Chennai fields
+            document.getElementById('policeStationDropdown').value = "";
+            document.getElementById('collectorNameDropdown').value = 'வட்டாட்சியர் அவர்கள்';
 
             // சாட்சி எண்
             document.getElementById('witnessNumber').value = 'PW 1';
@@ -1083,13 +939,17 @@
             document.getElementById('witnessTitle').value = 'திருமதி.';
             document.getElementById('witnessName').value = 'மாலதி';
             document.getElementById('witnessAge').value = '31';
-            document.getElementById('witnessFather').value = 'டி. சந்திரன்';
+            
+            // Reset relationship to தந்தை பெயர்
+            selectRelationship('father');
+            document.getElementById('witnessRelationship').value = 'டி. சந்திரன்';
+            
             document.getElementById('witnessAddress').value = 'எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031';
 
             document.getElementById('documentDate').value = '2025-12-22';
             document.getElementById('caseNumber').value = '1249/2012';
             document.getElementById('caseSections').value = '452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC';
-            document.getElementById('additionalInfo').value = 'பார்வையில் கண்ட பு7 செத்துப்பட்டு காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் 1 (Pறு-1) திருமதி மாலதி, வயது 31, த/பெ டி. சந்திரன், எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031 என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.';
+            document.getElementById('additionalInfo').value = 'பார்வையில் கண்ட AWPS பேரவள்ளூர் காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் திருமதி மாலதி, வயது 31, த/பெ டி. சந்திரன், எண் 7, வள்ளுவர் சாலை, பேரவள்ளூர், சென்னை 600031 என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.';
 
             updatePreview();
         }
@@ -1225,14 +1085,17 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Populate both station lists with Chennai stations
+            // Populate Chennai stations
             populateChennaiStations();
-            populateOtherStations();
             
             // Set default district to Chennai
             document.getElementById('districtSelect').value = 'chennai';
             
+            // Set default relationship to தந்தை பெயர்
+            selectRelationship('father');
+            
             // Initialize the form
+            toggleDistrictFields();
             updatePreview();
 
             // Add CSS for animation
