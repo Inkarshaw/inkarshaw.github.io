@@ -376,10 +376,7 @@
                     <input type="text" class="form-control" id="caseSections" value="452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC" oninput="updatePreview()" placeholder="எ.கா: 452, 326 IPC">
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">கூடுதல் விளக்கம்:</label>
-                    <textarea class="form-control" id="additionalInfo" rows="3" oninput="updatePreview()" placeholder="கூடுதல் விளக்கங்களை இங்கே உள்ளிடவும்...">பார்வையில் கண்ட AWPS பேரவள்ளூர் காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் திருமதி மாலதி, வயது 31, த/பெ டி. சந்திரன், எண் 7, வள்ளுவர் சாலை, பேரவள்ளூர், சென்னை 600031 என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.</textarea>
-                </div>
+                <!-- கூடுதல் விளக்கம் section REMOVED -->
 
                 <!-- Controls -->
                 <div class="controls">
@@ -811,7 +808,9 @@
             const documentDate = document.getElementById('documentDate').value;
             const caseNumber = document.getElementById('caseNumber').value || 'குற்ற எண்';
             const caseSections = document.getElementById('caseSections').value || 'குற்ற விதிகள்';
-            let additionalInfo = document.getElementById('additionalInfo').value || 'கூடுதல் விளக்கம்';
+            
+            // Generate standard additional info based on the form inputs
+            const additionalInfo = `பார்வையில் கண்ட ${stationNameForBody} காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் ${fullWitnessName}, வயது ${witnessAge}, ${relationshipPrefix} ${witnessRelationship}, ${witnessAddress} என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.`;
 
             // Format date
             let formattedDate = 'தேதி';
@@ -819,19 +818,6 @@
                 const dateObj = new Date(documentDate);
                 formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}.${(dateObj.getMonth()+1).toString().padStart(2, '0')}.${dateObj.getFullYear()}`;
             }
-
-            // Update additional info with the selected police station
-            // Replace "AWPS பேரவள்ளூர்" with the station name for body
-            additionalInfo = additionalInfo.replace(/AWPS பேரவள்ளூர்/g, stationNameForBody);
-            additionalInfo = additionalInfo.replace(/பேரவள்ளூர்/g, policeStationName);
-            
-            // Update witness details in additional info
-            const updatedAdditionalInfo = additionalInfo
-                .replace(/திருமதி மாலதி/g, fullWitnessName)
-                .replace(/வயது 31/g, `வயது ${witnessAge}`)
-                .replace(/டி. சந்திரன்/g, witnessRelationship)
-                .replace(/த\/பெ/g, relationshipPrefix)
-                .replace(/பேரவள்ளூர், சென்னை 600031/g, witnessAddress);
 
             // Create preview HTML
             const previewHTML = `
@@ -892,7 +878,7 @@
                 <!-- Main Content -->
                 <div style="margin-bottom: 25px;">
                     <div style="text-align: justify; line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif; margin-bottom: 15px; text-indent: 40px;">
-                        ${updatedAdditionalInfo.replace('சாட்சி எண்', `சாட்சி எண் ${witnessNumber}`)}
+                        சாட்சி எண் ${witnessNumber} ${additionalInfo}
                     </div>
                     <div style="text-align: justify; line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif; text-indent: 40px;">
                         எனவே பார்வையில் கண்ட வழக்கு தொடர்பாக நீதிமன்ற நடவடிக்கைக்கு மேற்படி நபரின் தற்போதைய விலாசம் பற்றி விசாரணை செய்து சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்ளப்படுகிறது.
@@ -946,7 +932,6 @@
             document.getElementById('documentDate').value = '2025-12-22';
             document.getElementById('caseNumber').value = '1249/2012';
             document.getElementById('caseSections').value = '452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC';
-            document.getElementById('additionalInfo').value = 'பார்வையில் கண்ட AWPS பேரவள்ளூர் காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் திருமதி மாலதி, வயது 31, த/பெ டி. சந்திரன், எண் 7, வள்ளுவர் சாலை, பேரவள்ளூர், சென்னை 600031 என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.';
 
             updatePreview();
         }
