@@ -331,90 +331,6 @@
             border: 1px solid #e0e6ed;
         }
         
-        .optional-notice {
-            background: #fffde7;
-            color: #ff8f00;
-            padding: 8px 12px;
-            border-radius: 5px;
-            margin: 8px 0;
-            font-size: 13px;
-            font-weight: 500;
-            border-left: 4px solid #ffb300;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .margin-notice {
-            background: #ffebee;
-            color: #c62828;
-            padding: 8px 12px;
-            border-radius: 5px;
-            margin: 8px 0;
-            font-size: 13px;
-            font-weight: 500;
-            border-left: 4px solid #d32f2f;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .justify-notice {
-            background: #e8eaf6;
-            color: #3949ab;
-            padding: 8px 12px;
-            border-radius: 5px;
-            margin: 8px 0;
-            font-size: 13px;
-            font-weight: 500;
-            border-left: 4px solid #5c6bc0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .feature-note {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 8px 12px;
-            border-radius: 5px;
-            margin: 8px 0;
-            font-size: 13px;
-            font-weight: 500;
-            border-left: 4px solid #388e3c;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .page-break-notice {
-            background: #fff3e0;
-            color: #ef6c00;
-            padding: 8px 12px;
-            border-radius: 5px;
-            margin: 8px 0;
-            font-size: 13px;
-            font-weight: 500;
-            border-left: 4px solid #ff9800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .tickbox-notice {
-            background: #e3f2fd;
-            color: #1565c0;
-            padding: 8px 12px;
-            border-radius: 5px;
-            margin: 8px 0;
-            font-size: 13px;
-            font-weight: 500;
-            border-left: 4px solid #1976d2;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
         .checkbox-info {
             font-size: 12px;
             color: #666;
@@ -494,45 +410,6 @@
             <h1>DIGITAL EVIDENCE CERTIFICATE</h1>
             <p class="subtitle">Schedule under section 63(4)(c) - A4 PDF Generator <span class="page-indicator">Hash Value Optional</span></p>
         </header>
-        
-        <div class="status-bar">
-            <div class="status-item" id="statusPartA">
-                <i class="fas fa-user-circle status-icon"></i>
-                <span>Part A: <span id="partAStatus">Pending</span></span>
-            </div>
-            <div class="status-item" id="statusPartB">
-                <i class="fas fa-user-tie status-icon"></i>
-                <span>Part B: <span id="partBStatus">Pending</span></span>
-            </div>
-            <div class="status-item" id="statusPDF">
-                <i class="fas fa-file-pdf status-icon"></i>
-                <span>PDF: <span id="pdfStatus">Ready</span></span>
-            </div>
-        </div>
-        
-        <div class="optional-notice">
-            <i class="fas fa-info-circle"></i> Hash Value fields are now optional - leave blank if not applicable
-        </div>
-        
-        <div class="margin-notice">
-            <i class="fas fa-arrows-alt-h"></i> PDF uses full A4 width with proper 20mm margins and perfect justification
-        </div>
-        
-        <div class="justify-notice">
-            <i class="fas fa-align-justify"></i> All paragraphs will be perfectly justified with proper word spacing
-        </div>
-        
-        <div class="feature-note">
-            <i class="fas fa-check-circle"></i> Professional formatting with proper page breaks and spacing
-        </div>
-        
-        <div class="page-break-notice">
-            <i class="fas fa-file-alt"></i> Part B automatically starts on a new page
-        </div>
-        
-        <div class="tickbox-notice">
-            <i class="fas fa-check-square"></i> Device selection with proper tick marks in PDF
-        </div>
         
         <div class="form-container">
             <!-- Part A -->
@@ -931,10 +808,6 @@
             document.getElementById('generateBtn').addEventListener('click', generatePDF);
             document.getElementById('resetBtn').addEventListener('click', resetForm);
             document.getElementById('generateFromPreview').addEventListener('click', generatePDF);
-            
-            // Initialize status
-            updateStatus('partA');
-            updateStatus('partB');
         });
         
         // Helper functions
@@ -964,7 +837,7 @@
                 const checkboxItem = document.createElement('div');
                 checkboxItem.className = 'checkbox-item';
                 checkboxItem.innerHTML = `
-                    <input type="checkbox" id="${prefix}_${id}" value="${option}" onchange="updateStatus('${prefix.includes('party') ? 'partA' : 'partB'}')">
+                    <input type="checkbox" id="${prefix}_${id}" value="${option}">
                     <label for="${prefix}_${id}">${option}</label>
                 `;
                 container.appendChild(checkboxItem);
@@ -980,7 +853,7 @@
                 const radioItem = document.createElement('div');
                 radioItem.className = 'radio-item';
                 radioItem.innerHTML = `
-                    <input type="radio" id="${name}_${id}" name="${name}" value="${option}" onchange="updateStatus('partA')">
+                    <input type="radio" id="${name}_${id}" name="${name}" value="${option}">
                     <label for="${name}_${id}">${option}</label>
                 `;
                 container.appendChild(radioItem);
@@ -994,9 +867,6 @@
             } else {
                 item.classList.remove('selected');
             }
-            
-            const isParty = checkbox.id.includes('party');
-            updateStatus(isParty ? 'partA' : 'partB');
         }
         
         function updateCheckboxVisualState() {
@@ -1014,9 +884,8 @@
             // Add change listeners to all checkboxes and radios
             document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => {
                 if (!el.onchange) {
-                    const isParty = el.id.includes('party') || (el.name && el.name.includes('party'));
                     el.addEventListener('change', function() {
-                        updateStatus(isParty ? 'partA' : 'partB');
+                        // No status updates needed since we removed the status bar
                     });
                 }
             });
@@ -1065,8 +934,6 @@
                 displayElement.innerHTML = '<span class="identifier-placeholder">Selected identifier will appear here</span>';
                 displayElement.classList.add('empty');
             }
-            
-            updateStatus('partA');
         }
         
         function updateExpertIdentifier() {
@@ -1087,8 +954,6 @@
                 displayElement.innerHTML = '<span class="identifier-placeholder">Selected identifier will appear here</span>';
                 displayElement.classList.add('empty');
             }
-            
-            updateStatus('partB');
         }
         
         function getPartyRelation() {
@@ -1171,69 +1036,6 @@
             } else {
                 return '[Not Specified]';
             }
-        }
-        
-        function updateStatus(part) {
-            let isComplete = false;
-            
-            if (part === 'partA') {
-                const requiredFields = [
-                    'partyName', 'partyPlace'
-                ];
-                
-                const relationName = document.getElementById('partyRelationName').value;
-                const relationType = document.getElementById('partyRelationType').value;
-                const addressDetails = document.getElementById('partyAddressDetails').value;
-                const addressType = document.getElementById('partyAddressType').value;
-                
-                isComplete = requiredFields.every(id => {
-                    const value = document.getElementById(id).value;
-                    return value && value.trim() !== '';
-                }) && getSelectedRadioValue('partyControl') !== '' 
-                    && relationName && relationName.trim() !== ''
-                    && relationType && relationType.trim() !== ''
-                    && addressDetails && addressDetails.trim() !== ''
-                    && addressType && addressType.trim() !== '';
-                
-                document.getElementById('partAStatus').textContent = isComplete ? 'Complete' : 'Pending';
-                document.getElementById('partAStatus').className = isComplete ? 'status-complete' : 'status-pending';
-                document.getElementById('statusPartA').querySelector('.status-icon').className = 
-                    `fas fa-${isComplete ? 'check-circle' : 'clock'} status-icon ${isComplete ? 'status-complete' : 'status-pending'}`;
-            } else if (part === 'partB') {
-                const requiredFields = [
-                    'expertName', 'expertDesignation', 'expertPlace'
-                ];
-                
-                const relationName = document.getElementById('expertRelationName').value;
-                const relationType = document.getElementById('expertRelationType').value;
-                const addressDetails = document.getElementById('expertAddressDetails').value;
-                const addressType = document.getElementById('expertAddressType').value;
-                
-                isComplete = requiredFields.every(id => {
-                    const value = document.getElementById(id).value;
-                    return value && value.trim() !== '';
-                }) && relationName && relationName.trim() !== ''
-                    && relationType && relationType.trim() !== ''
-                    && addressDetails && addressDetails.trim() !== ''
-                    && addressType && addressType.trim() !== '';
-                
-                document.getElementById('partBStatus').textContent = isComplete ? 'Complete' : 'Pending';
-                document.getElementById('partBStatus').className = isComplete ? 'status-complete' : 'status-pending';
-                document.getElementById('statusPartB').querySelector('.status-icon').className = 
-                    `fas fa-${isComplete ? 'check-circle' : 'clock'} status-icon ${isComplete ? 'status-complete' : 'status-pending'}`;
-            }
-            
-            // Update PDF status
-            const partAComplete = document.getElementById('partAStatus').textContent === 'Complete';
-            const partBComplete = document.getElementById('partBStatus').textContent === 'Complete';
-            const pdfReady = partAComplete && partBComplete;
-            
-            document.getElementById('pdfStatus').textContent = pdfReady ? 'Ready' : 'Waiting';
-            document.getElementById('pdfStatus').className = pdfReady ? 'status-complete' : 'status-pending';
-            document.getElementById('statusPDF').querySelector('.status-icon').className = 
-                `fas fa-${pdfReady ? 'file-pdf' : 'hourglass-half'} status-icon ${pdfReady ? 'status-complete' : 'status-pending'}`;
-            
-            return isComplete;
         }
         
         // PERFECT JUSTIFICATION FUNCTION
@@ -1843,10 +1645,6 @@ Place: ${data.expertPlace}`;
                 
                 // Hide preview
                 document.getElementById('previewContainer').style.display = 'none';
-                
-                // Reset status
-                updateStatus('partA');
-                updateStatus('partB');
                 
                 alert('Form has been reset successfully.');
             }
