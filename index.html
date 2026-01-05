@@ -1,169 +1,370 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exam Preparation Quiz</title>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <!-- Google Font (Tamil + English) -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Indian Polity – Constitution of India Quiz</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', 'Noto Sans Tamil', sans-serif;
-      background: #f5f7fb;
-      color: #333;
-    }
-
-    header {
-      background: #1e40af;
-      color: #fff;
-      padding: 16px;
-      text-align: center;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-    }
-
-    .lang-toggle {
-      margin-top: 8px;
-      font-size: 14px;
-    }
-
-    .container {
-      padding: 15px;
-    }
-
-    .section-title {
-      font-size: 18px;
-      margin: 20px 0 10px;
-      font-weight: 700;
-    }
-
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 15px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .card:hover {
-      transform: scale(1.03);
-    }
-
-    .card h3 {
-      margin: 10px 0;
-      font-size: 16px;
-    }
-
-    .daily-quiz {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: white;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    .daily-quiz button {
-      background: #fff;
-      color: #16a34a;
-      border: none;
-      padding: 10px 20px;
-      font-weight: bold;
-      border-radius: 20px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
-    .ad-box {
-      background: #e5e7eb;
-      text-align: center;
-      padding: 20px;
-      margin: 25px 0;
-      font-size: 14px;
-      color: #555;
-      border-radius: 8px;
-    }
-
-    footer {
-      background: #111827;
-      color: #d1d5db;
-      padding: 15px;
-      text-align: center;
-      font-size: 13px;
-    }
-
-    footer a {
-      color: #93c5fd;
-      text-decoration: none;
-      margin: 0 8px;
-    }
-
-    .card-link {
-  text-decoration: none;
-  color: inherit;
+<style>
+body{
+  font-family:Arial,sans-serif;
+  background:#f5f7fb;
+  margin:0;
+  -webkit-tap-highlight-color: transparent;
+}
+header{
+  background:#1e40af;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+}
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:15px;
+}
+.box{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:15px;
 }
 
-  </style>
+/* SETTINGS */
+.settings-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  margin-bottom:15px;
+}
+.setting{
+  flex:1;
+  min-width:200px;
+}
+.setting label{
+  font-weight:bold;
+  font-size:14px;
+}
+.setting small{
+  display:block;
+  font-size:12px;
+  color:#555;
+}
+.setting input,.setting select{
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #cbd5e1;
+}
+
+/* OPTIONS */
+.options label{
+  display:block;
+  background:#f1f5f9;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+}
+
+/* BUTTONS */
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:20px;
+  font-size:14px;
+  cursor:pointer;
+}
+.start{background:#16a34a;color:#fff}
+.next{background:#2563eb;color:#fff}
+.submit{background:#dc2626;color:#fff;margin-left:10px}
+
+/* TIMER */
+.timer{
+  font-weight:bold;
+  color:#dc2626;
+  margin-bottom:10px;
+}
+
+/* PALETTE */
+.palette-wrapper{
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:8px;
+  margin-bottom:15px;
+  overflow-x:auto;
+}
+.palette{
+  display:flex;
+  gap:8px;
+}
+.palette div{
+  min-width:40px;
+  padding:8px;
+  text-align:center;
+  border-radius:6px;
+  cursor:pointer;
+  background:#e5e7eb;
+}
+.palette .visited{background:#93c5fd}
+.palette .answered{background:#86efac}
+
+/* REVIEW */
+.correct{color:green;font-weight:bold}
+.wrong{color:red;font-weight:bold}
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>📘 Exam Preparation Quiz</h1>
-  <div class="lang-toggle">தமிழ் | English</div>
+  <h2>Exam Practice Quiz</h2>
 </header>
 
 <div class="container">
 
-  <!-- Daily Quiz -->
-  <div class="daily-quiz">
-    <h2>🔥 Today’s Quiz</h2>
-    <p>10 Important Questions for Exam Practice</p>
-    <button>Start Quiz</button>
+<!-- SETTINGS -->
+<div class="box" id="settingsBox">
+  <h3>⚙️ Quiz Settings</h3>
+
+  <div class="settings-row">
+    <div class="setting">
+      <label>No. of Questions</label>
+      <select id="questionCount">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+        <option value="all">All</option>
+      </select>
+      <small>Select number of questions</small>
+    </div>
+
+    <div class="setting">
+      <label>Time (Minutes)</label>
+      <input type="number" id="timeLimit" value="10">
+      <small>Auto-submit on time end</small>
+    </div>
   </div>
 
-  <!-- Ad Space -->
-  <div class="ad-box">
-    Advertisement Space
+  <div class="settings-row">
+    <div class="setting">
+      <label>Question Range</label>
+      <input type="number" id="rangeFrom">
+    </div>
+    <div class="setting">
+      <label>&nbsp;</label>
+      <input type="number" id="rangeTo">
+    </div>
   </div>
 
-  <!-- Subjects Section -->
-  <div class="section-title">Practice by Subject</div>
-  <div class="card-grid">
-    <a href="https://www.clearexams.online/exam/indian_polity.html" class="card-link">
-  <div class="card">
-    <h3>Indian Polity</h3>
+  <p id="rangeInfo" style="font-size:13px;color:#555">
+    Loading questions…
+  </p>
+
+  <label>
+    <input type="checkbox" id="randomize"> Randomize Questions
+  </label><br><br>
+
+  <!-- START BUTTON HIDDEN INITIALLY -->
+  <button class="start" id="startBtn" onclick="startQuiz()" style="display:none">
+    Start Quiz
+  </button>
+</div>
+
+<!-- QUIZ -->
+<div class="box" id="quizBox" style="display:none">
+  <div class="timer" id="timer"></div>
+
+  <div class="palette-wrapper">
+    <div class="palette" id="palette"></div>
   </div>
-</a>
-    <div class="card"><h3>History</h3></div>
-    <div class="card"><h3>Geography</h3></div>
-    <div class="card"><h3>Economy</h3></div>
-    <div class="card"><h3>Science</h3></div>
-    <div class="card"><h3>Current Affairs</h3></div>
-  </div>
+
+  <div id="question"></div>
+  <div class="options" id="options"></div>
+
+  <button class="next" onclick="nextQ()">Next</button>
+  <button class="submit" onclick="confirmSubmit()">Submit</button>
+</div>
+
+<!-- REVIEW -->
+<div id="reviewBox"></div>
 
 </div>
 
-<footer>
-  © 2026 Exam Quiz |
-  <a href="#">About</a>
-  <a href="#">Privacy</a>
-  <a href="#">Contact</a>
-</footer>
+<script>
+const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
+
+let allQuestions=[],quiz=[],index=0,userAnswers=[];
+let timerInterval,timeLeft;
+
+/* LOAD QUESTIONS */
+fetch(sheetURL)
+.then(r=>r.text())
+.then(t=>{
+  const rows=t.trim().split("\n").slice(1);
+  allQuestions=rows.map(r=>{
+    const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+    return{
+      q:c[0],
+      opts:c.slice(1,5),
+      ans:c[5].trim().toUpperCase(),
+      exp:c[6]
+    };
+  });
+
+  rangeFrom.max = rangeTo.max = allQuestions.length;
+  rangeFrom.value = 1;
+  rangeTo.value = allQuestions.length;
+  rangeInfo.innerText = `Available questions: 1 to ${allQuestions.length}`;
+
+  /* ✅ SHOW START BUTTON ONLY AFTER LOAD */
+  document.getElementById("startBtn").style.display = "inline-block";
+})
+.catch(()=>{
+  rangeInfo.innerText="Failed to load questions. Check internet.";
+});
+
+/* START */
+function startQuiz(){
+  let count=questionCount.value;
+  let from=parseInt(rangeFrom.value);
+  let to=parseInt(rangeTo.value);
+  let random=randomize.checked;
+  let minutes=parseInt(timeLimit.value)||10;
+
+  quiz=[...allQuestions].slice(from-1,to);
+  if(random) quiz.sort(()=>Math.random()-0.5);
+  if(count!=="all") quiz=quiz.slice(0,parseInt(count));
+
+  index=0;
+  userAnswers=new Array(quiz.length).fill(null);
+
+  settingsBox.style.display="none";
+  quizBox.style.display="block";
+
+  createPalette();
+  startTimer(minutes*60);
+  loadQ();
+}
+
+/* TIMER */
+function startTimer(sec){
+  timeLeft=sec;
+  timerInterval=setInterval(()=>{
+    let m=Math.floor(timeLeft/60);
+    let s=timeLeft%60;
+    timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
+    if(timeLeft--<=0){
+      clearInterval(timerInterval);
+      submitQuiz();
+    }
+  },1000);
+}
+
+/* PALETTE */
+function createPalette(){
+  palette.innerHTML="";
+  quiz.forEach((_,i)=>{
+    let d=document.createElement("div");
+    d.innerText=i+1;
+    d.onclick=()=>jumpQ(i);
+    palette.appendChild(d);
+  });
+}
+function updatePalette(){
+  document.querySelectorAll(".palette div").forEach((d,i)=>{
+    d.className="";
+    if(userAnswers[i]) d.classList.add("answered");
+    else if(i===index) d.classList.add("visited");
+  });
+}
+
+/* QUESTIONS */
+function loadQ(){
+  let q=quiz[index];
+  question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
+  options.innerHTML="";
+  q.opts.forEach((opt,i)=>{
+    let letter=String.fromCharCode(65+i);
+    options.innerHTML+=`
+    <label>
+      <input type="radio" name="opt" value="${letter}"
+      ${userAnswers[index]==letter?"checked":""}>
+      <b>${letter}.</b> ${opt}
+    </label>`;
+  });
+  updatePalette();
+}
+
+/* NAV */
+function saveAnswer(){
+  let sel=document.querySelector('input[name="opt"]:checked');
+  userAnswers[index]=sel?sel.value:null;
+}
+function nextQ(){saveAnswer();if(index<quiz.length-1){index++;loadQ();}}
+function jumpQ(i){saveAnswer();index=i;loadQ();}
+
+/* SUBMIT */
+function confirmSubmit(){
+  saveAnswer();
+  if(confirm("Are you sure you want to submit?")){
+    submitQuiz();
+  }
+}
+function submitQuiz(){
+  clearInterval(timerInterval);
+  quizBox.style.display="none";
+  showReview();
+}
+
+/* REVIEW */
+function showReview(){
+  let score=0,attempted=0;
+  let html=`<div class="box"><h2>📊 Result Analytics</h2>`;
+
+  quiz.forEach((q,i)=>{
+    if(!userAnswers[i]) return;
+    attempted++;
+    let right=userAnswers[i]===q.ans;
+    if(right) score++;
+    let ua=userAnswers[i].charCodeAt(0)-65;
+    let ca=q.ans.charCodeAt(0)-65;
+    html+=`
+    <hr>
+    <p><b>Q${i+1}. ${q.q}</b></p>
+    <p>Your Answer: ${q.opts[ua]}</p>
+    <p>Correct Answer: ${q.opts[ca]}</p>
+    <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
+    <p><b>Explanation:</b> ${q.exp}</p>`;
+  });
+
+  let unattempted=quiz.length-attempted;
+  let percent=((score/quiz.length)*100).toFixed(2);
+  let accuracy=attempted?((score/attempted)*100).toFixed(2):0;
+
+  html+=`
+  <hr>
+  <h3>Score: ${score}/${quiz.length}</h3>
+  <h3>Attempted: ${attempted}</h3>
+  <h3>Unattempted: ${unattempted}</h3>
+  <h3>Percentage: ${percent}%</h3>
+  <h3>Accuracy: ${accuracy}%</h3>
+  </div>`;
+
+  reviewBox.innerHTML=html;
+}
+
+/* ANDROID BACK BUTTON SAFETY */
+history.pushState(null,null,location.href);
+window.onpopstate=function(){
+  if(confirm("Exit quiz? Your progress will be lost.")){
+    history.back();
+  }else{
+    history.pushState(null,null,location.href);
+  }
+};
+</script>
 
 </body>
 </html>
