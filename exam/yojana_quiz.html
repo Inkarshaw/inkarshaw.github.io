@@ -6,114 +6,61 @@
 <title>Yojanas & Schemes Quiz</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f5f7fb;
-}
-header{
-  background:#1e40af;
-  color:#fff;
-  padding:15px;
-  text-align:center;
-}
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:15px;
-}
-.box{
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:15px;
-}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb}
+header{background:#1e40af;color:#fff;padding:15px;text-align:center}
+.container{max-width:1000px;margin:auto;padding:15px}
+.box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
 
-.form-label{
-  font-weight:bold;
-  display:block;
-  margin-bottom:6px;
-}
+.form-label{font-weight:bold;margin-bottom:6px;display:block}
 
-input[type="text"],
 input[type="number"]{
-  padding:8px;
-  border-radius:6px;
-  border:1px solid #d1d5db;
-  width:100%;
-  box-sizing:border-box;
+  padding:8px;border-radius:6px;border:1px solid #d1d5db;width:100%
 }
 
 button{
-  padding:8px 14px;
-  border:none;
-  border-radius:20px;
-  font-size:14px;
-  cursor:pointer;
+  padding:8px 14px;border:none;border-radius:20px;
+  font-size:14px;cursor:pointer;margin:5px
 }
-
-.start{background:#16a34a;color:#fff;margin-top:15px}
+.start{background:#16a34a;color:#fff}
 .next{background:#2563eb;color:#fff}
-.submit{background:#dc2626;color:#fff;margin-left:10px}
+.submit{background:#dc2626;color:#fff}
+.retry-wrong{background:#0f766e;color:#fff}
+.retry-un{background:#7c3aed;color:#fff}
 
-.small-btn{
-  background:#e5e7eb;
-  margin-right:8px;
-}
+.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
-.timer{
-  font-weight:bold;
-  color:#dc2626;
-  margin-bottom:10px;
-}
-
-/* TOPIC LIST */
 .topic-list{
-  max-height:220px;
-  overflow-y:auto;
-  border:1px solid #d1d5db;
-  padding:10px;
-  border-radius:8px;
-  background:#f9fafb;
+  max-height:220px;overflow-y:auto;border:1px solid #d1d5db;
+  padding:10px;border-radius:8px;background:#f9fafb
 }
-
 .topic-list label{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-weight:normal;
-  margin-bottom:6px;
-  line-height:1.4;
-  word-break:break-word;
+  display:flex;gap:8px;font-weight:normal;margin-bottom:6px
 }
 
 /* PALETTE */
 .palette{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,40px);
-  gap:6px;
-  margin-bottom:15px;
+  display:grid;grid-template-columns:repeat(auto-fill,40px);
+  gap:6px;margin-bottom:15px
 }
 .palette div{
-  padding:8px;
-  text-align:center;
-  border-radius:6px;
-  background:#e5e7eb;
-  cursor:pointer;
+  padding:8px;text-align:center;border-radius:6px;
+  background:#e5e7eb;cursor:pointer
 }
 .palette .visited{background:#93c5fd}
 .palette .answered{background:#86efac}
 
 .options label{
-  display:block;
-  background:#f1f5f9;
-  padding:10px;
-  margin:8px 0;
-  border-radius:6px;
+  display:block;background:#f1f5f9;padding:10px;
+  margin:8px 0;border-radius:6px
 }
 
 .correct{color:green;font-weight:bold}
 .wrong{color:red;font-weight:bold}
+
+.score-box{
+  background:#ecfeff;border:1px solid #67e8f9;
+  padding:15px;border-radius:10px;text-align:center
+}
 </style>
 </head>
 
@@ -129,30 +76,13 @@ button{
 <div class="box" id="settingsBox">
   <h3>Quiz Settings</h3>
 
-  <label class="form-label">Select Yojanas / Schemes (Multiple)</label>
-
-  <input type="text" id="topicSearch"
-         placeholder="Search scheme / yojana..."
-         onkeyup="filterTopics()"
-         style="margin-bottom:10px">
-
-  <!-- SELECT / CLEAR BUTTONS -->
-  <div style="margin-bottom:8px">
-    <button class="small-btn" onclick="selectAllTopics()">Select All</button>
-    <button class="small-btn" onclick="clearAllTopics()">Clear All</button>
-  </div>
-
-  <div class="topic-list" id="topicList">Loading topics…</div>
+  <label class="form-label">Select Yojanas / Schemes</label>
+  <div class="topic-list" id="topicList">Loading…</div>
 
   <br>
-
-  <label>
-    <input type="checkbox" id="randomize">
-    Random Questions
-  </label>
+  <label><input type="checkbox" id="randomize"> Random Questions</label>
 
   <br><br>
-
   <label class="form-label">Time Limit (minutes)</label>
   <input type="number" id="timeLimit" value="10" min="1">
 
@@ -163,12 +93,10 @@ button{
 <div class="box" id="quizBox" style="display:none">
   <div class="timer" id="timer"></div>
   <div class="palette" id="palette"></div>
-
   <div id="question"></div>
   <div class="options" id="options"></div>
-
   <button class="next" onclick="nextQ()">Next</button>
-  <button class="submit" onclick="confirmSubmit()">Submit Quiz</button>
+  <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
 <!-- REVIEW -->
@@ -181,7 +109,8 @@ const sheetURL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOEwxsSeGZI2M074Zdjy5K0ewaZYJD38m5eCM0aKS7gAqlBUOKbCQPN3_FbHP-4uA25uBgobRt3l1w/pub?output=csv";
 
 let allQuestions=[], quiz=[], index=0, userAnswers=[];
-let timerInterval, timeLeft;
+let wrongQuestions=[], unattemptedQuestions=[];
+let timerInterval,timeLeft;
 
 /* LOAD DATA */
 fetch(sheetURL).then(r=>r.text()).then(t=>{
@@ -189,8 +118,7 @@ fetch(sheetURL).then(r=>r.text()).then(t=>{
   allQuestions=rows.map(r=>{
     const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
     return {
-      topic:c[0].trim(),
-      q:c[1],
+      topic:c[0], q:c[1],
       opts:[c[2],c[3],c[4],c[5]],
       ans:c[6].trim().toUpperCase(),
       exp:c[7]
@@ -199,52 +127,35 @@ fetch(sheetURL).then(r=>r.text()).then(t=>{
   populateTopics();
 });
 
-/* POPULATE TOPICS */
 function populateTopics(){
-  const topics=[...new Set(allQuestions.map(q=>q.topic))];
   topicList.innerHTML="";
-  topics.forEach(t=>{
+  [...new Set(allQuestions.map(q=>q.topic))].forEach(t=>{
     topicList.innerHTML+=`
-      <label>
-        <input type="checkbox" value="${t}"> ${t}
-      </label>`;
+      <label><input type="checkbox" value="${t}"> ${t}</label>`;
   });
-}
-
-/* SEARCH */
-function filterTopics(){
-  const q=topicSearch.value.toLowerCase();
-  document.querySelectorAll("#topicList label").forEach(l=>{
-    l.style.display = l.innerText.toLowerCase().includes(q) ? "flex" : "none";
-  });
-}
-
-/* SELECT ALL / CLEAR ALL */
-function selectAllTopics(){
-  document.querySelectorAll("#topicList input[type=checkbox]")
-    .forEach(cb=>cb.checked=true);
-}
-function clearAllTopics(){
-  document.querySelectorAll("#topicList input[type=checkbox]")
-    .forEach(cb=>cb.checked=false);
 }
 
 /* START QUIZ */
-function startQuiz(){
-  const selected=[...document.querySelectorAll("#topicList input:checked")].map(i=>i.value);
-  if(!selected.length){ alert("Select at least one scheme"); return; }
+function startQuiz(customSet=null){
+  quiz = customSet ? [...customSet] :
+    allQuestions.filter(q =>
+      [...document.querySelectorAll("#topicList input:checked")]
+        .map(i=>i.value).includes(q.topic)
+    );
 
-  quiz=allQuestions.filter(q=>selected.includes(q.topic));
+  if(!quiz.length){ alert("Select at least one topic"); return; }
+
   if(randomize.checked) quiz.sort(()=>Math.random()-0.5);
 
   index=0;
   userAnswers=new Array(quiz.length).fill(null);
 
   settingsBox.style.display="none";
+  reviewBox.innerHTML="";
   quizBox.style.display="block";
 
   createPalette();
-  startTimer((parseInt(timeLimit.value)||10)*60);
+  startTimer(timeLimit.value*60);
   loadQ();
 }
 
@@ -252,8 +163,7 @@ function startQuiz(){
 function startTimer(sec){
   timeLeft=sec;
   timerInterval=setInterval(()=>{
-    let m=Math.floor(timeLeft/60);
-    let s=timeLeft%60;
+    let m=Math.floor(timeLeft/60), s=timeLeft%60;
     timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
     if(timeLeft--<=0){ clearInterval(timerInterval); submitQuiz(); }
   },1000);
@@ -282,18 +192,14 @@ function loadQ(){
   const q=quiz[index];
   question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
   options.innerHTML="";
-  q.opts.forEach((opt,i)=>{
+  q.opts.forEach((o,i)=>{
     const L=String.fromCharCode(65+i);
     options.innerHTML+=`
-      <label>
-        <input type="radio" name="opt" value="${L}"
-        ${userAnswers[index]===L?"checked":""}>
-        <b>${L}.</b> ${opt}
-      </label>`;
+      <label><input type="radio" name="opt" value="${L}"
+      ${userAnswers[index]===L?"checked":""}> <b>${L}.</b> ${o}</label>`;
   });
   updatePalette();
 }
-
 function saveAnswer(){
   const sel=document.querySelector('input[name="opt"]:checked');
   userAnswers[index]=sel?sel.value:null;
@@ -302,10 +208,7 @@ function nextQ(){ saveAnswer(); if(index<quiz.length-1){ index++; loadQ(); } }
 function jumpQ(i){ saveAnswer(); index=i; loadQ(); }
 
 /* SUBMIT */
-function confirmSubmit(){
-  saveAnswer();
-  if(confirm("Submit quiz?")) submitQuiz();
-}
+function confirmSubmit(){ saveAnswer(); if(confirm("Submit quiz?")) submitQuiz(); }
 function submitQuiz(){
   clearInterval(timerInterval);
   quizBox.style.display="none";
@@ -315,23 +218,58 @@ function submitQuiz(){
 /* REVIEW */
 function showReview(){
   let score=0,attempted=0;
-  let html=`<div class="box"><h2>Quiz Review</h2>`;
+  wrongQuestions=[];
+  unattemptedQuestions=[];
+
+  quiz.forEach((q,i)=>{
+    if(!userAnswers[i]){
+      unattemptedQuestions.push(q);
+    }else{
+      attempted++;
+      if(userAnswers[i]===q.ans) score++;
+      else wrongQuestions.push(q);
+    }
+  });
+
+  let html=`
+    <div class="box">
+      <div class="score-box">
+        <h2>Score: ${score} / ${attempted}</h2>
+      </div>
+  `;
+
+  if(wrongQuestions.length){
+    html+=`
+      <button class="retry-wrong"
+        onclick="startQuiz(wrongQuestions)">
+        🔁 Reattempt Wrong (${wrongQuestions.length})
+      </button>
+    `;
+  }
+
+  if(unattemptedQuestions.length){
+    html+=`
+      <button class="retry-un"
+        onclick="startQuiz(unattemptedQuestions)">
+        🔁 Reattempt Unattempted (${unattemptedQuestions.length})
+      </button>
+    `;
+  }
+
+  html+="<hr>";
+
   quiz.forEach((q,i)=>{
     if(!userAnswers[i]) return;
-    attempted++;
     const right=userAnswers[i]===q.ans;
-    if(right) score++;
-    const ua=userAnswers[i].charCodeAt(0)-65;
-    const ca=q.ans.charCodeAt(0)-65;
     html+=`
-      <hr>
-      <p><b>Q${i+1}. ${q.q}</b></p>
-      <p>Your Answer: <b>${userAnswers[i]}</b>. ${q.opts[ua]}</p>
-      <p>Correct Answer: <b>${q.ans}</b>. ${q.opts[ca]}</p>
-      <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
-      <p><b>Explanation:</b> ${q.exp}</p>`;
+      <p><b>Q. ${q.q}</b></p>
+      <p class="${right?'correct':'wrong'}">
+        ${right?'✔ Correct':'✖ Wrong'}
+      </p>
+      <p><b>Explanation:</b> ${q.exp}</p><hr>`;
   });
-  html+=`<h3>Score: ${score}/${attempted}</h3></div>`;
+
+  html+="</div>";
   reviewBox.innerHTML=html;
 }
 </script>
