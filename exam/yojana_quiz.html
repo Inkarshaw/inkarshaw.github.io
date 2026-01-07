@@ -29,13 +29,22 @@ header{
   margin-bottom:15px;
 }
 
-label{font-weight:bold}
-select,input{
+/* FORM LABELS ONLY */
+.form-label{
+  font-weight:bold;
+  display:block;
+  margin-bottom:6px;
+}
+
+input[type="text"],
+input[type="number"]{
   padding:8px;
   border-radius:6px;
   border:1px solid #d1d5db;
   width:100%;
+  box-sizing:border-box;
 }
+
 button{
   padding:10px 18px;
   border:none;
@@ -43,7 +52,6 @@ button{
   font-size:15px;
   cursor:pointer;
 }
-
 .start{background:#16a34a;color:#fff;margin-top:15px}
 .next{background:#2563eb;color:#fff}
 .submit{background:#dc2626;color:#fff;margin-left:10px}
@@ -54,6 +62,7 @@ button{
   margin-bottom:10px;
 }
 
+/* OPTIONS */
 .options label{
   display:block;
   background:#f1f5f9;
@@ -62,7 +71,7 @@ button{
   border-radius:6px;
 }
 
-/* Palette */
+/* PALETTE */
 .palette{
   display:grid;
   grid-template-columns:repeat(auto-fill,40px);
@@ -79,20 +88,20 @@ button{
 .palette .visited{background:#93c5fd}
 .palette .answered{background:#86efac}
 
-/* Topic list with overflow fix */
+/* TOPIC LIST */
 .topic-list{
   max-height:220px;
   overflow-y:auto;
-  overflow-x:hidden;
   border:1px solid #d1d5db;
   padding:10px;
   border-radius:8px;
   background:#f9fafb;
 }
+
 .topic-list label{
   display:flex;
-  gap:6px;
-  align-items:flex-start;
+  align-items:center;
+  gap:8px;
   font-weight:normal;
   margin-bottom:6px;
   line-height:1.4;
@@ -116,25 +125,25 @@ button{
 <div class="box" id="settingsBox">
   <h3>Quiz Settings</h3>
 
-  <label>Select Yojanas / Schemes (Multiple)</label>
+  <label class="form-label">Select Yojanas / Schemes (Multiple)</label>
 
-  <!-- SEARCH -->
   <input type="text" id="topicSearch"
          placeholder="Search scheme / yojana..."
          onkeyup="filterTopics()"
-         style="margin:10px 0">
+         style="margin-bottom:10px">
 
   <div class="topic-list" id="topicList">Loading topics…</div>
 
   <br>
 
   <label>
-    <input type="checkbox" id="randomize"> Random Questions
+    <input type="checkbox" id="randomize">
+    Random Questions
   </label>
 
   <br><br>
 
-  <label>Time Limit (minutes)</label>
+  <label class="form-label">Time Limit (minutes)</label>
   <input type="number" id="timeLimit" value="10" min="1">
 
   <button class="start" onclick="startQuiz()">Start Quiz</button>
@@ -183,19 +192,18 @@ fetch(sheetURL).then(r=>r.text()).then(t=>{
 /* POPULATE TOPICS */
 function populateTopics(){
   const topics=[...new Set(allQuestions.map(q=>q.topic))];
-  const box=document.getElementById("topicList");
-  box.innerHTML="";
+  topicList.innerHTML="";
   topics.forEach(t=>{
-    box.innerHTML+=`
+    topicList.innerHTML+=`
       <label>
         <input type="checkbox" value="${t}"> ${t}
       </label>`;
   });
 }
 
-/* SEARCH FILTER */
+/* SEARCH */
 function filterTopics(){
-  const q=document.getElementById("topicSearch").value.toLowerCase();
+  const q=topicSearch.value.toLowerCase();
   document.querySelectorAll("#topicList label").forEach(l=>{
     l.style.display = l.innerText.toLowerCase().includes(q) ? "flex" : "none";
   });
@@ -203,19 +211,11 @@ function filterTopics(){
 
 /* START QUIZ */
 function startQuiz(){
-  const selected=[...document.querySelectorAll("#topicList input:checked")]
-    .map(i=>i.value);
-
-  if(selected.length===0){
-    alert("Please select at least one scheme");
-    return;
-  }
+  const selected=[...document.querySelectorAll("#topicList input:checked")].map(i=>i.value);
+  if(!selected.length){ alert("Select at least one scheme"); return; }
 
   quiz=allQuestions.filter(q=>selected.includes(q.topic));
-
-  if(document.getElementById("randomize").checked){
-    quiz.sort(()=>Math.random()-0.5);
-  }
+  if(randomize.checked) quiz.sort(()=>Math.random()-0.5);
 
   index=0;
   userAnswers=new Array(quiz.length).fill(null);
@@ -235,10 +235,7 @@ function startTimer(sec){
     let m=Math.floor(timeLeft/60);
     let s=timeLeft%60;
     timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
-    if(timeLeft--<=0){
-      clearInterval(timerInterval);
-      submitQuiz();
-    }
+    if(timeLeft--<=0){ clearInterval(timerInterval); submitQuiz(); }
   },1000);
 }
 
@@ -260,7 +257,7 @@ function updatePalette(){
   });
 }
 
-/* LOAD QUESTION */
+/* QUESTIONS */
 function loadQ(){
   const q=quiz[index];
   question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
@@ -277,20 +274,17 @@ function loadQ(){
   updatePalette();
 }
 
-/* NAVIGATION */
 function saveAnswer(){
   const sel=document.querySelector('input[name="opt"]:checked');
   userAnswers[index]=sel?sel.value:null;
 }
-function nextQ(){saveAnswer();if(index<quiz.length-1){index++;loadQ();}}
-function jumpQ(i){saveAnswer();index=i;loadQ();}
+function nextQ(){ saveAnswer(); if(index<quiz.length-1){ index++; loadQ(); } }
+function jumpQ(i){ saveAnswer(); index=i; loadQ(); }
 
 /* SUBMIT */
 function confirmSubmit(){
   saveAnswer();
-  if(confirm("Are you sure you want to submit the quiz?")){
-    submitQuiz();
-  }
+  if(confirm("Submit quiz?")) submitQuiz();
 }
 function submitQuiz(){
   clearInterval(timerInterval);
@@ -298,20 +292,17 @@ function submitQuiz(){
   showReview();
 }
 
-/* REVIEW – ATTEMPTED ONLY */
+/* REVIEW */
 function showReview(){
   let score=0,attempted=0;
   let html=`<div class="box"><h2>Quiz Review</h2>`;
-
   quiz.forEach((q,i)=>{
     if(!userAnswers[i]) return;
     attempted++;
     const right=userAnswers[i]===q.ans;
     if(right) score++;
-
     const ua=userAnswers[i].charCodeAt(0)-65;
     const ca=q.ans.charCodeAt(0)-65;
-
     html+=`
       <hr>
       <p><b>Q${i+1}. ${q.q}</b></p>
@@ -320,12 +311,7 @@ function showReview(){
       <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
       <p><b>Explanation:</b> ${q.exp}</p>`;
   });
-
-  html+=`
-    <h3>Attempted: ${attempted}/${quiz.length}</h3>
-    <h3>Score: ${score}/${attempted}</h3>
-  </div>`;
-
+  html+=`<h3>Score: ${score}/${attempted}</h3></div>`;
   reviewBox.innerHTML=html;
 }
 </script>
