@@ -29,7 +29,6 @@ header{
   margin-bottom:15px;
 }
 
-/* FORM LABELS ONLY */
 .form-label{
   font-weight:bold;
   display:block;
@@ -46,47 +45,27 @@ input[type="number"]{
 }
 
 button{
-  padding:10px 18px;
+  padding:8px 14px;
   border:none;
   border-radius:20px;
-  font-size:15px;
+  font-size:14px;
   cursor:pointer;
 }
+
 .start{background:#16a34a;color:#fff;margin-top:15px}
 .next{background:#2563eb;color:#fff}
 .submit{background:#dc2626;color:#fff;margin-left:10px}
+
+.small-btn{
+  background:#e5e7eb;
+  margin-right:8px;
+}
 
 .timer{
   font-weight:bold;
   color:#dc2626;
   margin-bottom:10px;
 }
-
-/* OPTIONS */
-.options label{
-  display:block;
-  background:#f1f5f9;
-  padding:10px;
-  margin:8px 0;
-  border-radius:6px;
-}
-
-/* PALETTE */
-.palette{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,40px);
-  gap:6px;
-  margin-bottom:15px;
-}
-.palette div{
-  padding:8px;
-  text-align:center;
-  border-radius:6px;
-  background:#e5e7eb;
-  cursor:pointer;
-}
-.palette .visited{background:#93c5fd}
-.palette .answered{background:#86efac}
 
 /* TOPIC LIST */
 .topic-list{
@@ -106,6 +85,31 @@ button{
   margin-bottom:6px;
   line-height:1.4;
   word-break:break-word;
+}
+
+/* PALETTE */
+.palette{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,40px);
+  gap:6px;
+  margin-bottom:15px;
+}
+.palette div{
+  padding:8px;
+  text-align:center;
+  border-radius:6px;
+  background:#e5e7eb;
+  cursor:pointer;
+}
+.palette .visited{background:#93c5fd}
+.palette .answered{background:#86efac}
+
+.options label{
+  display:block;
+  background:#f1f5f9;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
 }
 
 .correct{color:green;font-weight:bold}
@@ -131,6 +135,12 @@ button{
          placeholder="Search scheme / yojana..."
          onkeyup="filterTopics()"
          style="margin-bottom:10px">
+
+  <!-- SELECT / CLEAR BUTTONS -->
+  <div style="margin-bottom:8px">
+    <button class="small-btn" onclick="selectAllTopics()">Select All</button>
+    <button class="small-btn" onclick="clearAllTopics()">Clear All</button>
+  </div>
 
   <div class="topic-list" id="topicList">Loading topics…</div>
 
@@ -173,7 +183,7 @@ const sheetURL =
 let allQuestions=[], quiz=[], index=0, userAnswers=[];
 let timerInterval, timeLeft;
 
-/* LOAD SHEET */
+/* LOAD DATA */
 fetch(sheetURL).then(r=>r.text()).then(t=>{
   const rows=t.trim().split("\n").slice(1);
   allQuestions=rows.map(r=>{
@@ -207,6 +217,16 @@ function filterTopics(){
   document.querySelectorAll("#topicList label").forEach(l=>{
     l.style.display = l.innerText.toLowerCase().includes(q) ? "flex" : "none";
   });
+}
+
+/* SELECT ALL / CLEAR ALL */
+function selectAllTopics(){
+  document.querySelectorAll("#topicList input[type=checkbox]")
+    .forEach(cb=>cb.checked=true);
+}
+function clearAllTopics(){
+  document.querySelectorAll("#topicList input[type=checkbox]")
+    .forEach(cb=>cb.checked=false);
 }
 
 /* START QUIZ */
