@@ -5,300 +5,236 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Exam Quiz Platform</title>
 
-<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Tamil&display=swap" rel="stylesheet">
 
 <style>
-/* ==============================
-   CSS VARIABLES (LIGHT MODE)
-============================== */
+/* ================= VARIABLES ================= */
 :root{
-  --primary:#1e40af;
-  --primary-light:#3b82f6;
+  --primary:#2563eb;
   --bg:#f4f6fb;
   --card:#ffffff;
   --text:#111827;
   --muted:#6b7280;
   --border:#e5e7eb;
-  --footer:#111827;
 }
 
-/* ==============================
-   DARK MODE VARIABLES
-============================== */
+/* DARK MODE */
 body.dark{
-  --primary:#60a5fa;
-  --primary-light:#93c5fd;
   --bg:#020617;
   --card:#020617;
   --text:#e5e7eb;
   --muted:#9ca3af;
   --border:#1f2937;
-  --footer:#020617;
 }
 
-/* ==============================
-   GLOBAL
-============================== */
+/* ================= GLOBAL ================= */
 *{box-sizing:border-box}
-
 body{
   margin:0;
-  font-family:Inter,'Noto Sans Tamil',system-ui,sans-serif;
+  font-family:Inter,'Noto Sans Tamil',sans-serif;
   background:var(--bg);
   color:var(--text);
-  line-height:1.6;
-  transition:background .3s,color .3s;
+  transition:.25s;
 }
 
-a{
-  color:var(--primary);
-  text-decoration:none;
-}
-a:hover{color:var(--primary-light)}
-
-/* ==============================
-   HEADER
-============================== */
-header{
+/* ================= SPLASH SCREEN ================= */
+#splash{
+  position:fixed;
+  inset:0;
   background:linear-gradient(135deg,#1e40af,#1d4ed8);
   color:#fff;
-  padding:22px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.splash-box{
+  text-align:center;
+  animation:fadeUp .6s ease;
+}
+.splash-box h1{margin:0;font-size:28px}
+.splash-box p{opacity:.85}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:none}
+}
+
+/* ================= HEADER ================= */
+header{
+  background:#1e40af;
+  color:#fff;
+  padding:18px;
   text-align:center;
   position:relative;
 }
-header h1{
-  margin:0;
-  font-size:26px;
-}
-header p{
-  margin:6px 0 0;
-  font-size:14px;
-  opacity:.9;
-}
-
-/* Dark mode button */
 .dark-toggle{
   position:absolute;
-  right:16px;
-  top:18px;
-  background:rgba(255,255,255,.15);
+  right:15px;
+  top:15px;
+  background:rgba(255,255,255,.2);
   border:none;
   color:#fff;
-  padding:8px 12px;
-  border-radius:8px;
+  padding:6px 10px;
+  border-radius:6px;
   cursor:pointer;
-  font-size:14px;
-}
-.dark-toggle:hover{
-  background:rgba(255,255,255,.25);
 }
 
-/* ==============================
-   LAYOUT
-============================== */
+/* ================= LAYOUT ================= */
 .container{
   max-width:1100px;
   margin:auto;
-  padding:22px 16px;
+  padding:20px;
 }
 
-/* ==============================
-   CARDS
-============================== */
-.card{
+/* ================= GRID CARDS ================= */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+
+.quiz-card{
   background:var(--card);
   border:1px solid var(--border);
   border-radius:14px;
-  padding:20px;
-  margin-bottom:18px;
-  box-shadow:0 6px 18px rgba(0,0,0,.06);
-  transition:.2s;
-}
-.card:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 28px rgba(0,0,0,.12);
-}
-
-.card h2,.card h3{
-  margin-top:0;
-}
-.card h2{font-size:20px}
-.card h3{font-size:17px}
-
-.card p{
-  color:var(--muted);
-  font-size:14.5px;
-}
-
-/* Lists */
-.card ul{
-  list-style:none;
-  padding:0;
-  margin:10px 0 0;
-}
-.card li{
-  padding:8px 0;
-  border-bottom:1px dashed var(--border);
-}
-.card li:last-child{border-bottom:none}
-
-.card li a{
-  font-weight:600;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-.card li a::before{
-  content:"➤";
-  font-size:12px;
-  color:var(--primary-light);
-}
-
-/* ==============================
-   FOOTER
-============================== */
-.site-footer{
-  background:var(--footer);
-  color:#d1d5db;
-  margin-top:50px;
-}
-
-.footer-container{
-  max-width:1200px;
-  margin:auto;
-  padding:40px 20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:30px;
-}
-
-.footer-section h4{
-  color:#fff;
-  font-size:15px;
-  margin-bottom:12px;
-}
-
-.footer-section a,
-.footer-section span{
-  display:block;
-  margin-bottom:8px;
-  color:#d1d5db;
-}
-.footer-section a:hover{
-  color:#93c5fd;
-}
-
-.footer-bottom{
+  padding:18px;
   text-align:center;
-  padding:14px;
-  background:#020617;
-  font-size:13px;
-  color:#9ca3af;
+  transition:.18s ease;
+  cursor:pointer;
+}
+.quiz-card:hover{
+  transform:translateY(-4px);
 }
 
-/* ==============================
-   RESPONSIVE
-============================== */
-@media(max-width:600px){
-  header h1{font-size:22px}
-  .dark-toggle{top:14px}
-  .card{padding:16px}
+.quiz-icon{
+  font-size:28px;
+}
+.quiz-card h3{
+  margin:10px 0 6px;
+  font-size:16px;
+}
+.quiz-card p{
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* ================= SKELETON ================= */
+.skeleton{
+  height:110px;
+  border-radius:14px;
+  background:linear-gradient(90deg,#e5e7eb,#f3f4f6,#e5e7eb);
+  background-size:200% 100%;
+  animation:shimmer 1.1s infinite linear;
+}
+@keyframes shimmer{
+  to{background-position:-200% 0}
+}
+
+/* ================= FOOTER ================= */
+footer{
+  margin-top:40px;
+  text-align:center;
+  padding:15px;
+  font-size:13px;
+  color:var(--muted);
 }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-box">
+    <h1>📘 Exam Quiz</h1>
+    <p>UPSC • TNPSC • Group Exams</p>
+  </div>
+</div>
+
 <header>
-  <h1>📘 Exam Quiz</h1>
-  <p>TNPSC • UPSC • Group Exams</p>
-  <button class="dark-toggle" onclick="toggleDark()">🌙 Dark</button>
+  <h1>Exam Quiz</h1>
+  <p>Practice Smart. Crack Exams.</p>
+  <button class="dark-toggle" onclick="toggleDark()">🌙</button>
 </header>
 
-<!-- MAIN CONTENT -->
 <div class="container">
 
-  <div class="card">
-    <h2>Welcome to Exam Quiz</h2>
-    <p>
-      Practice subject-wise and topic-wise quizzes for competitive exams.
-      Designed specially for UPSC, TNPSC, and Group Exams.
-    </p>
+  <h2>Subjects</h2>
+
+  <!-- Skeleton Loader -->
+  <div id="skeleton" class="grid">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
   </div>
 
-  <div class="card">
-    <h3>Popular Subjects</h3>
-    <ul>
-      <li><a href="polity/index.html">Indian Polity</a></li>
-      <li><a href="history/index.html">History</a></li>
-      <li><a href="geography/index.html">Geography</a></li>
-      <li><a href="economy/index.html">Economy</a></li>
-      <li><a href="science/index.html">General Science</a></li>
-      <li><a href="current-affairs/index.html">Current Affairs</a></li>
-    </ul>
-  </div>
+  <!-- Actual Grid -->
+  <div id="content" class="grid" style="display:none">
 
-  <div class="card">
-    <h3>📊 Yojana & Government Schemes Quiz</h3>
-    <p>
-      Important Central & State Government schemes frequently asked in exams.
-    </p>
-    <ul>
-      <li><a href="yojana/index.html">All Government Schemes</a></li>
-      <li><a href="yojana/central.html">Central Government Schemes</a></li>
-      <li><a href="yojana/state.html">Tamil Nadu State Schemes</a></li>
-      <li><a href="yojana/current.html">Latest & Current Schemes</a></li>
-    </ul>
+    <a class="quiz-card" href="polity/index.html">
+      <div class="quiz-icon">⚖️</div>
+      <h3>Indian Polity</h3>
+      <p>Constitution, Articles, Amendments</p>
+    </a>
+
+    <a class="quiz-card" href="history/index.html">
+      <div class="quiz-icon">🏺</div>
+      <h3>History</h3>
+      <p>Ancient, Medieval, Modern</p>
+    </a>
+
+    <a class="quiz-card" href="geography/index.html">
+      <div class="quiz-icon">🌍</div>
+      <h3>Geography</h3>
+      <p>Physical & Human Geography</p>
+    </a>
+
+    <a class="quiz-card" href="economy/index.html">
+      <div class="quiz-icon">💹</div>
+      <h3>Economy</h3>
+      <p>Budget, Banking, Schemes</p>
+    </a>
+
+    <a class="quiz-card" href="science/index.html">
+      <div class="quiz-icon">🔬</div>
+      <h3>General Science</h3>
+      <p>Physics, Chemistry, Biology</p>
+    </a>
+
+    <a class="quiz-card" href="yojana/index.html">
+      <div class="quiz-icon">📊</div>
+      <h3>Yojana & Schemes</h3>
+      <p>Central & TN Govt Schemes</p>
+    </a>
+
   </div>
 
 </div>
 
-<!-- FOOTER -->
-<footer class="site-footer">
-  <div class="footer-container">
-
-    <div class="footer-section">
-      <h4>Exams & Practice</h4>
-      <a href="index.html">Home</a>
-      <a href="polity/index.html">Indian Polity</a>
-      <a href="yojana/index.html">Yojana & Schemes</a>
-      <a href="current-affairs/index.html">Current Affairs</a>
-    </div>
-
-    <div class="footer-section">
-      <h4>Quick Links</h4>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-      <a href="privacy.html">Privacy Policy</a>
-      <a href="disclaimer.html">Disclaimer</a>
-    </div>
-
-    <div class="footer-section">
-      <h4>Exams Covered</h4>
-      <span>UPSC</span>
-      <span>TNPSC</span>
-      <span>TNUSRB</span>
-      <span>Group Exams</span>
-    </div>
-
-  </div>
-
-  <div class="footer-bottom">
-    © 2026 Exam Quiz. All Rights Reserved.
-  </div>
+<footer>
+  © 2026 Exam Quiz
 </footer>
 
-<!-- DARK MODE SCRIPT -->
 <script>
+/* Splash hide */
+setTimeout(()=>{
+  document.getElementById("splash").style.display="none";
+},1800);
+
+/* Skeleton loader */
+setTimeout(()=>{
+  document.getElementById("skeleton").style.display="none";
+  document.getElementById("content").style.display="grid";
+},900);
+
+/* Dark mode */
 function toggleDark(){
   document.body.classList.toggle("dark");
   localStorage.setItem("theme",
-    document.body.classList.contains("dark") ? "dark" : "light"
-  );
+    document.body.classList.contains("dark")?"dark":"light");
 }
-
 if(localStorage.getItem("theme")==="dark"){
   document.body.classList.add("dark");
 }
