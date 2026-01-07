@@ -6,47 +6,20 @@
 <title>Yojanas & Schemes Quiz</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f5f7fb;
-  color:#111827;
-}
-header{
-  background:#1e40af;
-  color:#fff;
-  padding:15px;
-  text-align:center;
-}
-.container{
-  max-width:900px;
-  margin:auto;
-  padding:15px;
-}
-.box{
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:15px;
-}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb}
+header{background:#1e40af;color:#fff;padding:15px;text-align:center}
+.container{max-width:1000px;margin:auto;padding:15px}
+.box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
+
 label{font-weight:bold}
-select{
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  border-radius:6px;
-  border:1px solid #d1d5db;
-}
-button{
-  padding:10px 18px;
-  border:none;
-  border-radius:20px;
-  font-size:15px;
-  cursor:pointer;
-}
+select,input{padding:8px;border-radius:6px;border:1px solid #d1d5db;width:100%}
+button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:pointer}
+
 .start{background:#16a34a;color:#fff;margin-top:15px}
 .next{background:#2563eb;color:#fff}
 .submit{background:#dc2626;color:#fff;margin-left:10px}
+
+.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
 .options label{
   display:block;
@@ -54,10 +27,41 @@ button{
   padding:10px;
   margin:8px 0;
   border-radius:6px;
-  cursor:pointer;
 }
+
 .correct{color:green;font-weight:bold}
 .wrong{color:red;font-weight:bold}
+
+/* Palette */
+.palette{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,40px);
+  gap:6px;
+  margin-bottom:15px;
+}
+.palette div{
+  padding:8px;
+  text-align:center;
+  border-radius:6px;
+  background:#e5e7eb;
+  cursor:pointer;
+}
+.palette .visited{background:#93c5fd}
+.palette .answered{background:#86efac}
+
+/* Topic list */
+.topic-list{
+  max-height:200px;
+  overflow:auto;
+  border:1px solid #d1d5db;
+  padding:10px;
+  border-radius:8px;
+  background:#f9fafb;
+}
+.topic-list label{
+  display:block;
+  font-weight:normal;
+}
 </style>
 </head>
 
@@ -71,23 +75,35 @@ button{
 
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
-  <h3>Select Topic</h3>
+  <h3>Quiz Settings</h3>
 
-  <label>Yojana / Scheme</label>
-  <select id="topicSelect">
-    <option value="">Loading topics...</option>
-  </select>
+  <label>Select Yojanas / Schemes (Multiple)</label>
+  <div class="topic-list" id="topicList">Loading topics…</div>
+
+  <br>
+
+  <label>
+    <input type="checkbox" id="randomize"> Random Questions
+  </label>
+
+  <br><br>
+
+  <label>Time Limit (minutes)</label>
+  <input type="number" id="timeLimit" value="10" min="1">
 
   <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
 <!-- QUIZ -->
 <div class="box" id="quizBox" style="display:none">
+  <div class="timer" id="timer"></div>
+  <div class="palette" id="palette"></div>
+
   <div id="question"></div>
   <div class="options" id="options"></div>
 
   <button class="next" onclick="nextQ()">Next</button>
-  <button class="submit" onclick="submitQuiz()">Submit Quiz</button>
+  <button class="submit" onclick="confirmSubmit()">Submit Quiz</button>
 </div>
 
 <!-- REVIEW -->
@@ -99,140 +115,164 @@ button{
 const sheetURL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOEwxsSeGZI2M074Zdjy5K0ewaZYJD38m5eCM0aKS7gAqlBUOKbCQPN3_FbHP-4uA25uBgobRt3l1w/pub?output=csv";
 
-let allQuestions = [];
-let quiz = [];
-let index = 0;
-let userAnswers = [];
+let allQuestions=[], quiz=[], index=0, userAnswers=[];
+let timerInterval, timeLeft;
 
-// LOAD SHEET
-fetch(sheetURL)
-.then(res => res.text())
-.then(csv => {
-  const rows = csv.trim().split("\n").slice(1);
-
-  allQuestions = rows.map(r => {
-    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+/* LOAD SHEET */
+fetch(sheetURL).then(r=>r.text()).then(t=>{
+  const rows=t.trim().split("\n").slice(1);
+  allQuestions=rows.map(r=>{
+    const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
     return {
-      topic: c[0].trim(),
-      q: c[1],
-      opts: [c[2], c[3], c[4], c[5]],
-      ans: c[6].trim().toUpperCase(), // A/B/C/D
-      exp: c[7]
+      topic:c[0].trim(),
+      q:c[1],
+      opts:[c[2],c[3],c[4],c[5]],
+      ans:c[6].trim().toUpperCase(),
+      exp:c[7]
     };
   });
-
   populateTopics();
 });
 
-// POPULATE TOPIC DROPDOWN
+/* POPULATE MULTI TOPIC */
 function populateTopics(){
-  const select = document.getElementById("topicSelect");
-  const topics = [...new Set(allQuestions.map(q => q.topic))];
-
-  select.innerHTML = `<option value="">-- Select Topic --</option>`;
-  topics.forEach(t => {
-    const opt = document.createElement("option");
-    opt.value = t;
-    opt.textContent = t;
-    select.appendChild(opt);
+  const topics=[...new Set(allQuestions.map(q=>q.topic))];
+  const box=document.getElementById("topicList");
+  box.innerHTML="";
+  topics.forEach(t=>{
+    box.innerHTML+=`
+      <label>
+        <input type="checkbox" value="${t}"> ${t}
+      </label>`;
   });
 }
 
-// START QUIZ
+/* START QUIZ */
 function startQuiz(){
-  const topic = document.getElementById("topicSelect").value;
-  if(!topic){
-    alert("Please select a topic");
+  const selected=[...document.querySelectorAll("#topicList input:checked")]
+    .map(i=>i.value);
+
+  if(selected.length===0){
+    alert("Please select at least one topic");
     return;
   }
 
-  quiz = allQuestions.filter(q => q.topic === topic);
+  quiz=allQuestions.filter(q=>selected.includes(q.topic));
 
-  index = 0;
-  userAnswers = new Array(quiz.length).fill(null);
+  if(document.getElementById("randomize").checked){
+    quiz.sort(()=>Math.random()-0.5);
+  }
 
-  document.getElementById("settingsBox").style.display = "none";
-  document.getElementById("quizBox").style.display = "block";
+  index=0;
+  userAnswers=new Array(quiz.length).fill(null);
 
+  document.getElementById("settingsBox").style.display="none";
+  document.getElementById("quizBox").style.display="block";
+
+  createPalette();
+  startTimer((parseInt(timeLimit.value)||10)*60);
   loadQ();
 }
 
-// LOAD QUESTION
-function loadQ(){
-  const q = quiz[index];
-  document.getElementById("question").innerHTML =
-    `<h3>Q${index+1}. ${q.q}</h3>`;
+/* TIMER */
+function startTimer(sec){
+  timeLeft=sec;
+  timerInterval=setInterval(()=>{
+    let m=Math.floor(timeLeft/60);
+    let s=timeLeft%60;
+    timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
+    if(timeLeft--<=0){
+      clearInterval(timerInterval);
+      submitQuiz();
+    }
+  },1000);
+}
 
-  const optDiv = document.getElementById("options");
-  optDiv.innerHTML = "";
-
-  q.opts.forEach((opt,i)=>{
-    const letter = String.fromCharCode(65+i);
-    optDiv.innerHTML += `
-      <label>
-        <input type="radio" name="opt" value="${letter}"
-        ${userAnswers[index]===letter?"checked":""}>
-        <b>${letter}.</b> ${opt}
-      </label>
-    `;
+/* PALETTE */
+function createPalette(){
+  palette.innerHTML="";
+  quiz.forEach((_,i)=>{
+    const d=document.createElement("div");
+    d.innerText=i+1;
+    d.onclick=()=>jumpQ(i);
+    palette.appendChild(d);
+  });
+}
+function updatePalette(){
+  document.querySelectorAll(".palette div").forEach((d,i)=>{
+    d.className="";
+    if(userAnswers[i]) d.classList.add("answered");
+    else if(i<=index) d.classList.add("visited");
   });
 }
 
-// NEXT
-function nextQ(){
+/* LOAD QUESTION */
+function loadQ(){
+  const q=quiz[index];
+  question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
+  options.innerHTML="";
+  q.opts.forEach((opt,i)=>{
+    const L=String.fromCharCode(65+i);
+    options.innerHTML+=`
+      <label>
+        <input type="radio" name="opt" value="${L}"
+        ${userAnswers[index]===L?"checked":""}>
+        <b>${L}.</b> ${opt}
+      </label>`;
+  });
+  updatePalette();
+}
+
+/* NAVIGATION */
+function saveAnswer(){
+  const sel=document.querySelector('input[name="opt"]:checked');
+  userAnswers[index]=sel?sel.value:null;
+}
+function nextQ(){saveAnswer();if(index<quiz.length-1){index++;loadQ();}}
+function jumpQ(i){saveAnswer();index=i;loadQ();}
+
+/* SUBMIT */
+function confirmSubmit(){
   saveAnswer();
-  if(index < quiz.length-1){
-    index++;
-    loadQ();
+  if(confirm("Are you sure you want to submit the quiz?")){
+    submitQuiz();
   }
 }
-
-// SAVE ANSWER
-function saveAnswer(){
-  const sel = document.querySelector('input[name="opt"]:checked');
-  userAnswers[index] = sel ? sel.value : null;
-}
-
-// SUBMIT
 function submitQuiz(){
-  saveAnswer();
-  document.getElementById("quizBox").style.display = "none";
+  clearInterval(timerInterval);
+  quizBox.style.display="none";
   showReview();
 }
 
-// REVIEW (ATTEMPTED ONLY)
+/* REVIEW – ATTEMPTED ONLY */
 function showReview(){
-  let score = 0, attempted = 0;
-  let html = `<div class="box"><h2>Quiz Review</h2>`;
+  let score=0,attempted=0;
+  let html=`<div class="box"><h2>Quiz Review</h2>`;
 
   quiz.forEach((q,i)=>{
     if(!userAnswers[i]) return;
     attempted++;
-
-    const right = userAnswers[i] === q.ans;
+    const right=userAnswers[i]===q.ans;
     if(right) score++;
 
-    const ua = userAnswers[i].charCodeAt(0)-65;
-    const ca = q.ans.charCodeAt(0)-65;
+    const ua=userAnswers[i].charCodeAt(0)-65;
+    const ca=q.ans.charCodeAt(0)-65;
 
-    html += `
+    html+=`
       <hr>
       <p><b>Q${i+1}. ${q.q}</b></p>
       <p>Your Answer: <b>${userAnswers[i]}</b>. ${q.opts[ua]}</p>
       <p>Correct Answer: <b>${q.ans}</b>. ${q.opts[ca]}</p>
-      <p class="${right?'correct':'wrong'}">
-        ${right?'✔ Correct':'✖ Wrong'}
-      </p>
-      <p><b>Explanation:</b> ${q.exp}</p>
-    `;
+      <p class="${right?'correct':'wrong'}">${right?'✔ Correct':'✖ Wrong'}</p>
+      <p><b>Explanation:</b> ${q.exp}</p>`;
   });
 
-  html += `
+  html+=`
     <h3>Attempted: ${attempted}/${quiz.length}</h3>
     <h3>Score: ${score}/${attempted}</h3>
   </div>`;
 
-  document.getElementById("reviewBox").innerHTML = html;
+  document.getElementById("reviewBox").innerHTML=html;
 }
 </script>
 
