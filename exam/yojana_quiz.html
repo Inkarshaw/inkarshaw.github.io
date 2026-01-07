@@ -6,20 +6,53 @@
 <title>Yojanas & Schemes Quiz</title>
 
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb}
-header{background:#1e40af;color:#fff;padding:15px;text-align:center}
-.container{max-width:1000px;margin:auto;padding:15px}
-.box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f5f7fb;
+}
+header{
+  background:#1e40af;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+}
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:15px;
+}
+.box{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:15px;
+}
 
 label{font-weight:bold}
-select,input{padding:8px;border-radius:6px;border:1px solid #d1d5db;width:100%}
-button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:pointer}
+select,input{
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #d1d5db;
+  width:100%;
+}
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:20px;
+  font-size:15px;
+  cursor:pointer;
+}
 
 .start{background:#16a34a;color:#fff;margin-top:15px}
 .next{background:#2563eb;color:#fff}
 .submit{background:#dc2626;color:#fff;margin-left:10px}
 
-.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
+.timer{
+  font-weight:bold;
+  color:#dc2626;
+  margin-bottom:10px;
+}
 
 .options label{
   display:block;
@@ -28,9 +61,6 @@ button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:po
   margin:8px 0;
   border-radius:6px;
 }
-
-.correct{color:green;font-weight:bold}
-.wrong{color:red;font-weight:bold}
 
 /* Palette */
 .palette{
@@ -49,19 +79,28 @@ button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:po
 .palette .visited{background:#93c5fd}
 .palette .answered{background:#86efac}
 
-/* Topic list */
+/* Topic list with overflow fix */
 .topic-list{
-  max-height:200px;
-  overflow:auto;
+  max-height:220px;
+  overflow-y:auto;
+  overflow-x:hidden;
   border:1px solid #d1d5db;
   padding:10px;
   border-radius:8px;
   background:#f9fafb;
 }
 .topic-list label{
-  display:block;
+  display:flex;
+  gap:6px;
+  align-items:flex-start;
   font-weight:normal;
+  margin-bottom:6px;
+  line-height:1.4;
+  word-break:break-word;
 }
+
+.correct{color:green;font-weight:bold}
+.wrong{color:red;font-weight:bold}
 </style>
 </head>
 
@@ -78,6 +117,13 @@ button{padding:10px 18px;border:none;border-radius:20px;font-size:15px;cursor:po
   <h3>Quiz Settings</h3>
 
   <label>Select Yojanas / Schemes (Multiple)</label>
+
+  <!-- SEARCH -->
+  <input type="text" id="topicSearch"
+         placeholder="Search scheme / yojana..."
+         onkeyup="filterTopics()"
+         style="margin:10px 0">
+
   <div class="topic-list" id="topicList">Loading topics…</div>
 
   <br>
@@ -134,7 +180,7 @@ fetch(sheetURL).then(r=>r.text()).then(t=>{
   populateTopics();
 });
 
-/* POPULATE MULTI TOPIC */
+/* POPULATE TOPICS */
 function populateTopics(){
   const topics=[...new Set(allQuestions.map(q=>q.topic))];
   const box=document.getElementById("topicList");
@@ -147,13 +193,21 @@ function populateTopics(){
   });
 }
 
+/* SEARCH FILTER */
+function filterTopics(){
+  const q=document.getElementById("topicSearch").value.toLowerCase();
+  document.querySelectorAll("#topicList label").forEach(l=>{
+    l.style.display = l.innerText.toLowerCase().includes(q) ? "flex" : "none";
+  });
+}
+
 /* START QUIZ */
 function startQuiz(){
   const selected=[...document.querySelectorAll("#topicList input:checked")]
     .map(i=>i.value);
 
   if(selected.length===0){
-    alert("Please select at least one topic");
+    alert("Please select at least one scheme");
     return;
   }
 
@@ -166,8 +220,8 @@ function startQuiz(){
   index=0;
   userAnswers=new Array(quiz.length).fill(null);
 
-  document.getElementById("settingsBox").style.display="none";
-  document.getElementById("quizBox").style.display="block";
+  settingsBox.style.display="none";
+  quizBox.style.display="block";
 
   createPalette();
   startTimer((parseInt(timeLimit.value)||10)*60);
@@ -272,7 +326,7 @@ function showReview(){
     <h3>Score: ${score}/${attempted}</h3>
   </div>`;
 
-  document.getElementById("reviewBox").innerHTML=html;
+  reviewBox.innerHTML=html;
 }
 </script>
 
