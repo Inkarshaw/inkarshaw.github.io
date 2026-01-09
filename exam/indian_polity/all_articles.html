@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>Indian Polity – All Articles Quiz</title>
 
 <style>
@@ -26,10 +25,10 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 .palette .current{background:#1e40af;color:#fff}
 .palette .answered{background:#16a34a;color:#fff}
 .palette .visited{background:#93c5fd}
-#toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;display:none}
-#splash{position:fixed;inset:0;background:#1e40af;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;z-index:9999}
 .correct{color:green;font-weight:bold}
 .wrong{color:red}
+#toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;display:none}
+#splash{position:fixed;inset:0;background:#1e40af;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;z-index:9999}
 </style>
 </head>
 
@@ -71,7 +70,7 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 <label>Article / Topic</label>
 <select id="topicFilter">
 <option value="all">All Articles</option>
-</select><br><br>
+</select>
 
 <p id="rangeInfo"></p>
 <button class="start" onclick="startQuiz()">Start Quiz</button>
@@ -94,7 +93,8 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 setTimeout(()=>splash.style.display="none",2000);
 
 function showToast(m){
-toast.innerText=m;toast.style.display="block";
+toast.innerText=m;
+toast.style.display="block";
 setTimeout(()=>toast.style.display="none",2000);
 }
 
@@ -103,47 +103,79 @@ const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiT
 let allQuestions=[],quiz=[],index=0,userAnswers=[];
 let timerInterval,timeLeft,quizStarted=false,backOnce=false;
 
-fetch(sheetURL).then(r=>r.text()).then(t=>{
+/* LOAD QUESTIONS */
+fetch(sheetURL)
+.then(r=>r.text())
+.then(t=>{
 const rows=t.trim().split("\n").slice(1);
 allQuestions=rows.map(r=>{
 const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 return{
-q:c[0],opts:c.slice(1,5),
-ans:c[5].trim().toUpperCase(),
-exp:c[6],topic:(c[7]||"General").trim()
+q:c[0],
+opts:c.slice(1,5),
+ans:(c[5]||"").trim().toUpperCase(),
+exp:c[6]||"",
+topic:(c[7]||"General").trim()
 };
 });
-rangeFrom.value=1;rangeTo.value=allQuestions.length;
+rangeFrom.value=1;
+rangeTo.value=allQuestions.length;
 rangeInfo.innerText=`Available questions: 1 to ${allQuestions.length}`;
 populateTopics();
 });
 
 function populateTopics(){
-[...new Set(allQuestions.map(q=>q.topic))].forEach(t=>{
-let o=document.createElement("option");
+const set=new Set(allQuestions.map(q=>q.topic).filter(Boolean));
+set.forEach(t=>{
+const o=document.createElement("option");
 o.value=t;o.textContent=t;
 topicFilter.appendChild(o);
 });
 }
 
+/* START QUIZ */
 function startQuiz(){
-let from=+rangeFrom.value,to=+rangeTo.value;
-let count=questionCount.value,random=randomize.checked;
+
+if(allQuestions.length===0){
+alert("Questions not loaded yet");
+return;
+}
+
+if(!rangeFrom.value) rangeFrom.value=1;
+if(!rangeTo.value) rangeTo.value=allQuestions.length;
+
+let from=+rangeFrom.value;
+let to=+rangeTo.value;
+let count=questionCount.value;
+let random=randomize.checked;
 let topic=topicFilter.value;
+
 quiz=allQuestions.filter((q,i)=>{
 let n=i+1;
-return n>=from&&n<=to&&(topic==="all"||q.topic===topic);
+return n>=from && n<=to &&
+(topic==="all" || !q.topic || q.topic===topic);
 });
+
+if(quiz.length===0){
+alert("No questions found");
+return;
+}
+
 if(random) quiz.sort(()=>Math.random()-0.5);
 if(count!=="all") quiz=quiz.slice(0,+count);
 
-index=0;userAnswers=new Array(quiz.length).fill(null);
+index=0;
+userAnswers=new Array(quiz.length).fill(null);
 settingsBox.style.display="none";
 quizBox.style.display="block";
 quizStarted=true;
-createPalette();startTimer(+timeLimit.value*60);loadQ();
+
+createPalette();
+startTimer(+timeLimit.value*60);
+loadQ();
 }
 
+/* TIMER */
 function startTimer(sec){
 timeLeft=sec;
 timerInterval=setInterval(()=>{
@@ -152,11 +184,13 @@ if(timeLeft--<=0){clearInterval(timerInterval);submitQuiz();}
 },1000);
 }
 
+/* PALETTE */
 function createPalette(){
 palette.innerHTML="";
 quiz.forEach((_,i)=>{
 let d=document.createElement("div");
-d.innerText=i+1;d.onclick=()=>jumpQ(i);
+d.innerText=i+1;
+d.onclick=()=>jumpQ(i);
 palette.appendChild(d);
 });
 }
@@ -171,15 +205,18 @@ else d.classList.add("visited");
 document.querySelector(".current")?.scrollIntoView({behavior:"smooth",inline:"center"});
 }
 
+/* QUESTIONS */
 function loadQ(){
 let q=quiz[index];
 question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
 options.innerHTML="";
 q.opts.forEach((o,i)=>{
 let l=String.fromCharCode(65+i);
-options.innerHTML+=`<label>
+options.innerHTML+=`
+<label>
 <input type="radio" name="opt" value="${l}" ${userAnswers[index]==l?"checked":""}>
-<b>${l}.</b> ${o}</label>`;
+<b>${l}.</b> ${o}
+</label>`;
 });
 updatePalette();
 }
@@ -192,6 +229,7 @@ function nextQ(){saveAnswer();index<quiz.length-1?loadQ(++index):confirmSubmit()
 function jumpQ(i){saveAnswer();index=i;loadQ();}
 function confirmSubmit(){saveAnswer();if(confirm("Submit quiz?"))submitQuiz();}
 
+/* SUBMIT & REVIEW */
 function submitQuiz(){
 clearInterval(timerInterval);
 quizBox.style.display="none";
@@ -219,21 +257,27 @@ html+=`<div><b>Explanation:</b> ${q.exp||"-"}</div><br>`;
 reviewBox.innerHTML=html+"</div>";
 }
 
+/* REATTEMPT */
 function reattempt(type){
 let nq=[];
 quiz.forEach((q,i)=>{
-if(type==="wrong"&&userAnswers[i]&&userAnswers[i]!==q.ans)nq.push(q);
-if(type==="unattempted"&&!userAnswers[i])nq.push(q);
-if(type==="all")nq.push(q);
+if(type==="wrong" && userAnswers[i] && userAnswers[i]!==q.ans) nq.push(q);
+if(type==="unattempted" && !userAnswers[i]) nq.push(q);
+if(type==="all") nq.push(q);
 });
 if(!nq.length){alert("No questions available");return;}
-quiz=nq;index=0;userAnswers=new Array(quiz.length).fill(null);
+quiz=nq;
+index=0;
+userAnswers=new Array(quiz.length).fill(null);
 reviewBox.innerHTML="";
 quizBox.style.display="block";
 quizStarted=true;
-createPalette();startTimer(+timeLimit.value*60);loadQ();
+createPalette();
+startTimer(+timeLimit.value*60);
+loadQ();
 }
 
+/* ANDROID BACK */
 history.pushState(null,null,location.href);
 window.onpopstate=function(){
 if(quizStarted){
@@ -242,7 +286,8 @@ history.pushState(null,null,location.href);
 }else{
 if(backOnce)return;
 showToast("Press back again to exit");
-backOnce=true;setTimeout(()=>backOnce=false,2000);
+backOnce=true;
+setTimeout(()=>backOnce=false,2000);
 history.pushState(null,null,location.href);
 }
 };
