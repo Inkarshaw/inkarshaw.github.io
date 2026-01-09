@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Indian Polity – Constitution of India Quiz</title>
+<title>Indian Polity – All Articles Quiz</title>
 
 <style>
 body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
@@ -91,12 +91,12 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer}
 <body>
 
 <!-- SPLASH -->
-<div id="splash">Exam Practice App</div>
+<div id="splash">All Articles Practice App</div>
 
 <!-- TOAST -->
 <div id="toast"></div>
 
-<header><h2>Exam Practice Quiz</h2></header>
+<header><h2>Indian Polity – All Articles Quiz</h2></header>
 
 <div class="container">
 
@@ -125,7 +125,7 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer}
 </div>
 
 <p id="rangeInfo"></p>
-<label><input type="checkbox" id="randomize"> Randomize</label><br><br>
+<label><input type="checkbox" id="randomize"> Randomize Questions</label><br><br>
 <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
@@ -158,7 +158,9 @@ function showToast(msg){
   setTimeout(()=>t.style.display="none",2000);
 }
 
-const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
+/* 🔗 ALL ARTICLES GOOGLE SHEET CSV */
+const sheetURL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
 let allQuestions=[],quiz=[],index=0,userAnswers=[];
 let timerInterval,timeLeft,quizStarted=false;
@@ -168,7 +170,12 @@ fetch(sheetURL).then(r=>r.text()).then(t=>{
 const rows=t.trim().split("\n").slice(1);
 allQuestions=rows.map(r=>{
 const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-return{q:c[0],opts:c.slice(1,5),ans:c[5].trim().toUpperCase(),exp:c[6]};
+return{
+  q:c[0],
+  opts:c.slice(1,5),
+  ans:c[5].trim().toUpperCase(),
+  exp:c[6]
+};
 });
 rangeFrom.value=1;
 rangeTo.value=allQuestions.length;
@@ -181,7 +188,10 @@ let count=questionCount.value;
 let random=randomize.checked;
 let minutes=+timeLimit.value||10;
 
-if(from<1||to>allQuestions.length||from>to){alert("Invalid range");return;}
+if(from<1||to>allQuestions.length||from>to){
+  alert("Invalid range");
+  return;
+}
 
 quiz=[...allQuestions].slice(from-1,to);
 if(random) quiz.sort(()=>Math.random()-0.5);
@@ -229,12 +239,9 @@ else d.classList.add("visited");
 autoScrollPalette();
 }
 
-/* AUTO-SCROLL */
 function autoScrollPalette(){
 const current=document.querySelector(".palette .current");
-if(current){
-current.scrollIntoView({behavior:"smooth",inline:"center"});
-}
+if(current) current.scrollIntoView({behavior:"smooth",inline:"center"});
 }
 
 /* QUESTIONS */
@@ -264,7 +271,10 @@ else if(confirm("Submit quiz?")) submitQuiz();
 }
 function jumpQ(i){saveAnswer();index=i;loadQ();}
 
-function confirmSubmit(){saveAnswer();if(confirm("Are you sure?")) submitQuiz();}
+function confirmSubmit(){
+saveAnswer();
+if(confirm("Are you sure you want to submit?")) submitQuiz();
+}
 function submitQuiz(){
 clearInterval(timerInterval);
 quizBox.style.display="none";
