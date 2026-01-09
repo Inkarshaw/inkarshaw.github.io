@@ -11,89 +11,31 @@ body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
 header{background:#1e40af;color:#fff;padding:15px;text-align:center}
 .container{max-width:1000px;margin:auto;padding:15px}
 .box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
-
-/* SPLASH */
-#splash{
-  position:fixed;inset:0;
-  background:#1e40af;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-  z-index:9999;
-}
-
-/* TOAST */
-#toast{
-  position:fixed;
-  bottom:40px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#111;
-  color:#fff;
-  padding:10px 16px;
-  border-radius:20px;
-  font-size:14px;
-  display:none;
-  z-index:9999;
-}
-
-/* SETTINGS */
-.settings-row{display:flex;gap:15px;margin-bottom:15px}
-.setting{flex:1}
-.setting input,.setting select{
-  width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1
-}
-
-/* OPTIONS */
-.options label{
-  display:block;background:#f1f5f9;padding:10px;margin:8px 0;border-radius:6px
-}
-
-/* BUTTONS */
-button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer}
+button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5px}
 .start{background:#16a34a;color:#fff}
 .next{background:#2563eb;color:#fff}
-.submit{background:#dc2626;color:#fff;margin-left:10px}
-
-/* TIMER */
+.submit{background:#dc2626;color:#fff}
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
-
-/* PALETTE */
-.palette-wrapper{
-  border:1px solid #e5e7eb;
-  border-radius:8px;
-  padding:8px;
-  margin-bottom:15px;
-  overflow-x:auto;
-}
-.palette{
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-}
-.palette div{
-  min-width:40px;
-  padding:8px;
-  text-align:center;
-  border-radius:6px;
-  cursor:pointer;
-  background:#e5e7eb;
-  flex-shrink:0;
-}
+.options label{display:block;background:#f1f5f9;padding:10px;margin:8px 0;border-radius:6px}
+.settings-row{display:flex;gap:15px;margin-bottom:15px}
+.setting{flex:1}
+.setting input,.setting select{width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1}
+.palette-wrapper{border:1px solid #e5e7eb;border-radius:8px;padding:8px;margin-bottom:15px;overflow-x:auto}
+.palette{display:flex;gap:8px}
+.palette div{min-width:40px;padding:8px;text-align:center;border-radius:6px;cursor:pointer;background:#e5e7eb}
 .palette .current{background:#1e40af;color:#fff}
 .palette .answered{background:#16a34a;color:#fff}
 .palette .visited{background:#93c5fd}
+#toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;display:none}
+#splash{position:fixed;inset:0;background:#1e40af;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;z-index:9999}
+.correct{color:green;font-weight:bold}
+.wrong{color:red}
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
 <div id="splash">All Articles Practice App</div>
-
-<!-- TOAST -->
 <div id="toast"></div>
 
 <header><h2>Indian Polity – All Articles Quiz</h2></header>
@@ -124,107 +66,97 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer}
 <div class="setting"><label>To</label><input type="number" id="rangeTo"></div>
 </div>
 
+<label><input type="checkbox" id="randomize"> Randomize</label><br><br>
+
+<label>Article / Topic</label>
+<select id="topicFilter">
+<option value="all">All Articles</option>
+</select><br><br>
+
 <p id="rangeInfo"></p>
-<label><input type="checkbox" id="randomize"> Randomize Questions</label><br><br>
 <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
 <div class="box" id="quizBox" style="display:none">
 <div class="timer" id="timer"></div>
-
-<div class="palette-wrapper">
-<div class="palette" id="palette"></div>
-</div>
-
+<div class="palette-wrapper"><div class="palette" id="palette"></div></div>
 <div id="question"></div>
 <div class="options" id="options"></div>
-
 <button class="next" onclick="nextQ()">Next</button>
 <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
 <div id="reviewBox"></div>
+
 </div>
 
 <script>
-/* SPLASH AUTO HIDE */
-setTimeout(()=>document.getElementById("splash").style.display="none",2000);
+setTimeout(()=>splash.style.display="none",2000);
 
-/* TOAST */
-function showToast(msg){
-  const t=document.getElementById("toast");
-  t.innerText=msg;
-  t.style.display="block";
-  setTimeout(()=>t.style.display="none",2000);
+function showToast(m){
+toast.innerText=m;toast.style.display="block";
+setTimeout(()=>toast.style.display="none",2000);
 }
 
-/* 🔗 ALL ARTICLES GOOGLE SHEET CSV */
-const sheetURL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
+const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
 let allQuestions=[],quiz=[],index=0,userAnswers=[];
-let timerInterval,timeLeft,quizStarted=false;
-let backOnce=false;
+let timerInterval,timeLeft,quizStarted=false,backOnce=false;
 
 fetch(sheetURL).then(r=>r.text()).then(t=>{
 const rows=t.trim().split("\n").slice(1);
 allQuestions=rows.map(r=>{
 const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 return{
-  q:c[0],
-  opts:c.slice(1,5),
-  ans:c[5].trim().toUpperCase(),
-  exp:c[6]
+q:c[0],opts:c.slice(1,5),
+ans:c[5].trim().toUpperCase(),
+exp:c[6],topic:(c[7]||"General").trim()
 };
 });
-rangeFrom.value=1;
-rangeTo.value=allQuestions.length;
+rangeFrom.value=1;rangeTo.value=allQuestions.length;
 rangeInfo.innerText=`Available questions: 1 to ${allQuestions.length}`;
+populateTopics();
 });
+
+function populateTopics(){
+[...new Set(allQuestions.map(q=>q.topic))].forEach(t=>{
+let o=document.createElement("option");
+o.value=t;o.textContent=t;
+topicFilter.appendChild(o);
+});
+}
 
 function startQuiz(){
 let from=+rangeFrom.value,to=+rangeTo.value;
-let count=questionCount.value;
-let random=randomize.checked;
-let minutes=+timeLimit.value||10;
-
-if(from<1||to>allQuestions.length||from>to){
-  alert("Invalid range");
-  return;
-}
-
-quiz=[...allQuestions].slice(from-1,to);
+let count=questionCount.value,random=randomize.checked;
+let topic=topicFilter.value;
+quiz=allQuestions.filter((q,i)=>{
+let n=i+1;
+return n>=from&&n<=to&&(topic==="all"||q.topic===topic);
+});
 if(random) quiz.sort(()=>Math.random()-0.5);
 if(count!=="all") quiz=quiz.slice(0,+count);
 
-index=0;
-userAnswers=new Array(quiz.length).fill(null);
+index=0;userAnswers=new Array(quiz.length).fill(null);
 settingsBox.style.display="none";
 quizBox.style.display="block";
 quizStarted=true;
-
-createPalette();
-startTimer(minutes*60);
-loadQ();
+createPalette();startTimer(+timeLimit.value*60);loadQ();
 }
 
-/* TIMER */
 function startTimer(sec){
 timeLeft=sec;
 timerInterval=setInterval(()=>{
-let m=Math.floor(timeLeft/60),s=timeLeft%60;
-timer.innerText=`Time Left: ${m}:${String(s).padStart(2,"0")}`;
+timer.innerText=`Time Left: ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`;
 if(timeLeft--<=0){clearInterval(timerInterval);submitQuiz();}
 },1000);
 }
 
-/* PALETTE */
 function createPalette(){
 palette.innerHTML="";
 quiz.forEach((_,i)=>{
 let d=document.createElement("div");
-d.innerText=i+1;
-d.onclick=()=>jumpQ(i);
+d.innerText=i+1;d.onclick=()=>jumpQ(i);
 palette.appendChild(d);
 });
 }
@@ -232,30 +164,22 @@ palette.appendChild(d);
 function updatePalette(){
 document.querySelectorAll(".palette div").forEach((d,i)=>{
 d.className="";
-if(i===index) d.classList.add("current");
-else if(userAnswers[i]) d.classList.add("answered");
+if(i===index)d.classList.add("current");
+else if(userAnswers[i])d.classList.add("answered");
 else d.classList.add("visited");
 });
-autoScrollPalette();
+document.querySelector(".current")?.scrollIntoView({behavior:"smooth",inline:"center"});
 }
 
-function autoScrollPalette(){
-const current=document.querySelector(".palette .current");
-if(current) current.scrollIntoView({behavior:"smooth",inline:"center"});
-}
-
-/* QUESTIONS */
 function loadQ(){
 let q=quiz[index];
 question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
 options.innerHTML="";
 q.opts.forEach((o,i)=>{
 let l=String.fromCharCode(65+i);
-options.innerHTML+=`
-<label>
+options.innerHTML+=`<label>
 <input type="radio" name="opt" value="${l}" ${userAnswers[index]==l?"checked":""}>
-<b>${l}.</b> ${o}
-</label>`;
+<b>${l}.</b> ${o}</label>`;
 });
 updatePalette();
 }
@@ -264,35 +188,61 @@ function saveAnswer(){
 let s=document.querySelector('input[name="opt"]:checked');
 userAnswers[index]=s?s.value:null;
 }
-function nextQ(){
-saveAnswer();
-if(index<quiz.length-1){index++;loadQ();}
-else if(confirm("Submit quiz?")) submitQuiz();
-}
+function nextQ(){saveAnswer();index<quiz.length-1?loadQ(++index):confirmSubmit();}
 function jumpQ(i){saveAnswer();index=i;loadQ();}
+function confirmSubmit(){saveAnswer();if(confirm("Submit quiz?"))submitQuiz();}
 
-function confirmSubmit(){
-saveAnswer();
-if(confirm("Are you sure you want to submit?")) submitQuiz();
-}
 function submitQuiz(){
 clearInterval(timerInterval);
 quizBox.style.display="none";
 quizStarted=false;
-reviewBox.innerHTML="<div class='box'><h2>Quiz Submitted</h2></div>";
+
+let score=0;
+quiz.forEach((q,i)=>{if(userAnswers[i]===q.ans)score++;});
+
+let html=`<div class="box"><h2>Score: ${score}/${quiz.length}</h2>
+<button onclick="reattempt('wrong')">Reattempt Wrong</button>
+<button onclick="reattempt('unattempted')">Reattempt Unattempted</button>
+<button onclick="reattempt('all')">Full Reattempt</button><hr>`;
+
+quiz.forEach((q,i)=>{
+if(!userAnswers[i])return;
+html+=`<b>Q${i+1}. ${q.q}</b>`;
+q.opts.forEach((o,j)=>{
+let l=String.fromCharCode(65+j);
+let cls=l===q.ans?"correct":(l===userAnswers[i]?"wrong":"");
+html+=`<div class="${cls}">${l}. ${o}</div>`;
+});
+html+=`<div><b>Explanation:</b> ${q.exp||"-"}</div><br>`;
+});
+
+reviewBox.innerHTML=html+"</div>";
 }
 
-/* ANDROID BACK BUTTON */
+function reattempt(type){
+let nq=[];
+quiz.forEach((q,i)=>{
+if(type==="wrong"&&userAnswers[i]&&userAnswers[i]!==q.ans)nq.push(q);
+if(type==="unattempted"&&!userAnswers[i])nq.push(q);
+if(type==="all")nq.push(q);
+});
+if(!nq.length){alert("No questions available");return;}
+quiz=nq;index=0;userAnswers=new Array(quiz.length).fill(null);
+reviewBox.innerHTML="";
+quizBox.style.display="block";
+quizStarted=true;
+createPalette();startTimer(+timeLimit.value*60);loadQ();
+}
+
 history.pushState(null,null,location.href);
 window.onpopstate=function(){
 if(quizStarted){
 showToast("Exit quiz? Progress will be lost");
 history.pushState(null,null,location.href);
 }else{
-if(backOnce) return;
+if(backOnce)return;
 showToast("Press back again to exit");
-backOnce=true;
-setTimeout(()=>backOnce=false,2000);
+backOnce=true;setTimeout(()=>backOnce=false,2000);
 history.pushState(null,null,location.href);
 }
 };
