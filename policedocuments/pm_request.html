@@ -155,6 +155,12 @@
             flex: 1;
         }
         
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+            flex: 1;
+        }
+        
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -170,6 +176,10 @@
         
         .btn-success:hover {
             background-color: #218838;
+        }
+        
+        .btn-info:hover {
+            background-color: #138496;
         }
         
         .btn i {
@@ -228,7 +238,6 @@
             align-items: flex-start;
         }
         
-        /* Single border table styles */
         .single-column-table {
             width: 28%;
             border: 1px solid #000;
@@ -356,6 +365,148 @@
             padding: 5px 10px;
         }
         
+        .font-selection-control {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .font-selection-control label {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        
+        .font-selection-control select {
+            width: auto;
+            padding: 5px 10px;
+            min-width: 150px;
+        }
+        
+        .voice-typing-control {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .voice-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .voice-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .voice-btn.active {
+            background-color: #f44336;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .voice-status {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .field-with-voice {
+            position: relative;
+        }
+        
+        .voice-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4CAF50;
+            display: none;
+        }
+        
+        .voice-indicator.active {
+            display: block;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        .police-station-controls, .hospital-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .station-select-group, .station-custom-group,
+        .hospital-select-group, .hospital-custom-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .station-address-group, .hospital-address-group {
+            grid-column: span 2;
+        }
+        
+        .custom-station-input, .custom-hospital-input {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .custom-station-input.active, .custom-hospital-input.active {
+            display: block;
+        }
+        
+        .station-info, .hospital-info {
+            background-color: #f0f7ff;
+            border: 1px solid #b6d4fe;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #0c5460;
+        }
+        
+        .station-info h5, .hospital-info h5 {
+            margin-bottom: 5px;
+            color: #1a3a8f;
+        }
+        
+        .mobile-optimized {
+            /* Styles for mobile optimization */
+        }
+        
+        .sender-format-notice, .receiver-format-notice {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #2e7d32;
+        }
+        
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -378,11 +529,77 @@
             .buttons {
                 flex-direction: column;
             }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .font-selection-control, 
+            .table-width-control,
+            .font-size-control,
+            .police-station-controls,
+            .hospital-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .police-station-controls,
+            .hospital-controls {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .station-address-group,
+            .hospital-address-group {
+                grid-column: span 1;
+            }
+            
+            .font-selection-control select,
+            .table-width-control select,
+            .font-size-control select {
+                width: 100%;
+            }
+            
+            .voice-typing-control {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .voice-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .form-section, .preview-section {
+                padding: 15px;
+            }
+            
+            input, select, textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            /* Improve touch targets */
+            .btn {
+                padding: 16px 20px;
+                min-height: 54px;
+            }
+            
+            select {
+                min-height: 44px;
+            }
         }
     </style>
     
-    <!-- Tamil font - Latha -->
+    <!-- Tamil fonts -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;700&display=swap');
+        
         @font-face {
             font-family: 'Latha';
             src: local('Latha'),
@@ -393,8 +610,20 @@
             font-display: swap;
         }
         
-        .tamil-text {
+        .font-latha {
             font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
+        }
+        
+        .font-noto {
+            font-family: 'Noto Sans Tamil', sans-serif;
+        }
+        
+        .font-avanam {
+            font-family: 'Aavanam', 'Latha', sans-serif;
+        }
+        
+        .font-bamini {
+            font-family: 'Bamini', sans-serif;
         }
     </style>
 </head>
@@ -410,42 +639,127 @@
                 <h2 class="section-title"><i class="fas fa-edit"></i> Document Details</h2>
                 
                 <div class="font-notice">
-                    <i class="fas fa-font"></i> <strong>Using Latha Tamil Font:</strong> All Tamil text will use Latha font (standard Windows Tamil font). Non-Tamil text uses Times New Roman.
+                    <i class="fas fa-font"></i> <strong>Tamil Font Selection:</strong> Choose from available Tamil fonts for the PDF
                 </div>
                 
-                <div class="form-group">
-                    <label for="documentNumber">Document Number/Reference</label>
-                    <input type="text" id="documentNumber" placeholder="e.g., G7 fhty; epiya Fw;w vz; 216-2025">
+                <div class="font-selection-control">
+                    <label for="tamilFontSelect"><i class="fas fa-font"></i> Tamil Font:</label>
+                    <select id="tamilFontSelect">
+                        <option value="Latha" selected>Latha (Standard Windows)</option>
+                        <option value="Noto Sans Tamil">Noto Sans Tamil (Google)</option>
+                        <option value="Aavanam">Aavanam</option>
+                        <option value="Bamini">Bamini</option>
+                    </select>
+                </div>
+                
+                <div class="voice-typing-control">
+                    <button class="voice-btn" id="startVoiceBtn">
+                        <i class="fas fa-microphone"></i> Start Voice Typing
+                    </button>
+                    <div class="voice-status" id="voiceStatus">
+                        <i class="fas fa-info-circle"></i> Click microphone button and speak
+                    </div>
+                </div>
+                
+                <div class="sender-format-notice">
+                    <i class="fas fa-info-circle"></i> <strong>Standard Sender Format:</strong><br>
+                    1. காவல் ஆய்வாளர் (Police Inspector)<br>
+                    2. Selected Police Station Name<br>
+                    3. Station Address
+                </div>
+                
+                <div class="receiver-format-notice">
+                    <i class="fas fa-info-circle"></i> <strong>Receiver Format:</strong><br>
+                    1. Selected Hospital/Office Name<br>
+                    2. Hospital/Office Address<br>
+                    3. Additional Information (if any)
                 </div>
                 
                 <div class="form-group">
                     <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <i class="fas fa-paper-plane"></i> Sender (அனுப்புநர்) - Single Field
+                        <i class="fas fa-paper-plane"></i> Sender (அனுப்புநர்) Details
                     </h3>
-                    <div class="form-group">
-                        <label for="fromDetails">Sender Details (Office, Address, Additional Info)</label>
-                        <textarea id="fromDetails" rows="5" placeholder="Enter all sender details here, each on a new line">G7 nrj;Jg;gl;L fhty; epiyak;
-nrj;Jg;gl;L. brd;id-31
-mDg;g[eh;
-bgWeh;
-nguhrpupau; mtu;fs;
-rl;lk; rhh;e;j kUj;Jtj;Jiw</textarea>
-                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
-                            <i class="fas fa-info-circle"></i> Enter each piece of information on a new line
-                        </p>
+                    
+                    <div class="police-station-controls">
+                        <div class="station-select-group">
+                            <label for="policeStationSelect"><i class="fas fa-building"></i> Select Police Station:</label>
+                            <select id="policeStationSelect">
+                                <option value="">-- Select Police Station --</option>
+                                <option value="G7" selected>G7 (சி.சி.பி., சீர்மை)</option>
+                                <option value="G1">G1 (அயன் அவென்யூ)</option>
+                                <option value="G2">G2 (கீழ்ப்பாக்கம்)</option>
+                                <option value="G3">G3 (சாஸ்திரி நகர்)</option>
+                                <option value="G4">G4 (தியாகராய நகர்)</option>
+                                <option value="G5">G5 (கோட்டூர்புரம்)</option>
+                                <option value="G6">G6 (வேப்பேரி)</option>
+                                <option value="G8">G8 (தேனாம்பேட்டை)</option>
+                                <option value="G9">G9 (அண்ணா நகர்)</option>
+                                <option value="G10">G10 (சைதாப்பேட்டை)</option>
+                                <option value="custom">-- Enter Custom Station --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="station-custom-group">
+                            <label for="policeStationCustom"><i class="fas fa-edit"></i> Custom Station Code:</label>
+                            <input type="text" id="policeStationCustom" placeholder="Enter custom station code">
+                        </div>
+                        
+                        <div class="station-address-group">
+                            <label for="policeStationAddress"><i class="fas fa-map-marker-alt"></i> Station Address:</label>
+                            <input type="text" id="policeStationAddress" placeholder="Station address will auto-fill" value="சீர்மை, சென்னை - 600 090">
+                        </div>
+                    </div>
+                    
+                    <div class="station-info">
+                        <h5><i class="fas fa-info-circle"></i> Selected Station Information:</h5>
+                        <div id="stationInfoText">G7 Police Station (சி.சி.பி., சீர்மை), சீர்மை, சென்னை - 600 090</div>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <i class="fas fa-envelope"></i> Receiver (பெறுநர்) - Single Field
+                        <i class="fas fa-envelope"></i> Receiver (பெறுநர்) Details
                     </h3>
+                    
+                    <div class="hospital-controls">
+                        <div class="hospital-select-group">
+                            <label for="hospitalSelect"><i class="fas fa-hospital"></i> Select Hospital/Office:</label>
+                            <select id="hospitalSelect">
+                                <option value="">-- Select Hospital/Office --</option>
+                                <option value="kpgmc" selected>கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை</option>
+                                <option value="gh">அரசு மருத்துவமனை (பொது மருத்துவமனை)</option>
+                                <option value="cmc">வி.எஸ். மருத்துவமனை</option>
+                                <option value="rgmc">ராஜா முத்தையா அரசு மருத்துவக் கல்லூரி மருத்துவமனை</option>
+                                <option value="kmch">கோவை மருத்துவக் கல்லூரி மருத்துவமனை</option>
+                                <option value="mgh">மகாத்மா காந்தி அரசு மருத்துவமனை</option>
+                                <option value="custom">-- Enter Custom Hospital/Office --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="hospital-custom-group">
+                            <label for="hospitalCustom"><i class="fas fa-edit"></i> Custom Hospital/Office:</label>
+                            <input type="text" id="hospitalCustom" placeholder="Enter custom hospital/office name">
+                        </div>
+                        
+                        <div class="hospital-address-group">
+                            <label for="hospitalAddress"><i class="fas fa-map-marker-alt"></i> Hospital/Office Address:</label>
+                            <input type="text" id="hospitalAddress" placeholder="Address will auto-fill" value="கீழ்ப்பாக்கம், சென்னை - 600 004">
+                        </div>
+                    </div>
+                    
+                    <div class="hospital-info">
+                        <h5><i class="fas fa-info-circle"></i> Selected Hospital Information:</h5>
+                        <div id="hospitalInfoText">கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை, கீழ்ப்பாக்கம், சென்னை - 600 004</div>
+                    </div>
+                    
                     <div class="form-group">
-                        <label for="toDetails">Receiver Details (Office, Address, Additional Info)</label>
-                        <textarea id="toDetails" rows="4" placeholder="Enter all receiver details here, each on a new line">fPH;g;ghf;fk; kUj;Jtf;fy;Y}hp kUj;Jtkid
-brd;id-10</textarea>
+                        <label for="receiverAdditionalInfo"><i class="fas fa-info-circle"></i> Additional Information (Optional):</label>
+                        <div class="field-with-voice">
+                            <textarea id="receiverAdditionalInfo" rows="2" placeholder="Any additional information about the receiver (e.g., department, specific office)"></textarea>
+                            <span class="voice-indicator" id="voiceIndicatorReceiverAdditional"><i class="fas fa-microphone"></i></span>
+                        </div>
                         <p style="font-size: 14px; color: #666; margin-top: 5px;">
-                            <i class="fas fa-info-circle"></i> Enter each piece of information on a new line
+                            <i class="fas fa-info-circle"></i> Optional: Add department, specific office, or other details
                         </p>
                     </div>
                 </div>
@@ -456,24 +770,31 @@ brd;id-10</textarea>
                     </h3>
                     
                     <div class="form-group">
-                        <label for="deceasedDetailsInput">Deceased Details Information (without "இறந்தவர்:")</label>
-                        <textarea id="deceasedDetailsInput" rows="6" placeholder="Enter deceased details information only (without 'இறந்தவர்:')" style="height: 90px;">இறந்தவரின் பெயர் மற்றும் விலாசம்</textarea>
-                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
-                            <i class="fas fa-info-circle"></i> <strong>"இறந்தவர்:" is automatically included and cannot be deleted.</strong> Just enter the deceased details below it.
-                        </p>
+                        <label for="deceasedDetailsInput">Deceased Details Information</label>
+                        <div class="field-with-voice">
+                            <textarea id="deceasedDetailsInput" rows="6" placeholder="Enter deceased details information" style="height: 90px;">இறந்தவர்:
+இறந்தவரின் பெயர் மற்றும் விலாசம்</textarea>
+                            <span class="voice-indicator" id="voiceIndicatorDeceased"><i class="fas fa-microphone"></i></span>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="subject">Subject (பொருள்)</label>
-                    <textarea id="subject" rows="2" placeholder="Enter the subject of the document">பிரேத பரிசோதனை செய்து சான்று வழங்க வேண்டுதல் தொடர்பாக</textarea>
+                    <div class="field-with-voice">
+                        <textarea id="subject" rows="2" placeholder="Enter the subject of the document">பிரேத பரிசோதனை செய்து சான்று வழங்க வேண்டுதல் தொடர்பாக</textarea>
+                        <span class="voice-indicator" id="voiceIndicatorSubject"><i class="fas fa-microphone"></i></span>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="reference">Reference (பார்வை)</label>
-                    <textarea id="reference" rows="2" placeholder="Enter reference details">G7 fhty; epiya Fw;w vz; 216-2025
+                    <div class="field-with-voice">
+                        <textarea id="reference" rows="2" placeholder="Enter reference details">G7 fhty; epiya Fw;w vz; 216-2025
 
 U/S 194 BNSS</textarea>
+                        <span class="voice-indicator" id="voiceIndicatorReference"><i class="fas fa-microphone"></i></span>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -483,7 +804,10 @@ U/S 194 BNSS</textarea>
                     
                     <div class="form-group">
                         <label for="deceasedDescription">Deceased Description (விளக்க விபரங்கள்)</label>
-                        <textarea id="deceasedDescription" rows="3" placeholder="Detailed description of deceased person">இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை</textarea>
+                        <div class="field-with-voice">
+                            <textarea id="deceasedDescription" rows="3" placeholder="Detailed description of deceased person">இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை</textarea>
+                            <span class="voice-indicator" id="voiceIndicatorDesc"><i class="fas fa-microphone"></i></span>
+                        </div>
                         <p style="font-size: 14px; color: #666; margin-top: 5px;">
                             <i class="fas fa-info-circle"></i> First part of the deceased description
                         </p>
@@ -491,7 +815,10 @@ U/S 194 BNSS</textarea>
                     
                     <div class="form-group">
                         <label for="policeOfficerDetails">Police Officer Details (முதல் நிலை காவலர் விவரங்கள்)</label>
-                        <input type="text" id="policeOfficerDetails" placeholder="Enter police officer details" value="முதல் நிலை காவலர் 43606 திரு. திருமுருகன்">
+                        <div class="field-with-voice">
+                            <input type="text" id="policeOfficerDetails" placeholder="Enter police officer details" value="முதல் நிலை காவலர் 43606 திரு. திருமுருகன்">
+                            <span class="voice-indicator" id="voiceIndicatorPolice"><i class="fas fa-microphone"></i></span>
+                        </div>
                         <p style="font-size: 14px; color: #666; margin-top: 5px;">
                             <i class="fas fa-info-circle"></i> Police officer details (editable)
                         </p>
@@ -499,7 +826,10 @@ U/S 194 BNSS</textarea>
                     
                     <div class="form-group">
                         <label for="deceasedDescriptionEnd">Deceased Description End (முடிவு பகுதி)</label>
-                        <textarea id="deceasedDescriptionEnd" rows="2" placeholder="End part of deceased description">என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.</textarea>
+                        <div class="field-with-voice">
+                            <textarea id="deceasedDescriptionEnd" rows="2" placeholder="End part of deceased description">என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.</textarea>
+                            <span class="voice-indicator" id="voiceIndicatorDescEnd"><i class="fas fa-microphone"></i></span>
+                        </div>
                         <p style="font-size: 14px; color: #666; margin-top: 5px;">
                             <i class="fas fa-info-circle"></i> End part of the deceased description
                         </p>
@@ -530,7 +860,7 @@ U/S 194 BNSS</textarea>
                 
                 <div class="buttons">
                     <button class="btn btn-primary" id="generatePdf">
-                        <i class="fas fa-file-pdf"></i> Download PDF (Latha Font)
+                        <i class="fas fa-file-pdf"></i> Download PDF
                     </button>
                     <button class="btn btn-secondary" id="resetForm">
                         <i class="fas fa-redo"></i> Reset Form
@@ -541,20 +871,25 @@ U/S 194 BNSS</textarea>
                     <button class="btn btn-success" id="printDocument">
                         <i class="fas fa-print"></i> Print Document
                     </button>
+                    <button class="btn btn-info" id="toggleVoiceControl">
+                        <i class="fas fa-microphone-alt"></i> Voice Control
+                    </button>
                 </div>
                 
                 <div class="instructions">
-                    <h4><i class="fas fa-info-circle"></i> Formatting Information:</h4>
-                    <p><strong>"இறந்தவர்:"</strong> - Automatically included in bold format (cannot be deleted)</p>
-                    <p><strong>"ஐயா,"</strong> - Always left-aligned (official document format)</p>
-                    <p><strong>"அனுப்புநர்"</strong> - Used instead of "From:" (Tamil sender heading)</p>
-                    <p><strong>"பெறுநர்"</strong> - Used instead of "To:" (Tamil receiver heading)</p>
-                    <p><strong>Police Officer Details</strong> - Editable field for "முதல் நிலை காவலர்" details</p>
-                    <p><strong>Signature</strong> - Automatically generated from "அனுப்புநர்" details</p>
-                    <p><strong>Tamil Text:</strong> Uses Latha font (standard Windows Tamil font)</p>
-                    <p><strong>English Text:</strong> Uses Times New Roman for English/non-Tamil text</p>
-                    <p><strong>Single Borders:</strong> Tables have single outer borders with internal dividers</p>
-                    <p><strong>No Underlines:</strong> Headings appear without underlines</p>
+                    <h4><i class="fas fa-info-circle"></i> Standard Formats:</h4>
+                    <p><strong>Sender (3 lines):</strong></p>
+                    <p>1. காவல் ஆய்வாளர் (Police Inspector)</p>
+                    <p>2. Selected Police Station Name</p>
+                    <p>3. Station Address</p>
+                    
+                    <p><strong>Receiver (2-3 lines):</strong></p>
+                    <p>1. Selected Hospital/Office Name</p>
+                    <p>2. Hospital/Office Address</p>
+                    <p>3. Additional Information (Optional)</p>
+                    
+                    <p><strong>Signature:</strong> All 3 sender lines used for signature</p>
+                    <p><strong>Deceased Details:</strong> Enter all details including "இறந்தவர்:" if needed</p>
                 </div>
             </div>
             
@@ -564,13 +899,13 @@ U/S 194 BNSS</textarea>
                     <!-- Document preview will be generated here -->
                 </div>
                 <p style="text-align: center; margin-top: 15px; color: #666; font-size: 14px;">
-                    <i class="fas fa-info-circle"></i> Preview shows Tamil headings: "அனுப்புநர்", "பெறுநர்", "இறந்தவர்:" in bold, and "ஐயா," left-aligned
+                    <i class="fas fa-info-circle"></i> Preview shows standard sender and receiver formats with selectable hospitals
                 </p>
             </div>
         </div>
         
         <footer>
-            <p>PM Request PDF Maker &copy; 2023 | Uses Latha Tamil font with English text in Times New Roman</p>
+            <p>PM Request PDF Maker &copy; 2023 | Police Station & Hospital Selection</p>
         </footer>
     </div>
 
@@ -583,31 +918,264 @@ U/S 194 BNSS</textarea>
         const printDocumentBtn = document.getElementById('printDocument');
         const fontSizeSelect = document.getElementById('fontSize');
         const leftTableWidthSelect = document.getElementById('leftTableWidth');
+        const tamilFontSelect = document.getElementById('tamilFontSelect');
+        const startVoiceBtn = document.getElementById('startVoiceBtn');
+        const voiceStatus = document.getElementById('voiceStatus');
+        const toggleVoiceControlBtn = document.getElementById('toggleVoiceControl');
+        
+        // Police station elements
+        const policeStationSelect = document.getElementById('policeStationSelect');
+        const policeStationCustom = document.getElementById('policeStationCustom');
+        const policeStationAddress = document.getElementById('policeStationAddress');
+        const stationInfoText = document.getElementById('stationInfoText');
+        
+        // Hospital elements
+        const hospitalSelect = document.getElementById('hospitalSelect');
+        const hospitalCustom = document.getElementById('hospitalCustom');
+        const hospitalAddress = document.getElementById('hospitalAddress');
+        const hospitalInfoText = document.getElementById('hospitalInfoText');
+        const receiverAdditionalInfo = document.getElementById('receiverAdditionalInfo');
+        
+        // Voice typing elements
+        const voiceIndicators = {
+            receiverAdditionalInfo: document.getElementById('voiceIndicatorReceiverAdditional'),
+            deceasedDetailsInput: document.getElementById('voiceIndicatorDeceased'),
+            subject: document.getElementById('voiceIndicatorSubject'),
+            reference: document.getElementById('voiceIndicatorReference'),
+            deceasedDescription: document.getElementById('voiceIndicatorDesc'),
+            policeOfficerDetails: document.getElementById('voiceIndicatorPolice'),
+            deceasedDescriptionEnd: document.getElementById('voiceIndicatorDescEnd')
+        };
+        
+        // Police station data
+        const policeStations = {
+            'G1': {
+                code: 'G1',
+                name: 'G1 (அயன் அவென்யூ)',
+                tamilName: 'G1 நிர்வாக காவல் நிலையம்',
+                address: 'அயன் அவென்யூ, சென்னை - 600 002',
+                fullName: 'G1 Police Station (அயன் அவென்யூ)'
+            },
+            'G2': {
+                code: 'G2',
+                name: 'G2 (கீழ்ப்பாக்கம்)',
+                tamilName: 'G2 நிர்வாக காவல் நிலையம்',
+                address: 'கீழ்ப்பாக்கம், சென்னை - 600 004',
+                fullName: 'G2 Police Station (கீழ்ப்பாக்கம்)'
+            },
+            'G3': {
+                code: 'G3',
+                name: 'G3 (சாஸ்திரி நகர்)',
+                tamilName: 'G3 நிர்வாக காவல் நிலையம்',
+                address: 'சாஸ்திரி நகர், சென்னை - 600 020',
+                fullName: 'G3 Police Station (சாஸ்திரி நகர்)'
+            },
+            'G4': {
+                code: 'G4',
+                name: 'G4 (தியாகராய நகர்)',
+                tamilName: 'G4 நிர்வாக காவல் நிலையம்',
+                address: 'தியாகராய நகர், சென்னை - 600 017',
+                fullName: 'G4 Police Station (தியாகராய நகர்)'
+            },
+            'G5': {
+                code: 'G5',
+                name: 'G5 (கோட்டூர்புரம்)',
+                tamilName: 'G5 நிர்வாக காவல் நிலையம்',
+                address: 'கோட்டூர்புரம், சென்னை - 600 085',
+                fullName: 'G5 Police Station (கோட்டூர்புரம்)'
+            },
+            'G6': {
+                code: 'G6',
+                name: 'G6 (வேப்பேரி)',
+                tamilName: 'G6 நிர்வாக காவல் நிலையம்',
+                address: 'வேப்பேரி, சென்னை - 600 007',
+                fullName: 'G6 Police Station (வேப்பேரி)'
+            },
+            'G7': {
+                code: 'G7',
+                name: 'G7 (சி.சி.பி., சீர்மை)',
+                tamilName: 'G7 நிர்வாக காவல் நிலையம்',
+                address: 'சீர்மை, சென்னை - 600 090',
+                fullName: 'G7 Police Station (சி.சி.பி., சீர்மை)'
+            },
+            'G8': {
+                code: 'G8',
+                name: 'G8 (தேனாம்பேட்டை)',
+                tamilName: 'G8 நிர்வாக காவல் நிலையம்',
+                address: 'தேனாம்பேட்டை, சென்னை - 600 018',
+                fullName: 'G8 Police Station (தேனாம்பேட்டை)'
+            },
+            'G9': {
+                code: 'G9',
+                name: 'G9 (அண்ணா நகர்)',
+                tamilName: 'G9 நிர்வாக காவல் நிலையம்',
+                address: 'அண்ணா நகர், சென்னை - 600 040',
+                fullName: 'G9 Police Station (அண்ணா நகர்)'
+            },
+            'G10': {
+                code: 'G10',
+                name: 'G10 (சைதாப்பேட்டை)',
+                tamilName: 'G10 நிர்வாக காவல் நிலையம்',
+                address: 'சைதாப்பேட்டை, சென்னை - 600 015',
+                fullName: 'G10 Police Station (சைதாப்பேட்டை)'
+            },
+            'custom': {
+                code: 'custom',
+                name: 'Custom Station',
+                tamilName: 'Custom நிர்வாக காவல் நிலையம்',
+                address: '',
+                fullName: 'Custom Police Station'
+            }
+        };
+        
+        // Hospital data
+        const hospitals = {
+            'kpgmc': {
+                id: 'kpgmc',
+                name: 'கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை',
+                tamilName: 'கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை',
+                address: 'கீழ்ப்பாக்கம், சென்னை - 600 004',
+                fullName: 'Kilpauk Government Medical College Hospital',
+                commonName: 'KGMCH'
+            },
+            'gh': {
+                id: 'gh',
+                name: 'அரசு மருத்துவமனை (பொது மருத்துவமனை)',
+                tamilName: 'அரசு மருத்துவமனை',
+                address: 'சென்னை - 600 003',
+                fullName: 'Government General Hospital',
+                commonName: 'GGH'
+            },
+            'cmc': {
+                id: 'cmc',
+                name: 'வி.எஸ். மருத்துவமனை',
+                tamilName: 'வி.எஸ். மருத்துவமனை',
+                address: 'அண்ணா சாலை, சென்னை - 600 002',
+                fullName: 'V.S. Hospital',
+                commonName: 'VSH'
+            },
+            'rgmc': {
+                id: 'rgmc',
+                name: 'ராஜா முத்தையா அரசு மருத்துவக் கல்லூரி மருத்துவமனை',
+                tamilName: 'ராஜா முத்தையா அரசு மருத்துவக் கல்லூரி மருத்துவமனை',
+                address: 'அண்ணா நகர், சென்னை - 600 028',
+                fullName: 'Rajah Muthiah Government Medical College Hospital',
+                commonName: 'RMGCH'
+            },
+            'kmch': {
+                id: 'kmch',
+                name: 'கோவை மருத்துவக் கல்லூரி மருத்துவமனை',
+                tamilName: 'கோவை மருத்துவக் கல்லூரி மருத்துவமனை',
+                address: 'கோவை - 641 014',
+                fullName: 'Coimbatore Medical College Hospital',
+                commonName: 'CMCH'
+            },
+            'mgh': {
+                id: 'mgh',
+                name: 'மகாத்மா காந்தி அரசு மருத்துவமனை',
+                tamilName: 'மகாத்மா காந்தி அரசு மருத்துவமனை',
+                address: 'திருவல்லிக்கேணி, சென்னை - 600 005',
+                fullName: 'Mahatma Gandhi Government Hospital',
+                commonName: 'MGGH'
+            },
+            'custom': {
+                id: 'custom',
+                name: 'Custom Hospital/Office',
+                tamilName: 'Custom மருத்துவமனை / அலுவலகம்',
+                address: '',
+                fullName: 'Custom Hospital/Office',
+                commonName: 'Custom'
+            }
+        };
+        
+        // Voice typing state
+        let isVoiceActive = false;
+        let currentVoiceField = null;
+        let recognition = null;
         
         // Default values
         const defaultValues = {
-            documentNumber: 'G7 fhty; epiya Fw;w vz; 216-2025',
-            fromDetails: 'G7 nrj;Jg;gl;L fhty; epiyak;\nnrj;Jg;gl;L. brd;id-31\nmDg;g[eh;\nbgWeh;\nnguhrpupau; mtu;fs;\nrl;lk; rhh;e;j kUj;Jtj;Jiw',
-            toDetails: 'fPH;g;ghf;fk; kUj;Jtf;fy;Y}hp kUj;Jtkid\nbrd;id-10',
-            deceasedDetailsInput: 'Name, M/A 54\nj-bg fhsg;gd;\nvz;/107. ntk;g[ypak;kd; nfhapy; njhl;lk;. b&dha; efu;. brd;id/31',
+            deceasedDetailsInput: 'இறந்தவர்:\nஇறந்தவரின் பெயர் மற்றும் விலாசம்',
             subject: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதத்தின் பிரேத பரிசோதனை டாக்டர் அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.',
             reference: 'G7 fhty; epiya Fw;w vz; 216-2025\n\nU/S 194 BNSS',
             deceasedDescription: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதம்; கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடப்பில் உள்ளது. மேற்படி பிரேதத்தை',
             policeOfficerDetails: 'முதல் நிலை காவலர் 43606 திரு. திருமுருகன்',
-            deceasedDescriptionEnd: 'என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.'
+            deceasedDescriptionEnd: 'என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.',
+            receiverAdditionalInfo: ''
         };
         
         // Initialize form
         function initializeForm() {
-            document.getElementById('documentNumber').value = defaultValues.documentNumber;
-            document.getElementById('fromDetails').value = defaultValues.fromDetails;
-            document.getElementById('toDetails').value = defaultValues.toDetails;
+            // Set default values
             document.getElementById('deceasedDetailsInput').value = defaultValues.deceasedDetailsInput;
             document.getElementById('subject').value = defaultValues.subject;
             document.getElementById('reference').value = defaultValues.reference;
             document.getElementById('deceasedDescription').value = defaultValues.deceasedDescription;
             document.getElementById('policeOfficerDetails').value = defaultValues.policeOfficerDetails;
             document.getElementById('deceasedDescriptionEnd').value = defaultValues.deceasedDescriptionEnd;
+            document.getElementById('receiverAdditionalInfo').value = defaultValues.receiverAdditionalInfo;
+            
+            // Set default police station
+            policeStationSelect.value = 'G7';
+            updatePoliceStationInfo();
+            
+            // Set default hospital
+            hospitalSelect.value = 'kpgmc';
+            updateHospitalInfo();
+            
+            updatePreview();
+        }
+        
+        // Update police station information
+        function updatePoliceStationInfo() {
+            const selectedValue = policeStationSelect.value;
+            const station = policeStations[selectedValue] || policeStations['G7'];
+            
+            if (selectedValue === 'custom') {
+                // Show custom input
+                policeStationCustom.style.display = 'block';
+                policeStationCustom.placeholder = 'Enter station code (e.g., X1, Y2)';
+                
+                // Clear address for custom entry
+                policeStationAddress.value = '';
+                stationInfoText.textContent = 'Custom Police Station - Enter details above';
+            } else {
+                // Hide custom input
+                policeStationCustom.style.display = 'none';
+                
+                // Set address based on selected station
+                policeStationAddress.value = station.address;
+                
+                // Update station info
+                stationInfoText.textContent = `${station.fullName}, ${station.address}`;
+            }
+            
+            updatePreview();
+        }
+        
+        // Update hospital information
+        function updateHospitalInfo() {
+            const selectedValue = hospitalSelect.value;
+            const hospital = hospitals[selectedValue] || hospitals['kpgmc'];
+            
+            if (selectedValue === 'custom') {
+                // Show custom input
+                hospitalCustom.style.display = 'block';
+                hospitalCustom.placeholder = 'Enter hospital/office name';
+                
+                // Clear address for custom entry
+                hospitalAddress.value = '';
+                hospitalInfoText.textContent = 'Custom Hospital/Office - Enter details above';
+            } else {
+                // Hide custom input
+                hospitalCustom.style.display = 'none';
+                
+                // Set address based on selected hospital
+                hospitalAddress.value = hospital.address;
+                
+                // Update hospital info
+                hospitalInfoText.textContent = `${hospital.name}, ${hospital.address}`;
+            }
             
             updatePreview();
         }
@@ -615,6 +1183,23 @@ U/S 194 BNSS</textarea>
         // Get selected font size
         function getFontSize() {
             return parseInt(fontSizeSelect.value) || 11;
+        }
+        
+        // Get selected Tamil font
+        function getTamilFont() {
+            return tamilFontSelect.value || 'Latha';
+        }
+        
+        // Get font class based on selected font
+        function getTamilFontClass() {
+            const font = getTamilFont();
+            switch(font) {
+                case 'Latha': return 'font-latha';
+                case 'Noto Sans Tamil': return 'font-noto';
+                case 'Aavanam': return 'font-avanam';
+                case 'Bamini': return 'font-bamini';
+                default: return 'font-latha';
+            }
         }
         
         // Get left table width
@@ -639,44 +1224,102 @@ U/S 194 BNSS</textarea>
             return tamilRegex.test(text);
         }
         
-        // Generate the formatted first column content with "இறந்தவர்:" always included
+        // Generate sender details with standard 3-line format
+        function generateSenderDetails() {
+            const selectedValue = policeStationSelect.value;
+            let stationTamilName = '';
+            let stationAddress = '';
+            
+            if (selectedValue === 'custom') {
+                const customCode = policeStationCustom.value || 'Custom';
+                stationTamilName = `${customCode} நிர்வாக காவல் நிலையம்`;
+                stationAddress = policeStationAddress.value || '';
+            } else {
+                const station = policeStations[selectedValue] || policeStations['G7'];
+                stationTamilName = station.tamilName;
+                stationAddress = station.address;
+            }
+            
+            // Build sender details array with STANDARD 3-LINE FORMAT:
+            // 1. காவல் ஆய்வாளர் (fixed first line)
+            // 2. Station Name
+            // 3. Station Address
+            const senderDetails = [
+                'காவல் ஆய்வாளர்', // Fixed first line as per standard format
+                stationTamilName,   // Second line: Station name
+                stationAddress      // Third line: Station address
+            ];
+            
+            return senderDetails;
+        }
+        
+        // Generate receiver details with hospital selection
+        function generateReceiverDetails() {
+            const selectedValue = hospitalSelect.value;
+            let hospitalName = '';
+            let hospitalAddress = '';
+            
+            if (selectedValue === 'custom') {
+                hospitalName = hospitalCustom.value || 'Custom Hospital/Office';
+                hospitalAddress = hospitalAddress.value || '';
+            } else {
+                const hospital = hospitals[selectedValue] || hospitals['kpgmc'];
+                hospitalName = hospital.tamilName;
+                hospitalAddress = hospital.address;
+            }
+            
+            const additionalInfo = (receiverAdditionalInfo.value || '').split('\n');
+            
+            // Build receiver details array:
+            // 1. Hospital/Office Name
+            // 2. Hospital/Office Address
+            // 3+. Additional info lines
+            const receiverDetails = [
+                hospitalName,    // First line: Hospital name
+                hospitalAddress  // Second line: Hospital address
+            ];
+            
+            // Add additional info lines
+            additionalInfo.forEach(line => {
+                if (line.trim()) {
+                    receiverDetails.push(line);
+                }
+            });
+            
+            return receiverDetails;
+        }
+        
+        // Generate the formatted first column content
         function generateFirstColumnContent() {
             const deceasedDetails = document.getElementById('deceasedDetailsInput').value || defaultValues.deceasedDetailsInput;
             
-            // Always start with "இறந்தவர்:" in bold, then add user input
+            // Process the deceased details as entered by user
             const lines = deceasedDetails.split('\n');
             
-            // Create formatted content with "இறந்தவர்:" in bold as first line
-            const formattedLines = [`<strong>இறந்தவர்:</strong>`];
+            // Create formatted content
+            const formattedLines = [];
             
             // Add all user input lines
             lines.forEach(line => {
                 if (line.trim()) {
-                    formattedLines.push(line);
+                    // Check if line contains "இறந்தவர்:" and make it bold
+                    if (line.includes('இறந்தவர்:')) {
+                        formattedLines.push(`<strong>${line}</strong>`);
+                    } else {
+                        formattedLines.push(line);
+                    }
                 }
             });
             
             return formattedLines.join('<br>');
         }
         
-        // Generate the first column content for text-based output (without HTML)
+        // Generate the first column content for text-based output
         function generateFirstColumnText() {
             const deceasedDetails = document.getElementById('deceasedDetailsInput').value || defaultValues.deceasedDetailsInput;
             
-            // Always start with "இறந்தவர்:", then add user input
-            const lines = deceasedDetails.split('\n');
-            
-            // Create text content with "இறந்தவர்:" as first line
-            const formattedLines = ['இறந்தவர்:'];
-            
-            // Add all user input lines
-            lines.forEach(line => {
-                if (line.trim()) {
-                    formattedLines.push(line);
-                }
-            });
-            
-            return formattedLines.join('\n');
+            // Return the text as entered by user
+            return deceasedDetails;
         }
         
         // Generate the complete deceased description with editable police officer details
@@ -689,20 +1332,126 @@ U/S 194 BNSS</textarea>
             return `${deceasedDescription} ${policeOfficerDetails} ${deceasedDescriptionEnd}`;
         }
         
-        // Generate signature lines from "அனுப்புநர்" details
+        // Generate signature lines from sender details (all 3 lines)
         function generateSignatureLines() {
-            const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
-            const lines = fromDetails.split('\n');
+            const senderDetails = generateSenderDetails();
             
-            // Return the first 3 lines from "அனுப்புநர்" details for signature
-            const signatureLines = [];
+            // Return all 3 lines from sender details for signature
+            return senderDetails;
+        }
+        
+        // Initialize voice recognition
+        function initVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'ta-IN'; // Tamil India
+                
+                recognition.onstart = function() {
+                    console.log('Voice recognition started');
+                    voiceStatus.innerHTML = '<i class="fas fa-circle" style="color:#4CAF50"></i> Listening... Speak now';
+                    startVoiceBtn.classList.add('active');
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    if (currentVoiceField) {
+                        const currentValue = currentVoiceField.value || '';
+                        currentVoiceField.value = currentValue + transcript;
+                        updatePreview();
+                        
+                        // Show voice indicator briefly
+                        const fieldId = currentVoiceField.id;
+                        const indicator = voiceIndicators[fieldId];
+                        if (indicator) {
+                            indicator.classList.add('active');
+                            setTimeout(() => {
+                                indicator.classList.remove('active');
+                            }, 1000);
+                        }
+                    }
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error', event.error);
+                    voiceStatus.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#f44336"></i> Error: ' + event.error;
+                    startVoiceBtn.classList.remove('active');
+                    stopVoiceRecognition();
+                };
+                
+                recognition.onend = function() {
+                    console.log('Voice recognition ended');
+                    voiceStatus.innerHTML = '<i class="fas fa-info-circle"></i> Click microphone button and speak';
+                    startVoiceBtn.classList.remove('active');
+                    isVoiceActive = false;
+                };
+                
+                return true;
+            }
+            return false;
+        }
+        
+        // Start voice recognition for a specific field
+        function startVoiceRecognition(fieldId) {
+            if (!recognition) {
+                if (!initVoiceRecognition()) {
+                    alert('Voice recognition is not supported in your browser. Please use Chrome or Edge on desktop or mobile.');
+                    return false;
+                }
+            }
             
-            // Add lines 0, 1, and 2 (if they exist)
-            if (lines.length > 0) signatureLines.push(lines[0]);
-            if (lines.length > 1) signatureLines.push(lines[1]);
-            if (lines.length > 2) signatureLines.push(lines[2]);
-            
-            return signatureLines;
+            const field = document.getElementById(fieldId);
+            if (field) {
+                currentVoiceField = field;
+                field.focus();
+                
+                try {
+                    recognition.start();
+                    isVoiceActive = true;
+                    voiceStatus.innerHTML = '<i class="fas fa-circle" style="color:#4CAF50"></i> Listening... Speak now';
+                    return true;
+                } catch (error) {
+                    console.error('Failed to start recognition:', error);
+                    voiceStatus.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#f44336"></i> Cannot start voice recognition';
+                    return false;
+                }
+            }
+            return false;
+        }
+        
+        // Stop voice recognition
+        function stopVoiceRecognition() {
+            if (recognition && isVoiceActive) {
+                try {
+                    recognition.stop();
+                } catch (error) {
+                    console.error('Error stopping recognition:', error);
+                }
+                isVoiceActive = false;
+                currentVoiceField = null;
+                startVoiceBtn.classList.remove('active');
+                voiceStatus.innerHTML = '<i class="fas fa-info-circle"></i> Voice recognition stopped';
+            }
+        }
+        
+        // Toggle voice control
+        function toggleVoiceControl() {
+            if (isVoiceActive) {
+                stopVoiceRecognition();
+                toggleVoiceControlBtn.innerHTML = '<i class="fas fa-microphone-alt"></i> Enable Voice';
+                toggleVoiceControlBtn.classList.remove('active');
+            } else {
+                // Start voice recognition on the first field
+                const activeElement = document.activeElement;
+                const fieldId = activeElement && activeElement.id ? activeElement.id : 'receiverAdditionalInfo';
+                if (startVoiceRecognition(fieldId)) {
+                    toggleVoiceControlBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Disable Voice';
+                    toggleVoiceControlBtn.classList.add('active');
+                }
+            }
         }
         
         // Update preview with all editable fields and auto-generated signature
@@ -711,66 +1460,70 @@ U/S 194 BNSS</textarea>
             const lineHeight = getLineHeight(fontSize) / 12;
             const leftTableWidth = getLeftTableWidth();
             const rightTableWidth = getRightTableWidth();
+            const tamilFontClass = getTamilFontClass();
             
-            const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
-            const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
             const subject = document.getElementById('subject').value || defaultValues.subject;
             const reference = document.getElementById('reference').value || defaultValues.reference;
-            const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
             
-            // Generate formatted first column content with "இறந்தவர்:" automatically included
+            // Generate sender details with standard 3-line format
+            const senderDetails = generateSenderDetails();
+            
+            // Generate receiver details with hospital selection
+            const receiverDetails = generateReceiverDetails();
+            
+            // Generate formatted first column content
             const firstColumnContent = generateFirstColumnContent();
             
             // Generate complete deceased description
             const deceasedDescription = generateDeceasedDescription();
             
-            // Generate signature lines from "அனுப்புநர்" details
+            // Generate signature lines from sender details (all 3 lines)
             const signatureLines = generateSignatureLines();
             
-            // Process Sender (அனுப்புநர்) details
-            const fromDetailsLines = fromDetails.split('\n').map(line => 
-                `<div class="document-line left tamil-text" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
+            // Process Sender (அனுப்புநர்) details - only 3 lines
+            const fromDetailsLines = senderDetails.map(line => 
+                `<div class="document-line left ${tamilFontClass}" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
             ).join('');
             
             // Process Receiver (பெறுநர்) details
-            const toDetailsLines = toDetails.split('\n').map(line => 
-                `<div class="document-line left tamil-text" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
+            const toDetailsLines = receiverDetails.map(line => 
+                `<div class="document-line left ${tamilFontClass}" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
             ).join('');
             
             // Process reference
             const referenceLines = reference.split('\n').map(line => {
-                const fontClass = containsTamil(line) ? 'tamil-text' : 'english-text';
+                const fontClass = containsTamil(line) ? tamilFontClass : 'english-text';
                 return `<div class="${fontClass}" style="font-size: ${fontSize - 1}px; margin-bottom: 2px;">${line}</div>`;
             }).join('');
             
             // Generate signature HTML
             const signatureHTML = signatureLines.map(line => 
-                `<div class="document-line tamil-text" style="font-size: ${fontSize}px; margin-bottom: 4px;">${line}</div>`
+                `<div class="document-line ${tamilFontClass}" style="font-size: ${fontSize}px; margin-bottom: 4px;">${line}</div>`
             ).join('');
             
             const previewHTML = `
                 <div class="preview-header" style="font-size: ${fontSize + 4}px; margin-bottom: 15px;">
-                    <h2 class="tamil-text" style="font-size: ${fontSize + 4}px; margin-bottom: 5px; font-weight: bold;">கோரிக்கை மனு</h2>
+                    <h2 class="${tamilFontClass}" style="font-size: ${fontSize + 4}px; margin-bottom: 5px; font-weight: bold;">கோரிக்கை மனு</h2>
                 </div>
                 
                 <div class="from-section" style="margin-bottom: 15px;">
-                    <div class="section-heading tamil-text" style="font-size: ${fontSize}px; margin-bottom: 5px; font-weight: bold;">அனுப்புநர்:</div>
+                    <div class="section-heading ${tamilFontClass}" style="font-size: ${fontSize}px; margin-bottom: 5px; font-weight: bold;">அனுப்புநர்:</div>
                     ${fromDetailsLines}
                 </div>
                 
                 <div class="to-section" style="margin-bottom: 15px;">
-                    <div class="section-heading tamil-text" style="font-size: ${fontSize}px; margin-bottom: 5px; font-weight: bold;">பெறுநர்:</div>
+                    <div class="section-heading ${tamilFontClass}" style="font-size: ${fontSize}px; margin-bottom: 5px; font-weight: bold;">பெறுநர்:</div>
                     ${toDetailsLines}
                 </div>
                 
-                <div class="document-line tamil-text" style="margin: 15px 0; font-size: ${fontSize + 1}px; text-align: left;">
+                <div class="document-line ${tamilFontClass}" style="margin: 15px 0; font-size: ${fontSize + 1}px; text-align: left;">
                     ஐயா,
                 </div>
                 
                 <div class="table-container" style="gap: 10px; margin: 10px 0;">
                     <table class="single-column-table" style="width: ${leftTableWidth}%; border: 1px solid #000;">
                         <tr>
-                            <td class="tamil-text" style="padding: 4px; font-size: ${fontSize - 1}px;">
+                            <td class="${tamilFontClass}" style="padding: 4px; font-size: ${fontSize - 1}px;">
                                 ${firstColumnContent}
                             </td>
                         </tr>
@@ -778,11 +1531,11 @@ U/S 194 BNSS</textarea>
                     
                     <table class="document-table" style="width: ${rightTableWidth}%; border: 1px solid #000;">
                         <tr>
-                            <td class="label tamil-text" style="width: 22%; padding: 4px; font-size: ${fontSize - 1}px; border-right: 1px solid #000;">பொருள்:</td>
-                            <td class="tamil-text document-line justify" style="padding: 4px; font-size: ${fontSize - 1}px;">${subject}</td>
+                            <td class="label ${tamilFontClass}" style="width: 22%; padding: 4px; font-size: ${fontSize - 1}px; border-right: 1px solid #000;">பொருள்:</td>
+                            <td class="${tamilFontClass} document-line justify" style="padding: 4px; font-size: ${fontSize - 1}px;">${subject}</td>
                         </tr>
                         <tr>
-                            <td class="label tamil-text" style="padding: 4px; font-size: ${fontSize - 1}px; border-right: 1px solid #000; border-bottom: 1px solid #000;">பார்வை:</td>
+                            <td class="label ${tamilFontClass}" style="padding: 4px; font-size: ${fontSize - 1}px; border-right: 1px solid #000; border-bottom: 1px solid #000;">பார்வை:</td>
                             <td style="padding: 4px; font-size: ${fontSize - 1}px; border-bottom: 1px solid #000;">
                                 ${referenceLines}
                             </td>
@@ -790,15 +1543,13 @@ U/S 194 BNSS</textarea>
                     </table>
                 </div>
                 
-                <div class="document-line tamil-text justify" style="margin-top: 15px; text-align: justify; font-size: ${fontSize}px; line-height: ${lineHeight}em;">
+                <div class="document-line ${tamilFontClass} justify" style="margin-top: 15px; text-align: justify; font-size: ${fontSize}px; line-height: ${lineHeight}em;">
                     ${deceasedDescription}
                 </div>
                 
                 <div style="margin-top: 30px;">
                     ${signatureHTML}
                 </div>
-                
-                ${documentNumber ? `<div class="document-line english-text" style="text-align: center; margin-top: 20px; font-size: ${fontSize - 2}px; color: #555;">${documentNumber}</div>` : ''}
             `;
             
             documentPreview.innerHTML = previewHTML;
@@ -813,23 +1564,27 @@ U/S 194 BNSS</textarea>
             generatePdfBtn.disabled = true;
             
             try {
-                const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
-                const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
                 const subject = document.getElementById('subject').value || defaultValues.subject;
                 const reference = document.getElementById('reference').value || defaultValues.reference;
-                const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
                 const fontSize = getFontSize();
                 const lineHeight = fontSize * 1.2;
                 const leftTableWidth = getLeftTableWidth();
                 const rightTableWidth = getRightTableWidth();
+                const tamilFont = getTamilFont();
                 
-                // Generate first column text with "இறந்தவர்:" automatically included
+                // Generate sender details with standard 3-line format
+                const senderDetails = generateSenderDetails();
+                
+                // Generate receiver details with hospital selection
+                const receiverDetails = generateReceiverDetails();
+                
+                // Generate first column text
                 const firstColumnText = generateFirstColumnText();
                 
                 // Generate complete deceased description
                 const deceasedDescription = generateDeceasedDescription();
                 
-                // Generate signature lines from "அனுப்புநர்" details
+                // Generate signature lines from sender details (all 3 lines)
                 const signatureLines = generateSignatureLines();
                 
                 // Create a temporary div for PDF content
@@ -848,47 +1603,63 @@ U/S 194 BNSS</textarea>
                     box-sizing: border-box;
                 `;
                 
+                // Determine font family for Tamil text
+                let tamilFontFamily = "'Latha', 'Arial Unicode MS', sans-serif";
+                switch(tamilFont) {
+                    case 'Noto Sans Tamil':
+                        tamilFontFamily = "'Noto Sans Tamil', sans-serif";
+                        break;
+                    case 'Aavanam':
+                        tamilFontFamily = "'Aavanam', 'Latha', sans-serif";
+                        break;
+                    case 'Bamini':
+                        tamilFontFamily = "'Bamini', sans-serif";
+                        break;
+                    default:
+                        tamilFontFamily = "'Latha', 'Arial Unicode MS', sans-serif";
+                }
+                
                 // Generate signature HTML for PDF
                 const signatureHTML = signatureLines.map(line => 
-                    `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${line}</div>`
+                    `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">${line}</div>`
                 ).join('');
                 
                 // Generate HTML with all editable fields
                 tempDiv.innerHTML = `
                     <div style="text-align: center; margin-bottom: 15px;">
-                        <h1 style="font-size: ${fontSize + 2}pt; margin-bottom: 5px; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-weight: bold;">கோரிக்கை மனு</h1>
+                        <h1 style="font-size: ${fontSize + 2}pt; margin-bottom: 5px; font-family: ${tamilFontFamily}; font-weight: bold;">கோரிக்கை மனு</h1>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 6px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">அனுப்புநர்:</div>
-                        ${fromDetails.split('\n').map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${line}</div>`).join('')}
+                        <div style="font-weight: bold; margin-bottom: 6px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">அனுப்புநர்:</div>
+                        ${senderDetails.map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">${line}</div>`).join('')}
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 6px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பெறுநர்:</div>
-                        ${toDetails.split('\n').map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${line}</div>`).join('')}
+                        <div style="font-weight: bold; margin-bottom: 6px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">பெறுநர்:</div>
+                        ${receiverDetails.map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">${line}</div>`).join('')}
                     </div>
                     
-                    <div style="margin: 15px 0; font-size: ${fontSize + 1}pt; font-family: 'Latha', 'Arial Unicode MS', sans-serif; text-align: left;">
+                    <div style="margin: 15px 0; font-size: ${fontSize + 1}pt; font-family: ${tamilFontFamily}; text-align: left;">
                         ஐயா,
                     </div>
                     
                     <div style="display: flex; width: 100%; margin: 15px 0; gap: 10px;">
-                        <div style="width: ${leftTableWidth}%; border: 1px solid #000; padding: 5px; min-height: 50px; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-size: ${fontSize}pt;">
+                        <div style="width: ${leftTableWidth}%; border: 1px solid #000; padding: 5px; min-height: 50px; font-family: ${tamilFontFamily}; font-size: ${fontSize}pt;">
                             ${firstColumnText.replace(/\n/g, '<br>').replace('இறந்தவர்:', '<span style="font-weight: bold;">இறந்தவர்:</span>')}
                         </div>
                         
                         <div style="width: ${rightTableWidth}%; border: 1px solid #000;">
                             <table style="width: 100%; border-collapse: collapse; font-size: ${fontSize}pt;">
                                 <tr>
-                                    <td style="width: 22%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பொருள்:</td>
-                                    <td style="border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">${subject}</td>
+                                    <td style="width: 22%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: ${tamilFontFamily};">பொருள்:</td>
+                                    <td style="border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-family: ${tamilFontFamily};">${subject}</td>
                                 </tr>
                                 <tr>
-                                    <td style="border-right: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: 'Latha', 'Arial Unicode MS', sans-serif;">பார்வை:</td>
+                                    <td style="border-right: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: ${tamilFontFamily};">பார்வை:</td>
                                     <td style="padding: 5px; vertical-align: top;">
                                         ${reference.split('\n').map(line => {
-                                            const fontFamily = containsTamil(line) ? "'Latha', 'Arial Unicode MS', sans-serif" : "'Times New Roman', Times, serif";
+                                            const fontFamily = containsTamil(line) ? tamilFontFamily : "'Times New Roman', Times, serif";
                                             return `<div style="font-family: ${fontFamily};">${line}</div>`;
                                         }).join('')}
                                     </td>
@@ -897,24 +1668,27 @@ U/S 194 BNSS</textarea>
                         </div>
                     </div>
                     
-                    <div style="margin: 15px 0; text-align: justify; font-family: 'Latha', 'Arial Unicode MS', sans-serif; font-size: ${fontSize}pt; line-height: ${lineHeight}pt;">
+                    <div style="margin: 15px 0; text-align: justify; font-family: ${tamilFontFamily}; font-size: ${fontSize}pt; line-height: ${lineHeight}pt;">
                         ${deceasedDescription}
                     </div>
                     
                     <div style="margin-top: 30px;">
                         ${signatureHTML}
                     </div>
-                    
-                    ${documentNumber ? `<div style="text-align: center; margin-top: 20px; font-size: ${fontSize - 2}pt; color: #555; font-family: 'Times New Roman', Times, serif;">${documentNumber}</div>` : ''}
                 `;
                 
                 document.body.appendChild(tempDiv);
                 
                 // Use html2canvas to convert to image
                 if (typeof html2canvas !== 'undefined') {
-                    // Preload Latha font
+                    // Load appropriate font based on selection
+                    let fontUrl = 'https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2';
+                    if (tamilFont === 'Noto Sans Tamil') {
+                        fontUrl = 'https://fonts.gstatic.com/s/notosanstamil/v22/ieVc2YdFI3GCY6SyQy1KfStzYKZgzN1z4LKDbeZce-044PPRgA.woff2';
+                    }
+                    
                     const fontLink = document.createElement('link');
-                    fontLink.href = 'https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2';
+                    fontLink.href = fontUrl;
                     fontLink.rel = 'preload';
                     fontLink.as = 'font';
                     fontLink.type = 'font/woff2';
@@ -928,7 +1702,7 @@ U/S 194 BNSS</textarea>
                             useCORS: true,
                             logging: false,
                             allowTaint: true,
-                            fontFamily: "'Latha', 'Times New Roman', serif"
+                            fontFamily: tamilFontFamily
                         }).then(canvas => {
                             const imgData = canvas.toDataURL('image/png');
                             const { jsPDF } = window.jspdf;
@@ -938,7 +1712,17 @@ U/S 194 BNSS</textarea>
                             const imgHeight = canvas.height * imgWidth / canvas.width;
                             
                             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                            pdf.save(`PM_Request_${leftTableWidth}%_${fontSize}pt.pdf`);
+                            
+                            // Get station code for filename
+                            const stationSelectedValue = policeStationSelect.value;
+                            const stationCode = stationSelectedValue === 'custom' ? (policeStationCustom.value || 'Custom') : stationSelectedValue;
+                            
+                            // Get hospital name for filename
+                            const hospitalSelectedValue = hospitalSelect.value;
+                            const hospital = hospitals[hospitalSelectedValue] || hospitals['kpgmc'];
+                            const hospitalShortName = hospital.commonName;
+                            
+                            pdf.save(`PM_Request_${stationCode}_to_${hospitalShortName}_${tamilFont.replace(/\s+/g, '_')}_${fontSize}pt.pdf`);
                             
                             document.body.removeChild(tempDiv);
                             document.head.removeChild(fontLink);
@@ -971,30 +1755,34 @@ U/S 194 BNSS</textarea>
         function fallbackToPrint() {
             alert('PDF generation failed. Opening print dialog instead.');
             printDocument();
-            generatePdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF (Latha Font)';
+            generatePdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
             generatePdfBtn.disabled = false;
         }
         
         // Print document with all editable fields and auto-generated signature
         function printDocument() {
             const printWindow = window.open('', '_blank');
-            const fromDetails = document.getElementById('fromDetails').value || defaultValues.fromDetails;
-            const toDetails = document.getElementById('toDetails').value || defaultValues.toDetails;
             const subject = document.getElementById('subject').value || defaultValues.subject;
             const reference = document.getElementById('reference').value || defaultValues.reference;
-            const documentNumber = document.getElementById('documentNumber').value || defaultValues.documentNumber;
             const fontSize = getFontSize();
             const lineHeight = fontSize * 1.2;
             const leftTableWidth = getLeftTableWidth();
             const rightTableWidth = getRightTableWidth();
+            const tamilFont = getTamilFont();
             
-            // Generate first column text with "இறந்தவர்:" automatically included
+            // Generate sender details with standard 3-line format
+            const senderDetails = generateSenderDetails();
+            
+            // Generate receiver details with hospital selection
+            const receiverDetails = generateReceiverDetails();
+            
+            // Generate first column text
             const firstColumnText = generateFirstColumnText();
             
             // Generate complete deceased description
             const deceasedDescription = generateDeceasedDescription();
             
-            // Generate signature lines from "அனுப்புநர்" details
+            // Generate signature lines from sender details (all 3 lines)
             const signatureLines = generateSignatureLines();
             
             printWindow.document.write(`
@@ -1013,6 +1801,8 @@ U/S 194 BNSS</textarea>
                             src: url('https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2') format('woff2');
                             font-display: swap;
                         }
+                        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;700&display=swap');
+                        
                         body {
                             font-family: 'Times New Roman', Times, serif;
                             font-size: ${fontSize}pt;
@@ -1021,7 +1811,7 @@ U/S 194 BNSS</textarea>
                             padding: 0;
                         }
                         .tamil {
-                            font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
+                            font-family: '${tamilFont}', 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
                         }
                         .english {
                             font-family: 'Times New Roman', Times, serif;
@@ -1047,7 +1837,7 @@ U/S 194 BNSS</textarea>
                         .section-heading {
                             font-weight: bold;
                             margin-bottom: 6px;
-                            font-family: 'Latha', 'Arial Unicode MS', sans-serif;
+                            font-family: '${tamilFont}', 'Latha', 'Arial Unicode MS', sans-serif;
                         }
                         .content-line {
                             margin-bottom: 4px;
@@ -1104,12 +1894,6 @@ U/S 194 BNSS</textarea>
                         .signature-line {
                             margin-bottom: 4px;
                         }
-                        .document-number {
-                            text-align: center;
-                            margin-top: 20px;
-                            font-size: ${fontSize - 2}pt;
-                            color: #555;
-                        }
                         .bold {
                             font-weight: bold;
                         }
@@ -1133,14 +1917,14 @@ U/S 194 BNSS</textarea>
                         
                         <div class="section">
                             <div class="section-heading tamil">அனுப்புநர்:</div>
-                            ${fromDetails.split('\n').map(line => 
+                            ${senderDetails.map(line => 
                                 `<div class="content-line tamil">${line}</div>`
                             ).join('')}
                         </div>
                         
                         <div class="section">
                             <div class="section-heading tamil">பெறுநர்:</div>
-                            ${toDetails.split('\n').map(line => 
+                            ${receiverDetails.map(line => 
                                 `<div class="content-line tamil">${line}</div>`
                             ).join('')}
                         </div>
@@ -1182,8 +1966,6 @@ U/S 194 BNSS</textarea>
                                 `<div class="signature-line tamil">${line}</div>`
                             ).join('')}
                         </div>
-                        
-                        ${documentNumber ? `<div class="document-number english">${documentNumber}</div>` : ''}
                     </div>
                     
                     <script>
@@ -1210,22 +1992,96 @@ U/S 194 BNSS</textarea>
         function resetForm() {
             if (confirm('Are you sure you want to reset all fields to default values?')) {
                 initializeForm();
+                stopVoiceRecognition();
+                toggleVoiceControlBtn.innerHTML = '<i class="fas fa-microphone-alt"></i> Voice Control';
+                toggleVoiceControlBtn.classList.remove('active');
             }
         }
         
         // Event Listeners
         formInputs.forEach(input => {
             input.addEventListener('input', updatePreview);
+            
+            // Add voice input focus event
+            input.addEventListener('focus', function() {
+                currentVoiceField = this;
+                if (isVoiceActive) {
+                    const indicator = voiceIndicators[this.id];
+                    if (indicator) {
+                        indicator.classList.add('active');
+                    }
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                const indicator = voiceIndicators[this.id];
+                if (indicator) {
+                    indicator.classList.remove('active');
+                }
+            });
         });
         
         fontSizeSelect.addEventListener('change', updatePreview);
         leftTableWidthSelect.addEventListener('change', updatePreview);
+        tamilFontSelect.addEventListener('change', updatePreview);
+        
+        // Police station event listeners
+        policeStationSelect.addEventListener('change', updatePoliceStationInfo);
+        policeStationCustom.addEventListener('input', updatePreview);
+        policeStationAddress.addEventListener('input', updatePreview);
+        
+        // Hospital event listeners
+        hospitalSelect.addEventListener('change', updateHospitalInfo);
+        hospitalCustom.addEventListener('input', updatePreview);
+        hospitalAddress.addEventListener('input', updatePreview);
+        receiverAdditionalInfo.addEventListener('input', updatePreview);
+        
         generatePdfBtn.addEventListener('click', generatePDF);
         resetFormBtn.addEventListener('click', resetForm);
         printDocumentBtn.addEventListener('click', printDocument);
         
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', initializeForm);
+        // Voice typing events
+        startVoiceBtn.addEventListener('click', function() {
+            if (isVoiceActive) {
+                stopVoiceRecognition();
+            } else {
+                // Get the currently focused field or start with receiverAdditionalInfo
+                const activeElement = document.activeElement;
+                const fieldId = activeElement && activeElement.id ? activeElement.id : 'receiverAdditionalInfo';
+                startVoiceRecognition(fieldId);
+            }
+        });
+        
+        toggleVoiceControlBtn.addEventListener('click', toggleVoiceControl);
+        
+        // Initialize voice recognition if available
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeForm();
+            
+            // Check for voice recognition support
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                voiceStatus.innerHTML = '<i class="fas fa-check-circle" style="color:#4CAF50"></i> Voice typing available. Click microphone button.';
+            } else {
+                voiceStatus.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#f44336"></i> Voice typing not supported in this browser';
+                startVoiceBtn.disabled = true;
+                toggleVoiceControlBtn.disabled = true;
+            }
+            
+            // Add mobile-specific optimizations
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                document.body.classList.add('mobile-optimized');
+                
+                // Enhance touch experience
+                const inputs = document.querySelectorAll('input, textarea, select, button');
+                inputs.forEach(element => {
+                    element.style.webkitAppearance = 'none';
+                    element.style.touchAction = 'manipulation';
+                });
+                
+                // Prevent zoom on input focus
+                document.addEventListener('touchstart', function() {}, {passive: true});
+            }
+        });
     </script>
     
     <!-- Load html2canvas library -->
