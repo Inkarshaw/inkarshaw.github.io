@@ -49,14 +49,14 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 <label>No. of Questions</label>
 <select id="questionCount">
 <option value="5">5</option>
-<option value="10" selected>10</option>
+<option value="10">10</option>
 <option value="20">20</option>
-<option value="all">All</option>
+<option value="50" selected>50</option>
 </select>
 </div>
 <div class="setting">
 <label>Time (Minutes)</label>
-<input type="number" id="timeLimit" value="10">
+<input type="number" id="timeLimit" value="50">
 </div>
 </div>
 
@@ -92,21 +92,20 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 <script>
 setTimeout(()=>splash.style.display="none",2000);
 
-function showToast(m){
-toast.innerText=m;
+function showToast(msg){
+toast.innerText=msg;
 toast.style.display="block";
 setTimeout(()=>toast.style.display="none",2000);
 }
 
+const MAX_QUESTIONS = 50;
 const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
 let allQuestions=[],quiz=[],index=0,userAnswers=[];
 let timerInterval,timeLeft,quizStarted=false,backOnce=false;
 
 /* LOAD QUESTIONS */
-fetch(sheetURL)
-.then(r=>r.text())
-.then(t=>{
+fetch(sheetURL).then(r=>r.text()).then(t=>{
 const rows=t.trim().split("\n").slice(1);
 allQuestions=rows.map(r=>{
 const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -125,10 +124,10 @@ populateTopics();
 });
 
 function populateTopics(){
-const set=new Set(allQuestions.map(q=>q.topic).filter(Boolean));
-set.forEach(t=>{
+[...new Set(allQuestions.map(q=>q.topic))].forEach(t=>{
 const o=document.createElement("option");
-o.value=t;o.textContent=t;
+o.value=t;
+o.textContent=t;
 topicFilter.appendChild(o);
 });
 }
@@ -146,23 +145,31 @@ if(!rangeTo.value) rangeTo.value=allQuestions.length;
 
 let from=+rangeFrom.value;
 let to=+rangeTo.value;
-let count=questionCount.value;
+let count=+questionCount.value;
 let random=randomize.checked;
 let topic=topicFilter.value;
 
 quiz=allQuestions.filter((q,i)=>{
 let n=i+1;
 return n>=from && n<=to &&
-(topic==="all" || !q.topic || q.topic===topic);
+(topic==="all" || q.topic===topic);
 });
+
+if(random) quiz.sort(()=>Math.random()-0.5);
+
+/* apply selected count */
+quiz = quiz.slice(0, count);
+
+/* hard safety cap */
+if(quiz.length > MAX_QUESTIONS){
+quiz = quiz.slice(0, MAX_QUESTIONS);
+showToast("Maximum 50 questions allowed per attempt");
+}
 
 if(quiz.length===0){
 alert("No questions found");
 return;
 }
-
-if(random) quiz.sort(()=>Math.random()-0.5);
-if(count!=="all") quiz=quiz.slice(0,+count);
 
 index=0;
 userAnswers=new Array(quiz.length).fill(null);
@@ -229,7 +236,7 @@ function nextQ(){saveAnswer();index<quiz.length-1?loadQ(++index):confirmSubmit()
 function jumpQ(i){saveAnswer();index=i;loadQ();}
 function confirmSubmit(){saveAnswer();if(confirm("Submit quiz?"))submitQuiz();}
 
-/* SUBMIT & REVIEW */
+/* SUBMIT */
 function submitQuiz(){
 clearInterval(timerInterval);
 quizBox.style.display="none";
@@ -238,43 +245,8 @@ quizStarted=false;
 let score=0;
 quiz.forEach((q,i)=>{if(userAnswers[i]===q.ans)score++;});
 
-let html=`<div class="box"><h2>Score: ${score}/${quiz.length}</h2>
-<button onclick="reattempt('wrong')">Reattempt Wrong</button>
-<button onclick="reattempt('unattempted')">Reattempt Unattempted</button>
-<button onclick="reattempt('all')">Full Reattempt</button><hr>`;
-
-quiz.forEach((q,i)=>{
-if(!userAnswers[i])return;
-html+=`<b>Q${i+1}. ${q.q}</b>`;
-q.opts.forEach((o,j)=>{
-let l=String.fromCharCode(65+j);
-let cls=l===q.ans?"correct":(l===userAnswers[i]?"wrong":"");
-html+=`<div class="${cls}">${l}. ${o}</div>`;
-});
-html+=`<div><b>Explanation:</b> ${q.exp||"-"}</div><br>`;
-});
-
-reviewBox.innerHTML=html+"</div>";
-}
-
-/* REATTEMPT */
-function reattempt(type){
-let nq=[];
-quiz.forEach((q,i)=>{
-if(type==="wrong" && userAnswers[i] && userAnswers[i]!==q.ans) nq.push(q);
-if(type==="unattempted" && !userAnswers[i]) nq.push(q);
-if(type==="all") nq.push(q);
-});
-if(!nq.length){alert("No questions available");return;}
-quiz=nq;
-index=0;
-userAnswers=new Array(quiz.length).fill(null);
-reviewBox.innerHTML="";
-quizBox.style.display="block";
-quizStarted=true;
-createPalette();
-startTimer(+timeLimit.value*60);
-loadQ();
+reviewBox.innerHTML=
+`<div class="box"><h2>Score: ${score}/${quiz.length}</h2></div>`;
 }
 
 /* ANDROID BACK */
