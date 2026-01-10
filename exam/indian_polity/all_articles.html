@@ -14,20 +14,17 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 .start{background:#16a34a;color:#fff}
 .next{background:#2563eb;color:#fff}
 .submit{background:#dc2626;color:#fff}
+.reviewBtn{background:#7c3aed;color:#fff}
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
-.options label{display:block;background:#f1f5f9;padding:10px;margin:8px 0;border-radius:6px}
-.settings-row{display:flex;gap:15px;margin-bottom:15px}
-.setting{flex:1}
-.setting input,.setting select{width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1}
+.options label{display:block;padding:10px;margin:6px 0;border-radius:6px;background:#f1f5f9}
+.correct{background:#dcfce7;color:#166534;font-weight:bold}
+.wrong{background:#fee2e2;color:#991b1b}
 .palette-wrapper{border:1px solid #e5e7eb;border-radius:8px;padding:8px;margin-bottom:15px;overflow-x:auto}
 .palette{display:flex;gap:8px}
-.palette div{min-width:40px;padding:8px;text-align:center;border-radius:6px;cursor:pointer;background:#e5e7eb}
+.palette div{min-width:40px;padding:8px;text-align:center;border-radius:6px;background:#e5e7eb}
 .palette .current{background:#1e40af;color:#fff}
 .palette .answered{background:#16a34a;color:#fff}
-.palette .visited{background:#93c5fd}
-.correct{color:green;font-weight:bold}
-.wrong{color:red}
-#toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;display:none}
+.palette .unanswered{background:#dc2626;color:#fff}
 #splash{position:fixed;inset:0;background:#1e40af;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;z-index:9999}
 </style>
 </head>
@@ -35,49 +32,31 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 <body>
 
 <div id="splash">All Articles Practice App</div>
-<div id="toast"></div>
 
 <header><h2>Indian Polity – All Articles Quiz</h2></header>
 
 <div class="container">
 
 <div class="box" id="settingsBox">
-<h3>⚙️ Quiz Settings</h3>
+<h3>Quiz Settings</h3>
 
-<div class="settings-row">
-<div class="setting">
 <label>No. of Questions</label>
 <select id="questionCount">
 <option value="5">5</option>
 <option value="10">10</option>
 <option value="20">20</option>
 <option value="50" selected>50</option>
-</select>
-</div>
-<div class="setting">
-<label>Time (Minutes)</label>
-<input type="number" id="timeLimit" value="50">
-</div>
-</div>
+</select><br><br>
 
-<div class="settings-row">
-<div class="setting"><label>From</label><input type="number" id="rangeFrom"></div>
-<div class="setting"><label>To</label><input type="number" id="rangeTo"></div>
-</div>
+<label>From</label>
+<input type="number" id="rangeFrom"><br><br>
+<label>To</label>
+<input type="number" id="rangeTo"><br><br>
 
-<label><input type="checkbox" id="randomize"> Randomize</label><br><br>
-
-<label>Article / Topic</label>
-<select id="topicFilter">
-<option value="all">All Articles</option>
-</select>
-
-<p id="rangeInfo"></p>
 <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
 <div class="box" id="quizBox" style="display:none">
-<div class="timer" id="timer"></div>
 <div class="palette-wrapper"><div class="palette" id="palette"></div></div>
 <div id="question"></div>
 <div class="options" id="options"></div>
@@ -85,24 +64,25 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
-<div id="reviewBox"></div>
+<!-- REVIEW MODE -->
+<div class="box" id="reviewBox" style="display:none">
+<h3 id="reviewCount"></h3>
+<div id="reviewQuestion"></div>
+<div id="reviewOptions"></div>
+<div id="reviewExp"></div>
+<button onclick="prevReview()">⬅ Previous</button>
+<button onclick="nextReview()">Next ➡</button>
+</div>
 
 </div>
 
 <script>
-setTimeout(()=>splash.style.display="none",2000);
+setTimeout(()=>splash.style.display="none",1500);
 
-function showToast(msg){
-toast.innerText=msg;
-toast.style.display="block";
-setTimeout(()=>toast.style.display="none",2000);
-}
-
-const MAX_QUESTIONS = 50;
 const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
 let allQuestions=[],quiz=[],index=0,userAnswers=[];
-let timerInterval,timeLeft,quizStarted=false,backOnce=false;
+let reviewIndex=0;
 
 /* LOAD QUESTIONS */
 fetch(sheetURL).then(r=>r.text()).then(t=>{
@@ -110,85 +90,26 @@ const rows=t.trim().split("\n").slice(1);
 allQuestions=rows.map(r=>{
 const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 return{
-q:c[0],
-opts:c.slice(1,5),
-ans:(c[5]||"").trim().toUpperCase(),
-exp:c[6]||"",
-topic:(c[7]||"General").trim()
+q:c[0],opts:c.slice(1,5),
+ans:c[5].trim().toUpperCase(),
+exp:c[6]||""
 };
 });
 rangeFrom.value=1;
 rangeTo.value=allQuestions.length;
-rangeInfo.innerText=`Available questions: 1 to ${allQuestions.length}`;
-populateTopics();
 });
-
-function populateTopics(){
-[...new Set(allQuestions.map(q=>q.topic))].forEach(t=>{
-const o=document.createElement("option");
-o.value=t;
-o.textContent=t;
-topicFilter.appendChild(o);
-});
-}
 
 /* START QUIZ */
 function startQuiz(){
-
-if(allQuestions.length===0){
-alert("Questions not loaded yet");
-return;
-}
-
-if(!rangeFrom.value) rangeFrom.value=1;
-if(!rangeTo.value) rangeTo.value=allQuestions.length;
-
-let from=+rangeFrom.value;
-let to=+rangeTo.value;
+let from=+rangeFrom.value,to=+rangeTo.value;
 let count=+questionCount.value;
-let random=randomize.checked;
-let topic=topicFilter.value;
-
-quiz=allQuestions.filter((q,i)=>{
-let n=i+1;
-return n>=from && n<=to &&
-(topic==="all" || q.topic===topic);
-});
-
-if(random) quiz.sort(()=>Math.random()-0.5);
-
-/* apply selected count */
-quiz = quiz.slice(0, count);
-
-/* hard safety cap */
-if(quiz.length > MAX_QUESTIONS){
-quiz = quiz.slice(0, MAX_QUESTIONS);
-showToast("Maximum 50 questions allowed per attempt");
-}
-
-if(quiz.length===0){
-alert("No questions found");
-return;
-}
-
-index=0;
+quiz=allQuestions.slice(from-1,to).slice(0,count);
 userAnswers=new Array(quiz.length).fill(null);
+index=0;
 settingsBox.style.display="none";
 quizBox.style.display="block";
-quizStarted=true;
-
 createPalette();
-startTimer(+timeLimit.value*60);
 loadQ();
-}
-
-/* TIMER */
-function startTimer(sec){
-timeLeft=sec;
-timerInterval=setInterval(()=>{
-timer.innerText=`Time Left: ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`;
-if(timeLeft--<=0){clearInterval(timerInterval);submitQuiz();}
-},1000);
 }
 
 /* PALETTE */
@@ -197,7 +118,6 @@ palette.innerHTML="";
 quiz.forEach((_,i)=>{
 let d=document.createElement("div");
 d.innerText=i+1;
-d.onclick=()=>jumpQ(i);
 palette.appendChild(d);
 });
 }
@@ -207,9 +127,8 @@ document.querySelectorAll(".palette div").forEach((d,i)=>{
 d.className="";
 if(i===index)d.classList.add("current");
 else if(userAnswers[i])d.classList.add("answered");
-else d.classList.add("visited");
+else d.classList.add("unanswered");
 });
-document.querySelector(".current")?.scrollIntoView({behavior:"smooth",inline:"center"});
 }
 
 /* QUESTIONS */
@@ -232,37 +151,49 @@ function saveAnswer(){
 let s=document.querySelector('input[name="opt"]:checked');
 userAnswers[index]=s?s.value:null;
 }
-function nextQ(){saveAnswer();index<quiz.length-1?loadQ(++index):confirmSubmit();}
-function jumpQ(i){saveAnswer();index=i;loadQ();}
-function confirmSubmit(){saveAnswer();if(confirm("Submit quiz?"))submitQuiz();}
+
+function nextQ(){
+saveAnswer();
+if(index<quiz.length-1){index++;loadQ();}
+else confirmSubmit();
+}
+
+function confirmSubmit(){
+saveAnswer();
+submitQuiz();
+}
 
 /* SUBMIT */
 function submitQuiz(){
-clearInterval(timerInterval);
 quizBox.style.display="none";
-quizStarted=false;
-
-let score=0;
-quiz.forEach((q,i)=>{if(userAnswers[i]===q.ans)score++;});
-
-reviewBox.innerHTML=
-`<div class="box"><h2>Score: ${score}/${quiz.length}</h2></div>`;
+reviewBox.style.display="block";
+reviewIndex=0;
+loadReview();
 }
 
-/* ANDROID BACK */
-history.pushState(null,null,location.href);
-window.onpopstate=function(){
-if(quizStarted){
-showToast("Exit quiz? Progress will be lost");
-history.pushState(null,null,location.href);
-}else{
-if(backOnce)return;
-showToast("Press back again to exit");
-backOnce=true;
-setTimeout(()=>backOnce=false,2000);
-history.pushState(null,null,location.href);
+/* REVIEW MODE */
+function loadReview(){
+let q=quiz[reviewIndex];
+reviewCount.innerText=`Review ${reviewIndex+1} / ${quiz.length}`;
+reviewQuestion.innerHTML=`<b>Q${reviewIndex+1}. ${q.q}</b>`;
+reviewOptions.innerHTML="";
+q.opts.forEach((o,i)=>{
+let l=String.fromCharCode(65+i);
+let cls="";
+if(l===q.ans) cls="correct";
+if(userAnswers[reviewIndex]===l && l!==q.ans) cls="wrong";
+reviewOptions.innerHTML+=`<div class="${cls}">${l}. ${o}</div>`;
+});
+reviewExp.innerHTML=`<p><b>Explanation:</b> ${q.exp||"—"}</p>`;
 }
-};
+
+function nextReview(){
+if(reviewIndex<quiz.length-1){reviewIndex++;loadReview();}
+}
+
+function prevReview(){
+if(reviewIndex>0){reviewIndex--;loadReview();}
+}
 </script>
 
 </body>
