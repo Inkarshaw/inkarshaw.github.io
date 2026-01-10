@@ -507,6 +507,16 @@
             color: #2e7d32;
         }
         
+        .deceased-notice {
+            background-color: #fff8e1;
+            border: 1px solid #ffe57f;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #ff6f00;
+        }
+        
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -672,7 +682,6 @@
                     <i class="fas fa-info-circle"></i> <strong>Receiver Format:</strong><br>
                     1. Selected Hospital/Office Name<br>
                     2. Hospital/Office Address<br>
-                    3. Additional Information (if any)
                 </div>
                 
                 <div class="form-group">
@@ -751,17 +760,6 @@
                         <h5><i class="fas fa-info-circle"></i> Selected Hospital Information:</h5>
                         <div id="hospitalInfoText">கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை, கீழ்ப்பாக்கம், சென்னை - 600 004</div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="receiverAdditionalInfo"><i class="fas fa-info-circle"></i> Additional Information (Optional):</label>
-                        <div class="field-with-voice">
-                            <textarea id="receiverAdditionalInfo" rows="2" placeholder="Any additional information about the receiver (e.g., department, specific office)"></textarea>
-                            <span class="voice-indicator" id="voiceIndicatorReceiverAdditional"><i class="fas fa-microphone"></i></span>
-                        </div>
-                        <p style="font-size: 14px; color: #666; margin-top: 5px;">
-                            <i class="fas fa-info-circle"></i> Optional: Add department, specific office, or other details
-                        </p>
-                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -769,11 +767,14 @@
                         <i class="fas fa-columns"></i> Deceased Details Section
                     </h3>
                     
+                    <div class="deceased-notice">
+                        <i class="fas fa-exclamation-circle"></i> <strong>Important:</strong> "இறந்தவர்:" will always be included in the document. Enter details after it.
+                    </div>
+                    
                     <div class="form-group">
                         <label for="deceasedDetailsInput">Deceased Details Information</label>
                         <div class="field-with-voice">
-                            <textarea id="deceasedDetailsInput" rows="6" placeholder="Enter deceased details information" style="height: 90px;">இறந்தவர்:
-இறந்தவரின் பெயர் மற்றும் விலாசம்</textarea>
+                            <textarea id="deceasedDetailsInput" rows="6" placeholder="Enter deceased details information" style="height: 90px;">இறந்தவரின் பெயர் மற்றும் விலாசம்</textarea>
                             <span class="voice-indicator" id="voiceIndicatorDeceased"><i class="fas fa-microphone"></i></span>
                         </div>
                     </div>
@@ -883,13 +884,12 @@ U/S 194 BNSS</textarea>
                     <p>2. Selected Police Station Name</p>
                     <p>3. Station Address</p>
                     
-                    <p><strong>Receiver (2-3 lines):</strong></p>
+                    <p><strong>Receiver (2 lines):</strong></p>
                     <p>1. Selected Hospital/Office Name</p>
                     <p>2. Hospital/Office Address</p>
-                    <p>3. Additional Information (Optional)</p>
                     
                     <p><strong>Signature:</strong> All 3 sender lines used for signature</p>
-                    <p><strong>Deceased Details:</strong> Enter all details including "இறந்தவர்:" if needed</p>
+                    <p><strong>Deceased Details:</strong> "இறந்தவர்:" is always included. Enter details after it.</p>
                 </div>
             </div>
             
@@ -934,11 +934,9 @@ U/S 194 BNSS</textarea>
         const hospitalCustom = document.getElementById('hospitalCustom');
         const hospitalAddress = document.getElementById('hospitalAddress');
         const hospitalInfoText = document.getElementById('hospitalInfoText');
-        const receiverAdditionalInfo = document.getElementById('receiverAdditionalInfo');
         
         // Voice typing elements
         const voiceIndicators = {
-            receiverAdditionalInfo: document.getElementById('voiceIndicatorReceiverAdditional'),
             deceasedDetailsInput: document.getElementById('voiceIndicatorDeceased'),
             subject: document.getElementById('voiceIndicatorSubject'),
             reference: document.getElementById('voiceIndicatorReference'),
@@ -1095,13 +1093,12 @@ U/S 194 BNSS</textarea>
         
         // Default values
         const defaultValues = {
-            deceasedDetailsInput: 'இறந்தவர்:\nஇறந்தவரின் பெயர் மற்றும் விலாசம்',
-            subject: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதத்தின் பிரேத பரிசோதனை டாக்டர் அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.',
+            deceasedDetailsInput: 'இறந்தவரின் பெயர் மற்றும் விலாசம்',
+            subject: 'பிரேத பரிசோதனை செய்து சான்று வழங்க வேண்டுதல் தொடர்பாக',
             reference: 'G7 fhty; epiya Fw;w vz; 216-2025\n\nU/S 194 BNSS',
-            deceasedDescription: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மரணத்தில் கண்ட பிரேதம்; கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடப்பில் உள்ளது. மேற்படி பிரேதத்தை',
+            deceasedDescription: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை',
             policeOfficerDetails: 'முதல் நிலை காவலர் 43606 திரு. திருமுருகன்',
-            deceasedDescriptionEnd: 'என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.',
-            receiverAdditionalInfo: ''
+            deceasedDescriptionEnd: 'என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.'
         };
         
         // Initialize form
@@ -1113,7 +1110,6 @@ U/S 194 BNSS</textarea>
             document.getElementById('deceasedDescription').value = defaultValues.deceasedDescription;
             document.getElementById('policeOfficerDetails').value = defaultValues.policeOfficerDetails;
             document.getElementById('deceasedDescriptionEnd').value = defaultValues.deceasedDescriptionEnd;
-            document.getElementById('receiverAdditionalInfo').value = defaultValues.receiverAdditionalInfo;
             
             // Set default police station
             policeStationSelect.value = 'G7';
@@ -1268,23 +1264,13 @@ U/S 194 BNSS</textarea>
                 hospitalAddress = hospital.address;
             }
             
-            const additionalInfo = (receiverAdditionalInfo.value || '').split('\n');
-            
-            // Build receiver details array:
+            // Build receiver details array (only 2 lines now):
             // 1. Hospital/Office Name
             // 2. Hospital/Office Address
-            // 3+. Additional info lines
             const receiverDetails = [
                 hospitalName,    // First line: Hospital name
                 hospitalAddress  // Second line: Hospital address
             ];
-            
-            // Add additional info lines
-            additionalInfo.forEach(line => {
-                if (line.trim()) {
-                    receiverDetails.push(line);
-                }
-            });
             
             return receiverDetails;
         }
@@ -1296,18 +1282,16 @@ U/S 194 BNSS</textarea>
             // Process the deceased details as entered by user
             const lines = deceasedDetails.split('\n');
             
-            // Create formatted content
+            // Create formatted content - ALWAYS start with "இறந்தவர்:"
             const formattedLines = [];
+            
+            // Add "இறந்தவர்:" as first line (bold)
+            formattedLines.push('<strong>இறந்தவர்:</strong>');
             
             // Add all user input lines
             lines.forEach(line => {
                 if (line.trim()) {
-                    // Check if line contains "இறந்தவர்:" and make it bold
-                    if (line.includes('இறந்தவர்:')) {
-                        formattedLines.push(`<strong>${line}</strong>`);
-                    } else {
-                        formattedLines.push(line);
-                    }
+                    formattedLines.push(line);
                 }
             });
             
@@ -1318,8 +1302,17 @@ U/S 194 BNSS</textarea>
         function generateFirstColumnText() {
             const deceasedDetails = document.getElementById('deceasedDetailsInput').value || defaultValues.deceasedDetailsInput;
             
-            // Return the text as entered by user
-            return deceasedDetails;
+            // ALWAYS start with "இறந்தவர்:" followed by user input
+            const lines = deceasedDetails.split('\n');
+            const resultLines = ['இறந்தவர்:'];
+            
+            lines.forEach(line => {
+                if (line.trim()) {
+                    resultLines.push(line);
+                }
+            });
+            
+            return resultLines.join('\n');
         }
         
         // Generate the complete deceased description with editable police officer details
@@ -1446,7 +1439,7 @@ U/S 194 BNSS</textarea>
             } else {
                 // Start voice recognition on the first field
                 const activeElement = document.activeElement;
-                const fieldId = activeElement && activeElement.id ? activeElement.id : 'receiverAdditionalInfo';
+                const fieldId = activeElement && activeElement.id ? activeElement.id : 'deceasedDetailsInput';
                 if (startVoiceRecognition(fieldId)) {
                     toggleVoiceControlBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Disable Voice';
                     toggleVoiceControlBtn.classList.add('active');
@@ -2034,7 +2027,6 @@ U/S 194 BNSS</textarea>
         hospitalSelect.addEventListener('change', updateHospitalInfo);
         hospitalCustom.addEventListener('input', updatePreview);
         hospitalAddress.addEventListener('input', updatePreview);
-        receiverAdditionalInfo.addEventListener('input', updatePreview);
         
         generatePdfBtn.addEventListener('click', generatePDF);
         resetFormBtn.addEventListener('click', resetForm);
@@ -2045,9 +2037,9 @@ U/S 194 BNSS</textarea>
             if (isVoiceActive) {
                 stopVoiceRecognition();
             } else {
-                // Get the currently focused field or start with receiverAdditionalInfo
+                // Get the currently focused field or start with deceasedDetailsInput
                 const activeElement = document.activeElement;
-                const fieldId = activeElement && activeElement.id ? activeElement.id : 'receiverAdditionalInfo';
+                const fieldId = activeElement && activeElement.id ? activeElement.id : 'deceasedDetailsInput';
                 startVoiceRecognition(fieldId);
             }
         });
