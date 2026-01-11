@@ -1,506 +1,301 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ta">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PM Request - PDF Maker</title>
+    <title>PM Request - PDF Maker (சிரேயம்)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --a4-width: 210mm;
+            --a4-height: 297mm;
+            --page-margin: 20mm;
+            --primary-blue: #1a3a8f;
+            --secondary-blue: #2c5aa0;
+            --light-bg: #f5f7fa;
         }
-        
+
         body {
-            background-color: #f5f7fa;
+            font-family: 'Helvetica', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
             color: #333;
             line-height: 1.6;
-            padding: 20px;
+            padding: 15px;
+            margin: 0;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+
+        .container-fluid {
+            padding: 10px;
+            min-height: 100vh;
         }
-        
-        header {
-            background: linear-gradient(135deg, #1a3a8f 0%, #2c5aa0 100%);
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
             color: white;
             padding: 20px;
             text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
-        header h1 {
+
+        .header h1 {
             margin-bottom: 10px;
             font-size: 28px;
         }
-        
-        header p {
+
+        .header p {
             opacity: 0.9;
             font-size: 16px;
+            margin-bottom: 0;
         }
-        
+
+        /* Main Content Layout */
         .main-content {
             display: flex;
-            flex-wrap: wrap;
-            padding: 0;
+            gap: 20px;
+            height: calc(100vh - 150px);
         }
-        
-        .form-section {
-            flex: 1;
-            min-width: 350px;
+
+        /* Input Panel */
+        .input-panel {
+            width: 450px;
+            background: white;
+            border-radius: 10px;
             padding: 25px;
-            border-right: 1px solid #eee;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
-        .preview-section {
+
+        /* Preview Panel */
+        .preview-panel {
             flex: 1;
-            min-width: 350px;
+            background: #f9f9f9;
+            border-radius: 10px;
             padding: 25px;
-            background-color: #f9f9f9;
-        }
-        
-        .section-title {
-            color: #1a3a8f;
-            border-bottom: 2px solid #1a3a8f;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 22px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
-        .section-title i {
-            margin-right: 10px;
+
+        /* Form Elements */
+        .form-label {
+            font-weight: bold;
+            margin-top: 15px;
+            color: var(--primary-blue);
+            font-size: 15px;
         }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
+
+        .form-control, .form-select {
+            font-size: 15px;
+            padding: 10px 15px;
             margin-bottom: 8px;
-            font-weight: 600;
-            color: #444;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 16px;
             transition: border-color 0.3s;
         }
-        
-        input:focus, select:focus, textarea:focus {
-            border-color: #1a3a8f;
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-blue);
             outline: none;
             box-shadow: 0 0 0 2px rgba(26, 58, 143, 0.2);
         }
-        
-        #deceasedDetailsInput {
-            height: 100px;
-            min-height: 100px;
+
+        textarea.form-control {
             resize: vertical;
-            font-size: 16px;
-            line-height: 1.5;
-            padding: 15px;
+            min-height: 80px;
         }
-        
-        .buttons {
+
+        /* Section Headers */
+        .section-header {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 20px;
             display: flex;
-            gap: 15px;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .section-header i {
+            margin-right: 10px;
+        }
+
+        /* A4 Preview Container */
+        .a4-preview-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            background: #6c757d;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* A4 Page */
+        .a4-page {
+            width: var(--a4-width);
+            min-height: var(--a4-height);
+            background: white;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        /* Document Content */
+        .document-content {
+            font-family: 'Latha', 'Times New Roman', serif;
+            line-height: 1.5;
+            font-size: 11pt;
+            height: 100%;
+            padding: var(--page-margin);
+            box-sizing: border-box;
+        }
+
+        /* Controls */
+        .controls {
             margin-top: 25px;
             padding-top: 20px;
             border-top: 1px solid #eee;
         }
-        
-        .btn {
-            padding: 14px 25px;
-            border: none;
-            border-radius: 5px;
+
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
             font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
             transition: all 0.3s;
         }
-        
-        .btn-primary {
-            background-color: #1a3a8f;
-            color: white;
-            flex: 2;
-        }
-        
-        .btn-secondary {
-            background-color: #f0f0f0;
-            color: #333;
-            flex: 1;
-        }
-        
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-            flex: 1;
-        }
-        
-        .btn-info {
-            background-color: #17a2b8;
-            color: white;
-            flex: 1;
-        }
-        
-        .btn:hover {
+
+        .btn-action:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
         .btn-primary:hover {
             background-color: #15317a;
         }
-        
-        .btn-secondary:hover {
-            background-color: #e0e0e0;
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
         }
-        
+
         .btn-success:hover {
             background-color: #218838;
         }
-        
-        .btn-info:hover {
-            background-color: #138496;
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
         }
-        
-        .btn i {
-            margin-right: 8px;
+
+        .btn-warning:hover {
+            background-color: #e0a800;
         }
-        
-        .document-preview {
-            background-color: white;
-            padding: 25px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            min-height: 500px;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 12px;
-            line-height: 1.4;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .tamil-text {
-            font-family: 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
-        }
-        
-        .english-text {
-            font-family: 'Times New Roman', Times, serif;
-        }
-        
-        .preview-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .preview-header h2 {
-            font-size: 16px;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        
-        .document-line {
-            margin-bottom: 8px;
-        }
-        
-        .from-section, .to-section {
-            margin-bottom: 20px;
-        }
-        
-        .section-heading {
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 12px;
-        }
-        
-        .table-container {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            align-items: flex-start;
-        }
-        
-        .single-column-table {
-            width: 28%;
-            border: 1px solid #000;
-            border-collapse: collapse;
-        }
-        
-        .single-column-table td {
-            border: none;
-            padding: 5px;
-            vertical-align: top;
-            font-size: 11px;
-        }
-        
-        .document-table {
-            width: 70%;
-            border: 1px solid #000;
-            border-collapse: collapse;
-        }
-        
-        .document-table td {
-            border: none;
-            border-bottom: 1px solid #000;
-            border-right: 1px solid #000;
-            padding: 5px;
-            vertical-align: top;
-            font-size: 11px;
-        }
-        
-        .document-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .document-table td:last-child {
-            border-right: none;
-        }
-        
-        .document-table .label {
-            font-weight: bold;
-            width: 22%;
-            font-size: 11px;
-            border-right: 1px solid #000;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            color: #666;
-            font-size: 14px;
-            border-top: 1px solid #eee;
-        }
-        
-        .instructions {
+
+        /* Customization Controls */
+        .customization-controls {
             background-color: #f8f9fa;
-            border-left: 4px solid #1a3a8f;
+            border-radius: 8px;
             padding: 15px;
             margin-top: 20px;
-            border-radius: 5px;
-            font-size: 14px;
+            border-left: 4px solid var(--primary-blue);
         }
-        
-        .instructions h4 {
-            color: #1a3a8f;
+
+        .customization-controls label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             margin-bottom: 10px;
         }
-        
-        .font-size-control {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+
+        /* District Selector */
+        .district-selector {
+            margin-bottom: 20px;
+            background-color: #e8f4fd;
+            border: 1px solid #b6d4fe;
+            border-radius: 8px;
+            padding: 15px;
         }
-        
-        .font-size-control label {
-            margin-bottom: 0;
+
+        .district-selector label {
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Other District Input */
+        .other-district-input {
             font-size: 14px;
+            padding: 12px;
+            min-height: 100px;
+            resize: vertical;
         }
-        
-        .font-size-control select {
-            width: auto;
-            padding: 5px 10px;
-        }
-        
-        .table-width-control {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .table-width-control label {
-            margin-bottom: 0;
-            font-size: 14px;
-        }
-        
-        .table-width-control select {
-            width: auto;
-            padding: 5px 10px;
-        }
-        
-        .font-selection-control {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .font-selection-control label {
-            margin-bottom: 0;
-            font-size: 14px;
-        }
-        
-        .font-selection-control select {
-            width: auto;
-            padding: 5px 10px;
-            min-width: 150px;
-        }
-        
-        .voice-typing-control {
-            margin-top: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .voice-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-        
-        .voice-btn.active {
-            background-color: #f44336;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .police-station-controls, .hospital-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .station-select-group, .station-custom-group,
-        .hospital-select-group, .hospital-custom-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .station-address-group, .hospital-address-group {
-            grid-column: span 2;
-        }
-        
-        .custom-station-input, .custom-hospital-input {
-            display: none;
-            margin-top: 10px;
-        }
-        
-        .custom-station-input.active, .custom-hospital-input.active {
-            display: block;
-        }
-        
-        .station-info, .hospital-info {
+
+        /* Hospital Info Box */
+        .hospital-info-box {
             background-color: #f0f7ff;
             border: 1px solid #b6d4fe;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 13px;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 14px;
             color: #0c5460;
         }
-        
-        .station-info h5, .hospital-info h5 {
-            margin-bottom: 5px;
-            color: #1a3a8f;
+
+        .hospital-info-box h5 {
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            font-size: 15px;
         }
-        
-        .mobile-optimized {
-            /* Styles for mobile optimization */
-        }
-        
-        .deceased-notice {
-            background-color: #fff8e1;
-            border: 1px solid #ffe57f;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 13px;
-            color: #ff6f00;
-        }
-        
-        .speech-input-button {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #1a3a8f;
-            cursor: pointer;
-            font-size: 18px;
-            padding: 5px;
-            z-index: 2;
-        }
-        
-        .speech-input-button:hover {
-            color: #15317a;
-        }
-        
-        input[type="text"], textarea {
-            padding-right: 40px !important;
-        }
-        
-        .crime-number-input {
+
+        /* Crime Number Box */
+        .crime-number-box {
             background-color: #fff3cd;
             border: 1px solid #ffeaa7;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 15px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
-        
-        .crime-number-input h4 {
+
+        .crime-number-box h5 {
             color: #856404;
             margin-bottom: 10px;
             font-size: 16px;
         }
-        
-        .crime-number-group {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        
-        .crime-number-group .form-group {
-            margin-bottom: 0;
-        }
-        
+
+        /* Station Display Box */
         .station-display-box {
             background-color: #e8f4fd;
             border: 1px solid #b6d4fe;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 12px;
             font-size: 14px;
             color: #0c5460;
@@ -511,153 +306,85 @@
             min-height: 60px;
             margin-top: 10px;
         }
-        
+
         .station-display-box i {
             margin-right: 8px;
-            color: #1a3a8f;
+            color: var(--primary-blue);
             margin-top: 2px;
         }
-        
+
         .station-display-content {
             flex: 1;
         }
-        
+
         .station-display-title {
             font-weight: bold;
             margin-bottom: 5px;
-            color: #1a3a8f;
+            color: var(--primary-blue);
             font-size: 13px;
         }
-        
+
         .station-display-value {
             font-size: 14px;
             line-height: 1.4;
         }
-        
-        .indent-control {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .indent-control label {
-            margin-bottom: 0;
-            font-size: 14px;
-        }
-        
-        .indent-control select {
-            width: auto;
-            padding: 5px 10px;
-        }
-        
-        /* Hidden sections */
+
+        /* Hidden Sections */
         .hidden-section {
             display: none !important;
         }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
+
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
             }
-            
-            .form-section {
-                border-right: none;
-                border-bottom: 1px solid #eee;
-            }
-            
-            .table-container {
-                flex-direction: column;
-            }
-            
-            .single-column-table,
-            .document-table {
-                width: 100%;
-            }
-            
-            .buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .font-selection-control, 
-            .table-width-control,
-            .font-size-control,
-            .indent-control,
-            .police-station-controls,
-            .hospital-controls {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .police-station-controls,
-            .hospital-controls {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .station-address-group,
-            .hospital-address-group {
-                grid-column: span 1;
-            }
-            
-            .font-selection-control select,
-            .table-width-control select,
-            .font-size-control select,
-            .indent-control select {
-                width: 100%;
-            }
-            
-            .voice-typing-control {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .voice-btn {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .speech-input-button {
-                right: 5px;
-                font-size: 20px;
-                padding: 8px;
-            }
-            
-            .crime-number-group {
-                grid-template-columns: 1fr;
-            }
-            
-            .station-display-box {
-                min-height: 50px;
-                padding: 10px;
+
+            .a4-page {
+                box-shadow: none !important;
+                margin: 0 !important;
             }
         }
-        
-        @media (max-width: 480px) {
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .input-panel {
+                width: 100%;
+                max-height: 60vh;
+            }
+
+            .a4-preview-container {
+                min-height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
-            
-            .form-section, .preview-section {
+
+            .input-panel, .preview-panel {
                 padding: 15px;
             }
-            
-            input, select, textarea {
-                font-size: 16px; /* Prevents zoom on iOS */
+
+            .control-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
             }
-            
-            /* Improve touch targets */
-            .btn {
-                padding: 16px 20px;
+
+            .btn-action {
+                padding: 16px;
                 min-height: 54px;
             }
-            
-            select {
-                min-height: 44px;
+
+            .form-control, .form-select {
+                font-size: 16px;
             }
         }
     </style>
@@ -683,434 +410,229 @@
         .font-noto {
             font-family: 'Noto Sans Tamil', sans-serif;
         }
-        
-        .font-avanam {
-            font-family: 'Aavanam', 'Latha', sans-serif;
-        }
-        
-        .font-bamini {
-            font-family: 'Bamini', sans-serif;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-file-pdf"></i> PM Request - PDF Maker</h1>
-            <p>Fill out the form below to generate a PDF with Tamil font</p>
-        </header>
-        
+    <div class="container-fluid">
+        <div class="header">
+            <h1><i class="fas fa-file-pdf"></i> PM Request - PDF Maker (சிரேயம்)</h1>
+            <p>Fill out the form below to generate a PM Request document with Tamil font</p>
+        </div>
+
         <div class="main-content">
-            <div class="form-section">
-                <h2 class="section-title"><i class="fas fa-edit"></i> Document Details</h2>
-                
-                <div class="font-selection-control">
-                    <label for="tamilFontSelect"><i class="fas fa-font"></i> Tamil Font:</label>
-                    <select id="tamilFontSelect">
-                        <option value="Latha" selected>Latha (Standard Windows)</option>
-                        <option value="Noto Sans Tamil">Noto Sans Tamil (Google)</option>
-                        <option value="Aavanam">Aavanam</option>
-                        <option value="Bamini">Bamini</option>
+            <!-- Input Panel -->
+            <div class="input-panel no-print">
+                <h4 class="section-header"><i class="fas fa-edit"></i> ஆவண விவரங்கள்</h4>
+
+                <!-- District Selector -->
+                <div class="district-selector">
+                    <label class="form-label">மாவட்டத்தை தேர்ந்தெடுக்கவும்:</label>
+                    <select class="form-select" id="districtSelect" onchange="toggleDistrictFields()">
+                        <option value="chennai" selected>சென்னை</option>
+                        <option value="other">பிற மாவட்டங்கள்</option>
                     </select>
                 </div>
+
+                <!-- Police Station Section -->
+                <h5 class="section-header"><i class="fas fa-paper-plane"></i> அனுப்புநர் (Police Station)</h5>
                 
-                <div class="form-group">
-                    <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <i class="fas fa-paper-plane"></i> Sender (அனுப்புநர்) Details
-                    </h3>
+                <div class="mb-3">
+                    <label class="form-label">காவல் நிலையத்தின் பெயர்:</label>
                     
-                    <div class="police-station-controls">
-                        <div class="station-select-group">
-                            <label for="policeStationSelect"><i class="fas fa-building"></i> Select Police Station:</label>
-                            <select id="policeStationSelect">
-                                <option value="">-- Select Police Station --</option>
-                                <option value="G7" selected>G7 (சி.சி.பி., சீர்மை)</option>
-                                <option value="G1">G1 (அயன் அவென்யூ)</option>
-                                <option value="G2">G2 (கீழ்ப்பாக்கம்)</option>
-                                <option value="G3">G3 (சாஸ்திரி நகர்)</option>
-                                <option value="G4">G4 (தியாகராய நகர்)</option>
-                                <option value="G5">G5 (கோட்டூர்புரம்)</option>
-                                <option value="G6">G6 (வேப்பேரி)</option>
-                                <option value="G8">G8 (தேனாம்பேட்டை)</option>
-                                <option value="G9">G9 (அண்ணா நகர்)</option>
-                                <option value="G10">G10 (சைதாப்பேட்டை)</option>
-                                <option value="custom">-- Enter Custom Station --</option>
-                            </select>
-                        </div>
-                        
-                        <div class="station-custom-group">
-                            <label for="policeStationCustom"><i class="fas fa-edit"></i> Custom Station Code:</label>
-                            <div class="field-with-voice">
-                                <input type="text" id="policeStationCustom" placeholder="Enter custom station code" style="display: none;">
-                                <button class="speech-input-button" data-target="policeStationCustom" style="display: none;">
-                                    <i class="fas fa-microphone"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="station-address-group">
-                            <label for="policeStationAddress"><i class="fas fa-map-marker-alt"></i> Station Address:</label>
-                            <div class="field-with-voice">
-                                <input type="text" id="policeStationAddress" placeholder="Station address will auto-fill" value="சீர்மை, சென்னை - 600 090">
-                                <button class="speech-input-button" data-target="policeStationAddress">
-                                    <i class="fas fa-microphone"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Chennai District - Dropdown -->
+                    <div id="chennaiPoliceStationContainer">
+                        <select class="form-select" id="policeStationDropdown" onchange="updatePoliceStationInfo()">
+                            <option value="" selected>-- தேர்ந்தெடுக்கவும் --</option>
+                            <!-- Chennai Police Stations -->
+                            <optgroup label="சென்னை காவல் நிலையங்கள்" id="chennaiStations">
+                                <!-- These will be populated dynamically -->
+                            </optgroup>
+                        </select>
                     </div>
                     
-                    <div class="station-info">
-                        <h5><i class="fas fa-info-circle"></i> Selected Station Information:</h5>
-                        <div id="stationInfoText">G7 Police Station (சி.சி.பி., சீர்மை), சீர்மை, சென்னை - 600 090</div>
+                    <!-- Other Districts - Text Input -->
+                    <div id="otherPoliceStationContainer" style="display: none;">
+                        <textarea class="form-control other-district-input" id="policeStationText" 
+                                  placeholder="காவல் நிலையத்தின் முழுப் பெயரை உள்ளிடவும்..." 
+                                  oninput="updatePoliceStationInfo()"></textarea>
                     </div>
                 </div>
-                
-                <div class="crime-number-input">
-                    <h4><i class="fas fa-file-invoice"></i> Crime Number Details (பார்வை பிரிவு)</h4>
+
+                <!-- Crime Number Section -->
+                <div class="crime-number-box">
+                    <h5><i class="fas fa-file-invoice"></i> Crime Number Details (பார்வை பிரிவு)</h5>
                     <p style="font-size: 14px; margin-bottom: 10px; color: #856404;">
-                        <i class="fas fa-info-circle"></i> Full station name is automatically taken from the selected police station above. Enter only the crime number.
+                        <i class="fas fa-info-circle"></i> Full station name is automatically taken from the selected police station above.
                     </p>
                     
-                    <div class="crime-number-group">
-                        <div class="form-group">
-                            <label for="crimeNumber"><i class="fas fa-hashtag"></i> Crime Number:</label>
-                            <div class="field-with-voice">
-                                <input type="text" id="crimeNumber" placeholder="e.g., 216-2025" value="216-2025">
-                                <button class="speech-input-button" data-target="crimeNumber">
-                                    <i class="fas fa-microphone"></i>
-                                </button>
-                            </div>
-                            <p style="font-size: 12px; color: #666; margin-top: 5px;">Crime Register Number (e.g., 216-2025)</p>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Crime Register Number (e.g., 216/2025):</label>
+                        <input type="text" class="form-control" id="crimeNumber" value="216/2025" oninput="updateReferenceDisplay()" placeholder="e.g., 216/2025">
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">Use forward slash (/) instead of hyphen (-)</p>
                     </div>
                     
                     <div class="station-display-box">
                         <i class="fas fa-info-circle"></i>
                         <div class="station-display-content">
                             <div class="station-display-title">Reference will use:</div>
-                            <div class="station-display-value" id="fullStationReference">G7 நிர்வாக காவல் நிலைய (சி.சி.பி., சீர்மை) fhty; epiya Fw;w vz; 216-2025</div>
+                            <div class="station-display-value" id="fullStationReference">G7 காவல் நிலைய (சேத்துப்பட்டு) fhty; epiya Fw;w vz; 216/2025 - G7 சேத்துப்பட்டு காவல் நிலைய குற்ற எண். 216/2025</div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Hospital Section -->
+                <h5 class="section-header"><i class="fas fa-envelope"></i> பெறுநர் (Hospital/Office)</h5>
                 
-                <div class="form-group">
-                    <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <i class="fas fa-envelope"></i> Receiver (பெறுநர்) Details
-                    </h3>
+                <div class="mb-3">
+                    <label class="form-label">மருத்துவமனை / அலுவலகம்:</label>
+                    <select class="form-select" id="hospitalSelect" onchange="updateHospitalInfo()">
+                        <option value="">-- Select Hospital/Office --</option>
+                        <option value="kpgmc" selected>கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை</option>
+                        <option value="gh">அரசு மருத்துவமனை (பொது மருத்துவமனை)</option>
+                        <option value="cmc">வி.எஸ். மருத்துவமனை</option>
+                        <option value="rgmc">ராஜா முத்தையா அரசு மருத்துவக் கல்லூரி மருத்துவமனை</option>
+                        <option value="kmch">கோவை மருத்துவக் கல்லூரி மருத்துவமனை</option>
+                        <option value="mgh">மகாத்மா காந்தி அரசு மருத்துவமனை</option>
+                        <option value="custom">-- Enter Custom Hospital/Office --</option>
+                    </select>
                     
-                    <div class="hospital-controls">
-                        <div class="hospital-select-group">
-                            <label for="hospitalSelect"><i class="fas fa-hospital"></i> Select Hospital/Office:</label>
-                            <select id="hospitalSelect">
-                                <option value="">-- Select Hospital/Office --</option>
-                                <option value="kpgmc" selected>கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை</option>
-                                <option value="gh">அரசு மருத்துவமனை (பொது மருத்துவமனை)</option>
-                                <option value="cmc">வி.எஸ். மருத்துவமனை</option>
-                                <option value="rgmc">ராஜா முத்தையா அரசு மருத்துவக் கல்லூரி மருத்துவமனை</option>
-                                <option value="kmch">கோவை மருத்துவக் கல்லூரி மருத்துவமனை</option>
-                                <option value="mgh">மகாத்மா காந்தி அரசு மருத்துவமனை</option>
-                                <option value="custom">-- Enter Custom Hospital/Office --</option>
-                            </select>
-                        </div>
-                        
-                        <div class="hospital-custom-group">
-                            <label for="hospitalCustom"><i class="fas fa-edit"></i> Custom Hospital/Office:</label>
-                            <div class="field-with-voice">
-                                <input type="text" id="hospitalCustom" placeholder="Enter custom hospital/office name" style="display: none;">
-                                <button class="speech-input-button" data-target="hospitalCustom" style="display: none;">
-                                    <i class="fas fa-microphone"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="hospital-address-group">
-                            <label for="hospitalAddress"><i class="fas fa-map-marker-alt"></i> Hospital/Office Address:</label>
-                            <div class="field-with-voice">
-                                <input type="text" id="hospitalAddress" placeholder="Address will auto-fill" value="கீழ்ப்பாக்கம், சென்னை - 600 004">
-                                <button class="speech-input-button" data-target="hospitalAddress">
-                                    <i class="fas fa-microphone"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="hospital-info">
-                        <h5><i class="fas fa-info-circle"></i> Selected Hospital Information:</h5>
-                        <div id="hospitalInfoText">கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை, கீழ்ப்பாக்கம், சென்னை - 600 004</div>
+                    <!-- Custom Hospital Input -->
+                    <div id="hospitalCustomContainer" style="display: none; margin-top: 10px;">
+                        <textarea class="form-control other-district-input" id="hospitalCustom" 
+                                  placeholder="Enter custom hospital/office name" 
+                                  oninput="updateHospitalInfo()"></textarea>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <i class="fas fa-columns"></i> Deceased Details Section
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label for="deceasedDetailsInput">Deceased Details Information</label>
-                        <div class="field-with-voice">
-                            <textarea id="deceasedDetailsInput" rows="6" placeholder="Enter deceased details information" style="height: 90px;">இறந்தவரின் பெயர் மற்றும் விலாசம்</textarea>
-                            <button class="speech-input-button" data-target="deceasedDetailsInput">
-                                <i class="fas fa-microphone"></i>
-                            </button>
-                        </div>
-                    </div>
+
+                <!-- Hospital Address -->
+                <div class="mb-3">
+                    <label class="form-label">மருத்துவமனை முகவரி:</label>
+                    <input type="text" class="form-control" id="hospitalAddress" value="கீழ்ப்பாக்கம், சென்னை - 600 004" oninput="updatePreview()">
                 </div>
-                
-                <div class="form-group">
-                    <label for="subject">Subject (பொருள்)</label>
-                    <div class="field-with-voice">
-                        <textarea id="subject" rows="2" placeholder="Enter the subject of the document">பிரேத பரிசோதனை செய்து சான்று வழங்க வேண்டுதல் தொடர்பாக</textarea>
-                        <button class="speech-input-button" data-target="subject">
-                            <i class="fas fa-microphone"></i>
-                        </button>
-                    </div>
+
+                <div class="hospital-info-box">
+                    <h5><i class="fas fa-info-circle"></i> Selected Hospital Information:</h5>
+                    <div id="hospitalInfoText">கீழ்ப்பாக்கம் அரசு மருத்துவக் கல்லூரி மருத்துவமனை, கீழ்ப்பாக்கம், சென்னை - 600 004</div>
                 </div>
+
+                <!-- Deceased Details Section -->
+                <h5 class="section-header"><i class="fas fa-columns"></i> Deceased Details Section</h5>
                 
-                <!-- Police Officer Details Field (Visible) -->
-                <div class="form-group">
-                    <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                        <i class="fas fa-user-shield"></i> Police Officer Details
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label for="policeOfficerDetails">Police Officer Details (முதல் நிலை காவலர் விவரங்கள்)</label>
-                        <div class="field-with-voice">
-                            <input type="text" id="policeOfficerDetails" placeholder="Enter police officer details" value="முதல் நிலை காவலர் 43606 திரு. திருமுருகன்">
-                            <button class="speech-input-button" data-target="policeOfficerDetails">
-                                <i class="fas fa-microphone"></i>
-                            </button>
-                        </div>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">Deceased Details Information:</label>
+                    <textarea class="form-control" id="deceasedDetailsInput" rows="4" oninput="updatePreview()">இறந்தவரின் பெயர் மற்றும் விலாசம்</textarea>
                 </div>
+
+                <!-- Police Officer Details -->
+                <h5 class="section-header"><i class="fas fa-user-shield"></i> Police Officer Details</h5>
                 
+                <div class="mb-3">
+                    <label class="form-label">Police Officer Details (முதல் நிலை காவலர் விவரங்கள்):</label>
+                    <input type="text" class="form-control" id="policeOfficerDetails" value="முதல் நிலை காவலர் 43606 திரு. திருமுருகன்" oninput="updatePreview()">
+                </div>
+
                 <!-- Hidden Deceased Description Sections -->
                 <div class="hidden-section">
-                    <div class="form-group">
-                        <h3 style="color: #1a3a8f; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                            <i class="fas fa-file-alt"></i> Deceased Description
-                        </h3>
-                        
-                        <div class="deceased-notice">
-                            <i class="fas fa-sync-alt"></i> <strong>Note:</strong> Hospital name in deceased description will auto-update when you select a hospital.
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="deceasedDescription">Deceased Description (விளக்க விபரங்கள்)</label>
-                            <div class="field-with-voice">
-                                <textarea id="deceasedDescription" rows="3" placeholder="Detailed description of deceased person">இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை</textarea>
-                                <button class="speech-input-button" data-target="deceasedDescription">
-                                    <i class="fas fa-microphone"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="deceasedDescriptionEnd">Deceased Description End (முடிவு பகுதி)</label>
-                            <div class="field-with-voice">
-                                <textarea id="deceasedDescriptionEnd" rows="2" placeholder="End part of deceased description">என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.</textarea>
-                                <button class="speech-input-button" data-target="deceasedDescriptionEnd">
-                                    <i class="fas fa-microphone"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <textarea id="deceasedDescription">இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை</textarea>
+                    <textarea id="deceasedDescriptionEnd">என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.</textarea>
+                </div>
+
+                <!-- Customization Controls -->
+                <div class="customization-controls">
+                    <h6><i class="fas fa-sliders-h"></i> Customization Options</h6>
+                    
+                    <div class="control-row">
+                        <label for="fontSize" style="min-width: 120px;">PDF Font Size:</label>
+                        <select class="form-select" id="fontSize" onchange="updatePreview()">
+                            <option value="10">Small (10pt)</option>
+                            <option value="11" selected>Medium (11pt)</option>
+                            <option value="12">Large (12pt)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-row">
+                        <label for="tamilFontSelect" style="min-width: 120px;">Tamil Font:</label>
+                        <select class="form-select" id="tamilFontSelect" onchange="updatePreview()">
+                            <option value="Latha" selected>Latha (Standard)</option>
+                            <option value="Noto Sans Tamil">Noto Sans Tamil</option>
+                        </select>
                     </div>
                 </div>
-                
-                <div class="indent-control">
-                    <label for="indentSize"><i class="fas fa-indent"></i> "இதன் பார்வையில்" Indent:</label>
-                    <select id="indentSize">
-                        <option value="0">No Indent</option>
-                        <option value="20" selected>Small (20px)</option>
-                        <option value="40">Medium (40px)</option>
-                        <option value="60">Large (60px)</option>
-                    </select>
-                </div>
-                
-                <div class="table-width-control">
-                    <label for="leftTableWidth">Left Table Width:</label>
-                    <select id="leftTableWidth">
-                        <option value="25">Narrow (25%)</option>
-                        <option value="28" selected>Medium (28%)</option>
-                        <option value="30">Wide (30%)</option>
-                    </select>
-                </div>
-                
-                <div class="font-size-control">
-                    <label for="fontSize">PDF Font Size:</label>
-                    <select id="fontSize">
-                        <option value="10">Small (10pt)</option>
-                        <option value="11" selected>Medium (11pt)</option>
-                        <option value="12">Large (12pt)</option>
-                    </select>
-                </div>
-                
-                <div class="buttons">
-                    <button class="btn btn-primary" id="generatePdf">
+
+                <!-- Action Buttons -->
+                <div class="controls">
+                    <button class="btn-action btn-primary" onclick="generatePDF()">
                         <i class="fas fa-file-pdf"></i> Download PDF
                     </button>
-                    <button class="btn btn-secondary" id="resetForm">
+                    <button class="btn-action btn-success" onclick="printDocument()">
+                        <i class="fas fa-print"></i> Print Document
+                    </button>
+                    <button class="btn-action btn-warning" onclick="resetForm()">
                         <i class="fas fa-redo"></i> Reset Form
                     </button>
                 </div>
-                
-                <div class="button-group">
-                    <button class="btn btn-success" id="printDocument">
-                        <i class="fas fa-print"></i> Print Document
-                    </button>
-                </div>
-                
-                <div class="instructions">
-                    <h4><i class="fas fa-info-circle"></i> Instructions:</h4>
-                    <p><strong>Crime Number:</strong> Full station name is automatically detected from police station selection.</p>
-                    <p><strong>Auto-Update:</strong> Hospital name in deceased description automatically updates when hospital is selected.</p>
-                    <p><strong>Voice Input:</strong> Use microphone buttons for voice input.</p>
-                </div>
+
             </div>
-            
-            <div class="preview-section">
-                <h2 class="section-title"><i class="fas fa-eye"></i> Document Preview</h2>
-                <div class="document-preview" id="documentPreview">
-                    <!-- Document preview will be generated here -->
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="section-header mb-0"><i class="fas fa-eye"></i> ஆவண முன்னோட்டம்</h4>
+                    <span class="badge bg-success">Preview = PDF</span>
                 </div>
-                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 14px;">
-                    <i class="fas fa-info-circle"></i> Preview updates automatically as you fill the form
-                </p>
+
+                <!-- A4 Preview Container -->
+                <div class="a4-preview-container">
+                    <!-- A4 Page -->
+                    <div class="a4-page" id="a4Page">
+                        <div class="document-content" id="previewContent">
+                            <!-- Preview content will be generated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3 no-print">
+                    <p class="text-muted mb-0">A4 பக்க அளவு: 210mm × 297mm | தமிழ் எழுத்துரு: Latha</p>
+                    <p class="text-muted mb-0"><strong>குறிப்பு:</strong> மேலே உள்ள preview சரியாக PDF இல் வரும்</p>
+                </div>
             </div>
         </div>
-        
-        <footer>
-            <p>PM Request PDF Maker &copy; 2023 | Police Station & Hospital Selection</p>
-        </footer>
     </div>
 
+    <!-- Hidden div for PDF generation -->
+    <div id="pdfContent" style="display: none;"></div>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
     <script>
-        // DOM Elements
-        const formInputs = document.querySelectorAll('input, textarea, select');
-        const documentPreview = document.getElementById('documentPreview');
-        const generatePdfBtn = document.getElementById('generatePdf');
-        const resetFormBtn = document.getElementById('resetForm');
-        const printDocumentBtn = document.getElementById('printDocument');
-        const fontSizeSelect = document.getElementById('fontSize');
-        const leftTableWidthSelect = document.getElementById('leftTableWidth');
-        const tamilFontSelect = document.getElementById('tamilFontSelect');
-        const indentSizeSelect = document.getElementById('indentSize');
-        
-        // Police station elements
-        const policeStationSelect = document.getElementById('policeStationSelect');
-        const policeStationCustom = document.getElementById('policeStationCustom');
-        const policeStationCustomBtn = document.querySelector('button[data-target="policeStationCustom"]');
-        const policeStationAddress = document.getElementById('policeStationAddress');
-        const stationInfoText = document.getElementById('stationInfoText');
-        const policeStationCustomLabel = document.querySelector('.station-custom-group label');
-        
-        // Hospital elements
-        const hospitalSelect = document.getElementById('hospitalSelect');
-        const hospitalCustom = document.getElementById('hospitalCustom');
-        const hospitalCustomBtn = document.querySelector('button[data-target="hospitalCustom"]');
-        const hospitalAddress = document.getElementById('hospitalAddress');
-        const hospitalInfoText = document.getElementById('hospitalInfoText');
-        const hospitalCustomLabel = document.querySelector('.hospital-custom-group label');
-        
-        // Crime number elements
-        const crimeNumberInput = document.getElementById('crimeNumber');
-        const fullStationReference = document.getElementById('fullStationReference');
-        
-        // Deceased description element (hidden but still functional)
-        const deceasedDescription = document.getElementById('deceasedDescription');
-        const deceasedDescriptionEnd = document.getElementById('deceasedDescriptionEnd');
-        const policeOfficerDetails = document.getElementById('policeOfficerDetails');
-        
-        // Default values
-        const defaultValues = {
-            deceasedDetailsInput: 'இறந்தவரின் பெயர் மற்றும் விலாசம்',
-            subject: 'பிரேத பரிசோதனை செய்து சான்று வழங்க வேண்டுதல் தொடர்பாக',
-            crimeNumber: '216-2025',
-            deceasedDescription: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை',
-            policeOfficerDetails: 'முதல் நிலை காவலர் 43606 திரு. திருமுருகன்',
-            deceasedDescriptionEnd: 'என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.'
-        };
-        
-        // Police stations data - UPDATED to use "நிலைய" instead of "நிலையம்" in reference section
-        const policeStations = {
-            'G7': {
-                tamilName: 'G7 நிர்வாக காவல் நிலையம் (சி.சி.பி., சீர்மை)',
-                tamilNameReference: 'G7 நிர்வாக காவல் நிலைய (சி.சி.பி., சீர்மை)', // For reference section
-                address: 'சீர்மை, சென்னை - 600 090',
-                fullName: 'G7 Police Station (CCP, Seermai)',
-                code: 'G7'
-            },
-            'G1': {
-                tamilName: 'G1 நிர்வாக காவல் நிலையம் (அயன் அவென்யூ)',
-                tamilNameReference: 'G1 நிர்வாக காவல் நிலைய (அயன் அவென்யூ)',
-                address: 'அயன் அவென்யூ, சென்னை - 600 018',
-                fullName: 'G1 Police Station (Ayan Avenue)',
-                code: 'G1'
-            },
-            'G2': {
-                tamilName: 'G2 நிர்வாக காவல் நிலையம் (கீழ்ப்பாக்கம்)',
-                tamilNameReference: 'G2 நிர்வாக காவல் நிலைய (கீழ்ப்பாக்கம்)',
-                address: 'கீழ்ப்பாக்கம், சென்னை - 600 010',
-                fullName: 'G2 Police Station (Kilpauk)',
-                code: 'G2'
-            },
-            'G3': {
-                tamilName: 'G3 நிர்வாக காவல் நிலையம் (சாஸ்திரி நகர்)',
-                tamilNameReference: 'G3 நிர்வாக காவல் நிலைய (சாஸ்திரி நகர்)',
-                address: 'சாஸ்திரி நகர், சென்னை - 600 020',
-                fullName: 'G3 Police Station (Shastri Nagar)',
-                code: 'G3'
-            },
-            'G4': {
-                tamilName: 'G4 நிர்வாக காவல் நிலையம் (தியாகராய நகர்)',
-                tamilNameReference: 'G4 நிர்வாக காவல் நிலைய (தியாகராய நகர்)',
-                address: 'தியாகராய நகர், சென்னை - 600 017',
-                fullName: 'G4 Police Station (Thyagaraya Nagar)',
-                code: 'G4'
-            },
-            'G5': {
-                tamilName: 'G5 நிர்வாக காவல் நிலையம் (கோட்டூர்புரம்)',
-                tamilNameReference: 'G5 நிர்வாக காவல் நிலைய (கோட்டூர்புரம்)',
-                address: 'கோட்டூர்புரம், சென்னை - 600 085',
-                fullName: 'G5 Police Station (Kotturpuram)',
-                code: 'G5'
-            },
-            'G6': {
-                tamilName: 'G6 நிர்வாக காவல் நிலையம் (வேப்பேரி)',
-                tamilNameReference: 'G6 நிர்வாக காவல் நிலைய (வேப்பேரி)',
-                address: 'வேப்பேரி, சென்னை - 600 007',
-                fullName: 'G6 Police Station (Vepery)',
-                code: 'G6'
-            },
-            'G8': {
-                tamilName: 'G8 நிர்வாக காவல் நிலையம் (தேனாம்பேட்டை)',
-                tamilNameReference: 'G8 நிர்வாக காவல் நிலைய (தேனாம்பேட்டை)',
-                address: 'தேனாம்பேட்டை, சென்னை - 600 018',
-                fullName: 'G8 Police Station (Teynampet)',
-                code: 'G8'
-            },
-            'G9': {
-                tamilName: 'G9 நிர்வாக காவல் நிலையம் (அண்ணா நகர்)',
-                tamilNameReference: 'G9 நிர்வாக காவல் நிலைய (அண்ணா நகர்)',
-                address: 'அண்ணா நகர், சென்னை - 600 040',
-                fullName: 'G9 Police Station (Anna Nagar)',
-                code: 'G9'
-            },
-            'G10': {
-                tamilName: 'G10 நிர்வாக காவல் நிலையம் (சைதாப்பேட்டை)',
-                tamilNameReference: 'G10 நிர்வாக காவல் நிலைய (சைதாப்பேட்டை)',
-                address: 'சைதாப்பேட்டை, சென்னை - 600 015',
-                fullName: 'G10 Police Station (Saidapet)',
-                code: 'G10'
-            },
-            'custom': {
-                tamilName: 'Custom Police Station',
-                tamilNameReference: 'Custom நிர்வாக காவல் நிலைய',
-                address: '',
-                fullName: 'Custom Police Station',
-                code: 'Custom'
-            }
-        };
-        
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+
+        // Chennai Police Stations Data (Tamil names)
+        const chennaiPoliceStations = [
+            "G7 சேத்துப்பட்டு காவல் நிலையம்",
+            "G1 வேப்பேரி காவல் நிலையம்",
+            "G2 பெரியமேடு காவல் நிலையம்",
+            "G3 கிளிப்பாக் காவல் நிலையம்",
+            "G4 மனநல மருத்துவமனை அவுட்போஸ்ட்",
+            "G5 செயலக காலனி காவல் நிலையம்",
+            "G6 கிளிப்பாக் மருத்துவக் கல்லூரி காவல் நிலையம்",
+            "G8 தேனாம்பேட்டை காவல் நிலையம்",
+            "G9 அண்ணா நகர் காவல் நிலையம்",
+            "G10 சைதாப்பேட்டை காவல் நிலையம்",
+            "C1 பூக்கடை காவல் நிலையம்",
+            "D1 திருப்பள்ளிக்கேணி காவல் நிலையம்",
+            "E1 மயிலாப்பூர் காவல் நிலையம்",
+            "F1 சிந்தாதிரிப்பேட்டை காவல் நிலையம்",
+            "K1 செம்பியம் காவல் நிலையம்",
+            "K2 அயனாவரம் காவல் நிலையம்",
+            "K4 அண்ணா நகர் காவல் நிலையம்",
+            "M1 ஹார்பர் காவல் நிலையம்",
+            "R1 மாம்பலம் காவல் நிலையம்",
+            "V1 வில்லிவாக்கம் காவல் நிலையம்"
+        ];
+
         // Hospital data
         const hospitals = {
             'kpgmc': {
@@ -1177,178 +699,150 @@
                 commonName: 'Custom'
             }
         };
-        
-        // Function to show/hide custom fields
-        function toggleCustomFields() {
-            const policeStationValue = policeStationSelect.value;
-            const hospitalValue = hospitalSelect.value;
-            
-            // Show/hide police station custom field
-            if (policeStationValue === 'custom') {
-                policeStationCustom.style.display = 'block';
-                policeStationCustomBtn.style.display = 'block';
-                policeStationCustomLabel.style.display = 'block';
-                policeStationCustom.placeholder = 'Enter custom station code (e.g., X1, Y2)';
-                policeStationAddress.value = '';
-            } else {
-                policeStationCustom.style.display = 'none';
-                policeStationCustomBtn.style.display = 'none';
-                policeStationCustomLabel.style.display = 'none';
-                
-                // Set address based on selected station
-                const station = policeStations[policeStationValue] || policeStations['G7'];
-                policeStationAddress.value = station.address;
+
+        // Default values - Subject is now fixed/standard
+        const defaultValues = {
+            deceasedDetailsInput: 'இறந்தவரின் பெயர் மற்றும் விலாசம்',
+            subject: 'பிரேத பரிசோதனை செய்து சான்று வழங்க வேண்டுதல் தொடர்பாக', // Standard subject
+            crimeNumber: '216/2025', // Changed to use forward slash
+            deceasedDescription: 'இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் கீழ்ப்பாக்கம் அரசு மருத்துவக்கல்லூரி மருத்துவமனை சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை',
+            policeOfficerDetails: 'முதல் நிலை காவலர் 43606 திரு. திருமுருகன்',
+            deceasedDescriptionEnd: 'என்பவர் மூலமாக அனுப்பி வைக்கப்படுகிறது. மேற்படி பிரேதத்தை பிரேத பரிசோதனை செய்து அசல் சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்கிறது.'
+        };
+
+        // Function to extract police station name without code and "காவல் நிலையம்"
+        function extractStationName(fullText) {
+            if (!fullText || fullText === "") {
+                return 'காவல் நிலையம்';
             }
             
-            // Show/hide hospital custom field
-            if (hospitalValue === 'custom') {
-                hospitalCustom.style.display = 'block';
-                hospitalCustomBtn.style.display = 'block';
-                hospitalCustomLabel.style.display = 'block';
-                hospitalCustom.placeholder = 'Enter custom hospital/office name';
-                hospitalAddress.value = '';
-            } else {
-                hospitalCustom.style.display = 'none';
-                hospitalCustomBtn.style.display = 'none';
-                hospitalCustomLabel.style.display = 'none';
-                
-                // Set address based on selected hospital
-                const hospital = hospitals[hospitalValue] || hospitals['kpgmc'];
-                hospitalAddress.value = hospital.address;
+            // Remove code (everything before first space)
+            const withoutCode = fullText.replace(/^[A-Z0-9]+\s*/, '');
+            
+            // Remove "காவல் நிலையம்" at the end
+            const withoutStationSuffix = withoutCode.replace(/\s*காவல் நிலையம்\s*$/, '');
+            
+            return withoutStationSuffix.trim() || 'காவல் நிலையம்';
+        }
+
+        // Function to extract police station code
+        function extractStationCode(fullText) {
+            if (!fullText || fullText === "") {
+                return '';
             }
+            
+            // Extract code (everything before first space)
+            const match = fullText.match(/^([A-Z0-9]+)\s*/);
+            return match ? match[1] : '';
         }
-        
-        // Initialize form
-        function initializeForm() {
-            // Set default values
-            document.getElementById('deceasedDetailsInput').value = defaultValues.deceasedDetailsInput;
-            document.getElementById('subject').value = defaultValues.subject;
-            document.getElementById('crimeNumber').value = defaultValues.crimeNumber;
-            document.getElementById('policeOfficerDetails').value = defaultValues.policeOfficerDetails;
+
+        // Function to get station name for letter body (without "காவல் நிலையம்")
+        function getStationNameForLetterBody(fullText) {
+            if (!fullText || fullText === "") {
+                return 'காவல் நிலையம்';
+            }
             
-            // Set hidden field values
-            document.getElementById('deceasedDescription').value = defaultValues.deceasedDescription;
-            document.getElementById('deceasedDescriptionEnd').value = defaultValues.deceasedDescriptionEnd;
+            const stationCode = extractStationCode(fullText);
+            const stationName = extractStationName(fullText);
             
-            // Set default police station
-            policeStationSelect.value = 'G7';
+            // For G7 station, we want to show "G7 சேத்துப்பட்டு" in the body
+            if (stationCode === 'G7') {
+                return 'G7 சேத்துப்பட்டு';
+            }
             
-            // Set default hospital
-            hospitalSelect.value = 'kpgmc';
+            // For other stations, use the code + name without "காவல் நிலையம்"
+            if (stationCode && stationName) {
+                return `${stationCode} ${stationName}`;
+            }
             
-            // Hide custom fields initially
-            toggleCustomFields();
-            
-            updatePoliceStationInfo();
-            updateHospitalInfo();
-            updatePreview();
+            return stationName || 'காவல் நிலையம்';
         }
-        
-        // Get current station full Tamil name for reference section (with "நிலைய")
+
+        // Function to get current station reference name WITHOUT "நிர்வாக"
         function getCurrentStationReferenceName() {
-            const selectedValue = policeStationSelect.value;
+            const district = document.getElementById('districtSelect').value;
+            let stationFull = "";
             
-            if (selectedValue === 'custom') {
-                const customCode = policeStationCustom.value || 'Custom';
-                return `${customCode} நிர்வாக காவல் நிலைய`;
+            if (district === 'chennai') {
+                stationFull = document.getElementById('policeStationDropdown').value || "";
             } else {
-                const station = policeStations[selectedValue] || policeStations['G7'];
-                return station.tamilNameReference || station.tamilName.replace('நிலையம்', 'நிலைய');
+                stationFull = document.getElementById('policeStationText').value.trim() || "";
             }
+            
+            const stationCode = extractStationCode(stationFull);
+            const stationName = extractStationName(stationFull);
+            
+            if (stationCode && stationName) {
+                return `${stationCode} காவல் நிலைய (${stationName})`;
+            } else if (stationName) {
+                return `${stationName} காவல் நிலைய`;
+            }
+            
+            return 'காவல் நிலைய';
         }
-        
-        // Get current station full Tamil name for sender details (with "நிலையம்")
+
+        // Function to get current station full Tamil name (with "நிலையம்")
         function getCurrentStationFullTamilName() {
-            const selectedValue = policeStationSelect.value;
+            const district = document.getElementById('districtSelect').value;
+            let stationFull = "";
             
-            if (selectedValue === 'custom') {
-                const customCode = policeStationCustom.value || 'Custom';
-                return `${customCode} நிர்வாக காவல் நிலையம்`;
+            if (district === 'chennai') {
+                stationFull = document.getElementById('policeStationDropdown').value || "";
             } else {
-                const station = policeStations[selectedValue] || policeStations['G7'];
-                return station.tamilName;
+                stationFull = document.getElementById('policeStationText').value.trim() || "";
             }
+            
+            if (!stationFull) {
+                return 'காவல் நிலையம்';
+            }
+            
+            return stationFull;
         }
-        
-        // Update reference display
+
+        // Function to get full station name for reference in document body
+        function getStationNameForDocumentBody() {
+            const district = document.getElementById('districtSelect').value;
+            let stationFull = "";
+            
+            if (district === 'chennai') {
+                stationFull = document.getElementById('policeStationDropdown').value || "";
+            } else {
+                stationFull = document.getElementById('policeStationText').value.trim() || "";
+            }
+            
+            const stationCode = extractStationCode(stationFull);
+            const stationName = extractStationName(stationFull);
+            
+            if (stationCode && stationName) {
+                return `${stationCode} ${stationName} காவல் நிலைய`;
+            } else if (stationName) {
+                return `${stationName} காவல் நிலைய`;
+            }
+            
+            return 'காவல் நிலைய';
+        }
+
+        // Function to update reference display
         function updateReferenceDisplay() {
             const stationReferenceName = getCurrentStationReferenceName();
-            const crimeNumber = crimeNumberInput.value || defaultValues.crimeNumber;
+            const stationNameForDocument = getStationNameForDocumentBody();
+            const crimeNumber = document.getElementById('crimeNumber').value || defaultValues.crimeNumber;
             
-            fullStationReference.textContent = `${stationReferenceName} fhty; epiya Fw;w vz; ${crimeNumber}`;
+            document.getElementById('fullStationReference').textContent = 
+                `${stationReferenceName} fhty; epiya Fw;w vz; ${crimeNumber} - ${stationNameForDocument} குற்ற எண். ${crimeNumber}`;
+            
+            updatePreview();
         }
-        
-        // Generate reference text from full station name (with "நிலைய") and crime number
-        function generateReferenceText() {
-            const stationReferenceName = getCurrentStationReferenceName();
-            const crimeNumber = crimeNumberInput.value || defaultValues.crimeNumber;
-            
-            return `${stationReferenceName} fhty; epiya Fw;w vz; ${crimeNumber}\n\nU/S 194 BNSS`;
-        }
-        
-        // Get selected indent size
-        function getIndentSize() {
-            return parseInt(indentSizeSelect.value) || 20;
-        }
-        
-        // Generate the complete deceased description with editable police officer details and indentation
-        function generateDeceasedDescription() {
-            const deceasedDescriptionText = document.getElementById('deceasedDescription').value || defaultValues.deceasedDescription;
-            const policeOfficerDetailsText = document.getElementById('policeOfficerDetails').value || defaultValues.policeOfficerDetails;
-            const deceasedDescriptionEndText = document.getElementById('deceasedDescriptionEnd').value || defaultValues.deceasedDescriptionEnd;
-            
-            // Add indentation to "இதன் பார்வையில்"
-            const indentSize = getIndentSize();
-            const indentedDescription = deceasedDescriptionText.replace(/^இதன் பார்வையில்/, 
-                `<span style="display: inline-block; margin-left: ${indentSize}px;">இதன் பார்வையில்</span>`);
-            
-            // Combine all parts
-            return `${indentedDescription} ${policeOfficerDetailsText} ${deceasedDescriptionEndText}`;
-        }
-        
-        // Generate receiver details with FIXED 2-line format + hospital name as 3rd line
-        function generateReceiverDetails() {
-            // Get selected hospital name
-            let hospitalLine = '';
-            if (hospitalSelect.value === 'custom') {
-                hospitalLine = hospitalCustom.value || 'Custom Hospital/Office';
-            } else {
-                const hospital = hospitals[hospitalSelect.value] || hospitals['kpgmc'];
-                hospitalLine = hospital.tamilName;
-            }
-            
-            // ALWAYS use fixed receiver format with hospital as 3rd line:
-            // 1. பேராசிரியர் அவர்கள்,
-            // 2. சட்டம் சார்ந்த மருத்துவத்துறை
-            // 3. [Hospital Name]
-            const receiverDetails = [
-                'பேராசிரியர் அவர்கள்,',    // First line: Fixed
-                'சட்டம் சார்ந்த மருத்துவத்துறை',  // Second line: Fixed
-                hospitalLine  // Third line: Selected hospital name
-            ];
-            
-            return receiverDetails;
-        }
-        
-        // Update police station information
+
+        // Function to update police station info
         function updatePoliceStationInfo() {
-            const selectedValue = policeStationSelect.value;
-            const station = policeStations[selectedValue] || policeStations['G7'];
+            const district = document.getElementById('districtSelect').value;
+            let stationFull = "";
             
-            if (selectedValue === 'custom') {
-                // Show custom input is handled by toggleCustomFields()
-                
-                // Clear address for custom entry
-                policeStationAddress.value = '';
-                stationInfoText.textContent = 'Custom Police Station - Enter details above';
+            if (district === 'chennai') {
+                stationFull = document.getElementById('policeStationDropdown').value || "";
             } else {
-                // Hide custom input is handled by toggleCustomFields()
-                
-                // Set address based on selected station
-                policeStationAddress.value = station.address;
-                
-                // Update station info
-                stationInfoText.textContent = `${station.fullName}, ${station.address}`;
+                stationFull = document.getElementById('policeStationText').value.trim() || "";
             }
             
             // Update reference display
@@ -1356,28 +850,29 @@
             
             updatePreview();
         }
-        
-        // Update hospital information and deceased description
+
+        // Function to update hospital info
         function updateHospitalInfo() {
-            const selectedValue = hospitalSelect.value;
-            const hospital = hospitals[selectedValue] || hospitals['kpgmc'];
+            const hospitalSelect = document.getElementById('hospitalSelect');
+            const hospitalCustomContainer = document.getElementById('hospitalCustomContainer');
+            const hospitalCustom = document.getElementById('hospitalCustom');
+            const hospitalAddress = document.getElementById('hospitalAddress');
+            const hospitalInfoText = document.getElementById('hospitalInfoText');
             
-            if (selectedValue === 'custom') {
-                // Show custom input is handled by toggleCustomFields()
-                
-                // Clear address for custom entry
+            // Show/hide custom hospital input
+            if (hospitalSelect.value === 'custom') {
+                hospitalCustomContainer.style.display = 'block';
                 hospitalAddress.value = '';
                 hospitalInfoText.textContent = 'Custom Hospital/Office - Enter details above';
                 
                 // Update deceased description with custom hospital name
                 updateDeceasedDescription(hospitalCustom.value || 'Custom Hospital/Office');
             } else {
-                // Hide custom input is handled by toggleCustomFields()
+                hospitalCustomContainer.style.display = 'none';
                 
                 // Set address based on selected hospital
+                const hospital = hospitals[hospitalSelect.value] || hospitals['kpgmc'];
                 hospitalAddress.value = hospital.address;
-                
-                // Update hospital info
                 hospitalInfoText.textContent = `${hospital.name}, ${hospital.address}`;
                 
                 // Update deceased description with selected hospital name
@@ -1386,95 +881,109 @@
             
             updatePreview();
         }
-        
-        // Update deceased description with hospital name
+
+        // Function to update deceased description with hospital name
         function updateDeceasedDescription(hospitalName) {
+            const deceasedDescription = document.getElementById('deceasedDescription');
+            if (!hospitalName) {
+                const hospital = hospitals[document.getElementById('hospitalSelect').value] || hospitals['kpgmc'];
+                hospitalName = hospital.shortName;
+            }
+            
             // Create the new description with the correct hospital name
-            // The standard format is: 
-            // "இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் [HOSPITAL_NAME] சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை"
             const newDescription = `இதன் பார்வையில் கண்ட வழக்கில் சம்பந்தப்பட்டு இறந்து போன இதன் மார்ஜினில் கண்ட பிரேதம் ${hospitalName} சவக்கிடங்கில் உள்ளது. மேற்படி பிரேதத்தை`;
             
             // Update the textarea
             deceasedDescription.value = newDescription;
             
-            // Also update the preview immediately
             updatePreview();
         }
-        
-        // Get selected font size
-        function getFontSize() {
-            return parseInt(fontSizeSelect.value) || 11;
-        }
-        
-        // Get selected Tamil font
-        function getTamilFont() {
-            return tamilFontSelect.value || 'Latha';
-        }
-        
-        // Get font class based on selected font
-        function getTamilFontClass() {
-            const font = getTamilFont();
-            switch(font) {
-                case 'Latha': return 'font-latha';
-                case 'Noto Sans Tamil': return 'font-noto';
-                case 'Aavanam': return 'font-avanam';
-                case 'Bamini': return 'font-bamini';
-                default: return 'font-latha';
-            }
-        }
-        
-        // Get left table width
-        function getLeftTableWidth() {
-            return parseInt(leftTableWidthSelect.value) || 28;
-        }
-        
-        // Get right table width (calculated)
-        function getRightTableWidth() {
-            const leftWidth = getLeftTableWidth();
-            return 100 - leftWidth - 2; // 2% for gap
-        }
-        
-        // Calculate line height based on font size
-        function getLineHeight(fontSize) {
-            return fontSize * 1.4;
-        }
-        
-        // Check if text contains Tamil characters
-        function containsTamil(text) {
-            const tamilRegex = /[\u0B80-\u0BFF]/;
-            return tamilRegex.test(text);
-        }
-        
-        // Generate sender details with standard 3-line format
-        function generateSenderDetails() {
-            const selectedValue = policeStationSelect.value;
-            let stationTamilName = '';
-            let stationAddress = '';
+
+        // Function to generate reference text for the document
+        function generateReferenceText() {
+            const stationReferenceName = getCurrentStationReferenceName();
+            const stationNameForDocument = getStationNameForDocumentBody();
+            const crimeNumber = document.getElementById('crimeNumber').value || defaultValues.crimeNumber;
             
-            if (selectedValue === 'custom') {
-                const customCode = policeStationCustom.value || 'Custom';
-                stationTamilName = `${customCode} நிர்வாக காவல் நிலையம்`;
-                stationAddress = policeStationAddress.value || '';
-            } else {
-                const station = policeStations[selectedValue] || policeStations['G7'];
-                stationTamilName = station.tamilName;
-                stationAddress = station.address;
-            }
+            return `${stationReferenceName} fhty; epiya Fw;w vz; ${crimeNumber} - ${stationNameForDocument} குற்ற எண். ${crimeNumber}\n\nU/S 194 BNSS`;
+        }
+
+        // Function to get selected font size
+        function getFontSize() {
+            return parseInt(document.getElementById('fontSize').value) || 11;
+        }
+
+        // Function to get selected Tamil font
+        function getTamilFont() {
+            return document.getElementById('tamilFontSelect').value || 'Latha';
+        }
+
+        // Function to generate sender details
+        function generateSenderDetails() {
+            const stationFullTamilName = getCurrentStationFullTamilName();
+            const stationName = extractStationName(stationFullTamilName);
+            const district = document.getElementById('districtSelect').value;
             
             // Build sender details array with STANDARD 3-LINE FORMAT:
-            // 1. காவல் ஆய்வாளர் (fixed first line)
-            // 2. Station Name
-            // 3. Station Address
             const senderDetails = [
                 'காவல் ஆய்வாளர்', // Fixed first line as per standard format
-                stationTamilName,   // Second line: Station name
-                stationAddress      // Third line: Station address
+                stationFullTamilName || 'காவல் நிலையம்', // Second line: Full station name
+                stationName + (district === 'chennai' ? ', சென்னை - 600 090' : '') // Third line: Station location
             ];
             
             return senderDetails;
         }
-        
-        // Generate the formatted first column content
+
+        // Function to generate receiver details
+        function generateReceiverDetails() {
+            const hospitalSelect = document.getElementById('hospitalSelect');
+            let hospitalName = '';
+            
+            if (hospitalSelect.value === 'custom') {
+                hospitalName = document.getElementById('hospitalCustom').value || 'Custom Hospital/Office';
+            } else {
+                const hospital = hospitals[hospitalSelect.value] || hospitals['kpgmc'];
+                hospitalName = hospital.tamilName;
+            }
+            
+            // ALWAYS use fixed receiver format:
+            // 1. பேராசிரியர் அவர்கள்,
+            // 2. சட்டம் சார்ந்த மருத்துவத்துறை
+            // 3. [Hospital Name]
+            const receiverDetails = [
+                'பேராசிரியர் அவர்கள்,',    // First line: Fixed
+                'சட்டம் சார்ந்த மருத்துவத்துறை',  // Second line: Fixed
+                hospitalName  // Third line: Selected hospital name
+            ];
+            
+            return receiverDetails;
+        }
+
+        // Function to generate the complete deceased description WITHOUT INDENTATION
+        function generateDeceasedDescription() {
+            const deceasedDescription = document.getElementById('deceasedDescription').value || defaultValues.deceasedDescription;
+            const policeOfficerDetails = document.getElementById('policeOfficerDetails').value || defaultValues.policeOfficerDetails;
+            const deceasedDescriptionEnd = document.getElementById('deceasedDescriptionEnd').value || defaultValues.deceasedDescriptionEnd;
+            
+            // Create the complete text WITHOUT any indentation
+            const completeText = `${deceasedDescription} ${policeOfficerDetails} ${deceasedDescriptionEnd}`;
+            
+            return completeText;
+        }
+
+        // Function to generate the complete deceased description for text output
+        function generateDeceasedDescriptionText() {
+            const deceasedDescription = document.getElementById('deceasedDescription').value || defaultValues.deceasedDescription;
+            const policeOfficerDetails = document.getElementById('policeOfficerDetails').value || defaultValues.policeOfficerDetails;
+            const deceasedDescriptionEnd = document.getElementById('deceasedDescriptionEnd').value || defaultValues.deceasedDescriptionEnd;
+            
+            // Combine all parts WITHOUT indentation
+            const completeText = `${deceasedDescription} ${policeOfficerDetails} ${deceasedDescriptionEnd}`;
+            
+            return completeText;
+        }
+
+        // Function to generate first column content
         function generateFirstColumnContent() {
             const deceasedDetails = document.getElementById('deceasedDetailsInput').value || defaultValues.deceasedDetailsInput;
             
@@ -1496,8 +1005,8 @@
             
             return formattedLines.join('<br>');
         }
-        
-        // Generate the first column content for text-based output
+
+        // Function to generate first column text for text-based output
         function generateFirstColumnText() {
             const deceasedDetails = document.getElementById('deceasedDetailsInput').value || defaultValues.deceasedDetailsInput;
             
@@ -1513,584 +1022,373 @@
             
             return resultLines.join('\n');
         }
-        
-        // Generate the complete deceased description for PDF output (without HTML tags)
-        function generateDeceasedDescriptionText() {
-            const deceasedDescriptionText = document.getElementById('deceasedDescription').value || defaultValues.deceasedDescription;
-            const policeOfficerDetailsText = document.getElementById('policeOfficerDetails').value || defaultValues.policeOfficerDetails;
-            const deceasedDescriptionEndText = document.getElementById('deceasedDescriptionEnd').value || defaultValues.deceasedDescriptionEnd;
+
+        // Function to populate Chennai police stations
+        function populateChennaiStations() {
+            const chennaiStationsGroup = document.getElementById('chennaiStations');
+            chennaiStationsGroup.innerHTML = '';
             
-            // For PDF, we need to add indentation differently
-            const indentSize = getIndentSize();
-            const indentSpaces = ' '.repeat(indentSize / 4); // Rough approximation
+            chennaiPoliceStations.forEach(station => {
+                const option = document.createElement('option');
+                option.value = station;
+                option.textContent = station;
+                chennaiStationsGroup.appendChild(option);
+            });
             
-            // Combine all parts with indentation
-            return `${indentSpaces}${deceasedDescriptionText} ${policeOfficerDetailsText} ${deceasedDescriptionEndText}`;
+            // Set default selection to G7
+            document.getElementById('policeStationDropdown').value = "G7 சேத்துப்பட்டு காவல் நிலையம்";
         }
-        
-        // Update preview with all editable fields - NO SIGNATURE
+
+        // Function to toggle between Chennai and Other district fields
+        function toggleDistrictFields() {
+            const district = document.getElementById('districtSelect').value;
+            const chennaiPoliceStationContainer = document.getElementById('chennaiPoliceStationContainer');
+            const otherPoliceStationContainer = document.getElementById('otherPoliceStationContainer');
+            
+            if (district === 'chennai') {
+                // Show Chennai fields, hide Other district fields
+                chennaiPoliceStationContainer.style.display = 'block';
+                otherPoliceStationContainer.style.display = 'none';
+                
+                // Clear Other district fields
+                document.getElementById('policeStationText').value = '';
+            } 
+            else if (district === 'other') {
+                // Show Other district fields, hide Chennai fields
+                chennaiPoliceStationContainer.style.display = 'none';
+                otherPoliceStationContainer.style.display = 'block';
+                
+                // Clear Chennai fields
+                document.getElementById('policeStationDropdown').value = "";
+            }
+            
+            updatePoliceStationInfo();
+        }
+
+        // Function to check if text contains Tamil characters
+        function containsTamil(text) {
+            const tamilRegex = /[\u0B80-\u0BFF]/;
+            return tamilRegex.test(text);
+        }
+
+        // Function to update preview
         function updatePreview() {
             const fontSize = getFontSize();
-            const lineHeight = getLineHeight(fontSize) / 12;
-            const leftTableWidth = getLeftTableWidth();
-            const rightTableWidth = getRightTableWidth();
-            const tamilFontClass = getTamilFontClass();
+            const lineHeight = 1.5; // Fixed line spacing (1.5 times font size)
+            const tamilFont = getTamilFont();
             
-            const subject = document.getElementById('subject').value || defaultValues.subject;
+            // Subject is now standard/fixed
+            const subject = defaultValues.subject;
             const reference = generateReferenceText();
             
-            // Generate sender details with standard 3-line format
+            // Generate sender details
             const senderDetails = generateSenderDetails();
             
-            // Generate receiver details with FIXED 2-line format + hospital as 3rd line
+            // Generate receiver details
             const receiverDetails = generateReceiverDetails();
             
             // Generate formatted first column content
             const firstColumnContent = generateFirstColumnContent();
             
-            // Generate complete deceased description with indentation
+            // Generate complete deceased description WITHOUT INDENTATION
             const deceasedDescriptionHTML = generateDeceasedDescription();
             
-            // Process Sender (அனுப்புநர்) details - only 3 lines
-            const fromDetailsLines = senderDetails.map(line => 
-                `<div class="document-line left ${tamilFontClass}" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
-            ).join('');
+            // Determine font family for Tamil text
+            let tamilFontFamily = "'Latha', 'Arial Unicode MS', sans-serif";
+            if (tamilFont === 'Noto Sans Tamil') {
+                tamilFontFamily = "'Noto Sans Tamil', sans-serif";
+            }
             
-            // Process Receiver (பெறுநர்) details - FIXED 2 lines + hospital as 3rd line
-            const toDetailsLines = receiverDetails.map(line => 
-                `<div class="document-line left ${tamilFontClass}" style="font-size: ${fontSize}px; line-height: ${lineHeight}em; margin-bottom: 4px;">${line}</div>`
-            ).join('');
-            
-            // Process reference
-            const referenceLines = reference.split('\n').map(line => {
-                const fontClass = containsTamil(line) ? tamilFontClass : 'english-text';
-                return `<div class="${fontClass}" style="font-size: ${fontSize - 1}px; margin-bottom: 2px;">${line}</div>`;
-            }).join('');
-            
+            // Create preview HTML
             const previewHTML = `
-                <div class="preview-header" style="font-size: ${fontSize + 4}px; margin-bottom: 15px;">
-                    <h2 class="${tamilFontClass}" style="font-size: ${fontSize + 4}px; margin-bottom: 5px; font-weight: bold;">கோரிக்கை மனு</h2>
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 20px; padding-top: 5px;">
+                    <div style="font-size: ${fontSize + 4}pt; font-weight: bold; margin-bottom: 5px; font-family: ${tamilFontFamily};">கோரிக்கை மனு</div>
+                    <div style="height: 2px; background: #000; width: 100px; margin: 0 auto;"></div>
                 </div>
                 
-                <div class="from-section" style="margin-bottom: 15px;">
-                    <div class="section-heading ${tamilFontClass}" style="font-size: ${fontSize}px; margin-bottom: 5px; font-weight: bold;">அனுப்புநர்:</div>
-                    ${fromDetailsLines}
+                <!-- Sender and Receiver Addresses -->
+                <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
+                    <!-- Sender -->
+                    <div style="width: 48%;">
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">அனுப்புநர்:</div>
+                        ${senderDetails.map(line => 
+                            `<div style="line-height: ${lineHeight}; font-size: ${fontSize}pt; font-family: ${tamilFontFamily}; margin-bottom: 3px;">${line}</div>`
+                        ).join('')}
+                    </div>
+                    
+                    <!-- Receiver -->
+                    <div style="width: 48%;">
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">பெறுநர்:</div>
+                        ${receiverDetails.map(line => 
+                            `<div style="line-height: ${lineHeight}; font-size: ${fontSize}pt; font-family: ${tamilFontFamily}; margin-bottom: 3px;">${line}</div>`
+                        ).join('')}
+                    </div>
                 </div>
                 
-                <div class="to-section" style="margin-bottom: 15px;">
-                    <div class="section-heading ${tamilFontClass}" style="font-size: ${fontSize}px; margin-bottom: 5px; font-weight: bold;">பெறுநர்:</div>
-                    ${toDetailsLines}
-                </div>
-                
-                <div class="document-line ${tamilFontClass}" style="margin: 15px 0; font-size: ${fontSize + 1}px; text-align: left;">
+                <!-- Salutation -->
+                <div style="margin: 12px 0; font-size: ${fontSize + 1}pt; font-family: ${tamilFontFamily}; text-align: left;">
                     ஐயா,
                 </div>
                 
-                <div class="table-container" style="gap: 10px; margin: 10px 0;">
-                    <table class="single-column-table" style="width: ${leftTableWidth}%; border: 1px solid #000;">
-                        <tr>
-                            <td class="${tamilFontClass}" style="padding: 4px; font-size: ${fontSize - 1}px;">
-                                ${firstColumnContent}
-                            </td>
-                        </tr>
-                    </table>
+                <!-- Two Column Layout -->
+                <div style="display: flex; width: 100%; margin: 15px 0; gap: 10px;">
+                    <!-- Left Column (Deceased Details) -->
+                    <div style="width: 28%; border: 1px solid #000; padding: 5px; min-height: 80px; font-family: ${tamilFontFamily}; font-size: ${fontSize}pt; line-height: ${lineHeight};">
+                        ${firstColumnContent}
+                    </div>
                     
-                    <table class="document-table" style="width: ${rightTableWidth}%; border: 1px solid #000;">
-                        <tr>
-                            <td class="label ${tamilFontClass}" style="width: 22%; padding: 4px; font-size: ${fontSize - 1}px; border-right: 1px solid #000;">பொருள்:</td>
-                            <td class="${tamilFontClass} document-line justify" style="padding: 4px; font-size: ${fontSize - 1}px;">${subject}</td>
-                        </tr>
-                        <tr>
-                            <td class="label ${tamilFontClass}" style="padding: 4px; font-size: ${fontSize - 1}px; border-right: 1px solid #000; border-bottom: 1px solid #000;">பார்வை:</td>
-                            <td style="padding: 4px; font-size: ${fontSize - 1}px; border-bottom: 1px solid #000;">
-                                ${referenceLines}
-                            </td>
-                        </tr>
-                    </table>
+                    <!-- Right Column (Subject and Reference) -->
+                    <div style="width: 70%; border: 1px solid #000;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: ${fontSize}pt;">
+                            <tr>
+                                <td style="width: 22%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: ${tamilFontFamily}; line-height: ${lineHeight};">பொருள்:</td>
+                                <td style="border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-family: ${tamilFontFamily}; line-height: ${lineHeight};">${subject}</td>
+                            </tr>
+                            <tr>
+                                <td style="border-right: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: ${tamilFontFamily}; line-height: ${lineHeight};">பார்வை:</td>
+                                <td style="padding: 5px; vertical-align: top; line-height: ${lineHeight};">
+                                    ${reference.split('\n').map(line => {
+                                        const fontFamily = containsTamil(line) ? tamilFontFamily : "'Times New Roman', Times, serif";
+                                        return `<div style="font-family: ${fontFamily}; margin-bottom: 2px;">${line}</div>`;
+                                    }).join('')}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
                 
-                <div class="document-line ${tamilFontClass} justify" style="margin-top: 15px; text-align: justify; font-size: ${fontSize}px; line-height: ${lineHeight}em;">
+                <!-- Deceased Description -->
+                <div style="margin: 15px 0; text-align: justify; font-family: ${tamilFontFamily}; font-size: ${fontSize}pt; line-height: ${lineHeight};">
                     ${deceasedDescriptionHTML}
                 </div>
             `;
-            
-            documentPreview.innerHTML = previewHTML;
-            documentPreview.style.fontSize = fontSize + 'px';
-            documentPreview.style.lineHeight = lineHeight + 'em';
+
+            // Update preview
+            document.getElementById('previewContent').innerHTML = previewHTML;
+
+            // Update the hidden PDF content with the SAME HTML
+            document.getElementById('pdfContent').innerHTML = `
+                <div class="a4-page" style="width: 210mm; min-height: 297mm; background: white; font-family: ${tamilFontFamily}; padding: 20mm; box-sizing: border-box;">
+                    ${previewHTML}
+                </div>
+            `;
         }
-        
-        // Generate PDF with all editable fields - NO SIGNATURE
-        function generatePDF() {
-            const originalText = generatePdfBtn.innerHTML;
-            generatePdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating PDF...';
-            generatePdfBtn.disabled = true;
-            
-            try {
-                const subject = document.getElementById('subject').value || defaultValues.subject;
-                const reference = generateReferenceText();
-                const fontSize = getFontSize();
-                const lineHeight = fontSize * 1.2;
-                const leftTableWidth = getLeftTableWidth();
-                const rightTableWidth = getRightTableWidth();
-                const tamilFont = getTamilFont();
-                const indentSize = getIndentSize();
+
+        // Function to reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to reset all fields to default values?')) {
+                // Reset district to Chennai
+                document.getElementById('districtSelect').value = 'chennai';
+                toggleDistrictFields();
                 
-                // Generate sender details with standard 3-line format
-                const senderDetails = generateSenderDetails();
+                // Reset Other district fields
+                document.getElementById('policeStationText').value = '';
                 
-                // Generate receiver details with FIXED 2-line format + hospital as 3rd line
-                const receiverDetails = generateReceiverDetails();
+                // Reset Chennai fields
+                populateChennaiStations(); // This sets G7 as default
                 
-                // Generate first column text
-                const firstColumnText = generateFirstColumnText();
+                // Reset crime number
+                document.getElementById('crimeNumber').value = defaultValues.crimeNumber;
                 
-                // Generate complete deceased description with indentation
-                const deceasedDescriptionText = generateDeceasedDescriptionText();
+                // Reset hospital
+                document.getElementById('hospitalSelect').value = 'kpgmc';
+                document.getElementById('hospitalCustomContainer').style.display = 'none';
+                document.getElementById('hospitalCustom').value = '';
+                document.getElementById('hospitalAddress').value = hospitals['kpgmc'].address;
                 
-                // Create a temporary div for PDF content
-                const tempDiv = document.createElement('div');
-                tempDiv.style.cssText = `
-                    position: absolute;
-                    left: -10000px;
-                    top: -10000px;
-                    width: 210mm;
-                    min-height: 297mm;
-                    padding: 15mm;
-                    background: white;
-                    font-family: 'Times New Roman', Times, serif;
-                    font-size: ${fontSize}pt;
-                    line-height: ${lineHeight}pt;
-                    box-sizing: border-box;
-                `;
+                // Reset other fields
+                document.getElementById('deceasedDetailsInput').value = defaultValues.deceasedDetailsInput;
+                document.getElementById('policeOfficerDetails').value = defaultValues.policeOfficerDetails;
                 
-                // Determine font family for Tamil text
-                let tamilFontFamily = "'Latha', 'Arial Unicode MS', sans-serif";
-                switch(tamilFont) {
-                    case 'Noto Sans Tamil':
-                        tamilFontFamily = "'Noto Sans Tamil', sans-serif";
-                        break;
-                    case 'Aavanam':
-                        tamilFontFamily = "'Aavanam', 'Latha', sans-serif";
-                        break;
-                    case 'Bamini':
-                        tamilFontFamily = "'Bamini', sans-serif";
-                        break;
-                    default:
-                        tamilFontFamily = "'Latha', 'Arial Unicode MS', sans-serif";
-                }
+                // Reset hidden fields
+                document.getElementById('deceasedDescription').value = defaultValues.deceasedDescription;
+                document.getElementById('deceasedDescriptionEnd').value = defaultValues.deceasedDescriptionEnd;
                 
-                // Generate HTML with all editable fields - NO SIGNATURE
-                tempDiv.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <h1 style="font-size: ${fontSize + 2}pt; margin-bottom: 5px; font-family: ${tamilFontFamily}; font-weight: bold;">கோரிக்கை மனு</h1>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 6px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">அனுப்புநர்:</div>
-                        ${senderDetails.map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">${line}</div>`).join('')}
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 6px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">பெறுநர்:</div>
-                        ${receiverDetails.map(line => `<div style="margin-bottom: 4px; font-size: ${fontSize}pt; font-family: ${tamilFontFamily};">${line}</div>`).join('')}
-                    </div>
-                    
-                    <div style="margin: 15px 0; font-size: ${fontSize + 1}pt; font-family: ${tamilFontFamily}; text-align: left;">
-                        ஐயா,
-                    </div>
-                    
-                    <div style="display: flex; width: 100%; margin: 15px 0; gap: 10px;">
-                        <div style="width: ${leftTableWidth}%; border: 1px solid #000; padding: 5px; min-height: 50px; font-family: ${tamilFontFamily}; font-size: ${fontSize}pt;">
-                            ${firstColumnText.replace(/\n/g, '<br>').replace('இறந்தவர்:', '<span style="font-weight: bold;">இறந்தவர்:</span>')}
-                        </div>
-                        
-                        <div style="width: ${rightTableWidth}%; border: 1px solid #000;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: ${fontSize}pt;">
-                                <tr>
-                                    <td style="width: 22%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: ${tamilFontFamily};">பொருள்:</td>
-                                    <td style="border-bottom: 1px solid #000; padding: 5px; vertical-align: top; font-family: ${tamilFontFamily};">${subject}</td>
-                                </tr>
-                                <tr>
-                                    <td style="border-right: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: ${tamilFontFamily};">பார்வை:</td>
-                                    <td style="padding: 5px; vertical-align: top;">
-                                        ${reference.split('\n').map(line => {
-                                            const fontFamily = containsTamil(line) ? tamilFontFamily : "'Times New Roman', Times, serif";
-                                            return `<div style="font-family: ${fontFamily};">${line}</div>`;
-                                        }).join('')}
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div style="margin: 15px 0; text-align: justify; font-family: ${tamilFontFamily}; font-size: ${fontSize}pt; line-height: ${lineHeight}pt; padding-left: ${indentSize}pt;">
-                        ${deceasedDescriptionText}
-                    </div>
-                `;
+                // Reset customization options
+                document.getElementById('fontSize').value = '11';
+                document.getElementById('tamilFontSelect').value = 'Latha';
                 
-                document.body.appendChild(tempDiv);
+                // Update displays
+                updatePoliceStationInfo();
+                updateHospitalInfo();
+                updatePreview();
                 
-                // Use html2canvas to convert to image
-                if (typeof html2canvas !== 'undefined') {
-                    // Load appropriate font based on selection
-                    let fontUrl = 'https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2';
-                    if (tamilFont === 'Noto Sans Tamil') {
-                        fontUrl = 'https://fonts.gstatic.com/s/notosanstamil/v22/ieVc2YdFI3GCY6SyQy1KfStzYKZgzN1z4LKDbeZce-044PPRgA.woff2';
-                    }
-                    
-                    const fontLink = document.createElement('link');
-                    fontLink.href = fontUrl;
-                    fontLink.rel = 'preload';
-                    fontLink.as = 'font';
-                    fontLink.type = 'font/woff2';
-                    fontLink.crossOrigin = 'anonymous';
-                    document.head.appendChild(fontLink);
-                    
-                    // Wait for font to load
-                    setTimeout(() => {
-                        html2canvas(tempDiv, {
-                            scale: 2,
-                            useCORS: true,
-                            logging: false,
-                            allowTaint: true,
-                            fontFamily: tamilFontFamily
-                        }).then(canvas => {
-                            const imgData = canvas.toDataURL('image/png');
-                            const { jsPDF } = window.jspdf;
-                            const pdf = new jsPDF('p', 'mm', 'a4');
-                            
-                            const imgWidth = 210;
-                            const imgHeight = canvas.height * imgWidth / canvas.width;
-                            
-                            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                            
-                            // Get station code for filename
-                            const stationReferenceName = getCurrentStationReferenceName();
-                            const stationCode = policeStationSelect.value === 'custom' ? 
-                                (policeStationCustom.value || 'Custom') : policeStationSelect.value;
-                            const crimeNumber = crimeNumberInput.value || defaultValues.crimeNumber;
-                            
-                            pdf.save(`PM_Request_${stationCode}_${crimeNumber}_${tamilFont.replace(/\s+/g, '_')}_${fontSize}pt.pdf`);
-                            
-                            document.body.removeChild(tempDiv);
-                            document.head.removeChild(fontLink);
-                            
-                            generatePdfBtn.innerHTML = '<i class="fas fa-check"></i> PDF Downloaded!';
-                            setTimeout(() => {
-                                generatePdfBtn.innerHTML = originalText;
-                                generatePdfBtn.disabled = false;
-                            }, 3000);
-                        }).catch(error => {
-                            console.error('html2canvas error:', error);
-                            document.head.removeChild(fontLink);
-                            fallbackToPrint();
-                        });
-                    }, 2000);
-                } else {
-                    fallbackToPrint();
-                }
-                
-            } catch (error) {
-                console.error('PDF generation error:', error);
-                fallbackToPrint();
-                
-                generatePdfBtn.innerHTML = originalText;
-                generatePdfBtn.disabled = false;
+                showNotification('Form has been reset to default values!', 'success');
             }
         }
-        
-        // Fallback to print if PDF generation fails
-        function fallbackToPrint() {
-            alert('PDF generation failed. Opening print dialog instead.');
-            printDocument();
-            generatePdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
-            generatePdfBtn.disabled = false;
+
+        // Function to generate and download PDF
+        function generatePDF() {
+            updatePreview(); // Ensure latest content
+
+            // Get the preview element
+            const previewElement = document.getElementById('a4Page');
+
+            // Create a clone of the preview element
+            const clone = previewElement.cloneNode(true);
+            clone.style.position = 'absolute';
+            clone.style.left = '-9999px';
+            clone.style.boxShadow = 'none';
+            document.body.appendChild(clone);
+
+            // Use html2canvas to capture the content
+            html2canvas(clone, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                width: clone.offsetWidth,
+                height: clone.offsetHeight
+            }).then(canvas => {
+                // Remove clone
+                document.body.removeChild(clone);
+
+                const imgData = canvas.toDataURL('image/png', 1.0);
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // Calculate dimensions to fit A4 exactly
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+
+                // Add image to PDF
+                pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+
+                // Save the PDF
+                const stationCode = extractStationCode(getCurrentStationFullTamilName()) || 'Custom';
+                const crimeNumber = document.getElementById('crimeNumber').value || defaultValues.crimeNumber;
+                const tamilFont = getTamilFont().replace(/\s+/g, '_');
+                const fontSize = getFontSize();
+                
+                pdf.save(`PM_Request_${stationCode}_${crimeNumber.replace(/\//g, '_')}_${tamilFont}_${fontSize}pt.pdf`);
+
+                // Show success message
+                showNotification('PDF வெற்றிகரமாக உருவாக்கப்பட்டது!', 'success');
+            }).catch(error => {
+                console.error('Error generating PDF:', error);
+                showNotification('PDF உருவாக்கும் போது பிழை ஏற்பட்டது.', 'error');
+            });
         }
-        
-        // Print document with all editable fields - NO SIGNATURE
+
+        // Function to print the document
         function printDocument() {
-            const printWindow = window.open('', '_blank');
-            const subject = document.getElementById('subject').value || defaultValues.subject;
-            const reference = generateReferenceText();
-            const fontSize = getFontSize();
-            const lineHeight = fontSize * 1.2;
-            const leftTableWidth = getLeftTableWidth();
-            const rightTableWidth = getRightTableWidth();
-            const tamilFont = getTamilFont();
-            const indentSize = getIndentSize();
-            
-            // Generate sender details with standard 3-line format
-            const senderDetails = generateSenderDetails();
-            
-            // Generate receiver details with FIXED 2-line format + hospital as 3rd line
-            const receiverDetails = generateReceiverDetails();
-            
-            // Generate first column text
-            const firstColumnText = generateFirstColumnText();
-            
-            // Generate complete deceased description with indentation
-            const deceasedDescriptionText = generateDeceasedDescriptionText();
-            
-            printWindow.document.write(`
+            updatePreview();
+
+            // Create print window
+            const printContent = `
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <title>PM Request Document</title>
-                    <meta charset="UTF-8">
                     <style>
-                        @page {
-                            size: A4;
-                            margin: 15mm;
+                        @media print {
+                            @page {
+                                size: A4;
+                                margin: 20mm;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
                         }
-                        @font-face {
-                            font-family: 'Latha';
-                            src: url('https://fonts.gstatic.com/s/latha/v11/SZc73FHnibV8eUZKd8q9.woff2') format('woff2');
-                            font-display: swap;
-                        }
-                        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;700&display=swap');
                         
                         body {
-                            font-family: 'Times New Roman', Times, serif;
-                            font-size: ${fontSize}pt;
-                            line-height: ${lineHeight}pt;
+                            font-family: 'Latha', serif;
                             margin: 0;
-                            padding: 0;
-                        }
-                        .tamil {
-                            font-family: '${tamilFont}', 'Latha', 'Arial Unicode MS', 'Nirmala UI', sans-serif;
-                        }
-                        .english {
-                            font-family: 'Times New Roman', Times, serif;
-                        }
-                        .document-container {
+                            padding: 20mm;
                             width: 210mm;
                             min-height: 297mm;
-                            padding: 15mm;
-                            margin: 0 auto;
-                        }
-                        .header {
-                            text-align: center;
-                            margin-bottom: 15px;
-                        }
-                        .header h1 {
-                            font-size: ${fontSize + 2}pt;
-                            margin-bottom: 5px;
-                            font-weight: bold;
-                        }
-                        .section {
-                            margin-bottom: 15px;
-                        }
-                        .section-heading {
-                            font-weight: bold;
-                            margin-bottom: 6px;
-                            font-family: '${tamilFont}', 'Latha', 'Arial Unicode MS', sans-serif;
-                        }
-                        .content-line {
-                            margin-bottom: 4px;
-                        }
-                        .salutation {
-                            margin: 15px 0;
-                            font-size: ${fontSize + 1}pt;
-                            text-align: left;
-                        }
-                        .table-container {
-                            display: flex;
-                            width: 100%;
-                            margin: 15px 0;
-                            gap: 10px;
-                        }
-                        .left-table {
-                            width: ${leftTableWidth}%;
-                            border: 1px solid #000;
-                            padding: 5px;
-                            min-height: 50px;
-                        }
-                        .right-table {
-                            width: ${rightTableWidth}%;
-                            border: 1px solid #000;
-                        }
-                        .right-table table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            border: 1px solid #000;
-                        }
-                        .right-table td {
-                            padding: 5px;
-                            vertical-align: top;
-                        }
-                        .right-table .label {
-                            width: 22%;
-                            font-weight: bold;
-                            border-right: 1px solid #000;
-                            border-bottom: 1px solid #000;
-                        }
-                        .right-table tr:last-child .label {
-                            border-bottom: 1px solid #000;
-                        }
-                        .right-table tr:last-child td:last-child {
-                            border-bottom: none;
-                        }
-                        .details {
-                            margin: 15px 0;
-                            text-align: justify;
-                            padding-left: ${indentSize}pt;
-                        }
-                        @media print {
-                            body {
-                                -webkit-print-color-adjust: exact;
-                                print-color-adjust: exact;
-                            }
-                            .document-container {
-                                padding: 0;
-                                margin: 0;
-                            }
+                            box-sizing: border-box;
+                            font-size: 11pt;
+                            line-height: 1.5;
                         }
                     </style>
                 </head>
                 <body>
-                    <div class="document-container">
-                        <div class="header">
-                            <h1 class="tamil">கோரிக்கை மனு</h1>
-                        </div>
-                        
-                        <div class="section">
-                            <div class="section-heading tamil">அனுப்புநர்:</div>
-                            ${senderDetails.map(line => 
-                                `<div class="content-line tamil">${line}</div>`
-                            ).join('')}
-                        </div>
-                        
-                        <div class="section">
-                            <div class="section-heading tamil">பெறுநர்:</div>
-                            ${receiverDetails.map(line => 
-                                `<div class="content-line tamil">${line}</div>`
-                            ).join('')}
-                        </div>
-                        
-                        <div class="salutation tamil">
-                            ஐயா,
-                        </div>
-                        
-                        <div class="table-container">
-                            <div class="left-table tamil">
-                                ${firstColumnText.replace(/\n/g, '<br>').replace('இறந்தவர்:', '<span class="bold">இறந்தவர்:</span>')}
-                            </div>
-                            
-                            <div class="right-table">
-                                <table>
-                                    <tr>
-                                        <td class="label tamil">பொருள்:</td>
-                                        <td class="tamil" style="border-bottom: 1px solid #000;">${subject}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="label tamil">பார்வை:</td>
-                                        <td>
-                                            ${reference.split('\n').map(line => {
-                                                const fontClass = /[\u0B80-\u0BFF]/.test(line) ? 'tamil' : 'english';
-                                                return `<div class="${fontClass}">${line}</div>`;
-                                            }).join('')}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <div class="details tamil">
-                            ${deceasedDescriptionText}
-                        </div>
-                    </div>
-                    
-                    <script>
-                        window.onload = function() {
-                            window.focus();
-                            setTimeout(function() {
-                                window.print();
-                            }, 1500);
-                            
-                            window.onafterprint = function() {
-                                setTimeout(function() {
-                                    window.close();
-                                }, 500);
-                            };
-                        };
-                    <\/script>
+                    ${document.getElementById('previewContent').innerHTML}
                 </body>
                 </html>
-            `);
+            `;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
             printWindow.document.close();
+            printWindow.focus();
+
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+                showNotification('Printing started...', 'info');
+            }, 500);
         }
-        
-        // Reset form
-        function resetForm() {
-            if (confirm('Are you sure you want to reset all fields to default values?')) {
-                initializeForm();
-            }
+
+        // Function to show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+                animation: slideIn 0.3s ease;
+            `;
+
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
-        
-        // Event Listeners
-        formInputs.forEach(input => {
-            input.addEventListener('input', updatePreview);
-        });
-        
-        // Add event listeners for crime number fields
-        crimeNumberInput.addEventListener('input', function() {
-            updateReferenceDisplay();
-            updatePreview();
-        });
-        policeStationCustom.addEventListener('input', function() {
-            updateReferenceDisplay();
-            updatePreview();
-        });
-        
-        fontSizeSelect.addEventListener('change', updatePreview);
-        leftTableWidthSelect.addEventListener('change', updatePreview);
-        tamilFontSelect.addEventListener('change', updatePreview);
-        indentSizeSelect.addEventListener('change', updatePreview);
-        
-        // Police station event listeners
-        policeStationSelect.addEventListener('change', function() {
-            toggleCustomFields();
-            updatePoliceStationInfo();
-            updateReferenceDisplay();
-        });
-        policeStationAddress.addEventListener('input', updatePreview);
-        
-        // Hospital event listeners
-        hospitalSelect.addEventListener('change', function() {
-            toggleCustomFields();
-            updateHospitalInfo();
-        });
-        hospitalCustom.addEventListener('input', function() {
-            updatePreview();
-            if (hospitalSelect.value === 'custom') {
-                updateDeceasedDescription(hospitalCustom.value);
-            }
-        });
-        hospitalAddress.addEventListener('input', updatePreview);
-        
-        generatePdfBtn.addEventListener('click', generatePDF);
-        resetFormBtn.addEventListener('click', resetForm);
-        printDocumentBtn.addEventListener('click', printDocument);
-        
-        // Speech button events
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.speech-input-button')) {
-                const button = e.target.closest('.speech-input-button');
-                const targetFieldId = button.getAttribute('data-target');
-                const field = document.getElementById(targetFieldId);
-                if (field) {
-                    field.focus();
-                }
-            }
-        });
-        
-        // Initialize the form
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            initializeForm();
+            // Populate Chennai stations
+            populateChennaiStations();
+            
+            // Set default district to Chennai
+            document.getElementById('districtSelect').value = 'chennai';
+            
+            // Initialize the form
+            toggleDistrictFields();
+            
+            // Set default hospital
+            document.getElementById('hospitalSelect').value = 'kpgmc';
+            updateHospitalInfo();
+            
+            // Set default values for hidden fields
+            document.getElementById('deceasedDescription').value = defaultValues.deceasedDescription;
+            document.getElementById('deceasedDescriptionEnd').value = defaultValues.deceasedDescriptionEnd;
+            
+            // Update preview
+            updatePreview();
+
+            // Add CSS for animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         });
     </script>
-    
-    <!-- Load html2canvas library -->
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>
