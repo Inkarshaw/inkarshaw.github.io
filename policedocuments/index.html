@@ -355,7 +355,7 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value">29</div>
+                <div class="stat-value">30</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
@@ -378,6 +378,19 @@
                 <h2><i>📋</i> Download Forms</h2>
                 <div class="search-info" id="downloadFormsInfo"></div>
                 <ul class="document-list" id="downloadFormsList">
+                    <!-- House Building Application Form Entry -->
+                    <li class="document-item" data-title="House Building Application Form" data-desc="HBA application form for police personnel housing loan">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>House Building Application Form</div>
+                            <div class="doc-desc">HBA application form for police personnel housing loan</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://clearexams.online/policedocuments/hba_application_form.pdf" target="_blank" class="btn btn-pdf">
+                                <i>📄</i> PDF
+                            </a>
+                        </div>
+                    </li>
+                    
                     <!-- PM Form Entry -->
                     <li class="document-item" data-title="PM Form" data-desc="Post Mortem form for autopsy and forensic examination documentation">
                         <div class="doc-info">
@@ -1092,9 +1105,10 @@
     </div>
 
     <script>
-        // Document data for search functionality
+        // Document data for search functionality - UPDATED to include House Building Application Form
         const documents = [
             // Download Forms
+            { title: "House Building Application Form", desc: "HBA application form for police personnel housing loan", type: "download", element: null },
             { title: "PM Form", desc: "Post Mortem form for autopsy and forensic examination documentation", type: "download", element: null },
             { title: "Arrest Card", desc: "Standard arrest card for documenting suspect apprehension details", type: "download", element: null },
             { title: "Arrest Intimation", desc: "Form for notifying relevant parties about an arrest", type: "download", element: null },
@@ -1341,34 +1355,23 @@
             searchInput.addEventListener('input', performSearch);
             searchButton.addEventListener('click', performSearch);
             
-            // Add click handlers for download forms
+            // Add click handlers for download forms - UPDATED to include House Building Application Form
             const downloadForms = [
-                { name: "pm_form", title: "PM Form" },
-                { name: "arrest_card", title: "Arrest Card" },
-                { name: "arrest_intimation", title: "Arrest Intimation" },
-                { name: "ndps_form5", title: "NDPS Form 5" },
-                { name: "pm_death_report", title: "PM Death Report" },
-                { name: "ndps_ca", title: "NDPS CA" },
-                { name: "el_form", title: "EL Form" },
-                { name: "el_surrender_form", title: "EL Surrender Form" },
-                { name: "incident_report_form", title: "Incident Report Form" }
+                { name: "hba_application_form", title: "House Building Application Form", folder: "" },
+                { name: "pm_form", title: "PM Form", folder: "pmforms/" },
+                { name: "arrest_card", title: "Arrest Card", folder: "remand_documents/" },
+                { name: "arrest_intimation", title: "Arrest Intimation", folder: "" },
+                { name: "ndps_form5", title: "NDPS Form 5", folder: "" },
+                { name: "pm_death_report", title: "PM Death Report", folder: "" },
+                { name: "ndps_ca", title: "NDPS CA", folder: "" },
+                { name: "el_form", title: "EL Form", folder: "" },
+                { name: "el_surrender_form", title: "EL Surrender Form", folder: "" },
+                { name: "incident_report_form", title: "Incident Report Form", folder: "" }
             ];
             
             downloadForms.forEach(form => {
-                // Word button handlers
-                const wordBtn = document.querySelector(`a[href="https://www.clearexams.online/policedocuments/${form.name}.doc"]`);
-                if (wordBtn) {
-                    wordBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        showNotification(`Opening ${form.title} Word document...`);
-                        setTimeout(() => {
-                            window.open(this.href, '_blank');
-                        }, 500);
-                    });
-                }
-                
                 // PDF button handlers
-                const pdfBtn = document.querySelector(`a[href="https://www.clearexams.online/policedocuments/${form.name}.pdf"]`);
+                const pdfBtn = document.querySelector(`a[href="https://${form.folder ? 'www.' : ''}clearexams.online/policedocuments/${form.folder}${form.name}.pdf"]`);
                 if (pdfBtn) {
                     pdfBtn.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -1379,6 +1382,18 @@
                     });
                 }
             });
+            
+            // Special handling for House Building Application Form
+            const hbaFormBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/hba_application_form.pdf"]');
+            if (hbaFormBtn) {
+                hbaFormBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification('Opening House Building Application Form...');
+                    setTimeout(() => {
+                        window.open(this.href, '_blank');
+                    }, 500);
+                });
+            }
             
             // Special handling for PM Form in pmforms folder
             const pmFormWordBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/pmforms/pm_form.doc"]');
@@ -1448,8 +1463,6 @@
                     }, 500);
                 });
             }
-            
-            // Add handlers for all other existing documents similarly...
             
             // Generate PDFs handlers
             const generatePDFLinks = document.querySelectorAll('.btn-generate');
