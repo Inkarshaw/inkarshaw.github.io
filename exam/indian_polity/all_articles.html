@@ -4,43 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Indian Polity – Article-wise Quiz</title>
+<title>Indian Polity – Multi-Part Quiz</title>
 
 <style>
-body{
-  font-family:Arial,sans-serif;
-  background:#f5f7fb;
-  margin:0
-}
-header{
-  background:#1e40af;
-  color:#fff;
-  padding:15px;
-  text-align:center
-}
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:15px
-}
-.box{
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:15px
-}
+body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
+header{background:#1e40af;color:#fff;padding:15px;text-align:center}
+.container{max-width:1000px;margin:auto;padding:15px}
+.box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
 
-/* 🔥 FULL-WIDTH FILTER + INPUTS */
-select, input{
+select,input{
   width:100%;
   padding:10px;
   border-radius:8px;
   border:1px solid #d1d5db;
-  font-size:15px;
-}
-
-select option{
-  white-space:normal;
+  font-size:15px
 }
 
 button{
@@ -55,16 +32,8 @@ button{
 .submit{background:#dc2626;color:#fff}
 .reviewBtn{background:#7c3aed;color:#fff}
 
-.timer{
-  font-weight:bold;
-  color:#dc2626;
-  margin-bottom:10px
-}
-.score{
-  font-weight:bold;
-  color:#166534;
-  margin-bottom:10px
-}
+.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
+.score{font-weight:bold;color:#166534;margin-bottom:10px}
 
 .options label{
   display:block;
@@ -77,6 +46,7 @@ button{
 .correct{background:#dcfce7;color:#166534;font-weight:bold}
 .wrong{background:#fee2e2;color:#991b1b}
 
+/* PALETTE */
 .palette-wrapper{
   border:1px solid #e5e7eb;
   border-radius:8px;
@@ -84,10 +54,7 @@ button{
   margin-bottom:15px;
   overflow-x:auto
 }
-.palette{
-  display:flex;
-  gap:8px
-}
+.palette{display:flex;gap:8px}
 .palette div{
   min-width:40px;
   padding:8px;
@@ -100,6 +67,22 @@ button{
 .palette .current{background:#1e40af;color:#fff}
 .palette .answered{background:#16a34a;color:#fff}
 .palette .unanswered{background:#dc2626;color:#fff}
+
+/* MULTI SELECT PARTS */
+.parts{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:8px
+}
+.parts label{
+  background:#eef2ff;
+  padding:6px 10px;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:14px
+}
+.parts input{margin-right:6px}
 </style>
 </head>
 
@@ -113,18 +96,16 @@ button{
 <div class="box" id="settingsBox">
 <h3>Quiz Settings</h3>
 
-<label>Article Category</label>
-<select id="articleFilter">
-  <option value="ALL">All Articles</option>
-</select>
-<br><br>
+<label><b>Select Article Parts (Multiple)</b></label>
+<div id="partContainer" class="parts"></div>
+<br>
 
 <label>No. of Questions</label>
 <select id="questionCount">
-  <option>5</option>
-  <option>10</option>
-  <option>20</option>
-  <option selected>50</option>
+<option>5</option>
+<option>10</option>
+<option>20</option>
+<option selected>50</option>
 </select>
 <br><br>
 
@@ -188,29 +169,34 @@ return{
 };
 });
 
-/* BUILD FILTER DROPDOWN DYNAMICALLY */
-const parts=[...new Set(allQuestions.map(q=>q.part))].sort();
-const filter=document.getElementById("articleFilter");
+/* BUILD MULTI-SELECT PARTS */
+const uniqueParts=[...new Set(allQuestions.map(q=>q.part))].sort();
+const box=document.getElementById("partContainer");
 
-parts.forEach(p=>{
-  const o=document.createElement("option");
-  o.value=p.toLowerCase().trim();
-  o.textContent=p;
-  filter.appendChild(o);
+uniqueParts.forEach(p=>{
+  box.innerHTML+=`
+    <label>
+      <input type="checkbox" value="${p.toLowerCase().trim()}">
+      ${p}
+    </label>`;
 });
 });
 
 /* START QUIZ */
 function startQuiz(){
-let selected=articleFilter.value;
+const checked=[...document.querySelectorAll('#partContainer input:checked')]
+  .map(i=>i.value);
+
 let count=+questionCount.value;
 
-let filtered = selected==="ALL"
+let filtered = checked.length===0
   ? allQuestions
-  : allQuestions.filter(q=>q.part.toLowerCase().trim()===selected);
+  : allQuestions.filter(q =>
+      checked.includes(q.part.toLowerCase().trim())
+    );
 
 quiz = filtered.slice(0,count);
-if(!quiz.length){alert("No questions in this category");return;}
+if(!quiz.length){alert("No questions for selected parts");return;}
 
 userAnswers=new Array(quiz.length).fill(null);
 index=0;
