@@ -385,6 +385,9 @@
                             <div class="doc-desc">HBA application form for police personnel housing loan</div>
                         </div>
                         <div class="doc-actions">
+                            <a href="https://clearexams.online/policedocuments/hba_application_form.doc" target="_blank" class="btn btn-word">
+                                <i>📝</i> Word
+                            </a>
                             <a href="https://clearexams.online/policedocuments/hba_application_form.pdf" target="_blank" class="btn btn-pdf">
                                 <i>📄</i> PDF
                             </a>
@@ -914,7 +917,7 @@
                         </div>
                     </li>
                     
-                    <li class="document-item" data-title="Juvenile Parent/Guardian Intimation" data-desc="Form for intimating parents/guardians about juvenile's apprehension">
+                    <li class="document-item" data-title="Juvenile Parent/Guardian Intimation", data-desc="Form for intimating parents/guardians about juvenile's apprehension">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Juvenile Parent/Guardian Intimation</div>
                             <div class="doc-desc">Form for intimating parents/guardians about juvenile's apprehension</div>
@@ -926,7 +929,7 @@
                         </div>
                     </li>
                     
-                    <li class="document-item" data-title="Juvenile Social Investigation Report" data-desc="Social investigation report format for juvenile justice board">
+                    <li class="document-item" data-title="Juvenile Social Investigation Report", data-desc="Social investigation report format for juvenile justice board">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Juvenile Social Investigation Report</div>
                             <div class="doc-desc">Social investigation report format for juvenile justice board</div>
@@ -938,7 +941,7 @@
                         </div>
                     </li>
                     
-                    <li class="document-item" data-title="Juvenile Bail Application Form" data-desc="Bail application form specifically designed for juvenile offenders">
+                    <li class="document-item" data-title="Juvenile Bail Application Form", data-desc="Bail application form specifically designed for juvenile offenders">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Juvenile Bail Application Form</div>
                             <div class="doc-desc">Bail application form specifically designed for juvenile offenders</div>
@@ -950,7 +953,7 @@
                         </div>
                     </li>
                     
-                    <li class="document-item" data-title="Juvenile Justice Act Checklist" data-desc="Compliance checklist for procedures under Juvenile Justice Act">
+                    <li class="document-item" data-title="Juvenile Justice Act Checklist", data-desc="Compliance checklist for procedures under Juvenile Justice Act">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Juvenile Justice Act Checklist</div>
                             <div class="doc-desc">Compliance checklist for procedures under Juvenile Justice Act</div>
@@ -1370,6 +1373,18 @@
             ];
             
             downloadForms.forEach(form => {
+                // Word button handlers
+                const wordBtn = document.querySelector(`a[href="https://${form.folder ? 'www.' : ''}clearexams.online/policedocuments/${form.folder}${form.name}.doc"]`);
+                if (wordBtn) {
+                    wordBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showNotification(`Opening ${form.title} Word document...`);
+                        setTimeout(() => {
+                            window.open(this.href, '_blank');
+                        }, 500);
+                    });
+                }
+                
                 // PDF button handlers
                 const pdfBtn = document.querySelector(`a[href="https://${form.folder ? 'www.' : ''}clearexams.online/policedocuments/${form.folder}${form.name}.pdf"]`);
                 if (pdfBtn) {
@@ -1383,81 +1398,23 @@
                 }
             });
             
-            // Special handling for House Building Application Form
-            const hbaFormBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/hba_application_form.pdf"]');
-            if (hbaFormBtn) {
-                hbaFormBtn.addEventListener('click', function(e) {
+            // Special handling for House Building Application Form - both Word and PDF
+            const hbaWordBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/hba_application_form.doc"]');
+            if (hbaWordBtn) {
+                hbaWordBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    showNotification('Opening House Building Application Form...');
+                    showNotification('Opening House Building Application Form (Word)...');
                     setTimeout(() => {
                         window.open(this.href, '_blank');
                     }, 500);
                 });
             }
             
-            // Special handling for PM Form in pmforms folder
-            const pmFormWordBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/pmforms/pm_form.doc"]');
-            if (pmFormWordBtn) {
-                pmFormWordBtn.addEventListener('click', function(e) {
+            const hbaPdfBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/hba_application_form.pdf"]');
+            if (hbaPdfBtn) {
+                hbaPdfBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    showNotification('Opening PM Form Word document...');
-                    setTimeout(() => {
-                        window.open(this.href, '_blank');
-                    }, 500);
-                });
-            }
-            
-            const pmFormPdfBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/pmforms/pm_form.pdf"]');
-            if (pmFormPdfBtn) {
-                pmFormPdfBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showNotification('Opening PM Form PDF document...');
-                    setTimeout(() => {
-                        window.open(this.href, '_blank');
-                    }, 500);
-                });
-            }
-            
-            // Special handling for Arrest Card in remand_documents folder
-            const arrestCardWordBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.doc"]');
-            if (arrestCardWordBtn) {
-                arrestCardWordBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showNotification('Opening Arrest Card Word document...');
-                    setTimeout(() => {
-                        window.open(this.href, '_blank');
-                    }, 500);
-                });
-            }
-            
-            const arrestCardPdfBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.pdf"]');
-            if (arrestCardPdfBtn) {
-                arrestCardPdfBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showNotification('Opening Arrest Card PDF document...');
-                    setTimeout(() => {
-                        window.open(this.href, '_blank');
-                    }, 500);
-                });
-            }
-            
-            // Special handling for Arrest Intimation with different URL
-            const arrestIntimationWordBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/arrest_intimation.doc"]');
-            if (arrestIntimationWordBtn) {
-                arrestIntimationWordBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showNotification('Opening Arrest Intimation Word document...');
-                    setTimeout(() => {
-                        window.open(this.href, '_blank');
-                    }, 500);
-                });
-            }
-            
-            const arrestIntimationPdfBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/arrest_intimation.pdf"]');
-            if (arrestIntimationPdfBtn) {
-                arrestIntimationPdfBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showNotification('Opening Arrest Intimation PDF document...');
+                    showNotification('Opening House Building Application Form (PDF)...');
                     setTimeout(() => {
                         window.open(this.href, '_blank');
                     }, 500);
