@@ -4,149 +4,135 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Indian Polity – CBT Quiz</title>
+<title>Indian Polity – Article-wise Quiz</title>
 
 <style>
-/* ===== THEME ===== */
-:root{
-  --bg:#f5f7fb;
-  --card:#ffffff;
-  --text:#111827;
-  --primary:#1e40af;
-  --accent:#16a34a;
-  --danger:#dc2626;
-  --border:#e5e7eb;
-}
-body.dark{
-  --bg:#0f172a;
-  --card:#020617;
-  --text:#e5e7eb;
-  --primary:#3b82f6;
-  --accent:#22c55e;
-  --danger:#ef4444;
-  --border:#334155;
-}
-
-/* ===== BASE ===== */
 body{
-  margin:0;
   font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  background:#f5f7fb;
+  margin:0
 }
 header{
-  background:var(--primary);
+  background:#1e40af;
   color:#fff;
-  padding:14px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  padding:15px;
+  text-align:center
 }
-.container{max-width:1000px;margin:auto;padding:15px}
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:15px
+}
 .box{
-  background:var(--card);
+  background:#fff;
   padding:20px;
   border-radius:12px;
-  margin-bottom:15px;
-  border:1px solid var(--border);
+  margin-bottom:15px
 }
 
-/* ===== SPLASH ===== */
-#splash{
-  position:fixed;inset:0;
-  background:var(--primary);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-  z-index:9999;
-}
-
-/* ===== INPUTS & BUTTONS ===== */
+/* INPUTS */
 select,input{
-  width:100%;padding:10px;
+  width:100%;
+  padding:10px;
   border-radius:8px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
+  border:1px solid #d1d5db;
+  font-size:15px
 }
+
+/* BUTTONS */
 button{
-  padding:8px 14px;
+  padding:10px 18px;
   border:none;
   border-radius:20px;
   cursor:pointer;
-  margin:4px;
+  margin:5px
 }
-.start{background:var(--accent);color:#fff}
-.next{background:var(--primary);color:#fff}
-.submit{background:var(--danger);color:#fff}
+.start{background:#16a34a;color:#fff}
+.next{background:#2563eb;color:#fff}
+.submit{background:#dc2626;color:#fff}
+.reviewBtn{background:#7c3aed;color:#fff}
 
-/* ===== TIMER ===== */
-.timer{font-weight:bold;color:var(--danger);margin-bottom:10px}
+/* TEXT */
+.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
+.score{font-weight:bold;color:#166534;margin-bottom:10px}
 
-/* ===== STICKY PALETTE ===== */
-.palette-wrapper{
-  position:sticky;
-  top:0;
-  background:var(--card);
-  padding:8px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  z-index:50;
-  margin-bottom:10px;
-}
-.palette{display:flex;gap:8px;overflow-x:auto}
-.palette div{
-  min-width:38px;
-  padding:8px;
-  text-align:center;
-  border-radius:6px;
-  background:#cbd5e1;
-  cursor:pointer;
-}
-.palette .current{background:var(--primary);color:#fff}
-.palette .answered{background:var(--accent);color:#fff}
-.palette .unanswered{background:var(--danger);color:#fff}
-
-/* ===== OPTIONS ===== */
+/* OPTIONS */
 .options label{
   display:block;
   padding:10px;
   margin:6px 0;
   border-radius:6px;
-  background:#e5e7eb;
+  background:#f1f5f9
 }
-body.dark .options label{background:#1e293b}
+.correct{background:#dcfce7;color:#166534;font-weight:bold}
+.wrong{background:#fee2e2;color:#991b1b}
 
-.correct{background:#dcfce7}
-.wrong{background:#fee2e2}
+/* PALETTE */
+.palette-wrapper{
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:8px;
+  margin-bottom:15px;
+  overflow-x:auto
+}
+.palette{
+  display:flex;
+  gap:8px
+}
+.palette div{
+  min-width:40px;
+  padding:8px;
+  text-align:center;
+  border-radius:6px;
+  background:#e5e7eb;
+  cursor:pointer;
+  user-select:none
+}
+.palette .current{background:#1e40af;color:#fff}
+.palette .answered{background:#16a34a;color:#fff}
+.palette .unanswered{background:#dc2626;color:#fff}
 
-/* ===== REVIEW ===== */
-.review-box{
-  margin-bottom:20px;
-  padding-bottom:10px;
-  border-bottom:1px solid var(--border);
+/* 🔥 MULTI-PART FILTER – PROPER LEFT ALIGNMENT */
+.parts{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:10px;
+  margin-top:8px;
+  align-items:start;
+}
+
+.parts label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#eef2ff;
+  padding:8px 12px;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:14px;
+  white-space:normal;
+}
+
+.parts input{
+  margin:0;
 }
 </style>
 </head>
 
 <body>
 
-<div id="splash">Indian Polity Practice App</div>
-
-<header>
-<h2>Indian Polity – CBT Quiz</h2>
-<label>
-<input type="checkbox" onchange="document.body.classList.toggle('dark',this.checked)"> 🌙
-</label>
-</header>
+<header><h2>Indian Polity – Article-wise Quiz</h2></header>
 
 <div class="container">
 
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
 <h3>Quiz Settings</h3>
+
+<label><b>Select Article Parts (Multiple)</b></label>
+<div id="partContainer" class="parts"></div>
+
+<br>
 
 <label>No. of Questions</label>
 <select id="questionCount">
@@ -157,6 +143,7 @@ body.dark .options label{background:#1e293b}
 </select>
 
 <br><br>
+
 <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
@@ -175,54 +162,79 @@ body.dark .options label{background:#1e293b}
 <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
-<!-- RESULT + REVIEW -->
+<!-- RESULT -->
 <div class="box" id="resultBox" style="display:none">
-<h3>Result Summary</h3>
-<p id="scoreSummary"></p>
+<div class="score" id="scoreBox"></div>
+<button class="reviewBtn" onclick="reviewAll()">Review All</button>
+<button class="reviewBtn" onclick="reattemptWrong()">Reattempt Wrong</button>
+<button class="reviewBtn" onclick="reattemptUnanswered()">Reattempt Unanswered</button>
+</div>
 
-<div id="reviewArea"></div>
+<!-- REVIEW -->
+<div class="box" id="reviewBox" style="display:none">
+<h3 id="reviewCount"></h3>
+<div id="reviewQuestion"></div>
+<div id="reviewOptions"></div>
+<div id="reviewExp"></div>
+<button onclick="prevReview()">⬅ Previous</button>
+<button onclick="nextReview()">Next ➡</button>
 </div>
 
 </div>
 
 <script>
-/* ===== SPLASH ===== */
-setTimeout(()=>document.getElementById("splash").style.display="none",2000);
+const sheetURL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
-/* ===== EXIT WARNING ===== */
-let quizActive=false;
-window.addEventListener("beforeunload",e=>{
-if(quizActive){
-e.preventDefault();
-e.returnValue="";
-}
-});
-
-/* ===== DATA ===== */
-const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
-
-let allQuestions=[],quiz=[],index=0,userAnswers=[];
-let timerInt,timeLeft=0;
+let allQuestions=[], quiz=[], index=0, userAnswers=[];
+let reviewIndex=0, timerInt, timeLeft=0;
 
 /* LOAD QUESTIONS */
 fetch(sheetURL).then(r=>r.text()).then(t=>{
 const rows=t.trim().split("\n").slice(1);
-allQuestions=rows.map(r=>{
+
+allQuestions = rows.map(r=>{
 const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 return{
-q:c[0],opts:c.slice(1,5),
-ans:(c[5]||"").trim().toUpperCase(),
-exp:c[6]||""
+  q:c[0],
+  opts:c.slice(1,5),
+  ans:(c[5]||"").trim().toUpperCase(),
+  exp:c[6]||"",
+  part:(c[7]||"Uncategorized").trim()
 };
+});
+
+/* BUILD MULTI-SELECT PARTS */
+const uniqueParts=[...new Set(allQuestions.map(q=>q.part))].sort();
+const box=document.getElementById("partContainer");
+
+uniqueParts.forEach(p=>{
+  box.innerHTML+=`
+    <label>
+      <input type="checkbox" value="${p.toLowerCase().trim()}">
+      ${p}
+    </label>`;
 });
 });
 
 /* START QUIZ */
 function startQuiz(){
-quiz=allQuestions.slice(0,+questionCount.value);
+const checked=[...document.querySelectorAll('#partContainer input:checked')]
+  .map(i=>i.value);
+
+let count=+questionCount.value;
+
+let filtered = checked.length===0
+  ? allQuestions
+  : allQuestions.filter(q =>
+      checked.includes(q.part.toLowerCase().trim())
+    );
+
+quiz = filtered.slice(0,count);
+if(!quiz.length){alert("No questions for selected parts");return;}
+
 userAnswers=new Array(quiz.length).fill(null);
 index=0;
-quizActive=true;
 
 settingsBox.style.display="none";
 quizBox.style.display="block";
@@ -234,9 +246,11 @@ loadQ();
 
 /* TIMER */
 function startTimer(){
+clearInterval(timerInt);
 timeLeft=quiz.length*60;
 timerInt=setInterval(()=>{
-timer.innerText=`Time Left: ${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,"0")}`;
+let m=Math.floor(timeLeft/60),s=timeLeft%60;
+timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
 if(--timeLeft<0){clearInterval(timerInt);submitQuiz();}
 },1000);
 }
@@ -246,28 +260,28 @@ function createPalette(){
 palette.innerHTML="";
 quiz.forEach((_,i)=>{
 let d=document.createElement("div");
-d.textContent=i+1;
-d.onclick=()=>{saveAnswer();index=i;loadQ();};
+d.innerText=i+1;
+d.onclick=()=>{saveAnswer();index=i;loadQ();}
 palette.appendChild(d);
 });
 }
 
 function updatePalette(){
-[...palette.children].forEach((d,i)=>{
+document.querySelectorAll(".palette div").forEach((d,i)=>{
 d.className="";
 if(i===index)d.classList.add("current");
-else if(userAnswers[i])d.classList.add("answered");
+else if(userAnswers[i]!==null)d.classList.add("answered");
 else d.classList.add("unanswered");
 });
 }
 
 /* QUESTIONS */
 function loadQ(){
-const q=quiz[index];
+let q=quiz[index];
 question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
 options.innerHTML="";
 q.opts.forEach((o,i)=>{
-const l=String.fromCharCode(65+i);
+let l=String.fromCharCode(65+i);
 options.innerHTML+=`
 <label>
 <input type="radio" name="opt" value="${l}" ${userAnswers[index]==l?"checked":""}>
@@ -278,7 +292,7 @@ updatePalette();
 }
 
 function saveAnswer(){
-const s=document.querySelector('input[name="opt"]:checked');
+let s=document.querySelector('input[name="opt"]:checked');
 userAnswers[index]=s?s.value:null;
 }
 
@@ -288,46 +302,64 @@ if(index<quiz.length-1){index++;loadQ();}
 else confirmSubmit();
 }
 
+/* SUBMIT */
 function confirmSubmit(){
 saveAnswer();
-if(userAnswers.includes(null) && !confirm("Unanswered questions exist. Submit?"))return;
+let un=userAnswers.filter(a=>a===null).length;
+if(un>0 && !confirm(`You have ${un} unanswered questions. Submit?`))return;
 submitQuiz();
 }
 
-/* SUBMIT + REVIEW */
 function submitQuiz(){
-quizActive=false;
 clearInterval(timerInt);
 quizBox.style.display="none";
 resultBox.style.display="block";
+let score=0;
+quiz.forEach((q,i)=>{if(userAnswers[i]===q.ans)score++;});
+scoreBox.innerText=`Score: ${score} / ${quiz.length}`;
+}
 
-let correct=0,wrong=0,un=0;
-quiz.forEach((q,i)=>{
-if(userAnswers[i]===q.ans)correct++;
-else if(userAnswers[i])wrong++;
-else un++;
-});
+/* REVIEW */
+function reviewAll(){
+resultBox.style.display="none";
+reviewBox.style.display="block";
+reviewIndex=0;
+loadReview();
+}
 
-scoreSummary.innerHTML=`
-<b>Total:</b> ${quiz.length} |
-<b>Correct:</b> ${correct} |
-<b>Wrong:</b> ${wrong} |
-<b>Unattempted:</b> ${un}
-`;
+function loadReview(){
+let q=quiz[reviewIndex];
+reviewCount.innerText=`Review ${reviewIndex+1}/${quiz.length}`;
+reviewQuestion.innerHTML=`<b>${q.q}</b>`;
+reviewOptions.innerHTML="";
+q.opts.forEach((o,i)=>{
+let l=String.fromCharCode(65+i),cls="";
+if(l===q.ans)cls="correct";
+if(userAnswers[reviewIndex]===l && l!==q.ans)cls="wrong";
+reviewOptions.innerHTML+=`<div class="${cls}">${l}. ${o}</div>`;
+});
+reviewExp.innerHTML=`<b>Explanation:</b> ${q.exp||"—"}`;
+}
 
-reviewArea.innerHTML="";
-quiz.forEach((q,i)=>{
-let div=document.createElement("div");
-div.className="review-box";
-div.innerHTML=`<b>Q${i+1}. ${q.q}</b><br>`;
-q.opts.forEach((o,j)=>{
-let l=String.fromCharCode(65+j);
-let cls=l===q.ans?"correct":(userAnswers[i]===l?"wrong":"");
-div.innerHTML+=`<div class="${cls}">${l}. ${o}</div>`;
-});
-div.innerHTML+=`<i>Explanation:</i> ${q.exp||"—"}`;
-reviewArea.appendChild(div);
-});
+function nextReview(){if(reviewIndex<quiz.length-1){reviewIndex++;loadReview();}}
+function prevReview(){if(reviewIndex>0){reviewIndex--;loadReview();}}
+
+/* REATTEMPT */
+function reattemptWrong(){
+filterReattempt((q,i)=>userAnswers[i]!==q.ans);
+}
+function reattemptUnanswered(){
+filterReattempt((q,i)=>userAnswers[i]===null);
+}
+function filterReattempt(fn){
+quiz=quiz.filter(fn);
+userAnswers=new Array(quiz.length).fill(null);
+index=0;
+resultBox.style.display="none";
+quizBox.style.display="block";
+startTimer();
+createPalette();
+loadQ();
 }
 </script>
 
