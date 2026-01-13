@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Indian Polity – Article-wise Quiz</title>
+<title>Indian Polity – CBT Quiz</title>
 
 <style>
-/* ========== THEME VARIABLES ========== */
+/* ===== THEME ===== */
 :root{
   --bg:#f5f7fb;
   --card:#ffffff;
@@ -17,7 +17,6 @@
   --danger:#dc2626;
   --border:#e5e7eb;
 }
-
 body.dark{
   --bg:#0f172a;
   --card:#020617;
@@ -28,27 +27,22 @@ body.dark{
   --border:#334155;
 }
 
-/* ========== BASE ========== */
+/* ===== BASE ===== */
 body{
   margin:0;
   font-family:Arial,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
-
 header{
   background:var(--primary);
   color:#fff;
-  padding:15px;
-  text-align:center;
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
-
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:15px;
-}
-
+.container{max-width:1000px;margin:auto;padding:15px}
 .box{
   background:var(--card);
   padding:20px;
@@ -57,25 +51,26 @@ header{
   border:1px solid var(--border);
 }
 
-/* ========== STICKY FILTER BAR ========== */
-.sticky{
-  position:sticky;
-  top:0;
-  z-index:100;
+/* ===== SPLASH ===== */
+#splash{
+  position:fixed;inset:0;
+  background:var(--primary);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  z-index:9999;
 }
 
-/* ========== INPUTS ========== */
+/* ===== INPUTS & BUTTONS ===== */
 select,input{
-  width:100%;
-  padding:10px;
+  width:100%;padding:10px;
   border-radius:8px;
   border:1px solid var(--border);
-  font-size:15px;
   background:var(--card);
   color:var(--text);
 }
-
-/* ========== BUTTONS ========== */
 button{
   padding:8px 14px;
   border:none;
@@ -83,65 +78,38 @@ button{
   cursor:pointer;
   margin:4px;
 }
-
 .start{background:var(--accent);color:#fff}
 .next{background:var(--primary);color:#fff}
 .submit{background:var(--danger);color:#fff}
-.secondary{background:#64748b;color:#fff}
 
-/* ========== FILTER CONTROLS ========== */
-.filter-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  cursor:pointer;
-}
-
-.parts{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:10px;
-  margin-top:10px;
-}
-
-.parts label{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  background:#eef2ff;
-  padding:8px 12px;
-  border-radius:20px;
-  font-size:14px;
-  cursor:pointer;
-}
-
-body.dark .parts label{background:#1e293b}
-
-/* ========== QUIZ ========== */
+/* ===== TIMER ===== */
 .timer{font-weight:bold;color:var(--danger);margin-bottom:10px}
 
+/* ===== STICKY PALETTE ===== */
 .palette-wrapper{
+  position:sticky;
+  top:0;
+  background:var(--card);
+  padding:8px;
   border:1px solid var(--border);
   border-radius:8px;
-  padding:8px;
-  margin-bottom:15px;
-  overflow-x:auto;
+  z-index:50;
+  margin-bottom:10px;
 }
-
-.palette{display:flex;gap:8px}
+.palette{display:flex;gap:8px;overflow-x:auto}
 .palette div{
-  min-width:40px;
+  min-width:38px;
   padding:8px;
   text-align:center;
   border-radius:6px;
   background:#cbd5e1;
   cursor:pointer;
 }
-
 .palette .current{background:var(--primary);color:#fff}
 .palette .answered{background:var(--accent);color:#fff}
 .palette .unanswered{background:var(--danger);color:#fff}
 
+/* ===== OPTIONS ===== */
 .options label{
   display:block;
   padding:10px;
@@ -149,48 +117,36 @@ body.dark .parts label{background:#1e293b}
   border-radius:6px;
   background:#e5e7eb;
 }
-
 body.dark .options label{background:#1e293b}
 
-/* ========== DARK MODE TOGGLE ========== */
-.toggle{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:14px;
+.correct{background:#dcfce7}
+.wrong{background:#fee2e2}
+
+/* ===== REVIEW ===== */
+.review-box{
+  margin-bottom:20px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
 }
 </style>
 </head>
 
 <body>
 
+<div id="splash">Indian Polity Practice App</div>
+
 <header>
-<h2>Indian Polity – Article-wise Quiz</h2>
+<h2>Indian Polity – CBT Quiz</h2>
+<label>
+<input type="checkbox" onchange="document.body.classList.toggle('dark',this.checked)"> 🌙
+</label>
 </header>
 
 <div class="container">
 
-<!-- ========== STICKY FILTER BAR ========== -->
-<div class="box sticky" id="settingsBox">
-
-<div class="filter-header" onclick="toggleFilters()">
-  <h3>Quiz Filters</h3>
-  <span id="collapseIcon">⬆</span>
-</div>
-
-<div id="filterBody">
-
-<div style="display:flex;justify-content:space-between;align-items:center">
-  <b>Select Article Parts</b>
-  <div>
-    <button class="secondary" onclick="selectAllParts()">Select All</button>
-    <button class="secondary" onclick="clearAllParts()">Clear All</button>
-  </div>
-</div>
-
-<div id="partContainer" class="parts"></div>
-
-<br>
+<!-- SETTINGS -->
+<div class="box" id="settingsBox">
+<h3>Quiz Settings</h3>
 
 <label>No. of Questions</label>
 <select id="questionCount">
@@ -201,20 +157,10 @@ body.dark .options label{background:#1e293b}
 </select>
 
 <br><br>
-
-<div style="display:flex;justify-content:space-between;align-items:center">
-  <button class="start" onclick="startQuiz()">Start Quiz</button>
-
-  <div class="toggle">
-    <input type="checkbox" onchange="toggleDarkMode(this)">
-    🌙 Dark
-  </div>
+<button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
-</div>
-</div>
-
-<!-- ========== QUIZ ========== -->
+<!-- QUIZ -->
 <div class="box" id="quizBox" style="display:none">
 <div class="timer" id="timer"></div>
 
@@ -229,11 +175,31 @@ body.dark .options label{background:#1e293b}
 <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
+<!-- RESULT + REVIEW -->
+<div class="box" id="resultBox" style="display:none">
+<h3>Result Summary</h3>
+<p id="scoreSummary"></p>
+
+<div id="reviewArea"></div>
+</div>
+
 </div>
 
 <script>
-const sheetURL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
+/* ===== SPLASH ===== */
+setTimeout(()=>document.getElementById("splash").style.display="none",2000);
+
+/* ===== EXIT WARNING ===== */
+let quizActive=false;
+window.addEventListener("beforeunload",e=>{
+if(quizActive){
+e.preventDefault();
+e.returnValue="";
+}
+});
+
+/* ===== DATA ===== */
+const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
 let allQuestions=[],quiz=[],index=0,userAnswers=[];
 let timerInt,timeLeft=0;
@@ -244,56 +210,19 @@ const rows=t.trim().split("\n").slice(1);
 allQuestions=rows.map(r=>{
 const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 return{
-  q:c[0],opts:c.slice(1,5),
-  ans:(c[5]||"").trim().toUpperCase(),
-  part:(c[7]||"Uncategorized").trim()
+q:c[0],opts:c.slice(1,5),
+ans:(c[5]||"").trim().toUpperCase(),
+exp:c[6]||""
 };
 });
-
-const parts=[...new Set(allQuestions.map(q=>q.part))].sort();
-const box=document.getElementById("partContainer");
-parts.forEach(p=>{
-  box.innerHTML+=`
-    <label>
-      <input type="checkbox" value="${p.toLowerCase()}"> ${p}
-    </label>`;
-});
 });
 
-/* FILTER UI */
-function toggleFilters(){
-const body=document.getElementById("filterBody");
-const icon=document.getElementById("collapseIcon");
-body.style.display = body.style.display==="none" ? "block" : "none";
-icon.textContent = body.style.display==="none" ? "⬇" : "⬆";
-}
-
-function selectAllParts(){
-document.querySelectorAll('#partContainer input')
-  .forEach(c=>c.checked=true);
-}
-function clearAllParts(){
-document.querySelectorAll('#partContainer input')
-  .forEach(c=>c.checked=false);
-}
-
-/* DARK MODE */
-function toggleDarkMode(cb){
-document.body.classList.toggle("dark",cb.checked);
-}
-
-/* QUIZ */
+/* START QUIZ */
 function startQuiz(){
-const selected=[...document.querySelectorAll('#partContainer input:checked')]
-  .map(c=>c.value);
-
-quiz = selected.length
- ? allQuestions.filter(q=>selected.includes(q.part.toLowerCase()))
- : allQuestions;
-
-quiz=quiz.slice(0,+questionCount.value);
+quiz=allQuestions.slice(0,+questionCount.value);
 userAnswers=new Array(quiz.length).fill(null);
 index=0;
+quizActive=true;
 
 settingsBox.style.display="none";
 quizBox.style.display="block";
@@ -308,7 +237,7 @@ function startTimer(){
 timeLeft=quiz.length*60;
 timerInt=setInterval(()=>{
 timer.innerText=`Time Left: ${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,"0")}`;
-if(--timeLeft<0){clearInterval(timerInt);alert("Time Up");}
+if(--timeLeft<0){clearInterval(timerInt);submitQuiz();}
 },1000);
 }
 
@@ -318,7 +247,7 @@ palette.innerHTML="";
 quiz.forEach((_,i)=>{
 let d=document.createElement("div");
 d.textContent=i+1;
-d.onclick=()=>{saveAnswer();index=i;loadQ();}
+d.onclick=()=>{saveAnswer();index=i;loadQ();};
 palette.appendChild(d);
 });
 }
@@ -361,9 +290,44 @@ else confirmSubmit();
 
 function confirmSubmit(){
 saveAnswer();
-const un=userAnswers.filter(a=>!a).length;
-if(un && !confirm(`${un} unanswered. Submit?`))return;
-alert("Quiz Submitted");
+if(userAnswers.includes(null) && !confirm("Unanswered questions exist. Submit?"))return;
+submitQuiz();
+}
+
+/* SUBMIT + REVIEW */
+function submitQuiz(){
+quizActive=false;
+clearInterval(timerInt);
+quizBox.style.display="none";
+resultBox.style.display="block";
+
+let correct=0,wrong=0,un=0;
+quiz.forEach((q,i)=>{
+if(userAnswers[i]===q.ans)correct++;
+else if(userAnswers[i])wrong++;
+else un++;
+});
+
+scoreSummary.innerHTML=`
+<b>Total:</b> ${quiz.length} |
+<b>Correct:</b> ${correct} |
+<b>Wrong:</b> ${wrong} |
+<b>Unattempted:</b> ${un}
+`;
+
+reviewArea.innerHTML="";
+quiz.forEach((q,i)=>{
+let div=document.createElement("div");
+div.className="review-box";
+div.innerHTML=`<b>Q${i+1}. ${q.q}</b><br>`;
+q.opts.forEach((o,j)=>{
+let l=String.fromCharCode(65+j);
+let cls=l===q.ans?"correct":(userAnswers[i]===l?"wrong":"");
+div.innerHTML+=`<div class="${cls}">${l}. ${o}</div>`;
+});
+div.innerHTML+=`<i>Explanation:</i> ${q.exp||"—"}`;
+reviewArea.appendChild(div);
+});
 }
 </script>
 
