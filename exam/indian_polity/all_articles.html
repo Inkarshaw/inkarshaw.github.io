@@ -2,102 +2,194 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Indian Polity – Multi-Part Quiz</title>
+<title>Indian Polity – Article-wise Quiz</title>
 
 <style>
-body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
-header{background:#1e40af;color:#fff;padding:15px;text-align:center}
-.container{max-width:1000px;margin:auto;padding:15px}
-.box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
+/* ========== THEME VARIABLES ========== */
+:root{
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#111827;
+  --primary:#1e40af;
+  --accent:#16a34a;
+  --danger:#dc2626;
+  --border:#e5e7eb;
+}
 
+body.dark{
+  --bg:#0f172a;
+  --card:#020617;
+  --text:#e5e7eb;
+  --primary:#3b82f6;
+  --accent:#22c55e;
+  --danger:#ef4444;
+  --border:#334155;
+}
+
+/* ========== BASE ========== */
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:15px;
+  text-align:center;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:15px;
+}
+
+.box{
+  background:var(--card);
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:15px;
+  border:1px solid var(--border);
+}
+
+/* ========== STICKY FILTER BAR ========== */
+.sticky{
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+/* ========== INPUTS ========== */
 select,input{
   width:100%;
   padding:10px;
   border-radius:8px;
-  border:1px solid #d1d5db;
-  font-size:15px
+  border:1px solid var(--border);
+  font-size:15px;
+  background:var(--card);
+  color:var(--text);
 }
 
+/* ========== BUTTONS ========== */
 button{
-  padding:10px 18px;
+  padding:8px 14px;
   border:none;
   border-radius:20px;
   cursor:pointer;
-  margin:5px
-}
-.start{background:#16a34a;color:#fff}
-.next{background:#2563eb;color:#fff}
-.submit{background:#dc2626;color:#fff}
-.reviewBtn{background:#7c3aed;color:#fff}
-
-.timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
-.score{font-weight:bold;color:#166534;margin-bottom:10px}
-
-.options label{
-  display:block;
-  padding:10px;
-  margin:6px 0;
-  border-radius:6px;
-  background:#f1f5f9
+  margin:4px;
 }
 
-.correct{background:#dcfce7;color:#166534;font-weight:bold}
-.wrong{background:#fee2e2;color:#991b1b}
+.start{background:var(--accent);color:#fff}
+.next{background:var(--primary);color:#fff}
+.submit{background:var(--danger);color:#fff}
+.secondary{background:#64748b;color:#fff}
 
-/* PALETTE */
+/* ========== FILTER CONTROLS ========== */
+.filter-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+}
+
+.parts{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+
+.parts label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#eef2ff;
+  padding:8px 12px;
+  border-radius:20px;
+  font-size:14px;
+  cursor:pointer;
+}
+
+body.dark .parts label{background:#1e293b}
+
+/* ========== QUIZ ========== */
+.timer{font-weight:bold;color:var(--danger);margin-bottom:10px}
+
 .palette-wrapper{
-  border:1px solid #e5e7eb;
+  border:1px solid var(--border);
   border-radius:8px;
   padding:8px;
   margin-bottom:15px;
-  overflow-x:auto
+  overflow-x:auto;
 }
+
 .palette{display:flex;gap:8px}
 .palette div{
   min-width:40px;
   padding:8px;
   text-align:center;
   border-radius:6px;
-  background:#e5e7eb;
+  background:#cbd5e1;
   cursor:pointer;
-  user-select:none
 }
-.palette .current{background:#1e40af;color:#fff}
-.palette .answered{background:#16a34a;color:#fff}
-.palette .unanswered{background:#dc2626;color:#fff}
 
-/* MULTI SELECT PARTS */
-.parts{
+.palette .current{background:var(--primary);color:#fff}
+.palette .answered{background:var(--accent);color:#fff}
+.palette .unanswered{background:var(--danger);color:#fff}
+
+.options label{
+  display:block;
+  padding:10px;
+  margin:6px 0;
+  border-radius:6px;
+  background:#e5e7eb;
+}
+
+body.dark .options label{background:#1e293b}
+
+/* ========== DARK MODE TOGGLE ========== */
+.toggle{
   display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:8px
+  align-items:center;
+  gap:6px;
+  font-size:14px;
 }
-.parts label{
-  background:#eef2ff;
-  padding:6px 10px;
-  border-radius:20px;
-  cursor:pointer;
-  font-size:14px
-}
-.parts input{margin-right:6px}
 </style>
 </head>
 
 <body>
 
-<header><h2>Indian Polity – Article-wise Quiz</h2></header>
+<header>
+<h2>Indian Polity – Article-wise Quiz</h2>
+</header>
 
 <div class="container">
 
-<!-- SETTINGS -->
-<div class="box" id="settingsBox">
-<h3>Quiz Settings</h3>
+<!-- ========== STICKY FILTER BAR ========== -->
+<div class="box sticky" id="settingsBox">
 
-<label><b>Select Article Parts (Multiple)</b></label>
+<div class="filter-header" onclick="toggleFilters()">
+  <h3>Quiz Filters</h3>
+  <span id="collapseIcon">⬆</span>
+</div>
+
+<div id="filterBody">
+
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <b>Select Article Parts</b>
+  <div>
+    <button class="secondary" onclick="selectAllParts()">Select All</button>
+    <button class="secondary" onclick="clearAllParts()">Clear All</button>
+  </div>
+</div>
+
 <div id="partContainer" class="parts"></div>
+
 <br>
 
 <label>No. of Questions</label>
@@ -107,12 +199,22 @@ button{
 <option>20</option>
 <option selected>50</option>
 </select>
+
 <br><br>
 
-<button class="start" onclick="startQuiz()">Start Quiz</button>
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <button class="start" onclick="startQuiz()">Start Quiz</button>
+
+  <div class="toggle">
+    <input type="checkbox" onchange="toggleDarkMode(this)">
+    🌙 Dark
+  </div>
 </div>
 
-<!-- QUIZ -->
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
 <div class="box" id="quizBox" style="display:none">
 <div class="timer" id="timer"></div>
 
@@ -127,77 +229,69 @@ button{
 <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
-<!-- RESULT -->
-<div class="box" id="resultBox" style="display:none">
-<div class="score" id="scoreBox"></div>
-<button class="reviewBtn" onclick="reviewAll()">Review All</button>
-<button class="reviewBtn" onclick="reattemptWrong()">Reattempt Wrong</button>
-<button class="reviewBtn" onclick="reattemptUnanswered()">Reattempt Unanswered</button>
-</div>
-
-<!-- REVIEW -->
-<div class="box" id="reviewBox" style="display:none">
-<h3 id="reviewCount"></h3>
-<div id="reviewQuestion"></div>
-<div id="reviewOptions"></div>
-<div id="reviewExp"></div>
-<button onclick="prevReview()">⬅ Previous</button>
-<button onclick="nextReview()">Next ➡</button>
-</div>
-
 </div>
 
 <script>
 const sheetURL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
-let allQuestions=[], quiz=[], index=0, userAnswers=[];
-let reviewIndex=0, timerInt, timeLeft=0;
+let allQuestions=[],quiz=[],index=0,userAnswers=[];
+let timerInt,timeLeft=0;
 
 /* LOAD QUESTIONS */
 fetch(sheetURL).then(r=>r.text()).then(t=>{
 const rows=t.trim().split("\n").slice(1);
-
-allQuestions = rows.map(r=>{
+allQuestions=rows.map(r=>{
 const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 return{
-  q:c[0],
-  opts:c.slice(1,5),
+  q:c[0],opts:c.slice(1,5),
   ans:(c[5]||"").trim().toUpperCase(),
-  exp:c[6]||"",
   part:(c[7]||"Uncategorized").trim()
 };
 });
 
-/* BUILD MULTI-SELECT PARTS */
-const uniqueParts=[...new Set(allQuestions.map(q=>q.part))].sort();
+const parts=[...new Set(allQuestions.map(q=>q.part))].sort();
 const box=document.getElementById("partContainer");
-
-uniqueParts.forEach(p=>{
+parts.forEach(p=>{
   box.innerHTML+=`
     <label>
-      <input type="checkbox" value="${p.toLowerCase().trim()}">
-      ${p}
+      <input type="checkbox" value="${p.toLowerCase()}"> ${p}
     </label>`;
 });
 });
 
-/* START QUIZ */
+/* FILTER UI */
+function toggleFilters(){
+const body=document.getElementById("filterBody");
+const icon=document.getElementById("collapseIcon");
+body.style.display = body.style.display==="none" ? "block" : "none";
+icon.textContent = body.style.display==="none" ? "⬇" : "⬆";
+}
+
+function selectAllParts(){
+document.querySelectorAll('#partContainer input')
+  .forEach(c=>c.checked=true);
+}
+function clearAllParts(){
+document.querySelectorAll('#partContainer input')
+  .forEach(c=>c.checked=false);
+}
+
+/* DARK MODE */
+function toggleDarkMode(cb){
+document.body.classList.toggle("dark",cb.checked);
+}
+
+/* QUIZ */
 function startQuiz(){
-const checked=[...document.querySelectorAll('#partContainer input:checked')]
-  .map(i=>i.value);
+const selected=[...document.querySelectorAll('#partContainer input:checked')]
+  .map(c=>c.value);
 
-let count=+questionCount.value;
+quiz = selected.length
+ ? allQuestions.filter(q=>selected.includes(q.part.toLowerCase()))
+ : allQuestions;
 
-let filtered = checked.length===0
-  ? allQuestions
-  : allQuestions.filter(q =>
-      checked.includes(q.part.toLowerCase().trim())
-    );
-
-quiz = filtered.slice(0,count);
-if(!quiz.length){alert("No questions for selected parts");return;}
-
+quiz=quiz.slice(0,+questionCount.value);
 userAnswers=new Array(quiz.length).fill(null);
 index=0;
 
@@ -211,12 +305,10 @@ loadQ();
 
 /* TIMER */
 function startTimer(){
-clearInterval(timerInt);
 timeLeft=quiz.length*60;
 timerInt=setInterval(()=>{
-let m=Math.floor(timeLeft/60),s=timeLeft%60;
-timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
-if(--timeLeft<0){clearInterval(timerInt);submitQuiz();}
+timer.innerText=`Time Left: ${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,"0")}`;
+if(--timeLeft<0){clearInterval(timerInt);alert("Time Up");}
 },1000);
 }
 
@@ -225,28 +317,28 @@ function createPalette(){
 palette.innerHTML="";
 quiz.forEach((_,i)=>{
 let d=document.createElement("div");
-d.innerText=i+1;
+d.textContent=i+1;
 d.onclick=()=>{saveAnswer();index=i;loadQ();}
 palette.appendChild(d);
 });
 }
 
 function updatePalette(){
-document.querySelectorAll(".palette div").forEach((d,i)=>{
+[...palette.children].forEach((d,i)=>{
 d.className="";
 if(i===index)d.classList.add("current");
-else if(userAnswers[i]!==null)d.classList.add("answered");
+else if(userAnswers[i])d.classList.add("answered");
 else d.classList.add("unanswered");
 });
 }
 
 /* QUESTIONS */
 function loadQ(){
-let q=quiz[index];
+const q=quiz[index];
 question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
 options.innerHTML="";
 q.opts.forEach((o,i)=>{
-let l=String.fromCharCode(65+i);
+const l=String.fromCharCode(65+i);
 options.innerHTML+=`
 <label>
 <input type="radio" name="opt" value="${l}" ${userAnswers[index]==l?"checked":""}>
@@ -257,7 +349,7 @@ updatePalette();
 }
 
 function saveAnswer(){
-let s=document.querySelector('input[name="opt"]:checked');
+const s=document.querySelector('input[name="opt"]:checked');
 userAnswers[index]=s?s.value:null;
 }
 
@@ -267,64 +359,11 @@ if(index<quiz.length-1){index++;loadQ();}
 else confirmSubmit();
 }
 
-/* SUBMIT */
 function confirmSubmit(){
 saveAnswer();
-let un=userAnswers.filter(a=>a===null).length;
-if(un>0 && !confirm(`You have ${un} unanswered questions. Submit?`))return;
-submitQuiz();
-}
-
-function submitQuiz(){
-clearInterval(timerInt);
-quizBox.style.display="none";
-resultBox.style.display="block";
-let score=0;
-quiz.forEach((q,i)=>{if(userAnswers[i]===q.ans)score++;});
-scoreBox.innerText=`Score: ${score} / ${quiz.length}`;
-}
-
-/* REVIEW */
-function reviewAll(){
-resultBox.style.display="none";
-reviewBox.style.display="block";
-reviewIndex=0;
-loadReview();
-}
-
-function loadReview(){
-let q=quiz[reviewIndex];
-reviewCount.innerText=`Review ${reviewIndex+1}/${quiz.length}`;
-reviewQuestion.innerHTML=`<b>${q.q}</b>`;
-reviewOptions.innerHTML="";
-q.opts.forEach((o,i)=>{
-let l=String.fromCharCode(65+i),cls="";
-if(l===q.ans)cls="correct";
-if(userAnswers[reviewIndex]===l && l!==q.ans)cls="wrong";
-reviewOptions.innerHTML+=`<div class="${cls}">${l}. ${o}</div>`;
-});
-reviewExp.innerHTML=`<b>Explanation:</b> ${q.exp||"—"}`;
-}
-
-function nextReview(){if(reviewIndex<quiz.length-1){reviewIndex++;loadReview();}}
-function prevReview(){if(reviewIndex>0){reviewIndex--;loadReview();}}
-
-/* REATTEMPT */
-function reattemptWrong(){
-filterReattempt((q,i)=>userAnswers[i]!==q.ans);
-}
-function reattemptUnanswered(){
-filterReattempt((q,i)=>userAnswers[i]===null);
-}
-function filterReattempt(fn){
-quiz=quiz.filter(fn);
-userAnswers=new Array(quiz.length).fill(null);
-index=0;
-resultBox.style.display="none";
-quizBox.style.display="block";
-startTimer();
-createPalette();
-loadQ();
+const un=userAnswers.filter(a=>!a).length;
+if(un && !confirm(`${un} unanswered. Submit?`))return;
+alert("Quiz Submitted");
 }
 </script>
 
