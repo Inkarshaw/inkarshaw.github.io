@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Indian Polity – Constitution of India Quiz</title>
+<title>Indian Polity – Constitution Quiz</title>
 
 <style>
 body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
@@ -12,91 +12,62 @@ header{background:#1e40af;color:#fff;padding:15px;text-align:center}
 .container{max-width:1000px;margin:auto;padding:15px}
 .box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
 
-/* SPLASH */
 #splash{
-  position:fixed;inset:0;
-  background:#1e40af;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-  z-index:9999;
+  position:fixed;inset:0;background:#1e40af;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;z-index:9999;
 }
 
-/* TOAST */
 #toast{
-  position:fixed;
-  bottom:40px;
-  left:50%;
+  position:fixed;bottom:40px;left:50%;
   transform:translateX(-50%);
-  background:#111;
-  color:#fff;
-  padding:10px 16px;
-  border-radius:20px;
-  font-size:14px;
-  display:none;
-  z-index:9999;
+  background:#111;color:#fff;
+  padding:10px 16px;border-radius:20px;
+  font-size:14px;display:none;z-index:9999;
 }
 
-/* SETTINGS */
 .settings-row{display:flex;gap:15px;margin-bottom:15px}
 .setting{flex:1}
 .setting input,.setting select{
   width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1
 }
 
-/* OPTIONS */
 .options label{
-  display:block;background:#f1f5f9;padding:10px;margin:8px 0;border-radius:6px
+  display:block;background:#f1f5f9;padding:10px;
+  margin:8px 0;border-radius:6px
 }
 
-/* BUTTONS */
 button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer}
 .start{background:#16a34a;color:#fff}
 .next{background:#2563eb;color:#fff}
-.submit{background:#dc2626;color:#fff;margin-left:10px}
+.submit{background:#dc2626;color:#fff;margin-left:8px}
 
-/* TIMER */
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
-/* PALETTE */
 .palette-wrapper{
-  border:1px solid #e5e7eb;
-  border-radius:8px;
-  padding:8px;
-  margin-bottom:15px;
-  overflow-x:auto;
+  border:1px solid #e5e7eb;border-radius:8px;
+  padding:8px;margin-bottom:15px;overflow-x:auto
 }
-.palette{
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-}
+.palette{display:flex;gap:8px}
 .palette div{
-  min-width:40px;
-  padding:8px;
-  text-align:center;
-  border-radius:6px;
-  cursor:pointer;
-  background:#e5e7eb;
-  flex-shrink:0;
+  min-width:40px;padding:8px;text-align:center;
+  border-radius:6px;cursor:pointer;background:#e5e7eb
 }
 .palette .current{background:#1e40af;color:#fff}
 .palette .answered{background:#16a34a;color:#fff}
 .palette .visited{background:#93c5fd}
+
+.correct{color:#16a34a;font-weight:bold}
+.wrong{color:#dc2626;font-weight:bold}
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
 <div id="splash">Exam Practice App</div>
-
-<!-- TOAST -->
 <div id="toast"></div>
 
-<header><h2>Exam Practice Quiz</h2></header>
+<header><h2>Indian Polity – Constitution Quiz</h2></header>
 
 <div class="container">
 
@@ -144,24 +115,24 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer}
 </div>
 
 <div id="reviewBox"></div>
+
 </div>
 
 <script>
-/* SPLASH AUTO HIDE */
-setTimeout(()=>document.getElementById("splash").style.display="none",2000);
+setTimeout(()=>splash.style.display="none",2000);
 
-/* TOAST */
 function showToast(msg){
-  const t=document.getElementById("toast");
-  t.innerText=msg;
-  t.style.display="block";
-  setTimeout(()=>t.style.display="none",2000);
+  toast.innerText=msg;
+  toast.style.display="block";
+  setTimeout(()=>toast.style.display="none",2000);
 }
 
 const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRhUA51WgTVQ7AnW8O136gYvtB_zKhPAyJU6vtR2-mghYEB0pPSZIqUT9q_kuDZSRrZENs1BfQAwDIf/pub?output=csv";
 
 let allQuestions=[],quiz=[],index=0,userAnswers=[];
 let timerInterval,timeLeft,quizStarted=false;
+let wrongIndexes=[],unattemptedIndexes=[];
+let reviewIndex=0,reviewList=[];
 let backOnce=false;
 
 fetch(sheetURL).then(r=>r.text()).then(t=>{
@@ -181,8 +152,6 @@ let count=questionCount.value;
 let random=randomize.checked;
 let minutes=+timeLimit.value||10;
 
-if(from<1||to>allQuestions.length||from>to){alert("Invalid range");return;}
-
 quiz=[...allQuestions].slice(from-1,to);
 if(random) quiz.sort(()=>Math.random()-0.5);
 if(count!=="all") quiz=quiz.slice(0,+count);
@@ -198,7 +167,6 @@ startTimer(minutes*60);
 loadQ();
 }
 
-/* TIMER */
 function startTimer(sec){
 timeLeft=sec;
 timerInterval=setInterval(()=>{
@@ -208,7 +176,6 @@ if(timeLeft--<=0){clearInterval(timerInterval);submitQuiz();}
 },1000);
 }
 
-/* PALETTE */
 function createPalette(){
 palette.innerHTML="";
 quiz.forEach((_,i)=>{
@@ -226,18 +193,8 @@ if(i===index) d.classList.add("current");
 else if(userAnswers[i]) d.classList.add("answered");
 else d.classList.add("visited");
 });
-autoScrollPalette();
 }
 
-/* AUTO-SCROLL */
-function autoScrollPalette(){
-const current=document.querySelector(".palette .current");
-if(current){
-current.scrollIntoView({behavior:"smooth",inline:"center"});
-}
-}
-
-/* QUESTIONS */
 function loadQ(){
 let q=quiz[index];
 question.innerHTML=`<h3>Q${index+1}. ${q.q}</h3>`;
@@ -257,22 +214,94 @@ function saveAnswer(){
 let s=document.querySelector('input[name="opt"]:checked');
 userAnswers[index]=s?s.value:null;
 }
+
 function nextQ(){
 saveAnswer();
 if(index<quiz.length-1){index++;loadQ();}
-else if(confirm("Submit quiz?")) submitQuiz();
+else submitQuiz();
 }
+
 function jumpQ(i){saveAnswer();index=i;loadQ();}
 
-function confirmSubmit(){saveAnswer();if(confirm("Are you sure?")) submitQuiz();}
+function confirmSubmit(){
+saveAnswer();
+if(confirm("Submit quiz?")) submitQuiz();
+}
+
 function submitQuiz(){
 clearInterval(timerInterval);
 quizBox.style.display="none";
 quizStarted=false;
-reviewBox.innerHTML="<div class='box'><h2>Quiz Submitted</h2></div>";
+
+let score=0;
+wrongIndexes=[];unattemptedIndexes=[];
+
+quiz.forEach((q,i)=>{
+if(!userAnswers[i]) unattemptedIndexes.push(i);
+else if(userAnswers[i]!==q.ans) wrongIndexes.push(i);
+else score++;
+});
+
+reviewBox.innerHTML=`
+<div class="box">
+<h2>📊 Result</h2>
+<p><b>Score:</b> ${score} / ${quiz.length}</p>
+
+<button class="next" onclick="startReattempt('wrong')">
+🔁 Reattempt Wrong (${wrongIndexes.length})
+</button>
+
+<button class="next" onclick="startReattempt('unattempted')">
+🔁 Reattempt Unattempted (${unattemptedIndexes.length})
+</button>
+
+<button class="submit" onclick="startReview()">
+📄 Review One by One
+</button>
+</div>`;
 }
 
-/* ANDROID BACK BUTTON */
+function startReattempt(type){
+reviewList = type==="wrong"?wrongIndexes:unattemptedIndexes;
+if(reviewList.length===0){alert("No questions");return;}
+
+quiz = reviewList.map(i=>quiz[i]);
+userAnswers=new Array(quiz.length).fill(null);
+index=0;
+
+reviewBox.innerHTML="";
+quizBox.style.display="block";
+createPalette();
+loadQ();
+}
+
+function startReview(){
+reviewList=[...Array(quiz.length).keys()];
+reviewIndex=0;
+showReview();
+}
+
+function showReview(){
+let i=reviewList[reviewIndex];
+let q=quiz[i];
+let u=userAnswers[i];
+let c=q.ans;
+
+reviewBox.innerHTML=`
+<div class="box">
+<h3>Q${i+1}. ${q.q}</h3>
+<p>Your Answer:
+<b class="${u===c?'correct':'wrong'}">
+${u||"Not Attempted"}
+</b></p>
+<p>Correct Answer: <b>${c}</b></p>
+<p>${q.exp||""}</p>
+
+<button class="next" onclick="reviewIndex>0&&(reviewIndex--,showReview())">⬅ Prev</button>
+<button class="next" onclick="reviewIndex<reviewList.length-1&&(reviewIndex++,showReview())">Next ➡</button>
+</div>`;
+}
+
 history.pushState(null,null,location.href);
 window.onpopstate=function(){
 if(quizStarted){
