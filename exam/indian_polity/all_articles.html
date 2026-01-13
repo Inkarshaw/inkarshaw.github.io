@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Indian Polity – All Articles Quiz</title>
+<title>Indian Polity – Article-wise Quiz</title>
 
 <style>
 body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
@@ -20,19 +20,16 @@ button{padding:10px 18px;border:none;border-radius:20px;cursor:pointer;margin:5p
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 .score{font-weight:bold;color:#166534;margin-bottom:10px}
 
-.options label{
-display:block;padding:10px;margin:6px 0;border-radius:6px;background:#f1f5f9
-}
+.options label{display:block;padding:10px;margin:6px 0;border-radius:6px;background:#f1f5f9}
 
 .correct{background:#dcfce7;color:#166534;font-weight:bold}
 .wrong{background:#fee2e2;color:#991b1b}
 
-.palette-wrapper{
-border:1px solid #e5e7eb;border-radius:8px;padding:8px;margin-bottom:15px;overflow-x:auto
-}
+.palette-wrapper{border:1px solid #e5e7eb;border-radius:8px;padding:8px;margin-bottom:15px;overflow-x:auto}
 .palette{display:flex;gap:8px}
 .palette div{
-min-width:40px;padding:8px;text-align:center;border-radius:6px;background:#e5e7eb
+min-width:40px;padding:8px;text-align:center;border-radius:6px;
+background:#e5e7eb;cursor:pointer
 }
 .palette .current{background:#1e40af;color:#fff}
 .palette .answered{background:#16a34a;color:#fff}
@@ -48,15 +45,25 @@ font-size:22px;z-index:9999
 
 <body>
 
-<div id="splash">All Articles Practice App</div>
+<div id="splash">Indian Polity Practice App</div>
 
-<header><h2>Indian Polity – All Articles Quiz</h2></header>
+<header><h2>Indian Polity – Article-wise Quiz</h2></header>
 
 <div class="container">
 
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
 <h3>Quiz Settings</h3>
+
+<label>Article Category</label>
+<select id="articleFilter">
+<option value="ALL">All Articles</option>
+<option value="Part III">Part III – Fundamental Rights</option>
+<option value="Part IV">Part IV – DPSP</option>
+<option value="Part IVA">Part IVA – Fundamental Duties</option>
+<option value="Part V">Part V – Union</option>
+<option value="Part VI">Part VI – State</option>
+</select><br><br>
 
 <label>No. of Questions</label>
 <select id="questionCount">
@@ -81,7 +88,6 @@ font-size:22px;z-index:9999
 <div class="palette-wrapper"><div class="palette" id="palette"></div></div>
 <div id="question"></div>
 <div class="options" id="options"></div>
-
 <button class="next" onclick="nextQ()">Next</button>
 <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
@@ -126,7 +132,8 @@ return{
 q:c[0],
 opts:c.slice(1,5),
 ans:(c[5]||"").trim().toUpperCase(),
-exp:c[6]||""
+exp:c[6]||"",
+part:(c[7]||"ALL").trim()
 };
 });
 rangeFrom.value=1;
@@ -135,10 +142,16 @@ rangeTo.value=allQuestions.length;
 
 /* START QUIZ */
 function startQuiz(){
-if(!rangeFrom.value||!rangeTo.value){alert("Enter range");return;}
+let part=articleFilter.value;
 let from=+rangeFrom.value,to=+rangeTo.value,count=+questionCount.value;
 
-quiz=allQuestions.slice(from-1,to).slice(0,count);
+let filtered = part==="ALL"
+  ? allQuestions
+  : allQuestions.filter(q=>q.part===part);
+
+quiz = filtered.slice(from-1,to).slice(0,count);
+if(quiz.length===0){alert("No questions in this filter");return;}
+
 userAnswers=new Array(quiz.length).fill(null);
 index=0;
 
@@ -167,8 +180,15 @@ palette.innerHTML="";
 quiz.forEach((_,i)=>{
 let d=document.createElement("div");
 d.innerText=i+1;
+d.onclick=()=>jumpTo(i);
 palette.appendChild(d);
 });
+}
+
+function jumpTo(i){
+saveAnswer();
+index=i;
+loadQ();
 }
 
 function updatePalette(){
@@ -207,7 +227,7 @@ if(index<quiz.length-1){index++;loadQ();}
 else confirmSubmit();
 }
 
-/* SUBMIT WARNING */
+/* SUBMIT */
 function confirmSubmit(){
 saveAnswer();
 let un=userAnswers.filter(a=>a===null).length;
@@ -215,12 +235,10 @@ if(un>0 && !confirm(`You have ${un} unanswered questions. Submit?`))return;
 submitQuiz();
 }
 
-/* SUBMIT */
 function submitQuiz(){
 clearInterval(timerInt);
 quizBox.style.display="none";
 resultBox.style.display="block";
-
 let score=0;
 quiz.forEach((q,i)=>{if(userAnswers[i]===q.ans)score++;});
 scoreBox.innerText=`Score: ${score} / ${quiz.length}`;
@@ -251,15 +269,15 @@ reviewExp.innerHTML=`<b>Explanation:</b> ${q.exp||"—"}`;
 function nextReview(){if(reviewIndex<quiz.length-1){reviewIndex++;loadReview();}}
 function prevReview(){if(reviewIndex>0){reviewIndex--;loadReview();}}
 
-/* REATTEMPTS */
+/* REATTEMPT */
 function reattemptWrong(){
 filterReattempt((q,i)=>userAnswers[i]!==q.ans);
 }
 function reattemptUnanswered(){
 filterReattempt((q,i)=>userAnswers[i]===null);
 }
-function filterReattempt(cond){
-quiz=quiz.filter(cond);
+function filterReattempt(fn){
+quiz=quiz.filter(fn);
 userAnswers=new Array(quiz.length).fill(null);
 index=0;
 resultBox.style.display="none";
