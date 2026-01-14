@@ -475,7 +475,7 @@
                         <i class="fas fa-info-circle"></i>
                         <div class="station-display-content">
                             <div class="station-display-title">Reference will use:</div>
-                            <div class="station-display-value" id="fullStationReference">G7 காவல் நிலைய (சேத்துப்பட்டு) fhty; epiya Fw;w vz; 216/2025 - G7 சேத்துப்பட்டு காவல் நிலைய குற்ற எண். 216/2025</div>
+                            <div class="station-display-value" id="fullStationReference">G7 சேத்துப்பட்டு காவல் நிலைய குற்ற எண். 216/2025 U/S 194 BNSS</div>
                         </div>
                     </div>
                 </div>
@@ -758,47 +758,6 @@
             return stationName || 'காவல் நிலையம்';
         }
 
-        // Function to get current station reference name WITHOUT "நிர்வாக"
-        function getCurrentStationReferenceName() {
-            const district = document.getElementById('districtSelect').value;
-            let stationFull = "";
-            
-            if (district === 'chennai') {
-                stationFull = document.getElementById('policeStationDropdown').value || "";
-            } else {
-                stationFull = document.getElementById('policeStationText').value.trim() || "";
-            }
-            
-            const stationCode = extractStationCode(stationFull);
-            const stationName = extractStationName(stationFull);
-            
-            if (stationCode && stationName) {
-                return `${stationCode} காவல் நிலைய (${stationName})`;
-            } else if (stationName) {
-                return `${stationName} காவல் நிலைய`;
-            }
-            
-            return 'காவல் நிலைய';
-        }
-
-        // Function to get current station full Tamil name (with "நிலையம்")
-        function getCurrentStationFullTamilName() {
-            const district = document.getElementById('districtSelect').value;
-            let stationFull = "";
-            
-            if (district === 'chennai') {
-                stationFull = document.getElementById('policeStationDropdown').value || "";
-            } else {
-                stationFull = document.getElementById('policeStationText').value.trim() || "";
-            }
-            
-            if (!stationFull) {
-                return 'காவல் நிலையம்';
-            }
-            
-            return stationFull;
-        }
-
         // Function to get full station name for reference in document body
         function getStationNameForDocumentBody() {
             const district = document.getElementById('districtSelect').value;
@@ -824,12 +783,11 @@
 
         // Function to update reference display
         function updateReferenceDisplay() {
-            const stationReferenceName = getCurrentStationReferenceName();
             const stationNameForDocument = getStationNameForDocumentBody();
             const crimeNumber = document.getElementById('crimeNumber').value || defaultValues.crimeNumber;
             
             document.getElementById('fullStationReference').textContent = 
-                `${stationReferenceName} fhty; epiya Fw;w vz; ${crimeNumber} - ${stationNameForDocument} குற்ற எண். ${crimeNumber}`;
+                `${stationNameForDocument} குற்ற எண். ${crimeNumber} U/S 194 BNSS`;
             
             updatePreview();
         }
@@ -899,13 +857,13 @@
             updatePreview();
         }
 
-        // Function to generate reference text for the document
+        // Function to generate reference text for the document - ALL IN ONE CONTINUOUS LINE
         function generateReferenceText() {
-            const stationReferenceName = getCurrentStationReferenceName();
             const stationNameForDocument = getStationNameForDocumentBody();
             const crimeNumber = document.getElementById('crimeNumber').value || defaultValues.crimeNumber;
             
-            return `${stationReferenceName} fhty; epiya Fw;w vz; ${crimeNumber} - ${stationNameForDocument} குற்ற எண். ${crimeNumber}\n\nU/S 194 BNSS`;
+            // ALL IN ONE CONTINUOUS LINE - NO LINE BREAKS
+            return `${stationNameForDocument} குற்ற எண். ${crimeNumber} U/S 194 BNSS`;
         }
 
         // Function to get selected font size
@@ -932,6 +890,24 @@
             ];
             
             return senderDetails;
+        }
+
+        // Function to get current station full Tamil name (with "நிலையம்")
+        function getCurrentStationFullTamilName() {
+            const district = document.getElementById('districtSelect').value;
+            let stationFull = "";
+            
+            if (district === 'chennai') {
+                stationFull = document.getElementById('policeStationDropdown').value || "";
+            } else {
+                stationFull = document.getElementById('policeStationText').value.trim() || "";
+            }
+            
+            if (!stationFull) {
+                return 'காவல் நிலையம்';
+            }
+            
+            return stationFull;
         }
 
         // Function to generate receiver details
@@ -1079,7 +1055,7 @@
             
             // Subject is now standard/fixed
             const subject = defaultValues.subject;
-            const reference = generateReferenceText();
+            const reference = generateReferenceText(); // This is now a single continuous line
             
             // Generate sender details
             const senderDetails = generateSenderDetails();
@@ -1148,10 +1124,7 @@
                             <tr>
                                 <td style="border-right: 1px solid #000; padding: 5px; vertical-align: top; font-weight: bold; font-family: ${tamilFontFamily}; line-height: ${lineHeight};">பார்வை:</td>
                                 <td style="padding: 5px; vertical-align: top; line-height: ${lineHeight};">
-                                    ${reference.split('\n').map(line => {
-                                        const fontFamily = containsTamil(line) ? tamilFontFamily : "'Times New Roman', Times, serif";
-                                        return `<div style="font-family: ${fontFamily}; margin-bottom: 2px;">${line}</div>`;
-                                    }).join('')}
+                                    <div style="font-family: ${tamilFontFamily};">${reference}</div>
                                 </td>
                             </tr>
                         </table>
