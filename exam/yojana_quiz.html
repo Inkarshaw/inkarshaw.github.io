@@ -22,13 +22,6 @@ button{
 
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
-.topic-list{
-  max-height:220px;overflow-y:auto;
-  border:1px solid #d1d5db;
-  padding:10px;border-radius:8px;
-}
-.topic-list label{display:block;margin-bottom:6px}
-
 .palette{
   display:flex;gap:8px;overflow-x:auto;
   padding:10px;border-radius:8px;
@@ -49,6 +42,11 @@ button{
 
 .correct{color:green;font-weight:bold}
 .wrong{color:red;font-weight:bold}
+.scorebar{
+  background:#ecfeff;border:1px solid #67e8f9;
+  padding:10px;border-radius:10px;margin-bottom:10px;
+  text-align:center;font-weight:bold
+}
 </style>
 </head>
 
@@ -60,27 +58,10 @@ button{
 
 <div class="container">
 
-<!-- SETTINGS -->
 <div class="box" id="settingsBox">
-  <h3>Quiz Settings</h3>
-
-  <button class="sel" onclick="selectAllTopics()">Select All</button>
-  <button class="sel" onclick="clearAllTopics()">Clear All</button>
-
-  <div class="topic-list" id="topicList">Loading…</div>
-
-  <br>
-  <label><input type="checkbox" id="randomize"> Random Questions</label>
-
-  <br><br>
-  <label>Time Limit (minutes)</label>
-  <input type="number" id="timeLimit" value="10">
-
-  <br><br>
   <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
-<!-- QUIZ -->
 <div class="box" id="quizBox" style="display:none">
   <div class="timer" id="timer"></div>
   <div class="palette" id="palette"></div>
@@ -91,7 +72,6 @@ button{
   <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
-<!-- REVIEW -->
 <div id="reviewBox"></div>
 
 </div>
@@ -110,39 +90,19 @@ fetch(sheetURL).then(r=>r.text()).then(t=>{
   allQuestions=rows.map(r=>{
     const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
     return {
-      topic:c[0], q:c[1],
+      q:c[1],
       opts:[c[2],c[3],c[4],c[5]],
       ans:c[6].trim().toUpperCase(),
       exp:c[7]
     };
   });
-  populateTopics();
 });
 
-function populateTopics(){
-  topicList.innerHTML="";
-  [...new Set(allQuestions.map(q=>q.topic))].forEach(t=>{
-    topicList.innerHTML+=`
-      <label><input type="checkbox" value="${t}"> ${t}</label>`;
-  });
-}
-
-function selectAllTopics(){
-  document.querySelectorAll("#topicList input").forEach(cb=>cb.checked=true);
-}
-function clearAllTopics(){
-  document.querySelectorAll("#topicList input").forEach(cb=>cb.checked=false);
-}
-
 /* START QUIZ */
-function startQuiz(){
-  quiz=allQuestions.filter(q=>
-    [...document.querySelectorAll("#topicList input:checked")]
-    .map(i=>i.value).includes(q.topic)
-  );
-  if(!quiz.length){ alert("Select at least one topic"); return; }
-
-  if(randomize.checked) quiz.sort(()=>Math.random()-0.5);
+function startQuiz(customIndexes=null){
+  quiz = customIndexes
+    ? customIndexes.map(i=>allQuestions[i])
+    : [...allQuestions];
 
   index=0;
   userAnswers=new Array(quiz.length).fill(null);
@@ -152,13 +112,14 @@ function startQuiz(){
   quizBox.style.display="block";
 
   createPalette();
-  startTimer(timeLimit.value*60);
+  startTimer(quiz.length*60);
   loadQ();
 }
 
 /* TIMER */
 function startTimer(sec){
   timeLeft=sec;
+  clearInterval(timerInterval);
   timerInterval=setInterval(()=>{
     let m=Math.floor(timeLeft/60), s=timeLeft%60;
     timer.innerText=`Time Left: ${m}:${s.toString().padStart(2,"0")}`;
@@ -223,13 +184,21 @@ function submitQuiz(){
   showReview();
 }
 
-/* REVIEW – ONE QUESTION AT A TIME */
+/* REVIEW */
 function showReview(){
   reviewIndex=0;
   renderReview();
 }
 
 function renderReview(){
+  let correct=0, attempted=0;
+  quiz.forEach((q,i)=>{
+    if(userAnswers[i]){
+      attempted++;
+      if(userAnswers[i]===q.ans) correct++;
+    }
+  });
+
   const q=quiz[reviewIndex];
   const ua=userAnswers[reviewIndex];
 
@@ -249,21 +218,43 @@ function renderReview(){
 
   reviewBox.innerHTML=`
   <div class="box">
-    <h3>Review ${reviewIndex+1} / ${quiz.length}</h3>
-    <h4>${q.q}</h4>
+    <div class="scorebar">
+      Score: ${correct} | Attempted: ${attempted} | Total: ${quiz.length}
+    </div>
+
+    <h4>Q${reviewIndex+1}. ${q.q}</h4>
     ${opts}
     <p><b>Explanation:</b> ${q.exp||"—"}</p>
 
-    <button class="sel" onclick="prevReview()" ${reviewIndex===0?"disabled":""}>⬅ Previous</button>
+    <button class="sel" onclick="prevReview()" ${reviewIndex===0?"disabled":""}>⬅ Prev</button>
     <button class="sel" onclick="nextReview()" ${reviewIndex===quiz.length-1?"disabled":""}>Next ➡</button>
+
+    <hr>
+    <button class="start" onclick="reattemptWrong()">Reattempt Wrong</button>
+    <button class="start" onclick="reattemptUnattempted()">Reattempt Unattempted</button>
   </div>`;
 }
 
-function nextReview(){
-  if(reviewIndex<quiz.length-1){ reviewIndex++; renderReview(); }
+function nextReview(){ if(reviewIndex<quiz.length-1){reviewIndex++;renderReview();} }
+function prevReview(){ if(reviewIndex>0){reviewIndex--;renderReview();} }
+
+/* REATTEMPT */
+function reattemptWrong(){
+  const idx=[];
+  quiz.forEach((q,i)=>{
+    if(userAnswers[i] && userAnswers[i]!==q.ans) idx.push(i);
+  });
+  if(!idx.length){ alert("No wrong questions"); return; }
+  startQuiz(idx);
 }
-function prevReview(){
-  if(reviewIndex>0){ reviewIndex--; renderReview(); }
+
+function reattemptUnattempted(){
+  const idx=[];
+  quiz.forEach((q,i)=>{
+    if(!userAnswers[i]) idx.push(i);
+  });
+  if(!idx.length){ alert("No unattempted questions"); return; }
+  startQuiz(idx);
 }
 </script>
 
