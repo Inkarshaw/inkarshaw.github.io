@@ -37,39 +37,25 @@ button{
   display:flex;gap:8px;font-weight:normal;margin-bottom:6px
 }
 
-/* CBT HORIZONTAL PALETTE */
+/* CBT PALETTE */
 .palette{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding:10px;
-  border-radius:8px;
-  background:#f1f5f9;
-  margin-bottom:15px;
+  display:flex;gap:8px;overflow-x:auto;
+  padding:10px;border-radius:8px;
+  background:#f1f5f9;margin-bottom:15px;
 }
-.palette::-webkit-scrollbar{height:6px}
-.palette::-webkit-scrollbar-thumb{
-  background:#94a3b8;border-radius:10px
-}
-
 .palette div{
-  min-width:40px;
-  height:40px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  background:#e5e7eb;
-  cursor:pointer;
-  font-weight:bold;
+  min-width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;background:#e5e7eb;
+  cursor:pointer;font-weight:bold;
 }
 .palette .visited{background:#93c5fd}
 .palette .answered{background:#86efac}
 
 /* OPTIONS */
 .options label{
-  display:block;background:#f1f5f9;padding:10px;
-  margin:8px 0;border-radius:6px
+  display:block;background:#f1f5f9;
+  padding:10px;margin:8px 0;border-radius:6px
 }
 
 .correct{color:green;font-weight:bold}
@@ -79,6 +65,7 @@ button{
   background:#ecfeff;border:1px solid #67e8f9;
   padding:15px;border-radius:10px;text-align:center
 }
+.review-q{margin-bottom:15px}
 </style>
 </head>
 
@@ -114,10 +101,7 @@ button{
 <!-- QUIZ -->
 <div class="box" id="quizBox" style="display:none">
   <div class="timer" id="timer"></div>
-
-  <!-- CBT PALETTE -->
   <div class="palette" id="palette"></div>
-
   <div id="question"></div>
   <div class="options" id="options"></div>
 
@@ -160,21 +144,12 @@ function populateTopics(){
   });
 }
 
-/* SELECT / CLEAR */
-function selectAllTopics(){
-  document.querySelectorAll("#topicList input").forEach(cb=>cb.checked=true);
-}
-function clearAllTopics(){
-  document.querySelectorAll("#topicList input").forEach(cb=>cb.checked=false);
-}
-
 /* START QUIZ */
 function startQuiz(){
   quiz=allQuestions.filter(q=>
     [...document.querySelectorAll("#topicList input:checked")]
     .map(i=>i.value).includes(q.topic)
   );
-
   if(!quiz.length){ alert("Select at least one topic"); return; }
 
   if(randomize.checked) quiz.sort(()=>Math.random()-0.5);
@@ -201,7 +176,7 @@ function startTimer(sec){
   },1000);
 }
 
-/* CBT PALETTE */
+/* PALETTE */
 function createPalette(){
   palette.innerHTML="";
   quiz.forEach((_,i)=>{
@@ -238,11 +213,24 @@ function saveAnswer(){
   const sel=document.querySelector('input[name="opt"]:checked');
   userAnswers[index]=sel?sel.value:null;
 }
-function nextQ(){ saveAnswer(); if(index<quiz.length-1){ index++; loadQ(); } }
+
+/* NEXT / LAST QUESTION SUBMIT */
+function nextQ(){
+  saveAnswer();
+  if(index === quiz.length - 1){
+    confirmSubmit();
+  } else {
+    index++;
+    loadQ();
+  }
+}
+
 function jumpQ(i){ saveAnswer(); index=i; loadQ(); }
 
 /* SUBMIT */
-function confirmSubmit(){ saveAnswer(); if(confirm("Submit quiz?")) submitQuiz(); }
+function confirmSubmit(){
+  if(confirm("Submit quiz?")) submitQuiz();
+}
 function submitQuiz(){
   clearInterval(timerInterval);
   quizBox.style.display="none";
@@ -251,20 +239,30 @@ function submitQuiz(){
 
 /* REVIEW */
 function showReview(){
-  let score=0,attempted=0;
+  let score=0;
   quiz.forEach((q,i)=>{
-    if(userAnswers[i]){
-      attempted++;
-      if(userAnswers[i]===q.ans) score++;
-    }
+    if(userAnswers[i]===q.ans) score++;
   });
 
-  reviewBox.innerHTML=`
-    <div class="box">
-      <div class="score-box">
-        <h2>Score: ${score} / ${attempted}</h2>
-      </div>
+  let html=`
+  <div class="box">
+    <div class="score-box">
+      <h2>Score: ${score} / ${quiz.length}</h2>
+    </div>
+  </div>`;
+
+  quiz.forEach((q,i)=>{
+    const ua=userAnswers[i]||"Not Answered";
+    html+=`
+    <div class="box review-q">
+      <h4>Q${i+1}. ${q.q}</h4>
+      <p>Your Answer: <span class="${ua===q.ans?'correct':'wrong'}">${ua}</span></p>
+      <p>Correct Answer: <b class="correct">${q.ans}</b></p>
+      <p><i>${q.exp||""}</i></p>
     </div>`;
+  });
+
+  reviewBox.innerHTML=html;
 }
 </script>
 
