@@ -11,12 +11,6 @@ header{background:#1e40af;color:#fff;padding:15px;text-align:center}
 .container{max-width:1000px;margin:auto;padding:15px}
 .box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px}
 
-.form-label{font-weight:bold;margin-bottom:6px;display:block}
-
-input[type="number"]{
-  padding:8px;border-radius:6px;border:1px solid #d1d5db;width:100%
-}
-
 button{
   padding:8px 14px;border:none;border-radius:20px;
   font-size:14px;cursor:pointer;margin:5px
@@ -28,31 +22,26 @@ button{
 
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
-/* TOPIC LIST */
 .topic-list{
-  max-height:220px;overflow-y:auto;border:1px solid #d1d5db;
-  padding:10px;border-radius:8px;background:#f9fafb
+  max-height:220px;overflow-y:auto;
+  border:1px solid #d1d5db;
+  padding:10px;border-radius:8px;
 }
-.topic-list label{
-  display:flex;gap:8px;font-weight:normal;margin-bottom:6px
-}
+.topic-list label{display:block;margin-bottom:6px}
 
-/* CBT PALETTE */
 .palette{
   display:flex;gap:8px;overflow-x:auto;
   padding:10px;border-radius:8px;
   background:#f1f5f9;margin-bottom:15px;
 }
 .palette div{
-  min-width:40px;height:40px;
+  min-width:40px;height:40px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  border-radius:50%;background:#e5e7eb;
-  cursor:pointer;font-weight:bold;
+  background:#e5e7eb;font-weight:bold;cursor:pointer
 }
 .palette .visited{background:#93c5fd}
 .palette .answered{background:#86efac}
 
-/* OPTIONS */
 .options label{
   display:block;background:#f1f5f9;
   padding:10px;margin:8px 0;border-radius:6px
@@ -60,19 +49,13 @@ button{
 
 .correct{color:green;font-weight:bold}
 .wrong{color:red;font-weight:bold}
-
-.score-box{
-  background:#ecfeff;border:1px solid #67e8f9;
-  padding:15px;border-radius:10px;text-align:center
-}
-.review-q{margin-bottom:15px}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h2>📘 Yojanas & Government Schemes Quiz</h2>
+<h2>📘 Yojanas & Government Schemes Quiz</h2>
 </header>
 
 <div class="container">
@@ -80,8 +63,6 @@ button{
 <!-- SETTINGS -->
 <div class="box" id="settingsBox">
   <h3>Quiz Settings</h3>
-
-  <label class="form-label">Select Yojanas / Schemes</label>
 
   <button class="sel" onclick="selectAllTopics()">Select All</button>
   <button class="sel" onclick="clearAllTopics()">Clear All</button>
@@ -92,9 +73,10 @@ button{
   <label><input type="checkbox" id="randomize"> Random Questions</label>
 
   <br><br>
-  <label class="form-label">Time Limit (minutes)</label>
-  <input type="number" id="timeLimit" value="10" min="1">
+  <label>Time Limit (minutes)</label>
+  <input type="number" id="timeLimit" value="10">
 
+  <br><br>
   <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
@@ -120,6 +102,7 @@ const sheetURL =
 
 let allQuestions=[], quiz=[], index=0, userAnswers=[];
 let timerInterval,timeLeft;
+let reviewIndex=0;
 
 /* LOAD DATA */
 fetch(sheetURL).then(r=>r.text()).then(t=>{
@@ -142,6 +125,13 @@ function populateTopics(){
     topicList.innerHTML+=`
       <label><input type="checkbox" value="${t}"> ${t}</label>`;
   });
+}
+
+function selectAllTopics(){
+  document.querySelectorAll("#topicList input").forEach(cb=>cb.checked=true);
+}
+function clearAllTopics(){
+  document.querySelectorAll("#topicList input").forEach(cb=>cb.checked=false);
 }
 
 /* START QUIZ */
@@ -202,9 +192,11 @@ function loadQ(){
   q.opts.forEach((o,i)=>{
     const L=String.fromCharCode(65+i);
     options.innerHTML+=`
-      <label><input type="radio" name="opt" value="${L}"
-      ${userAnswers[index]===L?"checked":""}>
-      <b>${L}.</b> ${o}</label>`;
+      <label>
+        <input type="radio" name="opt" value="${L}"
+        ${userAnswers[index]===L?"checked":""}>
+        <b>${L}.</b> ${o}
+      </label>`;
   });
   updatePalette();
 }
@@ -214,17 +206,11 @@ function saveAnswer(){
   userAnswers[index]=sel?sel.value:null;
 }
 
-/* NEXT / LAST QUESTION SUBMIT */
 function nextQ(){
   saveAnswer();
-  if(index === quiz.length - 1){
-    confirmSubmit();
-  } else {
-    index++;
-    loadQ();
-  }
+  if(index===quiz.length-1) confirmSubmit();
+  else { index++; loadQ(); }
 }
-
 function jumpQ(i){ saveAnswer(); index=i; loadQ(); }
 
 /* SUBMIT */
@@ -237,32 +223,47 @@ function submitQuiz(){
   showReview();
 }
 
-/* REVIEW */
+/* REVIEW – ONE QUESTION AT A TIME */
 function showReview(){
-  let score=0;
-  quiz.forEach((q,i)=>{
-    if(userAnswers[i]===q.ans) score++;
+  reviewIndex=0;
+  renderReview();
+}
+
+function renderReview(){
+  const q=quiz[reviewIndex];
+  const ua=userAnswers[reviewIndex];
+
+  let opts="";
+  q.opts.forEach((o,i)=>{
+    const L=String.fromCharCode(65+i);
+    let cls="";
+    if(L===q.ans) cls="correct";
+    else if(L===ua && ua!==q.ans) cls="wrong";
+
+    opts+=`<p class="${cls}">
+      <b>${L}.</b> ${o}
+      ${L===ua?" ← Your Answer":""}
+      ${L===q.ans?" ✓ Correct":""}
+    </p>`;
   });
 
-  let html=`
+  reviewBox.innerHTML=`
   <div class="box">
-    <div class="score-box">
-      <h2>Score: ${score} / ${quiz.length}</h2>
-    </div>
+    <h3>Review ${reviewIndex+1} / ${quiz.length}</h3>
+    <h4>${q.q}</h4>
+    ${opts}
+    <p><b>Explanation:</b> ${q.exp||"—"}</p>
+
+    <button class="sel" onclick="prevReview()" ${reviewIndex===0?"disabled":""}>⬅ Previous</button>
+    <button class="sel" onclick="nextReview()" ${reviewIndex===quiz.length-1?"disabled":""}>Next ➡</button>
   </div>`;
+}
 
-  quiz.forEach((q,i)=>{
-    const ua=userAnswers[i]||"Not Answered";
-    html+=`
-    <div class="box review-q">
-      <h4>Q${i+1}. ${q.q}</h4>
-      <p>Your Answer: <span class="${ua===q.ans?'correct':'wrong'}">${ua}</span></p>
-      <p>Correct Answer: <b class="correct">${q.ans}</b></p>
-      <p><i>${q.exp||""}</i></p>
-    </div>`;
-  });
-
-  reviewBox.innerHTML=html;
+function nextReview(){
+  if(reviewIndex<quiz.length-1){ reviewIndex++; renderReview(); }
+}
+function prevReview(){
+  if(reviewIndex>0){ reviewIndex--; renderReview(); }
 }
 </script>
 
