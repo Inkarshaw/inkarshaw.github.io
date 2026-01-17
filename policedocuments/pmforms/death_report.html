@@ -183,27 +183,20 @@
             padding: 20px;
             min-height: 800px;
             box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            font-size: 14px; /* Increased from 12px */
+            font-size: 14px;
             line-height: 1.4;
         }
         
         .preview-header {
             text-align: center;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #333;
+            /* Removed border-bottom */
         }
         
         .preview-header h3 {
             margin: 0;
-            font-size: 18px; /* Increased from 16px */
+            font-size: 18px;
             color: #2c3e50;
-        }
-        
-        .preview-header p {
-            margin: 5px 0 0 0;
-            color: #666;
-            font-size: 13px; /* Increased from 11px */
         }
         
         .preview-table {
@@ -212,7 +205,7 @@
         }
         
         .preview-table td {
-            padding: 8px 6px; /* Increased padding */
+            padding: 8px 6px;
             vertical-align: top;
             border-bottom: 1px solid #eee;
         }
@@ -221,22 +214,12 @@
             font-weight: bold;
             width: 45%;
             color: #2c3e50;
-            font-size: 14px; /* Added font size */
+            font-size: 14px;
         }
         
         .preview-value {
             width: 55%;
-            font-size: 14px; /* Added font size */
-        }
-        
-        .preview-footer {
-            margin-top: 30px;
-            text-align: right;
-            font-style: italic;
-            color: #666;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-            font-size: 12px; /* Increased from 10px */
+            font-size: 14px;
         }
         
         .no-preview {
@@ -274,10 +257,10 @@
         .pdf-template {
             width: 210mm;
             min-height: 297mm;
-            padding: 20mm; /* Reduced padding to accommodate larger fonts */
+            padding: 25mm;
             background: white;
-            font-size: 16px !important; /* Increased from 12px - IMPORTANT FOR PDF */
-            line-height: 1.5 !important; /* Increased line height */
+            font-size: 16px !important;
+            line-height: 1.5 !important;
             box-sizing: border-box;
         }
     </style>
@@ -293,7 +276,6 @@
             </div>
             
             <form id="deathReportForm">
-                <!-- Form fields remain the same -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="policeStation" class="required">1. காவல்நிலையம்</label>
@@ -516,18 +498,16 @@
             
             const data = getFormData();
             const formattedDate = formatDate(data.deathDate);
-            const currentDate = new Date().toLocaleDateString('ta-IN');
             
-            const previewHTML = createPDFHTML(data, formattedDate, currentDate);
+            const previewHTML = createPDFHTML(data, formattedDate);
             previewContent.innerHTML = previewHTML;
         }
         
-        function createPDFHTML(data, formattedDate, currentDate) {
+        function createPDFHTML(data, formattedDate) {
             return `
                 <div class="preview-page">
                     <div class="preview-header">
                         <h3>மரண அறிக்கை</h3>
-                        <p>(அதிகாரப்பூர்வ ஆவணம்)</p>
                     </div>
                     
                     <table class="preview-table">
@@ -600,11 +580,6 @@
                             <td class="preview-value">${escapeHtml(data.informantName) || '-'}</td>
                         </tr>
                     </table>
-                    
-                    <div class="preview-footer">
-                        <p>உருவாக்கப்பட்ட தேதி: ${currentDate}</p>
-                        <p>உரிய அதிகாரியின் கையொப்பம்: ___________________</p>
-                    </div>
                 </div>
             `;
         }
@@ -627,15 +602,13 @@
             
             const data = getFormData();
             const formattedDate = formatDate(data.deathDate);
-            const currentDate = new Date().toLocaleDateString('ta-IN');
             
             try {
                 // Create PDF template HTML with larger font sizes
                 const pdfHTML = `
                     <div class="pdf-template" style="font-size: 16px !important; line-height: 1.5 !important;">
-                        <div style="text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #333;">
+                        <div style="text-align: center; margin-bottom: 30px; /* Removed border-bottom */">
                             <h3 style="margin: 0; font-size: 22px !important; color: #2c3e50;">மரண அறிக்கை</h3>
-                            <p style="margin: 8px 0 0 0; color: #666; font-size: 16px !important;">(அதிகாரப்பூர்வ ஆவணம்)</p>
                         </div>
                         
                         <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 16px !important;">
@@ -708,11 +681,6 @@
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.informantName) || '-'}</td>
                             </tr>
                         </table>
-                        
-                        <div style="margin-top: 35px; text-align: right; font-style: italic; color: #666; border-top: 1px solid #ddd; padding-top: 15px; font-size: 14px !important;">
-                            <p>உருவாக்கப்பட்ட தேதி: ${currentDate}</p>
-                            <p>உரிய அதிகாரியின் கையொப்பம்: ___________________</p>
-                        </div>
                     </div>
                 `;
                 
@@ -724,13 +692,12 @@
                 
                 // Use html2canvas to capture the HTML as an image
                 const canvas = await html2canvas(pdfElement, {
-                    scale: 2, // Higher quality
+                    scale: 2,
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#ffffff',
                     logging: false,
                     onclone: function(clonedDoc) {
-                        // Ensure font sizes are applied in the cloned document
                         const template = clonedDoc.querySelector('.pdf-template');
                         if (template) {
                             template.style.fontSize = '16px';
@@ -753,7 +720,7 @@
                 const pageWidth = pdf.internal.pageSize.getWidth();
                 const pageHeight = pdf.internal.pageSize.getHeight();
                 
-                const imgWidth = pageWidth - 20; // 10mm margin on each side
+                const imgWidth = pageWidth - 20;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 
                 // Add image to PDF
@@ -769,7 +736,7 @@
                 document.getElementById('pdfLoading').style.display = 'none';
                 successMessage.style.display = 'block';
                 
-                console.log('PDF generated successfully with larger Tamil text!');
+                console.log('PDF generated successfully!');
                 
             } catch (error) {
                 console.error('PDF generation error:', error);
@@ -786,32 +753,23 @@
         }
         
         function generateSimplePDF(data) {
-            // Simple fallback without html2canvas
             const doc = new jsPDF();
             
             doc.setFontSize(16);
-            doc.text('Death Report', 105, 15, { align: 'center' });
-            
-            doc.setFontSize(12);
-            doc.text('(Official Document)', 105, 22, { align: 'center' });
+            doc.text('மரண அறிக்கை', 105, 15, { align: 'center' });
             
             let yPos = 35;
             
-            // Add data in English/Tamil mixed
-            doc.text(`1. Police Station: ${data.policeStation}`, 20, yPos);
+            doc.text(`1. காவல்நிலையம்: ${data.policeStation}`, 20, yPos);
             yPos += 10;
-            doc.text(`2. Crime Number: ${data.crimeNumber}`, 20, yPos);
+            doc.text(`2. குற்ற எண்: ${data.crimeNumber}`, 20, yPos);
             yPos += 10;
-            doc.text(`3. Section: ${data.section}`, 20, yPos);
-            yPos += 10;
-            doc.text(`4. Name: ${data.name}`, 20, yPos);
-            yPos += 10;
-            doc.text(`5. Father's Name: ${data.fatherName}`, 20, yPos);
+            doc.text(`3. பிரிவு: ${data.section}`, 20, yPos);
             
             const fileName = `death_report_${data.name.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
             doc.save(fileName);
             
-            alert('PDF generated (English version). Tamil text requires html2canvas.');
+            alert('Simple PDF generated.');
         }
         
         function resetForm() {
