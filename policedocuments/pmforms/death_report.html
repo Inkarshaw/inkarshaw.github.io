@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>மரண அறிக்கை படிவம் - PDF உருவாக்கி</title>
+    <!-- Load required libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Unicode MS', Arial, sans-serif;
+        }
+        
+        body {
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-section, .preview-section {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            padding: 20px;
+        }
+        
+        .form-section {
+            flex: 1;
+        }
+        
+        .preview-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e74c3c;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+        }
+        
+        textarea {
+            height: 60px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-generate {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .btn-generate:hover {
+            background-color: #1a252f;
+        }
+        
+        .btn-reset {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+        
+        .btn-reset:hover {
+            background-color: #d5dbdb;
+        }
+        
+        .btn-preview {
+            background-color: #3498db;
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .btn-preview:hover {
+            background-color: #2980b9;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: #3498db;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        .instructions {
+            background-color: #e8f4fc;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        
+        /* Preview styling */
+        #previewContent {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background: white;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .preview-page {
+            background: white;
+            padding: 20px;
+            min-height: 800px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            font-size: 14px; /* Increased from 12px */
+            line-height: 1.4;
+        }
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+        
+        .preview-header h3 {
+            margin: 0;
+            font-size: 18px; /* Increased from 16px */
+            color: #2c3e50;
+        }
+        
+        .preview-header p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 13px; /* Increased from 11px */
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .preview-table td {
+            padding: 8px 6px; /* Increased padding */
+            vertical-align: top;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .preview-label {
+            font-weight: bold;
+            width: 45%;
+            color: #2c3e50;
+            font-size: 14px; /* Added font size */
+        }
+        
+        .preview-value {
+            width: 55%;
+            font-size: 14px; /* Added font size */
+        }
+        
+        .preview-footer {
+            margin-top: 30px;
+            text-align: right;
+            font-style: italic;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            font-size: 12px; /* Increased from 10px */
+        }
+        
+        .no-preview {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        /* Hidden template for PDF generation */
+        .pdf-template-container {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 210mm;
+            background: white;
+        }
+        
+        .pdf-template {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm; /* Reduced padding to accommodate larger fonts */
+            background: white;
+            font-size: 16px !important; /* Increased from 12px - IMPORTANT FOR PDF */
+            line-height: 1.5 !important; /* Increased line height */
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-section">
+            <h1>மரண அறிக்கை படிவம்</h1>
+            
+            <div class="instructions">
+                <p><strong>வழிமுறைகள்:</strong> படிவத்தை நிரப்பி "முன்னோட்டம் காட்டு" பொத்தானை அழுத்தவும். PDF உருவாக்க "PDF உருவாக்கு" பொத்தானை அழுத்தவும்.</p>
+                <p><strong>குறிப்பு:</strong> இப்போது PDF கோப்புகளில் தமிழ் எழுத்துகள் சரியாகக் காண்பிக்கப்படும் (html2canvas மூலம்).</p>
+            </div>
+            
+            <form id="deathReportForm">
+                <!-- Form fields remain the same -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="policeStation" class="required">1. காவல்நிலையம்</label>
+                        <input type="text" id="policeStation" name="policeStation" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="crimeNumber" class="required">2. குற்ற எண்</label>
+                        <input type="text" id="crimeNumber" name="crimeNumber" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="section" class="required">3. பிரிவு</label>
+                        <input type="text" id="section" name="section" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name" class="required">4. பெயர்</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fatherName" class="required">5. தகப்பனார் பெயர்</label>
+                        <input type="text" id="fatherName" name="fatherName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="polym" class="required">6. பாலிமம்</label>
+                        <select id="polym" name="polym" required>
+                            <option value="" selected disabled>தேர்வு செய்யவும்</option>
+                            <option value="ஆண்">ஆண்</option>
+                            <option value="பெண்">பெண்</option>
+                            <option value="மற்றவை">மற்றவை</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nationality" class="required">7. எந்த நாட்டை சேர்ந்தவர்</label>
+                        <input type="text" id="nationality" name="nationality" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="religion" class="required">8. மதம்</label>
+                        <input type="text" id="religion" name="religion" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age" class="required">9. வயது</label>
+                        <input type="number" id="age" name="age" min="0" max="120" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deathDate" class="required">10. மரணம் அடைந்த நாள்</label>
+                        <input type="date" id="deathDate" name="deathDate" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deathCause" class="required">11. மரணத்திற்கான காரணம்</label>
+                    <textarea id="deathCause" name="deathCause" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address" class="required">12. விலாசம்</label>
+                    <textarea id="address" name="address" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deathPlace" class="required">13. மரணம் ஏற்பட்ட இடம்</label>
+                    <textarea id="deathPlace" name="deathPlace" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maritalStatus" class="required">14. திருமணம் ஆவரா/ விதையா</label>
+                        <select id="maritalStatus" name="maritalStatus" required>
+                            <option value="" selected disabled>தேர்வு செய்யவும்</option>
+                            <option value="ஆம்">ஆம்</option>
+                            <option value="இல்லை">இல்லை</option>
+                            <option value="விதவை">விதவை</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="occupation" class="required">15. தொழில்</label>
+                        <input type="text" id="occupation" name="occupation" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bodyDisposal" class="required">16. பிரதேம் புனைக்கப்பருமா/ எரிக்கப்பருமா</label>
+                        <select id="bodyDisposal" name="bodyDisposal" required>
+                            <option value="" selected disabled>தேர்வு செய்யவும்</option>
+                            <option value="புதைத்தல்">புதைத்தல்</option>
+                            <option value="எரித்தல்">எரித்தல்</option>
+                            <option value="மற்றவை">மற்றவை</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="informantName" class="required">17. கழகாட்பன் பெயர்</label>
+                        <input type="text" id="informantName" name="informantName" required>
+                    </div>
+                </div>
+                
+                <div class="button-container">
+                    <button type="button" id="previewBtn" class="btn btn-preview">முன்னோட்டம் காட்டு</button>
+                    <button type="button" id="generatePdf" class="btn btn-generate">PDF உருவாக்கு</button>
+                    <button type="reset" id="resetForm" class="btn btn-reset">மீட்டமை</button>
+                </div>
+            </form>
+            
+            <div class="loading" id="pdfLoading">
+                <p>PDF உருவாக்கப்படுகிறது... தயவு செய்து காத்திருக்கவும்</p>
+            </div>
+            
+            <div class="success-message" id="successMessage">
+                PDF வெற்றிகரமாக உருவாக்கப்பட்டது!
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <h2>PDF முன்னோட்டம்</h2>
+            <div id="previewContent">
+                <div class="no-preview">
+                    <p>படிவத்தை நிரப்பி "முன்னோட்டம் காட்டு" பொத்தானை அழுத்தவும்</p>
+                    <p>படிவத்தில் உள்ள தகவல்கள் இங்கே PDF வடிவத்தில் காட்டப்படும்</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden container for PDF template -->
+    <div id="pdfTemplateContainer" class="pdf-template-container"></div>
+
+    <script>
+        // Load jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Form elements
+        const form = document.getElementById('deathReportForm');
+        const previewBtn = document.getElementById('previewBtn');
+        const generateBtn = document.getElementById('generatePdf');
+        const resetBtn = document.getElementById('resetForm');
+        const previewContent = document.getElementById('previewContent');
+        const successMessage = document.getElementById('successMessage');
+        const pdfTemplateContainer = document.getElementById('pdfTemplateContainer');
+        
+        // Event Listeners
+        previewBtn.addEventListener('click', showPreview);
+        generateBtn.addEventListener('click', generatePDFWithCanvas);
+        resetBtn.addEventListener('click', resetForm);
+        
+        // Auto-update preview when form changes
+        form.addEventListener('input', debounce(showPreview, 500));
+        
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        function getFormData() {
+            return {
+                policeStation: document.getElementById('policeStation').value,
+                crimeNumber: document.getElementById('crimeNumber').value,
+                section: document.getElementById('section').value,
+                name: document.getElementById('name').value,
+                fatherName: document.getElementById('fatherName').value,
+                polym: document.getElementById('polym').value,
+                nationality: document.getElementById('nationality').value,
+                religion: document.getElementById('religion').value,
+                age: document.getElementById('age').value,
+                deathDate: document.getElementById('deathDate').value,
+                deathCause: document.getElementById('deathCause').value,
+                address: document.getElementById('address').value,
+                deathPlace: document.getElementById('deathPlace').value,
+                maritalStatus: document.getElementById('maritalStatus').value,
+                occupation: document.getElementById('occupation').value,
+                bodyDisposal: document.getElementById('bodyDisposal').value,
+                informantName: document.getElementById('informantName').value
+            };
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ta-IN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        function showPreview() {
+            if (!form.checkValidity()) {
+                previewContent.innerHTML = `
+                    <div class="no-preview">
+                        <p style="color: #e74c3c;">தயவு செய்து அனைத்து கட்டாய புலங்களையும் நிரப்பவும்</p>
+                        <p>படிவத்தில் உள்ள தகவல்கள் இங்கே PDF வடிவத்தில் காட்டப்படும்</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const data = getFormData();
+            const formattedDate = formatDate(data.deathDate);
+            const currentDate = new Date().toLocaleDateString('ta-IN');
+            
+            const previewHTML = createPDFHTML(data, formattedDate, currentDate);
+            previewContent.innerHTML = previewHTML;
+        }
+        
+        function createPDFHTML(data, formattedDate, currentDate) {
+            return `
+                <div class="preview-page">
+                    <div class="preview-header">
+                        <h3>மரண அறிக்கை</h3>
+                        <p>(அதிகாரப்பூர்வ ஆவணம்)</p>
+                    </div>
+                    
+                    <table class="preview-table">
+                        <tr>
+                            <td class="preview-label">1. காவல்நிலையம்:</td>
+                            <td class="preview-value">${escapeHtml(data.policeStation) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">2. குற்ற எண்:</td>
+                            <td class="preview-value">${escapeHtml(data.crimeNumber) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">3. பிரிவு:</td>
+                            <td class="preview-value">${escapeHtml(data.section) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">4. பெயர்:</td>
+                            <td class="preview-value">${escapeHtml(data.name) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">5. தகப்பனார் பெயர்:</td>
+                            <td class="preview-value">${escapeHtml(data.fatherName) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">6. பாலிமம்:</td>
+                            <td class="preview-value">${escapeHtml(data.polym) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">7. எந்த நாட்டை சேர்ந்தவர்:</td>
+                            <td class="preview-value">${escapeHtml(data.nationality) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">8. மதம்:</td>
+                            <td class="preview-value">${escapeHtml(data.religion) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">9. வயது:</td>
+                            <td class="preview-value">${escapeHtml(data.age) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">10. மரணம் அடைந்த நாள்:</td>
+                            <td class="preview-value">${escapeHtml(formattedDate) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">11. மரணத்திற்கான காரணம்:</td>
+                            <td class="preview-value">${escapeHtml(data.deathCause) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">12. விலாசம்:</td>
+                            <td class="preview-value">${escapeHtml(data.address) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">13. மரணம் ஏற்பட்ட இடம்:</td>
+                            <td class="preview-value">${escapeHtml(data.deathPlace) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">14. திருமணம் ஆவரா/ விதையா:</td>
+                            <td class="preview-value">${escapeHtml(data.maritalStatus) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">15. தொழில்:</td>
+                            <td class="preview-value">${escapeHtml(data.occupation) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">16. பிரதேம் புனைக்கப்பருமா/ எரிக்கப்பருமா:</td>
+                            <td class="preview-value">${escapeHtml(data.bodyDisposal) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="preview-label">17. கழகாட்பன் பெயர்:</td>
+                            <td class="preview-value">${escapeHtml(data.informantName) || '-'}</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="preview-footer">
+                        <p>உருவாக்கப்பட்ட தேதி: ${currentDate}</p>
+                        <p>உரிய அதிகாரியின் கையொப்பம்: ___________________</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        async function generatePDFWithCanvas() {
+            if (!form.checkValidity()) {
+                alert('தயவு செய்து அனைத்து கட்டாய புலங்களையும் நிரப்பவும்.');
+                return;
+            }
+            
+            document.getElementById('pdfLoading').style.display = 'block';
+            successMessage.style.display = 'none';
+            
+            const data = getFormData();
+            const formattedDate = formatDate(data.deathDate);
+            const currentDate = new Date().toLocaleDateString('ta-IN');
+            
+            try {
+                // Create PDF template HTML with larger font sizes
+                const pdfHTML = `
+                    <div class="pdf-template" style="font-size: 16px !important; line-height: 1.5 !important;">
+                        <div style="text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #333;">
+                            <h3 style="margin: 0; font-size: 22px !important; color: #2c3e50;">மரண அறிக்கை</h3>
+                            <p style="margin: 8px 0 0 0; color: #666; font-size: 16px !important;">(அதிகாரப்பூர்வ ஆவணம்)</p>
+                        </div>
+                        
+                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 16px !important;">
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; width: 48%; font-weight: bold; font-size: 16px !important;">1. காவல்நிலையம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; width: 52%; font-size: 16px !important;">${escapeHtml(data.policeStation) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">2. குற்ற எண்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.crimeNumber) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">3. பிரிவு:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.section) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">4. பெயர்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.name) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">5. தகப்பனார் பெயர்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.fatherName) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">6. பாலிமம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.polym) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">7. எந்த நாட்டை சேர்ந்தவர்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.nationality) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">8. மதம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.religion) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">9. வயது:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.age) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">10. மரணம் அடைந்த நாள்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(formattedDate) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">11. மரணத்திற்கான காரணம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.deathCause) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">12. விலாசம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.address) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">13. மரணம் ஏற்பட்ட இடம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.deathPlace) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">14. திருமணம் ஆவரா/ விதையா:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.maritalStatus) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">15. தொழில்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.occupation) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">16. பிரதேம் புனைக்கப்பருமா/ எரிக்கப்பருமா:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.bodyDisposal) || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">17. கழகாட்பன் பெயர்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.informantName) || '-'}</td>
+                            </tr>
+                        </table>
+                        
+                        <div style="margin-top: 35px; text-align: right; font-style: italic; color: #666; border-top: 1px solid #ddd; padding-top: 15px; font-size: 14px !important;">
+                            <p>உருவாக்கப்பட்ட தேதி: ${currentDate}</p>
+                            <p>உரிய அதிகாரியின் கையொப்பம்: ___________________</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Add HTML to hidden container
+                pdfTemplateContainer.innerHTML = pdfHTML;
+                
+                // Get the PDF template element
+                const pdfElement = pdfTemplateContainer.querySelector('.pdf-template');
+                
+                // Use html2canvas to capture the HTML as an image
+                const canvas = await html2canvas(pdfElement, {
+                    scale: 2, // Higher quality
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    onclone: function(clonedDoc) {
+                        // Ensure font sizes are applied in the cloned document
+                        const template = clonedDoc.querySelector('.pdf-template');
+                        if (template) {
+                            template.style.fontSize = '16px';
+                            template.style.lineHeight = '1.5';
+                        }
+                    }
+                });
+                
+                // Convert canvas to image data
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Create PDF document
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Calculate dimensions
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                
+                const imgWidth = pageWidth - 20; // 10mm margin on each side
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                // Add image to PDF
+                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                
+                // Save PDF with Tamil filename
+                const fileName = `மரண_அறிக்கை_${data.name.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+                pdf.save(fileName);
+                
+                // Clean up
+                pdfTemplateContainer.innerHTML = '';
+                
+                document.getElementById('pdfLoading').style.display = 'none';
+                successMessage.style.display = 'block';
+                
+                console.log('PDF generated successfully with larger Tamil text!');
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                document.getElementById('pdfLoading').style.display = 'none';
+                
+                // Try simple fallback
+                try {
+                    generateSimplePDF(data);
+                } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
+                    alert('PDF உருவாக்கத்தில் பிழை. தயவு செய்து மீண்டும் முயற்சிக்கவும்.');
+                }
+            }
+        }
+        
+        function generateSimplePDF(data) {
+            // Simple fallback without html2canvas
+            const doc = new jsPDF();
+            
+            doc.setFontSize(16);
+            doc.text('Death Report', 105, 15, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text('(Official Document)', 105, 22, { align: 'center' });
+            
+            let yPos = 35;
+            
+            // Add data in English/Tamil mixed
+            doc.text(`1. Police Station: ${data.policeStation}`, 20, yPos);
+            yPos += 10;
+            doc.text(`2. Crime Number: ${data.crimeNumber}`, 20, yPos);
+            yPos += 10;
+            doc.text(`3. Section: ${data.section}`, 20, yPos);
+            yPos += 10;
+            doc.text(`4. Name: ${data.name}`, 20, yPos);
+            yPos += 10;
+            doc.text(`5. Father's Name: ${data.fatherName}`, 20, yPos);
+            
+            const fileName = `death_report_${data.name.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+            doc.save(fileName);
+            
+            alert('PDF generated (English version). Tamil text requires html2canvas.');
+        }
+        
+        function resetForm() {
+            document.getElementById('pdfLoading').style.display = 'none';
+            successMessage.style.display = 'none';
+            previewContent.innerHTML = `
+                <div class="no-preview">
+                    <p>படிவத்தை நிரப்பி "முன்னோட்டம் காட்டு" பொத்தானை அழுத்தவும்</p>
+                    <p>படிவத்தில் உள்ள தகவல்கள் இங்கே PDF வடிவத்தில் காட்டப்படும்</p>
+                </div>
+            `;
+        }
+        
+        // Set default date to today
+        document.getElementById('deathDate').value = new Date().toISOString().split('T')[0];
+        
+        // Fill sample data for testing
+        function fillSampleData() {
+            document.getElementById('policeStation').value = 'மத்திய காவல் நிலையம், சென்னை';
+            document.getElementById('crimeNumber').value = 'CR/4567/2023';
+            document.getElementById('section').value = '174 CrPC';
+            document.getElementById('name').value = 'ராஜேஷ் குமார்';
+            document.getElementById('fatherName').value = 'மோகன் சிங்';
+            document.getElementById('polym').value = 'ஆண்';
+            document.getElementById('nationality').value = 'இந்தியா';
+            document.getElementById('religion').value = 'இந்து';
+            document.getElementById('age').value = '45';
+            document.getElementById('deathCause').value = 'இதய நோய்';
+            document.getElementById('address').value = '12, காந்தி தெரு, தேனாம்பேட்டை, சென்னை - 600018';
+            document.getElementById('deathPlace').value = 'அப்போல்லோ மருத்துவமனை, சென்னை';
+            document.getElementById('maritalStatus').value = 'ஆம்';
+            document.getElementById('occupation').value = 'வணிகர்';
+            document.getElementById('bodyDisposal').value = 'எரித்தல்';
+            document.getElementById('informantName').value = 'மோகன் சிங் (தகப்பனார்)';
+            
+            // Auto-show preview after filling sample data
+            setTimeout(showPreview, 100);
+        }
+        
+        // Auto-fill sample data for testing
+        fillSampleData();
+    </script>
+</body>
+</html>
