@@ -22,6 +22,14 @@ button{
 
 .timer{font-weight:bold;color:#dc2626;margin-bottom:10px}
 
+.topic-list{
+  max-height:220px;overflow-y:auto;
+  border:1px solid #d1d5db;
+  padding:10px;border-radius:8px;
+  background:#f9fafb
+}
+.topic-list label{display:block;margin-bottom:6px}
+
 .palette{
   display:flex;gap:8px;overflow-x:auto;
   padding:10px;border-radius:8px;
@@ -44,8 +52,8 @@ button{
 .wrong{color:red;font-weight:bold}
 .scorebar{
   background:#ecfeff;border:1px solid #67e8f9;
-  padding:10px;border-radius:10px;margin-bottom:10px;
-  text-align:center;font-weight:bold
+  padding:10px;border-radius:10px;
+  margin-bottom:10px;text-align:center;font-weight:bold
 }
 </style>
 </head>
@@ -58,10 +66,27 @@ button{
 
 <div class="container">
 
+<!-- SETTINGS -->
 <div class="box" id="settingsBox">
+  <h3>Quiz Settings</h3>
+
+  <button class="sel" onclick="selectAllTopics()">Select All</button>
+  <button class="sel" onclick="clearAllTopics()">Clear All</button>
+
+  <div class="topic-list" id="topicList">Loading…</div>
+
+  <br>
+  <label><input type="checkbox" id="randomize"> Randomize Questions</label>
+
+  <br><br>
+  <label>Time Limit (minutes)</label>
+  <input type="number" id="timeLimit" value="10" min="1">
+
+  <br><br>
   <button class="start" onclick="startQuiz()">Start Quiz</button>
 </div>
 
+<!-- QUIZ -->
 <div class="box" id="quizBox" style="display:none">
   <div class="timer" id="timer"></div>
   <div class="palette" id="palette"></div>
@@ -72,6 +97,7 @@ button{
   <button class="submit" onclick="confirmSubmit()">Submit</button>
 </div>
 
+<!-- REVIEW -->
 <div id="reviewBox"></div>
 
 </div>
@@ -90,20 +116,51 @@ fetch(sheetURL).then(r=>r.text()).then(t=>{
   allQuestions=rows.map(r=>{
     const c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
     return {
+      topic:c[0],
       q:c[1],
       opts:[c[2],c[3],c[4],c[5]],
       ans:c[6].trim().toUpperCase(),
       exp:c[7]
     };
   });
+  populateTopics();
 });
+
+/* TOPIC LIST */
+function populateTopics(){
+  topicList.innerHTML="";
+  [...new Set(allQuestions.map(q=>q.topic))].forEach(t=>{
+    topicList.innerHTML+=`
+      <label><input type="checkbox" value="${t}"> ${t}</label>`;
+  });
+}
+function selectAllTopics(){
+  document.querySelectorAll("#topicList input").forEach(cb=>cb.checked=true);
+}
+function clearAllTopics(){
+  document.querySelectorAll("#topicList input").forEach(cb=>cb.checked=false);
+}
 
 /* START QUIZ */
 function startQuiz(customIndexes=null){
-  quiz = customIndexes
-    ? customIndexes.map(i=>allQuestions[i])
-    : [...allQuestions];
+  let baseQuiz;
 
+  if(customIndexes){
+    baseQuiz = customIndexes.map(i=>quiz[i]);
+  } else {
+    const selected=[...document.querySelectorAll("#topicList input:checked")]
+      .map(i=>i.value);
+
+    if(!selected.length){
+      alert("Select at least one topic");
+      return;
+    }
+
+    baseQuiz = allQuestions.filter(q=>selected.includes(q.topic));
+    if(randomize.checked) baseQuiz.sort(()=>Math.random()-0.5);
+  }
+
+  quiz = baseQuiz;
   index=0;
   userAnswers=new Array(quiz.length).fill(null);
 
@@ -112,7 +169,7 @@ function startQuiz(customIndexes=null){
   quizBox.style.display="block";
 
   createPalette();
-  startTimer(quiz.length*60);
+  startTimer(timeLimit.value*60);
   loadQ();
 }
 
