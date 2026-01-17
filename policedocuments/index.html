@@ -544,6 +544,19 @@
                 <h2><i>📄</i> Generate PDF Documents</h2>
                 <div class="search-info" id="generatePDFsInfo"></div>
                 <ul class="document-list" id="generatePDFsList">
+                    <!-- Death Report Generator Entry - ADDED -->
+                    <li class="document-item" data-title="Death Report" data-desc="Generate comprehensive death report for medico-legal cases">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Death Report</div>
+                            <div class="doc-desc">Generate comprehensive death report for medico-legal cases</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://clearexams.online/policedocuments/pmforms/death_report.html" target="_blank" class="btn btn-generate">
+                                <i>🔄</i> Generate
+                            </a>
+                        </div>
+                    </li>
+                    
                     <!-- Tahsildar Letter Entry -->
                     <li class="document-item" data-title="Tahsildar Letter" data-desc="Generate official letters to Tahsildar for land records and revenue matters">
                         <div class="doc-info">
@@ -1108,7 +1121,7 @@
     </div>
 
     <script>
-        // Document data for search functionality - UPDATED to include House Building Application Form
+        // Document data for search functionality - UPDATED to include Death Report
         const documents = [
             // Download Forms
             { title: "House Building Application Form", desc: "HBA application form for police personnel housing loan", type: "download", element: null },
@@ -1122,7 +1135,8 @@
             { title: "EL Surrender Form", desc: "Form for surrendering unused Earned Leave days", type: "download", element: null },
             { title: "Incident Report Form", desc: "Standard form for documenting incidents and criminal activities", type: "download", element: null },
             
-            // Generate PDFs
+            // Generate PDFs - ADDED Death Report
+            { title: "Death Report", desc: "Generate comprehensive death report for medico-legal cases", type: "generate", element: null },
             { title: "Tahsildar Letter", desc: "Generate official letters to Tahsildar for land records and revenue matters", type: "generate", element: null },
             { title: "Digital Evidence Certificate", desc: "Generate digital evidence chain of custody certificates", type: "generate", element: null },
             { title: "Formal Letter Generator", desc: "Generate formal letters for official police correspondence", type: "generate", element: null },
@@ -1358,7 +1372,7 @@
             searchInput.addEventListener('input', performSearch);
             searchButton.addEventListener('click', performSearch);
             
-            // Add click handlers for download forms - UPDATED to include House Building Application Form
+            // Add click handlers for download forms
             const downloadForms = [
                 { name: "hba_application_form", title: "House Building Application Form", folder: "" },
                 { name: "pm_form", title: "PM Form", folder: "pmforms/" },
@@ -1421,7 +1435,7 @@
                 });
             }
             
-            // Generate PDFs handlers
+            // Generate PDFs handlers - ADDED Death Report handler
             const generatePDFLinks = document.querySelectorAll('.btn-generate');
             generatePDFLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -1433,6 +1447,18 @@
                     }, 500);
                 });
             });
+            
+            // Special handling for Death Report
+            const deathReportLink = document.querySelector('a[href="https://clearexams.online/policedocuments/pmforms/death_report.html"]');
+            if (deathReportLink) {
+                deathReportLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification('Opening Death Report Generator...');
+                    setTimeout(() => {
+                        window.open(this.href, '_blank');
+                    }, 500);
+                });
+            }
         });
     </script>
 </body>
