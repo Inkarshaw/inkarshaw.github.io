@@ -159,14 +159,6 @@
             color: #e74c3c;
         }
         
-        .instructions {
-            background-color: #e8f4fc;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-size: 13px;
-        }
-        
         /* Preview styling */
         #previewContent {
             flex: 1;
@@ -190,7 +182,6 @@
         .preview-header {
             text-align: center;
             margin-bottom: 20px;
-            /* Removed border-bottom */
         }
         
         .preview-header h3 {
@@ -205,7 +196,7 @@
         }
         
         .preview-table td {
-            padding: 8px 6px;
+            padding: 8px 4px;
             vertical-align: top;
             border-bottom: 1px solid #eee;
         }
@@ -215,11 +206,22 @@
             width: 45%;
             color: #2c3e50;
             font-size: 14px;
+            text-align: left;
+            padding-right: 8px !important;
+        }
+        
+        .preview-colon {
+            width: 5%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 0 4px !important;
         }
         
         .preview-value {
-            width: 55%;
+            width: 50%;
             font-size: 14px;
+            padding-left: 8px !important;
         }
         
         .no-preview {
@@ -269,11 +271,6 @@
     <div class="container">
         <div class="form-section">
             <h1>மரண அறிக்கை படிவம்</h1>
-            
-            <div class="instructions">
-                <p><strong>வழிமுறைகள்:</strong> படிவத்தை நிரப்பி "முன்னோட்டம் காட்டு" பொத்தானை அழுத்தவும். PDF உருவாக்க "PDF உருவாக்கு" பொத்தானை அழுத்தவும்.</p>
-                <p><strong>குறிப்பு:</strong> இப்போது PDF கோப்புகளில் தமிழ் எழுத்துகள் சரியாகக் காண்பிக்கப்படும் (html2canvas மூலம்).</p>
-            </div>
             
             <form id="deathReportForm">
                 <div class="form-row">
@@ -478,11 +475,11 @@
         function formatDate(dateString) {
             if (!dateString) return '';
             const date = new Date(dateString);
-            return date.toLocaleDateString('ta-IN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
+            // Convert to DD/MM/YYYY format
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
         }
         
         function showPreview() {
@@ -512,71 +509,88 @@
                     
                     <table class="preview-table">
                         <tr>
-                            <td class="preview-label">1. காவல்நிலையம்:</td>
+                            <td class="preview-label">1. காவல்நிலையம்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.policeStation) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">2. குற்ற எண்:</td>
+                            <td class="preview-label">2. குற்ற எண்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.crimeNumber) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">3. பிரிவு:</td>
+                            <td class="preview-label">3. பிரிவு</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.section) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">4. பெயர்:</td>
+                            <td class="preview-label">4. பெயர்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.name) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">5. தகப்பனார் பெயர்:</td>
+                            <td class="preview-label">5. தகப்பனார் பெயர்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.fatherName) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">6. பாலிமம்:</td>
+                            <td class="preview-label">6. பாலிமம்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.polym) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">7. எந்த நாட்டை சேர்ந்தவர்:</td>
+                            <td class="preview-label">7. எந்த நாட்டை சேர்ந்தவர்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.nationality) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">8. மதம்:</td>
+                            <td class="preview-label">8. மதம்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.religion) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">9. வயது:</td>
+                            <td class="preview-label">9. வயது</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.age) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">10. மரணம் அடைந்த நாள்:</td>
+                            <td class="preview-label">10. மரணம் அடைந்த நாள்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(formattedDate) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">11. மரணத்திற்கான காரணம்:</td>
+                            <td class="preview-label">11. மரணத்திற்கான காரணம்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.deathCause) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">12. விலாசம்:</td>
+                            <td class="preview-label">12. விலாசம்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.address) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">13. மரணம் ஏற்பட்ட இடம்:</td>
+                            <td class="preview-label">13. மரணம் ஏற்பட்ட இடம்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.deathPlace) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">14. திருமணம் ஆவரா/ விதையா:</td>
+                            <td class="preview-label">14. திருமணம் ஆவரா/ விதையா</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.maritalStatus) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">15. தொழில்:</td>
+                            <td class="preview-label">15. தொழில்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.occupation) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">16. பிரதேம் புனைக்கப்பருமா/ எரிக்கப்பருமா:</td>
+                            <td class="preview-label">16. பிரதேம் புனைக்கப்பருமா/ எரிக்கப்பருமா</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.bodyDisposal) || '-'}</td>
                         </tr>
                         <tr>
-                            <td class="preview-label">17. கழகாட்பன் பெயர்:</td>
+                            <td class="preview-label">17. கழகாட்பன் பெயர்</td>
+                            <td class="preview-colon">:</td>
                             <td class="preview-value">${escapeHtml(data.informantName) || '-'}</td>
                         </tr>
                     </table>
@@ -607,77 +621,94 @@
                 // Create PDF template HTML with larger font sizes
                 const pdfHTML = `
                     <div class="pdf-template" style="font-size: 16px !important; line-height: 1.5 !important;">
-                        <div style="text-align: center; margin-bottom: 30px; /* Removed border-bottom */">
+                        <div style="text-align: center; margin-bottom: 30px;">
                             <h3 style="margin: 0; font-size: 22px !important; color: #2c3e50;">மரண அறிக்கை</h3>
                         </div>
                         
                         <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 16px !important;">
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; width: 48%; font-weight: bold; font-size: 16px !important;">1. காவல்நிலையம்:</td>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; width: 52%; font-size: 16px !important;">${escapeHtml(data.policeStation) || '-'}</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; width: 45%; font-weight: bold; font-size: 16px !important; text-align: left;">1. காவல்நிலையம்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; width: 5%; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; width: 50%; font-size: 16px !important;">${escapeHtml(data.policeStation) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">2. குற்ற எண்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">2. குற்ற எண்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.crimeNumber) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">3. பிரிவு:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">3. பிரிவு</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.section) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">4. பெயர்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">4. பெயர்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.name) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">5. தகப்பனார் பெயர்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">5. தகப்பனார் பெயர்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.fatherName) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">6. பாலிமம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">6. பாலிமம்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.polym) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">7. எந்த நாட்டை சேர்ந்தவர்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">7. எந்த நாட்டை சேர்ந்தவர்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.nationality) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">8. மதம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">8. மதம்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.religion) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">9. வயது:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">9. வயது</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.age) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">10. மரணம் அடைந்த நாள்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">10. மரணம் அடைந்த நாள்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(formattedDate) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">11. மரணத்திற்கான காரணம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">11. மரணத்திற்கான காரணம்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.deathCause) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">12. விலாசம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">12. விலாசம்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.address) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">13. மரணம் ஏற்பட்ட இடம்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">13. மரணம் ஏற்பட்ட இடம்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.deathPlace) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">14. திருமணம் ஆவரா/ விதையா:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">14. திருமணம் ஆவரா/ விதையா</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.maritalStatus) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">15. தொழில்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">15. தொழில்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.occupation) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">16. பிரதேம் புனைக்கப்பருமா/ எரிக்கப்பருமா:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">16. பிரதேம் புனைக்கப்பருமா/ எரிக்கப்பருமா</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.bodyDisposal) || '-'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important;">17. கழகாட்பன் பெயர்:</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">17. கழகாட்பன் பெயர்</td>
+                                <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.informantName) || '-'}</td>
                             </tr>
                         </table>
@@ -789,7 +820,7 @@
         // Fill sample data for testing
         function fillSampleData() {
             document.getElementById('policeStation').value = 'மத்திய காவல் நிலையம், சென்னை';
-            document.getElementById('crimeNumber').value = 'CR/4567/2023';
+            document.getElementById('crimeNumber').value = '4567/2023';
             document.getElementById('section').value = '174 CrPC';
             document.getElementById('name').value = 'ராஜேஷ் குமார்';
             document.getElementById('fatherName').value = 'மோகன் சிங்';
