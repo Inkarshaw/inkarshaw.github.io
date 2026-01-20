@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Maker - கொரு முஹாத்து ஆவணம்</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans Tamil', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a3a8f 0%, #2c5aa0 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .input-section, .preview-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #1a3a8f;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+            font-weight: 700;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Noto Sans Tamil', sans-serif;
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #1a3a8f;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #143076;
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        /* Document Preview Styling */
+        #documentPreview {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: 'Noto Sans Tamil', sans-serif;
+            min-height: 500px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+        
+        #statusMessage {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PDF Maker - கொரு முஹாத்து ஆவணம்</h1>
+            <p>கொரு முஹாத்து தெரிவுதல் செய்யப்படும் கொருவுடன் தெரிவு செய்யப்பட வேண்டிய அறிக்கை</p>
+        </div>
+        
+        <div id="statusMessage"></div>
+        
+        <div class="content-wrapper">
+            <div class="input-section">
+                <h2 class="section-title">தகவல்களை உள்ளிடுக</h2>
+                
+                <div class="form-group">
+                    <label for="refNo">குறிப்பு எண்:</label>
+                    <input type="text" id="refNo" value="G-7 நிர்ணயிக்கப்பட்ட ஃபைல்/எப்.பி/எஃப். எண்/12 /2026">
+                </div>
+                
+                <div class="form-group">
+                    <label for="caseNo">வழக்கு எண்:</label>
+                    <input type="text" id="caseNo" value="ஆர்-ஜிபி/194 BNSS எண்:- 2332/20 U/S 174 C">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gotkNo">கோட்டகி எண்:</label>
+                        <input type="text" id="gotkNo" placeholder="_______________">
+                    </div>
+                    <div class="form-group">
+                        <label for="mizNo">மீஸ் எண்:</label>
+                        <input type="text" id="mizNo" value="67">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="personName">பெயர்:</label>
+                    <input type="text" id="personName" value="நகஃப். எம்/டி 34. ஜே/பி.கி மொஹிதா. எண் 23. கச்சகாயில் பிளாக். பிரதான் எஸ்டேட். சென்னை?30">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age">வயது:</label>
+                        <input type="text" id="age" value="49.">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">பால்:</label>
+                        <select id="gender">
+                            <option value="ஆண்;">ஆண்</option>
+                            <option value="பெண்;">பெண்</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="build">உருவம்:</label>
+                        <input type="text" id="build" value="கருப்பு நிறம்">
+                    </div>
+                    <div class="form-group">
+                        <label for="height">உயரம்:</label>
+                        <input type="text" id="height" value="அடி 5 1/2 அங்குலம்">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="complexion">தோல் நிறம்:</label>
+                        <input type="text" id="complexion">
+                    </div>
+                    <div class="form-group">
+                        <label for="hair">முடி:</label>
+                        <input type="text" id="hair">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="specialMarks">சிறப்பு குறிகள்:</label>
+                    <textarea id="specialMarks">1) இடது கை முழங்கையில் ஒரு வடு;
+2) இடது காலில் ஒரு வடு;
+முகத்தில் வடு ஒரு வடு;</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ch">சு:-</label>
+                    <input type="text" id="ch" value="பிரதான் எஸ்டேட் ஆர்.பி">
+                </div>
+                
+                <div class="form-group">
+                    <label for="officerDetails">அதிகாரி விவரங்கள்:</label>
+                    <textarea id="officerDetails">தெரிவு செய்தவர் நிர்ணயிக்கப்பட்ட காவல் நிலையம் காவல் நிலையம் சம்பந்தப்பட்ட அதிகாரி 16/01/2026 ஆம் நாள் நேரம் 11.30 மணிக்கு G7 நிர்ணயிக்கப்பட்ட காவலர் PC 63364 திரு.ரெஞ்சு சகாய் என்பவரை கைது செய்து விசாரணையின் போது கைவசம் இருந்த பொருட்களை காட்டும் கீழ்க்குறிப்பு அரசு மருத்துவமனை மருத்துவ வாரியத்திற்கு தெரிவு செய்யப்பட்டது/</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="clothes">ஆடைகள்:</label>
+                    <textarea id="clothes">முழுக்கை மற்றும் பாக்கெட்டுடன் கூடிய காலர் சட்டை , ஸ்காட் காலர் ஷர்ட் , வெள்ளை ஷர்ட் , கருப்பு ஷர்ட் , ப்ளேக் ஷர்ட் சஸ்பென்டர். வெள்ளை மற்றும் பாக்கெட்டுடன் கூடிய $பேண்ட்!; நீளம்;</textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="policeStation">காவல் நிலையம்:</label>
+                        <input type="text" id="policeStation" value="G-7 நிர்ணயிக்கப்பட்ட காவல் நிலையம்">
+                    </div>
+                    <div class="form-group">
+                        <label for="date">தேதி:</label>
+                        <input type="text" id="date" value="16.01.2026.">
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="generatePdfBtn">PDF உருவாக்கு</button>
+                    <button class="btn btn-secondary" id="resetBtn">மீட்டமை</button>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2 class="section-title">ஆவண முன்னோட்டம்</h2>
+                <div id="documentPreview">
+                    <!-- Document will be rendered here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>PDF Maker - கொரு முஹாத்து ஆவணம் | அலுவல் பயன்பாட்டிற்காக</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // DOM Elements
+        const generatePdfBtn = document.getElementById('generatePdfBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Show message function
+        function showMessage(message, type = 'success') {
+            statusMessage.textContent = message;
+            statusMessage.className = type;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, type === 'error' ? 10000 : 5000);
+        }
+        
+        // Generate document HTML for preview
+        function generateDocumentHTML() {
+            const gotkNo = document.getElementById('gotkNo').value || '_______________';
+            
+            return `
+                <div style="font-family: 'Noto Sans Tamil', sans-serif; line-height: 1.6;">
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px; text-decoration: underline; font-size: 16px;">
+                        கொரு முஹாத்து தெரிவுதல் செய்யப்படும் கொருவுடன் தெரிவு செய்யப்பட வேண்டிய அறிக்கை
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">குறிப்பு:</span> ${document.getElementById('refNo').value}
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        ${document.getElementById('caseNo').value}
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <span style="font-weight: bold;">கோட்டகி எண்:</span> ${gotkNo}
+                        <span style="margin-left: 100px; font-weight: bold;">மீஸ் எண்:</span> ${document.getElementById('mizNo').value}
+                    </div>
+                    
+                    <div style="font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+                        பின்வரும் விவரங்களை நிரப்ப வேண்டிய அட்டவணை
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">பெயர்/</span> ${document.getElementById('personName').value}
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">வயது</span> ${document.getElementById('age').value}
+                        <span style="margin-left: 30px; font-weight: bold;">${document.getElementById('gender').value}</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">உருவம்;</span> ${document.getElementById('build').value}.
+                        <span style="margin-left: 30px; font-weight: bold;">உயரம் :</span> ${document.getElementById('height').value}
+                    </div>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <span style="font-weight: bold;">தோல் நிறம்</span> ${document.getElementById('complexion').value}
+                        <span style="margin-left: 30px; font-weight: bold;">முடி</span> ${document.getElementById('hair').value}
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">சிறப்பு குறிகள் :</span> ?
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">கையில் உள்ள குறிகள் :</span>
+                    </div>
+                    
+                    <div style="margin-left: 20px; margin-bottom: 10px;">
+                        ${document.getElementById('specialMarks').value.split('\n').map(line => 
+                            `<div>${line}</div>`
+                        ).join('')}
+                    </div>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <span style="font-weight: bold;">சு:-</span> ${document.getElementById('ch').value}
+                    </div>
+                    
+                    <div style="margin-bottom: 15px; font-size: 13px;">
+                        ${document.getElementById('officerDetails').value}
+                    </div>
+                    
+                    <div style="font-weight: bold; margin-bottom: 8px;">
+                        உடலில் காணப்பட்ட காயங்கள் மற்றும் வடுக்கள் ?
+                    </div>
+                    
+                    <div style="font-weight: bold; margin-bottom: 8px;">
+                        மேலே 2?ல் குறிப்பிடப்பட்ட காயங்கள் எவ்வகையில், எந்த ஆயுதத்தால் ஏற்பட்டதாக காணப்படுகின்றன?
+                    </div>
+                    
+                    <div style="font-weight: bold; margin-bottom: 15px;">
+                        கொருவுடன் கையகப்படுத்தப்பட்ட பொருட்களும் தெரிவு செய்யப்படுகின்றன.
+                    </div>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <span style="font-weight: bold;">ஆடைகள்:-</span> ${document.getElementById('clothes').value}
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">நகங்கள் (கேள்விகள்)-</span> இல்லை
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">சிறு காயங்கள்-</span> இல்லை
+                        <span style="margin-left: 30px; font-weight: bold;">காய்ச்சல் :-</span> இல்லை
+                        <span style="margin-left: 30px; font-weight: bold;">தேவையானது :-</span> இல்லை
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">தேய்ப்பு :-</span> இல்லை
+                    </div>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <span style="font-weight: bold;">ஆயுதங்கள்</span> இல்லை
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">காவல் நிலையம் :-</span> ${document.getElementById('policeStation').value}
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-weight: bold;">தேதி :</span> ${document.getElementById('date').value}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Update preview
+        function updatePreview() {
+            const previewDiv = document.getElementById('documentPreview');
+            previewDiv.innerHTML = generateDocumentHTML();
+        }
+        
+        // Simple PDF generation without html2canvas
+        function generateSimplePDF() {
+            try {
+                showMessage('PDF உருவாக்கப்படுகிறது...', 'success');
+                
+                const pdf = new jsPDF();
+                
+                // Set document properties
+                pdf.setProperties({
+                    title: 'கொரு முஹாத்து ஆவணம்',
+                    subject: 'தமிழ் ஆவணம்',
+                    author: 'PDF Maker'
+                });
+                
+                let y = 20;
+                
+                // Title
+                pdf.setFontSize(14);
+                pdf.text('கொரு முஹாத்து தெரிவுதல் செய்யப்படும் கொருவுடன்', 105, y, { align: 'center' });
+                y += 7;
+                pdf.text('தெரிவு செய்யப்பட வேண்டிய அறிக்கை', 105, y, { align: 'center' });
+                y += 15;
+                
+                // Reference
+                pdf.setFontSize(11);
+                pdf.text('குறிப்பு: ' + document.getElementById('refNo').value, 20, y);
+                y += 7;
+                
+                // Case number
+                pdf.text(document.getElementById('caseNo').value, 20, y);
+                y += 10;
+                
+                // Gotk and Miz numbers
+                const gotkNo = document.getElementById('gotkNo').value || '_______________';
+                pdf.text('கோட்டகி எண்: ' + gotkNo, 20, y);
+                pdf.text('மீஸ் எண்: ' + document.getElementById('mizNo').value, 120, y);
+                y += 10;
+                
+                // Section title
+                pdf.text('பின்வரும் விவரங்களை நிரப்ப வேண்டிய அட்டவணை', 20, y);
+                y += 10;
+                
+                // Name
+                pdf.text('பெயர்/ ' + document.getElementById('personName').value, 20, y);
+                y += 10;
+                
+                // Age and gender
+                pdf.text('வயது ' + document.getElementById('age').value + '     ' + document.getElementById('gender').value, 20, y);
+                y += 10;
+                
+                // Build and height
+                pdf.text('உருவம்; ' + document.getElementById('build').value + '.     உயரம் : ' + document.getElementById('height').value, 20, y);
+                y += 10;
+                
+                // Complexion and hair
+                pdf.text('தோல் நிறம் ' + document.getElementById('complexion').value + '     முடி ' + document.getElementById('hair').value, 20, y);
+                y += 15;
+                
+                // Special marks
+                pdf.text('சிறப்பு குறிகள் : ?', 20, y);
+                y += 10;
+                pdf.text('கையில் உள்ள குறிகள் :', 20, y);
+                y += 7;
+                
+                // Special marks list
+                const specialMarks = document.getElementById('specialMarks').value.split('\n');
+                specialMarks.forEach(mark => {
+                    pdf.text(mark, 25, y);
+                    y += 7;
+                });
+                y += 10;
+                
+                // CH
+                pdf.text('சு:- ' + document.getElementById('ch').value, 20, y);
+                y += 15;
+                
+                // Officer details
+                const officerDetails = document.getElementById('officerDetails').value;
+                const splitOfficerDetails = pdf.splitTextToSize(officerDetails, 170);
+                pdf.text(splitOfficerDetails, 20, y);
+                y += (splitOfficerDetails.length * 6) + 10;
+                
+                // Questions
+                pdf.text('உடலில் காணப்பட்ட காயங்கள் மற்றும் வடுக்கள் ?', 20, y);
+                y += 10;
+                pdf.text('மேலே 2?ல் குறிப்பிடப்பட்ட காயங்கள் எவ்வகையில், எந்த ஆயுதத்தால் ஏற்பட்டதாக காணப்படுகின்றன?', 20, y);
+                y += 10;
+                pdf.text('கொருவுடன் கையகப்படுத்தப்பட்ட பொருட்களும் தெரிவு செய்யப்படுகின்றன.', 20, y);
+                y += 15;
+                
+                // Clothes
+                pdf.text('ஆடைகள்:- ' + document.getElementById('clothes').value, 20, y);
+                y += 20;
+                
+                // Items
+                pdf.text('நகங்கள் (கேள்விகள்)- இல்லை', 20, y);
+                y += 10;
+                pdf.text('சிறு காயங்கள்- இல்லை     காய்ச்சல் :-  இல்லை     தேவையானது :-  இல்லை', 20, y);
+                y += 10;
+                pdf.text('தேய்ப்பு :-  இல்லை', 20, y);
+                y += 10;
+                pdf.text('ஆயுதங்கள்  இல்லை', 20, y);
+                y += 15;
+                
+                // Police station and date
+                pdf.text('காவல் நிலையம் :- ' + document.getElementById('policeStation').value, 20, y);
+                y += 10;
+                pdf.text('தேதி : ' + document.getElementById('date').value, 20, y);
+                
+                // Save PDF
+                const fileName = `கொரு_முஹாத்து_ஆவணம்_${new Date().getTime()}.pdf`;
+                pdf.save(fileName);
+                
+                showMessage('PDF வெற்றிகரமாக உருவாக்கப்பட்டது!', 'success');
+                
+            } catch (error) {
+                console.error('PDF பிழை:', error);
+                showMessage(`PDF உருவாக்க பிழை: ${error.message}`, 'error');
+            }
+        }
+        
+        // Generate PDF with html2canvas (alternative method)
+        async function generatePDFWithCanvas() {
+            try {
+                showMessage('PDF உருவாக்கப்படுகிறது... தயவு செய்து காத்திருக்கவும்', 'success');
+                
+                // Create a temporary element for capture
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.top = '0';
+                tempDiv.style.width = '794px'; // A4 width in pixels at 96 DPI
+                tempDiv.style.padding = '40px';
+                tempDiv.style.background = 'white';
+                tempDiv.style.fontFamily = "'Noto Sans Tamil', sans-serif";
+                tempDiv.style.fontSize = '12px';
+                tempDiv.style.lineHeight = '1.6';
+                tempDiv.innerHTML = generateDocumentHTML();
+                
+                document.body.appendChild(tempDiv);
+                
+                // Capture with html2canvas
+                const canvas = await html2canvas(tempDiv, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+                
+                // Remove temp element
+                document.body.removeChild(tempDiv);
+                
+                // Create PDF
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Add image to PDF
+                const imgWidth = 190;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                const imgData = canvas.toDataURL('image/png');
+                
+                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                
+                // Save PDF
+                const fileName = `கொரு_முஹாத்து_ஆவணம்_${new Date().getTime()}.pdf`;
+                pdf.save(fileName);
+                
+                showMessage('PDF வெற்றிகரமாக உருவாக்கப்பட்டது!', 'success');
+                
+            } catch (error) {
+                console.error('Canvas PDF பிழை:', error);
+                // Fallback to simple PDF
+                generateSimplePDF();
+            }
+        }
+        
+        // Generate PDF button handler
+        generatePdfBtn.addEventListener('click', function() {
+            // Try canvas method first, fallback to simple method
+            generatePDFWithCanvas().catch(error => {
+                console.error('Canvas method failed:', error);
+                generateSimplePDF();
+            });
+        });
+        
+        // Reset form
+        resetBtn.addEventListener('click', function() {
+            document.getElementById('refNo').value = "G-7 நிர்ணயிக்கப்பட்ட ஃபைல்/எப்.பி/எஃப். எண்/12 /2026";
+            document.getElementById('caseNo').value = "ஆர்-ஜிபி/194 BNSS எண்:- 2332/20 U/S 174 C";
+            document.getElementById('gotkNo').value = "";
+            document.getElementById('mizNo').value = "67";
+            document.getElementById('personName').value = "நகஃப். எம்/டி 34. ஜே/பி.கி மொஹிதா. எண் 23. கச்சகாயில் பிளாக். பிரதான் எஸ்டேட். சென்னை?30";
+            document.getElementById('age').value = "49.";
+            document.getElementById('gender').value = "ஆண்;";
+            document.getElementById('build').value = "கருப்பு நிறம்";
+            document.getElementById('height').value = "அடி 5 1/2 அங்குலம்";
+            document.getElementById('complexion').value = "";
+            document.getElementById('hair').value = "";
+            document.getElementById('specialMarks').value = "1) இடது கை முழங்கையில் ஒரு வடு;\n2) இடது காலில் ஒரு வடு;\nமுகத்தில் வடு ஒரு வடு;";
+            document.getElementById('ch').value = "பிரதான் எஸ்டேட் ஆர்.பி";
+            document.getElementById('officerDetails').value = "தெரிவு செய்தவர் நிர்ணயிக்கப்பட்ட காவல் நிலையம் காவல் நிலையம் சம்பந்தப்பட்ட அதிகாரி 16/01/2026 ஆம் நாள் நேரம் 11.30 மணிக்கு G7 நிர்ணயிக்கப்பட்ட காவலர் PC 63364 திரு.ரெஞ்சு சகாய் என்பவரை கைது செய்து விசாரணையின் போது கைவசம் இருந்த பொருட்களை காட்டும் கீழ்க்குறிப்பு அரசு மருத்துவமனை மருத்துவ வாரியத்திற்கு தெரிவு செய்யப்பட்டது/";
+            document.getElementById('clothes').value = "முழுக்கை மற்றும் பாக்கெட்டுடன் கூடிய காலர் சட்டை , ஸ்காட் காலர் ஷர்ட் , வெள்ளை ஷர்ட் , கருப்பு ஷர்ட் , ப்ளேக் ஷர்ட் சஸ்பென்டர். வெள்ளை மற்றும் பாக்கெட்டுடன் கூடிய $பேண்ட்!; நீளம்;";
+            document.getElementById('policeStation').value = "G-7 நிர்ணயிக்கப்பட்ட காவல் நிலையம்";
+            document.getElementById('date').value = "16.01.2026.";
+            
+            updatePreview();
+            showMessage('படிவம் மீட்டமைக்கப்பட்டது!', 'success');
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update preview on input
+            const formIds = ['refNo', 'caseNo', 'gotkNo', 'mizNo', 'personName', 'age', 
+                           'gender', 'build', 'height', 'complexion', 'hair', 'specialMarks',
+                           'ch', 'officerDetails', 'clothes', 'policeStation', 'date'];
+            
+            formIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', updatePreview);
+                }
+            });
+            
+            // Initial preview
+            updatePreview();
+            
+            // Check if libraries are loaded
+            if (typeof jsPDF === 'undefined') {
+                showMessage('எச்சரிக்கை: jsPDF நூலகம் ஏற்றப்படவில்லை', 'error');
+            }
+            
+            if (typeof html2canvas === 'undefined') {
+                showMessage('எச்சரிக்கை: html2canvas நூலகம் ஏற்றப்படவில்லை', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
