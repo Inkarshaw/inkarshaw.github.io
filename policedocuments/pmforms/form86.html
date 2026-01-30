@@ -202,7 +202,7 @@
                 <h2 class="section-title">தகவல்களை உள்ளிடுக</h2>
                 
                 <div class="form-group">
-                    <label for="refNo">குறிப்பு எண்:</label>
+                    <label for="refNo">பார்வை:</label>
                     <input type="text" id="refNo" value="G-7 நிர்ணயிக்கப்பட்ட ஃபைல்/எப்.பி/எஃப். எண்/12 /2026">
                 </div>
                 
@@ -213,11 +213,11 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="gotkNo">கோட்டகி எண்:</label>
+                        <label for="gotkNo">படிவம் எண்:</label>
                         <input type="text" id="gotkNo" placeholder="_______________">
                     </div>
                     <div class="form-group">
-                        <label for="mizNo">மீஸ் எண்:</label>
+                        <label for="mizNo">ஆணை எண்:</label>
                         <input type="text" id="mizNo" value="67">
                     </div>
                 </div>
@@ -264,7 +264,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="specialMarks">சிறப்பு குறிகள்:</label>
+                    <label for="specialMarks">அங்க மச்ச அடையாளங்கள்:</label>
                     <textarea id="specialMarks">1) இடது கை முழங்கையில் ஒரு வடு;
 2) இடது காலில் ஒரு வடு;
 முகத்தில் வடு ஒரு வடு;</textarea>
@@ -354,12 +354,12 @@
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <span style="font-weight: bold;">கோட்டகி எண்:</span> ${gotkNo}
-                        <span style="margin-left: 100px; font-weight: bold;">மீஸ் எண்:</span> ${document.getElementById('mizNo').value}
+                        <span style="font-weight: bold;">படிவம் எண்:</span> ${gotkNo}
+                        <span style="margin-left: 100px; font-weight: bold;">ஆணை எண்:</span> ${document.getElementById('mizNo').value}
                     </div>
                     
                     <div style="font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
-                        பின்வரும் விவரங்களை நிரப்ப வேண்டிய அட்டவணை
+                        தொடக்கத்தில் எழுதவேண்டிய விவரங்கள்
                     </div>
                     
                     <div style="margin-bottom: 8px;">
@@ -382,7 +382,7 @@
                     </div>
                     
                     <div style="margin-bottom: 8px;">
-                        <span style="font-weight: bold;">சிறப்பு குறிகள் :</span> ?
+                        <span style="font-weight: bold;">அங்க மச்ச அடையாளங்கள் :</span> ?
                     </div>
                     
                     <div style="margin-bottom: 8px;">
@@ -420,13 +420,13 @@
                     </div>
                     
                     <div style="margin-bottom: 8px;">
-                        <span style="font-weight: bold;">நகங்கள் (கேள்விகள்)-</span> இல்லை
+                        <span style="font-weight: bold;">அணிகலன்கள்(நகைகள்)-</span> இல்லை
                     </div>
                     
                     <div style="margin-bottom: 8px;">
-                        <span style="font-weight: bold;">சிறு காயங்கள்-</span> இல்லை
-                        <span style="margin-left: 30px; font-weight: bold;">காய்ச்சல் :-</span> இல்லை
-                        <span style="margin-left: 30px; font-weight: bold;">தேவையானது :-</span> இல்லை
+                        <span style="font-weight: bold;">சிறுநீர் மலம்-</span> இல்லை
+                        <span style="margin-left: 30px; font-weight: bold;">வாந்தியானது:-</span> இல்லை
+                        <span style="margin-left: 30px; font-weight: bold;">விந்து :-</span> இல்லை
                     </div>
                     
                     <div style="margin-bottom: 8px;">
@@ -488,12 +488,12 @@
                 
                 // Gotk and Miz numbers
                 const gotkNo = document.getElementById('gotkNo').value || '_______________';
-                pdf.text('கோட்டகி எண்: ' + gotkNo, 20, y);
-                pdf.text('மீஸ் எண்: ' + document.getElementById('mizNo').value, 120, y);
+                pdf.text('படிவம் எண்: ' + gotkNo, 20, y);
+                pdf.text('ஆணை எண்: ' + document.getElementById('mizNo').value, 120, y);
                 y += 10;
                 
                 // Section title
-                pdf.text('பின்வரும் விவரங்களை நிரப்ப வேண்டிய அட்டவணை', 20, y);
+                pdf.text('தொடக்கத்தில் எழுதவேண்டிய விவரங்கள்', 20, y);
                 y += 10;
                 
                 // Name
@@ -513,7 +513,7 @@
                 y += 15;
                 
                 // Special marks
-                pdf.text('சிறப்பு குறிகள் : ?', 20, y);
+                pdf.text('அங்க மச்ச அடையாளங்கள் : ?', 20, y);
                 y += 10;
                 pdf.text('கையில் உள்ள குறிகள் :', 20, y);
                 y += 7;
@@ -549,9 +549,9 @@
                 y += 20;
                 
                 // Items
-                pdf.text('நகங்கள் (கேள்விகள்)- இல்லை', 20, y);
+                pdf.text('அணிகலன்கள்(நகைகள்)- இல்லை', 20, y);
                 y += 10;
-                pdf.text('சிறு காயங்கள்- இல்லை     காய்ச்சல் :-  இல்லை     தேவையானது :-  இல்லை', 20, y);
+                pdf.text('சிறுநீர் மலம்- இல்லை     வாந்தியானது:-  இல்லை     விந்து :-  இல்லை', 20, y);
                 y += 10;
                 pdf.text('தேய்ப்பு :-  இல்லை', 20, y);
                 y += 10;
