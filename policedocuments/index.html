@@ -355,7 +355,7 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value">30</div>
+                <div class="stat-value">31</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
@@ -533,6 +533,22 @@
                                 <i>📝</i> Word
                             </a>
                             <a href="https://www.clearexams.online/policedocuments/incident_report_form.pdf" target="_blank" class="btn btn-pdf">
+                                <i>📄</i> PDF
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- MM PT Warrant Entry - ADDED -->
+                    <li class="document-item" data-title="MM PT Warrant" data-desc="Metropolitan Magistrate/Police Training Warrant for court procedures">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>MM PT Warrant</div>
+                            <div class="doc-desc">Metropolitan Magistrate/Police Training Warrant for court procedures</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.doc" target="_blank" class="btn btn-word">
+                                <i>📝</i> Word
+                            </a>
+                            <a href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.pdf" target="_blank" class="btn btn-pdf">
                                 <i>📄</i> PDF
                             </a>
                         </div>
@@ -1134,7 +1150,7 @@
     </div>
 
     <script>
-        // Document data for search functionality - UPDATED to include Form 86
+        // Document data for search functionality - UPDATED to include MM PT Warrant
         const documents = [
             // Download Forms
             { title: "House Building Application Form", desc: "HBA application form for police personnel housing loan", type: "download", element: null },
@@ -1147,8 +1163,9 @@
             { title: "EL Form", desc: "Earned Leave application form for police personnel", type: "download", element: null },
             { title: "EL Surrender Form", desc: "Form for surrendering unused Earned Leave days", type: "download", element: null },
             { title: "Incident Report Form", desc: "Standard form for documenting incidents and criminal activities", type: "download", element: null },
+            { title: "MM PT Warrant", desc: "Metropolitan Magistrate/Police Training Warrant for court procedures", type: "download", element: null }, // ADDED
             
-            // Generate PDFs - ADDED Form 86
+            // Generate PDFs
             { title: "Form 86", desc: "Generate Form 86 for police department official documentation", type: "generate", element: null },
             { title: "Death Report", desc: "Generate comprehensive death report for medico-legal cases", type: "generate", element: null },
             { title: "Tahsildar Letter", desc: "Generate official letters to Tahsildar for land records and revenue matters", type: "generate", element: null },
@@ -1397,12 +1414,13 @@
                 { name: "ndps_ca", title: "NDPS CA", folder: "" },
                 { name: "el_form", title: "EL Form", folder: "" },
                 { name: "el_surrender_form", title: "EL Surrender Form", folder: "" },
-                { name: "incident_report_form", title: "Incident Report Form", folder: "" }
+                { name: "incident_report_form", title: "Incident Report Form", folder: "" },
+                { name: "mm_pt_warrant", title: "MM PT Warrant", folder: "court_forms/" } // ADDED
             ];
             
             downloadForms.forEach(form => {
                 // Word button handlers
-                const wordBtn = document.querySelector(`a[href="https://${form.folder ? 'www.' : ''}clearexams.online/policedocuments/${form.folder}${form.name}.doc"]`);
+                const wordBtn = document.querySelector(`a[href="https://${form.folder ? 'clearexams.online' : 'www.clearexams.online'}/policedocuments/${form.folder}${form.name}.doc"]`);
                 if (wordBtn) {
                     wordBtn.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -1414,7 +1432,7 @@
                 }
                 
                 // PDF button handlers
-                const pdfBtn = document.querySelector(`a[href="https://${form.folder ? 'www.' : ''}clearexams.online/policedocuments/${form.folder}${form.name}.pdf"]`);
+                const pdfBtn = document.querySelector(`a[href="https://${form.folder ? 'clearexams.online' : 'www.clearexams.online'}/policedocuments/${form.folder}${form.name}.pdf"]`);
                 if (pdfBtn) {
                     pdfBtn.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -1449,7 +1467,7 @@
                 });
             }
             
-            // Generate PDFs handlers - ADDED Form 86 handler
+            // Generate PDFs handlers
             const generatePDFLinks = document.querySelectorAll('.btn-generate');
             generatePDFLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -1480,6 +1498,29 @@
                 deathReportLink.addEventListener('click', function(e) {
                     e.preventDefault();
                     showNotification('Opening Death Report Generator...');
+                    setTimeout(() => {
+                        window.open(this.href, '_blank');
+                    }, 500);
+                });
+            }
+            
+            // Special handling for MM PT Warrant
+            const mmPtWarrantWordBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.doc"]');
+            if (mmPtWarrantWordBtn) {
+                mmPtWarrantWordBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification('Opening MM PT Warrant (Word)...');
+                    setTimeout(() => {
+                        window.open(this.href, '_blank');
+                    }, 500);
+                });
+            }
+            
+            const mmPtWarrantPdfBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.pdf"]');
+            if (mmPtWarrantPdfBtn) {
+                mmPtWarrantPdfBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification('Opening MM PT Warrant (PDF)...');
                     setTimeout(() => {
                         window.open(this.href, '_blank');
                     }, 500);
