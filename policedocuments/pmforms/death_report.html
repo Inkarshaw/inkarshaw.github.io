@@ -265,6 +265,73 @@
             line-height: 1.5 !important;
             box-sizing: border-box;
         }
+        
+        .searchable-select {
+            position: relative;
+        }
+        
+        .search-box {
+            margin-bottom: 5px;
+            padding: 6px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .station-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 5px;
+            display: none;
+            position: absolute;
+            background: white;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .station-item {
+            padding: 8px 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        
+        .station-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .station-item.selected {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .custom-option {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .crime-number-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .crime-number-container input {
+            flex: 1;
+        }
+        
+        .crime-number-container .slash {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .year-select {
+            width: 100px !important;
+        }
     </style>
 </head>
 <body>
@@ -274,21 +341,29 @@
             
             <form id="deathReportForm">
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group searchable-select">
                         <label for="policeStation" class="required">1. காவல் நிலையம்</label>
-                        <input type="text" id="policeStation" name="policeStation" required>
+                        <input type="text" id="policeStation" name="policeStation" required placeholder="காவல் நிலையத்தை தேடவும் அல்லது தேர்ந்தெடுக்கவும்">
+                        <input type="text" id="stationSearch" class="search-box" placeholder="தேடவும்..." style="display: none;">
+                        <div id="stationList" class="station-list"></div>
                     </div>
                     
                     <div class="form-group">
                         <label for="crimeNumber" class="required">2. குற்ற எண்</label>
-                        <input type="text" id="crimeNumber" name="crimeNumber" required>
+                        <div class="crime-number-container">
+                            <input type="text" id="crimeNumber" name="crimeNumber" required placeholder="எண்" style="flex: 1;">
+                            <span class="slash">/</span>
+                            <select id="crimeYear" class="year-select" name="crimeYear" required style="width: 100px;">
+                                <!-- Years will be populated by JavaScript -->
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="section" class="required">3. பிரிவு</label>
-                        <input type="text" id="section" name="section" required>
+                        <input type="text" id="section" name="section" value="194 BNSS" required>
                     </div>
                     
                     <div class="form-group">
@@ -421,14 +496,308 @@
         // Load jsPDF
         const { jsPDF } = window.jspdf;
         
+        // Police stations data
+        const policeStations = [
+            "AWPS பேரவள்ளூர்",
+            "B1 வடக்குக் கடற்கரை காவல் நிலையம்",
+            "B2 எஸ்பிளனேட் காவல் நிலையம்",
+            "B3 கோட்டை செயின்ட் ஜார்ஜ் காவல் நிலையம்",
+            "B4 உயர்நீதிமன்ற காவல் நிலையம்",
+            "C1 பூக்கடை காவல் நிலையம்",
+            "C2 எலிபெண்ட் கேட் காவல் நிலையம்",
+            "C3 செவன் வெல்ஸ் காவல் நிலையம்",
+            "C4 அரசு பொது மருத்துவமனை அவுட்போஸ்ட்",
+            "C5 கொத்தவால் சாவடி காவல் நிலையம்",
+            "D1 திருப்பள்ளிக்கேணி காவல் நிலையம்",
+            "D2 அண்ணா சாலை காவல் நிலையம்",
+            "D3 ஐஸ் ஹவுஸ் காவல் நிலையம்",
+            "D4 ஜாம் பஜார் காவல் நிலையம்",
+            "D5 மெரினா காவல் நிலையம்",
+            "D6 அண்ணா சதுக்கம் காவல் நிலையம்",
+            "D6 அண்ணா சதுக்கம் போக்குவரத்து விசாரணை",
+            "D7 அரசு எஸ்டேட் காவல் நிலையம்",
+            "D8 கஸ்தூரிபாய் காந்தி மருத்துவமனை காவல் நிலையம்",
+            "E1 மயிலாப்பூர் காவல் நிலையம்",
+            "E2 ராயப்பேட்டை காவல் நிலையம்",
+            "E3 தேனாம்பேட்டை காவல் நிலையம்",
+            "E4 அபிராமபுரம் காவல் நிலையம்",
+            "E5 பட்டினப்பாக்கம் காவல் நிலையம்",
+            "F1 சிந்தாதிரிப்பேட்டை காவல் நிலையம்",
+            "F2 எழும்பூர் காவல் நிலையம்",
+            "F3 நுங்கம்பாக்கம் காவல் நிலையம்",
+            "F4 தௌசண்ட் லைட்ஸ் காவல் நிலையம்",
+            "F5 சேத்துப்பட்டு காவல் நிலையம்",
+            "F6 மியூசியம் காவல் நிலையம்",
+            "F7 அரசு மகளிர் குழந்தைகள் மருத்துவமனை காவல் நிலையம்",
+            "G1 வேப்பேரி காவல் நிலையம்",
+            "G2 பெரியமேடு காவல் நிலையம்",
+            "G3 கிளிப்பாக் காவல் நிலையம்",
+            "G3 கிளிப்பாக் போக்குவரத்து விசாரணை",
+            "G4 மனநல மருத்துவமனை அவுட்போஸ்ட்",
+            "G5 செயலக காலனி காவல் நிலையம்",
+            "G6 கிளிப்பாக் மருத்துவக் கல்லூரி காவல் நிலையம்",
+            "G7 சேத்துபட்டு காவல் நிலையம்",
+            "H1 பழைய வண்ணாரப்பேட்டை காவல் நிலையம்",
+            "H2 ஸ்டான்லி மருத்துவமனை அவுட்போஸ்ட்",
+            "H3 தொண்டையார்பேட்டை காவல் நிலையம்",
+            "H4 கொருக்குப்பேட்டை காவல் நிலையம்",
+            "H5 புதிய வண்ணாரப்பேட்டை காவல் நிலையம்",
+            "H6 டாக்டர் ராதாகிருஷ்ணன் நகர்",
+            "H8 திருவொற்றியூர் காவல் நிலையம்",
+            "J13 தரமணி காவல் நிலையம்",
+            "J1 சைதாப்பேட்டை காவல் நிலையம்",
+            "J2 அடையாறு காவல் நிலையம்",
+            "J3 கிண்டி காவல் நிலையம்",
+            "J4 கொட்டூர்புரம் காவல் நிலையம்",
+            "J5 சாஸ்திரி நகர் காவல் நிலையம்",
+            "J6 திருவான்மியூர் காவல் நிலையம்",
+            "J7 வேளச்சேரி காவல் நிலையம்",
+            "J8 நீலாங்கரை காவல் நிலையம்",
+            "J9 துரைப்பாக்கம் காவல் நிலையம்",
+            "K10 கோயம்பேடு காவல் நிலையம்",
+            "K10 TIW கோயம்பேடு",
+            "K11 CMBT காவல் நிலையம்",
+            "K1 செம்பியம் காவல் நிலையம்",
+            "K2 அயனாவரம் காவல் நிலையம்",
+            "K3 அமைஞ்சிக்கரை காவல் நிலையம்",
+            "K4 அண்ணா நகர் காவல் நிலையம்",
+            "K4 TIW அண்ணா நகர்",
+            "K5 பேரவள்ளூர் காவல் நிலையம்",
+            "K6 டிபி சத்திரம் காவல் நிலையம்",
+            "K7 ICF காவல் நிலையம்",
+            "K8 அரும்பாக்கம் காவல் நிலையம்",
+            "K9 திரு வி க நகர் காவல் நிலையம்",
+            "M1 ஹார்பர் காவல் நிலையம்",
+            "M2 வாட்டர் பிரோன் காவல் நிலையம்",
+            "N1 ராயபுரம் காவல் நிலையம்",
+            "N2 காசிமேடு காவல் நிலையம்",
+            "N3 முத்தியால்பேட்டை காவல் நிலையம்",
+            "N4 மீன்பிடி துறைமுக காவல் நிலையம்",
+            "N5 RSRM மருத்துவமனை காவல் நிலையம்",
+            "P1 புளியந்தோப்பு காவல் நிலையம்",
+            "P2 ஒட்டேரி காவல் நிலையம்",
+            "P3 வியாசர்பாடி காவல் நிலையம்",
+            "P4 பேசின் பிரிட்ஜ் காவல் நிலையம்",
+            "P5 MKB நகர் காவல் நிலையம்",
+            "P6 கொடுங்கையூர் காவல் நிலையம்",
+            "R10 எம்ஜிஆர் நகர் காவல் நிலையம்",
+            "R1 மாம்பலம் காவல் நிலையம்",
+            "R2 கோடம்பாக்கம் காவல் நிலையம்",
+            "R3 அசோக் நகர் காவல் நிலையம்",
+            "R4 பாண்டி பஜார் காவல் நிலையம்",
+            "R4 TIW பாண்டி பஜார்",
+            "R5 சூளைமேடு காவல் நிலையம்",
+            "R6 குமரன் காலனி காவல் நிலையம்",
+            "R7 கேகே நகர் காவல் நிலையம்",
+            "R9 வளசரவாக்கம் காவல் நிலையம்",
+            "V1 வில்லிவாக்கம் காவல் நிலையம்",
+            "V2 விருகம்பாக்கம் காவல் நிலையம்",
+            "V3 ஜே ஜே நகர் காவல் நிலையம்",
+            "V4 ராஜமங்கலம் காவல் நிலையம்",
+            "V5 திருமங்கலம் காவல் நிலையம்",
+            "V5 TIW திருமங்கலம்",
+            "V6 கொளத்தூர் காவல் நிலையம்",
+            "W10 அனைத்து மகளிர் காவல் நிலையம் பூக்கடை",
+            "W11 அனைத்து மகளிர் காவல் நிலையம் உயர்நீதிமன்றம்",
+            "W12 அனைத்து மகளிர் காவல் நிலையம் ஹார்பர்",
+            "W13 அனைத்து மகளிர் காவல் நிலையம் வண்ணாரப்பேட்டை",
+            "W14 அனைத்து மகளிர் காவல் நிலையம் திருவொற்றியூர்",
+            "W15 அனைத்து மகளிர் காவல் நிலையம் ராயபுரம்",
+            "W16 அனைத்து மகளிர் காவல் நிலையம் புளியந்தோப்பு",
+            "W18 அனைத்து மகளிர் காவல் நிலையம் MKB நகர்",
+            "W19 அனைத்து மகளிர் காவல் நிலையம் அடையாறு",
+            "W1 அனைத்து மகளிர் காவல் நிலையம் தௌசண்ட் லைட்ஸ்",
+            "W20 அனைத்து மகளிர் காவல் நிலையம் சைதாப்பேட்டை",
+            "W21 அனைத்து மகளிர் காவல் நிலையம் கிண்டி",
+            "W22 அனைத்து மகளிர் காவல் நிலையம் மயிலாப்பூர்",
+            "W23 அனைத்து மகளிர் காவல் நிலையம் ராயப்பேட்டை",
+            "W24 அனைத்து மகளிர் காவல் நிலையம் தேனாம்பேட்டை",
+            "W25 அனைத்து மகளிர் காவல் நிலையம் தி நகர்",
+            "W26 அனைத்து மகளிர் காவல் நிலையம் அசோக் நகர்",
+            "W27 அனைத்து மகளிர் காவல் நிலையம் வடபழனி",
+            "W2 அனைத்து மகளிர் காவல் நிலையம் அடையாறு",
+            "W2 AWPS திருப்பள்ளிக்கேணி",
+            "W35 கோயம்பேடு AWPS",
+            "W38 கொளத்தூர் AWPS",
+            "W4 அனைத்து மகளிர் காவல் நிலையம் கிளிப்பாக்",
+            "W5 அனைத்து மகளிர் காவல் நிலையம் வேப்பேரி",
+            "W6 அனைத்து மகளிர் காவல் நிலையம் அயனாவரம்",
+            "W7 AWPS அண்ணா நகர்",
+            "W8 அனைத்து மகளிர் காவல் நிலையம் திருமங்கலம்",
+            "W9 அனைத்து மகளிர் காவல் நிலையம் வில்லிவாக்கம்"
+        ];
+        
         // Form elements
         const form = document.getElementById('deathReportForm');
+        const policeStationInput = document.getElementById('policeStation');
+        const stationSearch = document.getElementById('stationSearch');
+        const stationList = document.getElementById('stationList');
+        const crimeNumberInput = document.getElementById('crimeNumber');
+        const crimeYearSelect = document.getElementById('crimeYear');
+        const sectionInput = document.getElementById('section');
         const previewBtn = document.getElementById('previewBtn');
         const generateBtn = document.getElementById('generatePdf');
         const resetBtn = document.getElementById('resetForm');
         const previewContent = document.getElementById('previewContent');
         const successMessage = document.getElementById('successMessage');
         const pdfTemplateContainer = document.getElementById('pdfTemplateContainer');
+        
+        // Function to populate year dropdown
+        function populateYearDropdown() {
+            const currentYear = new Date().getFullYear();
+            const startYear = currentYear - 10; // Last 10 years
+            const endYear = currentYear + 5; // Next 5 years
+            
+            crimeYearSelect.innerHTML = '';
+            
+            for (let year = startYear; year <= endYear; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (year === currentYear) {
+                    option.selected = true;
+                }
+                crimeYearSelect.appendChild(option);
+            }
+        }
+        
+        // Initialize police station dropdown
+        function initializePoliceStationDropdown() {
+            // Create station list items
+            policeStations.forEach(station => {
+                const item = document.createElement('div');
+                item.className = 'station-item';
+                item.textContent = station;
+                item.addEventListener('click', () => {
+                    policeStationInput.value = station;
+                    stationList.style.display = 'none';
+                    stationSearch.style.display = 'none';
+                    stationSearch.value = '';
+                    showPreview();
+                });
+                stationList.appendChild(item);
+            });
+            
+            // Add "மற்றவை" option
+            const otherOption = document.createElement('div');
+            otherOption.className = 'station-item custom-option';
+            otherOption.textContent = 'மற்றவை (தனிப்பயன்)';
+            otherOption.addEventListener('click', () => {
+                policeStationInput.value = '';
+                stationList.style.display = 'none';
+                stationSearch.style.display = 'none';
+                policeStationInput.focus();
+            });
+            stationList.appendChild(otherOption);
+            
+            // Show dropdown when input is clicked
+            policeStationInput.addEventListener('click', (e) => {
+                stationSearch.style.display = 'block';
+                stationList.style.display = 'block';
+                filterStations();
+                stationSearch.focus();
+                e.stopPropagation();
+            });
+            
+            // Search functionality
+            stationSearch.addEventListener('input', filterStations);
+            
+            // Hide dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.searchable-select')) {
+                    stationList.style.display = 'none';
+                    stationSearch.style.display = 'none';
+                }
+            });
+            
+            // Handle keyboard navigation
+            policeStationInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    stationSearch.style.display = 'block';
+                    stationList.style.display = 'block';
+                    filterStations();
+                    stationSearch.focus();
+                }
+            });
+            
+            stationSearch.addEventListener('keydown', (e) => {
+                const items = stationList.querySelectorAll('.station-item:not(.custom-option)');
+                const visibleItems = Array.from(items).filter(item => 
+                    item.style.display !== 'none' && !item.classList.contains('custom-option')
+                );
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (visibleItems.length > 0) {
+                        visibleItems[0].classList.add('selected');
+                        visibleItems[0].focus();
+                    }
+                }
+            });
+            
+            stationList.addEventListener('keydown', (e) => {
+                const items = stationList.querySelectorAll('.station-item:not(.custom-option)');
+                const visibleItems = Array.from(items).filter(item => 
+                    item.style.display !== 'none' && !item.classList.contains('custom-option')
+                );
+                const currentIndex = visibleItems.findIndex(item => item.classList.contains('selected'));
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currentIndex < visibleItems.length - 1) {
+                        visibleItems.forEach(item => item.classList.remove('selected'));
+                        visibleItems[currentIndex + 1].classList.add('selected');
+                        visibleItems[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        visibleItems.forEach(item => item.classList.remove('selected'));
+                        visibleItems[currentIndex - 1].classList.add('selected');
+                        visibleItems[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const selectedItem = stationList.querySelector('.station-item.selected');
+                    if (selectedItem) {
+                        selectedItem.click();
+                    }
+                } else if (e.key === 'Escape') {
+                    stationList.style.display = 'none';
+                    stationSearch.style.display = 'none';
+                    policeStationInput.focus();
+                }
+            });
+        }
+        
+        function filterStations() {
+            const searchTerm = stationSearch.value.toLowerCase();
+            const items = stationList.querySelectorAll('.station-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm) || searchTerm === '') {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+                item.classList.remove('selected');
+            });
+            
+            // Select first visible item
+            const visibleItems = stationList.querySelectorAll('.station-item[style="display: block"]');
+            if (visibleItems.length > 0 && !visibleItems[0].classList.contains('custom-option')) {
+                visibleItems[0].classList.add('selected');
+            }
+        }
+        
+        // Initialize year dropdown and police station dropdown
+        populateYearDropdown();
+        initializePoliceStationDropdown();
+        
+        // Set default section value
+        sectionInput.value = "194 BNSS";
         
         // Event Listeners
         previewBtn.addEventListener('click', showPreview);
@@ -452,9 +821,10 @@
         
         function getFormData() {
             return {
-                policeStation: document.getElementById('policeStation').value,
-                crimeNumber: document.getElementById('crimeNumber').value,
-                section: document.getElementById('section').value,
+                policeStation: policeStationInput.value,
+                crimeNumber: crimeNumberInput.value,
+                crimeYear: crimeYearSelect.value,
+                section: sectionInput.value,
                 name: document.getElementById('name').value,
                 fatherName: document.getElementById('fatherName').value,
                 polym: document.getElementById('polym').value,
@@ -470,6 +840,14 @@
                 bodyDisposal: document.getElementById('bodyDisposal').value,
                 informantName: document.getElementById('informantName').value
             };
+        }
+        
+        function getFormattedCrimeNumber() {
+            const data = getFormData();
+            if (data.crimeNumber && data.crimeYear) {
+                return `${data.crimeNumber}/${data.crimeYear}`;
+            }
+            return data.crimeNumber || '';
         }
         
         function formatDate(dateString) {
@@ -495,12 +873,13 @@
             
             const data = getFormData();
             const formattedDate = formatDate(data.deathDate);
+            const formattedCrimeNumber = getFormattedCrimeNumber();
             
-            const previewHTML = createPDFHTML(data, formattedDate);
+            const previewHTML = createPDFHTML(data, formattedDate, formattedCrimeNumber);
             previewContent.innerHTML = previewHTML;
         }
         
-        function createPDFHTML(data, formattedDate) {
+        function createPDFHTML(data, formattedDate, formattedCrimeNumber) {
             return `
                 <div class="preview-page">
                     <div class="preview-header">
@@ -516,7 +895,7 @@
                         <tr>
                             <td class="preview-label">2. குற்ற எண்</td>
                             <td class="preview-colon">:</td>
-                            <td class="preview-value">${escapeHtml(data.crimeNumber) || '-'}</td>
+                            <td class="preview-value">${escapeHtml(formattedCrimeNumber) || '-'}</td>
                         </tr>
                         <tr>
                             <td class="preview-label">3. பிரிவு</td>
@@ -616,6 +995,7 @@
             
             const data = getFormData();
             const formattedDate = formatDate(data.deathDate);
+            const formattedCrimeNumber = getFormattedCrimeNumber();
             
             try {
                 // Create PDF template HTML with larger font sizes
@@ -634,7 +1014,7 @@
                             <tr>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">2. குற்ற எண்</td>
                                 <td style="padding: 10px 2px; vertical-align: top; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 16px !important;">:</td>
-                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(data.crimeNumber) || '-'}</td>
+                                <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-size: 16px !important;">${escapeHtml(formattedCrimeNumber) || '-'}</td>
                             </tr>
                             <tr>
                                 <td style="padding: 10px 6px; vertical-align: top; border-bottom: 1px solid #eee; font-weight: bold; font-size: 16px !important; text-align: left;">3. பிரிவு</td>
@@ -775,7 +1155,7 @@
                 
                 // Try simple fallback
                 try {
-                    generateSimplePDF(data);
+                    generateSimplePDF(data, formattedCrimeNumber);
                 } catch (fallbackError) {
                     console.error('Fallback also failed:', fallbackError);
                     alert('PDF உருவாக்கத்தில் பிழை. தயவு செய்து மீண்டும் முயற்சிக்கவும்.');
@@ -783,7 +1163,7 @@
             }
         }
         
-        function generateSimplePDF(data) {
+        function generateSimplePDF(data, formattedCrimeNumber) {
             const doc = new jsPDF();
             
             doc.setFontSize(16);
@@ -793,7 +1173,7 @@
             
             doc.text(`1. காவல் நிலையம்: ${data.policeStation}`, 20, yPos);
             yPos += 10;
-            doc.text(`2. குற்ற எண்: ${data.crimeNumber}`, 20, yPos);
+            doc.text(`2. குற்ற எண்: ${formattedCrimeNumber}`, 20, yPos);
             yPos += 10;
             doc.text(`3. பிரிவு: ${data.section}`, 20, yPos);
             
@@ -806,6 +1186,10 @@
         function resetForm() {
             document.getElementById('pdfLoading').style.display = 'none';
             successMessage.style.display = 'none';
+            stationList.style.display = 'none';
+            stationSearch.style.display = 'none';
+            sectionInput.value = "194 BNSS";
+            populateYearDropdown(); // Reset year to current year
             previewContent.innerHTML = `
                 <div class="no-preview">
                     <p>படிவத்தை நிரப்பி "முன்னோட்டம் காட்டு" பொத்தானை அழுத்தவும்</p>
@@ -819,9 +1203,9 @@
         
         // Fill sample data for testing
         function fillSampleData() {
-            document.getElementById('policeStation').value = 'மத்திய காவல் நிலையம், சென்னை';
-            document.getElementById('crimeNumber').value = '4567/2023';
-            document.getElementById('section').value = '174 CrPC';
+            policeStationInput.value = 'B1 வடக்குக் கடற்கரை காவல் நிலையம்';
+            crimeNumberInput.value = '4567';
+            sectionInput.value = '194 BNSS';
             document.getElementById('name').value = 'ராஜேஷ் குமார்';
             document.getElementById('fatherName').value = 'மோகன் சிங்';
             document.getElementById('polym').value = 'ஆண்';
