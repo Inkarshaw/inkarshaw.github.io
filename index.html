@@ -6,25 +6,32 @@
 <title>Exam Quiz Platform</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Tamil&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
 /* ================= VARIABLES ================= */
 :root{
   --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --success:#10b981;
+  --danger:#ef4444;
+  --warning:#f59e0b;
   --bg:#f4f6fb;
   --card:#ffffff;
   --text:#111827;
   --muted:#6b7280;
   --border:#e5e7eb;
+  --shadow:0 4px 12px rgba(0,0,0,0.05);
 }
 
 /* DARK MODE */
 body.dark{
   --bg:#020617;
-  --card:#020617;
+  --card:#1e293b;
   --text:#e5e7eb;
   --muted:#9ca3af;
-  --border:#1f2937;
+  --border:#334155;
+  --shadow:0 4px 12px rgba(0,0,0,0.2);
 }
 
 /* ================= GLOBAL ================= */
@@ -35,6 +42,11 @@ body{
   background:var(--bg);
   color:var(--text);
   transition:.25s;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
 }
 
 /* ================= SPLASH SCREEN ================= */
@@ -68,16 +80,240 @@ header{
   text-align:center;
   position:relative;
 }
-.dark-toggle{
+.header-content{
+  max-width:1100px;
+  margin:0 auto;
+  position:relative;
+}
+
+.user-actions{
   position:absolute;
   right:15px;
-  top:15px;
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.dark-toggle, .login-btn{
   background:rgba(255,255,255,.2);
   border:none;
   color:#fff;
-  padding:6px 10px;
+  padding:8px 15px;
   border-radius:6px;
   cursor:pointer;
+  font-family:inherit;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  transition:background .2s;
+}
+
+.dark-toggle:hover, .login-btn:hover{
+  background:rgba(255,255,255,.3);
+}
+
+.user-info{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:white;
+}
+
+.user-avatar{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:rgba(255,255,255,.9);
+  color:#1e40af;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+.logout-btn{
+  background:rgba(255,255,255,.15);
+  border:none;
+  color:#fff;
+  padding:6px 12px;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:13px;
+}
+
+/* ================= MODAL ================= */
+.modal{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  z-index:1000;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal.active{
+  display:flex;
+}
+
+.modal-content{
+  background:var(--card);
+  border-radius:16px;
+  width:90%;
+  max-width:400px;
+  padding:30px;
+  box-shadow:var(--shadow);
+  animation:modalSlide .3s ease;
+}
+
+@keyframes modalSlide{
+  from{opacity:0;transform:translateY(-20px)}
+  to{opacity:1;transform:none}
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.modal-title{
+  font-size:20px;
+  font-weight:700;
+  margin:0;
+}
+
+.close-modal{
+  background:none;
+  border:none;
+  font-size:24px;
+  cursor:pointer;
+  color:var(--muted);
+}
+
+/* ================= FORM ================= */
+.form-group{
+  margin-bottom:18px;
+}
+
+.form-group label{
+  display:block;
+  margin-bottom:6px;
+  font-weight:600;
+  font-size:14px;
+}
+
+.form-input{
+  width:100%;
+  padding:12px 15px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--bg);
+  color:var(--text);
+  font-family:inherit;
+  font-size:15px;
+}
+
+.form-input:focus{
+  outline:none;
+  border-color:var(--primary);
+}
+
+.form-submit{
+  width:100%;
+  padding:13px;
+  background:var(--primary);
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:10px;
+  transition:background .2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.form-submit:hover{
+  background:var(--primary-dark);
+}
+
+.form-submit:disabled{
+  opacity:0.7;
+  cursor:not-allowed;
+}
+
+.form-switch{
+  text-align:center;
+  margin-top:20px;
+  font-size:14px;
+}
+
+.form-switch button{
+  background:none;
+  border:none;
+  color:var(--primary);
+  font-weight:600;
+  cursor:pointer;
+}
+
+.form-error{
+  color:var(--danger);
+  font-size:13px;
+  margin-top:5px;
+  display:none;
+}
+
+.form-success{
+  color:var(--success);
+  font-size:13px;
+  margin-top:5px;
+  display:none;
+}
+
+/* ================= LOADER ================= */
+.loader{
+  width:20px;
+  height:20px;
+  border:2px solid #fff;
+  border-bottom-color:transparent;
+  border-radius:50%;
+  display:inline-block;
+  animation:rotation 1s linear infinite;
+}
+
+@keyframes rotation{
+  0%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+
+.loading{
+  position:relative;
+  color:transparent !important;
+}
+
+.loading::after{
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  top:50%;
+  left:50%;
+  margin-left:-10px;
+  margin-top:-10px;
+  border:2px solid var(--primary);
+  border-bottom-color:transparent;
+  border-radius:50%;
+  animation:rotation 1s linear infinite;
 }
 
 /* ================= LAYOUT ================= */
@@ -102,9 +338,11 @@ header{
   text-align:center;
   transition:.18s ease;
   cursor:pointer;
+  display:block;
 }
 .quiz-card:hover{
   transform:translateY(-4px);
+  box-shadow:var(--shadow);
 }
 
 .quiz-icon{
@@ -139,6 +377,110 @@ footer{
   font-size:13px;
   color:var(--muted);
 }
+
+/* ================= ADMIN PANEL ================= */
+.admin-panel{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:100;
+}
+
+.admin-btn{
+  background:var(--primary);
+  color:white;
+  border:none;
+  border-radius:50%;
+  width:50px;
+  height:50px;
+  font-size:20px;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(37, 99, 235, 0.3);
+  transition:all .3s;
+}
+
+.admin-btn:hover{
+  transform:scale(1.1);
+}
+
+.admin-window{
+  position:fixed;
+  bottom:80px;
+  right:20px;
+  width:300px;
+  background:var(--card);
+  border-radius:12px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  display:none;
+  z-index:100;
+}
+
+.admin-window.active{
+  display:block;
+  animation:modalSlide .3s ease;
+}
+
+.admin-window h3{
+  margin-top:0;
+  margin-bottom:15px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.admin-stats{
+  background:var(--bg);
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+
+.admin-stats p{
+  margin:5px 0;
+  font-size:14px;
+}
+
+.download-btn{
+  width:100%;
+  padding:10px;
+  background:var(--success);
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:768px){
+  .user-actions{
+    position:static;
+    transform:none;
+    justify-content:center;
+    margin-top:15px;
+  }
+  
+  .header-content{
+    display:flex;
+    flex-direction:column;
+  }
+  
+  .modal-content{
+    padding:20px;
+    width:95%;
+  }
+  
+  .admin-window{
+    width:calc(100% - 40px);
+    right:20px;
+    left:20px;
+  }
+}
 </style>
 </head>
 
@@ -152,14 +494,122 @@ footer{
   </div>
 </div>
 
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Login</h2>
+      <button class="close-modal" onclick="closeModal()">×</button>
+    </div>
+    
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+        <div class="form-error" id="emailError"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+        <div class="form-error" id="passwordError"></div>
+      </div>
+      
+      <button type="submit" class="form-submit" id="loginSubmit">
+        <span id="loginText">Login</span>
+        <div id="loginLoader" class="loader" style="display:none"></div>
+      </button>
+      
+      <div class="form-switch">
+        Don't have an account? <button type="button" onclick="switchToSignup()">Sign up</button>
+      </div>
+    </form>
+    
+    <form id="signupForm" style="display:none">
+      <div class="form-group">
+        <label for="signupName">Full Name</label>
+        <input type="text" id="signupName" class="form-input" placeholder="Enter your name" required>
+        <div class="form-error" id="nameError"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="signupEmail">Email</label>
+        <input type="email" id="signupEmail" class="form-input" placeholder="your@email.com" required>
+        <div class="form-error" id="signupEmailError"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" class="form-input" placeholder="••••••••" required minlength="6">
+        <div class="form-error" id="signupPasswordError"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" required>
+        <div class="form-error" id="confirmError"></div>
+      </div>
+      
+      <button type="submit" class="form-submit" id="signupSubmit">
+        <span id="signupText">Create Account</span>
+        <div id="signupLoader" class="loader" style="display:none"></div>
+      </button>
+      
+      <div class="form-switch">
+        Already have an account? <button type="button" onclick="switchToLogin()">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel">
+  <button class="admin-btn" onclick="toggleAdminWindow()">
+    <i class="fas fa-chart-line"></i>
+  </button>
+  <div class="admin-window" id="adminWindow">
+    <h3><i class="fas fa-users-cog"></i> Admin Panel</h3>
+    
+    <div class="admin-stats">
+      <p><strong>Total Users:</strong> <span id="totalUsers">0</span></p>
+      <p><strong>Active Today:</strong> <span id="activeToday">0</span></p>
+      <p><strong>Last Sync:</strong> <span id="lastSync">Never</span></p>
+    </div>
+    
+    <button class="download-btn" onclick="downloadUserData()">
+      <i class="fas fa-download"></i> Download User Data
+    </button>
+  </div>
+</div>
+
 <header>
-  <h1>Exam Quiz</h1>
-  <p>Practice Smart. Crack Exams.</p>
-  <button class="dark-toggle" onclick="toggleDark()">🌙</button>
+  <div class="header-content">
+    <h1>Exam Quiz</h1>
+    <p>Practice Smart. Crack Exams.</p>
+    
+    <div class="user-actions">
+      <button class="dark-toggle" onclick="toggleDark()">
+        <i class="fas fa-moon"></i> Theme
+      </button>
+      
+      <div id="loggedOutSection">
+        <button class="login-btn" onclick="openModal('login')">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+      </div>
+      
+      <div id="loggedInSection" style="display:none">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <span id="userName">User</span>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </header>
 
 <div class="container">
-
   <h2>Subjects</h2>
 
   <!-- Skeleton Loader -->
@@ -172,7 +622,6 @@ footer{
 
   <!-- Actual Grid -->
   <div id="content" class="grid" style="display:none">
-
     <a class="quiz-card" href="exam/indian_polity.html">
       <div class="quiz-icon">⚖️</div>
       <h3>Indian Polity</h3>
@@ -208,9 +657,7 @@ footer{
       <h3>Yojana & Schemes</h3>
       <p>Central & TN Govt Schemes</p>
     </a>
-
   </div>
-
 </div>
 
 <footer>
@@ -218,26 +665,541 @@ footer{
 </footer>
 
 <script>
-/* Splash hide */
-setTimeout(()=>{
-  document.getElementById("splash").style.display="none";
-},1800);
+// ================= CONFIGURATION =================
+// REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT DEPLOYMENT URL
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwX3tZlvzrOJCxL3tSk6tifY_ygh-6lU8SLOK4GYxVW_diM42b7fYCluDx8NNT8aK6T/exec';
 
-/* Skeleton loader */
-setTimeout(()=>{
-  document.getElementById("skeleton").style.display="none";
-  document.getElementById("content").style.display="grid";
-},900);
+// ================= DOM ELEMENTS =================
+const splash = document.getElementById('splash');
+const skeleton = document.getElementById('skeleton');
+const content = document.getElementById('content');
+const loginModal = document.getElementById('loginModal');
+const modalTitle = document.getElementById('modalTitle');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const loggedOutSection = document.getElementById('loggedOutSection');
+const loggedInSection = document.getElementById('loggedInSection');
+const userAvatar = document.getElementById('userAvatar');
+const userName = document.getElementById('userName');
+const adminWindow = document.getElementById('adminWindow');
 
-/* Dark mode */
-function toggleDark(){
+// Form elements
+const loginSubmit = document.getElementById('loginSubmit');
+const loginText = document.getElementById('loginText');
+const loginLoader = document.getElementById('loginLoader');
+const signupSubmit = document.getElementById('signupSubmit');
+const signupText = document.getElementById('signupText');
+const signupLoader = document.getElementById('signupLoader');
+
+// Admin panel elements
+const totalUsers = document.getElementById('totalUsers');
+const activeToday = document.getElementById('activeToday');
+const lastSync = document.getElementById('lastSync');
+
+// ================= STATE MANAGEMENT =================
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+const users = JSON.parse(localStorage.getItem('examQuizUsers')) || [];
+
+// ================= INITIALIZATION =================
+document.addEventListener('DOMContentLoaded', () => {
+  // Hide splash screen after 1.8s
+  setTimeout(() => splash.style.display = "none", 1800);
+  
+  // Hide skeleton loader after 0.9s
+  setTimeout(() => {
+    skeleton.style.display = "none";
+    content.style.display = "grid";
+  }, 900);
+  
+  // Check if user is logged in
+  if (currentUser) {
+    updateUIForLoggedInUser();
+    // Record login activity
+    recordActivity('login');
+  }
+  
+  // Update admin stats
+  updateAdminStats();
+  
+  // Check for admin mode (hidden feature)
+  checkAdminMode();
+});
+
+// ================= DARK MODE =================
+function toggleDark() {
   document.body.classList.toggle("dark");
-  localStorage.setItem("theme",
-    document.body.classList.contains("dark")?"dark":"light");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
 }
-if(localStorage.getItem("theme")==="dark"){
+
+if (localStorage.getItem("theme") === "dark") {
   document.body.classList.add("dark");
 }
+
+// ================= MODAL FUNCTIONS =================
+function openModal(type) {
+  loginModal.classList.add('active');
+  if (type === 'signup') {
+    switchToSignup();
+  } else {
+    switchToLogin();
+  }
+}
+
+function closeModal() {
+  loginModal.classList.remove('active');
+  resetForms();
+}
+
+function switchToSignup() {
+  loginForm.style.display = 'none';
+  signupForm.style.display = 'block';
+  modalTitle.textContent = 'Create Account';
+}
+
+function switchToLogin() {
+  signupForm.style.display = 'none';
+  loginForm.style.display = 'block';
+  modalTitle.textContent = 'Login';
+}
+
+function resetForms() {
+  // Clear inputs
+  document.getElementById('email').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('signupName').value = '';
+  document.getElementById('signupEmail').value = '';
+  document.getElementById('signupPassword').value = '';
+  document.getElementById('confirmPassword').value = '';
+  
+  // Hide errors
+  document.querySelectorAll('.form-error').forEach(el => {
+    el.style.display = 'none';
+  });
+  
+  // Reset button states
+  setLoading(loginSubmit, false);
+  setLoading(signupSubmit, false);
+}
+
+// ================= LOADING STATES =================
+function setLoading(button, isLoading) {
+  const textSpan = button.querySelector('span');
+  const loader = button.querySelector('.loader');
+  
+  if (isLoading) {
+    button.disabled = true;
+    if (textSpan) textSpan.classList.add('loading');
+    if (loader) loader.style.display = 'inline-block';
+  } else {
+    button.disabled = false;
+    if (textSpan) textSpan.classList.remove('loading');
+    if (loader) loader.style.display = 'none';
+  }
+}
+
+// ================= GOOGLE SHEETS INTEGRATION =================
+async function saveToGoogleSheets(userData, action = 'signup') {
+  try {
+    const data = {
+      action: action,
+      timestamp: new Date().toISOString(),
+      ...userData
+    };
+    
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Important for Google Apps Script
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    
+    // Since we use no-cors, we can't read the response
+    // But the data will still be sent
+    return true;
+  } catch (error) {
+    console.error('Error saving to Google Sheets:', error);
+    return false;
+  }
+}
+
+async function getStatsFromGoogleSheets() {
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getStats`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    return null;
+  }
+}
+
+// ================= FORM HANDLERS =================
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const emailError = document.getElementById('emailError');
+  const passwordError = document.getElementById('passwordError');
+  
+  // Reset errors
+  emailError.style.display = 'none';
+  passwordError.style.display = 'none';
+  
+  // Set loading state
+  setLoading(loginSubmit, true);
+  
+  // Find user in localStorage
+  const user = users.find(u => u.email === email);
+  
+  if (!user) {
+    emailError.textContent = 'No account found with this email';
+    emailError.style.display = 'block';
+    setLoading(loginSubmit, false);
+    return;
+  }
+  
+  if (user.password !== password) {
+    passwordError.textContent = 'Incorrect password';
+    passwordError.style.display = 'block';
+    setLoading(loginSubmit, false);
+    return;
+  }
+  
+  // Login successful
+  currentUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt || new Date().toISOString()
+  };
+  
+  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  
+  // Save login to Google Sheets
+  const loginData = {
+    userId: user.id,
+    name: user.name,
+    email: user.email,
+    activity: 'login'
+  };
+  
+  await saveToGoogleSheets(loginData, 'login');
+  
+  // Update UI
+  updateUIForLoggedInUser();
+  closeModal();
+  
+  // Show success message
+  showToast(`Welcome back, ${user.name.split(' ')[0]}!`);
+  
+  // Record activity
+  recordActivity('login');
+  
+  // Reset loading state
+  setLoading(loginSubmit, false);
+});
+
+signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const name = document.getElementById('signupName').value;
+  const email = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  
+  const nameError = document.getElementById('nameError');
+  const emailError = document.getElementById('signupEmailError');
+  const passwordError = document.getElementById('signupPasswordError');
+  const confirmError = document.getElementById('confirmError');
+  
+  // Reset errors
+  nameError.style.display = 'none';
+  emailError.style.display = 'none';
+  passwordError.style.display = 'none';
+  confirmError.style.display = 'none';
+  
+  // Set loading state
+  setLoading(signupSubmit, true);
+  
+  // Validation
+  let isValid = true;
+  
+  if (name.length < 2) {
+    nameError.textContent = 'Name must be at least 2 characters';
+    nameError.style.display = 'block';
+    isValid = false;
+  }
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    emailError.textContent = 'Please enter a valid email';
+    emailError.style.display = 'block';
+    isValid = false;
+  }
+  
+  // Check if email already exists
+  if (users.some(u => u.email === email)) {
+    emailError.textContent = 'Email already registered';
+    emailError.style.display = 'block';
+    isValid = false;
+  }
+  
+  if (password.length < 6) {
+    passwordError.textContent = 'Password must be at least 6 characters';
+    passwordError.style.display = 'block';
+    isValid = false;
+  }
+  
+  if (password !== confirmPassword) {
+    confirmError.textContent = 'Passwords do not match';
+    confirmError.style.display = 'block';
+    isValid = false;
+  }
+  
+  if (!isValid) {
+    setLoading(signupSubmit, false);
+    return;
+  }
+  
+  // Create new user
+  const userId = Date.now();
+  const newUser = {
+    id: userId,
+    name: name,
+    email: email,
+    password: password,
+    createdAt: new Date().toISOString()
+  };
+  
+  // Save to localStorage
+  users.push(newUser);
+  localStorage.setItem('examQuizUsers', JSON.stringify(users));
+  
+  // Save to Google Sheets
+  const userData = {
+    userId: userId,
+    name: name,
+    email: email,
+    action: 'signup'
+  };
+  
+  const savedToSheets = await saveToGoogleSheets(userData, 'signup');
+  
+  // Auto login
+  currentUser = {
+    id: newUser.id,
+    name: newUser.name,
+    email: newUser.email,
+    createdAt: newUser.createdAt
+  };
+  
+  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  
+  // Update UI
+  updateUIForLoggedInUser();
+  closeModal();
+  
+  // Show success message
+  if (savedToSheets) {
+    showToast(`Account created successfully! Welcome, ${name.split(' ')[0]}!`);
+  } else {
+    showToast(`Account created! Welcome, ${name.split(' ')[0]}! (Local only)`, 'warning');
+  }
+  
+  // Record activity
+  recordActivity('signup');
+  
+  // Reset loading state
+  setLoading(signupSubmit, false);
+  
+  // Update admin stats
+  updateAdminStats();
+});
+
+// ================= USER MANAGEMENT =================
+function updateUIForLoggedInUser() {
+  loggedOutSection.style.display = 'none';
+  loggedInSection.style.display = 'flex';
+  
+  // Set user details
+  userName.textContent = currentUser.name;
+  
+  // Set avatar initials
+  const initials = currentUser.name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+  
+  userAvatar.textContent = initials;
+}
+
+function logout() {
+  // Record logout activity
+  if (currentUser) {
+    recordActivity('logout');
+  }
+  
+  currentUser = null;
+  localStorage.removeItem('currentUser');
+  
+  loggedOutSection.style.display = 'block';
+  loggedInSection.style.display = 'none';
+  
+  showToast('Logged out successfully');
+}
+
+function recordActivity(activityType) {
+  if (!currentUser) return;
+  
+  const activity = {
+    userId: currentUser.id,
+    name: currentUser.name,
+    email: currentUser.email,
+    activity: activityType,
+    timestamp: new Date().toISOString()
+  };
+  
+  // Save activity to localStorage
+  const activities = JSON.parse(localStorage.getItem('userActivities')) || [];
+  activities.push(activity);
+  localStorage.setItem('userActivities', JSON.stringify(activities));
+  
+  // Try to send to Google Sheets
+  saveToGoogleSheets(activity, 'activity');
+}
+
+// ================= ADMIN FUNCTIONS =================
+function toggleAdminWindow() {
+  adminWindow.classList.toggle('active');
+  if (adminWindow.classList.contains('active')) {
+    updateAdminStats();
+  }
+}
+
+async function updateAdminStats() {
+  // Calculate local stats
+  const users = JSON.parse(localStorage.getItem('examQuizUsers')) || [];
+  const today = new Date().toISOString().split('T')[0];
+  
+  totalUsers.textContent = users.length;
+  
+  // Try to get stats from Google Sheets
+  try {
+    const stats = await getStatsFromGoogleSheets();
+    if (stats) {
+      totalUsers.textContent = stats.totalUsers || users.length;
+      activeToday.textContent = stats.activeToday || 'N/A';
+      lastSync.textContent = 'Just now';
+    } else {
+      lastSync.textContent = new Date().toLocaleTimeString();
+    }
+  } catch (error) {
+    lastSync.textContent = new Date().toLocaleTimeString();
+  }
+}
+
+function downloadUserData() {
+  const users = JSON.parse(localStorage.getItem('examQuizUsers')) || [];
+  const activities = JSON.parse(localStorage.getItem('userActivities')) || [];
+  
+  const data = {
+    users: users,
+    activities: activities,
+    exportDate: new Date().toISOString()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `examquiz_users_${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToast('User data downloaded!');
+}
+
+function checkAdminMode() {
+  // Hidden admin access - press Ctrl+Shift+A to show admin panel
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+      adminWindow.classList.add('active');
+      updateAdminStats();
+      showToast('Admin panel activated!', 'success');
+    }
+  });
+}
+
+// ================= TOAST NOTIFICATIONS =================
+function showToast(message, type = 'success') {
+  // Remove existing toast
+  const existingToast = document.querySelector('.toast');
+  if (existingToast) existingToast.remove();
+  
+  // Create toast
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  
+  // Style toast based on type
+  const colors = {
+    success: '#10b981',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    info: '#3b82f6'
+  };
+  
+  toast.style.position = 'fixed';
+  toast.style.bottom = '20px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.background = colors[type] || colors.success;
+  toast.style.color = 'white';
+  toast.style.padding = '12px 24px';
+  toast.style.borderRadius = '8px';
+  toast.style.zIndex = '10000';
+  toast.style.fontWeight = '600';
+  toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+  toast.style.animation = 'toastFade 0.3s ease';
+  
+  document.body.appendChild(toast);
+  
+  // Remove toast after 3 seconds
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Add toast animation
+const style = document.createElement('style');
+style.textContent = `
+@keyframes toastFade {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+`;
+document.head.appendChild(style);
+
+// Close modal when clicking outside
+loginModal.addEventListener('click', (e) => {
+  if (e.target === loginModal) closeModal();
+});
+
+// Close admin window when clicking outside
+document.addEventListener('click', (e) => {
+  if (!adminWindow.contains(e.target) && !e.target.closest('.admin-btn')) {
+    adminWindow.classList.remove('active');
+  }
+});
 </script>
 
 </body>
