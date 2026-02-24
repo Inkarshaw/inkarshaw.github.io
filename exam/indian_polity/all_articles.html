@@ -113,7 +113,7 @@ button{
     </p>
 
     <div id="partContainer" class="parts">
-      <div>Loading parts...</div>
+      <div>Loading parts from ArticlePart column...</div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap">
@@ -180,39 +180,75 @@ async function loadQuestions() {
     const res = await fetch(sheetURL);
     const text = await res.text();
     const rows = text.trim().split("\n").slice(1);
+    
     allQuestions = rows.map(r => {
-      // handle possible commas inside fields – crude but keeps original format
-      const c = r.split(",");
-      // expected columns: question, opt1, opt2, opt3, opt4, answerLetter, explanation, part
+      // Split by comma, but handle quoted fields properly
+      const fields = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let char of r) {
+        if (char === '"' && !inQuotes) {
+          inQuotes = true;
+        } else if (char === '"' && inQuotes) {
+          inQuotes = false;
+        } else if (char === ',' && !inQuotes) {
+          fields.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      fields.push(current); // push last field
+      
+      // Clean up fields
+      const cleaned = fields.map(f => f.trim());
+      
+      // Expected columns: question, opt1, opt2, opt3, opt4, answerLetter, explanation, part (ArticlePart)
       return {
-        q: c[0] || "",
-        opts: c.slice(1,5).map(s => s.replace(/^"|"$/g, '')),  // remove surrounding quotes
-        ans: (c[5] || "A").trim().charAt(0).toUpperCase(),    // 'A','B','C','D'
-        exp: c[6] || "",
-        part: (c[7] || "Other").trim()
+        q: cleaned[0] || "Question text not available",
+        opts: cleaned.slice(1, 5).map(opt => opt || "Option not available"),
+        ans: (cleaned[5] || "A").trim().charAt(0).toUpperCase(), // 'A','B','C','D'
+        exp: cleaned[6] || "No explanation provided",
+        part: cleaned[7] ? cleaned[7].trim() : "Other"  // ArticlePart column - show exactly as in sheet
       };
-    });
+    }).filter(q => q.q && q.q !== "Question text not available"); // filter out completely empty rows
+    
+    if (allQuestions.length === 0) {
+      throw new Error("No valid questions found");
+    }
+    
     displayPartFilters();
   } catch (e) {
-    partContainer.innerHTML = "<div style='color:red'>Failed to load questions. Using sample data.</div>";
-    // fallback sample data (polity like)
+    console.error("Error loading questions:", e);
+    partContainer.innerHTML = "<div style='color:red'>Failed to load questions from sheet. Using sample data with ArticlePart values.</div>";
+    
+    // Fallback sample data with ArticlePart column values
     allQuestions = [
       {q:"Who is the guardian of the Constitution of India?", opts:["President","Supreme Court","Parliament","Chief Justice"], ans:"B", exp:"Supreme Court is the guardian.", part:"Part V"},
       {q:"Which article deals with the President's impeachment?", opts:["Article 61","Article 72","Article 74","Article 123"], ans:"A", exp:"Article 61 describes impeachment.", part:"Part V"},
       {q:"Right to Equality is ensured by which articles?", opts:["14-18","19-22","23-24","25-28"], ans:"A", exp:"Articles 14 to 18 cover Right to Equality.", part:"Part III"},
       {q:"Which article abolishes untouchability?", opts:["17","15","16","18"], ans:"A", exp:"Article 17 abolishes untouchability.", part:"Part III"},
       {q:"The Constitution of India came into force on?", opts:["26 Jan 1950","15 Aug 1947","26 Nov 1949","30 Jan 1948"], ans:"A", exp:"26 January 1950.", part:"Part I"},
+      {q:"What is the maximum strength of Lok Sabha?", opts:["545","552","550","543"], ans:"B", exp:"552 members (530 from states, 20 from UTs, 2 nominated).", part:"Part V"},
+      {q:"Article 21 deals with?", opts:["Right to Equality","Right to Freedom","Right to Life","Right to Religion"], ans:"C", exp:"Protection of life and personal liberty.", part:"Part III"},
     ];
     displayPartFilters();
   }
 }
 
 function displayPartFilters() {
-  const parts = [...new Set(allQuestions.map(q => q.part))];
-  if (parts.length === 0) parts.push("Part I","Part III","Part V","Other");
+  // Get unique parts from the ArticlePart column
+  const parts = [...new Set(allQuestions.map(q => q.part))].sort();
+  
+  if (parts.length === 0) {
+    partContainer.innerHTML = "<div>No parts found in ArticlePart column</div>";
+    return;
+  }
+  
   partContainer.innerHTML = parts.map(p => `
     <label>
-      <input type="checkbox" value="${p.toLowerCase().replace(/\s+/g,'')}">
+      <input type="checkbox" value="${p.replace(/\s+/g, '_')}">
       <span>${p}</span>
     </label>
   `).join("");
@@ -221,34 +257,41 @@ function displayPartFilters() {
 function selectAllParts() {
   document.querySelectorAll("#partContainer input").forEach(c => c.checked = true);
 }
+
 function clearAllParts() {
   document.querySelectorAll("#partContainer input").forEach(c => c.checked = false);
 }
 
 // main start function
 function startQuiz() {
-  // get selected parts
+  // get selected parts - using the display text from span, not the value attribute
   const partChecks = document.querySelectorAll("#partContainer input");
   const selectedParts = [];
-  partChecks.forEach(c => { if (c.checked) selectedParts.push(c.nextElementSibling.innerText.trim()); });
+  partChecks.forEach(c => { 
+    if (c.checked) {
+      // Get the part name from the following span element
+      const partName = c.nextElementSibling ? c.nextElementSibling.innerText.trim() : "";
+      if (partName) selectedParts.push(partName);
+    }
+  });
 
   // filter questions by part (if any selected)
   let pool = allQuestions;
   if (selectedParts.length > 0) {
     pool = allQuestions.filter(q => selectedParts.includes(q.part));
-  }
-
-  if (pool.length === 0) {
-    alert("No questions available for selected parts. Select other parts.");
-    return;
+    if (pool.length === 0) {
+      alert("No questions match the selected parts. Please choose different parts.");
+      return;
+    }
   }
 
   const count = parseInt(questionCount.value, 10);
   // shuffle and pick
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   quiz = shuffled.slice(0, Math.min(count, shuffled.length));
+  
   if (quiz.length < count) {
-    alert(`Only ${quiz.length} questions available for selected parts. Starting with ${quiz.length} questions.`);
+    alert(`Note: Only ${quiz.length} questions available for selected parts. Starting with ${quiz.length} questions.`);
   }
 
   // reset state
@@ -308,6 +351,7 @@ function renderQuizQuestion() {
       <h3>Question ${index+1} / ${quiz.length}</h3>
       <div class="timer">⏳ <span id="timerDisplay"></span></div>
     </div>
+    <div style="margin-bottom:8px;color:#4b5563;font-size:0.9rem">📌 ${q.part}</div>
     <div class="question-text">${q.q}</div>
     <div id="optionsContainer">${optsHtml}</div>
     <div style="display:flex;justify-content:space-between;margin-top:25px;gap:10px;flex-wrap:wrap">
@@ -386,6 +430,7 @@ function reviewQuiz() {
 
     html += `<div style="border-bottom:1px solid #ddd;padding:20px 0">
       <p><strong>Q${i+1}:</strong> ${q.q}</p>
+      <p style="color:#4b5563;font-size:0.9rem">📌 ${q.part}</p>
       <p>${statusIcon} Your answer: ${userLetter}  |  Correct: ${correctLetter}</p>
       <p style="background:#f1f5f9;padding:10px;border-radius:12px">💡 ${explanation}</p>
     </div>`;
