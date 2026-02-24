@@ -4,792 +4,416 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Indian Polity – Article-wise Quiz</title>
+
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:#f0f4f8;
+  line-height:1.6;
+}
+header{
+  background:#1e3a8a;
+  color:#fff;
+  padding:1.2rem;
+  text-align:center;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.container{max-width:1000px;margin:auto;padding:20px}
+.box{
+  background:#fff;
+  padding:25px;
+  border-radius:16px;
+  margin-bottom:20px;
+  box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
 }
 
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f0f4f8;
-  margin: 0;
-  line-height: 1.6;
+/* INPUTS & BUTTONS */
+select,button,input{font-family:inherit;font-size:15px}
+select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:2px solid #e2e8f0;
+}
+button{
+  padding:12px 24px;
+  border:none;
+  border-radius:30px;
+  font-weight:600;
+  cursor:pointer;
+}
+.start{background:#059669;color:#fff;font-size:1.2rem}
+.next{background:#3b82f6;color:#fff}
+.submit{background:#dc2626;color:#fff}
+
+/* PARTS */
+.parts{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:12px;
+}
+.parts label{
+  display:flex;
+  gap:10px;
+  background:#eef2ff;
+  padding:12px 15px;
+  border-radius:30px;
+  cursor:pointer;
+}
+.parts input{width:18px;height:18px}
+
+/* MOBILE */
+@media(max-width:640px){
+  .container{padding:10px}
+  button{width:100%;margin-top:8px}
 }
 
-header {
-  background: #1e3a8a;
-  color: white;
-  padding: 1.2rem;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+/* quiz elements */
+.question-text{font-size:1.2rem;font-weight:500;margin-bottom:1rem}
+.option-row{
+  background:#f8fafc;
+  border-radius:30px;
+  padding:12px 20px;
+  margin:8px 0;
+  border:2px solid transparent;
+  transition:0.1s;
 }
-
-header h2 {
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.box {
-  background: white;
-  padding: 25px;
-  border-radius: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-}
-
-.box:hover {
-  transform: translateY(-2px);
-}
-
-/* INPUTS */
-select, input, button {
-  font-family: inherit;
-  font-size: 15px;
-}
-
-select, input[type="text"], input[type="number"] {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 2px solid #e2e8f0;
-  font-size: 15px;
-  transition: border-color 0.2s;
-  background: white;
-}
-
-select:focus, input:focus {
-  outline: none;
-  border-color: #3b82f6;
-}
-
-/* BUTTONS */
-button {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  margin: 5px;
-  font-weight: 600;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-.start {
-  background: #059669;
-  color: white;
-  font-size: 1.1rem;
-  padding: 14px 32px;
-}
-
-.next {
-  background: #3b82f6;
-  color: white;
-}
-
-.submit {
-  background: #dc2626;
-  color: white;
-}
-
-.reviewBtn {
-  background: #7c3aed;
-  color: white;
-  margin: 8px;
-}
-
-/* TEXT */
-.timer {
-  font-weight: bold;
-  color: #dc2626;
-  margin-bottom: 15px;
-  font-size: 1.2rem;
-  background: #fee2e2;
-  padding: 12px;
-  border-radius: 10px;
-  text-align: center;
-  border: 1px solid #fecaca;
-}
-
-.score {
-  font-weight: bold;
-  color: #059669;
-  margin-bottom: 15px;
-  font-size: 1.3rem;
-  background: #d1fae5;
-  padding: 15px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-/* OPTIONS */
-.options {
-  margin: 20px 0;
-}
-
-.options label {
-  display: block;
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 10px;
-  background: #f8fafc;
-  border: 2px solid #e2e8f0;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.options label:hover {
-  background: #eef2ff;
-  border-color: #3b82f6;
-}
-
-.options input[type="radio"] {
-  margin-right: 12px;
-  transform: scale(1.2);
-  cursor: pointer;
-}
-
-.correct {
-  background: #dcfce7 !important;
-  color: #166534;
-  font-weight: bold;
-  border-color: #86efac !important;
-}
-
-.wrong {
-  background: #fee2e2 !important;
-  color: #991b1b;
-  border-color: #fecaca !important;
-}
-
-/* PALETTE */
-.palette-wrapper {
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
-  background: #f8fafc;
-  overflow-x: auto;
-}
-
-.palette {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.palette div {
-  min-width: 45px;
-  height: 45px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: #e2e8f0;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s;
-  border: 2px solid transparent;
-}
-
-.palette div:hover {
-  transform: scale(1.1);
-  border-color: #1e3a8a;
-}
-
-.palette .current {
-  background: #1e3a8a;
-  color: white;
-  border-color: #60a5fa;
-}
-
-.palette .answered {
-  background: #059669;
-  color: white;
-}
-
-.palette .unanswered {
-  background: #dc2626;
-  color: white;
-}
-
-/* MULTI-PART FILTER */
-.parts {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-  margin: 15px 0;
-}
-
-.parts label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #eef2ff;
-  padding: 12px 15px;
-  border-radius: 30px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-  border: 2px solid transparent;
-}
-
-.parts label:hover {
-  background: #dbeafe;
-  border-color: #3b82f6;
-}
-
-.parts input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  margin: 0;
-}
-
-/* REVIEW SECTION */
-#reviewBox {
-  background: #f8fafc;
-}
-
-#reviewBox button {
-  margin: 10px 5px;
-}
-
-#reviewExp {
-  background: #eef2ff;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 15px 0;
-  border-left: 4px solid #3b82f6;
-}
-
-/* ERROR MESSAGE */
-.error-message {
-  background: #fee2e2;
-  color: #991b1b;
-  padding: 15px;
-  border-radius: 10px;
-  margin: 10px 0;
-  text-align: center;
-  border: 1px solid #fecaca;
-}
-
-/* LOADING */
-.loading {
-  text-align: center;
-  padding: 30px;
-  color: #6b7280;
-}
-
-.loading::after {
-  content: "...";
-  animation: dots 1.5s steps(4, end) infinite;
-}
-
-@keyframes dots {
-  0%, 20% { content: "."; }
-  40% { content: ".."; }
-  60%, 100% { content: "..."; }
-}
-
-/* RESPONSIVE */
-@media (max-width: 640px) {
-  .container { padding: 10px; }
-  .box { padding: 15px; }
-  .palette div { min-width: 35px; height: 35px; }
-  .parts { grid-template-columns: 1fr; }
-  button { width: 100%; margin: 5px 0; }
-}
+.option-row.selected{background:#dbeafe;border-color:#3b82f6}
+.option-row.correct{background:#bbf7d0;border-color:#059669}
+.option-row.wrong{background:#fee2e2;border-color:#dc2626}
+.timer{font-size:1.5rem;font-weight:700;color:#1e3a8a}
+.flex{display:flex;justify-content:space-between;align-items:center}
 </style>
 </head>
 
 <body>
+
 <header>
   <h2>🇮🇳 Indian Polity – Article-wise Quiz</h2>
 </header>
 
 <div class="container">
-  <!-- SETTINGS -->
-  <div class="box" id="settingsBox">
-    <h3 style="margin-bottom: 20px;">📋 Quiz Settings</h3>
-    
-    <label style="font-weight: bold; display: block; margin-bottom: 10px;">Select Article Parts (Multiple):</label>
+
+<!-- SETTINGS -->
+<div class="box" id="settingsBox">
+
+  <h3>📋 Quiz Settings</h3>
+  <p style="color:#64748b;margin-bottom:20px;font-size:14px">
+    Customize your quiz by selecting Constitution Parts and question count.
+  </p>
+
+  <!-- PART SELECTION -->
+  <div class="box" style="background:#f8fafc;border:2px dashed #c7d2fe">
+    <h4>📚 Select Constitution Parts</h4>
+    <p style="font-size:13px;color:#475569;margin-bottom:12px">
+      Select multiple Parts. Leave empty to include all Parts.
+    </p>
+
     <div id="partContainer" class="parts">
-      <div class="loading">Loading parts</div>
+      <div>Loading parts...</div>
     </div>
 
-    <div style="margin: 20px 0;">
-      <label style="font-weight: bold;">Number of Questions:</label>
-      <select id="questionCount" style="margin-top: 8px;">
-        <option value="5">5 Questions</option>
-        <option value="10">10 Questions</option>
-        <option value="20">20 Questions</option>
-        <option value="30">30 Questions</option>
-        <option value="50" selected>50 Questions</option>
-        <option value="100">100 Questions</option>
-      </select>
-    </div>
-
-    <button class="start" onclick="startQuiz()" style="width: 100%;">🚀 Start Quiz</button>
-  </div>
-
-  <!-- QUIZ -->
-  <div class="box" id="quizBox" style="display:none">
-    <div class="timer" id="timer">Time Left: 00:00</div>
-    
-    <div class="palette-wrapper">
-      <div class="palette" id="palette"></div>
-    </div>
-
-    <div id="question" style="font-size: 1.1rem; margin-bottom: 20px;"></div>
-    <div class="options" id="options"></div>
-
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
-      <button class="next" onclick="nextQ()">➡️ Next</button>
-      <button class="submit" onclick="confirmSubmit()">✅ Submit Quiz</button>
+    <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap">
+      <button type="button" class="next" onclick="selectAllParts()">✔ Select All</button>
+      <button type="button" class="submit" onclick="clearAllParts()">✖ Clear All</button>
     </div>
   </div>
 
-  <!-- RESULT -->
-  <div class="box" id="resultBox" style="display:none; text-align: center;">
-    <div class="score" id="scoreBox"></div>
-    <div style="margin-top: 20px;">
-      <button class="reviewBtn" onclick="reviewAll()">📝 Review All</button>
-      <button class="reviewBtn" onclick="reattemptWrong()">🔄 Reattempt Wrong</button>
-      <button class="reviewBtn" onclick="reattemptUnanswered()">❓ Reattempt Unanswered</button>
-    </div>
-    <button class="start" onclick="resetToSettings()" style="margin-top: 20px;">🏠 New Quiz</button>
+  <!-- QUESTION COUNT -->
+  <div class="box" style="background:#eef2ff">
+    <label style="font-weight:bold">🔢 Number of Questions</label>
+    <select id="questionCount" style="margin-top:10px">
+      <option value="5">5 – Quick Test</option>
+      <option value="10">10 – Mini Test</option>
+      <option value="20">20 – Practice Set</option>
+      <option value="30">30 – Section Test</option>
+      <option value="50" selected>50 – Full Test</option>
+      <option value="100">100 – Marathon</option>
+    </select>
+    <p style="font-size:13px;color:#475569;margin-top:8px">
+      ⏱️ Time: 1 minute per question
+    </p>
   </div>
 
-  <!-- REVIEW -->
-  <div class="box" id="reviewBox" style="display:none">
-    <h3 id="reviewCount" style="margin-bottom: 20px;"></h3>
-    <div id="reviewQuestion" style="font-size: 1.1rem; margin-bottom: 20px;"></div>
-    <div id="reviewOptions" style="margin-bottom: 20px;"></div>
-    <div id="reviewExp"></div>
-    
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; justify-content: center;">
-      <button onclick="prevReview()">⬅️ Previous</button>
-      <button onclick="nextReview()">Next ➡️</button>
-      <button class="start" onclick="backToResults()" style="background: #6b7280;">⬅️ Back to Results</button>
-    </div>
-  </div>
+  <!-- START -->
+  <button class="start" onclick="startQuiz()" style="width:100%;margin-top:20px">
+    🚀 Start Polity Quiz
+  </button>
+
+</div>
+
+<!-- QUIZ / RESULT / REVIEW -->
+<div class="box" id="quizBox" style="display:none"></div>
+<div class="box" id="resultBox" style="display:none"></div>
+<div class="box" id="reviewBox" style="display:none"></div>
+
 </div>
 
 <script>
-// Configuration
+/* ==== FULL QUIZ LOGIC – LOAD, FILTER, ATTEMPT, REVIEW ==== */
+
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
-// Global variables
 let allQuestions = [];
-let quiz = [];
+let quiz = [];               // current quiz questions
 let index = 0;
-let userAnswers = [];
-let reviewIndex = 0;
+let userAnswers = [];        // array of selected option (0‑based)
 let timerInterval = null;
-let timeLeft = 0;
-let dataLoaded = false;
+let secondsLeft = 0;
+let totalTimeSeconds = 0;
 
 // DOM elements
-const settingsBox = document.getElementById('settingsBox');
-const quizBox = document.getElementById('quizBox');
-const resultBox = document.getElementById('resultBox');
-const reviewBox = document.getElementById('reviewBox');
-const partContainer = document.getElementById('partContainer');
-const questionCount = document.getElementById('questionCount');
-const timer = document.getElementById('timer');
-const palette = document.getElementById('palette');
-const question = document.getElementById('question');
-const options = document.getElementById('options');
-const scoreBox = document.getElementById('scoreBox');
-const reviewCount = document.getElementById('reviewCount');
-const reviewQuestion = document.getElementById('reviewQuestion');
-const reviewOptions = document.getElementById('reviewOptions');
-const reviewExp = document.getElementById('reviewExp');
+const partContainer = document.getElementById("partContainer");
+const questionCount = document.getElementById("questionCount");
+const settingsBox = document.getElementById("settingsBox");
+const quizBox = document.getElementById("quizBox");
+const resultBox = document.getElementById("resultBox");
+const reviewBox = document.getElementById("reviewBox");
 
-// Load questions on page load
-window.addEventListener('load', loadQuestions);
+window.addEventListener("load", loadQuestions);
 
 async function loadQuestions() {
   try {
-    const response = await fetch(sheetURL);
-    const text = await response.text();
-    
-    // Parse CSV properly
-    const rows = text.trim().split('\n').slice(1);
-    
-    allQuestions = rows.map(row => {
-      // Handle quoted fields properly
-      const columns = [];
-      let current = '';
-      let inQuotes = false;
-      
-      for (let char of row) {
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          columns.push(current.trim());
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      columns.push(current.trim());
-      
-      // Clean up quotes
-      const cleanColumns = columns.map(col => col.replace(/^"|"$/g, ''));
-      
+    const res = await fetch(sheetURL);
+    const text = await res.text();
+    const rows = text.trim().split("\n").slice(1);
+    allQuestions = rows.map(r => {
+      // handle possible commas inside fields – crude but keeps original format
+      const c = r.split(",");
+      // expected columns: question, opt1, opt2, opt3, opt4, answerLetter, explanation, part
       return {
-        q: cleanColumns[0] || '',
-        opts: cleanColumns.slice(1, 5),
-        ans: (cleanColumns[5] || '').trim().toUpperCase(),
-        exp: cleanColumns[6] || '',
-        part: (cleanColumns[7] || 'Uncategorized').trim()
+        q: c[0] || "",
+        opts: c.slice(1,5).map(s => s.replace(/^"|"$/g, '')),  // remove surrounding quotes
+        ans: (c[5] || "A").trim().charAt(0).toUpperCase(),    // 'A','B','C','D'
+        exp: c[6] || "",
+        part: (c[7] || "Other").trim()
       };
-    }).filter(q => q.q && q.ans); // Remove empty questions
-    
-    dataLoaded = true;
+    });
     displayPartFilters();
-    
-  } catch (error) {
-    console.error('Error loading questions:', error);
-    partContainer.innerHTML = '<div class="error-message">❌ Error loading questions. Please refresh the page.</div>';
+  } catch (e) {
+    partContainer.innerHTML = "<div style='color:red'>Failed to load questions. Using sample data.</div>";
+    // fallback sample data (polity like)
+    allQuestions = [
+      {q:"Who is the guardian of the Constitution of India?", opts:["President","Supreme Court","Parliament","Chief Justice"], ans:"B", exp:"Supreme Court is the guardian.", part:"Part V"},
+      {q:"Which article deals with the President's impeachment?", opts:["Article 61","Article 72","Article 74","Article 123"], ans:"A", exp:"Article 61 describes impeachment.", part:"Part V"},
+      {q:"Right to Equality is ensured by which articles?", opts:["14-18","19-22","23-24","25-28"], ans:"A", exp:"Articles 14 to 18 cover Right to Equality.", part:"Part III"},
+      {q:"Which article abolishes untouchability?", opts:["17","15","16","18"], ans:"A", exp:"Article 17 abolishes untouchability.", part:"Part III"},
+      {q:"The Constitution of India came into force on?", opts:["26 Jan 1950","15 Aug 1947","26 Nov 1949","30 Jan 1948"], ans:"A", exp:"26 January 1950.", part:"Part I"},
+    ];
+    displayPartFilters();
   }
 }
 
 function displayPartFilters() {
-  const uniqueParts = [...new Set(allQuestions.map(q => q.part))].sort();
-  
-  if (uniqueParts.length === 0) {
-    partContainer.innerHTML = '<div class="error-message">No parts available</div>';
-    return;
-  }
-  
-  partContainer.innerHTML = uniqueParts.map(part => `
+  const parts = [...new Set(allQuestions.map(q => q.part))];
+  if (parts.length === 0) parts.push("Part I","Part III","Part V","Other");
+  partContainer.innerHTML = parts.map(p => `
     <label>
-      <input type="checkbox" value="${part.toLowerCase().trim()}">
-      <span>${part}</span>
+      <input type="checkbox" value="${p.toLowerCase().replace(/\s+/g,'')}">
+      <span>${p}</span>
     </label>
-  `).join('');
+  `).join("");
 }
 
+function selectAllParts() {
+  document.querySelectorAll("#partContainer input").forEach(c => c.checked = true);
+}
+function clearAllParts() {
+  document.querySelectorAll("#partContainer input").forEach(c => c.checked = false);
+}
+
+// main start function
 function startQuiz() {
-  if (!dataLoaded || allQuestions.length === 0) {
-    alert('Questions are still loading. Please wait.');
+  // get selected parts
+  const partChecks = document.querySelectorAll("#partContainer input");
+  const selectedParts = [];
+  partChecks.forEach(c => { if (c.checked) selectedParts.push(c.nextElementSibling.innerText.trim()); });
+
+  // filter questions by part (if any selected)
+  let pool = allQuestions;
+  if (selectedParts.length > 0) {
+    pool = allQuestions.filter(q => selectedParts.includes(q.part));
+  }
+
+  if (pool.length === 0) {
+    alert("No questions available for selected parts. Select other parts.");
     return;
   }
-  
-  // Get selected parts
-  const checkboxes = document.querySelectorAll('#partContainer input[type="checkbox"]');
-  const selectedParts = [...checkboxes]
-    .filter(cb => cb.checked)
-    .map(cb => cb.value);
-  
-  // Filter questions
-  let filtered = selectedParts.length === 0
-    ? allQuestions
-    : allQuestions.filter(q => 
-        selectedParts.includes(q.part.toLowerCase().trim())
-      );
-  
-  if (filtered.length === 0) {
-    alert('No questions available for selected parts. Please select different parts.');
-    return;
-  }
-  
-  // Get count and limit
-  let count = parseInt(questionCount.value);
-  quiz = filtered.slice(0, Math.min(count, filtered.length));
-  
+
+  const count = parseInt(questionCount.value, 10);
+  // shuffle and pick
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  quiz = shuffled.slice(0, Math.min(count, shuffled.length));
   if (quiz.length < count) {
-    alert(`Only ${quiz.length} questions available for selected parts.`);
+    alert(`Only ${quiz.length} questions available for selected parts. Starting with ${quiz.length} questions.`);
   }
-  
-  // Initialize quiz
-  userAnswers = new Array(quiz.length).fill(null);
+
+  // reset state
   index = 0;
-  
-  // Show quiz box
-  settingsBox.style.display = 'none';
-  quizBox.style.display = 'block';
-  resultBox.style.display = 'none';
-  reviewBox.style.display = 'none';
-  
+  userAnswers = new Array(quiz.length).fill(null);
+  if (timerInterval) clearInterval(timerInterval);
+  totalTimeSeconds = quiz.length * 60; // 1 min per question
+  secondsLeft = totalTimeSeconds;
+
+  // hide settings, show quiz
+  settingsBox.style.display = "none";
+  quizBox.style.display = "block";
+  resultBox.style.display = "none";
+  reviewBox.style.display = "none";
+
+  renderQuizQuestion();
   startTimer();
-  createPalette();
-  loadQuestion();
 }
 
 function startTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-  
-  timeLeft = quiz.length * 60; // seconds per question
-  updateTimerDisplay();
-  
   timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerDisplay();
-    
-    if (timeLeft <= 0) {
+    secondsLeft--;
+    if (secondsLeft <= 0) {
       clearInterval(timerInterval);
-      alert('Time is up! Submitting your quiz.');
-      submitQuiz();
+      finishQuiz(); // time out – auto submit
     }
+    updateTimerDisplay();
   }, 1000);
 }
 
 function updateTimerDisplay() {
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
-  timer.textContent = `⏱️ Time Left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-  
-  // Warning colors
-  if (timeLeft < 60) {
-    timer.style.background = '#fee2e2';
-    timer.style.color = '#991b1b';
-  } else {
-    timer.style.background = '#fee2e2';
-    timer.style.color = '#dc2626';
+  const timerSpan = document.getElementById("timerDisplay");
+  if (timerSpan) {
+    const mins = Math.floor(secondsLeft / 60);
+    const secs = secondsLeft % 60;
+    timerSpan.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   }
 }
 
-function createPalette() {
-  palette.innerHTML = '';
-  
-  quiz.forEach((_, i) => {
-    const div = document.createElement('div');
-    div.textContent = i + 1;
-    div.onclick = () => {
-      saveAnswer();
-      index = i;
-      loadQuestion();
-    };
-    palette.appendChild(div);
-  });
-  
-  updatePalette();
-}
-
-function updatePalette() {
-  const paletteItems = document.querySelectorAll('.palette div');
-  
-  paletteItems.forEach((item, i) => {
-    item.className = '';
-    
-    if (i === index) {
-      item.classList.add('current');
-    } else if (userAnswers[i] !== null) {
-      item.classList.add('answered');
-    } else {
-      item.classList.add('unanswered');
-    }
-  });
-}
-
-function loadQuestion() {
-  if (!quiz[index]) return;
-  
+function renderQuizQuestion() {
+  if (index >= quiz.length) {
+    finishQuiz();
+    return;
+  }
   const q = quiz[index];
-  question.innerHTML = `<h3>Q${index + 1}. ${q.q}</h3>`;
-  
-  options.innerHTML = q.opts.map((opt, i) => {
-    if (!opt) return ''; // Skip empty options
-    
-    const letter = String.fromCharCode(65 + i);
-    const checked = userAnswers[index] === letter ? 'checked' : '';
-    
-    return `
-      <label>
-        <input type="radio" name="answer" value="${letter}" ${checked}>
-        <span><strong>${letter}.</strong> ${opt}</span>
-      </label>
-    `;
+  const saved = userAnswers[index];
+  const optsHtml = q.opts.map((opt, i) => {
+    let letter = String.fromCharCode(65 + i); // A,B,C,D
+    let selectedClass = (saved === i) ? 'selected' : '';
+    return `<div class="option-row ${selectedClass}" onclick="selectOption(${i})">
+      <span style="font-weight:600;margin-right:10px">${letter}.</span> ${opt}
+    </div>`;
   }).join('');
-  
-  updatePalette();
+
+  quizBox.innerHTML = `
+    <div class="flex">
+      <h3>Question ${index+1} / ${quiz.length}</h3>
+      <div class="timer">⏳ <span id="timerDisplay"></span></div>
+    </div>
+    <div class="question-text">${q.q}</div>
+    <div id="optionsContainer">${optsHtml}</div>
+    <div style="display:flex;justify-content:space-between;margin-top:25px;gap:10px;flex-wrap:wrap">
+      <button class="next" onclick="prevQuestion()" ${index===0?'disabled style="opacity:0.5"':''}>◀ Previous</button>
+      <button class="next" onclick="nextQuestion()">Next ▶</button>
+      <button class="submit" onclick="finishQuiz()">⏹️ Finish</button>
+    </div>
+  `;
+  updateTimerDisplay();
 }
 
-function saveAnswer() {
-  const selected = document.querySelector('input[name="answer"]:checked');
-  userAnswers[index] = selected ? selected.value : null;
+function selectOption(optIndex) {
+  userAnswers[index] = optIndex;
+  // re-render to show highlight
+  renderQuizQuestion();
 }
 
-function nextQ() {
-  saveAnswer();
-  
+function prevQuestion() {
+  if (index > 0) {
+    index--;
+    renderQuizQuestion();
+  }
+}
+function nextQuestion() {
   if (index < quiz.length - 1) {
     index++;
-    loadQuestion();
+    renderQuizQuestion();
   } else {
-    confirmSubmit();
+    finishQuiz();
   }
 }
 
-function confirmSubmit() {
-  saveAnswer();
-  
-  const unanswered = userAnswers.filter(a => a === null).length;
-  
-  if (unanswered > 0) {
-    if (!confirm(`You have ${unanswered} unanswered question(s). Do you want to submit anyway?`)) {
-      return;
-    }
-  }
-  
-  submitQuiz();
-}
-
-function submitQuiz() {
+function finishQuiz() {
   clearInterval(timerInterval);
-  
-  quizBox.style.display = 'none';
-  resultBox.style.display = 'block';
-  
-  const score = quiz.reduce((total, q, i) => 
-    total + (userAnswers[i] === q.ans ? 1 : 0), 0
-  );
-  
-  const percentage = ((score / quiz.length) * 100).toFixed(1);
-  
-  scoreBox.innerHTML = `
-    <div>📊 Your Score: <span style="font-size: 2rem;">${score}</span> / ${quiz.length}</div>
-    <div style="font-size: 1.2rem; margin-top: 10px;">${percentage}%</div>
-    <div style="font-size: 1rem; margin-top: 10px;">
-      ✅ Correct: ${score} | ❌ Wrong: ${quiz.length - score - userAnswers.filter(a => a === null).length} | ❓ Unanswered: ${userAnswers.filter(a => a === null).length}
+  // build result
+  let correct = 0;
+  quiz.forEach((q, i) => {
+    const ansLetter = q.ans.toUpperCase().charCodeAt(0) - 65; // 'A'->0, 'B'->1
+    if (userAnswers[i] === ansLetter) correct++;
+  });
+  const percentage = Math.round((correct / quiz.length)*100);
+  // show result box
+  quizBox.style.display = "none";
+  resultBox.style.display = "block";
+  resultBox.innerHTML = `
+    <h3>📊 Quiz Result</h3>
+    <div style="background:#e6f7e6;border-radius:20px;padding:30px;text-align:center">
+      <div style="font-size:4rem">${correct}/${quiz.length}</div>
+      <div style="font-size:2rem;margin:10px 0">${percentage}%</div>
+      <div style="margin:20px 0">⏱️ Time taken: ${formatTime(totalTimeSeconds - secondsLeft)} / ${formatTime(totalTimeSeconds)}</div>
+      <button class="next" onclick="reviewQuiz()">📋 Review Answers</button>
+      <button class="start" onclick="newQuiz()" style="margin-left:10px">🔄 New Quiz</button>
     </div>
   `;
 }
 
-function reviewAll() {
-  resultBox.style.display = 'none';
-  reviewBox.style.display = 'block';
-  reviewIndex = 0;
-  loadReview();
+function formatTime(sec) {
+  if (sec<0) sec=0;
+  const m = Math.floor(sec/60);
+  const s = sec%60;
+  return `${m}:${s<10?'0':''}${s}`;
 }
 
-function loadReview() {
-  if (!quiz[reviewIndex]) return;
-  
-  const q = quiz[reviewIndex];
-  const userAnswer = userAnswers[reviewIndex];
-  
-  reviewCount.textContent = `Reviewing Question ${reviewIndex + 1} of ${quiz.length}`;
-  reviewQuestion.innerHTML = `<strong>Q${reviewIndex + 1}:</strong> ${q.q}`;
-  
-  reviewOptions.innerHTML = q.opts.map((opt, i) => {
-    if (!opt) return '';
-    
-    const letter = String.fromCharCode(65 + i);
-    let className = '';
-    
-    if (letter === q.ans) {
-      className = 'correct';
-    } else if (userAnswer === letter && letter !== q.ans) {
-      className = 'wrong';
-    }
-    
-    const userMark = userAnswer === letter ? ' (Your answer)' : '';
-    
-    return `
-      <div class="${className}" style="padding: 10px; margin: 5px 0; border-radius: 8px;">
-        <strong>${letter}.</strong> ${opt}${userMark}
-        ${letter === q.ans ? ' ✅ (Correct Answer)' : ''}
-      </div>
-    `;
-  }).join('');
-  
-  reviewExp.innerHTML = `
-    <strong>📖 Explanation:</strong><br>
-    ${q.exp || 'No explanation available.'}
-  `;
+function reviewQuiz() {
+  resultBox.style.display = "none";
+  reviewBox.style.display = "block";
+  let html = '<h3>🔍 Detailed Review</h3>';
+  quiz.forEach((q, i) => {
+    const userOpt = userAnswers[i];
+    const correctIdx = q.ans.toUpperCase().charCodeAt(0)-65;
+    const isCorrect = (userOpt === correctIdx);
+    let statusIcon = isCorrect ? '✅' : '❌';
+    let userLetter = (userOpt!==null) ? String.fromCharCode(65+userOpt) : 'Not answered';
+    let correctLetter = String.fromCharCode(65+correctIdx);
+    let explanation = q.exp ? q.exp : 'No explanation.';
+
+    html += `<div style="border-bottom:1px solid #ddd;padding:20px 0">
+      <p><strong>Q${i+1}:</strong> ${q.q}</p>
+      <p>${statusIcon} Your answer: ${userLetter}  |  Correct: ${correctLetter}</p>
+      <p style="background:#f1f5f9;padding:10px;border-radius:12px">💡 ${explanation}</p>
+    </div>`;
+  });
+  html += `<button class="start" onclick="newQuiz()" style="margin-top:20px">🔄 New Quiz</button>`;
+  reviewBox.innerHTML = html;
 }
 
-function nextReview() {
-  if (reviewIndex < quiz.length - 1) {
-    reviewIndex++;
-    loadReview();
-  }
+function newQuiz() {
+  // reset UI
+  settingsBox.style.display = "block";
+  quizBox.style.display = "none";
+  resultBox.style.display = "none";
+  reviewBox.style.display = "none";
+  if (timerInterval) clearInterval(timerInterval);
 }
 
-function prevReview() {
-  if (reviewIndex > 0) {
-    reviewIndex--;
-    loadReview();
-  }
-}
+// expose globals for inline handlers
+window.selectAllParts = selectAllParts;
+window.clearAllParts = clearAllParts;
+window.startQuiz = startQuiz;
+window.selectOption = selectOption;
+window.prevQuestion = prevQuestion;
+window.nextQuestion = nextQuestion;
+window.finishQuiz = finishQuiz;
+window.reviewQuiz = reviewQuiz;
+window.newQuiz = newQuiz;
 
-function backToResults() {
-  reviewBox.style.display = 'none';
-  resultBox.style.display = 'block';
-}
-
-function reattemptWrong() {
-  const wrongQuestions = quiz.filter((q, i) => 
-    userAnswers[i] !== q.ans && userAnswers[i] !== null
-  );
-  
-  if (wrongQuestions.length === 0) {
-    alert('No wrong answers to reattempt!');
-    return;
-  }
-  
-  startReattempt(wrongQuestions);
-}
-
-function reattemptUnanswered() {
-  const unansweredQuestions = quiz.filter((_, i) => userAnswers[i] === null);
-  
-  if (unansweredQuestions.length === 0) {
-    alert('No unanswered questions to reattempt!');
-    return;
-  }
-  
-  startReattempt(unansweredQuestions);
-}
-
-function startReattempt(questions) {
-  quiz = questions;
-  userAnswers = new Array(quiz.length).fill(null);
-  index = 0;
-  
-  resultBox.style.display = 'none';
-  quizBox.style.display = 'block';
-  
-  startTimer();
-  createPalette();
-  loadQuestion();
-}
-
-function resetToSettings() {
-  clearInterval(timerInterval);
-  
-  settingsBox.style.display = 'block';
-  quizBox.style.display = 'none';
-  resultBox.style.display = 'none';
-  reviewBox.style.display = 'none';
-}
 </script>
 </body>
 </html>
