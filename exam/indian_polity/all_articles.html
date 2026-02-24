@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Indian Polity – Article-wise Quiz</title>
+<title>🇮🇳 Indian Polity – Article-wise Quiz (No Stars)</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -11,6 +11,11 @@ body{
   font-family:'Segoe UI',Arial,sans-serif;
   background:#f0f4f8;
   line-height:1.6;
+  transition:background 0.3s, color 0.3s;
+}
+body.dark-mode{
+  background:#1a1a1a;
+  color:#e0e0e0;
 }
 header{
   background:#1e3a8a;
@@ -20,23 +25,36 @@ header{
   position:sticky;
   top:0;
   z-index:100;
+  box-shadow:0 4px 6px rgba(0,0,0,0.1);
 }
-.container{max-width:1000px;margin:auto;padding:20px}
+body.dark-mode header{background:#0f2350}
+.container{max-width:1400px;margin:auto;padding:20px}
 .box{
   background:#fff;
   padding:25px;
   border-radius:16px;
   margin-bottom:20px;
   box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
+  transition:background 0.3s;
+}
+body.dark-mode .box{
+  background:#2d2d2d;
+  box-shadow:0 10px 15px -3px rgba(0,0,0,.5);
 }
 
 /* INPUTS & BUTTONS */
-select,button,input{font-family:inherit;font-size:15px}
+select,button,input,textarea{font-family:inherit;font-size:15px}
 select{
   width:100%;
   padding:12px;
   border-radius:10px;
   border:2px solid #e2e8f0;
+  background:#fff;
+}
+body.dark-mode select{
+  background:#3d3d3d;
+  border-color:#555;
+  color:#fff;
 }
 button{
   padding:12px 24px;
@@ -44,10 +62,15 @@ button{
   border-radius:30px;
   font-weight:600;
   cursor:pointer;
+  transition:transform 0.1s, opacity 0.2s;
 }
+button:active{transform:scale(0.98)}
+button:disabled{opacity:0.5;cursor:not-allowed}
 .start{background:#059669;color:#fff;font-size:1.2rem}
 .next{background:#3b82f6;color:#fff}
 .submit{background:#dc2626;color:#fff}
+.secondary{background:#6b7280;color:#fff}
+.warning{background:#f59e0b;color:#fff}
 
 /* PARTS */
 .parts{
@@ -62,6 +85,11 @@ button{
   padding:12px 15px;
   border-radius:30px;
   cursor:pointer;
+  transition:background 0.2s;
+}
+body.dark-mode .parts label{
+  background:#3a3a5a;
+  color:#fff;
 }
 .parts input{width:18px;height:18px}
 
@@ -71,29 +99,384 @@ button{
   button{width:100%;margin-top:8px}
 }
 
-/* quiz elements */
+/* QUIZ LAYOUT */
+.quiz-layout{
+  position:relative;
+}
+.quiz-main{
+  width:100%;
+}
+
+/* ROUND PALETTE - Always visible, no stars */
+.round-palette-container{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:15px;
+  background:#f8fafc;
+  border-radius:50px;
+  padding:12px 20px;
+  margin-bottom:25px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  border:2px solid #e2e8f0;
+}
+body.dark-mode .round-palette-container{
+  background:#3a3a4a;
+  border-color:#555;
+}
+
+.palette-summary-round{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  font-size:0.9rem;
+}
+.summary-item-round{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  background:#fff;
+  padding:5px 12px;
+  border-radius:30px;
+  box-shadow:0 2px 4px rgba(0,0,0,0.05);
+}
+body.dark-mode .summary-item-round{
+  background:#2d2d2d;
+}
+.summary-dot-round{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+}
+.dot-current-round{background:#3b82f6}
+.dot-answered-round{background:#059669}
+.dot-unanswered-round{background:#e2e8f0;border:1px solid #94a3b8}
+.dot-flagged-round{background:#f59e0b}
+
+.palette-circles{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  flex:1;
+  justify-content:flex-end;
+}
+.palette-circle{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  border:2px solid #e2e8f0;
+  font-weight:600;
+  font-size:0.9rem;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+body.dark-mode .palette-circle{
+  background:#2d2d2d;
+  border-color:#555;
+  color:#fff;
+}
+.palette-circle:hover{
+  transform:scale(1.1);
+  box-shadow:0 4px 8px rgba(0,0,0,0.15);
+}
+.palette-circle.current{
+  border-color:#3b82f6;
+  background:#dbeafe;
+  border-width:3px;
+}
+body.dark-mode .palette-circle.current{
+  background:#2a3f5a;
+  border-color:#5a9eff;
+}
+.palette-circle.answered{
+  background:#bbf7d0;
+  border-color:#059669;
+  color:#065f46;
+}
+body.dark-mode .palette-circle.answered{
+  background:#1a3a2a;
+  color:#a7f3d0;
+  border-color:#2ecc71;
+}
+/* No star indicator for flagged questions - just use a different color/border */
+.palette-circle.flagged{
+  background:#fff3cd;
+  border-color:#f59e0b;
+  color:#856404;
+}
+body.dark-mode .palette-circle.flagged{
+  background:#5a4a2a;
+  border-color:#f59e0b;
+  color:#ffd966;
+}
+
+/* QUIZ ELEMENTS */
 .question-text{font-size:1.2rem;font-weight:500;margin-bottom:1rem}
+.article-ref{
+  background:#e2e8f0;
+  display:inline-block;
+  padding:4px 12px;
+  border-radius:20px;
+  font-size:0.9rem;
+  margin-bottom:10px;
+}
+body.dark-mode .article-ref{background:#4a4a5a}
 .option-row{
   background:#f8fafc;
   border-radius:30px;
-  padding:12px 20px;
-  margin:8px 0;
+  padding:15px 20px;
+  margin:10px 0;
   border:2px solid transparent;
   transition:0.1s;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+body.dark-mode .option-row{
+  background:#3a3a4a;
+  color:#fff;
 }
 .option-row.selected{background:#dbeafe;border-color:#3b82f6}
-.option-row.correct{background:#bbf7d0;border-color:#059669}
-.option-row.wrong{background:#fee2e2;border-color:#dc2626}
-.timer{font-size:1.5rem;font-weight:700;color:#1e3a8a}
-.flex{display:flex;justify-content:space-between;align-items:center}
+.option-row.correct-review{background:#bbf7d0;border-color:#059669}
+.option-row.wrong-review{background:#fee2e2;border-color:#dc2626}
+body.dark-mode .option-row.selected{background:#2a3f5a;border-color:#5a9eff}
+body.dark-mode .option-row.correct-review{background:#1a3a2a;border-color:#2ecc71}
+body.dark-mode .option-row.wrong-review{background:#4a2a2a;border-color:#e74c3c}
+.timer{
+  font-size:1.5rem;
+  font-weight:700;
+  color:#1e3a8a;
+  font-family:monospace;
+}
+body.dark-mode .timer{color:#7fa9ff}
+.flex{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+
+/* PROGRESS BAR */
+.progress-container{
+  width:100%;
+  height:10px;
+  background:#e2e8f0;
+  border-radius:5px;
+  margin:15px 0;
+}
+body.dark-mode .progress-container{background:#4a4a5a}
+.progress-fill{
+  height:100%;
+  background:#059669;
+  border-radius:5px;
+  transition:width 0.3s;
+}
+
+/* SPINNER */
+.spinner{
+  border:4px solid #f3f3f3;
+  border-top:4px solid #1e3a8a;
+  border-radius:50%;
+  width:40px;
+  height:40px;
+  animation:spin 1s linear infinite;
+  margin:20px auto;
+}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+
+/* TAGS */
+.tags-container{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0;
+}
+.tag{
+  background:#e2e8f0;
+  padding:4px 12px;
+  border-radius:20px;
+  font-size:0.8rem;
+}
+body.dark-mode .tag{background:#4a4a5a}
+.tag.part-I{background:#ffcdd2}
+.tag.part-II{background:#f8bbd0}
+.tag.part-III{background:#c8e6c9}
+.tag.part-IV{background:#ffe0b2}
+.tag.part-V{background:#b3e5fc}
+
+/* BOOKMARK */
+.bookmark-btn{
+  background:none;
+  border:none;
+  font-size:1.5rem;
+  cursor:pointer;
+  padding:5px;
+}
+.bookmark-btn.bookmarked{color:#f59e0b}
+
+/* KEYBOARD SHORTCUT HINT */
+.shortcut-hint{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#1e3a8a;
+  color:#fff;
+  padding:8px 16px;
+  border-radius:30px;
+  font-size:0.8rem;
+  opacity:0.7;
+  z-index:1000;
+}
+
+/* ACHIEVEMENT BADGES */
+.badge-container{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:20px 0;
+}
+.badge{
+  background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+  padding:10px 20px;
+  border-radius:30px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:600;
+}
+body.dark-mode .badge{
+  background:linear-gradient(135deg,#2d3e50 0%,#1a2632 100%);
+  color:#fff;
+}
+.badge.earned{background:linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%)}
+
+/* ADMIN PANEL */
+.admin-panel{
+  background:#f1f5f9;
+  padding:20px;
+  border-radius:12px;
+  margin:20px 0;
+}
+body.dark-mode .admin-panel{background:#3a3a4a}
+.admin-input{
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+body.dark-mode .admin-input{background:#2d2d2d;color:#fff;border-color:#555}
+
+/* CHART */
+.chart-container{
+  height:300px;
+  margin:20px 0;
+  position:relative;
+}
+.bar-chart{
+  display:flex;
+  height:250px;
+  align-items:flex-end;
+  gap:10px;
+  margin-top:20px;
+}
+.bar-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.bar{
+  width:100%;
+  background:#3b82f6;
+  border-radius:8px 8px 0 0;
+  transition:height 0.3s;
+  min-height:5px;
+}
+.bar-label{
+  margin-top:8px;
+  font-size:0.8rem;
+  text-align:center;
+}
+
+/* SHARE BUTTONS */
+.share-buttons{
+  display:flex;
+  gap:10px;
+  margin:20px 0;
+  flex-wrap:wrap;
+}
+.share-btn{
+  flex:1;
+  padding:10px;
+  border-radius:30px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+}
+.share-twitter{background:#1DA1F2;color:#fff}
+.share-whatsapp{background:#25D366;color:#fff}
+.share-email{background:#6b7280;color:#fff}
+
+/* OFFLINE INDICATOR */
+.offline-indicator{
+  background:#f59e0b;
+  color:#000;
+  text-align:center;
+  padding:4px;
+  font-size:0.8rem;
+  position:sticky;
+  top:70px;
+  z-index:99;
+}
+
+/* DARK MODE TOGGLE */
+.dark-mode-toggle{
+  position:fixed;
+  top:80px;
+  right:20px;
+  background:#fff;
+  border-radius:30px;
+  padding:8px 16px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+  z-index:101;
+  cursor:pointer;
+}
+body.dark-mode .dark-mode-toggle{background:#2d2d2d;color:#fff;border:1px solid #555}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .flex{flex-direction:column;align-items:stretch}
+  .share-buttons{flex-direction:column}
+  .dark-mode-toggle{top:auto;bottom:20px;right:10px}
+  .round-palette-container{
+    flex-direction:column;
+    align-items:stretch;
+    border-radius:20px;
+  }
+  .palette-circles{
+    justify-content:center;
+  }
+  .palette-summary-round{
+    justify-content:center;
+  }
+}
 </style>
 </head>
-
 <body>
 
 <header>
-  <h2>🇮🇳 Indian Polity – Article-wise Quiz</h2>
+  <h2>🇮🇳 Indian Polity – Article-wise Quiz (No Stars)</h2>
 </header>
+
+<!-- Dark Mode Toggle -->
+<div class="dark-mode-toggle" onclick="toggleDarkMode()">🌓 Dark Mode</div>
+
+<!-- Offline Indicator -->
+<div id="offlineIndicator" class="offline-indicator" style="display:none">📡 You are offline - using cached questions</div>
+
+<!-- Keyboard Shortcut Hint -->
+<div class="shortcut-hint">⌨️ 1-4: Select | ← →: Navigate</div>
 
 <div class="container">
 
@@ -105,6 +488,14 @@ button{
     Customize your quiz by selecting Constitution Parts and question count.
   </p>
 
+  <!-- PROGRESS RESUME -->
+  <div id="resumePrompt" style="display:none;background:#e6f7e6;padding:15px;border-radius:12px;margin-bottom:20px">
+    <h4>📌 Resume Previous Quiz?</h4>
+    <p>You have an unfinished quiz from earlier.</p>
+    <button class="next" onclick="resumeQuiz()">▶ Resume Quiz</button>
+    <button class="secondary" onclick="discardProgress()">✖ Start Fresh</button>
+  </div>
+
   <!-- PART SELECTION -->
   <div class="box" style="background:#f8fafc;border:2px dashed #c7d2fe">
     <h4>📚 Select Constitution Parts</h4>
@@ -113,12 +504,21 @@ button{
     </p>
 
     <div id="partContainer" class="parts">
+      <div class="spinner"></div>
       <div>Loading parts from ArticlePart column...</div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap">
       <button type="button" class="next" onclick="selectAllParts()">✔ Select All</button>
       <button type="button" class="submit" onclick="clearAllParts()">✖ Clear All</button>
+    </div>
+  </div>
+
+  <!-- TOPIC TAGS -->
+  <div class="box" style="background:#eef2ff">
+    <h4>🏷️ Filter by Topic Tags</h4>
+    <div id="tagContainer" class="tags-container">
+      <div>Loading tags...</div>
     </div>
   </div>
 
@@ -143,115 +543,251 @@ button{
     🚀 Start Polity Quiz
   </button>
 
+  <!-- ADMIN BUTTON -->
+  <button class="secondary" onclick="toggleAdminPanel()" style="width:100%;margin-top:10px">
+    🔧 Admin Panel
+  </button>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="admin-panel" style="display:none">
+    <h4>📝 Question Editor</h4>
+    <input type="text" id="adminPassword" placeholder="Enter admin password" class="admin-input">
+    <button class="next" onclick="checkAdminPassword()">Login</button>
+    <div id="adminControls" style="display:none;margin-top:15px">
+      <textarea id="newQuestion" placeholder="Question text" class="admin-input" rows="2"></textarea>
+      <input type="text" id="newOpt1" placeholder="Option A" class="admin-input">
+      <input type="text" id="newOpt2" placeholder="Option B" class="admin-input">
+      <input type="text" id="newOpt3" placeholder="Option C" class="admin-input">
+      <input type="text" id="newOpt4" placeholder="Option D" class="admin-input">
+      <input type="text" id="newAnswer" placeholder="Correct answer (A/B/C/D)" class="admin-input" maxlength="1">
+      <input type="text" id="newExp" placeholder="Explanation" class="admin-input">
+      <input type="text" id="newPart" placeholder="Part (e.g., Part III)" class="admin-input">
+      <input type="text" id="newTags" placeholder="Tags (comma separated)" class="admin-input">
+      <button class="start" onclick="addQuestion()">Add Question</button>
+      <button class="submit" onclick="exportQuestions()">📤 Export CSV</button>
+      <input type="file" id="importFile" accept=".csv" style="margin-top:10px">
+      <button class="next" onclick="importQuestions()">📥 Import CSV</button>
+    </div>
+  </div>
 </div>
 
-<!-- QUIZ / RESULT / REVIEW -->
-<div class="box" id="quizBox" style="display:none"></div>
+<!-- QUIZ BOX WITH ROUND PALETTE -->
+<div class="box" id="quizBox" style="display:none">
+  <div class="quiz-layout">
+    <!-- Round palette at top - always visible, no stars -->
+    <div class="round-palette-container" id="roundPalette">
+      <div class="palette-summary-round">
+        <div class="summary-item-round"><span class="summary-dot-round dot-current-round"></span> <span id="currentCountRound">0</span></div>
+        <div class="summary-item-round"><span class="summary-dot-round dot-answered-round"></span> <span id="answeredCountRound">0</span></div>
+        <div class="summary-item-round"><span class="summary-dot-round dot-unanswered-round"></span> <span id="unansweredCountRound">0</span></div>
+        <div class="summary-item-round"><span class="summary-dot-round dot-flagged-round"></span> <span id="flaggedCountRound">0</span></div>
+      </div>
+      <div class="palette-circles" id="paletteCircles"></div>
+    </div>
+    
+    <!-- Main quiz content -->
+    <div class="quiz-main" id="quizMain"></div>
+  </div>
+</div>
+
+<!-- RESULT BOX -->
 <div class="box" id="resultBox" style="display:none"></div>
+
+<!-- REVIEW BOX -->
 <div class="box" id="reviewBox" style="display:none"></div>
 
+<!-- ANALYTICS BOX -->
+<div class="box" id="analyticsBox" style="display:none"></div>
+
+<!-- BOOKMARKS BOX -->
+<div class="box" id="bookmarksBox" style="display:none"></div>
+
+<!-- DAILY CHALLENGE BOX -->
+<div class="box" id="dailyBox" style="display:none"></div>
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-/* ==== FULL QUIZ LOGIC – LOAD, FILTER, ATTEMPT, REVIEW ==== */
+/* ==== ENHANCED QUIZ WITH ROUND PALETTE (NO STARS) ==== */
 
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
 let allQuestions = [];
-let quiz = [];               // current quiz questions
+let quiz = [];
 let index = 0;
-let userAnswers = [];        // array of selected option (0‑based)
+let userAnswers = [];
+let flaggedQuestions = new Set();
 let timerInterval = null;
 let secondsLeft = 0;
 let totalTimeSeconds = 0;
+let questionTimes = [];
+let questionStartTime = null;
+let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+let achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+let quizHistory = JSON.parse(localStorage.getItem('quizHistory') || '[]');
+let darkMode = localStorage.getItem('darkMode') === 'true';
+let offlineCache = null;
 
 // DOM elements
 const partContainer = document.getElementById("partContainer");
 const questionCount = document.getElementById("questionCount");
 const settingsBox = document.getElementById("settingsBox");
 const quizBox = document.getElementById("quizBox");
+const quizMain = document.getElementById("quizMain");
 const resultBox = document.getElementById("resultBox");
 const reviewBox = document.getElementById("reviewBox");
+const analyticsBox = document.getElementById("analyticsBox");
+const bookmarksBox = document.getElementById("bookmarksBox");
+const dailyBox = document.getElementById("dailyBox");
+const resumePrompt = document.getElementById("resumePrompt");
+const offlineIndicator = document.getElementById("offlineIndicator");
+const tagContainer = document.getElementById("tagContainer");
+const roundPalette = document.getElementById("roundPalette");
 
-window.addEventListener("load", loadQuestions);
+// Apply dark mode on load
+if (darkMode) document.body.classList.add('dark-mode');
 
-async function loadQuestions() {
-  try {
-    const res = await fetch(sheetURL);
-    const text = await res.text();
-    const rows = text.trim().split("\n").slice(1);
-    
-    allQuestions = rows.map(r => {
-      // Split by comma, but handle quoted fields properly
-      const fields = [];
-      let current = '';
-      let inQuotes = false;
-      
-      for (let char of r) {
-        if (char === '"' && !inQuotes) {
-          inQuotes = true;
-        } else if (char === '"' && inQuotes) {
-          inQuotes = false;
-        } else if (char === ',' && !inQuotes) {
-          fields.push(current);
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      fields.push(current); // push last field
-      
-      // Clean up fields
-      const cleaned = fields.map(f => f.trim());
-      
-      // Expected columns: question, opt1, opt2, opt3, opt4, answerLetter, explanation, part (ArticlePart)
-      return {
-        q: cleaned[0] || "Question text not available",
-        opts: cleaned.slice(1, 5).map(opt => opt || "Option not available"),
-        ans: (cleaned[5] || "A").trim().charAt(0).toUpperCase(), // 'A','B','C','D'
-        exp: cleaned[6] || "No explanation provided",
-        part: cleaned[7] ? cleaned[7].trim() : "Other"  // ArticlePart column - show exactly as in sheet
-      };
-    }).filter(q => q.q && q.q !== "Question text not available"); // filter out completely empty rows
-    
-    if (allQuestions.length === 0) {
-      throw new Error("No valid questions found");
+// Check for offline status
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// Check for saved progress
+checkSavedProgress();
+
+// Load questions
+loadQuestions();
+
+function updateOnlineStatus() {
+  if (!navigator.onLine) {
+    offlineIndicator.style.display = 'block';
+    if (offlineCache) {
+      allQuestions = offlineCache;
+      displayPartFilters();
+      displayTagFilters();
     }
-    
-    displayPartFilters();
-  } catch (e) {
-    console.error("Error loading questions:", e);
-    partContainer.innerHTML = "<div style='color:red'>Failed to load questions from sheet. Using sample data with ArticlePart values.</div>";
-    
-    // Fallback sample data with ArticlePart column values
-    allQuestions = [
-      {q:"Who is the guardian of the Constitution of India?", opts:["President","Supreme Court","Parliament","Chief Justice"], ans:"B", exp:"Supreme Court is the guardian.", part:"Part V"},
-      {q:"Which article deals with the President's impeachment?", opts:["Article 61","Article 72","Article 74","Article 123"], ans:"A", exp:"Article 61 describes impeachment.", part:"Part V"},
-      {q:"Right to Equality is ensured by which articles?", opts:["14-18","19-22","23-24","25-28"], ans:"A", exp:"Articles 14 to 18 cover Right to Equality.", part:"Part III"},
-      {q:"Which article abolishes untouchability?", opts:["17","15","16","18"], ans:"A", exp:"Article 17 abolishes untouchability.", part:"Part III"},
-      {q:"The Constitution of India came into force on?", opts:["26 Jan 1950","15 Aug 1947","26 Nov 1949","30 Jan 1948"], ans:"A", exp:"26 January 1950.", part:"Part I"},
-      {q:"What is the maximum strength of Lok Sabha?", opts:["545","552","550","543"], ans:"B", exp:"552 members (530 from states, 20 from UTs, 2 nominated).", part:"Part V"},
-      {q:"Article 21 deals with?", opts:["Right to Equality","Right to Freedom","Right to Life","Right to Religion"], ans:"C", exp:"Protection of life and personal liberty.", part:"Part III"},
-    ];
-    displayPartFilters();
+  } else {
+    offlineIndicator.style.display = 'none';
   }
 }
 
-function displayPartFilters() {
-  // Get unique parts from the ArticlePart column
-  const parts = [...new Set(allQuestions.map(q => q.part))].sort();
-  
-  if (parts.length === 0) {
-    partContainer.innerHTML = "<div>No parts found in ArticlePart column</div>";
-    return;
+function checkSavedProgress() {
+  const saved = localStorage.getItem('quizProgress');
+  if (saved) {
+    resumePrompt.style.display = 'block';
   }
-  
+}
+
+function discardProgress() {
+  localStorage.removeItem('quizProgress');
+  resumePrompt.style.display = 'none';
+}
+
+async function loadQuestions() {
+  try {
+    const cached = localStorage.getItem('questionCache');
+    if (cached) {
+      offlineCache = JSON.parse(cached);
+    }
+
+    const res = await fetch(sheetURL);
+    const text = await res.text();
+    
+    const rows = parseCSV(text);
+    allQuestions = rows.map(row => ({
+      q: row[0] || "Question text not available",
+      opts: [row[1] || "Option A", row[2] || "Option B", row[3] || "Option C", row[4] || "Option D"],
+      ans: (row[5] || "A").trim().charAt(0).toUpperCase(),
+      exp: row[6] || "No explanation",
+      part: row[7] ? row[7].trim() : "Other",
+      tags: row[8] ? row[8].split(',').map(t => t.trim()) : [],
+      articleNumber: extractArticleNumber(row[0])
+    })).filter(q => q.q && q.q !== "Question text not available");
+
+    localStorage.setItem('questionCache', JSON.stringify(allQuestions));
+    offlineCache = allQuestions;
+    
+    displayPartFilters();
+    displayTagFilters();
+    checkDailyChallenge();
+  } catch (e) {
+    console.error("Error loading:", e);
+    if (offlineCache) {
+      allQuestions = offlineCache;
+      displayPartFilters();
+      displayTagFilters();
+    } else {
+      useSampleData();
+    }
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n').slice(1);
+  return lines.map(line => {
+    const result = [];
+    let start = 0;
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"' && (i === 0 || line[i-1] !== '\\')) {
+        inQuotes = !inQuotes;
+      } else if (line[i] === ',' && !inQuotes) {
+        result.push(line.substring(start, i).replace(/^"|"$/g, '').trim());
+        start = i + 1;
+      }
+    }
+    result.push(line.substring(start).replace(/^"|"$/g, '').trim());
+    return result;
+  });
+}
+
+function extractArticleNumber(questionText) {
+  const match = questionText.match(/Article\s+(\d+[A-Za-z]?)/i);
+  return match ? match[1] : null;
+}
+
+function useSampleData() {
+  allQuestions = [
+    {q:"Who is the guardian of the Constitution of India?", opts:["President","Supreme Court","Parliament","Chief Justice"], ans:"B", exp:"Supreme Court is the guardian.", part:"Part V", tags:["Fundamental", "Court"], articleNumber:"124"},
+    {q:"Which article deals with the President's impeachment?", opts:["Article 61","Article 72","Article 74","Article 123"], ans:"A", exp:"Article 61 describes impeachment.", part:"Part V", tags:["President", "Impeachment"], articleNumber:"61"},
+    {q:"Right to Equality is ensured by which articles?", opts:["14-18","19-22","23-24","25-28"], ans:"A", exp:"Articles 14 to 18 cover Right to Equality.", part:"Part III", tags:["FR", "Equality"], articleNumber:"14-18"},
+    {q:"Which article abolishes untouchability?", opts:["17","15","16","18"], ans:"A", exp:"Article 17 abolishes untouchability.", part:"Part III", tags:["FR", "Social Justice"], articleNumber:"17"},
+    {q:"The Constitution of India came into force on?", opts:["26 Jan 1950","15 Aug 1947","26 Nov 1949","30 Jan 1948"], ans:"A", exp:"26 January 1950.", part:"Part I", tags:["History"], articleNumber:null},
+  ];
+  displayPartFilters();
+  displayTagFilters();
+}
+
+function displayPartFilters() {
+  const parts = [...new Set(allQuestions.map(q => q.part))].sort();
   partContainer.innerHTML = parts.map(p => `
     <label>
       <input type="checkbox" value="${p.replace(/\s+/g, '_')}">
       <span>${p}</span>
     </label>
   `).join("");
+}
+
+function displayTagFilters() {
+  const allTags = [...new Set(allQuestions.flatMap(q => q.tags || []))].sort();
+  if (allTags.length === 0) {
+    tagContainer.innerHTML = '<div>No tags available</div>';
+    return;
+  }
+  tagContainer.innerHTML = allTags.map(tag => `
+    <label class="tag" style="cursor:pointer">
+      <input type="checkbox" value="${tag}" style="display:none">
+      <span>#${tag}</span>
+    </label>
+  `).join('');
+  
+  document.querySelectorAll('#tagContainer input').forEach(cb => {
+    cb.addEventListener('change', function() {
+      this.parentElement.style.background = this.checked ? '#f59e0b' : '#e2e8f0';
+    });
+  });
 }
 
 function selectAllParts() {
@@ -262,63 +798,168 @@ function clearAllParts() {
   document.querySelectorAll("#partContainer input").forEach(c => c.checked = false);
 }
 
-// main start function
+function getSelectedTags() {
+  const selected = [];
+  document.querySelectorAll('#tagContainer input:checked').forEach(cb => {
+    selected.push(cb.value);
+  });
+  return selected;
+}
+
+function updateRoundPalette() {
+  const circles = document.getElementById('paletteCircles');
+  const currentSpan = document.getElementById('currentCountRound');
+  const answeredSpan = document.getElementById('answeredCountRound');
+  const unansweredSpan = document.getElementById('unansweredCountRound');
+  const flaggedSpan = document.getElementById('flaggedCountRound');
+  
+  if (!circles) return;
+  
+  let answered = 0;
+  let flagged = 0;
+  
+  const items = [];
+  for (let i = 0; i < quiz.length; i++) {
+    const isAnswered = userAnswers[i] !== null;
+    const isFlagged = flaggedQuestions.has(i);
+    const isCurrent = i === index;
+    
+    if (isAnswered) answered++;
+    if (isFlagged) flagged++;
+    
+    let classes = 'palette-circle';
+    if (isCurrent) classes += ' current';
+    if (isAnswered) classes += ' answered';
+    if (isFlagged) classes += ' flagged';
+    
+    items.push(`<div class="${classes}" onclick="jumpToQuestion(${i})">${i+1}</div>`);
+  }
+  
+  circles.innerHTML = items.join('');
+  currentSpan.textContent = index + 1;
+  answeredSpan.textContent = answered;
+  unansweredSpan.textContent = quiz.length - answered;
+  flaggedSpan.textContent = flagged;
+}
+
+function jumpToQuestion(qIndex) {
+  if (qIndex >= 0 && qIndex < quiz.length) {
+    if (questionStartTime) {
+      questionTimes[index] = (Date.now() - questionStartTime) / 1000;
+    }
+    index = qIndex;
+    questionStartTime = Date.now();
+    renderQuizQuestion();
+    saveProgress();
+  }
+}
+
 function startQuiz() {
-  // get selected parts - using the display text from span, not the value attribute
   const partChecks = document.querySelectorAll("#partContainer input");
   const selectedParts = [];
   partChecks.forEach(c => { 
     if (c.checked) {
-      // Get the part name from the following span element
       const partName = c.nextElementSibling ? c.nextElementSibling.innerText.trim() : "";
       if (partName) selectedParts.push(partName);
     }
   });
 
-  // filter questions by part (if any selected)
+  const selectedTags = getSelectedTags();
+
   let pool = allQuestions;
   if (selectedParts.length > 0) {
-    pool = allQuestions.filter(q => selectedParts.includes(q.part));
-    if (pool.length === 0) {
-      alert("No questions match the selected parts. Please choose different parts.");
-      return;
-    }
+    pool = pool.filter(q => selectedParts.includes(q.part));
+  }
+  if (selectedTags.length > 0) {
+    pool = pool.filter(q => q.tags && selectedTags.some(tag => q.tags.includes(tag)));
+  }
+
+  if (pool.length === 0) {
+    alert("No questions match selected criteria. Please choose different filters.");
+    return;
   }
 
   const count = parseInt(questionCount.value, 10);
-  // shuffle and pick
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   quiz = shuffled.slice(0, Math.min(count, shuffled.length));
   
   if (quiz.length < count) {
-    alert(`Note: Only ${quiz.length} questions available for selected parts. Starting with ${quiz.length} questions.`);
+    alert(`Note: Only ${quiz.length} questions available. Starting with ${quiz.length} questions.`);
   }
 
-  // reset state
   index = 0;
   userAnswers = new Array(quiz.length).fill(null);
+  flaggedQuestions.clear();
+  questionTimes = new Array(quiz.length).fill(0);
   if (timerInterval) clearInterval(timerInterval);
-  totalTimeSeconds = quiz.length * 60; // 1 min per question
+  totalTimeSeconds = quiz.length * 60;
   secondsLeft = totalTimeSeconds;
 
-  // hide settings, show quiz
   settingsBox.style.display = "none";
   quizBox.style.display = "block";
   resultBox.style.display = "none";
   reviewBox.style.display = "none";
+  analyticsBox.style.display = "none";
+  bookmarksBox.style.display = "none";
+  dailyBox.style.display = "none";
 
   renderQuizQuestion();
   startTimer();
+  updateRoundPalette();
+  saveProgress();
+}
+
+function saveProgress() {
+  const progress = {
+    quiz,
+    index,
+    userAnswers,
+    secondsLeft,
+    totalTimeSeconds,
+    questionTimes,
+    flaggedQuestions: Array.from(flaggedQuestions),
+    timestamp: Date.now()
+  };
+  localStorage.setItem('quizProgress', JSON.stringify(progress));
+}
+
+function resumeQuiz() {
+  const saved = localStorage.getItem('quizProgress');
+  if (!saved) return;
+  
+  try {
+    const progress = JSON.parse(saved);
+    quiz = progress.quiz;
+    index = progress.index;
+    userAnswers = progress.userAnswers;
+    secondsLeft = progress.secondsLeft;
+    totalTimeSeconds = progress.totalTimeSeconds;
+    questionTimes = progress.questionTimes || new Array(quiz.length).fill(0);
+    flaggedQuestions = new Set(progress.flaggedQuestions || []);
+    
+    settingsBox.style.display = "none";
+    quizBox.style.display = "block";
+    resumePrompt.style.display = "none";
+    
+    renderQuizQuestion();
+    startTimer();
+    updateRoundPalette();
+  } catch (e) {
+    console.error("Failed to resume:", e);
+    localStorage.removeItem('quizProgress');
+  }
 }
 
 function startTimer() {
+  questionStartTime = Date.now();
   timerInterval = setInterval(() => {
     secondsLeft--;
     if (secondsLeft <= 0) {
       clearInterval(timerInterval);
-      finishQuiz(); // time out – auto submit
+      finishQuiz();
     }
     updateTimerDisplay();
+    saveProgress();
   }, 1000);
 }
 
@@ -328,6 +969,14 @@ function updateTimerDisplay() {
     const mins = Math.floor(secondsLeft / 60);
     const secs = secondsLeft % 60;
     timerSpan.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    
+    if (secondsLeft < 60) {
+      timerSpan.style.color = '#dc2626';
+    } else if (secondsLeft < 120) {
+      timerSpan.style.color = '#f59e0b';
+    } else {
+      timerSpan.style.color = '#1e3a8a';
+    }
   }
 }
 
@@ -336,119 +985,633 @@ function renderQuizQuestion() {
     finishQuiz();
     return;
   }
+  
   const q = quiz[index];
   const saved = userAnswers[index];
+  const progress = ((index) / quiz.length) * 100;
+  const isFlagged = flaggedQuestions.has(index);
+  
   const optsHtml = q.opts.map((opt, i) => {
-    let letter = String.fromCharCode(65 + i); // A,B,C,D
+    let letter = String.fromCharCode(65 + i);
     let selectedClass = (saved === i) ? 'selected' : '';
-    return `<div class="option-row ${selectedClass}" onclick="selectOption(${i})">
-      <span style="font-weight:600;margin-right:10px">${letter}.</span> ${opt}
+    return `<div class="option-row ${selectedClass}" onclick="selectOption(${i})" role="radio" aria-checked="${saved === i}">
+      <span style="font-weight:600;min-width:25px">${letter}.</span> 
+      <span>${opt}</span>
     </div>`;
   }).join('');
 
-  quizBox.innerHTML = `
+  quizMain.innerHTML = `
+    <div class="progress-container">
+      <div class="progress-fill" style="width: ${progress}%"></div>
+    </div>
     <div class="flex">
       <h3>Question ${index+1} / ${quiz.length}</h3>
       <div class="timer">⏳ <span id="timerDisplay"></span></div>
     </div>
-    <div style="margin-bottom:8px;color:#4b5563;font-size:0.9rem">📌 ${q.part}</div>
+    <div class="flex">
+      <div>
+        <span class="article-ref">📖 ${q.articleNumber ? 'Article '+q.articleNumber : q.part}</span>
+        ${q.tags && q.tags.map(t => `<span class="tag">#${t}</span>`).join('')}
+      </div>
+      <button class="bookmark-btn ${isFlagged ? 'bookmarked' : ''}" onclick="toggleBookmark(${index})">
+        ${isFlagged ? '★' : '☆'}
+      </button>
+    </div>
     <div class="question-text">${q.q}</div>
-    <div id="optionsContainer">${optsHtml}</div>
+    <div id="optionsContainer" role="radiogroup" aria-label="Answer options">${optsHtml}</div>
     <div style="display:flex;justify-content:space-between;margin-top:25px;gap:10px;flex-wrap:wrap">
-      <button class="next" onclick="prevQuestion()" ${index===0?'disabled style="opacity:0.5"':''}>◀ Previous</button>
-      <button class="next" onclick="nextQuestion()">Next ▶</button>
+      <button class="next" onclick="prevQuestion()" ${index===0?'disabled':''}>◀ Previous (←)</button>
+      <button class="next" onclick="nextQuestion()">Next (→) ▶</button>
+      <button class="warning" onclick="flagQuestion()">🏷️ Flag for Review</button>
       <button class="submit" onclick="finishQuiz()">⏹️ Finish</button>
     </div>
+    <p style="font-size:0.8rem;color:#666;margin-top:10px;text-align:center">
+      ⌨️ Press 1-4 to select answer
+    </p>
   `;
+  
   updateTimerDisplay();
+  updateRoundPalette();
+  
+  if (questionStartTime) {
+    const timeSpent = (Date.now() - questionStartTime) / 1000;
+    if (index > 0) questionTimes[index-1] = timeSpent;
+  }
+  questionStartTime = Date.now();
 }
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (quizBox.style.display !== 'block') return;
+  
+  if (e.key >= '1' && e.key <= '4') {
+    const optIndex = parseInt(e.key) - 1;
+    if (optIndex < quiz[index].opts.length) {
+      selectOption(optIndex);
+    }
+  } else if (e.key === 'ArrowRight') {
+    nextQuestion();
+  } else if (e.key === 'ArrowLeft') {
+    prevQuestion();
+  } else if (e.key === 'f' || e.key === 'F') {
+    flagQuestion();
+  }
+});
 
 function selectOption(optIndex) {
   userAnswers[index] = optIndex;
-  // re-render to show highlight
   renderQuizQuestion();
+  updateRoundPalette();
+  saveProgress();
 }
 
 function prevQuestion() {
   if (index > 0) {
+    if (questionStartTime) {
+      questionTimes[index] = (Date.now() - questionStartTime) / 1000;
+    }
     index--;
+    questionStartTime = Date.now();
     renderQuizQuestion();
+    updateRoundPalette();
+    saveProgress();
   }
 }
+
 function nextQuestion() {
   if (index < quiz.length - 1) {
+    if (questionStartTime) {
+      questionTimes[index] = (Date.now() - questionStartTime) / 1000;
+    }
     index++;
+    questionStartTime = Date.now();
     renderQuizQuestion();
+    updateRoundPalette();
+    saveProgress();
   } else {
     finishQuiz();
   }
 }
 
+function flagQuestion() {
+  if (flaggedQuestions.has(index)) {
+    flaggedQuestions.delete(index);
+  } else {
+    flaggedQuestions.add(index);
+  }
+  renderQuizQuestion();
+  updateRoundPalette();
+  saveProgress();
+}
+
+function toggleBookmark(qIndex) {
+  const q = quiz[qIndex];
+  const bookmarkKey = `${q.q.substring(0,50)}_${q.part}`;
+  
+  if (bookmarks.includes(bookmarkKey)) {
+    bookmarks = bookmarks.filter(b => b !== bookmarkKey);
+  } else {
+    bookmarks.push(bookmarkKey);
+  }
+  
+  localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+  renderQuizQuestion();
+}
+
 function finishQuiz() {
   clearInterval(timerInterval);
-  // build result
+  
+  if (questionStartTime) {
+    questionTimes[index] = (Date.now() - questionStartTime) / 1000;
+  }
+  
   let correct = 0;
+  let partPerformance = {};
+  let tagPerformance = {};
+  
   quiz.forEach((q, i) => {
-    const ansLetter = q.ans.toUpperCase().charCodeAt(0) - 65; // 'A'->0, 'B'->1
-    if (userAnswers[i] === ansLetter) correct++;
+    const ansLetter = q.ans.charCodeAt(0) - 65;
+    const isCorrect = (userAnswers[i] === ansLetter);
+    if (isCorrect) correct++;
+    
+    if (!partPerformance[q.part]) {
+      partPerformance[q.part] = { correct: 0, total: 0 };
+    }
+    partPerformance[q.part].total++;
+    if (isCorrect) partPerformance[q.part].correct++;
+    
+    (q.tags || []).forEach(tag => {
+      if (!tagPerformance[tag]) {
+        tagPerformance[tag] = { correct: 0, total: 0 };
+      }
+      tagPerformance[tag].total++;
+      if (isCorrect) tagPerformance[tag].correct++;
+    });
   });
-  const percentage = Math.round((correct / quiz.length)*100);
-  // show result box
+  
+  const percentage = Math.round((correct / quiz.length) * 100);
+  const timeTaken = totalTimeSeconds - secondsLeft;
+  
+  quizHistory.push({
+    date: new Date().toISOString(),
+    score: correct,
+    total: quiz.length,
+    percentage,
+    timeTaken,
+    partPerformance
+  });
+  localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
+  
+  checkAchievements(correct, quiz.length, percentage, timeTaken);
+  
+  localStorage.removeItem('quizProgress');
+  
   quizBox.style.display = "none";
   resultBox.style.display = "block";
+  
   resultBox.innerHTML = `
     <h3>📊 Quiz Result</h3>
     <div style="background:#e6f7e6;border-radius:20px;padding:30px;text-align:center">
       <div style="font-size:4rem">${correct}/${quiz.length}</div>
       <div style="font-size:2rem;margin:10px 0">${percentage}%</div>
-      <div style="margin:20px 0">⏱️ Time taken: ${formatTime(totalTimeSeconds - secondsLeft)} / ${formatTime(totalTimeSeconds)}</div>
-      <button class="next" onclick="reviewQuiz()">📋 Review Answers</button>
-      <button class="start" onclick="newQuiz()" style="margin-left:10px">🔄 New Quiz</button>
+      <div style="margin:20px 0">
+        ⏱️ Time: ${formatTime(timeTaken)} / ${formatTime(totalTimeSeconds)}<br>
+        ⚡ Avg time per question: ${formatTime(timeTaken/quiz.length)}
+      </div>
+      
+      <div class="badge-container" id="achievementDisplay"></div>
+      
+      <div class="share-buttons">
+        <button class="share-btn share-twitter" onclick="shareResult('twitter', ${correct}, ${quiz.length}, ${percentage})">🐦 Twitter</button>
+        <button class="share-btn share-whatsapp" onclick="shareResult('whatsapp', ${correct}, ${quiz.length}, ${percentage})">📱 WhatsApp</button>
+        <button class="share-btn share-email" onclick="shareResult('email', ${correct}, ${quiz.length}, ${percentage})">📧 Email</button>
+      </div>
+      
+      <div style="margin-top:20px">
+        <button class="next" onclick="reviewQuiz()">📋 Review Answers</button>
+        <button class="next" onclick="showAnalytics()">📈 View Analytics</button>
+        <button class="start" onclick="newQuiz()" style="margin-left:10px">🔄 New Quiz</button>
+      </div>
     </div>
   `;
+  
+  displayAchievements();
+}
+
+function checkAchievements(correct, total, percentage, timeTaken) {
+  const newAchievements = [];
+  
+  if (percentage === 100) {
+    if (!achievements.includes('Constitution Expert')) {
+      achievements.push('Constitution Expert');
+      newAchievements.push('Constitution Expert');
+    }
+  }
+  
+  const partsInQuiz = [...new Set(quiz.map(q => q.part))];
+  partsInQuiz.forEach(part => {
+    const partQuestions = quiz.filter(q => q.part === part);
+    const partCorrect = partQuestions.filter((q, i) => {
+      const ansLetter = q.ans.charCodeAt(0) - 65;
+      return userAnswers[quiz.indexOf(q)] === ansLetter;
+    }).length;
+    
+    if (partCorrect === partQuestions.length && partQuestions.length >= 3) {
+      const badge = `${part} Master`;
+      if (!achievements.includes(badge)) {
+        achievements.push(badge);
+        newAchievements.push(badge);
+      }
+    }
+  });
+  
+  if (timeTaken / total < 30 && percentage >= 90) {
+    if (!achievements.includes('Speed Demon')) {
+      achievements.push('Speed Demon');
+      newAchievements.push('Speed Demon');
+    }
+  }
+  
+  if (newAchievements.length > 0) {
+    localStorage.setItem('achievements', JSON.stringify(achievements));
+    alert(`🏆 New Achievements: ${newAchievements.join(', ')}`);
+  }
+}
+
+function displayAchievements() {
+  const container = document.getElementById('achievementDisplay');
+  if (!container) return;
+  
+  const earned = achievements;
+  const allPossible = ['Constitution Expert', 'Part V Master', 'Part III Master', 'Speed Demon'];
+  
+  container.innerHTML = allPossible.map(ach => `
+    <div class="badge ${earned.includes(ach) ? 'earned' : ''}">
+      ${earned.includes(ach) ? '🏆' : '🔜'} ${ach}
+    </div>
+  `).join('');
+}
+
+function shareResult(platform, correct, total, percentage) {
+  const text = `I scored ${correct}/${total} (${percentage}%) on Indian Polity Quiz! Try it yourself: ${window.location.href}`;
+  
+  switch(platform) {
+    case 'twitter':
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`);
+      break;
+    case 'whatsapp':
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+      break;
+    case 'email':
+      window.location.href = `mailto:?subject=My Polity Quiz Score&body=${encodeURIComponent(text)}`;
+      break;
+  }
 }
 
 function formatTime(sec) {
-  if (sec<0) sec=0;
-  const m = Math.floor(sec/60);
-  const s = sec%60;
-  return `${m}:${s<10?'0':''}${s}`;
+  if (sec < 0) sec = 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
 function reviewQuiz() {
   resultBox.style.display = "none";
   reviewBox.style.display = "block";
+  
   let html = '<h3>🔍 Detailed Review</h3>';
+  
+  html += `
+    <div style="margin-bottom:20px">
+      <button class="next" onclick="filterReview('all')">All</button>
+      <button class="next" onclick="filterReview('correct')">Correct</button>
+      <button class="next" onclick="filterReview('wrong')">Wrong</button>
+      <button class="next" onclick="filterReview('flagged')">Flagged</button>
+    </div>
+    <div id="reviewList">
+  `;
+  
   quiz.forEach((q, i) => {
     const userOpt = userAnswers[i];
-    const correctIdx = q.ans.toUpperCase().charCodeAt(0)-65;
+    const correctIdx = q.ans.charCodeAt(0) - 65;
     const isCorrect = (userOpt === correctIdx);
-    let statusIcon = isCorrect ? '✅' : '❌';
-    let userLetter = (userOpt!==null) ? String.fromCharCode(65+userOpt) : 'Not answered';
-    let correctLetter = String.fromCharCode(65+correctIdx);
-    let explanation = q.exp ? q.exp : 'No explanation.';
-
-    html += `<div style="border-bottom:1px solid #ddd;padding:20px 0">
-      <p><strong>Q${i+1}:</strong> ${q.q}</p>
-      <p style="color:#4b5563;font-size:0.9rem">📌 ${q.part}</p>
-      <p>${statusIcon} Your answer: ${userLetter}  |  Correct: ${correctLetter}</p>
-      <p style="background:#f1f5f9;padding:10px;border-radius:12px">💡 ${explanation}</p>
+    const isFlagged = flaggedQuestions.has(i);
+    const statusIcon = isCorrect ? '✅' : '❌';
+    const userLetter = (userOpt !== null) ? String.fromCharCode(65 + userOpt) : 'Not answered';
+    const correctLetter = String.fromCharCode(65 + correctIdx);
+    const reviewClass = isCorrect ? 'correct-review' : 'wrong-review';
+    
+    html += `<div class="review-item" data-correct="${isCorrect}" data-flagged="${isFlagged}" style="border-bottom:1px solid #ddd;padding:20px 0">
+      <div class="flex">
+        <p><strong>Q${i+1}:</strong> ${q.q}</p>
+        ${isFlagged ? '<span class="tag" style="background:#f59e0b">⭐ Flagged</span>' : ''}
+      </div>
+      <p style="color:#4b5563;font-size:0.9rem">📌 ${q.part} ${q.articleNumber ? '| Article ' + q.articleNumber : ''}</p>
+      <div class="option-row ${userOpt === 0 ? reviewClass : ''}">A. ${q.opts[0]}</div>
+      <div class="option-row ${userOpt === 1 ? reviewClass : ''}">B. ${q.opts[1]}</div>
+      <div class="option-row ${userOpt === 2 ? reviewClass : ''}">C. ${q.opts[2]}</div>
+      <div class="option-row ${userOpt === 3 ? reviewClass : ''}">D. ${q.opts[3]}</div>
+      <p>${statusIcon} Your answer: ${userLetter} | Correct: ${correctLetter}</p>
+      <p style="background:#f1f5f9;padding:10px;border-radius:12px">💡 ${q.exp}</p>
+      <p style="font-size:0.8rem;color:#666">⏱️ Time spent: ${formatTime(questionTimes[i] || 0)}</p>
     </div>`;
   });
+  
+  html += '</div>';
   html += `<button class="start" onclick="newQuiz()" style="margin-top:20px">🔄 New Quiz</button>`;
+  html += `<button class="next" onclick="exportReview()" style="margin-left:10px">📥 Export Review</button>`;
+  
   reviewBox.innerHTML = html;
 }
 
+function filterReview(type) {
+  const items = document.querySelectorAll('.review-item');
+  items.forEach(item => {
+    const isCorrect = item.dataset.correct === 'true';
+    const isFlagged = item.dataset.flagged === 'true';
+    
+    if (type === 'all') item.style.display = 'block';
+    else if (type === 'correct' && isCorrect) item.style.display = 'block';
+    else if (type === 'wrong' && !isCorrect) item.style.display = 'block';
+    else if (type === 'flagged' && isFlagged) item.style.display = 'block';
+    else item.style.display = 'none';
+  });
+}
+
+function exportReview() {
+  let csv = 'Question,Your Answer,Correct Answer,Explanation,Part,Time Spent\n';
+  
+  quiz.forEach((q, i) => {
+    const userOpt = userAnswers[i];
+    const correctIdx = q.ans.charCodeAt(0) - 65;
+    const userLetter = (userOpt !== null) ? String.fromCharCode(65 + userOpt) : 'NA';
+    const correctLetter = String.fromCharCode(65 + correctIdx);
+    
+    csv += `"${q.q}","${userLetter}","${correctLetter}","${q.exp}","${q.part}","${formatTime(questionTimes[i] || 0)}"\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quiz_review.csv';
+  a.click();
+}
+
+function showAnalytics() {
+  resultBox.style.display = "none";
+  analyticsBox.style.display = "block";
+  
+  const partLabels = [...new Set(quiz.map(q => q.part))];
+  const partData = partLabels.map(part => {
+    const partQs = quiz.filter(q => q.part === part);
+    const partCorrect = partQs.filter((q, i) => {
+      const ansLetter = q.ans.charCodeAt(0) - 65;
+      return userAnswers[quiz.indexOf(q)] === ansLetter;
+    }).length;
+    return (partCorrect / partQs.length * 100).toFixed(1);
+  });
+  
+  const allTags = [...new Set(quiz.flatMap(q => q.tags || []))];
+  const tagData = allTags.map(tag => {
+    const tagQs = quiz.filter(q => q.tags && q.tags.includes(tag));
+    const tagCorrect = tagQs.filter((q, i) => {
+      const ansLetter = q.ans.charCodeAt(0) - 65;
+      return userAnswers[quiz.indexOf(q)] === ansLetter;
+    }).length;
+    return (tagCorrect / tagQs.length * 100).toFixed(1);
+  });
+  
+  analyticsBox.innerHTML = `
+    <h3>📈 Performance Analytics</h3>
+    
+    <div style="margin-bottom:30px">
+      <h4>📊 Part-wise Performance</h4>
+      <div class="bar-chart" id="partChart">
+        ${partLabels.map((part, i) => `
+          <div class="bar-item">
+            <div class="bar" style="height:${partData[i] * 2}px; background:${getColor(partData[i])}"></div>
+            <div class="bar-label">${part}<br>${partData[i]}%</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    
+    <div style="margin-bottom:30px">
+      <h4>🏷️ Tag-wise Performance</h4>
+      <div class="bar-chart" id="tagChart">
+        ${allTags.map((tag, i) => `
+          <div class="bar-item">
+            <div class="bar" style="height:${tagData[i] * 2}px; background:${getColor(tagData[i])}"></div>
+            <div class="bar-label">${tag}<br>${tagData[i]}%</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    
+    <div style="margin-bottom:30px">
+      <h4>⏱️ Time Analysis</h4>
+      <p>Average time per question: ${formatTime(questionTimes.reduce((a,b) => a + b, 0) / questionTimes.length)}</p>
+      <p>Total time: ${formatTime(questionTimes.reduce((a,b) => a + b, 0))}</p>
+      <p>Fastest question: Q${questionTimes.indexOf(Math.min(...questionTimes.filter(t => t > 0)))+1} (${formatTime(Math.min(...questionTimes))})</p>
+      <p>Slowest question: Q${questionTimes.indexOf(Math.max(...questionTimes))+1} (${formatTime(Math.max(...questionTimes))})</p>
+    </div>
+    
+    <div style="margin-bottom:30px">
+      <h4>📜 Quiz History</h4>
+      <div id="historyList">
+        ${quizHistory.slice(-5).reverse().map(h => `
+          <div style="background:#f1f5f9;padding:10px;border-radius:8px;margin:5px 0">
+            ${new Date(h.date).toLocaleDateString()}: ${h.score}/${h.total} (${h.percentage}%) in ${formatTime(h.timeTaken)}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    
+    <button class="start" onclick="newQuiz()">🔄 New Quiz</button>
+    <button class="next" onclick="showBookmarks()">⭐ View Bookmarks</button>
+  `;
+}
+
+function getColor(percent) {
+  if (percent >= 80) return '#059669';
+  if (percent >= 60) return '#3b82f6';
+  if (percent >= 40) return '#f59e0b';
+  return '#dc2626';
+}
+
+function showBookmarks() {
+  analyticsBox.style.display = "none";
+  bookmarksBox.style.display = "block";
+  
+  const bookmarkedQs = allQuestions.filter(q => {
+    const key = `${q.q.substring(0,50)}_${q.part}`;
+    return bookmarks.includes(key);
+  });
+  
+  bookmarksBox.innerHTML = `
+    <h3>⭐ Bookmarked Questions</h3>
+    ${bookmarkedQs.length === 0 ? '<p>No bookmarks yet. Star questions during quiz to save them.</p>' : ''}
+    ${bookmarkedQs.map((q, i) => `
+      <div style="border-bottom:1px solid #ddd;padding:15px 0">
+        <p><strong>${i+1}.</strong> ${q.q}</p>
+        <p style="color:#4b5563">${q.part} ${q.articleNumber ? '| Article ' + q.articleNumber : ''}</p>
+        <p>Correct: ${q.ans}. ${q.opts[q.ans.charCodeAt(0)-65]}</p>
+        <p style="background:#f1f5f9;padding:8px;border-radius:8px">${q.exp}</p>
+      </div>
+    `).join('')}
+    <button class="start" onclick="newQuiz()" style="margin-top:20px">🔄 New Quiz</button>
+  `;
+}
+
+function checkDailyChallenge() {
+  const lastDaily = localStorage.getItem('lastDaily');
+  const today = new Date().toDateString();
+  
+  if (lastDaily !== today) {
+    const dailyQs = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, 5);
+    localStorage.setItem('dailyChallenge', JSON.stringify(dailyQs));
+    localStorage.setItem('lastDaily', today);
+    
+    const dailyBtn = document.createElement('button');
+    dailyBtn.className = 'next';
+    dailyBtn.innerText = '📅 Daily Challenge Available';
+    dailyBtn.onclick = showDailyChallenge;
+    dailyBtn.style.marginTop = '10px';
+    dailyBtn.style.width = '100%';
+    document.querySelector('#settingsBox .start').after(dailyBtn);
+  }
+}
+
+function showDailyChallenge() {
+  const dailyQs = JSON.parse(localStorage.getItem('dailyChallenge') || '[]');
+  
+  dailyBox.style.display = "block";
+  settingsBox.style.display = "none";
+  
+  let html = '<h3>📅 Daily Challenge</h3>';
+  dailyQs.forEach((q, i) => {
+    html += `
+      <div style="border-bottom:1px solid #ddd;padding:15px 0">
+        <p><strong>${i+1}.</strong> ${q.q}</p>
+        <p>${q.opts.map((opt, j) => `${String.fromCharCode(65+j)}. ${opt}`).join(' | ')}</p>
+        <details>
+          <summary>Reveal Answer</summary>
+          <p style="background:#e6f7e6;padding:10px;border-radius:8px;margin-top:10px">
+            ✅ ${q.ans}. ${q.opts[q.ans.charCodeAt(0)-65]}<br>
+            💡 ${q.exp}
+          </p>
+        </details>
+      </div>
+    `;
+  });
+  
+  html += `<button class="start" onclick="newQuiz()" style="margin-top:20px">Back to Menu</button>`;
+  dailyBox.innerHTML = html;
+}
+
+function toggleAdminPanel() {
+  const panel = document.getElementById('adminPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function checkAdminPassword() {
+  const pwd = document.getElementById('adminPassword').value;
+  if (pwd === 'admin123') {
+    document.getElementById('adminControls').style.display = 'block';
+    document.getElementById('adminPassword').style.display = 'none';
+  } else {
+    alert('Incorrect password');
+  }
+}
+
+function addQuestion() {
+  const newQ = {
+    q: document.getElementById('newQuestion').value,
+    opts: [
+      document.getElementById('newOpt1').value,
+      document.getElementById('newOpt2').value,
+      document.getElementById('newOpt3').value,
+      document.getElementById('newOpt4').value
+    ],
+    ans: document.getElementById('newAnswer').value.toUpperCase(),
+    exp: document.getElementById('newExp').value,
+    part: document.getElementById('newPart').value,
+    tags: document.getElementById('newTags').value.split(',').map(t => t.trim()),
+    articleNumber: extractArticleNumber(document.getElementById('newQuestion').value)
+  };
+  
+  allQuestions.push(newQ);
+  localStorage.setItem('questionCache', JSON.stringify(allQuestions));
+  displayPartFilters();
+  displayTagFilters();
+  alert('Question added!');
+}
+
+function exportQuestions() {
+  let csv = 'Question,Option A,Option B,Option C,Option D,Answer,Explanation,Part,Tags\n';
+  
+  allQuestions.forEach(q => {
+    csv += `"${q.q}","${q.opts[0]}","${q.opts[1]}","${q.opts[2]}","${q.opts[3]}","${q.ans}","${q.exp}","${q.part}","${q.tags ? q.tags.join(',') : ''}"\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'polity_questions.csv';
+  a.click();
+}
+
+function importQuestions() {
+  const file = document.getElementById('importFile').files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const text = e.target.result;
+    const rows = parseCSV(text);
+    const imported = rows.map(row => ({
+      q: row[0],
+      opts: [row[1], row[2], row[3], row[4]],
+      ans: row[5].charAt(0).toUpperCase(),
+      exp: row[6],
+      part: row[7],
+      tags: row[8] ? row[8].split(',').map(t => t.trim()) : []
+    }));
+    
+    allQuestions = [...allQuestions, ...imported];
+    localStorage.setItem('questionCache', JSON.stringify(allQuestions));
+    displayPartFilters();
+    displayTagFilters();
+    alert(`Imported ${imported.length} questions`);
+  };
+  reader.readAsText(file);
+}
+
 function newQuiz() {
-  // reset UI
   settingsBox.style.display = "block";
   quizBox.style.display = "none";
   resultBox.style.display = "none";
   reviewBox.style.display = "none";
+  analyticsBox.style.display = "none";
+  bookmarksBox.style.display = "none";
+  dailyBox.style.display = "none";
   if (timerInterval) clearInterval(timerInterval);
+  checkSavedProgress();
 }
 
-// expose globals for inline handlers
+function toggleDarkMode() {
+  darkMode = !darkMode;
+  if (darkMode) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+  localStorage.setItem('darkMode', darkMode);
+}
+
+// Expose functions globally
 window.selectAllParts = selectAllParts;
 window.clearAllParts = clearAllParts;
 window.startQuiz = startQuiz;
@@ -458,7 +1621,23 @@ window.nextQuestion = nextQuestion;
 window.finishQuiz = finishQuiz;
 window.reviewQuiz = reviewQuiz;
 window.newQuiz = newQuiz;
-
+window.resumeQuiz = resumeQuiz;
+window.discardProgress = discardProgress;
+window.toggleBookmark = toggleBookmark;
+window.flagQuestion = flagQuestion;
+window.showAnalytics = showAnalytics;
+window.showBookmarks = showBookmarks;
+window.showDailyChallenge = showDailyChallenge;
+window.filterReview = filterReview;
+window.exportReview = exportReview;
+window.shareResult = shareResult;
+window.toggleDarkMode = toggleDarkMode;
+window.toggleAdminPanel = toggleAdminPanel;
+window.checkAdminPassword = checkAdminPassword;
+window.addQuestion = addQuestion;
+window.exportQuestions = exportQuestions;
+window.importQuestions = importQuestions;
+window.jumpToQuestion = jumpToQuestion;
 </script>
 </body>
 </html>
