@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🇮🇳 Indian Polity – Article-wise Quiz (No Stars)</title>
+<title>🇮🇳 Indian Polity – Article-wise Quiz</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -107,7 +107,7 @@ body.dark-mode .parts label{
   width:100%;
 }
 
-/* ROUND PALETTE - Always visible, no stars */
+/* ROUND PALETTE - Always visible */
 .round-palette-container{
   display:flex;
   flex-wrap:wrap;
@@ -202,7 +202,6 @@ body.dark-mode .palette-circle.answered{
   color:#a7f3d0;
   border-color:#2ecc71;
 }
-/* No star indicator for flagged questions - just use a different color/border */
 .palette-circle.flagged{
   background:#fff3cd;
   border-color:#f59e0b;
@@ -284,7 +283,7 @@ body.dark-mode .progress-container{background:#4a4a5a}
 }
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
-/* TAGS */
+/* TAGS - Only used for display in questions, not for filtering */
 .tags-container{
   display:flex;
   flex-wrap:wrap;
@@ -303,16 +302,6 @@ body.dark-mode .tag{background:#4a4a5a}
 .tag.part-III{background:#c8e6c9}
 .tag.part-IV{background:#ffe0b2}
 .tag.part-V{background:#b3e5fc}
-
-/* BOOKMARK */
-.bookmark-btn{
-  background:none;
-  border:none;
-  font-size:1.5rem;
-  cursor:pointer;
-  padding:5px;
-}
-.bookmark-btn.bookmarked{color:#f59e0b}
 
 /* KEYBOARD SHORTCUT HINT */
 .shortcut-hint{
@@ -466,7 +455,7 @@ body.dark-mode .dark-mode-toggle{background:#2d2d2d;color:#fff;border:1px solid 
 <body>
 
 <header>
-  <h2>🇮🇳 Indian Polity – Article-wise Quiz (No Stars)</h2>
+  <h2>🇮🇳 Indian Polity – Article-wise Quiz</h2>
 </header>
 
 <!-- Dark Mode Toggle -->
@@ -511,14 +500,6 @@ body.dark-mode .dark-mode-toggle{background:#2d2d2d;color:#fff;border:1px solid 
     <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap">
       <button type="button" class="next" onclick="selectAllParts()">✔ Select All</button>
       <button type="button" class="submit" onclick="clearAllParts()">✖ Clear All</button>
-    </div>
-  </div>
-
-  <!-- TOPIC TAGS -->
-  <div class="box" style="background:#eef2ff">
-    <h4>🏷️ Filter by Topic Tags</h4>
-    <div id="tagContainer" class="tags-container">
-      <div>Loading tags...</div>
     </div>
   </div>
 
@@ -574,7 +555,7 @@ body.dark-mode .dark-mode-toggle{background:#2d2d2d;color:#fff;border:1px solid 
 <!-- QUIZ BOX WITH ROUND PALETTE -->
 <div class="box" id="quizBox" style="display:none">
   <div class="quiz-layout">
-    <!-- Round palette at top - always visible, no stars -->
+    <!-- Round palette at top - always visible -->
     <div class="round-palette-container" id="roundPalette">
       <div class="palette-summary-round">
         <div class="summary-item-round"><span class="summary-dot-round dot-current-round"></span> <span id="currentCountRound">0</span></div>
@@ -599,9 +580,6 @@ body.dark-mode .dark-mode-toggle{background:#2d2d2d;color:#fff;border:1px solid 
 <!-- ANALYTICS BOX -->
 <div class="box" id="analyticsBox" style="display:none"></div>
 
-<!-- BOOKMARKS BOX -->
-<div class="box" id="bookmarksBox" style="display:none"></div>
-
 <!-- DAILY CHALLENGE BOX -->
 <div class="box" id="dailyBox" style="display:none"></div>
 
@@ -609,7 +587,7 @@ body.dark-mode .dark-mode-toggle{background:#2d2d2d;color:#fff;border:1px solid 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-/* ==== ENHANCED QUIZ WITH ROUND PALETTE (NO STARS) ==== */
+/* ==== ENHANCED QUIZ WITH ROUND PALETTE (NO BOOKMARKS) ==== */
 
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
@@ -623,7 +601,6 @@ let secondsLeft = 0;
 let totalTimeSeconds = 0;
 let questionTimes = [];
 let questionStartTime = null;
-let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
 let achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
 let quizHistory = JSON.parse(localStorage.getItem('quizHistory') || '[]');
 let darkMode = localStorage.getItem('darkMode') === 'true';
@@ -638,11 +615,9 @@ const quizMain = document.getElementById("quizMain");
 const resultBox = document.getElementById("resultBox");
 const reviewBox = document.getElementById("reviewBox");
 const analyticsBox = document.getElementById("analyticsBox");
-const bookmarksBox = document.getElementById("bookmarksBox");
 const dailyBox = document.getElementById("dailyBox");
 const resumePrompt = document.getElementById("resumePrompt");
 const offlineIndicator = document.getElementById("offlineIndicator");
-const tagContainer = document.getElementById("tagContainer");
 const roundPalette = document.getElementById("roundPalette");
 
 // Apply dark mode on load
@@ -665,7 +640,6 @@ function updateOnlineStatus() {
     if (offlineCache) {
       allQuestions = offlineCache;
       displayPartFilters();
-      displayTagFilters();
     }
   } else {
     offlineIndicator.style.display = 'none';
@@ -709,14 +683,12 @@ async function loadQuestions() {
     offlineCache = allQuestions;
     
     displayPartFilters();
-    displayTagFilters();
     checkDailyChallenge();
   } catch (e) {
     console.error("Error loading:", e);
     if (offlineCache) {
       allQuestions = offlineCache;
       displayPartFilters();
-      displayTagFilters();
     } else {
       useSampleData();
     }
@@ -757,7 +729,6 @@ function useSampleData() {
     {q:"The Constitution of India came into force on?", opts:["26 Jan 1950","15 Aug 1947","26 Nov 1949","30 Jan 1948"], ans:"A", exp:"26 January 1950.", part:"Part I", tags:["History"], articleNumber:null},
   ];
   displayPartFilters();
-  displayTagFilters();
 }
 
 function displayPartFilters() {
@@ -770,40 +741,12 @@ function displayPartFilters() {
   `).join("");
 }
 
-function displayTagFilters() {
-  const allTags = [...new Set(allQuestions.flatMap(q => q.tags || []))].sort();
-  if (allTags.length === 0) {
-    tagContainer.innerHTML = '<div>No tags available</div>';
-    return;
-  }
-  tagContainer.innerHTML = allTags.map(tag => `
-    <label class="tag" style="cursor:pointer">
-      <input type="checkbox" value="${tag}" style="display:none">
-      <span>#${tag}</span>
-    </label>
-  `).join('');
-  
-  document.querySelectorAll('#tagContainer input').forEach(cb => {
-    cb.addEventListener('change', function() {
-      this.parentElement.style.background = this.checked ? '#f59e0b' : '#e2e8f0';
-    });
-  });
-}
-
 function selectAllParts() {
   document.querySelectorAll("#partContainer input").forEach(c => c.checked = true);
 }
 
 function clearAllParts() {
   document.querySelectorAll("#partContainer input").forEach(c => c.checked = false);
-}
-
-function getSelectedTags() {
-  const selected = [];
-  document.querySelectorAll('#tagContainer input:checked').forEach(cb => {
-    selected.push(cb.value);
-  });
-  return selected;
 }
 
 function updateRoundPalette() {
@@ -864,14 +807,9 @@ function startQuiz() {
     }
   });
 
-  const selectedTags = getSelectedTags();
-
   let pool = allQuestions;
   if (selectedParts.length > 0) {
     pool = pool.filter(q => selectedParts.includes(q.part));
-  }
-  if (selectedTags.length > 0) {
-    pool = pool.filter(q => q.tags && selectedTags.some(tag => q.tags.includes(tag)));
   }
 
   if (pool.length === 0) {
@@ -900,7 +838,6 @@ function startQuiz() {
   resultBox.style.display = "none";
   reviewBox.style.display = "none";
   analyticsBox.style.display = "none";
-  bookmarksBox.style.display = "none";
   dailyBox.style.display = "none";
 
   renderQuizQuestion();
@@ -1013,9 +950,7 @@ function renderQuizQuestion() {
         <span class="article-ref">📖 ${q.articleNumber ? 'Article '+q.articleNumber : q.part}</span>
         ${q.tags && q.tags.map(t => `<span class="tag">#${t}</span>`).join('')}
       </div>
-      <button class="bookmark-btn ${isFlagged ? 'bookmarked' : ''}" onclick="toggleBookmark(${index})">
-        ${isFlagged ? '★' : '☆'}
-      </button>
+      <!-- No bookmark button -->
     </div>
     <div class="question-text">${q.q}</div>
     <div id="optionsContainer" role="radiogroup" aria-label="Answer options">${optsHtml}</div>
@@ -1102,20 +1037,6 @@ function flagQuestion() {
   renderQuizQuestion();
   updateRoundPalette();
   saveProgress();
-}
-
-function toggleBookmark(qIndex) {
-  const q = quiz[qIndex];
-  const bookmarkKey = `${q.q.substring(0,50)}_${q.part}`;
-  
-  if (bookmarks.includes(bookmarkKey)) {
-    bookmarks = bookmarks.filter(b => b !== bookmarkKey);
-  } else {
-    bookmarks.push(bookmarkKey);
-  }
-  
-  localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-  renderQuizQuestion();
 }
 
 function finishQuiz() {
@@ -1429,7 +1350,6 @@ function showAnalytics() {
     </div>
     
     <button class="start" onclick="newQuiz()">🔄 New Quiz</button>
-    <button class="next" onclick="showBookmarks()">⭐ View Bookmarks</button>
   `;
 }
 
@@ -1438,30 +1358,6 @@ function getColor(percent) {
   if (percent >= 60) return '#3b82f6';
   if (percent >= 40) return '#f59e0b';
   return '#dc2626';
-}
-
-function showBookmarks() {
-  analyticsBox.style.display = "none";
-  bookmarksBox.style.display = "block";
-  
-  const bookmarkedQs = allQuestions.filter(q => {
-    const key = `${q.q.substring(0,50)}_${q.part}`;
-    return bookmarks.includes(key);
-  });
-  
-  bookmarksBox.innerHTML = `
-    <h3>⭐ Bookmarked Questions</h3>
-    ${bookmarkedQs.length === 0 ? '<p>No bookmarks yet. Star questions during quiz to save them.</p>' : ''}
-    ${bookmarkedQs.map((q, i) => `
-      <div style="border-bottom:1px solid #ddd;padding:15px 0">
-        <p><strong>${i+1}.</strong> ${q.q}</p>
-        <p style="color:#4b5563">${q.part} ${q.articleNumber ? '| Article ' + q.articleNumber : ''}</p>
-        <p>Correct: ${q.ans}. ${q.opts[q.ans.charCodeAt(0)-65]}</p>
-        <p style="background:#f1f5f9;padding:8px;border-radius:8px">${q.exp}</p>
-      </div>
-    `).join('')}
-    <button class="start" onclick="newQuiz()" style="margin-top:20px">🔄 New Quiz</button>
-  `;
 }
 
 function checkDailyChallenge() {
@@ -1544,7 +1440,6 @@ function addQuestion() {
   allQuestions.push(newQ);
   localStorage.setItem('questionCache', JSON.stringify(allQuestions));
   displayPartFilters();
-  displayTagFilters();
   alert('Question added!');
 }
 
@@ -1583,7 +1478,6 @@ function importQuestions() {
     allQuestions = [...allQuestions, ...imported];
     localStorage.setItem('questionCache', JSON.stringify(allQuestions));
     displayPartFilters();
-    displayTagFilters();
     alert(`Imported ${imported.length} questions`);
   };
   reader.readAsText(file);
@@ -1595,7 +1489,6 @@ function newQuiz() {
   resultBox.style.display = "none";
   reviewBox.style.display = "none";
   analyticsBox.style.display = "none";
-  bookmarksBox.style.display = "none";
   dailyBox.style.display = "none";
   if (timerInterval) clearInterval(timerInterval);
   checkSavedProgress();
@@ -1623,10 +1516,8 @@ window.reviewQuiz = reviewQuiz;
 window.newQuiz = newQuiz;
 window.resumeQuiz = resumeQuiz;
 window.discardProgress = discardProgress;
-window.toggleBookmark = toggleBookmark;
 window.flagQuestion = flagQuestion;
 window.showAnalytics = showAnalytics;
-window.showBookmarks = showBookmarks;
 window.showDailyChallenge = showDailyChallenge;
 window.filterReview = filterReview;
 window.exportReview = exportReview;
