@@ -339,23 +339,6 @@ body.dark-mode .badge{
 }
 .badge.earned{background:linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%)}
 
-/* ADMIN PANEL */
-.admin-panel{
-  background:#f1f5f9;
-  padding:20px;
-  border-radius:12px;
-  margin:20px 0;
-}
-body.dark-mode .admin-panel{background:#3a3a4a}
-.admin-input{
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-body.dark-mode .admin-input{background:#2d2d2d;color:#fff;border-color:#555}
-
 /* CHART */
 .chart-container{
   height:300px;
@@ -523,33 +506,6 @@ body.dark-mode .dark-mode-toggle{background:#2d2d2d;color:#fff;border:1px solid 
   <button class="start" onclick="startQuiz()" style="width:100%;margin-top:20px">
     🚀 Start Polity Quiz
   </button>
-
-  <!-- ADMIN BUTTON -->
-  <button class="secondary" onclick="toggleAdminPanel()" style="width:100%;margin-top:10px">
-    🔧 Admin Panel
-  </button>
-
-  <!-- ADMIN PANEL -->
-  <div id="adminPanel" class="admin-panel" style="display:none">
-    <h4>📝 Question Editor</h4>
-    <input type="text" id="adminPassword" placeholder="Enter admin password" class="admin-input">
-    <button class="next" onclick="checkAdminPassword()">Login</button>
-    <div id="adminControls" style="display:none;margin-top:15px">
-      <textarea id="newQuestion" placeholder="Question text" class="admin-input" rows="2"></textarea>
-      <input type="text" id="newOpt1" placeholder="Option A" class="admin-input">
-      <input type="text" id="newOpt2" placeholder="Option B" class="admin-input">
-      <input type="text" id="newOpt3" placeholder="Option C" class="admin-input">
-      <input type="text" id="newOpt4" placeholder="Option D" class="admin-input">
-      <input type="text" id="newAnswer" placeholder="Correct answer (A/B/C/D)" class="admin-input" maxlength="1">
-      <input type="text" id="newExp" placeholder="Explanation" class="admin-input">
-      <input type="text" id="newPart" placeholder="Part (e.g., Part III)" class="admin-input">
-      <input type="text" id="newTags" placeholder="Tags (comma separated)" class="admin-input">
-      <button class="start" onclick="addQuestion()">Add Question</button>
-      <button class="submit" onclick="exportQuestions()">📤 Export CSV</button>
-      <input type="file" id="importFile" accept=".csv" style="margin-top:10px">
-      <button class="next" onclick="importQuestions()">📥 Import CSV</button>
-    </div>
-  </div>
 </div>
 
 <!-- QUIZ BOX WITH ROUND PALETTE -->
@@ -587,7 +543,7 @@ body.dark-mode .dark-mode-toggle{background:#2d2d2d;color:#fff;border:1px solid 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-/* ==== ENHANCED QUIZ WITH ROUND PALETTE (NO BOOKMARKS) ==== */
+/* ==== ENHANCED QUIZ WITH ROUND PALETTE (NO ADMIN) ==== */
 
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSoofrGeEqZfnkiTKZOJ68ap8x70uC77dafP0psIy-GRn1gWyFCEl5bKCou24KZQqG_YBkL3dNmJlCI/pub?output=csv";
 
@@ -1406,83 +1362,6 @@ function showDailyChallenge() {
   dailyBox.innerHTML = html;
 }
 
-function toggleAdminPanel() {
-  const panel = document.getElementById('adminPanel');
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-}
-
-function checkAdminPassword() {
-  const pwd = document.getElementById('adminPassword').value;
-  if (pwd === 'admin123') {
-    document.getElementById('adminControls').style.display = 'block';
-    document.getElementById('adminPassword').style.display = 'none';
-  } else {
-    alert('Incorrect password');
-  }
-}
-
-function addQuestion() {
-  const newQ = {
-    q: document.getElementById('newQuestion').value,
-    opts: [
-      document.getElementById('newOpt1').value,
-      document.getElementById('newOpt2').value,
-      document.getElementById('newOpt3').value,
-      document.getElementById('newOpt4').value
-    ],
-    ans: document.getElementById('newAnswer').value.toUpperCase(),
-    exp: document.getElementById('newExp').value,
-    part: document.getElementById('newPart').value,
-    tags: document.getElementById('newTags').value.split(',').map(t => t.trim()),
-    articleNumber: extractArticleNumber(document.getElementById('newQuestion').value)
-  };
-  
-  allQuestions.push(newQ);
-  localStorage.setItem('questionCache', JSON.stringify(allQuestions));
-  displayPartFilters();
-  alert('Question added!');
-}
-
-function exportQuestions() {
-  let csv = 'Question,Option A,Option B,Option C,Option D,Answer,Explanation,Part,Tags\n';
-  
-  allQuestions.forEach(q => {
-    csv += `"${q.q}","${q.opts[0]}","${q.opts[1]}","${q.opts[2]}","${q.opts[3]}","${q.ans}","${q.exp}","${q.part}","${q.tags ? q.tags.join(',') : ''}"\n`;
-  });
-  
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'polity_questions.csv';
-  a.click();
-}
-
-function importQuestions() {
-  const file = document.getElementById('importFile').files[0];
-  if (!file) return;
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const text = e.target.result;
-    const rows = parseCSV(text);
-    const imported = rows.map(row => ({
-      q: row[0],
-      opts: [row[1], row[2], row[3], row[4]],
-      ans: row[5].charAt(0).toUpperCase(),
-      exp: row[6],
-      part: row[7],
-      tags: row[8] ? row[8].split(',').map(t => t.trim()) : []
-    }));
-    
-    allQuestions = [...allQuestions, ...imported];
-    localStorage.setItem('questionCache', JSON.stringify(allQuestions));
-    displayPartFilters();
-    alert(`Imported ${imported.length} questions`);
-  };
-  reader.readAsText(file);
-}
-
 function newQuiz() {
   settingsBox.style.display = "block";
   quizBox.style.display = "none";
@@ -1523,11 +1402,6 @@ window.filterReview = filterReview;
 window.exportReview = exportReview;
 window.shareResult = shareResult;
 window.toggleDarkMode = toggleDarkMode;
-window.toggleAdminPanel = toggleAdminPanel;
-window.checkAdminPassword = checkAdminPassword;
-window.addQuestion = addQuestion;
-window.exportQuestions = exportQuestions;
-window.importQuestions = importQuestions;
 window.jumpToQuestion = jumpToQuestion;
 </script>
 </body>
