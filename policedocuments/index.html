@@ -702,7 +702,7 @@
                             </a>
                         </div>
                     </li>
-                    <li class="document-item" data-title="Statement Maker", data-desc="Generate official witness and suspect statements with customization">
+                    <li class="document-item" data-title="Statement Maker" data-desc="Generate official witness and suspect statements with customization">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Statement Maker</div>
                             <div class="doc-desc">Generate official witness and suspect statements with customization</div>
@@ -959,7 +959,7 @@
                         </div>
                     </li>
                     
-                    <li class="document-item" data-title="Juvenile Parent/Guardian Intimation", data-desc="Form for intimating parents/guardians about juvenile's apprehension">
+                    <li class="document-item" data-title="Juvenile Parent/Guardian Intimation" data-desc="Form for intimating parents/guardians about juvenile's apprehension">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Juvenile Parent/Guardian Intimation</div>
                             <div class="doc-desc">Form for intimating parents/guardians about juvenile's apprehension</div>
@@ -971,7 +971,7 @@
                         </div>
                     </li>
                     
-                    <li class="document-item" data-title="Juvenile Social Investigation Report", data-desc="Social investigation report format for juvenile justice board">
+                    <li class="document-item" data-title="Juvenile Social Investigation Report" data-desc="Social investigation report format for juvenile justice board">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Juvenile Social Investigation Report</div>
                             <div class="doc-desc">Social investigation report format for juvenile justice board</div>
@@ -983,7 +983,7 @@
                         </div>
                     </li>
                     
-                    <li class="document-item" data-title="Juvenile Bail Application Form", data-desc="Bail application form specifically designed for juvenile offenders">
+                    <li class="document-item" data-title="Juvenile Bail Application Form" data-desc="Bail application form specifically designed for juvenile offenders">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Juvenile Bail Application Form</div>
                             <div class="doc-desc">Bail application form specifically designed for juvenile offenders</div>
@@ -995,7 +995,7 @@
                         </div>
                     </li>
                     
-                    <li class="document-item" data-title="Juvenile Justice Act Checklist", data-desc="Compliance checklist for procedures under Juvenile Justice Act">
+                    <li class="document-item" data-title="Juvenile Justice Act Checklist" data-desc="Compliance checklist for procedures under Juvenile Justice Act">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Juvenile Justice Act Checklist</div>
                             <div class="doc-desc">Compliance checklist for procedures under Juvenile Justice Act</div>
@@ -1135,6 +1135,20 @@
                             </a>
                         </div>
                     </li>
+
+                    <!-- NEW: Withdrawal Report Entry (Misc) -->
+                    <li class="document-item" data-title="Withdrawal Report" data-desc="Form for court withdrawal report documentation">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Withdrawal Report</div>
+                            <div class="doc-desc">Court withdrawal report for case/fund documentation</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/court_forms/withdrawal_report.docx" target="_blank" class="btn btn-word">
+                                <i>📝</i> Word
+                            </a>
+                            <!-- If a PDF version exists, add here; otherwise only Word is provided -->
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -1150,7 +1164,7 @@
     </div>
 
     <script>
-        // Document data for search functionality - UPDATED to include MM PT Warrant
+        // Document data for search functionality - UPDATED to include Withdrawal Report
         const documents = [
             // Download Forms
             { title: "House Building Application Form", desc: "HBA application form for police personnel housing loan", type: "download", element: null },
@@ -1163,7 +1177,7 @@
             { title: "EL Form", desc: "Earned Leave application form for police personnel", type: "download", element: null },
             { title: "EL Surrender Form", desc: "Form for surrendering unused Earned Leave days", type: "download", element: null },
             { title: "Incident Report Form", desc: "Standard form for documenting incidents and criminal activities", type: "download", element: null },
-            { title: "MM PT Warrant", desc: "Metropolitan Magistrate/Police Training Warrant for court procedures", type: "download", element: null }, // ADDED
+            { title: "MM PT Warrant", desc: "Metropolitan Magistrate/Police Training Warrant for court procedures", type: "download", element: null },
             
             // Generate PDFs
             { title: "Form 86", desc: "Generate Form 86 for police department official documentation", type: "generate", element: null },
@@ -1214,7 +1228,8 @@
             { title: "TN PSO", desc: "Tamil Nadu Police Standing Orders documentation", type: "misc", element: null },
             { title: "TN Parade Book", desc: "Tamil Nadu Police Parade Book for duty management", type: "misc", element: null },
             { title: "Week Off GO", desc: "Week Off, Birthday, Wedding Day permission orders", type: "misc", element: null },
-            { title: "Land Document Missing Guidelines", desc: "Guidelines for handling cases of missing land documents", type: "misc", element: null }
+            { title: "Land Document Missing Guidelines", desc: "Guidelines for handling cases of missing land documents", type: "misc", element: null },
+            { title: "Withdrawal Report", desc: "Court withdrawal report for case/fund documentation", type: "misc", element: null } // ADDED
         ];
 
         function downloadDocument(docName) {
@@ -1415,7 +1430,7 @@
                 { name: "el_form", title: "EL Form", folder: "" },
                 { name: "el_surrender_form", title: "EL Surrender Form", folder: "" },
                 { name: "incident_report_form", title: "Incident Report Form", folder: "" },
-                { name: "mm_pt_warrant", title: "MM PT Warrant", folder: "court_forms/" } // ADDED
+                { name: "mm_pt_warrant", title: "MM PT Warrant", folder: "court_forms/" }
             ];
             
             downloadForms.forEach(form => {
@@ -1504,8 +1519,20 @@
                 });
             }
             
+            // Special handling for Withdrawal Report (new)
+            const withdrawalReportWordBtn = document.querySelector('a[href="https://www.clearexams.online/policedocuments/court_forms/withdrawal_report.docx"]');
+            if (withdrawalReportWordBtn) {
+                withdrawalReportWordBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification('Opening Withdrawal Report Word document...');
+                    setTimeout(() => {
+                        window.open(this.href, '_blank');
+                    }, 500);
+                });
+            }
+            
             // Special handling for MM PT Warrant
-            const mmPtWarrantWordBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.docx"]');
+            const mmPtWarrantWordBtn = document.querySelector('a[href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.doc"]');
             if (mmPtWarrantWordBtn) {
                 mmPtWarrantWordBtn.addEventListener('click', function(e) {
                     e.preventDefault();
