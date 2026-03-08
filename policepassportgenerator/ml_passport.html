@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Leave Passport Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2d3748;
+            --accent-color: #3182ce;
+            --light-color: #f7fafc;
+            --border-color: #e2e8f0;
+            --success-color: #38a169;
+            --danger-color: #e53e3e;
+            --warning-color: #dd6b20;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .modern-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background-color: white;
+            color: var(--primary-color);
+            padding: 25px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        header h1 i {
+            color: var(--accent-color);
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 25px;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--accent-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #2c5aa0;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #2f855a;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #c05621;
+        }
+        
+        .officer-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .officer-controls input {
+            flex: 1;
+        }
+        
+        .officer-container {
+            position: relative;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            background-color: #f8fafc;
+            transition: var(--transition);
+        }
+        
+        .officer-container:hover {
+            background-color: #f0f9ff;
+        }
+        
+        .officer-container h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .remove-officer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .remove-officer:hover {
+            background-color: #c53030;
+        }
+        
+        .notification {
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .notification.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .notification.error {
+            background-color: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+        
+        .document-preview {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            background-color: white;
+            min-height: 500px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 595px;
+            height: 842px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .document-title {
+            text-align: center;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid var(--primary-color);
+            table-layout: fixed;
+            margin-bottom: 20px;
+        }
+        
+        .document-table td {
+            border: 1px solid var(--primary-color);
+            padding: 12px;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-size: 13px !important;
+        }
+        
+        .document-table .left-column {
+            width: 30%;
+        }
+        
+        .document-table .middle-column {
+            width: 20%;
+            text-align: center;
+        }
+        
+        .document-table .right-column {
+            width: 50%;
+            text-align: justify;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        .preview-field {
+            width: 100%;
+            padding: 5px;
+            margin: 8px 0;
+            min-height: 20px;
+            background: transparent;
+            color: #000000 !important;
+            box-sizing: border-box;
+            font-size: 13px !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .preview-field.empty:before {
+            content: attr(placeholder);
+            color: #a0aec0;
+        }
+        
+        .time-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 0;
+            gap: 0;
+            min-height: 24px;
+        }
+        
+        .time-field {
+            min-width: 50px;
+            padding: 2px 5px;
+            min-height: 18px;
+            background: transparent;
+            color: #000000 !important;
+            box-sizing: border-box;
+            font-size: 13px !important;
+            text-align: center;
+            margin: 0;
+            border: none;
+        }
+        
+        .time-field.empty:before {
+            content: attr(placeholder);
+            color: #a0aec0;
+        }
+        
+        .time-suffix {
+            color: #000000 !important;
+            white-space: nowrap;
+            font-size: 13px !important;
+            margin-left: 2px;
+            display: inline;
+        }
+        
+        .content-text {
+            text-align: justify;
+            line-height: 1.6;
+            font-size: 13px !important;
+            color: #000000 !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-justify: inter-word;
+        }
+        
+        .embedded-field {
+            display: inline;
+            min-width: 60px;
+            padding: 0 2px;
+            margin: 0;
+            background: transparent;
+            white-space: normal;
+            color: #000000 !important;
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-size: 13px !important;
+        }
+        
+        .embedded-field.empty:before {
+            content: attr(placeholder);
+            color: #a0aec0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-buttons .btn {
+            flex: 1;
+        }
+        
+        .language-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .language-selector label {
+            margin-bottom: 0;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .language-selector select {
+            width: auto;
+            min-width: 150px;
+        }
+        
+        .language-content {
+            display: none;
+        }
+        
+        .language-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .help-text {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+        
+        .required:after {
+            content: ' *';
+            color: var(--danger-color);
+        }
+        
+        .officer-details {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .officer-container-preview {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 1px;
+        }
+        
+        .officer-details-preview {
+            flex: 1;
+        }
+        
+        .officer-designation,
+        .officer-name {
+            margin-top: 0;
+            margin-bottom: 2px;
+        }
+        
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .input-error {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+        }
+        
+        .input-success {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
+        }
+        
+        .auto-calculation {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background-color: #f0f9ff;
+            color: #1a365d;
+            border: 1px solid #bee3f8;
+        }
+        
+        .auto-calculation i {
+            color: #3182ce;
+        }
+        
+        .readonly-field {
+            background-color: #f7fafc;
+            color: #4a5568;
+            cursor: not-allowed;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .auto-save {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+        }
+        
+        /* PDF Mode Styling */
+        .pdf-mode .document-table {
+            border: 2px solid #000000 !important;
+        }
+        
+        .pdf-mode .document-table td {
+            border: 1px solid #000000 !important;
+        }
+        
+        .pdf-mode .preview-field.empty:before,
+        .pdf-mode .embedded-field.empty:before,
+        .pdf-mode .time-field.empty:before {
+            color: #000000 !important;
+            opacity: 0.5 !important;
+        }
+        
+        .pdf-mode,
+        .pdf-mode * {
+            color: #000000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        
+        /* Remove placeholder text in PDF mode */
+        .pdf-mode .empty:before {
+            content: "" !important;
+            display: none !important;
+        }
+        
+        /* Compact field styling */
+        .compact-field {
+            margin: 3px 0;
+            min-height: 18px;
+        }
+        
+        /* Hide placeholder content completely */
+        #content-placeholder {
+            display: none !important;
+        }
+        
+        /* Ensure content is visible only when filled */
+        .content-text .embedded-field.empty {
+            display: inline-block;
+            min-width: 60px;
+        }
+        
+        /* Style for empty fields - make them visible but without placeholder text */
+        .empty {
+            position: relative;
+        }
+        
+        .empty:before {
+            content: "" !important;
+            display: none !important;
+        }
+        
+        /* Style for empty time field */
+        .time-field.empty {
+            min-width: 50px;
+        }
+        
+        .time-field.empty:before {
+            content: "" !important;
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="modern-container">
+        <header>
+            <h1><i class="fas fa-notes-medical"></i> Medical Leave Passport Generator</h1>
+            <p>Create professional Medical Leave (ML) Passport documents</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-edit"></i> Medical Leave Information</h2>
+                
+                <div class="language-selector">
+                    <label for="language"><i class="fas fa-language"></i> Document Language:</label>
+                    <select id="language">
+                        <option value="tamil">Tamil</option>
+                        <option value="english">English</option>
+                    </select>
+                </div>
+                
+                <!-- ML Passport Fields -->
+                <div class="ml-passport-fields" id="ml-passport-fields">
+                    <div class="form-group">
+                        <label for="mlPoliceStation" class="required">Police Station</label>
+                        <input type="text" id="mlPoliceStation" placeholder="Enter police station name">
+                        <div class="error-message" id="mlPoliceStation-error">Please enter a police station</div>
+                        <div class="help-text">This will be used in the document content</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="leaveDays" class="required">Number of Leave Days</label>
+                        <input type="number" id="leaveDays" placeholder="Enter number of days (e.g., 5, 10, 15)" min="1" max="365">
+                        <div class="error-message" id="leaveDays-error">Please enter number of leave days (1-365)</div>
+                        <div class="help-text">Enter the number of medical leave days</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="leaveStartDate" class="required">Leave Start Date</label>
+                        <input type="text" id="leaveStartDate" placeholder="Enter start date in DD/MM/YYYY format">
+                        <div class="error-message" id="leaveStartDate-error">Please enter a valid start date</div>
+                        <div class="help-text">Enter the date when the medical leave begins</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="leaveEndDate" class="required">Leave End Date</label>
+                        <input type="text" id="leaveEndDate" placeholder="Leave end date will be calculated automatically" readonly class="readonly-field">
+                        <div class="error-message" id="leaveEndDate-error">Please enter a valid end date</div>
+                        <div class="auto-calculation">
+                            <i class="fas fa-calculator"></i>
+                            <span>Auto-calculated based on start date and leave days</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reportBackDate" class="required">Report Back Date</label>
+                        <input type="text" id="reportBackDate" placeholder="Report back date will be calculated automatically" readonly class="readonly-field">
+                        <div class="error-message" id="reportBackDate-error">Please enter a valid report back date</div>
+                        <div class="auto-calculation">
+                            <i class="fas fa-calculator"></i>
+                            <span>Auto-calculated as the next working day after leave ends</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="session" class="required">Session</label>
+                        <select id="session">
+                            <option value="F.N">F.N (Forenoon)</option>
+                            <option value="A.N">A.N (Afternoon)</option>
+                        </select>
+                        <div class="error-message" id="session-error">Please select session</div>
+                        <div class="help-text">Select F.N for Forenoon or A.N for Afternoon</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mlDate" class="required">Document Date</label>
+                        <input type="text" id="mlDate" placeholder="Enter date in DD/MM/YYYY format">
+                        <div class="error-message" id="mlDate-error">Please enter a valid date in DD/MM/YYYY format</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mlTime">Document Time</label>
+                        <input type="text" id="mlTime" placeholder="Enter time in HH:MM format">
+                        <div class="error-message" id="mlTime-error">Please enter a valid time in HH:MM format</div>
+                        <div class="help-text">Optional field - leave blank to keep space vacant in document</div>
+                    </div>
+                </div>
+                
+                <h3 class="section-title"><i class="fas fa-user-shield"></i> Police Officers</h3>
+                
+                <div class="form-group">
+                    <div class="officer-controls">
+                        <input type="number" id="officer-count" min="1" max="10" value="1" placeholder="Number of officers">
+                        <button type="button" id="add-officer" class="btn"><i class="fas fa-plus"></i> Add Officer</button>
+                    </div>
+                    <div class="help-text">Enter the number of officers or use the button to add individually</div>
+                </div>
+                
+                <div id="police-officers-container"></div>
+                
+                <div id="notification" class="notification"></div>
+                
+                <button id="fill-form" class="btn btn-success btn-block"><i class="fas fa-file-alt"></i> Generate Document</button>
+            </div>
+            
+            <div class="card preview-section">
+                <h2 class="section-title"><i class="fas fa-eye"></i> Document Preview</h2>
+                
+                <div class="document-preview" id="document-to-print">
+                    <div class="document-title">
+                        MEDICAL LEAVE PASSPORT
+                    </div>
+                    
+                    <table class="document-table">
+                        <tr>
+                            <td class="left-column">
+                                <div id="police-officers-list"></div>
+                                <div class="preview-field compact-field" id="police-station-field"></div>
+                            </td>
+                            <td class="middle-column">
+                                <div class="middle-column-content">
+                                    <div class="time-container" id="time-container">
+                                        <span class="time-field" id="time-field"></span>
+                                        <span class="time-suffix" id="time-suffix">Hrs</span>
+                                    </div>
+                                    <div class="preview-field compact-field" id="date-field"></div>
+                                </div>
+                            </td>
+                            <td class="right-column">
+                                <!-- Content will be dynamically filled here -->
+                                <div class="language-content active" id="tamil-content">
+                                    <div class="content-text" id="ml-passport-tamil-content">
+                                        காவல் மருத்துவமனையின் மருத்துவ அதிகாரியால் பரிந்துரைக்கப்பட்ட 
+                                        <span class="embedded-field" id="leave-days-field-tamil"></span> 
+                                        நாட்கள் மருத்துவ விடுப்பு 
+                                        <span class="embedded-field" id="leave-start-date-field-tamil"></span> 
+                                        முதல் 
+                                        <span class="embedded-field" id="leave-end-date-field-tamil"></span> 
+                                        வரை வழங்கப்பட்டுள்ளது. 
+                                        <span class="embedded-field" id="report-back-date-field-tamil"></span> 
+                                        அன்று 
+                                        <span class="embedded-field" id="session-field-tamil"></span> 
+                                        உடல் நலமானதாக உள்ளது என்ற அத்தாட்சிப் பத்திரத்துடன் பணிக்குத் திரும்ப வேண்டும்.
+                                    </div>
+                                </div>
+                                
+                                <div class="language-content" id="english-content">
+                                    <div class="content-text" id="ml-passport-english-content">
+                                        You are passported to avail 
+                                        <span class="embedded-field" id="leave-days-field-english"></span> 
+                                        days Medical leave as recommended by medical officer of Police Hospital with effect from 
+                                        <span class="embedded-field" id="leave-start-date-field-english"></span> 
+                                        to 
+                                        <span class="embedded-field" id="leave-end-date-field-english"></span> 
+                                        and you should report back for duty on 
+                                        <span class="embedded-field" id="report-back-date-field-english"></span> 
+                                        <span class="embedded-field" id="session-field-english"></span> 
+                                        with fitness certificate.
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="print-document" class="btn btn-warning"><i class="fas fa-print"></i> Print Document</button>
+                    <button id="generate-pdf" class="btn btn-success"><i class="fas fa-file-pdf"></i> Generate PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auto-save" id="auto-save-indicator"><i class="fas fa-check-circle"></i> Auto-saved</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const { jsPDF } = window.jspdf;
+            const generateBtn = document.getElementById('generate-pdf');
+            const printBtn = document.getElementById('print-document');
+            const fillFormBtn = document.getElementById('fill-form');
+            const languageSelect = document.getElementById('language');
+            const notification = document.getElementById('notification');
+            const officerCountInput = document.getElementById('officer-count');
+            const addOfficerBtn = document.getElementById('add-officer');
+            const policeOfficersContainer = document.getElementById('police-officers-container');
+            const policeOfficersList = document.getElementById('police-officers-list');
+            const languageContents = document.querySelectorAll('.language-content');
+            const autoSaveIndicator = document.getElementById('auto-save-indicator');
+            const timeSuffix = document.getElementById('time-suffix');
+            
+            // ML Passport specific fields
+            const leaveDaysInput = document.getElementById('leaveDays');
+            const leaveStartDateInput = document.getElementById('leaveStartDate');
+            const leaveEndDateInput = document.getElementById('leaveEndDate');
+            const reportBackDateInput = document.getElementById('reportBackDate');
+            
+            let officerCounter = 1;
+            let currentLanguage = 'tamil';
+            let autoSaveTimeout;
+
+            function showNotification(message, type) {
+                notification.textContent = message;
+                notification.className = 'notification ' + type;
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 5000);
+            }
+
+            // Function to parse date in DD/MM/YYYY format
+            function parseDate(dateString) {
+                if (!dateString || !isValidDate(dateString)) return null;
+                
+                const parts = dateString.split('/');
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                const year = parseInt(parts[2], 10);
+                
+                return new Date(year, month, day);
+            }
+
+            // Function to format date as DD/MM/YYYY
+            function formatDate(date) {
+                if (!date) return '';
+                
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                
+                return `${day}/${month}/${year}`;
+            }
+
+            // Function to calculate leave end date and report back date
+            function calculateLeaveDates() {
+                const leaveDays = parseInt(leaveDaysInput.value) || 0;
+                const startDate = parseDate(leaveStartDateInput.value);
+                
+                if (!startDate || leaveDays <= 0) {
+                    leaveEndDateInput.value = '';
+                    reportBackDateInput.value = '';
+                    return;
+                }
+                
+                // Calculate leave end date (start date + leave days - 1)
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + leaveDays - 1);
+                leaveEndDateInput.value = formatDate(endDate);
+                
+                // Calculate report back date (next working day after leave ends)
+                const reportBackDate = new Date(endDate);
+                reportBackDate.setDate(reportBackDate.getDate() + 1);
+                
+                // Skip weekends (Saturday = 6, Sunday = 0)
+                if (reportBackDate.getDay() === 6) { // Saturday
+                    reportBackDate.setDate(reportBackDate.getDate() + 2);
+                } else if (reportBackDate.getDay() === 0) { // Sunday
+                    reportBackDate.setDate(reportBackDate.getDate() + 1);
+                }
+                
+                reportBackDateInput.value = formatDate(reportBackDate);
+            }
+
+            function isValidDate(dateString) {
+                const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                if (!regex.test(dateString)) return false;
+                
+                const parts = dateString.split('/');
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10);
+                const year = parseInt(parts[2], 10);
+                
+                if (year < 1000 || year > 3000 || month === 0 || month > 12) return false;
+                
+                const monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                
+                if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) {
+                    monthLength[1] = 29;
+                }
+                
+                return day > 0 && day <= monthLength[month - 1];
+            }
+
+            function isValidTime(timeString) {
+                if (!timeString || timeString.trim() === '') return true;
+                const regex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+                return regex.test(timeString);
+            }
+
+            function showError(inputId, message) {
+                const input = document.getElementById(inputId);
+                const errorElement = document.getElementById(`${inputId}-error`);
+                
+                input.classList.add('input-error');
+                input.classList.remove('input-success');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+
+            function hideError(inputId) {
+                const input = document.getElementById(inputId);
+                const errorElement = document.getElementById(`${inputId}-error`);
+                
+                input.classList.remove('input-error');
+                input.classList.add('input-success');
+                errorElement.style.display = 'none';
+            }
+
+            function validateField() {
+                const fieldId = this.id;
+                const value = this.value.trim();
+                
+                if (fieldId === 'mlTime') {
+                    if (value && !isValidTime(value)) {
+                        showError(fieldId, 'Please enter a valid time in HH:MM format or leave blank');
+                        return false;
+                    } else {
+                        hideError(fieldId);
+                        return true;
+                    }
+                }
+                
+                if (!value) {
+                    if (this.hasAttribute('required') || fieldId.includes('required')) {
+                        showError(fieldId, 'This field is required');
+                        return false;
+                    } else {
+                        hideError(fieldId);
+                        return true;
+                    }
+                }
+                
+                if (fieldId === 'mlDate' || fieldId === 'leaveStartDate' || fieldId === 'leaveEndDate' || fieldId === 'reportBackDate') {
+                    if (!isValidDate(value)) {
+                        showError(fieldId, 'Please enter a valid date in DD/MM/YYYY format');
+                        return false;
+                    }
+                }
+                
+                if (fieldId === 'leaveDays') {
+                    const numValue = parseInt(value);
+                    if (isNaN(numValue) || numValue < 1 || numValue > 365) {
+                        showError(fieldId, 'Please enter a valid number of days (1-365)');
+                        return false;
+                    }
+                }
+                
+                if (fieldId === 'session') {
+                    if (!value) {
+                        showError(fieldId, 'Please select a session');
+                        return false;
+                    }
+                }
+                
+                hideError(fieldId);
+                return true;
+            }
+
+            function createPoliceOfficerForm(index) {
+                const officerDiv = document.createElement('div');
+                officerDiv.className = 'officer-container';
+                officerDiv.id = `officer-${index}`;
+                
+                officerDiv.innerHTML = `
+                    <h4>Police Officer ${index}</h4>
+                    <div class="officer-details">
+                        <div class="form-group">
+                            <label for="designation${index}" class="required">Designation with Number</label>
+                            <input type="text" id="designation${index}" placeholder="Enter designation with number (e.g., SI 1234, HC 5678)">
+                            <div class="error-message" id="designation${index}-error">Please enter designation with number</div>
+                            <div class="help-text">Enter designation followed by number (e.g., SI 1234, HC 5678, PC 8901)</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fullName${index}" class="required">Full Name</label>
+                        <input type="text" id="fullName${index}" placeholder="Enter full name">
+                        <div class="error-message" id="fullName${index}-error">Please enter a full name</div>
+                    </div>
+                    ${index > 1 ? `<button type="button" class="remove-officer" data-index="${index}">Remove Officer</button>` : ''}
+                `;
+                
+                return officerDiv;
+            }
+
+            function createPoliceOfficerDocumentField(index) {
+                const officerContainer = document.createElement('div');
+                officerContainer.className = 'officer-container-preview';
+                officerContainer.id = `police-officer-${index}`;
+                
+                officerContainer.innerHTML = `
+                    <div class="officer-details-preview">
+                        <div class="preview-field compact-field officer-designation" id="designation-field-${index}"></div>
+                        <div class="preview-field compact-field officer-name" id="full-name-field-${index}"></div>
+                    </div>
+                `;
+                
+                return officerContainer;
+            }
+
+            function updatePoliceOfficers() {
+                const count = parseInt(officerCountInput.value) || 1;
+                
+                if (count < 1) {
+                    officerCountInput.value = 1;
+                    return;
+                }
+                if (count > 10) {
+                    officerCountInput.value = 10;
+                    showNotification('Maximum 10 police officers allowed', 'error');
+                    return;
+                }
+                
+                policeOfficersContainer.innerHTML = '';
+                for (let i = 1; i <= count; i++) {
+                    policeOfficersContainer.appendChild(createPoliceOfficerForm(i));
+                }
+                officerCounter = count;
+                
+                policeOfficersList.innerHTML = '';
+                for (let i = 1; i <= count; i++) {
+                    policeOfficersList.appendChild(createPoliceOfficerDocumentField(i));
+                }
+                
+                document.querySelectorAll('.remove-officer').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        removePoliceOfficer(index);
+                    });
+                });
+                
+                // Add validation listeners to new officer fields
+                addValidationListeners();
+            }
+
+            function addPoliceOfficer() {
+                officerCounter++;
+                officerCountInput.value = officerCounter;
+                updatePoliceOfficers();
+            }
+
+            function removePoliceOfficer(index) {
+                if (officerCounter <= 1) {
+                    showNotification('At least one police officer is required', 'error');
+                    return;
+                }
+                
+                officerCounter--;
+                officerCountInput.value = officerCounter;
+                updatePoliceOfficers();
+            }
+
+            function validateForm() {
+                let isValid = true;
+                
+                // Validate ML Passport fields
+                const mlFields = ['mlPoliceStation', 'leaveDays', 'leaveStartDate', 'leaveEndDate', 'reportBackDate', 'session', 'mlDate'];
+                mlFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (!validateField.call(field)) {
+                        isValid = false;
+                    }
+                });
+                
+                // Validate time field (optional)
+                const timeField = document.getElementById('mlTime');
+                if (!validateField.call(timeField)) {
+                    isValid = false;
+                }
+                
+                // Validate police officers
+                for (let i = 1; i <= officerCounter; i++) {
+                    const designationField = document.getElementById(`designation${i}`);
+                    const fullNameField = document.getElementById(`fullName${i}`);
+                    
+                    if (!validateField.call(designationField) || !validateField.call(fullNameField)) {
+                        isValid = false;
+                    }
+                }
+                
+                return isValid;
+            }
+
+            function updateLanguageContent() {
+                languageContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                document.getElementById(`${currentLanguage}-content`).classList.add('active');
+            }
+
+            function updateField(fieldId, value) {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    if (value && value.trim() !== '') {
+                        field.textContent = value;
+                        field.classList.remove('empty');
+                    } else {
+                        field.textContent = '';
+                        field.classList.add('empty');
+                    }
+                }
+            }
+
+            function fillDocumentPreview() {
+                if (!validateForm()) {
+                    showNotification('Please fix the errors in the form before generating the document', 'error');
+                    return;
+                }
+                
+                // Update police officers in preview
+                for (let i = 1; i <= officerCounter; i++) {
+                    const designation = document.getElementById(`designation${i}`).value;
+                    const fullName = document.getElementById(`fullName${i}`).value;
+                    
+                    const designationField = document.getElementById(`designation-field-${i}`);
+                    const fullNameField = document.getElementById(`full-name-field-${i}`);
+                    
+                    if (designation && designation.trim() !== '') {
+                        designationField.textContent = designation;
+                        designationField.classList.remove('empty');
+                    } else {
+                        designationField.textContent = '';
+                        designationField.classList.add('empty');
+                    }
+                    
+                    if (fullName && fullName.trim() !== '') {
+                        fullNameField.textContent = fullName;
+                        fullNameField.classList.remove('empty');
+                    } else {
+                        fullNameField.textContent = '';
+                        fullNameField.classList.add('empty');
+                    }
+                }
+                
+                // Update police station field
+                const policeStationValue = document.getElementById('mlPoliceStation').value;
+                const policeStationField = document.getElementById('police-station-field');
+                if (policeStationValue && policeStationValue.trim() !== '') {
+                    policeStationField.textContent = policeStationValue;
+                    policeStationField.classList.remove('empty');
+                } else {
+                    policeStationField.textContent = '';
+                    policeStationField.classList.add('empty');
+                }
+                
+                // Update date and time
+                const dateValue = document.getElementById('mlDate').value;
+                const timeValue = document.getElementById('mlTime').value;
+                
+                const dateField = document.getElementById('date-field');
+                if (dateValue && dateValue.trim() !== '') {
+                    dateField.textContent = dateValue;
+                    dateField.classList.remove('empty');
+                } else {
+                    dateField.textContent = '';
+                    dateField.classList.add('empty');
+                }
+                
+                const timeField = document.getElementById('time-field');
+                if (timeValue && timeValue.trim() !== '') {
+                    timeField.textContent = timeValue;
+                    timeField.classList.remove('empty');
+                    timeSuffix.style.display = 'inline';
+                } else {
+                    timeField.textContent = '';
+                    timeField.classList.add('empty');
+                    timeSuffix.style.display = 'none';
+                }
+                
+                // Update ML Passport fields
+                const leaveDays = document.getElementById('leaveDays').value;
+                const leaveStartDate = document.getElementById('leaveStartDate').value;
+                const leaveEndDate = document.getElementById('leaveEndDate').value;
+                const reportBackDate = document.getElementById('reportBackDate').value;
+                const session = document.getElementById('session').value;
+                
+                updateField('leave-days-field-tamil', leaveDays);
+                updateField('leave-start-date-field-tamil', leaveStartDate);
+                updateField('leave-end-date-field-tamil', leaveEndDate);
+                updateField('report-back-date-field-tamil', reportBackDate);
+                updateField('session-field-tamil', session);
+                
+                updateField('leave-days-field-english', leaveDays);
+                updateField('leave-start-date-field-english', leaveStartDate);
+                updateField('leave-end-date-field-english', leaveEndDate);
+                updateField('report-back-date-field-english', reportBackDate);
+                updateField('session-field-english', session);
+                
+                showNotification('Document preview updated successfully', 'success');
+            }
+
+            function autoSave() {
+                clearTimeout(autoSaveTimeout);
+                
+                autoSaveTimeout = setTimeout(() => {
+                    const formData = {
+                        mlPoliceStation: document.getElementById('mlPoliceStation').value,
+                        leaveDays: document.getElementById('leaveDays').value,
+                        leaveStartDate: document.getElementById('leaveStartDate').value,
+                        session: document.getElementById('session').value,
+                        mlDate: document.getElementById('mlDate').value,
+                        mlTime: document.getElementById('mlTime').value,
+                        officerCount: officerCounter,
+                        language: currentLanguage
+                    };
+                    
+                    localStorage.setItem('mlPassportFormData', JSON.stringify(formData));
+                    
+                    autoSaveIndicator.style.display = 'block';
+                    setTimeout(() => {
+                        autoSaveIndicator.style.display = 'none';
+                    }, 2000);
+                }, 1000);
+            }
+
+            function loadSavedData() {
+                const savedData = localStorage.getItem('mlPassportFormData');
+                
+                if (savedData) {
+                    const formData = JSON.parse(savedData);
+                    
+                    document.getElementById('mlPoliceStation').value = formData.mlPoliceStation || '';
+                    document.getElementById('leaveDays').value = formData.leaveDays || '';
+                    document.getElementById('leaveStartDate').value = formData.leaveStartDate || '';
+                    document.getElementById('session').value = formData.session || '';
+                    document.getElementById('mlDate').value = formData.mlDate || '';
+                    document.getElementById('mlTime').value = formData.mlTime || '';
+                    
+                    if (formData.officerCount) {
+                        officerCountInput.value = formData.officerCount;
+                        updatePoliceOfficers();
+                    }
+                    
+                    if (formData.language) {
+                        currentLanguage = formData.language;
+                        languageSelect.value = currentLanguage;
+                        updateLanguageContent();
+                    }
+                    
+                    // Calculate dates if needed
+                    calculateLeaveDates();
+                    
+                    showNotification('Previous form data loaded successfully', 'success');
+                }
+            }
+
+            function printDocument() {
+                const printContent = document.getElementById('document-to-print');
+                const originalContents = document.body.innerHTML;
+                
+                document.body.innerHTML = printContent.outerHTML;
+                window.print();
+                document.body.innerHTML = originalContents;
+                
+                // Re-attach event listeners
+                initializeEventListeners();
+                
+                showNotification('Document sent to printer', 'success');
+            }
+
+            async function generatePDF() {
+                if (!validateForm()) {
+                    showNotification('Please fix the errors in the form before generating PDF', 'error');
+                    return;
+                }
+                
+                generateBtn.innerHTML = '<span class="spinner"></span> Generating PDF...';
+                generateBtn.disabled = true;
+                
+                try {
+                    const element = document.getElementById('document-to-print');
+                    
+                    // Add PDF mode class for styling
+                    element.classList.add('pdf-mode');
+                    
+                    const canvas = await html2canvas(element, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#ffffff',
+                        onclone: function(clonedDoc) {
+                            const clonedElement = clonedDoc.getElementById('document-to-print');
+                            if (clonedElement) {
+                                clonedElement.classList.add('pdf-mode');
+                            }
+                        }
+                    });
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210;
+                    const pageHeight = 295;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    const fileName = `Medical_Leave_Passport_${new Date().toISOString().slice(0, 10)}.pdf`;
+                    pdf.save(fileName);
+                    
+                    // Remove PDF mode class
+                    element.classList.remove('pdf-mode');
+                    
+                    showNotification('PDF generated successfully', 'success');
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    showNotification('Error generating PDF. Please try again.', 'error');
+                    
+                    const element = document.getElementById('document-to-print');
+                    element.classList.remove('pdf-mode');
+                } finally {
+                    generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Generate PDF';
+                    generateBtn.disabled = false;
+                }
+            }
+
+            function addValidationListeners() {
+                const allInputs = document.querySelectorAll('input, select');
+                allInputs.forEach(input => {
+                    input.removeEventListener('blur', validateField);
+                    input.removeEventListener('input', autoSave);
+                    input.addEventListener('blur', validateField);
+                    input.addEventListener('input', autoSave);
+                });
+            }
+
+            function initializeEventListeners() {
+                // Language selector
+                languageSelect.addEventListener('change', function() {
+                    currentLanguage = this.value;
+                    updateLanguageContent();
+                    autoSave();
+                });
+                
+                // Officer controls
+                officerCountInput.addEventListener('change', updatePoliceOfficers);
+                addOfficerBtn.addEventListener('click', addPoliceOfficer);
+                
+                // Form actions
+                fillFormBtn.addEventListener('click', fillDocumentPreview);
+                printBtn.addEventListener('click', printDocument);
+                generateBtn.addEventListener('click', generatePDF);
+                
+                // ML Passport specific calculations
+                leaveDaysInput.addEventListener('input', function() {
+                    calculateLeaveDates();
+                    autoSave();
+                });
+                leaveStartDateInput.addEventListener('input', function() {
+                    calculateLeaveDates();
+                    autoSave();
+                });
+                
+                // Add validation and auto-save listeners
+                addValidationListeners();
+                
+                // Additional listeners for specific fields
+                document.getElementById('mlPoliceStation').addEventListener('input', autoSave);
+                document.getElementById('session').addEventListener('change', autoSave);
+                document.getElementById('mlDate').addEventListener('input', autoSave);
+                document.getElementById('mlTime').addEventListener('input', autoSave);
+            }
+
+            // Initialize the application
+            function init() {
+                updatePoliceOfficers();
+                updateLanguageContent();
+                initializeEventListeners();
+                loadSavedData();
+                
+                showNotification('Medical Leave Passport Generator is ready!', 'success');
+            }
+            
+            init();
+        });
+    </script>
+</body>
+</html>
