@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Police Passport · FIR Filing (Compact Font)</title>
+    <!-- jsPDF and html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(135deg, #0b2a41 0%, #1b4f6e 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #1e293b;
+        }
+        .master-card {
+            max-width: 1350px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(6px);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px -20px #05121e;
+            display: grid;
+            grid-template-columns: 1.2fr 0.9fr;
+            overflow: hidden;
+            border: 1px solid #ffffff50;
+        }
+        @media (max-width: 1000px) {
+            .master-card { grid-template-columns: 1fr; }
+        }
+
+        /* ========== FORM PANEL ========== */
+        .form-panel {
+            background: white;
+            padding: 2.5rem 2.5rem 2.5rem 2.8rem;
+            border-right: 1px solid #d4e2f0;
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .panel-header i {
+            font-size: 2.4rem;
+            color: #1d5b9e;
+            background: #e4f0fe;
+            padding: 14px;
+            border-radius: 24px;
+        }
+        .panel-header h2 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            color: #0c3150;
+            letter-spacing: -0.5px;
+        }
+        .panel-header .badge {
+            background: #215b8f;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+        .field-row {
+            margin-bottom: 25px;
+        }
+        label {
+            font-weight: 600;
+            font-size: 0.98rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1b3e61;
+            margin-bottom: 6px;
+        }
+        label i { color: #2b6eb0; width: 22px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #dae7f2;
+            border-radius: 24px;
+            font-size: 1rem;
+            transition: 0.2s;
+            background: #fbfeff;
+            font-family: inherit;
+        }
+        input:focus, select:focus {
+            border-color: #1f6dc6;
+            outline: none;
+            background: white;
+            box-shadow: 0 6px 16px #0d4b8d30;
+        }
+        .help-text {
+            font-size: 0.8rem;
+            color: #5b7996;
+            margin-top: 6px;
+            margin-left: 12px;
+        }
+        .error-message {
+            color: #bc2800;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+            background: #ffede8;
+            padding: 4px 16px;
+            border-radius: 30px;
+        }
+        .input-error {
+            border-color: #bc2800 !important;
+            background-color: #fff6f2;
+        }
+        .btn {
+            background: #1e4f88;
+            border: none;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 12px 24px -12px #10355c;
+            border: 1px solid #ffffff60;
+        }
+        .btn:hover {
+            background: #0f3a62;
+            transform: scale(1.02);
+        }
+        .btn-success { background: #1a6e4b; }
+        .btn-success:hover { background: #125737; }
+        .btn-warning { background: #b45b10; }
+        .btn-warning:hover { background: #964a09; }
+
+        /* officer block */
+        .officer-container {
+            background: #f1f8ff;
+            padding: 18px 22px;
+            border-radius: 28px;
+            margin: 18px 0 8px;
+            border: 1px solid #bdd6f5;
+        }
+        .officer-container h4 {
+            color: #16487a;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .remove-officer {
+            background: #b33c1f;
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-weight: 500;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        /* ========== PREVIEW PANEL ========== */
+        .preview-panel {
+            background: #f0f6fd;
+            padding: 2rem 2rem 2rem 2rem;
+        }
+        .document-preview {
+            background: white;
+            border-radius: 32px;
+            padding: 30px 24px;
+            box-shadow: 0 20px 40px -12px #153d5a;
+            border: 1px solid #bed6f0;
+            width: 100%;
+            max-width: 595px;
+            margin: 0 auto;
+            min-height: 820px;
+        }
+        .document-title {
+            font-weight: 800;
+            font-size: 1.8rem;       /* slightly reduced from 2rem */
+            text-align: center;
+            color: #0b2e48;
+            text-decoration: underline 4px #3068a8;
+            text-underline-offset: 8px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #173f5f;
+        }
+        .document-table td {
+            border: 1px solid #2f5680;
+            padding: 10px 8px;          /* reduced padding */
+            vertical-align: top;
+        }
+        .left-column { width: 30%; background: #ffffff; }
+        .middle-column { width: 20%; background: #fdfdfd; text-align: center; }
+        .right-column { width: 50%; background: #ffffff; }
+
+        /* ALL PREVIEW TEXT – REDUCED FONT SIZE */
+        .preview-field {
+            min-height: 20px;
+            padding: 2px 0;
+            color: #000000 !important;
+            font-weight: 500;
+            word-break: break-word;
+            font-size: 11px !important;      /* smaller base */
+            line-height: 1.3;
+        }
+        .preview-field.empty:before {
+            content: attr(placeholder);
+            color: #8aa9c9;
+            font-weight: 400;
+            font-size: 11px !important;
+        }
+        .time-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 11px !important;
+        }
+        .time-field {
+            font-size: 11px !important;
+        }
+        .time-field.empty:before { 
+            content: attr(placeholder); 
+            color: #8aa9c9; 
+            font-size: 11px !important;
+        }
+        .time-suffix { 
+            color: #000; 
+            font-weight: 400;
+            font-size: 11px !important;
+        }
+
+        /* embedded fields inside content */
+        .embedded-field {
+            font-size: 11px !important;
+            display: inline;
+            color: #000 !important;
+        }
+        .embedded-field.empty:before { 
+            content: attr(placeholder); 
+            color: #708fb1; 
+            font-size: 11px !important;
+        }
+        .content-text {
+            font-size: 11px !important;
+            line-height: 1.4;
+            text-align: justify;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        /* language toggle */
+        .lang-toggle {
+            display: flex;
+            gap: 8px;
+            background: #deecfb;
+            padding: 5px;
+            border-radius: 60px;
+            width: fit-content;
+            margin: 20px 0 10px;
+        }
+        .lang-opt {
+            padding: 10px 30px;
+            border-radius: 50px;
+            background: transparent;
+            font-weight: 600;
+            color: #1c4980;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        .lang-opt.active {
+            background: white;
+            color: #003a70;
+            box-shadow: 0 2px 12px #1b4d8020;
+        }
+        .language-content { display: none; }
+        .language-content.active { display: block; }
+
+        /* pdf mode fix — enforce tiny font */
+        .pdf-mode .preview-field,
+        .pdf-mode .embedded-field,
+        .pdf-mode .content-text,
+        .pdf-mode .time-field,
+        .pdf-mode .time-suffix,
+        .pdf-mode .document-table td {
+            font-size: 11px !important;
+            color: #000 !important;
+        }
+
+        .hidden { display: none !important; }
+        .auto-save {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #156b41;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 60px;
+            font-weight: 500;
+            display: none;
+            box-shadow: 0 10px 30px black;
+        }
+    </style>
+</head>
+<body>
+<div class="master-card">
+    <!-- LEFT: FORM (FIR Filing) -->
+    <div class="form-panel">
+        <div class="panel-header">
+            <i class="fas fa-scale-balanced"></i>
+            <h2>FIR Filing <span class="badge">compact font</span></h2>
+        </div>
+
+        <!-- language selector -->
+        <div class="lang-toggle">
+            <button class="lang-opt active" data-lang="tamil">தமிழ்</button>
+            <button class="lang-opt" data-lang="english">ENGLISH</button>
+        </div>
+
+        <!-- ===== FIR SPECIFIC FIELDS ===== -->
+        <div class="field-row">
+            <label><i class="fas fa-building"></i> Police station <span style="color:#c52828;">*</span></label>
+            <input type="text" id="firPoliceStation" placeholder="e.g., K-9, Nungambakkam" value="Nungambakkam">
+            <div class="error-message" id="firPoliceStation-error">Station required</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-hashtag"></i> Crime number <span style="color:#c52828;">*</span></label>
+            <input type="text" id="firCrimeNumber" placeholder="123/2025" value="248/2025">
+            <div class="error-message" id="firCrimeNumber-error">Use format number/year</div>
+            <div class="help-text">e.g., 142/2024</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-gavel"></i> Section (IPC/Act) <span style="color:#c52828;">*</span></label>
+            <input type="text" id="firSection" placeholder="e.g., 302, 420, 376" value="420, 120B">
+            <div class="error-message" id="firSection-error">Section required</div>
+        </div>
+
+        <!-- Court selection (FIR filing requires court) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="field-row">
+                <label><i class="fas fa-gavel"></i> Court <span style="color:#c52828;">*</span></label>
+                <select id="court">
+                    <option value="">Select court</option>
+                    <option value="MM" selected>MM (Metropolitan Magistrate)</option>
+                    <option value="CMM">CMM (Chief Metropolitan Magistrate)</option>
+                    <option value="PJ">PJ (Principal Judge)</option>
+                    <option value="NDPS">NDPS (Special Court)</option>
+                </select>
+                <div class="error-message" id="court-error">Select court</div>
+            </div>
+            <div class="field-row">
+                <label><i class="fas fa-hashtag"></i> Court No.</label>
+                <input type="text" id="courtNumber" placeholder="e.g., 5, VIII" value="5">
+                <div class="error-message" id="courtNumber-error">Court number</div>
+            </div>
+        </div>
+
+        <!-- Date & Time (standard) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+            <div class="field-row">
+                <label><i class="fas fa-calendar"></i> Date *</label>
+                <input type="text" id="date" placeholder="DD/MM/YYYY" value="08/04/2025">
+                <div class="error-message" id="date-error">Invalid date</div>
+            </div>
+            <div class="field-row">
+                <label><i class="fas fa-clock"></i> Time (opt.)</label>
+                <input type="text" id="time" placeholder="HH:MM" value="11:15">
+                <div class="error-message" id="time-error">HH:MM format</div>
+            </div>
+        </div>
+
+        <!-- POLICE OFFICERS (dynamic) -->
+        <div style="margin-top: 30px;">
+            <label><i class="fas fa-user-shield"></i> Investigating officers</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="number" id="officer-count" min="1" max="5" value="1" style="width: 80px;">
+                <button type="button" id="add-officer" class="btn" style="padding: 12px 22px; width: auto;"><i class="fas fa-plus"></i> Add officer</button>
+            </div>
+            <div id="police-officers-container"></div>
+        </div>
+
+        <!-- Generate button -->
+        <button id="fill-form" class="btn" style="margin: 40px 0 20px; width: 100%;"><i class="fas fa-file-lines"></i> Refresh preview</button>
+
+        <div class="help-text"><i class="fas fa-info-circle"></i> FIR filing passport — font reduced for more content.</div>
+    </div>
+
+    <!-- RIGHT: PREVIEW + PDF ACTIONS -->
+    <div class="preview-panel">
+        <div class="document-preview" id="document-to-print">
+            <div class="document-title">POLICE PASSPORT</div>
+            <table class="document-table">
+                <tr>
+                    <td class="left-column">
+                        <div id="police-officers-list"></div>
+                        <div class="preview-field compact-field empty" id="police-station-field" placeholder="Police Station"></div>
+                    </td>
+                    <td class="middle-column">
+                        <div class="middle-column-content">
+                            <div class="time-container">
+                                <span class="time-field empty" id="time-field" placeholder="HH:MM"></span>
+                                <span class="time-suffix" id="time-suffix">Hrs</span>
+                            </div>
+                            <div class="preview-field compact-field empty" id="date-field" placeholder="DD/MM/YYYY"></div>
+                        </div>
+                    </td>
+                    <td class="right-column">
+                        <!-- TAMIL CONTENT (FIR filing) -->
+                        <div class="language-content active" id="tamil-content">
+                            <div class="content-text" id="fir-filing-tamil-content">
+                                ஆகிய நீவிர் <span class="embedded-field empty" id="ps-fir-tamil" placeholder="Police Station"></span> காவல்நிலைய குற்ற எண். <span class="embedded-field empty" id="crime-fir-tamil" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="sec-fir-tamil" placeholder="Section"></span> என்ற வழக்கின் முதல் தகவல் அறிக்கையை கனம் <span class="embedded-field empty" id="court-fir-tamil" placeholder="Court"></span> நீதிமன்றத்தில் தாக்கல் செய்து அத்தாட்சி பெற்று நிலையம் வரவும்.
+                            </div>
+                        </div>
+                        <!-- ENGLISH CONTENT (FIR filing) -->
+                        <div class="language-content" id="english-content">
+                            <div class="content-text" id="fir-filing-english-content">
+                                You are hereby directed to file the FIR in <span class="embedded-field empty" id="ps-fir-eng" placeholder="Police Station"></span> Crime No. <span class="embedded-field empty" id="crime-fir-eng" placeholder="Cr. No."></span> U/s <span class="embedded-field empty" id="sec-fir-eng" placeholder="Section"></span> before the <span class="embedded-field empty" id="court-fir-eng" placeholder="Court"></span> and return to the station with acknowledgement.
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="action-buttons">
+            <button id="print-document" class="btn btn-warning"><i class="fas fa-print"></i> Print</button>
+            <button id="generate-pdf" class="btn btn-success"><i class="fas fa-file-pdf"></i> PDF</button>
+        </div>
+    </div>
+</div>
+<div class="auto-save" id="auto-save-indicator"><i class="fas fa-check-circle"></i> draft updated</div>
+
+<script>
+(function() {
+    // --- FIR Filing only ---
+    const { jsPDF } = window.jspdf;
+
+    // DOM elements
+    const policeStation = document.getElementById('firPoliceStation');
+    const crimeNumber = document.getElementById('firCrimeNumber');
+    const section = document.getElementById('firSection');
+    const courtSelect = document.getElementById('court');
+    const courtNumber = document.getElementById('courtNumber');
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+
+    const officerCount = document.getElementById('officer-count');
+    const addOfficer = document.getElementById('add-officer');
+    const officersContainer = document.getElementById('police-officers-container');
+    const officersPreview = document.getElementById('police-officers-list');
+
+    const fillBtn = document.getElementById('fill-form');
+    const printBtn = document.getElementById('print-document');
+    const pdfBtn = document.getElementById('generate-pdf');
+
+    const langTamil = document.querySelector('[data-lang="tamil"]');
+    const langEnglish = document.querySelector('[data-lang="english"]');
+    const tamilContent = document.getElementById('tamil-content');
+    const englishContent = document.getElementById('english-content');
+
+    // preview fields
+    const stationPreview = document.getElementById('police-station-field');
+    const datePreview = document.getElementById('date-field');
+    const timePreview = document.getElementById('time-field');
+    const timeSuffix = document.getElementById('time-suffix');
+
+    // embedded fields (tamil & english)
+    const psTam = document.getElementById('ps-fir-tamil');
+    const crimeTam = document.getElementById('crime-fir-tamil');
+    const secTam = document.getElementById('sec-fir-tamil');
+    const courtTam = document.getElementById('court-fir-tamil');
+    const psEng = document.getElementById('ps-fir-eng');
+    const crimeEng = document.getElementById('crime-fir-eng');
+    const secEng = document.getElementById('sec-fir-eng');
+    const courtEng = document.getElementById('court-fir-eng');
+
+    const autoSaveDiv = document.getElementById('auto-save-indicator');
+
+    let officerCounter = 1;
+    let currentLanguage = 'tamil';
+
+    // ---------- helpers ----------
+    function showNotification(msg) { alert(msg); }  // simplified
+
+    function isValidDate(d) { return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(d); }
+    function isValidTime(t) { return !t || /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(t); }
+    function isValidCrimeNo(c) { return /^\d+\/\d{4}$/.test(c); }
+
+    function validateField(el, errId) {
+        const err = document.getElementById(errId);
+        if (!el) return true;
+        const val = el.value.trim();
+        if (el.id === 'time' && val === '') {  // optional
+            if (err) err.style.display = 'none';
+            el.classList.remove('input-error');
+            return true;
+        }
+        if (el.id === 'time' && !isValidTime(val)) {
+            if (err) err.style.display = 'block';
+            el.classList.add('input-error');
+            return false;
+        }
+        if (el.id === 'date' && !isValidDate(val)) {
+            if (err) err.style.display = 'block';
+            el.classList.add('input-error');
+            return false;
+        }
+        if (el.id === 'firCrimeNumber' && !isValidCrimeNo(val)) {
+            if (err) err.style.display = 'block';
+            el.classList.add('input-error');
+            return false;
+        }
+        if ((el.id === 'firPoliceStation' || el.id === 'firSection' || el.id === 'court') && val === '') {
+            if (err) err.style.display = 'block';
+            el.classList.add('input-error');
+            return false;
+        }
+        if (err) err.style.display = 'none';
+        el.classList.remove('input-error');
+        return true;
+    }
+
+    // create officer form
+    function createOfficerForm(idx) {
+        const div = document.createElement('div');
+        div.className = 'officer-container';
+        div.id = `officer-${idx}`;
+        div.innerHTML = `
+            <h4>👮 Officer ${idx}</h4>
+            <div style="margin-bottom:12px;">
+                <label>Designation & number</label>
+                <input type="text" id="designation${idx}" placeholder="SI 1234" value="SI ${2100+idx}">
+                <div class="error-message" id="designation${idx}-error"></div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label>Full name</label>
+                <input type="text" id="fullName${idx}" placeholder="Full name" value="Officer ${idx}">
+                <div class="error-message" id="fullName${idx}-error"></div>
+            </div>
+            ${idx > 1 ? `<button class="remove-officer" data-idx="${idx}">✖ Remove</button>` : ''}
+        `;
+        return div;
+    }
+
+    function createOfficerPreview(idx) {
+        const wrap = document.createElement('div');
+        wrap.className = 'officer-container-preview';
+        wrap.id = `preview-officer-${idx}`;
+        wrap.innerHTML = `
+            <div class="preview-field compact-field officer-designation empty" id="designation-field-${idx}" placeholder="Designation"></div>
+            <div class="preview-field compact-field officer-name empty" id="full-name-field-${idx}" placeholder="Full Name"></div>
+        `;
+        return wrap;
+    }
+
+    function rebuildOfficers() {
+        let count = parseInt(officerCount.value);
+        if (count < 1) count = 1;
+        if (count > 5) count = 5;
+        officerCount.value = count;
+        officerCounter = count;
+
+        officersContainer.innerHTML = '';
+        for (let i=1; i<=count; i++) {
+            officersContainer.appendChild(createOfficerForm(i));
+        }
+        officersPreview.innerHTML = '';
+        for (let i=1; i<=count; i++) {
+            officersPreview.appendChild(createOfficerPreview(i));
+        }
+
+        document.querySelectorAll('.remove-officer').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (officerCounter <= 1) return;
+                officerCounter--;
+                officerCount.value = officerCounter;
+                rebuildOfficers();
+            });
+        });
+    }
+
+    function addOfficerFn() {
+        if (officerCounter < 5) {
+            officerCounter++;
+            officerCount.value = officerCounter;
+            rebuildOfficers();
+        }
+    }
+
+    // format court display
+    function formatCourt() {
+        const courtVal = courtSelect.value;
+        const num = courtNumber.value.trim();
+        if (!courtVal) return '';
+        if (num) {
+            let suffix = 'th';
+            const last = num.slice(-1);
+            if (num.endsWith('1') && !num.endsWith('11')) suffix = 'st';
+            else if (num.endsWith('2') && !num.endsWith('12')) suffix = 'nd';
+            else if (num.endsWith('3') && !num.endsWith('13')) suffix = 'rd';
+            return `${courtVal} ${num}${suffix} Court`;
+        }
+        return courtVal;
+    }
+
+    // fill preview
+    function fillPreview() {
+        // validate required
+        let valid = true;
+        if (!validateField(policeStation, 'firPoliceStation-error')) valid = false;
+        if (!validateField(crimeNumber, 'firCrimeNumber-error')) valid = false;
+        if (!validateField(section, 'firSection-error')) valid = false;
+        if (!validateField(courtSelect, 'court-error')) valid = false;
+        if (!validateField(dateInput, 'date-error')) valid = false;
+        if (!validateField(timeInput, 'time-error')) valid = false;
+        if (courtSelect.value && !courtNumber.value.trim()) {
+            document.getElementById('courtNumber-error').style.display = 'block';
+            courtNumber.classList.add('input-error');
+            valid = false;
+        } else {
+            document.getElementById('courtNumber-error').style.display = 'none';
+            courtNumber.classList.remove('input-error');
+        }
+        if (!valid) { alert('Please correct errors'); return; }
+
+        // station preview
+        const psVal = policeStation.value.trim();
+        stationPreview.textContent = psVal;
+        stationPreview.classList.remove('empty');
+
+        // date/time
+        datePreview.textContent = dateInput.value.trim();
+        datePreview.classList.remove('empty');
+        if (timeInput.value.trim()) {
+            timePreview.textContent = timeInput.value.trim();
+            timePreview.classList.remove('empty');
+            timeSuffix.style.display = 'inline';
+        } else {
+            timePreview.textContent = '';
+            timePreview.classList.add('empty');
+            timeSuffix.style.display = 'none';
+        }
+
+        // officers preview
+        for (let i=1; i<=officerCounter; i++) {
+            const desig = document.getElementById(`designation${i}`)?.value || '';
+            const full = document.getElementById(`fullName${i}`)?.value || '';
+            const desigPrev = document.getElementById(`designation-field-${i}`);
+            const namePrev = document.getElementById(`full-name-field-${i}`);
+            if (desigPrev) {
+                if (desig) { desigPrev.textContent = desig; desigPrev.classList.remove('empty'); }
+                else { desigPrev.textContent = ''; desigPrev.classList.add('empty'); }
+            }
+            if (namePrev) {
+                if (full) { namePrev.textContent = full; namePrev.classList.remove('empty'); }
+                else { namePrev.textContent = ''; namePrev.classList.add('empty'); }
+            }
+        }
+
+        // embedded fields
+        const crimeVal = crimeNumber.value.trim();
+        const secVal = section.value.trim();
+        const courtDisplay = formatCourt();
+
+        // tamil
+        if (psTam) { psTam.textContent = psVal; psTam.classList.remove('empty'); }
+        if (crimeTam) { crimeTam.textContent = crimeVal; crimeTam.classList.remove('empty'); }
+        if (secTam) { secTam.textContent = secVal; secTam.classList.remove('empty'); }
+        if (courtTam) { courtTam.textContent = courtDisplay; courtTam.classList.remove('empty'); }
+        // english
+        if (psEng) { psEng.textContent = psVal; psEng.classList.remove('empty'); }
+        if (crimeEng) { crimeEng.textContent = crimeVal; crimeEng.classList.remove('empty'); }
+        if (secEng) { secEng.textContent = secVal; secEng.classList.remove('empty'); }
+        if (courtEng) { courtEng.textContent = courtDisplay; courtEng.classList.remove('empty'); }
+
+        autoSaveDiv.style.display = 'block';
+        setTimeout(() => autoSaveDiv.style.display = 'none', 1200);
+    }
+
+    // language
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        if (lang === 'tamil') {
+            tamilContent.classList.add('active');
+            englishContent.classList.remove('active');
+            langTamil.classList.add('active');
+            langEnglish.classList.remove('active');
+        } else {
+            englishContent.classList.add('active');
+            tamilContent.classList.remove('active');
+            langEnglish.classList.add('active');
+            langTamil.classList.remove('active');
+        }
+        fillPreview(); // refresh embedded text
+    }
+
+    // print
+    function printDoc() {
+        const printEl = document.getElementById('document-to-print').outerHTML;
+        const bodyBackup = document.body.innerHTML;
+        document.body.innerHTML = printEl;
+        window.print();
+        document.body.innerHTML = bodyBackup;
+        window.location.reload();
+    }
+
+    // PDF
+    async function pdfGenerate() {
+        fillPreview();
+        pdfBtn.innerHTML = '<span class="spinner"></span> PDF...';
+        pdfBtn.disabled = true;
+        const element = document.getElementById('document-to-print');
+        element.classList.add('pdf-mode');
+
+        try {
+            const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#fff' });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210;
+            const pageHeight = 297;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let pos = 0;
+            pdf.addImage(imgData, 'PNG', 0, pos, imgWidth, imgHeight);
+            let hLeft = imgHeight - pageHeight;
+            while (hLeft > 0) {
+                pos = hLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, pos, imgWidth, imgHeight);
+                hLeft -= pageHeight;
+            }
+            pdf.save(`FIR_Filing_${policeStation.value.trim() || 'case'}.pdf`);
+        } catch(e) {
+            alert('PDF error: ' + e);
+        } finally {
+            element.classList.remove('pdf-mode');
+            pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
+            pdfBtn.disabled = false;
+        }
+    }
+
+    // init
+    function init() {
+        rebuildOfficers();
+
+        // event listeners
+        addOfficer.addEventListener('click', addOfficerFn);
+        [policeStation, crimeNumber, section, courtSelect, courtNumber, dateInput, timeInput].forEach(el => {
+            if (el) el.addEventListener('input', ()=> {
+                if (el.id === 'firCrimeNumber') validateField(el, 'firCrimeNumber-error');
+                else if (el.id === 'date') validateField(el, 'date-error');
+                else if (el.id === 'time') validateField(el, 'time-error');
+                else if (el.id === 'firPoliceStation') validateField(el, 'firPoliceStation-error');
+                else if (el.id === 'firSection') validateField(el, 'firSection-error');
+                else if (el.id === 'court') validateField(el, 'court-error');
+            });
+        });
+
+        fillBtn.addEventListener('click', fillPreview);
+        printBtn.addEventListener('click', printDoc);
+        pdfBtn.addEventListener('click', pdfGenerate);
+
+        langTamil.addEventListener('click', () => setLanguage('tamil'));
+        langEnglish.addEventListener('click', () => setLanguage('english'));
+
+        // initial fill
+        fillPreview();
+    }
+
+    init();
+})();
+</script>
+</body>
+</html>
