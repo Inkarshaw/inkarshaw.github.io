@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Police Passport · Sick Passport Generator</title>
+    <!-- jsPDF and html2canvas (kept for PDF export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(145deg, #0f2b4d 0%, #1b4a6b 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #1e293b;
+        }
+        .generator-card {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        @media (max-width: 950px) {
+            .generator-card { grid-template-columns: 1fr; }
+        }
+        /* left panel – form */
+        .form-panel {
+            background: white;
+            padding: 2rem 2rem 2rem 2.5rem;
+            border-right: 1px solid #e9eef2;
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .panel-header i {
+            font-size: 2.2rem;
+            color: #2266a8;
+            background: #e4f0fe;
+            padding: 12px;
+            border-radius: 20px;
+        }
+        .panel-header h2 {
+            font-weight: 600;
+            font-size: 1.9rem;
+            letter-spacing: -0.5px;
+            color: #0c314e;
+        }
+        .panel-header span {
+            font-size: 0.9rem;
+            background: #d1e7ff;
+            color: #004e9e;
+            padding: 4px 12px;
+            border-radius: 40px;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+        .field-row {
+            margin-bottom: 24px;
+        }
+        label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #1e3a5f;
+            margin-bottom: 6px;
+        }
+        label i { color: #2f6eb3; width: 20px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #dde7f0;
+            border-radius: 18px;
+            font-size: 1rem;
+            transition: 0.2s;
+            background: #fbfdff;
+            font-family: inherit;
+        }
+        input:focus, select:focus {
+            border-color: #1e6ec7;
+            outline: none;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,88,209,0.15);
+        }
+        .help-text {
+            font-size: 0.8rem;
+            color: #577594;
+            margin-top: 6px;
+            margin-left: 10px;
+        }
+        .error-message {
+            color: #c2410c;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: none;
+            background: #ffeee8;
+            padding: 4px 12px;
+            border-radius: 30px;
+        }
+        .input-error {
+            border-color: #c2410c !important;
+            background-color: #fff5f0;
+        }
+        .btn {
+            background: #1f4e8c;
+            border: none;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 8px 16px -6px #1f4e8c70;
+            border: 1px solid #ffffff40;
+            width: 100%;
+        }
+        .btn:hover {
+            background: #0f3b6b;
+            transform: scale(1.01);
+            box-shadow: 0 12px 24px -8px #0c2e4e;
+        }
+        .btn-success {
+            background: #1f5f3e;
+        }
+        .btn-success:hover { background: #154f31; }
+        .btn-warning {
+            background: #b95b0b;
+        }
+        .btn-warning:hover { background: #9f4b06; }
+        /* officer block */
+        .officer-container {
+            background: #f4f9ff;
+            padding: 18px 20px;
+            border-radius: 24px;
+            margin: 20px 0 10px;
+            border: 1px solid #c7dfff;
+        }
+        .officer-container h4 {
+            color: #164579;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .remove-officer {
+            background: #b22222;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-weight: 500;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        /* preview panel */
+        .preview-panel {
+            background: #f2f7fd;
+            padding: 2rem 2rem 2rem 2rem;
+        }
+        .document-preview {
+            background: white;
+            border-radius: 28px;
+            padding: 28px 20px;
+            box-shadow: 0 20px 40px -14px #0c2942;
+            border: 1px solid #bed9f7;
+            width: 100%;
+            max-width: 595px;
+            margin: 0 auto;
+            min-height: 820px;
+            transition: 0.2s;
+        }
+        .document-title {
+            font-weight: 800;
+            font-size: 1.9rem;
+            text-align: center;
+            color: #162b42;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-decoration: underline 3px #326ba0;
+            text-underline-offset: 8px;
+        }
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #113355;
+        }
+        .document-table td {
+            border: 1px solid #2a4b71;
+            padding: 14px 10px;
+            vertical-align: top;
+        }
+        .left-column { width: 30%; background: #ffffff; }
+        .middle-column { width: 20%; background: #fdfdfd; text-align: center; }
+        .right-column { width: 50%; background: #ffffff; }
+
+        /* preview fields */
+        .preview-field {
+            min-height: 24px;
+            padding: 4px 0;
+            color: #000000 !important;
+            font-weight: 500;
+            word-break: break-word;
+        }
+        .preview-field.empty:before {
+            content: attr(placeholder);
+            color: #a1b7cc;
+            font-weight: 400;
+        }
+        .time-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .time-field.empty:before {
+            content: attr(placeholder);
+            color: #a1b7cc;
+        }
+        .time-suffix { color: #000; font-weight: 400; }
+
+        .embedded-field.empty:before {
+            content: attr(placeholder);
+            color: #6b8fb1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .action-buttons .btn { margin: 0; }
+
+        /* language toggles */
+        .language-switch {
+            display: flex;
+            gap: 8px;
+            background: #e2ecf9;
+            padding: 5px;
+            border-radius: 60px;
+            width: fit-content;
+            margin: 20px 0 10px;
+        }
+        .lang-opt {
+            padding: 10px 26px;
+            border-radius: 40px;
+            background: transparent;
+            font-weight: 600;
+            color: #1e4f77;
+            cursor: pointer;
+            border: none;
+        }
+        .lang-opt.active {
+            background: white;
+            color: #003d77;
+            box-shadow: 0 2px 8px rgba(0,65,130,0.2);
+        }
+        .language-content { display: none; }
+        .language-content.active { display: block; }
+
+        /* pdf mode fix */
+        .pdf-mode .preview-field,
+        .pdf-mode .embedded-field,
+        .pdf-mode .time-field { color: #000 !important; }
+        .pdf-mode .right-column * { color: #000 !important; }
+
+        .hidden { display: none !important; }
+        .auto-save {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1d6130;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 60px;
+            font-weight: 500;
+            display: none;
+            box-shadow: 0 6px 18px black;
+        }
+        .sick-badge {
+            background: #c3dfff;
+            padding: 4px 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #0f4880;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<div class="generator-card">
+    <!-- LEFT: FORM (only sick passport essentials) -->
+    <div class="form-panel">
+        <div class="panel-header">
+            <i class="fas fa-notes-medical"></i>
+            <h2>Sick Passport <span>medical escort</span></h2>
+        </div>
+
+        <!-- passport type is fixed: Sick Passport (but we keep selector, hidden to avoid confusion) -->
+        <div class="field-row hidden">
+            <label><i class="fas fa-tag"></i> Passport type</label>
+            <select id="passportType">
+                <option value="Sick Passport" selected>Sick Passport</option>
+            </select>
+        </div>
+
+        <!-- language toggle -->
+        <div class="language-switch">
+            <button class="lang-opt active" data-lang="tamil">தமிழ்</button>
+            <button class="lang-opt" data-lang="english">ENGLISH</button>
+        </div>
+
+        <!-- police station (only required field for sick passport) -->
+        <div class="field-row">
+            <label><i class="fas fa-building"></i> Police station <span style="color:#b52a1d;">*</span></label>
+            <input type="text" id="sickPoliceStation" placeholder="e.g., Mylapore, Triplicane" value="Mylapore">
+            <div class="error-message" id="sickPoliceStation-error">Station name required</div>
+            <div class="help-text"><i class="far fa-circle-info"></i> This will appear in the document</div>
+        </div>
+
+        <!-- date & time (required in sick passport) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="field-row">
+                <label><i class="fas fa-calendar"></i> Date *</label>
+                <input type="text" id="date" placeholder="DD/MM/YYYY" value="15/04/2025">
+                <div class="error-message" id="date-error">Invalid date</div>
+            </div>
+            <div class="field-row">
+                <label><i class="fas fa-clock"></i> Time</label>
+                <input type="text" id="time" placeholder="HH:MM (optional)" value="10:30">
+                <div class="error-message" id="time-error">Use HH:MM format</div>
+            </div>
+        </div>
+
+        <!-- POLICE OFFICERS (dynamic) -->
+        <div style="margin-top: 30px;">
+            <label><i class="fas fa-user-shield"></i> Investigating officers</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="number" id="officer-count" min="1" max="5" value="1" style="width: 80px;">
+                <button type="button" id="add-officer" class="btn" style="padding: 12px 20px; width: auto;"><i class="fas fa-plus"></i> Add officer</button>
+            </div>
+            <div id="police-officers-container"></div>
+        </div>
+
+        <!-- fill button -->
+        <button id="fill-form" class="btn" style="margin: 30px 0 20px;"><i class="fas fa-file-pen"></i> Generate preview</button>
+
+        <!-- extra note: no accused, no court for sick passport -->
+        <div class="sick-badge"><i class="fas fa-stethoscope"></i> Sick passport — only police station, date/time & officers needed</div>
+    </div>
+
+    <!-- RIGHT: PREVIEW & PDF -->
+    <div class="preview-panel">
+        <div class="document-preview" id="document-to-print">
+            <div class="document-title">POLICE PASSPORT</div>
+            <table class="document-table">
+                <tr>
+                    <td class="left-column">
+                        <div id="police-officers-list"></div>
+                        <div class="preview-field compact-field empty" id="police-station-field" placeholder="Police Station"></div>
+                    </td>
+                    <td class="middle-column">
+                        <div class="middle-column-content">
+                            <div class="time-container">
+                                <span class="time-field empty" id="time-field" placeholder="HH:MM"></span>
+                                <span class="time-suffix" id="time-suffix">Hrs</span>
+                            </div>
+                            <div class="preview-field compact-field empty" id="date-field" placeholder="DD/MM/YYYY"></div>
+                        </div>
+                    </td>
+                    <td class="right-column">
+                        <!-- tamil content -->
+                        <div class="language-content active" id="tamil-content">
+                            <div class="content-text" id="sick-passport-tamil-content">
+                                உங்கள் உடல்நிலை சிகிச்சைக்காக காவல் மருத்துவமனையின் மருத்துவ அதிகாரியிடம் ஆஜர்படுத்தி அங்கீகாரம் பெற்று திரும்பவும். உங்கள் சிகிச்சை I.P. அல்லது O.P. இல் இருந்தால் உடனடியாக காவல் நிலையத்திற்கு செய்தியைத் தெரிவிக்க வேண்டும்.
+                            </div>
+                        </div>
+                        <!-- english content -->
+                        <div class="language-content" id="english-content">
+                            <div class="content-text" id="sick-passport-english-content">
+                                You are directed to report before Medical officer of Police Hospital for your illness treatment and get back with acknowledgment. If you are treated as I.P. or O.P. you must intimate the message to the police station at once without fail.
+                            </div>
+                        </div>
+                        <!-- hidden field to embed station name inside later? we already show above, but we can also embed in content: optional -->
+                        <div class="embedded-field empty" id="station-embed-tamil" placeholder="[Police Station]"></div>
+                        <div class="embedded-field empty" id="station-embed-english" placeholder="[Police Station]"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="action-buttons">
+            <button id="print-document" class="btn btn-warning"><i class="fas fa-print"></i> Print</button>
+            <button id="generate-pdf" class="btn btn-success"><i class="fas fa-file-pdf"></i> PDF</button>
+        </div>
+    </div>
+</div>
+
+<div class="auto-save" id="auto-save-indicator"><i class="fas fa-check"></i> draft saved</div>
+
+<script>
+(function() {
+    // --------------------------------------------------------------
+    // Sick passport only — everything else disabled / hidden
+    // --------------------------------------------------------------
+    const { jsPDF } = window.jspdf;
+
+    // DOM elements
+    const stationInput = document.getElementById('sickPoliceStation');
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+    const officerCount = document.getElementById('officer-count');
+    const addOfficerBtn = document.getElementById('add-officer');
+    const officersContainer = document.getElementById('police-officers-container');
+    const officersListPreview = document.getElementById('police-officers-list');
+    const fillBtn = document.getElementById('fill-form');
+    const printBtn = document.getElementById('print-document');
+    const pdfBtn = document.getElementById('generate-pdf');
+    const langTamil = document.querySelector('[data-lang="tamil"]');
+    const langEnglish = document.querySelector('[data-lang="english"]');
+    const tamilContentDiv = document.getElementById('tamil-content');
+    const englishContentDiv = document.getElementById('english-content');
+    const autoSave = document.getElementById('auto-save-indicator');
+
+    // preview fields
+    const policeStationField = document.getElementById('police-station-field');
+    const dateField = document.getElementById('date-field');
+    const timeField = document.getElementById('time-field');
+    const timeSuffix = document.getElementById('time-suffix');
+
+    let officerCounter = 1;
+    let currentLanguage = 'tamil';
+
+    // ---------- helper functions ----------
+    function showNotification(msg, type) { alert(msg); }  // simplified
+
+    function isValidDate(d) { return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(d); }
+    function isValidTime(t) { return !t || /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(t); }
+
+    function validateField(el, errId) {
+        const err = document.getElementById(errId);
+        if (!el) return true;
+        const val = el.value.trim();
+        if (el.id === 'time' && val === '') { // time optional
+            if (err) err.style.display = 'none';
+            el.classList.remove('input-error');
+            return true;
+        }
+        if (el.id === 'time' && !isValidTime(val)) {
+            if (err) err.style.display = 'block';
+            el.classList.add('input-error');
+            return false;
+        }
+        if (el.id === 'date' && !isValidDate(val)) {
+            if (err) err.style.display = 'block';
+            el.classList.add('input-error');
+            return false;
+        }
+        if (el.id === 'sickPoliceStation' && val === '') {
+            if (err) err.style.display = 'block';
+            el.classList.add('input-error');
+            return false;
+        }
+        if (err) err.style.display = 'none';
+        el.classList.remove('input-error');
+        return true;
+    }
+
+    // create officer form (input fields)
+    function createOfficerForm(idx) {
+        const div = document.createElement('div');
+        div.className = 'officer-container';
+        div.id = `officer-${idx}`;
+        div.innerHTML = `
+            <h4>👮 Officer ${idx}</h4>
+            <div style="margin-bottom:12px;">
+                <label>Designation & number</label>
+                <input type="text" id="designation${idx}" placeholder="e.g., SI 1245" value="SI ${1200+idx}">
+                <div class="error-message" id="designation${idx}-error"></div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label>Full name</label>
+                <input type="text" id="fullName${idx}" placeholder="Full name" value="Officer Name ${idx}">
+                <div class="error-message" id="fullName${idx}-error"></div>
+            </div>
+            ${idx > 1 ? `<button class="remove-officer" data-idx="${idx}">✖ Remove</button>` : ''}
+        `;
+        return div;
+    }
+
+    // create officer preview element
+    function createOfficerPreview(idx) {
+        const wrap = document.createElement('div');
+        wrap.className = 'officer-container-preview';
+        wrap.id = `preview-officer-${idx}`;
+        wrap.innerHTML = `
+            <div class="preview-field compact-field officer-designation empty" id="designation-field-${idx}" placeholder="Designation"></div>
+            <div class="preview-field compact-field officer-name empty" id="full-name-field-${idx}" placeholder="Full Name"></div>
+        `;
+        return wrap;
+    }
+
+    function rebuildOfficers() {
+        let count = parseInt(officerCount.value);
+        if (count < 1) count = 1;
+        if (count > 5) count = 5;
+        officerCount.value = count;
+        officerCounter = count;
+
+        officersContainer.innerHTML = '';
+        for (let i=1; i<=count; i++) {
+            officersContainer.appendChild(createOfficerForm(i));
+        }
+
+        officersListPreview.innerHTML = '';
+        for (let i=1; i<=count; i++) {
+            officersListPreview.appendChild(createOfficerPreview(i));
+        }
+
+        // attach remove event
+        document.querySelectorAll('.remove-officer').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const idx = this.dataset.idx;
+                if (officerCounter <= 1) return;
+                officerCounter--;
+                officerCount.value = officerCounter;
+                rebuildOfficers();
+            });
+        });
+    }
+
+    function addOfficer() {
+        if (officerCounter < 5) {
+            officerCounter++;
+            officerCount.value = officerCounter;
+            rebuildOfficers();
+        }
+    }
+
+    // fill preview with data
+    function fillPreview() {
+        // validate required
+        let ok = true;
+        if (!validateField(stationInput, 'sickPoliceStation-error')) ok = false;
+        if (!validateField(dateInput, 'date-error')) ok = false;
+        if (!validateField(timeInput, 'time-error')) ok = false;
+        if (!ok) { alert('Please correct red fields'); return; }
+
+        // update station
+        const stationVal = stationInput.value.trim();
+        if (stationVal) {
+            policeStationField.textContent = stationVal;
+            policeStationField.classList.remove('empty');
+        } else {
+            policeStationField.textContent = '';
+            policeStationField.classList.add('empty');
+        }
+
+        // date / time
+        const dVal = dateInput.value.trim();
+        dateField.textContent = dVal;
+        dateField.classList.remove('empty');
+        const tVal = timeInput.value.trim();
+        if (tVal) {
+            timeField.textContent = tVal;
+            timeField.classList.remove('empty');
+            timeSuffix.style.display = 'inline';
+        } else {
+            timeField.textContent = '';
+            timeField.classList.add('empty');
+            timeSuffix.style.display = 'none';
+        }
+
+        // officers
+        for (let i=1; i<=officerCounter; i++) {
+            const desig = document.getElementById(`designation${i}`)?.value || '';
+            const name = document.getElementById(`fullName${i}`)?.value || '';
+            const desigPreview = document.getElementById(`designation-field-${i}`);
+            const namePreview = document.getElementById(`full-name-field-${i}`);
+            if (desigPreview) {
+                if (desig) { desigPreview.textContent = desig; desigPreview.classList.remove('empty'); }
+                else { desigPreview.textContent = ''; desigPreview.classList.add('empty'); }
+            }
+            if (namePreview) {
+                if (name) { namePreview.textContent = name; namePreview.classList.remove('empty'); }
+                else { namePreview.textContent = ''; namePreview.classList.add('empty'); }
+            }
+        }
+
+        // optional: inject station name into content as embedded (for completeness)
+        const embedTam = document.getElementById('station-embed-tamil');
+        const embedEng = document.getElementById('station-embed-english');
+        if (embedTam) {
+            embedTam.textContent = stationVal;
+            embedTam.classList.remove('empty');
+        }
+        if (embedEng) {
+            embedEng.textContent = stationVal;
+            embedEng.classList.remove('empty');
+        }
+
+        autoSave.style.display = 'block';
+        setTimeout(() => { autoSave.style.display = 'none'; }, 1200);
+    }
+
+    // language toggle
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        if (lang === 'tamil') {
+            tamilContentDiv.classList.add('active');
+            englishContentDiv.classList.remove('active');
+            langTamil.classList.add('active');
+            langEnglish.classList.remove('active');
+        } else {
+            englishContentDiv.classList.add('active');
+            tamilContentDiv.classList.remove('active');
+            langEnglish.classList.add('active');
+            langTamil.classList.remove('active');
+        }
+        // re-fill to keep embedded station consistent
+        fillPreview();
+    }
+
+    // Print
+    function printDoc() {
+        const printContents = document.getElementById('document-to-print').outerHTML;
+        const original = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = original;
+        window.location.reload(); // simple reload to restore UI
+    }
+
+    // PDF
+    async function generatePdf() {
+        fillPreview(); // ensure latest
+        pdfBtn.innerHTML = '<span class="spinner"></span> PDF...';
+        pdfBtn.disabled = true;
+
+        const element = document.getElementById('document-to-print');
+        element.classList.add('pdf-mode');
+
+        try {
+            const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210;
+            const pageHeight = 297;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+            let pos = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, pos, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft > 0) {
+                pos = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, pos, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(`Sick_Passport_${stationInput.value.trim() || 'station'}.pdf`);
+        } catch (e) {
+            alert('PDF error: ' + e);
+        } finally {
+            element.classList.remove('pdf-mode');
+            pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
+            pdfBtn.disabled = false;
+        }
+    }
+
+    // ---------- init ----------
+    function init() {
+        rebuildOfficers();
+
+        // event listeners
+        addOfficerBtn.addEventListener('click', addOfficer);
+        stationInput.addEventListener('input', ()=>validateField(stationInput, 'sickPoliceStation-error'));
+        dateInput.addEventListener('input', ()=>validateField(dateInput, 'date-error'));
+        timeInput.addEventListener('input', ()=>validateField(timeInput, 'time-error'));
+
+        fillBtn.addEventListener('click', fillPreview);
+        printBtn.addEventListener('click', printDoc);
+        pdfBtn.addEventListener('click', generatePdf);
+
+        langTamil.addEventListener('click', () => setLanguage('tamil'));
+        langEnglish.addEventListener('click', () => setLanguage('english'));
+
+        // initial fill
+        fillPreview();
+
+        // auto-save stub (just visual)
+        setInterval(() => {}, 10000);
+    }
+
+    init();
+})();
+</script>
+</body>
+</html>
