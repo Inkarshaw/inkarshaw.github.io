@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Police Passport · Visera Report</title>
+    <!-- jsPDF and html2canvas for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(145deg, #2e4053 0%, #3e5f7a 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #1e293b;
+        }
+        .master-card {
+            max-width: 1350px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(6px);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px -20px #1f3345;
+            display: grid;
+            grid-template-columns: 1.2fr 0.9fr;
+            overflow: hidden;
+            border: 1px solid #cbdae7;
+        }
+        @media (max-width:1000px){ .master-card{ grid-template-columns:1fr; } }
+
+        /* ===== FORM PANEL ===== */
+        .form-panel {
+            background: white;
+            padding: 2.5rem 2.5rem 2.5rem 2.8rem;
+            border-right: 1px solid #cbdae7;
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        .panel-header i {
+            font-size: 2.4rem;
+            color: #5a3e7a;
+            background: #eee6fc;
+            padding: 14px;
+            border-radius: 28px;
+        }
+        .panel-header h2 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            color: #3a2c4a;
+            letter-spacing: -0.5px;
+        }
+        .badge {
+            background: #5a3e7a;
+            color: white;
+            padding: 6px 20px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+        .field-row { margin-bottom: 25px; }
+        label {
+            font-weight: 600;
+            font-size: 0.98rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3a2c4a;
+            margin-bottom: 6px;
+        }
+        label i { color: #5a3e7a; width: 22px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #d5c7e8;
+            border-radius: 24px;
+            font-size: 1rem;
+            background: #fcfaff;
+            transition: 0.2s;
+        }
+        input:focus, textarea:focus {
+            border-color: #6b4e91;
+            outline: none;
+            box-shadow: 0 6px 16px #4a2e6b40;
+        }
+        .help-text {
+            font-size: 0.8rem;
+            color: #6a5c7c;
+            margin-top: 6px;
+            margin-left: 12px;
+        }
+        .error-message {
+            color: #b3402b;
+            font-size: 0.8rem;
+            display: none;
+            background: #ffeae5;
+            padding: 4px 16px;
+            border-radius: 30px;
+        }
+        .input-error { border-color: #b3402b !important; background: #fff4f0; }
+        .btn {
+            background: #5a3e7a;
+            border: none;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 12px 24px -12px #3a2c4a;
+        }
+        .btn:hover { background: #472e63; transform: scale(1.02); }
+        .btn-success { background: #1a6e4b; }
+        .btn-warning { background: #b4692e; }
+
+        /* officer block */
+        .officer-container {
+            background: #f0eaf9;
+            padding: 18px 22px;
+            border-radius: 28px;
+            margin: 18px 0 8px;
+            border: 1px solid #cbb9e6;
+        }
+        .officer-container h4 { color: #3a2c4a; margin-bottom: 12px; }
+        .remove-officer {
+            background: #b85c3a;
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 6px 18px;
+            cursor: pointer;
+        }
+
+        /* ===== PREVIEW PANEL ===== */
+        .preview-panel {
+            background: #f2ecfc;
+            padding: 2rem 2rem 2rem 2rem;
+        }
+        .document-preview {
+            background: white;
+            border-radius: 32px;
+            padding: 30px 24px;
+            box-shadow: 0 20px 40px -12px #3f3a5e;
+            border: 1px solid #d2c0ee;
+            width: 100%;
+            max-width: 595px;
+            margin: 0 auto;
+            min-height: 820px;
+        }
+        .document-title {
+            font-weight: 800;
+            font-size: 1.8rem;
+            text-align: center;
+            color: #3a2c4a;
+            text-decoration: underline 4px #6b4e91;
+            margin-bottom: 20px;
+        }
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #4a3670;
+        }
+        .document-table td {
+            border: 1px solid #6b4e91;
+            padding: 10px 8px;
+            vertical-align: top;
+        }
+        .left-column { width: 30%; }
+        .middle-column { width: 20%; text-align: center; vertical-align: middle; }
+        .right-column { width: 50%; }
+
+        /* COMPACT FONT (11px) + JUSTIFY for right column */
+        .preview-field, .content-text, .embedded-field, .time-field, .time-suffix {
+            font-size: 11px !important;
+            line-height: 1.4;
+            color: #000 !important;
+        }
+        /* RIGHT COLUMN CONTENT JUSTIFIED */
+        .right-column .content-text,
+        .right-column .embedded-field {
+            text-align: justify !important;
+            text-justify: inter-word;
+        }
+        .preview-field { min-height: 20px; padding: 2px 0; }
+        .preview-field.empty:before { content: attr(placeholder); color: #8b79a6; font-size: 11px !important; }
+        
+        /* MIDDLE COLUMN: centre everything, including Hrs */
+        .middle-column .time-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 11px !important;
+            width: 100%;
+        }
+        .time-field { text-align: center; min-width: 45px; }
+        .time-suffix { text-align: left; white-space: nowrap; }
+
+        .embedded-field.empty:before { content: attr(placeholder); color: #8b79a6; font-size: 11px !important; }
+
+        .action-buttons { display: flex; gap: 15px; margin-top: 25px; }
+
+        /* language toggle */
+        .lang-toggle {
+            display: flex; gap: 8px; background: #e3d9f3; padding: 5px; border-radius: 60px; width: fit-content; margin: 20px 0 10px;
+        }
+        .lang-opt {
+            padding: 10px 30px; border-radius: 50px; background: transparent; font-weight: 600;
+            color: #3a2c4a; cursor: pointer; border: none;
+        }
+        .lang-opt.active { background: white; color: #3a2c4a; box-shadow: 0 2px 10px #5a3e7a40; }
+        .language-content { display: none; }
+        .language-content.active { display: block; }
+
+        /* pdf mode */
+        .pdf-mode .preview-field, .pdf-mode .embedded-field, .pdf-mode .content-text {
+            font-size: 11px !important; color: #000 !important;
+        }
+        .pdf-mode .right-column .content-text,
+        .pdf-mode .right-column .embedded-field {
+            text-align: justify !important;
+        }
+        .auto-save {
+            position: fixed; bottom: 30px; right: 30px; background: #1b6b4b;
+            color: white; padding: 14px 28px; border-radius: 60px; display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="master-card">
+    <!-- LEFT: FORM (Visera Report) -->
+    <div class="form-panel">
+        <div class="panel-header">
+            <i class="fas fa-flask"></i>
+            <h2>Visera Report <span class="badge">FSL</span></h2>
+        </div>
+
+        <div class="lang-toggle">
+            <button class="lang-opt active" data-lang="tamil">தமிழ்</button>
+            <button class="lang-opt" data-lang="english">ENGLISH</button>
+        </div>
+
+        <!-- ===== VISERA REPORT SPECIFIC FIELDS ===== -->
+        <div class="field-row">
+            <label><i class="fas fa-building"></i> Police station <span style="color:#b34f2e;">*</span></label>
+            <input type="text" id="viseraPoliceStation" placeholder="e.g., Mylapore" value="Mylapore">
+            <div class="error-message" id="viseraPoliceStation-error">Required</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-hashtag"></i> Crime number <span style="color:#b34f2e;">*</span></label>
+            <input type="text" id="viseraCrimeNumber" placeholder="123/2025" value="312/2025">
+            <div class="error-message" id="viseraCrimeNumber-error">Format: number/year</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-gavel"></i> Section (IPC/Act) <span style="color:#b34f2e;">*</span></label>
+            <input type="text" id="viseraSection" placeholder="e.g., 302, 376" value="302">
+            <div class="error-message" id="viseraSection-error">Section required</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-user"></i> Deceased name <span style="color:#b34f2e;">*</span></label>
+            <input type="text" id="deceasedName" placeholder="Full name" value="Rajendran">
+            <div class="error-message" id="deceasedName-error">Required</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-calendar"></i> Deceased age <span style="color:#b34f2e;">*</span></label>
+            <input type="text" id="deceasedAge" placeholder="Age" value="45">
+            <div class="error-message" id="deceasedAge-error">Required</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-user-tie"></i> Father's name <span style="color:#b34f2e;">*</span></label>
+            <input type="text" id="deceasedFatherName" placeholder="Father's name" value="Muthu">
+            <div class="error-message" id="deceasedFatherName-error">Required</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-hashtag"></i> P.M. Number <span style="color:#b34f2e;">*</span></label>
+            <input type="text" id="pmNumber" placeholder="e.g., 45/2025" value="89/2025">
+            <div class="error-message" id="pmNumber-error">Required</div>
+        </div>
+
+        <div class="field-row">
+            <label><i class="fas fa-calendar"></i> P.M. Date <span style="color:#b34f2e;">*</span></label>
+            <input type="text" id="pmDate" placeholder="DD/MM/YYYY" value="02/04/2025">
+            <div class="error-message" id="pmDate-error">Invalid date</div>
+        </div>
+
+        <!-- Date & Time (passport issue) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+            <div class="field-row">
+                <label><i class="fas fa-calendar"></i> Passport date *</label>
+                <input type="text" id="date" placeholder="DD/MM/YYYY" value="08/04/2025">
+                <div class="error-message" id="date-error">Invalid date</div>
+            </div>
+            <div class="field-row">
+                <label><i class="fas fa-clock"></i> Time (opt.)</label>
+                <input type="text" id="time" placeholder="HH:MM" value="10:30">
+                <div class="error-message" id="time-error">HH:MM format</div>
+            </div>
+        </div>
+
+        <!-- OFFICERS -->
+        <div style="margin-top: 30px;">
+            <label><i class="fas fa-user-shield"></i> Investigating officers</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="number" id="officer-count" min="1" max="5" value="1" style="width: 80px;">
+                <button type="button" id="add-officer" class="btn" style="padding: 12px 22px; width: auto;"><i class="fas fa-plus"></i> Add officer</button>
+            </div>
+            <div id="police-officers-container"></div>
+        </div>
+
+        <button id="fill-form" class="btn" style="margin: 40px 0 20px; width: 100%;"><i class="fas fa-file-lines"></i> Refresh preview</button>
+        <div class="help-text"><i class="fas fa-flask"></i> Visera report — FSL Mylapore</div>
+    </div>
+
+    <!-- RIGHT: PREVIEW + PDF -->
+    <div class="preview-panel">
+        <div class="document-preview" id="document-to-print">
+            <div class="document-title">POLICE PASSPORT</div>
+            <table class="document-table">
+                <tr>
+                    <td class="left-column">
+                        <div id="police-officers-list"></div>
+                        <div class="preview-field empty" id="police-station-field" placeholder="Police Station"></div>
+                    </td>
+                    <td class="middle-column">
+                        <div class="time-container">
+                            <span class="time-field empty" id="time-field" placeholder="HH:MM"></span>
+                            <span class="time-suffix" id="time-suffix">Hrs</span>
+                        </div>
+                        <div class="preview-field empty" id="date-field" placeholder="DD/MM/YYYY"></div>
+                    </td>
+                    <td class="right-column">
+                        <!-- TAMIL CONTENT (Visera Report) -->
+                        <div class="language-content active" id="tamil-content">
+                            <div class="content-text" id="visera-tamil">
+                                ஆகிய நீவிர் மயிலாப்பூரில் உள்ள தடயவியல் அறிவியல் ஆய்வகத்திற்கு சென்று 
+                                <span class="embedded-field empty" id="ps-tam" placeholder="Police Station"></span> 
+                                காவல் நிலைய குற்ற எண். <span class="embedded-field empty" id="crime-tam" placeholder="Cr. No."></span> 
+                                U/s <span class="embedded-field empty" id="sec-tam" placeholder="Section"></span> 
+                                இறப்பு <span class="embedded-field empty" id="name-tam" placeholder="Deceased name"></span> 
+                                ஆ/வ <span class="embedded-field empty" id="age-tam" placeholder="Age"></span> 
+                                த/பெ <span class="embedded-field empty" id="father-tam" placeholder="Father's name"></span> 
+                                P.M. எண்: <span class="embedded-field empty" id="pm-tam" placeholder="P.M. Number"></span>, 
+                                தேதி <span class="embedded-field empty" id="pmdate-tam" placeholder="P.M. Date"></span> 
+                                இன் விசரா அறிக்கையை பெற்று அத்தாட்சி பெற்று நிலையம் வரவும்.
+                            </div>
+                        </div>
+                        <!-- ENGLISH CONTENT (Visera Report) -->
+                        <div class="language-content" id="english-content">
+                            <div class="content-text" id="visera-eng">
+                                You are directed to report forensic science lab at Mylapore and obtain the Visra Report of 
+                                <span class="embedded-field empty" id="ps-eng" placeholder="Police Station"></span> 
+                                Cr.No. <span class="embedded-field empty" id="crime-eng" placeholder="Cr. No."></span> 
+                                U/s <span class="embedded-field empty" id="sec-eng" placeholder="Section"></span> 
+                                deceased <span class="embedded-field empty" id="name-eng" placeholder="Deceased name"></span> 
+                                M/a <span class="embedded-field empty" id="age-eng" placeholder="Age"></span>, 
+                                S/o <span class="embedded-field empty" id="father-eng" placeholder="Father's name"></span>, 
+                                P.M. No: <span class="embedded-field empty" id="pm-eng" placeholder="P.M. Number"></span>, 
+                                dated <span class="embedded-field empty" id="pmdate-eng" placeholder="P.M. Date"></span> 
+                                and get back with acknowledgment.
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="action-buttons">
+            <button id="print-document" class="btn btn-warning"><i class="fas fa-print"></i> Print</button>
+            <button id="generate-pdf" class="btn btn-success"><i class="fas fa-file-pdf"></i> PDF</button>
+        </div>
+    </div>
+</div>
+<div class="auto-save" id="auto-save-indicator">✓ updated</div>
+
+<script>
+(function() {
+    const { jsPDF } = window.jspdf;
+
+    // DOM – visera fields
+    const ps = document.getElementById('viseraPoliceStation');
+    const crime = document.getElementById('viseraCrimeNumber');
+    const section = document.getElementById('viseraSection');
+    const deceasedName = document.getElementById('deceasedName');
+    const deceasedAge = document.getElementById('deceasedAge');
+    const deceasedFather = document.getElementById('deceasedFatherName');
+    const pmNumber = document.getElementById('pmNumber');
+    const pmDate = document.getElementById('pmDate');
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+
+    // officers
+    const officerCount = document.getElementById('officer-count');
+    const addOfficerBtn = document.getElementById('add-officer');
+    const officersContainer = document.getElementById('police-officers-container');
+    const officersPreview = document.getElementById('police-officers-list');
+
+    const fillBtn = document.getElementById('fill-form');
+    const printBtn = document.getElementById('print-document');
+    const pdfBtn = document.getElementById('generate-pdf');
+
+    const langTamil = document.querySelector('[data-lang="tamil"]');
+    const langEnglish = document.querySelector('[data-lang="english"]');
+    const tamilContent = document.getElementById('tamil-content');
+    const englishContent = document.getElementById('english-content');
+
+    // preview fields
+    const stationPreview = document.getElementById('police-station-field');
+    const datePreview = document.getElementById('date-field');
+    const timePreview = document.getElementById('time-field');
+    const timeSuffix = document.getElementById('time-suffix');
+
+    // embedded (tamil)
+    const psTam = document.getElementById('ps-tam');
+    const crimeTam = document.getElementById('crime-tam');
+    const secTam = document.getElementById('sec-tam');
+    const nameTam = document.getElementById('name-tam');
+    const ageTam = document.getElementById('age-tam');
+    const fatherTam = document.getElementById('father-tam');
+    const pmTam = document.getElementById('pm-tam');
+    const pmdateTam = document.getElementById('pmdate-tam');
+
+    // embedded (english)
+    const psEng = document.getElementById('ps-eng');
+    const crimeEng = document.getElementById('crime-eng');
+    const secEng = document.getElementById('sec-eng');
+    const nameEng = document.getElementById('name-eng');
+    const ageEng = document.getElementById('age-eng');
+    const fatherEng = document.getElementById('father-eng');
+    const pmEng = document.getElementById('pm-eng');
+    const pmdateEng = document.getElementById('pmdate-eng');
+
+    const autoSaveDiv = document.getElementById('auto-save-indicator');
+
+    let officerCounter = 1;
+    let currentLanguage = 'tamil';
+
+    // helpers
+    function isValidDate(d) { return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(d); }
+    function isValidTime(t) { return !t || /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(t); }
+    function isValidCrimeNo(c) { return /^\d+\/\d{4}$/.test(c); }
+
+    function validateField(el, errId) {
+        const err = document.getElementById(errId);
+        if (!el) return true;
+        const val = el.value.trim();
+        if (el.id === 'time' && val === '') { err.style.display='none'; el.classList.remove('input-error'); return true; }
+        if (el.id === 'time' && !isValidTime(val)) { err.style.display='block'; el.classList.add('input-error'); return false; }
+        if ((el.id === 'date' || el.id === 'pmDate') && !isValidDate(val)) { err.style.display='block'; el.classList.add('input-error'); return false; }
+        if (el.id === 'viseraCrimeNumber' && !isValidCrimeNo(val)) { err.style.display='block'; el.classList.add('input-error'); return false; }
+        if (['viseraPoliceStation','viseraSection','deceasedName','deceasedAge','deceasedFatherName','pmNumber'].includes(el.id) && val === '') { err.style.display='block'; el.classList.add('input-error'); return false; }
+        err.style.display='none'; el.classList.remove('input-error');
+        return true;
+    }
+
+    // officer functions
+    function createOfficerForm(idx) {
+        const div = document.createElement('div');
+        div.className = 'officer-container';
+        div.id = `officer-${idx}`;
+        div.innerHTML = `
+            <h4>👮 Officer ${idx}</h4>
+            <div style="margin-bottom:12px;">
+                <label>Designation & number</label>
+                <input type="text" id="designation${idx}" placeholder="SI 1234" value="SI ${2100+idx}">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label>Full name</label>
+                <input type="text" id="fullName${idx}" placeholder="Full name" value="Officer ${idx}">
+            </div>
+            ${idx>1?`<button class="remove-officer" data-idx="${idx}">✖ Remove</button>`:''}
+        `;
+        return div;
+    }
+
+    function createOfficerPreview(idx) {
+        const wrap = document.createElement('div');
+        wrap.id = `preview-officer-${idx}`;
+        wrap.innerHTML = `
+            <div class="preview-field officer-designation empty" id="designation-field-${idx}" placeholder="Designation"></div>
+            <div class="preview-field officer-name empty" id="full-name-field-${idx}" placeholder="Full Name"></div>
+        `;
+        return wrap;
+    }
+
+    function rebuildOfficers() {
+        let count = parseInt(officerCount.value);
+        if(count<1) count=1; if(count>5) count=5;
+        officerCount.value = count; officerCounter = count;
+        officersContainer.innerHTML = '';
+        officersPreview.innerHTML = '';
+        for(let i=1;i<=count;i++) {
+            officersContainer.appendChild(createOfficerForm(i));
+            officersPreview.appendChild(createOfficerPreview(i));
+        }
+        document.querySelectorAll('.remove-officer').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if(officerCounter<=1) return;
+                officerCounter--; officerCount.value = officerCounter;
+                rebuildOfficers();
+            });
+        });
+    }
+
+    function addOfficerFn() { if(officerCounter<5) { officerCounter++; officerCount.value = officerCounter; rebuildOfficers(); } }
+
+    function fillPreview() {
+        let valid = true;
+        if(!validateField(ps, 'viseraPoliceStation-error')) valid=false;
+        if(!validateField(crime, 'viseraCrimeNumber-error')) valid=false;
+        if(!validateField(section, 'viseraSection-error')) valid=false;
+        if(!validateField(deceasedName, 'deceasedName-error')) valid=false;
+        if(!validateField(deceasedAge, 'deceasedAge-error')) valid=false;
+        if(!validateField(deceasedFather, 'deceasedFatherName-error')) valid=false;
+        if(!validateField(pmNumber, 'pmNumber-error')) valid=false;
+        if(!validateField(pmDate, 'pmDate-error')) valid=false;
+        if(!validateField(dateInput, 'date-error')) valid=false;
+        if(!validateField(timeInput, 'time-error')) valid=false;
+        if(!valid) { alert('Please fix errors'); return; }
+
+        const psVal = ps.value.trim();
+        stationPreview.textContent = psVal; stationPreview.classList.remove('empty');
+
+        datePreview.textContent = dateInput.value.trim(); datePreview.classList.remove('empty');
+        if(timeInput.value.trim()) {
+            timePreview.textContent = timeInput.value.trim(); timePreview.classList.remove('empty');
+            timeSuffix.style.display = 'inline';
+        } else { timePreview.textContent = ''; timePreview.classList.add('empty'); timeSuffix.style.display = 'none'; }
+
+        for(let i=1;i<=officerCounter;i++) {
+            const d = document.getElementById(`designation${i}`)?.value || '';
+            const n = document.getElementById(`fullName${i}`)?.value || '';
+            const dp = document.getElementById(`designation-field-${i}`);
+            const np = document.getElementById(`full-name-field-${i}`);
+            if(dp) { dp.textContent = d; dp.classList.toggle('empty',!d); }
+            if(np) { np.textContent = n; np.classList.toggle('empty',!n); }
+        }
+
+        const crimeVal = crime.value.trim();
+        const secVal = section.value.trim();
+        const nameVal = deceasedName.value.trim();
+        const ageVal = deceasedAge.value.trim();
+        const fatherVal = deceasedFather.value.trim();
+        const pmNumVal = pmNumber.value.trim();
+        const pmDateVal = pmDate.value.trim();
+
+        if(psTam) { psTam.textContent = psVal; psTam.classList.remove('empty'); }
+        if(crimeTam) { crimeTam.textContent = crimeVal; crimeTam.classList.remove('empty'); }
+        if(secTam) { secTam.textContent = secVal; secTam.classList.remove('empty'); }
+        if(nameTam) { nameTam.textContent = nameVal; nameTam.classList.remove('empty'); }
+        if(ageTam) { ageTam.textContent = ageVal; ageTam.classList.remove('empty'); }
+        if(fatherTam) { fatherTam.textContent = fatherVal; fatherTam.classList.remove('empty'); }
+        if(pmTam) { pmTam.textContent = pmNumVal; pmTam.classList.remove('empty'); }
+        if(pmdateTam) { pmdateTam.textContent = pmDateVal; pmdateTam.classList.remove('empty'); }
+
+        if(psEng) { psEng.textContent = psVal; psEng.classList.remove('empty'); }
+        if(crimeEng) { crimeEng.textContent = crimeVal; crimeEng.classList.remove('empty'); }
+        if(secEng) { secEng.textContent = secVal; secEng.classList.remove('empty'); }
+        if(nameEng) { nameEng.textContent = nameVal; nameEng.classList.remove('empty'); }
+        if(ageEng) { ageEng.textContent = ageVal; ageEng.classList.remove('empty'); }
+        if(fatherEng) { fatherEng.textContent = fatherVal; fatherEng.classList.remove('empty'); }
+        if(pmEng) { pmEng.textContent = pmNumVal; pmEng.classList.remove('empty'); }
+        if(pmdateEng) { pmdateEng.textContent = pmDateVal; pmdateEng.classList.remove('empty'); }
+
+        autoSaveDiv.style.display = 'block'; setTimeout(()=>autoSaveDiv.style.display='none',1200);
+    }
+
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        if(lang==='tamil') { tamilContent.classList.add('active'); englishContent.classList.remove('active'); langTamil.classList.add('active'); langEnglish.classList.remove('active'); }
+        else { englishContent.classList.add('active'); tamilContent.classList.remove('active'); langEnglish.classList.add('active'); langTamil.classList.remove('active'); }
+        fillPreview();
+    }
+
+    function printDoc() {
+        const printEl = document.getElementById('document-to-print').outerHTML;
+        const backup = document.body.innerHTML;
+        document.body.innerHTML = printEl;
+        window.print();
+        document.body.innerHTML = backup;
+        window.location.reload();
+    }
+
+    async function pdfGenerate() {
+        fillPreview();
+        pdfBtn.innerHTML = '<span class="spinner"></span> PDF...';
+        pdfBtn.disabled = true;
+        const el = document.getElementById('document-to-print');
+        el.classList.add('pdf-mode');
+        try {
+            const canvas = await html2canvas(el, { scale:2, backgroundColor:'#fff' });
+            const img = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p','mm','a4');
+            const w = 210;
+            const h = canvas.height * w / canvas.width;
+            pdf.addImage(img, 'PNG', 0, 0, w, h);
+            let left = h - 297;
+            while(left>0) {
+                pdf.addPage();
+                pdf.addImage(img, 'PNG', 0, left - h, w, h);
+                left -= 297;
+            }
+            pdf.save(`Visera_Report_${ps.value.trim()||'case'}.pdf`);
+        } catch(e) { alert('PDF error: '+e); }
+        finally { el.classList.remove('pdf-mode'); pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF'; pdfBtn.disabled = false; }
+    }
+
+    function init() {
+        rebuildOfficers();
+        addOfficerBtn.addEventListener('click', addOfficerFn);
+        [ps, crime, section, deceasedName, deceasedAge, deceasedFather, pmNumber, pmDate, dateInput, timeInput].forEach(el => {
+            el.addEventListener('input', ()=>{
+                if(el.id==='viseraCrimeNumber') validateField(el, 'viseraCrimeNumber-error');
+                else if(el.id==='date') validateField(el, 'date-error');
+                else if(el.id==='pmDate') validateField(el, 'pmDate-error');
+                else if(el.id==='time') validateField(el, 'time-error');
+                else if(el.id==='viseraPoliceStation') validateField(el, 'viseraPoliceStation-error');
+                else if(el.id==='viseraSection') validateField(el, 'viseraSection-error');
+                else if(el.id==='deceasedName') validateField(el, 'deceasedName-error');
+                else if(el.id==='deceasedAge') validateField(el, 'deceasedAge-error');
+                else if(el.id==='deceasedFatherName') validateField(el, 'deceasedFatherName-error');
+                else if(el.id==='pmNumber') validateField(el, 'pmNumber-error');
+            });
+        });
+        fillBtn.addEventListener('click', fillPreview);
+        printBtn.addEventListener('click', printDoc);
+        pdfBtn.addEventListener('click', pdfGenerate);
+        langTamil.addEventListener('click', ()=>setLanguage('tamil'));
+        langEnglish.addEventListener('click', ()=>setLanguage('english'));
+        fillPreview();
+    }
+    init();
+})();
+</script>
+</body>
+</html>
