@@ -1,103 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Police Case Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Police Case System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body {
-      font-family: Arial;
-      background: #f4f6f9;
-      padding: 15px;
-    }
-
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-    }
-
-    form {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      max-width: 500px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    input, select, textarea {
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background: #2c3e50;
-      color: white;
-      padding: 12px;
-      border: none;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #34495e;
-    }
-
-    #statusMsg {
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-    }
+    body { font-family: Arial; background:#f4f6f9; padding:15px; }
+    form { background:#fff; padding:15px; border-radius:10px; max-width:500px; margin:auto; }
+    input, textarea, select { width:100%; margin:8px 0; padding:10px; }
+    button { background:#2c3e50; color:white; padding:12px; border:none; width:100%; }
   </style>
 </head>
 
 <body>
 
-<h2>🚔 Police Case Entry</h2>
+<h2>🚔 Case Entry</h2>
 
 <form id="caseForm">
 
-  <input type="text" name="fir_no" placeholder="FIR Number" required>
+<input name="fircsr" placeholder="FIR/CSR">
+<input name="station" placeholder="Station">
+<input name="number" placeholder="Number">
+<input name="year" placeholder="Year">
+<input name="sections" placeholder="Sections">
+<input type="date" name="do">
+<input type="date" name="dr">
 
-  <input type="date" name="date" required>
+<input name="complainant" placeholder="Complainant">
+<input name="accused" placeholder="Accused">
 
-  <input type="text" name="name" placeholder="Complainant Name">
+<textarea name="contents" placeholder="FIR Contents"></textarea>
 
-  <input type="text" name="accused" placeholder="Accused Name">
+<label>Accused Photo</label>
+<input type="file" id="photo">
 
-  <select name="type">
-    <option>Theft</option>
-    <option>Missing</option>
-    <option>Accident</option>
-    <option>Other</option>
-  </select>
+<label>Accused ID Proof</label>
+<input type="file" id="idproof">
 
-  <input type="text" name="section" placeholder="Section of Law">
+<label>Property Seized</label>
+<input type="file" id="property">
 
-  <select name="status">
-    <option>Open</option>
-    <option>Under Investigation</option>
-    <option>Closed</option>
-  </select>
-
-  <select name="priority">
-    <option>Normal</option>
-    <option>Urgent</option>
-  </select>
-
-  <textarea name="remarks" placeholder="Remarks"></textarea>
-
-  <!-- 📷 IMAGE UPLOAD -->
-  <input type="file" id="imageInput" accept="image/*">
-
-  <button type="submit">Submit Case</button>
-
-  <div id="statusMsg"></div>
+<button type="submit">Submit</button>
 
 </form>
 
@@ -107,46 +50,35 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbwesHKAF5m6yJl6KQXRAs
 document.getElementById("caseForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  const statusMsg = document.getElementById("statusMsg");
-  statusMsg.innerText = "Uploading... ⏳";
-
   const formData = new FormData(this);
   const data = Object.fromEntries(formData.entries());
 
-  const file = document.getElementById("imageInput").files[0];
+  async function getBase64(fileInputId, dataKey, typeKey) {
+    const file = document.getElementById(fileInputId).files[0];
+    if (!file) return;
 
-  if (file) {
-    const reader = new FileReader();
-
-    reader.onload = function() {
-      const base64 = reader.result.split(",")[1];
-
-      data.image = base64;
-      data.imageType = file.type;
-
-      sendData(data);
-    };
-
-    reader.readAsDataURL(file);
-  } else {
-    sendData(data);
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = function() {
+        data[dataKey] = reader.result.split(",")[1];
+        data[typeKey] = file.type;
+        resolve();
+      };
+      reader.readAsDataURL(file);
+    });
   }
-});
 
-function sendData(data) {
+  await getBase64("photo", "photo", "photoType");
+  await getBase64("idproof", "idproof", "idType");
+  await getBase64("property", "property", "propertyType");
+
   fetch(scriptURL, {
     method: "POST",
     body: JSON.stringify(data)
   })
-  .then(res => res.text())
-  .then(response => {
-    document.getElementById("statusMsg").innerText = "✅ Case Saved Successfully";
-    document.getElementById("caseForm").reset();
-  })
-  .catch(err => {
-    document.getElementById("statusMsg").innerText = "❌ Error: " + err;
-  });
-}
+  .then(res => alert("✅ Case Saved"))
+  .catch(err => alert("❌ Error: " + err));
+});
 </script>
 
 </body>
