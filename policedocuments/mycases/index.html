@@ -2,87 +2,151 @@
 <html>
 <head>
   <title>Police Case Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       font-family: Arial;
       background: #f4f6f9;
-      padding: 20px;
+      padding: 15px;
     }
 
     h2 {
       text-align: center;
+      color: #2c3e50;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    form {
       background: white;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    th, td {
+    input, select, textarea {
+      width: 100%;
+      margin: 8px 0;
       padding: 10px;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      text-align: center;
     }
 
-    th {
+    button {
       background: #2c3e50;
       color: white;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
     }
 
-    input {
-      padding: 10px;
-      width: 100%;
-      margin-bottom: 10px;
+    button:hover {
+      background: #34495e;
+    }
+
+    #statusMsg {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
 
-<h2>🚔 Case Dashboard</h2>
+<h2>🚔 Police Case Entry</h2>
 
-<input type="text" id="search" placeholder="Search FIR / Name...">
+<form id="caseForm">
 
-<table id="caseTable">
-  <thead></thead>
-  <tbody></tbody>
-</table>
+  <input type="text" name="fir_no" placeholder="FIR Number" required>
+
+  <input type="date" name="date" required>
+
+  <input type="text" name="name" placeholder="Complainant Name">
+
+  <input type="text" name="accused" placeholder="Accused Name">
+
+  <select name="type">
+    <option>Theft</option>
+    <option>Missing</option>
+    <option>Accident</option>
+    <option>Other</option>
+  </select>
+
+  <input type="text" name="section" placeholder="Section of Law">
+
+  <select name="status">
+    <option>Open</option>
+    <option>Under Investigation</option>
+    <option>Closed</option>
+  </select>
+
+  <select name="priority">
+    <option>Normal</option>
+    <option>Urgent</option>
+  </select>
+
+  <textarea name="remarks" placeholder="Remarks"></textarea>
+
+  <!-- 📷 IMAGE UPLOAD -->
+  <input type="file" id="imageInput" accept="image/*">
+
+  <button type="submit">Submit Case</button>
+
+  <div id="statusMsg"></div>
+
+</form>
 
 <script>
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEAWS00EGr4y_37Di53_1O2xhG3f-qEOp0t7i3UHhDMYTR6Qr_nrKjOM-7ZE2FidNhAdfksesIjdh-/pub?output=csv";
+const scriptURL = "https://script.google.com/macros/s/AKfycbwesHKAF5m6yJl6KQXRAs8JdCCK6LTOf_bP3ENMjITCuPL0WNwxxwfESm_OaOA_whX5/exec";
 
-fetch(sheetURL)
-  .then(res => res.text())
-  .then(csv => {
-    const rows = csv.split("\n").map(r => r.split(","));
+document.getElementById("caseForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-    let thead = "<tr>";
-    rows[0].forEach(col => thead += `<th>${col}</th>`);
-    thead += "</tr>";
-    document.querySelector("#caseTable thead").innerHTML = thead;
+  const statusMsg = document.getElementById("statusMsg");
+  statusMsg.innerText = "Uploading... ⏳";
 
-    let tbody = "";
-    for (let i = 1; i < rows.length; i++) {
-      tbody += "<tr>";
-      rows[i].forEach(cell => {
-        tbody += `<td>${cell}</td>`;
-      });
-      tbody += "</tr>";
-    }
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
 
-    document.querySelector("#caseTable tbody").innerHTML = tbody;
-  });
+  const file = document.getElementById("imageInput").files[0];
 
-// SEARCH FUNCTION
-document.getElementById("search").addEventListener("keyup", function() {
-  let filter = this.value.toLowerCase();
-  let rows = document.querySelectorAll("#caseTable tbody tr");
+  if (file) {
+    const reader = new FileReader();
 
-  rows.forEach(row => {
-    row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
-  });
+    reader.onload = function() {
+      const base64 = reader.result.split(",")[1];
+
+      data.image = base64;
+      data.imageType = file.type;
+
+      sendData(data);
+    };
+
+    reader.readAsDataURL(file);
+  } else {
+    sendData(data);
+  }
 });
+
+function sendData(data) {
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(res => res.text())
+  .then(response => {
+    document.getElementById("statusMsg").innerText = "✅ Case Saved Successfully";
+    document.getElementById("caseForm").reset();
+  })
+  .catch(err => {
+    document.getElementById("statusMsg").innerText = "❌ Error: " + err;
+  });
+}
 </script>
 
 </body>
