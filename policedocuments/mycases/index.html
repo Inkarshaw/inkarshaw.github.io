@@ -5,42 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body { font-family: Arial; background:#f4f6f9; padding:15px; }
-    form { background:#fff; padding:15px; border-radius:10px; max-width:500px; margin:auto; }
-    input, textarea, select { width:100%; margin:8px 0; padding:10px; }
-    button { background:#2c3e50; color:white; padding:12px; border:none; width:100%; }
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      padding: 15px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    form {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #2c3e50;
+      color: white;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #34495e;
+    }
+
+    #msg {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
   </style>
 </head>
 
 <body>
 
-<h2>🚔 Case Entry</h2>
+<h2>🚔 Police Case Entry</h2>
 
 <form id="caseForm">
 
-<input name="fircsr" placeholder="FIR/CSR">
-<input name="station" placeholder="Station">
-<input name="number" placeholder="Number">
-<input name="year" placeholder="Year">
-<input name="sections" placeholder="Sections">
-<input type="date" name="do">
-<input type="date" name="dr">
+  <input name="fircsr" placeholder="FIR / CSR">
 
-<input name="complainant" placeholder="Complainant">
-<input name="accused" placeholder="Accused">
+  <input name="station" placeholder="Station">
 
-<textarea name="contents" placeholder="FIR Contents"></textarea>
+  <input name="number" placeholder="Case Number">
 
-<label>Accused Photo</label>
-<input type="file" id="photo">
+  <input name="year" placeholder="Year">
 
-<label>Accused ID Proof</label>
-<input type="file" id="idproof">
+  <input name="sections" placeholder="Sections">
 
-<label>Property Seized</label>
-<input type="file" id="property">
+  <label>Date of Occurrence (DO)</label>
+  <input type="date" name="do">
 
-<button type="submit">Submit</button>
+  <label>Date of Report (DR)</label>
+  <input type="date" name="dr">
+
+  <input name="complainant" placeholder="Complainant">
+
+  <input name="accused" placeholder="Accused">
+
+  <textarea name="contents" placeholder="FIR Contents"></textarea>
+
+  <label>Accused Photo</label>
+  <input type="file" id="photo" accept="image/*">
+
+  <label>Accused ID Proof</label>
+  <input type="file" id="idproof" accept="image/*">
+
+  <label>Property Seized</label>
+  <input type="file" id="property" accept="image/*">
+
+  <button type="submit">Submit Case</button>
+
+  <div id="msg"></div>
 
 </form>
 
@@ -50,17 +105,20 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbwesHKAF5m6yJl6KQXRAs
 document.getElementById("caseForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
+  const msg = document.getElementById("msg");
+  msg.innerText = "Uploading... ⏳";
+
   const formData = new FormData(this);
   const data = Object.fromEntries(formData.entries());
 
-  async function getBase64(fileInputId, dataKey, typeKey) {
-    const file = document.getElementById(fileInputId).files[0];
+  async function getBase64(inputId, key, typeKey) {
+    const file = document.getElementById(inputId).files[0];
     if (!file) return;
 
     return new Promise(resolve => {
       const reader = new FileReader();
       reader.onload = function() {
-        data[dataKey] = reader.result.split(",")[1];
+        data[key] = reader.result.split(",")[1];
         data[typeKey] = file.type;
         resolve();
       };
@@ -76,8 +134,18 @@ document.getElementById("caseForm").addEventListener("submit", async function(e)
     method: "POST",
     body: JSON.stringify(data)
   })
-  .then(res => alert("✅ Case Saved"))
-  .catch(err => alert("❌ Error: " + err));
+  .then(res => res.json())
+  .then(res => {
+    if (res.status === "success") {
+      msg.innerText = "✅ Case Saved Successfully";
+      document.getElementById("caseForm").reset();
+    } else {
+      msg.innerText = "❌ Error: " + res.error;
+    }
+  })
+  .catch(err => {
+    msg.innerText = "❌ Failed: " + err;
+  });
 });
 </script>
 
