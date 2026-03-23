@@ -62,7 +62,6 @@
 
 <form id="caseForm">
 
-  <!-- TEXT FIELDS -->
   <input name="fircsr" placeholder="FIR / CSR">
   <input name="station" placeholder="Station">
   <input name="number" placeholder="Case Number">
@@ -80,7 +79,6 @@
 
   <textarea name="contents" placeholder="FIR Contents"></textarea>
 
-  <!-- IMAGE UPLOAD -->
   <label>Accused Photo</label>
   <input type="file" id="photo" accept="image/*">
 
@@ -105,14 +103,19 @@ document.getElementById("caseForm").addEventListener("submit", async function(e)
   const msg = document.getElementById("msg");
   msg.innerText = "Uploading... ⏳";
 
-  const form = document.getElementById("caseForm");
-  const formData = new FormData(form);
-
-  // ✅ SAFE DATA COLLECTION (FIXES COLUMN SHIFT ISSUE)
-  let data = {};
-  formData.forEach((value, key) => {
-    data[key] = value;
-  });
+  // ✅ MANUAL DATA COLLECTION (FIXES YOUR ISSUE)
+  let data = {
+    fircsr: document.querySelector('[name="fircsr"]').value,
+    station: document.querySelector('[name="station"]').value,
+    number: document.querySelector('[name="number"]').value,
+    year: document.querySelector('[name="year"]').value,
+    sections: document.querySelector('[name="sections"]').value,
+    do: document.querySelector('[name="do"]').value,
+    dr: document.querySelector('[name="dr"]').value,
+    complainant: document.querySelector('[name="complainant"]').value,
+    accused: document.querySelector('[name="accused"]').value,
+    contents: document.querySelector('[name="contents"]').value
+  };
 
   console.log("DATA SENT:", data); // 🔍 DEBUG
 
@@ -141,12 +144,11 @@ document.getElementById("caseForm").addEventListener("submit", async function(e)
     method: "POST",
     body: JSON.stringify(data)
   })
-  .then(res => res.text()) // using text to avoid JSON error
+  .then(res => res.text())
   .then(response => {
     console.log("SERVER RESPONSE:", response);
-
     msg.innerText = "✅ Case Saved Successfully";
-    form.reset();
+    document.getElementById("caseForm").reset();
   })
   .catch(err => {
     console.error(err);
