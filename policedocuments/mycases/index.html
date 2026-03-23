@@ -1,169 +1,492 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Police Case System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    body {
-      font-family: Arial;
-      background: #f4f6f9;
-      padding: 15px;
-    }
-
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-    }
-
-    form {
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      max-width: 500px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    input, textarea {
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background: #2c3e50;
-      color: white;
-      padding: 12px;
-      border: none;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #34495e;
-    }
-
-    #msg {
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+        }
+        
+        /* Forms */
+        .form-container, .cases-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .form-container.active, .cases-container.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Cases Table */
+        .cases-table {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-new { background: #e3f2fd; color: #1976d2; }
+        .status-in-progress { background: #fff3e0; color: #f57c00; }
+        .status-resolved { background: #e8f5e9; color: #388e3c; }
+        .status-closed { background: #f5f5f5; color: #757575; }
+        
+        .priority-high { color: #d32f2f; font-weight: 600; }
+        .priority-medium { color: #f57c00; }
+        .priority-low { color: #388e3c; }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            th, td {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-
-<h2>🚔 Police Case Entry</h2>
-
-<form id="caseForm">
-
-  <input name="fircsr" placeholder="FIR / CSR">
-  <input name="station" placeholder="Station">
-  <input name="number" placeholder="Case Number">
-  <input name="year" placeholder="Year">
-  <input name="sections" placeholder="Sections">
-
-  <label>Date of Occurrence (DO)</label>
-  <input type="date" name="do">
-
-  <label>Date of Report (DR)</label>
-  <input type="date" name="dr">
-
-  <input name="complainant" placeholder="Complainant">
-  <input name="accused" placeholder="Accused">
-
-  <textarea name="contents" placeholder="FIR Contents"></textarea>
-
-  <label>Accused Photo</label>
-  <input type="file" id="photo" accept="image/*">
-
-  <label>Accused ID Proof</label>
-  <input type="file" id="idproof" accept="image/*">
-
-  <label>Property Seized</label>
-  <input type="file" id="property" accept="image/*">
-
-  <button type="submit">Submit Case</button>
-
-  <div id="msg"></div>
-
-</form>
-
-<script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbwesHKAF5m6yJl6KQXRAs8JdCCK6LTOf_bP3ENMjITCuPL0WNwxxwfESm_OaOA_whX5/exec";
-
-document.getElementById("caseForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
-
-  const msg = document.getElementById("msg");
-  msg.innerText = "Uploading... ⏳";
-
-  // ✅ MANUAL DATA COLLECTION (FIXES YOUR ISSUE)
-  let data = {
-    fircsr: document.querySelector('[name="fircsr"]').value,
-    station: document.querySelector('[name="station"]').value,
-    number: document.querySelector('[name="number"]').value,
-    year: document.querySelector('[name="year"]').value,
-    sections: document.querySelector('[name="sections"]').value,
-    do: document.querySelector('[name="do"]').value,
-    dr: document.querySelector('[name="dr"]').value,
-    complainant: document.querySelector('[name="complainant"]').value,
-    accused: document.querySelector('[name="accused"]').value,
-    contents: document.querySelector('[name="contents"]').value
-  };
-
-  console.log("DATA SENT:", data); // 🔍 DEBUG
-
-  // 📷 IMAGE HANDLER
-  async function getBase64(inputId, dataKey, typeKey) {
-    const file = document.getElementById(inputId).files[0];
-    if (!file) return;
-
-    return new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onload = function() {
-        data[dataKey] = reader.result.split(",")[1];
-        data[typeKey] = file.type;
-        resolve();
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  await getBase64("photo", "photo", "photoType");
-  await getBase64("idproof", "idproof", "idType");
-  await getBase64("property", "property", "propertyType");
-
-  // 🚀 SEND DATA
-  fetch(scriptURL, {
-  method: "POST",
-  mode: "no-cors",   // 🔥 IMPORTANT
-  body: JSON.stringify(data)
-})
-.then(() => {
-  msg.innerText = "✅ Case Saved Successfully";
-  form.reset();
-})
-.catch(err => {
-  msg.innerText = "❌ Error: " + err;
-});
-  .then(res => res.text())
-  .then(response => {
-    console.log("SERVER RESPONSE:", response);
-    msg.innerText = "✅ Case Saved Successfully";
-    document.getElementById("caseForm").reset();
-  })
-  .catch(err => {
-    console.error(err);
-    msg.innerText = "❌ Error: " + err;
-  });
-});
-</script>
-
+    <div class="container">
+        <div class="header">
+            <h1>📋 Case Management System</h1>
+            <p>Register and track cases efficiently</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('register')">➕ Register New Case</button>
+            <button class="tab-btn" onclick="switchTab('view')">📊 View All Cases</button>
+        </div>
+        
+        <!-- Register Case Form -->
+        <div id="registerForm" class="form-container active">
+            <h2>Register New Case</h2>
+            <div id="registerMessage" class="message"></div>
+            
+            <form id="caseForm">
+                <div class="form-group">
+                    <label>Case Title *</label>
+                    <input type="text" id="caseTitle" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Client Name *</label>
+                    <input type="text" id="clientName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Case Type *</label>
+                    <select id="caseType" required>
+                        <option value="">Select Case Type</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Criminal">Criminal</option>
+                        <option value="Corporate">Corporate</option>
+                        <option value="Family">Family</option>
+                        <option value="Property">Property</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="priority">
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="New">New</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Assigned To</label>
+                    <input type="text" id="assignedTo" placeholder="Name of assigned person">
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="description" placeholder="Case details..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn-submit">Register Case</button>
+            </form>
+        </div>
+        
+        <!-- View Cases -->
+        <div id="viewCases" class="cases-container">
+            <h2>All Registered Cases</h2>
+            <div class="stats" id="stats"></div>
+            <div class="cases-table" id="casesList">
+                <div class="loading">Loading cases...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Replace with your Google Apps Script Web App URL
+        const WEB_APP_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+        
+        // Switch between tabs
+        function switchTab(tab) {
+            const registerForm = document.getElementById('registerForm');
+            const viewCases = document.getElementById('viewCases');
+            const tabs = document.querySelectorAll('.tab-btn');
+            
+            tabs.forEach(btn => btn.classList.remove('active'));
+            
+            if (tab === 'register') {
+                registerForm.classList.add('active');
+                viewCases.classList.remove('active');
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+            } else {
+                registerForm.classList.remove('active');
+                viewCases.classList.add('active');
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                loadCases();
+            }
+        }
+        
+        // Register new case
+        document.getElementById('caseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const caseData = {
+                caseTitle: document.getElementById('caseTitle').value,
+                clientName: document.getElementById('clientName').value,
+                caseType: document.getElementById('caseType').value,
+                priority: document.getElementById('priority').value,
+                status: document.getElementById('status').value,
+                assignedTo: document.getElementById('assignedTo').value,
+                description: document.getElementById('description').value
+            };
+            
+            const messageDiv = document.getElementById('registerMessage');
+            
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(caseData)
+                });
+                
+                messageDiv.className = 'message success';
+                messageDiv.style.display = 'block';
+                messageDiv.textContent = '✅ Case registered successfully!';
+                
+                // Reset form
+                document.getElementById('caseForm').reset();
+                
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                messageDiv.textContent = '❌ Error registering case. Please try again.';
+                console.error('Error:', error);
+            }
+        });
+        
+        // Load all cases
+        async function loadCases() {
+            const casesDiv = document.getElementById('casesList');
+            casesDiv.innerHTML = '<div class="loading">Loading cases...</div>';
+            
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                
+                if (data.cases && data.cases.length > 0) {
+                    displayCases(data.cases);
+                    displayStats(data.cases);
+                } else {
+                    casesDiv.innerHTML = '<p>No cases registered yet.</p>';
+                }
+            } catch (error) {
+                casesDiv.innerHTML = '<p class="error">Error loading cases. Please check your connection.</p>';
+                console.error('Error:', error);
+            }
+        }
+        
+        // Display cases in table
+        function displayCases(cases) {
+            const casesDiv = document.getElementById('casesList');
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Date</th>
+                            <th>Case Title</th>
+                            <th>Client</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            cases.forEach(caseItem => {
+                const statusClass = getStatusClass(caseItem.status);
+                const priorityClass = `priority-${caseItem.priority.toLowerCase()}`;
+                const date = new Date(caseItem.dateRegistered).toLocaleDateString();
+                
+                html += `
+                    <tr>
+                        <td>${caseItem.caseId}</td>
+                        <td>${date}</td>
+                        <td><strong>${caseItem.caseTitle}</strong></td>
+                        <td>${caseItem.clientName}</td>
+                        <td>${caseItem.caseType}</td>
+                        <td><span class="status-badge ${statusClass}">${caseItem.status}</span></td>
+                        <td class="${priorityClass}">${caseItem.priority}</td>
+                        <td>${caseItem.assignedTo}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody></table>`;
+            casesDiv.innerHTML = html;
+        }
+        
+        // Display statistics
+        function displayStats(cases) {
+            const statsDiv = document.getElementById('stats');
+            const totalCases = cases.length;
+            const newCases = cases.filter(c => c.status === 'New').length;
+            const inProgress = cases.filter(c => c.status === 'In Progress').length;
+            const highPriority = cases.filter(c => c.priority === 'High').length;
+            
+            statsDiv.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${totalCases}</div>
+                    <div class="stat-label">Total Cases</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${newCases}</div>
+                    <div class="stat-label">New Cases</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${inProgress}</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${highPriority}</div>
+                    <div class="stat-label">High Priority</div>
+                </div>
+            `;
+        }
+        
+        function getStatusClass(status) {
+            const statusMap = {
+                'New': 'status-new',
+                'In Progress': 'status-in-progress',
+                'Resolved': 'status-resolved',
+                'Closed': 'status-closed'
+            };
+            return statusMap[status] || 'status-new';
+        }
+        
+        // Load cases when page loads
+        window.addEventListener('load', () => {
+            // Check if view tab is active initially
+            if (document.getElementById('viewCases').classList.contains('active')) {
+                loadCases();
+            }
+        });
+    </script>
 </body>
 </html>
