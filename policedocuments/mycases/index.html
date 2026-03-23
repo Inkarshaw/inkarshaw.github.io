@@ -141,12 +141,17 @@ document.getElementById("caseForm").addEventListener("submit", async function(e)
 
   // 🚀 SEND DATA
   fetch(scriptURL, {
-    method: "POST",
-    headers: {
-    "Content-Type": "application/json"
-  },
-    body: JSON.stringify(data)
-  })
+  method: "POST",
+  mode: "no-cors",   // 🔥 IMPORTANT
+  body: JSON.stringify(data)
+})
+.then(() => {
+  msg.innerText = "✅ Case Saved Successfully";
+  form.reset();
+})
+.catch(err => {
+  msg.innerText = "❌ Error: " + err;
+});
   .then(res => res.text())
   .then(response => {
     console.log("SERVER RESPONSE:", response);
