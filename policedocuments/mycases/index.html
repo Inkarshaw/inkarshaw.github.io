@@ -1,15 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Police Case System</title>
+  <title>Police Case Entry</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body { font-family: Arial; background:#f4f6f9; padding:15px; }
-    form { background:#fff; padding:15px; border-radius:10px; max-width:500px; margin:auto; }
-    input, textarea { width:100%; margin:8px 0; padding:10px; }
-    button { background:#2c3e50; color:white; padding:12px; border:none; width:100%; }
-    #msg { text-align:center; margin-top:10px; font-weight:bold; }
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      padding: 15px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    form {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #2c3e50;
+      color: white;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #34495e;
+    }
   </style>
 </head>
 
@@ -17,92 +54,31 @@
 
 <h2>🚔 Police Case Entry</h2>
 
-<form id="caseForm">
+<form 
+  action="https://script.google.com/macros/s/AKfycbwesHKAF5m6yJl6KQXRAs8JdCCK6LTOf_bP3ENMjITCuPL0WNwxxwfESm_OaOA_whX5/exec"
+  method="POST">
 
-<input name="fircsr" placeholder="FIR / CSR">
-<input name="station" placeholder="Station">
-<input name="number" placeholder="Case Number">
-<input name="year" placeholder="Year">
-<input name="sections" placeholder="Sections">
+  <!-- TEXT FIELDS -->
+  <input name="fircsr" placeholder="FIR / CSR" required>
+  <input name="station" placeholder="Station">
+  <input name="number" placeholder="Case Number">
+  <input name="year" placeholder="Year">
+  <input name="sections" placeholder="Sections">
 
-<label>DO</label>
-<input type="date" name="do">
+  <label>Date of Occurrence (DO)</label>
+  <input type="date" name="do">
 
-<label>DR</label>
-<input type="date" name="dr">
+  <label>Date of Report (DR)</label>
+  <input type="date" name="dr">
 
-<input name="complainant" placeholder="Complainant">
-<input name="accused" placeholder="Accused">
+  <input name="complainant" placeholder="Complainant">
+  <input name="accused" placeholder="Accused">
 
-<textarea name="contents" placeholder="FIR Contents"></textarea>
+  <textarea name="contents" placeholder="FIR Contents"></textarea>
 
-<label>Accused Photo</label>
-<input type="file" id="photo">
-
-<label>ID Proof</label>
-<input type="file" id="idproof">
-
-<label>Property</label>
-<input type="file" id="property">
-
-<button type="submit">Submit</button>
-
-<div id="msg"></div>
+  <button type="submit">Submit Case</button>
 
 </form>
-
-<script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbwesHKAF5m6yJl6KQXRAs8JdCCK6LTOf_bP3ENMjITCuPL0WNwxxwfESm_OaOA_whX5/exec";
-
-document.getElementById("caseForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
-
-  const msg = document.getElementById("msg");
-  msg.innerText = "Saving... ⏳";
-
-  let data = {
-    fircsr: document.querySelector('[name="fircsr"]').value,
-    station: document.querySelector('[name="station"]').value,
-    number: document.querySelector('[name="number"]').value,
-    year: document.querySelector('[name="year"]').value,
-    sections: document.querySelector('[name="sections"]').value,
-    do: document.querySelector('[name="do"]').value,
-    dr: document.querySelector('[name="dr"]').value,
-    complainant: document.querySelector('[name="complainant"]').value,
-    accused: document.querySelector('[name="accused"]').value,
-    contents: document.querySelector('[name="contents"]').value
-  };
-
-  async function getBase64(id, key, typeKey) {
-    const file = document.getElementById(id).files[0];
-    if (!file) return;
-
-    return new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        data[key] = reader.result.split(",")[1];
-        data[typeKey] = file.type;
-        resolve();
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  await getBase64("photo", "photo", "photoType");
-  await getBase64("idproof", "idproof", "idType");
-  await getBase64("property", "property", "propertyType");
-
-  // 🔥 CORS FIX
-  fetch(scriptURL, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(data)
-  });
-
-  msg.innerText = "✅ Case Saved Successfully";
-  document.getElementById("caseForm").reset();
-});
-</script>
 
 </body>
 </html>
