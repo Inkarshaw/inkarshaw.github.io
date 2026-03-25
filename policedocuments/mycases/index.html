@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CaseFlow | FIR/CSR Records Manager</title>
+    <title>CaseFlow | FIR/CSR Records Manager with Full Case Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -64,7 +64,7 @@
 
         .form-panel {
             flex: 1.2;
-            min-width: 320px;
+            min-width: 340px;
             background: white;
             border-radius: 28px;
             box-shadow: 0 12px 30px rgba(0,0,0,0.06);
@@ -74,7 +74,7 @@
 
         .data-panel {
             flex: 2.5;
-            min-width: 400px;
+            min-width: 450px;
             background: white;
             border-radius: 28px;
             box-shadow: 0 12px 30px rgba(0,0,0,0.06);
@@ -99,7 +99,7 @@
         }
 
         .input-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .full-width {
@@ -120,6 +120,13 @@
             margin-left: 2px;
         }
 
+        label .field-hint {
+            font-weight: normal;
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-left: 4px;
+        }
+
         input, textarea, select {
             width: 100%;
             padding: 0.75rem 1rem;
@@ -135,6 +142,10 @@
             outline: none;
             border-color: #1e4a6b;
             box-shadow: 0 0 0 3px rgba(30,74,107,0.15);
+        }
+
+        input[type="date"] {
+            font-family: inherit;
         }
 
         textarea {
@@ -211,7 +222,7 @@
             font-weight: 700;
             color: #0f172a;
             border-bottom: 1px solid #e2e8f0;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
@@ -243,6 +254,22 @@
         .badge-csr {
             background: #e0f2fe;
             color: #075985;
+        }
+
+        .case-number {
+            font-family: monospace;
+            font-weight: 600;
+            background: #f1f5f9;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .date-cell {
+            font-family: monospace;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
 
         .delete-btn {
@@ -305,6 +332,12 @@
             text-align: center;
         }
 
+        .inline-hint {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-top: 0.2rem;
+        }
+
         @media (max-width: 780px) {
             body {
                 padding: 1rem;
@@ -322,7 +355,7 @@
 <div class="container">
     <div class="header">
         <h1>⚖️ CaseFlow Manager</h1>
-        <p>FIR / CSR • DO • DR • SOC • Accused & Complainant Details</p>
+        <p>FIR / CSR • Case Number • DO (Date of Occurence) • DR (Date of Report) • SOC (Scene of Crime)</p>
         <div class="badge">📋 Google Sheets Backend (Live Sync)</div>
     </div>
 
@@ -339,16 +372,24 @@
                     </select>
                 </div>
                 <div class="input-group">
-                    <label>🔢 DO (Diary Number) <span class="required">*</span></label>
-                    <input type="text" id="doNumber" placeholder="e.g., 123/2024" autocomplete="off">
+                    <label>🔢 FIR No. / CSR No. <span class="required">*</span></label>
+                    <input type="text" id="caseNumber" placeholder="e.g., FIR 123/2024  or  CSR 045/24" autocomplete="off">
+                    <div class="inline-hint">Unique case/report number</div>
                 </div>
                 <div class="input-group">
-                    <label>📋 DR (Daily Report) <span class="required">*</span></label>
-                    <input type="text" id="drNumber" placeholder="e.g., DR-456/24" autocomplete="off">
+                    <label>📅 DO - Date of Occurence <span class="required">*</span></label>
+                    <input type="date" id="doDate">
+                    <div class="inline-hint">When the incident occurred</div>
                 </div>
                 <div class="input-group">
-                    <label>⚖️ SOC (Section of Crime) <span class="required">*</span></label>
-                    <input type="text" id="soc" placeholder="e.g., IPC 307, 341, 34" autocomplete="off">
+                    <label>📅 DR - Date of Report <span class="required">*</span></label>
+                    <input type="date" id="drDate">
+                    <div class="inline-hint">When the case was reported</div>
+                </div>
+                <div class="input-group full-width">
+                    <label>📍 SOC - Scene of Crime <span class="required">*</span></label>
+                    <input type="text" id="socLocation" placeholder="Full address / location where crime took place" autocomplete="off">
+                    <div class="inline-hint">Exact place of occurrence</div>
                 </div>
                 <div class="input-group full-width">
                     <label>👤 Accused Name <span class="required">*</span></label>
@@ -360,7 +401,7 @@
                 </div>
                 <div class="input-group full-width">
                     <label>📝 Additional Notes / Case Summary</label>
-                    <textarea id="caseNotes" placeholder="Brief facts, incident details, witness info..."></textarea>
+                    <textarea id="caseNotes" placeholder="Brief facts, incident details, witness info, sections of law..."></textarea>
                 </div>
             </div>
             <button id="submitBtn">➕ Register Case</button>
@@ -373,7 +414,7 @@
         <div class="data-panel">
             <div class="section-title">📋 Case Records</div>
             <div class="filter-bar">
-                <input type="text" id="searchInput" placeholder="🔍 Search by Accused, Complainant, DO, DR..." autocomplete="off">
+                <input type="text" id="searchInput" placeholder="🔍 Search by Case No, Accused, Complainant, Location..." autocomplete="off">
                 <select id="filterCaseType">
                     <option value="all">All Cases (FIR/CSR)</option>
                     <option value="FIR">FIR Only</option>
@@ -386,18 +427,19 @@
                 <table id="dataTable">
                     <thead>
                         <tr>
-                            <th>Case Type</th>
-                            <th>DO (Diary No)</th>
-                            <th>DR (Daily Report)</th>
-                            <th>SOC</th>
-                            <th>Accused Name</th>
-                            <th>Complainant Name</th>
+                            <th>Type</th>
+                            <th>Case No.</th>
+                            <th>DO (Occurrence)</th>
+                            <th>DR (Report)</th>
+                            <th>SOC (Scene)</th>
+                            <th>Accused</th>
+                            <th>Complainant</th>
                             <th>Notes</th>
                             <th style="width:65px">Action</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr><td colspan="8" style="text-align:center;">Loading case data from Google Sheets...</td></tr>
+                        <tr><td colspan="9" style="text-align:center;">Loading case data from Google Sheets...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -414,9 +456,10 @@
     
     // DOM elements
     const caseTypeSelect = document.getElementById('caseType');
-    const doNumberInput = document.getElementById('doNumber');
-    const drNumberInput = document.getElementById('drNumber');
-    const socInput = document.getElementById('soc');
+    const caseNumberInput = document.getElementById('caseNumber');
+    const doDateInput = document.getElementById('doDate');
+    const drDateInput = document.getElementById('drDate');
+    const socLocationInput = document.getElementById('socLocation');
     const accusedNameInput = document.getElementById('accusedName');
     const complainantNameInput = document.getElementById('complainantName');
     const caseNotesInput = document.getElementById('caseNotes');
@@ -429,6 +472,18 @@
     const filterCaseType = document.getElementById('filterCaseType');
     const refreshBtn = document.getElementById('refreshBtn');
     const statsInfo = document.getElementById('statsInfo');
+    
+    // Helper: format date for display (YYYY-MM-DD to DD-MMM-YYYY)
+    function formatDate(dateString) {
+        if (!dateString) return '—';
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        } catch(e) {
+            return dateString;
+        }
+    }
     
     // Helper: status message
     function setStatus(element, msg, isError = false) {
@@ -472,16 +527,14 @@
     
     async function addCaseToSheet(caseData) {
         try {
-            const response = await fetch(API_URL, {
+            await fetch(API_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Required for Apps Script CORS handling
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(caseData)
             });
-            // Note: With no-cors, we can't read response, but the request is sent
-            // Apps Script will still process it
             return true;
         } catch (error) {
             console.error("Add error:", error);
@@ -519,7 +572,7 @@
         const success = await addCaseToSheet(caseData);
         if (success) {
             setStatus(formStatus, "✅ Case registered successfully!", false);
-            await refreshData(); // Refresh to show new data
+            await refreshData();
             return true;
         } else {
             setStatus(formStatus, "❌ Failed to save case. Check connection.", true);
@@ -548,11 +601,10 @@
         
         if (searchTerm) {
             filtered = filtered.filter(c =>
+                (c.caseNumber && c.caseNumber.toLowerCase().includes(searchTerm)) ||
                 (c.accusedName && c.accusedName.toLowerCase().includes(searchTerm)) ||
                 (c.complainantName && c.complainantName.toLowerCase().includes(searchTerm)) ||
-                (c.doNumber && c.doNumber.toLowerCase().includes(searchTerm)) ||
-                (c.drNumber && c.drNumber.toLowerCase().includes(searchTerm)) ||
-                (c.soc && c.soc.toLowerCase().includes(searchTerm)) ||
+                (c.socLocation && c.socLocation.toLowerCase().includes(searchTerm)) ||
                 (c.caseNotes && c.caseNotes.toLowerCase().includes(searchTerm))
             );
         }
@@ -566,7 +618,7 @@
         statsInfo.textContent = `📋 Total: ${cases.length} cases | Showing: ${filtered.length}`;
         
         if (filtered.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 2.2rem;">📭 No case records found. Register a new FIR/CSR above.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 2.2rem;">📭 No case records found. Register a new FIR/CSR above.</td></tr>`;
             return;
         }
         
@@ -579,9 +631,10 @@
             html += `
                 <tr>
                     <td>${caseTypeDisplay}</td>
-                    <td><strong>${escapeHtml(c.doNumber || '—')}</strong></td>
-                    <td>${escapeHtml(c.drNumber || '—')}</td>
-                    <td><code style="font-size:0.75rem;">${escapeHtml(c.soc || '—')}</code></td>
+                    <td><span class="case-number">${escapeHtml(c.caseNumber || '—')}</span></td>
+                    <td class="date-cell">${formatDate(c.doDate)}</td>
+                    <td class="date-cell">${formatDate(c.drDate)}</td>
+                    <td><strong>${escapeHtml(c.socLocation || '—')}</strong></td>
                     <td>${escapeHtml(c.accusedName || '—')}</td>
                     <td>${escapeHtml(c.complainantName || '—')}</td>
                     <td style="max-width:180px;">${escapeHtml(c.caseNotes ? c.caseNotes.substring(0, 65) : '—')}${c.caseNotes && c.caseNotes.length > 65 ? '…' : ''}</td>
@@ -611,26 +664,40 @@
         });
     }
     
+    // Get today's date in YYYY-MM-DD format for default values
+    function getTodayDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
     // Validate and submit form
     async function onSubmitCase() {
         const caseType = caseTypeSelect.value;
-        const doNumber = doNumberInput.value.trim();
-        const drNumber = drNumberInput.value.trim();
-        const soc = socInput.value.trim();
+        const caseNumber = caseNumberInput.value.trim();
+        const doDate = doDateInput.value;
+        const drDate = drDateInput.value;
+        const socLocation = socLocationInput.value.trim();
         const accusedName = accusedNameInput.value.trim();
         const complainantName = complainantNameInput.value.trim();
         const caseNotes = caseNotesInput.value.trim();
         
-        if (!doNumber) {
-            setStatus(formStatus, "❌ Diary Number (DO) is required", true);
+        if (!caseNumber) {
+            setStatus(formStatus, "❌ FIR/CSR Number is required", true);
             return;
         }
-        if (!drNumber) {
-            setStatus(formStatus, "❌ Daily Report (DR) is required", true);
+        if (!doDate) {
+            setStatus(formStatus, "❌ Date of Occurence (DO) is required", true);
             return;
         }
-        if (!soc) {
-            setStatus(formStatus, "❌ Section of Crime (SOC) is required", true);
+        if (!drDate) {
+            setStatus(formStatus, "❌ Date of Report (DR) is required", true);
+            return;
+        }
+        if (!socLocation) {
+            setStatus(formStatus, "❌ Scene of Crime (SOC) is required", true);
             return;
         }
         if (!accusedName) {
@@ -644,9 +711,10 @@
         
         const newCaseRecord = {
             caseType: caseType,
-            doNumber: doNumber,
-            drNumber: drNumber,
-            soc: soc,
+            caseNumber: caseNumber,
+            doDate: doDate,
+            drDate: drDate,
+            socLocation: socLocation,
             accusedName: accusedName,
             complainantName: complainantName,
             caseNotes: caseNotes || ""
@@ -659,9 +727,10 @@
         await addCase(newCaseRecord);
         
         // Clear form
-        doNumberInput.value = "";
-        drNumberInput.value = "";
-        socInput.value = "";
+        caseNumberInput.value = "";
+        doDateInput.value = "";
+        drDateInput.value = "";
+        socLocationInput.value = "";
         accusedNameInput.value = "";
         complainantNameInput.value = "";
         caseNotesInput.value = "";
@@ -672,9 +741,10 @@
     
     function resetForm() {
         caseTypeSelect.value = "FIR";
-        doNumberInput.value = "";
-        drNumberInput.value = "";
-        socInput.value = "";
+        caseNumberInput.value = "";
+        doDateInput.value = "";
+        drDateInput.value = "";
+        socLocationInput.value = "";
         accusedNameInput.value = "";
         complainantNameInput.value = "";
         caseNotesInput.value = "";
@@ -683,6 +753,11 @@
     
     // ========== INITIALIZATION ==========
     async function init() {
+        // Set default dates to today for convenience
+        const today = getTodayDate();
+        doDateInput.value = today;
+        drDateInput.value = today;
+        
         await refreshData();
         
         submitBtn.addEventListener('click', onSubmitCase);
