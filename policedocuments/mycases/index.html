@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CaseFlow | FIR/CSR Case Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaseFlow | Case Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,6 +12,7 @@
         .header { text-align: center; margin-bottom: 2rem; }
         .header h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #1e4a6b, #0f3b5c); background-clip: text; -webkit-background-clip: text; color: transparent; }
         .badge { background: #e2f0fa; color: #1e4a6b; padding: 0.25rem 0.8rem; border-radius: 40px; font-size: 0.8rem; display: inline-block; margin-top: 0.6rem; }
+        .admin-badge { background: #fef9e3; color: #b45309; margin-left: 0.5rem; }
         .dashboard { display: flex; flex-wrap: wrap; gap: 2rem; }
         .form-panel, .data-panel { background: white; border-radius: 28px; box-shadow: 0 12px 30px rgba(0,0,0,0.06); padding: 1.8rem; }
         .form-panel { flex: 1.2; min-width: 360px; }
@@ -26,12 +27,13 @@
         input:focus, textarea:focus, select:focus { outline: none; border-color: #1e4a6b; box-shadow: 0 0 0 3px rgba(30,74,107,0.15); }
         button { background: #1e4a6b; border: none; padding: 0.85rem 1.2rem; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; width: 100%; margin-top: 0.5rem; transition: all 0.2s; }
         button:hover { background: #0f3b5c; transform: translateY(-1px); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
         .btn-secondary { background: #475569; margin-top: 0.7rem; }
+        .btn-edit { background: #0f3b5c; margin-top: 0; width: auto; padding: 0.3rem 0.8rem; font-size: 0.7rem; display: inline-block; margin-right: 0.3rem; }
         .status { margin-top: 1rem; padding: 0.7rem; border-radius: 40px; font-size: 0.8rem; text-align: center; background: #f1f5f9; }
         .status.success { background: #dff1e6; color: #166534; }
         .status.error { background: #fee2e2; color: #991b1b; }
         .status.warning { background: #fef9e3; color: #b45309; }
-        .status.info { background: #e0f2fe; color: #075985; }
         .table-wrapper { overflow-x: auto; margin-top: 1.2rem; border-radius: 20px; border: 1px solid #eef2f6; }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         th { background: #f8fafc; padding: 0.9rem 0.7rem; text-align: left; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
@@ -39,15 +41,20 @@
         .case-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 30px; font-weight: 600; font-size: 0.7rem; }
         .badge-fir { background: #fee2e2; color: #991b1b; }
         .badge-csr { background: #e0f2fe; color: #075985; }
-        .delete-btn { background: #fef2f2; border: none; color: #dc2626; font-weight: 600; font-size: 0.7rem; cursor: pointer; padding: 0.3rem 0.8rem; border-radius: 30px; width: auto; margin: 0; }
+        .action-buttons { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+        .delete-btn, .edit-btn { background: none; border: none; font-weight: 600; font-size: 0.7rem; cursor: pointer; padding: 0.3rem 0.8rem; border-radius: 30px; width: auto; margin: 0; }
+        .delete-btn { background: #fef2f2; color: #dc2626; }
+        .delete-btn:hover { background: #fee2e2; }
+        .edit-btn { background: #eef2ff; color: #1e4a6b; }
+        .edit-btn:hover { background: #e2e8f0; }
         .filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1.2rem; align-items: center; }
         .filter-bar input, .filter-bar select { width: auto; flex: 1; min-width: 150px; }
         .filter-bar button { width: auto; padding: 0.6rem 1.2rem; background: #eef2ff; color: #1e4a6b; margin-top: 0; }
         .stats { background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 40px; font-size: 0.75rem; margin-bottom: 1rem; display: inline-block; }
-        .connection-status { font-size: 0.7rem; margin-top: 0.5rem; padding: 4px 8px; border-radius: 20px; text-align: center; }
+        .connection-status { font-size: 0.7rem; margin-top: 0.5rem; padding: 4px 8px; border-radius: 20px; text-align: center; background: #eef2ff; }
+        .admin-panel { background: #fef9e3; border-radius: 16px; padding: 0.5rem; margin-bottom: 1rem; text-align: center; font-size: 0.75rem; }
         .inline-hint { font-size: 0.7rem; color: #5b6e8c; margin-top: 0.2rem; }
-        .debug-panel { background: #1e293b; color: #e2e8f0; padding: 0.8rem; border-radius: 16px; font-family: monospace; font-size: 0.7rem; margin-top: 1rem; max-height: 150px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
-        .test-btn { background: #0f3b5c; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.5rem; }
+        .cancel-edit { background: #64748b; margin-top: 0.5rem; }
         @media (max-width: 880px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
     </style>
 </head>
@@ -56,12 +63,13 @@
     <div class="header">
         <h1>⚖️ CaseFlow Manager</h1>
         <p>FIR / CSR • Number • Sections • DO • DR • SOC • Accused • Complainant</p>
-        <div class="badge">📋 Google Sheets Backend | Live Sync</div>
+        <div class="badge">📋 Google Sheets Backend | <span id="adminStatus">Checking...</span></div>
     </div>
 
     <div class="dashboard">
         <div class="form-panel">
-            <div class="section-title">📝 Register New Case</div>
+            <div class="section-title" id="formTitle">📝 Register New Case</div>
+            <div id="adminOnlyWarning" class="admin-panel" style="display: none;">🔒 Admin Mode: You can also edit/delete existing cases</div>
             <div class="form-grid">
                 <div class="input-group">
                     <label>📌 Case Type <span class="required">*</span></label>
@@ -105,11 +113,11 @@
                 </div>
             </div>
             <button id="submitBtn">➕ Register Case</button>
+            <button id="updateBtn" class="btn-secondary" style="display: none;">✏️ Update Case</button>
+            <button id="cancelEditBtn" class="cancel-edit" style="display: none;">Cancel Edit</button>
             <button id="resetFormBtn" class="btn-secondary">⟳ Clear Form</button>
-            <button id="testApiBtn" class="test-btn">🔍 Test API Connection</button>
             <div id="formStatus" class="status">Ready — fill all required fields</div>
             <div id="connectionStatus" class="connection-status">🔌 Connecting to Google Sheets...</div>
-            <div class="debug-panel" id="debugPanel">📡 Debug console will appear here...</div>
         </div>
 
         <div class="data-panel">
@@ -126,22 +134,21 @@
             <div id="statsInfo" class="stats">📊 Loading case records...</div>
             <div class="table-wrapper">
                 <table id="dataTable">
-                    <thead><tr><th>S.No.</th><th>Type</th><th>Number</th><th>Sections</th><th>DO</th><th>DR</th><th>SOC</th><th>Accused</th><th>Complainant</th><th>Notes</th><th>Action</th></tr></thead>
-                    <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;">Loading case data...</td></tr></tbody>
-                </table>
+                    <thead>运转<th>S.No.</th><th>Type</th><th>Number</th><th>Sections</th><th>DO</th><th>DR</th><th>SOC</th><th>Accused</th><th>Complainant</th><th>Notes</th><th>Actions</th></thead>
+                    <tbody id="tableBody">发展<td colspan="11" style="text-align:center;">Loading case data...发展</tbody>
+                 </>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // ===================== CONFIGURATION =====================
-    // PASTE YOUR CORRECT API URL HERE
-    const API_URL = "https://script.google.com/macros/s/AKfycbwjOyJO5lO6Itv362jLQeUOmEbXIog2J5jTorVfzzCVaCbjZh3TUWt0wRQVl3VYe_b0cA/exec";
-    // =========================================================
+    // REPLACE WITH YOUR DEPLOYED APPS SCRIPT URL
+    const API_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
     
     let cases = [];
-    let debugLogs = [];
+    let isAdmin = false;
+    let editingSerialNo = null;
     
     // DOM elements
     const caseTypeSelect = document.getElementById('caseType');
@@ -154,30 +161,19 @@
     const complainantNameInput = document.getElementById('complainantName');
     const caseNotesInput = document.getElementById('caseNotes');
     const submitBtn = document.getElementById('submitBtn');
+    const updateBtn = document.getElementById('updateBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
     const resetFormBtn = document.getElementById('resetFormBtn');
-    const testApiBtn = document.getElementById('testApiBtn');
     const formStatus = document.getElementById('formStatus');
     const connectionStatus = document.getElementById('connectionStatus');
-    const debugPanel = document.getElementById('debugPanel');
+    const adminStatusSpan = document.getElementById('adminStatus');
+    const adminOnlyWarning = document.getElementById('adminOnlyWarning');
+    const formTitle = document.getElementById('formTitle');
     const tableBody = document.getElementById('tableBody');
     const searchInput = document.getElementById('searchInput');
     const filterCaseType = document.getElementById('filterCaseType');
     const refreshBtn = document.getElementById('refreshBtn');
     const statsInfo = document.getElementById('statsInfo');
-    
-    function addDebug(message, type = 'info') {
-        const timestamp = new Date().toLocaleTimeString();
-        debugLogs.unshift(`[${timestamp}] ${message}`);
-        if (debugLogs.length > 20) debugLogs.pop();
-        debugPanel.innerHTML = debugLogs.map(log => {
-            let color = '#e2e8f0';
-            if (log.includes('✅')) color = '#86efac';
-            if (log.includes('❌')) color = '#fca5a5';
-            if (log.includes('⚠️')) color = '#fde047';
-            return `<span style="color: ${color}">${escapeHtml(log)}</span>`;
-        }).join('<br>');
-        console.log(message);
-    }
     
     function formatDate(dateString) {
         if (!dateString) return '—';
@@ -188,90 +184,62 @@
         } catch(e) { return dateString; }
     }
     
-    function setStatus(element, msg, isError = false, isWarning = false, isInfo = false) {
+    function setStatus(element, msg, isError = false, isWarning = false) {
         element.textContent = msg;
         element.className = 'status';
         if (isWarning) element.classList.add('warning');
         else if (isError) element.classList.add('error');
-        else if (isInfo) element.classList.add('info');
         else element.classList.add('success');
-    }
-    
-    function setConnectionStatus(message, isConnected = true, isWarning = false) {
-        connectionStatus.textContent = message;
-        if (isWarning) {
-            connectionStatus.style.background = '#fef9e3';
-            connectionStatus.style.color = '#b45309';
-        } else if (isConnected) {
-            connectionStatus.style.background = '#dff1e6';
-            connectionStatus.style.color = '#166534';
-        } else {
-            connectionStatus.style.background = '#fee2e2';
-            connectionStatus.style.color = '#991b1b';
-        }
-    }
-    
-    async function testApiConnection() {
-        addDebug("🔍 Testing API connection...");
-        addDebug(`📍 URL: ${API_URL}`);
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-            
-            const response = await fetch(API_URL, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            addDebug(`✅ Response status: ${response.status} ${response.statusText}`);
-            
-            const text = await response.text();
-            addDebug(`📦 Response length: ${text.length} characters`);
-            addDebug(`📄 First 200 chars: ${text.substring(0, 200)}`);
-            
-            try {
-                const json = JSON.parse(text);
-                addDebug(`✅ Valid JSON! Array length: ${Array.isArray(json) ? json.length : 'not array'}`);
-                if (Array.isArray(json) && json.length > 0) {
-                    addDebug(`📋 Sample record: ${JSON.stringify(json[0]).substring(0, 150)}`);
-                }
-                setConnectionStatus(`✅ API Connected | ${Array.isArray(json) ? json.length : 0} records`, true);
-                return json;
-            } catch (e) {
-                addDebug(`⚠️ Response is not valid JSON: ${e.message}`);
-                setConnectionStatus("⚠️ API returned non-JSON response", false, true);
-                return null;
+        setTimeout(() => {
+            if (element === formStatus && element.textContent === msg) {
+                element.className = 'status';
+                element.textContent = 'Ready — fill all required fields';
             }
-        } catch (error) {
-            addDebug(`❌ Connection failed: ${error.message}`);
-            if (error.name === 'AbortError') addDebug("⏰ Request timed out after 10 seconds");
-            setConnectionStatus(`❌ Connection failed: ${error.message}`, false);
-            return null;
+        }, 3000);
+    }
+    
+    function setConnectionStatus(message, isConnected = true) {
+        connectionStatus.textContent = message;
+        connectionStatus.style.background = isConnected ? '#dff1e6' : '#fee2e2';
+        connectionStatus.style.color = isConnected ? '#166534' : '#991b1b';
+    }
+    
+    async function checkAdminStatus() {
+        try {
+            const response = await fetch(`${API_URL}?checkAdmin=true`);
+            const data = await response.json();
+            isAdmin = data.isAdmin || false;
+            if (isAdmin) {
+                adminStatusSpan.innerHTML = '👑 Admin Mode - Full Access (Edit/Delete)';
+                adminStatusSpan.style.background = '#fef9e3';
+                adminStatusSpan.style.color = '#b45309';
+                adminOnlyWarning.style.display = 'block';
+                adminOnlyWarning.innerHTML = '👑 Admin Mode: You can edit or delete any case';
+            } else {
+                adminStatusSpan.innerHTML = '📝 Anyone Can Add Cases';
+                adminStatusSpan.style.background = '#dff1e6';
+                adminStatusSpan.style.color = '#166534';
+                adminOnlyWarning.style.display = 'none';
+            }
+        } catch(e) {
+            adminStatusSpan.innerHTML = '⚠️ Could not verify admin status';
         }
     }
     
     async function fetchAllCases() {
-        addDebug("🔄 Fetching cases from API...");
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-            const response = await fetch(API_URL, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            addDebug(`✅ Response: ${response.status}`);
+            const response = await fetch(API_URL);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
             const data = await response.json();
-            addDebug(`✅ Received ${Array.isArray(data) ? data.length : 'invalid'} records`);
             cases = Array.isArray(data) ? data : [];
             return true;
         } catch (error) {
-            addDebug(`❌ Fetch error: ${error.message}`);
-            setConnectionStatus(`⚠️ Connection issue - ${error.message}`, false, true);
+            setConnectionStatus(`❌ Connection failed: ${error.message}`, false);
             return false;
         }
     }
     
     async function addCaseToSheet(caseData) {
-        addDebug(`📤 Sending POST: ${caseData.number} - ${caseData.soc.substring(0, 30)}...`);
         try {
             await fetch(API_URL, {
                 method: 'POST',
@@ -279,10 +247,22 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(caseData)
             });
-            addDebug("✅ POST request sent (no-cors mode - assuming success)");
             return true;
         } catch (error) {
-            addDebug(`❌ POST error: ${error.message}`);
+            return false;
+        }
+    }
+    
+    async function updateCaseInSheet(serialNo, caseData) {
+        try {
+            await fetch(`${API_URL}?id=${serialNo}`, {
+                method: 'PUT',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(caseData)
+            });
+            return true;
+        } catch (error) {
             return false;
         }
     }
@@ -290,10 +270,8 @@
     async function deleteCaseFromSheet(serialNo) {
         try {
             await fetch(`${API_URL}?id=${serialNo}`, { method: 'DELETE', mode: 'no-cors' });
-            addDebug(`🗑️ DELETE request sent for S.No. ${serialNo}`);
             return true;
         } catch (error) {
-            addDebug(`❌ DELETE error: ${error.message}`);
             return false;
         }
     }
@@ -303,8 +281,6 @@
         const success = await fetchAllCases();
         if (success) {
             setConnectionStatus(`✅ Connected | ${cases.length} records loaded`, true);
-        } else {
-            setConnectionStatus("⚠️ Connection issue - using cached data", false, true);
         }
         renderTableAndStats();
     }
@@ -314,23 +290,92 @@
         if (success) {
             setStatus(formStatus, "✅ Case registered successfully!", false);
             await refreshData();
+            clearForm();
             return true;
         } else {
-            setStatus(formStatus, "❌ Failed to save case. Check connection.", true);
+            setStatus(formStatus, "❌ Failed to save case.", true);
+            return false;
+        }
+    }
+    
+    async function updateCase(serialNo, caseData) {
+        if (!isAdmin) {
+            setStatus(formStatus, "⚠️ Only admin can edit cases", true);
+            return false;
+        }
+        const success = await updateCaseInSheet(serialNo, caseData);
+        if (success) {
+            setStatus(formStatus, "✅ Case updated successfully!", false);
+            await refreshData();
+            cancelEdit();
+            return true;
+        } else {
+            setStatus(formStatus, "❌ Failed to update case.", true);
             return false;
         }
     }
     
     async function deleteCase(serialNo) {
+        if (!isAdmin) {
+            setStatus(formStatus, "⚠️ Only admin can delete cases", true);
+            return;
+        }
+        if (!confirm('⚠️ Delete this case permanently? This action cannot be undone.')) return;
         const success = await deleteCaseFromSheet(serialNo);
         if (success) {
             setStatus(formStatus, "🗑️ Case deleted", false);
             await refreshData();
-            return true;
         } else {
             setStatus(formStatus, "❌ Delete failed", true);
-            return false;
         }
+    }
+    
+    function editCase(serialNo) {
+        if (!isAdmin) {
+            setStatus(formStatus, "⚠️ Only admin can edit cases", true);
+            return;
+        }
+        const caseToEdit = cases.find(c => c.serialNo === serialNo);
+        if (!caseToEdit) return;
+        
+        editingSerialNo = serialNo;
+        caseTypeSelect.value = caseToEdit.caseType;
+        caseNumberInput.value = caseToEdit.number;
+        sectionsInput.value = caseToEdit.sections;
+        doDateInput.value = caseToEdit.doDate;
+        drDateInput.value = caseToEdit.drDate;
+        socLocationInput.value = caseToEdit.soc;
+        accusedNameInput.value = caseToEdit.accusedName;
+        complainantNameInput.value = caseToEdit.complainantName;
+        caseNotesInput.value = caseToEdit.notes;
+        
+        submitBtn.style.display = 'none';
+        updateBtn.style.display = 'block';
+        cancelEditBtn.style.display = 'block';
+        formTitle.textContent = '✏️ Edit Case (S.No. ' + serialNo + ')';
+        setStatus(formStatus, "Editing case " + serialNo, false);
+    }
+    
+    function cancelEdit() {
+        editingSerialNo = null;
+        clearForm();
+        submitBtn.style.display = 'block';
+        updateBtn.style.display = 'none';
+        cancelEditBtn.style.display = 'none';
+        formTitle.textContent = '📝 Register New Case';
+        setStatus(formStatus, "Edit cancelled", false);
+    }
+    
+    function clearForm() {
+        caseTypeSelect.value = "FIR";
+        caseNumberInput.value = "";
+        sectionsInput.value = "";
+        doDateInput.value = getTodayDate();
+        drDateInput.value = getTodayDate();
+        socLocationInput.value = "";
+        accusedNameInput.value = "";
+        complainantNameInput.value = "";
+        caseNotesInput.value = "";
     }
     
     function renderTableAndStats() {
@@ -352,7 +397,7 @@
         statsInfo.textContent = `📋 Total: ${cases.length} cases | Showing: ${filtered.length}`;
         
         if (filtered.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;">📭 No case records found. Register a new case above.</td></tr>';
+            tableBody.innerHTML = '<td><td colspan="11" style="text-align:center;">📭 No case records found. Register a new case above.发展</tr>';
             return;
         }
         
@@ -362,26 +407,41 @@
                 '<span class="case-badge badge-fir">FIR</span>' : 
                 '<span class="case-badge badge-csr">CSR</span>';
             
-            html += `<tr>
-                <td>${c.serialNo || '—'}</td>
-                <td>${caseTypeDisplay}</td>
-                <td><strong>${escapeHtml(c.number || '—')}</strong></td>
-                <td><code>${escapeHtml(c.sections || '—')}</code></td>
-                <td>${formatDate(c.doDate)}</td>
-                <td>${formatDate(c.drDate)}</td>
-                <td>${escapeHtml(c.soc || '—')}</td>
-                <td>${escapeHtml(c.accusedName || '—')}</td>
-                <td>${escapeHtml(c.complainantName || '—')}</td>
+            html += `——
+                 <td>${c.serialNo || '—'}</td>
+                 <td>${caseTypeDisplay}</td>
+                 <td><strong>${escapeHtml(c.number || '—')}</strong></td>
+                 <td><code>${escapeHtml(c.sections || '—')}</code></td>
+                 <td>${formatDate(c.doDate)}</td>
+                 <td>${formatDate(c.drDate)}</td>
+                 <td>${escapeHtml(c.soc || '—')}</td>
+                 <td>${escapeHtml(c.accusedName || '—')}</td>
+                 <td>${escapeHtml(c.complainantName || '—')}</td>
                 <td style="max-width:150px;">${escapeHtml(c.notes ? c.notes.substring(0, 50) : '—')}${c.notes && c.notes.length > 50 ? '…' : ''}</td>
-                <td><button class="delete-btn" data-id="${c.serialNo}">Delete</button></td>
+                <td class="action-buttons">`;
+            
+            if (isAdmin) {
+                html += `<button class="edit-btn" data-id="${c.serialNo}">✏️ Edit</button>
+                         <button class="delete-btn" data-id="${c.serialNo}">🗑️ Delete</button>`;
+            } else {
+                html += `<span style="color:#94a3b8; font-size:0.7rem;">View Only</span>`;
+            }
+            html += `</td>
             </tr>`;
         });
         tableBody.innerHTML = html;
         
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                editCase(id);
+            });
+        });
+        
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = parseInt(btn.getAttribute('data-id'));
-                if (confirm('⚠️ Delete this case permanently?')) await deleteCase(id);
+                await deleteCase(id);
             });
         });
     }
@@ -400,54 +460,57 @@
         return new Date().toISOString().split('T')[0];
     }
     
+    function getFormData() {
+        return {
+            caseType: caseTypeSelect.value,
+            number: caseNumberInput.value.trim(),
+            sections: sectionsInput.value.trim(),
+            doDate: doDateInput.value,
+            drDate: drDateInput.value,
+            soc: socLocationInput.value.trim(),
+            accusedName: accusedNameInput.value.trim(),
+            complainantName: complainantNameInput.value.trim(),
+            notes: caseNotesInput.value.trim()
+        };
+    }
+    
+    function validateForm(data) {
+        if (!data.number) { setStatus(formStatus, "❌ Number is required", true); return false; }
+        if (!data.sections) { setStatus(formStatus, "❌ Sections is required", true); return false; }
+        if (!data.doDate) { setStatus(formStatus, "❌ DO is required", true); return false; }
+        if (!data.drDate) { setStatus(formStatus, "❌ DR is required", true); return false; }
+        if (!data.soc) { setStatus(formStatus, "❌ SOC is required", true); return false; }
+        if (!data.accusedName) { setStatus(formStatus, "❌ Accused Name is required", true); return false; }
+        if (!data.complainantName) { setStatus(formStatus, "❌ Complainant Name is required", true); return false; }
+        return true;
+    }
+    
     async function onSubmitCase() {
-        const caseType = caseTypeSelect.value;
-        const number = caseNumberInput.value.trim();
-        const sections = sectionsInput.value.trim();
-        const doDate = doDateInput.value;
-        const drDate = drDateInput.value;
-        const soc = socLocationInput.value.trim();
-        const accusedName = accusedNameInput.value.trim();
-        const complainantName = complainantNameInput.value.trim();
-        const notes = caseNotesInput.value.trim();
-        
-        if (!number) { setStatus(formStatus, "❌ Number is required", true); return; }
-        if (!sections) { setStatus(formStatus, "❌ Sections is required", true); return; }
-        if (!doDate) { setStatus(formStatus, "❌ DO is required", true); return; }
-        if (!drDate) { setStatus(formStatus, "❌ DR is required", true); return; }
-        if (!soc) { setStatus(formStatus, "❌ SOC is required", true); return; }
-        if (!accusedName) { setStatus(formStatus, "❌ Accused Name is required", true); return; }
-        if (!complainantName) { setStatus(formStatus, "❌ Complainant Name is required", true); return; }
-        
-        const newCase = { caseType, number, sections, doDate, drDate, soc, accusedName, complainantName, notes };
+        const data = getFormData();
+        if (!validateForm(data)) return;
         
         submitBtn.disabled = true;
         submitBtn.innerText = "Registering...";
-        await addCase(newCase);
-        
-        caseNumberInput.value = "";
-        sectionsInput.value = "";
-        socLocationInput.value = "";
-        accusedNameInput.value = "";
-        complainantNameInput.value = "";
-        caseNotesInput.value = "";
-        doDateInput.value = getTodayDate();
-        drDateInput.value = getTodayDate();
-        
+        await addCase(data);
         submitBtn.disabled = false;
         submitBtn.innerText = "➕ Register Case";
     }
     
+    async function onUpdateCase() {
+        if (!isAdmin || !editingSerialNo) return;
+        const data = getFormData();
+        if (!validateForm(data)) return;
+        
+        updateBtn.disabled = true;
+        updateBtn.innerText = "Updating...";
+        await updateCase(editingSerialNo, data);
+        updateBtn.disabled = false;
+        updateBtn.innerText = "✏️ Update Case";
+    }
+    
     function resetForm() {
-        caseTypeSelect.value = "FIR";
-        caseNumberInput.value = "";
-        sectionsInput.value = "";
-        doDateInput.value = getTodayDate();
-        drDateInput.value = getTodayDate();
-        socLocationInput.value = "";
-        accusedNameInput.value = "";
-        complainantNameInput.value = "";
-        caseNotesInput.value = "";
+        if (editingSerialNo) cancelEdit();
+        clearForm();
         setStatus(formStatus, "Form cleared", false);
     }
     
@@ -455,14 +518,13 @@
         doDateInput.value = getTodayDate();
         drDateInput.value = getTodayDate();
         
-        addDebug(`🚀 Application started`);
-        addDebug(`📍 API URL: ${API_URL}`);
-        
+        await checkAdminStatus();
         await refreshData();
         
         submitBtn.addEventListener('click', onSubmitCase);
+        updateBtn.addEventListener('click', onUpdateCase);
+        cancelEditBtn.addEventListener('click', cancelEdit);
         resetFormBtn.addEventListener('click', resetForm);
-        testApiBtn.addEventListener('click', testApiConnection);
         refreshBtn.addEventListener('click', async () => { await refreshData(); setStatus(formStatus, "🔄 Refreshed", false); });
         searchInput.addEventListener('input', () => renderTableAndStats());
         filterCaseType.addEventListener('change', () => renderTableAndStats());
