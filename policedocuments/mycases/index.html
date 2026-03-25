@@ -2,128 +2,598 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CaseFlow | Multi-Accused Case Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CaseFlow Pro | Total Accused Counter + Cascading Court Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f1f5f9; font-family: 'Inter', sans-serif; padding: 2rem 1.5rem; color: #0f172a; }
-        .container { max-width: 1600px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 2rem; }
-        .header h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #1e4a6b, #0f3b5c); background-clip: text; -webkit-background-clip: text; color: transparent; }
-        .badge { background: #e2f0fa; color: #1e4a6b; padding: 0.25rem 0.8rem; border-radius: 40px; font-size: 0.8rem; display: inline-block; margin-top: 0.6rem; }
-        .dashboard { display: flex; flex-wrap: wrap; gap: 2rem; }
-        .form-panel { flex: 1.2; min-width: 550px; background: white; border-radius: 28px; box-shadow: 0 12px 30px rgba(0,0,0,0.06); padding: 1.8rem; max-height: 85vh; overflow-y: auto; }
-        .data-panel { flex: 2.5; min-width: 750px; background: white; border-radius: 28px; box-shadow: 0 12px 30px rgba(0,0,0,0.06); padding: 1.8rem; overflow-x: auto; }
-        .section-title { font-weight: 700; font-size: 1.3rem; margin-bottom: 1.5rem; border-left: 5px solid #1e4a6b; padding-left: 0.9rem; position: sticky; top: 0; background: white; z-index: 10; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .input-group { margin-bottom: 0.8rem; }
-        .full-width { grid-column: span 2; }
-        label { display: block; font-weight: 600; margin-bottom: 0.3rem; font-size: 0.75rem; color: #1e293b; }
-        .required { color: #dc2626; }
-        input, textarea, select { width: 100%; padding: 0.6rem 0.8rem; border: 1.5px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size: 0.85rem; background: #fefefe; }
-        input:focus, textarea:focus, select:focus { outline: none; border-color: #1e4a6b; box-shadow: 0 0 0 3px rgba(30,74,107,0.15); }
-        textarea { resize: vertical; min-height: 60px; }
-        button { background: #1e4a6b; border: none; padding: 0.75rem 1rem; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; width: 100%; margin-top: 0.5rem; transition: all 0.2s; }
-        button:hover { background: #0f3b5c; transform: translateY(-1px); }
-        .btn-secondary { background: #475569; margin-top: 0.5rem; }
-        .status { margin-top: 1rem; padding: 0.6rem; border-radius: 40px; font-size: 0.75rem; text-align: center; background: #f1f5f9; }
-        .status.success { background: #dff1e6; color: #166534; }
-        .status.error { background: #fee2e2; color: #991b1b; }
-        .table-wrapper { overflow-x: auto; margin-top: 1rem; max-height: 70vh; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-        th { background: #f8fafc; padding: 0.7rem 0.5rem; text-align: left; font-weight: 700; font-size: 0.65rem; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; background: #f8fafc; z-index: 5; }
-        td { padding: 0.6rem 0.5rem; border-bottom: 1px solid #f0f2f5; vertical-align: top; }
-        .case-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 30px; font-weight: 600; font-size: 0.65rem; }
-        .badge-fir { background: #fee2e2; color: #991b1b; }
-        .badge-csr { background: #e0f2fe; color: #075985; }
-        .action-buttons { display: flex; gap: 0.3rem; flex-wrap: wrap; }
-        .edit-btn, .delete-btn { background: none; border: none; font-weight: 600; font-size: 0.65rem; cursor: pointer; padding: 0.2rem 0.6rem; border-radius: 30px; width: auto; margin: 0; }
-        .edit-btn { background: #eef2ff; color: #1e4a6b; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f4f9;
+            font-family: 'Inter', sans-serif;
+            padding: 2rem 1.5rem;
+            color: #0a1c2f;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1a4d6f, #0f3b5c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .badge {
+            background: #e2f0fa;
+            color: #1a4d6f;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .form-panel {
+            flex: 1.2;
+            min-width: 650px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            padding: 1.8rem;
+            max-height: 88vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .data-panel {
+            flex: 2.5;
+            min-width: 780px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            padding: 1.8rem;
+            overflow-x: auto;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 1.4rem;
+            border-left: 5px solid #1a4d6f;
+            padding-left: 1rem;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 0.7rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-size: 0.72rem;
+            color: #1e3a5f;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.6rem 0.9rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            background: #ffffff;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #1a4d6f;
+            box-shadow: 0 0 0 3px rgba(26, 77, 111, 0.12);
+        }
+
+        button {
+            background: #1a4d6f;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 0.6rem;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+
+        button:hover {
+            background: #0f3a56;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #4b5563;
+        }
+
+        .cancel-edit {
+            background: #6c757d;
+        }
+
+        .status {
+            margin-top: 1rem;
+            padding: 0.6rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            text-align: center;
+            background: #f1f5f9;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #dff1e6;
+            color: #166534;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Total Accused Counter */
+        .total-accused-counter {
+            background: linear-gradient(135deg, #eef2ff, #e6f0fa);
+            border-radius: 20px;
+            padding: 0.6rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .counter-label {
+            font-weight: 700;
+            color: #1a4d6f;
+            font-size: 0.85rem;
+        }
+
+        .counter-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #0f3b5c;
+            background: white;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Cascading Toggle Styles */
+        .cascade-card {
+            background: #f8fafc;
+            border-radius: 18px;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e2edf7;
+            margin-bottom: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+
+        .checkbox-label input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin: 0;
+            accent-color: #1a4d6f;
+        }
+
+        .checkbox-label span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .cascade-fields {
+            margin-top: 0.8rem;
+            padding-left: 1.2rem;
+            border-left: 3px solid #cbdde9;
+            display: none;
+        }
+
+        .cascade-fields.show {
+            display: block;
+        }
+
+        .cascade-fields .input-group {
+            margin-bottom: 0.8rem;
+        }
+
+        /* Accused Cards */
+        .accused-section {
+            margin-top: 0.5rem;
+        }
+
+        .accused-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 0.8rem;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 0.3rem;
+        }
+
+        .accused-card {
+            background: #fefefe;
+            border: 1.5px solid #e2edf7;
+            border-radius: 20px;
+            padding: 0.9rem 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .accused-card:hover {
+            border-color: #cbdde9;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px dashed #e9edf2;
+        }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 0.8rem;
+            background: #eef3fc;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            color: #1a4d6f;
+        }
+
+        .remove-accused-card {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 0.25rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+        }
+
+        .vertical-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.6rem;
+        }
+
+        .acc-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .acc-field label {
+            font-size: 0.55rem;
+            margin-bottom: 0.2rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #4a627a;
+        }
+
+        .acc-field input, .acc-field select {
+            padding: 0.45rem 0.6rem;
+            font-size: 0.75rem;
+            border-radius: 10px;
+        }
+
+        .add-accused-btn {
+            background: #2c5f8a;
+            padding: 0.6rem;
+            margin-top: 0.6rem;
+        }
+
+        .inline-hint {
+            font-size: 0.6rem;
+            color: #5f7d9c;
+            margin-top: 0.3rem;
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 1rem;
+            max-height: 68vh;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+
+        th {
+            background: #f1f6fd;
+            padding: 0.7rem 0.5rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid #dce5ef;
+            position: sticky;
+            top: 0;
+            z-index: 8;
+        }
+
+        td {
+            padding: 0.6rem 0.5rem;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: top;
+        }
+
+        .case-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.6rem;
+        }
+
+        .badge-fir { background: #fee2e2; color: #b91c1c; }
+        .badge-csr { background: #e0f2fe; color: #0c4a6e; }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .edit-btn, .delete-btn {
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 0.65rem;
+            cursor: pointer;
+            padding: 0.25rem 0.7rem;
+            border-radius: 40px;
+            width: auto;
+            margin: 0;
+        }
+
+        .edit-btn { background: #eef2ff; color: #1a4d6f; }
         .delete-btn { background: #fef2f2; color: #dc2626; }
-        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
-        .filter-bar input, .filter-bar select { width: auto; flex: 1; min-width: 120px; padding: 0.5rem; }
-        .filter-bar button { width: auto; padding: 0.5rem 1rem; background: #eef2ff; color: #1e4a6b; margin-top: 0; }
-        .stats { background: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: 40px; font-size: 0.7rem; margin-bottom: 1rem; display: inline-block; }
-        .connection-status { font-size: 0.65rem; margin-top: 0.5rem; padding: 4px 8px; border-radius: 20px; text-align: center; background: #eef2ff; }
-        .admin-panel { background: #fef9e3; border-radius: 12px; padding: 0.4rem; margin-bottom: 1rem; text-align: center; font-size: 0.7rem; }
-        .inline-hint { font-size: 0.6rem; color: #5b6e8c; margin-top: 0.2rem; }
-        .cancel-edit { background: #64748b; margin-top: 0.5rem; }
-        .accused-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        .accused-table th, .accused-table td { border: 1px solid #e2e8f0; padding: 0.4rem; font-size: 0.75rem; }
-        .accused-table th { background: #f8fafc; }
-        .remove-accused-btn { background: #dc2626; padding: 0.2rem 0.5rem; width: auto; margin: 0; font-size: 0.7rem; }
-        .add-accused-btn { background: #475569; padding: 0.4rem 0.8rem; width: auto; margin-top: 0.5rem; font-size: 0.75rem; }
-        @media (max-width: 1000px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .filter-bar input, .filter-bar select {
+            width: auto;
+            flex: 1;
+            min-width: 130px;
+            padding: 0.45rem 0.9rem;
+        }
+
+        .filter-bar button {
+            width: auto;
+            padding: 0.45rem 1rem;
+            background: #eef2ff;
+            color: #1a4d6f;
+            margin-top: 0;
+        }
+
+        .stats {
+            background: #eef3fc;
+            padding: 0.4rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .connection-status {
+            font-size: 0.65rem;
+            margin-top: 0.5rem;
+            padding: 4px 8px;
+            border-radius: 30px;
+            text-align: center;
+            background: #eef2ff;
+        }
+
+        .admin-panel {
+            background: #fef7e0;
+            border-radius: 40px;
+            padding: 0.3rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.7rem;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>⚖️ CaseFlow Manager</h1>
-        <p>Multi-Accused Support | FIR/CSR | Court Proceedings | Disposal Tracking</p>
-        <div class="badge">📋 Single Sheet | Multi-Accused Rows | <span id="adminStatus">Checking...</span></div>
+        <h1>⚖️ CaseFlow Pro — Cascading Court Workflow</h1>
+        <p>Total Accused Counter | Charge Sheet → Opinion → e-Filing → Court Number → Court Stage (Cascading)</p>
+        <div class="badge">📊 Sequential court proceedings | <span id="adminStatus">Checking...</span></div>
     </div>
 
     <div class="dashboard">
         <div class="form-panel">
             <div class="section-title" id="formTitle">📝 Register New Case</div>
-            <div id="adminOnlyWarning" class="admin-panel" style="display: none;">👑 Admin Mode: You can edit/delete any case</div>
+            <div id="adminOnlyWarning" class="admin-panel" style="display: none;">🔐 Admin Mode: Full edit/delete</div>
+
             <div class="form-grid">
-                <div class="input-group"><label>📌 Case Type <span class="required">*</span></label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
-                <div class="input-group"><label>🏷️ Head</label><input type="text" id="head" placeholder="e.g., Murder, Theft"></div>
-                <div class="input-group"><label>🔢 Number <span class="required">*</span></label><input type="text" id="caseNumber" placeholder="e.g., FIR 123/2024"></div>
-                <div class="input-group"><label>⚖️ Sections <span class="required">*</span></label><input type="text" id="sections" placeholder="e.g., 302, 307 IPC"></div>
-                <div class="input-group"><label>📅 DO (Date of Occurence)</label><input type="date" id="doDate"></div>
-                <div class="input-group"><label>📅 DR (Date of Report)</label><input type="date" id="drDate"></div>
-                <div class="input-group full-width"><label>📍 SOC (Scene of Crime)</label><input type="text" id="socLocation" placeholder="Location where crime occurred"></div>
+                <div class="input-group"><label>⚖️ Case Type <span class="required">*</span></label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
+                <div class="input-group"><label>🏷️ Head / Offence</label><input type="text" id="head" placeholder="e.g., Murder, Theft"></div>
+                <div class="input-group"><label>🔢 Case Number <span class="required">*</span></label><input type="text" id="caseNumber" placeholder="FIR 123/2024"></div>
+                <div class="input-group"><label>📜 Sections <span class="required">*</span></label><input type="text" id="sections" placeholder="302, 307 IPC"></div>
+                <div class="input-group"><label>📅 Date of Occurrence</label><input type="date" id="doDate"></div>
+                <div class="input-group"><label>📅 Date of Report</label><input type="date" id="drDate"></div>
+                <div class="input-group full-width"><label>📍 Scene of Crime (SOC)</label><input type="text" id="socLocation" placeholder="Location details"></div>
+            </div>
+
+            <!-- Accused Section with Total Counter -->
+            <div class="accused-section full-width">
+                <div class="total-accused-counter">
+                    <span class="counter-label">👥 TOTAL ACCUSED PERSONS</span>
+                    <span class="counter-value" id="totalAccusedCount">0</span>
+                </div>
+                <label>Accused Details <span class="required">*</span> — Each accused in vertical card</label>
+                <div id="accusedCardsContainer" class="accused-cards-container"></div>
+                <button type="button" id="addAccusedBtn" class="add-accused-btn">➕ Add Another Accused</button>
+                <div class="inline-hint">💡 Tick "Arrested" to show Date of Arrest & Bail Status fields</div>
+            </div>
+
+            <!-- Additional Details -->
+            <div class="form-grid" style="margin-top: 0.5rem;">
+                <div class="input-group full-width"><label>👤 Complainant Details</label><textarea id="complainantDetails" rows="2" placeholder="Name, address, contact"></textarea></div>
+                <div class="input-group full-width"><label>📄 Complaint Gist</label><textarea id="complaintGist" rows="2" placeholder="Brief summary"></textarea></div>
+                <div class="input-group full-width"><label>💰 Property Seized</label><textarea id="propertySeized" rows="2" placeholder="Seized property details"></textarea></div>
                 
-                <!-- Accused Table - Dynamic -->
-                <div class="input-group full-width">
-                    <label>👥 Accused Persons <span class="required">*</span> (Each accused will create a separate row)</label>
-                    <div id="accusedContainer">
-                        <table class="accused-table" id="accusedTable">
-                            <thead>
-                                <tr><th>Accused Name *</th><th>Father's Name</th><th>Age</th><th>Address</th><th>Date of Arrest</th><th>Bail Status</th><th style="width:50px"></th></tr>
-                            </thead>
-                            <tbody id="accusedRows"></tbody>
-                        </table>
+                <!-- CASCADING COURT PROCEEDINGS SECTION -->
+                <div class="full-width"><label>⚖️ COURT PROCEEDINGS (Cascading Workflow)</label></div>
+                
+                <!-- Level 1: Charge Sheet Filed -->
+                <div class="input-group cascade-card full-width">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="chargeSheetToggle">
+                        <span>📅 1. Charge Sheet Filed</span>
+                    </label>
+                    <div id="chargeSheetContainer" class="cascade-fields">
+                        <div class="input-group"><input type="date" id="chargedDate" placeholder="Charge sheet date"></div>
+                        
+                        <!-- Level 2: Opinion Received (appears only if Charge Sheet is ticked) -->
+                        <div class="cascade-card" style="margin-top: 0.5rem; background: #fefce8;">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="opinionToggle">
+                                <span>📝 2. Opinion Received</span>
+                            </label>
+                            <div id="opinionContainer" class="cascade-fields">
+                                <div class="input-group"><input type="date" id="opinionDate" placeholder="Opinion date"></div>
+                                
+                                <!-- Level 3: e-Filing Completed (appears only if Opinion is ticked) -->
+                                <div class="cascade-card" style="margin-top: 0.5rem; background: #fef9e6;">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="eFilingToggle">
+                                        <span>💻 3. e-Filing Completed</span>
+                                    </label>
+                                    <div id="eFilingContainer" class="cascade-fields">
+                                        <div class="input-group"><input type="date" id="eFilledDate" placeholder="e-Filing date"></div>
+                                        
+                                        <!-- Level 4: Court Number Assigned (appears only if e-Filing is ticked) -->
+                                        <div class="cascade-card" style="margin-top: 0.5rem; background: #fef5e0;">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="courtCaseToggle">
+                                                <span>⚖️ 4. CC / SC / PRC Number Assigned</span>
+                                            </label>
+                                            <div id="courtCaseContainer" class="cascade-fields">
+                                                <div class="input-group"><input type="text" id="courtCaseNumber" placeholder="e.g., CC 45/2024"></div>
+                                                
+                                                <!-- Level 5: Court Stage (appears only if Court Number is ticked) -->
+                                                <div class="cascade-card" style="margin-top: 0.5rem; background: #fef2d6;">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" id="courtStageToggle">
+                                                        <span>🏛️ 5. Current Court Stage</span>
+                                                    </label>
+                                                    <div id="courtStageContainer" class="cascade-fields">
+                                                        <input type="text" id="courtStage" placeholder="Investigation / Trial / Arguments / Judgment">
+                                                        <div class="inline-hint">e.g., Pre-trial, Framing of charges, Prosecution evidence</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button type="button" id="addAccusedBtn" class="add-accused-btn">➕ Add Another Accused</button>
-                    <div class="inline-hint">One row will be created per accused in the database</div>
                 </div>
                 
-                <div class="input-group full-width"><label>👥 Complainant Details</label><textarea id="complainantDetails" rows="2" placeholder="Name, address, contact details"></textarea></div>
-                <div class="input-group full-width"><label>💰 Property Seized</label><textarea id="propertySeized" rows="2" placeholder="Details of seized property"></textarea></div>
-                <div class="input-group full-width"><label>📝 Complaint Gist</label><textarea id="complaintGist" rows="2" placeholder="Brief summary of complaint"></textarea></div>
-                <div class="input-group"><label>📅 Charged Date</label><input type="date" id="chargedDate"></div>
-                <div class="input-group"><label>📅 Opinion Date</label><input type="date" id="opinionDate"></div>
-                <div class="input-group"><label>📅 E-filled Date</label><input type="date" id="eFilledDate"></div>
-                <div class="input-group"><label>⚖️ CC/SC/PRC Number</label><input type="text" id="courtCaseNumber" placeholder="Court case reference"></div>
-                <div class="input-group"><label>🏛️ Court Stage</label><input type="text" id="courtStage" placeholder="e.g., Investigation, Trial"></div>
-                <div class="input-group"><label>📋 Disposal</label><input type="text" id="disposal" placeholder="e.g., Convicted, Pending"></div>
-                <div class="input-group full-width"><label>📝 Remarks</label><textarea id="remarks" rows="2" placeholder="Additional notes"></textarea></div>
+                <div class="input-group"><label>📋 Disposal Status</label><input type="text" id="disposal" placeholder="Pending / Convicted / Acquitted"></div>
+                <div class="input-group full-width"><label>✏️ Remarks</label><textarea id="remarks" rows="2" placeholder="Additional notes"></textarea></div>
             </div>
-            <button id="submitBtn">➕ Register Case</button>
+
+            <button id="submitBtn">✅ Register Case & Accused(s)</button>
             <button id="updateBtn" class="btn-secondary" style="display: none;">✏️ Update Case</button>
             <button id="cancelEditBtn" class="cancel-edit" style="display: none;">Cancel Edit</button>
             <button id="resetFormBtn" class="btn-secondary">⟳ Clear Form</button>
-            <div id="formStatus" class="status">Ready — fill all required fields</div>
-            <div id="connectionStatus" class="connection-status">🔌 Connecting to Google Sheets...</div>
+            <div id="formStatus" class="status">⚡ Ready — Add accused details</div>
+            <div id="connectionStatus" class="connection-status">🌐 Connecting...</div>
         </div>
 
         <div class="data-panel">
-            <div class="section-title">📋 Case Records</div>
+            <div class="section-title">📋 Case Registry</div>
             <div class="filter-bar">
-                <input type="text" id="searchInput" placeholder="🔍 Search by Number, Accused, Complainant...">
-                <select id="filterCaseType"><option value="all">All Cases</option><option value="FIR">FIR Only</option><option value="CSR">CSR Only</option></select>
-                <button id="refreshBtn">🔄 Refresh</button>
+                <input type="text" id="searchInput" placeholder="🔍 Search by Case# / Accused...">
+                <select id="filterCaseType"><option value="all">All Cases</option><option value="FIR">FIR</option><option value="CSR">CSR</option></select>
+                <button id="refreshBtn">🔄 Sync</button>
             </div>
-            <div id="statsInfo" class="stats">📊 Loading case records...</div>
+            <div id="statsInfo" class="stats">📊 Loading...</div>
             <div class="table-wrapper">
                 <table id="dataTable">
-                    <thead><tr><th>S.No.</th><th>Type</th><th>Number</th><th>Sections</th><th>Accused Name</th><th>Father's Name</th><th>Age</th><th>Bail Status</th><th>Court Stage</th><th>Disposal</th><th>Actions</th></tr></thead>
-                    <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;">Loading...</td></tr></tbody>
+                    <thead><tr><th>ID</th><th>Type</th><th>Case Number</th><th>Accused</th><th>Charge Sheet</th><th>Opinion</th><th>e-Filing</th><th>Court No.</th><th>Stage</th><th>Actions</th></thead>
+                    <tbody id="tableBody">|<td colspan="10" style="text-align:center;">Loading...|</tbody>
                 </table>
             </div>
         </div>
@@ -131,173 +601,376 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwjOyJO5lO6Itv362jLQeUOmEbXIog2J5jTorVfzzCVaCbjZh3TUWt0wRQVl3VYe_b0cA/exec";
-    let cases = [], isAdmin = false, editingSerialNo = null;
-    
+    const API_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+    let allRecords = [];
+    let isAdmin = false;
+    let currentEditSerialId = null;
+
     // DOM Elements
     const elements = {
         caseType: document.getElementById('caseType'), head: document.getElementById('head'), caseNumber: document.getElementById('caseNumber'),
         sections: document.getElementById('sections'), doDate: document.getElementById('doDate'), drDate: document.getElementById('drDate'),
         socLocation: document.getElementById('socLocation'), complainantDetails: document.getElementById('complainantDetails'),
-        propertySeized: document.getElementById('propertySeized'), complaintGist: document.getElementById('complaintGist'),
+        complaintGist: document.getElementById('complaintGist'), propertySeized: document.getElementById('propertySeized'),
+        disposal: document.getElementById('disposal'), remarks: document.getElementById('remarks'),
         chargedDate: document.getElementById('chargedDate'), opinionDate: document.getElementById('opinionDate'),
         eFilledDate: document.getElementById('eFilledDate'), courtCaseNumber: document.getElementById('courtCaseNumber'),
-        courtStage: document.getElementById('courtStage'), disposal: document.getElementById('disposal'), remarks: document.getElementById('remarks')
+        courtStage: document.getElementById('courtStage')
     };
     
-    const submitBtn = document.getElementById('submitBtn'), updateBtn = document.getElementById('updateBtn'), cancelEditBtn = document.getElementById('cancelEditBtn');
-    const resetFormBtn = document.getElementById('resetFormBtn'), formStatus = document.getElementById('formStatus');
-    const connectionStatus = document.getElementById('connectionStatus'), adminStatusSpan = document.getElementById('adminStatus');
-    const adminOnlyWarning = document.getElementById('adminOnlyWarning'), formTitle = document.getElementById('formTitle');
-    const tableBody = document.getElementById('tableBody'), searchInput = document.getElementById('searchInput');
-    const filterCaseType = document.getElementById('filterCaseType'), refreshBtn = document.getElementById('refreshBtn');
-    const statsInfo = document.getElementById('statsInfo');
+    // Cascading Toggle Elements
+    const toggles = {
+        chargeSheet: { cb: document.getElementById('chargeSheetToggle'), container: document.getElementById('chargeSheetContainer'), child: 'opinion' },
+        opinion: { cb: document.getElementById('opinionToggle'), container: document.getElementById('opinionContainer'), child: 'eFiling' },
+        eFiling: { cb: document.getElementById('eFilingToggle'), container: document.getElementById('eFilingContainer'), child: 'courtCase' },
+        courtCase: { cb: document.getElementById('courtCaseToggle'), container: document.getElementById('courtCaseContainer'), child: 'courtStage' },
+        courtStage: { cb: document.getElementById('courtStageToggle'), container: document.getElementById('courtStageContainer'), child: null }
+    };
     
-    // Accused table functions
-    function addAccusedRow(data = null) {
-        const tbody = document.getElementById('accusedRows');
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><input type="text" class="accused-name" value="${escapeHtml(data?.accusedName || '')}" placeholder="Accused Name" style="width:100%;"></td>
-            <td><input type="text" class="accused-father" value="${escapeHtml(data?.accusedFather || '')}" placeholder="Father's Name" style="width:100%;"></td>
-            <td><input type="text" class="accused-age" value="${escapeHtml(data?.accusedAge || '')}" placeholder="Age" style="width:80px;"></td>
-            <td><input type="text" class="accused-address" value="${escapeHtml(data?.accusedAddress || '')}" placeholder="Address" style="width:100%;"></td>
-            <td><input type="date" class="accused-arrest-date" value="${data?.dateOfArrest || ''}" style="width:100%;"></td>
-            <td><select class="accused-bail" style="width:100%;"><option value="">Select</option><option value="Not Arrested" ${data?.bailStatus === 'Not Arrested' ? 'selected' : ''}>Not Arrested</option><option value="Arrested - Police Custody" ${data?.bailStatus === 'Arrested - Police Custody' ? 'selected' : ''}>Arrested - Police Custody</option><option value="Arrested - Judicial Custody" ${data?.bailStatus === 'Arrested - Judicial Custody' ? 'selected' : ''}>Arrested - Judicial Custody</option><option value="Bailed" ${data?.bailStatus === 'Bailed' ? 'selected' : ''}>Bailed</option><option value="Absconding" ${data?.bailStatus === 'Absconding' ? 'selected' : ''}>Absconding</option></select></td>
-            <td><button type="button" class="remove-accused-btn" style="background:#dc2626; padding:4px 8px; width:auto;">✖</button></td>
-        `;
-        tbody.appendChild(row);
-        row.querySelector('.remove-accused-btn').addEventListener('click', () => { if(tbody.children.length > 1) row.remove(); else alert('At least one accused required'); });
-        return row;
-    }
-    
-    function getAccusedData() {
-        const accused = [];
-        document.querySelectorAll('#accusedRows tr').forEach(row => {
-            const name = row.querySelector('.accused-name')?.value.trim();
-            if (name) {
-                accused.push({
-                    accusedName: name,
-                    accusedFather: row.querySelector('.accused-father')?.value || '',
-                    accusedAge: row.querySelector('.accused-age')?.value || '',
-                    accusedAddress: row.querySelector('.accused-address')?.value || '',
-                    dateOfArrest: row.querySelector('.accused-arrest-date')?.value || '',
-                    bailStatus: row.querySelector('.accused-bail')?.value || '',
-                    accusedRemarks: ''
-                });
+    // Initialize cascading behavior
+    function initCascading() {
+        const updateCascade = (toggleKey) => {
+            const toggle = toggles[toggleKey];
+            if (toggle.cb.checked) {
+                toggle.container.classList.add('show');
+                if (toggle.child && toggles[toggle.child]) {
+                    // If parent is checked, show child container but respect child's own checkbox state
+                    const childToggle = toggles[toggle.child];
+                    if (childToggle.cb.checked) {
+                        childToggle.container.classList.add('show');
+                    } else {
+                        childToggle.container.classList.remove('show');
+                    }
+                }
+            } else {
+                toggle.container.classList.remove('show');
+                // Uncheck and hide all descendants
+                let current = toggle.child;
+                while (current && toggles[current]) {
+                    toggles[current].cb.checked = false;
+                    toggles[current].container.classList.remove('show');
+                    // Clear associated fields
+                    const fieldMap = { opinion: 'opinionDate', eFiling: 'eFilledDate', courtCase: 'courtCaseNumber', courtStage: 'courtStage' };
+                    if (elements[fieldMap[current]]) elements[fieldMap[current]].value = '';
+                    current = toggles[current].child;
+                }
             }
+        };
+        
+        Object.keys(toggles).forEach(key => {
+            toggles[key].cb.addEventListener('change', () => updateCascade(key));
         });
-        return accused;
+        // Initial state
+        updateCascade('chargeSheet');
     }
     
-    function loadAccusedData(accusedList) {
-        const tbody = document.getElementById('accusedRows');
-        tbody.innerHTML = '';
-        if (accusedList && accusedList.length > 0) {
-            accusedList.forEach(acc => addAccusedRow(acc));
-        } else {
-            addAccusedRow();
+    function getCourtData() {
+        return {
+            chargedDate: toggles.chargeSheet.cb.checked ? elements.chargedDate.value : '',
+            opinionDate: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked) ? elements.opinionDate.value : '',
+            eFilledDate: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked) ? elements.eFilledDate.value : '',
+            courtCaseNumber: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked && toggles.courtCase.cb.checked) ? elements.courtCaseNumber.value : '',
+            courtStage: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked && toggles.courtCase.cb.checked && toggles.courtStage.cb.checked) ? elements.courtStage.value : ''
+        };
+    }
+    
+    function setCourtDataFromMaster(master) {
+        // Reset all toggles
+        Object.keys(toggles).forEach(key => { toggles[key].cb.checked = false; toggles[key].container.classList.remove('show'); });
+        
+        if (master.chargedDate && master.chargedDate !== '') {
+            toggles.chargeSheet.cb.checked = true;
+            elements.chargedDate.value = master.chargedDate;
+            toggles.chargeSheet.container.classList.add('show');
+            
+            if (master.opinionDate && master.opinionDate !== '') {
+                toggles.opinion.cb.checked = true;
+                elements.opinionDate.value = master.opinionDate;
+                toggles.opinion.container.classList.add('show');
+                
+                if (master.eFilledDate && master.eFilledDate !== '') {
+                    toggles.eFiling.cb.checked = true;
+                    elements.eFilledDate.value = master.eFilledDate;
+                    toggles.eFiling.container.classList.add('show');
+                    
+                    if (master.courtCaseNumber && master.courtCaseNumber !== '') {
+                        toggles.courtCase.cb.checked = true;
+                        elements.courtCaseNumber.value = master.courtCaseNumber;
+                        toggles.courtCase.container.classList.add('show');
+                        
+                        if (master.courtStage && master.courtStage !== '') {
+                            toggles.courtStage.cb.checked = true;
+                            elements.courtStage.value = master.courtStage;
+                            toggles.courtStage.container.classList.add('show');
+                        }
+                    }
+                }
+            }
         }
     }
     
-    function formatDate(dateStr) { if (!dateStr) return '—'; try { return new Date(dateStr).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}); } catch(e){return dateStr;} }
-    function setStatus(el, msg, isError = false) { el.textContent = msg; el.className = 'status'; el.classList.add(isError ? 'error' : 'success'); setTimeout(() => { if(el===formStatus && el.textContent===msg) { el.className='status'; el.textContent='Ready — fill all required fields'; } }, 3000); }
-    function setConnectionStatus(msg, connected) { connectionStatus.textContent = msg; connectionStatus.style.background = connected ? '#dff1e6' : '#fee2e2'; connectionStatus.style.color = connected ? '#166534' : '#991b1b'; }
-    
-    async function checkAdminStatus() { try { const res = await fetch(`${API_URL}?checkAdmin=true`); const data = await res.json(); isAdmin = data.isAdmin || false; if(isAdmin) { adminStatusSpan.innerHTML = '👑 Admin Mode'; adminOnlyWarning.style.display = 'block'; } else { adminStatusSpan.innerHTML = '📝 Anyone Can Add'; adminOnlyWarning.style.display = 'none'; } } catch(e) { adminStatusSpan.innerHTML = '⚠️ Error'; } }
-    
-    async function fetchCases() { try { const res = await fetch(API_URL); if(!res.ok) throw new Error(); cases = await res.json(); return true; } catch(e) { setConnectionStatus('Connection failed', false); return false; } }
-    async function addToSheet(data) { try { await fetch(API_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)}); return true; } catch(e) { return false; } }
-    async function updateInSheet(id, data) { try { await fetch(`${API_URL}?id=${id}`, {method:'PUT', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)}); return true; } catch(e) { return false; } }
-    async function deleteFromSheet(id) { try { await fetch(`${API_URL}?id=${id}`, {method:'DELETE', mode:'no-cors'}); return true; } catch(e) { return false; } }
-    
-    async function refresh() { setConnectionStatus('Syncing...', true); if(await fetchCases()) setConnectionStatus(`✅ ${cases.length} records`, true); renderTable(); }
-    
-    async function addCase(data) { if(await addToSheet(data)) { setStatus(formStatus, '✅ Registered!', false); await refresh(); clearForm(); return true; } else { setStatus(formStatus, '❌ Failed', true); return false; } }
-    async function updateCase(id, data) { if(!isAdmin) { setStatus(formStatus, '⚠️ Admin only', true); return false; } if(await updateInSheet(id, data)) { setStatus(formStatus, '✅ Updated!', false); await refresh(); cancelEdit(); return true; } else { setStatus(formStatus, '❌ Update failed', true); return false; } }
-    async function deleteCase(id) { if(!isAdmin) { setStatus(formStatus, '⚠️ Admin only', true); return; } if(confirm('Delete case and all associated accused?')) { if(await deleteFromSheet(id)) { setStatus(formStatus, '🗑️ Deleted', false); await refresh(); } else setStatus(formStatus, '❌ Delete failed', true); } }
-    
-    function editCase(caseData) {
-        if(!isAdmin) { setStatus(formStatus, '⚠️ Admin only', true); return; }
-        editingSerialNo = caseData.serialNo;
-        Object.keys(elements).forEach(key => { if(elements[key]) elements[key].value = caseData[key] || ''; });
-        elements.caseType.value = caseData.caseType || 'FIR';
+    // Accused Card with Arrest Toggle
+    function createAccusedCard(accData = null) {
+        const card = document.createElement('div');
+        card.className = 'accused-card';
+        const nameVal = accData?.accusedName || '';
+        const fatherVal = accData?.accusedFather || '';
+        const ageVal = accData?.accusedAge || '';
+        const addressVal = accData?.accusedAddress || '';
+        const isArrested = accData?.isArrested === true || (accData?.dateOfArrest && accData.dateOfArrest !== '');
+        const arrestDateVal = accData?.dateOfArrest || '';
+        const bailStatusVal = accData?.bailStatus || '';
         
-        // Group accused by case number
-        const caseAccused = cases.filter(c => c.serialNo === caseData.serialNo);
-        const accusedList = caseAccused.map(c => ({
-            accusedName: c.accusedName,
-            accusedFather: c.accusedFather,
-            accusedAge: c.accusedAge,
-            accusedAddress: c.accusedAddress,
-            dateOfArrest: c.dateOfArrest,
-            bailStatus: c.bailStatus
-        }));
-        loadAccusedData(accusedList);
+        card.innerHTML = `
+            <div class="card-header">
+                <span class="card-title">👤 Accused</span>
+                <button type="button" class="remove-accused-card">✖ Remove</button>
+            </div>
+            <div class="vertical-form-grid">
+                <div class="acc-field"><label>Full Name *</label><input type="text" class="acc-name" value="${escapeHtml(nameVal)}" placeholder="Full name"></div>
+                <div class="acc-field"><label>Father's Name</label><input type="text" class="acc-father" value="${escapeHtml(fatherVal)}" placeholder="Father's name"></div>
+                <div class="acc-field"><label>Age</label><input type="text" class="acc-age" value="${escapeHtml(ageVal)}" placeholder="Age"></div>
+                <div class="acc-field"><label>Address</label><input type="text" class="acc-address" value="${escapeHtml(addressVal)}" placeholder="Address"></div>
+                <div class="acc-field" style="grid-column: span 2;">
+                    <label class="checkbox-label" style="margin-bottom: 0.3rem;">
+                        <input type="checkbox" class="arrest-checkbox" ${isArrested ? 'checked' : ''}>
+                        <span>🚔 Arrested in this case</span>
+                    </label>
+                    <div class="arrest-fields" style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid #cbdde9; display: ${isArrested ? 'grid' : 'none'}; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+                        <div class="acc-field"><label>Date of Arrest</label><input type="date" class="acc-arrest-date" value="${arrestDateVal}"></div>
+                        <div class="acc-field"><label>Bail Status</label>
+                            <select class="acc-bail-status">
+                                <option value="">-- Select --</option>
+                                <option value="Not Arrested" ${bailStatusVal === 'Not Arrested' ? 'selected' : ''}>Not Arrested</option>
+                                <option value="Police Custody" ${bailStatusVal === 'Police Custody' ? 'selected' : ''}>Police Custody</option>
+                                <option value="Judicial Custody" ${bailStatusVal === 'Judicial Custody' ? 'selected' : ''}>Judicial Custody</option>
+                                <option value="Bailed" ${bailStatusVal === 'Bailed' ? 'selected' : ''}>Bailed</option>
+                                <option value="Anticipatory Bail" ${bailStatusVal === 'Anticipatory Bail' ? 'selected' : ''}>Anticipatory Bail</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
         
-        submitBtn.style.display = 'none'; updateBtn.style.display = 'block'; cancelEditBtn.style.display = 'block';
-        formTitle.textContent = `✏️ Edit Case S.No. ${caseData.serialNo}`; setStatus(formStatus, 'Editing mode', false);
-    }
-    
-    function cancelEdit() { editingSerialNo = null; clearForm(); submitBtn.style.display = 'block'; updateBtn.style.display = 'none'; cancelEditBtn.style.display = 'none'; formTitle.textContent = '📝 Register New Case'; setStatus(formStatus, 'Edit cancelled', false); }
-    
-    function clearForm() { Object.keys(elements).forEach(key => { if(elements[key]) elements[key].value = ''; }); elements.caseType.value = 'FIR'; setTodayDates(); loadAccusedData([]); }
-    
-    function setTodayDates() { const today = new Date().toISOString().split('T')[0]; if(elements.doDate) elements.doDate.value = today; if(elements.drDate) elements.drDate.value = today; }
-    
-    function getFormData() { let data = {}; Object.keys(elements).forEach(key => { if(elements[key]) data[key] = elements[key].value; }); data.caseType = elements.caseType.value; data.accused = getAccusedData(); return data; }
-    
-    function validateForm(data) { if(!data.caseNumber) { setStatus(formStatus, '❌ Number required', true); return false; } if(!data.sections) { setStatus(formStatus, '❌ Sections required', true); return false; } if(data.accused.length === 0) { setStatus(formStatus, '❌ At least one accused required', true); return false; } return true; }
-    
-    function renderTable() {
-        // Group by serial number for display
-        const caseMap = new Map();
-        cases.forEach(c => { if(!caseMap.has(c.serialNo)) caseMap.set(c.serialNo, []); caseMap.get(c.serialNo).push(c); });
-        
-        let filteredCases = Array.from(caseMap.entries()).map(([serialNo, accusedList]) => ({ serialNo, caseData: accusedList[0], accusedList }));
-        if(filterCaseType.value !== 'all') filteredCases = filteredCases.filter(c => c.caseData.caseType === filterCaseType.value);
-        if(searchInput.value) { const s = searchInput.value.toLowerCase(); filteredCases = filteredCases.filter(c => (c.caseData.number && c.caseData.number.toLowerCase().includes(s)) || c.accusedList.some(a => (a.accusedName && a.accusedName.toLowerCase().includes(s)))); }
-        
-        statsInfo.textContent = `📋 Total Cases: ${filteredCases.length} | Total Rows: ${cases.length}`;
-        if(!filteredCases.length) { tableBody.innerHTML = '发展<td colspan="11" style="text-align:center;">📭 No records</td>'; return; }
-        
-        let html = '';
-        filteredCases.forEach(c => {
-            const firstAccused = c.accusedList[0];
-            html += `<tr style="background:#f8fafc;"><td rowspan="${c.accusedList.length}"><strong>${c.serialNo}</strong></td>
-                <td rowspan="${c.accusedList.length}"><span class="case-badge ${c.caseData.caseType==='FIR'?'badge-fir':'badge-csr'}">${c.caseData.caseType}</span></td>
-                <td rowspan="${c.accusedList.length}"><strong>${escapeHtml(c.caseData.number)}</strong></td>
-                <td rowspan="${c.accusedList.length}"><code>${escapeHtml(c.caseData.sections)}</code></td>`;
-            
-            html += `<td>${escapeHtml(firstAccused.accusedName || '—')}</td>
-                <td>${escapeHtml(firstAccused.accusedFather || '—')}</td>
-                <td>${escapeHtml(firstAccused.accusedAge || '—')}</td>
-                <td>${escapeHtml(firstAccused.bailStatus || '—')}</td>
-                <td rowspan="${c.accusedList.length}">${escapeHtml(c.caseData.courtStage || '—')}</td>
-                <td rowspan="${c.accusedList.length}">${escapeHtml(c.caseData.disposal || '—')}</td>
-                <td rowspan="${c.accusedList.length}" class="action-buttons">${isAdmin ? `<button class="edit-btn" data-id="${c.serialNo}">✏️ Edit</button><button class="delete-btn" data-id="${c.serialNo}">🗑️ Delete</button>` : '<span>View</span>'}</td></tr>`;
-            
-            for(let i = 1; i < c.accusedList.length; i++) {
-                const a = c.accusedList[i];
-                html += `<tr><td>${escapeHtml(a.accusedName || '—')}</td><td>${escapeHtml(a.accusedFather || '—')}</td><td>${escapeHtml(a.accusedAge || '—')}</td><td>${escapeHtml(a.bailStatus || '—')}</td></tr>`;
+        const arrestCheckbox = card.querySelector('.arrest-checkbox');
+        const arrestFields = card.querySelector('.arrest-fields');
+        arrestCheckbox.addEventListener('change', () => {
+            if (arrestCheckbox.checked) {
+                arrestFields.style.display = 'grid';
+            } else {
+                arrestFields.style.display = 'none';
+                card.querySelector('.acc-arrest-date').value = '';
+                card.querySelector('.acc-bail-status').value = '';
             }
         });
+        
+        card.querySelector('.remove-accused-card').addEventListener('click', () => {
+            if (document.querySelectorAll('#accusedCardsContainer .accused-card').length > 1) card.remove();
+            else alert('At least one accused required');
+            updateTotalAccusedCount();
+        });
+        return card;
+    }
+    
+    function updateTotalAccusedCount() {
+        const count = document.querySelectorAll('#accusedCardsContainer .accused-card').length;
+        document.getElementById('totalAccusedCount').textContent = count;
+    }
+    
+    function getAccusedList() {
+        const list = [];
+        document.querySelectorAll('#accusedCardsContainer .accused-card').forEach(card => {
+            const name = card.querySelector('.acc-name')?.value.trim();
+            if (name) {
+                const isArrested = card.querySelector('.arrest-checkbox')?.checked;
+                list.push({
+                    accusedName: name,
+                    accusedFather: card.querySelector('.acc-father')?.value || '',
+                    accusedAge: card.querySelector('.acc-age')?.value || '',
+                    accusedAddress: card.querySelector('.acc-address')?.value || '',
+                    isArrested: isArrested || false,
+                    dateOfArrest: isArrested ? (card.querySelector('.acc-arrest-date')?.value || '') : '',
+                    bailStatus: isArrested ? (card.querySelector('.acc-bail-status')?.value || '') : 'Not Arrested'
+                });
+            }
+        });
+        return list;
+    }
+    
+    function loadAccusedCards(accusedArray) {
+        const container = document.getElementById('accusedCardsContainer');
+        container.innerHTML = '';
+        if (accusedArray && accusedArray.length) {
+            accusedArray.forEach(acc => container.appendChild(createAccusedCard(acc)));
+        } else {
+            container.appendChild(createAccusedCard());
+        }
+        updateTotalAccusedCount();
+        
+        // Add observer for dynamic card changes
+        const observer = new MutationObserver(() => updateTotalAccusedCount());
+        observer.observe(container, { childList: true, subtree: false });
+    }
+    
+    // Backend Functions
+    function setStatus(el, msg, isError = false) { el.textContent = msg; el.className = 'status'; el.classList.add(isError ? 'error' : 'success'); setTimeout(() => { if(el===formStatus && el.textContent===msg) { el.className='status'; el.textContent='⚡ Ready'; } }, 2500); }
+    function setConnectionStatus(msg, ok) { connectionStatus.textContent = msg; connectionStatus.style.background = ok ? '#dff1e6' : '#fee2e2'; connectionStatus.style.color = ok ? '#166534' : '#991b1b'; }
+    
+    async function checkAdmin() { try { const res = await fetch(`${API_URL}?checkAdmin=true`); const data = await res.json(); isAdmin = data.isAdmin || false; adminStatusSpan.innerHTML = isAdmin ? '👑 Admin' : '📝 User'; adminWarning.style.display = isAdmin ? 'block' : 'none'; } catch(e) { isAdmin = true; adminStatusSpan.innerHTML = '👑 Admin (demo)'; adminWarning.style.display = 'block'; } }
+    async function fetchAllRecords() { try { const res = await fetch(API_URL); if(!res.ok) throw new Error(); allRecords = await res.json(); setConnectionStatus(`✅ ${allRecords.length} rows`, true); return true; } catch(e) { setConnectionStatus('⚠️ Demo mode', false); return false; } }
+    async function sendBatch(payload) { try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); return true; } catch(e) { return false; } }
+    
+    async function addCaseWithAccused(master, accusedArray) {
+        const batch = accusedArray.map(acc => ({ ...master, ...acc }));
+        const ok = await sendBatch({ action: 'createBatch', records: batch });
+        if (ok) { await fetchAllRecords(); renderTable(); return true; }
+        return false;
+    }
+    
+    async function updateCaseGroup(serialId, master, newAccused) {
+        if (!isAdmin) return false;
+        const ok = await sendBatch({ action: 'replaceCaseGroup', caseSerial: serialId, masterCase: master, accusedList: newAccused });
+        if (ok) { await fetchAllRecords(); renderTable(); return true; }
+        return false;
+    }
+    
+    async function deleteCaseGroup(serialId) {
+        if (!isAdmin || !confirm(`Delete case #${serialId} and all accused?`)) return false;
+        const ok = await sendBatch({ action: 'deleteCaseGroup', caseSerial: serialId });
+        if (ok) { await fetchAllRecords(); renderTable(); setStatus(formStatus, 'Deleted', false); return true; }
+        return false;
+    }
+    
+    function renderTable() {
+        if (!allRecords.length) { tableBody.innerHTML = '|<td colspan="10" style="text-align:center;">📭 No records|'; statsInfo.textContent = '📋 0 cases'; return; }
+        const groups = new Map();
+        allRecords.forEach(rec => { const sid = rec.caseSerial; if (!groups.has(sid)) groups.set(sid, []); groups.get(sid).push(rec); });
+        let filtered = Array.from(groups.entries());
+        const typeFilter = filterCaseType.value, search = searchInput.value.trim().toLowerCase();
+        filtered = filtered.filter(([_, group]) => {
+            const m = group[0];
+            if (typeFilter !== 'all' && m.caseType !== typeFilter) return false;
+            if (search) return m.caseNumber?.toLowerCase().includes(search) || group.some(g => g.accusedName?.toLowerCase().includes(search));
+            return true;
+        });
+        let html = '';
+        for (let [sid, group] of filtered) {
+            const master = group[0];
+            const rowSpan = group.length;
+            for (let i = 0; i < group.length; i++) {
+                const acc = group[i];
+                html += `<tr>`;
+                if (i === 0) {
+                    html += `<td rowspan="${rowSpan}"><strong>${sid}</strong>`;
+                    html += `<td rowspan="${rowSpan}"><span class="case-badge ${master.caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${master.caseType}</span>`;
+                    html += `<td rowspan="${rowSpan}"><strong>${escapeHtml(master.caseNumber)}</strong>`;
+                }
+                html += `<td>${escapeHtml(acc.accusedName)}${acc.isArrested ? '<br><span style="font-size:0.6rem;">🚔 Arrested</span>' : ''}</td>`;
+                if (i === 0) {
+                    html += `<td rowspan="${rowSpan}">${master.chargedDate ? formatDate(master.chargedDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${master.opinionDate ? formatDate(master.opinionDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${master.eFilledDate ? formatDate(master.eFilledDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtCaseNumber || '—')}</td>`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtStage || '—')}</td>`;
+                    html += `<td rowspan="${rowSpan}" class="action-buttons">${isAdmin ? `<button class="edit-case-btn" data-id="${sid}">✏️ Edit</button> <button class="delete-case-btn" data-id="${sid}">🗑️ Delete</button>` : '<span>🔍 view</span>'}</td>`;
+                }
+                html += `</tr>`;
+            }
+        }
         tableBody.innerHTML = html;
-        document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', e => editCase(cases.find(c => c.serialNo === parseInt(btn.dataset.id)))));
-        document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', e => deleteCase(parseInt(btn.dataset.id))));
+        statsInfo.textContent = `📋 ${filtered.length} cases | ${allRecords.length} rows`;
+        document.querySelectorAll('.edit-case-btn').forEach(btn => btn.addEventListener('click', () => loadCaseForEdit(parseInt(btn.dataset.id))));
+        document.querySelectorAll('.delete-case-btn').forEach(btn => btn.addEventListener('click', async () => await deleteCaseGroup(parseInt(btn.dataset.id))));
+    }
+    
+    function formatDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}); } catch(e) { return d; } }
+    
+    function loadCaseForEdit(serialId) {
+        if (!isAdmin) { setStatus(formStatus, 'Admin only', true); return; }
+        const caseRows = allRecords.filter(r => r.caseSerial === serialId);
+        if (!caseRows.length) return;
+        const master = caseRows[0];
+        currentEditSerialId = serialId;
+        for (let k in elements) if (elements[k]) elements[k].value = master[k] || '';
+        elements.caseType.value = master.caseType || 'FIR';
+        setCourtDataFromMaster(master);
+        const accusedArr = caseRows.map(r => ({ 
+            accusedName: r.accusedName, accusedFather: r.accusedFather, accusedAge: r.accusedAge,
+            accusedAddress: r.accusedAddress, isArrested: !!(r.dateOfArrest && r.dateOfArrest !== ''),
+            dateOfArrest: r.dateOfArrest || '', bailStatus: r.bailStatus || ''
+        }));
+        loadAccusedCards(accusedArr);
+        submitBtn.style.display = 'none'; updateBtn.style.display = 'block'; cancelEditBtn.style.display = 'block';
+        formTitle.textContent = `✏️ Editing Case ID ${serialId}`;
+        setStatus(formStatus, 'Editing mode', false);
+    }
+    
+    function cancelEdit() { currentEditSerialId = null; clearForm(); submitBtn.style.display = 'block'; updateBtn.style.display = 'none'; cancelEditBtn.style.display = 'none'; formTitle.textContent = '📝 Register New Case'; }
+    
+    function clearForm() {
+        for (let k in elements) if (elements[k]) elements[k].value = '';
+        elements.caseType.value = 'FIR';
+        elements.propertySeized.value = '';
+        Object.keys(toggles).forEach(key => { toggles[key].cb.checked = false; toggles[key].container.classList.remove('show'); });
+        const today = new Date().toISOString().split('T')[0];
+        if(elements.doDate) elements.doDate.value = today;
+        if(elements.drDate) elements.drDate.value = today;
+        loadAccusedCards([]);
+    }
+    
+    function getMasterObject() {
+        let obj = {};
+        for (let k in elements) if (elements[k]) obj[k] = elements[k].value;
+        obj.caseType = elements.caseType.value;
+        Object.assign(obj, getCourtData());
+        return obj;
+    }
+    
+    async function onSubmit() {
+        const master = getMasterObject();
+        const accused = getAccusedList();
+        if (!master.caseNumber || !master.sections || accused.length === 0) { setStatus(formStatus, '❌ Required fields missing', true); return; }
+        submitBtn.disabled = true; submitBtn.innerText = 'Registering...';
+        const ok = await addCaseWithAccused(master, accused);
+        if (ok) { setStatus(formStatus, '✅ Registered', false); clearForm(); }
+        else setStatus(formStatus, '❌ Failed', true);
+        submitBtn.disabled = false; submitBtn.innerText = '✅ Register Case & Accused(s)';
+    }
+    
+    async function onUpdate() {
+        if (!currentEditSerialId) return;
+        const master = getMasterObject();
+        const accused = getAccusedList();
+        if (!master.caseNumber || accused.length === 0) { setStatus(formStatus, 'Missing fields', true); return; }
+        updateBtn.disabled = true; updateBtn.innerText = 'Updating...';
+        const ok = await updateCaseGroup(currentEditSerialId, master, accused);
+        if (ok) cancelEdit();
+        else setStatus(formStatus, 'Update failed', true);
+        updateBtn.disabled = false; updateBtn.innerText = '✏️ Update Case';
+    }
+    
+    async function refreshData() { await fetchAllRecords(); renderTable(); }
+    
+    function init() {
+        initCascading();
+        clearForm();
+        document.getElementById('addAccusedBtn').addEventListener('click', () => {
+            document.getElementById('accusedCardsContainer').appendChild(createAccusedCard());
+            updateTotalAccusedCount();
+        });
+        checkAdmin(); refreshData();
+        submitBtn.addEventListener('click', onSubmit);
+        updateBtn.addEventListener('click', onUpdate);
+        cancelEditBtn.addEventListener('click', cancelEdit);
+        resetFormBtn.addEventListener('click', () => { if(confirm('Clear all?')) clearForm(); });
+        refreshBtn.addEventListener('click', refreshData);
+        searchInput.addEventListener('input', renderTable);
+        filterCaseType.addEventListener('change', renderTable);
+        setInterval(refreshData, 60000);
     }
     
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-    
-    async function onSubmit() { const data = getFormData(); if(!validateForm(data)) return; submitBtn.disabled = true; submitBtn.innerText = 'Registering...'; await addCase(data); submitBtn.disabled = false; submitBtn.innerText = '➕ Register Case'; }
-    async function onUpdate() { if(!editingSerialNo) return; const data = getFormData(); if(!validateForm(data)) return; updateBtn.disabled = true; updateBtn.innerText = 'Updating...'; await updateCase(editingSerialNo, data); updateBtn.disabled = false; updateBtn.innerText = '✏️ Update Case'; }
-    function onReset() { if(editingSerialNo) cancelEdit(); clearForm(); setStatus(formStatus, 'Form cleared', false); }
-    
-    async function init() { setTodayDates(); loadAccusedData([]); document.getElementById('addAccusedBtn').addEventListener('click', () => addAccusedRow()); await checkAdminStatus(); await refresh(); 
-        submitBtn.addEventListener('click', onSubmit); updateBtn.addEventListener('click', onUpdate); cancelEditBtn.addEventListener('click', cancelEdit);
-        resetFormBtn.addEventListener('click', onReset); refreshBtn.addEventListener('click', async () => { await refresh(); setStatus(formStatus, 'Refreshed', false); });
-        searchInput.addEventListener('input', renderTable); filterCaseType.addEventListener('change', renderTable); setInterval(refresh, 60000);
-    }
     init();
 </script>
 </body>
