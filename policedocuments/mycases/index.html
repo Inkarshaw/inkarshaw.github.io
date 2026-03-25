@@ -6,299 +6,49 @@
     <title>CaseFlow | FIR/CSR Case Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #f1f5f9;
-            font-family: 'Inter', sans-serif;
-            padding: 2rem 1.5rem;
-            color: #0f172a;
-        }
-
-        .container {
-            max-width: 1500px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1e4a6b, #0f3b5c);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        .header p {
-            color: #334155;
-            margin-top: 0.5rem;
-        }
-
-        .badge {
-            background: #e2f0fa;
-            color: #1e4a6b;
-            padding: 0.25rem 0.8rem;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            display: inline-block;
-            margin-top: 0.6rem;
-        }
-
-        .dashboard {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-        }
-
-        .form-panel {
-            flex: 1.2;
-            min-width: 360px;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.06);
-            padding: 1.8rem;
-        }
-
-        .data-panel {
-            flex: 2.5;
-            min-width: 550px;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.06);
-            padding: 1.8rem;
-        }
-
-        .section-title {
-            font-weight: 700;
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            border-left: 5px solid #1e4a6b;
-            padding-left: 0.9rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
-        }
-
-        .full-width {
-            grid-column: span 2;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            font-size: 0.8rem;
-            color: #1e293b;
-        }
-
-        label .required {
-            color: #dc2626;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 16px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            background: #fefefe;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #1e4a6b;
-            box-shadow: 0 0 0 3px rgba(30,74,107,0.15);
-        }
-
-        input[type="date"] {
-            font-family: inherit;
-        }
-
-        button {
-            background: #1e4a6b;
-            border: none;
-            padding: 0.85rem 1.2rem;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: white;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 0.5rem;
-            transition: all 0.2s;
-        }
-
-        button:hover {
-            background: #0f3b5c;
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: #475569;
-            margin-top: 0.7rem;
-        }
-
-        .btn-secondary:hover {
-            background: #334155;
-        }
-
-        .status {
-            margin-top: 1rem;
-            padding: 0.7rem;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            text-align: center;
-            background: #f1f5f9;
-        }
-
-        .status.success {
-            background: #dff1e6;
-            color: #166534;
-        }
-
-        .status.error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            margin-top: 1.2rem;
-            border-radius: 20px;
-            border: 1px solid #eef2f6;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-
-        th {
-            background: #f8fafc;
-            padding: 0.9rem 0.7rem;
-            text-align: left;
-            font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        td {
-            padding: 0.8rem 0.7rem;
-            border-bottom: 1px solid #f0f2f5;
-            vertical-align: top;
-        }
-
-        tr:hover {
-            background: #fafcff;
-        }
-
-        .case-badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.7rem;
-        }
-
-        .badge-fir {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .badge-csr {
-            background: #e0f2fe;
-            color: #075985;
-        }
-
-        .delete-btn {
-            background: #fef2f2;
-            border: none;
-            color: #dc2626;
-            font-weight: 600;
-            font-size: 0.7rem;
-            cursor: pointer;
-            padding: 0.3rem 0.8rem;
-            border-radius: 30px;
-            width: auto;
-            margin: 0;
-        }
-
-        .delete-btn:hover {
-            background: #fee2e2;
-        }
-
-        .filter-bar {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 1.2rem;
-            align-items: center;
-        }
-
-        .filter-bar input, .filter-bar select {
-            width: auto;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .filter-bar button {
-            width: auto;
-            padding: 0.6rem 1.2rem;
-            background: #eef2ff;
-            color: #1e4a6b;
-            margin-top: 0;
-        }
-
-        .stats {
-            background: #f1f5f9;
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-
-        .connection-status {
-            font-size: 0.7rem;
-            margin-top: 0.5rem;
-            padding: 4px 8px;
-            border-radius: 20px;
-            text-align: center;
-        }
-
-        .inline-hint {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            margin-top: 0.2rem;
-        }
-
-        @media (max-width: 880px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .full-width {
-                grid-column: span 1;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f1f5f9; font-family: 'Inter', sans-serif; padding: 2rem 1.5rem; color: #0f172a; }
+        .container { max-width: 1500px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .header h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #1e4a6b, #0f3b5c); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .badge { background: #e2f0fa; color: #1e4a6b; padding: 0.25rem 0.8rem; border-radius: 40px; font-size: 0.8rem; display: inline-block; margin-top: 0.6rem; }
+        .dashboard { display: flex; flex-wrap: wrap; gap: 2rem; }
+        .form-panel, .data-panel { background: white; border-radius: 28px; box-shadow: 0 12px 30px rgba(0,0,0,0.06); padding: 1.8rem; }
+        .form-panel { flex: 1.2; min-width: 360px; }
+        .data-panel { flex: 2.5; min-width: 550px; }
+        .section-title { font-weight: 700; font-size: 1.3rem; margin-bottom: 1.5rem; border-left: 5px solid #1e4a6b; padding-left: 0.9rem; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .input-group { margin-bottom: 1rem; }
+        .full-width { grid-column: span 2; }
+        label { display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem; color: #1e293b; }
+        .required { color: #dc2626; }
+        input, textarea, select { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 16px; font-family: inherit; font-size: 0.9rem; background: #fefefe; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #1e4a6b; box-shadow: 0 0 0 3px rgba(30,74,107,0.15); }
+        button { background: #1e4a6b; border: none; padding: 0.85rem 1.2rem; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; width: 100%; margin-top: 0.5rem; transition: all 0.2s; }
+        button:hover { background: #0f3b5c; transform: translateY(-1px); }
+        .btn-secondary { background: #475569; margin-top: 0.7rem; }
+        .status { margin-top: 1rem; padding: 0.7rem; border-radius: 40px; font-size: 0.8rem; text-align: center; background: #f1f5f9; }
+        .status.success { background: #dff1e6; color: #166534; }
+        .status.error { background: #fee2e2; color: #991b1b; }
+        .status.warning { background: #fef9e3; color: #b45309; }
+        .status.info { background: #e0f2fe; color: #075985; }
+        .table-wrapper { overflow-x: auto; margin-top: 1.2rem; border-radius: 20px; border: 1px solid #eef2f6; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th { background: #f8fafc; padding: 0.9rem 0.7rem; text-align: left; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 0.8rem 0.7rem; border-bottom: 1px solid #f0f2f5; vertical-align: top; }
+        .case-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 30px; font-weight: 600; font-size: 0.7rem; }
+        .badge-fir { background: #fee2e2; color: #991b1b; }
+        .badge-csr { background: #e0f2fe; color: #075985; }
+        .delete-btn { background: #fef2f2; border: none; color: #dc2626; font-weight: 600; font-size: 0.7rem; cursor: pointer; padding: 0.3rem 0.8rem; border-radius: 30px; width: auto; margin: 0; }
+        .filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1.2rem; align-items: center; }
+        .filter-bar input, .filter-bar select { width: auto; flex: 1; min-width: 150px; }
+        .filter-bar button { width: auto; padding: 0.6rem 1.2rem; background: #eef2ff; color: #1e4a6b; margin-top: 0; }
+        .stats { background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 40px; font-size: 0.75rem; margin-bottom: 1rem; display: inline-block; }
+        .connection-status { font-size: 0.7rem; margin-top: 0.5rem; padding: 4px 8px; border-radius: 20px; text-align: center; }
+        .inline-hint { font-size: 0.7rem; color: #5b6e8c; margin-top: 0.2rem; }
+        .debug-panel { background: #1e293b; color: #e2e8f0; padding: 0.8rem; border-radius: 16px; font-family: monospace; font-size: 0.7rem; margin-top: 1rem; max-height: 150px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+        .test-btn { background: #0f3b5c; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.5rem; }
+        @media (max-width: 880px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
     </style>
 </head>
 <body>
@@ -340,7 +90,6 @@
                 <div class="input-group full-width">
                     <label>📍 SOC (Scene of Crime) <span class="required">*</span></label>
                     <input type="text" id="socLocation" placeholder="Full address where crime took place" autocomplete="off">
-                    <div class="inline-hint">Exact location of occurrence</div>
                 </div>
                 <div class="input-group full-width">
                     <label>👤 Accused Name <span class="required">*</span></label>
@@ -352,13 +101,15 @@
                 </div>
                 <div class="input-group full-width">
                     <label>📝 Notes</label>
-                    <textarea id="caseNotes" placeholder="Additional case details, investigation status..."></textarea>
+                    <textarea id="caseNotes" placeholder="Additional case details..."></textarea>
                 </div>
             </div>
             <button id="submitBtn">➕ Register Case</button>
             <button id="resetFormBtn" class="btn-secondary">⟳ Clear Form</button>
+            <button id="testApiBtn" class="test-btn">🔍 Test API Connection</button>
             <div id="formStatus" class="status">Ready — fill all required fields</div>
             <div id="connectionStatus" class="connection-status">🔌 Connecting to Google Sheets...</div>
+            <div class="debug-panel" id="debugPanel">📡 Debug console will appear here...</div>
         </div>
 
         <div class="data-panel">
@@ -375,24 +126,8 @@
             <div id="statsInfo" class="stats">📊 Loading case records...</div>
             <div class="table-wrapper">
                 <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>S.No.</th>
-                            <th>Case Type</th>
-                            <th>Number</th>
-                            <th>Sections</th>
-                            <th>DO</th>
-                            <th>DR</th>
-                            <th>SOC</th>
-                            <th>Accused Name</th>
-                            <th>Complainant Name</th>
-                            <th>Notes</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <tr><td colspan="11" style="text-align:center;">Loading case data...</td></tr>
-                    </tbody>
+                    <thead><tr><th>S.No.</th><th>Type</th><th>Number</th><th>Sections</th><th>DO</th><th>DR</th><th>SOC</th><th>Accused</th><th>Complainant</th><th>Notes</th><th>Action</th></tr></thead>
+                    <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;">Loading case data...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -401,10 +136,12 @@
 
 <script>
     // ===================== CONFIGURATION =====================
-    // REPLACE THIS URL WITH YOUR DEPLOYED APPS SCRIPT WEB APP URL
+    // PASTE YOUR CORRECT API URL HERE
     const API_URL = "https://script.google.com/macros/s/AKfycbwjOyJO5lO6Itv362jLQeUOmEbXIog2J5jTorVfzzCVaCbjZh3TUWt0wRQVl3VYe_b0cA/exec";
+    // =========================================================
     
     let cases = [];
+    let debugLogs = [];
     
     // DOM elements
     const caseTypeSelect = document.getElementById('caseType');
@@ -418,13 +155,29 @@
     const caseNotesInput = document.getElementById('caseNotes');
     const submitBtn = document.getElementById('submitBtn');
     const resetFormBtn = document.getElementById('resetFormBtn');
+    const testApiBtn = document.getElementById('testApiBtn');
     const formStatus = document.getElementById('formStatus');
     const connectionStatus = document.getElementById('connectionStatus');
+    const debugPanel = document.getElementById('debugPanel');
     const tableBody = document.getElementById('tableBody');
     const searchInput = document.getElementById('searchInput');
     const filterCaseType = document.getElementById('filterCaseType');
     const refreshBtn = document.getElementById('refreshBtn');
     const statsInfo = document.getElementById('statsInfo');
+    
+    function addDebug(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        debugLogs.unshift(`[${timestamp}] ${message}`);
+        if (debugLogs.length > 20) debugLogs.pop();
+        debugPanel.innerHTML = debugLogs.map(log => {
+            let color = '#e2e8f0';
+            if (log.includes('✅')) color = '#86efac';
+            if (log.includes('❌')) color = '#fca5a5';
+            if (log.includes('⚠️')) color = '#fde047';
+            return `<span style="color: ${color}">${escapeHtml(log)}</span>`;
+        }).join('<br>');
+        console.log(message);
+    }
     
     function formatDate(dateString) {
         if (!dateString) return '—';
@@ -432,45 +185,93 @@
             const date = new Date(dateString);
             if (isNaN(date.getTime())) return dateString;
             return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        } catch(e) {
-            return dateString;
+        } catch(e) { return dateString; }
+    }
+    
+    function setStatus(element, msg, isError = false, isWarning = false, isInfo = false) {
+        element.textContent = msg;
+        element.className = 'status';
+        if (isWarning) element.classList.add('warning');
+        else if (isError) element.classList.add('error');
+        else if (isInfo) element.classList.add('info');
+        else element.classList.add('success');
+    }
+    
+    function setConnectionStatus(message, isConnected = true, isWarning = false) {
+        connectionStatus.textContent = message;
+        if (isWarning) {
+            connectionStatus.style.background = '#fef9e3';
+            connectionStatus.style.color = '#b45309';
+        } else if (isConnected) {
+            connectionStatus.style.background = '#dff1e6';
+            connectionStatus.style.color = '#166534';
+        } else {
+            connectionStatus.style.background = '#fee2e2';
+            connectionStatus.style.color = '#991b1b';
         }
     }
     
-    function setStatus(element, msg, isError = false) {
-        element.textContent = msg;
-        element.className = 'status';
-        if (!isError) element.classList.add('success');
-        else element.classList.add('error');
-        setTimeout(() => {
-            if (element === formStatus && element.textContent === msg) {
-                element.className = 'status';
-                element.textContent = 'Ready — fill all required fields';
+    async function testApiConnection() {
+        addDebug("🔍 Testing API connection...");
+        addDebug(`📍 URL: ${API_URL}`);
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
+            const response = await fetch(API_URL, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            addDebug(`✅ Response status: ${response.status} ${response.statusText}`);
+            
+            const text = await response.text();
+            addDebug(`📦 Response length: ${text.length} characters`);
+            addDebug(`📄 First 200 chars: ${text.substring(0, 200)}`);
+            
+            try {
+                const json = JSON.parse(text);
+                addDebug(`✅ Valid JSON! Array length: ${Array.isArray(json) ? json.length : 'not array'}`);
+                if (Array.isArray(json) && json.length > 0) {
+                    addDebug(`📋 Sample record: ${JSON.stringify(json[0]).substring(0, 150)}`);
+                }
+                setConnectionStatus(`✅ API Connected | ${Array.isArray(json) ? json.length : 0} records`, true);
+                return json;
+            } catch (e) {
+                addDebug(`⚠️ Response is not valid JSON: ${e.message}`);
+                setConnectionStatus("⚠️ API returned non-JSON response", false, true);
+                return null;
             }
-        }, 3000);
-    }
-    
-    function setConnectionStatus(message, isConnected = true) {
-        connectionStatus.textContent = message;
-        connectionStatus.style.background = isConnected ? '#dff1e6' : '#fee2e2';
-        connectionStatus.style.color = isConnected ? '#166534' : '#991b1b';
+        } catch (error) {
+            addDebug(`❌ Connection failed: ${error.message}`);
+            if (error.name === 'AbortError') addDebug("⏰ Request timed out after 10 seconds");
+            setConnectionStatus(`❌ Connection failed: ${error.message}`, false);
+            return null;
+        }
     }
     
     async function fetchAllCases() {
+        addDebug("🔄 Fetching cases from API...");
         try {
-            const response = await fetch(API_URL);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const response = await fetch(API_URL, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            addDebug(`✅ Response: ${response.status}`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
             const data = await response.json();
+            addDebug(`✅ Received ${Array.isArray(data) ? data.length : 'invalid'} records`);
             cases = Array.isArray(data) ? data : [];
             return true;
         } catch (error) {
-            console.error("Fetch error:", error);
-            setConnectionStatus(`❌ Connection failed: ${error.message}`, false);
+            addDebug(`❌ Fetch error: ${error.message}`);
+            setConnectionStatus(`⚠️ Connection issue - ${error.message}`, false, true);
             return false;
         }
     }
     
     async function addCaseToSheet(caseData) {
+        addDebug(`📤 Sending POST: ${caseData.number} - ${caseData.soc.substring(0, 30)}...`);
         try {
             await fetch(API_URL, {
                 method: 'POST',
@@ -478,9 +279,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(caseData)
             });
+            addDebug("✅ POST request sent (no-cors mode - assuming success)");
             return true;
         } catch (error) {
-            console.error("Add error:", error);
+            addDebug(`❌ POST error: ${error.message}`);
             return false;
         }
     }
@@ -488,9 +290,10 @@
     async function deleteCaseFromSheet(serialNo) {
         try {
             await fetch(`${API_URL}?id=${serialNo}`, { method: 'DELETE', mode: 'no-cors' });
+            addDebug(`🗑️ DELETE request sent for S.No. ${serialNo}`);
             return true;
         } catch (error) {
-            console.error("Delete error:", error);
+            addDebug(`❌ DELETE error: ${error.message}`);
             return false;
         }
     }
@@ -501,7 +304,7 @@
         if (success) {
             setConnectionStatus(`✅ Connected | ${cases.length} records loaded`, true);
         } else {
-            setConnectionStatus("⚠️ Connection issue - using cached data", false);
+            setConnectionStatus("⚠️ Connection issue - using cached data", false, true);
         }
         renderTableAndStats();
     }
@@ -540,8 +343,7 @@
                 return (c.number && c.number.toLowerCase().includes(searchTerm)) ||
                        (c.accusedName && c.accusedName.toLowerCase().includes(searchTerm)) ||
                        (c.complainantName && c.complainantName.toLowerCase().includes(searchTerm)) ||
-                       (c.soc && c.soc.toLowerCase().includes(searchTerm)) ||
-                       (c.sections && c.sections.toLowerCase().includes(searchTerm));
+                       (c.soc && c.soc.toLowerCase().includes(searchTerm));
             }
             return true;
         });
@@ -579,9 +381,7 @@
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = parseInt(btn.getAttribute('data-id'));
-                if (confirm('⚠️ Delete this case permanently? This action cannot be undone.')) {
-                    await deleteCase(id);
-                }
+                if (confirm('⚠️ Delete this case permanently?')) await deleteCase(id);
             });
         });
     }
@@ -597,8 +397,7 @@
     }
     
     function getTodayDate() {
-        const today = new Date();
-        return today.toISOString().split('T')[0];
+        return new Date().toISOString().split('T')[0];
     }
     
     async function onSubmitCase() {
@@ -612,55 +411,20 @@
         const complainantName = complainantNameInput.value.trim();
         const notes = caseNotesInput.value.trim();
         
-        // Validation
-        if (!number) { 
-            setStatus(formStatus, "❌ Number is required", true); 
-            return; 
-        }
-        if (!sections) { 
-            setStatus(formStatus, "❌ Sections is required", true); 
-            return; 
-        }
-        if (!doDate) { 
-            setStatus(formStatus, "❌ DO (Date of Occurence) is required", true); 
-            return; 
-        }
-        if (!drDate) { 
-            setStatus(formStatus, "❌ DR (Date of Report) is required", true); 
-            return; 
-        }
-        if (!soc) { 
-            setStatus(formStatus, "❌ SOC (Scene of Crime) is required", true); 
-            return; 
-        }
-        if (!accusedName) { 
-            setStatus(formStatus, "❌ Accused Name is required", true); 
-            return; 
-        }
-        if (!complainantName) { 
-            setStatus(formStatus, "❌ Complainant Name is required", true); 
-            return; 
-        }
+        if (!number) { setStatus(formStatus, "❌ Number is required", true); return; }
+        if (!sections) { setStatus(formStatus, "❌ Sections is required", true); return; }
+        if (!doDate) { setStatus(formStatus, "❌ DO is required", true); return; }
+        if (!drDate) { setStatus(formStatus, "❌ DR is required", true); return; }
+        if (!soc) { setStatus(formStatus, "❌ SOC is required", true); return; }
+        if (!accusedName) { setStatus(formStatus, "❌ Accused Name is required", true); return; }
+        if (!complainantName) { setStatus(formStatus, "❌ Complainant Name is required", true); return; }
         
-        const newCase = { 
-            caseType, 
-            number: number,
-            sections, 
-            doDate, 
-            drDate, 
-            soc: soc,
-            accusedName, 
-            complainantName, 
-            notes 
-        };
+        const newCase = { caseType, number, sections, doDate, drDate, soc, accusedName, complainantName, notes };
         
         submitBtn.disabled = true;
-        const originalText = submitBtn.innerText;
         submitBtn.innerText = "Registering...";
-        
         await addCase(newCase);
         
-        // Clear form
         caseNumberInput.value = "";
         sectionsInput.value = "";
         socLocationInput.value = "";
@@ -671,7 +435,7 @@
         drDateInput.value = getTodayDate();
         
         submitBtn.disabled = false;
-        submitBtn.innerText = originalText;
+        submitBtn.innerText = "➕ Register Case";
     }
     
     function resetForm() {
@@ -690,21 +454,20 @@
     async function init() {
         doDateInput.value = getTodayDate();
         drDateInput.value = getTodayDate();
+        
+        addDebug(`🚀 Application started`);
+        addDebug(`📍 API URL: ${API_URL}`);
+        
         await refreshData();
         
         submitBtn.addEventListener('click', onSubmitCase);
         resetFormBtn.addEventListener('click', resetForm);
-        refreshBtn.addEventListener('click', async () => { 
-            await refreshData(); 
-            setStatus(formStatus, "🔄 Case list refreshed", false);
-        });
+        testApiBtn.addEventListener('click', testApiConnection);
+        refreshBtn.addEventListener('click', async () => { await refreshData(); setStatus(formStatus, "🔄 Refreshed", false); });
         searchInput.addEventListener('input', () => renderTableAndStats());
         filterCaseType.addEventListener('change', () => renderTableAndStats());
         
-        // Auto-refresh every 30 seconds
-        setInterval(async () => {
-            await refreshData();
-        }, 30000);
+        setInterval(async () => { await refreshData(); }, 30000);
     }
     
     init();
