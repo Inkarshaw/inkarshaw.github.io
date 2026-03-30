@@ -2,29 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CaseFlow Pro | Case Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #f0f4f9;
             font-family: 'Inter', sans-serif;
             padding: 1.5rem;
             color: #0a1c2f;
         }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1600px; margin: 0 auto; }
+        
         .header {
             display: flex;
             justify-content: space-between;
@@ -35,7 +26,6 @@
             padding-bottom: 1rem;
             border-bottom: 2px solid #e2e8f0;
         }
-
         .header-left h1 {
             font-size: 1.8rem;
             font-weight: 700;
@@ -44,24 +34,16 @@
             background-clip: text;
             color: transparent;
         }
-
-        .header-left p {
-            font-size: 0.85rem;
-            color: #5f7d9c;
-            margin-top: 0.2rem;
-        }
-
+        .header-left p { font-size: 0.85rem; color: #5f7d9c; margin-top: 0.2rem; }
         .badge {
             background: #e2f0fa;
             color: #1a4d6f;
             padding: 0.3rem 1rem;
             border-radius: 40px;
             font-size: 0.75rem;
-            font-weight: 500;
             display: inline-block;
             margin-top: 0.3rem;
         }
-
         .dashboard-toggle-btn {
             background: linear-gradient(135deg, #1a4d6f, #0f3b5c);
             border: none;
@@ -70,21 +52,13 @@
             font-weight: 600;
             color: white;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
             width: auto;
             margin: 0;
-            box-shadow: 0 4px 12px rgba(26, 77, 111, 0.2);
         }
-
-        .dashboard-toggle-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(26, 77, 111, 0.3);
-        }
-
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -92,57 +66,29 @@
             margin-bottom: 2rem;
             display: none;
         }
-
-        .stats-grid.show {
-            display: grid;
-        }
-
+        .stats-grid.show { display: grid; }
         .stat-card {
             background: white;
             border-radius: 24px;
             padding: 1.2rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .stat-card i {
-            font-size: 2rem;
-            color: #1a4d6f;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card h3 {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: #5f7d9c;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card .value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #0f3b5c;
-        }
-
+        .stat-card i { font-size: 2rem; color: #1a4d6f; margin-bottom: 0.5rem; }
+        .stat-card h3 { font-size: 0.75rem; text-transform: uppercase; color: #5f7d9c; margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 2rem; font-weight: 800; color: #0f3b5c; }
+        
         .main-content {
             background: white;
             border-radius: 28px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
             overflow: hidden;
         }
-
         .tab-navigation {
             display: flex;
             border-bottom: 2px solid #e2e8f0;
             background: white;
             padding: 0 1.5rem;
         }
-
         .tab-btn {
             background: none;
             border: none;
@@ -151,63 +97,20 @@
             font-weight: 600;
             color: #5f7d9c;
             cursor: pointer;
-            transition: all 0.2s;
-            width: auto;
-            margin: 0;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             border-bottom: 3px solid transparent;
         }
-
-        .tab-btn:hover {
-            color: #1a4d6f;
-            background: #f8fafc;
-            transform: none;
-        }
-
-        .tab-btn.active {
-            color: #1a4d6f;
-            border-bottom-color: #1a4d6f;
-            background: white;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 1.8rem;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .input-group {
-            margin-bottom: 0.8rem;
-        }
-
-        .full-width {
-            grid-column: span 2;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            font-size: 0.7rem;
-            color: #1e3a5f;
-            text-transform: uppercase;
-        }
-
-        .required {
-            color: #dc2626;
-        }
-
+        .tab-btn.active { color: #1a4d6f; border-bottom-color: #1a4d6f; }
+        .tab-content { display: none; padding: 1.8rem; }
+        .tab-content.active { display: block; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .input-group { margin-bottom: 0.8rem; }
+        .full-width { grid-column: span 2; }
+        label { display: block; font-weight: 600; margin-bottom: 0.3rem; font-size: 0.7rem; color: #1e3a5f; text-transform: uppercase; }
+        .required { color: #dc2626; }
         input, textarea, select {
             width: 100%;
             padding: 0.6rem 0.9rem;
@@ -215,15 +118,8 @@
             border-radius: 12px;
             font-family: 'Inter', sans-serif;
             font-size: 0.85rem;
-            transition: all 0.2s;
         }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #1a4d6f;
-            box-shadow: 0 0 0 3px rgba(26, 77, 111, 0.1);
-        }
-
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #1a4d6f; }
         button {
             background: #1a4d6f;
             border: none;
@@ -234,88 +130,18 @@
             cursor: pointer;
             width: 100%;
             margin-top: 0.5rem;
-            transition: all 0.2s;
-            font-size: 0.85rem;
         }
-
-        button:hover {
-            background: #0f3a56;
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: #4b5563;
-        }
-
-        .btn-outline {
-            background: white;
-            color: #1a4d6f;
-            border: 2px solid #1a4d6f;
-        }
-
-        .accused-cards-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 0.8rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .accused-card {
-            background: #fefefe;
-            border: 1.5px solid #e2edf7;
-            border-radius: 16px;
-            padding: 1rem;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.8rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px dashed #e9edf2;
-        }
-
-        .card-title {
-            font-weight: 700;
-            font-size: 0.8rem;
-            background: #eef3fc;
-            padding: 0.25rem 0.8rem;
-            border-radius: 30px;
-            color: #1a4d6f;
-        }
-
-        .remove-accused-card {
-            background: #fee2e2;
-            color: #b91c1c;
-            border: none;
-            padding: 0.25rem 0.8rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            width: auto;
-            margin: 0;
-        }
-
-        .vertical-form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 0.6rem;
-        }
-
-        .acc-field label {
-            font-size: 0.6rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .add-accused-btn {
-            background: #2c5f8a;
-            padding: 0.6rem;
-            margin-top: 0.6rem;
-        }
-
+        .btn-secondary { background: #4b5563; }
+        .btn-outline { background: white; color: #1a4d6f; border: 2px solid #1a4d6f; }
+        
+        .accused-cards-container { display: flex; flex-direction: column; gap: 1rem; margin-top: 0.8rem; max-height: 400px; overflow-y: auto; }
+        .accused-card { background: #fefefe; border: 1.5px solid #e2edf7; border-radius: 16px; padding: 1rem; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px dashed #e9edf2; padding-bottom: 0.5rem; }
+        .card-title { font-weight: 700; font-size: 0.8rem; background: #eef3fc; padding: 0.25rem 0.8rem; border-radius: 30px; color: #1a4d6f; }
+        .remove-accused-card { background: #fee2e2; color: #b91c1c; border: none; padding: 0.25rem 0.8rem; border-radius: 40px; cursor: pointer; width: auto; margin: 0; }
+        .vertical-form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.6rem; }
+        .acc-field label { font-size: 0.6rem; margin-bottom: 0.2rem; }
+        .add-accused-btn { background: #2c5f8a; padding: 0.6rem; margin-top: 0.6rem; }
         .total-counter {
             background: linear-gradient(135deg, #eef2ff, #e6f0fa);
             border-radius: 16px;
@@ -325,168 +151,30 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        .cascade-card {
-            background: #f8fafc;
-            border-radius: 14px;
-            padding: 0.8rem 1rem;
-            border: 1px solid #e2edf7;
-            margin-bottom: 0.8rem;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .checkbox-label input {
-            width: 18px;
-            height: 18px;
-            margin: 0;
-        }
-
-        .cascade-fields {
-            margin-top: 0.8rem;
-            padding-left: 1.2rem;
-            border-left: 2px solid #cbdde9;
-            display: none;
-        }
-
-        .cascade-fields.show {
-            display: block;
-        }
-
-        .arrest-fields {
-            margin-top: 0.5rem;
-            padding-left: 1rem;
-            border-left: 2px solid #cbdde9;
-            display: none;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.6rem;
-        }
-
-        .arrest-fields.show {
-            display: grid;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            margin-top: 1rem;
-            max-height: 65vh;
-            overflow-y: auto;
-            border-radius: 16px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-        }
-
-        th {
-            background: #f1f6fd;
-            padding: 0.8rem 0.6rem;
-            text-align: left;
-            font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            position: sticky;
-            top: 0;
-            z-index: 5;
-        }
-
-        td {
-            padding: 0.7rem 0.6rem;
-            border-bottom: 1px solid #edf2f7;
-            vertical-align: top;
-        }
-
-        .case-badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 0.65rem;
-        }
-
+        .cascade-card { background: #f8fafc; border-radius: 14px; padding: 0.8rem 1rem; border: 1px solid #e2edf7; margin-bottom: 0.8rem; }
+        .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .cascade-fields { margin-top: 0.8rem; padding-left: 1.2rem; border-left: 2px solid #cbdde9; display: none; }
+        .cascade-fields.show { display: block; }
+        .arrest-fields { margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid #cbdde9; display: none; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .arrest-fields.show { display: grid; }
+        
+        .table-wrapper { overflow-x: auto; margin-top: 1rem; max-height: 65vh; overflow-y: auto; border-radius: 16px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        th { background: #f1f6fd; padding: 0.8rem 0.6rem; text-align: left; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; position: sticky; top: 0; }
+        td { padding: 0.7rem 0.6rem; border-bottom: 1px solid #edf2f7; vertical-align: top; }
+        .case-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 30px; font-weight: 700; font-size: 0.65rem; }
         .badge-fir { background: #fee2e2; color: #b91c1c; }
         .badge-csr { background: #e0f2fe; color: #0c4a6e; }
-
-        .action-buttons {
-            display: flex;
-            gap: 0.4rem;
-            flex-wrap: wrap;
-        }
-
-        .edit-btn, .delete-btn {
-            background: none;
-            border: none;
-            font-weight: 600;
-            font-size: 0.7rem;
-            cursor: pointer;
-            padding: 0.3rem 0.7rem;
-            border-radius: 40px;
-            width: auto;
-            margin: 0;
-        }
-
-        .edit-btn { background: #eef2ff; color: #1a4d6f; }
-        .delete-btn { background: #fef2f2; color: #dc2626; }
-
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 1.2rem;
-            align-items: center;
-        }
-
-        .filter-bar input, .filter-bar select {
-            width: auto;
-            flex: 1;
-            min-width: 140px;
-            padding: 0.5rem 0.9rem;
-        }
-
-        .filter-bar button {
-            width: auto;
-            padding: 0.5rem 1.2rem;
-            background: #eef2ff;
-            color: #1a4d6f;
-            margin-top: 0;
-        }
-
-        .status {
-            margin-top: 1rem;
-            padding: 0.6rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            text-align: center;
-            background: #f1f5f9;
-        }
-
+        .action-buttons { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .delete-btn { background: #fef2f2; color: #dc2626; border: none; padding: 0.3rem 0.7rem; border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 0.7rem; width: auto; margin: 0; }
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.2rem; align-items: center; }
+        .filter-bar input, .filter-bar select { width: auto; flex: 1; min-width: 140px; padding: 0.5rem 0.9rem; }
+        .filter-bar button { width: auto; padding: 0.5rem 1.2rem; background: #eef2ff; color: #1a4d6f; margin-top: 0; }
+        .status { margin-top: 1rem; padding: 0.6rem; border-radius: 40px; font-size: 0.75rem; text-align: center; background: #f1f5f9; }
         .status.success { background: #dff1e6; color: #166534; }
         .status.error { background: #fee2e2; color: #991b1b; }
-
-        .connection-status {
-            font-size: 0.65rem;
-            margin-top: 0.6rem;
-            padding: 5px 10px;
-            border-radius: 30px;
-            text-align: center;
-            background: #eef2ff;
-        }
-
-        .admin-panel {
-            background: #fef7e0;
-            border-radius: 40px;
-            padding: 0.4rem;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-size: 0.7rem;
-        }
+        .connection-status { font-size: 0.65rem; margin-top: 0.6rem; padding: 5px 10px; border-radius: 30px; text-align: center; background: #eef2ff; }
+        .admin-panel { background: #fef7e0; border-radius: 40px; padding: 0.4rem; margin-bottom: 1rem; text-align: center; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -497,9 +185,7 @@
             <p>Multi-Accused Case Management | Cascading Court Workflow</p>
             <div class="badge"><i class="fas fa-database"></i> Google Sheets Sync | <span id="adminStatus">Checking...</span></div>
         </div>
-        <button id="dashboardToggleBtn" class="dashboard-toggle-btn">
-            <i class="fas fa-chart-line"></i> Show Dashboard
-        </button>
+        <button id="dashboardToggleBtn" class="dashboard-toggle-btn"><i class="fas fa-chart-line"></i> Show Dashboard</button>
     </div>
 
     <div id="statsGrid" class="stats-grid">
@@ -517,52 +203,39 @@
         </div>
 
         <div id="registerTab" class="tab-content active">
-            <div id="adminOnlyWarning" class="admin-panel" style="display: none;"><i class="fas fa-shield-alt"></i> Admin Mode: Full edit/delete privileges</div>
-
+            <div id="adminOnlyWarning" class="admin-panel" style="display: none;"><i class="fas fa-shield-alt"></i> Admin Mode</div>
             <div class="form-grid">
-                <div class="input-group"><label>⚖️ Case Type <span class="required">*</span></label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
-                <div class="input-group"><label>🏷️ Head / Offence</label><input type="text" id="head" placeholder="e.g., Murder, Theft"></div>
-                <div class="input-group"><label>🔢 Case Number <span class="required">*</span></label><input type="text" id="caseNumber" placeholder="FIR 123/2024"></div>
-                <div class="input-group"><label>📜 Sections <span class="required">*</span></label><input type="text" id="sections" placeholder="302, 307 IPC"></div>
-                <div class="input-group"><label>📅 Date of Occurrence</label><input type="date" id="doDate"></div>
-                <div class="input-group"><label>📅 Date of Report</label><input type="date" id="drDate"></div>
-                <div class="input-group full-width"><label>📍 Scene of Crime</label><input type="text" id="socLocation" placeholder="Location details"></div>
+                <div class="input-group"><label>Case Type *</label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
+                <div class="input-group"><label>Head / Offence</label><input type="text" id="head" placeholder="e.g., Murder"></div>
+                <div class="input-group"><label>Case Number *</label><input type="text" id="caseNumber" placeholder="FIR 123/2024"></div>
+                <div class="input-group"><label>Sections *</label><input type="text" id="sections" placeholder="302, 307 IPC"></div>
+                <div class="input-group"><label>Date of Occurrence</label><input type="date" id="doDate"></div>
+                <div class="input-group"><label>Date of Report</label><input type="date" id="drDate"></div>
+                <div class="input-group full-width"><label>Scene of Crime</label><input type="text" id="socLocation"></div>
             </div>
 
-            <div class="total-counter">
-                <span><i class="fas fa-user-tie"></i> Total Accused Persons</span>
-                <span id="totalAccusedCount">0</span>
-            </div>
+            <div class="total-counter"><span><i class="fas fa-user-tie"></i> Total Accused</span><span id="totalAccusedCount">0</span></div>
             <div id="accusedCardsContainer" class="accused-cards-container"></div>
-            <button type="button" id="addAccusedBtn" class="add-accused-btn"><i class="fas fa-plus"></i> Add Another Accused</button>
+            <button type="button" id="addAccusedBtn" class="add-accused-btn"><i class="fas fa-plus"></i> Add Accused</button>
 
             <div class="form-grid" style="margin-top: 1.2rem;">
-                <div class="input-group full-width"><label>👤 Complainant Details</label><textarea id="complainantDetails" rows="2"></textarea></div>
-                <div class="input-group full-width"><label>📄 Complaint Gist</label><textarea id="complaintGist" rows="2"></textarea></div>
-                <div class="input-group full-width"><label>💰 Property Seized</label><textarea id="propertySeized" rows="2"></textarea></div>
+                <div class="input-group full-width"><label>Complainant Details</label><textarea id="complainantDetails" rows="2"></textarea></div>
+                <div class="input-group full-width"><label>Complaint Gist</label><textarea id="complaintGist" rows="2"></textarea></div>
+                <div class="input-group full-width"><label>Property Seized</label><textarea id="propertySeized" rows="2"></textarea></div>
                 
-                <div class="full-width"><label><i class="fas fa-gavel"></i> COURT PROCEEDINGS</label></div>
+                <div class="full-width"><label>COURT PROCEEDINGS</label></div>
                 <div class="input-group cascade-card full-width">
                     <label class="checkbox-label"><input type="checkbox" id="chargeSheetToggle"><span>📅 Charge Sheet Filed</span></label>
                     <div id="chargeSheetContainer" class="cascade-fields">
                         <input type="date" id="chargedDate" style="width:100%;">
-                        <div class="cascade-card" style="margin-top:0.5rem;">
-                            <label class="checkbox-label"><input type="checkbox" id="opinionToggle"><span>📝 Opinion Received</span></label>
-                            <div id="opinionContainer" class="cascade-fields">
-                                <input type="date" id="opinionDate" style="width:100%;">
-                                <div class="cascade-card">
-                                    <label class="checkbox-label"><input type="checkbox" id="eFilingToggle"><span>💻 e-Filing Completed</span></label>
-                                    <div id="eFilingContainer" class="cascade-fields">
-                                        <input type="date" id="eFilledDate" style="width:100%;">
-                                        <div class="cascade-card">
-                                            <label class="checkbox-label"><input type="checkbox" id="courtCaseToggle"><span>⚖️ Court Number Assigned</span></label>
-                                            <div id="courtCaseContainer" class="cascade-fields">
-                                                <input type="text" id="courtCaseNumber" placeholder="e.g., CC 45/2024" style="width:100%;">
-                                                <div class="cascade-card">
-                                                    <label class="checkbox-label"><input type="checkbox" id="courtStageToggle"><span>🏛️ Current Court Stage</span></label>
-                                                    <div id="courtStageContainer" class="cascade-fields">
-                                                        <input type="text" id="courtStage" placeholder="Investigation / Trial" style="width:100%;">
-                                                    </div>
+                        <div class="cascade-card"><label class="checkbox-label"><input type="checkbox" id="opinionToggle"><span>📝 Opinion Received</span></label>
+                            <div id="opinionContainer" class="cascade-fields"><input type="date" id="opinionDate" style="width:100%;">
+                                <div class="cascade-card"><label class="checkbox-label"><input type="checkbox" id="eFilingToggle"><span>💻 e-Filing</span></label>
+                                    <div id="eFilingContainer" class="cascade-fields"><input type="date" id="eFilledDate" style="width:100%;">
+                                        <div class="cascade-card"><label class="checkbox-label"><input type="checkbox" id="courtCaseToggle"><span>⚖️ Court Number</span></label>
+                                            <div id="courtCaseContainer" class="cascade-fields"><input type="text" id="courtCaseNumber" placeholder="CC 45/2024" style="width:100%;">
+                                                <div class="cascade-card"><label class="checkbox-label"><input type="checkbox" id="courtStageToggle"><span>🏛️ Court Stage</span></label>
+                                                    <div id="courtStageContainer" class="cascade-fields"><input type="text" id="courtStage" placeholder="Investigation / Trial" style="width:100%;"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -573,30 +246,28 @@
                     </div>
                 </div>
                 
-                <div class="input-group"><label>📋 Disposal Status</label><input type="text" id="disposal"></div>
-                <div class="input-group full-width"><label>✏️ Remarks</label><textarea id="remarks" rows="2"></textarea></div>
+                <div class="input-group"><label>Disposal Status</label><input type="text" id="disposal"></div>
+                <div class="input-group full-width"><label>Remarks</label><textarea id="remarks" rows="2"></textarea></div>
             </div>
 
             <button id="submitBtn"><i class="fas fa-save"></i> Register Case</button>
-            <button id="updateBtn" class="btn-secondary" style="display: none;"><i class="fas fa-edit"></i> Update Case</button>
-            <button id="cancelEditBtn" class="btn-outline" style="display: none;">Cancel Edit</button>
-            <button id="resetFormBtn" class="btn-secondary"><i class="fas fa-undo"></i> Clear Form</button>
+            <button id="updateBtn" class="btn-secondary" style="display: none;"><i class="fas fa-edit"></i> Update</button>
+            <button id="cancelEditBtn" class="btn-outline" style="display: none;">Cancel</button>
+            <button id="resetFormBtn" class="btn-secondary"><i class="fas fa-undo"></i> Clear</button>
             <div id="formStatus" class="status">⚡ Ready</div>
             <div id="connectionStatus" class="connection-status"><i class="fas fa-spinner fa-pulse"></i> Connecting...</div>
         </div>
 
         <div id="casesTab" class="tab-content">
             <div class="filter-bar">
-                <input type="text" id="searchInput" placeholder="🔍 Search by Case# / Accused...">
-                <select id="filterCaseType"><option value="all">All Cases</option><option value="FIR">FIR Only</option><option value="CSR">CSR Only</option></select>
+                <input type="text" id="searchInput" placeholder="Search by Case# / Accused...">
+                <select id="filterCaseType"><option value="all">All Cases</option><option value="FIR">FIR</option><option value="CSR">CSR</option></select>
                 <button id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
             <div id="statsInfo" class="status" style="display: inline-block; width: auto; padding: 0.3rem 1rem;">Loading...</div>
             <div class="table-wrapper">
                 <table id="dataTable">
-                    <thead>
-                        <tr><th>Case ID</th><th>Type</th><th>Case Number</th><th>Accused Name</th><th>Arrest</th><th>Charge Sheet</th><th>Opinion</th><th>e-Filing</th><th>Court No.</th><th>Stage</th><th>Actions</th></tr>
-                    </thead>
+                    <thead><tr><th>Case ID</th><th>Type</th><th>Case Number</th><th>Accused Name</th><th>Arrest</th><th>Charge Sheet</th><th>Opinion</th><th>e-Filing</th><th>Court No.</th><th>Stage</th><th>Actions</th></tr></thead>
                     <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;">Loading cases...</td></tr></tbody>
                 </table>
             </div>
@@ -605,15 +276,12 @@
 </div>
 
 <script>
-    // ==================== CONFIGURATION ====================
     const API_URL = "https://script.google.com/macros/s/AKfycbwjOyJO5lO6Itv362jLQeUOmEbXIog2J5jTorVfzzCVaCbjZh3TUWt0wRQVl3VYe_b0cA/exec";
     
     let allRecords = [];
     let isAdmin = false;
-    let currentEditSerialId = null;
     let dashboardVisible = false;
     
-    // DOM Elements
     const elements = {
         caseType: document.getElementById('caseType'), head: document.getElementById('head'), caseNumber: document.getElementById('caseNumber'),
         sections: document.getElementById('sections'), doDate: document.getElementById('doDate'), drDate: document.getElementById('drDate'),
@@ -625,7 +293,6 @@
         courtStage: document.getElementById('courtStage')
     };
     
-    // Toggles
     const toggles = {
         chargeSheet: { cb: document.getElementById('chargeSheetToggle'), container: document.getElementById('chargeSheetContainer'), child: 'opinion' },
         opinion: { cb: document.getElementById('opinionToggle'), container: document.getElementById('opinionContainer'), child: 'eFiling' },
@@ -645,7 +312,6 @@
         });
     });
     
-    // Dashboard Toggle
     document.getElementById('dashboardToggleBtn').addEventListener('click', () => {
         dashboardVisible = !dashboardVisible;
         document.getElementById('statsGrid').classList.toggle('show', dashboardVisible);
@@ -673,320 +339,4 @@
                 }
             }
         };
-        Object.keys(toggles).forEach(key => toggles[key].cb.addEventListener('change', () => updateCascade(key)));
-    }
-    
-    function getCourtData() {
-        return {
-            chargedDate: toggles.chargeSheet.cb.checked ? elements.chargedDate.value : '',
-            opinionDate: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked) ? elements.opinionDate.value : '',
-            eFilledDate: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked) ? elements.eFilledDate.value : '',
-            courtCaseNumber: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked && toggles.courtCase.cb.checked) ? elements.courtCaseNumber.value : '',
-            courtStage: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked && toggles.courtCase.cb.checked && toggles.courtStage.cb.checked) ? elements.courtStage.value : ''
-        };
-    }
-    
-    // Accused Card Functions
-    function createAccusedCard(accData = null) {
-        const card = document.createElement('div');
-        card.className = 'accused-card';
-        const nameVal = accData?.accusedName || '';
-        const fatherVal = accData?.accusedFather || '';
-        const ageVal = accData?.accusedAge || '';
-        const addressVal = accData?.accusedAddress || '';
-        const isArrested = accData?.isArrested === true || (accData?.dateOfArrest && accData.dateOfArrest !== '');
-        const arrestDateVal = accData?.dateOfArrest || '';
-        const bailStatusVal = accData?.bailStatus || '';
-        
-        card.innerHTML = `
-            <div class="card-header"><span class="card-title"><i class="fas fa-user"></i> Accused</span><button type="button" class="remove-accused-card"><i class="fas fa-trash"></i> Remove</button></div>
-            <div class="vertical-form-grid">
-                <div class="acc-field"><label>Full Name *</label><input type="text" class="acc-name" value="${escapeHtml(nameVal)}" placeholder="Full name"></div>
-                <div class="acc-field"><label>Father's Name</label><input type="text" class="acc-father" value="${escapeHtml(fatherVal)}" placeholder="Father's name"></div>
-                <div class="acc-field"><label>Age</label><input type="text" class="acc-age" value="${escapeHtml(ageVal)}" placeholder="Age"></div>
-                <div class="acc-field"><label>Address</label><input type="text" class="acc-address" value="${escapeHtml(addressVal)}" placeholder="Address"></div>
-                <div class="acc-field" style="grid-column: span 2;">
-                    <label class="checkbox-label"><input type="checkbox" class="arrest-checkbox" ${isArrested ? 'checked' : ''}> <span>🚔 Arrested</span></label>
-                    <div class="arrest-fields ${isArrested ? 'show' : ''}">
-                        <div class="acc-field"><label>Date of Arrest</label><input type="date" class="acc-arrest-date" value="${arrestDateVal}"></div>
-                        <div class="acc-field"><label>Bail Status</label>
-                            <select class="acc-bail-status"><option value="">-- Select --</option><option value="Not Arrested" ${bailStatusVal === 'Not Arrested' ? 'selected' : ''}>Not Arrested</option><option value="Police Custody" ${bailStatusVal === 'Police Custody' ? 'selected' : ''}>Police Custody</option><option value="Judicial Custody" ${bailStatusVal === 'Judicial Custody' ? 'selected' : ''}>Judicial Custody</option><option value="Bailed" ${bailStatusVal === 'Bailed' ? 'selected' : ''}>Bailed</option></select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        const arrestCheckbox = card.querySelector('.arrest-checkbox');
-        const arrestFields = card.querySelector('.arrest-fields');
-        arrestCheckbox.addEventListener('change', () => {
-            if (arrestCheckbox.checked) arrestFields.classList.add('show');
-            else { arrestFields.classList.remove('show'); card.querySelector('.acc-arrest-date').value = ''; card.querySelector('.acc-bail-status').value = ''; }
-        });
-        card.querySelector('.remove-accused-card').addEventListener('click', () => { if(document.querySelectorAll('#accusedCardsContainer .accused-card').length > 1) card.remove(); updateTotalCount(); });
-        return card;
-    }
-    
-    function updateTotalCount() { document.getElementById('totalAccusedCount').textContent = document.querySelectorAll('#accusedCardsContainer .accused-card').length; }
-    
-    function getAccusedList() {
-        const list = [];
-        document.querySelectorAll('#accusedCardsContainer .accused-card').forEach(card => {
-            const name = card.querySelector('.acc-name')?.value.trim();
-            if (name) {
-                const isArrested = card.querySelector('.arrest-checkbox')?.checked;
-                list.push({ 
-                    accusedName: name, accusedFather: card.querySelector('.acc-father')?.value || '', 
-                    accusedAge: card.querySelector('.acc-age')?.value || '', accusedAddress: card.querySelector('.acc-address')?.value || '', 
-                    isArrested: isArrested || false, 
-                    dateOfArrest: isArrested ? (card.querySelector('.acc-arrest-date')?.value || '') : '', 
-                    bailStatus: isArrested ? (card.querySelector('.acc-bail-status')?.value || '') : 'Not Arrested' 
-                });
-            }
-        });
-        return list;
-    }
-    
-    function loadAccusedCards(accusedArray) {
-        const container = document.getElementById('accusedCardsContainer');
-        container.innerHTML = '';
-        if (accusedArray && accusedArray.length) accusedArray.forEach(acc => container.appendChild(createAccusedCard(acc)));
-        else container.appendChild(createAccusedCard());
-        updateTotalCount();
-    }
-    
-    // Backend Functions
-    function setStatus(el, msg, isError = false) { 
-        el.textContent = msg; 
-        el.className = 'status'; 
-        el.classList.add(isError ? 'error' : 'success'); 
-        setTimeout(() => { if(el===formStatus && el.textContent===msg) { el.className='status'; el.textContent='⚡ Ready'; } }, 2500); 
-    }
-    
-    function setConnectionStatus(msg, ok) { 
-        connectionStatus.innerHTML = `<i class="fas ${ok ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${msg}`; 
-        connectionStatus.style.background = ok ? '#dff1e6' : '#fee2e2'; 
-    }
-    
-    async function checkAdmin() { 
-        try { 
-            const res = await fetch(`${API_URL}?checkAdmin=true`); 
-            const data = await res.json(); 
-            isAdmin = data.isAdmin || false; 
-            document.getElementById('adminStatus').innerHTML = isAdmin ? '<i class="fas fa-shield-alt"></i> Admin Mode' : '<i class="fas fa-user"></i> User Mode'; 
-            document.getElementById('adminOnlyWarning').style.display = isAdmin ? 'block' : 'none'; 
-        } catch(e) { 
-            isAdmin = true; 
-            document.getElementById('adminStatus').innerHTML = '<i class="fas fa-shield-alt"></i> Admin (Demo)'; 
-        } 
-    }
-    
-    async function fetchAllRecords() { 
-        try { 
-            setConnectionStatus('Loading...', true);
-            const res = await fetch(API_URL); 
-            if(!res.ok) throw new Error(`HTTP ${res.status}`); 
-            const data = await res.json(); 
-            if (data.error) throw new Error(data.error);
-            allRecords = data; 
-            console.log("Loaded", allRecords.length, "records");
-            setConnectionStatus(`✅ ${allRecords.length} records loaded`, true); 
-            renderTable();
-            return true; 
-        } catch(e) { 
-            console.error("Fetch error:", e);
-            setConnectionStatus('⚠️ Error: ' + e.message, false); 
-            return false; 
-        } 
-    }
-    
-    async function sendBatch(payload) { 
-        try { 
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); 
-            return true; 
-        } catch(e) { return false; } 
-    }
-    
-    async function addCaseWithAccused(master, accusedArray) {
-        const batch = accusedArray.map(acc => ({ ...master, ...acc }));
-        const ok = await sendBatch({ action: 'createBatch', records: batch });
-        if (ok) { await fetchAllRecords(); return true; }
-        return false;
-    }
-    
-    async function deleteCaseGroup(serialId) {
-        if (!isAdmin || !confirm(`Delete case #${serialId} and all accused?`)) return false;
-        const ok = await sendBatch({ action: 'deleteCaseGroup', caseSerial: serialId });
-        if (ok) { await fetchAllRecords(); setStatus(formStatus, 'Case deleted', false); return true; }
-        return false;
-    }
-    
-    function renderTable() {
-        if (!allRecords || allRecords.length === 0) { 
-            tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;"><i class="fas fa-inbox"></i> No cases registered</td></tr>'; 
-            updateStats(); 
-            return; 
-        }
-        
-        const groups = new Map();
-        allRecords.forEach(rec => { 
-            const sid = rec.caseSerial; 
-            if (!groups.has(sid)) groups.set(sid, []); 
-            groups.get(sid).push(rec); 
-        });
-        
-        let filtered = Array.from(groups.entries());
-        const typeFilter = filterCaseType.value;
-        const search = searchInput.value.trim().toLowerCase();
-        
-        filtered = filtered.filter(([sid, group]) => {
-            const master = group[0];
-            if (typeFilter !== 'all' && master.caseType !== typeFilter) return false;
-            if (search) {
-                const matchCase = master.caseNumber?.toLowerCase().includes(search);
-                const matchAccused = group.some(g => g.accusedName?.toLowerCase().includes(search));
-                if (!matchCase && !matchAccused) return false;
-            }
-            return true;
-        });
-        
-        let html = '';
-        for (let [sid, group] of filtered) {
-            const master = group[0];
-            const rowSpan = group.length;
-            
-            for (let i = 0; i < group.length; i++) {
-                const acc = group[i];
-                html += '<tr>';
-                
-                if (i === 0) {
-                    html += `<td rowspan="${rowSpan}"><strong>${sid}</strong></td>`;
-                    html += `<td rowspan="${rowSpan}"><span class="case-badge ${master.caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${master.caseType || '—'}</span></td>`;
-                    html += `<td rowspan="${rowSpan}"><strong>${escapeHtml(master.caseNumber || '—')}</strong></td>`;
-                }
-                
-                html += `<td>${escapeHtml(acc.accusedName || '—')}${acc.isArrested ? '<br><span style="font-size:0.6rem;">🚔 Arrested</span>' : ''}</td>`;
-                html += `<td>${acc.isArrested ? (acc.dateOfArrest || 'Yes') : '❌ No'}</td>`;
-                
-                if (i === 0) {
-                    html += `<td rowspan="${rowSpan}">${master.chargedDate ? formatDate(master.chargedDate) : '—'}</td>`;
-                    html += `<td rowspan="${rowSpan}">${master.opinionDate ? formatDate(master.opinionDate) : '—'}</td>`;
-                    html += `<td rowspan="${rowSpan}">${master.eFilledDate ? formatDate(master.eFilledDate) : '—'}</td>`;
-                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtCaseNumber || '—')}</td>`;
-                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtStage || '—')}</td>`;
-                    html += `<td rowspan="${rowSpan}" class="action-buttons">`;
-                    if (isAdmin) {
-                        html += `<button class="delete-btn" data-id="${sid}"><i class="fas fa-trash"></i> Delete</button>`;
-                    } else {
-                        html += `<span>🔍 view</span>`;
-                    }
-                    html += `</td>`;
-                }
-                
-                html += '</tr>';
-            }
-        }
-        
-        tableBody.innerHTML = html;
-        updateStats(filtered);
-        
-        document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', async () => await deleteCaseGroup(parseInt(btn.dataset.id))));
-    }
-    
-    function updateStats(filtered = null) {
-        if (!allRecords || allRecords.length === 0) {
-            document.getElementById('totalCases').textContent = '0';
-            document.getElementById('totalAccused').textContent = '0';
-            document.getElementById('firCount').textContent = '0';
-            document.getElementById('csrCount').textContent = '0';
-            document.getElementById('chargeSheetCount').textContent = '0';
-            statsInfo.innerHTML = '0 cases | 0 accused';
-            return;
-        }
-        
-        const uniqueCasesSet = new Set();
-        allRecords.forEach(rec => uniqueCasesSet.add(rec.caseSerial));
-        const uniqueCases = uniqueCasesSet.size;
-        const totalAccused = allRecords.length;
-        const firCount = allRecords.filter(r => r.caseType === 'FIR').length;
-        const csrCount = allRecords.filter(r => r.caseType === 'CSR').length;
-        const chargeSheetCount = allRecords.filter(r => r.chargedDate && r.chargedDate !== '').length;
-        
-        document.getElementById('totalCases').textContent = uniqueCases;
-        document.getElementById('totalAccused').textContent = totalAccused;
-        document.getElementById('firCount').textContent = firCount;
-        document.getElementById('csrCount').textContent = csrCount;
-        document.getElementById('chargeSheetCount').textContent = chargeSheetCount;
-        
-        if (filtered) {
-            const totalFilteredAccused = filtered.reduce((sum, [_, group]) => sum + group.length, 0);
-            statsInfo.innerHTML = `${filtered.length} cases | ${totalFilteredAccused} accused`;
-        } else {
-            statsInfo.innerHTML = `${uniqueCases} cases | ${totalAccused} accused`;
-        }
-    }
-    
-    function formatDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('en-GB', {day:'2-digit',month:'short'}); } catch(e) { return d; } }
-    
-    function clearForm() {
-        for (let k in elements) if (elements[k]) elements[k].value = '';
-        elements.caseType.value = 'FIR';
-        Object.keys(toggles).forEach(key => { toggles[key].cb.checked = false; toggles[key].container.classList.remove('show'); });
-        const today = new Date().toISOString().split('T')[0];
-        if(elements.doDate) elements.doDate.value = today;
-        if(elements.drDate) elements.drDate.value = today;
-        loadAccusedCards([]);
-    }
-    
-    function getMasterObject() {
-        let obj = {};
-        for (let k in elements) if (elements[k]) obj[k] = elements[k].value;
-        obj.caseType = elements.caseType.value;
-        Object.assign(obj, getCourtData());
-        return obj;
-    }
-    
-    async function onSubmit() {
-        const master = getMasterObject();
-        const accused = getAccusedList();
-        if (!master.caseNumber || !master.sections || accused.length === 0) { 
-            setStatus(formStatus, '❌ Required fields missing', true); 
-            return; 
-        }
-        submitBtn.disabled = true; 
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Registering...';
-        const ok = await addCaseWithAccused(master, accused);
-        if (ok) { 
-            setStatus(formStatus, '✅ Registered successfully', false); 
-            clearForm(); 
-        } else { 
-            setStatus(formStatus, '❌ Registration failed', true); 
-        }
-        submitBtn.disabled = false; 
-        submitBtn.innerHTML = '<i class="fas fa-save"></i> Register Case';
-    }
-    
-    async function refreshData() { await fetchAllRecords(); }
-    
-    function init() {
-        initCascading();
-        clearForm();
-        document.getElementById('addAccusedBtn').addEventListener('click', () => { 
-            document.getElementById('accusedCardsContainer').appendChild(createAccusedCard()); 
-            updateTotalCount(); 
-        });
-        checkAdmin(); 
-        refreshData();
-        submitBtn.addEventListener('click', onSubmit);
-        resetFormBtn.addEventListener('click', () => { if(confirm('Clear all fields?')) clearForm(); });
-        refreshBtn.addEventListener('click', refreshData);
-        searchInput.addEventListener('input', renderTable);
-        filterCaseType.addEventListener('change', renderTable);
-        setInterval(refreshData, 60000);
-    }
-    
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-    
-    init();
-</script>
-</body>
-</html>
+        Object.keys(toggles).forEach(key => toggles[key].cb.addEventListener('change', () => updateC
