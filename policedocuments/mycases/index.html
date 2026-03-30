@@ -229,9 +229,9 @@
             <div class="table-wrapper">
                 <table id="dataTable">
                     <thead>
-                        <tr><th>Case ID</th><th>Type</th><th>Case Number</th><th>Sections</th><th>Accused Name</th><th>Court Stage</th><th>Disposal</th><th>Actions</th></tr>
+                        <tr><th>Case ID</th><th>Type</th><th>Case Number</th><th>Sections</th><th>Accused Name</th><th>Court Stage</th><th>Disposal</th><th>Actions</th>\\
                     </thead>
-                    <tbody id="tableBody"><tr><td colspan="8" style="text-align:center;">Loading cases...</td></tr></tbody>
+                    <tbody id="tableBody">|<td colspan="8" style="text-align:center;">Loading cases...|</tbody>
                 </table>
             </div>
         </div>
@@ -368,6 +368,7 @@
             console.log("Loaded", allRecords.length, "records");
             if (allRecords.length > 0) {
                 console.log("Sample record:", allRecords[0]);
+                console.log("Sample caseSerial:", allRecords[0].caseSerial);
             }
             setConnectionStatus(`✅ ${allRecords.length} records loaded`, true); 
             renderTable();
@@ -410,19 +411,27 @@
     
     function renderTable() {
         if (!allRecords || allRecords.length === 0) { 
-            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;"><i class="fas fa-inbox"></i> No cases registered</td></tr>'; 
+            tableBody.innerHTML = '|<td colspan="8" style="text-align:center;"><i class="fas fa-inbox"></i> No cases registered|';
+            updateStats();
             return; 
         }
         
-        // Group by caseSerial
+        // Group by caseSerial - FIXED: Handle both number and string caseSerial
         const groups = new Map();
         allRecords.forEach(rec => { 
-            const sid = rec.caseSerial; 
+            let sid = rec.caseSerial;
+            // If caseSerial is undefined or null, use serialNo as fallback
+            if (!sid || sid === undefined || sid === null || sid === "") {
+                sid = rec.serialNo;
+                console.log("Using serialNo as fallback:", sid);
+            }
             if (sid) {
                 if (!groups.has(sid)) groups.set(sid, []); 
                 groups.get(sid).push(rec); 
             }
         });
+        
+        console.log("Groups count:", groups.size);
         
         let filtered = Array.from(groups.entries());
         const typeFilter = filterCaseType.value;
@@ -446,37 +455,37 @@
             
             for (let i = 0; i < group.length; i++) {
                 const acc = group[i];
-                html += '<tr>';
+                html += '</td>';
                 
                 if (i === 0) {
-                    html += `<td rowspan="${rowSpan}"><strong>${sid}</strong></td>`;
-                    html += `<td rowspan="${rowSpan}"><span class="case-badge ${master.caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${master.caseType || '—'}</span></td>`;
-                    html += `<td rowspan="${rowSpan}"><strong>${escapeHtml(master.caseNumber || '—')}</strong></td>`;
-                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.sections || '—')}</td>`;
+                    html += `<td rowspan="${rowSpan}"><strong>${sid || 'N/A'}</strong>`;
+                    html += `<td rowspan="${rowSpan}"><span class="case-badge ${master.caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${master.caseType || '—'}</span>`;
+                    html += `<td rowspan="${rowSpan}"><strong>${escapeHtml(master.caseNumber || '—')}</strong>`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.sections || '—')}`;
                 }
                 
-                html += `<td>${escapeHtml(acc.accusedName || '—')}</td>`;
+                html += `<td class="accused-name">${escapeHtml(acc.accusedName || '—')}`;
                 
                 if (i === 0) {
-                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtStage || '—')}</td>`;
-                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.disposal || '—')}</td>`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtStage || '—')}`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.disposal || '—')}`;
                     html += `<td rowspan="${rowSpan}" class="action-buttons">`;
                     if (isAdmin) {
                         html += `<button class="delete-btn" data-id="${sid}"><i class="fas fa-trash"></i> Delete</button>`;
                     } else {
                         html += `<span>🔍 view</span>`;
                     }
-                    html += `</td>`;
+                    html += ``;
                 }
                 
-                html += '</tr>';
+                html += '`';
             }
         }
         
         tableBody.innerHTML = html;
         updateStats(filtered);
         
-        document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', async () => await deleteCase(parseInt(btn.dataset.id))));
+        document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', async () => await deleteCase(btn.dataset.id)));
     }
     
     function updateStats(filtered = null) {
@@ -489,12 +498,21 @@
             return;
         }
         
+        // Group by caseSerial for unique case count
         const uniqueCasesSet = new Set();
-        allRecords.forEach(rec => { if (rec.caseSerial) uniqueCasesSet.add(rec.caseSerial); });
+        allRecords.forEach(rec => { 
+            let sid = rec.caseSerial;
+            if (!sid || sid === undefined || sid === null || sid === "") {
+                sid = rec.serialNo;
+            }
+            if (sid) uniqueCasesSet.add(sid); 
+        });
         const uniqueCases = uniqueCasesSet.size;
         const totalAccused = allRecords.length;
         const firCount = allRecords.filter(r => r.caseType === 'FIR').length;
         const csrCount = allRecords.filter(r => r.caseType === 'CSR').length;
+        
+        console.log("Stats - Unique Cases:", uniqueCases, "Total Accused:", totalAccused);
         
         document.getElementById('totalCases').textContent = uniqueCases;
         document.getElementById('totalAccused').textContent = totalAccused;
