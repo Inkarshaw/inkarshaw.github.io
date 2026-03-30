@@ -339,4 +339,325 @@
                 }
             }
         };
-        Object.keys(toggles).forEach(key => toggles[key].cb.addEventListener('change', () => updateC
+        Object.keys(toggles).forEach(key => toggles[key].cb.addEventListener('change', () => updateCascade(key)));
+    }
+    
+    function getCourtData() {
+        return {
+            chargedDate: toggles.chargeSheet.cb.checked ? elements.chargedDate.value : '',
+            opinionDate: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked) ? elements.opinionDate.value : '',
+            eFilledDate: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked) ? elements.eFilledDate.value : '',
+            courtCaseNumber: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked && toggles.courtCase.cb.checked) ? elements.courtCaseNumber.value : '',
+            courtStage: (toggles.chargeSheet.cb.checked && toggles.opinion.cb.checked && toggles.eFiling.cb.checked && toggles.courtCase.cb.checked && toggles.courtStage.cb.checked) ? elements.courtStage.value : ''
+        };
+    }
+    
+    function createAccusedCard(accData = null) {
+        const card = document.createElement('div');
+        card.className = 'accused-card';
+        const nameVal = accData?.accusedName || '';
+        const fatherVal = accData?.accusedFather || '';
+        const ageVal = accData?.accusedAge || '';
+        const addressVal = accData?.accusedAddress || '';
+        const isArrested = accData?.isArrested === true || (accData?.dateOfArrest && accData.dateOfArrest !== '');
+        const arrestDateVal = accData?.dateOfArrest || '';
+        const bailStatusVal = accData?.bailStatus || '';
+        
+        card.innerHTML = `
+            <div class="card-header"><span class="card-title"><i class="fas fa-user"></i> Accused</span><button type="button" class="remove-accused-card"><i class="fas fa-trash"></i> Remove</button></div>
+            <div class="vertical-form-grid">
+                <div class="acc-field"><label>Full Name *</label><input type="text" class="acc-name" value="${escapeHtml(nameVal)}" placeholder="Full name"></div>
+                <div class="acc-field"><label>Father's Name</label><input type="text" class="acc-father" value="${escapeHtml(fatherVal)}" placeholder="Father's name"></div>
+                <div class="acc-field"><label>Age</label><input type="text" class="acc-age" value="${escapeHtml(ageVal)}" placeholder="Age"></div>
+                <div class="acc-field"><label>Address</label><input type="text" class="acc-address" value="${escapeHtml(addressVal)}" placeholder="Address"></div>
+                <div class="acc-field" style="grid-column: span 2;">
+                    <label class="checkbox-label"><input type="checkbox" class="arrest-checkbox" ${isArrested ? 'checked' : ''}> <span>🚔 Arrested</span></label>
+                    <div class="arrest-fields ${isArrested ? 'show' : ''}">
+                        <div class="acc-field"><label>Date of Arrest</label><input type="date" class="acc-arrest-date" value="${arrestDateVal}"></div>
+                        <div class="acc-field"><label>Bail Status</label><select class="acc-bail-status"><option value="">-- Select --</option><option value="Not Arrested" ${bailStatusVal === 'Not Arrested' ? 'selected' : ''}>Not Arrested</option><option value="Police Custody" ${bailStatusVal === 'Police Custody' ? 'selected' : ''}>Police Custody</option><option value="Judicial Custody" ${bailStatusVal === 'Judicial Custody' ? 'selected' : ''}>Judicial Custody</option><option value="Bailed" ${bailStatusVal === 'Bailed' ? 'selected' : ''}>Bailed</option></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        const arrestCheckbox = card.querySelector('.arrest-checkbox');
+        const arrestFields = card.querySelector('.arrest-fields');
+        arrestCheckbox.addEventListener('change', () => {
+            if (arrestCheckbox.checked) arrestFields.classList.add('show');
+            else { arrestFields.classList.remove('show'); card.querySelector('.acc-arrest-date').value = ''; card.querySelector('.acc-bail-status').value = ''; }
+        });
+        card.querySelector('.remove-accused-card').addEventListener('click', () => { if(document.querySelectorAll('#accusedCardsContainer .accused-card').length > 1) card.remove(); updateTotalCount(); });
+        return card;
+    }
+    
+    function updateTotalCount() { document.getElementById('totalAccusedCount').textContent = document.querySelectorAll('#accusedCardsContainer .accused-card').length; }
+    
+    function getAccusedList() {
+        const list = [];
+        document.querySelectorAll('#accusedCardsContainer .accused-card').forEach(card => {
+            const name = card.querySelector('.acc-name')?.value.trim();
+            if (name) {
+                const isArrested = card.querySelector('.arrest-checkbox')?.checked;
+                list.push({ 
+                    accusedName: name, accusedFather: card.querySelector('.acc-father')?.value || '', 
+                    accusedAge: card.querySelector('.acc-age')?.value || '', accusedAddress: card.querySelector('.acc-address')?.value || '', 
+                    isArrested: isArrested || false, 
+                    dateOfArrest: isArrested ? (card.querySelector('.acc-arrest-date')?.value || '') : '', 
+                    bailStatus: isArrested ? (card.querySelector('.acc-bail-status')?.value || '') : 'Not Arrested' 
+                });
+            }
+        });
+        return list;
+    }
+    
+    function loadAccusedCards(accusedArray) {
+        const container = document.getElementById('accusedCardsContainer');
+        container.innerHTML = '';
+        if (accusedArray && accusedArray.length) accusedArray.forEach(acc => container.appendChild(createAccusedCard(acc)));
+        else container.appendChild(createAccusedCard());
+        updateTotalCount();
+    }
+    
+    function setStatus(el, msg, isError = false) { 
+        el.textContent = msg; 
+        el.className = 'status'; 
+        el.classList.add(isError ? 'error' : 'success'); 
+        setTimeout(() => { if(el===formStatus && el.textContent===msg) { el.className='status'; el.textContent='⚡ Ready'; } }, 2500); 
+    }
+    
+    function setConnectionStatus(msg, ok) { 
+        connectionStatus.innerHTML = `<i class="fas ${ok ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${msg}`; 
+        connectionStatus.style.background = ok ? '#dff1e6' : '#fee2e2'; 
+    }
+    
+    async function checkAdmin() { 
+        try { 
+            const res = await fetch(`${API_URL}?checkAdmin=true`); 
+            const data = await res.json(); 
+            isAdmin = data.isAdmin || false; 
+            document.getElementById('adminStatus').innerHTML = isAdmin ? '<i class="fas fa-shield-alt"></i> Admin Mode' : '<i class="fas fa-user"></i> User Mode'; 
+            document.getElementById('adminOnlyWarning').style.display = isAdmin ? 'block' : 'none'; 
+        } catch(e) { 
+            isAdmin = true; 
+            document.getElementById('adminStatus').innerHTML = '<i class="fas fa-shield-alt"></i> Admin (Demo)'; 
+        } 
+    }
+    
+    async function fetchAllRecords() { 
+        try { 
+            setConnectionStatus('Loading...', true);
+            const res = await fetch(API_URL); 
+            if(!res.ok) throw new Error(`HTTP ${res.status}`); 
+            const data = await res.json(); 
+            if (data.error) throw new Error(data.error);
+            allRecords = data; 
+            console.log("Loaded", allRecords.length, "records");
+            if (allRecords.length > 0) {
+                console.log("First record:", allRecords[0]);
+            }
+            setConnectionStatus(`✅ ${allRecords.length} records loaded`, true); 
+            renderTable();
+            return true; 
+        } catch(e) { 
+            console.error("Fetch error:", e);
+            setConnectionStatus('⚠️ Error: ' + e.message, false); 
+            return false; 
+        } 
+    }
+    
+    async function sendBatch(payload) { 
+        try { 
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); 
+            return true; 
+        } catch(e) { return false; } 
+    }
+    
+    async function addCaseWithAccused(master, accusedArray) {
+        const batch = accusedArray.map(acc => ({ ...master, ...acc }));
+        const ok = await sendBatch({ action: 'createBatch', records: batch });
+        if (ok) { await fetchAllRecords(); return true; }
+        return false;
+    }
+    
+    async function deleteCaseGroup(serialId) {
+        if (!isAdmin || !confirm(`Delete case #${serialId} and all accused?`)) return false;
+        const ok = await sendBatch({ action: 'deleteCaseGroup', caseSerial: serialId });
+        if (ok) { await fetchAllRecords(); setStatus(formStatus, 'Case deleted', false); return true; }
+        return false;
+    }
+    
+    function renderTable() {
+        if (!allRecords || allRecords.length === 0) { 
+            tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;"><i class="fas fa-inbox"></i> No cases registered. Click "Register New Case" to add.</td></tr>'; 
+            updateStats(); 
+            return; 
+        }
+        
+        // Group records by caseSerial
+        const groups = new Map();
+        allRecords.forEach(rec => { 
+            const sid = rec.caseSerial; 
+            if (sid) {
+                if (!groups.has(sid)) groups.set(sid, []); 
+                groups.get(sid).push(rec); 
+            }
+        });
+        
+        console.log("Groups:", groups.size);
+        
+        let filtered = Array.from(groups.entries());
+        const typeFilter = filterCaseType.value;
+        const search = searchInput.value.trim().toLowerCase();
+        
+        filtered = filtered.filter(([sid, group]) => {
+            const master = group[0];
+            if (typeFilter !== 'all' && master.caseType !== typeFilter) return false;
+            if (search) {
+                const matchCase = master.caseNumber?.toLowerCase().includes(search);
+                const matchAccused = group.some(g => g.accusedName?.toLowerCase().includes(search));
+                if (!matchCase && !matchAccused) return false;
+            }
+            return true;
+        });
+        
+        let html = '';
+        for (let [sid, group] of filtered) {
+            const master = group[0];
+            const rowSpan = group.length;
+            
+            for (let i = 0; i < group.length; i++) {
+                const acc = group[i];
+                html += '<tr>';
+                
+                if (i === 0) {
+                    html += `<td rowspan="${rowSpan}"><strong>${sid || 'N/A'}</strong></td>`;
+                    html += `<td rowspan="${rowSpan}"><span class="case-badge ${master.caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${master.caseType || '—'}</span></td>`;
+                    html += `<td rowspan="${rowSpan}"><strong>${escapeHtml(master.caseNumber || '—')}</strong></td>`;
+                }
+                
+                html += `<td>${escapeHtml(acc.accusedName || '—')}${acc.isArrested ? '<br><span style="font-size:0.6rem;">🚔 Arrested</span>' : ''}</td>`;
+                html += `<td>${acc.isArrested ? (acc.dateOfArrest || 'Yes') : '❌ No'}</td>`;
+                
+                if (i === 0) {
+                    html += `<td rowspan="${rowSpan}">${master.chargedDate ? formatDate(master.chargedDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${master.opinionDate ? formatDate(master.opinionDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${master.eFilledDate ? formatDate(master.eFilledDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtCaseNumber || '—')}</td>`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtStage || '—')}</td>`;
+                    html += `<td rowspan="${rowSpan}" class="action-buttons">`;
+                    if (isAdmin) {
+                        html += `<button class="delete-btn" data-id="${sid}"><i class="fas fa-trash"></i> Delete</button>`;
+                    } else {
+                        html += `<span>🔍 view</span>`;
+                    }
+                    html += `</td>`;
+                }
+                
+                html += '</tr>';
+            }
+        }
+        
+        tableBody.innerHTML = html;
+        updateStats(filtered);
+        
+        document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', async () => await deleteCaseGroup(parseInt(btn.dataset.id))));
+    }
+    
+    function updateStats(filtered = null) {
+        if (!allRecords || allRecords.length === 0) {
+            document.getElementById('totalCases').textContent = '0';
+            document.getElementById('totalAccused').textContent = '0';
+            document.getElementById('firCount').textContent = '0';
+            document.getElementById('csrCount').textContent = '0';
+            document.getElementById('chargeSheetCount').textContent = '0';
+            statsInfo.innerHTML = '0 cases | 0 accused';
+            return;
+        }
+        
+        const uniqueCasesSet = new Set();
+        allRecords.forEach(rec => { if (rec.caseSerial) uniqueCasesSet.add(rec.caseSerial); });
+        const uniqueCases = uniqueCasesSet.size;
+        const totalAccused = allRecords.length;
+        const firCount = allRecords.filter(r => r.caseType === 'FIR').length;
+        const csrCount = allRecords.filter(r => r.caseType === 'CSR').length;
+        const chargeSheetCount = allRecords.filter(r => r.chargedDate && r.chargedDate !== '').length;
+        
+        document.getElementById('totalCases').textContent = uniqueCases;
+        document.getElementById('totalAccused').textContent = totalAccused;
+        document.getElementById('firCount').textContent = firCount;
+        document.getElementById('csrCount').textContent = csrCount;
+        document.getElementById('chargeSheetCount').textContent = chargeSheetCount;
+        
+        if (filtered) {
+            const totalFilteredAccused = filtered.reduce((sum, [_, group]) => sum + group.length, 0);
+            statsInfo.innerHTML = `${filtered.length} cases | ${totalFilteredAccused} accused`;
+        } else {
+            statsInfo.innerHTML = `${uniqueCases} cases | ${totalAccused} accused`;
+        }
+    }
+    
+    function formatDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('en-GB', {day:'2-digit',month:'short'}); } catch(e) { return d; } }
+    
+    function clearForm() {
+        for (let k in elements) if (elements[k]) elements[k].value = '';
+        elements.caseType.value = 'FIR';
+        Object.keys(toggles).forEach(key => { toggles[key].cb.checked = false; toggles[key].container.classList.remove('show'); });
+        const today = new Date().toISOString().split('T')[0];
+        if(elements.doDate) elements.doDate.value = today;
+        if(elements.drDate) elements.drDate.value = today;
+        loadAccusedCards([]);
+    }
+    
+    function getMasterObject() {
+        let obj = {};
+        for (let k in elements) if (elements[k]) obj[k] = elements[k].value;
+        obj.caseType = elements.caseType.value;
+        Object.assign(obj, getCourtData());
+        return obj;
+    }
+    
+    async function onSubmit() {
+        const master = getMasterObject();
+        const accused = getAccusedList();
+        if (!master.caseNumber || !master.sections || accused.length === 0) { 
+            setStatus(formStatus, '❌ Required fields missing', true); 
+            return; 
+        }
+        submitBtn.disabled = true; 
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Registering...';
+        const ok = await addCaseWithAccused(master, accused);
+        if (ok) { 
+            setStatus(formStatus, '✅ Registered successfully', false); 
+            clearForm(); 
+        } else { 
+            setStatus(formStatus, '❌ Registration failed', true); 
+        }
+        submitBtn.disabled = false; 
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Register Case';
+    }
+    
+    async function refreshData() { await fetchAllRecords(); }
+    
+    function init() {
+        initCascading();
+        clearForm();
+        document.getElementById('addAccusedBtn').addEventListener('click', () => { 
+            document.getElementById('accusedCardsContainer').appendChild(createAccusedCard()); 
+            updateTotalCount(); 
+        });
+        checkAdmin(); 
+        refreshData();
+        submitBtn.addEventListener('click', onSubmit);
+        resetFormBtn.addEventListener('click', () => { if(confirm('Clear all fields?')) clearForm(); });
+        refreshBtn.addEventListener('click', refreshData);
+        searchInput.addEventListener('input', renderTable);
+        filterCaseType.addEventListener('change', renderTable);
+        setInterval(refreshData, 60000);
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    init();
+</script>
+</body>
+</html>
