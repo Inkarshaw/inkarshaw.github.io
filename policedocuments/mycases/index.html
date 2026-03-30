@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CaseFlow Pro | Centralized Case Management</title>
+    <title>CaseFlow Pro | Case Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -25,7 +25,6 @@
             margin: 0 auto;
         }
 
-        /* Header with Dashboard Button */
         .header {
             display: flex;
             justify-content: space-between;
@@ -86,11 +85,6 @@
             box-shadow: 0 6px 16px rgba(26, 77, 111, 0.3);
         }
 
-        .dashboard-toggle-btn i {
-            font-size: 1rem;
-        }
-
-        /* Stats Cards - Hidden by default, shown when dashboard is toggled */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -135,13 +129,6 @@
             color: #0f3b5c;
         }
 
-        .stat-card .sub {
-            font-size: 0.7rem;
-            color: #7c8ba0;
-            margin-top: 0.3rem;
-        }
-
-        /* Main Content Area */
         .main-content {
             background: white;
             border-radius: 28px;
@@ -149,7 +136,6 @@
             overflow: hidden;
         }
 
-        /* Tab Navigation */
         .tab-navigation {
             display: flex;
             border-bottom: 2px solid #e2e8f0;
@@ -186,7 +172,6 @@
             background: white;
         }
 
-        /* Tab Content */
         .tab-content {
             display: none;
             padding: 1.8rem;
@@ -196,7 +181,6 @@
             display: block;
         }
 
-        /* Form Styles */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -218,7 +202,6 @@
             font-size: 0.7rem;
             color: #1e3a5f;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
 
         .required {
@@ -233,7 +216,6 @@
             font-family: 'Inter', sans-serif;
             font-size: 0.85rem;
             transition: all 0.2s;
-            background: #ffffff;
         }
 
         input:focus, textarea:focus, select:focus {
@@ -271,12 +253,6 @@
             border: 2px solid #1a4d6f;
         }
 
-        .btn-outline:hover {
-            background: #eef2ff;
-            transform: none;
-        }
-
-        /* Accused Cards */
         .accused-cards-container {
             display: flex;
             flex-direction: column;
@@ -284,7 +260,6 @@
             margin-top: 0.8rem;
             max-height: 400px;
             overflow-y: auto;
-            padding-right: 0.3rem;
         }
 
         .accused-card {
@@ -335,16 +310,10 @@
             margin-bottom: 0.2rem;
         }
 
-        .acc-field input, .acc-field select {
-            padding: 0.45rem 0.7rem;
-            font-size: 0.75rem;
-        }
-
         .add-accused-btn {
             background: #2c5f8a;
             padding: 0.6rem;
             margin-top: 0.6rem;
-            font-size: 0.8rem;
         }
 
         .total-counter {
@@ -357,18 +326,6 @@
             align-items: center;
         }
 
-        .total-counter span:first-child {
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        .total-counter span:last-child {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #1a4d6f;
-        }
-
-        /* Cascading Toggles */
         .cascade-card {
             background: #f8fafc;
             border-radius: 14px;
@@ -388,13 +345,6 @@
             width: 18px;
             height: 18px;
             margin: 0;
-        }
-
-        .checkbox-label span {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #1e3a5f;
-            text-transform: none;
         }
 
         .cascade-fields {
@@ -421,7 +371,6 @@
             display: grid;
         }
 
-        /* Table Styles */
         .table-wrapper {
             overflow-x: auto;
             margin-top: 1rem;
@@ -443,7 +392,6 @@
             font-weight: 700;
             font-size: 0.7rem;
             text-transform: uppercase;
-            border-bottom: 1px solid #dce5ef;
             position: sticky;
             top: 0;
             z-index: 5;
@@ -472,7 +420,7 @@
             flex-wrap: wrap;
         }
 
-        .edit-btn, .delete-btn, .view-btn {
+        .edit-btn, .delete-btn {
             background: none;
             border: none;
             font-weight: 600;
@@ -486,7 +434,6 @@
 
         .edit-btn { background: #eef2ff; color: #1a4d6f; }
         .delete-btn { background: #fef2f2; color: #dc2626; }
-        .view-btn { background: #e6f7e6; color: #2e7d32; }
 
         .filter-bar {
             display: flex;
@@ -540,22 +487,6 @@
             text-align: center;
             font-size: 0.7rem;
         }
-
-        .stats-info {
-            background: #eef3fc;
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 900px) {
-            body { padding: 1rem; }
-            .form-grid { grid-template-columns: 1fr; }
-            .full-width { grid-column: span 1; }
-            .tab-btn { padding: 0.8rem 1rem; font-size: 0.8rem; }
-        }
     </style>
 </head>
 <body>
@@ -571,23 +502,20 @@
         </button>
     </div>
 
-    <!-- Stats Cards - Toggleable Dashboard -->
     <div id="statsGrid" class="stats-grid">
-        <div class="stat-card"><i class="fas fa-folder-open"></i><h3>Total Cases</h3><div class="value" id="totalCases">0</div><div class="sub">Unique case numbers</div></div>
-        <div class="stat-card"><i class="fas fa-users"></i><h3>Total Accused</h3><div class="value" id="totalAccused">0</div><div class="sub">Across all cases</div></div>
-        <div class="stat-card"><i class="fas fa-file-alt"></i><h3>FIR Cases</h3><div class="value" id="firCount">0</div><div class="sub">Registered FIRs</div></div>
-        <div class="stat-card"><i class="fas fa-file-signature"></i><h3>CSR Cases</h3><div class="value" id="csrCount">0</div><div class="sub">Registered CSRs</div></div>
-        <div class="stat-card"><i class="fas fa-charge-sheet"></i><h3>Charge Sheet Filed</h3><div class="value" id="chargeSheetCount">0</div><div class="sub">Cases with charge sheet</div></div>
+        <div class="stat-card"><i class="fas fa-folder-open"></i><h3>Total Cases</h3><div class="value" id="totalCases">0</div></div>
+        <div class="stat-card"><i class="fas fa-users"></i><h3>Total Accused</h3><div class="value" id="totalAccused">0</div></div>
+        <div class="stat-card"><i class="fas fa-file-alt"></i><h3>FIR Cases</h3><div class="value" id="firCount">0</div></div>
+        <div class="stat-card"><i class="fas fa-file-signature"></i><h3>CSR Cases</h3><div class="value" id="csrCount">0</div></div>
+        <div class="stat-card"><i class="fas fa-charge-sheet"></i><h3>Charge Sheet Filed</h3><div class="value" id="chargeSheetCount">0</div></div>
     </div>
 
-    <!-- Main Content with Tabs -->
     <div class="main-content">
         <div class="tab-navigation">
             <button class="tab-btn active" data-tab="register"><i class="fas fa-plus-circle"></i> Register New Case</button>
             <button class="tab-btn" data-tab="cases"><i class="fas fa-list-ul"></i> View All Cases</button>
         </div>
 
-        <!-- Register Case Tab -->
         <div id="registerTab" class="tab-content active">
             <div id="adminOnlyWarning" class="admin-panel" style="display: none;"><i class="fas fa-shield-alt"></i> Admin Mode: Full edit/delete privileges</div>
 
@@ -601,7 +529,6 @@
                 <div class="input-group full-width"><label>📍 Scene of Crime</label><input type="text" id="socLocation" placeholder="Location details"></div>
             </div>
 
-            <!-- Accused Section -->
             <div class="total-counter">
                 <span><i class="fas fa-user-tie"></i> Total Accused Persons</span>
                 <span id="totalAccusedCount">0</span>
@@ -609,35 +536,32 @@
             <div id="accusedCardsContainer" class="accused-cards-container"></div>
             <button type="button" id="addAccusedBtn" class="add-accused-btn"><i class="fas fa-plus"></i> Add Another Accused</button>
 
-            <!-- Additional Details -->
             <div class="form-grid" style="margin-top: 1.2rem;">
-                <div class="input-group full-width"><label>👤 Complainant Details</label><textarea id="complainantDetails" rows="2" placeholder="Name, address, contact"></textarea></div>
-                <div class="input-group full-width"><label>📄 Complaint Gist</label><textarea id="complaintGist" rows="2" placeholder="Brief summary"></textarea></div>
-                <div class="input-group full-width"><label>💰 Property Seized</label><textarea id="propertySeized" rows="2" placeholder="Seized property details"></textarea></div>
+                <div class="input-group full-width"><label>👤 Complainant Details</label><textarea id="complainantDetails" rows="2"></textarea></div>
+                <div class="input-group full-width"><label>📄 Complaint Gist</label><textarea id="complaintGist" rows="2"></textarea></div>
+                <div class="input-group full-width"><label>💰 Property Seized</label><textarea id="propertySeized" rows="2"></textarea></div>
                 
-                <!-- Cascading Court Proceedings -->
-                <div class="full-width"><label><i class="fas fa-gavel"></i> COURT PROCEEDINGS (Cascading)</label></div>
-                
+                <div class="full-width"><label><i class="fas fa-gavel"></i> COURT PROCEEDINGS</label></div>
                 <div class="input-group cascade-card full-width">
-                    <label class="checkbox-label"><input type="checkbox" id="chargeSheetToggle"><span>📅 1. Charge Sheet Filed</span></label>
+                    <label class="checkbox-label"><input type="checkbox" id="chargeSheetToggle"><span>📅 Charge Sheet Filed</span></label>
                     <div id="chargeSheetContainer" class="cascade-fields">
-                        <div class="input-group"><input type="date" id="chargedDate" placeholder="Charge sheet date"></div>
-                        <div class="cascade-card" style="margin-top: 0.5rem;">
-                            <label class="checkbox-label"><input type="checkbox" id="opinionToggle"><span>📝 2. Opinion Received</span></label>
+                        <input type="date" id="chargedDate" style="width:100%;">
+                        <div class="cascade-card" style="margin-top:0.5rem;">
+                            <label class="checkbox-label"><input type="checkbox" id="opinionToggle"><span>📝 Opinion Received</span></label>
                             <div id="opinionContainer" class="cascade-fields">
-                                <div class="input-group"><input type="date" id="opinionDate" placeholder="Opinion date"></div>
+                                <input type="date" id="opinionDate" style="width:100%;">
                                 <div class="cascade-card">
-                                    <label class="checkbox-label"><input type="checkbox" id="eFilingToggle"><span>💻 3. e-Filing Completed</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" id="eFilingToggle"><span>💻 e-Filing Completed</span></label>
                                     <div id="eFilingContainer" class="cascade-fields">
-                                        <div class="input-group"><input type="date" id="eFilledDate" placeholder="e-Filing date"></div>
+                                        <input type="date" id="eFilledDate" style="width:100%;">
                                         <div class="cascade-card">
-                                            <label class="checkbox-label"><input type="checkbox" id="courtCaseToggle"><span>⚖️ 4. Court Number Assigned</span></label>
+                                            <label class="checkbox-label"><input type="checkbox" id="courtCaseToggle"><span>⚖️ Court Number Assigned</span></label>
                                             <div id="courtCaseContainer" class="cascade-fields">
-                                                <div class="input-group"><input type="text" id="courtCaseNumber" placeholder="e.g., CC 45/2024"></div>
+                                                <input type="text" id="courtCaseNumber" placeholder="e.g., CC 45/2024" style="width:100%;">
                                                 <div class="cascade-card">
-                                                    <label class="checkbox-label"><input type="checkbox" id="courtStageToggle"><span>🏛️ 5. Current Court Stage</span></label>
+                                                    <label class="checkbox-label"><input type="checkbox" id="courtStageToggle"><span>🏛️ Current Court Stage</span></label>
                                                     <div id="courtStageContainer" class="cascade-fields">
-                                                        <input type="text" id="courtStage" placeholder="Investigation / Trial / Arguments">
+                                                        <input type="text" id="courtStage" placeholder="Investigation / Trial" style="width:100%;">
                                                     </div>
                                                 </div>
                                             </div>
@@ -649,34 +573,31 @@
                     </div>
                 </div>
                 
-                <div class="input-group"><label>📋 Disposal Status</label><input type="text" id="disposal" placeholder="Pending / Convicted / Acquitted"></div>
-                <div class="input-group full-width"><label>✏️ Remarks</label><textarea id="remarks" rows="2" placeholder="Additional notes"></textarea></div>
+                <div class="input-group"><label>📋 Disposal Status</label><input type="text" id="disposal"></div>
+                <div class="input-group full-width"><label>✏️ Remarks</label><textarea id="remarks" rows="2"></textarea></div>
             </div>
 
-            <button id="submitBtn"><i class="fas fa-save"></i> Register Case & Accused(s)</button>
+            <button id="submitBtn"><i class="fas fa-save"></i> Register Case</button>
             <button id="updateBtn" class="btn-secondary" style="display: none;"><i class="fas fa-edit"></i> Update Case</button>
             <button id="cancelEditBtn" class="btn-outline" style="display: none;">Cancel Edit</button>
             <button id="resetFormBtn" class="btn-secondary"><i class="fas fa-undo"></i> Clear Form</button>
-            <div id="formStatus" class="status">⚡ Ready — Fill required fields</div>
+            <div id="formStatus" class="status">⚡ Ready</div>
             <div id="connectionStatus" class="connection-status"><i class="fas fa-spinner fa-pulse"></i> Connecting...</div>
         </div>
 
-        <!-- View Cases Tab -->
         <div id="casesTab" class="tab-content">
             <div class="filter-bar">
                 <input type="text" id="searchInput" placeholder="🔍 Search by Case# / Accused...">
                 <select id="filterCaseType"><option value="all">All Cases</option><option value="FIR">FIR Only</option><option value="CSR">CSR Only</option></select>
-                <select id="filterStage"><option value="all">All Stages</option><option value="Charge Sheet">Charge Sheet Filed</option><option value="Opinion">Opinion Received</option><option value="e-Filing">e-Filing Done</option><option value="Trial">In Trial</option></select>
                 <button id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
-                <button id="exportBtn" class="btn-outline"><i class="fas fa-download"></i> Export CSV</button>
             </div>
-            <div id="statsInfo" class="stats-info"><i class="fas fa-info-circle"></i> Loading records...</div>
+            <div id="statsInfo" class="status" style="display: inline-block; width: auto; padding: 0.3rem 1rem;">Loading...</div>
             <div class="table-wrapper">
                 <table id="dataTable">
                     <thead>
-                        <tr><th>Case ID</th><th>Type</th><th>Case Number</th><th>Accused Name</th><th>Arrest</th><th>Charge Sheet</th><th>Opinion</th><th>e-Filing</th><th>Court No.</th><th>Stage</th><th>Actions</th>
+                        <tr><th>Case ID</th><th>Type</th><th>Case Number</th><th>Accused Name</th><th>Arrest</th><th>Charge Sheet</th><th>Opinion</th><th>e-Filing</th><th>Court No.</th><th>Stage</th><th>Actions</th></tr>
                     </thead>
-                    <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;"><i class="fas fa-spinner fa-pulse"></i> Loading cases...</td></tr></tbody>
+                    <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;">Loading cases...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -704,7 +625,7 @@
         courtStage: document.getElementById('courtStage')
     };
     
-    // Cascading Toggles
+    // Toggles
     const toggles = {
         chargeSheet: { cb: document.getElementById('chargeSheetToggle'), container: document.getElementById('chargeSheetContainer'), child: 'opinion' },
         opinion: { cb: document.getElementById('opinionToggle'), container: document.getElementById('opinionContainer'), child: 'eFiling' },
@@ -725,18 +646,11 @@
     });
     
     // Dashboard Toggle
-    const dashboardToggleBtn = document.getElementById('dashboardToggleBtn');
-    const statsGrid = document.getElementById('statsGrid');
-    dashboardToggleBtn.addEventListener('click', () => {
+    document.getElementById('dashboardToggleBtn').addEventListener('click', () => {
         dashboardVisible = !dashboardVisible;
-        if (dashboardVisible) {
-            statsGrid.classList.add('show');
-            dashboardToggleBtn.innerHTML = '<i class="fas fa-chart-line"></i> Hide Dashboard';
-            updateStats();
-        } else {
-            statsGrid.classList.remove('show');
-            dashboardToggleBtn.innerHTML = '<i class="fas fa-chart-line"></i> Show Dashboard';
-        }
+        document.getElementById('statsGrid').classList.toggle('show', dashboardVisible);
+        document.getElementById('dashboardToggleBtn').innerHTML = dashboardVisible ? '<i class="fas fa-chart-line"></i> Hide Dashboard' : '<i class="fas fa-chart-line"></i> Show Dashboard';
+        if (dashboardVisible) updateStats();
     });
     
     function initCascading() {
@@ -772,35 +686,6 @@
         };
     }
     
-    function setCourtDataFromMaster(master) {
-        Object.keys(toggles).forEach(key => { toggles[key].cb.checked = false; toggles[key].container.classList.remove('show'); });
-        if (master.chargedDate && master.chargedDate !== '') {
-            toggles.chargeSheet.cb.checked = true;
-            elements.chargedDate.value = master.chargedDate;
-            toggles.chargeSheet.container.classList.add('show');
-            if (master.opinionDate && master.opinionDate !== '') {
-                toggles.opinion.cb.checked = true;
-                elements.opinionDate.value = master.opinionDate;
-                toggles.opinion.container.classList.add('show');
-                if (master.eFilledDate && master.eFilledDate !== '') {
-                    toggles.eFiling.cb.checked = true;
-                    elements.eFilledDate.value = master.eFilledDate;
-                    toggles.eFiling.container.classList.add('show');
-                    if (master.courtCaseNumber && master.courtCaseNumber !== '') {
-                        toggles.courtCase.cb.checked = true;
-                        elements.courtCaseNumber.value = master.courtCaseNumber;
-                        toggles.courtCase.container.classList.add('show');
-                        if (master.courtStage && master.courtStage !== '') {
-                            toggles.courtStage.cb.checked = true;
-                            elements.courtStage.value = master.courtStage;
-                            toggles.courtStage.container.classList.add('show');
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     // Accused Card Functions
     function createAccusedCard(accData = null) {
         const card = document.createElement('div');
@@ -821,17 +706,11 @@
                 <div class="acc-field"><label>Age</label><input type="text" class="acc-age" value="${escapeHtml(ageVal)}" placeholder="Age"></div>
                 <div class="acc-field"><label>Address</label><input type="text" class="acc-address" value="${escapeHtml(addressVal)}" placeholder="Address"></div>
                 <div class="acc-field" style="grid-column: span 2;">
-                    <label class="checkbox-label" style="margin-bottom: 0.2rem;"><input type="checkbox" class="arrest-checkbox" ${isArrested ? 'checked' : ''}> <span>🚔 Arrested in this case</span></label>
+                    <label class="checkbox-label"><input type="checkbox" class="arrest-checkbox" ${isArrested ? 'checked' : ''}> <span>🚔 Arrested</span></label>
                     <div class="arrest-fields ${isArrested ? 'show' : ''}">
                         <div class="acc-field"><label>Date of Arrest</label><input type="date" class="acc-arrest-date" value="${arrestDateVal}"></div>
                         <div class="acc-field"><label>Bail Status</label>
-                            <select class="acc-bail-status">
-                                <option value="">-- Select --</option>
-                                <option value="Not Arrested" ${bailStatusVal === 'Not Arrested' ? 'selected' : ''}>Not Arrested</option>
-                                <option value="Police Custody" ${bailStatusVal === 'Police Custody' ? 'selected' : ''}>Police Custody</option>
-                                <option value="Judicial Custody" ${bailStatusVal === 'Judicial Custody' ? 'selected' : ''}>Judicial Custody</option>
-                                <option value="Bailed" ${bailStatusVal === 'Bailed' ? 'selected' : ''}>Bailed</option>
-                            </select>
+                            <select class="acc-bail-status"><option value="">-- Select --</option><option value="Not Arrested" ${bailStatusVal === 'Not Arrested' ? 'selected' : ''}>Not Arrested</option><option value="Police Custody" ${bailStatusVal === 'Police Custody' ? 'selected' : ''}>Police Custody</option><option value="Judicial Custody" ${bailStatusVal === 'Judicial Custody' ? 'selected' : ''}>Judicial Custody</option><option value="Bailed" ${bailStatusVal === 'Bailed' ? 'selected' : ''}>Bailed</option></select>
                         </div>
                     </div>
                 </div>
@@ -848,17 +727,25 @@
     }
     
     function updateTotalCount() { document.getElementById('totalAccusedCount').textContent = document.querySelectorAll('#accusedCardsContainer .accused-card').length; }
+    
     function getAccusedList() {
         const list = [];
         document.querySelectorAll('#accusedCardsContainer .accused-card').forEach(card => {
             const name = card.querySelector('.acc-name')?.value.trim();
             if (name) {
                 const isArrested = card.querySelector('.arrest-checkbox')?.checked;
-                list.push({ accusedName: name, accusedFather: card.querySelector('.acc-father')?.value || '', accusedAge: card.querySelector('.acc-age')?.value || '', accusedAddress: card.querySelector('.acc-address')?.value || '', isArrested: isArrested || false, dateOfArrest: isArrested ? (card.querySelector('.acc-arrest-date')?.value || '') : '', bailStatus: isArrested ? (card.querySelector('.acc-bail-status')?.value || '') : 'Not Arrested' });
+                list.push({ 
+                    accusedName: name, accusedFather: card.querySelector('.acc-father')?.value || '', 
+                    accusedAge: card.querySelector('.acc-age')?.value || '', accusedAddress: card.querySelector('.acc-address')?.value || '', 
+                    isArrested: isArrested || false, 
+                    dateOfArrest: isArrested ? (card.querySelector('.acc-arrest-date')?.value || '') : '', 
+                    bailStatus: isArrested ? (card.querySelector('.acc-bail-status')?.value || '') : 'Not Arrested' 
+                });
             }
         });
         return list;
     }
+    
     function loadAccusedCards(accusedArray) {
         const container = document.getElementById('accusedCardsContainer');
         container.innerHTML = '';
@@ -868,54 +755,96 @@
     }
     
     // Backend Functions
-    function setStatus(el, msg, isError = false) { el.textContent = msg; el.className = 'status'; el.classList.add(isError ? 'error' : 'success'); setTimeout(() => { if(el===formStatus && el.textContent===msg) { el.className='status'; el.textContent='⚡ Ready — Fill required fields'; } }, 2500); }
-    function setConnectionStatus(msg, ok) { connectionStatus.innerHTML = `<i class="fas ${ok ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${msg}`; connectionStatus.style.background = ok ? '#dff1e6' : '#fee2e2'; }
+    function setStatus(el, msg, isError = false) { 
+        el.textContent = msg; 
+        el.className = 'status'; 
+        el.classList.add(isError ? 'error' : 'success'); 
+        setTimeout(() => { if(el===formStatus && el.textContent===msg) { el.className='status'; el.textContent='⚡ Ready'; } }, 2500); 
+    }
+    
+    function setConnectionStatus(msg, ok) { 
+        connectionStatus.innerHTML = `<i class="fas ${ok ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${msg}`; 
+        connectionStatus.style.background = ok ? '#dff1e6' : '#fee2e2'; 
+    }
     
     async function checkAdmin() { 
-        try { const res = await fetch(`${API_URL}?checkAdmin=true`); const data = await res.json(); isAdmin = data.isAdmin || false; adminStatusSpan.innerHTML = isAdmin ? '<i class="fas fa-shield-alt"></i> Admin Mode' : '<i class="fas fa-user"></i> User Mode'; adminOnlyWarning.style.display = isAdmin ? 'block' : 'none'; } 
-        catch(e) { isAdmin = true; adminStatusSpan.innerHTML = '<i class="fas fa-shield-alt"></i> Admin (Demo)'; adminOnlyWarning.style.display = 'block'; } 
+        try { 
+            const res = await fetch(`${API_URL}?checkAdmin=true`); 
+            const data = await res.json(); 
+            isAdmin = data.isAdmin || false; 
+            document.getElementById('adminStatus').innerHTML = isAdmin ? '<i class="fas fa-shield-alt"></i> Admin Mode' : '<i class="fas fa-user"></i> User Mode'; 
+            document.getElementById('adminOnlyWarning').style.display = isAdmin ? 'block' : 'none'; 
+        } catch(e) { 
+            isAdmin = true; 
+            document.getElementById('adminStatus').innerHTML = '<i class="fas fa-shield-alt"></i> Admin (Demo)'; 
+        } 
     }
-    async function fetchAllRecords() { try { const res = await fetch(API_URL); if(!res.ok) throw new Error(); allRecords = await res.json(); setConnectionStatus(`${allRecords.length} records loaded`, true); return true; } catch(e) { setConnectionStatus('Demo mode', false); return false; } }
-    async function sendBatch(payload) { try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); return true; } catch(e) { return false; } }
+    
+    async function fetchAllRecords() { 
+        try { 
+            setConnectionStatus('Loading...', true);
+            const res = await fetch(API_URL); 
+            if(!res.ok) throw new Error(`HTTP ${res.status}`); 
+            const data = await res.json(); 
+            if (data.error) throw new Error(data.error);
+            allRecords = data; 
+            console.log("Loaded", allRecords.length, "records");
+            setConnectionStatus(`✅ ${allRecords.length} records loaded`, true); 
+            renderTable();
+            return true; 
+        } catch(e) { 
+            console.error("Fetch error:", e);
+            setConnectionStatus('⚠️ Error: ' + e.message, false); 
+            return false; 
+        } 
+    }
+    
+    async function sendBatch(payload) { 
+        try { 
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); 
+            return true; 
+        } catch(e) { return false; } 
+    }
     
     async function addCaseWithAccused(master, accusedArray) {
         const batch = accusedArray.map(acc => ({ ...master, ...acc }));
         const ok = await sendBatch({ action: 'createBatch', records: batch });
-        if (ok) { await fetchAllRecords(); renderTable(); return true; }
-        return false;
-    }
-    
-    async function updateCaseGroup(serialId, master, newAccused) {
-        if (!isAdmin) return false;
-        const ok = await sendBatch({ action: 'replaceCaseGroup', caseSerial: serialId, masterCase: master, accusedList: newAccused });
-        if (ok) { await fetchAllRecords(); renderTable(); return true; }
+        if (ok) { await fetchAllRecords(); return true; }
         return false;
     }
     
     async function deleteCaseGroup(serialId) {
         if (!isAdmin || !confirm(`Delete case #${serialId} and all accused?`)) return false;
         const ok = await sendBatch({ action: 'deleteCaseGroup', caseSerial: serialId });
-        if (ok) { await fetchAllRecords(); renderTable(); setStatus(formStatus, 'Case deleted', false); return true; }
+        if (ok) { await fetchAllRecords(); setStatus(formStatus, 'Case deleted', false); return true; }
         return false;
     }
     
     function renderTable() {
-        if (!allRecords.length) { tableBody.innerHTML = '|<td colspan="11" style="text-align:center;"><i class="fas fa-inbox"></i> No cases registered|'; updateStats(); return; }
+        if (!allRecords || allRecords.length === 0) { 
+            tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;"><i class="fas fa-inbox"></i> No cases registered</td></tr>'; 
+            updateStats(); 
+            return; 
+        }
         
         const groups = new Map();
-        allRecords.forEach(rec => { const sid = rec.caseSerial; if (!groups.has(sid)) groups.set(sid, []); groups.get(sid).push(rec); });
+        allRecords.forEach(rec => { 
+            const sid = rec.caseSerial; 
+            if (!groups.has(sid)) groups.set(sid, []); 
+            groups.get(sid).push(rec); 
+        });
         
         let filtered = Array.from(groups.entries());
-        const typeFilter = filterCaseType.value, search = searchInput.value.trim().toLowerCase(), stageFilter = filterStage.value;
-        filtered = filtered.filter(([_, group]) => {
-            const m = group[0];
-            if (typeFilter !== 'all' && m.caseType !== typeFilter) return false;
-            if (search) return m.caseNumber?.toLowerCase().includes(search) || group.some(g => g.accusedName?.toLowerCase().includes(search));
-            if (stageFilter !== 'all') {
-                if (stageFilter === 'Charge Sheet' && !m.chargedDate) return false;
-                if (stageFilter === 'Opinion' && !m.opinionDate) return false;
-                if (stageFilter === 'e-Filing' && !m.eFilledDate) return false;
-                if (stageFilter === 'Trial' && (!m.courtStage || !m.courtStage.toLowerCase().includes('trial'))) return false;
+        const typeFilter = filterCaseType.value;
+        const search = searchInput.value.trim().toLowerCase();
+        
+        filtered = filtered.filter(([sid, group]) => {
+            const master = group[0];
+            if (typeFilter !== 'all' && master.caseType !== typeFilter) return false;
+            if (search) {
+                const matchCase = master.caseNumber?.toLowerCase().includes(search);
+                const matchAccused = group.some(g => g.accusedName?.toLowerCase().includes(search));
+                if (!matchCase && !matchAccused) return false;
             }
             return true;
         });
@@ -923,73 +852,80 @@
         let html = '';
         for (let [sid, group] of filtered) {
             const master = group[0];
+            const rowSpan = group.length;
+            
             for (let i = 0; i < group.length; i++) {
                 const acc = group[i];
-                html += `\\
-                    <td${i === 0 ? ` rowspan="${group.length}"` : ''}><strong>${sid}</strong>`;
+                html += '<tr>';
+                
                 if (i === 0) {
-                    html += `<td rowspan="${group.length}"><span class="case-badge ${master.caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${master.caseType}</span>`;
-                    html += `<td rowspan="${group.length}"><strong>${escapeHtml(master.caseNumber)}</strong>`;
+                    html += `<td rowspan="${rowSpan}"><strong>${sid}</strong></td>`;
+                    html += `<td rowspan="${rowSpan}"><span class="case-badge ${master.caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${master.caseType || '—'}</span></td>`;
+                    html += `<td rowspan="${rowSpan}"><strong>${escapeHtml(master.caseNumber || '—')}</strong></td>`;
                 }
-                html += `}<td class="accused-name-cell">${escapeHtml(acc.accusedName)}${acc.isArrested ? '<br><span style="font-size:0.6rem;">🚔 Arrested</span>' : ''}`;
-                html += `}<td>${acc.isArrested ? (acc.dateOfArrest || 'Yes') : '❌ No'}`;
+                
+                html += `<td>${escapeHtml(acc.accusedName || '—')}${acc.isArrested ? '<br><span style="font-size:0.6rem;">🚔 Arrested</span>' : ''}</td>`;
+                html += `<td>${acc.isArrested ? (acc.dateOfArrest || 'Yes') : '❌ No'}</td>`;
+                
                 if (i === 0) {
-                    html += `<td rowspan="${group.length}">${master.chargedDate ? formatDate(master.chargedDate) : '—'}`;
-                    html += `<td rowspan="${group.length}">${master.opinionDate ? formatDate(master.opinionDate) : '—'}`;
-                    html += `<td rowspan="${group.length}">${master.eFilledDate ? formatDate(master.eFilledDate) : '—'}`;
-                    html += `<td rowspan="${group.length}">${escapeHtml(master.courtCaseNumber || '—')}`;
-                    html += `<td rowspan="${group.length}">${escapeHtml(master.courtStage || '—')}`;
-                    html += `<td rowspan="${group.length}" class="action-buttons">`;
-                    if (isAdmin) html += `<button class="edit-btn" data-id="${sid}"><i class="fas fa-edit"></i> Edit</button> <button class="delete-btn" data-id="${sid}"><i class="fas fa-trash"></i> Delete</button>`;
-                    else html += `<button class="view-btn" data-id="${sid}"><i class="fas fa-eye"></i> View</button>`;
+                    html += `<td rowspan="${rowSpan}">${master.chargedDate ? formatDate(master.chargedDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${master.opinionDate ? formatDate(master.opinionDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${master.eFilledDate ? formatDate(master.eFilledDate) : '—'}</td>`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtCaseNumber || '—')}</td>`;
+                    html += `<td rowspan="${rowSpan}">${escapeHtml(master.courtStage || '—')}</td>`;
+                    html += `<td rowspan="${rowSpan}" class="action-buttons">`;
+                    if (isAdmin) {
+                        html += `<button class="delete-btn" data-id="${sid}"><i class="fas fa-trash"></i> Delete</button>`;
+                    } else {
+                        html += `<span>🔍 view</span>`;
+                    }
                     html += `</td>`;
                 }
-                html += `</tr>`;
+                
+                html += '</tr>';
             }
         }
+        
         tableBody.innerHTML = html;
         updateStats(filtered);
         
-        document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => loadCaseForEdit(parseInt(btn.dataset.id))));
         document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', async () => await deleteCaseGroup(parseInt(btn.dataset.id))));
     }
     
     function updateStats(filtered = null) {
-        const groups = new Map();
-        allRecords.forEach(rec => { const sid = rec.caseSerial; if (!groups.has(sid)) groups.set(sid, []); groups.get(sid).push(rec); });
-        const uniqueCases = groups.size;
+        if (!allRecords || allRecords.length === 0) {
+            document.getElementById('totalCases').textContent = '0';
+            document.getElementById('totalAccused').textContent = '0';
+            document.getElementById('firCount').textContent = '0';
+            document.getElementById('csrCount').textContent = '0';
+            document.getElementById('chargeSheetCount').textContent = '0';
+            statsInfo.innerHTML = '0 cases | 0 accused';
+            return;
+        }
+        
+        const uniqueCasesSet = new Set();
+        allRecords.forEach(rec => uniqueCasesSet.add(rec.caseSerial));
+        const uniqueCases = uniqueCasesSet.size;
         const totalAccused = allRecords.length;
         const firCount = allRecords.filter(r => r.caseType === 'FIR').length;
         const csrCount = allRecords.filter(r => r.caseType === 'CSR').length;
         const chargeSheetCount = allRecords.filter(r => r.chargedDate && r.chargedDate !== '').length;
+        
         document.getElementById('totalCases').textContent = uniqueCases;
         document.getElementById('totalAccused').textContent = totalAccused;
         document.getElementById('firCount').textContent = firCount;
         document.getElementById('csrCount').textContent = csrCount;
         document.getElementById('chargeSheetCount').textContent = chargeSheetCount;
-        statsInfo.innerHTML = `<i class="fas fa-chart-bar"></i> ${filtered ? filtered.length : uniqueCases} cases | ${totalAccused} accused rows`;
+        
+        if (filtered) {
+            const totalFilteredAccused = filtered.reduce((sum, [_, group]) => sum + group.length, 0);
+            statsInfo.innerHTML = `${filtered.length} cases | ${totalFilteredAccused} accused`;
+        } else {
+            statsInfo.innerHTML = `${uniqueCases} cases | ${totalAccused} accused`;
+        }
     }
     
     function formatDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('en-GB', {day:'2-digit',month:'short'}); } catch(e) { return d; } }
-    
-    function loadCaseForEdit(serialId) {
-        if (!isAdmin) { setStatus(formStatus, 'Admin only', true); return; }
-        const caseRows = allRecords.filter(r => r.caseSerial === serialId);
-        if (!caseRows.length) return;
-        const master = caseRows[0];
-        currentEditSerialId = serialId;
-        for (let k in elements) if (elements[k]) elements[k].value = master[k] || '';
-        elements.caseType.value = master.caseType || 'FIR';
-        setCourtDataFromMaster(master);
-        const accusedArr = caseRows.map(r => ({ accusedName: r.accusedName, accusedFather: r.accusedFather, accusedAge: r.accusedAge, accusedAddress: r.accusedAddress, isArrested: !!(r.dateOfArrest && r.dateOfArrest !== ''), dateOfArrest: r.dateOfArrest || '', bailStatus: r.bailStatus || '' }));
-        loadAccusedCards(accusedArr);
-        submitBtn.style.display = 'none'; updateBtn.style.display = 'block'; cancelEditBtn.style.display = 'block';
-        formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Case ID ' + serialId;
-        setStatus(formStatus, 'Editing mode', false);
-        document.querySelector('.tab-btn[data-tab="register"]').click();
-    }
-    
-    function cancelEdit() { currentEditSerialId = null; clearForm(); submitBtn.style.display = 'block'; updateBtn.style.display = 'none'; cancelEditBtn.style.display = 'block'; formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Register New Case'; }
     
     function clearForm() {
         for (let k in elements) if (elements[k]) elements[k].value = '';
@@ -1012,56 +948,44 @@
     async function onSubmit() {
         const master = getMasterObject();
         const accused = getAccusedList();
-        if (!master.caseNumber || !master.sections || accused.length === 0) { setStatus(formStatus, '❌ Required fields missing', true); return; }
-        submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Registering...';
+        if (!master.caseNumber || !master.sections || accused.length === 0) { 
+            setStatus(formStatus, '❌ Required fields missing', true); 
+            return; 
+        }
+        submitBtn.disabled = true; 
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Registering...';
         const ok = await addCaseWithAccused(master, accused);
-        if (ok) { setStatus(formStatus, '✅ Registered successfully', false); clearForm(); }
-        else setStatus(formStatus, '❌ Registration failed', true);
-        submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-save"></i> Register Case & Accused(s)';
+        if (ok) { 
+            setStatus(formStatus, '✅ Registered successfully', false); 
+            clearForm(); 
+        } else { 
+            setStatus(formStatus, '❌ Registration failed', true); 
+        }
+        submitBtn.disabled = false; 
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Register Case';
     }
     
-    async function onUpdate() {
-        if (!currentEditSerialId) return;
-        const master = getMasterObject();
-        const accused = getAccusedList();
-        if (!master.caseNumber || accused.length === 0) { setStatus(formStatus, 'Missing fields', true); return; }
-        updateBtn.disabled = true; updateBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Updating...';
-        const ok = await updateCaseGroup(currentEditSerialId, master, accused);
-        if (ok) cancelEdit();
-        else setStatus(formStatus, 'Update failed', true);
-        updateBtn.disabled = false; updateBtn.innerHTML = '<i class="fas fa-edit"></i> Update Case';
-    }
-    
-    async function refreshData() { await fetchAllRecords(); renderTable(); }
-    
-    function exportToCSV() {
-        if (!allRecords.length) { alert('No data to export'); return; }
-        const headers = ['Case ID', 'Case Type', 'Case Number', 'Sections', 'Accused Name', 'Arrested', 'Date of Arrest', 'Bail Status', 'Charge Sheet Date', 'Opinion Date', 'e-Filing Date', 'Court Number', 'Court Stage', 'Disposal'];
-        const rows = allRecords.map(r => [r.caseSerial, r.caseType, r.caseNumber, r.sections, r.accusedName, r.isArrested, r.dateOfArrest, r.bailStatus, r.chargedDate, r.opinionDate, r.eFilledDate, r.courtCaseNumber, r.courtStage, r.disposal]);
-        const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `caseflow_export_${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(url);
-    }
+    async function refreshData() { await fetchAllRecords(); }
     
     function init() {
         initCascading();
         clearForm();
-        document.getElementById('addAccusedBtn').addEventListener('click', () => { document.getElementById('accusedCardsContainer').appendChild(createAccusedCard()); updateTotalCount(); });
-        checkAdmin(); refreshData();
+        document.getElementById('addAccusedBtn').addEventListener('click', () => { 
+            document.getElementById('accusedCardsContainer').appendChild(createAccusedCard()); 
+            updateTotalCount(); 
+        });
+        checkAdmin(); 
+        refreshData();
         submitBtn.addEventListener('click', onSubmit);
-        updateBtn.addEventListener('click', onUpdate);
-        cancelEditBtn.addEventListener('click', cancelEdit);
         resetFormBtn.addEventListener('click', () => { if(confirm('Clear all fields?')) clearForm(); });
         refreshBtn.addEventListener('click', refreshData);
-        exportBtn.addEventListener('click', exportToCSV);
         searchInput.addEventListener('input', renderTable);
         filterCaseType.addEventListener('change', renderTable);
-        filterStage.addEventListener('change', renderTable);
         setInterval(refreshData, 60000);
     }
     
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
     init();
 </script>
 </body>
