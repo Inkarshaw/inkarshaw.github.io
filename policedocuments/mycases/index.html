@@ -121,6 +121,17 @@
             color: #7c9ab3;
         }
 
+        .auto-id-badge {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1f6e8c;
+            padding: 0.25rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
         .debug-panel {
             background: #1e293b;
             color: #e2e8f0;
@@ -222,6 +233,11 @@
             box-shadow: 0 0 0 3px rgba(31,110,140,0.1);
         }
 
+        input[readonly] {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+
         button {
             background: #1f6e8c;
             border: none;
@@ -242,6 +258,15 @@
 
         .btn-secondary {
             background: #4b6575;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1a6b8a;
+            margin: 1rem 0 0.8rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2edf2;
         }
 
         .accused-cards-container {
@@ -294,7 +319,7 @@
 
         .vertical-form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 0.7rem;
         }
 
@@ -327,28 +352,31 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.75rem;
+            min-width: 900px;
         }
 
         th {
             background: #f7fafd;
-            padding: 0.9rem 0.8rem;
+            padding: 1rem 0.8rem;
             text-align: left;
             font-weight: 700;
             font-size: 0.7rem;
             position: sticky;
             top: 0;
             color: #235b72;
+            white-space: nowrap;
+            border-bottom: 2px solid #e2edf2;
         }
 
         td {
-            padding: 0.8rem 0.7rem;
+            padding: 0.9rem 0.8rem;
             border-bottom: 1px solid #ecf2f7;
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         .case-badge {
             display: inline-block;
-            padding: 0.2rem 0.7rem;
+            padding: 0.25rem 0.8rem;
             border-radius: 50px;
             font-weight: 700;
             font-size: 0.65rem;
@@ -364,6 +392,31 @@
             color: #136b8d;
         }
 
+        .stage-badge {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.65rem;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .stage-ntf {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .stage-pt {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .stage-ui {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
         .delete-btn {
             background: #fff0ed;
             color: #c2410c;
@@ -375,6 +428,24 @@
             margin: 0;
             font-size: 0.7rem;
             font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #ffe0db;
+            transform: scale(0.98);
+        }
+
+        .clickable-case {
+            cursor: pointer;
+            color: #1f6e8c;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .clickable-case:hover {
+            color: #0e5a75;
+            text-decoration: underline;
         }
 
         .filter-bar {
@@ -393,7 +464,7 @@
 
         .filter-bar button {
             width: auto;
-            padding: 0.5rem 1.5rem;
+            padding: 0.5rem 1.2rem;
             background: #eaf3fa;
             color: #1f6e8c;
             margin-top: 0;
@@ -436,6 +507,153 @@
             font-size: 0.7rem;
         }
 
+        .accused-list {
+            max-width: 250px;
+            line-height: 1.4;
+        }
+
+        .stage-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stage-description {
+            font-size: 0.6rem;
+            color: #6b7280;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #145c7a, #0c4a6e);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 28px 28px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .close-modal {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #e2edf2;
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e2edf2;
+            padding-bottom: 1rem;
+        }
+
+        .detail-section h3 {
+            color: #1a6b8a;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .detail-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #5b7c99;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            color: #1f2937;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .accused-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+
+        .accused-table th {
+            background: #f7fafd;
+            padding: 0.6rem;
+            font-size: 0.7rem;
+            position: static;
+        }
+
+        .accused-table td {
+            padding: 0.6rem;
+            font-size: 0.75rem;
+        }
+
         @media (max-width: 720px) {
             body {
                 padding: 1rem;
@@ -445,6 +663,13 @@
             }
             .full-width {
                 grid-column: span 1;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
             }
         }
     </style>
@@ -460,30 +685,10 @@
     </div>
 
     <div id="statsGrid" class="stats-grid">
-        <div class="stat-card">
-            <i class="fas fa-folder-open"></i>
-            <h3>Total Cases</h3>
-            <div class="value" id="totalCases">0</div>
-            <small>unique Group IDs (1001, 1002, etc.)</small>
-        </div>
-        <div class="stat-card">
-            <i class="fas fa-users"></i>
-            <h3>Total Accused</h3>
-            <div class="value" id="totalAccused">0</div>
-            <small>across all cases</small>
-        </div>
-        <div class="stat-card">
-            <i class="fas fa-gavel"></i>
-            <h3>FIR Cases</h3>
-            <div class="value" id="firCount">0</div>
-            <small>First Information Report</small>
-        </div>
-        <div class="stat-card">
-            <i class="fas fa-file-alt"></i>
-            <h3>CSR Cases</h3>
-            <div class="value" id="csrCount">0</div>
-            <small>Community Service Register</small>
-        </div>
+        <div class="stat-card"><i class="fas fa-folder-open"></i><h3>Total Cases</h3><div class="value" id="totalCases">0</div><small>unique Group IDs</small></div>
+        <div class="stat-card"><i class="fas fa-users"></i><h3>Total Accused</h3><div class="value" id="totalAccused">0</div><small>across all cases</small></div>
+        <div class="stat-card"><i class="fas fa-gavel"></i><h3>FIR Cases</h3><div class="value" id="firCount">0</div><small>First Information Report</small></div>
+        <div class="stat-card"><i class="fas fa-file-alt"></i><h3>CSR Cases</h3><div class="value" id="csrCount">0</div><small>Community Service Register</small></div>
     </div>
 
     <div class="debug-panel" id="debugPanel">
@@ -501,27 +706,44 @@
             <div id="adminOnlyWarning" class="admin-panel" style="display: none;"><i class="fas fa-user-shield"></i> Admin Mode</div>
             
             <div class="form-grid">
-                <div class="input-group"><label>Group ID *</label><input type="text" id="groupId" placeholder="1001, 1002, etc."></div>
-                <div class="input-group"><label>Case Type *</label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
-                <div class="input-group"><label>Head / Offence Description</label><input type="text" id="offenceDesc" placeholder="Brief description of offence"></div>
+                <div class="input-group"><label>Group ID * <span class="auto-id-badge"><i class="fas fa-magic"></i> Auto-generated</span></label><input type="text" id="groupId" readonly></div>
+                <div class="input-group"><label>FIR / CSR *</label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
+                <div class="input-group"><label>Head</label><input type="text" id="head" placeholder="Head / Offence description"></div>
                 <div class="input-group"><label>Case Number *</label><input type="text" id="caseNumber" placeholder="e.g., FIR 123/2024"></div>
-                <div class="input-group"><label>IPC / BNS Sections *</label><input type="text" id="sections" placeholder="302, 307 IPC"></div>
+                <div class="input-group"><label>Sections *</label><input type="text" id="sections" placeholder="302, 307 IPC"></div>
             </div>
 
-            <div class="total-counter"><span><i class="fas fa-user-tie"></i> Accused Persons (this case may have multiple accused)</span><span id="totalAccusedCount">0</span></div>
+            <div class="section-title"><i class="fas fa-calendar-alt"></i> Date, Time & Location Details</div>
+            <div class="form-grid">
+                <div class="input-group"><label>Date of Occurrence</label><input type="date" id="doDate"></div>
+                <div class="input-group"><label>Time of Occurrence</label><input type="time" id="doTime"></div>
+                <div class="input-group"><label>Date of Report</label><input type="date" id="drDate"></div>
+                <div class="input-group"><label>Time of Report</label><input type="time" id="drTime"></div>
+                <div class="input-group full-width"><label>Scene of Crime</label><input type="text" id="sceneOfCrime" placeholder="Location where crime occurred"></div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-user-tie"></i> Accused Persons Details</div>
+            <div class="total-counter"><span><i class="fas fa-users"></i> Total Accused in this Case</span><span id="totalAccusedCount">0</span></div>
             <div id="accusedCardsContainer" class="accused-cards-container"></div>
             <button type="button" id="addAccusedBtn" class="add-accused-btn"><i class="fas fa-plus-circle"></i> Add Another Accused</button>
 
-            <div class="form-grid" style="margin-top: 1.5rem;">
-                <div class="input-group"><label>Date of Occurrence</label><input type="date" id="doDate"></div>
-                <div class="input-group"><label>Date of Report</label><input type="date" id="drDate"></div>
-                <div class="input-group full-width"><label>Scene of Crime Location</label><input type="text" id="socLocation"></div>
+            <div class="section-title"><i class="fas fa-info-circle"></i> Case Details</div>
+            <div class="form-grid">
                 <div class="input-group full-width"><label>Complainant Details</label><textarea id="complainantDetails" rows="2" placeholder="Name, address, contact"></textarea></div>
                 <div class="input-group full-width"><label>Brief Summary of Complaint</label><textarea id="complaintSummary" rows="2"></textarea></div>
                 <div class="input-group full-width"><label>Seized Property Details</label><textarea id="propertySeized" rows="2"></textarea></div>
-                <div class="input-group"><label>Current Court Stage</label><input type="text" id="courtStage" placeholder="Investigation / Trial"></div>
-                <div class="input-group"><label>Disposal Status</label><input type="text" id="disposal" placeholder="Pending / Convicted / Acquitted"></div>
-                <div class="input-group full-width"><label>Additional Notes</label><textarea id="remarks" rows="2"></textarea></div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-gavel"></i> Legal Process</div>
+            <div class="form-grid">
+                <div class="input-group"><label>Charge sheeted date</label><input type="date" id="chargeSheetDate"></div>
+                <div class="input-group"><label>Opinion received date</label><input type="date" id="opinionDate"></div>
+                <div class="input-group"><label>e-Filing date</label><input type="date" id="efilingDate"></div>
+                <div class="input-group"><label>SR number obtained date</label><input type="date" id="srDate"></div>
+                <div class="input-group"><label>CC / SC / PRC number</label><input type="text" id="ccNumber" placeholder="CC/SC/PRC number"></div>
+                <div class="input-group"><label>Current court stage</label><input type="text" id="courtStage" placeholder="Investigation / Trial"></div>
+                <div class="input-group"><label>Disposal status</label><input type="text" id="disposal" placeholder="Pending / Convicted / Acquitted"></div>
+                <div class="input-group full-width"><label>Additional notes</label><textarea id="remarks" rows="2"></textarea></div>
             </div>
 
             <button id="submitBtn"><i class="fas fa-check-circle"></i> Register Case & Sync</button>
@@ -548,20 +770,31 @@
                         <tr>
                             <th>Group ID</th>
                             <th>Type</th>
-                            <th>Head / Offence</th>
-                            <th>Case Number</th>
+                            <th>Head</th>
+                            <th>Case No</th>
                             <th>Sections</th>
                             <th>Accused Name</th>
-                            <th>Father's Name</th>
-                            <th>Age</th>
-                            <th>Court Stage</th>
-                            <th>Disposal</th>
+                            <th>Stage</th>
                             <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;"><i class="fas fa-spinner fa-pulse"></i> Loading records...</td></tr></tbody>
+                        </thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="8" style="text-align:center;"><i class="fas fa-spinner fa-pulse"></i> Loading records...</td></tr>
+                    </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Case Details -->
+<div id="caseModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-folder-open"></i> Case Details</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Dynamic content will be loaded here -->
         </div>
     </div>
 </div>
@@ -573,115 +806,253 @@
     let isAdmin = false;
     let dashboardVisible = false;
 
-    // Field mapping based on your column structure
+    function getField(record, fieldNames, defaultValue = '—') {
+        for (let name of fieldNames) {
+            if (record[name] !== undefined && record[name] !== null && record[name] !== '') {
+                return record[name];
+            }
+        }
+        return defaultValue;
+    }
+
     function getGroupIdentifier(record) {
-        return record['Group identifier (same for all accused in a case)'] || 
-               record['Group identifier'] || 
-               record['groupId'] || 
-               record['Group ID'] || 
-               null;
+        return getField(record, ['Group identifier (same for all accused in a case)', 'Group identifier', 'groupId', 'Group ID'], null);
     }
     
     function getCaseType(record) {
-        const type = record['FIR / CSR'] || record['FIR/CSR'] || record['Type'] || '';
+        const type = getField(record, ['FIR / CSR', 'FIR/CSR', 'Type'], '');
         return type === 'FIR' ? 'FIR' : (type === 'CSR' ? 'CSR' : 'Unknown');
     }
     
-    function getHeadOffence(record) {
-        return record['Head / Offence description'] || record['Head'] || record['Offence description'] || '—';
+    function getHead(record) {
+        return getField(record, ['Head', 'Head / Offence description'], '—');
     }
     
     function getCaseNumber(record) {
-        return record['Case number (e.g., FIR 123/2024)'] || 
-               record['Case number'] || 
-               record['caseNumber'] || 
-               '—';
+        return getField(record, ['Case number (e.g., FIR 123/2024)', 'Case number', 'caseNumber'], '—');
     }
     
     function getSections(record) {
-        return record['IPC / BNS sections'] || 
-               record['IPC/BNS sections'] || 
-               record['Sections'] || 
-               '—';
+        return getField(record, ['Sections', 'IPC / BNS sections'], '—');
     }
     
     function getAccusedName(record) {
-        return record["Accused person's full name"] || record['Accused Name'] || '—';
+        return getField(record, ["Accused person's full name", 'Accused Name'], '—');
     }
     
     function getFatherName(record) {
-        return record["Father's name of accused"] || record['Father Name'] || '—';
+        return getField(record, ["Father's name of accused", 'Father Name'], '—');
     }
     
     function getAccusedAge(record) {
-        return record["Age of accused"] || record['Age'] || '—';
+        return getField(record, ["Age of accused", 'Age'], '—');
+    }
+    
+    function getAccusedAddress(record) {
+        return getField(record, ["Address of accused", 'Address'], '—');
+    }
+    
+    function getArrested(record) {
+        return getField(record, ["TRUE / FALSE (arrested in this case)", 'Arrested'], 'FALSE');
+    }
+    
+    function getArrestPlace(record) {
+        return getField(record, ["Arrest Place", 'Arrest place'], '—');
+    }
+    
+    function getArrestDate(record) {
+        return getField(record, ["Date of arrest (if arrested)", 'Arrest Date'], '—');
+    }
+    
+    function getBailStatus(record) {
+        return getField(record, ["Bail status (Police Custody / Judicial Custody / Bailed / Not Arrested / Anticipatory Bail)", 'Bail status'], '—');
+    }
+    
+    function getEFilingDate(record) {
+        return getField(record, ['e-Filing date', 'eFiling date', 'efilingDate'], '');
+    }
+    
+    function getCCNumber(record) {
+        return getField(record, ['CC / SC / PRC number', 'CC/SC/PRC number', 'ccNumber'], '');
+    }
+    
+    function getChargeSheetDate(record) {
+        return getField(record, ['Charge sheeted date', 'chargeSheetDate'], '—');
+    }
+    
+    function getOpinionDate(record) {
+        return getField(record, ['Opinion received date', 'opinionDate'], '—');
+    }
+    
+    function getSRDate(record) {
+        return getField(record, ['SR number obtained date', 'srDate'], '—');
     }
     
     function getCourtStage(record) {
-        return record['Current court stage'] || record['Court Stage'] || '—';
+        return getField(record, ['Current court stage', 'courtStage'], '—');
     }
     
     function getDisposal(record) {
-        return record['Disposal status'] || record['Disposal'] || '—';
+        return getField(record, ['Disposal status', 'disposal'], '—');
+    }
+    
+    function getComplainant(record) {
+        return getField(record, ['Complainant name, address, contact', 'complainantDetails'], '—');
+    }
+    
+    function getComplaintSummary(record) {
+        return getField(record, ['Brief summary of complaint', 'complaintSummary'], '—');
+    }
+    
+    function getPropertySeized(record) {
+        return getField(record, ['Seized property details', 'propertySeized'], '—');
+    }
+    
+    function getRemarks(record) {
+        return getField(record, ['Additional notes', 'remarks'], '—');
+    }
+    
+    function getSceneOfCrime(record) {
+        return getField(record, ['Scene of Crime', 'sceneOfCrime'], '—');
+    }
+    
+    function getDoDate(record) {
+        return getField(record, ['Date of Occurrence', 'doDate'], '—');
+    }
+    
+    function getDoTime(record) {
+        return getField(record, ['Time of Occurrence', 'doTime'], '—');
+    }
+    
+    function getDrDate(record) {
+        return getField(record, ['Date of Report', 'drDate'], '—');
+    }
+    
+    function getDrTime(record) {
+        return getField(record, ['Time of Report', 'drTime'], '—');
+    }
+    
+    function calculateStage(record) {
+        const efilingDate = getEFilingDate(record);
+        const ccNumber = getCCNumber(record);
+        
+        if (efilingDate && efilingDate !== '') {
+            return { code: 'NTF', label: 'NTF', description: 'e-Filing completed' };
+        } else if (ccNumber && ccNumber !== '' && ccNumber !== '—') {
+            return { code: 'PT', label: 'PT', description: 'CC/SC/PRC assigned' };
+        } else {
+            return { code: 'UI', label: 'UI', description: 'Under Investigation' };
+        }
     }
 
-    function updateDebugInfo() {
-        if (!allRecords || allRecords.length === 0) {
-            document.getElementById('debugContent').innerHTML = '<span style="color: #999;">No data loaded. Click Refresh to load from Google Sheets.</span>';
-            return;
-        }
-        
-        let html = '<div style="font-size: 0.7rem;">';
-        html += `<strong>📊 Total Records:</strong> ${allRecords.length}<br><br>`;
-        
-        html += `<strong>📝 Available Fields in Data:</strong><br>`;
-        html += `&nbsp;&nbsp;${Object.keys(allRecords[0]).join(', ')}<br><br>`;
-        
-        html += `<strong>🔍 Sample Record (Raw):</strong><br>`;
-        for (let key in allRecords[0]) {
-            if (allRecords[0][key]) {
-                html += `&nbsp;&nbsp;${key}: "${allRecords[0][key]}"<br>`;
-            }
-        }
-        
-        html += `<br><strong>✅ Processed Data:</strong><br>`;
-        html += `&nbsp;&nbsp;Group ID: "${getGroupIdentifier(allRecords[0])}"<br>`;
-        html += `&nbsp;&nbsp;Type: "${getCaseType(allRecords[0])}"<br>`;
-        html += `&nbsp;&nbsp;Head/Offence: "${getHeadOffence(allRecords[0])}"<br>`;
-        html += `&nbsp;&nbsp;Case Number: "${getCaseNumber(allRecords[0])}"<br>`;
-        html += `&nbsp;&nbsp;Sections: "${getSections(allRecords[0])}"<br><br>`;
-        
-        // Group by Group Identifier
-        const groups = new Map();
+    function calculateNextGroupId() {
+        if (!allRecords || allRecords.length === 0) return 1001;
+        const groupIds = new Set();
         allRecords.forEach(rec => {
             const groupId = getGroupIdentifier(rec);
-            if (groupId && groupId.toString().trim() !== '') {
-                const groupIdStr = groupId.toString();
-                if (!groups.has(groupIdStr)) groups.set(groupIdStr, []);
-                groups.get(groupIdStr).push(rec);
-            }
+            if (groupId && !isNaN(parseInt(groupId))) groupIds.add(parseInt(groupId));
+        });
+        let nextId = 1001;
+        while (groupIds.has(nextId)) nextId++;
+        return nextId;
+    }
+
+    function updateGroupIdField() {
+        document.getElementById('groupId').value = calculateNextGroupId();
+    }
+
+    function showCaseDetails(groupId) {
+        // Get all records for this group
+        const caseRecords = allRecords.filter(rec => getGroupIdentifier(rec) === groupId);
+        if (caseRecords.length === 0) return;
+        
+        const master = caseRecords[0];
+        const caseType = getCaseType(master);
+        const stage = calculateStage(master);
+        
+        let modalHtml = `
+            <div class="detail-section">
+                <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="detail-label">Group ID</span><span class="detail-value"><strong>${escapeHtml(groupId)}</strong></span></div>
+                    <div class="detail-item"><span class="detail-label">Case Type</span><span class="detail-value"><span class="case-badge ${caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${escapeHtml(caseType)}</span></span></div>
+                    <div class="detail-item"><span class="detail-label">Case Number</span><span class="detail-value">${escapeHtml(getCaseNumber(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">Head / Offence</span><span class="detail-value">${escapeHtml(getHead(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">Sections</span><span class="detail-value">${escapeHtml(getSections(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">Stage</span><span class="detail-value"><span class="stage-badge ${getStageClass(stage.code)}">${escapeHtml(stage.label)}</span> - ${escapeHtml(stage.description)}</span></div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h3><i class="fas fa-calendar-alt"></i> Date, Time & Location</h3>
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="detail-label">Date of Occurrence</span><span class="detail-value">${escapeHtml(getDoDate(master))} ${getDoTime(master) !== '—' ? 'at ' + escapeHtml(getDoTime(master)) : ''}</span></div>
+                    <div class="detail-item"><span class="detail-label">Date of Report</span><span class="detail-value">${escapeHtml(getDrDate(master))} ${getDrTime(master) !== '—' ? 'at ' + escapeHtml(getDrTime(master)) : ''}</span></div>
+                    <div class="detail-item full-width"><span class="detail-label">Scene of Crime</span><span class="detail-value">${escapeHtml(getSceneOfCrime(master))}</span></div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h3><i class="fas fa-gavel"></i> Legal Process</h3>
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="detail-label">Charge sheeted date</span><span class="detail-value">${escapeHtml(getChargeSheetDate(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">Opinion received date</span><span class="detail-value">${escapeHtml(getOpinionDate(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">e-Filing date</span><span class="detail-value">${escapeHtml(getEFilingDate(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">SR number obtained date</span><span class="detail-value">${escapeHtml(getSRDate(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">CC / SC / PRC number</span><span class="detail-value">${escapeHtml(getCCNumber(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">Current court stage</span><span class="detail-value">${escapeHtml(getCourtStage(master))}</span></div>
+                    <div class="detail-item"><span class="detail-label">Disposal status</span><span class="detail-value">${escapeHtml(getDisposal(master))}</span></div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h3><i class="fas fa-user-friends"></i> Accused Persons (${caseRecords.length})</h3>
+                <table class="accused-table">
+                    <thead>
+                        <tr><th>Sl. No.</th><th>Full Name</th><th>Father's Name</th><th>Age</th><th>Address</th><th>Arrested</th><th>Arrest Place</th><th>Arrest Date</th><th>Bail Status</th></thead>
+                    <tbody>
+        `;
+        
+        caseRecords.forEach((rec, idx) => {
+            modalHtml += `实践
+                <td>${idx + 1}</td>
+                <td><strong>${escapeHtml(getAccusedName(rec))}</strong></td>
+                <td>${escapeHtml(getFatherName(rec))}</td>
+                <td>${escapeHtml(getAccusedAge(rec))}</td>
+                <td>${escapeHtml(getAccusedAddress(rec))}</td>
+                <td><span class="case-badge ${getArrested(rec) === 'TRUE' ? 'badge-fir' : ''}" style="${getArrested(rec) === 'TRUE' ? '' : 'background:#e5e7eb;color:#374151;'}">${getArrested(rec) === 'TRUE' ? 'Yes' : 'No'}</span></td>
+                <td>${escapeHtml(getArrestPlace(rec))}</td>
+                <td>${escapeHtml(getArrestDate(rec))}</td>
+                <td>${escapeHtml(getBailStatus(rec))}</td>
+            </tr>`;
         });
         
-        html += `<br><strong>📁 Grouped by Group ID (${groups.size} unique cases):</strong><br>`;
-        groups.forEach((records, groupId) => {
-            const caseType = getCaseType(records[0]);
-            html += `&nbsp;&nbsp;• Group ${groupId} (${caseType}) - ${records.length} accused person(s)<br>`;
-        });
+        modalHtml += `
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="detail-section">
+                <h3><i class="fas fa-file-alt"></i> Case Details</h3>
+                <div class="detail-grid">
+                    <div class="detail-item full-width"><span class="detail-label">Complainant Details</span><span class="detail-value">${escapeHtml(getComplainant(master))}</span></div>
+                    <div class="detail-item full-width"><span class="detail-label">Brief Summary of Complaint</span><span class="detail-value">${escapeHtml(getComplaintSummary(master))}</span></div>
+                    <div class="detail-item full-width"><span class="detail-label">Seized Property Details</span><span class="detail-value">${escapeHtml(getPropertySeized(master))}</span></div>
+                    <div class="detail-item full-width"><span class="detail-label">Additional Notes</span><span class="detail-value">${escapeHtml(getRemarks(master))}</span></div>
+                </div>
+            </div>
+        `;
         
-        html += `<br><strong>📊 Statistics:</strong><br>`;
-        let firCount = 0, csrCount = 0;
-        groups.forEach((records, groupId) => {
-            const caseType = getCaseType(records[0]);
-            if (caseType === 'FIR') firCount++;
-            else if (caseType === 'CSR') csrCount++;
-        });
-        html += `Total Cases (unique Group IDs): ${groups.size}<br>`;
-        html += `Total Accused: ${allRecords.length}<br>`;
-        html += `FIR Cases: ${firCount}<br>`;
-        html += `CSR Cases: ${csrCount}<br>`;
-        html += `</div>`;
-        
-        document.getElementById('debugContent').innerHTML = html;
+        document.getElementById('modalBody').innerHTML = modalHtml;
+        document.getElementById('caseModal').style.display = 'block';
+    }
+    
+    function getStageClass(stageCode) {
+        switch(stageCode) {
+            case 'NTF': return 'stage-ntf';
+            case 'PT': return 'stage-pt';
+            default: return 'stage-ui';
+        }
     }
 
     function createAccusedCard(accData = null) {
@@ -692,8 +1063,9 @@
         const ageVal = accData?.["Age of accused"] || '';
         const addressVal = accData?.["Address of accused"] || '';
         const arrestedVal = accData?.["TRUE / FALSE (arrested in this case)"] || 'FALSE';
+        const arrestPlaceVal = accData?.["Arrest Place"] || '';
         const arrestDateVal = accData?.["Date of arrest (if arrested)"] || '';
-        const bailStatusVal = accData?.["Bail status"] || '';
+        const bailStatusVal = accData?.["Bail status (Police Custody / Judicial Custody / Bailed / Not Arrested / Anticipatory Bail)"] || '';
         
         card.innerHTML = `
             <div class="card-header">
@@ -701,13 +1073,14 @@
                 <button type="button" class="remove-accused-card"><i class="fas fa-trash-alt"></i> Remove</button>
             </div>
             <div class="vertical-form-grid">
-                <div><label>Full Name *</label><input type="text" class="acc-name" value="${escapeHtml(nameVal)}" placeholder="Enter full name"></div>
+                <div><label>Full Name *</label><input type="text" class="acc-name" value="${escapeHtml(nameVal)}" placeholder="Full name"></div>
                 <div><label>Father's Name</label><input type="text" class="acc-father" value="${escapeHtml(fatherVal)}" placeholder="Father's name"></div>
                 <div><label>Age</label><input type="text" class="acc-age" value="${escapeHtml(ageVal)}" placeholder="Age"></div>
                 <div><label>Address</label><input type="text" class="acc-address" value="${escapeHtml(addressVal)}" placeholder="Address"></div>
                 <div><label>Arrested?</label><select class="acc-arrested"><option value="TRUE" ${arrestedVal === 'TRUE' ? 'selected' : ''}>TRUE</option><option value="FALSE" ${arrestedVal === 'FALSE' ? 'selected' : ''}>FALSE</option></select></div>
+                <div><label>Arrest Place</label><input type="text" class="acc-arrest-place" value="${escapeHtml(arrestPlaceVal)}" placeholder="Arrest place"></div>
                 <div><label>Date of Arrest</label><input type="date" class="acc-arrest-date" value="${arrestDateVal}"></div>
-                <div><label>Bail Status</label><input type="text" class="acc-bail-status" value="${escapeHtml(bailStatusVal)}" placeholder="Police Custody / Judicial Custody / Bailed"></div>
+                <div><label>Bail Status</label><input type="text" class="acc-bail-status" value="${escapeHtml(bailStatusVal)}" placeholder="Bail status"></div>
             </div>
         `;
         card.querySelector('.remove-accused-card').addEventListener('click', () => {
@@ -732,8 +1105,9 @@
                     "Age of accused": card.querySelector('.acc-age')?.value || '',
                     "Address of accused": card.querySelector('.acc-address')?.value || '',
                     "TRUE / FALSE (arrested in this case)": card.querySelector('.acc-arrested')?.value || 'FALSE',
+                    "Arrest Place": card.querySelector('.acc-arrest-place')?.value || '',
                     "Date of arrest (if arrested)": card.querySelector('.acc-arrest-date')?.value || '',
-                    "Bail status": card.querySelector('.acc-bail-status')?.value || ''
+                    "Bail status (Police Custody / Judicial Custody / Bailed / Not Arrested / Anticipatory Bail)": card.querySelector('.acc-bail-status')?.value || ''
                 });
             }
         });
@@ -752,9 +1126,9 @@
     }
     
     function setConnectionStatus(msg, isOk) {
-        const connectionStatus = document.getElementById('connectionStatus');
-        connectionStatus.innerHTML = `<i class="fas ${isOk ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${msg}`;
-        connectionStatus.style.background = isOk ? '#dff1e6' : '#fee2e2';
+        const el = document.getElementById('connectionStatus');
+        el.innerHTML = `<i class="fas ${isOk ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${msg}`;
+        el.style.background = isOk ? '#dff1e6' : '#fee2e2';
     }
     
     async function checkAdmin() {
@@ -766,7 +1140,6 @@
             document.getElementById('adminOnlyWarning').style.display = isAdmin ? 'block' : 'none';
         } catch(e) {
             isAdmin = true;
-            document.getElementById('adminStatus').innerHTML = '<i class="fas fa-shield-alt"></i> Admin Mode';
         }
     }
     
@@ -779,22 +1152,15 @@
             if (data.error) throw new Error(data.error);
             allRecords = Array.isArray(data) ? data : [];
             
-            console.log("=== DATA LOADED ===");
-            console.log("Total records:", allRecords.length);
-            if (allRecords.length > 0) {
-                console.log("Sample record:", allRecords[0]);
-                console.log("Available fields:", Object.keys(allRecords[0]));
-                console.log("Group ID:", getGroupIdentifier(allRecords[0]));
-                console.log("Type:", getCaseType(allRecords[0]));
-            }
+            console.log("Loaded", allRecords.length, "records");
+            if (allRecords.length > 0) console.log("Sample:", allRecords[0]);
             
+            updateGroupIdField();
             setConnectionStatus(`✅ ${allRecords.length} records loaded`, true);
             renderTable();
             updateStats();
-            updateDebugInfo();
             return true;
         } catch(e) {
-            console.error("Fetch error:", e);
             setConnectionStatus('⚠️ Error: ' + e.message, false);
             return false;
         }
@@ -804,46 +1170,25 @@
         try {
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             return true;
-        } catch(e) {
-            return false;
-        }
+        } catch(e) { return false; }
     }
     
     async function addCaseWithAccused(master, accusedArray) {
         const batch = accusedArray.map(acc => ({ ...master, ...acc }));
         const ok = await sendBatch({ action: 'createBatch', records: batch });
-        if (ok) {
-            await fetchAllRecords();
-            return true;
-        }
+        if (ok) { await fetchAllRecords(); return true; }
         return false;
     }
     
     async function deleteCase(groupId) {
-        if (!isAdmin || !confirm(`Delete Case Group ${groupId} and all accused persons?`)) return false;
+        if (!isAdmin || !confirm(`Delete Case Group ${groupId}?`)) return false;
         const ok = await sendBatch({ action: 'deleteCaseGroup', groupId: groupId });
-        if (ok) {
-            await fetchAllRecords();
-            setStatusMessage(document.getElementById('formStatus'), 'Case deleted', false);
-            return true;
-        }
+        if (ok) { await fetchAllRecords(); return true; }
         return false;
     }
     
-    function setStatusMessage(el, msg, isError = false) {
-        el.textContent = msg;
-        el.className = 'status';
-        el.classList.add(isError ? 'error' : 'success');
-        setTimeout(() => {
-            if(el === document.getElementById('formStatus') && el.textContent === msg) {
-                el.className = 'status';
-                el.textContent = '⚡ Ready';
-            }
-        }, 2500);
-    }
-    
     function updateStats() {
-        if (!allRecords || allRecords.length === 0) {
+        if (!allRecords.length) {
             document.getElementById('totalCases').textContent = '0';
             document.getElementById('totalAccused').textContent = '0';
             document.getElementById('firCount').textContent = '0';
@@ -851,21 +1196,13 @@
             return;
         }
         
-        // Group by Group ID
         const casesMap = new Map();
         allRecords.forEach(rec => {
             const groupId = getGroupIdentifier(rec);
-            if (groupId && groupId.toString().trim() !== '') {
-                const groupIdStr = groupId.toString();
-                if (!casesMap.has(groupIdStr)) {
-                    casesMap.set(groupIdStr, { caseType: getCaseType(rec), accusedCount: 0 });
-                }
-                casesMap.get(groupIdStr).accusedCount++;
+            if (groupId) {
+                if (!casesMap.has(groupId)) casesMap.set(groupId, { caseType: getCaseType(rec) });
             }
         });
-        
-        const uniqueCases = casesMap.size;
-        const totalAccused = allRecords.length;
         
         let firCases = 0, csrCases = 0;
         casesMap.forEach(value => {
@@ -873,102 +1210,80 @@
             else if (value.caseType === 'CSR') csrCases++;
         });
         
-        document.getElementById('totalCases').textContent = uniqueCases;
-        document.getElementById('totalAccused').textContent = totalAccused;
+        document.getElementById('totalCases').textContent = casesMap.size;
+        document.getElementById('totalAccused').textContent = allRecords.length;
         document.getElementById('firCount').textContent = firCases;
         document.getElementById('csrCount').textContent = csrCases;
-        
-        const statsInfo = document.getElementById('statsInfo');
-        if (statsInfo) statsInfo.innerHTML = `${uniqueCases} case(s) | ${totalAccused} accused`;
+        document.getElementById('statsInfo').innerHTML = `${casesMap.size} case(s) | ${allRecords.length} accused`;
     }
     
     function renderTable() {
         if (!allRecords.length) {
-            document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" style="text-align:center;">📭 No cases registered yet</td></tr>';
+            document.getElementById('tableBody').innerHTML = '|<td colspan="8" style="text-align:center;">📭 No cases registered yet|</td></tr>';
             updateStats();
             return;
         }
         
-        // Sort records by Group ID to ensure proper grouping
-        const sortedRecords = [...allRecords].sort((a, b) => {
-            const idA = getGroupIdentifier(a) || '';
-            const idB = getGroupIdentifier(b) || '';
-            return idA.toString().localeCompare(idB.toString());
+        // Group by Group ID
+        const groups = new Map();
+        allRecords.forEach(rec => {
+            const groupId = getGroupIdentifier(rec);
+            if (groupId) {
+                if (!groups.has(groupId)) groups.set(groupId, []);
+                groups.get(groupId).push(rec);
+            }
         });
         
         const typeFilter = document.getElementById('filterCaseType').value;
         const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
         
-        // Filter records first
-        let filteredRecords = sortedRecords.filter(rec => {
-            const groupId = getGroupIdentifier(rec);
-            const caseType = getCaseType(rec);
-            if (typeFilter !== 'all' && caseType !== typeFilter) return false;
-            if (searchTerm) {
-                const matchGroup = groupId?.toString().toLowerCase().includes(searchTerm);
-                const matchCaseNum = getCaseNumber(rec).toLowerCase().includes(searchTerm);
-                const matchHead = getHeadOffence(rec).toLowerCase().includes(searchTerm);
-                const matchAccused = getAccusedName(rec).toLowerCase().includes(searchTerm);
-                const matchSections = getSections(rec).toLowerCase().includes(searchTerm);
-                if (!matchGroup && !matchCaseNum && !matchHead && !matchAccused && !matchSections) return false;
-            }
-            return true;
-        });
-        
-        // Group for display (to get case-level info)
-        const groups = new Map();
-        filteredRecords.forEach(rec => {
-            const groupId = getGroupIdentifier(rec);
-            if (groupId && groupId.toString().trim() !== '') {
-                const groupIdStr = groupId.toString();
-                if (!groups.has(groupIdStr)) groups.set(groupIdStr, []);
-                groups.get(groupIdStr).push(rec);
-            }
-        });
-        
-        // Build HTML with each accused on its own row
         let html = '';
         for (let [groupId, group] of groups) {
             const master = group[0];
             const caseType = getCaseType(master);
-            const headOffence = getHeadOffence(master);
+            const head = getHead(master);
             const caseNumber = getCaseNumber(master);
             const sections = getSections(master);
-            const courtStage = getCourtStage(master);
-            const disposal = getDisposal(master);
+            const stage = calculateStage(master);
             
-            // For each accused in this case, create a separate row
-            for (let i = 0; i < group.length; i++) {
-                const acc = group[i];
-                html += '提速';
-                // Group ID - repeats for each accused
-                html += `<td><strong>${escapeHtml(groupId)}</strong>`;
-                // Type - repeats for each accused
-                html += `<td><span class="case-badge ${caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${escapeHtml(caseType)}</span>`;
-                // Head / Offence - repeats for each accused
-                html += `<td>${escapeHtml(headOffence)}`;
-                // Case Number - repeats for each accused
-                html += `<td>${escapeHtml(caseNumber)}`;
-                // Sections - repeats for each accused
-                html += `<td>${escapeHtml(sections)}`;
-                // Accused Name - unique per row
-                html += ` <td><strong>${escapeHtml(getAccusedName(acc))}</strong>`;
-                // Father's Name - unique per row
-                html += ` <td>${escapeHtml(getFatherName(acc))}`;
-                // Age - unique per row
-                html += `  Whether${escapeHtml(getAccusedAge(acc))}`;
-                // Court Stage - repeats for each accused
-                html += `<td>${escapeHtml(courtStage)}`;
-                // Disposal - repeats for each accused
-                html += `<td>${escapeHtml(disposal)}`;
-                // Action - delete button for the whole case (shows on every row but deletes entire case)
-                html += `<td>${isAdmin ? `<button class="delete-btn" data-case="${escapeHtml(groupId)}"><i class="fas fa-trash-can"></i> Delete Case</button>` : '<span>🔍 View</span>'}`;
-                html += '</tr>';
+            // Filter by type
+            if (typeFilter !== 'all' && caseType !== typeFilter) continue;
+            
+            // Combine all accused names
+            const accusedNames = group.map(acc => getAccusedName(acc)).filter(name => name !== '—').join(', ');
+            
+            // Search filter
+            if (searchTerm) {
+                const matchGroup = groupId.toLowerCase().includes(searchTerm);
+                const matchCaseNum = caseNumber.toLowerCase().includes(searchTerm);
+                const matchHead = head.toLowerCase().includes(searchTerm);
+                const matchAccused = accusedNames.toLowerCase().includes(searchTerm);
+                const matchSections = sections.toLowerCase().includes(searchTerm);
+                if (!matchGroup && !matchCaseNum && !matchHead && !matchAccused && !matchSections) continue;
             }
+            
+            html += '提速';
+            html += `<td><strong class="clickable-case" data-group="${escapeHtml(groupId)}">${escapeHtml(groupId)}</strong>`;
+            html += `<td><span class="case-badge ${caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${escapeHtml(caseType)}</span>`;
+            html += `<td>${escapeHtml(head)}`;
+            html += `<td><span class="clickable-case" data-group="${escapeHtml(groupId)}">${escapeHtml(caseNumber)}</span>`;
+            html += `<td>${escapeHtml(sections)}`;
+            html += `<td class="accused-list"><strong>${escapeHtml(accusedNames || '—')}</strong>`;
+            html += `<td><div class="stage-info"><span class="stage-badge ${getStageClass(stage.code)}">${escapeHtml(stage.label)}</span><span class="stage-description">${escapeHtml(stage.description)}</span></div>`;
+            html += `<td>${isAdmin ? `<button class="delete-btn" data-case="${escapeHtml(groupId)}"><i class="fas fa-trash-can"></i> Delete</button>` : '<span>🔍</span>'}`;
+            html += '</tr>';
         }
         
-        document.getElementById('tableBody').innerHTML = html || '|<td colspan="11" style="text-align:center;">No matching cases|</td>';
-
+        document.getElementById('tableBody').innerHTML = html || '|<td colspan="8" style="text-align:center;">No matching cases|</tr>';
+        
+        // Add click handlers for clickable case numbers and group IDs
+        document.querySelectorAll('.clickable-case').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const groupId = el.dataset.group;
+                if (groupId) showCaseDetails(groupId);
+            });
+        });
+        
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 await deleteCase(btn.dataset.case);
@@ -983,15 +1298,22 @@
         return {
             'Group identifier (same for all accused in a case)': document.getElementById('groupId').value,
             'FIR / CSR': document.getElementById('caseType').value,
-            'Head / Offence description': document.getElementById('offenceDesc').value,
+            'Head': document.getElementById('head').value,
             'Case number (e.g., FIR 123/2024)': document.getElementById('caseNumber').value,
-            'IPC / BNS sections': document.getElementById('sections').value,
+            'Sections': document.getElementById('sections').value,
             'Date of Occurrence': document.getElementById('doDate').value,
+            'Time of Occurrence': document.getElementById('doTime').value,
             'Date of Report': document.getElementById('drDate').value,
-            'Scene of Crime location': document.getElementById('socLocation').value,
+            'Time of Report': document.getElementById('drTime').value,
+            'Scene of Crime': document.getElementById('sceneOfCrime').value,
             'Complainant name, address, contact': document.getElementById('complainantDetails').value,
             'Brief summary of complaint': document.getElementById('complaintSummary').value,
             'Seized property details': document.getElementById('propertySeized').value,
+            'Charge sheeted date': document.getElementById('chargeSheetDate').value,
+            'Opinion received date': document.getElementById('opinionDate').value,
+            'e-Filing date': document.getElementById('efilingDate').value,
+            'SR number obtained date': document.getElementById('srDate').value,
+            'CC / SC / PRC number': document.getElementById('ccNumber').value,
             'Current court stage': document.getElementById('courtStage').value,
             'Disposal status': document.getElementById('disposal').value,
             'Additional notes': document.getElementById('remarks').value
@@ -999,36 +1321,41 @@
     }
     
     function clearFormFields() {
-        document.getElementById('groupId').value = '';
         document.getElementById('caseType').value = 'FIR';
-        document.getElementById('offenceDesc').value = '';
+        document.getElementById('head').value = '';
         document.getElementById('caseNumber').value = '';
         document.getElementById('sections').value = '';
         document.getElementById('doDate').value = '';
+        document.getElementById('doTime').value = '';
         document.getElementById('drDate').value = '';
-        document.getElementById('socLocation').value = '';
+        document.getElementById('drTime').value = '';
+        document.getElementById('sceneOfCrime').value = '';
         document.getElementById('complainantDetails').value = '';
         document.getElementById('complaintSummary').value = '';
         document.getElementById('propertySeized').value = '';
+        document.getElementById('chargeSheetDate').value = '';
+        document.getElementById('opinionDate').value = '';
+        document.getElementById('efilingDate').value = '';
+        document.getElementById('srDate').value = '';
+        document.getElementById('ccNumber').value = '';
         document.getElementById('courtStage').value = '';
         document.getElementById('disposal').value = '';
         document.getElementById('remarks').value = '';
         loadAccusedCards([]);
+        updateGroupIdField();
     }
     
     async function onSubmitCase() {
         const master = getMasterObject();
         const accusedList = getAccusedList();
-        if (!master['Group identifier (same for all accused in a case)'].trim() || 
-            !master['Case number (e.g., FIR 123/2024)'].trim() || 
-            accusedList.length === 0) {
+        if (!master['Group identifier (same for all accused in a case)'] || !master['Case number (e.g., FIR 123/2024)'] || accusedList.length === 0) {
             setStatusMessage(document.getElementById('formStatus'), '❌ Group ID, Case Number & at least one accused required', true);
             return;
         }
         
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Registering...';
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Registering...';
         
         const success = await addCaseWithAccused(master, accusedList);
         if (success) {
@@ -1038,8 +1365,20 @@
             setStatusMessage(document.getElementById('formStatus'), '❌ Registration failed', true);
         }
         
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Register Case & Sync';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Register Case & Sync';
+    }
+    
+    function setStatusMessage(el, msg, isError) {
+        el.textContent = msg;
+        el.className = 'status';
+        el.classList.add(isError ? 'error' : 'success');
+        setTimeout(() => {
+            if (el === document.getElementById('formStatus') && el.textContent === msg) {
+                el.className = 'status';
+                el.textContent = '⚡ Ready';
+            }
+        }, 2500);
     }
     
     function init() {
@@ -1059,10 +1398,26 @@
         document.getElementById('filterCaseType').addEventListener('change', renderTable);
         document.getElementById('showDebugBtn').addEventListener('click', () => {
             document.getElementById('debugPanel').classList.toggle('show');
-            updateDebugInfo();
+            const content = document.getElementById('debugContent');
+            if (allRecords.length) {
+                content.innerHTML = '<pre>' + JSON.stringify(allRecords.slice(0, 3), null, 2) + '</pre>';
+            } else {
+                content.innerHTML = 'No data loaded. Click Refresh to load.';
+            }
         });
         
-        // Tab switching
+        // Modal close functionality
+        const modal = document.getElementById('caseModal');
+        const closeBtn = document.querySelector('.close-modal');
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
