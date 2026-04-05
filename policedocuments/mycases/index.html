@@ -2,627 +2,715 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CaseFlow Pro | Sequential Case IDs Starting from 1</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaseFlow Pro - Works with Local HTML</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f4f9; font-family: 'Inter', sans-serif; padding: 1.5rem; color: #0a2a3b; }
-        .container { max-width: 1600px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid #e2edf2; }
-        .header-left h1 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #145c7a, #0c4a6e); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .badge { background: #e1f0fa; color: #155e75; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.75rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
-        .dashboard-toggle-btn { background: linear-gradient(105deg, #1e5f7a, #134b63); border: none; padding: 0.7rem 1.6rem; border-radius: 60px; font-weight: 600; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; display: none; }
-        .stats-grid.show { display: grid; }
-        .stat-card { background: white; border-radius: 28px; padding: 1.3rem 1.2rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03); border: 1px solid #eef2f8; transition: transform 0.2s; }
-        .stat-card:hover { transform: translateY(-2px); }
-        .stat-card i { font-size: 2rem; color: #1f6e8c; margin-bottom: 0.6rem; }
-        .stat-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #5b7c99; margin-bottom: 0.5rem; }
-        .stat-card .value { font-size: 2rem; font-weight: 800; color: #0c4a5e; }
-        .auto-id-badge { display: inline-block; background: #e8f0fe; color: #1f6e8c; padding: 0.25rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500; margin-left: 0.5rem; }
-        .debug-panel { background: #1e293b; color: #e2e8f0; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; font-family: 'Courier New', monospace; font-size: 0.7rem; max-height: 400px; overflow-y: auto; display: none; }
-        .debug-panel.show { display: block; }
-        .main-content { background: white; border-radius: 32px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06); overflow: hidden; }
-        .tab-navigation { display: flex; border-bottom: 1.5px solid #e9f0f5; background: white; padding: 0 1.8rem; gap: 0.5rem; }
-        .tab-btn { background: transparent; border: none; padding: 1rem 1.8rem; font-size: 0.9rem; font-weight: 600; color: #5f7f9a; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border-bottom: 3px solid transparent; transition: all 0.2s; }
-        .tab-btn.active { color: #1a6b8a; border-bottom-color: #1a6b8a; }
-        .tab-content { display: none; padding: 2rem; }
-        .tab-content.active { display: block; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .input-group { margin-bottom: 0.6rem; }
-        .full-width { grid-column: span 2; }
-        label { display: block; font-weight: 600; margin-bottom: 0.3rem; font-size: 0.7rem; color: #1f5068; text-transform: uppercase; letter-spacing: 0.3px; }
-        input, textarea, select { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid #e2edf2; border-radius: 16px; font-family: 'Inter', sans-serif; font-size: 0.85rem; background: #fefefe; transition: all 0.2s; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #1f6e8c; box-shadow: 0 0 0 3px rgba(31,110,140,0.1); }
-        input[readonly] { background: #f8f9fa; cursor: not-allowed; }
-        button { background: #1f6e8c; border: none; padding: 0.8rem 1rem; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; width: 100%; margin-top: 0.8rem; transition: all 0.2s; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4f9; padding: 20px; color: #1a2a3a; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #e0e8f0; }
+        .header h1 { font-size: 1.8rem; background: linear-gradient(135deg, #1a6b8a, #0c4a6e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .badge { background: #e1f0fa; color: #155e75; padding: 5px 15px; border-radius: 40px; font-size: 0.75rem; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card i { font-size: 2rem; color: #1a6b8a; margin-bottom: 10px; }
+        .stat-card .value { font-size: 2rem; font-weight: 700; color: #0c4a5e; }
+        .stat-card label { font-size: 0.7rem; color: #6b8a9e; text-transform: uppercase; }
+        
+        .status { padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; font-size: 0.85rem; }
+        .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .status.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        
+        button { background: #1a6b8a; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
         button:hover { background: #0e5a75; transform: translateY(-1px); }
-        .btn-secondary { background: #4b6575; }
-        .section-title { font-size: 0.9rem; font-weight: 700; color: #1a6b8a; margin: 1rem 0 0.8rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e2edf2; display: flex; align-items: center; gap: 8px; }
-        .legal-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.8rem; padding: 0.5rem; background: #fafcff; border-radius: 16px; transition: all 0.2s; }
-        .legal-dropdown { display: flex; align-items: center; gap: 0.8rem; min-width: 200px; }
-        .legal-dropdown label { margin: 0; text-transform: none; font-weight: 600; color: #1f5068; }
-        .legal-dropdown select { width: auto; min-width: 100px; margin: 0; padding: 0.4rem 1rem; background: white; }
-        .legal-date-field { flex: 1; min-width: 220px; transition: all 0.2s; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
-        .legal-date-field.hidden, .property-field-hidden, .step-hidden { display: none !important; }
-        .legal-date-field input { margin-top: 0; flex: 1; min-width: 140px; }
-        .ltn-field, .sr-number-field, .cc-date-field { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 200px; }
-        .ltn-field label, .sr-number-field label, .cc-date-field label { margin: 0; text-transform: none; font-weight: 600; font-size: 0.7rem; white-space: nowrap; }
-        .ltn-field input, .sr-number-field input { flex: 1; }
-        .accused-cards-container { display: flex; flex-direction: column; gap: 1rem; margin-top: 0.8rem; max-height: 550px; overflow-y: auto; padding-right: 4px; }
-        .accused-card { background: #ffffff; border: 1.5px solid #e4edf3; border-radius: 20px; padding: 1rem; transition: all 0.2s; }
-        .accused-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbdde6; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px dashed #e9f0f5; padding-bottom: 0.5rem; }
-        .card-title { font-weight: 700; font-size: 0.75rem; background: #eef4fc; padding: 0.3rem 1rem; border-radius: 50px; color: #1a5f7a; }
-        .remove-accused-card { background: #fff1f0; color: #bc4e2c; border: none; padding: 0.3rem 1rem; border-radius: 40px; cursor: pointer; width: auto; margin: 0; font-size: 0.7rem; font-weight: 600; transition: all 0.2s; }
-        .remove-accused-card:hover { background: #ffe0db; transform: scale(0.98); }
-        .vertical-form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
-        .arrest-field-hidden { display: none; }
-        .document-upload-area { display: flex; flex-direction: column; gap: 8px; background: #fafcff; padding: 0.8rem; border-radius: 16px; border: 1px solid #eef2f8; }
-        .document-preview { max-width: 100%; max-height: 120px; object-fit: contain; border-radius: 12px; border: 1px solid #e2edf2; margin-top: 5px; cursor: pointer; background: #f8fafc; }
-        .photo-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 2px solid #e2edf2; margin-top: 5px; cursor: pointer; }
-        .add-accused-btn { background: #2a6f8f; padding: 0.7rem; margin-top: 0.8rem; }
-        .total-counter { background: #eff6fc; border-radius: 40px; padding: 0.6rem 1.2rem; margin: 0.5rem 0 0.8rem 0; display: flex; justify-content: space-between; font-weight: 600; }
-        .table-wrapper { overflow-x: auto; margin-top: 1rem; border-radius: 20px; max-height: 65vh; overflow-y: auto; border: 1px solid #ecf3f8; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 1100px; }
-        th { background: #f7fafd; padding: 1rem 0.8rem; text-align: left; font-weight: 700; font-size: 0.7rem; position: sticky; top: 0; color: #235b72; white-space: nowrap; border-bottom: 2px solid #e2edf2; }
-        td { padding: 0.9rem 0.8rem; border-bottom: 1px solid #ecf2f7; vertical-align: middle; }
-        .case-badge { display: inline-block; padding: 0.25rem 0.8rem; border-radius: 50px; font-weight: 700; font-size: 0.65rem; }
+        .btn-secondary { background: #6c757d; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
+        
+        .form-card { background: white; border-radius: 24px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .form-title { font-size: 1.2rem; font-weight: 600; color: #1a6b8a; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e0e8f0; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; font-size: 0.7rem; color: #1f5068; text-transform: uppercase; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1.5px solid #e2edf2; border-radius: 12px; font-family: inherit; font-size: 0.85rem; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #1a6b8a; box-shadow: 0 0 0 3px rgba(26,107,138,0.1); }
+        
+        .accused-card { background: #f8fafc; border: 1px solid #e2edf2; border-radius: 16px; padding: 15px; margin-bottom: 15px; }
+        .accused-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #d0dfe8; }
+        .accused-title { font-weight: 700; background: #e8f0fe; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; color: #1a5f7a; }
+        
+        .table-wrapper { overflow-x: auto; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th { background: #f7fafd; padding: 14px 12px; text-align: left; font-weight: 700; color: #1a6b8a; border-bottom: 2px solid #e2edf2; }
+        td { padding: 12px; border-bottom: 1px solid #ecf2f7; }
+        .clickable { cursor: pointer; color: #1a6b8a; font-weight: 600; }
+        .clickable:hover { text-decoration: underline; }
+        .case-badge { display: inline-block; padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
         .badge-fir { background: #fee9e6; color: #bc3900; }
         .badge-csr { background: #e1f0fe; color: #136b8d; }
-        .stage-badge { display: inline-block; padding: 0.25rem 0.8rem; border-radius: 50px; font-weight: 700; font-size: 0.65rem; text-align: center; min-width: 60px; }
-        .stage-ntf { background: #d1fae5; color: #065f46; }
-        .stage-pt { background: #fef3c7; color: #92400e; }
-        .stage-ui { background: #fee2e2; color: #991b1b; }
-        .delete-btn { background: #fff0ed; color: #c2410c; border: none; padding: 0.4rem 1rem; border-radius: 30px; cursor: pointer; width: auto; margin: 0; font-size: 0.7rem; font-weight: 600; transition: all 0.2s; }
-        .delete-btn:hover { background: #ffe0db; transform: scale(0.98); }
-        .clickable-case { cursor: pointer; color: #1f6e8c; font-weight: 600; transition: all 0.2s; }
-        .clickable-case:hover { color: #0e5a75; text-decoration: underline; }
-        .filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
-        .filter-bar input, .filter-bar select { width: auto; flex: 1; min-width: 150px; }
-        .filter-bar button { width: auto; padding: 0.5rem 1.2rem; background: #eaf3fa; color: #1f6e8c; margin-top: 0; }
-        .status { margin-top: 1rem; padding: 0.6rem; border-radius: 40px; font-size: 0.75rem; text-align: center; background: #f3f6fa; }
-        .status.success { background: #dff3e6; color: #166534; }
-        .status.error { background: #ffe8e6; color: #aa2e1c; }
-        .connection-status { font-size: 0.7rem; margin-top: 0.8rem; padding: 0.4rem 1rem; border-radius: 60px; text-align: center; background: #eef3fc; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
-        .modal-content { background-color: white; margin: 2% auto; padding: 0; border-radius: 28px; width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); animation: modalSlideIn 0.3s ease-out; }
-        @keyframes modalSlideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-header { background: linear-gradient(135deg, #145c7a, #0c4a6e); color: white; padding: 1.5rem 2rem; border-radius: 28px 28px 0 0; display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h2 { font-size: 1.3rem; font-weight: 600; margin: 0; }
-        .close-modal { color: white; font-size: 2rem; font-weight: bold; cursor: pointer; transition: all 0.2s; line-height: 1; }
-        .close-modal:hover { color: #e2edf2; transform: scale(1.1); }
-        .modal-body { padding: 2rem; }
-        .detail-section { margin-bottom: 2rem; border-bottom: 1px solid #e2edf2; padding-bottom: 1rem; }
-        .detail-section h3 { color: #1a6b8a; font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
-        .detail-item { display: flex; flex-direction: column; gap: 0.3rem; }
-        .detail-label { font-size: 0.7rem; font-weight: 600; color: #5b7c99; text-transform: uppercase; letter-spacing: 0.5px; }
-        .detail-value { font-size: 0.85rem; color: #1f2937; font-weight: 500; word-break: break-word; }
-        .detail-doc-link { color: #1f6e8c; text-decoration: none; font-weight: 600; cursor: pointer; }
-        .detail-doc-link:hover { text-decoration: underline; }
-        .accused-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        .accused-table th { background: #f7fafd; padding: 0.6rem; font-size: 0.7rem; position: static; text-align: left; }
-        .accused-table td { padding: 0.6rem; font-size: 0.75rem; border-bottom: 1px solid #ecf2f7; vertical-align: middle; }
-        .accused-photo-thumb, .doc-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 1px solid #e2edf2; }
-        .doc-thumb { object-fit: contain; background: #f8fafc; }
-        .workflow-hint { font-size: 0.65rem; color: #6c8dae; margin-left: 1rem; font-style: italic; }
-        .btn-remove-doc { background: #fee2e2; color: #991b1b; border: none; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.6rem; cursor: pointer; margin-top: 4px; width: auto; }
-        .btn-remove-doc:hover { background: #fecaca; }
-        .aadhar-upload-wrapper { transition: all 0.2s; }
-        @media (max-width: 720px) { body { padding: 1rem; } .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } .legal-row { flex-direction: column; align-items: flex-start; } }
+        
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .modal-content { background: white; margin: 5% auto; padding: 0; border-radius: 28px; width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto; }
+        .modal-header { background: linear-gradient(135deg, #145c7a, #0c4a6e); color: white; padding: 20px 25px; border-radius: 28px 28px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        .close-modal { font-size: 1.8rem; cursor: pointer; }
+        .modal-body { padding: 25px; }
+        
+        .hidden { display: none; }
+        .text-center { text-align: center; }
+        
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div class="header-left">
+        <div>
             <h1><i class="fas fa-balance-scale"></i> CaseFlow Pro</h1>
-            <div class="badge"><i class="fas fa-id-card"></i> Sequential IDs from 1 | Conditional Aadhar</div>
+            <div class="badge"><i class="fas fa-cloud-upload-alt"></i> JSONP Mode - Works Locally</div>
         </div>
-        <button id="dashboardToggleBtn" class="dashboard-toggle-btn"><i class="fas fa-chart-simple"></i> Show Dashboard</button>
+        <button id="dashboardToggleBtn" class="btn-secondary"><i class="fas fa-chart-line"></i> Show Dashboard</button>
     </div>
-
-    <div id="statsGrid" class="stats-grid">
-        <div class="stat-card"><i class="fas fa-folder-open"></i><h3>Total Cases</h3><div class="value" id="totalCases">0</div></div>
-        <div class="stat-card"><i class="fas fa-users"></i><h3>Total Accused</h3><div class="value" id="totalAccused">0</div></div>
-        <div class="stat-card"><i class="fas fa-gavel"></i><h3>FIR Cases</h3><div class="value" id="firCount">0</div></div>
-        <div class="stat-card"><i class="fas fa-file-alt"></i><h3>CSR Cases</h3><div class="value" id="csrCount">0</div></div>
+    
+    <div id="statsGrid" class="stats-grid hidden">
+        <div class="stat-card"><i class="fas fa-folder-open"></i><div class="value" id="totalCases">0</div><label>Total Cases</label></div>
+        <div class="stat-card"><i class="fas fa-users"></i><div class="value" id="totalAccused">0</div><label>Total Accused</label></div>
+        <div class="stat-card"><i class="fas fa-gavel"></i><div class="value" id="firCount">0</div><label>FIR Cases</label></div>
+        <div class="stat-card"><i class="fas fa-file-alt"></i><div class="value" id="csrCount">0</div><label>CSR Cases</label></div>
     </div>
-
-    <div class="debug-panel" id="debugPanel"><h4><i class="fas fa-bug"></i> Debug</h4><div id="debugContent"></div></div>
-
-    <div class="main-content">
-        <div class="tab-navigation">
-            <button class="tab-btn active" data-tab="register"><i class="fas fa-pen-alt"></i> New Case</button>
-            <button class="tab-btn" data-tab="cases"><i class="fas fa-table-list"></i> Case Registry</button>
-        </div>
-
-        <div id="registerTab" class="tab-content active">
-            <div class="form-grid">
-                <div class="input-group"><label>Group ID * <span class="auto-id-badge"><i class="fas fa-sort-numeric-down"></i> Auto (1,2,3...)</span></label><input type="text" id="groupId" readonly></div>
-                <div class="input-group"><label>FIR / CSR *</label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
-                <div class="input-group"><label>Head</label><input type="text" id="head" placeholder="Offence description"></div>
-                <div class="input-group"><label>Case Number *</label><input type="text" id="caseNumber" placeholder="e.g., FIR 123/2024"></div>
-                <div class="input-group"><label>Sections *</label><input type="text" id="sections" placeholder="302, 307 IPC"></div>
-            </div>
-
-            <div class="section-title"><i class="fas fa-calendar-alt"></i> Date, Time & Location</div>
-            <div class="form-grid">
-                <div class="input-group"><label>Date of Occurrence</label><input type="date" id="doDate"></div>
-                <div class="input-group"><label>Time of Occurrence</label><input type="time" id="doTime"></div>
-                <div class="input-group"><label>Date of Report</label><input type="date" id="drDate"></div>
-                <div class="input-group"><label>Time of Report</label><input type="time" id="drTime"></div>
-                <div class="input-group full-width"><label>Scene of Crime</label><input type="text" id="sceneOfCrime"></div>
-            </div>
-
-            <div class="section-title"><i class="fas fa-user-tie"></i> Accused Persons <span style="font-size:0.65rem;">(Aadhar upload only if arrested)</span></div>
-            <div class="total-counter"><span><i class="fas fa-users"></i> Total Accused</span><span id="totalAccusedCount">0</span></div>
-            <div id="accusedCardsContainer" class="accused-cards-container"></div>
-            <button type="button" id="addAccusedBtn" class="add-accused-btn"><i class="fas fa-plus-circle"></i> Add Another Accused</button>
-
-            <div class="section-title"><i class="fas fa-info-circle"></i> Case Details & Documents</div>
-            <div class="form-grid">
-                <div class="input-group full-width"><label>Complainant Details</label><textarea id="complainantDetails" rows="2"></textarea></div>
-                <div class="input-group full-width"><label>Brief Summary</label><textarea id="complaintSummary" rows="2"></textarea></div>
-                
-                <div class="input-group full-width"><div class="document-upload-area"><label><i class="fas fa-file-pdf"></i> Complaint Copy</label><input type="file" id="complaintCopyFile" accept="image/*,application/pdf"><div id="complaintCopyPreview"></div><button type="button" id="removeComplaintCopy" class="btn-remove-doc" style="display:none;">Remove</button></div></div>
-                <div class="input-group full-width"><div class="document-upload-area"><label><i class="fas fa-id-card"></i> Complainant ID Proof</label><input type="file" id="complainantIdFile" accept="image/*,application/pdf"><div id="complainantIdPreview"></div><button type="button" id="removeComplainantId" class="btn-remove-doc" style="display:none;">Remove</button></div></div>
-                
-                <div class="input-group full-width"><div class="legal-row" style="background:transparent; padding-left:0;"><div class="legal-dropdown"><label>📦 Property Seized:</label><select id="propertySeizedSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div><div class="legal-date-field" id="propertySeizedField"><textarea id="propertySeized" rows="2" placeholder="Describe seized property..." style="width:100%;"></textarea></div></div></div>
-            </div>
-
-            <div class="section-title"><i class="fas fa-gavel"></i> Legal Process (Sequential)</div>
-            <div class="workflow-hint"><i class="fas fa-info-circle"></i> Charge Sheet → Opinion → e-Filed → SR Number → CC/SC/PRC</div>
+    
+    <div id="statusMsg" class="status info"><i class="fas fa-sync-alt fa-spin"></i> Connecting to server...</div>
+    
+    <div style="display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #e0e8f0;">
+        <button id="tabRegisterBtn" style="background: transparent; color: #1a6b8a; border-bottom: 3px solid #1a6b8a; border-radius: 0; padding: 10px 20px;">New Case</button>
+        <button id="tabCasesBtn" style="background: transparent; color: #6b8a9e; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 20px;">Case Registry</button>
+    </div>
+    
+    <div id="registerTab">
+        <div class="form-card">
+            <div class="form-title"><i class="fas fa-pen-alt"></i> Register New Case</div>
             
-            <div class="legal-row" id="rowChargeSheet">
-                <div class="legal-dropdown"><label>📄 Charge Sheet:</label><select id="chargeSheetSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="legal-date-field" id="chargeSheetDateField"><input type="date" id="chargeSheetDate"></div>
+            <div class="form-row">
+                <div class="form-group"><label>Group ID <span style="color:#1a6b8a;">(Auto)</span></label><input type="text" id="groupId" readonly placeholder="Will be auto-generated"></div>
+                <div class="form-group"><label>FIR / CSR *</label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
             </div>
-            <div class="legal-row step-hidden" id="rowOpinion">
-                <div class="legal-dropdown"><label>⚖️ Opinion Received:</label><select id="opinionSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="legal-date-field" id="opinionDateField"><input type="date" id="opinionDate"></div>
+            <div class="form-row">
+                <div class="form-group"><label>Head / Offence</label><input type="text" id="head" placeholder="e.g., Murder, Theft, Assault"></div>
+                <div class="form-group"><label>Case Number *</label><input type="text" id="caseNumber" placeholder="e.g., FIR 123/2024"></div>
             </div>
-            <div class="legal-row step-hidden" id="rowEFiling">
-                <div class="legal-dropdown"><label>📎 e-Filed:</label><select id="efilingSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="legal-date-field" id="efilingDateField">
-                    <input type="date" id="efilingDate">
-                    <div class="ltn-field"><label>LTN:</label><input type="text" id="ltnNumber" placeholder="LTN Number"></div>
-                </div>
+            <div class="form-row">
+                <div class="form-group"><label>Sections</label><input type="text" id="sections" placeholder="302, 307 IPC"></div>
             </div>
-            <div class="legal-row step-hidden" id="rowSR">
-                <div class="legal-dropdown"><label>🔢 SR Number Obtained:</label><select id="srSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="legal-date-field" id="srNumberField">
-                    <input type="date" id="srDate" placeholder="Date">
-                    <div class="sr-number-field"><label>SR Number:</label><input type="text" id="srNumber" placeholder="e.g., SR-2024-001"></div>
-                </div>
+            
+            <div class="form-title" style="margin-top: 20px;"><i class="fas fa-calendar-alt"></i> Date & Location</div>
+            <div class="form-row">
+                <div class="form-group"><label>Date of Occurrence</label><input type="date" id="doDate"></div>
+                <div class="form-group"><label>Time of Occurrence</label><input type="time" id="doTime"></div>
+                <div class="form-group"><label>Date of Report</label><input type="date" id="drDate"></div>
+                <div class="form-group"><label>Time of Report</label><input type="time" id="drTime"></div>
             </div>
-            <div class="legal-row step-hidden" id="rowCC">
-                <div class="legal-dropdown"><label>⚖️ CC/SC/PRC Number:</label><select id="ccSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="legal-date-field" id="ccNumberField">
-                    <input type="text" id="ccNumber" placeholder="CC/SC/PRC Number">
-                    <div class="cc-date-field"><label>Date:</label><input type="date" id="ccDate"></div>
-                </div>
+            <div class="form-row">
+                <div class="form-group"><label>Scene of Crime</label><input type="text" id="sceneOfCrime" placeholder="Location where crime occurred"></div>
             </div>
-
-            <div class="form-grid"><div class="input-group full-width"><label>Additional notes</label><textarea id="remarks" rows="2"></textarea></div></div>
-
-            <button id="submitBtn"><i class="fas fa-check-circle"></i> Register Case & Sync</button>
-            <button id="resetFormBtn" class="btn-secondary"><i class="fas fa-broom"></i> Clear Form</button>
-            <div id="formStatus" class="status">⚡ Ready</div>
-            <div id="connectionStatus" class="connection-status"><i class="fas fa-sync-alt fa-spin"></i> Connecting...</div>
+            
+            <div class="form-title" style="margin-top: 20px;"><i class="fas fa-user-tie"></i> Accused Persons</div>
+            <div id="accusedContainer"></div>
+            <button id="addAccusedBtn" class="btn-secondary" style="margin-top: 10px;"><i class="fas fa-plus-circle"></i> Add Accused Person</button>
+            
+            <div class="form-title" style="margin-top: 20px;"><i class="fas fa-info-circle"></i> Case Details</div>
+            <div class="form-row">
+                <div class="form-group"><label>Complainant Details</label><textarea id="complainantDetails" rows="2" placeholder="Name, address, contact"></textarea></div>
+                <div class="form-group"><label>Brief Summary</label><textarea id="complaintSummary" rows="2"></textarea></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Property Seized?</label><select id="propertySeizedSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                <div class="form-group" id="propertySeizedField" style="display:none;"><label>Property Details</label><textarea id="propertySeized" rows="2" placeholder="Describe seized property..."></textarea></div>
+            </div>
+            
+            <div class="form-title" style="margin-top: 20px;"><i class="fas fa-gavel"></i> Legal Process</div>
+            <div class="form-row">
+                <div class="form-group"><label>Charge Sheet Prepared?</label><select id="chargeSheetSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                <div class="form-group" id="chargeSheetDateField" style="display:none;"><label>Charge Sheet Date</label><input type="date" id="chargeSheetDate"></div>
+            </div>
+            <div class="form-row" id="opinionRow" style="display:none;">
+                <div class="form-group"><label>Opinion Received?</label><select id="opinionSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                <div class="form-group" id="opinionDateField" style="display:none;"><label>Opinion Date</label><input type="date" id="opinionDate"></div>
+            </div>
+            <div class="form-row" id="efilingRow" style="display:none;">
+                <div class="form-group"><label>e-Filed?</label><select id="efilingSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                <div class="form-group" id="efilingDateField" style="display:none;"><label>e-Filing Date</label><input type="date" id="efilingDate"></div>
+                <div class="form-group" id="ltnField" style="display:none;"><label>LTN Number</label><input type="text" id="ltnNumber" placeholder="LTN Number"></div>
+            </div>
+            <div class="form-row" id="srRow" style="display:none;">
+                <div class="form-group"><label>SR Number Obtained?</label><select id="srSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                <div class="form-group" id="srNumberField" style="display:none;"><label>SR Number</label><input type="text" id="srNumber" placeholder="SR Number"></div>
+                <div class="form-group" id="srDateField" style="display:none;"><label>SR Date</label><input type="date" id="srDate"></div>
+            </div>
+            <div class="form-row" id="ccRow" style="display:none;">
+                <div class="form-group"><label>CC/SC/PRC Number?</label><select id="ccSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                <div class="form-group" id="ccNumberField" style="display:none;"><label>CC/SC/PRC Number</label><input type="text" id="ccNumber" placeholder="Enter number"></div>
+                <div class="form-group" id="ccDateField" style="display:none;"><label>CC Date</label><input type="date" id="ccDate"></div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group"><label>Additional Notes</label><textarea id="remarks" rows="2"></textarea></div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="submitBtn"><i class="fas fa-check-circle"></i> Register Case</button>
+                <button id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i> Reset Form</button>
+            </div>
         </div>
-
-        <div id="casesTab" class="tab-content">
-            <div class="filter-bar">
-                <input type="text" id="searchInput" placeholder="Search...">
-                <select id="filterCaseType"><option value="all">All Cases</option><option value="FIR">FIR</option><option value="CSR">CSR</option></select>
-                <button id="refreshBtn"><i class="fas fa-rotate-right"></i> Refresh</button>
-                <button id="showDebugBtn" style="background:#6c757d;"><i class="fas fa-bug"></i> Debug</button>
-            </div>
-            <div id="statsInfo" class="status" style="display:inline-block; width:auto;">Loading...</div>
-            <div class="table-wrapper"><table id="dataTable"><thead><tr><th>Group ID</th><th>Type</th><th>Head</th><th>Case No</th><th>Sections</th><th>DO</th><th>DR</th><th>Accused</th><th>Stage</th><th>Action</th></tr></thead><tbody id="tableBody"><tr><td colspan="10"><i class="fas fa-spinner fa-pulse"></i> Loading...<\/td></tr></tbody>}</div>
+    </div>
+    
+    <div id="casesTab" style="display: none;">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <input type="text" id="searchInput" placeholder="Search by Group ID, Case Number, Accused..." style="flex: 1; min-width: 200px;">
+            <select id="filterCaseType"><option value="all">All Cases</option><option value="FIR">FIR Only</option><option value="CSR">CSR Only</option></select>
+            <button id="refreshBtn"><i class="fas fa-refresh"></i> Refresh</button>
+        </div>
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead><tr><th>Group ID</th><th>Type</th><th>Case No</th><th>Head</th><th>Sections</th><th>Accused</th><th>Stage</th><th>Action</th></tr></thead>
+                <tbody id="tableBody"><tr><td colspan="8" class="text-center">Loading cases...</td></tr></tbody>
+            </table>
         </div>
     </div>
 </div>
-<div id="caseModal" class="modal"><div class="modal-content"><div class="modal-header"><h2>Case Details</h2><span class="close-modal">&times;</span></div><div class="modal-body" id="modalBody"></div></div></div>
+
+<div id="caseModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h2><i class="fas fa-folder-open"></i> Case Details</h2><span class="close-modal">&times;</span></div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwjOyJO5lO6Itv362jLQeUOmEbXIog2J5jTorVfzzCVaCbjZh3TUWt0wRQVl3VYe_b0cA/exec";
-    let allRecords = [], dashboardVisible = false;
-    let complaintCopyData = "", complainantIdData = "";
-
-    function updateWorkflowVisibility() {
-        const cs = document.getElementById('chargeSheetSelect').value === 'Yes';
-        const op = document.getElementById('opinionSelect').value === 'Yes';
-        const ef = document.getElementById('efilingSelect').value === 'Yes';
-        const sr = document.getElementById('srSelect').value === 'Yes';
-        const cc = document.getElementById('ccSelect').value === 'Yes';
+    // ==================== CONFIGURATION ====================
+    // REPLACE THIS WITH YOUR ACTUAL APPS SCRIPT URL
+    const API_URL = "https://script.google.com/macros/s/YOUR_ACTUAL_URL/exec";
+    
+    let allRecords = [];
+    let dashboardVisible = false;
+    let accusedCounter = 0;
+    
+    // ==================== JSONP FUNCTION (BYPASSES CORS) ====================
+    function jsonpRequest(url, callbackName, onSuccess, onError) {
+        const script = document.createElement('script');
+        const callbackFunction = `jsonp_callback_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
         
-        document.getElementById('rowOpinion').classList.toggle('step-hidden', !cs);
-        document.getElementById('rowEFiling').classList.toggle('step-hidden', !(cs && op));
-        document.getElementById('rowSR').classList.toggle('step-hidden', !(cs && op && ef));
-        document.getElementById('rowCC').classList.toggle('step-hidden', !(cs && op && ef && sr));
-        
-        document.getElementById('chargeSheetDateField').classList.toggle('hidden', !cs);
-        document.getElementById('opinionDateField').classList.toggle('hidden', !op);
-        document.getElementById('efilingDateField').classList.toggle('hidden', !(cs && op && ef));
-        
-        const srField = document.getElementById('srNumberField');
-        if (sr && (cs && op && ef)) srField.classList.remove('hidden');
-        else srField.classList.add('hidden');
-        
-        const ccField = document.getElementById('ccNumberField');
-        if (cc && (cs && op && ef && sr)) ccField.classList.remove('hidden');
-        else ccField.classList.add('hidden');
-        
-        document.getElementById('propertySeizedField').classList.toggle('hidden', document.getElementById('propertySeizedSelect').value !== 'Yes');
-    }
-
-    function setupFileUpload(inputId, previewId, removeBtnId, storageVar) {
-        const input = document.getElementById(inputId);
-        const preview = document.getElementById(previewId);
-        const removeBtn = document.getElementById(removeBtnId);
-        input.addEventListener('change', () => {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const dataUrl = e.target.result;
-                    window[storageVar] = dataUrl;
-                    if (input.files[0].type.startsWith('image/')) {
-                        preview.innerHTML = `<img src="${dataUrl}" class="document-preview" style="max-height:100px;" onclick="window.open('${dataUrl}','_blank')">`;
-                    } else {
-                        preview.innerHTML = `<div class="document-preview" style="padding:1rem;background:#eef2f8;border-radius:12px;"><i class="fas fa-file-pdf"></i> ${input.files[0].name}<br><small>Click to view</small></div>`;
-                        preview.querySelector('.document-preview')?.addEventListener('click', () => window.open(dataUrl, '_blank'));
-                    }
-                    removeBtn.style.display = 'inline-block';
-                };
-                reader.readAsDataURL(input.files[0]);
+        window[callbackFunction] = function(data) {
+            delete window[callbackFunction];
+            document.body.removeChild(script);
+            if (data && data.error) {
+                onError(data.error);
+            } else {
+                onSuccess(data);
             }
-        });
-        removeBtn.addEventListener('click', () => {
-            input.value = '';
-            preview.innerHTML = '';
-            window[storageVar] = '';
-            removeBtn.style.display = 'none';
-        });
-    }
-
-    setupFileUpload('complaintCopyFile', 'complaintCopyPreview', 'removeComplaintCopy', 'complaintCopyData');
-    setupFileUpload('complainantIdFile', 'complainantIdPreview', 'removeComplainantId', 'complainantIdData');
-
-    function createAccusedCard(data = null) {
-        const div = document.createElement('div'); div.className = 'accused-card';
-        const name = data?.["Accused person's full name"] || '';
-        const father = data?.["Father's name of accused"] || '';
-        const age = data?.["Age of accused"] || '';
-        const addr = data?.["Address of accused"] || '';
-        const arrested = data?.["TRUE / FALSE (arrested in this case)"] || 'FALSE';
-        const arrestPlace = data?.["Arrest Place"] || '';
-        const arrestDate = data?.["Date of arrest (if arrested)"] || '';
-        const bail = data?.["Bail status"] || '';
-        const photo = data?.["Accused Photo"] || '';
-        const aadhar = data?.["Accused Aadhar Card"] || '';
-        const isArrested = arrested === 'TRUE';
-        
-        div.innerHTML = `
-            <div class="card-header"><span class="card-title"><i class="fas fa-user"></i> Accused</span><button type="button" class="remove-accused-card"><i class="fas fa-trash-alt"></i> Remove</button></div>
-            <div class="vertical-form-grid">
-                <div><label>Full Name *</label><input class="acc-name" value="${escapeHtml(name)}"></div>
-                <div><label>Father's Name</label><input class="acc-father" value="${escapeHtml(father)}"></div>
-                <div><label>Age</label><input class="acc-age" value="${escapeHtml(age)}"></div>
-                <div><label>Address</label><input class="acc-address" value="${escapeHtml(addr)}"></div>
-                <div><label>Arrested?</label><select class="acc-arrested"><option value="TRUE" ${arrested === 'TRUE' ? 'selected' : ''}>Yes</option><option value="FALSE" ${arrested !== 'TRUE' ? 'selected' : ''}>No</option></select></div>
-                <div class="arrest-field ${!isArrested ? 'arrest-field-hidden' : ''}"><label>Arrest Place</label><input class="acc-arrest-place" value="${escapeHtml(arrestPlace)}"></div>
-                <div class="arrest-field ${!isArrested ? 'arrest-field-hidden' : ''}"><label>Arrest Date</label><input type="date" class="acc-arrest-date" value="${arrestDate}"></div>
-                <div class="arrest-field ${!isArrested ? 'arrest-field-hidden' : ''}"><label>Bail Status</label><input class="acc-bail-status" value="${escapeHtml(bail)}"></div>
-                <div class="arrest-field ${!isArrested ? 'arrest-field-hidden' : ''}"><label>Photo</label><div><input type="file" class="acc-photo-file" accept="image/*"><img class="photo-preview" src="${photo}" style="${photo ? 'display:block' : 'display:none'}; max-width:80px;"><button type="button" class="btn-remove-doc remove-photo-btn" style="${photo ? 'display:inline-block' : 'display:none'}">Remove</button></div></div>
-                <div class="aadhar-upload-wrapper ${!isArrested ? 'arrest-field-hidden' : ''}"><label><i class="fas fa-id-card"></i> Aadhar Card (Only for Arrested)</label><div><input type="file" class="acc-aadhar-file" accept="image/*,application/pdf"><div class="aadhar-preview-container"></div><button type="button" class="btn-remove-doc remove-aadhar-btn" style="display:none">Remove</button></div></div>
-            </div>`;
-        
-        const photoFile = div.querySelector('.acc-photo-file');
-        const photoPreview = div.querySelector('.photo-preview');
-        const removePhotoBtn = div.querySelector('.remove-photo-btn');
-        if (photoFile) {
-            photoFile.addEventListener('change', () => {
-                if (photoFile.files[0]) {
-                    const r = new FileReader();
-                    r.onload = e => { photoPreview.src = e.target.result; photoPreview.style.display = 'block'; removePhotoBtn.style.display = 'inline-block'; };
-                    r.readAsDataURL(photoFile.files[0]);
-                }
-            });
-            if (removePhotoBtn) removePhotoBtn.addEventListener('click', () => { photoFile.value = ''; photoPreview.src = ''; photoPreview.style.display = 'none'; removePhotoBtn.style.display = 'none'; });
-        }
-        
-        const aadharFile = div.querySelector('.acc-aadhar-file');
-        const aadharContainer = div.querySelector('.aadhar-preview-container');
-        const removeAadharBtn = div.querySelector('.remove-aadhar-btn');
-        if (aadharFile) {
-            aadharFile.addEventListener('change', () => {
-                if (aadharFile.files[0]) {
-                    const r = new FileReader();
-                    r.onload = e => {
-                        const dataUrl = e.target.result;
-                        if (aadharFile.files[0].type.startsWith('image/')) {
-                            aadharContainer.innerHTML = `<img src="${dataUrl}" class="document-preview" style="max-height:80px;" onclick="window.open('${dataUrl}','_blank')">`;
-                        } else {
-                            aadharContainer.innerHTML = `<div class="document-preview" style="padding:0.5rem;background:#eef2f8;border-radius:8px;"><i class="fas fa-file-pdf"></i> Aadhar PDF</div>`;
-                            aadharContainer.querySelector('.document-preview')?.addEventListener('click', () => window.open(dataUrl, '_blank'));
-                        }
-                        removeAadharBtn.style.display = 'inline-block';
-                        aadharContainer.dataset.dataUrl = dataUrl;
-                    };
-                    r.readAsDataURL(aadharFile.files[0]);
-                }
-            });
-            if (removeAadharBtn) removeAadharBtn.addEventListener('click', () => { aadharFile.value = ''; aadharContainer.innerHTML = ''; removeAadharBtn.style.display = 'none'; delete aadharContainer.dataset.dataUrl; });
-        }
-        
-        const arrestedSelect = div.querySelector('.acc-arrested');
-        const aadharWrapper = div.querySelector('.aadhar-upload-wrapper');
-        const toggleArrestFields = () => {
-            const isArrestedNow = arrestedSelect.value === 'TRUE';
-            div.querySelectorAll('.arrest-field').forEach(f => f.classList.toggle('arrest-field-hidden', !isArrestedNow));
-            if (aadharWrapper) aadharWrapper.classList.toggle('arrest-field-hidden', !isArrestedNow);
-            if (!isArrestedNow && photoPreview) { photoPreview.src = ''; photoPreview.style.display = 'none'; if(photoFile) photoFile.value = ''; if(removePhotoBtn) removePhotoBtn.style.display = 'none'; }
-            if (!isArrestedNow && aadharFile) { aadharFile.value = ''; if(aadharContainer) aadharContainer.innerHTML = ''; if(removeAadharBtn) removeAadharBtn.style.display = 'none'; delete aadharContainer?.dataset?.dataUrl; }
         };
-        arrestedSelect.addEventListener('change', toggleArrestFields);
         
-        div.querySelector('.remove-accused-card').addEventListener('click', () => { if(document.querySelectorAll('#accusedCardsContainer .accused-card').length > 1) div.remove(); updateTotalCount(); });
-        return div;
+        const separator = url.includes('?') ? '&' : '?';
+        script.src = `${url}${separator}callback=${callbackFunction}`;
+        script.onerror = function() {
+            delete window[callbackFunction];
+            document.body.removeChild(script);
+            onError('JSONP request failed');
+        };
+        
+        document.body.appendChild(script);
     }
     
-    function updateTotalCount() { document.getElementById('totalAccusedCount').textContent = document.querySelectorAll('#accusedCardsContainer .accused-card').length; }
+    // ==================== FETCH USING JSONP ====================
+    function fetchCases() {
+        showStatus('Loading cases...', 'info');
+        
+        jsonpRequest(API_URL, 'callback', 
+            (data) => {
+                allRecords = Array.isArray(data) ? data : [];
+                renderTable();
+                updateStats();
+                updateGroupId();
+                showStatus(`✅ Loaded ${allRecords.length} records`, 'success');
+            },
+            (error) => {
+                showStatus(`❌ Connection error: ${error}. Make sure Apps Script is deployed with "Anyone" access.`, 'error');
+                console.error('JSONP error:', error);
+            }
+        );
+    }
+    
+    // ==================== POST USING FETCH (with CORS - works for POST) ====================
+    async function postRequest(data) {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.error('POST error:', error);
+            throw error;
+        }
+    }
+    
+    // ==================== INITIALIZATION ====================
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tab switching
+        document.getElementById('tabRegisterBtn').onclick = () => {
+            document.getElementById('registerTab').style.display = 'block';
+            document.getElementById('casesTab').style.display = 'none';
+            document.getElementById('tabRegisterBtn').style.borderBottom = '3px solid #1a6b8a';
+            document.getElementById('tabCasesBtn').style.borderBottom = '3px solid transparent';
+            document.getElementById('tabRegisterBtn').style.color = '#1a6b8a';
+            document.getElementById('tabCasesBtn').style.color = '#6b8a9e';
+        };
+        document.getElementById('tabCasesBtn').onclick = () => {
+            document.getElementById('registerTab').style.display = 'none';
+            document.getElementById('casesTab').style.display = 'block';
+            document.getElementById('tabCasesBtn').style.borderBottom = '3px solid #1a6b8a';
+            document.getElementById('tabRegisterBtn').style.borderBottom = '3px solid transparent';
+            document.getElementById('tabCasesBtn').style.color = '#1a6b8a';
+            document.getElementById('tabRegisterBtn').style.color = '#6b8a9e';
+            fetchCases();
+        };
+        
+        // Dashboard toggle
+        document.getElementById('dashboardToggleBtn').onclick = () => {
+            dashboardVisible = !dashboardVisible;
+            document.getElementById('statsGrid').classList.toggle('hidden', !dashboardVisible);
+            document.getElementById('dashboardToggleBtn').innerHTML = dashboardVisible ? '<i class="fas fa-chart-line"></i> Hide Dashboard' : '<i class="fas fa-chart-line"></i> Show Dashboard';
+            if (dashboardVisible) updateStats();
+        };
+        
+        // Add accused
+        document.getElementById('addAccusedBtn').onclick = addAccused;
+        
+        // Submit
+        document.getElementById('submitBtn').onclick = submitCase;
+        document.getElementById('resetBtn').onclick = resetForm;
+        document.getElementById('refreshBtn').onclick = () => fetchCases();
+        
+        // Search and filter
+        document.getElementById('searchInput').addEventListener('input', () => renderTable());
+        document.getElementById('filterCaseType').addEventListener('change', () => renderTable());
+        
+        // Property seized toggle
+        document.getElementById('propertySeizedSelect').onchange = function() {
+            document.getElementById('propertySeizedField').style.display = this.value === 'Yes' ? 'block' : 'none';
+        };
+        
+        // Legal process conditional visibility
+        setupLegalToggles();
+        
+        // Add first accused by default
+        addAccused();
+        
+        // Fetch initial data
+        fetchCases();
+        
+        // Auto-refresh every 60 seconds
+        setInterval(fetchCases, 60000);
+    });
+    
+    // ==================== LEGAL PROCESS TOGGLES ====================
+    function setupLegalToggles() {
+        const chargeSheet = document.getElementById('chargeSheetSelect');
+        const opinion = document.getElementById('opinionSelect');
+        const efiling = document.getElementById('efilingSelect');
+        const sr = document.getElementById('srSelect');
+        
+        chargeSheet.onchange = () => {
+            const isYes = chargeSheet.value === 'Yes';
+            document.getElementById('chargeSheetDateField').style.display = isYes ? 'block' : 'none';
+            document.getElementById('opinionRow').style.display = isYes ? 'flex' : 'none';
+        };
+        
+        opinion.onchange = () => {
+            document.getElementById('opinionDateField').style.display = opinion.value === 'Yes' ? 'block' : 'none';
+            const showEfiling = opinion.value === 'Yes' && chargeSheet.value === 'Yes';
+            document.getElementById('efilingRow').style.display = showEfiling ? 'flex' : 'none';
+        };
+        
+        efiling.onchange = () => {
+            const isYes = efiling.value === 'Yes';
+            document.getElementById('efilingDateField').style.display = isYes ? 'block' : 'none';
+            document.getElementById('ltnField').style.display = isYes ? 'block' : 'none';
+            const showSr = isYes && opinion.value === 'Yes' && chargeSheet.value === 'Yes';
+            document.getElementById('srRow').style.display = showSr ? 'flex' : 'none';
+        };
+        
+        sr.onchange = () => {
+            const isYes = sr.value === 'Yes';
+            document.getElementById('srNumberField').style.display = isYes ? 'block' : 'none';
+            document.getElementById('srDateField').style.display = isYes ? 'block' : 'none';
+            const showCc = isYes && efiling.value === 'Yes';
+            document.getElementById('ccRow').style.display = showCc ? 'flex' : 'none';
+        };
+        
+        document.getElementById('ccSelect').onchange = () => {
+            const isYes = document.getElementById('ccSelect').value === 'Yes';
+            document.getElementById('ccNumberField').style.display = isYes ? 'block' : 'none';
+            document.getElementById('ccDateField').style.display = isYes ? 'block' : 'none';
+        };
+    }
+    
+    // ==================== ACCUSED MANAGEMENT ====================
+    function addAccused() {
+        const container = document.getElementById('accusedContainer');
+        const id = accusedCounter++;
+        const div = document.createElement('div');
+        div.className = 'accused-card';
+        div.id = `accused_${id}`;
+        div.innerHTML = `
+            <div class="accused-header">
+                <span class="accused-title"><i class="fas fa-user-circle"></i> Accused Person ${accusedCounter}</span>
+                <button type="button" class="btn-danger btn-sm" onclick="removeAccused(${id})"><i class="fas fa-trash"></i> Remove</button>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Full Name *</label><input type="text" class="acc-name" placeholder="Full name" required></div>
+                <div class="form-group"><label>Father's Name</label><input type="text" class="acc-father" placeholder="Father's name"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Age</label><input type="text" class="acc-age" placeholder="Age"></div>
+                <div class="form-group"><label>Address</label><input type="text" class="acc-address" placeholder="Address"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Arrested?</label><select class="acc-arrested"><option value="FALSE">No</option><option value="TRUE">Yes</option></select></div>
+                <div class="form-group arrest-fields" style="display:none;"><label>Arrest Place</label><input type="text" class="acc-arrest-place" placeholder="Arrest place"></div>
+                <div class="form-group arrest-fields" style="display:none;"><label>Arrest Date</label><input type="date" class="acc-arrest-date"></div>
+                <div class="form-group arrest-fields" style="display:none;"><label>Bail Status</label><input type="text" class="acc-bail-status" placeholder="Bail status"></div>
+            </div>
+        `;
+        
+        const arrestedSelect = div.querySelector('.acc-arrested');
+        const arrestFields = div.querySelectorAll('.arrest-fields');
+        arrestedSelect.onchange = () => {
+            const isArrested = arrestedSelect.value === 'TRUE';
+            arrestFields.forEach(field => field.style.display = isArrested ? 'block' : 'none');
+        };
+        
+        container.appendChild(div);
+    }
+    
+    function removeAccused(id) {
+        const div = document.getElementById(`accused_${id}`);
+        if (div && document.querySelectorAll('.accused-card').length > 1) {
+            div.remove();
+        } else {
+            showStatus('At least one accused person is required', 'warning');
+        }
+    }
     
     function getAccusedList() {
         const list = [];
-        document.querySelectorAll('#accusedCardsContainer .accused-card').forEach(card => {
+        document.querySelectorAll('.accused-card').forEach(card => {
             const name = card.querySelector('.acc-name')?.value.trim();
             if (name) {
-                const arrested = card.querySelector('.acc-arrested')?.value === 'TRUE';
-                const photoPreview = card.querySelector('.photo-preview');
-                const aadharContainer = card.querySelector('.aadhar-preview-container');
                 list.push({
                     "Accused person's full name": name,
                     "Father's name of accused": card.querySelector('.acc-father')?.value || '',
                     "Age of accused": card.querySelector('.acc-age')?.value || '',
                     "Address of accused": card.querySelector('.acc-address')?.value || '',
-                    "TRUE / FALSE (arrested in this case)": arrested ? "TRUE" : "FALSE",
-                    "Arrest Place": arrested ? (card.querySelector('.acc-arrest-place')?.value || '') : '',
-                    "Date of arrest (if arrested)": arrested ? (card.querySelector('.acc-arrest-date')?.value || '') : '',
-                    "Bail status": arrested ? (card.querySelector('.acc-bail-status')?.value || '') : '',
-                    "Accused Photo": arrested && photoPreview?.src ? photoPreview.src : '',
-                    "Accused Aadhar Card": arrested && aadharContainer?.dataset?.dataUrl ? aadharContainer.dataset.dataUrl : ''
+                    "TRUE / FALSE (arrested in this case)": card.querySelector('.acc-arrested')?.value === 'TRUE' ? 'TRUE' : 'FALSE',
+                    "Arrest Place": card.querySelector('.acc-arrest-place')?.value || '',
+                    "Date of arrest (if arrested)": card.querySelector('.acc-arrest-date')?.value || '',
+                    "Bail status": card.querySelector('.acc-bail-status')?.value || ''
                 });
             }
         });
         return list;
     }
     
-    function loadAccusedCards(arr = []) {
-        const container = document.getElementById('accusedCardsContainer');
-        container.innerHTML = '';
-        if (arr.length) arr.forEach(a => container.appendChild(createAccusedCard(a)));
-        else container.appendChild(createAccusedCard());
-        updateTotalCount();
+    // ==================== SUBMIT CASE ====================
+    async function submitCase() {
+        const caseNumber = document.getElementById('caseNumber').value.trim();
+        if (!caseNumber) {
+            showStatus('❌ Case Number is required', 'error');
+            return;
+        }
+        
+        const accused = getAccusedList();
+        if (accused.length === 0) {
+            showStatus('❌ At least one accused person is required', 'error');
+            return;
+        }
+        
+        const groupId = document.getElementById('groupId').value || Date.now().toString();
+        
+        const master = {
+            "Group identifier (same for all accused in a case)": groupId,
+            "FIR / CSR": document.getElementById('caseType').value,
+            "Head": document.getElementById('head').value,
+            "Case number (e.g., FIR 123/2024)": caseNumber,
+            "Sections": document.getElementById('sections').value,
+            "Date of Occurrence": document.getElementById('doDate').value,
+            "Time of Occurrence": document.getElementById('doTime').value,
+            "Date of Report": document.getElementById('drDate').value,
+            "Time of Report": document.getElementById('drTime').value,
+            "Scene of Crime": document.getElementById('sceneOfCrime').value,
+            "Complainant name, address, contact": document.getElementById('complainantDetails').value,
+            "Brief summary of complaint": document.getElementById('complaintSummary').value,
+            "Seized property details": document.getElementById('propertySeizedSelect').value === 'Yes' ? document.getElementById('propertySeized').value : '',
+            "Charge sheeted date": document.getElementById('chargeSheetSelect').value === 'Yes' ? document.getElementById('chargeSheetDate').value : '',
+            "Opinion received date": document.getElementById('opinionSelect').value === 'Yes' ? document.getElementById('opinionDate').value : '',
+            "e-Filing date": document.getElementById('efilingSelect').value === 'Yes' ? document.getElementById('efilingDate').value : '',
+            "LTN Number": document.getElementById('efilingSelect').value === 'Yes' ? document.getElementById('ltnNumber').value : '',
+            "SR Number": document.getElementById('srSelect').value === 'Yes' ? document.getElementById('srNumber').value : '',
+            "SR Date": document.getElementById('srSelect').value === 'Yes' ? document.getElementById('srDate').value : '',
+            "CC / SC / PRC number": document.getElementById('ccSelect').value === 'Yes' ? document.getElementById('ccNumber').value : '',
+            "CC Date": document.getElementById('ccSelect').value === 'Yes' ? document.getElementById('ccDate').value : '',
+            "Additional notes": document.getElementById('remarks').value
+        };
+        
+        const records = accused.map(acc => ({ ...master, ...acc }));
+        
+        showStatus('Submitting case...', 'info');
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+        
+        try {
+            const result = await postRequest({ action: 'createBatch', records: records });
+            
+            if (result.success) {
+                showStatus(`✅ Case ${groupId} registered with ${accused.length} accused persons`, 'success');
+                resetForm();
+                fetchCases();
+                document.getElementById('tabCasesBtn').click();
+            } else {
+                throw new Error(result.error || 'Registration failed');
+            }
+        } catch (error) {
+            showStatus(`❌ Registration failed: ${error.message}`, 'error');
+            console.error('Submit error:', error);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Register Case';
+        }
     }
-
-    function getField(rec, names, def='—') { for(let n of names) if(rec[n] && rec[n]!=='') return rec[n]; return def; }
-    function getGroupIdentifier(rec) { return getField(rec, ['Group identifier (same for all accused in a case)', 'groupId', 'Group ID']); }
-    function getCaseType(rec) { return getField(rec, ['FIR / CSR', 'caseType', 'Type'], 'Unknown'); }
-    function getHead(rec) { return getField(rec, ['Head']); }
-    function getCaseNumber(rec) { return getField(rec, ['Case number (e.g., FIR 123/2024)', 'caseNumber']); }
-    function getSections(rec) { return getField(rec, ['Sections']); }
-    function getAccusedName(rec) { return getField(rec, ["Accused person's full name", 'Accused Name']); }
-    function getDoDate(rec) { return getField(rec, ['Date of Occurrence', 'doDate']); }
-    function getDrDate(rec) { return getField(rec, ['Date of Report', 'drDate']); }
-    function getEFilingDate(rec) { return getField(rec, ['e-Filing date', 'efilingDate']); }
-    function getCCNumber(rec) { return getField(rec, ['CC / SC / PRC number', 'ccNumber']); }
-    function getCCDate(rec) { return getField(rec, ['CC Date', 'ccDate']); }
-    function getSRNumber(rec) { return getField(rec, ['SR Number', 'srNumber']); }
-    function getSRDate(rec) { return getField(rec, ['SR Date', 'srDate']); }
-    function calculateStage(rec) { if(getEFilingDate(rec) !== '—') return {code:'NTF',label:'NTF',desc:'e-Filed'}; if(getCCNumber(rec) !== '—') return {code:'PT',label:'PT',desc:'CC Assigned'}; return {code:'UI',label:'UI',desc:'Investigation'}; }
-    function getStageClass(c) { return c==='NTF'?'stage-ntf':(c==='PT'?'stage-pt':'stage-ui'); }
     
-    // START GROUP ID FROM 1 (not 1001)
-    function calcNextGroupId() { 
-        if (!allRecords.length) return 1;
+    async function deleteCase(groupId) {
+        if (!confirm(`Delete Case ${groupId}? This will remove all accused records.`)) return;
+        
+        showStatus('Deleting case...', 'info');
+        try {
+            const result = await postRequest({ action: 'deleteCaseGroup', groupId: groupId });
+            
+            if (result.success) {
+                showStatus(`✅ Case ${groupId} deleted`, 'success');
+                fetchCases();
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (error) {
+            showStatus(`❌ Delete failed: ${error.message}`, 'error');
+        }
+    }
+    
+    // ==================== UI RENDERING ====================
+    function renderTable() {
+        if (!allRecords.length) {
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" class="text-center">📭 No cases registered yet</td></tr>';
+            return;
+        }
+        
+        const groups = new Map();
+        allRecords.forEach(record => {
+            const gid = record["Group identifier (same for all accused in a case)"];
+            if (!groups.has(gid)) groups.set(gid, []);
+            groups.get(gid).push(record);
+        });
+        
+        const filter = document.getElementById('filterCaseType').value;
+        const search = document.getElementById('searchInput').value.trim().toLowerCase();
+        
+        let html = '';
+        for (const [gid, group] of groups) {
+            const master = group[0];
+            const type = master["FIR / CSR"] || '—';
+            const caseNo = master["Case number (e.g., FIR 123/2024)"] || '—';
+            const head = master["Head"] || '—';
+            const sections = master["Sections"] || '—';
+            const accusedNames = group.map(a => a["Accused person's full name"]).filter(n => n).join(', ');
+            
+            let stage = 'Under Investigation';
+            if (master["e-Filing date"]) stage = 'e-Filed';
+            else if (master["CC / SC / PRC number"]) stage = 'Court Assigned';
+            
+            if (filter !== 'all' && type !== filter) continue;
+            if (search && !gid.toString().includes(search) && !caseNo.toLowerCase().includes(search) && !head.toLowerCase().includes(search) && !accusedNames.toLowerCase().includes(search)) continue;
+            
+            html += `<tr>
+                <td><strong class="clickable" data-group="${escapeHtml(gid)}">${escapeHtml(gid)}</strong></td>
+                <td><span class="case-badge ${type === 'FIR' ? 'badge-fir' : 'badge-csr'}">${escapeHtml(type)}</span></td>
+                <td class="clickable" data-group="${escapeHtml(gid)}">${escapeHtml(caseNo)}</td>
+                <td>${escapeHtml(head)}</td>
+                <td>${escapeHtml(sections)}</td>
+                <td><strong>${escapeHtml(accusedNames.substring(0, 50))}${accusedNames.length > 50 ? '...' : ''}</strong></td>
+                <td>${escapeHtml(stage)}</td>
+                <td><button class="btn-danger btn-sm" onclick="deleteCase('${escapeHtml(gid)}')"><i class="fas fa-trash"></i> Delete</button></td>
+            </tr>`;
+        }
+        
+        document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="8" class="text-center">No matching cases</td></tr>';
+        
+        document.querySelectorAll('.clickable').forEach(el => {
+            el.addEventListener('click', () => showCaseDetails(el.dataset.group));
+        });
+    }
+    
+    function showCaseDetails(groupId) {
+        const caseRecords = allRecords.filter(r => String(r["Group identifier (same for all accused in a case)"]) === String(groupId));
+        if (!caseRecords.length) return;
+        
+        const master = caseRecords[0];
+        let html = `
+            <div style="margin-bottom: 20px;">
+                <h3>Case Information</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div><strong>Group ID:</strong> ${escapeHtml(groupId)}</div>
+                    <div><strong>Case Type:</strong> ${escapeHtml(master["FIR / CSR"])}</div>
+                    <div><strong>Case Number:</strong> ${escapeHtml(master["Case number (e.g., FIR 123/2024)"])}</div>
+                    <div><strong>Head:</strong> ${escapeHtml(master["Head"])}</div>
+                    <div><strong>Sections:</strong> ${escapeHtml(master["Sections"])}</div>
+                    <div><strong>Complainant:</strong> ${escapeHtml(master["Complainant name, address, contact"])}</div>
+                </div>
+            </div>
+            <div>
+                <h3>Accused Persons (${caseRecords.length})</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead><tr style="background:#f0f4f9;"><th>#</th><th>Name</th><th>Father</th><th>Arrested</th></tr></thead>
+                    <tbody>`;
+        
+        caseRecords.forEach((rec, idx) => {
+            html += `<tr>
+                <td>${idx + 1}</td>
+                <td><strong>${escapeHtml(rec["Accused person's full name"])}</strong></td>
+                <td>${escapeHtml(rec["Father's name of accused"])}</td>
+                <td>${rec["TRUE / FALSE (arrested in this case)"] === 'TRUE' ? 'Yes' : 'No'}</td>
+            </tr>`;
+        });
+        
+        html += `</tbody></table></div>`;
+        
+        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('caseModal').style.display = 'block';
+    }
+    
+    function updateStats() {
+        if (!allRecords.length) {
+            document.getElementById('totalCases').textContent = '0';
+            document.getElementById('totalAccused').textContent = '0';
+            document.getElementById('firCount').textContent = '0';
+            document.getElementById('csrCount').textContent = '0';
+            return;
+        }
+        
+        const groups = new Set();
+        let fir = 0, csr = 0;
+        allRecords.forEach(record => {
+            const gid = record["Group identifier (same for all accused in a case)"];
+            if (gid) groups.add(gid);
+            const type = record["FIR / CSR"];
+            if (type === 'FIR') fir++;
+            else if (type === 'CSR') csr++;
+        });
+        
+        document.getElementById('totalCases').textContent = groups.size;
+        document.getElementById('totalAccused').textContent = allRecords.length;
+        document.getElementById('firCount').textContent = fir;
+        document.getElementById('csrCount').textContent = csr;
+    }
+    
+    function updateGroupId() {
         const existingIds = new Set();
         allRecords.forEach(record => {
-            const gid = getGroupIdentifier(record);
+            const gid = record["Group identifier (same for all accused in a case)"];
             if (gid && !isNaN(parseInt(gid))) existingIds.add(parseInt(gid));
         });
         let nextId = 1;
         while (existingIds.has(nextId)) nextId++;
-        return nextId;
+        document.getElementById('groupId').value = nextId;
     }
     
-    function updateGroupId() { document.getElementById('groupId').value = calcNextGroupId(); }
-    
-    async function fetchRecords() { 
-        try{ 
-            const res=await fetch(`${API_URL}?_=${Date.now()}`); 
-            const data=await res.json(); 
-            allRecords=Array.isArray(data)?data:[]; 
-            updateGroupId(); 
-            renderTable(); 
-            updateStats(); 
-            document.getElementById('connectionStatus').innerHTML=`✅ ${allRecords.length} records | Next ID: ${calcNextGroupId()}`; 
-        } catch(e){ 
-            document.getElementById('connectionStatus').innerHTML='⚠️ Error'; 
-        } 
-    }
-    
-    async function sendBatch(p) { try{ await fetch(API_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}); return true; }catch(e){ return false; } }
-    async function addCase(master,accused){ const batch=accused.map(a=>({...master,...a})); const ok=await sendBatch({action:'createBatch',records:batch}); if(ok){ await fetchRecords(); return true; } return false; }
-    async function deleteCase(gid){ if(confirm(`Delete case ${gid}?`)){ await sendBatch({action:'deleteCaseGroup',groupId:gid}); await fetchRecords(); } }
-    
-    function updateStats(){
-        if(!allRecords.length){ document.getElementById('totalCases').textContent='0'; document.getElementById('totalAccused').textContent='0'; document.getElementById('firCount').textContent='0'; document.getElementById('csrCount').textContent='0'; return; }
-        const cases=new Map(); let fir=0,csr=0;
-        allRecords.forEach(r=>{ let g=getGroupIdentifier(r); if(g && !cases.has(g)){ let t=getCaseType(r); cases.set(g,t); if(t==='FIR') fir++; else if(t==='CSR') csr++; } });
-        document.getElementById('totalCases').textContent=cases.size;
-        document.getElementById('totalAccused').textContent=allRecords.length;
-        document.getElementById('firCount').textContent=fir;
-        document.getElementById('csrCount').textContent=csr;
-        document.getElementById('statsInfo').innerHTML=`${cases.size} cases | ${allRecords.length} accused`;
-    }
-    
-    function renderTable(){
-        if(!allRecords.length){ document.getElementById('tableBody').innerHTML='<tr><td colspan="10">No cases registered yet. Create your first case!<\/td></tr>'; updateStats(); return; }
-        const groups=new Map(); allRecords.forEach(r=>{ let g=getGroupIdentifier(r); if(g){ if(!groups.has(g)) groups.set(g,[]); groups.get(g).push(r); } });
-        const filter=document.getElementById('filterCaseType').value;
-        const search=document.getElementById('searchInput').value.trim().toLowerCase();
-        let html='';
-        for(let[gid,group] of groups){
-            const m=group[0]; const type=getCaseType(m); const head=getHead(m); const caseNo=getCaseNumber(m); const sections=getSections(m); const doDate=getDoDate(m); const drDate=getDrDate(m); const stage=calculateStage(m);
-            const accusedNames=group.map(a=>getAccusedName(a)).filter(n=>n!=='—').join(', ');
-            if(filter!=='all' && type!==filter) continue;
-            if(search && !gid.toString().toLowerCase().includes(search) && !caseNo.toLowerCase().includes(search) && !head.toLowerCase().includes(search) && !accusedNames.toLowerCase().includes(search) && !sections.toLowerCase().includes(search)) continue;
-            html+=`<tr>
-                <td><strong class="clickable-case" data-group="${escapeHtml(gid)}">${escapeHtml(gid)}</strong></td>
-                <td><span class="case-badge ${type==='FIR'?'badge-fir':'badge-csr'}">${escapeHtml(type)}</span></td>
-                <td>${escapeHtml(head)}</td>
-                <td class="clickable-case" data-group="${escapeHtml(gid)}">${escapeHtml(caseNo)}</td>
-                <td>${escapeHtml(sections)}</td>
-                <td>${doDate!=='—'?doDate:'—'}</td>
-                <td>${drDate!=='—'?drDate:'—'}</td>
-                <td><strong>${escapeHtml(accusedNames||'—')}</strong></td>
-                <td><span class="stage-badge ${getStageClass(stage.code)}">${stage.label}</span> ${stage.desc}</td>
-                <td><button class="delete-btn" data-case="${escapeHtml(gid)}"><i class="fas fa-trash"></i> Del</button></td>
-            </tr>`;
-        }
-        document.getElementById('tableBody').innerHTML=html||'<tr><td colspan="10">No matching cases</td></tr>';
-        document.querySelectorAll('.clickable-case').forEach(el=>el.addEventListener('click',()=>showCaseDetails(el.dataset.group)));
-        document.querySelectorAll('.delete-btn').forEach(btn=>btn.addEventListener('click',async()=>{ await deleteCase(btn.dataset.case); await fetchRecords(); }));
-        updateStats();
-    }
-    
-    function showCaseDetails(gid){
-        const recs=allRecords.filter(r=>String(getGroupIdentifier(r))===String(gid));
-        if(!recs.length) return;
-        const m=recs[0]; const stage=calculateStage(m);
-        let html=`<div class="detail-section"><h3>Case Info</h3><div class="detail-grid"><div class="detail-item"><span class="detail-label">Group ID</span><span class="detail-value">${escapeHtml(gid)}</span></div><div class="detail-item"><span class="detail-label">Case No</span><span class="detail-value">${escapeHtml(getCaseNumber(m))}</span></div><div class="detail-item"><span class="detail-label">Head</span><span class="detail-value">${escapeHtml(getHead(m))}</span></div><div class="detail-item"><span class="detail-label">Sections</span><span class="detail-value">${escapeHtml(getSections(m))}</span></div><div class="detail-item"><span class="detail-label">Stage</span><span class="detail-value">${stage.label} - ${stage.desc}</span></div></div></div>
-        <div class="detail-section"><h3>Documents</h3><div class="detail-grid"><div class="detail-item"><span class="detail-label">Complaint Copy</span><span class="detail-value">${m['Complaint Copy'] ? `<a href="${m['Complaint Copy']}" target="_blank" class="detail-doc-link"><i class="fas fa-file"></i> View</a>` : '—'}</span></div><div class="detail-item"><span class="detail-label">Complainant ID Proof</span><span class="detail-value">${m['Complainant ID Proof'] ? `<a href="${m['Complainant ID Proof']}" target="_blank" class="detail-doc-link"><i class="fas fa-id-card"></i> View</a>` : '—'}</span></div></div></div>
-        <div class="detail-section"><h3>Legal Process</h3><div class="detail-grid"><div class="detail-item"><span class="detail-label">Charge Sheet Date</span><span class="detail-value">${getField(m,['Charge sheeted date'])}</span></div><div class="detail-item"><span class="detail-label">Opinion Date</span><span class="detail-value">${getField(m,['Opinion received date'])}</span></div><div class="detail-item"><span class="detail-label">e-Filing Date</span><span class="detail-value">${getEFilingDate(m)}</span></div><div class="detail-item"><span class="detail-label">LTN</span><span class="detail-value">${getField(m,['LTN Number'])}</span></div><div class="detail-item"><span class="detail-label">SR Number</span><span class="detail-value">${getSRNumber(m)}</span></div><div class="detail-item"><span class="detail-label">SR Date</span><span class="detail-value">${getSRDate(m)}</span></div><div class="detail-item"><span class="detail-label">CC/SC/PRC</span><span class="detail-value">${getCCNumber(m)}</span></div><div class="detail-item"><span class="detail-label">CC Date</span><span class="detail-value">${getCCDate(m)}</span></div></div></div>
-        <div class="detail-section"><h3>Accused (${recs.length})</h3><table class="accused-table"><thead><tr><th>#</th><th>Name</th><th>Father</th><th>Arrested</th><th>Photo</th><th>Aadhar</th></tr></thead><tbody>`;
-        recs.forEach((rec,idx)=>{ html+=`<tr><td>${idx+1}</td><td><strong>${escapeHtml(getAccusedName(rec))}</strong></td><td>${escapeHtml(getField(rec,["Father's name of accused"]))}</td><td>${getField(rec,["TRUE / FALSE (arrested in this case)"])==='TRUE'?'Yes':'No'}</td><td>${rec['Accused Photo']?`<img src="${rec['Accused Photo']}" class="accused-photo-thumb" onclick="window.open('${rec['Accused Photo']}','_blank')">`:'—'}</td><td>${rec['Accused Aadhar Card']?`<a href="${rec['Accused Aadhar Card']}" target="_blank" class="detail-doc-link"><i class="fas fa-id-card"></i> View</a>`:'—'}</td></tr>`; });
-        html+=`</tbody>}</div>`;
-        document.getElementById('modalBody').innerHTML=html;
-        document.getElementById('caseModal').style.display='block';
-    }
-    
-    function getMasterObject(){
-        const efilingYes = document.getElementById('efilingSelect').value === 'Yes';
-        const srYes = document.getElementById('srSelect').value === 'Yes';
-        const ccYes = document.getElementById('ccSelect').value === 'Yes';
-        const cs = document.getElementById('chargeSheetSelect').value === 'Yes';
-        const op = document.getElementById('opinionSelect').value === 'Yes';
-        const ef = efilingYes;
-        const sr = srYes;
+    function resetForm() {
+        document.getElementById('caseType').value = 'FIR';
+        document.getElementById('head').value = '';
+        document.getElementById('caseNumber').value = '';
+        document.getElementById('sections').value = '';
+        document.getElementById('doDate').value = '';
+        document.getElementById('doTime').value = '';
+        document.getElementById('drDate').value = '';
+        document.getElementById('drTime').value = '';
+        document.getElementById('sceneOfCrime').value = '';
+        document.getElementById('complainantDetails').value = '';
+        document.getElementById('complaintSummary').value = '';
+        document.getElementById('propertySeized').value = '';
+        document.getElementById('propertySeizedSelect').value = 'No';
+        document.getElementById('propertySeizedField').style.display = 'none';
+        document.getElementById('chargeSheetSelect').value = 'No';
+        document.getElementById('chargeSheetDateField').style.display = 'none';
+        document.getElementById('opinionSelect').value = 'No';
+        document.getElementById('opinionDateField').style.display = 'none';
+        document.getElementById('opinionRow').style.display = 'none';
+        document.getElementById('efilingSelect').value = 'No';
+        document.getElementById('efilingDateField').style.display = 'none';
+        document.getElementById('ltnField').style.display = 'none';
+        document.getElementById('efilingRow').style.display = 'none';
+        document.getElementById('srSelect').value = 'No';
+        document.getElementById('srNumberField').style.display = 'none';
+        document.getElementById('srDateField').style.display = 'none';
+        document.getElementById('srRow').style.display = 'none';
+        document.getElementById('ccSelect').value = 'No';
+        document.getElementById('ccNumberField').style.display = 'none';
+        document.getElementById('ccDateField').style.display = 'none';
+        document.getElementById('ccRow').style.display = 'none';
+        document.getElementById('remarks').value = '';
+        document.getElementById('chargeSheetDate').value = '';
+        document.getElementById('opinionDate').value = '';
+        document.getElementById('efilingDate').value = '';
+        document.getElementById('ltnNumber').value = '';
+        document.getElementById('srNumber').value = '';
+        document.getElementById('srDate').value = '';
+        document.getElementById('ccNumber').value = '';
+        document.getElementById('ccDate').value = '';
         
-        return {
-            'Group identifier (same for all accused in a case)': document.getElementById('groupId').value,
-            'FIR / CSR': document.getElementById('caseType').value,
-            'Head': document.getElementById('head').value,
-            'Case number (e.g., FIR 123/2024)': document.getElementById('caseNumber').value,
-            'Sections': document.getElementById('sections').value,
-            'Date of Occurrence': document.getElementById('doDate').value,
-            'Time of Occurrence': document.getElementById('doTime').value,
-            'Date of Report': document.getElementById('drDate').value,
-            'Time of Report': document.getElementById('drTime').value,
-            'Scene of Crime': document.getElementById('sceneOfCrime').value,
-            'Complainant name, address, contact': document.getElementById('complainantDetails').value,
-            'Brief summary of complaint': document.getElementById('complaintSummary').value,
-            'Seized property details': document.getElementById('propertySeizedSelect').value==='Yes'?document.getElementById('propertySeized').value:'',
-            'Charge sheeted date': cs ? document.getElementById('chargeSheetDate').value : '',
-            'Opinion received date': op ? document.getElementById('opinionDate').value : '',
-            'e-Filing date': ef ? document.getElementById('efilingDate').value : '',
-            'LTN Number': ef ? document.getElementById('ltnNumber').value : '',
-            'SR Number': (cs && op && ef && sr) ? document.getElementById('srNumber').value : '',
-            'SR Date': (cs && op && ef && sr) ? document.getElementById('srDate').value : '',
-            'CC / SC / PRC number': (cs && op && ef && sr && ccYes) ? document.getElementById('ccNumber').value : '',
-            'CC Date': (cs && op && ef && sr && ccYes) ? document.getElementById('ccDate').value : '',
-            'Additional notes': document.getElementById('remarks').value,
-            'Complaint Copy': complaintCopyData,
-            'Complainant ID Proof': complainantIdData
-        };
-    }
-    
-    function clearForm(){
-        document.getElementById('caseType').value='FIR';
-        document.getElementById('head').value='';
-        document.getElementById('caseNumber').value='';
-        document.getElementById('sections').value='';
-        document.getElementById('doDate').value='';
-        document.getElementById('doTime').value='';
-        document.getElementById('drDate').value='';
-        document.getElementById('drTime').value='';
-        document.getElementById('sceneOfCrime').value='';
-        document.getElementById('complainantDetails').value='';
-        document.getElementById('complaintSummary').value='';
-        document.getElementById('remarks').value='';
-        ['chargeSheetSelect','opinionSelect','efilingSelect','srSelect','ccSelect','propertySeizedSelect'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value='No'; });
-        document.getElementById('propertySeized').value='';
-        document.getElementById('chargeSheetDate').value='';
-        document.getElementById('opinionDate').value='';
-        document.getElementById('efilingDate').value='';
-        document.getElementById('ltnNumber').value='';
-        document.getElementById('srDate').value='';
-        document.getElementById('srNumber').value='';
-        document.getElementById('ccNumber').value='';
-        document.getElementById('ccDate').value='';
-        complaintCopyData=''; complainantIdData='';
-        document.getElementById('complaintCopyFile').value='';
-        document.getElementById('complainantIdFile').value='';
-        document.getElementById('complaintCopyPreview').innerHTML='';
-        document.getElementById('complainantIdPreview').innerHTML='';
-        document.getElementById('removeComplaintCopy').style.display='none';
-        document.getElementById('removeComplainantId').style.display='none';
-        updateWorkflowVisibility();
-        loadAccusedCards([]);
+        document.getElementById('accusedContainer').innerHTML = '';
+        accusedCounter = 0;
+        addAccused();
+        
         updateGroupId();
     }
     
-    async function onSubmit(){
-        const master=getMasterObject();
-        const accused=getAccusedList();
-        if(!master['Group identifier (same for all accused in a case)'] || !master['Case number (e.g., FIR 123/2024)'] || accused.length===0){
-            const sd=document.getElementById('formStatus'); sd.textContent='❌ Group ID, Case Number & at least one accused required'; sd.classList.add('error');
-            setTimeout(()=>{sd.textContent='⚡ Ready'; sd.classList.remove('error');},3000);
-            return;
-        }
-        const btn=document.getElementById('submitBtn'); btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-pulse"></i> Registering...';
-        const ok=await addCase(master,accused);
-        if(ok){ document.getElementById('formStatus').textContent=`✅ Registered with ${accused.length} accused | Group ID: ${master['Group identifier (same for all accused in a case)']}`; document.getElementById('formStatus').classList.add('success'); clearForm(); }
-        else{ document.getElementById('formStatus').textContent='❌ Registration failed'; document.getElementById('formStatus').classList.add('error'); }
-        setTimeout(()=>{document.getElementById('formStatus').textContent='⚡ Ready'; document.getElementById('formStatus').classList.remove('success','error');},4000);
-        btn.disabled=false; btn.innerHTML='<i class="fas fa-check-circle"></i> Register Case & Sync';
+    function showStatus(message, type) {
+        const statusDiv = document.getElementById('statusMsg');
+        statusDiv.innerHTML = message;
+        statusDiv.className = `status ${type}`;
+        setTimeout(() => {
+            if (statusDiv.className === `status ${type}`) {
+                statusDiv.className = 'status info';
+                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Ready';
+            }
+        }, 5000);
     }
     
-    function init(){
-        clearForm();
-        const selects=['chargeSheetSelect','opinionSelect','efilingSelect','srSelect','ccSelect','propertySeizedSelect'];
-        selects.forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',updateWorkflowVisibility); });
-        updateWorkflowVisibility();
-        document.getElementById('addAccusedBtn').addEventListener('click',()=>{ document.getElementById('accusedCardsContainer').appendChild(createAccusedCard()); updateTotalCount(); });
-        fetchRecords();
-        document.getElementById('submitBtn').addEventListener('click',onSubmit);
-        document.getElementById('resetFormBtn').addEventListener('click',()=>{ if(confirm('Clear all form fields?')) clearForm(); });
-        document.getElementById('refreshBtn').addEventListener('click',fetchRecords);
-        document.getElementById('searchInput').addEventListener('input',renderTable);
-        document.getElementById('filterCaseType').addEventListener('change',renderTable);
-        document.getElementById('showDebugBtn').addEventListener('click',()=>{ document.getElementById('debugPanel').classList.toggle('show'); document.getElementById('debugContent').innerHTML=allRecords.length?`<pre>${JSON.stringify(allRecords.slice(0,2),null,2)}</pre>`:'No data'; });
-        const modal=document.getElementById('caseModal'); document.querySelector('.close-modal').onclick=()=>modal.style.display='none'; window.onclick=e=>{if(e.target===modal)modal.style.display='none';};
-        document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); document.getElementById(btn.dataset.tab+'Tab').classList.add('active'); if(btn.dataset.tab==='cases') renderTable(); });});
-        document.getElementById('dashboardToggleBtn').addEventListener('click',()=>{ dashboardVisible=!dashboardVisible; document.getElementById('statsGrid').classList.toggle('show',dashboardVisible); document.getElementById('dashboardToggleBtn').innerHTML=dashboardVisible?'<i class="fas fa-chart-line"></i> Hide Dashboard':'<i class="fas fa-chart-line"></i> Show Dashboard'; if(dashboardVisible) updateStats(); });
-        setInterval(fetchRecords,60000);
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
     }
-    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-    init();
+    
+    document.querySelector('.close-modal').onclick = () => document.getElementById('caseModal').style.display = 'none';
+    window.onclick = (e) => { if (e.target === document.getElementById('caseModal')) document.getElementById('caseModal').style.display = 'none'; };
 </script>
 </body>
 </html>
