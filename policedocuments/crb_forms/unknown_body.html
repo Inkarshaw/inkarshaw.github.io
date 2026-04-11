@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Police Form: Unknown Dead Body Entry | PDF Generator</title>
+    <!-- Using html2canvas and jsPDF directly for reliable PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #e9eef3;
+            font-family: 'Times New Roman', Times, serif;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            justify-content: center;
+        }
+
+        .form-panel {
+            flex: 1.2;
+            min-width: 320px;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+            padding: 24px 28px;
+        }
+
+        .form-panel h2 {
+            font-size: 1.7rem;
+            border-left: 6px solid #1e3a8a;
+            padding-left: 18px;
+            margin-bottom: 20px;
+            color: #0f172a;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px 24px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.75rem;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            padding: 10px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-family: 'Times New Roman', Times, serif;
+            background: #fefefe;
+            transition: 0.2s;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+        }
+
+        .identify-marks {
+            grid-column: span 2;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 18px;
+            margin-top: 35px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            border: none;
+            background: #1e293b;
+            padding: 12px 26px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .btn-primary {
+            background: #1e3a8a;
+        }
+
+        .btn-primary:hover {
+            background: #0f2b6d;
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            background: #334155;
+        }
+
+        .btn-secondary:hover {
+            background: #1e293b;
+        }
+
+        .preview-panel {
+            flex: 1;
+            min-width: 460px;
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .preview-header h3 {
+            font-weight: 700;
+            color: #0c4a6e;
+            font-size: 1.35rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .download-btn {
+            background: #059669;
+            padding: 8px 22px;
+            border-radius: 60px;
+            border: none;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .download-btn:hover {
+            background: #047857;
+            transform: translateY(-1px);
+        }
+
+        .dead-body-card {
+            background: white;
+            border-radius: 4px;
+            overflow-x: auto;
+            padding: 20px 18px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .police-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            line-height: 1.5;
+            font-family: 'Times New Roman', Times, serif;
+            table-layout: fixed;
+        }
+
+        .police-table td, .police-table th {
+            border: 1.2px solid #000000;
+            padding: 12px 8px;
+            vertical-align: top;
+        }
+
+        .label-cell {
+            font-weight: 700;
+            background: #ffffff;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .value-cell {
+            background: #ffffff;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* Title row styling - no top, left, right borders, only bottom border */
+        .title-row-cell {
+            background: #ffffff;
+            color: #000000;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 15px 6px;
+            border-bottom: 1.2px solid #000000 !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            text-decoration: underline;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        
+        /* Authority cell with stacked layout */
+        .authority-cell {
+            vertical-align: top;
+            padding: 12px 8px;
+        }
+        
+        .authority-label {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13px;
+        }
+        
+        .authority-value {
+            display: block;
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.5;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        @media (max-width: 780px) {
+            .form-panel, .preview-panel {
+                min-width: 95%;
+            }
+            .police-table {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="form-panel">
+        <h2>UNKNOWN DEAD BODY ENTRY</h2>
+        <div class="form-grid">
+            <div class="input-group">
+                <label>Crime No.</label>
+                <input type="text" id="crimeNo" value="421">
+            </div>
+            <div class="input-group">
+                <label>Year</label>
+                <input type="text" id="year" value="2025">
+            </div>
+            <div class="input-group">
+                <label>Police Station</label>
+                <input type="text" id="stationName" value="G2 Periamet Police Station">
+            </div>
+            <div class="input-group">
+                <label>D/O (Date of Occ.)</label>
+                <input type="text" id="doDate" value="10.08.2025 at 11.00 hrs">
+            </div>
+            <div class="input-group">
+                <label>D/R (Date of Report)</label>
+                <input type="text" id="drDate" value="13.08.2025 at 20.00 hrs">
+            </div>
+            <div class="input-group">
+                <label>Age (Years)</label>
+                <input type="text" id="age" value="40">
+            </div>
+            <div class="input-group">
+                <label>Height</label>
+                <input type="text" id="height" value="Approx 5.5 Feet">
+            </div>
+            <div class="input-group">
+                <label>Sex</label>
+                <select id="sex">
+                    <option value="Transgender" selected>Transgender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Section</label>
+                <input type="text" id="section" value="194 BNSS">
+            </div>
+            <div class="input-group">
+                <label>Body Kept in</label>
+                <input type="text" id="bodyKept" value="RGGGH Mortuary">
+            </div>
+            <div class="input-group">
+                <label>Scene of Crime</label>
+                <input type="text" id="sceneCrime" value="Rail Coach Restaurent Back Side">
+            </div>
+            <div class="input-group">
+                <label>Remarks</label>
+                <input type="text" id="remarks" value="Nil">
+            </div>
+            <div class="input-group">
+                <label>Built</label>
+                <input type="text" id="built" value="Lean">
+            </div>
+            <div class="input-group">
+                <label>Eyes</label>
+                <input type="text" id="eyes" value="open">
+            </div>
+            <div class="input-group">
+                <label>Hair</label>
+                <input type="text" id="hair" value="Black Colour / 3 Cm">
+            </div>
+            <div class="input-group">
+                <label>Complexion</label>
+                <input type="text" id="complexion" value="Wheatish">
+            </div>
+            <div class="input-group">
+                <label>Face Shape</label>
+                <input type="text" id="face" value="Oval">
+            </div>
+            <div class="input-group">
+                <label>Dress</label>
+                <input type="text" id="dress" value="T.Shirt, Black Lungi">
+            </div>
+            <div class="input-group identify-marks">
+                <label>Identify Marks</label>
+                <textarea id="identifyMarks" rows="2">1) A Black Mole on the Left Cheeks.
+2) A Black Mole on the Right Cheeks.</textarea>
+            </div>
+            <div class="input-group">
+                <label>Scar/Tattoo</label>
+                <input type="text" id="scarTattoo" value="Nil">
+            </div>
+            <div class="input-group">
+                <label>Deformity</label>
+                <input type="text" id="deformity" value="Nil">
+            </div>
+            <div class="input-group">
+                <label>Authority-1 (Inspector)</label>
+                <textarea id="auth1Name" rows="2">The Inspector of Police, G2 Periamet P.S, Chennai 03.</textarea>
+            </div>
+            <div class="input-group">
+                <label>Authority-2 (Asst. Commissioner)</label>
+                <textarea id="auth2Name" rows="2">The Asst. Commissioner of Police, Crime Records Bureau, Vepery, Chennai-7</textarea>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-secondary" id="resetBtn">Reset Defaults</button>
+            <button class="btn btn-primary" id="refreshPreviewBtn">Refresh Preview</button>
+        </div>
+        <p style="font-size: 12px; color: #475569; margin-top: 15px; text-align: center; font-family: 'Times New Roman', Times, serif;">Fill details → Preview updates live → Click "Download as PDF" for official record.</p>
+    </div>
+
+    <div class="preview-panel">
+        <div class="preview-header">
+            <h3>OFFICIAL RECORD PREVIEW</h3>
+            <button class="download-btn" id="downloadPdfBtn">Download as PDF</button>
+        </div>
+        <div id="previewContainer">
+            <div class="dead-body-card" id="reportCardPreview"></div>
+        </div>
+        <p style="font-size: 11px; margin-top: 14px; text-align: center; color: #334155; font-family: 'Times New Roman', Times, serif;">Official police record as per BNSS Section 194.</p>
+    </div>
+</div>
+
+<script>
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/\n/g, '<br>');
+    }
+
+    function generateBodyHTMLFromFields() {
+        const crimeNo = document.getElementById('crimeNo').value.trim() || "421";
+        const year = document.getElementById('year').value.trim() || "2025";
+        const stationName = document.getElementById('stationName').value.trim() || "G2 Periamet Police Station";
+        const doDate = document.getElementById('doDate').value.trim() || "10.08.2025 at 11.00 hrs";
+        const drDate = document.getElementById('drDate').value.trim() || "13.08.2025 at 20.00 hrs";
+        const age = document.getElementById('age').value.trim() || "40";
+        const height = document.getElementById('height').value.trim() || "Approx 5.5 Feet";
+        const sex = document.getElementById('sex').value;
+        const sectionVal = document.getElementById('section').value.trim() || "194 BNSS";
+        const bodyKept = document.getElementById('bodyKept').value.trim() || "RGGGH Mortuary";
+        const sceneCrime = document.getElementById('sceneCrime').value.trim() || "Rail Coach Restaurent Back Side";
+        const remarks = document.getElementById('remarks').value.trim() || "Nil";
+        const built = document.getElementById('built').value.trim() || "Lean";
+        const eyes = document.getElementById('eyes').value.trim() || "open";
+        const hair = document.getElementById('hair').value.trim() || "Black Colour / 3 Cm";
+        const complexion = document.getElementById('complexion').value.trim() || "Wheatish";
+        const face = document.getElementById('face').value.trim() || "Oval";
+        const dress = document.getElementById('dress').value.trim() || "T.Shirt, Black Lungi";
+        let identifyMarks = document.getElementById('identifyMarks').value.trim();
+        if (!identifyMarks) identifyMarks = "1) A Black Mole on the Left Cheeks.\n2) A Black Mole on the Right Cheeks.";
+        const scarTattoo = document.getElementById('scarTattoo').value.trim() || "Nil";
+        const deformity = document.getElementById('deformity').value.trim() || "Nil";
+        const auth1 = document.getElementById('auth1Name').value.trim() || "The Inspector of Police, G2 Periamet P.S, Chennai 03.";
+        const auth2 = document.getElementById('auth2Name').value.trim() || "The Asst. Commissioner of Police, Crime Records Bureau, Vepery, Chennai-7";
+        const identifyMarksHtml = identifyMarks.replace(/\n/g, '<br>');
+        const auth1Html = auth1.replace(/\n/g, '<br>');
+        const auth2Html = auth2.replace(/\n/g, '<br>');
+
+        return `
+            <table class="police-table" style="width:100%; border-collapse: collapse; font-size: 13px; font-family: 'Times New Roman', Times, serif; table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 14%">
+                    <col style="width: 14%">
+                    <col style="width: 14%">
+                    <col style="width: 14%">
+                    <col style="width: 14%">
+                    <col style="width: 30%">
+                </colgroup>
+                <!-- Title Row: no top, left, or right borders, only bottom border -->
+                <tr>
+                    <td colspan="6" class="title-row-cell" style="border-bottom: 1.2px solid #000000; border-top: none; border-left: none; border-right: none;">
+                        UNKNOWN DEAD BODY ENTRY
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-cell"><strong>Crime No.</strong></td>
+                    <td class="value-cell"><strong>${escapeHtml(crimeNo)}</strong></td>
+                    <td class="label-cell"><strong>Year</strong></td>
+                    <td class="value-cell"><strong>${escapeHtml(year)}</strong></td>
+                    <td class="label-cell"><strong>Station Name</strong></td>
+                    <td class="value-cell"><strong>${escapeHtml(stationName)}</strong></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">D/O (Date of Occurrence)</td>
+                    <td colspan="2">${escapeHtml(doDate)}</td>
+                    <td class="label-cell">D/R (Date of Report)</td>
+                    <td colspan="2">${escapeHtml(drDate)}</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">Age</th>
+                    <td>${escapeHtml(age)} Years</th>
+                    <td class="label-cell">Height</th>
+                    <td>${escapeHtml(height)}</th>
+                    <td class="label-cell">Sex</th>
+                    <td>${escapeHtml(sex)}</th>
+                </tr>
+                <tr>
+                    <td class="label-cell">Section</th>
+                    <td>${escapeHtml(sectionVal)}</th>
+                    <td class="label-cell">Body Kept in</th>
+                    <td>${escapeHtml(bodyKept)}</th>
+                    <td class="label-cell">Scene of Crime</th>
+                    <td>${escapeHtml(sceneCrime)}</th>
+                </tr>
+                <tr>
+                    <td class="label-cell">Remarks</th>
+                    <td colspan="5">${escapeHtml(remarks)}</th>
+                </tr>
+                <tr>
+                    <td class="label-cell">Built</th>
+                    <td>${escapeHtml(built)}</th>
+                    <td class="label-cell">Eyes</th>
+                    <td>${escapeHtml(eyes)}</th>
+                    <td class="label-cell">Hair</th>
+                    <td>${escapeHtml(hair)}</th>
+                </tr>
+                <tr>
+                    <td class="label-cell">Complexion</th>
+                    <td>${escapeHtml(complexion)}</th>
+                    <td class="label-cell">Face</th>
+                    <td colspan="3">${escapeHtml(face)}</th>
+                </tr>
+                <tr>
+                    <td class="label-cell">Dress</th>
+                    <td colspan="5">${escapeHtml(dress)}</th>
+                </tr>
+                <tr>
+                    <td class="label-cell">Identify Marks</th>
+                    <td colspan="5">${identifyMarksHtml}</th>
+                </tr>
+                <tr>
+                    <td class="label-cell">Scar/Tattoo</th>
+                    <td colspan="2">${escapeHtml(scarTattoo)}</th>
+                    <td class="label-cell">Deformity</th>
+                    <td colspan="2">${escapeHtml(deformity)}</th>
+                </tr>
+                <!-- Authority section without header row and without signature row -->
+                <tr>
+                    <td colspan="3" class="authority-cell" style="border: 1.2px solid #000000;">
+                        <div class="authority-label">Authority - 1 (Inspector)</div>
+                        <div class="authority-value">${auth1Html}</div>
+                    </th>
+                    <td colspan="3" class="authority-cell" style="border: 1.2px solid #000000;">
+                        <div class="authority-label">Authority - 2 (Asst. Commissioner)</div>
+                        <div class="authority-value">${auth2Html}</div>
+                    </th>
+                </tr>
+            </table>
+        `;
+    }
+
+    function updatePreview() {
+        const previewContainer = document.getElementById('reportCardPreview');
+        if (previewContainer) {
+            previewContainer.innerHTML = generateBodyHTMLFromFields();
+        }
+    }
+
+    function resetToDefault() {
+        document.getElementById('crimeNo').value = "421";
+        document.getElementById('year').value = "2025";
+        document.getElementById('stationName').value = "G2 Periamet Police Station";
+        document.getElementById('doDate').value = "10.08.2025 at 11.00 hrs";
+        document.getElementById('drDate').value = "13.08.2025 at 20.00 hrs";
+        document.getElementById('age').value = "40";
+        document.getElementById('height').value = "Approx 5.5 Feet";
+        document.getElementById('sex').value = "Transgender";
+        document.getElementById('section').value = "194 BNSS";
+        document.getElementById('bodyKept').value = "RGGGH Mortuary";
+        document.getElementById('sceneCrime').value = "Rail Coach Restaurent Back Side";
+        document.getElementById('remarks').value = "Nil";
+        document.getElementById('built').value = "Lean";
+        document.getElementById('eyes').value = "open";
+        document.getElementById('hair').value = "Black Colour / 3 Cm";
+        document.getElementById('complexion').value = "Wheatish";
+        document.getElementById('face').value = "Oval";
+        document.getElementById('dress').value = "T.Shirt, Black Lungi";
+        document.getElementById('identifyMarks').value = "1) A Black Mole on the Left Cheeks.\n2) A Black Mole on the Right Cheeks.";
+        document.getElementById('scarTattoo').value = "Nil";
+        document.getElementById('deformity').value = "Nil";
+        document.getElementById('auth1Name').value = "The Inspector of Police, G2 Periamet P.S, Chennai 03.";
+        document.getElementById('auth2Name').value = "The Asst. Commissioner of Police, Crime Records Bureau, Vepery, Chennai-7";
+        updatePreview();
+    }
+
+    function bindLiveEvents() {
+        const allFields = [
+            'crimeNo', 'year', 'stationName', 'doDate', 'drDate', 'age', 'height', 'sex', 'section',
+            'bodyKept', 'sceneCrime', 'remarks', 'built', 'eyes', 'hair', 'complexion', 'face', 'dress',
+            'identifyMarks', 'scarTattoo', 'deformity', 'auth1Name', 'auth2Name'
+        ];
+        allFields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => updatePreview());
+                el.addEventListener('change', () => updatePreview());
+            }
+        });
+    }
+
+    async function downloadPDF() {
+        const downloadBtn = document.getElementById('downloadPdfBtn');
+        const originalText = downloadBtn.innerText;
+        downloadBtn.innerText = 'Generating PDF...';
+        downloadBtn.disabled = true;
+
+        try {
+            const element = document.getElementById('reportCardPreview');
+            
+            if (!element) {
+                throw new Error("Preview element not found");
+            }
+            
+            if (!element.innerHTML || element.innerHTML.trim() === '') {
+                updatePreview();
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            const crimeNo = document.getElementById('crimeNo').value.trim() || "421";
+            const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+            
+            const originalWidth = element.style.width;
+            element.style.width = '750px';
+            
+            const canvas = await html2canvas(element, {
+                scale: 2.5,
+                backgroundColor: '#ffffff',
+                logging: false,
+                useCORS: false,
+                windowWidth: 750
+            });
+            
+            element.style.width = originalWidth;
+            
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            
+            const pdfWidth = 210;
+            const pdfHeight = 297;
+            const topMargin = 20;
+            const leftMargin = 15;
+            const rightMargin = 15;
+            
+            const availableWidth = pdfWidth - leftMargin - rightMargin;
+            
+            let imgWidth = availableWidth;
+            let imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            const xOffset = (pdfWidth - imgWidth) / 2;
+            
+            let pdf = new jsPDF({
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            });
+            
+            pdf.addImage(imgData, 'PNG', xOffset, topMargin, imgWidth, imgHeight);
+            pdf.save(`Unknown_DeadBody_Crime${crimeNo}_${timestamp}.pdf`);
+            
+        } catch (error) {
+            console.error("PDF Error:", error);
+            alert("PDF generation failed: " + error.message);
+        } finally {
+            downloadBtn.innerText = originalText;
+            downloadBtn.disabled = false;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updatePreview();
+        bindLiveEvents();
+        document.getElementById('resetBtn')?.addEventListener('click', resetToDefault);
+        document.getElementById('refreshPreviewBtn')?.addEventListener('click', updatePreview);
+        document.getElementById('downloadPdfBtn')?.addEventListener('click', downloadPDF);
+    });
+</script>
+</body>
+</html>
