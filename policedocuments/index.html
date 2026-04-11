@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Police Document Management System | Jail Forms & Antecedent</title>
+    <title>Police Document Management System | Jail, CRB & Antecedent Forms</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         
@@ -59,17 +59,23 @@
             vertical-align: middle;
         }
         
-        /* Updated grid to 4 columns on large screens for new Jail section */
+        /* Updated grid to 5 columns on large screens for new CRB section */
         .content {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 30px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 25px;
             margin-top: 20px;
         }
         
-        @media (max-width: 1200px) {
+        @media (max-width: 1400px) {
             .content {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 1000px) {
+            .content {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
@@ -86,6 +92,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             border: 1px solid #2a4d69;
             transition: transform 0.3s ease;
+            backdrop-filter: blur(5px);
         }
         
         .card:hover {
@@ -108,6 +115,18 @@
         
         .document-list {
             list-style-type: none;
+            max-height: 550px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .document-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .document-list::-webkit-scrollbar-thumb {
+            background: #2a4d69;
+            border-radius: 10px;
         }
         
         .document-item {
@@ -207,7 +226,6 @@
             background: #7d5c8a;
         }
         
-        /* New Jail Forms button styles */
         .btn-jail {
             background: #2c5f2d;
             color: white;
@@ -226,6 +244,16 @@
             background: #A0522D;
         }
         
+        /* New CRB Forms button styles */
+        .btn-crb {
+            background: #0f4c5c;
+            color: white;
+        }
+        
+        .btn-crb:hover {
+            background: #1a6f7a;
+        }
+
         .status-indicator {
             display: inline-block;
             width: 10px;
@@ -351,15 +379,15 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value">32</div>
+                <div class="stat-value" id="formsCount">33</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">1,255</div>
+                <div class="stat-value">1,412</div>
                 <div class="stat-label">PDFs Generated</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">98%</div>
+                <div class="stat-value">99.2%</div>
                 <div class="stat-label">System Uptime</div>
             </div>
         </div>
@@ -370,7 +398,7 @@
         </div>
         
         <div class="content">
-            <!-- Download Forms Card (unchanged) -->
+            <!-- Download Forms Card -->
             <div class="card">
                 <h2><i>📋</i> Download Forms</h2>
                 <div class="search-info" id="downloadFormsInfo"></div>
@@ -422,7 +450,7 @@
                 </ul>
             </div>
             
-            <!-- Generate PDF Documents Card (unchanged) -->
+            <!-- Generate PDF Documents Card -->
             <div class="card">
                 <h2><i>📄</i> Generate PDF Documents</h2>
                 <div class="search-info" id="generatePDFsInfo"></div>
@@ -444,7 +472,7 @@
                 </ul>
             </div>
 
-            <!-- Juvenile Remand Forms Card (unchanged) -->
+            <!-- Juvenile Remand Forms Card -->
             <div class="card">
                 <h2><i>👦</i> Juvenile Remand Forms</h2>
                 <div class="search-info" id="juvenileRemandInfo"></div>
@@ -471,12 +499,11 @@
                 </ul>
             </div>
 
-            <!-- NEW: Jail Forms Card -->
+            <!-- Jail Forms Card -->
             <div class="card">
                 <h2><i>🔒</i> Jail Forms</h2>
                 <div class="search-info" id="jailFormsInfo"></div>
                 <ul class="document-list" id="jailFormsList">
-                    <!-- Antecedent Format - as requested -->
                     <li class="document-item" data-title="Antecedent Format" data-desc="Jail antecedent format for recording prisoner background and criminal history">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Antecedent Format</div>
@@ -488,7 +515,6 @@
                             </a>
                         </div>
                     </li>
-                    <!-- Additional placeholder for future Jail forms (optional to show extensibility) -->
                     <li class="document-item" data-title="Prisoner Movement Register" data-desc="Jail register for tracking prisoner movements and court production">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Prisoner Movement Register</div>
@@ -510,7 +536,45 @@
                 </ul>
             </div>
 
-            <!-- Misc Card (unchanged, but included for completeness) -->
+            <!-- NEW: CRB Forms Card -->
+            <div class="card">
+                <h2><i>🕵️</i> CRB Forms</h2>
+                <div class="search-info" id="crbFormsInfo"></div>
+                <ul class="document-list" id="crbFormsList">
+                    <li class="document-item" data-title="Unknown Body Entry Form" data-desc="CRB form for entry and documentation of unknown/unidentified bodies">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Unknown Body Entry Form</div>
+                            <div class="doc-desc">Document unidentified bodies: physical features, location found, belongings & forensic details</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/crb_forms/unknown_body.html" target="_blank" class="btn btn-crb">
+                                🔍 Generate / Fill
+                            </a>
+                        </div>
+                    </li>
+                    <!-- Additional CRB forms can be added here in the future -->
+                    <li class="document-item" data-title="Missing Person Report (CRB)" data-desc="CRB format for filing missing person complaints">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Missing Person Report (CRB)</div>
+                            <div class="doc-desc">Standard CRB entry for missing persons with identification details</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="#" class="btn btn-crb" style="opacity:0.7; cursor:default;">📄 Coming Soon</a>
+                        </div>
+                    </li>
+                    <li class="document-item" data-title="Unclaimed Property Register" data-desc="CRB register for unclaimed / seized property documentation">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Unclaimed Property Register</div>
+                            <div class="doc-desc">Documentation of unclaimed items in police custody</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="#" class="btn btn-crb" style="opacity:0.7; cursor:default;">📄 Coming Soon</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Misc Card -->
             <div class="card">
                 <h2><i>📂</i> Misc</h2>
                 <div class="search-info" id="miscInfo"></div>
@@ -541,7 +605,7 @@
     </div>
 
     <script>
-        // Enhanced search and notification logic, now includes Jail Forms section
+        // Enhanced search and notification logic, now includes CRB Forms section
         function showNotification(message) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -562,6 +626,7 @@
                 { listId: 'generatePDFsList', infoId: 'generatePDFsInfo', type: 'Generate' },
                 { listId: 'juvenileRemandList', infoId: 'juvenileRemandInfo', type: 'Juvenile' },
                 { listId: 'jailFormsList', infoId: 'jailFormsInfo', type: 'Jail' },
+                { listId: 'crbFormsList', infoId: 'crbFormsInfo', type: 'CRB' },
                 { listId: 'miscList', infoId: 'miscInfo', type: 'Misc' }
             ];
             
@@ -600,9 +665,7 @@
         
         // Setup interactive handlers for all buttons with notification + external open
         function setupGlobalLinkHandlers() {
-            // All anchor tags inside .doc-actions (except those with 'Coming Soon' style)
             document.querySelectorAll('.doc-actions a').forEach(link => {
-                // skip placeholder "Coming Soon" links that have no href or are dummy
                 if (link.getAttribute('href') === '#' || link.getAttribute('href') === 'javascript:void(0)' || link.style.cursor === 'default') {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -615,7 +678,7 @@
                     const docItem = this.closest('.document-item');
                     let docTitle = docItem ? docItem.getAttribute('data-title') : 'Document';
                     if (!docTitle) docTitle = 'Document';
-                    const isGenerate = this.classList.contains('btn-generate');
+                    const isGenerate = this.classList.contains('btn-generate') || this.classList.contains('btn-crb');
                     const actionMsg = isGenerate ? `Opening ${docTitle} generator...` : `Opening ${docTitle} document...`;
                     showNotification(actionMsg);
                     setTimeout(() => {
@@ -631,9 +694,10 @@
             if (searchInput) searchInput.addEventListener('input', performSearch);
             if (searchButton) searchButton.addEventListener('click', performSearch);
             setupGlobalLinkHandlers();
-            // Update stats count: new Jail forms section adds at least 1 active form (Antecedent Format)
-            const statValueSpan = document.querySelector('.stat-value');
-            if (statValueSpan && statValueSpan.innerText === '31') statValueSpan.innerText = '32';
+            
+            // Update forms count to 33 (added CRB section with at least 1 active form)
+            const statValueSpan = document.getElementById('formsCount');
+            if (statValueSpan) statValueSpan.innerText = '33';
         });
     </script>
 </body>
