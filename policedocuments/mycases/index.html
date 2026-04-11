@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CaseFlow Pro - Live Google Sheets Sync</title>
+    <title>CaseFlow Pro - Google Drive Evidence System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -15,7 +15,7 @@
         .header h1 { font-size: 1.8rem; background: linear-gradient(135deg, #1a6b8a, #0c4a6e); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .badge { background: #e1f0fa; color: #155e75; padding: 5px 15px; border-radius: 40px; font-size: 0.75rem; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
         .stat-card i { font-size: 2rem; color: #1a6b8a; margin-bottom: 10px; }
         .stat-card .value { font-size: 2rem; font-weight: 700; color: #0c4a5e; }
@@ -29,22 +29,36 @@
         
         button { background: #1a6b8a; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
         button:hover { background: #0e5a75; transform: translateY(-1px); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-secondary { background: #6c757d; }
         .btn-danger { background: #dc3545; }
         .btn-danger:hover { background: #c82333; }
         .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
+        .btn-google { background: #4285f4; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-google:hover { background: #3367d6; }
         
         .form-card { background: white; border-radius: 24px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .form-title { font-size: 1.2rem; font-weight: 600; color: #1a6b8a; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e0e8f0; }
+        .form-title { font-size: 1.2rem; font-weight: 600; color: #1a6b8a; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e0e8f0; display: flex; align-items: center; gap: 10px; }
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 600; font-size: 0.7rem; color: #1f5068; text-transform: uppercase; margin-bottom: 5px; }
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1.5px solid #e2edf2; border-radius: 12px; font-family: inherit; font-size: 0.85rem; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #1a6b8a; box-shadow: 0 0 0 3px rgba(26,107,138,0.1); }
+        textarea { resize: vertical; min-height: 60px; }
         
         .accused-card { background: #f8fafc; border: 1px solid #e2edf2; border-radius: 16px; padding: 15px; margin-bottom: 15px; }
         .accused-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #d0dfe8; }
         .accused-title { font-weight: 700; background: #e8f0fe; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; color: #1a5f7a; }
+        
+        .upload-area { border: 2px dashed #cbd5e1; border-radius: 16px; padding: 15px; margin-top: 10px; background: #fafcff; }
+        .upload-label { display: inline-block; background: #4285f4; color: white; padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 0.75rem; font-weight: 600; margin-bottom: 10px; }
+        .upload-label:hover { background: #3367d6; }
+        .image-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .image-preview-item { position: relative; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; border: 1px solid #e2edf2; }
+        .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .image-preview-item .remove-img { position: absolute; top: -8px; right: -8px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; }
+        .file-input { display: none; }
+        
+        .conditional-section { background: #f8fafc; border-radius: 16px; padding: 15px; margin-top: 10px; border-left: 4px solid #1a6b8a; }
         
         .table-wrapper { overflow-x: auto; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
@@ -55,13 +69,20 @@
         .case-badge { display: inline-block; padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
         .badge-fir { background: #fee9e6; color: #bc3900; }
         .badge-csr { background: #e1f0fe; color: #136b8d; }
+        .evidence-badge { background: #e8f0fe; color: #1a5f7a; font-size: 0.65rem; padding: 2px 6px; border-radius: 12px; margin-left: 5px; }
         
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .modal-content { background: white; margin: 5% auto; padding: 0; border-radius: 28px; width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: white; margin: 5% auto; padding: 0; border-radius: 28px; width: 90%; max-width: 1000px; max-height: 85vh; overflow-y: auto; }
         .modal-header { background: linear-gradient(135deg, #145c7a, #0c4a6e); color: white; padding: 20px 25px; border-radius: 28px 28px 0 0; display: flex; justify-content: space-between; align-items: center; }
         .close-modal { font-size: 1.8rem; cursor: pointer; }
         .modal-body { padding: 25px; }
         
+        .evidence-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .evidence-card { background: #f8fafc; border-radius: 16px; padding: 12px; text-align: center; border: 1px solid #e2edf2; }
+        .evidence-card a { color: #1a6b8a; text-decoration: none; font-size: 0.75rem; word-break: break-all; }
+        .evidence-card i { font-size: 2rem; margin-bottom: 8px; color: #4285f4; }
+        
+        .drive-auth { background: #e8f0fe; border-radius: 16px; padding: 15px; margin-bottom: 20px; text-align: center; border: 1px solid #4285f4; }
         .hidden { display: none; }
         .text-center { text-align: center; }
         
@@ -72,10 +93,15 @@
 <div class="container">
     <div class="header">
         <div>
-            <h1><i class="fas fa-balance-scale"></i> CaseFlow Pro</h1>
-            <div class="badge"><i class="fas fa-cloud-upload-alt"></i> Live Sync with Google Sheets</div>
+            <h1><i class="fab fa-google"></i> CaseFlow Pro</h1>
+            <div class="badge"><i class="fab fa-google-drive"></i> Google Drive Evidence Storage</div>
         </div>
         <button id="dashboardToggleBtn" class="btn-secondary"><i class="fas fa-chart-line"></i> Show Dashboard</button>
+    </div>
+    
+    <div id="driveStatus" class="drive-auth">
+        <span id="authStatus"><i class="fab fa-google"></i> Connect to Google Drive to upload evidence</span>
+        <button id="connectDriveBtn" class="btn-google" style="margin-left: 15px;"><i class="fab fa-google"></i> Sign in with Google</button>
     </div>
     
     <div id="statsGrid" class="stats-grid hidden">
@@ -85,7 +111,7 @@
         <div class="stat-card"><i class="fas fa-file-alt"></i><div class="value" id="csrCount">0</div><label>CSR Cases</label></div>
     </div>
     
-    <div id="statusMsg" class="status info"><i class="fas fa-sync-alt fa-spin"></i> Connecting to server...</div>
+    <div id="statusMsg" class="status info"><i class="fas fa-sync-alt fa-spin"></i> Loading system...</div>
     
     <div style="display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #e0e8f0;">
         <button id="tabRegisterBtn" style="background: transparent; color: #1a6b8a; border-bottom: 3px solid #1a6b8a; border-radius: 0; padding: 10px 20px;">New Case</button>
@@ -97,7 +123,7 @@
             <div class="form-title"><i class="fas fa-pen-alt"></i> Register New Case</div>
             
             <div class="form-row">
-                <div class="form-group"><label>Group ID <span style="color:#1a6b8a;">(Auto)</span></label><input type="text" id="groupId" readonly placeholder="Will be auto-generated"></div>
+                <div class="form-group"><label>Group ID <span style="color:#1a6b8a;">(Auto)</span></label><input type="text" id="groupId" readonly></div>
                 <div class="form-group"><label>FIR / CSR *</label><select id="caseType"><option value="FIR">FIR</option><option value="CSR">CSR</option></select></div>
             </div>
             <div class="form-row">
@@ -108,7 +134,7 @@
                 <div class="form-group"><label>Sections</label><input type="text" id="sections" placeholder="302, 307 IPC"></div>
             </div>
             
-            <div class="form-title" style="margin-top: 20px;"><i class="fas fa-calendar-alt"></i> Date & Location</div>
+            <div class="form-title"><i class="fas fa-calendar-alt"></i> Date & Location</div>
             <div class="form-row">
                 <div class="form-group"><label>Date of Occurrence</label><input type="date" id="doDate"></div>
                 <div class="form-group"><label>Time of Occurrence</label><input type="time" id="doTime"></div>
@@ -116,46 +142,71 @@
                 <div class="form-group"><label>Time of Report</label><input type="time" id="drTime"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Scene of Crime</label><input type="text" id="sceneOfCrime" placeholder="Location where crime occurred"></div>
+                <div class="form-group"><label>Scene of Crime</label><textarea id="sceneOfCrime" rows="2" placeholder="Full address of crime location"></textarea></div>
             </div>
             
-            <div class="form-title" style="margin-top: 20px;"><i class="fas fa-user-tie"></i> Accused Persons</div>
+            <!-- Accused Section -->
+            <div class="form-title"><i class="fas fa-user-tie"></i> Accused Persons</div>
             <div id="accusedContainer"></div>
             <button id="addAccusedBtn" class="btn-secondary" style="margin-top: 10px;"><i class="fas fa-plus-circle"></i> Add Accused Person</button>
             
-            <div class="form-title" style="margin-top: 20px;"><i class="fas fa-info-circle"></i> Case Details</div>
-            <div class="form-row">
-                <div class="form-group"><label>Complainant Details</label><textarea id="complainantDetails" rows="2" placeholder="Name, address, contact"></textarea></div>
-                <div class="form-group"><label>Brief Summary</label><textarea id="complaintSummary" rows="2"></textarea></div>
-            </div>
+            <!-- Property Seized Section -->
+            <div class="form-title"><i class="fas fa-box"></i> Property Seized</div>
             <div class="form-row">
                 <div class="form-group"><label>Property Seized?</label><select id="propertySeizedSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="form-group" id="propertySeizedField" style="display:none;"><label>Property Details</label><textarea id="propertySeized" rows="2" placeholder="Describe seized property..."></textarea></div>
+            </div>
+            <div id="propertySeizedSection" class="conditional-section hidden">
+                <div class="form-group"><label>Property Description</label><textarea id="propertyDescription" rows="2" placeholder="Describe seized items, quantity, estimated value"></textarea></div>
+                <div class="form-group"><label>Property Photos</label>
+                    <div class="upload-area"><label class="upload-label"><i class="fab fa-google-drive"></i> Upload to Google Drive</label>
+                    <input type="file" id="propertyPhotosInput" accept="image/*" multiple class="file-input">
+                    <div id="propertyPhotosPreview" class="image-preview"></div>
+                    <div id="propertyPhotosUrls" style="font-size:0.7rem; margin-top:5px;"></div></div>
+                </div>
             </div>
             
-            <div class="form-title" style="margin-top: 20px;"><i class="fas fa-gavel"></i> Legal Process</div>
+            <!-- Hospital Intimation Section -->
+            <div class="form-title"><i class="fas fa-hospital"></i> Hospital Intimation</div>
+            <div class="form-row">
+                <div class="form-group"><label>Hospital Intimation Received?</label><select id="hospitalIntimationSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+            </div>
+            <div id="hospitalIntimationSection" class="conditional-section hidden">
+                <div class="form-group"><label>Hospital Details</label><textarea id="hospitalDetails" rows="2" placeholder="Hospital name, address, doctor, contact"></textarea></div>
+                <div class="form-group"><label>AR Copy / Medical Report</label>
+                    <div class="upload-area"><label class="upload-label"><i class="fab fa-google-drive"></i> Upload to Google Drive</label>
+                    <input type="file" id="arCopyInput" accept="image/*,application/pdf" multiple class="file-input">
+                    <div id="arCopyPreview" class="image-preview"></div>
+                    <div id="arCopyUrls" style="font-size:0.7rem; margin-top:5px;"></div></div>
+                </div>
+            </div>
+            
+            <!-- Other Evidence -->
+            <div class="form-title"><i class="fas fa-file-alt"></i> Other Evidence Documents</div>
+            <div class="form-row">
+                <div class="form-group"><label>Complainant ID Proof</label>
+                    <div class="upload-area"><label class="upload-label"><i class="fab fa-google-drive"></i> Upload to Drive</label>
+                    <input type="file" id="complainantIdInput" accept="image/*,application/pdf" multiple class="file-input">
+                    <div id="complainantIdPreview" class="image-preview"></div>
+                    <div id="complainantIdUrls" style="font-size:0.7rem; margin-top:5px;"></div></div>
+                </div>
+                <div class="form-group"><label>Complaint / FIR Copy</label>
+                    <div class="upload-area"><label class="upload-label"><i class="fab fa-google-drive"></i> Upload to Drive</label>
+                    <input type="file" id="complaintCopyInput" accept="image/*,application/pdf" multiple class="file-input">
+                    <div id="complaintCopyPreview" class="image-preview"></div>
+                    <div id="complaintCopyUrls" style="font-size:0.7rem; margin-top:5px;"></div></div>
+                </div>
+            </div>
+            
+            <div class="form-title"><i class="fas fa-info-circle"></i> Case Details</div>
+            <div class="form-row">
+                <div class="form-group"><label>Complainant Details</label><textarea id="complainantDetails" rows="3" placeholder="Full name, address, phone, email"></textarea></div>
+                <div class="form-group"><label>Brief Summary</label><textarea id="complaintSummary" rows="3" placeholder="Brief description of the incident"></textarea></div>
+            </div>
+            
+            <div class="form-title"><i class="fas fa-gavel"></i> Legal Process</div>
             <div class="form-row">
                 <div class="form-group"><label>Charge Sheet Prepared?</label><select id="chargeSheetSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
                 <div class="form-group" id="chargeSheetDateField" style="display:none;"><label>Charge Sheet Date</label><input type="date" id="chargeSheetDate"></div>
-            </div>
-            <div class="form-row" id="opinionRow" style="display:none;">
-                <div class="form-group"><label>Opinion Received?</label><select id="opinionSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="form-group" id="opinionDateField" style="display:none;"><label>Opinion Date</label><input type="date" id="opinionDate"></div>
-            </div>
-            <div class="form-row" id="efilingRow" style="display:none;">
-                <div class="form-group"><label>e-Filed?</label><select id="efilingSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="form-group" id="efilingDateField" style="display:none;"><label>e-Filing Date</label><input type="date" id="efilingDate"></div>
-                <div class="form-group" id="ltnField" style="display:none;"><label>LTN Number</label><input type="text" id="ltnNumber" placeholder="LTN Number"></div>
-            </div>
-            <div class="form-row" id="srRow" style="display:none;">
-                <div class="form-group"><label>SR Number Obtained?</label><select id="srSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="form-group" id="srNumberField" style="display:none;"><label>SR Number</label><input type="text" id="srNumber" placeholder="SR Number"></div>
-                <div class="form-group" id="srDateField" style="display:none;"><label>SR Date</label><input type="date" id="srDate"></div>
-            </div>
-            <div class="form-row" id="ccRow" style="display:none;">
-                <div class="form-group"><label>CC/SC/PRC Number?</label><select id="ccSelect"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                <div class="form-group" id="ccNumberField" style="display:none;"><label>CC/SC/PRC Number</label><input type="text" id="ccNumber" placeholder="Enter number"></div>
-                <div class="form-group" id="ccDateField" style="display:none;"><label>CC Date</label><input type="date" id="ccDate"></div>
             </div>
             
             <div class="form-row">
@@ -163,7 +214,7 @@
             </div>
             
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button id="submitBtn"><i class="fas fa-check-circle"></i> Register Case</button>
+                <button id="submitBtn"><i class="fas fa-save"></i> Register Case</button>
                 <button id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i> Reset Form</button>
             </div>
         </div>
@@ -177,10 +228,10 @@
         </div>
         <div class="table-wrapper">
             <table id="dataTable">
-                <thead><tr><th>Group ID</th><th>Type</th><th>Case No</th><th>Head</th><th>Sections</th><th>Accused</th><th>Stage</th><th>Action</th></tr></thead>
+                <thead><tr><th>Group ID</th><th>Type</th><th>Case No</th><th>Head</th><th>Accused</th><th>Evidence</th><th>Stage</th><th>Action</th></tr></thead>
                 <tbody id="tableBody"><tr><td colspan="8" class="text-center">Loading cases...</td></tr>
-            </tbody>
-            </table>
+                </tbody>
+            }</table>
         </div>
     </div>
 </div>
@@ -193,193 +244,205 @@
 </div>
 
 <script>
-    // ==================== CONFIGURATION ====================
-    // LIVE APPS SCRIPT URL - FULLY INTEGRATED
-    const API_URL = "https://script.google.com/macros/s/AKfycbzdNJg6ceAkNFQXdbHn1lUq3dBLKBzn_eRk0UoN4SHAvzHL-lHFV9HcfEy2vaSBo5MC2Q/exec";
+    // ============================================================
+    // ✅ YOUR CREDENTIALS ARE CONFIGURED BELOW
+    // ============================================================
+    const CLIENT_ID = '1042947113447-ahprgppk86i9harpk1saqk1sdcm2l3hg.apps.googleusercontent.com';
+    const API_KEY = 'AIzaSyAbmucLH63D6FCmE1M2otB5Zq3kY3uLc4k';
     
-    let allRecords = [];
-    let dashboardVisible = false;
+    const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.metadata.readonly';
+    
+    let tokenClient;
+    let accessToken = null;
+    let gapiInited = false;
+    let gisInited = false;
+    
     let accusedCounter = 0;
+    let allCases = [];
+    let evidenceUrls = { complainantId: [], complaintCopy: [], propertyPhotos: [], arCopy: [] };
     
-    // ==================== JSONP FUNCTION (BYPASSES CORS FOR GET) ====================
-    function jsonpRequest(url, onSuccess, onError) {
-        const callbackName = `jsonp_callback_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
-        const script = document.createElement('script');
-        
-        window[callbackName] = function(data) {
-            delete window[callbackName];
-            document.body.removeChild(script);
-            if (data && data.error) {
-                onError(data.error);
-            } else {
-                onSuccess(data);
-            }
+    // Load Google APIs
+    function loadGoogleApis() {
+        // Load GAPI
+        const gapiScript = document.createElement('script');
+        gapiScript.src = 'https://apis.google.com/js/api.js';
+        gapiScript.onload = () => {
+            gapi.load('client', initializeGapiClient);
         };
+        document.body.appendChild(gapiScript);
         
-        const separator = url.includes('?') ? '&' : '?';
-        script.src = `${url}${separator}callback=${callbackName}`;
-        script.onerror = function() {
-            delete window[callbackName];
-            document.body.removeChild(script);
-            onError('Network error: Failed to fetch data. Check your internet connection and CORS settings.');
+        // Load GIS (OAuth)
+        const gisScript = document.createElement('script');
+        gisScript.src = 'https://accounts.google.com/gsi/client';
+        gisScript.onload = () => {
+            initializeGisClient();
         };
-        
-        document.body.appendChild(script);
+        document.body.appendChild(gisScript);
     }
     
-    // ==================== FETCH USING JSONP ====================
-    function fetchCases() {
-        showStatus('Syncing with Google Sheets...', 'info');
-        
-        jsonpRequest(API_URL, 
-            (data) => {
-                allRecords = Array.isArray(data) ? data : [];
-                renderTable();
-                updateStats();
-                updateGroupId();
-                showStatus(`✅ Synced ${allRecords.length} records from Google Sheets`, 'success');
+    async function initializeGapiClient() {
+        await gapi.client.init({
+            apiKey: API_KEY,
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+        });
+        gapiInited = true;
+        console.log('GAPI initialized');
+        showStatus('Google Drive API ready. Click "Sign in with Google" to connect.', 'info');
+    }
+    
+    function initializeGisClient() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: SCOPES,
+            callback: (tokenResponse) => {
+                if (tokenResponse.access_token) {
+                    accessToken = tokenResponse.access_token;
+                    localStorage.setItem('gdrive_token', accessToken);
+                    updateDriveStatus(true);
+                    showStatus('✅ Connected to Google Drive! You can now upload files.', 'success');
+                } else if (tokenResponse.error) {
+                    showStatus('Authentication failed: ' + tokenResponse.error, 'error');
+                }
             },
-            (error) => {
-                showStatus(`⚠️ Sync error: ${error}. Make sure your Apps Script is deployed with "Anyone" access.`, 'error');
-                console.error('JSONP error:', error);
-                allRecords = [];
-                renderTable();
-                updateStats();
-            }
-        );
+        });
+        gisInited = true;
+        console.log('GIS initialized');
     }
     
-    // ==================== POST REQUEST (CORS ENABLED FOR APPS SCRIPT) ====================
-    async function postRequest(data) {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                mode: 'cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            const result = await response.json();
-            return result;
-        } catch (error) {
-            console.error('POST error:', error);
-            throw new Error(`Server error: ${error.message}. Please check if the Apps Script is deployed correctly.`);
+    function updateDriveStatus(connected) {
+        if (connected) {
+            document.getElementById('authStatus').innerHTML = '<i class="fab fa-google-drive" style="color:#4285f4;"></i> ✅ Connected to Google Drive - Ready to upload';
+            document.getElementById('connectDriveBtn').style.display = 'none';
+        } else {
+            document.getElementById('authStatus').innerHTML = '<i class="fab fa-google"></i> Connect to Google Drive to upload evidence files';
+            document.getElementById('connectDriveBtn').style.display = 'inline-block';
         }
     }
     
-    // ==================== INITIALIZATION ====================
-    document.addEventListener('DOMContentLoaded', () => {
-        // Tab switching
-        document.getElementById('tabRegisterBtn').onclick = () => {
-            document.getElementById('registerTab').style.display = 'block';
-            document.getElementById('casesTab').style.display = 'none';
-            document.getElementById('tabRegisterBtn').style.borderBottom = '3px solid #1a6b8a';
-            document.getElementById('tabCasesBtn').style.borderBottom = '3px solid transparent';
-            document.getElementById('tabRegisterBtn').style.color = '#1a6b8a';
-            document.getElementById('tabCasesBtn').style.color = '#6b8a9e';
-        };
-        document.getElementById('tabCasesBtn').onclick = () => {
-            document.getElementById('registerTab').style.display = 'none';
-            document.getElementById('casesTab').style.display = 'block';
-            document.getElementById('tabCasesBtn').style.borderBottom = '3px solid #1a6b8a';
-            document.getElementById('tabRegisterBtn').style.borderBottom = '3px solid transparent';
-            document.getElementById('tabCasesBtn').style.color = '#1a6b8a';
-            document.getElementById('tabRegisterBtn').style.color = '#6b8a9e';
-            fetchCases();
-        };
-        
-        // Dashboard toggle
-        document.getElementById('dashboardToggleBtn').onclick = () => {
-            dashboardVisible = !dashboardVisible;
-            document.getElementById('statsGrid').classList.toggle('hidden', !dashboardVisible);
-            document.getElementById('dashboardToggleBtn').innerHTML = dashboardVisible ? '<i class="fas fa-chart-line"></i> Hide Dashboard' : '<i class="fas fa-chart-line"></i> Show Dashboard';
-            if (dashboardVisible) updateStats();
-        };
-        
-        // Add accused
-        document.getElementById('addAccusedBtn').onclick = addAccused;
-        
-        // Submit and reset
-        document.getElementById('submitBtn').onclick = submitCase;
-        document.getElementById('resetBtn').onclick = resetForm;
-        document.getElementById('refreshBtn').onclick = () => fetchCases();
-        
-        // Search and filter
-        document.getElementById('searchInput').addEventListener('input', () => renderTable());
-        document.getElementById('filterCaseType').addEventListener('change', () => renderTable());
-        
-        // Property seized toggle
-        document.getElementById('propertySeizedSelect').onchange = function() {
-            document.getElementById('propertySeizedField').style.display = this.value === 'Yes' ? 'block' : 'none';
-        };
-        
-        // Legal process conditional visibility
-        setupLegalToggles();
-        
-        // Add first accused by default
-        addAccused();
-        
-        // Fetch initial data
-        fetchCases();
-        
-        // Auto-refresh every 45 seconds
-        setInterval(fetchCases, 45000);
-    });
-    
-    // ==================== LEGAL PROCESS TOGGLES ====================
-    function setupLegalToggles() {
-        const chargeSheet = document.getElementById('chargeSheetSelect');
-        const opinion = document.getElementById('opinionSelect');
-        const efiling = document.getElementById('efilingSelect');
-        const sr = document.getElementById('srSelect');
-        
-        chargeSheet.onchange = () => {
-            const isYes = chargeSheet.value === 'Yes';
-            document.getElementById('chargeSheetDateField').style.display = isYes ? 'block' : 'none';
-            document.getElementById('opinionRow').style.display = isYes ? 'flex' : 'none';
-            if (!isYes) {
-                document.getElementById('efilingRow').style.display = 'none';
-                document.getElementById('srRow').style.display = 'none';
-                document.getElementById('ccRow').style.display = 'none';
-            }
-        };
-        
-        opinion.onchange = () => {
-            document.getElementById('opinionDateField').style.display = opinion.value === 'Yes' ? 'block' : 'none';
-            const showEfiling = opinion.value === 'Yes' && chargeSheet.value === 'Yes';
-            document.getElementById('efilingRow').style.display = showEfiling ? 'flex' : 'none';
-            if (!showEfiling) {
-                document.getElementById('srRow').style.display = 'none';
-                document.getElementById('ccRow').style.display = 'none';
-            }
-        };
-        
-        efiling.onchange = () => {
-            const isYes = efiling.value === 'Yes';
-            document.getElementById('efilingDateField').style.display = isYes ? 'block' : 'none';
-            document.getElementById('ltnField').style.display = isYes ? 'block' : 'none';
-            const showSr = isYes && opinion.value === 'Yes' && chargeSheet.value === 'Yes';
-            document.getElementById('srRow').style.display = showSr ? 'flex' : 'none';
-            if (!showSr) document.getElementById('ccRow').style.display = 'none';
-        };
-        
-        sr.onchange = () => {
-            const isYes = sr.value === 'Yes';
-            document.getElementById('srNumberField').style.display = isYes ? 'block' : 'none';
-            document.getElementById('srDateField').style.display = isYes ? 'block' : 'none';
-            const showCc = isYes && efiling.value === 'Yes';
-            document.getElementById('ccRow').style.display = showCc ? 'flex' : 'none';
-        };
-        
-        document.getElementById('ccSelect').onchange = () => {
-            const isYes = document.getElementById('ccSelect').value === 'Yes';
-            document.getElementById('ccNumberField').style.display = isYes ? 'block' : 'none';
-            document.getElementById('ccDateField').style.display = isYes ? 'block' : 'none';
-        };
+    function handleDriveSignIn() {
+        if (!gapiInited || !gisInited) {
+            showStatus('Loading Google APIs, please wait a moment...', 'warning');
+            return;
+        }
+        tokenClient.requestAccessToken({ prompt: 'consent' });
     }
     
-    // ==================== ACCUSED MANAGEMENT ====================
+    // Check for existing token on load
+    async function checkExistingToken() {
+        const savedToken = localStorage.getItem('gdrive_token');
+        if (savedToken) {
+            accessToken = savedToken;
+            updateDriveStatus(true);
+        }
+    }
+    
+    // Upload file to Google Drive
+    async function uploadToDrive(file, subFolder) {
+        if (!accessToken) {
+            showStatus('Please connect to Google Drive first', 'error');
+            return null;
+        }
+        
+        const folderId = await getOrCreateFolder('CaseFlow_Evidence/' + subFolder);
+        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        
+        const metadata = { name: fileName, parents: [folderId], mimeType: file.type };
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', file);
+        
+        try {
+            const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${accessToken}` },
+                body: form
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                // Make file publicly accessible (anyone with link can view)
+                await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}/permissions`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: 'reader', type: 'anyone' })
+                });
+                return `https://drive.google.com/file/d/${data.id}/view`;
+            } else {
+                const errorText = await response.text();
+                console.error('Upload failed:', errorText);
+                return null;
+            }
+        } catch(e) {
+            console.error('Upload error:', e);
+            showStatus('Upload failed: ' + e.message, 'error');
+            return null;
+        }
+    }
+    
+    async function getOrCreateFolder(path) {
+        const folders = path.split('/');
+        let parentId = 'root';
+        
+        for (const folderName of folders) {
+            const query = `name='${folderName}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`;
+            const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}`, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            const data = await response.json();
+            
+            let folderId;
+            if (data.files && data.files.length > 0) {
+                folderId = data.files[0].id;
+            } else {
+                const createResponse = await fetch('https://www.googleapis.com/drive/v3/files', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: folderName, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] })
+                });
+                const folderData = await createResponse.json();
+                folderId = folderData.id;
+            }
+            parentId = folderId;
+        }
+        return parentId;
+    }
+    
+    function setupUpload(inputId, previewId, urlsDivId, evidenceKey, folder) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        const urlsDiv = document.getElementById(urlsDivId);
+        if (!input) return;
+        
+        input.addEventListener('change', async (e) => {
+            if (!accessToken) {
+                showStatus('Please connect to Google Drive first', 'error');
+                input.value = '';
+                return;
+            }
+            
+            for (const file of e.target.files) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'image-preview-item';
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    previewItem.innerHTML = `<img src="${ev.target.result}"><span class="remove-img" onclick="this.parentElement.remove()">×</span>`;
+                };
+                reader.readAsDataURL(file);
+                preview.appendChild(previewItem);
+                
+                const url = await uploadToDrive(file, folder);
+                if (url) {
+                    evidenceUrls[evidenceKey].push({ name: file.name, url: url });
+                    urlsDiv.innerHTML = evidenceUrls[evidenceKey].map(u => `<div><i class="fas fa-link"></i> <a href="${u.url}" target="_blank">${u.name.substring(0, 35)}</a></div>`).join('');
+                    showStatus(`✅ Uploaded: ${file.name}`, 'success');
+                } else {
+                    showStatus(`❌ Failed to upload: ${file.name}`, 'error');
+                }
+            }
+            input.value = '';
+        });
+    }
+    
     function addAccused() {
         const container = document.getElementById('accusedContainer');
         const id = accusedCounter++;
@@ -387,43 +450,94 @@
         div.className = 'accused-card';
         div.id = `accused_${id}`;
         div.innerHTML = `
-            <div class="accused-header">
-                <span class="accused-title"><i class="fas fa-user-circle"></i> Accused Person ${accusedCounter}</span>
-                <button type="button" class="btn-danger btn-sm" onclick="removeAccused(${id})"><i class="fas fa-trash"></i> Remove</button>
+            <div class="accused-header"><span class="accused-title"><i class="fas fa-user-circle"></i> Accused Person ${accusedCounter}</span>
+            <button type="button" class="btn-danger btn-sm" onclick="removeAccused(${id})"><i class="fas fa-trash"></i> Remove</button></div>
+            <div class="form-row">
+                <div class="form-group"><label>Full Name *</label><input type="text" class="acc-name" required></div>
+                <div class="form-group"><label>Father's Name</label><input type="text" class="acc-father"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Full Name *</label><input type="text" class="acc-name" placeholder="Full name" required></div>
-                <div class="form-group"><label>Father's Name</label><input type="text" class="acc-father" placeholder="Father's name"></div>
+                <div class="form-group"><label>Age</label><input type="text" class="acc-age"></div>
+                <div class="form-group"><label>Address</label><textarea class="acc-address" rows="3" placeholder="Complete address with PIN"></textarea></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Age</label><input type="text" class="acc-age" placeholder="Age"></div>
-                <div class="form-group"><label>Address</label><input type="text" class="acc-address" placeholder="Address"></div>
+                <div class="form-group"><label>Aadhar Number</label><input type="text" class="acc-aadhar"></div>
+                <div class="form-group"><label>Aadhar Upload</label>
+                    <div class="upload-area" style="margin:0;padding:8px;">
+                        <label class="upload-label" style="padding:4px 12px;"><i class="fab fa-google-drive"></i> Upload Aadhar</label>
+                        <input type="file" class="acc-aadhar-input" accept="image/*" style="display:none;">
+                        <div class="acc-aadhar-preview"></div>
+                        <div class="acc-aadhar-url" style="font-size:0.65rem;"></div>
+                    </div>
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>Arrested?</label><select class="acc-arrested"><option value="FALSE">No</option><option value="TRUE">Yes</option></select></div>
-                <div class="form-group arrest-fields" style="display:none;"><label>Arrest Place</label><input type="text" class="acc-arrest-place" placeholder="Arrest place"></div>
+                <div class="form-group arrest-fields" style="display:none;"><label>Arrest Place</label><input type="text" class="acc-arrest-place"></div>
                 <div class="form-group arrest-fields" style="display:none;"><label>Arrest Date</label><input type="date" class="acc-arrest-date"></div>
-                <div class="form-group arrest-fields" style="display:none;"><label>Bail Status</label><input type="text" class="acc-bail-status" placeholder="Bail status"></div>
+                <div class="form-group arrest-fields" style="display:none;"><label>Bail Status</label><input type="text" class="acc-bail-status"></div>
+            </div>
+            <div class="form-row arrest-photo-field" style="display:none;">
+                <div class="form-group"><label>Accused Photo (Required if Arrested)</label>
+                    <div class="upload-area" style="margin:0;padding:8px;">
+                        <label class="upload-label" style="padding:4px 12px;"><i class="fab fa-google-drive"></i> Upload Photo</label>
+                        <input type="file" class="acc-photo-input" accept="image/*" style="display:none;">
+                        <div class="acc-photo-preview"></div>
+                        <div class="acc-photo-url" style="font-size:0.65rem;"></div>
+                    </div>
+                </div>
             </div>
         `;
         
         const arrestedSelect = div.querySelector('.acc-arrested');
         const arrestFields = div.querySelectorAll('.arrest-fields');
-        arrestedSelect.onchange = () => {
+        const arrestPhotoField = div.querySelector('.arrest-photo-field');
+        
+        const updateArrestFields = () => {
             const isArrested = arrestedSelect.value === 'TRUE';
-            arrestFields.forEach(field => field.style.display = isArrested ? 'block' : 'none');
+            arrestFields.forEach(f => f.style.display = isArrested ? 'block' : 'none');
+            arrestPhotoField.style.display = isArrested ? 'flex' : 'none';
         };
+        arrestedSelect.onchange = updateArrestFields;
+        
+        // Photo upload
+        const photoInput = div.querySelector('.acc-photo-input');
+        const photoPreview = div.querySelector('.acc-photo-preview');
+        const photoUrlDiv = div.querySelector('.acc-photo-url');
+        photoInput.addEventListener('change', async (e) => {
+            if (e.target.files[0] && accessToken) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (ev) => { photoPreview.innerHTML = `<div class="image-preview-item"><img src="${ev.target.result}" style="width:60px;height:60px;"><span class="remove-img" onclick="this.parentElement.remove()">×</span></div>`; };
+                reader.readAsDataURL(file);
+                const url = await uploadToDrive(file, 'Arrested_Photos');
+                if (url) { div.dataset.photoUrl = url; photoUrlDiv.innerHTML = `<i class="fas fa-link"></i> <a href="${url}" target="_blank">Photo URL</a>`; }
+            }
+        });
+        
+        // Aadhar upload
+        const aadharInput = div.querySelector('.acc-aadhar-input');
+        const aadharPreview = div.querySelector('.acc-aadhar-preview');
+        const aadharUrlDiv = div.querySelector('.acc-aadhar-url');
+        aadharInput.addEventListener('change', async (e) => {
+            if (e.target.files[0] && accessToken) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (ev) => { aadharPreview.innerHTML = `<div class="image-preview-item"><img src="${ev.target.result}" style="width:60px;height:60px;"><span class="remove-img" onclick="this.parentElement.remove()">×</span></div>`; };
+                reader.readAsDataURL(file);
+                const url = await uploadToDrive(file, 'Aadhar_Cards');
+                if (url) { div.dataset.aadharUrl = url; aadharUrlDiv.innerHTML = `<i class="fas fa-link"></i> <a href="${url}" target="_blank">Aadhar URL</a>`; }
+            }
+        });
         
         container.appendChild(div);
+        updateArrestFields();
     }
     
     window.removeAccused = function(id) {
         const div = document.getElementById(`accused_${id}`);
-        if (div && document.querySelectorAll('.accused-card').length > 1) {
-            div.remove();
-        } else {
-            showStatus('At least one accused person is required', 'warning');
-        }
+        if (div && document.querySelectorAll('.accused-card').length > 1) div.remove();
+        else showStatus('At least one accused person is required', 'warning');
     };
     
     function getAccusedList() {
@@ -432,24 +546,25 @@
             const name = card.querySelector('.acc-name')?.value.trim();
             if (name) {
                 list.push({
-                    "Accused person's full name": name,
-                    "Father's name of accused": card.querySelector('.acc-father')?.value || '',
-                    "Age of accused": card.querySelector('.acc-age')?.value || '',
-                    "Address of accused": card.querySelector('.acc-address')?.value || '',
-                    "TRUE / FALSE (arrested in this case)": card.querySelector('.acc-arrested')?.value === 'TRUE' ? 'TRUE' : 'FALSE',
-                    "Arrest Place": card.querySelector('.acc-arrest-place')?.value || '',
-                    "Date of arrest (if arrested)": card.querySelector('.acc-arrest-date')?.value || '',
-                    "Bail status": card.querySelector('.acc-bail-status')?.value || ''
+                    name: name,
+                    father: card.querySelector('.acc-father')?.value || '',
+                    age: card.querySelector('.acc-age')?.value || '',
+                    address: card.querySelector('.acc-address')?.value || '',
+                    aadharNumber: card.querySelector('.acc-aadhar')?.value || '',
+                    aadharUrl: card.dataset.aadharUrl || '',
+                    photoUrl: card.dataset.photoUrl || '',
+                    arrested: card.querySelector('.acc-arrested')?.value === 'TRUE',
+                    arrestPlace: card.querySelector('.acc-arrest-place')?.value || '',
+                    arrestDate: card.querySelector('.acc-arrest-date')?.value || '',
+                    bailStatus: card.querySelector('.acc-bail-status')?.value || ''
                 });
             }
         });
         return list;
     }
     
-    // ==================== SUBMIT CASE ====================
     async function submitCase() {
-        const caseNumber = document.getElementById('caseNumber').value.trim();
-        if (!caseNumber) {
+        if (!document.getElementById('caseNumber').value.trim()) {
             showStatus('❌ Case Number is required', 'error');
             return;
         }
@@ -460,124 +575,99 @@
             return;
         }
         
-        const groupId = document.getElementById('groupId').value || Date.now().toString();
-        
-        const master = {
-            "Group identifier (same for all accused in a case)": groupId,
-            "FIR / CSR": document.getElementById('caseType').value,
-            "Head": document.getElementById('head').value,
-            "Case number (e.g., FIR 123/2024)": caseNumber,
-            "Sections": document.getElementById('sections').value,
-            "Date of Occurrence": document.getElementById('doDate').value,
-            "Time of Occurrence": document.getElementById('doTime').value,
-            "Date of Report": document.getElementById('drDate').value,
-            "Time of Report": document.getElementById('drTime').value,
-            "Scene of Crime": document.getElementById('sceneOfCrime').value,
-            "Complainant name, address, contact": document.getElementById('complainantDetails').value,
-            "Brief summary of complaint": document.getElementById('complaintSummary').value,
-            "Seized property details": document.getElementById('propertySeizedSelect').value === 'Yes' ? document.getElementById('propertySeized').value : '',
-            "Charge sheeted date": document.getElementById('chargeSheetSelect').value === 'Yes' ? document.getElementById('chargeSheetDate').value : '',
-            "Opinion received date": document.getElementById('opinionSelect').value === 'Yes' ? document.getElementById('opinionDate').value : '',
-            "e-Filing date": document.getElementById('efilingSelect').value === 'Yes' ? document.getElementById('efilingDate').value : '',
-            "LTN Number": document.getElementById('efilingSelect').value === 'Yes' ? document.getElementById('ltnNumber').value : '',
-            "SR Number": document.getElementById('srSelect').value === 'Yes' ? document.getElementById('srNumber').value : '',
-            "SR Date": document.getElementById('srSelect').value === 'Yes' ? document.getElementById('srDate').value : '',
-            "CC / SC / PRC number": document.getElementById('ccSelect').value === 'Yes' ? document.getElementById('ccNumber').value : '',
-            "CC Date": document.getElementById('ccSelect').value === 'Yes' ? document.getElementById('ccDate').value : '',
-            "Additional notes": document.getElementById('remarks').value
-        };
-        
-        const records = accused.map(acc => ({ ...master, ...acc }));
-        
-        showStatus('Submitting to Google Sheets...', 'info');
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
-        
-        try {
-            const result = await postRequest({ action: 'createBatch', records: records });
-            
-            if (result.success) {
-                showStatus(`✅ Case ${groupId} registered with ${accused.length} accused persons`, 'success');
-                resetForm();
-                fetchCases();
-                document.getElementById('tabCasesBtn').click();
-            } else {
-                throw new Error(result.error || 'Registration failed');
-            }
-        } catch (error) {
-            showStatus(`❌ Registration failed: ${error.message}`, 'error');
-            console.error('Submit error:', error);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Register Case';
-        }
-    }
-    
-    window.deleteCase = async function(groupId) {
-        if (!confirm(`⚠️ Delete Case ${groupId}?\n\nThis will permanently remove all accused records from Google Sheets.`)) return;
-        
-        showStatus('Deleting case from Google Sheets...', 'info');
-        try {
-            const result = await postRequest({ action: 'deleteCaseGroup', groupId: groupId });
-            
-            if (result.success) {
-                showStatus(`✅ Case ${groupId} deleted successfully`, 'success');
-                fetchCases();
-            } else {
-                throw new Error(result.error);
-            }
-        } catch (error) {
-            showStatus(`❌ Delete failed: ${error.message}`, 'error');
-        }
-    };
-    
-    // ==================== UI RENDERING ====================
-    function renderTable() {
-        if (!allRecords.length) {
-            document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" class="text-center">📭 No cases registered yet. Create your first case!</td></tr>';
+        // Validate arrested accused have photos
+        const missingPhoto = accused.filter(a => a.arrested && !a.photoUrl);
+        if (missingPhoto.length > 0) {
+            showStatus(`❌ Please upload arrest photos for: ${missingPhoto.map(a => a.name).join(', ')}`, 'error');
             return;
         }
         
-        const groups = new Map();
-        allRecords.forEach(record => {
-            const gid = record["Group identifier (same for all accused in a case)"];
-            if (!groups.has(gid)) groups.set(gid, []);
-            groups.get(gid).push(record);
-        });
+        const caseData = {
+            groupId: document.getElementById('groupId').value || Date.now().toString(),
+            caseType: document.getElementById('caseType').value,
+            head: document.getElementById('head').value,
+            caseNumber: document.getElementById('caseNumber').value,
+            sections: document.getElementById('sections').value,
+            doDate: document.getElementById('doDate').value,
+            doTime: document.getElementById('doTime').value,
+            drDate: document.getElementById('drDate').value,
+            drTime: document.getElementById('drTime').value,
+            sceneOfCrime: document.getElementById('sceneOfCrime').value,
+            complainantDetails: document.getElementById('complainantDetails').value,
+            complaintSummary: document.getElementById('complaintSummary').value,
+            propertySeized: document.getElementById('propertySeizedSelect').value === 'Yes',
+            propertyDescription: document.getElementById('propertySeizedSelect').value === 'Yes' ? document.getElementById('propertyDescription').value : '',
+            propertyPhotos: evidenceUrls.propertyPhotos,
+            hospitalIntimation: document.getElementById('hospitalIntimationSelect').value === 'Yes',
+            hospitalDetails: document.getElementById('hospitalIntimationSelect').value === 'Yes' ? document.getElementById('hospitalDetails').value : '',
+            arCopyUrls: evidenceUrls.arCopy,
+            chargeSheetDate: document.getElementById('chargeSheetSelect').value === 'Yes' ? document.getElementById('chargeSheetDate').value : '',
+            remarks: document.getElementById('remarks').value,
+            evidenceUrls: { complainantId: evidenceUrls.complainantId, complaintCopy: evidenceUrls.complaintCopy },
+            accused: accused,
+            timestamp: new Date().toISOString()
+        };
         
-        const filter = document.getElementById('filterCaseType').value;
-        const search = document.getElementById('searchInput').value.trim().toLowerCase();
+        showStatus('Saving case to storage...', 'info');
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         
-        let html = '';
-        for (const [gid, group] of groups) {
-            const master = group[0];
-            const type = master["FIR / CSR"] || '—';
-            const caseNo = master["Case number (e.g., FIR 123/2024)"] || '—';
-            const head = master["Head"] || '—';
-            const sections = master["Sections"] || '—';
-            const accusedNames = group.map(a => a["Accused person's full name"]).filter(n => n).join(', ');
-            
-            let stage = 'Under Investigation';
-            if (master["e-Filing date"]) stage = 'e-Filed';
-            else if (master["CC / SC / PRC number"]) stage = 'Court Assigned';
-            
-            if (filter !== 'all' && type !== filter) continue;
-            if (search && !gid.toString().includes(search) && !caseNo.toLowerCase().includes(search) && !head.toLowerCase().includes(search) && !accusedNames.toLowerCase().includes(search)) continue;
-            
-            html += `<tr>
-                <td><strong class="clickable" data-group="${escapeHtml(gid)}">${escapeHtml(gid)}</strong></td>
-                <td><span class="case-badge ${type === 'FIR' ? 'badge-fir' : 'badge-csr'}">${escapeHtml(type)}</span></td>
-                <td class="clickable" data-group="${escapeHtml(gid)}">${escapeHtml(caseNo)}</td>
-                <td>${escapeHtml(head)}</td>
-                <td>${escapeHtml(sections)}</td>
-                <td><strong>${escapeHtml(accusedNames.substring(0, 50))}${accusedNames.length > 50 ? '...' : ''}</strong></td>
-                <td>${escapeHtml(stage)}</td>
-                <td><button class="btn-danger btn-sm" onclick="deleteCase('${escapeHtml(gid)}')"><i class="fas fa-trash"></i> Delete</button></td>
-            </tr>`;
+        try {
+            const existing = JSON.parse(localStorage.getItem('caseflow_cases') || '[]');
+            existing.push(caseData);
+            localStorage.setItem('caseflow_cases', JSON.stringify(existing));
+            showStatus(`✅ Case ${caseData.groupId} registered with ${accused.length} accused and Google Drive evidence`, 'success');
+            resetForm();
+            loadCases();
+            document.getElementById('tabCasesBtn').click();
+        } catch(e) {
+            showStatus('Error saving case: ' + e.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Register Case';
+        }
+    }
+    
+    function loadCases() {
+        allCases = JSON.parse(localStorage.getItem('caseflow_cases') || '[]');
+        renderTable();
+        updateStats();
+        updateGroupId();
+        showStatus(`✅ Loaded ${allCases.length} cases`, 'success');
+    }
+    
+    function renderTable() {
+        if (!allCases.length) {
+            document.getElementById('tableBody').innerHTML = '<td><td colspan="8" class="text-center">📭 No cases registered yet. Create your first case!</td></tr>';
+            return;
         }
         
-        document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="8" class="text-center">No matching cases found</td></tr>';
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const filter = document.getElementById('filterCaseType').value;
+        let html = '';
+        
+        allCases.forEach(c => {
+            if (filter !== 'all' && c.caseType !== filter) return;
+            if (search && !c.groupId.includes(search) && !c.caseNumber.toLowerCase().includes(search)) return;
+            
+            const evidenceCount = (c.propertyPhotos?.length || 0) + (c.arCopyUrls?.length || 0) + 
+                                 (c.evidenceUrls?.complainantId?.length || 0) + (c.evidenceUrls?.complaintCopy?.length || 0) +
+                                 (c.accused?.filter(a => a.photoUrl || a.aadharUrl).length || 0);
+            
+            html += `<tr>
+                <td><strong class="clickable" data-group="${c.groupId}">${c.groupId}</strong></td>
+                <td><span class="case-badge ${c.caseType === 'FIR' ? 'badge-fir' : 'badge-csr'}">${c.caseType}</span></td>
+                <td class="clickable" data-group="${c.groupId}">${c.caseNumber}</td>
+                <td>${c.head || '—'}</td>
+                <td><strong>${c.accused.map(a => a.name).join(', ').substring(0, 40)}</strong></td>
+                <td><span class="evidence-badge"><i class="fab fa-google-drive"></i> ${evidenceCount} files</span></td>
+                <td>Registered</td>
+                <td><button class="btn-danger btn-sm" onclick="deleteCase('${c.groupId}')"><i class="fas fa-trash"></i> Delete</button></td>
+            </tr>`;
+        });
+        
+        document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="8" class="text-center">No matching cases</td></tr>';
         
         document.querySelectorAll('.clickable').forEach(el => {
             el.addEventListener('click', () => showCaseDetails(el.dataset.group));
@@ -585,147 +675,155 @@
     }
     
     function showCaseDetails(groupId) {
-        const caseRecords = allRecords.filter(r => String(r["Group identifier (same for all accused in a case)"]) === String(groupId));
-        if (!caseRecords.length) return;
+        const c = allCases.find(c => c.groupId === groupId);
+        if (!c) return;
         
-        const master = caseRecords[0];
-        let html = `
-            <div style="margin-bottom: 20px;">
-                <h3>📋 Case Information</h3>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    <div><strong>Group ID:</strong> ${escapeHtml(groupId)}</div>
-                    <div><strong>Case Type:</strong> ${escapeHtml(master["FIR / CSR"])}</div>
-                    <div><strong>Case Number:</strong> ${escapeHtml(master["Case number (e.g., FIR 123/2024)"])}</div>
-                    <div><strong>Head:</strong> ${escapeHtml(master["Head"])}</div>
-                    <div><strong>Sections:</strong> ${escapeHtml(master["Sections"])}</div>
-                    <div><strong>Complainant:</strong> ${escapeHtml(master["Complainant name, address, contact"])}</div>
-                </div>
-            </div>
-            <div>
-                <h3>👤 Accused Persons (${caseRecords.length})</h3>
-                <table style="width:100%; border-collapse:collapse;">
-                    <thead><tr style="background:#f0f4f9;"><th>#</th><th>Name</th><th>Father</th><th>Arrested</th></tr></thead>
-                    <tbody>`;
+        const gallery = (title, items) => {
+            if (!items || !items.length) return '';
+            return `<div><h4>${title}</h4><div class="evidence-gallery">${items.map(i => `<div class="evidence-card"><i class="fab fa-google-drive fa-2x"></i><div><a href="${i.url}" target="_blank">${i.name.substring(0, 35)}</a></div></div>`).join('')}</div></div>`;
+        };
         
-        caseRecords.forEach((rec, idx) => {
-            html += `<tr>
-                <td>${idx + 1}</td>
-                <td><strong>${escapeHtml(rec["Accused person's full name"])}</strong></td>
-                <td>${escapeHtml(rec["Father's name of accused"])}</td>
-                <td>${rec["TRUE / FALSE (arrested in this case)"] === 'TRUE' ? '✅ Yes' : '❌ No'}</td>
-            </tr>`;
-        });
+        const accusedHtml = `<div class="evidence-gallery">${c.accused.map(a => `<div class="evidence-card">
+            <strong>${a.name}</strong><br>
+            <small>${a.father || ''}</small><br>
+            <small>${(a.address || '').substring(0, 60)}</small><br>
+            ${a.arrested ? '<span style="background:#dc3545;color:white;padding:2px 6px;border-radius:10px;font-size:0.65rem;">Arrested</span><br>' : ''}
+            ${a.photoUrl ? `<a href="${a.photoUrl}" target="_blank"><i class="fas fa-camera"></i> Arrest Photo</a><br>` : ''}
+            ${a.aadharUrl ? `<a href="${a.aadharUrl}" target="_blank"><i class="fas fa-id-card"></i> Aadhar</a>` : ''}
+        </div>`).join('')}</div>`;
         
-        html += `</tbody></table></div>`;
-        
-        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('modalBody').innerHTML = `
+            <h3>Case: ${c.caseNumber}</h3>
+            <p><strong>Group ID:</strong> ${c.groupId} | <strong>Type:</strong> ${c.caseType}</p>
+            <p><strong>Head:</strong> ${c.head} | <strong>Sections:</strong> ${c.sections}</p>
+            <p><strong>Scene of Crime:</strong> ${c.sceneOfCrime || 'Not specified'}</p>
+            <p><strong>Complainant:</strong> ${c.complainantDetails}</p>
+            <p><strong>Summary:</strong> ${c.complaintSummary}</p>
+            <h3>👤 Accused Persons</h3>${accusedHtml}
+            ${c.propertySeized ? `<h3><i class="fas fa-box"></i> Property Seized</h3><p>${c.propertyDescription}</p>${gallery('Property Photos', c.propertyPhotos)}` : ''}
+            ${c.hospitalIntimation ? `<h3><i class="fas fa-hospital"></i> Hospital Intimation</h3><p>${c.hospitalDetails}</p>${gallery('AR Copy / Medical Report', c.arCopyUrls)}` : ''}
+            ${gallery('📄 Complainant ID Proofs', c.evidenceUrls?.complainantId)}
+            ${gallery('📋 Complaint/FIR Copies', c.evidenceUrls?.complaintCopy)}
+        `;
         document.getElementById('caseModal').style.display = 'block';
     }
     
-    function updateStats() {
-        if (!allRecords.length) {
-            document.getElementById('totalCases').textContent = '0';
-            document.getElementById('totalAccused').textContent = '0';
-            document.getElementById('firCount').textContent = '0';
-            document.getElementById('csrCount').textContent = '0';
-            return;
+    function deleteCase(groupId) {
+        if (confirm(`Delete case ${groupId}? This will remove all records.`)) {
+            let cases = JSON.parse(localStorage.getItem('caseflow_cases') || '[]');
+            cases = cases.filter(c => c.groupId !== groupId);
+            localStorage.setItem('caseflow_cases', JSON.stringify(cases));
+            loadCases();
+            showStatus(`✅ Case ${groupId} deleted`, 'success');
         }
-        
-        const groups = new Set();
-        let fir = 0, csr = 0;
-        allRecords.forEach(record => {
-            const gid = record["Group identifier (same for all accused in a case)"];
-            if (gid) groups.add(gid);
-            const type = record["FIR / CSR"];
-            if (type === 'FIR') fir++;
-            else if (type === 'CSR') csr++;
-        });
-        
-        document.getElementById('totalCases').textContent = groups.size;
-        document.getElementById('totalAccused').textContent = allRecords.length;
-        document.getElementById('firCount').textContent = fir;
-        document.getElementById('csrCount').textContent = csr;
+    }
+    
+    function updateStats() {
+        document.getElementById('totalCases').textContent = allCases.length;
+        document.getElementById('totalAccused').textContent = allCases.reduce((s, c) => s + (c.accused?.length || 0), 0);
+        document.getElementById('firCount').textContent = allCases.filter(c => c.caseType === 'FIR').length;
+        document.getElementById('csrCount').textContent = allCases.filter(c => c.caseType === 'CSR').length;
     }
     
     function updateGroupId() {
-        const existingIds = new Set();
-        allRecords.forEach(record => {
-            const gid = record["Group identifier (same for all accused in a case)"];
-            if (gid && !isNaN(parseInt(gid))) existingIds.add(parseInt(gid));
-        });
-        let nextId = 1;
-        while (existingIds.has(nextId)) nextId++;
-        document.getElementById('groupId').value = nextId;
+        let maxId = 0;
+        allCases.forEach(c => { let id = parseInt(c.groupId); if (!isNaN(id) && id > maxId) maxId = id; });
+        document.getElementById('groupId').value = maxId + 1;
     }
     
     function resetForm() {
-        document.getElementById('caseType').value = 'FIR';
-        document.getElementById('head').value = '';
         document.getElementById('caseNumber').value = '';
+        document.getElementById('head').value = '';
         document.getElementById('sections').value = '';
+        document.getElementById('complainantDetails').value = '';
+        document.getElementById('complaintSummary').value = '';
+        document.getElementById('remarks').value = '';
         document.getElementById('doDate').value = '';
         document.getElementById('doTime').value = '';
         document.getElementById('drDate').value = '';
         document.getElementById('drTime').value = '';
         document.getElementById('sceneOfCrime').value = '';
-        document.getElementById('complainantDetails').value = '';
-        document.getElementById('complaintSummary').value = '';
-        document.getElementById('propertySeized').value = '';
+        document.getElementById('propertyDescription').value = '';
+        document.getElementById('hospitalDetails').value = '';
         document.getElementById('propertySeizedSelect').value = 'No';
-        document.getElementById('propertySeizedField').style.display = 'none';
-        document.getElementById('chargeSheetSelect').value = 'No';
-        document.getElementById('chargeSheetDateField').style.display = 'none';
-        document.getElementById('opinionSelect').value = 'No';
-        document.getElementById('opinionDateField').style.display = 'none';
-        document.getElementById('opinionRow').style.display = 'none';
-        document.getElementById('efilingSelect').value = 'No';
-        document.getElementById('efilingDateField').style.display = 'none';
-        document.getElementById('ltnField').style.display = 'none';
-        document.getElementById('efilingRow').style.display = 'none';
-        document.getElementById('srSelect').value = 'No';
-        document.getElementById('srNumberField').style.display = 'none';
-        document.getElementById('srDateField').style.display = 'none';
-        document.getElementById('srRow').style.display = 'none';
-        document.getElementById('ccSelect').value = 'No';
-        document.getElementById('ccNumberField').style.display = 'none';
-        document.getElementById('ccDateField').style.display = 'none';
-        document.getElementById('ccRow').style.display = 'none';
-        document.getElementById('remarks').value = '';
-        document.getElementById('chargeSheetDate').value = '';
-        document.getElementById('opinionDate').value = '';
-        document.getElementById('efilingDate').value = '';
-        document.getElementById('ltnNumber').value = '';
-        document.getElementById('srNumber').value = '';
-        document.getElementById('srDate').value = '';
-        document.getElementById('ccNumber').value = '';
-        document.getElementById('ccDate').value = '';
+        document.getElementById('hospitalIntimationSelect').value = 'No';
+        document.getElementById('propertySeizedSection').classList.add('hidden');
+        document.getElementById('hospitalIntimationSection').classList.add('hidden');
+        
+        evidenceUrls = { complainantId: [], complaintCopy: [], propertyPhotos: [], arCopy: [] };
+        ['complainantIdPreview', 'complaintCopyPreview', 'propertyPhotosPreview', 'arCopyPreview'].forEach(id => document.getElementById(id).innerHTML = '');
+        ['complainantIdUrls', 'complaintCopyUrls', 'propertyPhotosUrls', 'arCopyUrls'].forEach(id => document.getElementById(id).innerHTML = '');
         
         document.getElementById('accusedContainer').innerHTML = '';
         accusedCounter = 0;
         addAccused();
-        
         updateGroupId();
     }
     
-    function showStatus(message, type) {
-        const statusDiv = document.getElementById('statusMsg');
-        statusDiv.innerHTML = message;
-        statusDiv.className = `status ${type}`;
+    function showStatus(msg, type) {
+        const div = document.getElementById('statusMsg');
+        div.innerHTML = msg;
+        div.className = `status ${type}`;
         setTimeout(() => {
-            if (statusDiv.className === `status ${type}` && type !== 'error') {
-                statusDiv.className = 'status info';
-                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Ready';
+            if (div.className === `status ${type}`) {
+                div.className = 'status info';
+                div.innerHTML = '<i class="fas fa-check-circle"></i> Ready';
             }
         }, 5000);
     }
     
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-    }
+    // Event Listeners
+    document.getElementById('propertySeizedSelect').onchange = function() {
+        document.getElementById('propertySeizedSection').classList.toggle('hidden', this.value !== 'Yes');
+    };
+    document.getElementById('hospitalIntimationSelect').onchange = function() {
+        document.getElementById('hospitalIntimationSection').classList.toggle('hidden', this.value !== 'Yes');
+    };
+    document.getElementById('chargeSheetSelect').onchange = function() {
+        document.getElementById('chargeSheetDateField').style.display = this.value === 'Yes' ? 'block' : 'none';
+    };
     
-    document.querySelector('.close-modal').onclick = () => document.getElementById('caseModal').style.display = 'none';
-    window.onclick = (e) => { if (e.target === document.getElementById('caseModal')) document.getElementById('caseModal').style.display = 'none'; };
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        loadGoogleApis();
+        checkExistingToken();
+        document.getElementById('connectDriveBtn').onclick = handleDriveSignIn;
+        
+        setupUpload('complainantIdInput', 'complainantIdPreview', 'complainantIdUrls', 'complainantId', 'Complainant_IDs');
+        setupUpload('complaintCopyInput', 'complaintCopyPreview', 'complaintCopyUrls', 'complaintCopy', 'Complaint_Copies');
+        setupUpload('propertyPhotosInput', 'propertyPhotosPreview', 'propertyPhotosUrls', 'propertyPhotos', 'Property_Photos');
+        setupUpload('arCopyInput', 'arCopyPreview', 'arCopyUrls', 'arCopy', 'AR_Copies');
+        
+        document.getElementById('tabRegisterBtn').onclick = () => {
+            document.getElementById('registerTab').style.display = 'block';
+            document.getElementById('casesTab').style.display = 'none';
+            document.getElementById('tabRegisterBtn').style.borderBottom = '3px solid #1a6b8a';
+            document.getElementById('tabCasesBtn').style.borderBottom = 'transparent';
+        };
+        document.getElementById('tabCasesBtn').onclick = () => {
+            document.getElementById('registerTab').style.display = 'none';
+            document.getElementById('casesTab').style.display = 'block';
+            document.getElementById('tabCasesBtn').style.borderBottom = '3px solid #1a6b8a';
+            document.getElementById('tabRegisterBtn').style.borderBottom = 'transparent';
+            loadCases();
+        };
+        document.getElementById('dashboardToggleBtn').onclick = () => {
+            const grid = document.getElementById('statsGrid');
+            grid.classList.toggle('hidden');
+            if (!grid.classList.contains('hidden')) updateStats();
+        };
+        document.getElementById('submitBtn').onclick = submitCase;
+        document.getElementById('resetBtn').onclick = resetForm;
+        document.getElementById('refreshBtn').onclick = loadCases;
+        document.getElementById('searchInput').addEventListener('input', renderTable);
+        document.getElementById('filterCaseType').addEventListener('change', renderTable);
+        
+        addAccused();
+        loadCases();
+        
+        document.querySelector('.close-modal').onclick = () => document.getElementById('caseModal').style.display = 'none';
+        window.onclick = (e) => { if (e.target === document.getElementById('caseModal')) document.getElementById('caseModal').style.display = 'none'; };
+    });
 </script>
 </body>
 </html>
