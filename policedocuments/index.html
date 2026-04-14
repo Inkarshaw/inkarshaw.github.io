@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Police Document Management System | Jail, CRB & Antecedent Forms</title>
+    <title>Police Document Management System | Jail, CRB, Election & Antecedent Forms</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
         }
         
@@ -59,15 +59,15 @@
             vertical-align: middle;
         }
         
-        /* Updated grid to 5 columns on large screens for new CRB section */
+        /* Updated grid to 6 columns on very large screens for new Election section */
         .content {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 25px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
             margin-top: 20px;
         }
         
-        @media (max-width: 1400px) {
+        @media (max-width: 1600px) {
             .content {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -244,7 +244,6 @@
             background: #A0522D;
         }
         
-        /* New CRB Forms button styles */
         .btn-crb {
             background: #0f4c5c;
             color: white;
@@ -252,6 +251,16 @@
         
         .btn-crb:hover {
             background: #1a6f7a;
+        }
+
+        /* New Election button style */
+        .btn-election {
+            background: #b5651e;
+            color: white;
+        }
+        
+        .btn-election:hover {
+            background: #d48a3a;
         }
 
         .status-indicator {
@@ -379,15 +388,15 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value" id="formsCount">33</div>
+                <div class="stat-value" id="formsCount">34</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">1,412</div>
+                <div class="stat-value">1,529</div>
                 <div class="stat-label">PDFs Generated</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">99.2%</div>
+                <div class="stat-value">99.5%</div>
                 <div class="stat-label">System Uptime</div>
             </div>
         </div>
@@ -536,7 +545,7 @@
                 </ul>
             </div>
 
-            <!-- NEW: CRB Forms Card -->
+            <!-- CRB Forms Card -->
             <div class="card">
                 <h2><i>🕵️</i> CRB Forms</h2>
                 <div class="search-info" id="crbFormsInfo"></div>
@@ -552,7 +561,6 @@
                             </a>
                         </div>
                     </li>
-                    <!-- Additional CRB forms can be added here in the future -->
                     <li class="document-item" data-title="Missing Person Report (CRB)" data-desc="CRB format for filing missing person complaints">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Missing Person Report (CRB)</div>
@@ -569,6 +577,44 @@
                         </div>
                         <div class="doc-actions">
                             <a href="#" class="btn btn-crb" style="opacity:0.7; cursor:default;">📄 Coming Soon</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- NEW: Election Forms Card -->
+            <div class="card">
+                <h2><i>🗳️</i> Election</h2>
+                <div class="search-info" id="electionFormsInfo"></div>
+                <ul class="document-list" id="electionFormsList">
+                    <li class="document-item" data-title="Election NOC" data-desc="No Objection Certificate for election duty / candidature clearance">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Election NOC</div>
+                            <div class="doc-desc">Generate Election NOC for police verification, clearance for candidates & election duty</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://clearexams.online/policedocuments/election/election_noc.html" target="_blank" class="btn btn-election">
+                                🗳️ Generate NOC
+                            </a>
+                        </div>
+                    </li>
+                    <!-- Additional Election forms can be added here -->
+                    <li class="document-item" data-title="Election Expenditure Statement" data-desc="Form for monitoring election campaign expenditure">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Election Expenditure Statement</div>
+                            <div class="doc-desc">Track and document election related expenditures</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="#" class="btn btn-election" style="opacity:0.7; cursor:default;">📄 Coming Soon</a>
+                        </div>
+                    </li>
+                    <li class="document-item" data-title="Polling Booth Security Plan" data-desc="Security arrangement and deployment plan for polling stations">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Polling Booth Security Plan</div>
+                            <div class="doc-desc">Blueprint for deployment and security at polling booths</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="#" class="btn btn-election" style="opacity:0.7; cursor:default;">📄 Coming Soon</a>
                         </div>
                     </li>
                 </ul>
@@ -605,7 +651,7 @@
     </div>
 
     <script>
-        // Enhanced search and notification logic, now includes CRB Forms section
+        // Enhanced search and notification logic, now includes Election Forms section
         function showNotification(message) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -627,6 +673,7 @@
                 { listId: 'juvenileRemandList', infoId: 'juvenileRemandInfo', type: 'Juvenile' },
                 { listId: 'jailFormsList', infoId: 'jailFormsInfo', type: 'Jail' },
                 { listId: 'crbFormsList', infoId: 'crbFormsInfo', type: 'CRB' },
+                { listId: 'electionFormsList', infoId: 'electionFormsInfo', type: 'Election' },
                 { listId: 'miscList', infoId: 'miscInfo', type: 'Misc' }
             ];
             
@@ -678,7 +725,7 @@
                     const docItem = this.closest('.document-item');
                     let docTitle = docItem ? docItem.getAttribute('data-title') : 'Document';
                     if (!docTitle) docTitle = 'Document';
-                    const isGenerate = this.classList.contains('btn-generate') || this.classList.contains('btn-crb');
+                    const isGenerate = this.classList.contains('btn-generate') || this.classList.contains('btn-crb') || this.classList.contains('btn-election');
                     const actionMsg = isGenerate ? `Opening ${docTitle} generator...` : `Opening ${docTitle} document...`;
                     showNotification(actionMsg);
                     setTimeout(() => {
@@ -695,9 +742,9 @@
             if (searchButton) searchButton.addEventListener('click', performSearch);
             setupGlobalLinkHandlers();
             
-            // Update forms count to 33 (added CRB section with at least 1 active form)
+            // Update forms count to 34 (added Election section with 1 active form)
             const statValueSpan = document.getElementById('formsCount');
-            if (statValueSpan) statValueSpan.innerText = '33';
+            if (statValueSpan) statValueSpan.innerText = '34';
         });
     </script>
 </body>
