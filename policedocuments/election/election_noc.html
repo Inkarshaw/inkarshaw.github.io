@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Election Document Generator | Tamil Bamini Font - Recipient Line Removed</title>
+    <!-- html2pdf.js for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f5f5;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', 'Tamil MN', 'Mangal', 'Noto Sans Tamil', 'Segoe UI', system-ui, sans-serif;
+            padding: 20px;
+        }
+
+        /* Main container - no outer border */
+        .app-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: #ffffff;
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Form panel */
+        .form-panel {
+            flex: 1.2;
+            min-width: 340px;
+            background: #ffffff;
+            border-right: 1px solid #000000;
+            padding: 24px 22px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Preview panel */
+        .preview-panel {
+            flex: 1.8;
+            min-width: 540px;
+            background: #ffffff;
+            padding: 24px 28px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #000000;
+            border-left: 3px solid #000000;
+            padding-left: 16px;
+            margin-bottom: 20px;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            font-weight: 700;
+            color: #000000;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #000000;
+            border-radius: 0px;
+            background: #ffffff;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', 'Segoe UI', monospace;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            color: #000000;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 65px;
+        }
+
+        .row-2col {
+            display: flex;
+            gap: 14px;
+        }
+        .row-2col > div {
+            flex: 1;
+        }
+
+        button {
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #000000;
+            padding: 11px 16px;
+            border-radius: 0px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: 0.2s;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+        button:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+        }
+        .btn-reset {
+            background: #ffffff;
+            border: 1px solid #000000;
+        }
+        .btn-reset:hover {
+            background: #f0f0f0;
+        }
+
+        /* ========= PDF DOCUMENT STYLES - FULL BAMINI FONT ========= */
+        .pdf-doc {
+            background: #ffffff;
+            overflow: hidden;
+            box-shadow: none;
+        }
+        
+        .document-inner {
+            padding: 28px 28px 22px 28px;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', 'Tamil MN', 'Noto Sans Tamil', serif;
+            font-size: 12.5px;
+            line-height: 1.45;
+            color: #000000;
+            background: #ffffff;
+        }
+        
+        /* Top center header - காவல் துறை in Bamini */
+        .top-center-header {
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #000000;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+        
+        /* Header table - black borders only - single row */
+        .election-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+            font-size: 12px;
+        }
+        .election-table td {
+            border: 1px solid #000000;
+            padding: 6px 8px;
+            vertical-align: top;
+        }
+        .table-label {
+            background-color: #ffffff;
+            font-weight: 700;
+            width: 42%;
+        }
+        
+        .ref-line {
+            font-weight: 600;
+            margin: 4px 0 3px;
+            font-size: 12px;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+        .recipient-line {
+            margin: 5px 0 8px;
+            font-size: 12px;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+        .subject-card {
+            background: #ffffff;
+            padding: 8px 12px;
+            border-left: 3px solid #000000;
+            margin: 12px 0 10px;
+            border-radius: 0px;
+            font-size: 12px;
+            border-top: 1px solid #000000;
+            border-right: 1px solid #000000;
+            border-bottom: 1px solid #000000;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+        .main-body-text {
+            text-align: justify;
+            margin: 10px 0;
+            font-size: 12px;
+            line-height: 1.45;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+        .legal-note {
+            margin: 12px 0 12px 0;
+            border-left: 3px solid #000000;
+            padding-left: 12px;
+            font-size: 11.5px;
+            line-height: 1.4;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+        }
+        
+        /* Single cell table for footer */
+        .footer-single-table {
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: 0;
+            width: auto;
+            min-width: 180px;
+            max-width: 250px;
+        }
+        .footer-single-table td {
+            border: 1px solid #000000;
+            padding: 8px 12px;
+            text-align: center;
+            vertical-align: middle;
+            font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;
+            font-size: 11px;
+            line-height: 1.5;
+            background: #ffffff;
+        }
+        
+        @media (max-width: 600px) {
+            .footer-single-table td {
+                white-space: normal;
+            }
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .bamini-badge {
+            background: #ffffff;
+            color: #000000;
+            padding: 4px 14px;
+            border-radius: 0px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: monospace;
+            border: 1px solid #000000;
+        }
+        
+        @media (max-width: 850px) {
+            .app-container {
+                flex-direction: column;
+            }
+            .form-panel {
+                border-right: none;
+                border-bottom: 1px solid #000000;
+                max-height: none;
+            }
+            .document-inner {
+                padding: 20px;
+            }
+            .footer-single-table {
+                margin-left: auto;
+                margin-right: 0;
+            }
+        }
+        
+        /* Embedded font-face for Bamini */
+        @font-face {
+            font-family: 'Bamini';
+            src: local('Bamini'), local('Tamil Bamini'), local('Bamini Tamil');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Tamil Bamini';
+            src: local('Bamini'), local('Tamil Bamini');
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- LEFT: EDITABLE FORM -->
+    <div class="form-panel">
+        <h2>📄 தேர்தல் ஆவணம் / Election Form</h2>
+        <h2 style="font-size: 0.9rem; border-left: none; margin-top: -10px; margin-bottom: 15px; color:#000000;">✨ Full Tamil Bamini Font PDF | Recipient Line Removed</h2>
+        <form id="docForm">
+            <div class="row-2col">
+                <div class="form-group">
+                    <label>C.No / Reference</label>
+                    <input type="text" id="refNo" value="C.No.75/Election/SDO/G7/2026">
+                </div>
+                <div class="form-group">
+                    <label>Date (DD.MM.YYYY)</label>
+                    <input type="text" id="docDate" value="10.04.2026">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Application Ref No</label>
+                <input type="text" id="appRefNo" value="32AC116069">
+            </div>
+            <div class="form-group">
+                <label>To (Recipient) - முகவரி</label>
+                <input type="text" id="recipientAddr" value="மா;அஹ்.">
+            </div>
+            <div class="form-group">
+                <label>Subject Line - பொருள்</label>
+                <textarea id="subjectText" rows="2">பொருள்: காவல் துறை? கீழ்நிலை அலுவலர்கள்? திரு/மகிழ்நன்$. மாவட்ட உதவி அலுவலர்கள் என்பவர்கள் எங்கள் தமிழகம் காவல் துறையின் சார்பில் அனுமதி வழங்கி நடத்தை கட்டுப்பாட்டிற்கு அனுமதி வழங்க வேண்டுமா? இது தொடர்பாக/</textarea>
+            </div>
+            <div class="form-group">
+                <label>Main Content (Body) - முக்கிய உள்ளடக்கம்</label>
+                <textarea id="mainContent" rows="4">எங்கள் தமிழகம் காவல் துறையின் சார்பில் வருகின்ற சட்டப்பூர்வ நடவடிக்கைகளை முன்னிறுத்தி வாக்குச்சீட்டு பட்டியலில் பகுதியாக மகிழ்நகர் மாவட்டத்தில் தொடங்கி ஏழு$ஆண்டு வரை மாவட்ட ஆட்சியர்/ மாவட்ட காவல் கண்காணிப்பாளர் மாவட்டம். தேர்தல் நடத்தை மாவட்டம். பகுதியின் வழித்தடம் மாவட்டம். காஞ்சிபுரம்$ மாவட்ட பகுதி வரை பல்வேறு காரணங்கள் 14/04/2026 காலை 09:00 மணி முதல் மதியம் 01:00 மணி வரை அனுமதி வழங்கி நடத்தை நடத்திக்கொண்டிருக்கிறது. நிகழ்ச்சியில் 1. பிரிவு / 20. வாக்காளர்கள் 20 வெவ்வேறு பிரிவுகளுடன் 20 நபர்கள் நடத்தை கட்டுப்பாட்டிற்கான அனுமதி கேட்டு விண்ணப்பத்தை சமர்ப்பித்துள்ளார்/</textarea>
+            </div>
+            <div class="form-group">
+                <label>Footer / Legal Clause - அடிக்குறிப்பு</label>
+                <textarea id="footerNote" rows="2">காவல் துறையின் விதிமுறைகளுக்கு உட்பட்டும். பொதுமக்களுக்கும் பொதுநலனுக்கும். இடையூறு விளைவிக்காத வகையில் அனுமதி வழங்கி நடத்தை கட்டுப்பாட்டை நடத்தி ஆவணங்களை பதிவு செய்ய காவல் துறையின் ஒத்துழைப்புடன் அனுமதி வழங்க மறுப்பு இல்லை என்பதை இதன் மூலம் உறுதிப்படுத்தி பெறப்படுகிறது/</textarea>
+            </div>
+            <button type="button" id="generatePdfBtn">📄 Generate PDF (Full Tamil Bamini Font)</button>
+            <button type="button" id="resetBtn" class="btn-reset">⟳ Reset to Original</button>
+            <p style="font-size: 11px; margin-top: 14px; text-align:center; color:#000000;">✅ "பெறுநர்: மா;அஹ்." line removed from document.</p>
+        </form>
+    </div>
+
+    <!-- RIGHT: PREVIEW - FULL BAMINI FONT, RECIPIENT LINE REMOVED -->
+    <div class="preview-panel">
+        <div class="preview-header">
+            <h2>📄 Preview (Full Tamil Bamini)</h2>
+            <span class="bamini-badge">📜 Recipient Line Removed | Pure Bamini</span>
+        </div>
+        <div id="pdfPreviewContainer">
+            <div id="livePreview" class="pdf-doc">
+                <div class="document-inner" id="dynamicInner">
+                    <!-- dynamic content - recipient line removed -->
+                </div>
+            </div>
+        </div>
+        <p style="margin-top: 14px; font-size: 11px; text-align: center; background:#ffffff; padding: 6px; border: 1px solid #000000;">✍️ "பெறுநர்: மா;அஹ்." line has been removed as requested.</p>
+    </div>
+</div>
+
+<script>
+    // DOM elements
+    const refNoInput = document.getElementById('refNo');
+    const docDateInput = document.getElementById('docDate');
+    const appRefNoInput = document.getElementById('appRefNo');
+    const subjectTextarea = document.getElementById('subjectText');
+    const mainContentTextarea = document.getElementById('mainContent');
+    const footerNoteTextarea = document.getElementById('footerNote');
+    const dynamicInner = document.getElementById('dynamicInner');
+    
+    // Full Tamil Bamini encoded content for the header table - SINGLE ROW only
+    const fromOfficeText = "மேற்கேள்வி;<br>காவல் ஆய்வாளர்.";
+    const toOfficeText = "பெறுநர்;<br>நடுவர் நடத்தும் அலுவலர்கள்.<br>வாக்குச்சீட்டு பட்டியல்.<br>தேர்தல் நடத்தை. சென்னை?31";
+    
+    function buildFullBaminiDocumentHTML() {
+        const refNo = refNoInput.value.trim() || "C.No.75/Election/SDO/G7/2026";
+        const docDate = docDateInput.value.trim() || "10.04.2026";
+        const appRefNo = appRefNoInput.value.trim() || "32AC116069";
+        const subject = subjectTextarea.value.trim() || "பொருள்: காவல் துறை? கீழ்நிலை அலுவலர்கள்? திரு/மகிழ்நன்$. மாவட்ட உதவி அலுவலர்கள் என்பவர்கள் எங்கள் தமிழகம் காவல் துறையின் சார்பில் அனுமதி வழங்கி நடத்தை கட்டுப்பாட்டிற்கு அனுமதி வழங்க வேண்டுமா? இது தொடர்பாக/";
+        let mainContent = mainContentTextarea.value.trim();
+        if (!mainContent) {
+            mainContent = "எங்கள் தமிழகம் காவல் துறையின் சார்பில் வருகின்ற சட்டப்பூர்வ நடவடிக்கைகளை முன்னிறுத்தி வாக்குச்சீட்டு பட்டியலில் பகுதியாக மகிழ்நகர் மாவட்டத்தில் தொடங்கி ஏழு$ஆண்டு வரை மாவட்ட ஆட்சியர்/ மாவட்ட காவல் கண்காணிப்பாளர் மாவட்டம். தேர்தல் நடத்தை மாவட்டம். பகுதியின் வழித்தடம் மாவட்டம். காஞ்சிபுரம்$ மாவட்ட பகுதி வரை பல்வேறு காரணங்கள் 14/04/2026 காலை 09:00 மணி முதல் மதியம் 01:00 மணி வரை அனுமதி வழங்கி நடத்தை நடத்திக்கொண்டிருக்கிறது. நிகழ்ச்சியில் 1. பிரிவு / 20. வாக்காளர்கள் 20 வெவ்வேறு பிரிவுகளுடன் 20 நபர்கள் நடத்தை கட்டுப்பாட்டிற்கான அனுமதி கேட்டு விண்ணப்பத்தை சமர்ப்பித்துள்ளார்/";
+        }
+        const footerNote = footerNoteTextarea.value.trim() || "காவல் துறையின் விதிமுறைகளுக்கு உட்பட்டும். பொதுமக்களுக்கும் பொதுநலனுக்கும். இடையூறு விளைவிக்காத வகையில் அனுமதி வழங்கி நடத்தை கட்டுப்பாட்டை நடத்தி ஆவணங்களை பதிவு செய்ய காவல் துறையின் ஒத்துழைப்புடன் அனுமதி வழங்க மறுப்பு இல்லை என்பதை இதன் மூலம் உறுதிப்படுத்தி பெறப்படுகிறது/";
+        
+        return `
+            <div style="font-family: 'Bamini', 'Tamil Bamini', 'Latha', 'Tamil MN', 'Noto Sans Tamil', serif; color: #000000;">
+                <!-- TOP CENTER HEADER: காவல் துறை in Bamini -->
+                <div class="top-center-header" style="text-align: center; font-weight: 700; font-size: 16px; letter-spacing: 1px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #000000;">
+                    காவல் துறை
+                </div>
+                
+                <!-- Header Table - SINGLE ROW ONLY -->
+                <table class="election-table" style="width:100%; border-collapse: collapse; font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif;">
+                    <tr>
+                        <td class="table-label" style="border:1px solid #000000; padding:5px 7px; background:#ffffff; font-weight:bold;">
+                            ${fromOfficeText}
+                        </td>
+                        <td style="border:1px solid #000000; padding:5px 7px; background:#ffffff;">
+                            ${toOfficeText}
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Reference lines - English numbers preserved -->
+                <div class="ref-line"><strong>${refNo}</strong>, நாள்: ${docDate}</div>
+                <div class="ref-line" style="margin-bottom: 8px;"><strong>குறிப்பு எண்.${appRefNo}</strong></div>
+                
+                <!-- "பெறுநர்: மா;அஹ்." LINE REMOVED as requested -->
+                
+                <div class="subject-card">
+                    <strong>பொருள் / Subject:</strong><br> ${subject}
+                </div>
+                
+                <div class="main-body-text">
+                    ${mainContent}
+                </div>
+                
+                <div class="legal-note">
+                    ${footerNote}
+                </div>
+                
+                <!-- SINGLE CELL TABLE - FOOTER WITH BAMINI TEXT -->
+                <table class="footer-single-table" style="border-collapse: collapse; margin-top: 20px; margin-left: auto; margin-right: 0; width: auto; min-width: 180px; max-width: 250px;">
+                    <tr>
+                        <td style="border: 1px solid #000000; padding: 8px 12px; text-align: center; vertical-align: middle; font-family: 'Bamini', 'Tamil Bamini', 'Latha', serif; font-size: 11px; line-height: 1.5; background: #ffffff;">
+                            காவல் ஆய்வாளர்<br>
+                            தேர்தல் காவல் நிலையம் (G7)<br>
+                            தேர்தல் நடத்தை. சென்னை?31
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        `;
+    }
+    
+    function updatePreview() {
+        const html = buildFullBaminiDocumentHTML();
+        dynamicInner.innerHTML = html;
+    }
+    
+    const allFields = [refNoInput, docDateInput, appRefNoInput, subjectTextarea, mainContentTextarea, footerNoteTextarea];
+    allFields.forEach(field => {
+        field.addEventListener('input', updatePreview);
+        field.addEventListener('change', updatePreview);
+    });
+    
+    function generateBaminiPDF() {
+        const previewElement = document.getElementById('livePreview');
+        if (!previewElement) return;
+        
+        const clone = previewElement.cloneNode(true);
+        clone.style.margin = "0";
+        clone.style.padding = "0";
+        clone.style.backgroundColor = "#ffffff";
+        clone.style.border = "none";
+        
+        const innerDiv = clone.querySelector('.document-inner');
+        if (innerDiv) {
+            innerDiv.style.padding = "0.35in 0.35in 0.28in 0.35in";
+            innerDiv.style.fontFamily = "'Bamini', 'Tamil Bamini', 'Latha', 'Tamil MN', 'Noto Sans Tamil', serif";
+            innerDiv.style.backgroundColor = "#ffffff";
+            innerDiv.style.color = "#000000";
+        }
+        
+        const pdfDocDiv = clone.querySelector('.pdf-doc');
+        if (pdfDocDiv) {
+            pdfDocDiv.style.border = "none";
+        }
+        
+        const allElements = clone.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.backgroundColor = "#ffffff";
+            el.style.color = "#000000";
+            const currentFont = window.getComputedStyle(el).fontFamily;
+            if (!currentFont.includes('Bamini') && !currentFont.includes('Tamil')) {
+                el.style.fontFamily = "'Bamini', 'Tamil Bamini', 'Latha', 'Tamil MN', 'Noto Sans Tamil', serif";
+            }
+        });
+        
+        const wrapper = document.createElement('div');
+        wrapper.style.background = "#ffffff";
+        wrapper.style.width = "100%";
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+        
+        const pdfOptions = {
+            margin:        [0.4, 0.45, 0.35, 0.45],
+            filename:     `Election_Notice_Bamini_${docDateInput.value.replace(/\//g, '-') || '2026'}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { 
+                scale: 2.2, 
+                letterRendering: true, 
+                logging: false,
+                useCORS: false,
+                backgroundColor: "#ffffff"
+            },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait', compress: true }
+        };
+        
+        html2pdf().set(pdfOptions).from(wrapper).save().then(() => {
+            document.body.removeChild(wrapper);
+        }).catch(err => {
+            console.error("PDF generation error:", err);
+            document.body.removeChild(wrapper);
+            alert("PDF generation failed. Please ensure your system supports Tamil Bamini font.");
+        });
+    }
+    
+    function resetToOriginal() {
+        refNoInput.value = "C.No.75/Election/SDO/G7/2026";
+        docDateInput.value = "10.04.2026";
+        appRefNoInput.value = "32AC116069";
+        subjectTextarea.value = "பொருள்: காவல் துறை? கீழ்நிலை அலுவலர்கள்? திரு/மகிழ்நன்$. மாவட்ட உதவி அலுவலர்கள் என்பவர்கள் எங்கள் தமிழகம் காவல் துறையின் சார்பில் அனுமதி வழங்கி நடத்தை கட்டுப்பாட்டிற்கு அனுமதி வழங்க வேண்டுமா? இது தொடர்பாக/";
+        mainContentTextarea.value = "எங்கள் தமிழகம் காவல் துறையின் சார்பில் வருகின்ற சட்டப்பூர்வ நடவடிக்கைகளை முன்னிறுத்தி வாக்குச்சீட்டு பட்டியலில் பகுதியாக மகிழ்நகர் மாவட்டத்தில் தொடங்கி ஏழு$ஆண்டு வரை மாவட்ட ஆட்சியர்/ மாவட்ட காவல் கண்காணிப்பாளர் மாவட்டம். தேர்தல் நடத்தை மாவட்டம். பகுதியின் வழித்தடம் மாவட்டம். காஞ்சிபுரம்$ மாவட்ட பகுதி வரை பல்வேறு காரணங்கள் 14/04/2026 காலை 09:00 மணி முதல் மதியம் 01:00 மணி வரை அனுமதி வழங்கி நடத்தை நடத்திக்கொண்டிருக்கிறது. நிகழ்ச்சியில் 1. பிரிவு / 20. வாக்காளர்கள் 20 வெவ்வேறு பிரிவுகளுடன் 20 நபர்கள் நடத்தை கட்டுப்பாட்டிற்கான அனுமதி கேட்டு விண்ணப்பத்தை சமர்ப்பித்துள்ளார்/";
+        footerNoteTextarea.value = "காவல் துறையின் விதிமுறைகளுக்கு உட்பட்டும். பொதுமக்களுக்கும் பொதுநலனுக்கும். இடையூறு விளைவிக்காத வகையில் அனுமதி வழங்கி நடத்தை கட்டுப்பாட்டை நடத்தி ஆவணங்களை பதிவு செய்ய காவல் துறையின் ஒத்துழைப்புடன் அனுமதி வழங்க மறுப்பு இல்லை என்பதை இதன் மூலம் உறுதிப்படுத்தி பெறப்படுகிறது/";
+        updatePreview();
+    }
+    
+    const generateBtn = document.getElementById('generatePdfBtn');
+    generateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        generateBaminiPDF();
+    });
+    
+    const resetButton = document.getElementById('resetBtn');
+    resetButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetToOriginal();
+    });
+    
+    updatePreview();
+</script>
+</body>
+</html>
