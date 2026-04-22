@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Criminal Intelligence Gazette - Clean B&W Final</title>
+    <!-- jsPDF + html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Font Awesome (only for form interface, NOT used in PDF) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #ffffff;
+            font-family: 'Times New Roman', Times, serif;
+            padding: 30px 20px;
+        }
+
+        .app-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        /* FORM PANEL - interface only */
+        .form-panel {
+            flex: 1.2;
+            min-width: 340px;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+            padding: 24px 28px;
+            transition: 0.2s;
+            max-height: 90vh;
+            overflow-y: auto;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .form-panel h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            border-left: 3px solid #000000;
+            padding-left: 18px;
+            margin-bottom: 20px;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #000000;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .input-group label i {
+            width: 20px;
+            color: #000000;
+        }
+
+        input, textarea, select {
+            padding: 9px 12px;
+            border: 1px solid #999999;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: 'Times New Roman', Times, serif;
+            background: #ffffff;
+            color: #000000;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: none;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .photo-upload-area {
+            background: #ffffff;
+            border: 1px solid #999999;
+            border-radius: 4px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 4px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000000;
+        }
+
+        .photo-upload-area:hover {
+            background: #f5f5f5;
+            border-color: #000000;
+        }
+
+        .photo-preview-sm {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .photo-preview-sm img {
+            max-width: 100%;
+            max-height: 100px;
+            border-radius: 4px;
+            border: 1px solid #666666;
+        }
+
+        .remove-photo {
+            background: #eeeeee;
+            border: 1px solid #999999;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-top: 6px;
+            cursor: pointer;
+            color: #000000;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .btn-group {
+            margin-top: 28px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 1px solid #000000;
+            padding: 12px 26px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            font-family: 'Times New Roman', Times, serif;
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .btn-pdf {
+            background: #000000;
+            color: white;
+            border: none;
+        }
+
+        .btn-pdf:hover {
+            background: #333333;
+        }
+
+        .btn-refresh {
+            background: #ffffff;
+            border: 1px solid #000000;
+            color: #000000;
+        }
+
+        .btn-refresh:hover {
+            background: #f0f0f0;
+        }
+
+        /* PREVIEW PANEL */
+        .preview-panel {
+            flex: 1;
+            min-width: 450px;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            font-family: 'Times New Roman', Times, serif;
+            border-bottom: 1px solid #cccccc;
+            padding-bottom: 10px;
+        }
+
+        .preview-header h3 {
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .preview-header span {
+            background: transparent;
+            border: 1px solid #999999;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #000000;
+        }
+
+        /* GAZETTE CARD - NO OUTER BORDER */
+        .gazette-card {
+            background: white;
+            padding: 26px 28px;
+            font-family: 'Times New Roman', Times, serif;
+            border: none;
+            box-shadow: none;
+        }
+
+        .gazette-header {
+            text-align: center;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* REDUCED FONT SIZE for main title */
+        .gazette-header h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #000000;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .gazette-header h3 {
+            font-size: 0.75rem;
+            color: #000000;
+            margin-top: 4px;
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: normal;
+        }
+
+        /* Unknown person section - NO VERTICAL BORDERS */
+        .unknown-badge {
+            text-align: center;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            margin: 14px 0;
+            background: transparent;
+            font-family: 'Times New Roman', Times, serif;
+            border: none;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.78rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .info-table td, .info-table th {
+            border: 1px solid #000000;
+            padding: 8px 10px;
+            vertical-align: top;
+            font-family: 'Times New Roman', Times, serif;
+            background: transparent;
+            color: #000000;
+        }
+
+        .info-table th {
+            background: transparent;
+            font-weight: 700;
+            width: 32%;
+        }
+
+        .photo-cell {
+            text-align: center;
+            vertical-align: middle;
+            background: transparent;
+        }
+
+        .photo-frame {
+            padding: 8px;
+        }
+
+        .photo-frame img {
+            max-width: 100%;
+            max-height: 110px;
+            border-radius: 0px;
+            border: 1px solid #000000;
+            object-fit: cover;
+        }
+
+        .no-photo-text {
+            font-size: 9px;
+            color: #000000;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .clothing-list, .marks-list {
+            margin: 0;
+            padding-left: 20px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000000;
+        }
+
+        .authorities-block {
+            margin-top: 20px;
+            border-top: 2px solid #000000;
+            padding-top: 16px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .authorities-flex {
+            display: flex;
+            gap: 18px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .auth-item {
+            flex: 1;
+            background: transparent;
+            padding: 10px 12px;
+            border-left: 3px solid #000000;
+            font-size: 0.72rem;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000000;
+        }
+
+        /* NO FOOTER, NO ICONS anywhere in PDF */
+        .footer-date {
+            display: none;
+        }
+        
+        /* Ensure no icon fonts appear in gazette card */
+        .gazette-card i, .gazette-card .fas, .gazette-card .far, .gazette-card .fab {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- LEFT: Input form (icons allowed here for UI only) -->
+    <div class="form-panel">
+        <h2><i class="fas fa-id-card"></i> CIG Intelligence Entry</h2>
+        <div class="form-grid">
+            <div class="input-group">
+                <label><i class="fas fa-map-marker-alt"></i> District & PS</label>
+                <input type="text" id="district" value="Kilpauk, G7 Chetpet PS">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-hashtag"></i> Crime Number & Law</label>
+                <input type="text" id="crimeNumber" value="G7 PS Cr.No. 88/2026 U/S 194 BNSS">
+            </div>
+            <div class="input-group">
+                <label><i class="far fa-calendar-alt"></i> Date of Report</label>
+                <input type="text" id="reportDate" value="11.04.2026 AT Before 06.00 Hrs">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-venus-mars"></i> Sex / Age</label>
+                <input type="text" id="sexAge" value="Male">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-face-smile"></i> Face / Hair</label>
+                <input type="text" id="faceHair" value="Oval /Black & White -- 3Cm(approx.)">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-arrows-alt-v"></i> Height / Built</label>
+                <input type="text" id="heightBuilt" value="5.5 feet & Medium Built">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-palette"></i> Color Complexion</label>
+                <input type="text" id="complexion" value="Black Color">
+            </div>
+            <div class="input-group full-width">
+                <label><i class="fas fa-tshirt"></i> Cloths (each on new line)</label>
+                <textarea id="clothes" rows="2">1. Yellow Colour Half hand shirt
+2. Dark blue color pant</textarea>
+            </div>
+            <div class="input-group full-width">
+                <label><i class="fas fa-dot-circle"></i> Identification Marks</label>
+                <textarea id="marks" rows="2">1. A Black Mole on the lower abdomen.
+2. A Black Mole on the left side of the abdomen</textarea>
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-user-tie"></i> Authority 1 (Name/Address)</label>
+                <input type="text" id="auth1" value="The Inspector of Police, G7 Chetpet P.S Chennai 31.">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-phone-alt"></i> Authority 1 Contact</label>
+                <input type="text" id="auth1Phone" value="9498100026">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-user-tie"></i> Authority 2 (Name/Address)</label>
+                <input type="text" id="auth2" value="The Asst. Commissioner of Police Crime Records Bureau Vepery, Chennai-7">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-phone-alt"></i> Authority 2 Contact</label>
+                <input type="text" id="auth2Phone" value="">
+            </div>
+            <div class="input-group full-width">
+                <label><i class="fas fa-user-tag"></i> Unknown Person Name</label>
+                <input type="text" id="personName" value="UNKNOWN PERSON">
+            </div>
+            <!-- PHOTO UPLOAD -->
+            <div class="input-group full-width">
+                <label><i class="fas fa-camera"></i> Suspect Photo (Upload Image)</label>
+                <div class="photo-upload-area" id="photoUploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i> Click to upload photo<br>
+                    <small style="font-size:11px;">JPG, PNG (max 2MB)</small>
+                    <input type="file" id="photoInput" accept="image/jpeg, image/png, image/jpg" style="display: none;">
+                </div>
+                <div id="photoPreviewContainer" class="photo-preview-sm"></div>
+                <button type="button" id="removePhotoBtn" class="remove-photo" style="display: none;"><i class="fas fa-trash-alt"></i> Remove Photo</button>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-pdf" id="generatePdfBtn"><i class="fas fa-file-pdf"></i> Download PDF Gazette</button>
+            <button class="btn btn-refresh" id="refreshPreviewBtn"><i class="fas fa-sync-alt"></i> Refresh Preview</button>
+        </div>
+        <p style="font-size: 11px; margin-top: 20px; color: #000000; font-family:'Times New Roman', Times, serif;"><i class="fas fa-info-circle"></i> Pure black & white official format. No icons, no colors, no borders on unknown person, no outer border, no CONFIDENTIAL text. Title font size reduced.</p>
+    </div>
+
+    <!-- RIGHT: Live Gazette Preview -->
+    <div class="preview-panel">
+        <div class="preview-header">
+            <h3>Gazette Preview (Clean B&W)</h3>
+            <span>Official Format</span>
+        </div>
+        <div id="gazetteContainer">
+            <div id="gazetteCard" class="gazette-card">
+                <!-- dynamic B&W content -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global variable for uploaded photo
+    let uploadedPhotoBase64 = null;
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function formatBulletList(text) {
+        if (!text.trim()) return '—';
+        const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+        if (lines.length === 0) return '—';
+        let html = '<ul class="clothing-list" style="margin:0; padding-left:20px; list-style-type:disc;">';
+        lines.forEach(line => {
+            html += `<li style="margin-bottom:3px;">${escapeHtml(line)}</li>`;
+        });
+        html += '</ul>';
+        return html;
+    }
+
+    // Render pure black & white gazette - NO outer border, NO CONFIDENTIAL, reduced title font
+    function updateGazettePreview() {
+        const district = document.getElementById('district').value;
+        const crimeNumber = document.getElementById('crimeNumber').value;
+        const reportDate = document.getElementById('reportDate').value;
+        const sexAge = document.getElementById('sexAge').value;
+        const faceHair = document.getElementById('faceHair').value;
+        const heightBuilt = document.getElementById('heightBuilt').value;
+        const complexion = document.getElementById('complexion').value;
+        const clothesRaw = document.getElementById('clothes').value;
+        const marksRaw = document.getElementById('marks').value;
+        const auth1 = document.getElementById('auth1').value;
+        const auth1Phone = document.getElementById('auth1Phone').value;
+        const auth2 = document.getElementById('auth2').value;
+        const auth2Phone = document.getElementById('auth2Phone').value;
+        let personName = document.getElementById('personName').value;
+        
+        // Remove any (RAMESH) occurrence
+        if (personName) {
+            personName = personName.replace(/\(RAMESH\)/gi, '').replace(/\s+/g, ' ').trim();
+            if (personName === "") personName = "UNKNOWN PERSON";
+        } else {
+            personName = "UNKNOWN PERSON";
+        }
+        
+        const clothesHtml = formatBulletList(clothesRaw);
+        const marksHtml = formatBulletList(marksRaw);
+
+        let photoHtml = '';
+        if (uploadedPhotoBase64) {
+            photoHtml = `<div class="photo-frame"><img src="${uploadedPhotoBase64}" alt="Suspect photo" style="max-width:130px; max-height:120px; width:auto; height:auto; border:1px solid #000000;"></div>`;
+        } else {
+            photoHtml = `<div class="photo-frame"><div style="font-size:48px; color:#000000; text-align:center;">📷</div><div class="no-photo-text">No Photo</div></div>`;
+        }
+
+        // Title font size already reduced via CSS (1.2rem)
+        const gazetteHTML = `
+            <div class="gazette-header">
+                <h1>CRIMINAL INTELLIGENCE GAZETTE</h1>
+                <h3>WEEKLY BASIS</h3>
+            </div>
+            <div class="unknown-badge">
+                ${escapeHtml(personName)}
+            </div>
+            <table class="info-table">
+                <tr>
+                    <th>District and Police Station</th>
+                    <td colspan="2">${escapeHtml(district)}</td>
+                    <td rowspan="4" class="photo-cell" style="width:130px; text-align:center;">${photoHtml}</td>
+                </tr>
+                <tr><th>Crime Number & Section of Law</th><td colspan="2">${escapeHtml(crimeNumber)}</td></tr>
+                <tr><th>Date of Report</th><td colspan="2">${escapeHtml(reportDate)}</td></tr>
+                <tr><th>Sex / Age</th><td colspan="2">${escapeHtml(sexAge)}</td></tr>
+                <tr><th>Face / Hair</th><td colspan="3">${escapeHtml(faceHair)}</td></tr>
+                <tr><th>Height / Built</th><td colspan="3">${escapeHtml(heightBuilt)}</td></tr>
+                <tr><th>Color Complexion</th><td colspan="3">${escapeHtml(complexion)}</td></tr>
+                <tr><th>Cloths</th><td colspan="3">${clothesHtml}</td></tr>
+                <tr><th>Identification Marks</th><td colspan="3">${marksHtml}</td></tr>
+            </table>
+            <div class="authorities-block">
+                <strong>AUTHORITIES TO BE INTIMATED WITH CONTACT NUMBER</strong>
+                <div class="authorities-flex">
+                    <div class="auth-item">
+                        <strong>Authority 1</strong><br>
+                        ${escapeHtml(auth1)}<br>
+                        ${auth1Phone ? `Contact: ${escapeHtml(auth1Phone)}` : '—'}
+                    </div>
+                    <div class="auth-item">
+                        <strong>Authority 2</strong><br>
+                        ${escapeHtml(auth2)}<br>
+                        ${auth2Phone ? `Contact: ${escapeHtml(auth2Phone)}` : '—'}
+                    </div>
+                </div>
+            </div>
+        `;
+        const gazetteCardDiv = document.getElementById('gazetteCard');
+        if (gazetteCardDiv) gazetteCardDiv.innerHTML = gazetteHTML;
+    }
+
+    // Photo upload handler
+    function setupPhotoUpload() {
+        const fileInput = document.getElementById('photoInput');
+        const uploadArea = document.getElementById('photoUploadArea');
+        const previewContainer = document.getElementById('photoPreviewContainer');
+        const removeBtn = document.getElementById('removePhotoBtn');
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('File too large. Maximum 2MB.');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    uploadedPhotoBase64 = ev.target.result;
+                    previewContainer.innerHTML = `<img src="${uploadedPhotoBase64}" style="max-width:100px; max-height:80px; border:1px solid #666;">`;
+                    removeBtn.style.display = 'inline-block';
+                    updateGazettePreview();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid JPG or PNG image.');
+            }
+        });
+
+        removeBtn.addEventListener('click', () => {
+            uploadedPhotoBase64 = null;
+            fileInput.value = '';
+            previewContainer.innerHTML = '';
+            removeBtn.style.display = 'none';
+            updateGazettePreview();
+        });
+    }
+
+    // PDF Generation - pure B&W capture
+    async function generatePDF() {
+        const element = document.getElementById('gazetteCard');
+        if (!element) {
+            alert("Preview element missing!");
+            return;
+        }
+
+        const btn = document.getElementById('generatePdfBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Generating PDF...';
+        btn.disabled = true;
+
+        try {
+            updateGazettePreview();
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const canvas = await html2canvas(element, {
+                scale: 3,
+                backgroundColor: '#ffffff',
+                logging: false,
+                useCORS: true,
+                letterRendering: true
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            let pdf = new jsPDF('p', 'mm', 'a4');
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            
+            let heightLeft = imgHeight;
+            if (imgHeight > pageHeight) {
+                heightLeft -= pageHeight;
+                while (heightLeft > 0) {
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, - (imgHeight - heightLeft), imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+            }
+            
+            const fileName = `Criminal_Intelligence_Gazette_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`;
+            pdf.save(fileName);
+        } catch (error) {
+            console.error("PDF error:", error);
+            alert("PDF generation failed: " + error.message);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    function refreshPreview() {
+        updateGazettePreview();
+        const card = document.getElementById('gazetteCard');
+        if (card) {
+            card.style.transition = '0.1s';
+            card.style.outline = '1px solid #000';
+            setTimeout(() => { card.style.outline = ''; }, 300);
+        }
+    }
+
+    function bindFormEvents() {
+        const fields = ['district', 'crimeNumber', 'reportDate', 'sexAge', 'faceHair', 'heightBuilt', 'complexion', 'clothes', 'marks', 'auth1', 'auth1Phone', 'auth2', 'auth2Phone', 'personName'];
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => updateGazettePreview());
+                el.addEventListener('change', () => updateGazettePreview());
+            }
+        });
+    }
+
+    function setOriginalDefaults() {
+        document.getElementById('district').value = "Kilpauk, G7 Chetpet PS";
+        document.getElementById('crimeNumber').value = "G7 PS Cr.No. 88/2026 U/S 194 BNSS";
+        document.getElementById('reportDate').value = "11.04.2026 AT Before 06.00 Hrs";
+        document.getElementById('sexAge').value = "Male";
+        document.getElementById('faceHair').value = "Oval /Black & White -- 3Cm(approx.)";
+        document.getElementById('heightBuilt').value = "5.5 feet & Medium Built";
+        document.getElementById('complexion').value = "Black Color";
+        document.getElementById('clothes').value = "1. Yellow Colour Half hand shirt\n2. Dark blue color pant";
+        document.getElementById('marks').value = "1. A Black Mole on the lower abdomen.\n2. A Black Mole on the left side of the abdomen";
+        document.getElementById('auth1').value = "The Inspector of Police, G7 Chetpet P.S Chennai 31.";
+        document.getElementById('auth1Phone').value = "9498100026";
+        document.getElementById('auth2').value = "The Asst. Commissioner of Police Crime Records Bureau Vepery, Chennai-7";
+        document.getElementById('auth2Phone').value = "";
+        document.getElementById('personName').value = "UNKNOWN PERSON";
+        uploadedPhotoBase64 = null;
+        const previewContainer = document.getElementById('photoPreviewContainer');
+        if(previewContainer) previewContainer.innerHTML = '';
+        const removeBtn = document.getElementById('removePhotoBtn');
+        if(removeBtn) removeBtn.style.display = 'none';
+        updateGazettePreview();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        setOriginalDefaults();
+        bindFormEvents();
+        setupPhotoUpload();
+        document.getElementById('generatePdfBtn').addEventListener('click', generatePDF);
+        document.getElementById('refreshPreviewBtn').addEventListener('click', refreshPreview);
+        updateGazettePreview();
+    });
+</script>
+</body>
+</html>
