@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CRB கடிதம் - தமிழ் யுனிகோடு | PDF பதிவிறக்கம்</title>
+    <!-- html2canvas + jsPDF for reliable PDF rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+            font-family: 'Segoe UI', 'Noto Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        .main-container {
+            max-width: 1060px;
+            width: 100%;
+            background: transparent;
+        }
+
+        /* Input Controls Panel */
+        .input-panel {
+            background: #ffffff;
+            border: 1px solid #2c3e4e;
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        .input-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .input-field-group label {
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            color: #1e2f3a;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', monospace;
+        }
+        .input-field-group input, .input-field-group textarea {
+            padding: 8px 10px;
+            border: 1px solid #a0b8c5;
+            background: #fffef7;
+            font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: 0.1s linear;
+        }
+        .input-field-group input:focus, .input-field-group textarea:focus {
+            border-color: #000000;
+            background: #fffae6;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+        }
+        .apply-btn {
+            grid-column: span 2;
+            background: #f3f6f8;
+            color: #000;
+            border: 1px solid #2c3e4e;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            transition: 0.1s;
+            margin-top: 6px;
+            border-radius: 3px;
+        }
+        .apply-btn:hover {
+            background: #e2e9ef;
+            border-color: black;
+        }
+
+        /* Document Card - Legal Style */
+        .document-card {
+            width: 100%;
+            background: white;
+            border: 1px solid #1e2f3a;
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
+            border-radius: 2px;
+        }
+
+        .legal-paper {
+            padding: 1.8rem 2.2rem;
+            background: white;
+            color: #000000;
+            line-height: 1.5;
+            font-size: 13px;
+        }
+
+        /* Tamil Unicode Font Support - Full standard */
+        .tamil-text, .legal-paper, p, div, span, table, td, .info-label, .info-value, .signature-box,
+        .header-left, .copy-section, .iah-section, .content-paragraph {
+            font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', 'Segoe UI Emoji', sans-serif;
+            font-weight: normal;
+        }
+
+        .header-left {
+            text-align: left;
+            margin-bottom: 0.7rem;
+            line-height: 1.45;
+            font-size: 12px;
+        }
+        .copy-section {
+            text-align: left;
+            margin-bottom: 0.5rem;
+            margin-top: 0.4rem;
+            line-height: 1.4;
+            font-size: 12px;
+        }
+        .iah-section {
+            text-align: left;
+            margin-bottom: 0.9rem;
+            margin-top: 0.2rem;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .info-row {
+            margin: 0.7rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            border: 1px solid #111;
+            background: white;
+        }
+        .info-label {
+            width: 28%;
+            padding: 8px 12px;
+            font-weight: 700;
+            border-right: 1px solid black;
+            background: #fefaf0;
+            letter-spacing: 0.2px;
+        }
+        .info-value {
+            width: 72%;
+            padding: 8px 12px;
+            background: white;
+        }
+
+        .content-paragraph {
+            margin: 14px 0;
+            text-align: justify;
+            line-height: 1.55;
+        }
+
+        .signature-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            margin-bottom: 0.3rem;
+        }
+        .signature-box {
+            text-align: center;
+            line-height: 1.65;
+        }
+        .signature-box div {
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .action-bar {
+            background: #f8fafc;
+            padding: 12px 2rem;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #2c3e4e;
+            gap: 14px;
+        }
+        button {
+            background: white;
+            color: black;
+            border: 1px solid #1e2f3a;
+            padding: 7px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12.5px;
+            transition: 0.1s;
+            font-family: inherit;
+            border-radius: 3px;
+        }
+        button:hover {
+            background: #e2e8ed;
+            border-color: black;
+            transform: translateY(-1px);
+        }
+
+        /* Loader overlay for PDF */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.1s, opacity 0.2s;
+        }
+        .loader-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .loader-content {
+            background: white;
+            padding: 28px 42px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            border: 1px solid black;
+            font-family: 'Segoe UI', 'Noto Sans', monospace;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid #ccc;
+            border-top: 4px solid #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 700px) {
+            .legal-paper {
+                padding: 1.2rem;
+            }
+            .info-label, .info-value {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            .info-row {
+                flex-direction: column;
+            }
+            .input-panel {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-content">
+        <div class="spinner"></div>
+        <div class="loader-text">PDF தயாராகிறது...<br>தயவுசெய்து காத்திருக்கவும்</div>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- Input Panel for dynamic data -->
+    <div class="input-panel">
+        <div class="input-field-group">
+            <label>⚖️ வழக்கு எண் (CRB)</label>
+            <input type="text" id="inputCaseNumber" value="88/2026">
+        </div>
+        <div class="input-field-group">
+            <label>📜 BNSS பிரிவு</label>
+            <input type="text" id="inputBnss" value="194 BNSS">
+        </div>
+        <div class="input-field-group">
+            <label>📅 சம்பவ தேதி</label>
+            <input type="text" id="inputIncidentDate" value="11.04.2026">
+        </div>
+        <div class="input-field-group">
+            <label>📆 புகார் தேதி</label>
+            <input type="text" id="inputComplaintDate" value="11.04.2025">
+        </div>
+        <div class="input-field-group">
+            <label>🧓 இறந்தவரின் வயது</label>
+            <input type="text" id="inputAgeValue" value="55">
+        </div>
+        <div class="input-field-group">
+            <label>👤 சந்தேக நபர் வயது</label>
+            <input type="text" id="inputSubjectAge" value="55-தஜ்">
+        </div>
+        <div class="input-field-group">
+            <label>🔢 பாதிக்கப்பட்டவர் எண்</label>
+            <input type="text" id="inputVictimNum" value="42">
+        </div>
+        <div class="input-field-group">
+            <label>📎 GYD குறிப்பு</label>
+            <input type="text" id="inputGydRef" value="108 ஆம் GYD">
+        </div>
+        <div class="input-field-group">
+            <label>⏰ நேரம் (24hr)</label>
+            <input type="text" id="inputTime" value="07.30">
+        </div>
+        <button class="apply-btn" id="applyBtn">⟳ புதுப்பிக்கவும் / மாற்றங்களைப் பயன்படுத்தவும்</button>
+    </div>
+
+    <!-- Official CRB Letter Content in Tamil Unicode -->
+    <div class="document-card">
+        <div class="legal-paper tamil-text" id="pdfContent">
+            <div class="header-left">
+                <div>மதிப்பிற்குரிய அவர்களே,</div>
+                <div>காவல் ஆய்வாளர் (ஆ&எ)</div>
+                <div>[போ 7 நற்சான்றிதழ் காவல்நிலையம்,</div>
+                <div>சென்னை - 31.</div>
+            </div>
+
+            <div class="copy-section">
+                <div>நகல் மூலம்,</div>
+                <div>துணை மாஜிஸ்திரேட் அவர்கள்,</div>
+                <div>குற்ற ஆவணக் காப்பகம் (C.R.B),</div>
+                <div>நெடுஞ்சாலை, சென்னை-07.</div>
+            </div>
+
+            <div class="iah-section">
+                <div>இது மூலம்&gt;</div>
+            </div>
+
+            <!-- Information rows (Dynamic Tamil Unicode) -->
+            <div class="info-row">
+                <div class="info-label">பொருள்:</div>
+                <div class="info-value" id="subjectTextDisplay">இறந்த நபரின் பெயர் தெரியாத ஆண் <span id="subjectAgeSpan">55-தஜ்</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">குறிப்பு:</div>
+                <div class="info-value">\[போ 7 நற்சான்றிதழ் காவல்நிலைய குற்ற எண்: <span id="caseNumberSpan">88/2026</span> பிரிவு <span id="bnssSpan">194 BNSS</span></div>
+            </div>
+
+            <!-- Main legal narrative in pure Tamil Unicode -->
+            <p class="content-paragraph">
+                மேற்குறிப்பிட்ட வழக்கில் புகார்தாரர் எம்/55 வயது நிரந்தர முகவரி எண். 
+                <span id="victimNumSpan">42</span> \> இளங்கோ செட்டி தெரு, கிழக்கு மேடு, இராமநாதபுரம், 
+                சென்னை என்பவர் அளித்த புகாரின் அடிப்படையில் 
+                <span id="incidentDateSpan">11.04.2026</span> ஆம் நாள் \[போ 7 நற்சான்றிதழ் காவல் நிலைய
+                எல்லைக்குட்பட்ட கிழக்கு உதகமண்டலம் காவல் நிலையத்தில் தங்கியிருந்த சுமார் 
+                <span id="ageValueSpan">55</span> வயது மதிக்கத்தக்க பெயர் தெரியாத ஆண் நபரை 
+                <span id="gydRefSpan">108 ஆம் GYD</span> மூலம் பிடித்து விசாரித்த போது அவர் இறந்து போனதாக தெரிய வந்ததுடன் 
+                இறந்தவரின் சடலத்தின் மீது விசாரணை செய்து சட்டப்படி நடவடிக்கை எடுக்கும்படி புகாரில் கோரிக்கை விடுக்கப்பட்டு 
+                <span id="complaintDateSpan">11.04.2025</span> ஆம் நாள் 
+                <span id="timeSpan">07.30</span> மணிக்கு \[போ-7 நற்சான்றிதழ் காவல்நிலைய குற்ற எண்.
+                <span id="crbCaseAgainSpan">88/2026</span> பிரிவு <span id="bnssAgainSpan">194 BNSS</span> 
+                -இல் வழக்குப் பதிவு செய்து விசாரணைக்கு எடுத்துக் கொள்ளப்பட்டது. வழக்கு இன்னும் விசாரணையில் உள்ளது. 
+                மேற்கண்ட நபரின் சடலம் அரசு மருத்துவமனை குளிர்சாதன பெட்டியில் வைக்கப்பட்டுள்ளது.
+            </p>
+
+            <p class="content-paragraph">
+                மேற்படி நபரின் உறவினர் அல்லது தகவல் தெரிந்தவர்கள் அவரது காணாமல் போனது தொடர்பாக தக்க ஆதாரங்களுடன் விரைந்து விசாரணைக்கு உதவுமாறு பணிவுடன் கேட்டுக் கொள்ளப்படுகிறார்கள்.
+            </p>
+
+            <!-- Official Signature Block -->
+            <div class="signature-container">
+                <div class="signature-box">
+                    <div>காவல் உதவி ஆய்வாளர்,</div>
+                    <div>[போ 7 நற்சான்றிதழ் காவல் நிலையம்,</div>
+                    <div>நற்சான்றிதழ், சென்னை-31</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="reset-btn" id="resetBtn">⟳ அனைத்தையும் மீட்டமை</button>
+            <button class="download-btn" id="downloadPdfBtn">📄 PDF ஆவணமாக பதிவிறக்கவும்</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Default values in Tamil Unicode context
+    const defaultValues = {
+        caseNumber: "88/2026",
+        bnss: "194 BNSS",
+        incidentDate: "11.04.2026",
+        complaintDate: "11.04.2025",
+        ageValue: "55",
+        subjectAge: "55-தஜ்",
+        victimNum: "42",
+        gydRef: "108 ஆம் GYD",
+        time: "07.30"
+    };
+
+    // Update the preview fields based on user input
+    function updatePreview() {
+        const caseNumber = document.getElementById('inputCaseNumber').value.trim() || "88/2026";
+        const bnss = document.getElementById('inputBnss').value.trim() || "194 BNSS";
+        const incidentDate = document.getElementById('inputIncidentDate').value.trim() || "11.04.2026";
+        const complaintDate = document.getElementById('inputComplaintDate').value.trim() || "11.04.2025";
+        const ageValue = document.getElementById('inputAgeValue').value.trim() || "55";
+        const subjectAge = document.getElementById('inputSubjectAge').value.trim() || "55-தஜ்";
+        const victimNum = document.getElementById('inputVictimNum').value.trim() || "42";
+        const gydRef = document.getElementById('inputGydRef').value.trim() || "108 ஆம் GYD";
+        const time = document.getElementById('inputTime').value.trim() || "07.30";
+
+        // Updating all dynamic spans
+        const subjectAgeSpan = document.getElementById('subjectAgeSpan');
+        if (subjectAgeSpan) subjectAgeSpan.innerText = subjectAge;
+        
+        const caseNumberSpan = document.getElementById('caseNumberSpan');
+        if (caseNumberSpan) caseNumberSpan.innerText = caseNumber;
+        
+        const bnssSpan = document.getElementById('bnssSpan');
+        if (bnssSpan) bnssSpan.innerText = bnss;
+        
+        const victimNumSpan = document.getElementById('victimNumSpan');
+        if (victimNumSpan) victimNumSpan.innerText = victimNum;
+        
+        const incidentDateSpan = document.getElementById('incidentDateSpan');
+        if (incidentDateSpan) incidentDateSpan.innerText = incidentDate;
+        
+        const ageValueSpan = document.getElementById('ageValueSpan');
+        if (ageValueSpan) ageValueSpan.innerText = ageValue;
+        
+        const gydRefSpan = document.getElementById('gydRefSpan');
+        if (gydRefSpan) gydRefSpan.innerText = gydRef;
+        
+        const complaintDateSpan = document.getElementById('complaintDateSpan');
+        if (complaintDateSpan) complaintDateSpan.innerText = complaintDate;
+        
+        const timeSpan = document.getElementById('timeSpan');
+        if (timeSpan) timeSpan.innerText = time;
+        
+        const crbCaseAgainSpan = document.getElementById('crbCaseAgainSpan');
+        if (crbCaseAgainSpan) crbCaseAgainSpan.innerText = caseNumber;
+        
+        const bnssAgainSpan = document.getElementById('bnssAgainSpan');
+        if (bnssAgainSpan) bnssAgainSpan.innerText = bnss;
+        
+        // Update the subject text display area (preserving inner structure)
+        const subjectDisplayDiv = document.getElementById('subjectTextDisplay');
+        if (subjectDisplayDiv) {
+            subjectDisplayDiv.innerHTML = `இறந்த நபரின் பெயர் தெரியாத ஆண் <span id="subjectAgeSpan">${subjectAge}</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.`;
+            // Reassign the inner span reference just to be consistent
+            const newInnerSpan = subjectDisplayDiv.querySelector('#subjectAgeSpan');
+            if (newInnerSpan) newInnerSpan.innerText = subjectAge;
+        }
+    }
+
+    // Reset all fields to default state
+    function resetToDefault() {
+        document.getElementById('inputCaseNumber').value = defaultValues.caseNumber;
+        document.getElementById('inputBnss').value = defaultValues.bnss;
+        document.getElementById('inputIncidentDate').value = defaultValues.incidentDate;
+        document.getElementById('inputComplaintDate').value = defaultValues.complaintDate;
+        document.getElementById('inputAgeValue').value = defaultValues.ageValue;
+        document.getElementById('inputSubjectAge').value = defaultValues.subjectAge;
+        document.getElementById('inputVictimNum').value = defaultValues.victimNum;
+        document.getElementById('inputGydRef').value = defaultValues.gydRef;
+        document.getElementById('inputTime').value = defaultValues.time;
+        updatePreview();
+    }
+
+    // Generate PDF with proper Unicode Tamil font embedding using html2canvas + jsPDF
+    async function downloadPDF() {
+        const element = document.getElementById('pdfContent');
+        const loader = document.getElementById('loaderOverlay');
+        if (!element) return;
+
+        loader.classList.add('active');
+        
+        try {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const caseNumRaw = document.getElementById('inputCaseNumber').value || "CRB_Letter";
+            const safeCaseNum = caseNumRaw.replace(/[\/\\:*?"<>|]/g, '_');
+            const filename = `CRB_Letter_${safeCaseNum}.pdf`;
+            
+            // High quality capture with explicit font settings for Tamil Unicode
+            const canvas = await html2canvas(element, {
+                scale: 3,
+                backgroundColor: '#ffffff',
+                logging: false,
+                useCORS: false,
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight,
+                letterRendering: true,
+                onclone: (clonedDoc, elementClone) => {
+                    // Enhance the cloned document with robust Tamil Unicode fonts
+                    const style = clonedDoc.createElement('style');
+                    style.textContent = `
+                        * {
+                            font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', 'Segoe UI Emoji', sans-serif !important;
+                        }
+                        .legal-paper, .tamil-text, p, div, span, .info-label, .info-value, .signature-box {
+                            font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif !important;
+                        }
+                        body {
+                            background: white;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .info-row {
+                            border: 1px solid black !important;
+                        }
+                        .info-label {
+                            border-right: 1px solid black !important;
+                        }
+                        .content-paragraph {
+                            text-align: justify;
+                        }
+                    `;
+                    clonedDoc.head.appendChild(style);
+                    
+                    // Force font rendering
+                    const allText = clonedDoc.querySelectorAll('.tamil-text, .legal-paper, p, .info-value');
+                    allText.forEach(el => {
+                        if (el.style) {
+                            el.style.fontFamily = "'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif";
+                        }
+                    });
+                }
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            });
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pdfWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            // Add image ensuring full content fits inside the page properly
+            if (imgHeight <= pdfHeight + 4) {
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            } else {
+                const fitScale = pdfHeight / imgHeight;
+                const scaledWidth = imgWidth * fitScale;
+                const scaledHeight = imgHeight * fitScale;
+                const xOffset = (pdfWidth - scaledWidth) / 2;
+                pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight);
+            }
+            
+            pdf.save(filename);
+        } catch (error) {
+            console.error('PDF Generation Error:', error);
+            alert('PDF உருவாக்கத்தில் பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.\nபிழை: ' + (error.message || 'Unknown'));
+        } finally {
+            loader.classList.remove('active');
+        }
+    }
+
+    // Add event listeners after DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+        const applyBtn = document.getElementById('applyBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const downloadBtn = document.getElementById('downloadPdfBtn');
+        
+        if (applyBtn) applyBtn.addEventListener('click', (e) => { e.preventDefault(); updatePreview(); });
+        if (resetBtn) resetBtn.addEventListener('click', (e) => { e.preventDefault(); resetToDefault(); });
+        if (downloadBtn) downloadBtn.addEventListener('click', (e) => { e.preventDefault(); downloadPDF(); });
+        
+        // Initial update
+        updatePreview();
+        
+        // Optional: Enter key on any input triggers preview update
+        const allInputs = document.querySelectorAll('.input-field-group input');
+        allInputs.forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    updatePreview();
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
