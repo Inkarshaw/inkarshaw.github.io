@@ -24,7 +24,7 @@
         }
 
         .main-container {
-            max-width: 1060px;
+            max-width: 1100px;
             width: 100%;
             background: transparent;
         }
@@ -36,7 +36,7 @@
             padding: 18px 24px;
             margin-bottom: 24px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 14px 20px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             border-radius: 4px;
@@ -54,7 +54,7 @@
             text-transform: uppercase;
             font-family: 'Segoe UI', monospace;
         }
-        .input-field-group input, .input-field-group textarea {
+        .input-field-group input, .input-field-group textarea, .input-field-group select {
             padding: 8px 10px;
             border: 1px solid #a0b8c5;
             background: #fffef7;
@@ -63,7 +63,14 @@
             outline: none;
             transition: 0.1s linear;
         }
-        .input-field-group input:focus, .input-field-group textarea:focus {
+        .input-field-group select {
+            cursor: pointer;
+        }
+        .input-field-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .input-field-group input:focus, .input-field-group textarea:focus, .input-field-group select:focus {
             border-color: #000000;
             background: #fffae6;
             box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
@@ -96,12 +103,13 @@
             border-radius: 2px;
         }
 
+        /* Significantly increased page margins */
         .legal-paper {
-            padding: 1.8rem 2.2rem;
+            padding: 4rem 3.8rem;
             background: white;
             color: #000000;
-            line-height: 1.5;
-            font-size: 13px;
+            line-height: 1.65;
+            font-size: 13.5px;
         }
 
         /* Tamil Unicode Font Support - Full standard */
@@ -111,63 +119,87 @@
             font-weight: normal;
         }
 
+        /* Sender address - "அனுப்புநர்" no indent, address lines indented */
         .header-left {
             text-align: left;
-            margin-bottom: 0.7rem;
-            line-height: 1.45;
+            margin-bottom: 1.2rem;
+            line-height: 1.55;
             font-size: 12px;
         }
+        .sender-label {
+            padding-left: 0;
+            margin-bottom: 0.3rem;
+        }
+        .sender-address {
+            padding-left: 35px;
+        }
+        
+        /* Receiver address - "பெறுநர்" no indent, address lines indented */
         .copy-section {
             text-align: left;
-            margin-bottom: 0.5rem;
-            margin-top: 0.4rem;
-            line-height: 1.4;
+            margin-bottom: 1rem;
+            margin-top: 0.8rem;
+            line-height: 1.5;
             font-size: 12px;
         }
+        .receiver-label {
+            padding-left: 0;
+            margin-bottom: 0.3rem;
+        }
+        .receiver-address {
+            padding-left: 35px;
+        }
+        
         .iah-section {
             text-align: left;
-            margin-bottom: 0.9rem;
-            margin-top: 0.2rem;
+            margin-bottom: 1.5rem;
+            margin-top: 0.5rem;
             font-size: 12px;
             font-weight: 500;
+            padding-left: 0;
         }
 
         .info-row {
-            margin: 0.7rem 0;
+            margin: 1rem 0;
             display: flex;
             flex-wrap: wrap;
             border: 1px solid #111;
             background: white;
         }
         .info-label {
-            width: 28%;
-            padding: 8px 12px;
+            width: 18%;
+            padding: 12px 16px;
             font-weight: 700;
             border-right: 1px solid black;
             background: #fefaf0;
             letter-spacing: 0.2px;
         }
         .info-value {
-            width: 72%;
-            padding: 8px 12px;
+            width: 82%;
+            padding: 12px 16px;
             background: white;
         }
 
         .content-paragraph {
-            margin: 14px 0;
+            margin: 22px 0;
             text-align: justify;
-            line-height: 1.55;
+            line-height: 1.7;
+        }
+        
+        /* First line indentation for paragraphs */
+        .indent-first-line {
+            text-indent: 50px;
         }
 
         .signature-container {
             display: flex;
             justify-content: flex-end;
-            margin-top: 2rem;
-            margin-bottom: 0.3rem;
+            margin-top: 3rem;
+            margin-bottom: 0.8rem;
         }
         .signature-box {
             text-align: center;
-            line-height: 1.65;
+            line-height: 1.8;
         }
         .signature-box div {
             text-align: center;
@@ -248,7 +280,7 @@
         /* Responsive */
         @media (max-width: 700px) {
             .legal-paper {
-                padding: 1.2rem;
+                padding: 1.8rem;
             }
             .info-label, .info-value {
                 width: 100%;
@@ -260,6 +292,24 @@
             }
             .input-panel {
                 padding: 14px;
+            }
+            .apply-btn {
+                grid-column: span 1;
+            }
+            .info-label {
+                width: 100%;
+            }
+            .info-value {
+                width: 100%;
+            }
+            .indent-first-line {
+                text-indent: 25px;
+            }
+            .sender-address {
+                padding-left: 15px;
+            }
+            .receiver-address {
+                padding-left: 15px;
             }
         }
     </style>
@@ -273,7 +323,7 @@
 </div>
 
 <div class="main-container">
-    <!-- Input Panel for dynamic data -->
+    <!-- Input Panel for dynamic data - including Complainant details -->
     <div class="input-panel">
         <div class="input-field-group">
             <label>⚖️ வழக்கு எண் (CRB)</label>
@@ -292,24 +342,45 @@
             <input type="text" id="inputComplaintDate" value="11.04.2025">
         </div>
         <div class="input-field-group">
+            <label>🧓 இறந்தவரின் பாலினம்</label>
+            <select id="inputDeceasedGender">
+                <option value="ஆண்">ஆண் (Male)</option>
+                <option value="பெண்">பெண் (Female)</option>
+                <option value="தெரியாது">தெரியாது (Unknown)</option>
+            </select>
+        </div>
+        <div class="input-field-group">
             <label>🧓 இறந்தவரின் வயது</label>
             <input type="text" id="inputAgeValue" value="55">
         </div>
         <div class="input-field-group">
-            <label>👤 சந்தேக நபர் வயது</label>
-            <input type="text" id="inputSubjectAge" value="55-தஜ்">
-        </div>
-        <div class="input-field-group">
-            <label>🔢 பாதிக்கப்பட்டவர் எண்</label>
-            <input type="text" id="inputVictimNum" value="42">
-        </div>
-        <div class="input-field-group">
-            <label>📎 GYD குறிப்பு</label>
-            <input type="text" id="inputGydRef" value="108 ஆம் GYD">
+            <label>✅ உறுதிபடுத்திய விதம்</label>
+            <input type="text" id="inputConfirmationMethod" value="108 ஆம்புலன்ஸ் மூலம்">
         </div>
         <div class="input-field-group">
             <label>⏰ நேரம் (24hr)</label>
             <input type="text" id="inputTime" value="07.30">
+        </div>
+        <div class="input-field-group">
+            <label>🏥 பிரேதம் வைக்கப்பட்ட இடம்</label>
+            <input type="text" id="inputBodyKept" value="கீழ்ப்பாக்கம் அரசு மருத்துவமனை சவக்கிடங்கு">
+        </div>
+        <!-- Complainant Details Section -->
+        <div class="input-field-group">
+            <label>👨 புகார்தாரர் பெயர் (Complainant)</label>
+            <input type="text" id="inputComplainantName" value="ஏழுமலை">
+        </div>
+        <div class="input-field-group">
+            <label>📅 புகார்தாரர் வயது</label>
+            <input type="text" id="inputComplainantAge" value="55">
+        </div>
+        <div class="input-field-group">
+            <label>👨‍👦 தந்தை பெயர் (Father's Name)</label>
+            <input type="text" id="inputFatherName" value="அண்ணாமலை">
+        </div>
+        <div class="input-field-group">
+            <label>🏠 முகவரி (Address)</label>
+            <textarea id="inputAddress" rows="2">எண்.12, இளங்கோ செட்டி தெரு, கிழக்கு மேடு, இராமநாதபுரம்</textarea>
         </div>
         <button class="apply-btn" id="applyBtn">⟳ புதுப்பிக்கவும் / மாற்றங்களைப் பயன்படுத்தவும்</button>
     </div>
@@ -317,18 +388,20 @@
     <!-- Official CRB Letter Content in Tamil Unicode -->
     <div class="document-card">
         <div class="legal-paper tamil-text" id="pdfContent">
+            <!-- Sender address - "அனுப்புநர்" no indent, address lines indented -->
             <div class="header-left">
-                <div>அனுப்புநர்</div>
-                <div>காவல் ஆய்வாளர் (L&O)</div>
-                <div>ஜி7 சேத்துப்பட்டு காவல்நிலையம்,</div>
-                <div>சென்னை-31.</div>
+                <div class="sender-label">அனுப்புநர்</div>
+                <div class="sender-address">காவல் ஆய்வாளர் (L&O)</div>
+                <div class="sender-address">ஜி7 சேத்துப்பட்டு காவல்நிலையம்,</div>
+                <div class="sender-address">சென்னை-31.</div>
             </div>
 
+            <!-- Receiver address - "பெறுநர்" no indent, address lines indented -->
             <div class="copy-section">
-                <div>பெறுநர்</div>
-                <div>உதவி ஆணையாளர் அவர்கள்,</div>
-                <div>குற்ற ஆவண காப்பகம்(C.R.B),</div>
-                <div>வேப்பேரி, சென்னை-07.</div>
+                <div class="receiver-label">பெறுநர்</div>
+                <div class="receiver-address">உதவி ஆணையாளர் அவர்கள்,</div>
+                <div class="receiver-address">குற்ற ஆவண காப்பகம்(C.R.B),</div>
+                <div class="receiver-address">வேப்பேரி, சென்னை-07.</div>
             </div>
 
             <div class="iah-section">
@@ -338,29 +411,30 @@
             <!-- Information rows (Dynamic Tamil Unicode) -->
             <div class="info-row">
                 <div class="info-label">பொருள்:</div>
-                <div class="info-value" id="subjectTextDisplay">இறந்து போன பெயர் விலாசம் தெரியாத ஆண்  <span id="subjectAgeSpan">55-</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.</div>
+                <div class="info-value" id="subjectTextDisplay">இறந்த நபரின் பெயர் தெரியாத <span id="deceasedGenderSpan">ஆண்</span> <span id="subjectAgeSpan">55</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.</div>
             </div>
             <div class="info-row">
                 <div class="info-label">பார்வை:</div>
-                <div class="info-value">ஜி7 சேத்துப்பட்டு கா.நி குற்ற எண்:<span id="caseNumberSpan">88/2026</span> பிரிவு <span id="bnssSpan">194 BNSS</span></div>
+                <div class="info-value" id="visionValue">ஜி7 சேத்துப்பட்டு கா.நி குற்ற எண்: <span id="caseNumberSpan">88/2026</span> பிரிவு <span id="bnssSpan">194 BNSS</span></div>
             </div>
 
-            <!-- Main legal narrative in pure Tamil Unicode -->
-            <p class="content-paragraph">
-                பார்வையில் கண்ட வழக்கில் புகார்தாரர் ஏழுமலை எம்/55 த/பெ அண்ணாமலை எண்.12 
-                <span id="victimNumSpan">42</span> \> இளங்கோ செட்டி தெரு, கிழக்கு மேடு, இராமநாதபுரம் என்பவர் அளித்த புகாரில்
-                <span id="incidentDateSpan">11.04.2026</span> ஆம் நாள் ஜி7 சேத்துப்பட்டு காவல் நிலைய
+            <!-- Main legal narrative with first line indentation -->
+            <p class="content-paragraph indent-first-line" id="mainNarrative">
+                பார்வையில் கண்ட வழக்கில் <span id="complainantNameSpan">ஏழுமலை</span> <span id="genderTitleSpan">எம்</span>/<span id="complainantAgeSpan">55</span> த/பெ <span id="fatherNameSpan">அண்ணாமலை</span> 
+                <span id="addressSpan">எண்.12, இளங்கோ செட்டி தெரு, கிழக்கு மேடு, இராமநாதபுரம்</span> என்பவர் அளித்த புகாரில்
+                <span id="incidentDateSpan">11.04.2026</span> -ஆம் நாள் ஜி7 சேத்துப்பட்டு காவல் நிலைய
                 மேயர் ராமநாதன் பூங்காவில் மயங்கிய நிலையில் இருந்த சுமார் 
-                <span id="ageValueSpan">55</span> வயது மதிக்கத்தக்க பபெயர் விலாசம் தெரியாத ஆண் நபரை
-                <span id="gydRefSpan">108 ஆம்புலன்ஸ் GYD</span> மூலமாக பரிசோதித்த போது அவர் இறந்துவிட்டதாக தெரிவித்ததாகவும் இறந்துபோனவரின் பிரேதத்தின் மீது விசாரணை செய்து சட்டப்படி நடவடிக்கை எடுக்குமாறு கொடுத்த புகாரைப் பெற்று  
+                <span id="ageValueSpan">55</span> வயது மதிக்கத்தக்க பெயர் விலாசம் தெரியாத <span id="deceasedGenderTextSpan">ஆண்</span> நபரை
+                <span id="confirmationMethodSpan">108 ஆம்புலன்ஸ் மூலம்</span> உறுதிபடுத்தப்பட்டதாகவும் இறந்துபோனவரின் பிரேதத்தின் மீது விசாரணை செய்து சட்டப்படி நடவடிக்கை எடுக்குமாறு கொடுத்த புகாரைப் பெற்று  
                 <span id="complaintDateSpan">11.04.2025</span> ஆம் நாள் 
                 <span id="timeSpan">07.30</span> மணிக்கு ஜி7 சேத்துப்பட்டு காவல்நிலைய குற்ற எண்.
                 <span id="crbCaseAgainSpan">88/2026</span> பிரிவு <span id="bnssAgainSpan">194 BNSS</span> 
                 -இல் வழக்குப் பதிவு செய்து விசாரணைக்கு எடுத்துக் கொள்ளப்பட்டது. வழக்கு புலன் விசாரணையில் உள்ளது. 
-                மேற்படி நபரின் பிரேதம் கீழ்ப்பாக்கம் அரசு மருத்துவமனை சவக்கிடங்கில் உள்ளது.
+                மேற்படி நபரின் பிரேதம் <span id="bodyKeptSpan">கீழ்ப்பாக்கம் அரசு மருத்துவமனை சவக்கிடங்கு</span> உள்ளது.
             </p>
 
-            <p class="content-paragraph">
+            <!-- Second paragraph with first line indentation -->
+            <p class="content-paragraph indent-first-line">
                 மேற்படி நபரின் விபரம் அறிய அவரது புகைப்படத்துடன் செய்திதாளில் இலவசமாக இச்செய்தி விளம்பரப்படுத்துமாறு கேட்டுக் கொள்கிறேன். 
             </p>
 
@@ -382,43 +456,62 @@
 </div>
 
 <script>
-    // Default values in Tamil Unicode context
+    // Default values including complainant details
     const defaultValues = {
         caseNumber: "88/2026",
         bnss: "194 BNSS",
         incidentDate: "11.04.2026",
         complaintDate: "11.04.2025",
+        deceasedGender: "ஆண்",
         ageValue: "55",
-        subjectAge: "55-தஜ்",
-        victimNum: "42",
-        gydRef: "108 ஆம் GYD",
-        time: "07.30"
+        confirmationMethod: "108 ஆம்புலன்ஸ் மூலம்",
+        time: "07.30",
+        bodyKept: "கீழ்ப்பாக்கம் அரசு மருத்துவமனை சவக்கிடங்கு",
+        complainantName: "ஏழுமலை",
+        complainantAge: "55",
+        fatherName: "அண்ணாமலை",
+        address: "எண்.12, இளங்கோ செட்டி தெரு, கிழக்கு மேடு, இராமநாதபுரம்"
     };
+
+    // Function to get gender title based on deceased gender selection
+    function getGenderTitle(deceasedGender) {
+        if (deceasedGender === "ஆண்") {
+            return "ஆண்";  // Mr. for male
+        } else if (deceasedGender === "பெண்") {
+            return "பெ";  // Mrs. for female
+        } else {
+            return "திரு";  // Default
+        }
+    }
 
     // Update the preview fields based on user input
     function updatePreview() {
-        const caseNumber = document.getElementById('inputCaseNumber').value.trim() || "88/2026";
-        const bnss = document.getElementById('inputBnss').value.trim() || "194 BNSS";
-        const incidentDate = document.getElementById('inputIncidentDate').value.trim() || "11.04.2026";
-        const complaintDate = document.getElementById('inputComplaintDate').value.trim() || "11.04.2025";
-        const ageValue = document.getElementById('inputAgeValue').value.trim() || "55";
-        const subjectAge = document.getElementById('inputSubjectAge').value.trim() || "55-தஜ்";
-        const victimNum = document.getElementById('inputVictimNum').value.trim() || "42";
-        const gydRef = document.getElementById('inputGydRef').value.trim() || "108 ஆம் GYD";
-        const time = document.getElementById('inputTime').value.trim() || "07.30";
+        // Get values from input fields with fallback to defaults
+        const caseNumber = document.getElementById('inputCaseNumber').value.trim() || defaultValues.caseNumber;
+        const bnss = document.getElementById('inputBnss').value.trim() || defaultValues.bnss;
+        const incidentDate = document.getElementById('inputIncidentDate').value.trim() || defaultValues.incidentDate;
+        const complaintDate = document.getElementById('inputComplaintDate').value.trim() || defaultValues.complaintDate;
+        const deceasedGender = document.getElementById('inputDeceasedGender').value || defaultValues.deceasedGender;
+        const ageValue = document.getElementById('inputAgeValue').value.trim() || defaultValues.ageValue;
+        const confirmationMethod = document.getElementById('inputConfirmationMethod').value.trim() || defaultValues.confirmationMethod;
+        const time = document.getElementById('inputTime').value.trim() || defaultValues.time;
+        const bodyKept = document.getElementById('inputBodyKept').value.trim() || defaultValues.bodyKept;
+        
+        // Complainant specific fields
+        const complainantName = document.getElementById('inputComplainantName').value.trim() || defaultValues.complainantName;
+        const complainantAge = document.getElementById('inputComplainantAge').value.trim() || defaultValues.complainantAge;
+        const fatherName = document.getElementById('inputFatherName').value.trim() || defaultValues.fatherName;
+        const address = document.getElementById('inputAddress').value.trim() || defaultValues.address;
+
+        // Get gender title based on deceased gender
+        const genderTitle = getGenderTitle(deceasedGender);
 
         // Updating all dynamic spans
-        const subjectAgeSpan = document.getElementById('subjectAgeSpan');
-        if (subjectAgeSpan) subjectAgeSpan.innerText = subjectAge;
-        
         const caseNumberSpan = document.getElementById('caseNumberSpan');
         if (caseNumberSpan) caseNumberSpan.innerText = caseNumber;
         
         const bnssSpan = document.getElementById('bnssSpan');
         if (bnssSpan) bnssSpan.innerText = bnss;
-        
-        const victimNumSpan = document.getElementById('victimNumSpan');
-        if (victimNumSpan) victimNumSpan.innerText = victimNum;
         
         const incidentDateSpan = document.getElementById('incidentDateSpan');
         if (incidentDateSpan) incidentDateSpan.innerText = incidentDate;
@@ -426,8 +519,8 @@
         const ageValueSpan = document.getElementById('ageValueSpan');
         if (ageValueSpan) ageValueSpan.innerText = ageValue;
         
-        const gydRefSpan = document.getElementById('gydRefSpan');
-        if (gydRefSpan) gydRefSpan.innerText = gydRef;
+        const confirmationMethodSpan = document.getElementById('confirmationMethodSpan');
+        if (confirmationMethodSpan) confirmationMethodSpan.innerText = confirmationMethod;
         
         const complaintDateSpan = document.getElementById('complaintDateSpan');
         if (complaintDateSpan) complaintDateSpan.innerText = complaintDate;
@@ -441,13 +534,46 @@
         const bnssAgainSpan = document.getElementById('bnssAgainSpan');
         if (bnssAgainSpan) bnssAgainSpan.innerText = bnss;
         
-        // Update the subject text display area (preserving inner structure)
+        const bodyKeptSpan = document.getElementById('bodyKeptSpan');
+        if (bodyKeptSpan) bodyKeptSpan.innerText = bodyKept;
+        
+        // Update deceased gender spans
+        const deceasedGenderSpan = document.getElementById('deceasedGenderSpan');
+        if (deceasedGenderSpan) deceasedGenderSpan.innerText = deceasedGender;
+        
+        const deceasedGenderTextSpan = document.getElementById('deceasedGenderTextSpan');
+        if (deceasedGenderTextSpan) deceasedGenderTextSpan.innerText = deceasedGender;
+        
+        // Update gender title span (எம் changes to ஆ or பெ based on gender)
+        const genderTitleSpan = document.getElementById('genderTitleSpan');
+        if (genderTitleSpan) genderTitleSpan.innerText = genderTitle;
+        
+        // Update complainant details spans
+        const complainantNameSpan = document.getElementById('complainantNameSpan');
+        if (complainantNameSpan) complainantNameSpan.innerText = complainantName;
+        
+        const complainantAgeSpan = document.getElementById('complainantAgeSpan');
+        if (complainantAgeSpan) complainantAgeSpan.innerText = complainantAge;
+        
+        const fatherNameSpan = document.getElementById('fatherNameSpan');
+        if (fatherNameSpan) fatherNameSpan.innerText = fatherName;
+        
+        const addressSpan = document.getElementById('addressSpan');
+        if (addressSpan) addressSpan.innerText = address;
+        
+        // Update subject text display (first info-row) - with gender and age
         const subjectDisplayDiv = document.getElementById('subjectTextDisplay');
         if (subjectDisplayDiv) {
-            subjectDisplayDiv.innerHTML = `இறந்த நபரின் பெயர் தெரியாத ஆண் <span id="subjectAgeSpan">${subjectAge}</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.`;
-            // Reassign the inner span reference just to be consistent
-            const newInnerSpan = subjectDisplayDiv.querySelector('#subjectAgeSpan');
-            if (newInnerSpan) newInnerSpan.innerText = subjectAge;
+            subjectDisplayDiv.innerHTML = `இறந்த நபரின் பெயர் தெரியாத <span id="deceasedGenderSpan">${deceasedGender}</span> <span id="subjectAgeSpan">${ageValue}</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.`;
+            // Ensure inner spans get correct values
+            const innerGenderSpan = subjectDisplayDiv.querySelector('#deceasedGenderSpan');
+            if (innerGenderSpan && innerGenderSpan.innerText !== deceasedGender) {
+                innerGenderSpan.innerText = deceasedGender;
+            }
+            const innerSubjectSpan = subjectDisplayDiv.querySelector('#subjectAgeSpan');
+            if (innerSubjectSpan && innerSubjectSpan.innerText !== ageValue) {
+                innerSubjectSpan.innerText = ageValue;
+            }
         }
     }
 
@@ -457,11 +583,15 @@
         document.getElementById('inputBnss').value = defaultValues.bnss;
         document.getElementById('inputIncidentDate').value = defaultValues.incidentDate;
         document.getElementById('inputComplaintDate').value = defaultValues.complaintDate;
+        document.getElementById('inputDeceasedGender').value = defaultValues.deceasedGender;
         document.getElementById('inputAgeValue').value = defaultValues.ageValue;
-        document.getElementById('inputSubjectAge').value = defaultValues.subjectAge;
-        document.getElementById('inputVictimNum').value = defaultValues.victimNum;
-        document.getElementById('inputGydRef').value = defaultValues.gydRef;
+        document.getElementById('inputConfirmationMethod').value = defaultValues.confirmationMethod;
         document.getElementById('inputTime').value = defaultValues.time;
+        document.getElementById('inputBodyKept').value = defaultValues.bodyKept;
+        document.getElementById('inputComplainantName').value = defaultValues.complainantName;
+        document.getElementById('inputComplainantAge').value = defaultValues.complainantAge;
+        document.getElementById('inputFatherName').value = defaultValues.fatherName;
+        document.getElementById('inputAddress').value = defaultValues.address;
         updatePreview();
     }
 
@@ -476,7 +606,7 @@
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
             
-            const caseNumRaw = document.getElementById('inputCaseNumber').value || "CRB_Letter";
+            const caseNumRaw = document.getElementById('inputCaseNumber').value.trim() || "CRB_Letter";
             const safeCaseNum = caseNumRaw.replace(/[\/\\:*?"<>|]/g, '_');
             const filename = `CRB_Letter_${safeCaseNum}.pdf`;
             
@@ -494,9 +624,9 @@
                     const style = clonedDoc.createElement('style');
                     style.textContent = `
                         * {
-                            font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', 'Segoe UI Emoji', sans-serif !important;
+                            font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', 'Segoe UI Emoji', 'FreeSerif', sans-serif !important;
                         }
-                        .legal-paper, .tamil-text, p, div, span, .info-label, .info-value, .signature-box {
+                        .legal-paper, .tamil-text, p, div, span, .info-label, .info-value, .signature-box, .content-paragraph {
                             font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif !important;
                         }
                         body {
@@ -509,15 +639,29 @@
                         }
                         .info-label {
                             border-right: 1px solid black !important;
+                            background: #fefaf0 !important;
+                            width: 18% !important;
+                        }
+                        .info-value {
+                            width: 82% !important;
                         }
                         .content-paragraph {
                             text-align: justify;
                         }
+                        .indent-first-line {
+                            text-indent: 50px !important;
+                        }
+                        .sender-address {
+                            padding-left: 35px !important;
+                        }
+                        .receiver-address {
+                            padding-left: 35px !important;
+                        }
                     `;
                     clonedDoc.head.appendChild(style);
                     
-                    // Force font rendering
-                    const allText = clonedDoc.querySelectorAll('.tamil-text, .legal-paper, p, .info-value');
+                    // Force font rendering on all text elements
+                    const allText = elementClone.querySelectorAll('.tamil-text, .legal-paper, p, .info-value, .content-paragraph span');
                     allText.forEach(el => {
                         if (el.style) {
                             el.style.fontFamily = "'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif";
@@ -572,8 +716,8 @@
         // Initial update
         updatePreview();
         
-        // Optional: Enter key on any input triggers preview update
-        const allInputs = document.querySelectorAll('.input-field-group input');
+        // Enter key on any input triggers preview update
+        const allInputs = document.querySelectorAll('.input-field-group input, .input-field-group textarea, .input-field-group select');
         allInputs.forEach(input => {
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -581,6 +725,14 @@
                     updatePreview();
                 }
             });
+            input.addEventListener('blur', () => {
+                updatePreview();
+            });
+            if (input.tagName === 'SELECT') {
+                input.addEventListener('change', () => {
+                    updatePreview();
+                });
+            }
         });
     });
 </script>
