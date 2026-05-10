@@ -77,18 +77,24 @@
             box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
         }
         
-        /* Time row with period dropdown + time input */
+        /* FIXED Time row with period dropdown + time input - no overlapping */
         .time-row {
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
         }
         .time-row select {
             flex: 1;
-            min-width: 95px;
+            min-width: 85px;
+            width: auto;
+            max-width: 110px;
         }
         .time-row input {
             flex: 2;
+            min-width: 80px;
+            width: auto;
         }
         
         .datetime-row {
@@ -98,6 +104,7 @@
         }
         .datetime-row .input-field-group {
             flex: 1;
+            min-width: 0; /* prevent overflow */
         }
         
         /* Row for SOC with location and proximity side by side */
@@ -167,7 +174,7 @@
         .sender-label {
             padding-left: 0;
             margin-bottom: 0.3rem;
-            fontWeight: 600;
+            font-weight: 600;
             letter-spacing: 0.3px;
         }
         .sender-address {
@@ -339,6 +346,7 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Responsive fixes - prevent time field overlap on small screens */
         @media (max-width: 780px) {
             .legal-paper {
                 padding: 3rem 2rem !important;
@@ -379,11 +387,30 @@
                 gap: 10px;
             }
             .time-row {
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
+            }
+            .time-row select {
+                min-width: 70px;
+            }
+            .time-row input {
+                min-width: 70px;
             }
             .soc-row {
                 flex-direction: column;
                 gap: 10px;
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 550px) {
+            .time-row {
+                flex-wrap: wrap;
+            }
+            .time-row select {
+                min-width: 100%;
+            }
+            .time-row input {
+                min-width: 100%;
             }
         }
         
