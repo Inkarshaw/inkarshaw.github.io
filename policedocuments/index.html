@@ -59,27 +59,33 @@
             vertical-align: middle;
         }
         
-        /* Updated grid to 6 columns on very large screens for new Election section */
+        /* Updated grid to 7 columns for new Remand section */
         .content {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 20px;
             margin-top: 20px;
         }
         
-        @media (max-width: 1600px) {
+        @media (max-width: 1800px) {
+            .content {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 1200px) {
             .content {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
         
-        @media (max-width: 1000px) {
+        @media (max-width: 900px) {
             .content {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             .content {
                 grid-template-columns: 1fr;
             }
@@ -253,7 +259,6 @@
             background: #1a6f7a;
         }
 
-        /* New Election button style */
         .btn-election {
             background: #b5651e;
             color: white;
@@ -261,6 +266,15 @@
         
         .btn-election:hover {
             background: #d48a3a;
+        }
+
+        .btn-remand {
+            background: #9b4d96;
+            color: white;
+        }
+        
+        .btn-remand:hover {
+            background: #b86bb3;
         }
 
         .status-indicator {
@@ -388,7 +402,7 @@
         
         <div class="stats">
             <div class="stat-item">
-                <div class="stat-value" id="formsCount">37</div>
+                <div class="stat-value" id="formsCount">34</div>
                 <div class="stat-label">Available Forms</div>
             </div>
             <div class="stat-item">
@@ -407,7 +421,7 @@
         </div>
         
         <div class="content">
-            <!-- Download Forms Card -->
+            <!-- Download Forms Card (Removed Arrest Card, Arrest Intimation, MM PT Warrant - moved to Remand section) -->
             <div class="card">
                 <h2><i>📋</i> Download Forms</h2>
                 <div class="search-info" id="downloadFormsInfo"></div>
@@ -419,14 +433,6 @@
                     <li class="document-item" data-title="PM Form" data-desc="Post Mortem form for autopsy and forensic examination documentation">
                         <div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>PM Form</div><div class="doc-desc">Post Mortem form for autopsy and forensic examination documentation</div></div>
                         <div class="doc-actions"><a href="https://www.clearexams.online/policedocuments/pmforms/pm_form.doc" target="_blank" class="btn btn-word">📝 Word</a><a href="https://www.clearexams.online/policedocuments/pmforms/pm_form.pdf" target="_blank" class="btn btn-pdf">📄 PDF</a></div>
-                    </li>
-                    <li class="document-item" data-title="Arrest Card" data-desc="Standard arrest card for documenting suspect apprehension details">
-                        <div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>Arrest Card</div><div class="doc-desc">Standard arrest card for documenting suspect apprehension details</div></div>
-                        <div class="doc-actions"><a href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.doc" target="_blank" class="btn btn-word">📝 Word</a><a href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.pdf" target="_blank" class="btn btn-pdf">📄 PDF</a></div>
-                    </li>
-                    <li class="document-item" data-title="Arrest Intimation" data-desc="Form for notifying relevant parties about an arrest">
-                        <div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>Arrest Intimation</div><div class="doc-desc">Form for notifying relevant parties about an arrest</div></div>
-                        <div class="doc-actions"><a href="https://www.clearexams.online/policedocuments/arrest_intimation.doc" target="_blank" class="btn btn-word">📝 Word</a><a href="https://clearexams.online/policedocuments/arrest_intimation.pdf" target="_blank" class="btn btn-pdf">📄 PDF</a></div>
                     </li>
                     <li class="document-item" data-title="NDPS Form 5" data-desc="Official NDPS Form 5 for narcotics case documentation">
                         <div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>NDPS Form 5</div><div class="doc-desc">Official NDPS Form 5 for narcotics case documentation</div></div>
@@ -452,10 +458,6 @@
                         <div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>Incident Report Form</div><div class="doc-desc">Standard form for documenting incidents and criminal activities</div></div>
                         <div class="doc-actions"><a href="https://www.clearexams.online/policedocuments/incident_report_form.doc" target="_blank" class="btn btn-word">📝 Word</a><a href="https://www.clearexams.online/policedocuments/incident_report_form.pdf" target="_blank" class="btn btn-pdf">📄 PDF</a></div>
                     </li>
-                    <li class="document-item" data-title="MM PT Warrant" data-desc="Metropolitan Magistrate/Police Training Warrant for court procedures">
-                        <div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>MM PT Warrant</div><div class="doc-desc">Metropolitan Magistrate/Police Training Warrant for court procedures</div></div>
-                        <div class="doc-actions"><a href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.doc" target="_blank" class="btn btn-word">📝 Word</a><a href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.pdf" target="_blank" class="btn btn-pdf">📄 PDF</a></div>
-                    </li>
                 </ul>
             </div>
             
@@ -478,6 +480,44 @@
                     <li class="document-item" data-title="Remand Warrant" data-desc="Generate remand warrant for police custody extension"><div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>Remand Warrant</div><div class="doc-desc">Generate remand warrant for police custody extension</div></div><div class="doc-actions"><a href="https://www.clearexams.online/policedocuments/remand_warrant.html" target="_blank" class="btn btn-generate">🔄 Generate</a></div></li>
                     <li class="document-item" data-title="Statement Maker" data-desc="Generate official witness and suspect statements with customization"><div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>Statement Maker</div><div class="doc-desc">Generate official witness and suspect statements with customization</div></div><div class="doc-actions"><a href="https://www.clearexams.online/policedocuments/statement_maker.html" target="_blank" class="btn btn-generate">🔄 Generate</a></div></li>
                     <li class="document-item" data-title="PM Request Letter" data-desc="Generate formal letter for requesting Post Mortem examination"><div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>PM Request Letter</div><div class="doc-desc">Generate formal letter for requesting Post Mortem examination</div></div><div class="doc-actions"><a href="https://www.clearexams.online/policedocuments/pm_request.html" target="_blank" class="btn btn-generate">🔄 Generate</a></div></li>
+                </ul>
+            </div>
+
+            <!-- NEW: Remand Related Documents Card -->
+            <div class="card">
+                <h2><i>⚖️</i> Remand Related Documents</h2>
+                <div class="search-info" id="remandDocumentsInfo"></div>
+                <ul class="document-list" id="remandDocumentsList">
+                    <li class="document-item" data-title="Arrest Card" data-desc="Standard arrest card for documenting suspect apprehension and custody details">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Arrest Card</div>
+                            <div class="doc-desc">Standard arrest card for documenting suspect apprehension and custody details</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.doc" target="_blank" class="btn btn-remand">📝 Word</a>
+                            <a href="https://www.clearexams.online/policedocuments/remand_documents/arrest_card.pdf" target="_blank" class="btn btn-remand">📄 PDF</a>
+                        </div>
+                    </li>
+                    <li class="document-item" data-title="Arrest Intimation" data-desc="Form for notifying relevant parties about an arrest as per legal requirements">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Arrest Intimation</div>
+                            <div class="doc-desc">Form for notifying relevant parties about an arrest as per legal requirements</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.online/policedocuments/arrest_intimation.doc" target="_blank" class="btn btn-remand">📝 Word</a>
+                            <a href="https://clearexams.online/policedocuments/arrest_intimation.pdf" target="_blank" class="btn btn-remand">📄 PDF</a>
+                        </div>
+                    </li>
+                    <li class="document-item" data-title="MM PT Warrant" data-desc="Metropolitan Magistrate/Police Training Warrant for court procedures and remand">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>MM PT Warrant</div>
+                            <div class="doc-desc">Metropolitan Magistrate/Police Training Warrant for court procedures and remand</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.doc" target="_blank" class="btn btn-remand">📝 Word</a>
+                            <a href="https://clearexams.online/policedocuments/court_forms/mm_pt_warrant.pdf" target="_blank" class="btn btn-remand">📄 PDF</a>
+                        </div>
+                    </li>
                 </ul>
             </div>
 
@@ -545,7 +585,7 @@
                 </ul>
             </div>
 
-            <!-- CRB Forms Card (UPDATED: Added CIG Format, Police Announcement & Letter to CRB) -->
+            <!-- CRB Forms Card -->
             <div class="card">
                 <h2><i>🕵️</i> CRB Forms</h2>
                 <div class="search-info" id="crbFormsInfo"></div>
@@ -615,7 +655,7 @@
                 </ul>
             </div>
 
-            <!-- NEW: Election Forms Card -->
+            <!-- Election Forms Card -->
             <div class="card">
                 <h2><i>🗳️</i> Election</h2>
                 <div class="search-info" id="electionFormsInfo"></div>
@@ -631,7 +671,6 @@
                             </a>
                         </div>
                     </li>
-                    <!-- Additional Election forms can be added here -->
                     <li class="document-item" data-title="Election Expenditure Statement" data-desc="Form for monitoring election campaign expenditure">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Election Expenditure Statement</div>
@@ -684,7 +723,6 @@
     </div>
 
     <script>
-        // Enhanced search and notification logic, now includes Election Forms section and new Letter to CRB
         function showNotification(message) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -701,13 +739,14 @@
         function performSearch() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const sections = [
-                { listId: 'downloadFormsList', infoId: 'downloadFormsInfo', type: 'Download' },
-                { listId: 'generatePDFsList', infoId: 'generatePDFsInfo', type: 'Generate' },
-                { listId: 'juvenileRemandList', infoId: 'juvenileRemandInfo', type: 'Juvenile' },
-                { listId: 'jailFormsList', infoId: 'jailFormsInfo', type: 'Jail' },
-                { listId: 'crbFormsList', infoId: 'crbFormsInfo', type: 'CRB' },
-                { listId: 'electionFormsList', infoId: 'electionFormsInfo', type: 'Election' },
-                { listId: 'miscList', infoId: 'miscInfo', type: 'Misc' }
+                { listId: 'downloadFormsList', infoId: 'downloadFormsInfo' },
+                { listId: 'generatePDFsList', infoId: 'generatePDFsInfo' },
+                { listId: 'remandDocumentsList', infoId: 'remandDocumentsInfo' },
+                { listId: 'juvenileRemandList', infoId: 'juvenileRemandInfo' },
+                { listId: 'jailFormsList', infoId: 'jailFormsInfo' },
+                { listId: 'crbFormsList', infoId: 'crbFormsInfo' },
+                { listId: 'electionFormsList', infoId: 'electionFormsInfo' },
+                { listId: 'miscList', infoId: 'miscInfo' }
             ];
             
             sections.forEach(section => {
@@ -743,7 +782,6 @@
             });
         }
         
-        // Setup interactive handlers for all buttons with notification + external open
         function setupGlobalLinkHandlers() {
             document.querySelectorAll('.doc-actions a').forEach(link => {
                 if (link.getAttribute('href') === '#' || link.getAttribute('href') === 'javascript:void(0)' || link.style.cursor === 'default') {
@@ -758,7 +796,7 @@
                     const docItem = this.closest('.document-item');
                     let docTitle = docItem ? docItem.getAttribute('data-title') : 'Document';
                     if (!docTitle) docTitle = 'Document';
-                    const isGenerate = this.classList.contains('btn-generate') || this.classList.contains('btn-crb') || this.classList.contains('btn-election');
+                    const isGenerate = this.classList.contains('btn-generate') || this.classList.contains('btn-crb') || this.classList.contains('btn-election') || this.classList.contains('btn-remand');
                     const actionMsg = isGenerate ? `Opening ${docTitle} generator...` : `Opening ${docTitle} document...`;
                     showNotification(actionMsg);
                     setTimeout(() => {
@@ -775,9 +813,9 @@
             if (searchButton) searchButton.addEventListener('click', performSearch);
             setupGlobalLinkHandlers();
             
-            // Update forms count to 37 (added Letter to CRB under CRB)
+            // Update forms count to reflect removal of 3 forms from Download and addition of new Remand section (net forms count remains same but reorganized)
             const statValueSpan = document.getElementById('formsCount');
-            if (statValueSpan) statValueSpan.innerText = '37';
+            if (statValueSpan) statValueSpan.innerText = '34';
         });
     </script>
 </body>
