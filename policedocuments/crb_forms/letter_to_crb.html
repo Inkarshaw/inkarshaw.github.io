@@ -167,7 +167,7 @@
         .sender-label {
             padding-left: 0;
             margin-bottom: 0.3rem;
-            font-weight: 600;
+            fontWeight: 600;
             letter-spacing: 0.3px;
         }
         .sender-address {
@@ -200,34 +200,47 @@
             padding-left: 0;
         }
 
-        /* MERGED TABLE: single unified info-row styling */
-        .info-row-merged {
+        /* MERGED TABLE: single outer table with two rows (பார்வை and பொருள்) */
+        .merged-info-table {
+            width: 100%;
+            border-collapse: collapse;
             margin: 1.8rem 0;
-            display: flex;
-            flex-wrap: wrap;
             border: 1.2px solid #000000;
             background: white;
         }
-        .info-label-merged {
+        .merged-info-table td {
+            border: none;
+            vertical-align: top;
+            padding: 0;
+        }
+        .merged-info-table .label-cell {
             width: 18%;
-            padding: 16px 22px;
-            font-weight: 700;
-            border-right: 1.2px solid black;
             background: white;
+            border-right: 1.2px solid black;
+            font-weight: 700;
+            padding: 16px 22px;
             letter-spacing: 0.3px;
             font-size: 13.5px;
-            vertical-align: top;
         }
-        .info-value-merged {
+        .merged-info-table .value-cell {
             width: 82%;
-            padding: 16px 22px;
             background: white;
+            padding: 16px 22px;
             font-size: 13.5px;
             line-height: 1.65;
         }
-        /* ensure inner spans display inline properly */
-        .info-value-merged span, .info-value-merged strong {
-            font-family: inherit;
+        /* subtle border only between rows: first row gets bottom border for visual separation */
+        .merged-info-table tr:first-child td {
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .merged-info-table tr:first-child .label-cell,
+        .merged-info-table tr:first-child .value-cell {
+            border-bottom: 1px solid #e0e0e0;
+        }
+        /* ensure no double border on last row */
+        .merged-info-table tr:last-child .label-cell,
+        .merged-info-table tr:last-child .value-cell {
+            border-bottom: none;
         }
 
         .content-paragraph {
@@ -330,27 +343,27 @@
             .legal-paper {
                 padding: 3rem 2rem !important;
             }
-            .info-label-merged, .info-value-merged {
+            .merged-info-table .label-cell, 
+            .merged-info-table .value-cell {
+                display: block;
                 width: 100%;
+            }
+            .merged-info-table .label-cell {
                 border-right: none;
                 border-bottom: 1px solid #ddd;
             }
-            .info-row-merged {
-                flex-direction: column;
+            .merged-info-table tr:first-child .label-cell,
+            .merged-info-table tr:first-child .value-cell {
+                border-bottom: 1px solid #ddd;
+            }
+            .merged-info-table {
+                border: 1.2px solid black;
             }
             .input-panel {
                 padding: 18px;
             }
             .apply-btn {
                 grid-column: span 1;
-            }
-            .info-label-merged {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #ddd;
-            }
-            .info-value-merged {
-                width: 100%;
             }
             .indent-first-line {
                 text-indent: 40px;
@@ -520,7 +533,7 @@
         <button class="apply-btn" id="applyBtn">⟳ புதுப்பிக்கவும் / மாற்றங்களைப் பயன்படுத்தவும்</button>
     </div>
 
-    <!-- Official CRB Letter Content in Tamil Unicode - MERGED TABLES (பார்வை + பொருள் combined into one unified table) -->
+    <!-- Official CRB Letter Content in Tamil Unicode - MERGED TABLE with TWO ROWS (பார்வை and பொருள்) -->
     <div class="document-card">
         <div class="legal-paper tamil-text" id="pdfContent">
             <div class="header-left">
@@ -541,15 +554,21 @@
                 <div>ஐயா,</div>
             </div>
 
-            <!-- MERGED TABLE: "பார்வை" and "பொருள்" combined into a single info row -->
-            <div class="info-row-merged">
-                <div class="info-label-merged">பார்வை / பொருள்:</div>
-                <div class="info-value-merged" id="mergedVisionSubject">
-                    <!-- Dynamic Content: station + case details + subject merged -->
-                    <span id="stationShortDisplay">ஜி7 சேத்துப்பட்டு கா.நி</span> குற்ற எண்: <strong><span id="caseNumberSpan">88/2026</span></strong> பிரிவு <strong><span id="bnssSpan">194 BNSS</span></strong> — 
-                    இறந்த நபரின் பெயர் தெரியாத <span id="mergedDeceasedGender">ஆண்</span> <span id="mergedAgeSpan">55</span> வயதுடைய மர்ம நபர் குறித்து அடையாளம் காணல் மற்றும் விசாரணை தொடர்பானது.
-                </div>
-            </div>
+            <!-- MERGED TABLE WITH TWO ROWS: பார்வை (first row) and பொருள் (second row) -->
+            <table class="merged-info-table">
+                <tr>
+                    <td class="label-cell">பார்வை:</td>
+                    <td class="value-cell" id="visionValue">
+                        <span id="stationShortDisplay">ஜி7 சேத்துப்பட்டு கா.நி</span> குற்ற எண்: <span id="caseNumberSpan">88/2026</span> பிரிவு <span id="bnssSpan">194 BNSS</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-cell">பொருள்:</td>
+                    <td class="value-cell" id="subjectTextDisplay">
+                        இறந்த நபரின் பெயர் தெரியாத <span id="deceasedGenderSpanSubject">ஆண்</span> <span id="subjectAgeSpan">55</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.
+                    </td>
+                </tr>
+            </table>
 
             <!-- Main narrative: includes station jurisdiction, SOC location with proximity -->
             <p class="content-paragraph indent-first-line" id="mainNarrative">
@@ -685,6 +704,8 @@
         document.getElementById('confirmationMethodSpan').innerText = confirmationMethod;
         document.getElementById('bodyKeptSpan').innerHTML = bodyKeptSelected;
         document.getElementById('deceasedGenderTextSpan').innerText = deceasedGender;
+        document.getElementById('deceasedGenderSpanSubject').innerText = deceasedGender;
+        document.getElementById('subjectAgeSpan').innerText = ageValue;
         
         // Complainant details
         document.getElementById('genderTitleSpan').innerText = genderTitle;
@@ -693,18 +714,11 @@
         document.getElementById('fatherNameSpan').innerText = fatherName;
         document.getElementById('addressSpan').innerText = address;
         
-        // MERGED TABLE update: combine vision (station/case/bnss) and subject (deceased details)
-        const mergedContainer = document.getElementById('mergedVisionSubject');
-        if (mergedContainer) {
-            mergedContainer.innerHTML = `<span id="stationShortDisplay">${stationInfo.short}</span> குற்ற எண்: <strong><span id="caseNumberSpan">${caseNumber}</span></strong> பிரிவு <strong><span id="bnssSpan">${bnss}</span></strong> — 
-            இறந்த நபரின் பெயர் தெரியாத <span id="mergedDeceasedGender">${deceasedGender}</span> <span id="mergedAgeSpan">${ageValue}</span> வயதுடைய மர்ம நபர் குறித்து அடையாளம் காணல் மற்றும் விசாரணை தொடர்பானது.`;
-            // re-attach dynamic inner references to keep consistency for future updates? but we do full replace each time anyway
+        // Update the subject text (second row in merged table)
+        const subjectDiv = document.getElementById('subjectTextDisplay');
+        if (subjectDiv) {
+            subjectDiv.innerHTML = `இறந்த நபரின் பெயர் தெரியாத <span id="deceasedGenderSpanSubject">${deceasedGender}</span> <span id="subjectAgeSpan">${ageValue}</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.`;
         }
-        // also update the separate merged gender/age span references used later (optional but keep consistent)
-        const mergedGenderSpan = document.getElementById('mergedDeceasedGender');
-        if (mergedGenderSpan) mergedGenderSpan.innerText = deceasedGender;
-        const mergedAgeSpan = document.getElementById('mergedAgeSpan');
-        if (mergedAgeSpan) mergedAgeSpan.innerText = ageValue;
     }
     
     function resetToDefault() {
@@ -754,12 +768,11 @@
                     const style = clonedDoc.createElement('style');
                     style.textContent = `
                         * { font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', 'Segoe UI Emoji', 'FreeSerif', sans-serif !important; }
-                        .legal-paper, .tamil-text, p, div, span, .info-label-merged, .info-value-merged { font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif !important; }
+                        .legal-paper, .tamil-text, p, div, span, .merged-info-table, .merged-info-table td { font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif !important; }
                         body { background: white; margin: 0; padding: 0; }
                         .legal-paper { padding: 6rem 5rem !important; }
-                        .info-row-merged { border: 1.2px solid black !important; margin: 1.8rem 0 !important; }
-                        .info-label-merged { border-right: 1.2px solid black !important; background: white !important; }
-                        .info-value-merged { background: white !important; }
+                        .merged-info-table { border: 1.2px solid black !important; margin: 1.8rem 0 !important; }
+                        .merged-info-table .label-cell { border-right: 1.2px solid black !important; background: white !important; }
                         .indent-first-line { text-indent: 72px !important; }
                         .sender-address { padding-left: 48px !important; }
                         .receiver-address { padding-left: 48px !important; }
