@@ -2,12 +2,18 @@
 <html lang="ta">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ஆளில்லா சான்று PDF ஜெனரேட்டர்</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ஆளில்லா சான்று PDF ஜெனரேட்டர் | Tamil Police Certificate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --a4-width: 210mm;
             --a4-height: 297mm;
@@ -15,1087 +21,651 @@
         }
 
         body {
-            font-family: 'Helvetica', Arial, sans-serif;
-            background-color: #2c3e50;
-            padding: 15px;
+            font-family: 'Segoe UI', 'Helvetica', Arial, sans-serif;
+            background: #e9ecef;
+            padding: 16px;
             margin: 0;
+            min-height: 100vh;
         }
 
-        .container-fluid {
-            padding: 10px;
-            height: 100vh;
+        /* main app container */
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
+        /* header */
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
+            margin-bottom: 24px;
+            padding: 18px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
         }
 
         .tamil-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e466e;
             margin: 0;
+            letter-spacing: -0.3px;
         }
 
-        /* Main Layout */
-        .main-content {
+        /* main flex layout */
+        .dashboard {
             display: flex;
-            height: calc(100vh - 120px);
-            gap: 15px;
+            gap: 24px;
+            flex-wrap: wrap;
         }
 
-        /* Input Panel */
+        /* left panel (inputs) */
         .input-panel {
-            width: 400px;
+            flex: 0 0 380px;
             background: white;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 24px;
+            padding: 22px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            height: fit-content;
+            max-height: calc(100vh - 140px);
             overflow-y: auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        /* Preview Panel */
+        /* right panel (preview) */
         .preview-panel {
             flex: 1;
-            background: #f8f9fa;
-            border-radius: 8px;
+            background: #f1f3f5;
+            border-radius: 24px;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         }
 
-        /* A4 Preview Container */
-        .a4-preview-container {
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 16px;
+            padding: 0 8px;
+        }
+
+        /* A4 scroll container */
+        .a4-scroll-container {
             flex: 1;
+            background: #6c757d40;
+            border-radius: 18px;
+            padding: 24px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             overflow: auto;
-            background: #6c757d;
-            border-radius: 4px;
-            padding: 20px;
-            position: relative;
+            min-height: 620px;
+            background-image: radial-gradient(circle at 1px 1px, #adb5bd20 1px, transparent 1px);
+            background-size: 24px 24px;
         }
 
-        /* A4 Page */
+        /* actual A4 page */
         .a4-page {
             width: var(--a4-width);
             min-height: var(--a4-height);
             background: white;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.35);
+            border-radius: 4px;
+            transition: all 0.1s;
             position: relative;
+            flex-shrink: 0;
         }
 
-        /* Document Content */
         .document-content {
-            font-family: 'Latha', 'Times New Roman', serif;
-            line-height: 1.6;
+            font-family: 'Latha', 'Noto Sans Tamil', 'Segoe UI', 'Times New Roman', serif;
+            line-height: 1.55;
             font-size: 11pt;
-            height: 100%;
             padding: var(--page-margin);
             box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            background: white;
         }
 
-        /* Form Elements */
+        /* form styling */
         .form-label {
-            font-weight: bold;
-            margin-top: 15px;
-            color: #2c3e50;
-            font-size: 14px;
+            font-weight: 600;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #1e466e;
         }
 
         .form-control, .form-select {
             font-size: 14px;
+            border-radius: 12px;
+            border: 1px solid #ced4da;
             padding: 8px 12px;
-            margin-bottom: 5px;
         }
 
-        textarea.form-control {
-            resize: vertical;
-            min-height: 60px;
+        .relationship-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 8px 0;
         }
 
-        /* Text input fields for other districts */
-        .other-district-input {
-            font-size: 14px;
-            padding: 12px;
-            min-height: 80px;
-            resize: vertical;
+        .relationship-btn {
+            flex: 1;
+            text-align: center;
+            padding: 6px 8px;
+            border-radius: 40px;
+            background: #f1f3f5;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid #dee2e6;
         }
 
-        /* Controls */
-        .controls {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #dee2e6;
+        .relationship-btn.active {
+            background: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+        }
+
+        .title-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .title-select {
+            width: 100px;
+        }
+
+        .small-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            display: block;
         }
 
         .btn-action {
             width: 100%;
+            margin-top: 12px;
             padding: 10px;
-            margin-bottom: 10px;
-            font-size: 14px;
+            font-weight: 600;
+            border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
 
-        /* Title Dropdown for Witness Only */
-        .title-section {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+        .other-district-input {
+            resize: vertical;
+            min-height: 80px;
         }
 
-        .title-select {
-            width: 120px;
-        }
-
-        .name-input {
-            flex: 1;
-        }
-
-        /* Small label for age and father/husband fields */
-        .small-label {
+        .badge-custom {
+            background: #198754;
             font-size: 12px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 3px;
-            display: block;
+            padding: 5px 12px;
+            border-radius: 40px;
         }
 
-        /* District selector */
-        .district-selector {
-            margin-bottom: 15px;
-        }
-
-        /* Relationship selector */
-        .relationship-selector {
-            margin-bottom: 15px;
-        }
-
-        .relationship-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .relationship-btn {
-            flex: 1;
-            padding: 8px 12px;
-            text-align: center;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            cursor: pointer;
-            background-color: #f8f9fa;
-            transition: all 0.2s;
-            font-size: 13px;
-        }
-
-        .relationship-btn:hover {
-            background-color: #e9ecef;
-        }
-
-        .relationship-btn.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .main-content {
-                flex-direction: column;
-                height: auto;
-            }
-
+        @media (max-width: 1000px) {
             .input-panel {
-                width: 100%;
-                max-height: 50vh;
+                flex: 0 0 100%;
+                max-height: 480px;
             }
-
-            .a4-preview-container {
+            .dashboard {
+                flex-direction: column;
+            }
+            .a4-scroll-container {
                 min-height: 500px;
             }
         }
 
-        /* Print styles */
         @media print {
             .no-print {
                 display: none !important;
             }
-
             .a4-page {
-                box-shadow: none !important;
-                margin: 0 !important;
+                box-shadow: none;
+                margin: 0 auto;
             }
         }
+
+        /* additional spacing for letter content */
+        .document-content div {
+            word-break: break-word;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="header">
-            <h1 class="tamil-title">ஆளில்லா சான்று PDF ஜெனரேட்டர்</h1>
-            <p class="mb-0 text-muted">Preview மற்றும் PDF சரியாக ஒரே மாதிரி</p>
-        </div>
+<div class="app-container">
+    <div class="header">
+        <h1 class="tamil-title">📄 ஆளில்லா சான்று PDF ஜெனரேட்டர்</h1>
+        <p class="text-muted mt-2 mb-0">தமிழ் காவல் சான்றிதழ் | A4 முன்னோட்டம் = PDF துல்லியம்</p>
+    </div>
 
-        <div class="main-content">
-            <!-- Input Panel -->
-            <div class="input-panel no-print">
-                <h5 class="mb-4">ஆவண விவரங்களை நிரப்புக</h5>
+    <div class="dashboard">
+        <!-- INPUT PANEL -->
+        <div class="input-panel no-print">
+            <h5 class="mb-3"><i class="bi bi-pencil-square"></i> ஆவண விவரங்கள்</h5>
 
-                <!-- District Selector -->
-                <div class="mb-3 district-selector">
-                    <label class="form-label">மாவட்டத்தை தேர்ந்தெடுக்கவும்:</label>
-                    <select class="form-select" id="districtSelect" onchange="toggleDistrictFields()">
-                        <option value="chennai" selected>சென்னை</option>
-                        <option value="other">பிற மாவட்டங்கள்</option>
+            <!-- District Toggle -->
+            <div class="mb-3">
+                <label class="form-label">📍 மாவட்டம்</label>
+                <select class="form-select" id="districtSelect">
+                    <option value="chennai" selected>சென்னை (காவல் நிலையங்கள் பட்டியல்)</option>
+                    <option value="other">பிற மாவட்டங்கள் (கைமுறை உள்ளீடு)</option>
+                </select>
+            </div>
+
+            <!-- Police station -->
+            <div class="mb-3">
+                <label class="form-label">👮 காவல் நிலையத்தின் பெயர்</label>
+                <div id="chennaiPoliceStationContainer">
+                    <select class="form-select" id="policeStationDropdown">
+                        <option value="" selected>-- தேர்ந்தெடுக்கவும் --</option>
+                        <optgroup label="சென்னை காவல் நிலையங்கள்" id="chennaiStations"></optgroup>
                     </select>
                 </div>
-
-                <!-- Form Fields -->
-                <div class="mb-3">
-                    <label class="form-label">காவல் நிலையத்தின் பெயர்:</label>
-                    
-                    <!-- Chennai District - Dropdown -->
-                    <div id="chennaiPoliceStationContainer">
-                        <select class="form-select" id="policeStationDropdown" onchange="updatePreview()">
-                            <option value="" selected>-- தேர்ந்தெடுக்கவும் --</option>
-                            <!-- Chennai Police Stations (Default) -->
-                            <optgroup label="சென்னை காவல் நிலையங்கள்" id="chennaiStations">
-                                <!-- These will be populated dynamically -->
-                            </optgroup>
-                        </select>
-                    </div>
-                    
-                    <!-- Other Districts - Text Input -->
-                    <div id="otherPoliceStationContainer" style="display: none;">
-                        <textarea class="form-control other-district-input" id="policeStationText" 
-                                  placeholder="காவல் நிலையத்தின் முழுப் பெயரை உள்ளிடவும்..." 
-                                  oninput="updatePreview()"></textarea>
-                    </div>
-                </div>
-
-                <!-- வட்டாட்சியர் - SELECTABLE DROPDOWN -->
-                <div class="mb-3">
-                    <label class="form-label">எழும்புர் வட்டாட்சியர்:</label>
-                    
-                    <!-- Chennai District - Dropdown -->
-                    <div id="chennaiCollectorContainer">
-                        <select class="form-select" id="collectorNameDropdown" onchange="updatePreview()">
-                            <option value="வட்டாட்சியர் அவர்கள்" selected>-- தேர்ந்தெடுக்கவும் --</option>
-                            <option value="சென்னை (வடக்கு) வட்டாட்சியர்">சென்னை (வடக்கு) வட்டாட்சியர்</option>
-                            <option value="திருவொற்றியூர் வட்டாட்சியர்">திருவொற்றியூர் வட்டாட்சியர்</option>
-                            <option value="புறாவாக்கம் வட்டாட்சியர்">புறாவாக்கம் வட்டாட்சியர்</option>
-                            <option value="பெரம்பூர் வட்டாட்சியர்">பெரம்பூர் வட்டாட்சியர்</option>
-                            <option value="மாதவரம் வட்டாட்சியர்">மாதவரம் வட்டாட்சியர்</option>
-                            <option value="ஆயிரம் விளக்கு வட்டாட்சியர்">ஆயிரம் விளக்கு வட்டாட்சியர்</option>
-                            <option value="வில்லிவாக்கம் வட்டாட்சியர்">வில்லிவாக்கம் வட்டாட்சியர்</option>
-                            <option value="அம்பத்தூர் வட்டாட்சியர்">அம்பத்தூர் வட்டாட்சியர்</option>
-                            <option value="எழும்பூர் வட்டாட்சியர்">எழும்பூர் வட்டாட்சியர்</option>
-                            <option value="மதுரவோயல் வட்டாட்சியர்">மதுரவோயல் வட்டாட்சியர்</option>
-                            <option value="மாம்பழம் வட்டாட்சியர்">மாம்பழம் வட்டாட்சியர்</option>
-                            <option value="மயிலாப்பூர் வட்டாட்சியர்">மயிலாப்பூர் வட்டாட்சியர்</option>
-                            <option value="வேளச்சேரி வட்டாட்சியர்">வேளச்சேரி வட்டாட்சியர்</option>
-                            <option value="தி.நகர் வட்டாட்சியர்">தி.நகர் வட்டாட்சியர்</option>
-                            <option value="அலந்தூர் வட்டாட்சியர்">அலந்தூர் வட்டாட்சியர்</option>
-                            <option value="சோழிங்கநல்லூர் வட்டாட்சியர்">சோழிங்கநல்லூர் வட்டாட்சியர்</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Other Districts - Text Input -->
-                    <div id="otherCollectorContainer" style="display: none;">
-                        <textarea class="form-control other-district-input" id="collectorNameText" 
-                                  placeholder="வட்டாட்சியர் அலுவலகத்தின் முழுப் பெயரை உள்ளிடவும்..." 
-                                  oninput="updatePreview()"></textarea>
-                    </div>
-                </div>
-
-                <!-- சாட்சி எண் -->
-                <div class="mb-3">
-                    <label class="form-label">சாட்சி எண்:</label>
-                    <input type="text" class="form-control" id="witnessNumber" value="PW 1" oninput="updatePreview()" placeholder="எ.கா: PW 1, PW 2">
-                </div>
-
-                <!-- சாட்சி விவரங்கள் -->
-                <div class="mb-3">
-                    <label class="form-label">சாட்சி விவரங்கள்:</label>
-                    <div class="title-section mb-2">
-                        <select class="form-control title-select" id="witnessTitle" onchange="updatePreview()">
-                            <option value="திரு.">திரு.</option>
-                            <option value="திருமதி." selected>திருமதி.</option>
-                            <option value="செல்வி.">செல்வி.</option>
-                            <option value="">(இல்லை)</option>
-                        </select>
-                        <input type="text" class="form-control name-input" id="witnessName" value="மாலதி" oninput="updatePreview()" placeholder="முழுப் பெயர்">
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label class="small-label">வயது:</label>
-                            <input type="text" class="form-control" id="witnessAge" value="31" oninput="updatePreview()" placeholder="எ.கா: 31">
-                        </div>
-                        <div class="col-6">
-                            <!-- Relationship Selector -->
-                            <div class="relationship-selector">
-                                <label class="small-label">தொடர்பு:</label>
-                                <div class="relationship-buttons">
-                                    <div class="relationship-btn active" id="fatherBtn" onclick="selectRelationship('father')">தந்தை பெயர்</div>
-                                    <div class="relationship-btn" id="husbandBtn" onclick="selectRelationship('husband')">கணவர் பெயர்</div>
-                                </div>
-                                <input type="text" class="form-control" id="witnessRelationship" value="டி. சந்திரன்" oninput="updatePreview()" placeholder="தந்தை/கணவர் பெயர்">
-                                <input type="hidden" id="relationshipType" value="father">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">சாட்சி முகவரி:</label>
-                    <textarea class="form-control" id="witnessAddress" rows="2" oninput="updatePreview()">எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031</textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">தேதி:</label>
-                    <input type="date" class="form-control" id="documentDate" value="2025-12-22" oninput="updatePreview()">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">குற்ற எண்:</label>
-                    <input type="text" class="form-control" id="caseNumber" value="1249/2012" oninput="updatePreview()" placeholder="எ.கா: 1249/2012">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">குற்ற விதிகள்:</label>
-                    <input type="text" class="form-control" id="caseSections" value="452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC" oninput="updatePreview()" placeholder="எ.கா: 452, 326 IPC">
-                </div>
-
-                <!-- கூடுதல் விளக்கம் section REMOVED -->
-
-                <!-- Controls -->
-                <div class="controls">
-                    <button class="btn btn-primary btn-action" onclick="generatePDF()">
-                        <i class="bi bi-file-pdf"></i> PDF உருவாக்கு & பதிவிறக்கம்
-                    </button>
-
-                    <button class="btn btn-success btn-action" onclick="printDocument()">
-                        <i class="bi bi-printer"></i> ஆவணத்தை அச்சிடுக
-                    </button>
-
-                    <button class="btn btn-warning btn-action" onclick="resetForm()">
-                        <i class="bi bi-arrow-clockwise"></i> படிவத்தை மீட்டமை
-                    </button>
+                <div id="otherPoliceStationContainer" style="display: none;">
+                    <textarea class="form-control other-district-input" id="policeStationText" placeholder="முழு காவல் நிலைய பெயர் (எ.கா: திருச்சி மத்திய காவல் நிலையம்)"></textarea>
                 </div>
             </div>
 
-            <!-- Preview Panel -->
-            <div class="preview-panel">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">A4 ஆவண முன்னோட்டம்</h5>
-                    <span class="badge bg-success">Preview = PDF</span>
+            <!-- Tahsildar -->
+            <div class="mb-3">
+                <label class="form-label">🏛️ வட்டாட்சியர் அலுவலகம்</label>
+                <div id="chennaiCollectorContainer">
+                    <select class="form-select" id="collectorNameDropdown">
+                        <option value="வட்டாட்சியர் அவர்கள்" selected>-- வட்டாட்சியரை தேர்வு செய்க --</option>
+                        <!-- options from data will be appended but already have hardcoded, keep extended via script -->
+                    </select>
                 </div>
+                <div id="otherCollectorContainer" style="display: none;">
+                    <textarea class="form-control other-district-input" id="collectorNameText" placeholder="வட்டாட்சியர் அலுவலகத்தின் முழு பெயர் (எ.கா: காஞ்சிபுரம் வட்டாட்சியர் அலுவலகம்)"></textarea>
+                </div>
+            </div>
 
-                <!-- A4 Preview Container -->
-                <div class="a4-preview-container">
-                    <!-- A4 Page -->
-                    <div class="a4-page" id="a4Page">
-                        <div class="document-content" id="previewContent">
-                            <!-- Preview content will be generated here -->
+            <!-- Witness Number -->
+            <div class="mb-3">
+                <label class="form-label">🔢 சாட்சி எண்</label>
+                <input type="text" class="form-control" id="witnessNumber" value="PW 1">
+            </div>
+
+            <!-- Witness details -->
+            <div class="mb-3">
+                <label class="form-label">🧑 சாட்சி விவரங்கள்</label>
+                <div class="title-section">
+                    <select class="form-select title-select" id="witnessTitle">
+                        <option value="திரு.">திரு.</option>
+                        <option value="திருமதி." selected>திருமதி.</option>
+                        <option value="செல்வி.">செல்வி.</option>
+                        <option value="">(இல்லை)</option>
+                    </select>
+                    <input type="text" class="form-control" id="witnessName" value="மாலதி" placeholder="முழுப்பெயர்">
+                </div>
+                <div class="row g-2 mt-1">
+                    <div class="col-6">
+                        <label class="small-label">வயது</label>
+                        <input type="text" class="form-control" id="witnessAge" value="31">
+                    </div>
+                    <div class="col-6">
+                        <label class="small-label">தொடர்பு</label>
+                        <div class="relationship-buttons">
+                            <div class="relationship-btn active" id="fatherBtn">தந்தை பெயர்</div>
+                            <div class="relationship-btn" id="husbandBtn">கணவர் பெயர்</div>
                         </div>
+                        <input type="text" class="form-control" id="witnessRelationship" value="டி. சந்திரன்">
+                        <input type="hidden" id="relationshipType" value="father">
                     </div>
                 </div>
+            </div>
 
-                <div class="text-center mt-3 no-print">
-                    <p class="text-muted mb-0">A4 பக்க அளவு: 210mm × 297mm | தமிழ் எழுத்துரு: Latha</p>
-                    <p class="text-muted mb-0"><strong>குறிப்பு:</strong> மேலே உள்ள preview சரியாக PDF இல் வரும்</p>
+            <div class="mb-3">
+                <label class="form-label">🏠 முகவரி</label>
+                <textarea class="form-control" id="witnessAddress" rows="2">எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">📅 தேதி</label>
+                <input type="date" class="form-control" id="documentDate" value="2025-12-22">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">⚖️ குற்ற எண்</label>
+                <input type="text" class="form-control" id="caseNumber" value="1249/2012">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">📜 குற்ற விதிகள்</label>
+                <input type="text" class="form-control" id="caseSections" value="452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC">
+            </div>
+
+            <div class="controls mt-3">
+                <button class="btn btn-primary btn-action" onclick="generatePDF()"><i class="bi bi-file-pdf-fill"></i> PDF உருவாக்கு & பதிவிறக்கம்</button>
+                <button class="btn btn-success btn-action" onclick="printDocument()"><i class="bi bi-printer-fill"></i> அச்சிடுக</button>
+                <button class="btn btn-outline-secondary btn-action" onclick="resetForm()"><i class="bi bi-arrow-repeat"></i> மீட்டமை</button>
+            </div>
+        </div>
+
+        <!-- PREVIEW PANEL -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <h5 class="mb-0"><i class="bi bi-eye-fill"></i> A4 முன்னோட்டம் (தமிழ்)</h5>
+                <span class="badge-custom badge text-white">Preview = PDF</span>
+            </div>
+            <div class="a4-scroll-container" id="a4ScrollContainer">
+                <div class="a4-page" id="a4Page">
+                    <div class="document-content" id="previewContent">
+                        <!-- dynamic content -->
+                    </div>
                 </div>
+            </div>
+            <div class="text-center mt-3 no-print">
+                <small class="text-secondary">📄 A4 210mm × 297mm | உங்கள் மாற்றங்கள் உடனுக்குடன் preview-இல் தெரியும்</small>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Hidden div for PDF generation -->
-    <div id="pdfContent" style="display: none;"></div>
+<script>
+    const { jsPDF } = window.jspdf;
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    // ---------- Complete Chennai Police stations ----------
+    const chennaiPoliceStations = [
+        "AWPS பேரவள்ளூர்", "B1 வடக்குக் கடற்கரை காவல் நிலையம்", "B2 எஸ்பிளனேட் காவல் நிலையம்", "B3 கோட்டை செயின்ட் ஜார்ஜ் காவல் நிலையம்",
+        "B4 உயர்நீதிமன்ற காவல் நிலையம்", "C1 பூக்கடை காவல் நிலையம்", "C2 எலிபெண்ட் கேட் காவல் நிலையம்", "C3 செவன் வெல்ஸ் காவல் நிலையம்",
+        "C4 அரசு பொது மருத்துவமனை அவுட்போஸ்ட்", "C5 கொத்தவால் சாவடி காவல் நிலையம்", "D1 திருப்பள்ளிக்கேணி காவல் நிலையம்", "D2 அண்ணா சாலை காவல் நிலையம்",
+        "D3 ஐஸ் ஹவுஸ் காவல் நிலையம்", "D4 ஜாம் பஜார் காவல் நிலையம்", "D5 மெரினா காவல் நிலையம்", "D6 அண்ணா சதுக்கம் காவல் நிலையம்",
+        "D7 அரசு எஸ்டேட் காவல் நிலையம்", "D8 கஸ்தூரிபாய் காந்தி மருத்துவமனை காவல் நிலையம்", "E1 மயிலாப்பூர் காவல் நிலையம்", "E2 ராயப்பேட்டை காவல் நிலையம்",
+        "E3 தேனாம்பேட்டை காவல் நிலையம்", "E4 அபிராமபுரம் காவல் நிலையம்", "F1 சிந்தாதிரிப்பேட்டை காவல் நிலையம்", "F2 எழும்பூர் காவல் நிலையம்",
+        "F3 நுங்கம்பாக்கம் காவல் நிலையம்", "F4 தௌசண்ட் லைட்ஸ் காவல் நிலையம்", "F5 சேத்துப்பட்டு காவல் நிலையம்", "G1 வேப்பேரி காவல் நிலையம்",
+        "G2 பெரியமேடு காவல் நிலையம்", "G3 கிளிப்பாக் காவல் நிலையம்", "G5 செயலக காலனி காவல் நிலையம்", "G7 சேத்துபட்டு காவல் நிலையம்",
+        "H1 பழைய வண்ணாரப்பேட்டை காவல் நிலையம்", "H3 தொண்டையார்பேட்டை காவல் நிலையம்", "J1 சைதாப்பேட்டை காவல் நிலையம்", "J2 அடையாறு காவல் நிலையம்",
+        "J3 கிண்டி காவல் நிலையம்", "J5 சாஸ்திரி நகர் காவல் நிலையம்", "J6 திருவான்மியூர் காவல் நிலையம்", "J7 வேளச்சேரி காவல் நிலையம்",
+        "K1 செம்பியம் காவல் நிலையம்", "K2 அயனாவரம் காவல் நிலையம்", "K4 அண்ணா நகர் காவல் நிலையம்", "K6 டிபி சத்திரம் காவல் நிலையம்",
+        "K8 அரும்பாக்கம் காவல் நிலையம்", "M1 ஹார்பர் காவல் நிலையம்", "N1 ராயபுரம் காவல் நிலையம்", "P1 புளியந்தோப்பு காவல் நிலையம்",
+        "R1 மாம்பலம் காவல் நிலையம்", "R2 கோடம்பாக்கம் காவல் நிலையம்", "R3 அசோக் நகர் காவல் நிலையம்", "V1 வில்லிவாக்கம் காவல் நிலையம்",
+        "V2 விருகம்பாக்கம் காவல் நிலையம்", "W1 அனைத்து மகளிர் காவல் நிலையம் தௌசண்ட் லைட்ஸ்"
+    ];
+    // collector options dropdown populate
+    const collectorOptions = [
+        "சென்னை (வடக்கு) வட்டாட்சியர்", "திருவொற்றியூர் வட்டாட்சியர்", "புறாவாக்கம் வட்டாட்சியர்", "பெரம்பூர் வட்டாட்சியர்",
+        "மாதவரம் வட்டாட்சியர்", "ஆயிரம் விளக்கு வட்டாட்சியர்", "வில்லிவாக்கம் வட்டாட்சியர்", "அம்பத்தூர் வட்டாட்சியர்",
+        "எழும்பூர் வட்டாட்சியர்", "மதுரவோயல் வட்டாட்சியர்", "மாம்பழம் வட்டாட்சியர்", "மயிலாப்பூர் வட்டாட்சியர்",
+        "வேளச்சேரி வட்டாட்சியர்", "தி.நகர் வட்டாட்சியர்", "அலந்தூர் வட்டாட்சியர்", "சோழிங்கநல்லூர் வட்டாட்சியர்"
+    ];
 
-    <script>
-        // Initialize jsPDF
-        const { jsPDF } = window.jspdf;
-
-        // Chennai Police Stations Data (Tamil names) with area-wise pincode mapping
-        const chennaiPoliceStations = [
-            "AWPS பேரவள்ளூர்",
-            "B1 வடக்குக் கடற்கரை காவல் நிலையம்",
-            "B2 எஸ்பிளனேட் காவல் நிலையம்",
-            "B3 கோட்டை செயின்ட் ஜார்ஜ் காவல் நிலையம்",
-            "B4 உயர்நீதிமன்ற காவல் நிலையம்",
-            "C1 பூக்கடை காவல் நிலையம்",
-            "C2 எலிபெண்ட் கேட் காவல் நிலையம்",
-            "C3 செவன் வெல்ஸ் காவல் நிலையம்",
-            "C4 அரசு பொது மருத்துவமனை அவுட்போஸ்ட்",
-            "C5 கொத்தவால் சாவடி காவல் நிலையம்",
-            "D1 திருப்பள்ளிக்கேணி காவல் நிலையம்",
-            "D2 அண்ணா சாலை காவல் நிலையம்",
-            "D3 ஐஸ் ஹவுஸ் காவல் நிலையம்",
-            "D4 ஜாம் பஜார் காவல் நிலையம்",
-            "D5 மெரினா காவல் நிலையம்",
-            "D6 அண்ணா சதுக்கம் காவல் நிலையம்",
-            "D6 அண்ணா சதுக்கம் போக்குவரத்து விசாரணை",
-            "D7 அரசு எஸ்டேட் காவல் நிலையம்",
-            "D8 கஸ்தூரிபாய் காந்தி மருத்துவமனை காவல் நிலையம்",
-            "E1 மயிலாப்பூர் காவல் நிலையம்",
-            "E2 ராயப்பேட்டை காவல் நிலையம்",
-            "E3 தேனாம்பேட்டை காவல் நிலையம்",
-            "E4 அபிராமபுரம் காவல் நிலையம்",
-            "E5 பட்டினப்பாக்கம் காவல் நிலையம்",
-            "F1 சிந்தாதிரிப்பேட்டை காவல் நிலையம்",
-            "F2 எழும்பூர் காவல் நிலையம்",
-            "F3 நுங்கம்பாக்கம் காவல் நிலையம்",
-            "F4 தௌசண்ட் லைட்ஸ் காவல் நிலையம்",
-            "F5 சேத்துப்பட்டு காவல் நிலையம்",
-            "F6 மியூசியம் காவல் நிலையம்",
-            "F7 அரசு மகளிர் குழந்தைகள் மருத்துவமனை காவல் நிலையம்",
-            "G1 வேப்பேரி காவல் நிலையம்",
-            "G2 பெரியமேடு காவல் நிலையம்",
-            "G3 கிளிப்பாக் காவல் நிலையம்",
-            "G3 கிளிப்பாக் போக்குவரத்து விசாரணை",
-            "G4 மனநல மருத்துவமனை அவுட்போஸ்ட்",
-            "G5 செயலக காலனி காவல் நிலையம்",
-            "G6 கிளிப்பாக் மருத்துவக் கல்லூரி காவல் நிலையம்",
-            "G7 சேத்துபட்டு காவல் நிலையம்",
-            "H1 பழைய வண்ணாரப்பேட்டை காவல் நிலையம்",
-            "H2 ஸ்டான்லி மருத்துவமனை அவுட்போஸ்ட்",
-            "H3 தொண்டையார்பேட்டை காவல் நிலையம்",
-            "H4 கொருக்குப்பேட்டை காவல் நிலையம்",
-            "H5 புதிய வண்ணாரப்பேட்டை காவல் நிலையம்",
-            "H6 டாக்டர் ராதாகிருஷ்ணன் நகர்",
-            "H8 திருவொற்றியூர் காவல் நிலையம்",
-            "J13 தரமணி காவல் நிலையம்",
-            "J1 சைதாப்பேட்டை காவல் நிலையம்",
-            "J2 அடையாறு காவல் நிலையம்",
-            "J3 கிண்டி காவல் நிலையம்",
-            "J4 கொட்டூர்புரம் காவல் நிலையம்",
-            "J5 சாஸ்திரி நகர் காவல் நிலையம்",
-            "J6 திருவான்மியூர் காவல் நிலையம்",
-            "J7 வேளச்சேரி காவல் நிலையம்",
-            "J8 நீலாங்கரை காவல் நிலையம்",
-            "J9 துரைப்பாக்கம் காவல் நிலையம்",
-            "K10 கோயம்பேடு காவல் நிலையம்",
-            "K10 TIW கோயம்பேடு",
-            "K11 CMBT காவல் நிலையம்",
-            "K1 செம்பியம் காவல் நிலையம்",
-            "K2 அயனாவரம் காவல் நிலையம்",
-            "K3 அமைஞ்சிக்கரை காவல் நிலையம்",
-            "K4 அண்ணா நகர் காவல் நிலையம்",
-            "K4 TIW அண்ணா நகர்",
-            "K5 பேரவள்ளூர் காவல் நிலையம்",
-            "K6 டிபி சத்திரம் காவல் நிலையம்",
-            "K7 ICF காவல் நிலையம்",
-            "K8 அரும்பாக்கம் காவல் நிலையம்",
-            "K9 திரு வி க நகர் காவல் நிலையம்",
-            "M1 ஹார்பர் காவல் நிலையம்",
-            "M2 வாட்டர் பிரோன் காவல் நிலையம்",
-            "N1 ராயபுரம் காவல் நிலையம்",
-            "N2 காசிமேடு காவல் நிலையம்",
-            "N3 முத்தியால்பேட்டை காவல் நிலையம்",
-            "N4 மீன்பிடி துறைமுக காவல் நிலையம்",
-            "N5 RSRM மருத்துவமனை காவல் நிலையம்",
-            "P1 புளியந்தோப்பு காவல் நிலையம்",
-            "P2 ஒட்டேரி காவல் நிலையம்",
-            "P3 வியாசர்பாடி காவல் நிலையம்",
-            "P4 பேசின் பிரிட்ஜ் காவல் நிலையம்",
-            "P5 MKB நகர் காவல் நிலையம்",
-            "P6 கொடுங்கையூர் காவல் நிலையம்",
-            "R10 எம்ஜிஆர் நகர் காவல் நிலையம்",
-            "R1 மாம்பலம் காவல் நிலையம்",
-            "R2 கோடம்பாக்கம் காவல் நிலையம்",
-            "R3 அசோக் நகர் காவல் நிலையம்",
-            "R4 பாண்டி பஜார் காவல் நிலையம்",
-            "R4 TIW பாண்டி பஜார்",
-            "R5 சூளைமேடு காவல் நிலையம்",
-            "R6 குமரன் காலனி காவல் நிலையம்",
-            "R7 கேகே நகர் காவல் நிலையம்",
-            "R9 வளசரவாக்கம் காவல் நிலையம்",
-            "V1 வில்லிவாக்கம் காவல் நிலையம்",
-            "V2 விருகம்பாக்கம் காவல் நிலையம்",
-            "V3 ஜே ஜே நகர் காவல் நிலையம்",
-            "V4 ராஜமங்கலம் காவல் நிலையம்",
-            "V5 திருமங்கலம் காவல் நிலையம்",
-            "V5 TIW திருமங்கலம்",
-            "V6 கொளத்தூர் காவல் நிலையம்",
-            "W10 அனைத்து மகளிர் காவல் நிலையம் பூக்கடை",
-            "W11 அனைத்து மகளிர் காவல் நிலையம் உயர்நீதிமன்றம்",
-            "W12 அனைத்து மகளிர் காவல் நிலையம் ஹார்பர்",
-            "W13 அனைத்து மகளிர் காவல் நிலையம் வண்ணாரப்பேட்டை",
-            "W14 அனைத்து மகளிர் காவல் நிலையம் திருவொற்றியூர்",
-            "W15 அனைத்து மகளிர் காவல் நிலையம் ராயபுரம்",
-            "W16 அனைத்து மகளிர் காவல் நிலையம் புளியந்தோப்பு",
-            "W18 அனைத்து மகளிர் காவல் நிலையம் MKB நகர்",
-            "W19 அனைத்து மகளிர் காவல் நிலையம் அடையாறு",
-            "W1 அனைத்து மகளிர் காவல் நிலையம் தௌசண்ட் லைட்ஸ்",
-            "W20 அனைத்து மகளிர் காவல் நிலையம் சைதாப்பேட்டை",
-            "W21 அனைத்து மகளிர் காவல் நிலையம் கிண்டி",
-            "W22 அனைத்து மகளிர் காவல் நிலையம் மயிலாப்பூர்",
-            "W23 அனைத்து மகளிர் காவல் நிலையம் ராயப்பேட்டை",
-            "W24 அனைத்து மகளிர் காவல் நிலையம் தேனாம்பேட்டை",
-            "W25 அனைத்து மகளிர் காவல் நிலையம் தி நகர்",
-            "W26 அனைத்து மகளிர் காவல் நிலையம் அசோக் நகர்",
-            "W27 அனைத்து மகளிர் காவல் நிலையம் வடபழனி",
-            "W2 அனைத்து மகளிர் காவல் நிலையம் அடையாறு",
-            "W2 AWPS திருப்பள்ளிக்கேணி",
-            "W35 கோயம்பேடு AWPS",
-            "W38 கொளத்தூர் AWPS",
-            "W4 அனைத்து மகளிர் காவல் நிலையம் கிளிப்பாக்",
-            "W5 அனைத்து மகளிர் காவல் நிலையம் வேப்பேரி",
-            "W6 அனைத்து மகளிர் காவல் நிலையம் அயனாவரம்",
-            "W7 AWPS அண்ணா நகர்",
-            "W8 அனைத்து மகளிர் காவல் நிலையம் திருமங்கலம்",
-            "W9 அனைத்து மகளிர் காவல் நிலையம் வில்லிவாக்கம்"
-        ];
-
-        // Function to select relationship type
-        function selectRelationship(type) {
-            const fatherBtn = document.getElementById('fatherBtn');
-            const husbandBtn = document.getElementById('husbandBtn');
-            const relationshipInput = document.getElementById('witnessRelationship');
-            
-            if (type === 'father') {
-                fatherBtn.classList.add('active');
-                husbandBtn.classList.remove('active');
-                document.getElementById('relationshipType').value = 'father';
-                relationshipInput.placeholder = 'தந்தை பெயர்';
-            } else if (type === 'husband') {
-                fatherBtn.classList.remove('active');
-                husbandBtn.classList.add('active');
-                document.getElementById('relationshipType').value = 'husband';
-                relationshipInput.placeholder = 'கணவர் பெயர்';
-            }
-            
-            updatePreview();
-        }
-
-        // Function to get relationship prefix
-        function getRelationshipPrefix() {
-            const type = document.getElementById('relationshipType').value;
-            return type === 'father' ? 'த/பெ' : 'க/பெ';
-        }
-
-        // Function to get full name with title (for witness only)
-        function getFullName(title, name) {
-            if (!title || title === '(இல்லை)') {
-                return name || '';
-            }
-            return `${title} ${name}`.trim();
-        }
-
-        // Function to extract police station name without code and "காவல் நிலையம்"
-        function extractStationName(fullText) {
-            if (!fullText || fullText === "") {
-                return 'காவல் நிலையம்';
-            }
-            
-            // Remove code (everything before first space)
-            const withoutCode = fullText.replace(/^[A-Z0-9]+\s*/, '');
-            
-            // Remove "காவல் நிலையம்" at the end
-            const withoutStationSuffix = withoutCode.replace(/\s*காவல் நிலையம்\s*$/, '');
-            
-            return withoutStationSuffix.trim() || 'காவல் நிலையம்';
-        }
-
-        // Function to extract police station code
-        function extractStationCode(fullText) {
-            if (!fullText || fullText === "") {
-                return '';
-            }
-            
-            // Extract code (everything before first space)
-            const match = fullText.match(/^([A-Z0-9]+)\s*/);
-            return match ? match[1] : '';
-        }
-
-        // Function to extract station name without "காவல் நிலையம்" for use in letter body
-        function getStationNameForLetterBody(fullText) {
-            if (!fullText || fullText === "") {
-                return 'காவல் நிலையம்';
-            }
-            
-            const stationCode = extractStationCode(fullText);
-            const stationName = extractStationName(fullText);
-            
-            // For G7 station, we want to show "G7 சேத்துப்பட்டு" in the body
-            if (stationCode === 'G7') {
-                return 'G7 சேத்துப்பட்டு';
-            }
-            
-            // For other stations, use the code + name without "காவல் நிலையம்"
-            if (stationCode && stationName) {
-                return `${stationCode} ${stationName}`;
-            }
-            
-            return stationName || 'காவல் நிலையம்';
-        }
-
-        // Function to extract Tahsildar office from selection
-        function getTahsildarOffice(fullText) {
-            // If the user selects "வட்டாட்சியர் அவர்கள்", return just "வட்டாட்சியர் அவர்கள்"
-            if (fullText === "வட்டாட்சியர் அவர்கள்") {
-                return "வட்டாட்சியர் அவர்கள்";
-            }
-            // Otherwise, extract the office name
-            const officeMatch = fullText.match(/^(.*?) வட்டாட்சியர்$/);
-            return officeMatch ? officeMatch[1] + " வட்டாட்சியர் அலுவலகம்" : "வட்டாட்சியர் அலுவலகம்";
-        }
-
-        // Function to get pincode based on வட்டாட்சியர் selection
-        function getPincodeForCollector(collectorName) {
-            const pincodeMap = {
-                "சென்னை (வடக்கு) வட்டாட்சியர்": "600001",
-                "திருவொற்றியூர் வட்டாட்சியர்": "600019",
-                "புறாவாக்கம் வட்டாட்சியர்": "600087",
-                "பெரம்பூர் வட்டாட்சியர்": "600011",
-                "மாதவரம் வட்டாட்சியர்": "600060",
-                "ஆயிரம் விளக்கு வட்டாட்சியர்": "600004",
-                "வில்லிவாக்கம் வட்டாட்சியர்": "600049",
-                "அம்பத்தூர் வட்டாட்சியர்": "600053",
-                "எழும்பூர் வட்டாட்சியர்": "600031",
-                "மதுரவோயல் வட்டாட்சியர்": "600095",
-                "மாம்பழம் வட்டாட்சியர்": "600033",
-                "மயிலாப்பூர் வட்டாட்சியர்": "600004",
-                "வேளச்சேரி வட்டாட்சியர்": "600042",
-                "தி.நகர் வட்டாட்சியர்": "600017",
-                "அலந்தூர் வட்டாட்சியர்": "600032",
-                "சோழிங்கநல்லூர் வட்டாட்சியர்": "600119",
-                "வட்டாட்சியர் அவர்கள்": "600031" // Default
-            };
-            
-            return pincodeMap[collectorName] || "600031";
-        }
-
-        // Function to get location name for the third line (for collector)
-        function getLocationForCollector(collectorName) {
-            // For திருவொற்றியூர், show "திருவொற்றியூர்"
-            if (collectorName === "திருவொற்றியூர் வட்டாட்சியர்") {
-                return "திருவொற்றியூர்";
-            }
-            // For others, extract the location name
-            const match = collectorName.match(/^(.*?)\s+வட்டாட்சியர்$/);
-            if (match && match[1] !== "வட்டாட்சியர் அவர்கள்") {
-                return match[1];
-            }
-            // Default to "சேத்துப்பட்டு"
-            return "சேத்துப்பட்டு";
-        }
-
-        // Function to populate Chennai police stations
-        function populateChennaiStations() {
-            const chennaiStationsGroup = document.getElementById('chennaiStations');
-            chennaiStationsGroup.innerHTML = '';
-            
-            chennaiPoliceStations.forEach(station => {
-                const option = document.createElement('option');
-                option.value = station;
-                option.textContent = station;
-                chennaiStationsGroup.appendChild(option);
-            });
-            
-            // Set default selection to "-- தேர்ந்தெடுக்கவும் --"
-            document.getElementById('policeStationDropdown').value = "";
-        }
-
-        // Function to toggle between Chennai and Other district fields
-        function toggleDistrictFields() {
-            const district = document.getElementById('districtSelect').value;
-            const chennaiPoliceStationContainer = document.getElementById('chennaiPoliceStationContainer');
-            const otherPoliceStationContainer = document.getElementById('otherPoliceStationContainer');
-            const chennaiCollectorContainer = document.getElementById('chennaiCollectorContainer');
-            const otherCollectorContainer = document.getElementById('otherCollectorContainer');
-            
-            if (district === 'chennai') {
-                // Show Chennai fields, hide Other district fields
-                chennaiPoliceStationContainer.style.display = 'block';
-                otherPoliceStationContainer.style.display = 'none';
-                chennaiCollectorContainer.style.display = 'block';
-                otherCollectorContainer.style.display = 'none';
-                
-                // Clear Other district fields
-                document.getElementById('policeStationText').value = '';
-                document.getElementById('collectorNameText').value = '';
-            } 
-            else if (district === 'other') {
-                // Show Other district fields, hide Chennai fields
-                chennaiPoliceStationContainer.style.display = 'none';
-                otherPoliceStationContainer.style.display = 'block';
-                chennaiCollectorContainer.style.display = 'none';
-                otherCollectorContainer.style.display = 'block';
-                
-                // Clear Chennai fields
-                document.getElementById('policeStationDropdown').value = "";
-                document.getElementById('collectorNameDropdown').value = "வட்டாட்சியர் அவர்கள்";
-            }
-            
-            updatePreview();
-        }
-
-        // Function to update preview with form values
-        function updatePreview() {
-            const district = document.getElementById('districtSelect').value;
-            
-            let policeStationFull = "";
-            let collectorSelection = "";
-            
-            if (district === 'chennai') {
-                // Get values from Chennai dropdowns
-                policeStationFull = document.getElementById('policeStationDropdown').value || "";
-                collectorSelection = document.getElementById('collectorNameDropdown').value || 'வட்டாட்சியர் அவர்கள்';
-            } 
-            else if (district === 'other') {
-                // Get values from Other district text inputs
-                policeStationFull = document.getElementById('policeStationText').value.trim() || "";
-                collectorSelection = document.getElementById('collectorNameText').value.trim() || "வட்டாட்சியர் அவர்கள்";
-            }
-            
-            // Extract just the station name without code and "காவல் நிலையம்"
-            const policeStationName = extractStationName(policeStationFull);
-            
-            // Extract the police station code
-            const policeStationCode = extractStationCode(policeStationFull);
-            
-            // Get the full station name for display in the station line
-            const policeStationFullName = policeStationFull || "காவல் நிலையம்";
-            
-            // Get station name for letter body (without "காவல் நிலையம்")
-            const stationNameForBody = getStationNameForLetterBody(policeStationFull);
-            
-            // Get pincode for the selected police station (default for other districts)
-            const stationPincode = district === 'chennai' ? "600031" : "";
-            
-            // Get location name for the police station
-            const stationLocation = policeStationName || "காவல் நிலையம்";
-            
-            // Always show "வட்டாட்சியர் அவர்கள்" as the first line in பெறுநர்
-            const receiverFirstLine = "வட்டாட்சியர் அவர்கள்";
-            
-            // Get the Tahsildar office for the second line
-            const tahsildarOffice = getTahsildarOffice(collectorSelection);
-            
-            // Get pincode based on collector selection (default for other districts)
-            const receiverPincode = district === 'chennai' ? getPincodeForCollector(collectorSelection) : "";
-            
-            // Get location name for third line (for collector)
-            const receiverLocation = getLocationForCollector(collectorSelection);
-
-            // Get சாட்சி எண்
-            const witnessNumber = document.getElementById('witnessNumber').value || 'PW 1';
-
-            // Get சாட்சி விவரங்கள்
-            const witnessTitle = document.getElementById('witnessTitle').value;
-            const witnessName = document.getElementById('witnessName').value || 'சாட்சி';
-            const fullWitnessName = getFullName(witnessTitle, witnessName);
-
-            const witnessAge = document.getElementById('witnessAge').value || 'வயது';
-            const witnessRelationship = document.getElementById('witnessRelationship').value || 'தந்தை/கணவர் பெயர்';
-            const relationshipPrefix = getRelationshipPrefix();
-            const witnessAddress = document.getElementById('witnessAddress').value || 'முகவரி';
-
-            const documentDate = document.getElementById('documentDate').value;
-            const caseNumber = document.getElementById('caseNumber').value || 'குற்ற எண்';
-            const caseSections = document.getElementById('caseSections').value || 'குற்ற விதிகள்';
-            
-            // Generate standard additional info based on the form inputs
-            const additionalInfo = `பார்வையில் கண்ட ${stationNameForBody} காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் ${fullWitnessName}, வயது ${witnessAge}, ${relationshipPrefix} ${witnessRelationship}, ${witnessAddress} என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.`;
-
-            // Format date
-            let formattedDate = 'தேதி';
-            if (documentDate) {
-                const dateObj = new Date(documentDate);
-                formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}.${(dateObj.getMonth()+1).toString().padStart(2, '0')}.${dateObj.getFullYear()}`;
-            }
-
-            // Create preview HTML
-            const previewHTML = `
-                <!-- Header -->
-                <div style="text-align: center; margin-bottom: 30px; padding-top: 5px;">
-                    <div style="font-size: 22pt; font-weight: bold; margin-bottom: 5px; font-family: 'Latha', serif;">காவல்துறை</div>
-                    <div style="height: 2px; background: #000; width: 100px; margin: 0 auto;"></div>
-                </div>
-                
-                <!-- Sender and Receiver Addresses -->
-                <div style="display: flex; justify-content: space-between; margin-bottom: 35px;">
-                    <!-- Sender -->
-                    <div style="width: 48%;">
-                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 10.5pt; font-family: 'Latha', serif;">அனுப்புநர்</div>
-                        <div style="line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif;">
-                            <div>காவல் ஆய்வாளர்</div>
-                            <div>${policeStationFullName}</div>
-                            <div>${stationLocation}${stationPincode ? ', சென்னை ' + stationPincode : ''}</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Receiver -->
-                    <div style="width: 48%;">
-                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 10.5pt; font-family: 'Latha', serif;">பெறுநர்</div>
-                        <div style="line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif;">
-                            <div>${receiverFirstLine}</div>
-                            <div>${tahsildarOffice}</div>
-                            <div>${receiverLocation}${receiverPincode ? ', சென்னை ' + receiverPincode : ''}</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Date -->
-                <div style="text-align: right; margin-bottom: 30px;">
-                    <div style="font-weight: bold; font-size: 10.5pt; font-family: 'Latha', serif;">நாள்: ${formattedDate}</div>
-                </div>
-                
-                <!-- Reference -->
-                <div style="margin-bottom: 25px;">
-                    <div style="margin-bottom: 8px; font-size: 10.5pt; font-family: 'Latha', serif;">
-                        <span style="font-weight: bold;">ஐயா,</span><br><br>
-                        <div style="padding-left: 40px;">
-                            <span style="font-weight: bold;">பார்வை:</span> காவல் நிலை குற்ற எண் ${caseNumber} U/s ${caseSections}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Subject -->
-                <div style="margin-bottom: 25px;">
-                    <div style="font-size: 10.5pt; font-family: 'Latha', serif; line-height: 1.8;">
-                        <div style="padding-left: 40px; text-align: justify;">
-                            <span style="font-weight: bold; display: inline-block; min-width: 60px;">பொருள்:</span>
-                            <span style="text-align: justify; display: inline;">பார்வையில் கண்ட வழக்கில் சாட்சியாக உள்ளவரின் விலாசம் மற்றும் விபரம் பற்றி விசாரித்து சான்றிதழ் அளிக்க வேண்டுகிறது.</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Main Content -->
-                <div style="margin-bottom: 25px;">
-                    <div style="text-align: justify; line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif; margin-bottom: 15px; text-indent: 40px;">
-                        சாட்சி எண் ${witnessNumber} ${additionalInfo}
-                    </div>
-                    <div style="text-align: justify; line-height: 1.8; font-size: 10.5pt; font-family: 'Latha', serif; text-indent: 40px;">
-                        எனவே பார்வையில் கண்ட வழக்கு தொடர்பாக நீதிமன்ற நடவடிக்கைக்கு மேற்படி நபரின் தற்போதைய விலாசம் பற்றி விசாரணை செய்து சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்ளப்படுகிறது.
-                    </div>
-                </div>
-                
-                <!-- Signature Area REMOVED - Just empty space for manual signing -->
-                <div style="margin-top: 120px; text-align: right;">
-                    <!-- Empty space for signature -->
-                </div>
-            `;
-
-            // Update preview
-            document.getElementById('previewContent').innerHTML = previewHTML;
-
-            // Update the hidden PDF content with the SAME HTML
-            document.getElementById('pdfContent').innerHTML = `
-                <div class="a4-page" style="width: 210mm; min-height: 297mm; background: white; font-family: 'Latha', serif; padding: 20mm; box-sizing: border-box;">
-                    ${previewHTML}
-                </div>
-            `;
-        }
-
-        // Function to reset form
-        function resetForm() {
-            document.getElementById('districtSelect').value = 'chennai';
-            toggleDistrictFields();
-            
-            // Clear Other district fields
-            document.getElementById('policeStationText').value = '';
-            document.getElementById('collectorNameText').value = '';
-            
-            // Reset Chennai fields
-            document.getElementById('policeStationDropdown').value = "";
-            document.getElementById('collectorNameDropdown').value = 'வட்டாட்சியர் அவர்கள்';
-
-            // சாட்சி எண்
-            document.getElementById('witnessNumber').value = 'PW 1';
-
-            // சாட்சி விவரங்கள்
-            document.getElementById('witnessTitle').value = 'திருமதி.';
-            document.getElementById('witnessName').value = 'மாலதி';
-            document.getElementById('witnessAge').value = '31';
-            
-            // Reset relationship to தந்தை பெயர்
-            selectRelationship('father');
-            document.getElementById('witnessRelationship').value = 'டி. சந்திரன்';
-            
-            document.getElementById('witnessAddress').value = 'எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031';
-
-            document.getElementById('documentDate').value = '2025-12-22';
-            document.getElementById('caseNumber').value = '1249/2012';
-            document.getElementById('caseSections').value = '452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC';
-
-            updatePreview();
-        }
-
-        // Function to generate and download PDF
-        function generatePDF() {
-            updatePreview(); // Ensure latest content
-
-            // Get the preview element
-            const previewElement = document.getElementById('a4Page');
-
-            // Create a clone of the preview element
-            const clone = previewElement.cloneNode(true);
-            clone.style.position = 'absolute';
-            clone.style.left = '-9999px';
-            clone.style.boxShadow = 'none';
-            document.body.appendChild(clone);
-
-            // Use html2canvas to capture the content
-            html2canvas(clone, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff',
-                width: clone.offsetWidth,
-                height: clone.offsetHeight
-            }).then(canvas => {
-                // Remove clone
-                document.body.removeChild(clone);
-
-                const imgData = canvas.toDataURL('image/png', 1.0);
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                // Calculate dimensions to fit A4 exactly
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-
-                // Add image to PDF
-                pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
-
-                // Save the PDF
-                const timestamp = new Date().toISOString().slice(0,10).replace(/-/g, '');
-                pdf.save(`காவல்துறை_ஆவணம்_${timestamp}.pdf`);
-
-                // Show success message
-                showNotification('PDF வெற்றிகரமாக உருவாக்கப்பட்டது!', 'success');
-            }).catch(error => {
-                console.error('Error generating PDF:', error);
-                showNotification('PDF உருவாக்கும் போது பிழை ஏற்பட்டது.', 'error');
-            });
-        }
-
-        // Function to print the document
-        function printDocument() {
-            updatePreview();
-
-            // Create print window
-            const printContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>காவல்துறை ஆவணம்</title>
-                    <style>
-                        @media print {
-                            @page {
-                                size: A4;
-                                margin: 20mm;
-                            }
-                            body {
-                                margin: 0;
-                                padding: 0;
-                            }
-                        }
-                        
-                        body {
-                            font-family: 'Latha', serif;
-                            margin: 0;
-                            padding: 20mm;
-                            width: 210mm;
-                            min-height: 297mm;
-                            box-sizing: border-box;
-                            font-size: 11pt;
-                            line-height: 1.6;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${document.getElementById('previewContent').innerHTML}
-                </body>
-                </html>
-            `;
-
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(printContent);
-            printWindow.document.close();
-            printWindow.focus();
-
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-                showNotification('அச்சிடல் தொடங்கப்பட்டது...', 'info');
-            }, 500);
-        }
-
-        // Function to show notification
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 9999;
-                min-width: 300px;
-                animation: slideIn 0.3s ease;
-            `;
-
-            notification.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Populate Chennai stations
-            populateChennaiStations();
-            
-            // Set default district to Chennai
-            document.getElementById('districtSelect').value = 'chennai';
-            
-            // Set default relationship to தந்தை பெயர்
-            selectRelationship('father');
-            
-            // Initialize the form
-            toggleDistrictFields();
-            updatePreview();
-
-            // Add CSS for animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from {
-                        transform: translateX(100%);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateX(0);
-                        opacity: 1;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
+    function populateChennaiStations() {
+        const group = document.getElementById('chennaiStations');
+        group.innerHTML = '';
+        chennaiPoliceStations.forEach(station => {
+            const opt = document.createElement('option');
+            opt.value = station;
+            opt.textContent = station;
+            group.appendChild(opt);
         });
-    </script>
+    }
+
+    function populateCollectorDropdown() {
+        const dropdown = document.getElementById('collectorNameDropdown');
+        dropdown.innerHTML = '<option value="வட்டாட்சியர் அவர்கள்" selected>-- வட்டாட்சியரை தேர்வு செய்க --</option>';
+        collectorOptions.forEach(opt => {
+            const optionEl = document.createElement('option');
+            optionEl.value = opt;
+            optionEl.textContent = opt;
+            dropdown.appendChild(optionEl);
+        });
+    }
+
+    // helper functions
+    function extractStationName(fullText) {
+        if (!fullText) return "காவல் நிலையம்";
+        let withoutCode = fullText.replace(/^[A-Z0-9]+\s*/, '');
+        return withoutCode.replace(/\s*காவல் நிலையம்\s*$/, '').trim() || "காவல் நிலையம்";
+    }
+    function extractStationCode(fullText) {
+        if (!fullText) return "";
+        const match = fullText.match(/^([A-Z0-9]+)\s*/);
+        return match ? match[1] : "";
+    }
+    function getStationNameForBody(fullText) {
+        if (!fullText) return "காவல் நிலையம்";
+        const code = extractStationCode(fullText);
+        const name = extractStationName(fullText);
+        if (code && name) return `${code} ${name}`;
+        return name || "காவல் நிலையம்";
+    }
+    function getTahsildarOffice(collectorVal) {
+        if (!collectorVal || collectorVal === "வட்டாட்சியர் அவர்கள்") return "வட்டாட்சியர் அவர்கள்";
+        return collectorVal.replace("வட்டாட்சியர்", "வட்டாட்சியர் அலுவலகம்");
+    }
+    function getLocationForCollector(collectorVal) {
+        if (collectorVal === "திருவொற்றியூர் வட்டாட்சியர்") return "திருவொற்றியூர்";
+        const match = collectorVal.match(/^(.*?)\s+வட்டாட்சியர்$/);
+        if (match && match[1]) return match[1];
+        return "சேத்துப்பட்டு";
+    }
+    function getRelationshipPrefix() {
+        return document.getElementById('relationshipType').value === 'father' ? 'த/பெ' : 'க/பெ';
+    }
+
+    function updatePreview() {
+        const district = document.getElementById('districtSelect').value;
+        let policeStationFull = "", collectorSelection = "";
+        if (district === 'chennai') {
+            policeStationFull = document.getElementById('policeStationDropdown').value || "";
+            collectorSelection = document.getElementById('collectorNameDropdown').value || "வட்டாட்சியர் அவர்கள்";
+        } else {
+            policeStationFull = document.getElementById('policeStationText').value.trim();
+            collectorSelection = document.getElementById('collectorNameText').value.trim();
+            if (!collectorSelection) collectorSelection = "வட்டாட்சியர் அவர்கள்";
+        }
+        if (!policeStationFull) policeStationFull = "காவல் நிலையம்";
+        
+        const policeStationFullName = policeStationFull;
+        const stationNameForBody = getStationNameForBody(policeStationFull);
+        const stationLocation = extractStationName(policeStationFull);
+        const witnessNumber = document.getElementById('witnessNumber').value || 'PW 1';
+        const witnessTitle = document.getElementById('witnessTitle').value;
+        const witnessName = document.getElementById('witnessName').value || 'சாட்சி';
+        const fullWitnessName = (witnessTitle ? witnessTitle + " " : "") + witnessName;
+        const witnessAge = document.getElementById('witnessAge').value || 'வயது';
+        const witnessRelationship = document.getElementById('witnessRelationship').value || 'தந்தை/கணவர் பெயர்';
+        const relationshipPrefix = getRelationshipPrefix();
+        const witnessAddress = document.getElementById('witnessAddress').value || 'முகவரி';
+        const documentDateRaw = document.getElementById('documentDate').value;
+        let formattedDate = "தேதி";
+        if (documentDateRaw) {
+            const d = new Date(documentDateRaw);
+            formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth()+1).toString().padStart(2, '0')}.${d.getFullYear()}`;
+        }
+        const caseNumber = document.getElementById('caseNumber').value || 'குற்ற எண்';
+        const caseSections = document.getElementById('caseSections').value || 'குற்ற விதிகள்';
+        
+        const additionalInfo = `பார்வையில் கண்ட ${stationNameForBody} காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் ${fullWitnessName}, வயது ${witnessAge}, ${relationshipPrefix} ${witnessRelationship}, ${witnessAddress} என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.`;
+        
+        const receiverFirstLine = "வட்டாட்சியர் அவர்கள்";
+        const tahsildarOffice = getTahsildarOffice(collectorSelection);
+        const receiverLocation = getLocationForCollector(collectorSelection);
+        
+        const previewHTML = `
+            <div style="text-align: center; margin-bottom: 28px;">
+                <div style="font-size: 24pt; font-weight: bold; letter-spacing: 1px;">காவல்துறை</div>
+                <div style="height: 2px; background: #000; width: 80px; margin: 8px auto 0;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 38px;">
+                <div style="width: 48%;">
+                    <div style="font-weight: bold; border-bottom: 1px solid #aaa; display: inline-block; margin-bottom: 8px;">அனுப்புநர்</div>
+                    <div style="line-height: 1.7; margin-top: 8px;">காவல் ஆய்வாளர்<br>${policeStationFullName}<br>${stationLocation}</div>
+                </div>
+                <div style="width: 48%;">
+                    <div style="font-weight: bold; border-bottom: 1px solid #aaa; display: inline-block; margin-bottom: 8px;">பெறுநர்</div>
+                    <div style="line-height: 1.7; margin-top: 8px;">${receiverFirstLine}<br>${tahsildarOffice}<br>${receiverLocation}</div>
+                </div>
+            </div>
+            <div style="text-align: right; margin-bottom: 32px;">
+                <div><strong>நாள்:</strong> ${formattedDate}</div>
+            </div>
+            <div style="margin-bottom: 28px;">
+                <div><strong>ஐயா,</strong></div>
+                <div style="margin-top: 12px; padding-left: 30px;"><strong>பார்வை:</strong> காவல் நிலை குற்ற எண் ${caseNumber} U/s ${caseSections}</div>
+            </div>
+            <div style="margin-bottom: 24px;">
+                <div style="padding-left: 30px;"><strong>பொருள்:</strong> பார்வையில் கண்ட வழக்கில் சாட்சியாக உள்ளவரின் விலாசம் மற்றும் விபரம் பற்றி விசாரித்து சான்றிதழ் அளிக்க வேண்டுகிறது.</div>
+            </div>
+            <div style="text-align: justify; line-height: 1.75; text-indent: 40px; margin-bottom: 20px;">
+                சாட்சி எண் ${witnessNumber} ${additionalInfo}
+            </div>
+            <div style="text-align: justify; line-height: 1.75; text-indent: 40px; margin-bottom: 30px;">
+                எனவே பார்வையில் கண்ட வழக்கு தொடர்பாக நீதிமன்ற நடவடிக்கைக்கு மேற்படி நபரின் தற்போதைய விலாசம் பற்றி விசாரணை செய்து சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்ளப்படுகிறது.
+            </div>
+            <div style="margin-top: 110px; text-align: right;">
+                <!-- கையெழுத்துக்கான இடம் -->
+            </div>
+        `;
+        document.getElementById('previewContent').innerHTML = previewHTML;
+        // also store clone-safe for pdf
+    }
+    
+    function toggleDistrictFields() {
+        const district = document.getElementById('districtSelect').value;
+        const isChennai = district === 'chennai';
+        document.getElementById('chennaiPoliceStationContainer').style.display = isChennai ? 'block' : 'none';
+        document.getElementById('otherPoliceStationContainer').style.display = isChennai ? 'none' : 'block';
+        document.getElementById('chennaiCollectorContainer').style.display = isChennai ? 'block' : 'none';
+        document.getElementById('otherCollectorContainer').style.display = isChennai ? 'none' : 'block';
+        if (!isChennai) {
+            document.getElementById('policeStationDropdown').value = "";
+            document.getElementById('collectorNameDropdown').value = "வட்டாட்சியர் அவர்கள்";
+        } else {
+            document.getElementById('policeStationText').value = "";
+            document.getElementById('collectorNameText').value = "";
+        }
+        updatePreview();
+    }
+    
+    function selectRelationship(type) {
+        const fatherBtn = document.getElementById('fatherBtn');
+        const husbandBtn = document.getElementById('husbandBtn');
+        if (type === 'father') {
+            fatherBtn.classList.add('active');
+            husbandBtn.classList.remove('active');
+            document.getElementById('relationshipType').value = 'father';
+            document.getElementById('witnessRelationship').placeholder = 'தந்தை பெயர்';
+        } else {
+            fatherBtn.classList.remove('active');
+            husbandBtn.classList.add('active');
+            document.getElementById('relationshipType').value = 'husband';
+            document.getElementById('witnessRelationship').placeholder = 'கணவர் பெயர்';
+        }
+        updatePreview();
+    }
+    
+    function resetForm() {
+        document.getElementById('districtSelect').value = 'chennai';
+        toggleDistrictFields();
+        document.getElementById('policeStationDropdown').value = "";
+        document.getElementById('collectorNameDropdown').value = "வட்டாட்சியர் அவர்கள்";
+        document.getElementById('witnessNumber').value = "PW 1";
+        document.getElementById('witnessTitle').value = "திருமதி.";
+        document.getElementById('witnessName').value = "மாலதி";
+        document.getElementById('witnessAge').value = "31";
+        selectRelationship('father');
+        document.getElementById('witnessRelationship').value = "டி. சந்திரன்";
+        document.getElementById('witnessAddress').value = "எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031";
+        document.getElementById('documentDate').value = "2025-12-22";
+        document.getElementById('caseNumber').value = "1249/2012";
+        document.getElementById('caseSections').value = "452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC";
+        document.getElementById('policeStationText').value = "";
+        document.getElementById('collectorNameText').value = "";
+        updatePreview();
+    }
+    
+    async function generatePDF() {
+        updatePreview();
+        const originalPage = document.getElementById('a4Page');
+        const clone = originalPage.cloneNode(true);
+        clone.style.position = 'absolute';
+        clone.style.left = '-9999px';
+        clone.style.top = '0';
+        clone.style.boxShadow = 'none';
+        document.body.appendChild(clone);
+        try {
+            const canvas = await html2canvas(clone, {
+                scale: 2.5,
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                logging: false
+            });
+            document.body.removeChild(clone);
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+            pdf.save(`police_certificate_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
+            showNotification('✅ PDF வெற்றிகரமாக உருவாக்கப்பட்டது!', 'success');
+        } catch (err) {
+            console.error(err);
+            document.body.removeChild(clone);
+            showNotification('❌ பிழை: PDF உருவாக்க முடியவில்லை', 'danger');
+        }
+    }
+    
+    function printDocument() {
+        updatePreview();
+        const content = document.getElementById('previewContent').innerHTML;
+        const printWin = window.open('', '_blank');
+        printWin.document.write(`
+            <html><head><title>காவல்துறை ஆவணம்</title>
+            <style>
+                body { font-family: 'Latha', 'Noto Sans Tamil', serif; margin: 20mm; padding:0; width: 210mm; }
+                @media print { @page { size: A4; margin: 20mm; } }
+            </style></head><body>${content}</body></html>
+        `);
+        printWin.document.close();
+        printWin.focus();
+        setTimeout(() => { printWin.print(); printWin.close(); }, 400);
+        showNotification('🖨️ அச்சிடல் துவங்கியது', 'info');
+    }
+    
+    function showNotification(msg, type) {
+        const notif = document.createElement('div');
+        notif.className = `alert alert-${type} position-fixed top-0 end-0 m-3 shadow-lg`;
+        notif.style.zIndex = '9999';
+        notif.style.minWidth = '260px';
+        notif.innerHTML = `${msg} <button type="button" class="btn-close float-end" data-bs-dismiss="alert"></button>`;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 2800);
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        populateChennaiStations();
+        populateCollectorDropdown();
+        document.getElementById('districtSelect').addEventListener('change', toggleDistrictFields);
+        document.getElementById('policeStationDropdown').addEventListener('change', updatePreview);
+        document.getElementById('policeStationText').addEventListener('input', updatePreview);
+        document.getElementById('collectorNameDropdown').addEventListener('change', updatePreview);
+        document.getElementById('collectorNameText').addEventListener('input', updatePreview);
+        document.getElementById('witnessNumber').addEventListener('input', updatePreview);
+        document.getElementById('witnessTitle').addEventListener('change', updatePreview);
+        document.getElementById('witnessName').addEventListener('input', updatePreview);
+        document.getElementById('witnessAge').addEventListener('input', updatePreview);
+        document.getElementById('witnessRelationship').addEventListener('input', updatePreview);
+        document.getElementById('witnessAddress').addEventListener('input', updatePreview);
+        document.getElementById('documentDate').addEventListener('input', updatePreview);
+        document.getElementById('caseNumber').addEventListener('input', updatePreview);
+        document.getElementById('caseSections').addEventListener('input', updatePreview);
+        document.getElementById('fatherBtn').addEventListener('click', () => selectRelationship('father'));
+        document.getElementById('husbandBtn').addEventListener('click', () => selectRelationship('husband'));
+        toggleDistrictFields();
+        updatePreview();
+    });
+</script>
 </body>
 </html>
