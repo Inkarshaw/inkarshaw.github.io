@@ -247,6 +247,13 @@
             font-size: 12px;
             margin-top: 8px;
         }
+        
+        /* Removed underline from section headers */
+        .section-header {
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 </head>
@@ -254,7 +261,7 @@
 <div class="app-container">
     <div class="header">
         <h1 class="tamil-title">📄 ஆளில்லா சான்று PDF ஜெனரேட்டர்</h1>
-        <p class="text-muted mt-2 mb-0">தமிழ் காவல் சான்றிதழ் | G7 சேத்துப்பட்டு → "சென்னை-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "சென்னை-31" (பெறுநர்)</p>
+        <p class="text-muted mt-2 mb-0">தமிழ் காவல் சான்றிதழ் | G7 சேத்துப்பட்டு → "Chennai-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "Chennai-31" (பெறுநர்)</p>
     </div>
 
     <div class="dashboard">
@@ -265,20 +272,20 @@
             <div class="mb-3">
                 <label class="form-label">📍 மாவட்டம்</label>
                 <select class="form-select" id="districtSelect">
-                    <option value="சென்னை" selected>சென்னை (காவல் நிலையங்கள் பட்டியல்)</option>
+                    <option value="chennai" selected>சென்னை (காவல் நிலையங்கள் பட்டியல்)</option>
                     <option value="other">பிற மாவட்டங்கள் (கைமுறை உள்ளீடு)</option>
                 </select>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">👮 காவல் நிலையத்தின் பெயர்</label>
-                <div id="சென்னைPoliceStationContainer">
+                <div id="chennaiPoliceStationContainer">
                     <select class="form-select" id="policeStationDropdown">
                         <option value="" selected>-- தேர்ந்தெடுக்கவும் --</option>
-                        <optgroup label="சென்னை காவல் நிலையங்கள்" id="சென்னைStations"></optgroup>
+                        <optgroup label="சென்னை காவல் நிலையங்கள்" id="chennaiStations"></optgroup>
                     </select>
-                    <div id="சென்னை31Hint" class="highlight-note" style="display: none;">
-                        <i class="bi bi-info-circle-fill"></i> G7 சேத்துப்பட்டு தேர்வு செய்யப்பட்டுள்ளது → "சென்னை-31" அனுப்புநர் முகவரியில் சேர்க்கப்படும்
+                    <div id="chennai31Hint" class="highlight-note" style="display: none;">
+                        <i class="bi bi-info-circle-fill"></i> G7 சேத்துப்பட்டு தேர்வு செய்யப்பட்டுள்ளது → "Chennai-31" அனுப்புநர் முகவரியில் சேர்க்கப்படும்
                     </div>
                 </div>
                 <div id="otherPoliceStationContainer" style="display: none;">
@@ -286,21 +293,20 @@
                 </div>
             </div>
 
-            <!-- New: Taluk Office District Dropdown -->
             <div class="mb-3">
                 <label class="form-label">🏛️ வட்டாட்சியர் அலுவலக மாவட்டம்</label>
                 <select class="form-select" id="talukDistrictSelect">
-                    <option value="சென்னை" selected>சென்னை மாவட்டம்</option>
+                    <option value="chennai" selected>சென்னை மாவட்டம்</option>
                     <option value="other_district">பிற மாவட்டம்</option>
                 </select>
-                <div id="சென்னைReceiverHint" class="district-hint" style="display: block;">
-                    <i class="bi bi-geo-alt-fill"></i> சென்னை மாவட்டம் தேர்வு செய்யப்பட்டால் பெறுநர் முகவரியின் இறுதியில் "சென்னை-31" சேர்க்கப்படும்
+                <div id="chennaiReceiverHint" class="district-hint" style="display: block;">
+                    <i class="bi bi-geo-alt-fill"></i> சென்னை மாவட்டம் தேர்வு செய்யப்பட்டால் பெறுநர் முகவரியின் இறுதியில் "Chennai-31" சேர்க்கப்படும்
                 </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">🏛️ வட்டாட்சியர் அலுவலகம்</label>
-                <div id="சென்னைCollectorContainer">
+                <div id="chennaiCollectorContainer">
                     <select class="form-select" id="collectorNameDropdown">
                         <option value="வட்டாட்சியர் அவர்கள்" selected>-- வட்டாட்சியரை தேர்வு செய்க --</option>
                     </select>
@@ -384,7 +390,7 @@
                 </div>
             </div>
             <div class="text-center mt-3 no-print">
-                <small class="text-secondary">📄 A4 210mm × 297mm | G7 சேத்துப்பட்டு → "சென்னை-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "சென்னை-31" (பெறுநர்)</small>
+                <small class="text-secondary">📄 A4 210mm × 297mm | G7 சேத்துப்பட்டு → "Chennai-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "Chennai-31" (பெறுநர்)</small>
             </div>
         </div>
     </div>
@@ -393,8 +399,8 @@
 <script>
     const { jsPDF } = window.jspdf;
 
-    // Complete சென்னை Police stations - includes G7 Chetpet
-    const சென்னைPoliceStations = [
+    // Complete Chennai Police stations - includes G7 Chetpet
+    const chennaiPoliceStations = [
         "AWPS பேரவள்ளூர்", "B1 வடக்குக் கடற்கரை காவல் நிலையம்", "B2 எஸ்பிளனேட் காவல் நிலையம்", "B3 கோட்டை செயின்ட் ஜார்ஜ் காவல் நிலையம்",
         "B4 உயர்நீதிமன்ற காவல் நிலையம்", "C1 பூக்கடை காவல் நிலையம்", "C2 எலிபெண்ட் கேட் காவல் நிலையம்", "C3 செவன் வெல்ஸ் காவல் நிலையம்",
         "C4 அரசு பொது மருத்துவமனை அவுட்போஸ்ட்", "C5 கொத்தவால் சாவடி காவல் நிலையம்", "D1 திருப்பள்ளிக்கேணி காவல் நிலையம்", "D2 அண்ணா சாலை காவல் நிலையம்",
@@ -419,10 +425,10 @@
         "வேளச்சேரி வட்டாட்சியர்", "தி.நகர் வட்டாட்சியர்", "அலந்தூர் வட்டாட்சியர்", "சோழிங்கநல்லூர் வட்டாட்சியர்"
     ];
 
-    function populateசென்னைStations() {
-        const group = document.getElementById('சென்னைStations');
+    function populateChennaiStations() {
+        const group = document.getElementById('chennaiStations');
         group.innerHTML = '';
-        சென்னைPoliceStations.forEach(station => {
+        chennaiPoliceStations.forEach(station => {
             const opt = document.createElement('option');
             opt.value = station;
             opt.textContent = station;
@@ -467,10 +473,10 @@
         return upper.includes("G7") && (upper.includes("சேத்துபட்டு") || upper.includes("சேத்துப்பட்டு") || upper.includes("CHETPET"));
     }
     
-    function updateசென்னை31Hint() {
+    function updateChennai31Hint() {
         const district = document.getElementById('districtSelect').value;
-        const hintDiv = document.getElementById('சென்னை31Hint');
-        if (district === 'சென்னை') {
+        const hintDiv = document.getElementById('chennai31Hint');
+        if (district === 'chennai') {
             const selectedStation = document.getElementById('policeStationDropdown').value;
             if (isG7ChetpetStation(selectedStation)) {
                 hintDiv.style.display = 'block';
@@ -482,7 +488,7 @@
         }
     }
     
-    // Build FROM address with சென்னை-31 for G7 Chetpet
+    // Build FROM address with Chennai-31 for G7 Chetpet
     function getFormattedFromAddress(policeStationFullName, stationLocation) {
         const displayStationName = policeStationFullName || "காவல் நிலையம்";
         let locationPart = stationLocation || extractStationName(policeStationFullName);
@@ -490,14 +496,14 @@
         let baseAddress = `காவல் ஆய்வாளர்<br>${displayStationName}<br>${locationPart}`;
         
         if (isG7ChetpetStation(policeStationFullName)) {
-            if (!locationPart.includes("சென்னை-31") && !locationPart.includes("சென்னை-31")) {
-                baseAddress = `காவல் ஆய்வாளர்<br>${displayStationName}<br>${locationPart}, சென்னை-31`;
+            if (!locationPart.includes("Chennai-31") && !locationPart.includes("சென்னை-31")) {
+                baseAddress = `காவல் ஆய்வாளர்<br>${displayStationName}<br>${locationPart}, Chennai-31`;
             }
         }
         return baseAddress;
     }
     
-    // Build RECEIVER address with சென்னை-31 if Taluk District is சென்னை
+    // Build RECEIVER address with Chennai-31 if Taluk District is Chennai
     function getFormattedReceiverAddress(collectorSelection, receiverLocation) {
         const receiverFirstLine = "வட்டாட்சியர் அவர்கள்";
         const tahsildarOffice = getTahsildarOffice(collectorSelection);
@@ -507,10 +513,9 @@
         
         let address = `${receiverFirstLine}<br>${tahsildarOffice}<br>${locationPart}`;
         
-        // Add சென்னை-31 if சென்னை district is selected
-        if (talukDistrict === 'சென்னை') {
-            if (!locationPart.includes("சென்னை-31") && !locationPart.includes("சென்னை-31")) {
-                address = `${receiverFirstLine}<br>${tahsildarOffice}<br>${locationPart}, சென்னை-31`;
+        if (talukDistrict === 'chennai') {
+            if (!locationPart.includes("Chennai-31") && !locationPart.includes("சென்னை-31")) {
+                address = `${receiverFirstLine}<br>${tahsildarOffice}<br>${locationPart}, Chennai-31`;
             }
         }
         return address;
@@ -535,7 +540,7 @@
     function updatePreview() {
         const district = document.getElementById('districtSelect').value;
         let policeStationFull = "", collectorSelection = "";
-        if (district === 'சென்னை') {
+        if (district === 'chennai') {
             policeStationFull = document.getElementById('policeStationDropdown').value || "";
             collectorSelection = document.getElementById('collectorNameDropdown').value || "வட்டாட்சியர் அவர்கள்";
         } else {
@@ -579,11 +584,11 @@
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 38px;">
                 <div style="width: 48%;">
-                    <div style="font-weight: bold; border-bottom: 1px solid #aaa; display: inline-block; margin-bottom: 8px;">அனுப்புநர்</div>
+                    <div style="font-weight: bold; margin-bottom: 8px;">அனுப்புநர்</div>
                     <div style="line-height: 1.7; margin-top: 8px;">${fromAddressHTML}</div>
                 </div>
                 <div style="width: 48%;">
-                    <div style="font-weight: bold; border-bottom: 1px solid #aaa; display: inline-block; margin-bottom: 8px;">பெறுநர்</div>
+                    <div style="font-weight: bold; margin-bottom: 8px;">பெறுநர்</div>
                     <div style="line-height: 1.7; margin-top: 8px;">${receiverAddressHTML}</div>
                 </div>
             </div>
@@ -609,24 +614,24 @@
         `;
         document.getElementById('previewContent').innerHTML = previewHTML;
         
-        updateசென்னை31Hint();
+        updateChennai31Hint();
     }
     
     function toggleDistrictFields() {
         const district = document.getElementById('districtSelect').value;
-        const isசென்னை = district === 'சென்னை';
-        document.getElementById('சென்னைPoliceStationContainer').style.display = isசென்னை ? 'block' : 'none';
-        document.getElementById('otherPoliceStationContainer').style.display = isசென்னை ? 'none' : 'block';
-        document.getElementById('சென்னைCollectorContainer').style.display = isசென்னை ? 'block' : 'none';
-        document.getElementById('otherCollectorContainer').style.display = isசென்னை ? 'none' : 'block';
-        if (!isசென்னை) {
+        const isChennai = district === 'chennai';
+        document.getElementById('chennaiPoliceStationContainer').style.display = isChennai ? 'block' : 'none';
+        document.getElementById('otherPoliceStationContainer').style.display = isChennai ? 'none' : 'block';
+        document.getElementById('chennaiCollectorContainer').style.display = isChennai ? 'block' : 'none';
+        document.getElementById('otherCollectorContainer').style.display = isChennai ? 'none' : 'block';
+        if (!isChennai) {
             document.getElementById('policeStationDropdown').value = "";
             document.getElementById('collectorNameDropdown').value = "வட்டாட்சியர் அவர்கள்";
-            document.getElementById('சென்னை31Hint').style.display = 'none';
+            document.getElementById('chennai31Hint').style.display = 'none';
         } else {
             document.getElementById('policeStationText').value = "";
             document.getElementById('collectorNameText').value = "";
-            updateசென்னை31Hint();
+            updateChennai31Hint();
         }
         updatePreview();
     }
@@ -649,8 +654,8 @@
     }
     
     function resetForm() {
-        document.getElementById('districtSelect').value = 'சென்னை';
-        document.getElementById('talukDistrictSelect').value = 'சென்னை';
+        document.getElementById('districtSelect').value = 'chennai';
+        document.getElementById('talukDistrictSelect').value = 'chennai';
         toggleDistrictFields();
         document.getElementById('policeStationDropdown').value = "";
         document.getElementById('collectorNameDropdown').value = "வட்டாட்சியர் அவர்கள்";
@@ -666,7 +671,7 @@
         document.getElementById('caseSections').value = "452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC";
         document.getElementById('policeStationText').value = "";
         document.getElementById('collectorNameText').value = "";
-        document.getElementById('சென்னை31Hint').style.display = 'none';
+        document.getElementById('chennai31Hint').style.display = 'none';
         updatePreview();
     }
     
@@ -729,13 +734,13 @@
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-        populateசென்னைStations();
+        populateChennaiStations();
         populateCollectorDropdown();
         document.getElementById('districtSelect').addEventListener('change', toggleDistrictFields);
         document.getElementById('talukDistrictSelect').addEventListener('change', updatePreview);
         document.getElementById('policeStationDropdown').addEventListener('change', () => {
             updatePreview();
-            updateசென்னை31Hint();
+            updateChennai31Hint();
         });
         document.getElementById('policeStationText').addEventListener('input', updatePreview);
         document.getElementById('collectorNameDropdown').addEventListener('change', updatePreview);
