@@ -261,7 +261,7 @@
 <div class="app-container">
     <div class="header">
         <h1 class="tamil-title">📄 ஆளில்லா சான்று PDF ஜெனரேட்டர்</h1>
-        <p class="text-muted mt-2 mb-0">தமிழ் காவல் சான்றிதழ் | G7 சேத்துப்பட்டு → "Chennai-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "Chennai-31" (பெறுநர்)</p>
+        <p class="text-muted mt-2 mb-0">தமிழ் காவல் சான்றிதழ் | G7 சேத்துப்பட்டு → "சென்னை-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "சென்னை-31" (பெறுநர்)</p>
     </div>
 
     <div class="dashboard">
@@ -285,7 +285,7 @@
                         <optgroup label="சென்னை காவல் நிலையங்கள்" id="chennaiStations"></optgroup>
                     </select>
                     <div id="chennai31Hint" class="highlight-note" style="display: none;">
-                        <i class="bi bi-info-circle-fill"></i> G7 சேத்துப்பட்டு தேர்வு செய்யப்பட்டுள்ளது → "Chennai-31" அனுப்புநர் முகவரியில் சேர்க்கப்படும்
+                        <i class="bi bi-info-circle-fill"></i> G7 சேத்துப்பட்டு தேர்வு செய்யப்பட்டுள்ளது → "சென்னை-31" அனுப்புநர் முகவரியில் சேர்க்கப்படும்
                     </div>
                 </div>
                 <div id="otherPoliceStationContainer" style="display: none;">
@@ -300,7 +300,7 @@
                     <option value="other_district">பிற மாவட்டம்</option>
                 </select>
                 <div id="chennaiReceiverHint" class="district-hint" style="display: block;">
-                    <i class="bi bi-geo-alt-fill"></i> சென்னை மாவட்டம் தேர்வு செய்யப்பட்டால் பெறுநர் முகவரியின் இறுதியில் "Chennai-31" சேர்க்கப்படும்
+                    <i class="bi bi-geo-alt-fill"></i> சென்னை மாவட்டம் தேர்வு செய்யப்பட்டால் பெறுநர் முகவரியின் இறுதியில் "சென்னை-31" சேர்க்கப்படும்
                 </div>
             </div>
 
@@ -390,7 +390,7 @@
                 </div>
             </div>
             <div class="text-center mt-3 no-print">
-                <small class="text-secondary">📄 A4 210mm × 297mm | G7 சேத்துப்பட்டு → "Chennai-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "Chennai-31" (பெறுநர்)</small>
+                <small class="text-secondary">📄 A4 210mm × 297mm | G7 சேத்துப்பட்டு → "சென்னை-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "சென்னை-31" (பெறுநர்)</small>
             </div>
         </div>
     </div>
@@ -488,7 +488,7 @@
         }
     }
     
-    // Build FROM address with Chennai-31 for G7 Chetpet
+    // Build FROM address with சென்னை-31 for G7 Chetpet
     function getFormattedFromAddress(policeStationFullName, stationLocation) {
         const displayStationName = policeStationFullName || "காவல் நிலையம்";
         let locationPart = stationLocation || extractStationName(policeStationFullName);
@@ -496,14 +496,14 @@
         let baseAddress = `காவல் ஆய்வாளர்<br>${displayStationName}<br>${locationPart}`;
         
         if (isG7ChetpetStation(policeStationFullName)) {
-            if (!locationPart.includes("Chennai-31") && !locationPart.includes("சென்னை-31")) {
-                baseAddress = `காவல் ஆய்வாளர்<br>${displayStationName}<br>${locationPart}, Chennai-31`;
+            if (!locationPart.includes("சென்னை-31") && !locationPart.includes("சென்னை-31")) {
+                baseAddress = `காவல் ஆய்வாளர்<br>${displayStationName}<br>${locationPart}, சென்னை-31`;
             }
         }
         return baseAddress;
     }
     
-    // Build RECEIVER address with Chennai-31 if Taluk District is Chennai
+    // Build RECEIVER address with சென்னை-31 if Taluk District is Chennai
     function getFormattedReceiverAddress(collectorSelection, receiverLocation) {
         const receiverFirstLine = "வட்டாட்சியர் அவர்கள்";
         const tahsildarOffice = getTahsildarOffice(collectorSelection);
@@ -514,8 +514,8 @@
         let address = `${receiverFirstLine}<br>${tahsildarOffice}<br>${locationPart}`;
         
         if (talukDistrict === 'chennai') {
-            if (!locationPart.includes("Chennai-31") && !locationPart.includes("சென்னை-31")) {
-                address = `${receiverFirstLine}<br>${tahsildarOffice}<br>${locationPart}, Chennai-31`;
+            if (!locationPart.includes("சென்னை-31") && !locationPart.includes("சென்னை-31")) {
+                address = `${receiverFirstLine}<br>${tahsildarOffice}<br>${locationPart}, சென்னை-31`;
             }
         }
         return address;
