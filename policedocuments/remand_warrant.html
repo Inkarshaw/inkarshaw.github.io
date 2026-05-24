@@ -235,9 +235,8 @@
         .document-title {
             text-align: center;
             font-size: 18px;
-            font-weight: bold;
             text-decoration: underline;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
             text-transform: uppercase;
         }
         
@@ -366,6 +365,26 @@
             background: white;
             padding: 40px;
             font-family: 'Times New Roman', serif;
+        }
+        
+        /* Compact header styles - no extra spaces */
+        .compact-header {
+            line-height: 1.2;
+        }
+        
+        .compact-header div {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .title-line1 {
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+        
+        .title-line2 {
+            font-size: 18px;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -642,15 +661,15 @@
             const formattedDate = formatDateWithOrdinal(currentDay, currentMonth, currentYear);
             
             return `
-                <div style="text-align: center; margin-bottom: 20px;">
+                <div class="compact-header" style="text-align: center;">
                     <div style="font-size: 14px; text-decoration: underline;">Judicial Form No.14</div>
                     <div style="font-size: 12px;">(Sec Rule 6(8))</div>
+                    <div class="title-line1">FORM OF ORDER FOR THE DETENTION IN</div>
+                    <div class="title-line2">CUSTODY OF AN ACCUSED PERSON</div>
+                    <div style="font-size: 12px; margin-top: 5px;">(SECTION 187(ii) BNSS)</div>
                 </div>
                 
-                <div class="document-title">FORM OF ORDER FOR THE DETENTION IN CUSTODY OF AN ACCUSED PERSON</div>
-                <div style="text-align: center; font-size: 12px; margin-bottom: 15px;">(SECTION 187(ii) BNSS)</div>
-                
-                <table class="document-table">
+                <table class="document-table" style="margin-top: 10px;">
                     <tr>
                         <td width="70%">${caseNumberInput.value}<br>Police Station: ${policeStationInput.value}</td>
                         <td width="30%"></td>
@@ -677,31 +696,31 @@
                                 ${uploadedImage ? `<img src="${uploadedImage}" class="preview-image" alt="Accused Photograph">` : '<div style="color: #888; font-style: italic; padding: 5px;">[Photograph]</div>'}
                             </div>
                         </td>
-                     </tr>
+                    </tr>
                     <tr>
                         <td>Father's Name</td>
                         <td><strong>${fatherNameInput.value}</strong></td>
-                     </tr>
+                    </tr>
                     <tr>
                         <td>Sex, Married or single</td>
                         <td><strong>${maritalStatusInput.value}</strong></td>
-                     </tr>
+                    </tr>
                     <tr>
                         <td>Race, Religion and Caste</td>
                         <td><strong>${religionInput.value}<br>${casteInput.value}</strong></td>
-                     </tr>
+                    </tr>
                     <tr>
                         <td>Previous Occupation</td>
                         <td><strong>${occupationInput.value}</strong></td>
-                     </tr>
+                    </tr>
                     <tr>
                         <td>Aged</td>
                         <td><strong>${accusedAgeInput.value}</strong></td>
-                     </tr>
+                    </tr>
                     <tr>
                         <td>Descriptive Mark's</td>
                         <td colspan="2">${descriptiveMarksInput.value.replace(/\n/g, '<br>')}</td>
-                     </tr>
+                    </tr>
                 </table>
                 
                 <!-- Footer with "Given under my hand" at left margin, seal label indented, and magistrate in right-aligned table (no line above) -->
@@ -740,23 +759,19 @@
             
             return `
                 <div style="font-family: 'Times New Roman', serif; line-height: 1.4; color: #000; padding: 40px; width: 100%;">
-                    <div style="text-align: center; margin-bottom: 25px;">
-                        <div style="font-size: 16px; text-decoration: underline; font-weight: bold;">Judicial Form No.14</div>
+                    <div style="text-align: center; line-height: 1.2;">
+                        <div style="font-size: 16px; text-decoration: underline;">Judicial Form No.14</div>
                         <div style="font-size: 14px;">(Sec Rule 6(8))</div>
+                        <div style="font-size: 18px; text-transform: uppercase;">FORM OF ORDER FOR THE DETENTION IN</div>
+                        <div style="font-size: 18px; text-transform: uppercase;">CUSTODY OF AN ACCUSED PERSON</div>
+                        <div style="font-size: 14px; margin-top: 5px;">(SECTION 187(ii) BNSS)</div>
                     </div>
                     
-                    <div style="text-align: center; font-size: 20px; font-weight: bold; text-decoration: underline; margin-bottom: 20px; text-transform: uppercase;">
-                        FORM OF ORDER FOR THE DETENTION IN CUSTODY OF AN ACCUSED PERSON
-                    </div>
-                    <div style="text-align: center; font-size: 14px; margin-bottom: 25px;">
-                        (SECTION 187(ii) BNSS)
-                    </div>
-                    
-                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px;">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; font-size: 13px;">
                         <tr>
                             <td style="padding: 4px 6px; width: 70%;">${caseNumberInput.value}<br>Police Station: ${policeStationInput.value}</td>
                             <td style="padding: 4px 6px; width: 30%;"></td>
-                         </tr>
+                        </tr>
                     </table>
 
                     <p><strong>To</strong></p>
@@ -768,9 +783,7 @@
                         Whereas it appears that a Charge against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> of an offence under ${offenseSectionInput.value} under investigation the police under the provision of Chapter XIII of the Bharathiya Nagarik Suraksha Sanhitha 2023, that such investigation cannot be completed within that period of 24 hours fixed by section 58 and that there are grounds of before that the accusation/information against the said person is well and the accused having been dully forwarded to this court, this authorize you to detain them against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> In custody for <strong>${detentionDaysInput.value}</strong> days and cause him to be produced before the ${courtNameInput.value} on the <strong>${productionDayInput.value}</strong> day of <strong>${productionMonthInput.value}</strong> ${currentYear} at 10.00 'o' clock.
                     </p>
                     
-                    <div style="text-align: center; font-size: 20px; font-weight: bold; text-decoration: underline; margin: 40px 0 25px 0; text-transform: uppercase;">
-                        DESCRIPTIVE ROLL
-                    </div>
+                    <div style="text-align: center; font-size: 18px; text-decoration: underline; margin: 40px 0 25px 0; text-transform: uppercase;">DESCRIPTIVE ROLL</div>
                     
                     <table style="width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 13px;">
                         <tr>
@@ -781,31 +794,31 @@
                                     ${uploadedImage ? `<img src="${uploadedImage}" style="width: 100%; height: 100%; object-fit: fill;" alt="Accused Photograph">` : '<div style="color: #888; font-style: italic; padding: 5px;">[Photograph]</div>'}
                                 </div>
                             </td>
-                         </tr>
+                        </tr>
                         <tr>
                             <td style="padding: 4px 6px; height: 28px;">Father's Name</td>
                             <td style="padding: 4px 6px; height: 28px;"><strong>${fatherNameInput.value}</strong></td>
-                         </tr>
+                        </tr>
                         <tr>
                             <td style="padding: 4px 6px; height: 28px;">Sex, Married or single</td>
                             <td style="padding: 4px 6px; height: 28px;"><strong>${maritalStatusInput.value}</strong></td>
-                         </tr>
+                        </tr>
                         <tr>
                             <td style="padding: 4px 6px; height: 28px;">Race, Religion and Caste</td>
                             <td style="padding: 4px 6px; height: 28px;"><strong>${religionInput.value}<br>${casteInput.value}</strong></td>
-                         </tr>
+                        </tr>
                         <tr>
                             <td style="padding: 4px 6px; height: 28px;">Previous Occupation</td>
                             <td style="padding: 4px 6px; height: 28px;"><strong>${occupationInput.value}</strong></td>
-                         </tr>
+                        </tr>
                         <tr>
                             <td style="padding: 4px 6px; height: 28px;">Aged</td>
                             <td style="padding: 4px 6px; height: 28px;"><strong>${accusedAgeInput.value}</strong></td>
-                         </tr>
+                        </tr>
                         <tr>
                             <td style="padding: 6px 8px;">Descriptive Mark's</td>
                             <td colspan="2" style="padding: 6px 8px;">${descriptiveMarksInput.value.replace(/\n/g, '<br>')}</td>
-                         </tr>
+                        </tr>
                     </table>
                     
                     <!-- Footer with "Given under my hand" at left margin, seal label indented, and magistrate in right-aligned table (no line above) -->
@@ -999,7 +1012,6 @@
                         .document-title {
                             text-align: center;
                             font-size: 18px;
-                            font-weight: bold;
                             text-decoration: underline;
                             margin-bottom: 20px;
                             text-transform: uppercase;
