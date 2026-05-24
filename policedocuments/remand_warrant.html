@@ -255,7 +255,7 @@
         }
         
         .document-table td, .document-table th {
-            border: 1px solid #000;
+            border: none;
             padding: 3px 5px;
             vertical-align: top;
         }
@@ -270,13 +270,38 @@
         
         .document-footer {
             margin-top: 80px;
-            text-align: right;
         }
         
-        .signature-line {
-            width: 250px;
-            border-top: 1px solid #000;
-            margin: 40px auto 10px;
+        .indented-item {
+            margin-left: 40px;
+        }
+        
+        .magistrate-section {
+            text-align: right;
+            margin-top: 30px;
+        }
+        
+        .magistrate-table {
+            margin-left: auto;
+            border-collapse: collapse;
+            width: auto;
+        }
+        
+        .magistrate-table td {
+            border: none;
+            text-align: center;
+            padding: 4px 8px;
+        }
+        
+        .indented-prison {
+            margin-left: 40px;
+        }
+        
+        .indented-paragraph {
+            text-indent: 50px;
+            text-align: justify;
+            margin: 20px 0;
+            line-height: 1.5;
         }
         
         .hidden {
@@ -530,7 +555,7 @@
         const productionDayInput = document.getElementById('productionDay');
         const productionMonthInput = document.getElementById('productionMonth');
         const courtNameInput = document.getElementById('courtName');
-        const prisonPlaceInput = document.getElementById('prisonPlace'); // NEW
+        const prisonPlaceInput = document.getElementById('prisonPlace');
         const descriptiveMarksInput = document.getElementById('descriptiveMarks');
         const imageUploadInput = document.getElementById('imageUpload');
         const imageUploadArea = document.getElementById('imageUploadArea');
@@ -584,14 +609,14 @@
             reader.onload = function(e) {
                 uploadedImage = e.target.result;
                 imagePreview.innerHTML = `<img src="${uploadedImage}" alt="Accused Photograph">`;
-                updatePreview(); // Update preview with new image
+                updatePreview();
             };
             reader.readAsDataURL(file);
         }
         
         // Function to get ordinal suffix (st, nd, rd, th)
         function getOrdinalSuffix(day) {
-            if (day > 3 && day < 21) return 'th'; // 11th, 12th, 13th, etc.
+            if (day > 3 && day < 21) return 'th';
             switch (day % 10) {
                 case 1: return 'st';
                 case 2: return 'nd';
@@ -632,10 +657,12 @@
                     </tr>
                 </table>
                 
-                <p><strong>To</strong><br>
-                The Superintendent Central Prison, ${prisonPlaceInput.value}</p>
+                <p><strong>To</strong></p>
+                <div class="indented-prison">
+                    <p>The Superintendent Central Prison, ${prisonPlaceInput.value}</p>
+                </div>
                 
-                <p style="text-align: justify; text-justify: inter-word; margin: 20px 0; line-height: 1.5;">
+                <p class="indented-paragraph">
                     Whereas it appears that a Charge against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> of an offence under ${offenseSectionInput.value} under investigation the police under the provision of Chapter XIII of the Bharathiya Nagarik Suraksha Sanhitha 2023, that such investigation cannot be completed within that period of 24 hours fixed by section 58 and that there are grounds of before that the accusation/information against the said person is well and the accused having been dully forwarded to this court, this authorize you to detain them against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> In custody for <strong>${detentionDaysInput.value}</strong> days and cause him to be produced before the ${courtNameInput.value} on the <strong>${productionDayInput.value}</strong> day of <strong>${productionMonthInput.value}</strong> ${currentYear} at 10.00 'o' clock.
                 </p>
                 
@@ -650,39 +677,52 @@
                                 ${uploadedImage ? `<img src="${uploadedImage}" class="preview-image" alt="Accused Photograph">` : '<div style="color: #888; font-style: italic; padding: 5px;">[Photograph]</div>'}
                             </div>
                         </td>
-                    </tr>
+                     </tr>
                     <tr>
                         <td>Father's Name</td>
                         <td><strong>${fatherNameInput.value}</strong></td>
-                    </tr>
+                     </tr>
                     <tr>
                         <td>Sex, Married or single</td>
                         <td><strong>${maritalStatusInput.value}</strong></td>
-                    </tr>
+                     </tr>
                     <tr>
                         <td>Race, Religion and Caste</td>
                         <td><strong>${religionInput.value}<br>${casteInput.value}</strong></td>
-                    </tr>
+                     </tr>
                     <tr>
                         <td>Previous Occupation</td>
                         <td><strong>${occupationInput.value}</strong></td>
-                    </tr>
+                     </tr>
                     <tr>
                         <td>Aged</td>
                         <td><strong>${accusedAgeInput.value}</strong></td>
-                    </tr>
+                     </tr>
                     <tr>
                         <td>Descriptive Mark's</td>
                         <td colspan="2">${descriptiveMarksInput.value.replace(/\n/g, '<br>')}</td>
-                    </tr>
+                     </tr>
                 </table>
                 
+                <!-- Footer with "Given under my hand" at left margin, seal label indented, and magistrate in right-aligned table (no line above) -->
                 <div class="document-footer">
-                    <p>Given under my hand and the seal of the Court this ${formattedDate}</p>
-                    <div class="signature-line"></div>
-                    <p>Court Seal</p>
-                    <p><strong>II METROPOLITAN MAGISTRATE</strong><br>
-                    EGMORE, CHENNAI-08</p>
+                    <div>
+                        <p>Given under my hand and the seal of the Court this ${formattedDate}</p>
+                        <div class="indented-item">
+                            <p>Court Seal</p>
+                        </div>
+                    </div>
+                    
+                    <div class="magistrate-section">
+                        <table class="magistrate-table">
+                            <tr>
+                                <td><strong>II METROPOLITAN MAGISTRATE</strong></td>
+                            </tr>
+                            <tr>
+                                <td>EGMORE, CHENNAI-08</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             `;
         }
@@ -712,17 +752,19 @@
                         (SECTION 187(ii) BNSS)
                     </div>
                     
-                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; border: 1px solid #000;">
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px;">
                         <tr>
-                            <td style="border: 1px solid #000; padding: 4px 6px; width: 70%;">${caseNumberInput.value}<br>Police Station: ${policeStationInput.value}</td>
-                            <td style="border: 1px solid #000; padding: 4px 6px; width: 30%;"></td>
-                        </tr>
+                            <td style="padding: 4px 6px; width: 70%;">${caseNumberInput.value}<br>Police Station: ${policeStationInput.value}</td>
+                            <td style="padding: 4px 6px; width: 30%;"></td>
+                         </tr>
                     </table>
+
+                    <p><strong>To</strong></p>
+                    <div style="margin-left: 40px;">
+                        <p>The Superintendent Central Prison, ${prisonPlaceInput.value}</p>
+                    </div>
                     
-                    <p><strong>To</strong><br>
-                    The Superintendent Central Prison, ${prisonPlaceInput.value}</p>
-                    
-                    <p style="text-align: justify; text-justify: inter-word; margin: 25px 0; line-height: 1.5; font-size: 13px;">
+                    <p style="text-indent: 50px; text-align: justify; margin: 25px 0; line-height: 1.5; font-size: 13px;">
                         Whereas it appears that a Charge against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> of an offence under ${offenseSectionInput.value} under investigation the police under the provision of Chapter XIII of the Bharathiya Nagarik Suraksha Sanhitha 2023, that such investigation cannot be completed within that period of 24 hours fixed by section 58 and that there are grounds of before that the accusation/information against the said person is well and the accused having been dully forwarded to this court, this authorize you to detain them against <strong>${accusedNameInput.value} M/a-${accusedAgeInput.value}, S/o ${fatherNameInput.value}</strong> In custody for <strong>${detentionDaysInput.value}</strong> days and cause him to be produced before the ${courtNameInput.value} on the <strong>${productionDayInput.value}</strong> day of <strong>${productionMonthInput.value}</strong> ${currentYear} at 10.00 'o' clock.
                     </p>
                     
@@ -730,48 +772,61 @@
                         DESCRIPTIVE ROLL
                     </div>
                     
-                    <table style="width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 13px; border: 1px solid #000;">
+                    <table style="width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 13px;">
                         <tr>
-                            <td style="border: 1px solid #000; padding: 4px 6px; width: 30%; height: 28px;">Name</td>
-                            <td style="border: 1px solid #000; padding: 4px 6px; width: 40%; height: 28px;"><strong>${accusedNameInput.value}</strong></td>
-                            <td rowspan="6" style="border: 1px solid #000; width: 30%; text-align: center; vertical-align: middle; padding: 0;">
+                            <td style="padding: 4px 6px; width: 30%; height: 28px;">Name</td>
+                            <td style="padding: 4px 6px; width: 40%; height: 28px;"><strong>${accusedNameInput.value}</strong></td>
+                            <td rowspan="6" style="width: 30%; text-align: center; vertical-align: middle; padding: 0;">
                                 <div style="width: 100%; height: 168px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0; margin: 0;">
                                     ${uploadedImage ? `<img src="${uploadedImage}" style="width: 100%; height: 100%; object-fit: fill;" alt="Accused Photograph">` : '<div style="color: #888; font-style: italic; padding: 5px;">[Photograph]</div>'}
                                 </div>
                             </td>
-                        </tr>
+                         </tr>
                         <tr>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Father's Name</td>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${fatherNameInput.value}</strong></td>
-                        </tr>
+                            <td style="padding: 4px 6px; height: 28px;">Father's Name</td>
+                            <td style="padding: 4px 6px; height: 28px;"><strong>${fatherNameInput.value}</strong></td>
+                         </tr>
                         <tr>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Sex, Married or single</td>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${maritalStatusInput.value}</strong></td>
-                        </tr>
+                            <td style="padding: 4px 6px; height: 28px;">Sex, Married or single</td>
+                            <td style="padding: 4px 6px; height: 28px;"><strong>${maritalStatusInput.value}</strong></td>
+                         </tr>
                         <tr>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Race, Religion and Caste</td>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${religionInput.value}<br>${casteInput.value}</strong></td>
-                        </tr>
+                            <td style="padding: 4px 6px; height: 28px;">Race, Religion and Caste</td>
+                            <td style="padding: 4px 6px; height: 28px;"><strong>${religionInput.value}<br>${casteInput.value}</strong></td>
+                         </tr>
                         <tr>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Previous Occupation</td>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${occupationInput.value}</strong></td>
-                        </tr>
+                            <td style="padding: 4px 6px; height: 28px;">Previous Occupation</td>
+                            <td style="padding: 4px 6px; height: 28px;"><strong>${occupationInput.value}</strong></td>
+                         </tr>
                         <tr>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;">Aged</td>
-                            <td style="border: 1px solid #000; padding: 4px 6px; height: 28px;"><strong>${accusedAgeInput.value}</strong></td>
-                        </tr>
+                            <td style="padding: 4px 6px; height: 28px;">Aged</td>
+                            <td style="padding: 4px 6px; height: 28px;"><strong>${accusedAgeInput.value}</strong></td>
+                         </tr>
                         <tr>
-                            <td style="border: 1px solid #000; padding: 6px 8px;">Descriptive Mark's</td>
-                            <td colspan="2" style="border: 1px solid #000; padding: 6px 8px;">${descriptiveMarksInput.value.replace(/\n/g, '<br>')}</td>
-                        </tr>
+                            <td style="padding: 6px 8px;">Descriptive Mark's</td>
+                            <td colspan="2" style="padding: 6px 8px;">${descriptiveMarksInput.value.replace(/\n/g, '<br>')}</td>
+                         </tr>
                     </table>
                     
-                    <div style="margin-top: 80px; text-align: right;">
-                        <p>Given under my hand and the seal of the Court this ${formattedDate}</p>
-                        <div style="width: 250px; border-top: 1px solid #000; margin: 40px auto 10px;"></div>
-                        <p>Court Seal</p>
-                        <p><strong>II METROPOLITAN MAGISTRATE</strong><br>
-                        EGMORE, CHENNAI-08</p>
+                    <!-- Footer with "Given under my hand" at left margin, seal label indented, and magistrate in right-aligned table (no line above) -->
+                    <div style="margin-top: 80px;">
+                        <div>
+                            <p>Given under my hand and the seal of the Court this ${formattedDate}</p>
+                            <div style="margin-left: 40px;">
+                                <p>Court Seal</p>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: right; margin-top: 30px;">
+                            <table style="margin-left: auto; border-collapse: collapse; width: auto;">
+                                <tr>
+                                    <td style="border: none; text-align: center; padding: 4px 8px;"><strong>II METROPOLITAN MAGISTRATE</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; text-align: center; padding: 4px 8px;">EGMORE, CHENNAI-08</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             `;
@@ -805,7 +860,7 @@
                 { input: detentionDaysInput, name: 'Detention Days' },
                 { input: productionDayInput, name: 'Production Day' },
                 { input: courtNameInput, name: 'Court Name' },
-                { input: prisonPlaceInput, name: 'Prison Place' }, // NEW
+                { input: prisonPlaceInput, name: 'Prison Place' },
                 { input: descriptiveMarksInput, name: 'Descriptive Marks' }
             ];
             
@@ -844,7 +899,7 @@
                     useCORS: true,
                     logging: false,
                     backgroundColor: '#ffffff',
-                    width: 794, // A4 width in pixels
+                    width: 794,
                     height: pdfHidden.scrollHeight
                 });
                 
@@ -857,7 +912,7 @@
                 });
                 
                 // Calculate dimensions
-                const imgWidth = 210; // A4 width in mm
+                const imgWidth = 210;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 
                 // Add image to PDF
@@ -956,7 +1011,6 @@
                             font-size: 13px;
                         }
                         td, th {
-                            border: 1px solid #000;
                             padding: 4px 6px;
                             vertical-align: top;
                         }
@@ -1020,7 +1074,7 @@
                 productionDayInput.value = '16';
                 productionMonthInput.value = 'July';
                 courtNameInput.value = 'NDPS PJ Court / Chennai';
-                prisonPlaceInput.value = 'Puzhal, Chennai'; // Reset to default
+                prisonPlaceInput.value = 'Puzhal, Chennai';
                 descriptiveMarksInput.value = `1) tyJ cs;s';ifapy; xU[ kr;rk;
 2) KJfpd; eLgFjpapy; xU kr;rk;
 3) tyJ fhy; ghj;jpy; xU kr;rk;`;
