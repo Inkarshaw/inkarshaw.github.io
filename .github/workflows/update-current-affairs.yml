@@ -1,0 +1,39 @@
+name: Update current affairs PDF list
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "current-affairs/*.pdf"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: current-affairs-pdf-list
+  cancel-in-progress: false
+
+jobs:
+  update-pdf-list:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate newest-first PDF list
+        run: python3 current-affairs/generate-pdf-list.py
+
+      - name: Commit generated list
+        run: |
+          if git diff --quiet -- current-affairs/pdfs.json; then
+            echo "PDF list is already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add current-affairs/pdfs.json
+          git commit -m "Update current affairs PDF list"
+          git push
