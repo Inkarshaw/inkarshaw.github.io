@@ -128,7 +128,7 @@
 </div>
 <script>
   // After the Google Sheet is connected and published as CSV, paste its URL here.
-  const GOOGLE_SHEET_CSV_URL = "";
+  const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1yhND5g2Q23eOXz3oakV7xX-pUuunw3i2GzES3yaFVVY/gviz/tq?tqx=out:csv&sheet=Questions";
   const FALLBACK_CSV_URL = "data/daily-quiz.csv";
   const DAILY_COUNT = 10;
   const letters = ["A","B","C","D"];
@@ -165,7 +165,7 @@
   }
   async function loadBank(){
     const urls=[GOOGLE_SHEET_CSV_URL,FALLBACK_CSV_URL].filter(Boolean);let lastError;
-    for(const url of urls){try{const res=await fetch(url,{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status);const rows=parseCSV(await res.text());if(rows.length)return rows}catch(e){lastError=e}}
+    for(const url of urls){try{const res=await fetch(url,{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status);const rows=parseCSV(await res.text());if(rows.some(valid))return rows;throw new Error("Source did not return valid quiz rows.")}catch(e){lastError=e}}
     throw lastError||new Error("No question source is configured.");
   }
   function valid(q){
