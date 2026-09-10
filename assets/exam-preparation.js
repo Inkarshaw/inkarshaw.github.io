@@ -2,61 +2,103 @@
   'use strict';
   const {json,escape,link,syllabusURL,notificationHTML,formatDate} = window.ClearExams;
   const host = document.getElementById('content');
+
   try {
     const catalog = await json('data/exam-catalog.json');
     const id = new URLSearchParams(location.search).get('exam') || 'tnpsc-group-4';
-    const exam = Object.values(catalog).flatMap(body=>body.items).find(item=>item.id===id);
+    const exam = Object.values(catalog).flatMap(body => body.items).find(item => item.id === id);
+
     if (!exam) {
       document.getElementById('examTitle').textContent = 'Choose an examination';
-      host.innerHTML = '<section class="panel"><h2>That examination was not found</h2><p>Use an exam category to choose a preparation page.</p>' + Object.entries(catalog).map(([key,body])=>link(body.name,'exam-posts.html?exam='+key)).join(' ') + '</section>';
+      host.innerHTML = '<section class="panel"><h2>That examination was not found</h2><p>Choose an exam category to continue.</p>' + Object.entries(catalog).map(([key,body]) => link(body.name,'exam-posts.html?exam='+key)).join(' ') + '</section>';
       return;
     }
-    const body = catalog[exam.category], group4 = id === 'tnpsc-group-4';
+
+    const body = catalog[exam.category];
+    const group4 = id === 'tnpsc-group-4';
     document.title = exam.title + ' Preparation | ClearExams';
     document.getElementById('examTitle').textContent = exam.title;
-    document.getElementById('examIntro').textContent = exam.description;
-    document.getElementById('categoryName').textContent = body.name + ' · Preparation guide';
-    const back = document.getElementById('backLink');back.href='exam-posts.html?exam='+exam.category;back.textContent='← All '+body.name+' examinations';
-    const syllabus = group4 ? '<div id="group4Reader"></div>' : `<p>${exam.syllabus ? 'Read the syllabus for this examination, organised by stage and subject. The syllabus page identifies its official source and available PDF.' : 'The scheme depends on the specific post, trade or recruitment notice. Use the official website to select this examination and read its syllabus.'}</p><div class="actions">${link(exam.syllabus?'Read this exam’s syllabus':'Official syllabus / recruitment notice ↗',syllabusURL(exam),'button')}</div>`;
-    host.innerHTML = `<nav class="jump-links" aria-label="On this page"><a href="#eligibility">Posts & qualifications</a><a href="#syllabus">Syllabus</a><a href="#notes">Study notes</a><a href="#practice">Daily quiz</a><a href="#papers">Previous papers</a><a href="#notifications">Notifications</a></nav>
-      <section class="panel" id="eligibility"><h2>Posts and services</h2><ul>${exam.roles.map(role=>`<li>${escape(role)}</li>`).join('')}</ul><h3>Minimum educational qualification</h3><p>${escape(exam.qualification)}</p><p class="source">${escape(exam.qualificationNote)}</p>${exam.source?link(exam.source.label+' ↗',exam.source.url):link('Official post qualifications ↗',exam.official)}<div id="postQualifications"></div><h3>Selection process</h3><p>${escape(exam.selection.join(' · '))}</p>${group4?'<p class="muted">Forest posts include the notified physical standards and endurance requirements. The 2026 notice will determine that cycle’s vacancies and selection conditions.</p>':''}</section>
-      <section class="panel" id="syllabus"><h2>${escape(exam.title)} syllabus</h2>${group4?'<div class="stats"><div class="stat"><strong>75</strong><span>General Studies questions</span></div><div class="stat"><strong>25</strong><span>Aptitude & Mental Ability</span></div><div class="stat"><strong>100</strong><span>Language questions</span></div></div><p class="muted">Single paper at SSLC standard · syllabus code 496. Part names below follow the syllabus document.</p>':''}${syllabus}</section>
-      <section class="panel" id="notes"><h2>Study notes and revision</h2><p>Use these foundation resources alongside this exam’s syllabus. Work through the listed topics and record mistakes after each practice set.</p><div class="grid"><article class="resource"><h3>Arithmetic essentials</h3><p>Percentage = part ÷ whole × 100. Simple interest = principal × annual rate × years ÷ 100. For annual compounding, amount = principal × (1 + rate ÷ 100)<sup>years</sup>.</p><p>For time and work, convert each worker’s completion time into work per day before adding rates. Keep units consistent in area and volume problems.</p></article>${group4?'<article class="resource" lang="ta"><h3>தமிழ் இலக்கணம் — மீள்பார்வை</h3><p>குறில்: அ, இ, உ, எ, ஒ. நெடில்: ஆ, ஈ, ஊ, ஏ, ஐ, ஓ, ஔ. ல / ள / ழ, ர / ற, ந / ண / ன வேறுபாடுகளுக்குச் சொல் எடுத்துக்காட்டுகளை எழுதிப் பயிற்சி செய்யுங்கள்.</p><p>திருக்குறளின் பாடத்திட்டத்தில் உள்ள 20 அதிகாரங்களையும் தனிப் பட்டியலாக வைத்துப் படியுங்கள். ஒவ்வொரு தவறுக்கும் சரியான சொல் மற்றும் அதன் பொருளைக் குறித்துவையுங்கள்.</p></article>':'<article class="resource"><h3>Build a revision notebook</h3><p>Use one page per syllabus topic. Write key terms, formulas and a worked example. After practice, add the reason for each mistake and revisit those questions before starting the next topic.</p></article>'}<article class="resource"><h3>Indian Polity</h3><p>Topic notes and practice for constitutional concepts. Useful for the General Studies component where prescribed.</p>${link('Read Polity topics','tnpsc/indian_polity.html')}</article><article class="resource"><h3>NCERT textbooks</h3><p>Official textbooks for science, social science and mathematics. Select the class and subject that match the required exam standard.</p>${link('Open official textbooks ↗','https://ncert.nic.in/textbook.php')}</article></div><p class="muted">These are starting resources. Specialist, technical and banking papers also require their own subject material.</p></section>
-      <section class="panel" id="practice"><h2>Daily quiz and topic practice</h2><p>Start with today’s 10-question Indian Polity set. Every option has an explanation. This is shared topic practice; it is not a full mock test for ${escape(exam.title)}.</p><div class="actions">${link('Start today’s Polity quiz','daily-quiz.html?topic=Indian%20Polity','button')}${link('Article-wise Polity practice','exam/indian_polity/all_articles.html')}${link('Prehistoric India practice','exam/history/prehistoric_india.html')}</div></section>
-      <section class="panel" id="papers"><h2>Previous-year question papers</h2>${papers(exam)}</section>
-      <section class="panel" id="notifications"><h2>Notifications and application dates</h2><div id="notificationList"><p role="status">Loading dated notices…</p></div><div class="actions">${link('All '+body.name+' notifications','exam-notifications.html?category='+exam.category)}${link('Official recruitment updates ↗',exam.official)}</div></section>`;
+    document.getElementById('examIntro').textContent = 'Follow the preparation path from syllabus to practice, previous papers and mock-test readiness.';
+    document.getElementById('categoryName').textContent = body.name + ' · Preparation path';
+    const back = document.getElementById('backLink');
+    back.href = 'exam-posts.html?exam=' + exam.category;
+    back.textContent = '← All ' + body.name + ' examinations';
+
+    const syllabusBlock = group4
+      ? '<div id="group4Reader"></div>'
+      : `<p>${exam.syllabus ? 'Read the syllabus for this examination, organised by stage and subject.' : 'The exact syllabus depends on the current recruitment notice. Use the official source below.'}</p><div class="actions">${link(exam.syllabus ? 'Read this exam’s syllabus' : 'Official syllabus / notice ↗', syllabusURL(exam), 'button')}</div>`;
+
+    host.innerHTML = `
+      <section class="panel" aria-labelledby="path-title">
+        <p class="eyebrow">Your study roadmap</p>
+        <h2 id="path-title">6-step preparation path</h2>
+        <div class="grid">
+          ${pathCard('1','Syllabus','Know exactly what to study.','#syllabus')}
+          ${pathCard('2','Study materials','Build concepts topic by topic.','#notes')}
+          ${pathCard('3','Topic quiz','Practise and learn from explanations.','#practice')}
+          ${pathCard('4','PYQs','Understand the real exam pattern.','#papers')}
+          ${pathCard('5','Mock tests','Test speed and accuracy.','#mocks')}
+          ${pathCard('6','Notification','Track the next application cycle.','#notifications')}
+        </div>
+      </section>
+
+      <nav class="jump-links" aria-label="On this page">
+        <a href="#eligibility">Eligibility</a><a href="#syllabus">Syllabus</a><a href="#notes">Study materials</a><a href="#practice">Topic quiz</a><a href="#papers">PYQs</a><a href="#mocks">Mock tests</a><a href="#notifications">Notifications</a>
+      </nav>
+
+      <section class="panel" id="eligibility"><p class="eyebrow">Before you start</p><h2>Eligibility & selection</h2><h3>Posts and services</h3><ul>${exam.roles.map(role=>`<li>${escape(role)}</li>`).join('')}</ul><h3>Minimum educational qualification</h3><p>${escape(exam.qualification)}</p><p class="source">${escape(exam.qualificationNote)}</p>${exam.source ? link(exam.source.label+' ↗',exam.source.url) : link('Official post qualifications ↗',exam.official)}<div id="postQualifications"></div><h3>Selection process</h3><p>${escape(exam.selection.join(' · '))}</p></section>
+
+      <section class="panel" id="syllabus"><p class="eyebrow">Step 1</p><h2>${escape(exam.title)} syllabus</h2>${group4 ? '<div class="stats"><div class="stat"><strong>75</strong><span>General Studies</span></div><div class="stat"><strong>25</strong><span>Aptitude</span></div><div class="stat"><strong>100</strong><span>Language</span></div></div><p class="muted">Single paper at SSLC standard · syllabus code 496.</p>' : ''}${syllabusBlock}</section>
+
+      <section class="panel" id="notes"><p class="eyebrow">Step 2</p><h2>Study materials & revision</h2><p>Study the syllabus topic by topic. Keep one revision page for every topic and add mistakes from practice sessions.</p><div class="grid"><article class="resource"><h3>Indian Polity</h3><p>Constitution, institutions, rights, governance and article-wise revision.</p>${link('Open Polity study material','tnpsc/indian_polity.html')}</article><article class="resource"><h3>Current Affairs</h3><p>Daily exam-ready PDF revision material.</p>${link('Open Current Affairs','current-affairs/')}</article><article class="resource"><h3>NCERT foundation</h3><p>Use official school textbooks for science, social science and mathematics fundamentals.</p>${link('Official NCERT textbooks ↗','https://ncert.nic.in/textbook.php')}</article><article class="resource"><h3>Revision method</h3><p>Write definitions, formulas, dates and one worked example per syllabus topic. Revisit errors before starting the next set.</p></article></div></section>
+
+      <section class="panel" id="practice"><p class="eyebrow">Step 3</p><h2>Topic quiz</h2><p>Use short topic-wise quizzes for active recall. Every answer should teach you why the correct option is right and the other options are wrong.</p><div class="actions">${link('Start Daily 10-question Quiz','daily-quiz.html','button')}${link('Article-wise Polity Practice','exam/indian_polity/all_articles.html')}${link('Prehistoric India Practice','exam/history/prehistoric_india.html')}</div></section>
+
+      <section class="panel" id="papers"><p class="eyebrow">Step 4</p><h2>Previous-year questions (PYQs)</h2>${papers(exam)}</section>
+
+      <section class="panel" id="mocks"><p class="eyebrow">Step 5</p><h2>Mock-test readiness</h2><p>A dedicated full-length ${escape(exam.title)} mock-test series is not yet published on ClearExams. Until it is added, use this sequence:</p><ol><li>Finish one full syllabus revision.</li><li>Complete topic quizzes without notes.</li><li>Solve an official previous-year paper under the real time limit.</li><li>Record score, weak topics and time lost.</li><li>Revise only the weak areas and repeat another paper.</li></ol><div class="actions">${link('Practise Daily Quiz','daily-quiz.html','button')}${link('Go to PYQs','#papers')}</div><p class="source">Dedicated exam-wise mock tests are coming soon. No placeholder score or fake test is shown.</p></section>
+
+      <section class="panel" id="notifications"><p class="eyebrow">Step 6</p><h2>Notifications & application dates</h2><div id="notificationList"><p role="status">Loading dated notices…</p></div><div class="actions">${link('All '+body.name+' notifications','exam-notifications.html?category='+exam.category)}${link('Official recruitment updates ↗',exam.official)}</div></section>`;
+
     const tasks = [loadNotifications(exam)];
     if (group4) {
       tasks.push(window.mountGroup4Syllabus(document.getElementById('group4Reader')));
       tasks.push(loadGroup4Posts());
     }
     await Promise.all(tasks);
-    // Honour links directly to a resource after async content has established its position.
+
     const anchor = location.hash.slice(1);
-    if (['eligibility','syllabus','notes','practice','papers','notifications'].includes(anchor)) document.getElementById(anchor).scrollIntoView();
+    if (['eligibility','syllabus','notes','practice','papers','mocks','notifications'].includes(anchor)) document.getElementById(anchor).scrollIntoView();
   } catch (error) {
-    host.innerHTML = '<section class="panel"><h2>Exam resources could not load</h2><p>Please reload the page or <a href="exam-posts.html?exam=tnpsc">choose an exam</a>. The <a href="syllabus.html">syllabus directory</a> is also available.</p></section>';
+    host.innerHTML = '<section class="panel"><h2>Exam resources could not load</h2><p>Please reload or <a href="exam-posts.html">choose an exam</a>. The <a href="syllabus.html">syllabus directory</a> is also available.</p></section>';
   }
+
+  function pathCard(number,title,text,href) {
+    return `<article class="resource"><span class="status-tag open">Step ${number}</span><h3>${escape(title)}</h3><p>${escape(text)}</p><div class="actions"><a class="button secondary" href="${href}">Open step</a></div></article>`;
+  }
+
   function papers(exam) {
-    if (exam.id === 'tnpsc-group-4') return '<p>Official TNPSC papers from the examination held on 12 July 2025. The specimen booklets contain tentative ticks; use the final key to review answers.</p><div class="actions">' + link('2025 Tamil + General Studies paper ↗','https://www.tnpsc.gov.in/Tentative/Document/07_2025_GENEAL_TAMIL_GS.pdf') + link('2025 permitted English + GS paper ↗','https://www.tnpsc.gov.in/Tentative/Document/07_2025_GENEARAL_ENGLISH_GS.pdf') + link('2025 final answer key ↗','https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/07_2025_CCSE_IV_FINAL_ANSWER_KEY.pdf') + link('Other years: TNPSC archive ↗','https://www.tnpsc.gov.in/English/answerkeys.aspx') + '</div>';
-    if (exam.category === 'tnpsc') return '<p>Select the exact group, stage and examination year in TNPSC’s question-paper archive.</p>' + link('TNPSC official question-paper archive ↗','https://www.tnpsc.gov.in/English/answerkeys.aspx');
-    if (exam.category === 'upsc') return '<p>Select Civil Services Preliminary or Civil Services Main for the required year. These services use the Civil Services Examination papers.</p>' + link('UPSC official previous question papers ↗','https://upsc.gov.in/examinations/previous-question-papers');
-    if (exam.category === 'tnusrb') return '<p>Choose the recruitment and year. Police Constable papers and SI papers have different requirements.</p>' + link('TNUSRB paper collection','tnusrb/previous_year_questions.html') + ' ' + link('TNUSRB official notices ↗',exam.official);
-    return '<p>No downloaded past-paper set is currently listed here for this examination. Check the official recruitment website for released question papers, response sheets, answer keys or information handouts. Some are available only during a limited access window.</p>' + link('Official papers / answer-key notices ↗',exam.official);
+    if (exam.id === 'tnpsc-group-4') return '<p>Use official TNPSC papers and final answer keys to learn the real question style.</p><div class="actions">' + link('2025 Tamil + General Studies paper ↗','https://www.tnpsc.gov.in/Tentative/Document/07_2025_GENEAL_TAMIL_GS.pdf') + link('2025 permitted English + GS paper ↗','https://www.tnpsc.gov.in/Tentative/Document/07_2025_GENEARAL_ENGLISH_GS.pdf') + link('2025 final answer key ↗','https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/07_2025_CCSE_IV_FINAL_ANSWER_KEY.pdf') + link('TNPSC archive ↗','https://www.tnpsc.gov.in/English/answerkeys.aspx') + '</div>';
+    if (exam.category === 'tnpsc') return '<p>Select the exact group, stage and year in TNPSC’s official question-paper archive.</p>' + link('TNPSC question-paper archive ↗','https://www.tnpsc.gov.in/English/answerkeys.aspx');
+    if (exam.category === 'upsc') return '<p>Select the relevant examination and year from UPSC’s official previous-question-paper collection.</p>' + link('UPSC previous question papers ↗','https://upsc.gov.in/examinations/previous-question-papers');
+    if (exam.category === 'tnusrb') return '<p>Choose the recruitment and year. Police Constable and SI papers have different patterns.</p>' + link('TNUSRB PYQ collection','tnusrb/previous_year_questions.html') + ' ' + link('TNUSRB official notices ↗',exam.official);
+    return '<p>No downloaded past-paper collection is listed here yet. Check the recruiting body for question papers, answer keys, response sheets or information handouts.</p>' + link('Official papers / answer-key notices ↗',exam.official);
   }
+
   async function loadGroup4Posts() {
     const area = document.getElementById('postQualifications');
     try {
       const data = await json('data/group4-posts.json');
-      area.innerHTML = `<h3>Post-wise qualifications · 2025 reference</h3><p class="source">${escape(data.reference)}</p><div class="table-scroll"><table class="post-table"><caption class="muted">Educational and technical requirements by post code</caption><thead><tr><th scope="col">Post / service</th><th scope="col">Minimum qualification and conditions</th></tr></thead><tbody>${data.rows.map(([name,codes,qualification,page])=>`<tr><td>${escape(name)}<small>Post codes: ${escape(codes)}</small></td><td>${escape(qualification)}<small><a href="${escape(data.source)}#page=${page}" target="_blank" rel="noopener noreferrer">Official notice · page ${page} ↗</a></small></td></tr>`).join('')}</tbody></table></div><p class="notice">${escape(data.note)}</p>`;
-    } catch (error) { area.innerHTML = '<p role="alert">The post-wise table could not load. Use the official qualification notice linked above.</p>'; }
+      area.innerHTML = `<h3>Post-wise qualifications · reference</h3><p class="source">${escape(data.reference)}</p><div class="table-scroll"><table class="post-table"><thead><tr><th>Post / service</th><th>Minimum qualification</th></tr></thead><tbody>${data.rows.map(([name,codes,qualification,page])=>`<tr><td>${escape(name)}<small>Post codes: ${escape(codes)}</small></td><td>${escape(qualification)}<small><a href="${escape(data.source)}#page=${page}" target="_blank" rel="noopener noreferrer">Official notice · page ${page} ↗</a></small></td></tr>`).join('')}</tbody></table></div><p class="notice">${escape(data.note)}</p>`;
+    } catch (error) { area.innerHTML = '<p role="alert">The post-wise table could not load. Use the official qualification notice above.</p>'; }
   }
+
   async function loadNotifications(exam) {
     const area = document.getElementById('notificationList');
     try {
       const data = await json('data/exam-notifications.json');
-      const entries = data.entries.filter(item=>item.exams.includes(exam.id));
-      area.innerHTML = `<p class="source">Dates checked on ${formatDate(data.checkedOn)}. Notices are updated manually; official amendments take priority.</p>` + (entries.length ? entries.map(notificationHTML).join('') : '<p>No dated notice has been added to this page for this examination. Open the official recruitment updates below to check current application dates.</p>');
+      const entries = data.entries.filter(item => item.exams.includes(exam.id));
+      area.innerHTML = `<p class="source">Dates checked on ${formatDate(data.checkedOn)}. Official amendments take priority.</p>` + (entries.length ? entries.map(notificationHTML).join('') : '<p>No dated notice has been added for this examination. Use the official recruitment link below.</p>');
     } catch (error) { area.innerHTML = '<p role="alert">Dates could not load. Use the official recruitment updates below.</p>'; }
   }
 })();
