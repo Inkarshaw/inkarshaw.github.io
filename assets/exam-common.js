@@ -1,5 +1,8 @@
 (function () {
   'use strict';
+  if (!window.ceTrack && !document.querySelector('script[src$="assets/analytics.js"]')) {
+    const analytics=document.createElement('script');analytics.src='assets/analytics.js';analytics.defer=true;document.head.appendChild(analytics);
+  }
   const cache = new Map();
   function json(path) {
     if (!cache.has(path)) cache.set(path, fetch(path).then(r => {
