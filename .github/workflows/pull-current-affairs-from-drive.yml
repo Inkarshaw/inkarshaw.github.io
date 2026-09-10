@@ -1,0 +1,104 @@
+name: Pull current affairs PDF from Google Drive
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Date in YYYY-MM-DD (defaults to current IST date)"
+        required: false
+        type: string
+  schedule:
+    - cron: "45 14 * * *"  # 20:15 IST
+
+permissions:
+  contents: write
+
+jobs:
+  pull-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Google Drive client
+        run: pip install google-api-python-client google-auth
+
+      - name: Resolve date
+        id: d
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            DATE="${{ inputs.date }}"
+          else
+            DATE=$(TZ=Asia/Kolkata date +%F)
+          fi
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+
+      - name: Download PDF from Google Drive
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          DRIVE_FOLDER_ID: "1j2dH78egIuD3Vj8mwUSpmuUZgJvhJlnU"
+          DATE: ${{ steps.d.outputs.date }}
+        run: |
+          python - <<'PY'
+          import io, json, os, sys
+          from pathlib import Path
+          from google.oauth2.service_account import Credentials
+          from googleapiclient.discovery import build
+          from googleapiclient.http import MediaIoBaseDownload
+
+          raw = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          if not raw:
+              raise SystemExit("Missing GOOGLE_SERVICE_ACCOUNT_JSON GitHub secret")
+
+          creds = Credentials.from_service_account_info(
+              json.loads(raw), scopes=["https://www.googleapis.com/auth/drive.readonly"]
+          )
+          drive = build("drive", "v3", credentials=creds)
+          folder_id = os.environ["DRIVE_FOLDER_ID"]
+          date = os.environ["DATE"]
+          name = f"{date}.pdf"
+
+          q = f"'{folder_id}' in parents and name = '{name}' and trashed = false"
+          files = drive.files().list(q=q, fields="files(id,name,size,modifiedTime)", pageSize=10).execute().get("files", [])
+          if not files:
+              print(f"No {name} found in Drive folder; nothing to publish.")
+              sys.exit(0)
+
+          f = max(files, key=lambda x: x.get("modifiedTime", ""))
+          out = Path("current-affairs") / name
+          out.parent.mkdir(parents=True, exist_ok=True)
+          request = drive.files().get_media(fileId=f["id"])
+          with io.FileIO(out, "wb") as fh:
+              downloader = MediaIoBaseDownload(fh, request)
+              done = False
+              while not done:
+                  status, done = downloader.next_chunk()
+                  if status:
+                      print(f"Download {int(status.progress()*100)}%")
+          print(f"Downloaded {name} -> {out}")
+          PY
+
+      - name: Commit pulled PDF
+        shell: bash
+        run: |
+          DATE="${{ steps.d.outputs.date }}"
+          FILE="current-affairs/$DATE.pdf"
+          if [ ! -f "$FILE" ]; then
+            echo "No PDF downloaded; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$FILE"
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Publish current affairs PDF for $DATE"
+          git push
