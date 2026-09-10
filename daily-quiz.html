@@ -176,7 +176,10 @@
     const select=document.getElementById("topicSelect");select.innerHTML="";
     topics.forEach(topic=>{const o=document.createElement("option");o.value=topic;o.textContent=topic;select.appendChild(o)});
     select.addEventListener("change",()=>startTopic(select.value));
-    startTopic(topics[0]);
+    const requestedTopic=new URLSearchParams(location.search).get("topic");
+    const initialTopic=topics.find(topic=>topic.toLowerCase()===(requestedTopic||"").toLowerCase())||topics[0];
+    select.value=initialTopic;
+    startTopic(initialTopic);
   }
   function startTopic(topic){
     const date=indiaDate();quiz=dailySet(bank,topic,date);current=0;answers=Array(quiz.length).fill(null);checked=Array(quiz.length).fill(false);
