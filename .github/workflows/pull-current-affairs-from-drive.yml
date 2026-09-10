@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Resolve date
         id: d
@@ -49,21 +51,20 @@ jobs:
           fi
           echo "Downloaded $OUT ($(du -h "$OUT" | cut -f1))"
 
-      - name: Commit pulled PDF
+      - name: Rebuild current affairs PDF list
+        run: python3 current-affairs/generate-pdf-list.py
+
+      - name: Commit PDF and updated list
         shell: bash
         run: |
           DATE="${{ steps.d.outputs.date }}"
           FILE="current-affairs/$DATE.pdf"
-          if [ ! -f "$FILE" ]; then
-            echo "No PDF downloaded; nothing to commit."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$FILE"
+          git add "$FILE" current-affairs/pdfs.json
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "PDF and list are already up to date."
             exit 0
           fi
-          git commit -m "Publish current affairs PDF for $DATE"
+          git commit -m "Publish current affairs PDF and update list for $DATE"
           git push
