@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071c33">
+  <meta name="description" content="Download daily ClearExams current affairs PDFs for competitive exam preparation. Newest issue first, with English and Tamil titles.">
+  <link rel="canonical" href="https://clearexams.ink/current-affairs/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ClearExams">
+  <meta property="og:title" content="Daily Current Affairs PDFs | ClearExams">
+  <meta property="og:description" content="Newest-first daily current affairs PDFs for competitive exam revision.">
+  <meta property="og:url" content="https://clearexams.ink/current-affairs/">
+  <title>Daily Current Affairs PDFs | ClearExams</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SS34PK7RL0"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-SS34PK7RL0');</script>
+  <style>
+    :root{--navy:#071c33;--navy2:#0d3154;--blue:#1463ff;--ink:#10233b;--muted:#607086;--line:#dfe7f0;--bg:#f4f7fb;--white:#fff;--green:#117a54;--shadow:0 14px 40px rgba(7,28,51,.09)}
+    *{box-sizing:border-box}body{margin:0;min-width:320px;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}a{text-decoration:none;color:inherit}.wrap{width:min(1080px,calc(100% - 28px));margin:auto}
+    header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}.nav{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:900;font-size:1.1rem}.home{font-weight:800;color:#38516c}
+    .hero{color:#fff;background:radial-gradient(circle at 85% 10%,rgba(47,117,255,.38),transparent 30%),linear-gradient(135deg,var(--navy),var(--navy2));padding:50px 0 44px}.eyebrow{margin:0 0 8px;color:#7bd2ff;font-size:.76rem;font-weight:850;letter-spacing:.09em;text-transform:uppercase}.hero h1{margin:0;font-size:clamp(2.2rem,6vw,4.2rem);line-height:1.03;letter-spacing:-.05em}.hero p{max-width:700px;margin:16px 0 0;color:#cad8e6}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:22px 0 16px}.toolbar p{margin:0;color:var(--muted)}.toggle{display:flex;gap:8px}.toggle button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 13px;font-weight:800;cursor:pointer}.toggle button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+    main{padding:18px 0 64px}.grid{display:grid;gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}.card.latest{border-color:#9fbaff}.meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.date{font-size:.78rem;font-weight:850;color:#51657a;text-transform:uppercase;letter-spacing:.05em}.badge{font-size:.72rem;font-weight:900;color:#0758e8;background:#edf3ff;padding:6px 9px;border-radius:999px}.card h2{margin:0 0 8px;font-size:1.2rem}.card p{margin:0;color:var(--muted);font-size:.92rem}.actions{display:flex;gap:10px;margin-top:17px;flex-wrap:wrap}.btn{min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:12px;font-weight:850;border:1px solid #cbd7e5;background:#fff}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.download{color:var(--green);border-color:#9fd2bf;background:#eef9f4}.empty,.error{padding:34px;text-align:center;background:#fff;border:1px solid var(--line);border-radius:18px}.error{color:#a52a4d}.footer{padding:28px 0;background:#061629;color:#c9d6e3;text-align:center;font-size:.9rem}
+    @media(max-width:620px){.wrap{width:min(100% - 20px,1080px)}.hero{padding:34px 0 36px}.toolbar{align-items:flex-start;flex-direction:column}.toggle{width:100%}.toggle button{flex:1}.card{padding:16px;border-radius:17px}.meta{align-items:flex-start}.actions{display:grid;grid-template-columns:1fr 1fr}.btn{width:100%}}
+  </style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="../index.html">ClearExams.</a><a class="home" href="../index.html">← Home</a></div></header>
+<section class="hero"><div class="wrap"><p class="eyebrow">Daily Digest</p><h1>Current Affairs</h1><p>Download concise, exam-ready daily PDFs. The newest issue appears first automatically.</p></div></section>
+<main class="wrap">
+  <div class="toolbar"><p id="status">Loading current affairs…</p><div class="toggle" aria-label="Language"><button type="button" class="active" data-lang="en">English</button><button type="button" data-lang="ta">தமிழ்</button></div></div>
+  <section class="grid" id="list" aria-live="polite"></section>
+</main>
+<footer class="footer">© 2026 ClearExams.ink · Daily Current Affairs PDFs</footer>
+<script>
+  const list=document.getElementById('list'),status=document.getElementById('status');let entries=[],lang='en';
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function track(name,params={}){if(window.gtag)gtag('event',name,params)}
+  function render(){
+    status.textContent=entries.length?`${entries.length} daily PDF${entries.length===1?'':'s'} available`:'No PDFs uploaded yet.';
+    if(!entries.length){list.innerHTML='<div class="empty">No current affairs PDFs are available yet.</div>';return}
+    list.innerHTML=entries.map((item,i)=>{
+      const title=lang==='ta'?item.title_ta:item.title_en,desc=lang==='ta'?item.description_ta:item.description_en,file=esc(item.file),date=esc(item.date);
+      return `<article class="card ${i===0?'latest':''}"><div class="meta"><span class="date">${date}</span>${i===0?'<span class="badge">Newest</span>':''}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p><div class="actions"><a class="btn primary" href="${file}" target="_blank" rel="noopener" data-view data-file="${file}" data-date="${date}">View PDF</a><a class="btn download" href="${file}" download data-download data-file="${file}" data-date="${date}">Download</a></div></article>`
+    }).join('');
+    list.querySelectorAll('[data-view]').forEach(a=>a.addEventListener('click',()=>track('current_affairs_pdf_view',{file_name:a.dataset.file,publish_date:a.dataset.date})));
+    list.querySelectorAll('[data-download]').forEach(a=>a.addEventListener('click',()=>track('pdf_download',{file_name:a.dataset.file,publish_date:a.dataset.date,content_type:'current_affairs'})));
+  }
+  document.querySelectorAll('[data-lang]').forEach(btn=>btn.addEventListener('click',()=>{lang=btn.dataset.lang;document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b===btn));track('current_affairs_language_selected',{language:lang});render()}));
+  fetch('pdfs.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Could not load list');return r.json()}).then(data=>{entries=Array.isArray(data)?data:[];entries.sort((a,b)=>String(b.date).localeCompare(String(a.date)));render()}).catch(()=>{status.textContent='Unable to load current affairs.';list.innerHTML='<div class="error">The PDF list could not be loaded. Please try again.</div>'});
+</script>
+</body>
+</html>
