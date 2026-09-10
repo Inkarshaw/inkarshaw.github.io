@@ -20,14 +20,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Google Drive client
-        run: pip install google-api-python-client google-auth
-
       - name: Resolve date
         id: d
         shell: bash
@@ -39,50 +31,23 @@ jobs:
           fi
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
 
-      - name: Download PDF from Google Drive
-        env:
-          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          DRIVE_FOLDER_ID: "1j2dH78egIuD3Vj8mwUSpmuUZgJvhJlnU"
-          DATE: ${{ steps.d.outputs.date }}
+      - name: Download public PDF from Google Drive
+        shell: bash
         run: |
-          python - <<'PY'
-          import io, json, os, sys
-          from pathlib import Path
-          from google.oauth2.service_account import Credentials
-          from googleapiclient.discovery import build
-          from googleapiclient.http import MediaIoBaseDownload
-
-          raw = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
-          if not raw:
-              raise SystemExit("Missing GOOGLE_SERVICE_ACCOUNT_JSON GitHub secret")
-
-          creds = Credentials.from_service_account_info(
-              json.loads(raw), scopes=["https://www.googleapis.com/auth/drive.readonly"]
-          )
-          drive = build("drive", "v3", credentials=creds)
-          folder_id = os.environ["DRIVE_FOLDER_ID"]
-          date = os.environ["DATE"]
-          name = f"{date}.pdf"
-
-          q = f"'{folder_id}' in parents and name = '{name}' and trashed = false"
-          files = drive.files().list(q=q, fields="files(id,name,size,modifiedTime)", pageSize=10).execute().get("files", [])
-          if not files:
-              print(f"No {name} found in Drive folder; nothing to publish.")
-              sys.exit(0)
-
-          f = max(files, key=lambda x: x.get("modifiedTime", ""))
-          out = Path("current-affairs") / name
-          out.parent.mkdir(parents=True, exist_ok=True)
-          request = drive.files().get_media(fileId=f["id"])
-          with io.FileIO(out, "wb") as fh:
-              downloader = MediaIoBaseDownload(fh, request)
-              done = False
-              while not done:
-                  status, done = downloader.next_chunk()
-                  if status:
-                      print(f"Download {int(status.progress()*100)}%")
-          print(f"Downloaded {name} -> {out}")
-          PY
+          DATE="${{ steps.d.outputs.date }}"
+          FILE_ID="1BVklPd77i1fb_dIQUjKe7N6QE2jYUIcd"
+          OUT="current-affairs/$DATE.pdf"
+          mkdir -p current-affairs
+          curl --fail --location --retry 3 \
+            "https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&confirm=t" \
+            --output "$OUT"
+          test -s "$OUT"
+          if ! head -c 5 "$OUT" | grep -q '%PDF-'; then
+            echo "Downloaded file is not a PDF. Check Drive sharing (Anyone with the link -> Viewer)."
+            rm -f "$OUT"
+            exit 1
+          fi
+          echo "Downloaded $OUT ($(du -h "$OUT" | cut -f1))"
 
       - name: Commit pulled PDF
         shell: bash
