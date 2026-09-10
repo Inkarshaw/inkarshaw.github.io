@@ -9,11 +9,13 @@ import io
 
 rl_config.useA85 = 0
 
+
 def image_key(p: Path):
     name = p.name.lower()
     if name.startswith("00-cover") or "cover" in name:
         return (0, name)
     return (1, name)
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -42,13 +44,14 @@ def main():
     for p in images:
         with Image.open(p) as im:
             im = im.convert("RGB")
-            # Keep phone text readable while controlling PDF size.
-            if im.width > 900:
-                nh = round(im.height * 900 / im.width)
-                im = im.resize((900, nh), Image.Resampling.LANCZOS)
+            # Optimise each page before embedding. 820 px width keeps phone text
+            # readable while keeping the daily PDF small enough for web delivery.
+            if im.width > 820:
+                nh = round(im.height * 820 / im.width)
+                im = im.resize((820, nh), Image.Resampling.LANCZOS)
 
             buf = io.BytesIO()
-            im.save(buf, "JPEG", quality=82, optimize=True)
+            im.save(buf, "JPEG", quality=78, optimize=True, progressive=True)
             buf.seek(0)
 
             iw, ih = im.size
@@ -59,7 +62,8 @@ def main():
             c.showPage()
 
     c.save()
-    print(f"Created {out} with {len(images)} pages")
+    print(f"Created optimised PDF {out} with {len(images)} pages")
+
 
 if __name__ == "__main__":
     main()
