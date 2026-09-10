@@ -4,248 +4,73 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071c33">
-  <meta name="description" content="ClearExams daily topic-wise quiz with 10 Indian Polity questions and explanations for every option.">
+  <meta name="description" content="ClearExams daily topic-wise quiz with 10 questions, instant explanations, score history and wrong-answer retry.">
   <title>Daily Quiz — ClearExams</title>
   <style>
-    :root{
-      --navy:#071c33;--navy2:#0d3154;--blue:#1463ff;--ink:#10233b;--muted:#607086;
-      --line:#dfe7f0;--canvas:#f4f7fb;--white:#fff;--green:#117a54;--green-bg:#e7f7ef;
-      --red:#bd3456;--red-bg:#fff0f3;--amber:#99600e;--amber-bg:#fff4dd;--shadow:0 18px 50px rgba(9,35,62,.10)
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;min-width:320px;background:var(--canvas);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
-    button,select{font:inherit} button,a{-webkit-tap-highlight-color:transparent} a{color:inherit;text-decoration:none}
-    button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid rgba(20,99,255,.3);outline-offset:3px}
-    .container{width:min(1080px,calc(100% - 32px));margin:auto}
-    header{position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(223,231,240,.9);background:rgba(255,255,255,.94);backdrop-filter:blur(16px)}
-    .nav{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:18px}
-    .brand{display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:850;letter-spacing:-.035em}
-    .brand-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:#fff;background:linear-gradient(145deg,#2f75ff,#04a3dc);box-shadow:0 8px 18px rgba(20,99,255,.24)}
-    .brand-dot{color:#ff9e2a}.back{font-size:.9rem;font-weight:750;color:#38516c}
-    .hero{padding:54px 0 46px;color:#fff;background:radial-gradient(circle at 86% 5%,rgba(47,117,255,.42),transparent 28%),linear-gradient(135deg,var(--navy),var(--navy2))}
-    .eyebrow{margin:0 0 10px;color:#7bd2ff;font-size:.78rem;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
-    h1{margin:0;font-size:clamp(2.15rem,6vw,4.25rem);line-height:1.03;letter-spacing:-.055em}
-    .hero p{max-width:690px;margin:18px 0 0;color:#c5d5e5;font-size:1.04rem}
-    .toolbar{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;margin-top:-24px;padding:20px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:var(--shadow)}
-    .field{display:grid;gap:6px}.field label{font-size:.78rem;font-weight:850;color:#43576e;text-transform:uppercase;letter-spacing:.06em}
-    select{min-height:48px;padding:0 42px 0 14px;border:1px solid #cbd7e5;border-radius:12px;color:var(--ink);background:#fff}
-    .daily-note{padding:12px 15px;border-radius:12px;color:var(--amber);background:var(--amber-bg);font-size:.88rem;font-weight:750}
-    main{padding:26px 0 70px}
-    .status{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:22px 0 12px}
-    .status strong{font-size:.95rem}.muted{color:var(--muted);font-size:.87rem}
-    .progress{height:9px;overflow:hidden;border-radius:999px;background:#dfe7f0}.progress span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--blue),#08a6d6);transition:width .25s}
-    .layout{display:grid;grid-template-columns:minmax(0,1fr) 235px;gap:18px;margin-top:18px;align-items:start}
-    .card,.palette-card{border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 8px 28px rgba(9,35,62,.07)}
-    .card{padding:clamp(20px,4vw,34px)}
-    .question-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
-    .badge{padding:6px 10px;border-radius:999px;color:#0758e8;background:#edf3ff;font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
-    .q-number{color:var(--muted);font-size:.84rem;font-weight:750}
-    h2{margin:0 0 24px;font-size:clamp(1.22rem,3vw,1.58rem);line-height:1.45;letter-spacing:-.015em}
-    .options{display:grid;gap:12px}
-    .option{width:100%;display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:center;padding:14px;border:1px solid #d9e3ee;border-radius:14px;background:#fff;color:#273c52;text-align:left;cursor:pointer;transition:.16s}
-    .option:hover:not(:disabled){transform:translateX(2px);border-color:#98b4d3}
-    .option:disabled{cursor:default}.letter{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;color:var(--blue);background:#edf3ff;font-weight:900}
-    .option.selected{border-color:var(--blue);background:#f2f6ff}
-    .option.correct{border-color:#68bd99;background:var(--green-bg)}.option.correct .letter{color:#fff;background:var(--green)}
-    .option.wrong{border-color:#e59aaf;background:var(--red-bg)}.option.wrong .letter{color:#fff;background:var(--red)}
-    .feedback{display:none;margin-top:22px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#f8fafc}
-    .feedback.show{display:block}.feedback-title{margin:0 0 13px;font-size:1rem}.explanation-list{display:grid;gap:9px}
-    .explanation{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px;border-radius:11px;background:#fff;font-size:.9rem}
-    .explanation.correct{color:#125c43;background:var(--green-bg)}.explanation .tag{font-weight:900}
-    .actions{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
-    .btn{min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:0 19px;border:1px solid #cbd7e5;border-radius:12px;background:#fff;color:#2d465f;cursor:pointer;font-weight:800}
-    .btn.primary{border-color:var(--blue);color:#fff;background:var(--blue)}.btn:disabled{opacity:.45;cursor:not-allowed}
-    .palette-card{position:sticky;top:88px;padding:18px}.palette-card h3{margin:0 0 12px;font-size:.95rem}
-    .palette{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-    .palette button{aspect-ratio:1;border:1px solid #d5e0eb;border-radius:9px;background:#fff;color:#53677c;cursor:pointer;font-size:.8rem;font-weight:850}
-    .palette button.current{border-color:var(--blue);color:#fff;background:var(--blue)}.palette button.answered{border-color:#79c4a3;color:#126244;background:var(--green-bg)}
-    .legend{display:grid;gap:7px;margin-top:14px;color:var(--muted);font-size:.78rem}.legend span{display:flex;align-items:center;gap:7px}
-    .dot{width:10px;height:10px;border-radius:3px;background:#fff;border:1px solid #cbd7e5}.dot.blue{border-color:var(--blue);background:var(--blue)}.dot.green{border-color:#79c4a3;background:var(--green-bg)}
-    .loading,.error,.result{padding:44px 24px;text-align:center}.error{color:var(--red)}.result h2{font-size:2rem;margin-bottom:8px}.score{font-size:3.2rem;font-weight:900;color:var(--blue);letter-spacing:-.06em}
-    .hidden{display:none!important}
-    @media(max-width:760px){
-      .container{width:min(100% - 22px,1080px)}.back span{display:none}.hero{padding:38px 0 42px}
-      .toolbar{grid-template-columns:1fr;margin-top:-18px;padding:15px}.daily-note{text-align:center}
-      .layout{grid-template-columns:1fr}.palette-card{position:static;order:-1}.palette-card h3,.legend{display:none}
-      .palette{grid-template-columns:repeat(10,1fr);gap:5px}.palette button{border-radius:7px;font-size:.7rem}
-      .card{border-radius:18px;padding:19px 15px}.option{grid-template-columns:36px 1fr;padding:12px 10px}
-      .actions{position:sticky;bottom:0;margin:20px -15px -19px;padding:12px 15px;border-top:1px solid var(--line);background:rgba(255,255,255,.96);backdrop-filter:blur(12px)}
-      .btn{flex:1;padding:0 10px}
-    }
+    :root{--navy:#071c33;--navy2:#0d3154;--blue:#1463ff;--ink:#10233b;--muted:#607086;--line:#dfe7f0;--canvas:#f4f7fb;--white:#fff;--green:#117a54;--green-bg:#e7f7ef;--red:#bd3456;--red-bg:#fff0f3;--amber:#99600e;--amber-bg:#fff4dd;--shadow:0 18px 50px rgba(9,35,62,.10)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:var(--canvas);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
+    button,select,input{font:inherit}button,a{-webkit-tap-highlight-color:transparent}a{color:inherit;text-decoration:none}button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid rgba(20,99,255,.3);outline-offset:3px}
+    .container{width:min(1080px,calc(100% - 32px));margin:auto}header{position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(223,231,240,.9);background:rgba(255,255,255,.94);backdrop-filter:blur(16px)}
+    .nav{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:850;letter-spacing:-.035em}.brand-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:#fff;background:linear-gradient(145deg,#2f75ff,#04a3dc);box-shadow:0 8px 18px rgba(20,99,255,.24)}.brand-dot{color:#ff9e2a}.back{font-size:.9rem;font-weight:750;color:#38516c}
+    .hero{padding:48px 0 42px;color:#fff;background:radial-gradient(circle at 86% 5%,rgba(47,117,255,.42),transparent 28%),linear-gradient(135deg,var(--navy),var(--navy2))}.eyebrow{margin:0 0 10px;color:#7bd2ff;font-size:.78rem;font-weight:850;letter-spacing:.1em;text-transform:uppercase}h1{margin:0;font-size:clamp(2.15rem,6vw,4.25rem);line-height:1.03;letter-spacing:-.055em}.hero p{max-width:690px;margin:18px 0 0;color:#c5d5e5;font-size:1.04rem}
+    .toolbar{display:grid;grid-template-columns:1fr 190px auto;gap:12px;align-items:end;margin-top:-24px;padding:20px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:var(--shadow)}.field{display:grid;gap:6px}.field label{font-size:.76rem;font-weight:850;color:#43576e;text-transform:uppercase;letter-spacing:.06em}select,input[type=date]{width:100%;min-height:48px;padding:0 14px;border:1px solid #cbd7e5;border-radius:12px;color:var(--ink);background:#fff}.daily-note{padding:12px 15px;border-radius:12px;color:var(--amber);background:var(--amber-bg);font-size:.86rem;font-weight:750;text-align:center;white-space:nowrap}
+    .summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.summary-box{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff}.summary-box span{display:block;color:var(--muted);font-size:.74rem;font-weight:750;text-transform:uppercase}.summary-box strong{display:block;margin-top:2px;font-size:1.05rem}
+    main{padding:24px 0 70px}.status{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:20px 0 12px}.status strong{font-size:.95rem}.muted{color:var(--muted);font-size:.87rem}.progress{height:9px;overflow:hidden;border-radius:999px;background:#dfe7f0}.progress span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--blue),#08a6d6);transition:width .25s}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 235px;gap:18px;margin-top:18px;align-items:start}.card,.palette-card{border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 8px 28px rgba(9,35,62,.07)}.card{padding:clamp(20px,4vw,34px)}.question-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}.badge{padding:6px 10px;border-radius:999px;color:#0758e8;background:#edf3ff;font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em}.q-number{color:var(--muted);font-size:.84rem;font-weight:750}h2{margin:0 0 24px;font-size:clamp(1.22rem,3vw,1.58rem);line-height:1.45;letter-spacing:-.015em}
+    .options{display:grid;gap:12px}.option{width:100%;min-height:62px;display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:center;padding:14px;border:1px solid #d9e3ee;border-radius:14px;background:#fff;color:#273c52;text-align:left;cursor:pointer;transition:.16s}.option:hover:not(:disabled){transform:translateX(2px);border-color:#98b4d3}.option:disabled{cursor:default}.letter{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;color:var(--blue);background:#edf3ff;font-weight:900}.option.selected{border-color:var(--blue);background:#f2f6ff}.option.correct{border-color:#68bd99;background:var(--green-bg)}.option.correct .letter{color:#fff;background:var(--green)}.option.wrong{border-color:#e59aaf;background:var(--red-bg)}.option.wrong .letter{color:#fff;background:var(--red)}
+    .feedback{display:none;margin-top:22px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#f8fafc}.feedback.show{display:block}.feedback-title{margin:0 0 13px;font-size:1rem}.explanation-list{display:grid;gap:9px}.explanation{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px;border-radius:11px;background:#fff;font-size:.9rem}.explanation.correct{color:#125c43;background:var(--green-bg)}.explanation .tag{font-weight:900}
+    .actions{display:flex;justify-content:space-between;gap:12px;margin-top:22px}.btn{min-height:48px;display:inline-flex;align-items:center;justify-content:center;padding:0 19px;border:1px solid #cbd7e5;border-radius:12px;background:#fff;color:#2d465f;cursor:pointer;font-weight:800}.btn.primary{border-color:var(--blue);color:#fff;background:var(--blue)}.btn.danger{border-color:#e59aaf;color:var(--red);background:var(--red-bg)}.btn:disabled{opacity:.45;cursor:not-allowed}
+    .palette-card{position:sticky;top:88px;padding:18px}.palette-card h3{margin:0 0 12px;font-size:.95rem}.palette{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.palette button{aspect-ratio:1;border:1px solid #d5e0eb;border-radius:9px;background:#fff;color:#53677c;cursor:pointer;font-size:.8rem;font-weight:850}.palette button.current{border-color:var(--blue);color:#fff;background:var(--blue)}.palette button.answered{border-color:#79c4a3;color:#126244;background:var(--green-bg)}.palette button.wrong{border-color:#e59aaf;color:var(--red);background:var(--red-bg)}.legend{display:grid;gap:7px;margin-top:14px;color:var(--muted);font-size:.78rem}.legend span{display:flex;align-items:center;gap:7px}.dot{width:10px;height:10px;border-radius:3px;background:#fff;border:1px solid #cbd7e5}.dot.blue{border-color:var(--blue);background:var(--blue)}.dot.green{border-color:#79c4a3;background:var(--green-bg)}.dot.red{border-color:#e59aaf;background:var(--red-bg)}
+    .loading,.error,.result{padding:44px 24px;text-align:center}.error{color:var(--red)}.score{font-size:3.2rem;font-weight:900;color:var(--blue);letter-spacing:-.06em}.result h2{font-size:2rem;margin:8px 0}.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:560px;margin:24px auto}.result-stat{padding:15px;border:1px solid var(--line);border-radius:14px;background:#f8fafc}.result-stat strong{display:block;font-size:1.35rem}.result-stat span{font-size:.78rem;color:var(--muted)}.result-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px}.history{max-width:640px;margin:28px auto 0;text-align:left}.history h3{margin:0 0 10px}.history-list{display:grid;gap:8px}.history-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:.86rem}.hidden{display:none!important}
+    @media(max-width:760px){.container{width:min(100% - 20px,1080px)}.back span:first-child{display:none}.hero{padding:30px 0 34px}.hero p{font-size:.94rem;margin-top:12px}.toolbar{grid-template-columns:1fr;margin-top:-15px;padding:14px}.daily-note{white-space:normal}.summary-strip{grid-template-columns:repeat(3,1fr);gap:7px}.summary-box{padding:9px 8px;text-align:center}.summary-box strong{font-size:.95rem}.summary-box span{font-size:.64rem}.layout{grid-template-columns:1fr}.palette-card{position:static;order:-1;padding:10px}.palette-card h3,.legend{display:none}.palette{grid-template-columns:repeat(10,1fr);gap:4px}.palette button{border-radius:7px;font-size:.68rem}.card{border-radius:18px;padding:18px 14px}.question-meta{margin-bottom:13px}h2{font-size:1.16rem;margin-bottom:18px}.option{grid-template-columns:36px 1fr;gap:10px;min-height:58px;padding:10px}.letter{width:36px;height:36px}.feedback{padding:13px;margin-top:16px}.explanation{font-size:.84rem;padding:9px}.actions{position:sticky;z-index:10;bottom:0;margin:18px -14px -18px;padding:11px 14px;border-top:1px solid var(--line);background:rgba(255,255,255,.97);backdrop-filter:blur(12px)}.btn{flex:1;padding:0 8px}.result{padding:30px 15px}.result-grid{grid-template-columns:repeat(3,1fr);gap:7px}.result-stat{padding:11px 6px}.result-stat strong{font-size:1.15rem}.result-stat span{font-size:.7rem}.result-actions{display:grid;grid-template-columns:1fr}.history-row{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-<header>
-  <div class="container nav">
-    <a class="brand" href="index.html" aria-label="ClearExams home"><span class="brand-mark">C</span><span>ClearExams<span class="brand-dot">.</span></span></a>
-    <a class="back" href="index.html"><span>← Back to home</span><span aria-hidden="true">⌂</span></a>
-  </div>
-</header>
-<section class="hero">
-  <div class="container">
-    <p class="eyebrow">Learn • Practise • Revise</p>
-    <h1>Today’s 10-question quiz</h1>
-    <p>Practise one topic at a time, check every answer instantly, and learn why each of the four options is right or wrong.</p>
-  </div>
-</section>
+<header><div class="container nav"><a class="brand" href="index.html" aria-label="ClearExams home"><span class="brand-mark">C</span><span>ClearExams<span class="brand-dot">.</span></span></a><a class="back" href="index.html"><span>← Back to home</span><span aria-hidden="true">⌂</span></a></div></header>
+<section class="hero"><div class="container"><p class="eyebrow">Learn • Practise • Revise</p><h1>Daily 10-question quiz</h1><p>Choose a topic, answer ten questions, review every option, and retry only the questions you got wrong.</p></div></section>
 <div class="container">
   <section class="toolbar" aria-label="Quiz filters">
     <div class="field"><label for="topicSelect">Choose topic</label><select id="topicSelect"><option>Loading topics…</option></select></div>
+    <div class="field"><label for="dateSelect">Quiz date</label><input id="dateSelect" type="date"></div>
     <div class="daily-note" id="quizDate">Daily set</div>
   </section>
+  <div class="summary-strip" aria-label="Your quiz summary"><div class="summary-box"><span>Today's best</span><strong id="bestScore">—</strong></div><div class="summary-box"><span>Completed</span><strong id="completedCount">0</strong></div><div class="summary-box"><span>Current score</span><strong id="liveScore">0 / 10</strong></div></div>
   <main>
-    <div id="loading" class="card loading">Loading today’s questions…</div>
-    <div id="error" class="card error hidden"></div>
-    <section id="quizArea" class="hidden">
-      <div class="status"><strong id="topicTitle">Indian Polity</strong><span class="muted" id="answeredCount">0 of 10 answered</span></div>
-      <div class="progress" aria-label="Quiz progress"><span id="progressBar"></span></div>
-      <div class="layout">
-        <article class="card" id="questionCard">
-          <div class="question-meta"><span class="badge" id="subjectBadge">Indian Polity</span><span class="q-number" id="questionNumber">Question 1 of 10</span></div>
-          <h2 id="questionText"></h2>
-          <div class="options" id="options"></div>
-          <div class="feedback" id="feedback" aria-live="polite">
-            <h3 class="feedback-title" id="feedbackTitle"></h3>
-            <div class="explanation-list" id="explanations"></div>
-          </div>
-          <div class="actions">
-            <button class="btn" id="prevBtn" type="button">Previous</button>
-            <button class="btn primary" id="actionBtn" type="button">Check answer</button>
-          </div>
-        </article>
-        <aside class="palette-card" aria-label="Question navigator">
-          <h3>Question navigator</h3><div class="palette" id="palette"></div>
-          <div class="legend"><span><i class="dot blue"></i>Current</span><span><i class="dot green"></i>Answered</span><span><i class="dot"></i>Not answered</span></div>
-        </aside>
-      </div>
+    <div id="loading" class="card loading">Loading today’s questions…</div><div id="error" class="card error hidden"></div>
+    <section id="quizArea" class="hidden"><div class="status"><strong id="topicTitle">Topic</strong><span class="muted" id="answeredCount">0 of 10 checked</span></div><div class="progress"><span id="progressBar"></span></div>
+      <div class="layout"><article class="card" id="questionCard"><div class="question-meta"><span class="badge" id="subjectBadge">Topic</span><span class="q-number" id="questionNumber">Question 1 of 10</span></div><h2 id="questionText"></h2><div class="options" id="options"></div><div class="feedback" id="feedback" aria-live="polite"><h3 class="feedback-title" id="feedbackTitle"></h3><div class="explanation-list" id="explanations"></div></div><div class="actions"><button class="btn" id="prevBtn" type="button">Previous</button><button class="btn primary" id="actionBtn" type="button">Check answer</button></div></article>
+      <aside class="palette-card" aria-label="Question navigator"><h3>Question navigator</h3><div class="palette" id="palette"></div><div class="legend"><span><i class="dot blue"></i>Current</span><span><i class="dot green"></i>Correct</span><span><i class="dot red"></i>Wrong</span></div></aside></div>
     </section>
-    <section id="result" class="card result hidden">
-      <p class="eyebrow" style="color:#1463ff">Quiz complete</p><div class="score" id="score"></div><h2 id="resultTitle"></h2>
-      <p class="muted" id="resultText"></p><button class="btn primary" id="restartBtn" type="button">Review again</button>
-    </section>
+    <section id="result" class="card result hidden"><p class="eyebrow" style="color:#1463ff">Quiz complete</p><div class="score" id="score"></div><h2 id="resultTitle"></h2><p class="muted" id="resultText"></p><div class="result-grid"><div class="result-stat"><strong id="correctStat">0</strong><span>Correct</span></div><div class="result-stat"><strong id="wrongStat">0</strong><span>Wrong</span></div><div class="result-stat"><strong id="percentStat">0%</strong><span>Accuracy</span></div></div><div class="result-actions"><button class="btn danger hidden" id="retryWrongBtn" type="button">Retry wrong answers</button><button class="btn primary" id="restartBtn" type="button">Try full set again</button></div><div class="history"><h3>Recent attempts</h3><div class="history-list" id="historyList"></div></div></section>
   </main>
 </div>
 <script>
-  // Public daily feed from the master Google Sheet; repository CSV remains the fallback.
-  const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1yhND5g2Q23eOXz3oakV7xX-pUuunw3i2GzES3yaFVVY/gviz/tq?tqx=out:csv&sheet=Daily%20Quiz%20Feed";
-  const FALLBACK_CSV_URL = "data/daily-quiz.csv";
-  const DAILY_COUNT = 10;
-  const letters = ["A","B","C","D"];
-  let bank=[], quiz=[], current=0, answers=[], checked=[];
-
-  function parseCSV(text){
-    const rows=[];let row=[],cell="",quoted=false;
-    for(let i=0;i<text.length;i++){
-      const ch=text[i],next=text[i+1];
-      if(ch==='"' && quoted && next==='"'){cell+='"';i++}
-      else if(ch==='"'){quoted=!quoted}
-      else if(ch==="," && !quoted){row.push(cell);cell=""}
-      else if((ch==="\n" || ch==="\r") && !quoted){
-        if(ch==="\r" && next==="\n")i++;
-        row.push(cell);if(row.some(v=>v.trim()!==""))rows.push(row);row=[];cell="";
-      }else cell+=ch;
-    }
-    row.push(cell);if(row.some(v=>v.trim()!==""))rows.push(row);
-    const headers=rows.shift().map(h=>h.trim());
-    return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||"").trim()])));
-  }
-  function indiaDate(){
-    const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
-    const get=t=>parts.find(p=>p.type===t).value;
-    return get("year")+"-"+get("month")+"-"+get("day");
-  }
-  function dateLabel(iso){return new Date(iso+"T00:00:00+05:30").toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric",timeZone:"Asia/Kolkata"})}
-  function hash(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-  function dailySet(rows,topic,date){
-    const exact=rows.filter(q=>q.Topic===topic && q.PublishDate===date);
-    if(exact.length>=DAILY_COUNT)return exact.slice(0,DAILY_COUNT);
-    const pool=rows.filter(q=>q.Topic===topic && (!q.PublishDate || q.PublishDate<=date));
-    return pool.map(q=>({q,rank:hash(date+"|"+topic+"|"+q.ID)})).sort((a,b)=>a.rank-b.rank).slice(0,DAILY_COUNT).map(x=>x.q);
-  }
-  async function loadBank(){
-    const urls=[GOOGLE_SHEET_CSV_URL,FALLBACK_CSV_URL].filter(Boolean);let lastError;
-    for(const url of urls){try{const res=await fetch(url,{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status);const rows=parseCSV(await res.text());if(rows.some(valid))return rows;throw new Error("Source did not return valid quiz rows.")}catch(e){lastError=e}}
-    throw lastError||new Error("No question source is configured.");
-  }
-  function valid(q){
-    return q.Question && letters.every(l=>q["Option"+l] && q["Explanation"+l]) && letters.includes(q.CorrectAnswer.toUpperCase());
-  }
-  function setupTopics(){
-    const topics=[...new Set(bank.map(q=>q.Topic).filter(Boolean))].sort();
-    const select=document.getElementById("topicSelect");select.innerHTML="";
-    topics.forEach(topic=>{const o=document.createElement("option");o.value=topic;o.textContent=topic;select.appendChild(o)});
-    select.addEventListener("change",()=>startTopic(select.value));
-    const requestedTopic=new URLSearchParams(location.search).get("topic");
-    const initialTopic=topics.find(topic=>topic.toLowerCase()===(requestedTopic||"").toLowerCase())||topics[0];
-    select.value=initialTopic;
-    startTopic(initialTopic);
-  }
-  function startTopic(topic){
-    const date=indiaDate();quiz=dailySet(bank,topic,date);current=0;answers=Array(quiz.length).fill(null);checked=Array(quiz.length).fill(false);
-    document.getElementById("topicTitle").textContent=topic;
-    document.getElementById("subjectBadge").textContent=topic;
-    document.getElementById("result").classList.add("hidden");
-    document.getElementById("quizArea").classList.remove("hidden");
-    if(quiz.length<DAILY_COUNT){
-      showError("Only "+quiz.length+" valid question(s) are available for "+topic+". Add at least 10 active rows to the master sheet.");return;
-    }
-    renderPalette();render();
-  }
-  function render(){
-    const q=quiz[current],isChecked=checked[current];
-    document.getElementById("questionNumber").textContent="Question "+(current+1)+" of "+quiz.length;
-    document.getElementById("questionText").textContent=q.Question;
-    const options=document.getElementById("options");options.innerHTML="";
-    letters.forEach(letter=>{
-      const btn=document.createElement("button");btn.type="button";btn.className="option";
-      if(answers[current]===letter)btn.classList.add("selected");
-      if(isChecked && letter===q.CorrectAnswer.toUpperCase())btn.classList.add("correct");
-      if(isChecked && answers[current]===letter && letter!==q.CorrectAnswer.toUpperCase())btn.classList.add("wrong");
-      btn.disabled=isChecked;btn.innerHTML='<span class="letter">'+letter+'</span><span></span>';btn.lastChild.textContent=q["Option"+letter];
-      btn.addEventListener("click",()=>{answers[current]=letter;render();renderPalette()});options.appendChild(btn);
-    });
-    const feedback=document.getElementById("feedback");feedback.classList.toggle("show",isChecked);
-    if(isChecked){
-      const correct=answers[current]===q.CorrectAnswer.toUpperCase();
-      document.getElementById("feedbackTitle").textContent=correct?"Correct — now review every option.":"Not quite — review all four options.";
-      const box=document.getElementById("explanations");box.innerHTML="";
-      letters.forEach(letter=>{const d=document.createElement("div");d.className="explanation"+(letter===q.CorrectAnswer.toUpperCase()?" correct":"");d.innerHTML='<span class="tag">'+letter+'</span><span></span>';d.lastChild.textContent=q["Explanation"+letter];box.appendChild(d)});
-    }
-    document.getElementById("prevBtn").disabled=current===0;
-    const action=document.getElementById("actionBtn");
-    action.textContent=isChecked?(current===quiz.length-1?"Finish quiz":"Next question"):"Check answer";
-    action.disabled=!isChecked && !answers[current];
-    updateStatus();renderPalette();
-  }
-  function renderPalette(){
-    const p=document.getElementById("palette");p.innerHTML="";
-    quiz.forEach((q,i)=>{const b=document.createElement("button");b.type="button";b.textContent=i+1;if(i===current)b.classList.add("current");else if(checked[i])b.classList.add("answered");b.addEventListener("click",()=>{current=i;render();window.scrollTo({top:document.getElementById("quizArea").offsetTop-80,behavior:"smooth"})});p.appendChild(b)});
-  }
-  function updateStatus(){
-    const done=checked.filter(Boolean).length;
-    document.getElementById("answeredCount").textContent=done+" of "+quiz.length+" answered";
-    document.getElementById("progressBar").style.width=(done/quiz.length*100)+"%";
-  }
-  function checkOrNext(){
-    if(!checked[current]){if(!answers[current])return;checked[current]=true;render();return}
-    if(current<quiz.length-1){current++;render();return}
-    finish();
-  }
-  function finish(){
-    const score=quiz.reduce((sum,q,i)=>sum+(checked[i]&&answers[i]===q.CorrectAnswer.toUpperCase()?1:0),0);
-    document.getElementById("quizArea").classList.add("hidden");document.getElementById("result").classList.remove("hidden");
-    document.getElementById("score").textContent=score+" / "+quiz.length;
-    document.getElementById("resultTitle").textContent=score>=8?"Excellent work!":score>=5?"Good progress. Keep revising.":"Review the explanations and try again.";
-    document.getElementById("resultText").textContent="You answered "+checked.filter(Boolean).length+" questions. Your daily set refreshes automatically using India time.";
-    window.scrollTo({top:document.getElementById("result").offsetTop-100,behavior:"smooth"});
-  }
-  function showError(message){document.getElementById("loading").classList.add("hidden");document.getElementById("quizArea").classList.add("hidden");const e=document.getElementById("error");e.textContent=message;e.classList.remove("hidden")}
-  document.getElementById("prevBtn").addEventListener("click",()=>{if(current>0){current--;render()}});
-  document.getElementById("actionBtn").addEventListener("click",checkOrNext);
-  document.getElementById("restartBtn").addEventListener("click",()=>startTopic(document.getElementById("topicSelect").value));
-  document.getElementById("quizDate").textContent="Daily set • "+dateLabel(indiaDate());
-  loadBank().then(rows=>{bank=rows.filter(q=>String(q.Active).toLowerCase()!=="false").filter(valid);document.getElementById("loading").classList.add("hidden");if(!bank.length)throw new Error("No valid active questions were found.");setupTopics()}).catch(e=>showError("Quiz could not load: "+e.message));
+const GOOGLE_SHEET_CSV_URL="https://docs.google.com/spreadsheets/d/1yhND5g2Q23eOXz3oakV7xX-pUuunw3i2GzES3yaFVVY/gviz/tq?tqx=out:csv&sheet=Daily%20Quiz%20Feed";
+const FALLBACK_CSV_URL="data/daily-quiz.csv",DAILY_COUNT=10,letters=["A","B","C","D"],HISTORY_KEY="clearexamsQuizHistoryV2";
+let bank=[],quiz=[],current=0,answers=[],checked=[],activeDate="",activeTopic="",retryMode=false;
+function parseCSV(text){const rows=[];let row=[],cell="",quoted=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(ch==='"'&&quoted&&next==='"'){cell+='"';i++}else if(ch==='"')quoted=!quoted;else if(ch===","&&!quoted){row.push(cell);cell=""}else if((ch==="\n"||ch==="\r")&&!quoted){if(ch==="\r"&&next==="\n")i++;row.push(cell);if(row.some(v=>v.trim()!==""))rows.push(row);row=[];cell=""}else cell+=ch}row.push(cell);if(row.some(v=>v.trim()!==""))rows.push(row);const headers=rows.shift().map(h=>h.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||"").trim()]))) }
+function indiaDate(){const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),get=t=>parts.find(p=>p.type===t).value;return get("year")+"-"+get("month")+"-"+get("day")}
+function dateLabel(iso){return new Date(iso+"T00:00:00+05:30").toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Kolkata"})}
+function hash(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function valid(q){return q.Question&&letters.every(l=>q["Option"+l]&&q["Explanation"+l])&&letters.includes((q.CorrectAnswer||"").toUpperCase())}
+function dailySet(rows,topic,date){const exact=rows.filter(q=>q.Topic===topic&&q.PublishDate===date);if(exact.length>=DAILY_COUNT)return exact.slice(0,DAILY_COUNT);const pool=rows.filter(q=>q.Topic===topic&&(!q.PublishDate||q.PublishDate<=date));return pool.map(q=>({q,rank:hash(date+"|"+topic+"|"+(q.ID||q.Question))})).sort((a,b)=>a.rank-b.rank).slice(0,DAILY_COUNT).map(x=>x.q)}
+async function loadBank(){let lastError;for(const url of [GOOGLE_SHEET_CSV_URL,FALLBACK_CSV_URL]){try{const res=await fetch(url,{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status);const rows=parseCSV(await res.text());if(rows.some(valid))return rows;throw new Error("Source did not return valid quiz rows.")}catch(e){lastError=e}}throw lastError||new Error("No question source is configured.")}
+function history(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]")}catch{return[]}}
+function saveAttempt(score,total,wrong){const list=history();list.unshift({date:activeDate,topic:activeTopic,score,total,wrong,ts:Date.now()});localStorage.setItem(HISTORY_KEY,JSON.stringify(list.slice(0,30)));refreshSummary();renderHistory()}
+function refreshSummary(){const list=history(),today=indiaDate(),todayScores=list.filter(x=>x.date===today).map(x=>x.score),best=todayScores.length?Math.max(...todayScores):null;document.getElementById("bestScore").textContent=best===null?"—":best+" / 10";document.getElementById("completedCount").textContent=list.length;updateLiveScore()}
+function updateLiveScore(){const s=quiz.reduce((sum,q,i)=>sum+(checked[i]&&answers[i]===q.CorrectAnswer.toUpperCase()?1:0),0);document.getElementById("liveScore").textContent=s+" / "+(quiz.length||10)}
+function setupTopics(){const topics=[...new Set(bank.map(q=>q.Topic).filter(Boolean))].sort(),select=document.getElementById("topicSelect");select.innerHTML="";topics.forEach(topic=>{const o=document.createElement("option");o.value=topic;o.textContent=topic;select.appendChild(o)});select.addEventListener("change",()=>startTopic(select.value,document.getElementById("dateSelect").value));document.getElementById("dateSelect").addEventListener("change",()=>startTopic(select.value,document.getElementById("dateSelect").value));const requested=new URLSearchParams(location.search).get("topic"),initial=topics.find(t=>t.toLowerCase()===(requested||"").toLowerCase())||topics[0];select.value=initial;startTopic(initial,activeDate)}
+function startTopic(topic,date){activeTopic=topic;activeDate=date||indiaDate();retryMode=false;quiz=dailySet(bank,topic,activeDate);resetQuiz();document.getElementById("topicTitle").textContent=topic;document.getElementById("subjectBadge").textContent=topic;document.getElementById("quizDate").textContent="Daily set • "+dateLabel(activeDate);document.getElementById("result").classList.add("hidden");document.getElementById("quizArea").classList.remove("hidden");if(quiz.length<DAILY_COUNT){showError("Only "+quiz.length+" valid question(s) are available for "+topic+" on or before this date. Add at least 10 active rows to the master sheet.");return}document.getElementById("error").classList.add("hidden");render()}
+function resetQuiz(){current=0;answers=Array(quiz.length).fill(null);checked=Array(quiz.length).fill(false)}
+function render(){const q=quiz[current],isChecked=checked[current];document.getElementById("questionNumber").textContent="Question "+(current+1)+" of "+quiz.length+(retryMode?" • Retry":"");document.getElementById("questionText").textContent=q.Question;const options=document.getElementById("options");options.innerHTML="";letters.forEach(letter=>{const btn=document.createElement("button");btn.type="button";btn.className="option";if(answers[current]===letter)btn.classList.add("selected");if(isChecked&&letter===q.CorrectAnswer.toUpperCase())btn.classList.add("correct");if(isChecked&&answers[current]===letter&&letter!==q.CorrectAnswer.toUpperCase())btn.classList.add("wrong");btn.disabled=isChecked;btn.innerHTML='<span class="letter">'+letter+'</span><span></span>';btn.lastChild.textContent=q["Option"+letter];btn.onclick=()=>{answers[current]=letter;render()};options.appendChild(btn)});const feedback=document.getElementById("feedback");feedback.classList.toggle("show",isChecked);if(isChecked){const correct=answers[current]===q.CorrectAnswer.toUpperCase();document.getElementById("feedbackTitle").textContent=correct?"Correct — review every option.":"Incorrect — review all four options.";const box=document.getElementById("explanations");box.innerHTML="";letters.forEach(letter=>{const d=document.createElement("div");d.className="explanation"+(letter===q.CorrectAnswer.toUpperCase()?" correct":"");d.innerHTML='<span class="tag">'+letter+'</span><span></span>';d.lastChild.textContent=q["Explanation"+letter];box.appendChild(d)})}document.getElementById("prevBtn").disabled=current===0;const action=document.getElementById("actionBtn");action.textContent=isChecked?(current===quiz.length-1?"Finish quiz":"Next question"):"Check answer";action.disabled=!isChecked&&!answers[current];updateStatus();renderPalette()}
+function renderPalette(){const p=document.getElementById("palette");p.innerHTML="";quiz.forEach((q,i)=>{const b=document.createElement("button");b.type="button";b.textContent=i+1;if(i===current)b.classList.add("current");else if(checked[i])b.classList.add(answers[i]===q.CorrectAnswer.toUpperCase()?"answered":"wrong");b.onclick=()=>{current=i;render();window.scrollTo({top:document.getElementById("quizArea").offsetTop-80,behavior:"smooth"})};p.appendChild(b)})}
+function updateStatus(){const done=checked.filter(Boolean).length;document.getElementById("answeredCount").textContent=done+" of "+quiz.length+" checked";document.getElementById("progressBar").style.width=(done/quiz.length*100)+"%";updateLiveScore()}
+function checkOrNext(){if(!checked[current]){if(!answers[current])return;checked[current]=true;render();return}if(current<quiz.length-1){current++;render();return}finish()}
+function finish(){const score=quiz.reduce((sum,q,i)=>sum+(checked[i]&&answers[i]===q.CorrectAnswer.toUpperCase()?1:0),0),wrongIndexes=quiz.map((q,i)=>checked[i]&&answers[i]!==q.CorrectAnswer.toUpperCase()?i:-1).filter(i=>i>=0),wrong=wrongIndexes.length;document.getElementById("quizArea").classList.add("hidden");document.getElementById("result").classList.remove("hidden");document.getElementById("score").textContent=score+" / "+quiz.length;document.getElementById("resultTitle").textContent=score>=8?"Excellent work!":score>=5?"Good progress. Keep revising.":"Review and retry the weak areas.";document.getElementById("resultText").textContent=retryMode?"Retry complete. Review any remaining weak areas and try the full daily set again.":"Your attempt has been saved on this device.";document.getElementById("correctStat").textContent=score;document.getElementById("wrongStat").textContent=wrong;document.getElementById("percentStat").textContent=Math.round(score/quiz.length*100)+"%";const retry=document.getElementById("retryWrongBtn");retry.classList.toggle("hidden",wrong===0);retry.onclick=()=>retryWrong(wrongIndexes);if(!retryMode)saveAttempt(score,quiz.length,wrong);else renderHistory();window.scrollTo({top:document.getElementById("result").offsetTop-90,behavior:"smooth"})}
+function retryWrong(indexes){const oldQuiz=quiz;quiz=indexes.map(i=>oldQuiz[i]);retryMode=true;resetQuiz();document.getElementById("result").classList.add("hidden");document.getElementById("quizArea").classList.remove("hidden");document.getElementById("topicTitle").textContent=activeTopic+" — Wrong answers";render();window.scrollTo({top:document.getElementById("quizArea").offsetTop-80,behavior:"smooth"})}
+function renderHistory(){const box=document.getElementById("historyList"),list=history().slice(0,6);box.innerHTML="";if(!list.length){box.innerHTML='<div class="muted">No completed attempts yet.</div>';return}list.forEach(x=>{const d=document.createElement("div");d.className="history-row";d.innerHTML='<span></span><strong></strong>';d.firstChild.textContent=dateLabel(x.date)+" • "+x.topic;d.lastChild.textContent=x.score+" / "+x.total;box.appendChild(d)})}
+function showError(message){document.getElementById("loading").classList.add("hidden");document.getElementById("quizArea").classList.add("hidden");const e=document.getElementById("error");e.textContent=message;e.classList.remove("hidden")}
+document.getElementById("prevBtn").onclick=()=>{if(current>0){current--;render()}};document.getElementById("actionBtn").onclick=checkOrNext;document.getElementById("restartBtn").onclick=()=>startTopic(activeTopic,activeDate);activeDate=indiaDate();const ds=document.getElementById("dateSelect");ds.value=activeDate;ds.max=activeDate;document.getElementById("quizDate").textContent="Daily set • "+dateLabel(activeDate);refreshSummary();renderHistory();loadBank().then(rows=>{bank=rows.filter(q=>String(q.Active).toLowerCase()!=="false").filter(valid);document.getElementById("loading").classList.add("hidden");if(!bank.length)throw new Error("No valid active questions were found.");setupTopics()}).catch(e=>showError("Quiz could not load: "+e.message));
 </script>
 </body>
 </html>
