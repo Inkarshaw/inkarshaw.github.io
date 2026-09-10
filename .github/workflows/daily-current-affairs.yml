@@ -39,8 +39,17 @@ jobs:
           fi
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
 
-      - name: Build PDF
+      - name: Build and compress PDF
         run: python scripts/build_daily_current_affairs.py --date "${{ steps.d.outputs.date }}"
+
+      - name: Show PDF size
+        shell: bash
+        run: |
+          DATE="${{ steps.d.outputs.date }}"
+          FILE="current-affairs/$DATE.pdf"
+          if [ -f "$FILE" ]; then
+            ls -lh "$FILE"
+          fi
 
       - name: Commit generated PDF
         shell: bash
@@ -58,5 +67,5 @@ jobs:
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "Add daily current affairs PDF for $DATE"
+          git commit -m "Add compressed daily current affairs PDF for $DATE"
           git push
