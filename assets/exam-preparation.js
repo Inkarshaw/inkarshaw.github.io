@@ -29,7 +29,7 @@
       : `<p>${exam.syllabus ? 'Read the syllabus for this examination, organised by stage and subject.' : 'The exact syllabus depends on the current recruitment notice. Use the official source below.'}</p><div class="actions">${link(exam.syllabus ? 'Read this exam’s syllabus' : 'Official syllabus / notice ↗', syllabusURL(exam), 'button')}</div>`;
 
     const mockBlock = group4
-      ? `<p>Mock Test 1 is now available as a shorter 25-question practice test with a 30-minute timer, question palette, mark-for-review, detailed results and explanations.</p><div class="actions">${link('Start TNPSC Group IV Mock Test 1','tnpsc-group4-mock-1.html','button')}</div><p class="source">This is a ClearExams practice mock, not the full official Group IV paper length. Full-length mocks can be added using the same test engine.</p>`
+      ? `<p>The TNPSC Group IV mock series is now available. Mock Test 1 includes 25 questions, a 30-minute timer, question palette, mark-for-review, detailed results and explanations. Your best score is saved on this device.</p><div class="actions">${link('Open TNPSC Group IV Mock Series','tnpsc-group4-mocks.html','button')}${link('Start Mock Test 1','tnpsc-group4-mock-1.html')}</div><p class="source">Mock Test 1 is a shorter ClearExams practice mock. Additional practice mocks and a full-length simulation are planned.</p>`
       : `<p>A dedicated full-length ${escape(exam.title)} mock-test series is not yet published on ClearExams. Until it is added, use this sequence:</p><ol><li>Finish one full syllabus revision.</li><li>Complete topic quizzes without notes.</li><li>Solve an official previous-year paper under the real time limit.</li><li>Record score, weak topics and time lost.</li><li>Revise only the weak areas and repeat another paper.</li></ol><div class="actions">${link('Practise Daily Quiz','daily-quiz.html','button')}${link('Go to PYQs','#papers')}</div><p class="source">Dedicated exam-wise mock tests are coming soon.</p>`;
 
     host.innerHTML = `
@@ -38,7 +38,7 @@
         ${pathCard('2','Study materials','Build concepts topic by topic.','#notes')}
         ${pathCard('3','Topic quiz','Practise and learn from explanations.','#practice')}
         ${pathCard('4','PYQs','Understand the real exam pattern.','#papers')}
-        ${pathCard('5','Mock tests',group4 ? 'Take Mock Test 1 and analyse your score.' : 'Test speed and accuracy.','#mocks')}
+        ${pathCard('5','Mock tests',group4 ? 'Open the mock series and track your best score.' : 'Test speed and accuracy.','#mocks')}
         ${pathCard('6','Notification','Track the next application cycle.','#notifications')}
       </div></section>
 
