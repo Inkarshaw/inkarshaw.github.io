@@ -1,6 +1,6 @@
 (async function () {
   'use strict';
-  const {json,escape,link,syllabusURL,notificationHTML,formatDate} = window.ClearExams;
+  const {json,escape,link,syllabusURL,notificationHTML,notificationPlaceholderHTML,formatDate} = window.ClearExams;
   const host = document.getElementById('content');
 
   try {
@@ -88,6 +88,6 @@
 
   async function loadNotifications(exam) {
     const area = document.getElementById('notificationList');
-    try {const data = await json('data/exam-notifications.json');const entries = data.entries.filter(item => item.exams.includes(exam.id));area.innerHTML = `<p class="source">Dates checked on ${formatDate(data.checkedOn)}. Official amendments take priority.</p>` + (entries.length ? entries.map(notificationHTML).join('') : '<p>No dated notice has been added for this examination. Use the official recruitment link below.</p>');} catch (error) {area.innerHTML = '<p role="alert">Dates could not load. Use the official recruitment updates below.</p>';}
+    try {const data = await json('data/exam-notifications.json');const entries = data.entries.filter(item => item.exams.includes(exam.id));area.innerHTML = entries.length ? `<p class="source">Dates checked on ${formatDate(data.checkedOn)}. Official amendments take priority.</p>` + entries.map(notificationHTML).join('') : notificationPlaceholderHTML(exam.title);} catch (error) {area.innerHTML = '<p role="alert">Dates could not load. Use the official recruitment updates below.</p>';}
   }
 })();

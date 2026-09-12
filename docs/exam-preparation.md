@@ -30,6 +30,9 @@ recruitment websites.
   recruitment notice. Never derive application dates from a planner date.
   Application deadlines must include their time and `+05:30` offset. Unknown
   dates are `null`. Check addenda before labelling an issued window open.
+  Categories and examinations with no dated entry show a shared "2026 updates
+  coming soon" card. This describes updates to ClearExams, not the official
+  notice's release status. Do not invent dates for these placeholders.
 
 The quiz remains connected to its existing public feed and repository fallback.
 `daily-quiz.html?topic=Indian%20Polity` selects an available topic, with a safe
