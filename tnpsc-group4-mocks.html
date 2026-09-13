@@ -21,5 +21,47 @@
 <article class="card available"><div class="top"><span class="badge">Available</span><span id="status3" class="badge">Not attempted</span></div><h2>Mock Test 3</h2><p>Another fresh mixed set covering core Group IV preparation areas.</p><div class="meta"><span class="pill">25 questions</span><span class="pill">30 minutes</span><span class="pill">Explanations</span></div><div id="score3" class="scorebox"><strong>No score yet</strong><span>Complete the mock to record your best score.</span></div><a class="btn primary" href="tnpsc-group4-mock-3.html" data-mock="3">Start Mock Test 3</a></article>
 <article class="card"><div class="top"><span class="badge soon">Planned</span></div><h2>Full-length Mock</h2><p>A complete exam-length simulation will be added after the shorter practice series.</p><div class="meta"><span class="pill">Full syllabus</span><span class="pill">Timed</span></div><a class="btn disabled" href="#" aria-disabled="true">Planned</a></article>
 </div><div class="note"><strong>How progress works:</strong> scores are saved only in your current browser/device using local storage. No account or personal information is required.</div></main>
-<script>const KEY='clearexamsTNPSCGroup4MockHistoryV1';let history=[];try{history=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}function renderMock(n){const rows=history.filter(x=>Number(x.mock)===n);if(!rows.length)return false;const best=Math.max(...rows.map(x=>Number(x.score)||0));const latest=rows[rows.length-1];const status=document.getElementById('status'+n);status.textContent='Completed';status.classList.add('done');document.getElementById('score'+n).innerHTML=`<strong>Best: ${best} / 25</strong><span>Latest: ${latest.score} / 25 · ${latest.accuracy}% accuracy</span>`;return true}const done=[1,2,3].map(renderMock);document.getElementById('completed').textContent=done.filter(Boolean).length+' / 3';const all=history.filter(x=>[1,2,3].includes(Number(x.mock)));if(all.length){document.getElementById('best').textContent=Math.max(...all.map(x=>Number(x.score)||0))+' / 25'}document.querySelectorAll('[data-mock]').forEach(a=>a.addEventListener('click',()=>gtag('event','mock_series_opened',{exam:'TNPSC Group IV',mock:Number(a.dataset.mock)})));</script>
+<script>
+(function () {
+  'use strict';
+  const KEY = 'clearexamsTNPSCGroup4MockHistoryV1';
+  const mocks = [1, 2, 3];
+  let records = [];
+  try {
+    const stored = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (Array.isArray(stored)) records = stored;
+  } catch (error) {
+    // Practice links remain usable when browser storage is unavailable.
+  }
+  const numeric = value => (typeof value === 'number' || (typeof value === 'string' && value.trim() !== '')) && Number.isFinite(Number(value));
+  const history = records.filter(row =>
+    row && mocks.includes(Number(row.mock)) && numeric(row.score) &&
+    Number.isInteger(Number(row.score)) && Number(row.score) >= 0 && Number(row.score) <= 25
+  ).map(row => ({
+    mock: Number(row.mock),
+    score: Number(row.score),
+    accuracy: numeric(row.accuracy) && Number(row.accuracy) >= 0 && Number(row.accuracy) <= 100
+      ? Number(row.accuracy) : Math.round(Number(row.score) / 25 * 100)
+  }));
+  function renderMock(n) {
+    const rows = history.filter(row => row.mock === n);
+    if (!rows.length) return false;
+    const best = rows.reduce((value, row) => Math.max(value, row.score), 0);
+    const latest = rows[rows.length - 1];
+    const status = document.getElementById('status' + n);
+    status.textContent = 'Completed';
+    status.classList.add('done');
+    const box = document.getElementById('score' + n);
+    box.querySelector('strong').textContent = 'Best: ' + best + ' / 25';
+    box.querySelector('span').textContent = 'Latest: ' + latest.score + ' / 25 · ' + latest.accuracy + '% accuracy · ' + rows.length + (rows.length === 1 ? ' saved attempt' : ' saved attempts');
+    document.querySelector('[data-mock="' + n + '"]').textContent = 'Retake Mock Test ' + n;
+    return true;
+  }
+  document.getElementById('completed').textContent = mocks.map(renderMock).filter(Boolean).length + ' / 3';
+  if (history.length) document.getElementById('best').textContent = history.reduce((value, row) => Math.max(value, row.score), 0) + ' / 25';
+  document.querySelectorAll('[data-mock]').forEach(a => a.addEventListener('click', () => {
+    if (typeof gtag === 'function') gtag('event', 'mock_series_opened', {exam: 'TNPSC Group IV', mock: Number(a.dataset.mock)});
+  }));
+})();
+</script>
 </body></html>
