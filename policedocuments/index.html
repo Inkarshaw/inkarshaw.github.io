@@ -319,6 +319,15 @@
             background: #b86bb3;
         }
 
+        .btn-court {
+            background: #4a4e8c;
+            color: white;
+        }
+
+        .btn-court:hover {
+            background: #5a5e9c;
+        }
+
         .status-indicator {
             display: inline-block;
             width: 10px;
@@ -610,6 +619,23 @@
                 </ul>
             </div>
 
+            <!-- Court Forms Card (NEW SECTION) -->
+            <div class="card">
+                <h2><i>🏛️</i> Court Forms</h2>
+                <div class="search-info" id="courtFormsInfo"></div>
+                <ul class="document-list" id="courtFormsList">
+                    <li class="document-item" data-title="Panchanama Form" data-desc="Judicial Panchanama Form 82 for court proceedings and evidence documentation">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Panchanama Form</div>
+                            <div class="doc-desc">Judicial Panchanama Form 82 for court proceedings and evidence documentation</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a href="https://www.clearexams.ink/policedocuments/court_forms/panchanama_judicial_form_82.docx" target="_blank" class="btn btn-court">📝 Word</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
             <!-- Juvenile Remand Forms Card -->
             <div class="card">
                 <h2><i>👦</i> Juvenile Remand Forms</h2>
@@ -797,7 +823,6 @@
                 <h2><i>📂</i> Misc</h2>
                 <div class="search-info" id="miscInfo"></div>
                 <ul class="document-list" id="miscList">
-                    <!-- NEW: Cheating Cases SOP -->
                     <li class="document-item" data-title="Cheating Cases SOP" data-desc="Standard Operating Procedure for investigating cheating cases">
                         <div class="doc-info">
                             <div class="doc-title"><span class="status-indicator status-active"></span>Cheating Cases SOP</div>
@@ -890,6 +915,7 @@
                 { listId: 'generatePDFsList', infoId: 'generatePDFsInfo' },
                 { listId: 'bnss194List', infoId: 'bnss194Info' },
                 { listId: 'remandDocumentsList', infoId: 'remandDocumentsInfo' },
+                { listId: 'courtFormsList', infoId: 'courtFormsInfo' },
                 { listId: 'juvenileRemandList', infoId: 'juvenileRemandInfo' },
                 { listId: 'jailFormsList', infoId: 'jailFormsInfo' },
                 { listId: 'crbFormsList', infoId: 'crbFormsInfo' },
@@ -966,7 +992,8 @@
                     if (!docTitle) docTitle = 'Document';
                     const isGenerate = this.classList.contains('btn-generate') || this.classList.contains(
                         'btn-crb') || this.classList.contains('btn-election') || this.classList.contains(
-                        'btn-remand') || this.classList.contains('btn-bnss');
+                        'btn-remand') || this.classList.contains('btn-bnss') || this.classList.contains(
+                        'btn-court');
                     const actionMsg = isGenerate ? `Opening ${docTitle} generator...` :
                         `Opening ${docTitle} document...`;
                     showNotification(actionMsg);
