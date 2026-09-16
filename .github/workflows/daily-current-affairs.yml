@@ -13,12 +13,18 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: daily-current-affairs-publish
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,30 +48,30 @@ jobs:
       - name: Build and compress PDF
         run: python scripts/build_daily_current_affairs.py --date "${{ steps.d.outputs.date }}"
 
-      - name: Show PDF size
+      - name: Verify PDF
         shell: bash
         run: |
           DATE="${{ steps.d.outputs.date }}"
           FILE="current-affairs/$DATE.pdf"
-          if [ -f "$FILE" ]; then
-            ls -lh "$FILE"
-          fi
+          test -s "$FILE"
+          head -c 5 "$FILE" | grep -q '%PDF-'
+          ls -lh "$FILE"
 
-      - name: Commit generated PDF
+      - name: Rebuild current affairs PDF list
+        run: python3 current-affairs/generate-pdf-list.py
+
+      - name: Commit PDF and updated list
         shell: bash
         run: |
           DATE="${{ steps.d.outputs.date }}"
           FILE="current-affairs/$DATE.pdf"
-          if [ ! -f "$FILE" ]; then
-            echo "No PDF generated; nothing to commit."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$FILE"
+          git add "$FILE" current-affairs/pdfs.json
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "PDF and list are already up to date."
             exit 0
           fi
-          git commit -m "Add compressed daily current affairs PDF for $DATE"
-          git push
+          git commit -m "Publish daily current affairs PDF for $DATE"
+          git pull --rebase origin main
+          git push origin main
