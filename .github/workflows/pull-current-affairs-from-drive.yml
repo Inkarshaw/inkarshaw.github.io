@@ -7,11 +7,17 @@ on:
         description: "Date in YYYY-MM-DD (defaults to current IST date)"
         required: false
         type: string
-  schedule:
-    - cron: "45 14 * * *"  # 20:15 IST
+  push:
+    branches: ["main"]
+    paths:
+      - "current-affairs/publish-date.txt"
 
 permissions:
   contents: write
+
+concurrency:
+  group: current-affairs-drive-publish
+  cancel-in-progress: false
 
 jobs:
   pull-and-publish:
@@ -26,10 +32,16 @@ jobs:
         id: d
         shell: bash
         run: |
-          if [ -n "${{ inputs.date }}" ]; then
+          if [ "${{ github.event_name }}" = "push" ]; then
+            DATE=$(tr -d '[:space:]' < current-affairs/publish-date.txt)
+          elif [ -n "${{ inputs.date }}" ]; then
             DATE="${{ inputs.date }}"
           else
             DATE=$(TZ=Asia/Kolkata date +%F)
+          fi
+          if ! [[ "$DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+            echo "Invalid publish date: $DATE"
+            exit 1
           fi
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
 
@@ -44,11 +56,7 @@ jobs:
             "https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&confirm=t" \
             --output "$OUT"
           test -s "$OUT"
-          if ! head -c 5 "$OUT" | grep -q '%PDF-'; then
-            echo "Downloaded file is not a PDF. Check Drive sharing (Anyone with the link -> Viewer)."
-            rm -f "$OUT"
-            exit 1
-          fi
+          head -c 5 "$OUT" | grep -q '%PDF-'
           echo "Downloaded $OUT ($(du -h "$OUT" | cut -f1))"
 
       - name: Rebuild current affairs PDF list
@@ -67,4 +75,5 @@ jobs:
             exit 0
           fi
           git commit -m "Publish current affairs PDF and update list for $DATE"
-          git push
+          git pull --rebase origin main
+          git push origin main
