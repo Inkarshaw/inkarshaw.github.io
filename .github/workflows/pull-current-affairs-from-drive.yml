@@ -7,10 +7,8 @@ on:
         description: "Date in YYYY-MM-DD (defaults to current IST date)"
         required: false
         type: string
-  push:
-    branches: ["main"]
-    paths:
-      - "current-affairs/publish-date.txt"
+  schedule:
+    - cron: "45 14 * * *"  # 20:15 IST
 
 permissions:
   contents: write
@@ -32,9 +30,7 @@ jobs:
         id: d
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            DATE=$(tr -d '[:space:]' < current-affairs/publish-date.txt)
-          elif [ -n "${{ inputs.date }}" ]; then
+          if [ -n "${{ inputs.date }}" ]; then
             DATE="${{ inputs.date }}"
           else
             DATE=$(TZ=Asia/Kolkata date +%F)
