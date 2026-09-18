@@ -442,6 +442,126 @@
             color: #a0c4e0;
             font-size: 0.9rem;
         }
+
+        /* Police Work Dashboard */
+        .dashboard-panel {
+            margin: 24px 0 28px;
+            padding: 22px;
+            background: rgba(13, 27, 42, 0.72);
+            border: 1px solid #2a4d69;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .dashboard-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .dashboard-heading h2 {
+            color: #e0e0e0;
+            font-size: 1.45rem;
+            margin-bottom: 4px;
+        }
+
+        .dashboard-heading p {
+            color: #a0c4e0;
+            font-size: 0.95rem;
+        }
+
+        .category-dashboard {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .category-tile {
+            min-height: 92px;
+            border: 1px solid #355b78;
+            background: rgba(30, 50, 70, 0.72);
+            color: #f0f0f0;
+            border-radius: 10px;
+            padding: 14px 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .category-tile:hover,
+        .category-tile:focus-visible {
+            transform: translateY(-2px);
+            border-color: #78b7e5;
+            background: rgba(40, 70, 100, 0.82);
+            outline: none;
+        }
+
+        .category-tile.active {
+            border-color: #8dccf2;
+            background: rgba(54, 91, 122, 0.95);
+            box-shadow: inset 0 0 0 1px rgba(141, 204, 242, 0.25);
+        }
+
+        .category-icon {
+            display: block;
+            font-size: 1.45rem;
+            margin-bottom: 8px;
+        }
+
+        .category-name {
+            display: block;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .category-hint {
+            display: block;
+            color: #b0c4de;
+            font-size: 0.78rem;
+            margin-top: 4px;
+            line-height: 1.25;
+        }
+
+        .content > .card.dashboard-focus {
+            border-color: #78b7e5;
+            box-shadow: 0 0 0 2px rgba(120, 183, 229, 0.14), 0 8px 24px rgba(0, 0, 0, 0.32);
+        }
+
+        @media (max-width: 1100px) {
+            .category-dashboard {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .dashboard-panel {
+                padding: 16px;
+            }
+
+            .dashboard-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .category-dashboard {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .category-tile {
+                min-height: 86px;
+                padding: 12px 10px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .category-dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
     </style>
 </head>
 
@@ -475,6 +595,73 @@
             <input type="text" id="searchInput" placeholder="Search for documents, forms, or reports..." />
             <button id="searchButton">Search</button>
         </div>
+
+        <section class="dashboard-panel" aria-labelledby="dashboardTitle">
+            <div class="dashboard-heading">
+                <div>
+                    <h2 id="dashboardTitle">Police Work Dashboard</h2>
+                    <p>Choose a category to open only the documents you need.</p>
+                </div>
+            </div>
+
+            <div class="category-dashboard" id="categoryDashboard">
+                <button type="button" class="category-tile active" data-target="all">
+                    <span class="category-icon">🗂️</span>
+                    <span class="category-name">All Documents</span>
+                    <span class="category-hint">Browse the complete catalogue</span>
+                </button>
+                <button type="button" class="category-tile" data-target="remandDocumentsList">
+                    <span class="category-icon">⚖️</span>
+                    <span class="category-name">Arrest &amp; Remand</span>
+                    <span class="category-hint">Remand and custody documents</span>
+                </button>
+                <button type="button" class="category-tile" data-target="generatePDFsList">
+                    <span class="category-icon">📝</span>
+                    <span class="category-name">Investigation Tools</span>
+                    <span class="category-hint">Letters and document generators</span>
+                </button>
+                <button type="button" class="category-tile" data-target="bnss194List">
+                    <span class="category-icon">🔎</span>
+                    <span class="category-name">Death / Inquest</span>
+                    <span class="category-hint">Section 194 BNSS documents</span>
+                </button>
+                <button type="button" class="category-tile" data-target="courtFormsList">
+                    <span class="category-icon">🏛️</span>
+                    <span class="category-name">Court</span>
+                    <span class="category-hint">Court-related forms and reports</span>
+                </button>
+                <button type="button" class="category-tile" data-target="juvenileRemandList">
+                    <span class="category-icon">👦</span>
+                    <span class="category-name">Juvenile</span>
+                    <span class="category-hint">Juvenile remand forms</span>
+                </button>
+                <button type="button" class="category-tile" data-target="jailFormsList">
+                    <span class="category-icon">🔒</span>
+                    <span class="category-name">Jail</span>
+                    <span class="category-hint">Prison and jail documentation</span>
+                </button>
+                <button type="button" class="category-tile" data-target="crbFormsList">
+                    <span class="category-icon">🕵️</span>
+                    <span class="category-name">CRB</span>
+                    <span class="category-hint">Crime Records Bureau forms</span>
+                </button>
+                <button type="button" class="category-tile" data-target="electionFormsList">
+                    <span class="category-icon">🗳️</span>
+                    <span class="category-name">Election</span>
+                    <span class="category-hint">Election duty documents</span>
+                </button>
+                <button type="button" class="category-tile" data-target="downloadFormsList">
+                    <span class="category-icon">📋</span>
+                    <span class="category-name">Forms &amp; Service</span>
+                    <span class="category-hint">Downloadable departmental forms</span>
+                </button>
+                <button type="button" class="category-tile" data-target="miscList">
+                    <span class="category-icon">📚</span>
+                    <span class="category-name">Reference &amp; Misc</span>
+                    <span class="category-hint">GOs, SOPs, vehicles and references</span>
+                </button>
+            </div>
+        </section>
 
         <div class="content">
             <!-- Download Forms Card -->
@@ -888,6 +1075,51 @@
     </div>
 
     <script>
+
+        let activeDashboardCategory = 'all';
+
+        function applyDashboardCategory(target, shouldScroll = true) {
+            activeDashboardCategory = target || 'all';
+            const cards = document.querySelectorAll('.content > .card');
+
+            cards.forEach(card => {
+                const list = card.querySelector('.document-list');
+                const isMatch = activeDashboardCategory === 'all' || (list && list.id === activeDashboardCategory);
+                card.style.display = isMatch ? '' : 'none';
+                card.classList.toggle('dashboard-focus', isMatch && activeDashboardCategory !== 'all');
+            });
+
+            document.querySelectorAll('.category-tile').forEach(button => {
+                button.classList.toggle('active', button.dataset.target === activeDashboardCategory);
+            });
+
+            if (shouldScroll && activeDashboardCategory !== 'all') {
+                const list = document.getElementById(activeDashboardCategory);
+                const card = list ? list.closest('.card') : null;
+                if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'police_dashboard_category', {
+                    'event_category': 'navigation',
+                    'event_label': activeDashboardCategory
+                });
+            }
+        }
+
+        function setupDashboardNavigation() {
+            document.querySelectorAll('.category-tile').forEach(button => {
+                button.addEventListener('click', () => {
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput && searchInput.value) {
+                        searchInput.value = '';
+                        performSearch();
+                    }
+                    applyDashboardCategory(button.dataset.target);
+                });
+            });
+        }
+
         function showNotification(message) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -910,6 +1142,13 @@
 
         function performSearch() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            if (searchTerm !== '') {
+                document.querySelectorAll('.content > .card').forEach(card => {
+                    card.style.display = '';
+                    card.classList.remove('dashboard-focus');
+                });
+            }
             const sections = [
                 { listId: 'downloadFormsList', infoId: 'downloadFormsInfo' },
                 { listId: 'generatePDFsList', infoId: 'generatePDFsInfo' },
@@ -957,7 +1196,16 @@
                     else infoSpan.textContent = foundCount > 0 ? `${foundCount} item${foundCount !== 1 ? 's' : ''} found` :
                         'No results';
                 }
+
+                if (searchTerm !== '') {
+                    const card = container.closest('.card');
+                    if (card) card.style.display = foundCount > 0 ? '' : 'none';
+                }
             });
+
+            if (searchTerm === '') {
+                applyDashboardCategory(activeDashboardCategory, false);
+            }
 
             if (searchTerm !== '' && typeof gtag !== 'undefined') {
                 gtag('event', 'search_performed', {
@@ -1020,6 +1268,8 @@
             if (searchInput) searchInput.addEventListener('input', performSearch);
             if (searchButton) searchButton.addEventListener('click', performSearch);
             setupGlobalLinkHandlers();
+            setupDashboardNavigation();
+            applyDashboardCategory('all', false);
 
             const statValueSpan = document.getElementById('formsCount');
             if (statValueSpan) statValueSpan.innerText = '40';
