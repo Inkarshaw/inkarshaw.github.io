@@ -405,25 +405,47 @@
         }
 
         .stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 30px 0;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin: 24px 0 28px;
             text-align: center;
         }
 
         .stat-item {
-            padding: 15px;
+            padding: 16px 12px;
+            background: rgba(20, 40, 60, 0.72);
+            border: 1px solid #2a4d69;
+            border-radius: 10px;
         }
 
         .stat-value {
-            font-size: 2.5rem;
+            font-size: 2rem;
+            line-height: 1;
             font-weight: bold;
             color: #a0c4e0;
         }
 
         .stat-label {
-            font-size: 0.9rem;
+            margin-top: 7px;
+            font-size: 0.82rem;
             color: #b0c4de;
+        }
+
+        @media (max-width: 700px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 9px;
+                margin: 18px 0 22px;
+            }
+
+            .stat-item {
+                padding: 14px 8px;
+            }
+
+            .stat-value {
+                font-size: 1.65rem;
+            }
         }
 
         .doc-actions a {
@@ -852,18 +874,22 @@
             <p class="subtitle">Download forms and generate PDF documents for law enforcement operations</p>
         </header>
 
-        <div class="stats">
+        <div class="stats" aria-label="Police document library statistics">
             <div class="stat-item">
-                <div class="stat-value" id="formsCount">40</div>
-                <div class="stat-label">Available Forms</div>
+                <div class="stat-value" id="documentsCount">0</div>
+                <div class="stat-label">Documents &amp; Tools</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">1,529</div>
-                <div class="stat-label">PDFs Generated</div>
+                <div class="stat-value" id="generatorsCount">0</div>
+                <div class="stat-label">Generators</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">99.5%</div>
-                <div class="stat-label">System Uptime</div>
+                <div class="stat-value" id="categoriesCount">0</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="comingSoonCount">0</div>
+                <div class="stat-label">Coming Soon</div>
             </div>
         </div>
 
@@ -1714,6 +1740,43 @@
             });
         }
 
+
+        function updateDashboardStats() {
+            const documentItems = Array.from(document.querySelectorAll('.document-item'));
+            const categoryCards = Array.from(document.querySelectorAll('.content > .card'));
+
+            const generatorItems = documentItems.filter(item => {
+                const links = Array.from(item.querySelectorAll('.doc-actions a'));
+                return links.some(link => {
+                    const href = (link.getAttribute('href') || '').toLowerCase();
+                    const classes = (link.className || '').toLowerCase();
+                    const text = (link.textContent || '').toLowerCase();
+                    return href.endsWith('.html') ||
+                        /btn-generate|btn-crb|btn-election|btn-remand|btn-bnss|btn-court/.test(classes) ||
+                        text.includes('generate');
+                });
+            });
+
+            const comingSoonItems = documentItems.filter(item => {
+                const links = Array.from(item.querySelectorAll('.doc-actions a'));
+                return links.some(link => {
+                    const href = (link.getAttribute('href') || '').trim().toLowerCase();
+                    const text = (link.textContent || '').toLowerCase();
+                    return href === '#' || href === 'javascript:void(0)' || text.includes('coming soon') || link.style.cursor === 'default';
+                });
+            });
+
+            const setStat = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = String(value);
+            };
+
+            setStat('documentsCount', documentItems.length);
+            setStat('generatorsCount', generatorItems.length);
+            setStat('categoriesCount', categoryCards.length);
+            setStat('comingSoonCount', comingSoonItems.length);
+        }
+
         function setupGlobalLinkHandlers() {
             document.querySelectorAll('.doc-actions a').forEach(link => {
                 if (link.getAttribute('href') === '#' || link.getAttribute('href') === 'javascript:void(0)' || link
@@ -1767,14 +1830,12 @@
             if (searchInput) searchInput.addEventListener('input', performSearch);
             if (searchButton) searchButton.addEventListener('click', performSearch);
             setupGlobalLinkHandlers();
+            updateDashboardStats();
             setupDashboardNavigation();
             setupDocumentFilters();
             setupQuickTools();
             setupWorkflowBundles();
             applyDashboardCategory('all', false);
-
-            const statValueSpan = document.getElementById('formsCount');
-            if (statValueSpan) statValueSpan.innerText = '40';
 
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'page_view', {
