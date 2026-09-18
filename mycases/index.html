@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071c33">
+  <meta name="description" content="My Cases is a browser-based police case workspace for tracking case details, stages, court information and upcoming hearings.">
+  <link rel="canonical" href="https://clearexams.ink/mycases/">
+  <title>My Cases | ClearExams Police Tools</title>
+  <style>
+    :root{
+      --navy:#071c33;--navy2:#0c355c;--blue:#1463ff;--blue2:#2f75ff;--ink:#10233b;
+      --muted:#607086;--bg:#f5f8fc;--line:#dfe7f0;--white:#fff;--orange:#ff9e2a;
+      --green:#15845b;--red:#b63d3d;--purple:#7446d7;--shadow:0 14px 40px rgba(7,28,51,.10)
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth}
+    body{margin:0;min-width:320px;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45}
+    a{text-decoration:none;color:inherit}button,input,select,textarea{font:inherit}
+    button{cursor:pointer}.wrap{width:min(1240px,calc(100% - 28px));margin:auto}
+    .header{position:sticky;top:0;z-index:80;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+    .nav{min-height:64px;display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.02em}
+    .logo{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,var(--blue2),#04a3dc)}
+    .nav-actions{margin-left:auto;display:flex;gap:8px}.nav-link{min-height:40px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#344b66;font-weight:750;font-size:.86rem}
+    .hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:30px 0 28px}
+    .hero-row{display:flex;align-items:end;justify-content:space-between;gap:20px}
+    .eyebrow{font-size:.75rem;text-transform:uppercase;letter-spacing:.09em;color:#bcd4ea;font-weight:800}
+    h1{margin:5px 0 6px;font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-.045em;line-height:1.05}.hero p{margin:0;color:#c8d7e7;max-width:720px}
+    .privacy-note{margin-top:12px;display:inline-flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);font-size:.76rem;color:#d9e6f2}
+    .main{padding:22px 0 56px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 3px 12px rgba(7,28,51,.04)}
+    .stat strong{display:block;font-size:1.7rem;line-height:1;color:var(--navy2)}.stat span{display:block;margin-top:6px;color:var(--muted);font-size:.8rem}
+    .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto auto auto;gap:8px;margin-bottom:16px;position:sticky;top:64px;z-index:60;background:rgba(245,248,252,.95);padding:8px 0;backdrop-filter:blur(10px)}
+    .input,.select,.textarea{width:100%;border:1px solid #cfd9e5;border-radius:10px;background:#fff;color:var(--ink);padding:10px 11px;min-height:44px;outline:none}
+    .input:focus,.select:focus,.textarea:focus{border-color:#79a7ff;box-shadow:0 0 0 3px rgba(20,99,255,.1)}
+    .btn{min-height:44px;border-radius:10px;border:1px solid var(--line);padding:9px 13px;font-weight:800;background:#fff;color:#29425e}
+    .btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn-danger{color:#9e2e2e;border-color:#e5bcbc;background:#fffafa}.btn-soft{background:#eef4fb}
+    .grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(340px,.9fr);gap:16px;align-items:start}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 18px rgba(7,28,51,.05);overflow:hidden}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 17px;border-bottom:1px solid var(--line);background:#fbfdff}.panel-head h2{margin:0;font-size:1.08rem}
+    .case-list{display:grid;gap:0}.empty{padding:34px 18px;text-align:center;color:var(--muted)}
+    .case-row{padding:15px 16px;border-bottom:1px solid #edf2f7;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;transition:.15s}
+    .case-row:last-child{border-bottom:0}.case-row:hover{background:#f9fbfe}.case-row.active{background:#eef5ff}
+    .case-title{display:flex;flex-wrap:wrap;gap:7px;align-items:center;font-weight:850}.case-meta{margin-top:5px;color:var(--muted);font-size:.82rem;display:flex;flex-wrap:wrap;gap:8px 13px}
+    .chip{display:inline-flex;align-items:center;min-height:24px;padding:3px 7px;border-radius:999px;font-size:.7rem;font-weight:800;background:#edf3f9;color:#405872}.chip.high{background:#fff0f0;color:#a02d2d}.chip.medium{background:#fff7e8;color:#9b6914}.chip.low{background:#eef8f3;color:#21704f}
+    .row-actions{display:flex;flex-direction:column;gap:6px}.mini{min-height:34px;padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:#fff;font-weight:750;font-size:.76rem}
+    .form-wrap{padding:16px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-group{display:grid;gap:5px}.form-group.full{grid-column:1/-1}
+    label{font-size:.76rem;font-weight:800;color:#435870}.textarea{min-height:82px;resize:vertical}
+    .form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.helper{font-size:.75rem;color:var(--muted);margin-top:8px}
+    .detail{padding:16px;display:none}.detail.visible{display:block}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.detail-item{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}.detail-item.full{grid-column:1/-1}.detail-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:#7b8b9d;font-weight:800}.detail-value{margin-top:3px;white-space:pre-wrap;word-break:break-word}
+    .detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .footer{padding:28px 0 44px;color:#607086;font-size:.8rem;text-align:center}
+    .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,90px);opacity:0;transition:.25s;z-index:120;background:#0e2944;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.82rem}.toast.show{transform:translate(-50%,0);opacity:1}
+    .hidden{display:none!important}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.hero-row{align-items:start;flex-direction:column}}
+    @media(max-width:620px){.wrap{width:min(100% - 20px,1240px)}.nav{min-height:58px}.nav-actions .hide-mobile{display:none}.hero{padding:22px 0}.main{padding-top:14px}.stats{gap:7px}.stat{padding:13px}.stat strong{font-size:1.45rem}.toolbar{top:58px;grid-template-columns:1fr 1fr;gap:7px}.toolbar .btn{padding-inline:9px}.form-grid,.detail-grid{grid-template-columns:1fr}.form-group.full,.detail-item.full{grid-column:auto}.case-row{grid-template-columns:1fr}.row-actions{flex-direction:row}.row-actions .mini{flex:1}.panel{border-radius:13px}.panel-head{padding:14px}.form-wrap{padding:13px}.detail{padding:13px}.nav-link{padding:8px 9px}.brand span:last-child{display:none}}
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="wrap nav">
+    <a class="brand" href="/"><span class="logo">C</span><span>ClearExams • My Cases</span></a>
+    <div class="nav-actions">
+      <a class="nav-link hide-mobile" href="/policedocuments/">Police Documents</a>
+      <a class="nav-link" href="/">Home</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-row">
+    <div>
+      <div class="eyebrow">Police case workspace</div>
+      <h1>My Cases</h1>
+      <p>Track case details, court progress and upcoming hearings in one mobile-friendly workspace.</p>
+      <div class="privacy-note">🔒 Stored only in this browser in the current version</div>
+    </div>
+  </div>
+</section>
+
+<main class="main">
+  <div class="wrap">
+    <section class="stats" aria-label="Case statistics">
+      <div class="stat"><strong id="totalCount">0</strong><span>Total Cases</span></div>
+      <div class="stat"><strong id="activeCount">0</strong><span>Active</span></div>
+      <div class="stat"><strong id="upcomingCount">0</strong><span>Hearings in 7 Days</span></div>
+      <div class="stat"><strong id="overdueCount">0</strong><span>Overdue Dates</span></div>
+    </section>
+
+    <div class="toolbar">
+      <input class="input search" id="searchInput" type="search" placeholder="Search Crime No, accused, sections, court..." autocomplete="off">
+      <select class="select" id="stageFilter" aria-label="Filter by stage">
+        <option value="">All Stages</option>
+      </select>
+      <select class="select" id="priorityFilter" aria-label="Filter by priority">
+        <option value="">All Priority</option><option>High</option><option>Medium</option><option>Low</option>
+      </select>
+      <button class="btn btn-primary" id="newCaseBtn" type="button">＋ New Case</button>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Case List</h2>
+          <div>
+            <button class="btn" id="exportBtn" type="button">Export</button>
+            <button class="btn" id="importBtn" type="button">Import</button>
+            <input class="hidden" id="importFile" type="file" accept="application/json,.json">
+          </div>
+        </div>
+        <div class="case-list" id="caseList"></div>
+      </section>
+
+      <section class="panel" id="editorPanel">
+        <div class="panel-head">
+          <h2 id="editorTitle">Add Case</h2>
+          <button class="btn btn-soft" id="clearFormBtn" type="button">Clear</button>
+        </div>
+        <form class="form-wrap" id="caseForm">
+          <input type="hidden" id="caseId">
+          <div class="form-grid">
+            <div class="form-group"><label for="crimeNo">Crime / CSR / UDR No.</label><input class="input" id="crimeNo" placeholder="e.g. 43"></div>
+            <div class="form-group"><label for="crimeYear">Year</label><input class="input" id="crimeYear" inputmode="numeric" placeholder="2026"></div>
+            <div class="form-group"><label for="policeStation">Police Station / Unit</label><input class="input" id="policeStation" placeholder="Police Station"></div>
+            <div class="form-group"><label for="caseType">Case Type</label><select class="select" id="caseType"><option>Crime</option><option>CSR</option><option>UDR</option><option>Petition</option><option>Other</option></select></div>
+            <div class="form-group full"><label for="sections">Sections / Offences</label><input class="input" id="sections" placeholder="e.g. BNS / BNSS / NDPS sections"></div>
+            <div class="form-group"><label for="complainant">Complainant</label><input class="input" id="complainant"></div>
+            <div class="form-group"><label for="accused">Accused / Suspect</label><input class="input" id="accused"></div>
+            <div class="form-group"><label for="ioName">Investigating Officer</label><input class="input" id="ioName"></div>
+            <div class="form-group"><label for="priority">Priority</label><select class="select" id="priority"><option>Medium</option><option>High</option><option>Low</option></select></div>
+            <div class="form-group"><label for="court">Court</label><input class="input" id="court" placeholder="Court / Establishment"></div>
+            <div class="form-group"><label for="courtCaseNo">Court Case No.</label><input class="input" id="courtCaseNo" placeholder="e.g. CC 1001/2026"></div>
+            <div class="form-group"><label for="stage">Stage</label><select class="select" id="stage"></select></div>
+            <div class="form-group"><label for="nextHearing">Next Hearing / Action Date</label><input class="input" id="nextHearing" type="date"></div>
+            <div class="form-group full"><label for="nextAction">Next Action</label><input class="input" id="nextAction" placeholder="What needs to be done next?"></div>
+            <div class="form-group full"><label for="notes">Notes</label><textarea class="textarea" id="notes" placeholder="Short working notes"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save Case</button>
+            <button class="btn" type="button" id="saveAndOpenBtn">Save & Open Documents</button>
+          </div>
+          <div class="helper">Case data is saved in this browser using local storage. Export a backup before clearing browser data or changing devices.</div>
+        </form>
+
+        <div class="detail" id="caseDetail">
+          <div class="detail-grid" id="detailGrid"></div>
+          <div class="detail-actions">
+            <button class="btn btn-primary" id="openDocsBtn" type="button">Open in Police Documents</button>
+            <button class="btn" id="editCaseBtn" type="button">Edit</button>
+            <button class="btn btn-danger" id="deleteCaseBtn" type="button">Delete</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">ClearExams • My Cases • Browser-local case workspace</footer>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STORAGE_KEY='clearexamsMyCasesV1';
+  const CURRENT_CASE_KEY='clearexamsCurrentCaseV1';
+  const STAGES=[
+    'Investigation','FIR Registered','Notice / Enquiry','Accused Search','Arrested','Remand',
+    'Bail','Property / FSL Pending','Charge Sheet Preparation','Charge Sheet Filed',
+    'Cognizance','Summons','Trial','Evidence','Arguments','Judgment','Disposed','Further Investigation','Other'
+  ];
+
+  const $=id=>document.getElementById(id);
+  const fields=['crimeNo','crimeYear','policeStation','caseType','sections','complainant','accused','ioName','priority','court','courtCaseNo','stage','nextHearing','nextAction','notes'];
+  let cases=loadCases();
+  let selectedId=null;
+
+  function loadCases(){
+    try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
+  }
+  function saveCases(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cases))}
+  function uid(){return 'case_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
+  function showToast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.remove('show'),2200)}
+  function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+  function fmtDate(v){if(!v)return'—';const d=new Date(v+'T00:00:00');return Number.isNaN(d.getTime())?v:d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+  function isDisposed(c){return /disposed|judgment/i.test(c.stage||'')}
+  function daysFromToday(v){if(!v)return null;const d=new Date(v+'T00:00:00');const t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000)}
+
+  function populateStages(){
+    $('stage').innerHTML=STAGES.map(s=>'<option>'+esc(s)+'</option>').join('');
+    $('stageFilter').innerHTML='<option value="">All Stages</option>'+STAGES.map(s=>'<option>'+esc(s)+'</option>').join('');
+  }
+
+  function updateStats(){
+    const active=cases.filter(c=>!isDisposed(c)).length;
+    const upcoming=cases.filter(c=>{const n=daysFromToday(c.nextHearing);return n!==null&&n>=0&&n<=7&&!isDisposed(c)}).length;
+    const overdue=cases.filter(c=>{const n=daysFromToday(c.nextHearing);return n!==null&&n<0&&!isDisposed(c)}).length;
+    $('totalCount').textContent=cases.length;$('activeCount').textContent=active;$('upcomingCount').textContent=upcoming;$('overdueCount').textContent=overdue;
+  }
+
+  function filteredCases(){
+    const q=$('searchInput').value.trim().toLowerCase(),stage=$('stageFilter').value,priority=$('priorityFilter').value;
+    return [...cases].filter(c=>{
+      const hay=fields.map(k=>c[k]||'').join(' ').toLowerCase();
+      return (!q||hay.includes(q))&&(!stage||c.stage===stage)&&(!priority||c.priority===priority);
+    }).sort((a,b)=>{
+      const ad=a.nextHearing||'9999-99-99',bd=b.nextHearing||'9999-99-99';
+      if(ad!==bd)return ad.localeCompare(bd);
+      return (b.updatedAt||'').localeCompare(a.updatedAt||'');
+    });
+  }
+
+  function renderList(){
+    const list=$('caseList'),data=filteredCases();
+    if(!data.length){list.innerHTML='<div class="empty">No matching cases. Tap <strong>New Case</strong> to add one.</div>';updateStats();return}
+    list.innerHTML=data.map(c=>{
+      const title=(c.caseType||'Case')+' '+(c.crimeNo?c.crimeNo+'/'+(c.crimeYear||''):'');
+      const due=daysFromToday(c.nextHearing);
+      let dateText=c.nextHearing?fmtDate(c.nextHearing):'No date';
+      if(due!==null&&due<0&&!isDisposed(c))dateText+=' • overdue';
+      return '<article class="case-row '+(selectedId===c.id?'active':'')+'" data-id="'+esc(c.id)+'">'+
+        '<div><div class="case-title"><span>'+esc(title)+'</span><span class="chip '+esc((c.priority||'medium').toLowerCase())+'">'+esc(c.priority||'Medium')+'</span><span class="chip">'+esc(c.stage||'Investigation')+'</span></div>'+
+        '<div class="case-meta"><span>🏢 '+esc(c.policeStation||'Police Station not set')+'</span><span>⚖️ '+esc(c.court||'Court not set')+'</span><span>📅 '+esc(dateText)+'</span></div>'+
+        '<div class="case-meta"><span>Sections: '+esc(c.sections||'—')+'</span><span>Accused: '+esc(c.accused||'—')+'</span></div></div>'+
+        '<div class="row-actions"><button class="mini" data-action="view" data-id="'+esc(c.id)+'">View</button><button class="mini" data-action="docs" data-id="'+esc(c.id)+'">Documents</button></div></article>'
+    }).join('');
+    updateStats();
+  }
+
+  function formData(){
+    const obj={id:$('caseId').value||uid()};
+    fields.forEach(k=>obj[k]=$(k).value.trim());
+    const old=cases.find(c=>c.id===obj.id);
+    obj.createdAt=old?.createdAt||new Date().toISOString();
+    obj.updatedAt=new Date().toISOString();
+    return obj;
+  }
+
+  function clearForm(){
+    $('caseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='Add Case';$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
+  }
+
+  function fillForm(c){
+    $('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
+  }
+
+  function saveCurrent(openDocs=false){
+    const c=formData();
+    if(!c.crimeNo&&!c.courtCaseNo&&!c.accused){showToast('Add at least a case number, court case number or accused name.');return false}
+    const i=cases.findIndex(x=>x.id===c.id);if(i>=0)cases[i]=c;else cases.unshift(c);
+    saveCases();selectedId=c.id;renderList();showDetail(c);showToast('Case saved.');
+    if(openDocs)setTimeout(()=>openInDocuments(c),250);
+    return true;
+  }
+
+  function showDetail(c){
+    selectedId=c.id;$('caseForm').classList.add('hidden');$('caseDetail').classList.add('visible');$('editorTitle').textContent='Case Details';
+    const rows=[
+      ['Crime / Reference',(c.caseType||'Case')+' '+(c.crimeNo?c.crimeNo+'/'+(c.crimeYear||''):'—')],
+      ['Police Station / Unit',c.policeStation||'—'],['Sections',c.sections||'—'],['Complainant',c.complainant||'—'],
+      ['Accused / Suspect',c.accused||'—'],['Investigating Officer',c.ioName||'—'],['Court',c.court||'—'],
+      ['Court Case No.',c.courtCaseNo||'—'],['Stage',c.stage||'—'],['Priority',c.priority||'—'],
+      ['Next Hearing / Action',fmtDate(c.nextHearing)],['Next Action',c.nextAction||'—'],['Notes',c.notes||'—']
+    ];
+    $('detailGrid').innerHTML=rows.map(([a,b],i)=>'<div class="detail-item '+(i===2||i===11||i===12?'full':'')+'"><div class="detail-label">'+esc(a)+'</div><div class="detail-value">'+esc(b)+'</div></div>').join('');
+    renderList();
+  }
+
+  function openInDocuments(c){
+    localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c));
+    window.location.href='/policedocuments/?case='+encodeURIComponent(c.id);
+  }
+
+  function deleteSelected(){
+    const c=cases.find(x=>x.id===selectedId);if(!c)return;
+    if(!confirm('Delete this case from this browser?'))return;
+    cases=cases.filter(x=>x.id!==selectedId);saveCases();clearForm();showToast('Case deleted.');
+  }
+
+  function exportCases(){
+    const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),cases},null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='clearexams-mycases-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);showToast('Backup exported.');
+  }
+
+  function importCases(file){
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        const data=JSON.parse(reader.result),incoming=Array.isArray(data)?data:data.cases;
+        if(!Array.isArray(incoming))throw new Error('Invalid file');
+        const map=new Map(cases.map(c=>[c.id,c]));incoming.forEach(c=>{if(c&&typeof c==='object')map.set(c.id||uid(),c)});
+        cases=[...map.values()];saveCases();renderList();showToast('Backup imported.');
+      }catch(e){showToast('Could not import this file.')}
+      $('importFile').value='';
+    };
+    reader.readAsText(file);
+  }
+
+  $('caseForm').addEventListener('submit',e=>{e.preventDefault();saveCurrent(false)});
+  $('saveAndOpenBtn').addEventListener('click',()=>saveCurrent(true));
+  $('newCaseBtn').addEventListener('click',()=>{clearForm();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'})});
+  $('clearFormBtn').addEventListener('click',clearForm);
+  $('searchInput').addEventListener('input',renderList);$('stageFilter').addEventListener('change',renderList);$('priorityFilter').addEventListener('change',renderList);
+  $('caseList').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-action]');if(!btn)return;const c=cases.find(x=>x.id===btn.dataset.id);if(!c)return;
+    btn.dataset.action==='docs'?openInDocuments(c):showDetail(c);
+  });
+  $('editCaseBtn').addEventListener('click',()=>{const c=cases.find(x=>x.id===selectedId);if(c)fillForm(c)});
+  $('deleteCaseBtn').addEventListener('click',deleteSelected);
+  $('openDocsBtn').addEventListener('click',()=>{const c=cases.find(x=>x.id===selectedId);if(c)openInDocuments(c)});
+  $('exportBtn').addEventListener('click',exportCases);
+  $('importBtn').addEventListener('click',()=>$('importFile').click());
+  $('importFile').addEventListener('change',e=>{if(e.target.files[0])importCases(e.target.files[0])});
+
+  populateStages();clearForm();renderList();
+</script>
+</body>
+</html>
