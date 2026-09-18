@@ -861,6 +861,152 @@
         }
 
 
+
+        /* Favorites and Recently Used */
+        .personal-docs {
+            margin: 18px 0 22px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .personal-panel {
+            background: rgba(20, 40, 60, 0.72);
+            border: 1px solid #2a4d69;
+            border-radius: 11px;
+            padding: 14px;
+        }
+
+        .personal-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .personal-panel-header h2 {
+            font-size: 1rem;
+            color: #e0e0e0;
+        }
+
+        .personal-clear {
+            border: 0;
+            background: transparent;
+            color: #9fc2d9;
+            font-size: 0.76rem;
+            cursor: pointer;
+            padding: 5px 7px;
+            border-radius: 5px;
+        }
+
+        .personal-clear:hover,
+        .personal-clear:focus-visible {
+            background: rgba(70, 130, 180, 0.18);
+            color: #ffffff;
+            outline: none;
+        }
+
+        .personal-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            min-height: 34px;
+        }
+
+        .personal-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 36px;
+            padding: 7px 9px;
+            border: 1px solid #456c8a;
+            border-radius: 7px;
+            background: rgba(30, 50, 70, 0.8);
+            color: #e9f3f9;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .personal-link:hover,
+        .personal-link:focus-visible {
+            border-color: #78b7e5;
+            background: rgba(51, 83, 109, 0.95);
+            outline: none;
+        }
+
+        .personal-empty {
+            color: #91adc2;
+            font-size: 0.78rem;
+            line-height: 1.4;
+        }
+
+        .favorite-toggle {
+            flex: 0 0 auto;
+            width: 36px;
+            height: 36px;
+            margin-left: 8px;
+            border: 1px solid #456c8a;
+            border-radius: 50%;
+            background: rgba(24, 47, 65, 0.85);
+            color: #adc5d6;
+            cursor: pointer;
+            font-size: 1.05rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+
+        .favorite-toggle:hover,
+        .favorite-toggle:focus-visible {
+            transform: scale(1.05);
+            border-color: #78b7e5;
+            color: #ffffff;
+            outline: none;
+        }
+
+        .favorite-toggle.is-favorite {
+            color: #ffe38a;
+            border-color: #c7a84f;
+        }
+
+        .doc-info {
+            min-width: 0;
+        }
+
+        .doc-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        @media (max-width: 700px) {
+            .personal-docs {
+                grid-template-columns: 1fr;
+                gap: 9px;
+                margin: 14px 0 18px;
+            }
+
+            .personal-panel {
+                padding: 12px;
+            }
+
+            .favorite-toggle {
+                width: 40px;
+                height: 40px;
+                margin-left: 4px;
+            }
+
+            .personal-link {
+                min-height: 40px;
+            }
+        }
+
         /* Mobile usability */
         .mobile-search-toolbar {
             position: relative;
@@ -1098,6 +1244,28 @@
                 <div class="filter-results-summary" id="filterResultsSummary" aria-live="polite"></div>
             </div>
         </div>
+
+        <section class="personal-docs" aria-label="Personal document shortcuts">
+            <div class="personal-panel">
+                <div class="personal-panel-header">
+                    <h2>⭐ Favorites</h2>
+                    <button type="button" class="personal-clear" id="clearFavorites">Clear</button>
+                </div>
+                <div class="personal-list" id="favoritesList">
+                    <span class="personal-empty">Tap ☆ on a document to pin it here.</span>
+                </div>
+            </div>
+
+            <div class="personal-panel">
+                <div class="personal-panel-header">
+                    <h2>🕘 Recently Used</h2>
+                    <button type="button" class="personal-clear" id="clearRecents">Clear</button>
+                </div>
+                <div class="personal-list" id="recentList">
+                    <span class="personal-empty">Documents you open will appear here.</span>
+                </div>
+            </div>
+        </section>
 
         <section class="quick-tools" aria-labelledby="quickToolsTitle">
             <div class="quick-tools-header">
@@ -1989,6 +2157,196 @@
             setStat('comingSoonCount', comingSoonItems.length);
         }
 
+
+        const FAVORITES_STORAGE_KEY = 'clearexamsPoliceFavoritesV1';
+        const RECENTS_STORAGE_KEY = 'clearexamsPoliceRecentsV1';
+
+        function readLocalList(key) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || '[]');
+                return Array.isArray(value) ? value : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function writeLocalList(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+            } catch (error) {
+                // Keep the page usable even if browser storage is unavailable.
+            }
+        }
+
+        function getPrimaryDocumentLink(item) {
+            if (!item) return null;
+            return Array.from(item.querySelectorAll('.doc-actions a')).find(link => {
+                const href = (link.getAttribute('href') || '').trim().toLowerCase();
+                const text = (link.textContent || '').toLowerCase();
+                return href && href !== '#' && href !== 'javascript:void(0)' && !text.includes('coming soon') && link.style.cursor !== 'default';
+            }) || null;
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('favoritesList');
+            if (!container) return;
+
+            const favorites = readLocalList(FAVORITES_STORAGE_KEY);
+            container.innerHTML = '';
+
+            favorites.forEach(title => {
+                const item = Array.from(document.querySelectorAll('.document-item')).find(doc =>
+                    (doc.getAttribute('data-title') || '') === title
+                );
+                const link = getPrimaryDocumentLink(item);
+                if (!item || !link) return;
+
+                const shortcut = document.createElement('a');
+                shortcut.className = 'personal-link';
+                shortcut.href = link.getAttribute('href');
+                shortcut.target = '_blank';
+                shortcut.rel = 'noopener';
+                shortcut.dataset.personalTitle = title;
+                shortcut.textContent = '⭐ ' + title;
+                container.appendChild(shortcut);
+            });
+
+            if (!container.children.length) {
+                container.innerHTML = '<span class="personal-empty">Tap ☆ on a document to pin it here.</span>';
+            }
+
+            document.querySelectorAll('.favorite-toggle').forEach(button => {
+                button.classList.toggle('is-favorite', favorites.includes(button.dataset.title));
+                button.textContent = favorites.includes(button.dataset.title) ? '★' : '☆';
+                button.setAttribute('aria-label', favorites.includes(button.dataset.title)
+                    ? 'Remove ' + button.dataset.title + ' from favorites'
+                    : 'Add ' + button.dataset.title + ' to favorites');
+            });
+        }
+
+        function toggleFavorite(title) {
+            if (!title) return;
+            let favorites = readLocalList(FAVORITES_STORAGE_KEY);
+
+            if (favorites.includes(title)) {
+                favorites = favorites.filter(item => item !== title);
+                showNotification(title + ' removed from favorites.');
+            } else {
+                favorites.unshift(title);
+                favorites = favorites.slice(0, 12);
+                showNotification(title + ' added to favorites.');
+            }
+
+            writeLocalList(FAVORITES_STORAGE_KEY, favorites);
+            renderFavorites();
+        }
+
+        function renderRecents() {
+            const container = document.getElementById('recentList');
+            if (!container) return;
+
+            const recents = readLocalList(RECENTS_STORAGE_KEY);
+            container.innerHTML = '';
+
+            recents.slice(0, 8).forEach(entry => {
+                if (!entry || !entry.href || !entry.title) return;
+                const shortcut = document.createElement('a');
+                shortcut.className = 'personal-link';
+                shortcut.href = entry.href;
+                shortcut.target = '_blank';
+                shortcut.rel = 'noopener';
+                shortcut.textContent = '🕘 ' + entry.title;
+                container.appendChild(shortcut);
+            });
+
+            if (!container.children.length) {
+                container.innerHTML = '<span class="personal-empty">Documents you open will appear here.</span>';
+            }
+        }
+
+        function recordRecent(title, href) {
+            if (!title || !href || href === '#' || href === 'javascript:void(0)') return;
+
+            let recents = readLocalList(RECENTS_STORAGE_KEY).filter(entry =>
+                entry && !(entry.title === title && entry.href === href)
+            );
+
+            recents.unshift({
+                title,
+                href,
+                usedAt: Date.now()
+            });
+
+            writeLocalList(RECENTS_STORAGE_KEY, recents.slice(0, 8));
+            renderRecents();
+        }
+
+        function setupFavoritesAndRecents() {
+            document.querySelectorAll('.document-item').forEach(item => {
+                const title = item.getAttribute('data-title') || '';
+                const info = item.querySelector('.doc-info');
+                const titleElement = item.querySelector('.doc-title');
+                if (!title || !info || !titleElement || item.querySelector('.favorite-toggle')) return;
+
+                const row = document.createElement('div');
+                row.className = 'doc-title-row';
+                titleElement.parentNode.insertBefore(row, titleElement);
+                row.appendChild(titleElement);
+
+                const favoriteButton = document.createElement('button');
+                favoriteButton.type = 'button';
+                favoriteButton.className = 'favorite-toggle';
+                favoriteButton.dataset.title = title;
+                favoriteButton.textContent = '☆';
+                favoriteButton.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleFavorite(title);
+                });
+                row.appendChild(favoriteButton);
+            });
+
+            document.addEventListener('click', event => {
+                const link = event.target.closest('.doc-actions a, .quick-tool, .workflow-link, .personal-link');
+                if (!link) return;
+
+                const href = (link.getAttribute('href') || '').trim();
+                const text = (link.textContent || '').toLowerCase();
+                if (!href || href === '#' || href === 'javascript:void(0)' || text.includes('coming soon')) return;
+
+                const docItem = link.closest('.document-item');
+                const title =
+                    link.dataset.personalTitle ||
+                    link.dataset.document ||
+                    link.dataset.tool ||
+                    (docItem ? docItem.getAttribute('data-title') : '') ||
+                    link.textContent.trim();
+
+                recordRecent(title, href);
+            }, true);
+
+            const clearFavorites = document.getElementById('clearFavorites');
+            if (clearFavorites) {
+                clearFavorites.addEventListener('click', () => {
+                    writeLocalList(FAVORITES_STORAGE_KEY, []);
+                    renderFavorites();
+                    showNotification('Favorites cleared.');
+                });
+            }
+
+            const clearRecents = document.getElementById('clearRecents');
+            if (clearRecents) {
+                clearRecents.addEventListener('click', () => {
+                    writeLocalList(RECENTS_STORAGE_KEY, []);
+                    renderRecents();
+                    showNotification('Recent documents cleared.');
+                });
+            }
+
+            renderFavorites();
+            renderRecents();
+        }
+
         function setupGlobalLinkHandlers() {
             document.querySelectorAll('.doc-actions a').forEach(link => {
                 if (link.getAttribute('href') === '#' || link.getAttribute('href') === 'javascript:void(0)' || link
@@ -2044,6 +2402,7 @@
             setupGlobalLinkHandlers();
             updateDashboardStats();
             setupMobileNavigation();
+            setupFavoritesAndRecents();
             setupDashboardNavigation();
             setupDocumentFilters();
             setupQuickTools();
