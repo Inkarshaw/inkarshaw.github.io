@@ -31,6 +31,25 @@
             padding-bottom: 15px;
             border-bottom: 2px solid #eaeaea;
         }
+
+        .case-load-banner {
+            display: none;
+            margin: 0 0 20px;
+            padding: 12px 14px;
+            border: 1px solid #b9cfe4;
+            border-radius: 8px;
+            background: #eef6fd;
+            color: #27445f;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .case-load-banner.visible {
+            display: block;
+        }
+        .case-load-banner strong {
+            color: #173a5a;
+        }
+
         .form-section {
             margin-bottom: 25px;
             padding: 20px;
@@ -294,6 +313,7 @@
 <body>
     <div class="container">
         <h1>CDR Request Generator</h1>
+        <div class="case-load-banner" id="caseLoadBanner"></div>
         
         <form id="cdrForm">
             <div class="form-section">
@@ -469,6 +489,38 @@
             const currentYear = new Date().getFullYear().toString();
             document.getElementById('fromDate').value = today;
             document.getElementById('crimeYear').value = currentYear;
+
+            // Prefill common case details from ClearExams My Cases when available.
+            try {
+                const currentCase = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
+                if (currentCase) {
+                    if (currentCase.crimeNo) document.getElementById('crimeCrNo').value = currentCase.crimeNo;
+                    if (currentCase.crimeYear) document.getElementById('crimeYear').value = currentCase.crimeYear;
+                    if (currentCase.sections) document.getElementById('crimeSection').value = currentCase.sections;
+
+                    if (currentCase.policeStation) {
+                        const wanted = currentCase.policeStation.trim().toLowerCase();
+                        const matchingOption = Array.from(policeStationSelect.options).find(option => {
+                            const value = (option.value || '').trim().toLowerCase();
+                            return value && value !== 'other' && (value === wanted || wanted.includes(value) || value.includes(wanted));
+                        });
+                        if (matchingOption) {
+                            policeStationSelect.value = matchingOption.value;
+                            policeStationSelect.dispatchEvent(new Event('change'));
+                        }
+                    }
+
+                    const banner = document.getElementById('caseLoadBanner');
+                    if (banner) {
+                        const caseNo = [currentCase.crimeNo, currentCase.crimeYear].filter(Boolean).join('/') || 'No case number';
+                        const station = currentCase.policeStation || 'Police station not matched';
+                        banner.textContent = 'Loaded from My Cases: ' + caseNo + ' · ' + station;
+                        banner.classList.add('visible');
+                    }
+                }
+            } catch (error) {
+                // Ignore unavailable/corrupt browser-local case data.
+            }
             
             // Set default "From" date in the mobile number cards
             const fromDateInputs = document.querySelectorAll('.from-date');
