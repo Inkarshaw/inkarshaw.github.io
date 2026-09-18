@@ -198,22 +198,6 @@
             height: 80px;
             resize: vertical;
         }
-        .mobile-telecom-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .mobile-number-input {
-            width: 100%;
-        }
-        .telecom-select {
-            width: 100%;
-        }
-        .telecom-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 2px;
-        }
         
         /* Vertical mobile numbers layout */
         .mobile-numbers-container {
@@ -382,18 +366,6 @@
                             <div class="mobile-number-full-width">
                                 <label for="mobileNumber0">Mobile/IMEI Number:</label>
                                 <input type="text" id="mobileNumber0" class="mobile-number" placeholder="Enter mobile or IMEI number" required>
-                            </div>
-                            <div class="mobile-number-full-width">
-                                <label for="telecomProvider0">Telecom Provider:</label>
-                                <select id="telecomProvider0" class="telecom-provider" required>
-                                    <option value="">Select Telecom Provider</option>
-                                    <option value="Airtel">Airtel</option>
-                                    <option value="Jio">Jio</option>
-                                    <option value="Vodafone Idea">Vodafone Idea</option>
-                                    <option value="BSNL">BSNL</option>
-                                    <option value="MTNL">MTNL</option>
-                                    <option value="Other">Other</option>
-                                </select>
                             </div>
                             <div class="date-fields">
                                 <div class="field-with-checkbox">
@@ -632,18 +604,6 @@
                             <label for="mobileNumber${newIndex}">Mobile/IMEI Number:</label>
                             <input type="text" id="mobileNumber${newIndex}" class="mobile-number" placeholder="Enter mobile or IMEI number" required>
                         </div>
-                        <div class="mobile-number-full-width">
-                            <label for="telecomProvider${newIndex}">Telecom Provider:</label>
-                            <select id="telecomProvider${newIndex}" class="telecom-provider" required>
-                                <option value="">Select Telecom Provider</option>
-                                <option value="Airtel">Airtel</option>
-                                <option value="Jio">Jio</option>
-                                <option value="Vodafone Idea">Vodafone Idea</option>
-                                <option value="BSNL">BSNL</option>
-                                <option value="MTNL">MTNL</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
                         <div class="date-fields">
                             <div class="field-with-checkbox">
                                 <label for="fromDate${newIndex}">From Date:</label>
@@ -835,7 +795,6 @@
                             
                             formData.mobileNumbers.push({
                                 mobileNumber: card.querySelector('.mobile-number').value,
-                                telecomProvider: card.querySelector('.telecom-provider').value,
                                 fromDate: card.querySelector('.from-date').value,
                                 toDate: toDateValue,
                                 relation: card.querySelector('.relation').value,
@@ -954,13 +913,13 @@
                     // Table header - Adjusted to fit within margins
                     const tableHeaders = ['S.No.', 'Mobile/IMEI Number', 'From', 'To', 'Whose/How related'];
                     
-                    // Calculate column widths - FIRST COLUMN: 13mm, SECOND COLUMN: 64mm
+                    // Column widths sized to fit within the A4 content area
                     const columnWidths = [
-                        13,  // S.No. - INCREASED to 13mm
-                        64,  // Mobile/IMEI Number - DECREASED to 64mm
-                        25,  // From - smaller for dates
-                        25,  // To - smaller for dates
-                        43   // Whose/How related - adjusted to balance
+                        13,  // S.No.
+                        53,  // Mobile/IMEI Number
+                        24,  // From
+                        24,  // To
+                        45   // Whose/How related
                     ];
                     
                     // Draw table header with bold text
@@ -984,8 +943,8 @@
                         doc.text((i + 1).toString(), xPosition + 5, yPosition + 7);
                         xPosition += columnWidths[0];
                         
-                        // Mobile/IMEI Number & Telecom Provider
-                        const mobileText = `${mobileData.mobileNumber} (${mobileData.telecomProvider})`;
+                        // Mobile/IMEI Number
+                        const mobileText = mobileData.mobileNumber;
                         const splitMobile = doc.splitTextToSize(mobileText, columnWidths[1] - 4);
                         doc.rect(xPosition, yPosition, columnWidths[1], 10);
                         doc.text(splitMobile[0], xPosition + 2, yPosition + 7);
