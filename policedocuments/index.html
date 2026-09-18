@@ -862,6 +862,29 @@
 
 
 
+
+        /* Focused search results mode */
+        body.search-results-mode .stats,
+        body.search-results-mode .personal-docs,
+        body.search-results-mode .quick-tools,
+        body.search-results-mode .workflow-bundles,
+        body.search-results-mode .dashboard-panel {
+            display: none !important;
+        }
+
+        body.search-results-mode .content {
+            margin-top: 12px;
+        }
+
+        body.search-results-mode .card {
+            max-height: none;
+        }
+
+        body.search-results-mode .document-list {
+            max-height: none;
+            overflow-y: visible;
+        }
+
         /* Favorites and Recently Used */
         .personal-docs {
             margin: 18px 0 22px;
@@ -1344,6 +1367,7 @@
                     <div class="workflow-desc">Section 194 BNSS, post-mortem request and related death-report documents.</div>
                     <div class="workflow-links">
                         <a class="workflow-link" href="/policedocuments/pmforms/death_report.html" target="_blank" data-workflow="Death / Inquest" data-document="Death Report BNSS">Death Report</a>
+                        <a class="workflow-link" href="/policedocuments/pmforms/inquest_form.pdf" target="_blank" data-workflow="Death / Inquest" data-document="Inquest Form">Inquest Form</a>
                         <a class="workflow-link" href="/policedocuments/pm_request.html" target="_blank" data-workflow="Death / Inquest" data-document="PM Request Letter">PM Request</a>
                         <a class="workflow-link" href="/policedocuments/pmforms/pm_form.doc" target="_blank" data-workflow="Death / Inquest" data-document="PM Form">PM Form</a>
                         <a class="workflow-link" href="/policedocuments/pm_death_report.doc" target="_blank" data-workflow="Death / Inquest" data-document="PM Death Report">PM Death Report</a>
@@ -2025,7 +2049,10 @@
         function performSearch() {
             const searchInput = document.getElementById('searchInput');
             const searchTerm = (searchInput ? searchInput.value : '').toLowerCase().trim();
-            const hasActiveQuery = searchTerm !== '' || activeDocumentFilter !== 'all';
+            const isTextSearching = searchTerm !== '';
+            const hasActiveQuery = isTextSearching || activeDocumentFilter !== 'all';
+
+            document.body.classList.toggle('search-results-mode', isTextSearching);
             const sections = [
                 { listId: 'downloadFormsList', infoId: 'downloadFormsInfo' },
                 { listId: 'generatePDFsList', infoId: 'generatePDFsInfo' },
@@ -2051,7 +2078,11 @@
                 items.forEach(item => {
                     const title = (item.getAttribute('data-title') || '').toLowerCase();
                     const desc = (item.getAttribute('data-desc') || '').toLowerCase();
-                    const textMatches = searchTerm === '' || title.includes(searchTerm) || desc.includes(searchTerm);
+                    const visibleText = (item.textContent || '').toLowerCase();
+                    const textMatches = searchTerm === '' ||
+                        title.includes(searchTerm) ||
+                        desc.includes(searchTerm) ||
+                        visibleText.includes(searchTerm);
                     const filterMatches = documentMatchesFilter(item, activeDocumentFilter);
                     const matches = textMatches && filterMatches;
 
