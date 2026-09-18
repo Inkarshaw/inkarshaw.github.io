@@ -443,6 +443,96 @@
             font-size: 0.9rem;
         }
 
+
+        /* Quick Tools */
+        .quick-tools {
+            margin: 18px 0 22px;
+        }
+
+        .quick-tools-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .quick-tools-header h2 {
+            font-size: 1.25rem;
+            color: #e0e0e0;
+        }
+
+        .quick-tools-header span {
+            color: #8fb3cf;
+            font-size: 0.85rem;
+        }
+
+        .quick-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .quick-tool {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 82px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #355b78;
+            background: rgba(30, 50, 70, 0.72);
+            color: #f0f0f0;
+            text-decoration: none;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .quick-tool:hover,
+        .quick-tool:focus-visible {
+            transform: translateY(-2px);
+            border-color: #78b7e5;
+            background: rgba(40, 70, 100, 0.9);
+            outline: none;
+        }
+
+        .quick-tool-icon {
+            font-size: 1.35rem;
+            margin-bottom: 6px;
+        }
+
+        .quick-tool-name {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .quick-tool-type {
+            color: #a9c4d8;
+            font-size: 0.75rem;
+            margin-top: 3px;
+        }
+
+        @media (max-width: 1100px) {
+            .quick-tools-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .quick-tools-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .quick-tool {
+                min-height: 78px;
+            }
+
+            .quick-tools-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
         /* Police Work Dashboard */
         .dashboard-panel {
             margin: 24px 0 28px;
@@ -595,6 +685,51 @@
             <input type="text" id="searchInput" placeholder="Search for documents, forms, or reports..." />
             <button id="searchButton">Search</button>
         </div>
+
+        <section class="quick-tools" aria-labelledby="quickToolsTitle">
+            <div class="quick-tools-header">
+                <h2 id="quickToolsTitle">⚡ Quick Tools</h2>
+                <span>Frequently used police documents</span>
+            </div>
+
+            <div class="quick-tools-grid">
+                <a class="quick-tool" href="/policedocuments/statement_maker.html" target="_blank" data-tool="Statement Maker">
+                    <span class="quick-tool-icon">🗣️</span>
+                    <span class="quick-tool-name">Statement Maker</span>
+                    <span class="quick-tool-type">Generator</span>
+                </a>
+
+                <a class="quick-tool" href="/policedocuments/formal_letter_generator.html" target="_blank" data-tool="Formal Letter Generator">
+                    <span class="quick-tool-icon">✉️</span>
+                    <span class="quick-tool-name">Formal Letter</span>
+                    <span class="quick-tool-type">Generator</span>
+                </a>
+
+                <a class="quick-tool" href="/policedocuments/cdr_request_generator.html" target="_blank" data-tool="CDR Request">
+                    <span class="quick-tool-icon">📱</span>
+                    <span class="quick-tool-name">CDR Request</span>
+                    <span class="quick-tool-type">Generator</span>
+                </a>
+
+                <a class="quick-tool" href="/policedocuments/remand_warrant.html" target="_blank" data-tool="Remand Warrant">
+                    <span class="quick-tool-icon">⚖️</span>
+                    <span class="quick-tool-name">Remand Warrant</span>
+                    <span class="quick-tool-type">Generator</span>
+                </a>
+
+                <a class="quick-tool" href="/policedocuments/remand_documents/arrest_card.doc" target="_blank" data-tool="Arrest Card">
+                    <span class="quick-tool-icon">👮</span>
+                    <span class="quick-tool-name">Arrest Card</span>
+                    <span class="quick-tool-type">Word form</span>
+                </a>
+
+                <a class="quick-tool" href="/policedocuments/misc/police_notice.docx" target="_blank" data-tool="Notice 35 BNSS">
+                    <span class="quick-tool-icon">📄</span>
+                    <span class="quick-tool-name">Notice 35 BNSS</span>
+                    <span class="quick-tool-type">Word form</span>
+                </a>
+            </div>
+        </section>
 
         <section class="dashboard-panel" aria-labelledby="dashboardTitle">
             <div class="dashboard-heading">
@@ -1107,6 +1242,21 @@
             }
         }
 
+
+        function setupQuickTools() {
+            document.querySelectorAll('.quick-tool').forEach(link => {
+                link.addEventListener('click', () => {
+                    const toolName = link.dataset.tool || link.textContent.trim();
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'quick_tool_open', {
+                            'event_category': 'document',
+                            'event_label': toolName
+                        });
+                    }
+                });
+            });
+        }
+
         function setupDashboardNavigation() {
             document.querySelectorAll('.category-tile').forEach(button => {
                 button.addEventListener('click', () => {
@@ -1269,6 +1419,7 @@
             if (searchButton) searchButton.addEventListener('click', performSearch);
             setupGlobalLinkHandlers();
             setupDashboardNavigation();
+            setupQuickTools();
             applyDashboardCategory('all', false);
 
             const statValueSpan = document.getElementById('formsCount');
