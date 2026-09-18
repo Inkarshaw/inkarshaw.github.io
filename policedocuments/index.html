@@ -444,6 +444,61 @@
         }
 
 
+
+        /* Document Filters */
+        .document-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: -8px 0 22px;
+        }
+
+        .filter-chip {
+            border: 1px solid #355b78;
+            background: rgba(30, 50, 70, 0.72);
+            color: #cfe1ef;
+            border-radius: 999px;
+            padding: 8px 13px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .filter-chip:hover,
+        .filter-chip:focus-visible {
+            border-color: #78b7e5;
+            background: rgba(40, 70, 100, 0.9);
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        .filter-chip.active {
+            background: #3a6d9a;
+            border-color: #8dccf2;
+            color: #fff;
+        }
+
+        .filter-results-summary {
+            width: 100%;
+            color: #93b2c9;
+            font-size: 0.8rem;
+            margin-top: 2px;
+            min-height: 1.1em;
+        }
+
+        @media (max-width: 600px) {
+            .document-filters {
+                gap: 7px;
+            }
+
+            .filter-chip {
+                flex: 1 1 calc(33.333% - 7px);
+                text-align: center;
+                padding: 8px 8px;
+            }
+        }
+
         /* Quick Tools */
         .quick-tools {
             margin: 18px 0 22px;
@@ -774,6 +829,16 @@
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Search for documents, forms, or reports..." />
             <button id="searchButton">Search</button>
+        </div>
+
+        <div class="document-filters" id="documentFilters" aria-label="Document type filters">
+            <button type="button" class="filter-chip active" data-filter="all">All</button>
+            <button type="button" class="filter-chip" data-filter="generate">⚙️ Generate</button>
+            <button type="button" class="filter-chip" data-filter="word">📝 Word</button>
+            <button type="button" class="filter-chip" data-filter="pdf">📄 PDF</button>
+            <button type="button" class="filter-chip" data-filter="reference">📚 Reference</button>
+            <button type="button" class="filter-chip" data-filter="coming">🕒 Coming Soon</button>
+            <div class="filter-results-summary" id="filterResultsSummary" aria-live="polite"></div>
         </div>
 
         <section class="quick-tools" aria-labelledby="quickToolsTitle">
@@ -1415,8 +1480,14 @@
                     const searchInput = document.getElementById('searchInput');
                     if (searchInput && searchInput.value) {
                         searchInput.value = '';
-                        performSearch();
                     }
+
+                    activeDocumentFilter = 'all';
+                    document.querySelectorAll('.filter-chip').forEach(chip => {
+                        chip.classList.toggle('active', chip.dataset.filter === 'all');
+                    });
+
+                    performSearch();
                     applyDashboardCategory(button.dataset.target);
                 });
             });
@@ -1442,15 +1513,53 @@
             return text.replace(regex, '<span class="search-highlight">$1</span>');
         }
 
-        function performSearch() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        let activeDocumentFilter = 'all';
 
-            if (searchTerm !== '') {
-                document.querySelectorAll('.content > .card').forEach(card => {
-                    card.style.display = '';
-                    card.classList.remove('dashboard-focus');
+        function documentMatchesFilter(item, filter) {
+            if (filter === 'all') return true;
+
+            const links = Array.from(item.querySelectorAll('.doc-actions a'));
+            const hrefs = links.map(link => (link.getAttribute('href') || '').toLowerCase());
+            const classes = links.map(link => link.className || '').join(' ').toLowerCase();
+            const actionText = links.map(link => link.textContent || '').join(' ').toLowerCase();
+            const title = (item.getAttribute('data-title') || '').toLowerCase();
+            const desc = (item.getAttribute('data-desc') || '').toLowerCase();
+            const searchable = title + ' ' + desc;
+
+            if (filter === 'generate') {
+                return hrefs.some(href => href.endsWith('.html')) ||
+                    /btn-generate|btn-crb|btn-election|btn-remand|btn-bnss|btn-court/.test(classes) ||
+                    /generate/.test(actionText);
+            }
+
+            if (filter === 'word') {
+                return hrefs.some(href => /\.(doc|docx)(\?|#|$)/.test(href)) || classes.includes('btn-word');
+            }
+
+            if (filter === 'pdf') {
+                return hrefs.some(href => /\.pdf(\?|#|$)/.test(href)) || classes.includes('btn-pdf');
+            }
+
+            if (filter === 'reference') {
+                return classes.includes('btn-misc') ||
+                    /\b(go|government order|sop|guideline|guidelines|rti|pso|parade book|reference|court order)\b/.test(searchable);
+            }
+
+            if (filter === 'coming') {
+                return links.some(link => {
+                    const href = (link.getAttribute('href') || '').trim().toLowerCase();
+                    const text = (link.textContent || '').toLowerCase();
+                    return href === '#' || href === 'javascript:void(0)' || text.includes('coming soon') || link.style.cursor === 'default';
                 });
             }
+
+            return true;
+        }
+
+        function performSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = (searchInput ? searchInput.value : '').toLowerCase().trim();
+            const hasActiveQuery = searchTerm !== '' || activeDocumentFilter !== 'all';
             const sections = [
                 { listId: 'downloadFormsList', infoId: 'downloadFormsInfo' },
                 { listId: 'generatePDFsList', infoId: 'generatePDFsInfo' },
@@ -1464,57 +1573,86 @@
                 { listId: 'miscList', infoId: 'miscInfo' }
             ];
 
+            let totalFound = 0;
+
             sections.forEach(section => {
                 const container = document.getElementById(section.listId);
                 if (!container) return;
+
                 const items = container.querySelectorAll('.document-item');
                 let foundCount = 0;
 
                 items.forEach(item => {
-                    const title = item.getAttribute('data-title').toLowerCase();
-                    const desc = item.getAttribute('data-desc').toLowerCase();
-                    const matches = (searchTerm === '' || title.includes(searchTerm) || desc.includes(
-                    searchTerm));
+                    const title = (item.getAttribute('data-title') || '').toLowerCase();
+                    const desc = (item.getAttribute('data-desc') || '').toLowerCase();
+                    const textMatches = searchTerm === '' || title.includes(searchTerm) || desc.includes(searchTerm);
+                    const filterMatches = documentMatchesFilter(item, activeDocumentFilter);
+                    const matches = textMatches && filterMatches;
 
-                    if (matches) {
-                        item.style.display = 'flex';
-                        if (searchTerm !== '') {
-                            const titleElem = item.querySelector('.doc-title');
-                            const descElem = item.querySelector('.doc-desc');
-                            if (titleElem) titleElem.innerHTML = highlightText(titleElem.textContent,
-                            searchTerm);
-                            if (descElem) descElem.innerHTML = highlightText(descElem.textContent,
-                            searchTerm);
-                        }
-                        foundCount++;
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    item.style.display = matches ? 'flex' : 'none';
+                    if (matches) foundCount++;
                 });
+
+                totalFound += foundCount;
 
                 const infoSpan = document.getElementById(section.infoId);
                 if (infoSpan) {
-                    if (searchTerm === '') infoSpan.textContent = '';
-                    else infoSpan.textContent = foundCount > 0 ? `${foundCount} item${foundCount !== 1 ? 's' : ''} found` :
-                        'No results';
+                    infoSpan.textContent = hasActiveQuery
+                        ? (foundCount > 0 ? `${foundCount} item${foundCount !== 1 ? 's' : ''}` : '')
+                        : '';
                 }
 
-                if (searchTerm !== '') {
-                    const card = container.closest('.card');
-                    if (card) card.style.display = foundCount > 0 ? '' : 'none';
+                const card = container.closest('.card');
+                if (card && hasActiveQuery) {
+                    card.style.display = foundCount > 0 ? '' : 'none';
+                    card.classList.remove('dashboard-focus');
                 }
             });
 
-            if (searchTerm === '') {
+            if (!hasActiveQuery) {
                 applyDashboardCategory(activeDashboardCategory, false);
+            }
+
+            const summary = document.getElementById('filterResultsSummary');
+            if (summary) {
+                if (!hasActiveQuery) {
+                    summary.textContent = '';
+                } else {
+                    const filterLabel = activeDocumentFilter === 'all'
+                        ? 'All types'
+                        : (document.querySelector(`.filter-chip[data-filter="${activeDocumentFilter}"]`)?.textContent.trim() || activeDocumentFilter);
+                    summary.textContent = `${totalFound} result${totalFound !== 1 ? 's' : ''} • ${filterLabel}`;
+                }
             }
 
             if (searchTerm !== '' && typeof gtag !== 'undefined') {
                 gtag('event', 'search_performed', {
                     'event_category': 'search',
-                    'search_term': searchTerm
+                    'search_term': searchTerm,
+                    'document_filter': activeDocumentFilter
                 });
             }
+        }
+
+        function setupDocumentFilters() {
+            document.querySelectorAll('.filter-chip').forEach(button => {
+                button.addEventListener('click', () => {
+                    activeDocumentFilter = button.dataset.filter || 'all';
+
+                    document.querySelectorAll('.filter-chip').forEach(chip => {
+                        chip.classList.toggle('active', chip === button);
+                    });
+
+                    performSearch();
+
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'document_filter_selected', {
+                            'event_category': 'search',
+                            'event_label': activeDocumentFilter
+                        });
+                    }
+                });
+            });
         }
 
         function setupGlobalLinkHandlers() {
@@ -1571,6 +1709,7 @@
             if (searchButton) searchButton.addEventListener('click', performSearch);
             setupGlobalLinkHandlers();
             setupDashboardNavigation();
+            setupDocumentFilters();
             setupQuickTools();
             setupWorkflowBundles();
             applyDashboardCategory('all', false);
