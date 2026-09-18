@@ -860,6 +860,195 @@
             }
         }
 
+
+        /* Mobile usability */
+        .mobile-search-toolbar {
+            position: relative;
+            z-index: 50;
+        }
+
+        .back-to-top {
+            position: fixed;
+            right: 16px;
+            bottom: 18px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid #78b7e5;
+            background: #234b68;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.35);
+            z-index: 1200;
+        }
+
+        .back-to-top.visible {
+            display: flex;
+        }
+
+        .back-to-top:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px 12px;
+                margin-bottom: 16px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                line-height: 1.15;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+
+            .mobile-search-toolbar {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                margin: 0 -10px 18px;
+                padding: 9px 10px 8px;
+                background: rgba(13, 27, 42, 0.96);
+                border-bottom: 1px solid #2a4d69;
+                backdrop-filter: blur(10px);
+            }
+
+            .search-box {
+                margin-bottom: 8px;
+                gap: 7px;
+            }
+
+            .search-box input {
+                min-height: 46px;
+                padding: 10px 12px;
+                font-size: 16px;
+            }
+
+            .search-box button {
+                min-width: 76px;
+                min-height: 46px;
+                padding: 0 12px;
+                font-size: 0.88rem;
+                font-weight: 700;
+            }
+
+            .document-filters {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                gap: 7px;
+                margin: 0;
+                padding: 2px 0 5px;
+                scrollbar-width: thin;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .filter-chip {
+                flex: 0 0 auto;
+                min-height: 40px;
+                padding: 8px 12px;
+                white-space: nowrap;
+            }
+
+            .filter-results-summary {
+                flex: 0 0 auto;
+                width: auto;
+                min-width: max-content;
+                display: flex;
+                align-items: center;
+                padding: 0 4px;
+            }
+
+            .content {
+                gap: 14px;
+            }
+
+            .card {
+                padding: 16px 12px;
+                border-radius: 9px;
+            }
+
+            .card:hover {
+                transform: none;
+            }
+
+            .card h2 {
+                font-size: 1.12rem;
+                margin-bottom: 13px;
+            }
+
+            .document-list {
+                max-height: none;
+                overflow-y: visible;
+                padding-right: 0;
+            }
+
+            .document-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 13px 12px;
+                margin-bottom: 10px;
+            }
+
+            .doc-title {
+                font-size: 0.96rem;
+                line-height: 1.35;
+            }
+
+            .doc-desc {
+                font-size: 0.82rem;
+                line-height: 1.45;
+            }
+
+            .doc-actions {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 7px;
+            }
+
+            .doc-actions .btn {
+                flex: 1 1 120px;
+                min-height: 44px;
+                justify-content: center;
+                text-align: center;
+                padding: 9px 10px;
+            }
+
+            .quick-tool,
+            .category-tile,
+            .workflow-link {
+                min-height: 44px;
+            }
+
+            .workflow-links {
+                gap: 8px;
+            }
+
+            .workflow-link {
+                padding: 9px 10px;
+            }
+
+            footer {
+                margin-top: 28px;
+                padding: 18px 8px 70px;
+                line-height: 1.5;
+            }
+        }
+
     </style>
 </head>
 
@@ -893,19 +1082,21 @@
             </div>
         </div>
 
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search for documents, forms, or reports..." />
-            <button id="searchButton">Search</button>
-        </div>
+        <div class="mobile-search-toolbar">
+            <div class="search-box">
+                <input type="search" id="searchInput" placeholder="Search police documents..." autocomplete="off" enterkeyhint="search" />
+                <button id="searchButton" type="button" aria-label="Search documents">Search</button>
+            </div>
 
-        <div class="document-filters" id="documentFilters" aria-label="Document type filters">
-            <button type="button" class="filter-chip active" data-filter="all">All</button>
-            <button type="button" class="filter-chip" data-filter="generate">⚙️ Generate</button>
-            <button type="button" class="filter-chip" data-filter="word">📝 Word</button>
-            <button type="button" class="filter-chip" data-filter="pdf">📄 PDF</button>
-            <button type="button" class="filter-chip" data-filter="reference">📚 Reference</button>
-            <button type="button" class="filter-chip" data-filter="coming">🕒 Coming Soon</button>
-            <div class="filter-results-summary" id="filterResultsSummary" aria-live="polite"></div>
+            <div class="document-filters" id="documentFilters" aria-label="Document type filters">
+                <button type="button" class="filter-chip active" data-filter="all">All</button>
+                <button type="button" class="filter-chip" data-filter="generate">⚙️ Generate</button>
+                <button type="button" class="filter-chip" data-filter="word">📝 Word</button>
+                <button type="button" class="filter-chip" data-filter="pdf">📄 PDF</button>
+                <button type="button" class="filter-chip" data-filter="reference">📚 Reference</button>
+                <button type="button" class="filter-chip" data-filter="coming">🕒 Coming Soon</button>
+                <div class="filter-results-summary" id="filterResultsSummary" aria-live="polite"></div>
+            </div>
         </div>
 
         <section class="quick-tools" aria-labelledby="quickToolsTitle">
@@ -1492,6 +1683,8 @@
         </footer>
     </div>
 
+    <button type="button" class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">↑</button>
+
     <div class="notification" id="notification">
         Document action completed successfully.
     </div>
@@ -1741,6 +1934,25 @@
         }
 
 
+
+        function setupMobileNavigation() {
+            const backToTop = document.getElementById('backToTop');
+            if (!backToTop) return;
+
+            const updateBackToTop = () => {
+                backToTop.classList.toggle('visible', window.scrollY > 500);
+            };
+
+            window.addEventListener('scroll', updateBackToTop, { passive: true });
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) searchInput.focus({ preventScroll: true });
+            });
+
+            updateBackToTop();
+        }
+
         function updateDashboardStats() {
             const documentItems = Array.from(document.querySelectorAll('.document-item'));
             const categoryCards = Array.from(document.querySelectorAll('.content > .card'));
@@ -1831,6 +2043,7 @@
             if (searchButton) searchButton.addEventListener('click', performSearch);
             setupGlobalLinkHandlers();
             updateDashboardStats();
+            setupMobileNavigation();
             setupDashboardNavigation();
             setupDocumentFilters();
             setupQuickTools();
