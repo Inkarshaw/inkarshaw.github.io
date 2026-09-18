@@ -863,6 +863,58 @@
 
 
 
+
+        /* Current case handoff */
+        .current-case-banner {
+            display: none;
+            margin: 0 0 18px;
+            padding: 13px 15px;
+            border: 1px solid #3d6e90;
+            border-radius: 10px;
+            background: rgba(25, 58, 82, 0.88);
+            color: #e8f4fb;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .current-case-banner.visible {
+            display: flex;
+        }
+
+        .current-case-banner strong {
+            color: #ffffff;
+        }
+
+        .current-case-details {
+            flex: 1;
+            min-width: 0;
+            font-size: 0.86rem;
+            line-height: 1.4;
+        }
+
+        .current-case-banner a {
+            flex: 0 0 auto;
+            min-height: 38px;
+            padding: 8px 11px;
+            border: 1px solid #78b7e5;
+            border-radius: 7px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        @media (max-width: 700px) {
+            .current-case-banner {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .current-case-banner a {
+                text-align: center;
+            }
+        }
+
         /* Focused search results mode */
         body.search-results-mode .stats,
         body.search-results-mode .personal-docs,
@@ -1231,6 +1283,11 @@
             <h1>Police Documentation Tools</h1>
             <p class="subtitle">Forms, document generators, workflow kits and references for police documentation.</p>
         </header>
+
+        <div class="current-case-banner" id="currentCaseBanner">
+            <div class="current-case-details" id="currentCaseDetails"></div>
+            <a href="/mycases/">Change Case</a>
+        </div>
 
         <div class="stats" aria-label="Police document library statistics">
             <div class="stat-item">
@@ -2154,6 +2211,32 @@
 
 
 
+
+        function setupCurrentCaseBanner() {
+            const banner = document.getElementById('currentCaseBanner');
+            const details = document.getElementById('currentCaseDetails');
+            if (!banner || !details) return;
+
+            try {
+                const currentCase = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
+                if (!currentCase) return;
+
+                const caseNo = [currentCase.crimeNo, currentCase.crimeYear].filter(Boolean).join('/') || 'No case number';
+                const station = currentCase.policeStation || 'Police station not set';
+                const sections = currentCase.sections || 'Sections not set';
+
+                details.innerHTML =
+                    '<strong>Current case:</strong> ' +
+                    caseNo.replace(/[&<>"']/g, '') + ' · ' +
+                    station.replace(/[&<>"']/g, '') + ' · ' +
+                    sections.replace(/[&<>"']/g, '');
+
+                banner.classList.add('visible');
+            } catch (error) {
+                // Ignore unavailable/corrupt browser-local case data.
+            }
+        }
+
         function setupMobileNavigation() {
             const backToTop = document.getElementById('backToTop');
             if (!backToTop) return;
@@ -2453,6 +2536,7 @@
             setupGlobalLinkHandlers();
             updateDashboardStats();
             setupMobileNavigation();
+            setupCurrentCaseBanner();
             setupFavoritesAndRecents();
             setupDashboardNavigation();
             setupDocumentFilters();
