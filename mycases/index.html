@@ -287,7 +287,13 @@
       try{
         const data=JSON.parse(reader.result),incoming=Array.isArray(data)?data:data.cases;
         if(!Array.isArray(incoming))throw new Error('Invalid file');
-        const map=new Map(cases.map(c=>[c.id,c]));incoming.forEach(c=>{if(c&&typeof c==='object')map.set(c.id||uid(),c)});
+        const map=new Map(cases.map(c=>[c.id,c]));
+        incoming.forEach(c=>{
+          if(!c||typeof c!=='object')return;
+          const imported={...c};
+          if(!imported.id)imported.id=uid();
+          map.set(imported.id,imported);
+        });
         cases=[...map.values()];saveCases();renderList();showToast('Backup imported.');
       }catch(e){showToast('Could not import this file.')}
       $('importFile').value='';
