@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const autoSaveIndicator = document.getElementById('auto-save-indicator');
             const contentStatus = document.getElementById('content-status');
             const contentStatusText = document.getElementById('content-status-text');
+            const documentOverflowWarning = document.getElementById('document-overflow-warning');
             const accusedSection = document.getElementById('accused-section');
             const courtSection = document.getElementById('court-section');
             const transferFields = document.getElementById('transfer-fields');
@@ -1097,6 +1098,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateMLPassportFields();
                 }
                 
+                updateDocumentOverflowWarning();
+
                 if (!skipValidation) {
                     showNotification('Document preview updated successfully', 'success');
                 }
@@ -1306,6 +1309,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            function updateDocumentOverflowWarning() {
+                const element = document.getElementById('document-to-print');
+                if (!element) return false;
+
+                const overflowed =
+                    element.scrollHeight > element.clientHeight + 2 ||
+                    element.scrollWidth > element.clientWidth + 2;
+
+                documentOverflowWarning.classList.toggle('hidden', !overflowed);
+                return overflowed;
+            }
+
+            function ensureDocumentFitsA4() {
+                if (!updateDocumentOverflowWarning()) return true;
+
+                showNotification(
+                    'Document exceeds one A4 page. Reduce entries or shorten details before export.',
+                    'error'
+                );
+                documentOverflowWarning.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                return false;
+            }
+
             function printDocument() {
                 if (!validateForm()) {
                     showNotification('Please fix the errors in the form before printing', 'error');
@@ -1313,6 +1342,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 fillDocumentPreview(true);
+                if (!ensureDocumentFitsA4()) return;
                 window.print();
                 showNotification('Document sent to printer', 'success');
             }
@@ -1361,6 +1391,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Always refresh the preview so the PDF contains the latest form values.
                 fillDocumentPreview(true);
+                if (!ensureDocumentFitsA4()) return;
                 
                 generateBtn.innerHTML = '<span class="spinner"></span> Generating PDF...';
                 generateBtn.disabled = true;
