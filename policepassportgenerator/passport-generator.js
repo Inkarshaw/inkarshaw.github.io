@@ -1749,11 +1749,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 setupInputPresets(document);
                 setupQuickDateTimeActions();
                 
-                // Add specific event listeners for crime number formatting
+                // Optimize crime-number entry for phones and normalize number/year automatically.
                 const crimeNumberInputs = document.querySelectorAll('input[id$="CrimeNumber"]');
                 crimeNumberInputs.forEach(input => {
+                    input.setAttribute('inputmode', 'numeric');
+                    input.setAttribute('autocomplete', 'off');
+                    input.setAttribute('spellcheck', 'false');
+                    input.setAttribute('maxlength', '12');
                     input.addEventListener('input', function() {
                         formatCrimeNumber(this);
+                    });
+                    input.addEventListener('blur', function() {
+                        const value = this.value.trim();
+                        if (/^\d+$/.test(value) && value.length <= 6) {
+                            this.value = value + '/' + new Date().getFullYear();
+                            dispatchFieldUpdate(this);
+                        }
+                        validateField.call(this);
                     });
                 });
                 
