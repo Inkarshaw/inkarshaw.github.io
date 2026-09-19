@@ -1627,6 +1627,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Event listeners for form fields
                 passportTypeSelect.addEventListener('change', function() {
                     updateContentVisibility();
+
+                    // Reuse saved common details when switching between passport types.
+                    // Only blank fields are populated, so case-specific values already
+                    // entered by the user are never overwritten.
+                    applyCommonDefaults({ notify: false, onlyIfBlank: true });
+
+                    // Make a newly selected passport immediately ready for routine use.
+                    // Date/time values are filled only when the selected type displays
+                    // the shared date/time section and those fields are still blank.
+                    const config = getSelectedPassportConfig();
+                    if (config?.showMainDateTime) {
+                        const dateField = document.getElementById('date');
+                        const timeField = document.getElementById('time');
+                        if (dateField && !dateField.value.trim()) {
+                            dateField.value = getTodayValue();
+                            dispatchFieldUpdate(dateField);
+                        }
+                        if (timeField && !timeField.value.trim()) {
+                            timeField.value = getCurrentTimeValue();
+                            dispatchFieldUpdate(timeField);
+                        }
+                    }
+
+                    scheduleLivePreview();
                     autoSave();
                 });
                 
