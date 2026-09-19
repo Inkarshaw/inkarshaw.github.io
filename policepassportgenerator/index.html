@@ -2332,7 +2332,7 @@
             function fillDocumentPreview(skipValidation = false) {
                 if (!skipValidation && !validateForm()) {
                     showNotification('Please fix the errors in the form before generating the document', 'error');
-                    return;
+                    return false;
                 }
                 
                 const passportType = passportTypeSelect.value;
@@ -2490,7 +2490,10 @@
                     updateMLPassportFields();
                 }
                 
-                showNotification('Document preview updated successfully', 'success');
+                if (!skipValidation) {
+                    showNotification('Document preview updated successfully', 'success');
+                }
+                return true;
             }
             
             function updateEscortFields(courtDisplayValue) {
@@ -2702,7 +2705,7 @@
                     return;
                 }
 
-                fillDocumentPreview();
+                fillDocumentPreview(true);
                 window.print();
                 showNotification('Document sent to printer', 'success');
             }
@@ -2731,7 +2734,7 @@
                 }
 
                 // Always refresh the preview so the PDF contains the latest form values.
-                fillDocumentPreview();
+                fillDocumentPreview(true);
                 
                 generateBtn.innerHTML = '<span class="spinner"></span> Generating PDF...';
                 generateBtn.disabled = true;
