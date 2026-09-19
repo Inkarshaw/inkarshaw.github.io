@@ -1337,6 +1337,98 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
 
+            function ensureDatalist(id, values) {
+                let list = document.getElementById(id);
+                if (!list) {
+                    list = document.createElement('datalist');
+                    list.id = id;
+                    document.body.appendChild(list);
+                }
+
+                list.innerHTML = '';
+                values.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    list.appendChild(option);
+                });
+            }
+
+            function setupInputPresets(root = document) {
+                ensureDatalist('police-station-suggestions', [
+                    'G7 Chetpet PS',
+                    'Mylapore',
+                    'Nungambakkam',
+                    'Triplicane'
+                ]);
+                ensureDatalist('prison-suggestions', [
+                    'Puzhal Central Prison, Chennai'
+                ]);
+                ensureDatalist('designation-suggestions', [
+                    'SI',
+                    'HC',
+                    'PC'
+                ]);
+
+                root.querySelectorAll('input[id$="PoliceStation"], #fromStation, #toStation').forEach(input => {
+                    input.setAttribute('list', 'police-station-suggestions');
+                    input.setAttribute('autocomplete', 'off');
+                });
+
+                root.querySelectorAll('#centralPrison, #arrestPrison').forEach(input => {
+                    input.setAttribute('list', 'prison-suggestions');
+                    input.setAttribute('autocomplete', 'off');
+                });
+
+                root.querySelectorAll('input[id^="designation"]').forEach(input => {
+                    input.setAttribute('list', 'designation-suggestions');
+                    input.setAttribute('autocomplete', 'off');
+                });
+            }
+
+            function dispatchFieldUpdate(input) {
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            function getTodayValue() {
+                return formatDate(new Date());
+            }
+
+            function getCurrentTimeValue() {
+                const now = new Date();
+                return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            }
+
+            function addQuickFillButton(input, label, valueGetter) {
+                if (!input || input.dataset.quickFillBound === 'true') return;
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'quick-fill-btn';
+                button.textContent = label;
+                button.setAttribute('aria-label', `${label} for ${input.id}`);
+                button.addEventListener('click', function() {
+                    input.value = valueGetter();
+                    dispatchFieldUpdate(input);
+                    validateField.call(input);
+                    input.focus();
+                });
+
+                input.insertAdjacentElement('afterend', button);
+                input.dataset.quickFillBound = 'true';
+            }
+
+            function setupQuickDateTimeActions() {
+                [
+                    'date', 'sickDate', 'mlDate', 'pmDate', 'narDate', 'transferOrderDate',
+                    'propertySeizedDate', 'leaveStartDate'
+                ].forEach(id => addQuickFillButton(document.getElementById(id), 'Today', getTodayValue));
+
+                ['time', 'sickTime', 'mlTime'].forEach(id => {
+                    addQuickFillButton(document.getElementById(id), 'Now', getCurrentTimeValue);
+                });
+            }
+
             function scheduleLivePreview() {
                 clearTimeout(previewRefreshTimeout);
                 previewRefreshTimeout = setTimeout(() => {
@@ -1363,6 +1455,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     input.dataset.passportEventsBound = 'true';
                 });
+
+                setupInputPresets(root);
             }
             
             function initializeEventListeners() {
@@ -1414,6 +1508,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Dynamic officer/accused fields use the same helper when they are rebuilt.
                 bindFieldEvents(document);
                 setupDateInputs();
+                setupInputPresets(document);
+                setupQuickDateTimeActions();
                 
                 // Add specific event listeners for crime number formatting
                 const crimeNumberInputs = document.querySelectorAll('input[id$="CrimeNumber"]');
