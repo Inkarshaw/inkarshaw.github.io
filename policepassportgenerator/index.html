@@ -2106,157 +2106,83 @@
                 autoSave();
             }
             
-            function validateForm() {
-                let isValid = true;
-                
-                const passportType = passportTypeSelect.value;
-                
-                // Handle date validation based on passport type
-                if (passportType === 'ML Passport') {
-                    const mlDateField = document.getElementById('mlDate');
-                    if (!validateField.call(mlDateField)) isValid = false;
-                    
-                    const mlTimeField = document.getElementById('mlTime');
-                    if (!validateField.call(mlTimeField)) isValid = false;
-                } else if (passportType === 'Sick Passport') {
-                    const dateField = document.getElementById('sickDate');
-                    if (!validateField.call(dateField)) isValid = false;
-                    
-                    const timeField = document.getElementById('sickTime');
-                    if (!validateField.call(timeField)) isValid = false;
-                } else {
-                    const dateField = document.getElementById('date');
-                    if (!validateField.call(dateField)) isValid = false;
-                    
-                    const timeField = document.getElementById('time');
-                    if (!validateField.call(timeField)) isValid = false;
-                }
-                
-                if (passportTypeSelect.value !== 'Lab Report' && passportTypeSelect.value !== 'Sick Passport' && passportTypeSelect.value !== 'Property to lab' && passportTypeSelect.value !== 'ML Passport') {
-                    const courtField = document.getElementById('court');
-                    const courtNumberField = document.getElementById('courtNumber');
-                    
-                    if (!validateField.call(courtField)) isValid = false;
-                    if (!validateField.call(courtNumberField)) isValid = false;
-                }
-                
-                // Validate fields based on active section
-                const activeFields = document.querySelector('.active');
-                if (activeFields) {
-                    const policeStation = activeFields.querySelector('input[id$="PoliceStation"]');
-                    
-                    if (policeStation && !validateField.call(policeStation)) isValid = false;
-                    
-                    // Only validate crime number and section if they exist (not for Sick Passport)
-                    const crimeNumber = activeFields.querySelector('input[id$="CrimeNumber"]');
-                    const section = activeFields.querySelector('input[id$="Section"]');
-                    
-                    if (crimeNumber && !validateField.call(crimeNumber)) isValid = false;
-                    if (section && !validateField.call(section)) isValid = false;
-                }
-                
-                // For Escort type, validate the escort-specific fields
-                if (passportTypeSelect.value === 'Escort') {
-                    const escortFields = ['escortPoliceStation', 'escortCrimeNumber', 'escortSection'];
-                    escortFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
-                }
-                
-                if (passportTypeSelect.value === 'Transfer Passport') {
-                    const transferFields = ['fromStation', 'toStation', 'transferReason', 'transferOrderNumber', 'transferOrderDate'];
-                    transferFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
-                }
-                
-                if (passportTypeSelect.value === 'Visera Report') {
-                    const viseraFields = ['deceasedName', 'deceasedAge', 'deceasedFatherName', 'pmNumber', 'pmDate'];
-                    viseraFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
-                }
-                
-                if (passportTypeSelect.value === 'Lab Report') {
-                    const labReportFields = ['narNumber', 'narDate'];
-                    labReportFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
-                }
-                
-                if (passportTypeSelect.value === 'PT warrant') {
-                    const ptWarrantFields = ['scNumber', 'prcNumber', 'centralPrison'];
-                    ptWarrantFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
+            function validateRequiredField(field, message = 'This field is required') {
+                if (!field) return false;
+
+                const value = String(field.value ?? '').trim();
+                if (!value) {
+                    showError(field.id, message);
+                    return false;
                 }
 
-                if (passportTypeSelect.value === 'Formal Arrest') {
-                    const formalArrestFields = ['arrestPrison', 'arrestType'];
-                    formalArrestFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
+                return validateField.call(field);
+            }
+
+            function validateRequiredLabels(container) {
+                if (!container) return true;
+
+                let isValid = true;
+                container.querySelectorAll('label.required[for]').forEach(label => {
+                    const field = document.getElementById(label.htmlFor);
+                    if (!validateRequiredField(field)) {
+                        isValid = false;
+                    }
+                });
+                return isValid;
+            }
+
+            function validateForm() {
+                let isValid = true;
+                const config = getSelectedPassportConfig();
+
+                if (!validateRequiredField(passportTypeSelect, 'Please select a passport type')) {
+                    isValid = false;
                 }
-                
-                if (passportTypeSelect.value === 'Property to lab') {
-                    const propertyLabFields = ['propertyDescription', 'propertySeizedDate'];
-                    propertyLabFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
+
+                if (!config || !config.available) {
+                    return false;
                 }
-                
-                if (passportTypeSelect.value === 'ML Passport') {
-                    const mlPassportFields = ['leaveDays', 'leaveStartDate', 'leaveEndDate', 'reportBackDate', 'session'];
-                    mlPassportFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!validateField.call(field)) {
-                            isValid = false;
-                        }
-                    });
+
+                const typeSection = config.fieldSectionId
+                    ? document.getElementById(config.fieldSectionId)
+                    : null;
+
+                if (!validateRequiredLabels(typeSection)) {
+                    isValid = false;
                 }
-                
-                for (let i = 1; i <= officerCounter; i++) {
-                    const designationField = document.getElementById(`designation${i}`);
-                    const fullNameField = document.getElementById(`fullName${i}`);
-                    
-                    if (!validateField.call(designationField) || !validateField.call(fullNameField)) {
+
+                if (config.showMainDateTime && !validateRequiredLabels(dateTimeSection)) {
+                    isValid = false;
+                }
+
+                // Time is optional, but if entered it must be valid.
+                const timeFieldId = passportTypeSelect.value === 'ML Passport'
+                    ? 'mlTime'
+                    : passportTypeSelect.value === 'Sick Passport'
+                        ? 'sickTime'
+                        : 'time';
+                const timeField = document.getElementById(timeFieldId);
+                if (timeField && !validateField.call(timeField)) {
+                    isValid = false;
+                }
+
+                if (config.requiresCourt) {
+                    if (!validateRequiredField(courtSelect, 'Please select a court')) {
+                        isValid = false;
+                    }
+                    if (!validateRequiredField(courtNumberInput, 'Please enter a court number')) {
                         isValid = false;
                     }
                 }
-                
-                if (passportTypeSelect.value !== 'FIR Filing Passport' && passportTypeSelect.value !== 'Visera Report' && passportTypeSelect.value !== 'Lab Report' && passportTypeSelect.value !== 'Sick Passport' && passportTypeSelect.value !== 'Property to lab' && passportTypeSelect.value !== 'ML Passport') {
-                    for (let i = 1; i <= accusedCounter; i++) {
-                        const accusedNameField = document.getElementById(`accusedName${i}`);
-                        const ageField = document.getElementById(`age${i}`);
-                        const fatherNameField = document.getElementById(`fatherName${i}`);
-                        
-                        if (!validateField.call(accusedNameField) || !validateField.call(ageField) || !validateField.call(fatherNameField)) {
-                            isValid = false;
-                        }
-                    }
+
+                if (!validateRequiredLabels(policeOfficersContainer)) {
+                    isValid = false;
                 }
-                
+
+                if (config.requiresAccused && !validateRequiredLabels(accusedPersonsContainer)) {
+                    isValid = false;
+                }
+
                 return isValid;
             }
             
