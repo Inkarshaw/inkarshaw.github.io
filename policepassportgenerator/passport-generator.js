@@ -1550,6 +1550,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 root.querySelectorAll('input[id^="designation"]').forEach(input => {
                     input.setAttribute('list', 'designation-suggestions');
                     input.setAttribute('autocomplete', 'off');
+                    input.setAttribute('autocapitalize', 'characters');
+                    input.setAttribute('spellcheck', 'false');
+                });
+
+                root.querySelectorAll('input[id^="fullName"], input[id^="accusedName"], input[id^="fatherName"]').forEach(input => {
+                    input.setAttribute('autocomplete', 'off');
+                    input.setAttribute('autocapitalize', 'words');
+                });
+
+                root.querySelectorAll('input[id^="age"]').forEach(input => {
+                    input.setAttribute('inputmode', 'numeric');
+                    input.setAttribute('pattern', '[0-9]*');
+                    input.setAttribute('maxlength', '3');
                 });
             }
 
