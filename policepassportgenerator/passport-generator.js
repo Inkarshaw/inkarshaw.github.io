@@ -1556,6 +1556,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 leaveStartDateInput.addEventListener('input', calculateLeaveDates);
             }
             
+            function applyPassportTypeFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                const requestedType = params.get('type');
+                if (!requestedType || !passportConfig[requestedType]) return false;
+
+                passportTypeSelect.value = requestedType;
+                updateContentVisibility();
+                updateLanguageContent();
+                scheduleLivePreview();
+
+                // Keep the URL clean after applying the requested passport type.
+                params.delete('type');
+                const remaining = params.toString();
+                const cleanUrl = window.location.pathname + (remaining ? `?${remaining}` : '') + window.location.hash;
+                window.history.replaceState({}, document.title, cleanUrl);
+
+                showNotification(`${requestedType} selected`, 'success');
+                return true;
+            }
+
             // Initialize the application
             function init() {
                 updatePoliceOfficers();
@@ -1563,8 +1583,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateContentVisibility();
                 initializeEventListeners();
                 loadSavedData();
-                
-                showNotification('Police Passport Document Generator is ready!', 'success');
+
+                const selectedFromUrl = applyPassportTypeFromUrl();
+                if (!selectedFromUrl) {
+                    showNotification('Police Passport Document Generator is ready!', 'success');
+                }
             }
             
             // Start the application
