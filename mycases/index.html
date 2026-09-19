@@ -135,7 +135,7 @@
         <form class="form-wrap" id="caseForm">
           <input type="hidden" id="caseId">
           <div class="form-grid">
-            <div class="form-group"><label for="crimeNo">Crime / CSR / UDR No.</label><input class="input" id="crimeNo" placeholder="e.g. 43"></div>
+            <div class="form-group"><label for="crimeNo">Crime / CSR / UDR No. <span style="color:#b63d3d">*</span></label><input class="input" id="crimeNo" placeholder="e.g. 43" required></div>
             <div class="form-group"><label for="crimeYear">Year</label><input class="input" id="crimeYear" inputmode="numeric" placeholder="2026"></div>
             <div class="form-group"><label for="policeStation">Police Station / Unit</label><input class="input" id="policeStation" placeholder="Police Station"></div>
             <div class="form-group"><label for="caseType">Case Type</label><select class="select" id="caseType"><option>Crime</option><option>CSR</option><option>UDR</option><option>Petition</option><option>Other</option></select></div>
@@ -152,10 +152,10 @@
             <div class="form-group full"><label for="notes">Notes</label><textarea class="textarea" id="notes" placeholder="Short working notes"></textarea></div>
           </div>
           <div class="form-actions">
-            <button class="btn btn-primary" type="submit">Save Case</button>
+            <button class="btn btn-primary" type="submit" id="saveCaseBtn">Create Case</button>
             <button class="btn" type="button" id="saveAndOpenBtn">Save & Open Documents</button>
           </div>
-          <div class="helper">Case data is saved in this browser using local storage. Export a backup before clearing browser data or changing devices.</div>
+          <div class="helper"><strong>Only the Crime / CSR / UDR No. is required to create a case.</strong> All other information can be added or updated later. Case data is saved locally and can also sync to your private cloud when connected.</div>
         </form>
 
         <div class="detail" id="caseDetail">
@@ -331,16 +331,16 @@
   }
 
   function clearForm(){
-    $('caseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='Add Case';$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
+    $('caseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='Add Case';$('saveCaseBtn').textContent='Create Case';$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
   }
 
   function fillForm(c){
-    $('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
+    $('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
   }
 
   function saveCurrent(openDocs=false){
     const c=formData();
-    if(!c.crimeNo&&!c.courtCaseNo&&!c.accused){showToast('Add at least a case number, court case number or accused name.');return false}
+    if(!c.crimeNo){showToast('Enter the Crime / CSR / UDR number to create the case.');$('crimeNo').focus();return false}
     const i=cases.findIndex(x=>x.id===c.id);const wasExisting=i>=0;if(wasExisting)cases[i]=c;else cases.unshift(c);
     saveCases();selectedId=c.id;renderList();showDetail(c);showToast('Case saved.');
     pushCaseToCloud(c,wasExisting);
