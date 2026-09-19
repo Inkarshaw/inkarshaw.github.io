@@ -50,6 +50,14 @@
     .form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.helper{font-size:.75rem;color:var(--muted);margin-top:8px}
     .detail{padding:16px;display:none}.detail.visible{display:block}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.detail-item{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}.detail-item.full{grid-column:1/-1}.detail-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:#7b8b9d;font-weight:800}.detail-value{margin-top:3px;white-space:pre-wrap;word-break:break-word}
     .detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+
+    .cloudbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 16px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+    .cloud-status{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:800;color:#40566e;margin-right:auto}
+    .cloud-dot{width:9px;height:9px;border-radius:50%;background:#9aa8b7}.cloud-dot.online{background:#1e8b5c}.cloud-dot.error{background:#ba3d3d}
+    .cloudbar .btn{min-height:40px}.cloud-note{width:100%;font-size:.72rem;color:var(--muted)}
+    .login-dialog{position:fixed;inset:0;background:rgba(6,22,41,.62);display:none;place-items:center;z-index:140;padding:18px}.login-dialog.open{display:grid}
+    .login-card{width:min(420px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}.login-card h3{margin:0 0 7px}.login-card p{margin:0 0 14px;color:var(--muted);font-size:.85rem}.login-card input{width:100%;min-height:44px;border:1px solid #cfd9e5;border-radius:10px;padding:10px 11px}.login-actions{display:flex;gap:8px;margin-top:12px}.login-actions button{flex:1}
+
     .footer{padding:28px 0 44px;color:#607086;font-size:.8rem;text-align:center}
     .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,90px);opacity:0;transition:.25s;z-index:120;background:#0e2944;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.82rem}.toast.show{transform:translate(-50%,0);opacity:1}
     .hidden{display:none!important}
@@ -81,6 +89,13 @@
 
 <main class="main">
   <div class="wrap">
+    <section class="cloudbar" aria-label="Google Sheets sync">
+      <div class="cloud-status"><span class="cloud-dot" id="cloudDot"></span><span id="cloudStatusText">Local only</span></div>
+      <button class="btn" id="cloudLoginBtn" type="button">Cloud Login</button>
+      <button class="btn btn-primary" id="syncNowBtn" type="button" disabled>Sync Now</button>
+      <div class="cloud-note">Local browser storage remains available offline. Cloud sync uses the private ClearExams My Cases Google Sheet.</div>
+    </section>
+
     <section class="stats" aria-label="Case statistics">
       <div class="stat"><strong id="totalCount">0</strong><span>Total Cases</span></div>
       <div class="stat"><strong id="activeCount">0</strong><span>Active</span></div>
@@ -160,8 +175,22 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="login-dialog" id="loginDialog" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="login-card">
+    <h3 id="loginTitle">My Cases Cloud Login</h3>
+    <p>Enter the private password configured in Railway. The password is sent only to the My Cases API and is not stored in GitHub.</p>
+    <input id="cloudPassword" type="password" autocomplete="current-password" placeholder="Private My Cases password">
+    <div class="login-actions">
+      <button class="btn" id="cancelLoginBtn" type="button">Cancel</button>
+      <button class="btn btn-primary" id="submitLoginBtn" type="button">Login</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const STORAGE_KEY='clearexamsMyCasesV1';
+  const CLOUD_TOKEN_KEY='clearexamsMyCasesCloudTokenV1';
+  const API_BASE='https://cdr-pdf-bot-production.up.railway.app';
   const CURRENT_CASE_KEY='clearexamsCurrentCaseV1';
   const STAGES=[
     'Investigation','FIR Registered','Notice / Enquiry','Accused Search','Arrested','Remand',
@@ -178,6 +207,72 @@
     try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
   }
   function saveCases(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cases))}
+  function cloudToken(){return sessionStorage.getItem(CLOUD_TOKEN_KEY)||''}
+  function setCloudState(text,state='idle'){
+    $('cloudStatusText').textContent=text;
+    $('cloudDot').className='cloud-dot'+(state==='online'?' online':state==='error'?' error':'');
+    $('syncNowBtn').disabled=!cloudToken();
+  }
+  async function cloudFetch(path,options={}){
+    const headers={...(options.headers||{})};
+    if(options.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
+    const token=cloudToken(); if(token) headers.Authorization='Bearer '+token;
+    const response=await fetch(API_BASE+path,{...options,headers});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok) throw new Error(data.error||('Cloud request failed ('+response.status+')'));
+    return data;
+  }
+  async function checkCloudSession(){
+    if(!cloudToken()){setCloudState('Local only');return false}
+    try{
+      const data=await cloudFetch('/api/session');
+      if(data.authenticated){setCloudState('Cloud connected','online');return true}
+    }catch(e){}
+    sessionStorage.removeItem(CLOUD_TOKEN_KEY);setCloudState('Local only');return false;
+  }
+  async function cloudLogin(){
+    const password=$('cloudPassword').value;
+    if(!password)return;
+    $('submitLoginBtn').disabled=true;
+    try{
+      const data=await cloudFetch('/api/login',{method:'POST',body:JSON.stringify({password})});
+      sessionStorage.setItem(CLOUD_TOKEN_KEY,data.token);
+      $('cloudPassword').value='';$('loginDialog').classList.remove('open');
+      setCloudState('Cloud connected','online');
+      await syncFromCloud();
+      showToast('Cloud sync connected.');
+    }catch(e){
+      setCloudState('Cloud unavailable','error');alert(e.message);
+    }finally{$('submitLoginBtn').disabled=false}
+  }
+  async function syncFromCloud(){
+    if(!cloudToken())return;
+    const data=await cloudFetch('/api/cases');
+    const remote=Array.isArray(data.cases)?data.cases:[];
+    const map=new Map();
+    [...cases,...remote].forEach(item=>{
+      if(!item||!item.id)return;
+      const prev=map.get(item.id);
+      if(!prev||String(item.updatedAt||'')>=String(prev.updatedAt||''))map.set(item.id,item);
+    });
+    cases=[...map.values()];saveCases();renderList();setCloudState('Cloud connected','online');
+  }
+  async function pushCaseToCloud(item,wasExisting){
+    if(!cloudToken())return;
+    try{
+      const path=wasExisting?'/api/cases/'+encodeURIComponent(item.id):'/api/cases';
+      const method=wasExisting?'PUT':'POST';
+      const data=await cloudFetch(path,{method,body:JSON.stringify(item)});
+      const remote=data.case;
+      const i=cases.findIndex(x=>x.id===remote.id);if(i>=0)cases[i]=remote;else cases.unshift(remote);
+      saveCases();renderList();setCloudState('Cloud connected','online');
+    }catch(e){setCloudState('Saved locally · cloud pending','error')}
+  }
+  async function deleteCaseFromCloud(id){
+    if(!cloudToken())return;
+    try{await cloudFetch('/api/cases/'+encodeURIComponent(id),{method:'DELETE'});setCloudState('Cloud connected','online')}
+    catch(e){setCloudState('Deleted locally · cloud pending','error')}
+  }
   function uid(){return 'case_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
   function showToast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.remove('show'),2200)}
   function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -246,8 +341,9 @@
   function saveCurrent(openDocs=false){
     const c=formData();
     if(!c.crimeNo&&!c.courtCaseNo&&!c.accused){showToast('Add at least a case number, court case number or accused name.');return false}
-    const i=cases.findIndex(x=>x.id===c.id);if(i>=0)cases[i]=c;else cases.unshift(c);
+    const i=cases.findIndex(x=>x.id===c.id);const wasExisting=i>=0;if(wasExisting)cases[i]=c;else cases.unshift(c);
     saveCases();selectedId=c.id;renderList();showDetail(c);showToast('Case saved.');
+    pushCaseToCloud(c,wasExisting);
     if(openDocs)setTimeout(()=>openInDocuments(c),250);
     return true;
   }
@@ -273,7 +369,7 @@
   function deleteSelected(){
     const c=cases.find(x=>x.id===selectedId);if(!c)return;
     if(!confirm('Delete this case from this browser?'))return;
-    cases=cases.filter(x=>x.id!==selectedId);saveCases();clearForm();showToast('Case deleted.');
+    const deletedId=selectedId;cases=cases.filter(x=>x.id!==selectedId);saveCases();clearForm();showToast('Case deleted.');deleteCaseFromCloud(deletedId);
   }
 
   function exportCases(){
@@ -317,7 +413,14 @@
   $('importBtn').addEventListener('click',()=>$('importFile').click());
   $('importFile').addEventListener('change',e=>{if(e.target.files[0])importCases(e.target.files[0])});
 
-  populateStages();clearForm();renderList();
+  $('cloudLoginBtn').addEventListener('click',()=>{$('loginDialog').classList.add('open');$('cloudPassword').focus()});
+  $('cancelLoginBtn').addEventListener('click',()=>$('loginDialog').classList.remove('open'));
+  $('submitLoginBtn').addEventListener('click',cloudLogin);
+  $('cloudPassword').addEventListener('keydown',e=>{if(e.key==='Enter')cloudLogin()});
+  $('syncNowBtn').addEventListener('click',async()=>{try{await syncFromCloud();showToast('Cloud sync complete.')}catch(e){setCloudState('Cloud sync failed','error');alert(e.message)}});
+  $('loginDialog').addEventListener('click',e=>{if(e.target===$('loginDialog'))$('loginDialog').classList.remove('open')});
+
+  populateStages();clearForm();renderList();checkCloudSession();
 </script>
 </body>
 </html>
