@@ -577,7 +577,15 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Account Number(s):</label>
+                    <label for="requestType">Request Type:</label>
+                    <select id="requestType">
+                        <option value="account">Bank Account Number</option>
+                        <option value="mobile">Mobile Number</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label id="identifierLabel">Account Number(s):</label>
                     <div id="accountNumbersContainer">
                         <div class="account-number-row">
                             <input type="text" id="accountNumber" class="account-number" value="38625685574" placeholder="Enter account number">
@@ -606,7 +614,8 @@
                     <h3>Instructions:</h3>
                     <ul>
                         <li>Fill in all the required fields</li>
-                        <li>Use "+ Add Another Account" to include multiple account numbers in the same request</li>
+                        <li>Select Bank Account Number or Mobile Number as the request type</li>
+                        <li>Use the add button to include multiple account or mobile numbers in the same request</li>
                         <li>Check/uncheck "Include Chennai City" to add/remove Chennai City from the document</li>
                         <li>Click "Preview Document" to see how your document will look</li>
                         <li>Click "Generate PDF" below the preview to download the document as PDF</li>
@@ -653,6 +662,11 @@
             document.getElementById('resetBtn').addEventListener('click', resetForm);
             document.getElementById('printBtn').addEventListener('click', printDocument);
             document.getElementById('addAccountBtn').addEventListener('click', addAccountNumber);
+            document.getElementById('requestType').addEventListener('change', function() {
+                updateIdentifierMode();
+                updateDocument();
+            });
+            updateIdentifierMode();
             
             // Add input event listeners for real-time validation and preview
             const inputs = document.querySelectorAll('input');
@@ -684,12 +698,28 @@
             }
         }
         
+        function updateIdentifierMode() {
+            const isMobile = document.getElementById('requestType').value === 'mobile';
+            document.getElementById('identifierLabel').textContent = isMobile ? 'Mobile Number(s):' : 'Account Number(s):';
+            document.getElementById('addAccountBtn').textContent = isMobile ? '+ Add Another Mobile' : '+ Add Another Account';
+            document.getElementById('accountNumberError').textContent = isMobile
+                ? 'Please enter valid 10-digit mobile number(s)'
+                : 'Please enter valid account number(s) using numbers only';
+
+            document.querySelectorAll('.account-number').forEach(input => {
+                input.placeholder = isMobile ? 'Enter 10-digit mobile number' : 'Enter account number';
+                input.maxLength = isMobile ? 10 : 30;
+            });
+            validateAccountNumbers();
+        }
+
         function addAccountNumber() {
             const container = document.getElementById('accountNumbersContainer');
+            const isMobile = document.getElementById('requestType').value === 'mobile';
             const row = document.createElement('div');
             row.className = 'account-number-row';
             row.innerHTML = `
-                <input type="text" class="account-number" placeholder="Enter account number">
+                <input type="text" class="account-number" placeholder="${isMobile ? 'Enter 10-digit mobile number' : 'Enter account number'}" ${isMobile ? 'maxlength="10"' : 'maxlength="30"'}>
                 <button type="button" class="btn btn-account btn-remove-account">Remove</button>
             `;
 
@@ -720,10 +750,13 @@
             const errorElement = document.getElementById('accountNumberError');
             let isValid = inputs.length > 0;
 
+            const isMobile = document.getElementById('requestType').value === 'mobile';
+
             inputs.forEach(input => {
                 input.classList.remove('input-error');
                 const value = input.value.trim();
-                if (value === '' || !/^\d+$/.test(value)) {
+                const validValue = isMobile ? /^\d{10}$/.test(value) : /^\d+$/.test(value);
+                if (value === '' || !validValue) {
                     input.classList.add('input-error');
                     isValid = false;
                 }
@@ -811,6 +844,7 @@
             const district = document.getElementById('district').value;
             const policeStation = document.getElementById('policeStation').value;
             const bankName = document.getElementById('bankName').value;
+            const requestType = document.getElementById('requestType').value;
             const accountNumbers = getAccountNumbers();
             const email = document.getElementById('email').value;
             const startDate = document.getElementById('startDate').value;
@@ -826,9 +860,16 @@
             
             // Generate case details with template - conditionally include Chennai City
             const cityText = includeChennaiCity ? `${district}, Chennai City` : district;
+            const isMobileRequest = requestType === 'mobile';
             const accountWord = accountNumbers.length > 1 ? 'accounts were' : 'account was';
             const accountRequestWord = accountNumbers.length > 1 ? 'bank accounts' : 'bank account';
-            const caseDetails = `I am enquiring the case mentioned in the above reference, ${caseType} case was registered at ${policeStation}, ${cityText} and we found below mentioned ${bankName} Bank ${accountWord} involved in this case.
+            const phoneWord = accountNumbers.length > 1 ? 'Phone Numbers' : 'Phone Number';
+
+            const caseDetails = isMobileRequest
+                ? `I am enquiring the case mentioned in the above reference, ${caseType} case was registered at ${policeStation}, ${cityText}.
+
+Hence I request you to furnish the details of the Bank Account Linked with the below mentioned ${phoneWord} for further investigation purpose.`
+                : `I am enquiring the case mentioned in the above reference, ${caseType} case was registered at ${policeStation}, ${cityText} and we found below mentioned ${bankName} Bank ${accountWord} involved in this case.
 
 Hence I request you to furnish the details of below mentioned ${accountRequestWord} for further investigation purpose.`;
 
@@ -836,10 +877,15 @@ Hence I request you to furnish the details of below mentioned ${accountRequestWo
                         <tr>
                             <td style="width: 15%">${index + 1}</td>
                             <td style="width: 85%" class="account-details">
-                                <strong>A/c No: ${account}</strong>
+                                <strong>${isMobileRequest ? 'Mobile No' : 'A/c No'}: ${account}</strong>
                             </td>
                         </tr>
             `).join('');
+
+            const tableHeading = isMobileRequest ? 'Mobile Details' : 'Account Details';
+            const subjectText = isMobileRequest
+                ? 'Request to furnish the Bank Account details linked with the below mentioned Phone Number(s)'
+                : 'Request to furnish the transaction details of account numbers';
             
             documentElement.innerHTML = `
                 <div class="header-section">
@@ -866,7 +912,7 @@ Hence I request you to furnish the details of below mentioned ${accountRequestWo
                 
                 <p class="salutation">Sir/Madam,</p>
                 
-                <p class="subject">Sub: Chennai Police -- ${district} -- Cyber Crime Team -- Request to furnish the transaction details of account numbers -- Reg.</p>
+                <p class="subject">Sub: Chennai Police -- ${district} -- Cyber Crime Team -- ${subjectText} -- Reg.</p>
                 
                 <p class="reference">Ref: ${policeStation} Cr.No.${crimeNumber}, U/s. ${sections}</p>
                 
@@ -880,7 +926,7 @@ Hence I request you to furnish the details of below mentioned ${accountRequestWo
                     <table>
                         <tr>
                             <th style="width: 15%">Sl.no</th>
-                            <th style="width: 85%" class="account-details-header">Account Details</th>
+                            <th style="width: 85%" class="account-details-header">${tableHeading}</th>
                         </tr>
                         ${accountRows}
                     </table>
@@ -1000,12 +1046,14 @@ Hence I request you to furnish the details of below mentioned ${accountRequestWo
             document.getElementById('district').value = '';
             document.getElementById('policeStation').value = '';
             document.getElementById('bankName').value = '';
+            document.getElementById('requestType').value = 'account';
             document.getElementById('accountNumber').value = '';
             document.querySelectorAll('#accountNumbersContainer .account-number-row').forEach((row, index) => {
                 if (index > 0) row.remove();
             });
             document.getElementById('email').value = '';
             document.getElementById('startDate').value = '';
+            updateIdentifierMode();
             
             // Set default dates
             setDefaultDates();
