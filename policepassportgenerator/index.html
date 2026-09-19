@@ -862,6 +862,37 @@
             color: #4a5568;
             cursor: not-allowed;
         }
+
+        .mobile-quick-actions {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding-bottom: 84px;
+            }
+
+            .mobile-quick-actions {
+                position: fixed;
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                z-index: 1200;
+                display: flex;
+                gap: 10px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.96);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+                backdrop-filter: blur(8px);
+            }
+
+            .mobile-quick-actions .btn {
+                flex: 1;
+                padding: 11px 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1487,6 +1518,15 @@
 
     <div class="auto-save" id="auto-save-indicator"><i class="fas fa-check-circle"></i> Auto-saved</div>
 
+    <div class="mobile-quick-actions" aria-label="Quick document actions">
+        <button type="button" id="mobile-preview" class="btn">
+            <i class="fas fa-eye"></i> Preview
+        </button>
+        <button type="button" id="mobile-pdf" class="btn btn-success">
+            <i class="fas fa-file-pdf"></i> PDF
+        </button>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const { jsPDF } = window.jspdf;
@@ -1495,6 +1535,8 @@
             const fillFormBtn = document.getElementById('fill-form');
             const newPassportBtn = document.getElementById('new-passport');
             const clearDraftBtn = document.getElementById('clear-draft');
+            const mobilePreviewBtn = document.getElementById('mobile-preview');
+            const mobilePdfBtn = document.getElementById('mobile-pdf');
             const passportTypeSelect = document.getElementById('passportType');
             const languageSelect = document.getElementById('language');
             const notification = document.getElementById('notification');
@@ -2854,6 +2896,16 @@
                 });
                 printBtn.addEventListener('click', printDocument);
                 generateBtn.addEventListener('click', generatePDF);
+
+                mobilePreviewBtn.addEventListener('click', function() {
+                    if (fillDocumentPreview() !== false) {
+                        document.querySelector('.preview-section')?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+                mobilePdfBtn.addEventListener('click', generatePDF);
                 
                 // Bind validation and autosave to the current form fields.
                 // Dynamic officer/accused fields use the same helper when they are rebuilt.
