@@ -961,7 +961,7 @@
                         <option value="PT warrant">PT warrant</option>
                         <option value="Escort">Escort</option>
                         <option value="Visera Report">Visera Report</option>
-                        <option value="Releaving Passport">Releaving Passport</option>
+                        <option value="Relieving Passport" disabled>Relieving Passport (Coming soon)</option>
                         <option value="Property to lab">Property to lab</option>
                         <option value="Sick Passport">Sick Passport</option>
                         <option value="ML Passport">ML Passport</option>
@@ -1428,6 +1428,8 @@
                 <div id="notification" class="notification"></div>
                 
                 <button id="fill-form" class="btn btn-success btn-block"><i class="fas fa-file-alt"></i> Generate Document</button>
+                <button id="clear-draft" type="button" class="btn btn-danger btn-block" style="margin-top: 10px;"><i class="fas fa-trash-alt"></i> Clear Saved Draft</button>
+                <div class="help-text"><i class="fas fa-shield-alt"></i> Draft data is stored only in this browser. Clear it after use on a shared computer.</div>
             </div>
             
             <div class="card preview-section">
@@ -1568,6 +1570,7 @@
             const generateBtn = document.getElementById('generate-pdf');
             const printBtn = document.getElementById('print-document');
             const fillFormBtn = document.getElementById('fill-form');
+            const clearDraftBtn = document.getElementById('clear-draft');
             const passportTypeSelect = document.getElementById('passportType');
             const languageSelect = document.getElementById('language');
             const notification = document.getElementById('notification');
@@ -1620,7 +1623,7 @@
                 'PT warrant': true,
                 'Escort': true,
                 'Visera Report': true,
-                'Releaving Passport': false,
+                'Relieving Passport': false,
                 'Property to lab': true,
                 'Sick Passport': true,
                 'ML Passport': true,
@@ -2815,16 +2818,13 @@
             }
             
             function printDocument() {
-                const printContent = document.getElementById('document-to-print');
-                const originalContents = document.body.innerHTML;
-                
-                document.body.innerHTML = printContent.outerHTML;
+                if (!validateForm()) {
+                    showNotification('Please fix the errors in the form before printing', 'error');
+                    return;
+                }
+
+                fillDocumentPreview();
                 window.print();
-                document.body.innerHTML = originalContents;
-                
-                // Re-attach event listeners
-                initializeEventListeners();
-                
                 showNotification('Document sent to printer', 'success');
             }
             
@@ -2859,8 +2859,8 @@
                     const imgData = canvas.toDataURL('image/png');
                     const pdf = new jsPDF('p', 'mm', 'a4');
                     const imgWidth = 210;
-                    const pageHeight = 295;
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    const pageHeight = 297;
+                    const imgHeight = Math.min(canvas.height * imgWidth / canvas.width, pageHeight);
                     let heightLeft = imgHeight;
                     let position = 0;
                     
@@ -2914,6 +2914,12 @@
                 addAccusedBtn.addEventListener('click', addAccusedPerson);
                 
                 fillFormBtn.addEventListener('click', fillDocumentPreview);
+                clearDraftBtn.addEventListener('click', function() {
+                    if (confirm('Clear all saved passport draft data from this browser?')) {
+                        localStorage.removeItem('policePassportFormData');
+                        window.location.reload();
+                    }
+                });
                 printBtn.addEventListener('click', printDocument);
                 generateBtn.addEventListener('click', generatePDF);
                 
