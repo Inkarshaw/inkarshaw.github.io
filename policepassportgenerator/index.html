@@ -2869,11 +2869,31 @@
                 showNotification('Document sent to printer', 'success');
             }
             
+            function safeFilePart(value) {
+                return String(value || '')
+                    .trim()
+                    .replace(/[\\/:*?"<>|]+/g, '-')
+                    .replace(/\s+/g, '_')
+                    .replace(/_+/g, '_')
+                    .slice(0, 60);
+            }
+
+            function getLocalDateStamp() {
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, '0');
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const year = now.getFullYear();
+                return `${day}-${month}-${year}`;
+            }
+
             async function generatePDF() {
                 if (!validateForm()) {
                     showNotification('Please fix the errors in the form before generating PDF', 'error');
                     return;
                 }
+
+                // Always refresh the preview so the PDF contains the latest form values.
+                fillDocumentPreview();
                 
                 generateBtn.innerHTML = '<span class="spinner"></span> Generating PDF...';
                 generateBtn.disabled = true;
@@ -2908,15 +2928,33 @@
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                     
-                    while (heightLeft >= 0) {
+                    while (heightLeft > 0) {
                         position = heightLeft - imgHeight;
                         pdf.addPage();
                         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                         heightLeft -= pageHeight;
                     }
                     
-                    const fileName = `Police_Passport_${passportTypeSelect.value.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
-                    pdf.save(fileName);
+                    let station = '';
+                    let crimeNumber = '';
+                    if (passportTypeSelect.value === 'Escort') {
+                        station = document.getElementById('escortPoliceStation')?.value || '';
+                        crimeNumber = document.getElementById('escortCrimeNumber')?.value || '';
+                    } else {
+                        const activeFields = document.querySelector('.active');
+                        station = activeFields?.querySelector('input[id$="PoliceStation"]')?.value || '';
+                        crimeNumber = activeFields?.querySelector('input[id$="CrimeNumber"]')?.value || '';
+                    }
+
+                    const fileParts = [
+                        'Police_Passport',
+                        passportTypeSelect.value,
+                        station,
+                        crimeNumber,
+                        getLocalDateStamp()
+                    ].map(safeFilePart).filter(Boolean);
+
+                    pdf.save(`${fileParts.join('_')}.pdf`);
                     
                     // Remove PDF mode class
                     element.classList.remove('pdf-mode', 'pdf-optimized');
