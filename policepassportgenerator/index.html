@@ -1619,6 +1619,7 @@
             let accusedCounter = 1;
             let currentLanguage = 'tamil';
             let autoSaveTimeout;
+            let previewRefreshTimeout;
             
             const availablePassportTypes = {
                 'Lab Report': true,
@@ -2475,6 +2476,9 @@
                         }
                     }
 
+                    if (passportTypeSelect.value) {
+                        fillDocumentPreview(true);
+                    }
                     showNotification('Previous form data loaded successfully', 'success');
                 } catch (error) {
                     console.error('Unable to load saved passport draft:', error);
@@ -2493,8 +2497,8 @@
                 updateContentTemplates();
             }
             
-            function fillDocumentPreview() {
-                if (!validateForm()) {
+            function fillDocumentPreview(skipValidation = false) {
+                if (!skipValidation && !validateForm()) {
                     showNotification('Please fix the errors in the form before generating the document', 'error');
                     return;
                 }
@@ -3005,11 +3009,22 @@
                 });
             }
 
+            function scheduleLivePreview() {
+                clearTimeout(previewRefreshTimeout);
+                previewRefreshTimeout = setTimeout(() => {
+                    if (passportTypeSelect.value) {
+                        fillDocumentPreview(true);
+                    }
+                }, 180);
+            }
+
             function bindFieldEvents(root) {
                 root.querySelectorAll('input, select, textarea').forEach(input => {
                     if (input.dataset.passportEventsBound === 'true') return;
                     input.addEventListener('input', autoSave);
                     input.addEventListener('change', autoSave);
+                    input.addEventListener('input', scheduleLivePreview);
+                    input.addEventListener('change', scheduleLivePreview);
                     input.addEventListener('blur', validateField);
                     input.dataset.passportEventsBound = 'true';
                 });
