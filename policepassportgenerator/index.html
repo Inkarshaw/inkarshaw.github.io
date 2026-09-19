@@ -1244,15 +1244,15 @@
                     
                     <!-- Date and Time Fields moved here for Sick Passport -->
                     <div class="form-group">
-                        <label for="date" class="required">Date</label>
-                        <input type="text" id="date" placeholder="Enter date in DD/MM/YYYY format">
-                        <div class="error-message" id="date-error">Please enter a valid date in DD/MM/YYYY format</div>
+                        <label for="sickDate" class="required">Date</label>
+                        <input type="text" id="sickDate" placeholder="Enter date in DD/MM/YYYY format">
+                        <div class="error-message" id="sickDate-error">Please enter a valid date in DD/MM/YYYY format</div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="time">Time</label>
-                        <input type="text" id="time" placeholder="Enter time in HH:MM format">
-                        <div class="error-message" id="time-error">Please enter a valid time in HH:MM format</div>
+                        <label for="sickTime">Time</label>
+                        <input type="text" id="sickTime" placeholder="Enter time in HH:MM format">
+                        <div class="error-message" id="sickTime-error">Please enter a valid time in HH:MM format</div>
                         <div class="help-text">Optional field - leave blank to keep space vacant in document</div>
                     </div>
                     
@@ -1745,7 +1745,7 @@
                 const fieldId = this.id;
                 const value = this.value.trim();
                 
-                if (fieldId === 'time' || fieldId === 'mlTime') {
+                if (fieldId === 'time' || fieldId === 'mlTime' || fieldId === 'sickTime') {
                     if (value && !isValidTime(value)) {
                         showError(fieldId, 'Please enter a valid time in HH:MM format or leave blank');
                         return false;
@@ -1772,7 +1772,7 @@
                     }
                 }
                 
-                if (fieldId === 'date' || fieldId === 'mlDate' || fieldId === 'pmDate' || fieldId === 'narDate' || fieldId === 'transferOrderDate' || fieldId === 'propertySeizedDate' || fieldId === 'leaveStartDate' || fieldId === 'leaveEndDate' || fieldId === 'reportBackDate') {
+                if (fieldId === 'date' || fieldId === 'sickDate' || fieldId === 'mlDate' || fieldId === 'pmDate' || fieldId === 'narDate' || fieldId === 'transferOrderDate' || fieldId === 'propertySeizedDate' || fieldId === 'leaveStartDate' || fieldId === 'leaveEndDate' || fieldId === 'reportBackDate') {
                     if (!isValidDate(value)) {
                         showError(fieldId, 'Please enter a valid date in DD/MM/YYYY format');
                         return false;
@@ -2119,10 +2119,10 @@
                     const mlTimeField = document.getElementById('mlTime');
                     if (!validateField.call(mlTimeField)) isValid = false;
                 } else if (passportType === 'Sick Passport') {
-                    const dateField = document.getElementById('date');
+                    const dateField = document.getElementById('sickDate');
                     if (!validateField.call(dateField)) isValid = false;
                     
-                    const timeField = document.getElementById('time');
+                    const timeField = document.getElementById('sickTime');
                     if (!validateField.call(timeField)) isValid = false;
                 } else {
                     const dateField = document.getElementById('date');
@@ -2422,8 +2422,8 @@
                     dateValue = document.getElementById('mlDate').value;
                     timeValue = document.getElementById('mlTime').value;
                 } else if (passportType === 'Sick Passport') {
-                    dateValue = document.getElementById('date').value;
-                    timeValue = document.getElementById('time').value;
+                    dateValue = document.getElementById('sickDate').value;
+                    timeValue = document.getElementById('sickTime').value;
                 } else {
                     dateValue = document.getElementById('date').value;
                     timeValue = document.getElementById('time').value;
@@ -2856,7 +2856,7 @@
 
             function setupDateInputs() {
                 const dateIds = [
-                    'date', 'mlDate', 'pmDate', 'narDate', 'transferOrderDate',
+                    'date', 'sickDate', 'mlDate', 'pmDate', 'narDate', 'transferOrderDate',
                     'propertySeizedDate', 'leaveStartDate', 'leaveEndDate', 'reportBackDate'
                 ];
 
