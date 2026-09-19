@@ -4,7 +4,7 @@
   const host = document.getElementById('content');
 
   try {
-    const catalog = await json('data/exam-catalog.json');
+    const catalog = await json('data/exams/exam-catalog.json');
     const id = new URLSearchParams(location.search).get('exam') || 'tnpsc-group-4';
     const exam = Object.values(catalog).flatMap(body => body.items).find(item => item.id === id);
 
@@ -83,11 +83,11 @@
 
   async function loadGroup4Posts() {
     const area = document.getElementById('postQualifications');
-    try {const data = await json('data/group4-posts.json');area.innerHTML = `<h3>Post-wise qualifications · reference</h3><p class="source">${escape(data.reference)}</p><div class="table-scroll"><table class="post-table"><thead><tr><th>Post / service</th><th>Minimum qualification</th></tr></thead><tbody>${data.rows.map(([name,codes,qualification,page])=>`<tr><td>${escape(name)}<small>Post codes: ${escape(codes)}</small></td><td>${escape(qualification)}<small><a href="${escape(data.source)}#page=${page}" target="_blank" rel="noopener noreferrer">Official notice · page ${page} ↗</a></small></td></tr>`).join('')}</tbody></table></div><p class="notice">${escape(data.note)}</p>`;} catch (error) {area.innerHTML = '<p role="alert">The post-wise table could not load. Use the official qualification notice above.</p>';}
+    try {const data = await json('data/exams/group4-posts.json');area.innerHTML = `<h3>Post-wise qualifications · reference</h3><p class="source">${escape(data.reference)}</p><div class="table-scroll"><table class="post-table"><thead><tr><th>Post / service</th><th>Minimum qualification</th></tr></thead><tbody>${data.rows.map(([name,codes,qualification,page])=>`<tr><td>${escape(name)}<small>Post codes: ${escape(codes)}</small></td><td>${escape(qualification)}<small><a href="${escape(data.source)}#page=${page}" target="_blank" rel="noopener noreferrer">Official notice · page ${page} ↗</a></small></td></tr>`).join('')}</tbody></table></div><p class="notice">${escape(data.note)}</p>`;} catch (error) {area.innerHTML = '<p role="alert">The post-wise table could not load. Use the official qualification notice above.</p>';}
   }
 
   async function loadNotifications(exam) {
     const area = document.getElementById('notificationList');
-    try {const data = await json('data/exam-notifications.json');const entries = data.entries.filter(item => item.exams.includes(exam.id));area.innerHTML = entries.length ? `<p class="source">Dates checked on ${formatDate(data.checkedOn)}. Official amendments take priority.</p>` + entries.map(notificationHTML).join('') : notificationPlaceholderHTML(exam.title);} catch (error) {area.innerHTML = '<p role="alert">Dates could not load. Use the official recruitment updates below.</p>';}
+    try {const data = await json('data/exams/exam-notifications.json');const entries = data.entries.filter(item => item.exams.includes(exam.id));area.innerHTML = entries.length ? `<p class="source">Dates checked on ${formatDate(data.checkedOn)}. Official amendments take priority.</p>` + entries.map(notificationHTML).join('') : notificationPlaceholderHTML(exam.title);} catch (error) {area.innerHTML = '<p role="alert">Dates could not load. Use the official recruitment updates below.</p>';}
   }
 })();

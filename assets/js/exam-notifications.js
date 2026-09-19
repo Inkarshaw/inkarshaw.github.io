@@ -3,7 +3,7 @@
   const {json,escape,link,formatDate,notificationHTML,notificationPlaceholderHTML} = window.ClearExams;
   const area = document.getElementById('notices');
   try {
-    const [catalog,data] = await Promise.all([json('data/exam-catalog.json'),json('data/exam-notifications.json')]);
+    const [catalog,data] = await Promise.all([json('data/exams/exam-catalog.json'),json('data/exams/exam-notifications.json')]);
     document.getElementById('checkedOn').textContent = 'Checked on ' + formatDate(data.checkedOn) + '. Manually maintained reference; this is not a live vacancy feed. Tentative plans are labelled, and 2026 updates for other exams are coming soon.';
     const filter = document.getElementById('categoryFilter');
     Object.entries(catalog).forEach(([key,body])=> {const option=document.createElement('option');option.value=key;option.textContent=body.name;filter.appendChild(option);});

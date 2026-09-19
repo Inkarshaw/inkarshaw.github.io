@@ -3,7 +3,7 @@
   const {json,escape,link,prepURL,syllabusURL}=window.ClearExams;
   const posts=document.getElementById('posts');
   try {
-    const bodies=await json('data/exam-catalog.json');
+    const bodies=await json('data/exams/exam-catalog.json');
     const requested=new URLSearchParams(location.search).get('exam');
     const selected=Object.hasOwn(bodies,requested)?requested:'upsc',body=bodies[selected];
     document.getElementById('tabs').innerHTML=Object.entries(bodies).map(([key,item])=>`<a class="tab${key===selected?' active':''}" ${key===selected?'aria-current="page"':''} href="exam-posts.html?exam=${key}">${escape(item.name)}</a>`).join('');

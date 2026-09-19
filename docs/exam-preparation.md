@@ -7,14 +7,14 @@ recruitment websites.
 
 ## Updating content
 
-- `data/exam-catalog.json` is the shared source for all six categories and 43
+- `data/exams/exam-catalog.json` is the shared source for all six categories and 43
   cards. Keep each `id` unique. `syllabus` is an existing ID in `syllabus.html`;
   use `null` when only the official recruitment source is available. Do not
   point an unrelated exam to another exam's syllabus.
-- `data/group4-posts.json` contains the qualification table, post codes and
+- `data/exams/group4-posts.json` contains the qualification table, post codes and
   source PDF pages. Its reference is notification 07/2025, not the 2026 cycle.
   Update the whole table against an issued notice before changing its year.
-- `data/group4-english.json` and `data/group4-tamil.json` contain the complete
+- `data/quizzes/group4-english.json` and `data/quizzes/group4-tamil.json` contain the complete
   text of the supplied bilingual TNPSC syllabus, code 496, dated 12 December
   2024. Tamil text was transcribed from the rendered document because its PDF
   text extraction has incorrect character mappings. Preserve all examples
@@ -24,7 +24,7 @@ recruitment websites.
   switches the General Studies/Aptitude reading language. The General English
   alternative remains explicitly restricted to candidates permitted by the
   recruitment notification. It is not a free choice of examination subject.
-- `data/exam-notifications.json` is manually maintained. Update `checkedOn`
+- `data/exams/exam-notifications.json` is manually maintained. Update `checkedOn`
   after checking official notices. Use `kind: "planned"` for a tentative annual
   planner, `"archive"` for historical references, or `"notice"` for an issued
   recruitment notice. Never derive application dates from a planner date.

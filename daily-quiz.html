@@ -46,7 +46,7 @@
 </div>
 <script>
 const GOOGLE_SHEET_CSV_URL="https://docs.google.com/spreadsheets/d/1yhND5g2Q23eOXz3oakV7xX-pUuunw3i2GzES3yaFVVY/gviz/tq?tqx=out:csv&sheet=Daily%20Quiz%20Feed";
-const FALLBACK_CSV_URL="data/daily-quiz.csv",DAILY_COUNT=10,letters=["A","B","C","D"],HISTORY_KEY="clearexamsQuizHistoryV2";
+const FALLBACK_CSV_URL="data/quizzes/daily-quiz.csv",DAILY_COUNT=10,letters=["A","B","C","D"],HISTORY_KEY="clearexamsQuizHistoryV2";
 let bank=[],quiz=[],current=0,answers=[],checked=[],activeDate="",activeTopic="",retryMode=false;
 function parseCSV(text){const rows=[];let row=[],cell="",quoted=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(ch==='"'&&quoted&&next==='"'){cell+='"';i++}else if(ch==='"')quoted=!quoted;else if(ch===","&&!quoted){row.push(cell);cell=""}else if((ch==="\n"||ch==="\r")&&!quoted){if(ch==="\r"&&next==="\n")i++;row.push(cell);if(row.some(v=>v.trim()!==""))rows.push(row);row=[];cell=""}else cell+=ch}row.push(cell);if(row.some(v=>v.trim()!==""))rows.push(row);const headers=rows.shift().map(h=>h.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||"").trim()]))) }
 function indiaDate(){const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),get=t=>parts.find(p=>p.type===t).value;return get("year")+"-"+get("month")+"-"+get("day")}

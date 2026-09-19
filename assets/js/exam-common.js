@@ -1,7 +1,7 @@
 (function () {
   'use strict';
-  if (!window.ceTrack && !document.querySelector('script[src$="assets/analytics.js"]')) {
-    const analytics=document.createElement('script');analytics.src='assets/analytics.js';analytics.defer=true;document.head.appendChild(analytics);
+  if (!window.ceTrack && !document.querySelector('script[src$="assets/js/analytics.js"]')) {
+    const analytics=document.createElement('script');analytics.src='assets/js/analytics.js';analytics.defer=true;document.head.appendChild(analytics);
   }
   const cache = new Map();
   function json(path) {
