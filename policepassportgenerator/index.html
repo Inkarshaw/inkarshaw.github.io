@@ -2098,22 +2098,47 @@
                 return officerContainer;
             }
             
-            function updatePoliceOfficers() {
-                const count = parseInt(officerCountInput.value) || 1;
+            function getOfficerData() {
+                const data = [];
+                for (let i = 1; i <= officerCounter; i++) {
+                    data.push({
+                        designation: document.getElementById(`designation${i}`)?.value || '',
+                        fullName: document.getElementById(`fullName${i}`)?.value || ''
+                    });
+                }
+                return data;
+            }
+
+            function getAccusedData() {
+                const data = [];
+                for (let i = 1; i <= accusedCounter; i++) {
+                    data.push({
+                        name: document.getElementById(`accusedName${i}`)?.value || '',
+                        age: document.getElementById(`age${i}`)?.value || '',
+                        fatherName: document.getElementById(`fatherName${i}`)?.value || ''
+                    });
+                }
+                return data;
+            }
+
+            function updatePoliceOfficers(preservedData = getOfficerData()) {
+                let count = parseInt(officerCountInput.value) || 1;
                 
-                if (count < 1) {
-                    officerCountInput.value = 1;
-                    return;
-                }
+                if (count < 1) count = 1;
                 if (count > 10) {
-                    officerCountInput.value = 10;
+                    count = 10;
                     showNotification('Maximum 10 police officers allowed', 'error');
-                    return;
                 }
+                officerCountInput.value = count;
                 
                 policeOfficersContainer.innerHTML = '';
                 for (let i = 1; i <= count; i++) {
                     policeOfficersContainer.appendChild(createPoliceOfficerForm(i));
+                    const saved = preservedData[i - 1];
+                    if (saved) {
+                        document.getElementById(`designation${i}`).value = saved.designation || '';
+                        document.getElementById(`fullName${i}`).value = saved.fullName || '';
+                    }
                 }
                 officerCounter = count;
                 
@@ -2121,52 +2146,69 @@
                 for (let i = 1; i <= count; i++) {
                     policeOfficersList.appendChild(createPoliceOfficerDocumentField(i));
                 }
+
+                bindFieldEvents(policeOfficersContainer);
                 
-                document.querySelectorAll('.remove-officer').forEach(button => {
+                policeOfficersContainer.querySelectorAll('.remove-officer').forEach(button => {
                     button.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        removePoliceOfficer(index);
+                        removePoliceOfficer(parseInt(this.getAttribute('data-index')));
                     });
                 });
             }
             
-            function updateAccusedPersons() {
-                const count = parseInt(accusedCountInput.value) || 1;
+            function updateAccusedPersons(preservedData = getAccusedData()) {
+                let count = parseInt(accusedCountInput.value) || 1;
                 
-                if (count < 1) {
-                    accusedCountInput.value = 1;
-                    return;
-                }
+                if (count < 1) count = 1;
                 if (count > 10) {
-                    accusedCountInput.value = 10;
+                    count = 10;
                     showNotification('Maximum 10 accused persons allowed', 'error');
-                    return;
                 }
+                accusedCountInput.value = count;
                 
                 accusedPersonsContainer.innerHTML = '';
                 for (let i = 1; i <= count; i++) {
                     accusedPersonsContainer.appendChild(createAccusedForm(i));
+                    const saved = preservedData[i - 1];
+                    if (saved) {
+                        document.getElementById(`accusedName${i}`).value = saved.name || '';
+                        document.getElementById(`age${i}`).value = saved.age || '';
+                        document.getElementById(`fatherName${i}`).value = saved.fatherName || '';
+                    }
                 }
                 accusedCounter = count;
+
+                bindFieldEvents(accusedPersonsContainer);
                 
-                document.querySelectorAll('.remove-accused').forEach(button => {
+                accusedPersonsContainer.querySelectorAll('.remove-accused').forEach(button => {
                     button.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        removeAccusedPerson(index);
+                        removeAccusedPerson(parseInt(this.getAttribute('data-index')));
                     });
                 });
             }
             
             function addPoliceOfficer() {
+                const preservedData = getOfficerData();
+                if (officerCounter >= 10) {
+                    showNotification('Maximum 10 police officers allowed', 'error');
+                    return;
+                }
                 officerCounter++;
                 officerCountInput.value = officerCounter;
-                updatePoliceOfficers();
+                updatePoliceOfficers(preservedData);
+                autoSave();
             }
             
             function addAccusedPerson() {
+                const preservedData = getAccusedData();
+                if (accusedCounter >= 10) {
+                    showNotification('Maximum 10 accused persons allowed', 'error');
+                    return;
+                }
                 accusedCounter++;
                 accusedCountInput.value = accusedCounter;
-                updateAccusedPersons();
+                updateAccusedPersons(preservedData);
+                autoSave();
             }
             
             function removePoliceOfficer(index) {
@@ -2175,9 +2217,12 @@
                     return;
                 }
                 
+                const preservedData = getOfficerData();
+                preservedData.splice(index - 1, 1);
                 officerCounter--;
                 officerCountInput.value = officerCounter;
-                updatePoliceOfficers();
+                updatePoliceOfficers(preservedData);
+                autoSave();
             }
             
             function removeAccusedPerson(index) {
@@ -2186,9 +2231,12 @@
                     return;
                 }
                 
+                const preservedData = getAccusedData();
+                preservedData.splice(index - 1, 1);
                 accusedCounter--;
                 accusedCountInput.value = accusedCounter;
-                updateAccusedPersons();
+                updateAccusedPersons(preservedData);
+                autoSave();
             }
             
             function validateForm() {
@@ -2349,94 +2397,87 @@
                 clearTimeout(autoSaveTimeout);
                 
                 autoSaveTimeout = setTimeout(() => {
-                    const passportType = document.getElementById('passportType').value;
+                    const fields = {};
+                    document.querySelectorAll('input[id], select[id], textarea[id]').forEach(field => {
+                        fields[field.id] = field.type === 'checkbox' ? field.checked : field.value;
+                    });
+
                     const formData = {
-                        passportType: passportType,
+                        version: 2,
+                        savedAt: new Date().toISOString(),
+                        passportType: passportTypeSelect.value,
                         officerCount: officerCounter,
                         accusedCount: accusedCounter,
-                        language: currentLanguage
+                        language: currentLanguage,
+                        officers: getOfficerData(),
+                        accused: getAccusedData(),
+                        fields: fields
                     };
                     
-                    // Handle date/time based on passport type
-                    if (passportType === 'ML Passport') {
-                        formData.date = document.getElementById('mlDate').value;
-                        formData.time = document.getElementById('mlTime').value;
-                    } else {
-                        formData.date = document.getElementById('date').value;
-                        formData.time = document.getElementById('time').value;
+                    try {
+                        localStorage.setItem('policePassportFormData', JSON.stringify(formData));
+                        autoSaveIndicator.style.display = 'block';
+                        setTimeout(() => {
+                            autoSaveIndicator.style.display = 'none';
+                        }, 2000);
+                    } catch (error) {
+                        console.error('Unable to save passport draft:', error);
+                        showNotification('Draft could not be saved in this browser', 'error');
                     }
-                    
-                    // Save police station data based on active section
-                    const activeFields = document.querySelector('.active');
-                    if (activeFields) {
-                        const policeStation = activeFields.querySelector('input[id$="PoliceStation"]');
-                        const crimeNumber = activeFields.querySelector('input[id$="CrimeNumber"]');
-                        const section = activeFields.querySelector('input[id$="Section"]');
-                        
-                        if (policeStation) formData.policeStation = policeStation.value;
-                        if (crimeNumber) formData.crimeNumber = crimeNumber.value;
-                        if (section) formData.section = section.value;
-                    }
-                    
-                    // Save escort fields if they exist
-                    if (document.getElementById('escortPoliceStation')) {
-                        formData.escortPoliceStation = document.getElementById('escortPoliceStation').value;
-                        formData.escortCrimeNumber = document.getElementById('escortCrimeNumber').value;
-                        formData.escortSection = document.getElementById('escortSection').value;
-                    }
-                    
-                    localStorage.setItem('policePassportFormData', JSON.stringify(formData));
-                    
-                    autoSaveIndicator.style.display = 'block';
-                    setTimeout(() => {
-                        autoSaveIndicator.style.display = 'none';
-                    }, 2000);
-                }, 1000);
+                }, 700);
             }
             
             function loadSavedData() {
                 const savedData = localStorage.getItem('policePassportFormData');
-                
-                if (savedData) {
+                if (!savedData) return;
+
+                try {
                     const formData = JSON.parse(savedData);
-                    
-                    document.getElementById('passportType').value = formData.passportType || '';
-                    
-                    // Handle date/time based on passport type
-                    if (formData.passportType === 'ML Passport') {
-                        document.getElementById('mlDate').value = formData.date || '';
-                        document.getElementById('mlTime').value = formData.time || '';
-                    } else {
-                        document.getElementById('date').value = formData.date || '';
-                        document.getElementById('time').value = formData.time || '';
-                    }
-                    
-                    if (formData.officerCount) {
-                        officerCountInput.value = formData.officerCount;
-                        updatePoliceOfficers();
-                    }
-                    
-                    if (formData.accusedCount) {
-                        accusedCountInput.value = formData.accusedCount;
-                        updateAccusedPersons();
-                    }
-                    
-                    if (formData.language) {
-                        currentLanguage = formData.language;
-                        languageSelect.value = currentLanguage;
-                        updateLanguageContent();
-                    }
-                    
-                    // Load escort fields if they exist
-                    if (formData.escortPoliceStation && document.getElementById('escortPoliceStation')) {
-                        document.getElementById('escortPoliceStation').value = formData.escortPoliceStation;
-                        document.getElementById('escortCrimeNumber').value = formData.escortCrimeNumber;
-                        document.getElementById('escortSection').value = formData.escortSection;
-                    }
-                    
+
+                    passportTypeSelect.value = formData.passportType || '';
+                    currentLanguage = formData.language || 'tamil';
+                    languageSelect.value = currentLanguage;
+
+                    officerCountInput.value = formData.officerCount || 1;
+                    updatePoliceOfficers(Array.isArray(formData.officers) ? formData.officers : []);
+
+                    accusedCountInput.value = formData.accusedCount || 1;
+                    updateAccusedPersons(Array.isArray(formData.accused) ? formData.accused : []);
+
                     updateContentVisibility();
-                    
+                    updateLanguageContent();
+
+                    if (formData.fields && typeof formData.fields === 'object') {
+                        Object.entries(formData.fields).forEach(([id, value]) => {
+                            const field = document.getElementById(id);
+                            if (!field) return;
+                            if (field.type === 'checkbox') {
+                                field.checked = Boolean(value);
+                            } else {
+                                field.value = value ?? '';
+                            }
+                        });
+                    } else {
+                        // Backward compatibility with drafts saved by the earlier version.
+                        if (formData.passportType === 'ML Passport') {
+                            document.getElementById('mlDate').value = formData.date || '';
+                            document.getElementById('mlTime').value = formData.time || '';
+                        } else {
+                            document.getElementById('date').value = formData.date || '';
+                            document.getElementById('time').value = formData.time || '';
+                        }
+                        if (formData.escortPoliceStation) {
+                            document.getElementById('escortPoliceStation').value = formData.escortPoliceStation || '';
+                            document.getElementById('escortCrimeNumber').value = formData.escortCrimeNumber || '';
+                            document.getElementById('escortSection').value = formData.escortSection || '';
+                        }
+                    }
+
                     showNotification('Previous form data loaded successfully', 'success');
+                } catch (error) {
+                    console.error('Unable to load saved passport draft:', error);
+                    localStorage.removeItem('policePassportFormData');
+                    showNotification('Saved draft was invalid and has been cleared', 'error');
                 }
             }
             
@@ -2894,6 +2935,16 @@
                 }
             }
             
+            function bindFieldEvents(root) {
+                root.querySelectorAll('input, select, textarea').forEach(input => {
+                    if (input.dataset.passportEventsBound === 'true') return;
+                    input.addEventListener('input', autoSave);
+                    input.addEventListener('change', autoSave);
+                    input.addEventListener('blur', validateField);
+                    input.dataset.passportEventsBound = 'true';
+                });
+            }
+            
             function initializeEventListeners() {
                 // Event listeners for form fields
                 passportTypeSelect.addEventListener('change', function() {
@@ -2923,12 +2974,9 @@
                 printBtn.addEventListener('click', printDocument);
                 generateBtn.addEventListener('click', generatePDF);
                 
-                // Add event listeners to all input fields for validation and auto-save
-                const allInputs = document.querySelectorAll('input, select, textarea');
-                allInputs.forEach(input => {
-                    input.addEventListener('input', autoSave);
-                    input.addEventListener('blur', validateField);
-                });
+                // Bind validation and autosave to the current form fields.
+                // Dynamic officer/accused fields use the same helper when they are rebuilt.
+                bindFieldEvents(document);
                 
                 // Add specific event listeners for crime number formatting
                 const crimeNumberInputs = document.querySelectorAll('input[id$="CrimeNumber"]');
