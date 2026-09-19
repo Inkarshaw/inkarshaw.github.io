@@ -1520,9 +1520,11 @@ document.addEventListener('DOMContentLoaded', function() {
             function setupInputPresets(root = document) {
                 ensureDatalist('police-station-suggestions', [
                     'G7 Chetpet PS',
-                    'Mylapore',
-                    'Nungambakkam',
-                    'Triplicane'
+                    'G3 Kilpauk PS',
+                    'G5 Secretariat Colony PS',
+                    'F3 Nungambakkam PS',
+                    'D1 Triplicane PS',
+                    'E1 Mylapore PS'
                 ]);
                 ensureDatalist('prison-suggestions', [
                     'Puzhal Central Prison, Chennai'
@@ -1536,6 +1538,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 root.querySelectorAll('input[id$="PoliceStation"], #fromStation, #toStation').forEach(input => {
                     input.setAttribute('list', 'police-station-suggestions');
                     input.setAttribute('autocomplete', 'off');
+                    input.setAttribute('autocapitalize', 'words');
+                    input.setAttribute('spellcheck', 'false');
                 });
 
                 root.querySelectorAll('#centralPrison, #arrestPrison').forEach(input => {
