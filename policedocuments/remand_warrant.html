@@ -55,6 +55,28 @@
             font-size: 1.1rem;
         }
         
+
+        .case-load-banner {
+            grid-column: 1 / -1;
+            display: none;
+            margin: -5px 0 10px;
+            padding: 12px 14px;
+            border: 1px solid #b9cfe4;
+            border-radius: 8px;
+            background: #eef6fd;
+            color: #27445f;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .case-load-banner.visible {
+            display: block;
+        }
+
+        .case-load-banner strong {
+            color: #173a5a;
+        }
+
         .form-section {
             background-color: white;
             border-radius: 10px;
@@ -394,6 +416,7 @@
             <h1><i class="fas fa-file-contract"></i> Legal Warrant Document Generator</h1>
             <p>Fill in the form to generate a detention order in PDF format. All fields are required unless marked optional.</p>
         </div>
+        <div class="case-load-banner" id="caseLoadBanner"></div>
         
         <div class="form-section">
             <h2 class="section-title"><i class="fas fa-edit"></i> Document Details</h2>
@@ -600,8 +623,36 @@
         printBtn.addEventListener('click', printDocument);
         resetBtn.addEventListener('click', resetForm);
         
-        // Initialize preview on page load
-        document.addEventListener('DOMContentLoaded', updatePreview);
+        function loadCurrentCaseFromMyCases() {
+            try {
+                const currentCase = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
+                if (!currentCase) return;
+
+                const caseNo = [currentCase.crimeNo, currentCase.crimeYear].filter(Boolean).join('/');
+                if (caseNo) {
+                    caseNumberInput.value = (currentCase.policeStation ? currentCase.policeStation + ' ' : '') + 'Cr No. ' + caseNo;
+                }
+                if (currentCase.policeStation) policeStationInput.value = currentCase.policeStation;
+                if (currentCase.accused) accusedNameInput.value = currentCase.accused;
+                if (currentCase.sections) offenseSectionInput.value = currentCase.sections;
+                if (currentCase.court) courtNameInput.value = currentCase.court;
+
+                const banner = document.getElementById('caseLoadBanner');
+                if (banner) {
+                    const label = caseNo || 'No case number';
+                    banner.textContent = 'Loaded from My Cases: ' + label + ' · ' + (currentCase.policeStation || 'Police station not set');
+                    banner.classList.add('visible');
+                }
+            } catch (error) {
+                // Ignore unavailable/corrupt browser-local case data.
+            }
+        }
+
+        // Initialize My Cases handoff and preview on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentCaseFromMyCases();
+            updatePreview();
+        });
         
         // Handle image upload
         function handleImageUpload(event) {
