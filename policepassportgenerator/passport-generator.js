@@ -1565,6 +1565,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateContentVisibility();
                 updateLanguageContent();
                 scheduleLivePreview();
+                autoSave();
 
                 // Keep the URL clean after applying the requested passport type.
                 params.delete('type');
