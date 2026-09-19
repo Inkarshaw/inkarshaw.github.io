@@ -96,6 +96,34 @@ if (!html.includes('<option value="Relieving Passport" disabled>')) {
   errors.push('Relieving Passport must remain disabled until approved wording is added');
 }
 
+const legacyRedirects = {
+  'escort_passport.html': 'Escort',
+  'fir_filing.html': 'FIR Filing Passport',
+  'formal_arrest.html': 'Formal Arrest',
+  'ml_passport.html': 'ML Passport',
+  'property_to_lab.html': 'Property to lab',
+  'pt_warrant.html': 'PT warrant',
+  'sick_passport.html': 'Sick Passport',
+  'visera_report.html': 'Visera Report'
+};
+
+for (const [file, type] of Object.entries(legacyRedirects)) {
+  const legacyPath = root + '/policepassportgenerator/' + file;
+  if (!fs.existsSync(legacyPath)) {
+    errors.push(`Missing legacy compatibility page: ${file}`);
+    continue;
+  }
+
+  const legacy = fs.readFileSync(legacyPath, 'utf8');
+  const expected = './?type=' + encodeURIComponent(type);
+  if (!legacy.includes(expected)) {
+    errors.push(`Legacy page ${file} does not redirect to ${type}`);
+  }
+  if (!legacy.includes('window.location.replace')) {
+    errors.push(`Legacy page ${file} is missing JavaScript redirect fallback`);
+  }
+}
+
 if (errors.length) {
   console.error('Police Passport Generator validation failed:');
   for (const error of errors) console.error(' - ' + error);
