@@ -160,6 +160,32 @@
             gap: 12px;
             margin-top: 25px;
         }
+
+        .account-number-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .account-number-row input {
+            flex: 1;
+        }
+
+        .btn-account {
+            width: auto;
+            min-width: 110px;
+            margin: 0;
+            padding: 11px 14px;
+        }
+
+        .btn-remove-account {
+            background: #e74c3c;
+        }
+
+        .btn-remove-account:hover {
+            background: #c0392b;
+        }
         
         .document-container {
             background: white;
@@ -551,9 +577,14 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="accountNumber">Account Number:</label>
-                    <input type="text" id="accountNumber" value="38625685574" placeholder="Enter account number">
-                    <div class="error-message" id="accountNumberError">Please enter an account number</div>
+                    <label>Account Number(s):</label>
+                    <div id="accountNumbersContainer">
+                        <div class="account-number-row">
+                            <input type="text" id="accountNumber" class="account-number" value="38625685574" placeholder="Enter account number">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-account" id="addAccountBtn">+ Add Another Account</button>
+                    <div class="error-message" id="accountNumberError">Please enter valid account number(s) using numbers only</div>
                 </div>
                 
                 <div class="form-group">
@@ -575,6 +606,7 @@
                     <h3>Instructions:</h3>
                     <ul>
                         <li>Fill in all the required fields</li>
+                        <li>Use "+ Add Another Account" to include multiple account numbers in the same request</li>
                         <li>Check/uncheck "Include Chennai City" to add/remove Chennai City from the document</li>
                         <li>Click "Preview Document" to see how your document will look</li>
                         <li>Click "Generate PDF" below the preview to download the document as PDF</li>
@@ -620,6 +652,7 @@
             document.getElementById('generatePdfBtn').addEventListener('click', generatePDF);
             document.getElementById('resetBtn').addEventListener('click', resetForm);
             document.getElementById('printBtn').addEventListener('click', printDocument);
+            document.getElementById('addAccountBtn').addEventListener('click', addAccountNumber);
             
             // Add input event listeners for real-time validation and preview
             const inputs = document.querySelectorAll('input');
@@ -651,6 +684,55 @@
             }
         }
         
+        function addAccountNumber() {
+            const container = document.getElementById('accountNumbersContainer');
+            const row = document.createElement('div');
+            row.className = 'account-number-row';
+            row.innerHTML = `
+                <input type="text" class="account-number" placeholder="Enter account number">
+                <button type="button" class="btn btn-account btn-remove-account">Remove</button>
+            `;
+
+            const input = row.querySelector('.account-number');
+            input.addEventListener('input', function() {
+                validateAccountNumbers();
+                updateDocument();
+            });
+
+            row.querySelector('.btn-remove-account').addEventListener('click', function() {
+                row.remove();
+                validateAccountNumbers();
+                updateDocument();
+            });
+
+            container.appendChild(row);
+            input.focus();
+        }
+
+        function getAccountNumbers() {
+            return Array.from(document.querySelectorAll('.account-number'))
+                .map(input => input.value.trim())
+                .filter(value => value !== '');
+        }
+
+        function validateAccountNumbers() {
+            const inputs = Array.from(document.querySelectorAll('.account-number'));
+            const errorElement = document.getElementById('accountNumberError');
+            let isValid = inputs.length > 0;
+
+            inputs.forEach(input => {
+                input.classList.remove('input-error');
+                const value = input.value.trim();
+                if (value === '' || !/^\d+$/.test(value)) {
+                    input.classList.add('input-error');
+                    isValid = false;
+                }
+            });
+
+            errorElement.style.display = isValid ? 'none' : 'block';
+            return isValid;
+        }
+
         function validateField(fieldId) {
             const field = document.getElementById(fieldId);
             const errorElement = document.getElementById(fieldId + 'Error');
@@ -679,11 +761,7 @@
                     isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value);
                     break;
                 case 'accountNumber':
-                    isValid = /^\d+$/.test(field.value.trim());
-                    if (!isValid) {
-                        errorElement.textContent = 'Account number must contain only numbers';
-                    }
-                    break;
+                    return validateAccountNumbers();
                 default:
                     isValid = field.value.trim() !== '';
             }
@@ -711,6 +789,10 @@
                     isValid = false;
                 }
             });
+
+            if (!validateAccountNumbers()) {
+                isValid = false;
+            }
             
             return isValid;
         }
@@ -729,7 +811,7 @@
             const district = document.getElementById('district').value;
             const policeStation = document.getElementById('policeStation').value;
             const bankName = document.getElementById('bankName').value;
-            const accountNumber = document.getElementById('accountNumber').value;
+            const accountNumbers = getAccountNumbers();
             const email = document.getElementById('email').value;
             const startDate = document.getElementById('startDate').value;
             
@@ -744,9 +826,21 @@
             
             // Generate case details with template - conditionally include Chennai City
             const cityText = includeChennaiCity ? `${district}, Chennai City` : district;
-            const caseDetails = `I am enquiring the case mentioned in the above reference, ${caseType} case was registered at ${policeStation}, ${cityText} and we found below mentioned ${bankName} Bank account was involved in this case.
+            const accountWord = accountNumbers.length > 1 ? 'accounts were' : 'account was';
+            const accountRequestWord = accountNumbers.length > 1 ? 'bank accounts' : 'bank account';
+            const caseDetails = `I am enquiring the case mentioned in the above reference, ${caseType} case was registered at ${policeStation}, ${cityText} and we found below mentioned ${bankName} Bank ${accountWord} involved in this case.
 
-Hence I request you to furnish the details of below mentioned bank account for further investigation purpose.`;
+Hence I request you to furnish the details of below mentioned ${accountRequestWord} for further investigation purpose.`;
+
+            const accountRows = accountNumbers.map((account, index) => `
+                        <tr>
+                            <td style="width: 15%">${index + 1}</td>
+                            <td style="width: 85%" class="account-details">
+                                <strong>${bankName}</strong><br>
+                                <strong>A/c No: ${account}</strong>
+                            </td>
+                        </tr>
+            `).join('');
             
             documentElement.innerHTML = `
                 <div class="header-section">
@@ -789,13 +883,7 @@ Hence I request you to furnish the details of below mentioned bank account for f
                             <th style="width: 15%">Sl.no</th>
                             <th style="width: 85%" class="account-details-header">Account Details</th>
                         </tr>
-                        <tr>
-                            <td style="width: 15%">1</td>
-                            <td style="width: 85%" class="account-details">
-                                <strong>${bankName}</strong><br>
-                                <strong>A/c No: ${accountNumber}</strong>
-                            </td>
-                        </tr>
+                        ${accountRows}
                     </table>
                 </div>
                 
@@ -914,6 +1002,9 @@ Hence I request you to furnish the details of below mentioned bank account for f
             document.getElementById('policeStation').value = '';
             document.getElementById('bankName').value = '';
             document.getElementById('accountNumber').value = '';
+            document.querySelectorAll('#accountNumbersContainer .account-number-row').forEach((row, index) => {
+                if (index > 0) row.remove();
+            });
             document.getElementById('email').value = '';
             document.getElementById('startDate').value = '';
             
