@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
 
                     const formData = {
-                        version: 2,
+                        version: 3,
                         savedAt: new Date().toISOString(),
                         passportType: passportTypeSelect.value,
                         officerCount: officerCounter,
@@ -776,7 +776,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateLanguageContent();
 
                     if (formData.fields && typeof formData.fields === 'object') {
-                        Object.entries(formData.fields).forEach(([id, value]) => {
+                        const savedFields = { ...formData.fields };
+
+                        // v3 migration: remove legacy 2023 transfer-order defaults that
+                        // were previously prefilled by the page rather than entered by the user.
+                        if ((formData.version || 1) < 3) {
+                            if (savedFields.transferOrderNumber === 'RC.No.Estt/EZ/2389/82/2023 EZO.No.485/2023') {
+                                savedFields.transferOrderNumber = '';
+                            }
+                            if (savedFields.transferOrderDate === '13/06/2023') {
+                                savedFields.transferOrderDate = '';
+                            }
+                        }
+
+                        Object.entries(savedFields).forEach(([id, value]) => {
                             const field = document.getElementById(id);
                             if (!field) return;
                             if (field.type === 'checkbox') {
