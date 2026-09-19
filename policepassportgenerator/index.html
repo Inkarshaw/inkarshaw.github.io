@@ -1857,6 +1857,13 @@
                 return passportConfig[passportTypeSelect.value] || null;
             }
 
+            function getSelectedPassportSection() {
+                const config = getSelectedPassportConfig();
+                return config?.fieldSectionId
+                    ? document.getElementById(config.fieldSectionId)
+                    : null;
+            }
+
             function updateContentVisibility() {
                 const config = getSelectedPassportConfig();
 
@@ -2367,9 +2374,9 @@
                 if (passportType === 'Escort') {
                     policeStationValue = document.getElementById('escortPoliceStation').value;
                 } else {
-                    const activeFields = document.querySelector('.active');
-                    if (activeFields) {
-                        const policeStation = activeFields.querySelector('input[id$="PoliceStation"]');
+                    const typeSection = getSelectedPassportSection();
+                    if (typeSection) {
+                        const policeStation = typeSection.querySelector('input[id$="PoliceStation"]');
                         if (policeStation) policeStationValue = policeStation.value;
                     }
                 }
@@ -2782,9 +2789,9 @@
                         station = document.getElementById('escortPoliceStation')?.value || '';
                         crimeNumber = document.getElementById('escortCrimeNumber')?.value || '';
                     } else {
-                        const activeFields = document.querySelector('.active');
-                        station = activeFields?.querySelector('input[id$="PoliceStation"]')?.value || '';
-                        crimeNumber = activeFields?.querySelector('input[id$="CrimeNumber"]')?.value || '';
+                        const typeSection = getSelectedPassportSection();
+                        station = typeSection?.querySelector('input[id$="PoliceStation"]')?.value || '';
+                        crimeNumber = typeSection?.querySelector('input[id$="CrimeNumber"]')?.value || '';
                     }
 
                     const fileParts = [
