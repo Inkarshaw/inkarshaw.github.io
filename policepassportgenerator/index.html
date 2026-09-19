@@ -1621,19 +1621,57 @@
             let autoSaveTimeout;
             let previewRefreshTimeout;
             
-            const availablePassportTypes = {
-                'Lab Report': true,
-                'PT warrant': true,
-                'Escort': true,
-                'Visera Report': true,
-                'Relieving Passport': false,
-                'Property to lab': true,
-                'Sick Passport': true,
-                'ML Passport': true,
-                'Formal Arrest': true,
-                'Transfer Passport': true,
-                'FIR Filing Passport': true
+            const passportConfig = {
+                'Lab Report': {
+                    available: true, fieldSectionId: 'lab-report-fields', templateKey: 'lab-report',
+                    requiresCourt: false, requiresAccused: false, showMainDateTime: true
+                },
+                'PT warrant': {
+                    available: true, fieldSectionId: 'pt-warrant-fields', templateKey: 'pt-warrant',
+                    requiresCourt: true, requiresAccused: true, showMainDateTime: true
+                },
+                'Escort': {
+                    available: true, fieldSectionId: 'escort-fields', templateKey: 'escort',
+                    requiresCourt: true, requiresAccused: true, showMainDateTime: true, escortSection: true
+                },
+                'Visera Report': {
+                    available: true, fieldSectionId: 'visera-fields', templateKey: 'visera-report',
+                    requiresCourt: true, requiresAccused: false, showMainDateTime: true
+                },
+                'Relieving Passport': {
+                    available: false, fieldSectionId: null, templateKey: null,
+                    requiresCourt: false, requiresAccused: false, showMainDateTime: false
+                },
+                'Property to lab': {
+                    available: true, fieldSectionId: 'property-lab-fields', templateKey: 'property-lab',
+                    requiresCourt: false, requiresAccused: false, showMainDateTime: true
+                },
+                'Sick Passport': {
+                    available: true, fieldSectionId: 'sick-passport-fields', templateKey: 'sick-passport',
+                    requiresCourt: false, requiresAccused: false, showMainDateTime: false
+                },
+                'ML Passport': {
+                    available: true, fieldSectionId: 'ml-passport-fields', templateKey: 'ml-passport',
+                    requiresCourt: false, requiresAccused: false, showMainDateTime: false
+                },
+                'Formal Arrest': {
+                    available: true, fieldSectionId: 'formal-arrest-fields', templateKey: 'formal-arrest',
+                    requiresCourt: true, requiresAccused: true, showMainDateTime: true
+                },
+                'Transfer Passport': {
+                    available: true, fieldSectionId: 'transfer-fields', templateKey: 'transfer-passport',
+                    requiresCourt: true, requiresAccused: true, showMainDateTime: true
+                },
+                'FIR Filing Passport': {
+                    available: true, fieldSectionId: 'fir-fields', templateKey: 'fir-filing',
+                    requiresCourt: true, requiresAccused: false, showMainDateTime: true
+                }
             };
+
+            const conditionalFieldSections = [
+                transferFields, firFields, viseraFields, labReportFields, ptWarrantFields,
+                formalArrestFields, sickPassportFields, propertyLabFields, mlPassportFields
+            ];
             
             function showNotification(message, type) {
                 notification.textContent = message;
@@ -1851,175 +1889,79 @@
                 return true;
             }
             
+            function getSelectedPassportConfig() {
+                return passportConfig[passportTypeSelect.value] || null;
+            }
+
             function updateContentVisibility() {
-                const passportType = passportTypeSelect.value;
-                
-                // Hide all conditional fields first
-                transferFields.classList.remove('active');
-                firFields.classList.remove('active');
-                viseraFields.classList.remove('active');
-                labReportFields.classList.remove('active');
-                ptWarrantFields.classList.remove('active');
-                formalArrestFields.classList.remove('active');
-                sickPassportFields.classList.remove('active');
-                propertyLabFields.classList.remove('active');
-                mlPassportFields.classList.remove('active');
-                
-                // Hide date/time sections by default
+                const config = getSelectedPassportConfig();
+
+                conditionalFieldSections.forEach(section => section.classList.remove('active'));
+                escortFields.classList.add('hidden');
                 dateTimeSection.classList.add('hidden');
                 timeSection.classList.add('hidden');
-                escortFields.classList.add('hidden');
-                
-                // Show relevant fields based on passport type
-                if (passportType === 'Transfer Passport') {
-                    transferFields.classList.add('active');
-                    dateTimeSection.classList.remove('hidden');
-                    timeSection.classList.remove('hidden');
-                } else if (passportType === 'FIR Filing Passport') {
-                    firFields.classList.add('active');
-                    dateTimeSection.classList.remove('hidden');
-                    timeSection.classList.remove('hidden');
-                } else if (passportType === 'Visera Report') {
-                    viseraFields.classList.add('active');
-                    dateTimeSection.classList.remove('hidden');
-                    timeSection.classList.remove('hidden');
-                } else if (passportType === 'Lab Report') {
-                    labReportFields.classList.add('active');
-                    dateTimeSection.classList.remove('hidden');
-                    timeSection.classList.remove('hidden');
-                } else if (passportType === 'PT warrant') {
-                    ptWarrantFields.classList.add('active');
-                    dateTimeSection.classList.remove('hidden');
-                    timeSection.classList.remove('hidden');
-                } else if (passportType === 'Formal Arrest') {
-                    formalArrestFields.classList.add('active');
-                    dateTimeSection.classList.remove('hidden');
-                    timeSection.classList.remove('hidden');
-                } else if (passportType === 'Sick Passport') {
-                    sickPassportFields.classList.add('active');
-                    // Date and time fields are already inside sick passport section
-                } else if (passportType === 'Property to lab') {
-                    propertyLabFields.classList.add('active');
-                    dateTimeSection.classList.remove('hidden');
-                    timeSection.classList.remove('hidden');
-                } else if (passportType === 'ML Passport') {
-                    mlPassportFields.classList.add('active');
-                    // Date and time fields are now inside ML passport section
-                    // Hide the main date/time sections
-                    dateTimeSection.classList.add('hidden');
-                    timeSection.classList.add('hidden');
-                } else if (passportType === 'Escort') {
-                    escortFields.classList.remove('hidden');
+
+                if (config?.fieldSectionId) {
+                    const section = document.getElementById(config.fieldSectionId);
+                    if (config.escortSection) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('active');
+                    }
+                }
+
+                if (config?.showMainDateTime) {
                     dateTimeSection.classList.remove('hidden');
                     timeSection.classList.remove('hidden');
                 }
-                
-                // Update content templates
+
                 updateContentTemplates();
-                
-                // Toggle accused and court sections based on passport type
                 toggleAccusedSection();
                 toggleCourtSection();
-                
-                // Update content status
                 updateContentStatus();
             }
             
             function updateContentTemplates() {
-                const passportType = passportTypeSelect.value;
-                
                 document.querySelectorAll('.content-text').forEach(el => {
                     el.style.display = 'none';
                 });
                 
+                const config = getSelectedPassportConfig();
                 contentPlaceholder.style.display = 'block';
-                
-                if (!passportType) return;
-                
-                contentPlaceholder.style.display = 'none';
-                
-                if (currentLanguage === 'tamil') {
-                    if (passportType === 'Escort') {
-                        document.getElementById('escort-tamil-content').style.display = 'block';
-                    } else if (passportType === 'PT warrant') {
-                        document.getElementById('pt-warrant-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Sick Passport') {
-                        document.getElementById('sick-passport-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Transfer Passport') {
-                        document.getElementById('transfer-passport-tamil-content').style.display = 'block';
-                    } else if (passportType === 'FIR Filing Passport') {
-                        document.getElementById('fir-filing-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Visera Report') {
-                        document.getElementById('visera-report-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Lab Report') {
-                        document.getElementById('lab-report-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Formal Arrest') {
-                        document.getElementById('formal-arrest-tamil-content').style.display = 'block';
-                    } else if (passportType === 'Property to lab') {
-                        document.getElementById('property-lab-tamil-content').style.display = 'block';
-                    } else if (passportType === 'ML Passport') {
-                        document.getElementById('ml-passport-tamil-content').style.display = 'block';
-                    }
-                } else if (currentLanguage === 'english') {
-                    if (passportType === 'Escort') {
-                        document.getElementById('escort-english-content').style.display = 'block';
-                    } else if (passportType === 'PT warrant') {
-                        document.getElementById('pt-warrant-english-content').style.display = 'block';
-                    } else if (passportType === 'Sick Passport') {
-                        document.getElementById('sick-passport-english-content').style.display = 'block';
-                    } else if (passportType === 'Transfer Passport') {
-                        document.getElementById('transfer-passport-english-content').style.display = 'block';
-                    } else if (passportType === 'FIR Filing Passport') {
-                        document.getElementById('fir-filing-english-content').style.display = 'block';
-                    } else if (passportType === 'Visera Report') {
-                        document.getElementById('visera-report-english-content').style.display = 'block';
-                    } else if (passportType === 'Lab Report') {
-                        document.getElementById('lab-report-english-content').style.display = 'block';
-                    } else if (passportType === 'Formal Arrest') {
-                        document.getElementById('formal-arrest-english-content').style.display = 'block';
-                    } else if (passportType === 'Property to lab') {
-                        document.getElementById('property-lab-english-content').style.display = 'block';
-                    } else if (passportType === 'ML Passport') {
-                        document.getElementById('ml-passport-english-content').style.display = 'block';
-                    }
+
+                if (!config?.templateKey || !config.available) return;
+
+                const content = document.getElementById(`${config.templateKey}-${currentLanguage}-content`);
+                if (content) {
+                    content.style.display = 'block';
+                    contentPlaceholder.style.display = 'none';
                 }
             }
             
             function toggleCourtSection() {
-                const passportType = passportTypeSelect.value;
+                const config = getSelectedPassportConfig();
+                const requiresCourt = Boolean(config?.requiresCourt);
                 
-                if (passportType === 'Lab Report' || passportType === 'Sick Passport' || passportType === 'Property to lab' || passportType === 'ML Passport') {
-                    courtSection.classList.add('hidden');
-                    document.getElementById('court').removeAttribute('required');
-                    document.getElementById('courtNumber').removeAttribute('required');
-                } else {
-                    courtSection.classList.remove('hidden');
-                    document.getElementById('court').setAttribute('required', 'required');
-                    document.getElementById('courtNumber').setAttribute('required', 'required');
-                }
+                courtSection.classList.toggle('hidden', !requiresCourt);
+                courtSelect.toggleAttribute('required', requiresCourt);
+                courtNumberInput.toggleAttribute('required', requiresCourt);
             }
             
             function toggleAccusedSection() {
-                const passportType = passportTypeSelect.value;
-                
-                if (passportType === 'FIR Filing Passport' || passportType === 'Visera Report' || passportType === 'Lab Report' || passportType === 'Sick Passport' || passportType === 'Property to lab' || passportType === 'ML Passport') {
-                    accusedSection.classList.add('hidden');
-                } else {
-                    accusedSection.classList.remove('hidden');
-                }
+                const config = getSelectedPassportConfig();
+                accusedSection.classList.toggle('hidden', !config?.requiresAccused);
             }
             
             function updateContentStatus() {
                 const selectedType = passportTypeSelect.value;
+                const config = getSelectedPassportConfig();
                 
                 if (!selectedType) {
                     contentStatus.classList.add('hidden');
                     return;
                 }
                 
-                const hasContent = availablePassportTypes[selectedType];
-                
-                if (hasContent) {
+                if (config?.available) {
                     contentStatus.className = 'content-status available';
                     contentStatusText.textContent = `✓ Content template available for ${selectedType}`;
                 } else {
