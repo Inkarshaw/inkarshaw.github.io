@@ -1690,7 +1690,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (hadSavedDraft) {
                     loadSavedData();
                 } else {
-                    applyCommonDefaults({ notify: false, onlyIfBlank: true });
+                    applyCommonDefaults({ notify: false, onlyIfBlank: false });
                 }
 
                 const selectedFromUrl = applyPassportTypeFromUrl();
