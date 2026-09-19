@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-            const { jsPDF } = window.jspdf;
+            const jsPDF = window.jspdf?.jsPDF || null;
+            const html2canvasLib = window.html2canvas || null;
             const generateBtn = document.getElementById('generate-pdf');
             const printBtn = document.getElementById('print-document');
             const fillFormBtn = document.getElementById('fill-form');
@@ -1333,7 +1334,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 return `${day}-${month}-${year}`;
             }
 
+            function updatePdfAvailability() {
+                const available = Boolean(jsPDF && html2canvasLib);
+                generateBtn.disabled = !available;
+                mobilePdfBtn.disabled = !available;
+
+                if (!available) {
+                    const message = 'PDF export is temporarily unavailable because a required library did not load. Print remains available.';
+                    generateBtn.title = message;
+                    mobilePdfBtn.title = message;
+                }
+
+                return available;
+            }
+
             async function generatePDF() {
+                if (!updatePdfAvailability()) {
+                    showNotification('PDF export library did not load. Use Print or refresh the page.', 'error');
+                    return;
+                }
+
                 if (!validateForm()) {
                     showNotification('Please fix the errors in the form before generating PDF', 'error');
                     return;
@@ -1351,7 +1371,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Add PDF mode class for styling
                     element.classList.add('pdf-mode', 'pdf-optimized');
                     
-                    const canvas = await html2canvas(element, {
+                    const canvas = await html2canvasLib(element, {
                         scale: 2,
                         useCORS: true,
                         logging: false,
@@ -1685,6 +1705,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateAccusedPersons();
                 updateContentVisibility();
                 initializeEventListeners();
+                updatePdfAvailability();
 
                 const hadSavedDraft = Boolean(localStorage.getItem('policePassportFormData'));
                 if (hadSavedDraft) {
