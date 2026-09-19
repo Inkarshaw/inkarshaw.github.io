@@ -1378,7 +1378,7 @@
                 <div id="police-officers-container">
                 </div>
                 
-                <div id="notification" class="notification"></div>
+                <div id="notification" class="notification" role="status" aria-live="polite"></div>
                 
                 <button id="fill-form" class="btn btn-success btn-block"><i class="fas fa-file-alt"></i> Generate Document</button>
                 <button id="new-passport" type="button" class="btn btn-warning btn-block" style="margin-top: 10px;"><i class="fas fa-file-circle-plus"></i> New Passport</button>
@@ -1767,20 +1767,36 @@
             function showError(inputId, message) {
                 const input = document.getElementById(inputId);
                 const errorElement = document.getElementById(`${inputId}-error`);
-                
-                input.classList.add('input-error');
-                input.classList.remove('input-success');
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
+
+                if (input) {
+                    input.classList.add('input-error');
+                    input.classList.remove('input-success');
+                    input.setAttribute('aria-invalid', 'true');
+                }
+
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
             }
             
             function hideError(inputId) {
                 const input = document.getElementById(inputId);
                 const errorElement = document.getElementById(`${inputId}-error`);
-                
-                input.classList.remove('input-error');
-                input.classList.add('input-success');
-                errorElement.style.display = 'none';
+
+                if (input) {
+                    input.classList.remove('input-error');
+                    input.removeAttribute('aria-invalid');
+                    if (String(input.value ?? '').trim()) {
+                        input.classList.add('input-success');
+                    } else {
+                        input.classList.remove('input-success');
+                    }
+                }
+
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
             }
             
             function validateField() {
@@ -2863,11 +2879,18 @@
             function bindFieldEvents(root) {
                 root.querySelectorAll('input, select, textarea').forEach(input => {
                     if (input.dataset.passportEventsBound === 'true') return;
+
                     input.addEventListener('input', autoSave);
                     input.addEventListener('change', autoSave);
                     input.addEventListener('input', scheduleLivePreview);
                     input.addEventListener('change', scheduleLivePreview);
-                    input.addEventListener('blur', validateField);
+
+                    // Only fields with an inline error target need blur validation.
+                    if (document.getElementById(`${input.id}-error`)) {
+                        input.addEventListener('blur', validateField);
+                        input.setAttribute('aria-describedby', `${input.id}-error`);
+                    }
+
                     input.dataset.passportEventsBound = 'true';
                 });
             }
