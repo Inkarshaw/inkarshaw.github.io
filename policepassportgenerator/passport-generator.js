@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const printBtn = document.getElementById('print-document');
             const fillFormBtn = document.getElementById('fill-form');
             const newPassportBtn = document.getElementById('new-passport');
+            const saveDefaultsBtn = document.getElementById('save-defaults');
+            const clearDefaultsBtn = document.getElementById('clear-defaults');
             const clearDraftBtn = document.getElementById('clear-draft');
             const mobilePreviewBtn = document.getElementById('mobile-preview');
             const mobilePdfBtn = document.getElementById('mobile-pdf');
@@ -721,6 +723,104 @@ document.addEventListener('DOMContentLoaded', function() {
                 return isValid;
             }
             
+            function getCurrentStationValue() {
+                if (passportTypeSelect.value === 'Escort') {
+                    return document.getElementById('escortPoliceStation')?.value?.trim() || '';
+                }
+
+                const section = getSelectedPassportSection();
+                return section?.querySelector('input[id$="PoliceStation"]')?.value?.trim() || '';
+            }
+
+            function saveCommonDefaults() {
+                const station = getCurrentStationValue();
+                const officers = getOfficerData().filter(item => item.designation || item.fullName);
+
+                const defaults = {
+                    version: 1,
+                    savedAt: new Date().toISOString(),
+                    station,
+                    language: currentLanguage,
+                    officers,
+                    court: courtSelect.value || '',
+                    courtNumber: courtNumberInput.value || '',
+                    centralPrison: document.getElementById('centralPrison')?.value || '',
+                    arrestPrison: document.getElementById('arrestPrison')?.value || ''
+                };
+
+                try {
+                    localStorage.setItem('policePassportCommonDefaults', JSON.stringify(defaults));
+                    showNotification('Common defaults saved in this browser', 'success');
+                } catch (error) {
+                    console.error('Unable to save common passport defaults:', error);
+                    showNotification('Common defaults could not be saved', 'error');
+                }
+            }
+
+            function applyCommonDefaults({ notify = false, onlyIfBlank = true } = {}) {
+                const saved = localStorage.getItem('policePassportCommonDefaults');
+                if (!saved) return false;
+
+                try {
+                    const defaults = JSON.parse(saved);
+
+                    if (defaults.language && (!onlyIfBlank || !languageSelect.value)) {
+                        currentLanguage = defaults.language;
+                        languageSelect.value = defaults.language;
+                        updateLanguageContent();
+                    }
+
+                    if (defaults.station) {
+                        document.querySelectorAll('input[id$="PoliceStation"]').forEach(input => {
+                            if (!onlyIfBlank || !input.value.trim()) {
+                                input.value = defaults.station;
+                            }
+                        });
+                    }
+
+                    if (Array.isArray(defaults.officers) && defaults.officers.length) {
+                        const currentOfficers = getOfficerData();
+                        const hasOfficerData = currentOfficers.some(item => item.designation || item.fullName);
+                        if (!onlyIfBlank || !hasOfficerData) {
+                            officerCountInput.value = Math.min(defaults.officers.length, 10);
+                            updatePoliceOfficers(defaults.officers.slice(0, 10));
+                        }
+                    }
+
+                    if (defaults.court && (!onlyIfBlank || !courtSelect.value)) {
+                        courtSelect.value = defaults.court;
+                    }
+                    if (defaults.courtNumber && (!onlyIfBlank || !courtNumberInput.value.trim())) {
+                        courtNumberInput.value = defaults.courtNumber;
+                    }
+
+                    const centralPrison = document.getElementById('centralPrison');
+                    if (centralPrison && defaults.centralPrison && (!onlyIfBlank || !centralPrison.value.trim())) {
+                        centralPrison.value = defaults.centralPrison;
+                    }
+
+                    const arrestPrison = document.getElementById('arrestPrison');
+                    if (arrestPrison && defaults.arrestPrison && (!onlyIfBlank || !arrestPrison.value.trim())) {
+                        arrestPrison.value = defaults.arrestPrison;
+                    }
+
+                    scheduleLivePreview();
+                    if (notify) {
+                        showNotification('Common defaults applied', 'success');
+                    }
+                    return true;
+                } catch (error) {
+                    console.error('Unable to load common passport defaults:', error);
+                    localStorage.removeItem('policePassportCommonDefaults');
+                    return false;
+                }
+            }
+
+            function clearCommonDefaults() {
+                localStorage.removeItem('policePassportCommonDefaults');
+                showNotification('Common defaults cleared from this browser', 'success');
+            }
+
             function autoSave() {
                 clearTimeout(autoSaveTimeout);
                 
@@ -1493,12 +1593,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 fillFormBtn.addEventListener('click', fillDocumentPreview);
                 newPassportBtn.addEventListener('click', function() {
-                    if (confirm('Start a new passport? The current form and saved draft will be cleared.')) {
+                    if (confirm('Start a new passport? Case-specific form data will be cleared. Saved common defaults will be kept.')) {
                         clearTimeout(autoSaveTimeout);
                         localStorage.removeItem('policePassportFormData');
                         window.location.reload();
                     }
                 });
+                saveDefaultsBtn.addEventListener('click', saveCommonDefaults);
+                clearDefaultsBtn.addEventListener('click', clearCommonDefaults);
                 clearDraftBtn.addEventListener('click', function() {
                     clearTimeout(autoSaveTimeout);
                     localStorage.removeItem('policePassportFormData');
@@ -1583,7 +1685,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateAccusedPersons();
                 updateContentVisibility();
                 initializeEventListeners();
-                loadSavedData();
+
+                const hadSavedDraft = Boolean(localStorage.getItem('policePassportFormData'));
+                if (hadSavedDraft) {
+                    loadSavedData();
+                } else {
+                    applyCommonDefaults({ notify: false, onlyIfBlank: true });
+                }
 
                 const selectedFromUrl = applyPassportTypeFromUrl();
                 if (!selectedFromUrl) {
