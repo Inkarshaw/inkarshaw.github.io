@@ -1647,7 +1647,38 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (confirm('Start a new passport? Case-specific form data will be cleared. Saved common defaults will be kept.')) {
                         clearTimeout(autoSaveTimeout);
                         localStorage.removeItem('policePassportFormData');
-                        window.location.reload();
+
+                        // Reset the current case without a page reload, then restore only
+                        // explicitly saved common defaults (station, officers, language,
+                        // court/prison preferences). This makes back-to-back passport
+                        // generation faster and avoids carrying case-specific details.
+                        document.querySelectorAll('input[id], select[id], textarea[id]').forEach(field => {
+                            if (field.type === 'checkbox' || field.type === 'radio') {
+                                field.checked = false;
+                            } else if (field.tagName === 'SELECT') {
+                                field.selectedIndex = 0;
+                            } else if (!field.readOnly) {
+                                field.value = '';
+                            }
+                        });
+
+                        currentLanguage = 'tamil';
+                        languageSelect.value = currentLanguage;
+                        officerCountInput.value = 1;
+                        accusedCountInput.value = 1;
+                        updatePoliceOfficers();
+                        updateAccusedPersons();
+                        updateContentVisibility();
+                        updateLanguageContent();
+
+                        const defaultsApplied = applyCommonDefaults({ notify: false, onlyIfBlank: false });
+                        updateContentVisibility();
+                        updateLanguageContent();
+                        scheduleLivePreview();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        showNotification(defaultsApplied
+                            ? 'New passport ready. Saved common defaults restored.'
+                            : 'New passport ready.', 'success');
                     }
                 });
                 saveDefaultsBtn.addEventListener('click', saveCommonDefaults);
