@@ -48,7 +48,7 @@
     .form-wrap{padding:16px}
     .quick-create{padding:16px}.quick-create-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}.quick-create .helper{margin-top:7px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-group{display:grid;gap:5px}.form-group.full{grid-column:1/-1}
     label{font-size:.76rem;font-weight:800;color:#435870}.textarea{min-height:82px;resize:vertical}
-    .form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.helper{font-size:.75rem;color:var(--muted);margin-top:8px}
+    .photo-box{display:flex;align-items:center;gap:12px;padding:10px;border:1px dashed #b9c8d8;border-radius:12px;background:#f9fbfe}.accused-photo{width:82px;height:96px;border-radius:10px;object-fit:cover;border:1px solid var(--line);background:#edf3f9}.photo-placeholder{width:82px;height:96px;border-radius:10px;display:grid;place-items:center;background:#edf3f9;color:#6d7f92;font-size:1.7rem;border:1px solid var(--line)}.photo-controls{display:flex;flex-wrap:wrap;gap:7px}.form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.helper{font-size:.75rem;color:var(--muted);margin-top:8px}
     .detail{padding:16px;display:none}.detail.visible{display:block}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.detail-item{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}.detail-item.full{grid-column:1/-1}.detail-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:#7b8b9d;font-weight:800}.detail-value{margin-top:3px;white-space:pre-wrap;word-break:break-word}
     .detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 
@@ -150,6 +150,7 @@
             <div class="form-group full"><label for="sections">Sections / Offences</label><input class="input" id="sections" placeholder="e.g. BNS / BNSS / NDPS sections"></div>
             <div class="form-group"><label for="complainant">Complainant</label><input class="input" id="complainant"></div>
             <div class="form-group"><label for="accused">Accused / Suspect</label><input class="input" id="accused"></div>
+            <div class="form-group full"><label>Accused Photo</label><div class="photo-box"><div class="photo-placeholder" id="photoPlaceholder">👤</div><img class="accused-photo hidden" id="accusedPhotoPreview" alt="Accused photo"><div class="photo-controls"><button class="btn" id="choosePhotoBtn" type="button">Upload Photo</button><button class="btn btn-danger hidden" id="removePhotoBtn" type="button">Remove</button><input class="hidden" id="accusedPhotoInput" type="file" accept="image/*" capture="environment"></div></div><div class="helper">Photo is compressed before saving. Use only images you are authorized to store.</div></div>
             <div class="form-group"><label for="ioName">Investigating Officer</label><input class="input" id="ioName"></div>
             <div class="form-group"><label for="priority">Priority</label><select class="select" id="priority"><option>Medium</option><option>High</option><option>Low</option></select></div>
             <div class="form-group"><label for="court">Court</label><input class="input" id="court" placeholder="Court / Establishment"></div>
@@ -210,6 +211,7 @@
   const fields=['crimeNo','crimeYear','policeStation','caseType','sections','complainant','accused','ioName','priority','court','courtCaseNo','stage','nextHearing','nextAction','notes'];
   let cases=loadCases();
   let selectedId=null;
+  let pendingAccusedPhoto='';
 
   function loadCases(){
     try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
@@ -330,7 +332,7 @@
   }
 
   function formData(){
-    const obj={id:$('caseId').value||uid()};
+    const obj={id:$('caseId').value||uid(),accusedPhoto:pendingAccusedPhoto};
     fields.forEach(k=>obj[k]=$(k).value.trim());
     const old=cases.find(c=>c.id===obj.id);
     obj.createdAt=old?.createdAt||new Date().toISOString();
@@ -339,11 +341,11 @@
   }
 
   function clearForm(){
-    $('caseForm').reset();$('quickCaseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='New Case';$('saveCaseBtn').textContent='Create Case';$('quickCaseForm').classList.remove('hidden');$('caseForm').classList.add('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
+    pendingAccusedPhoto='';updatePhotoPreview();$('caseForm').reset();$('quickCaseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='New Case';$('saveCaseBtn').textContent='Create Case';$('quickCaseForm').classList.remove('hidden');$('caseForm').classList.add('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
   }
 
   function fillForm(c){
-    $('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('quickCaseForm').classList.add('hidden');$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
+    pendingAccusedPhoto=c.accusedPhoto||'';updatePhotoPreview();$('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('quickCaseForm').classList.add('hidden');$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
   }
 
   function saveCurrent(openDocs=false){
@@ -361,12 +363,28 @@
     const rows=[
       ['Crime / Reference',(c.caseType||'Case')+' '+(c.crimeNo?c.crimeNo+'/'+(c.crimeYear||''):'—')],
       ['Police Station / Unit',c.policeStation||'—'],['Sections',c.sections||'—'],['Complainant',c.complainant||'—'],
-      ['Accused / Suspect',c.accused||'—'],['Investigating Officer',c.ioName||'—'],['Court',c.court||'—'],
+      ['Accused / Suspect',c.accused||'—'],['Accused Photo',c.accusedPhoto?'__PHOTO__':'—'],['Investigating Officer',c.ioName||'—'],['Court',c.court||'—'],
       ['Court Case No.',c.courtCaseNo||'—'],['Stage',c.stage||'—'],['Priority',c.priority||'—'],
       ['Next Hearing / Action',fmtDate(c.nextHearing)],['Next Action',c.nextAction||'—'],['Notes',c.notes||'—']
     ];
-    $('detailGrid').innerHTML=rows.map(([a,b],i)=>'<div class="detail-item '+(i===2||i===11||i===12?'full':'')+'"><div class="detail-label">'+esc(a)+'</div><div class="detail-value">'+esc(b)+'</div></div>').join('');
+    $('detailGrid').innerHTML=rows.map(([a,b],i)=>'<div class="detail-item '+(i===2||i===12||i===13?'full':'')+'"><div class="detail-label">'+esc(a)+'</div><div class="detail-value">'+(b==='__PHOTO__'?'<img class="accused-photo" src="'+esc(c.accusedPhoto)+'" alt="Accused photo">':esc(b))+'</div></div>').join('');
     renderList();
+  }
+
+  function updatePhotoPreview(){
+    const has=!!pendingAccusedPhoto;
+    $('accusedPhotoPreview').classList.toggle('hidden',!has);$('photoPlaceholder').classList.toggle('hidden',has);$('removePhotoBtn').classList.toggle('hidden',!has);
+    if(has)$('accusedPhotoPreview').src=pendingAccusedPhoto;else $('accusedPhotoPreview').removeAttribute('src');
+  }
+  function processAccusedPhoto(file){
+    if(!file||!file.type.startsWith('image/'))return;
+    const reader=new FileReader();
+    reader.onload=()=>{const img=new Image();img.onload=()=>{
+      const max=640,scale=Math.min(1,max/Math.max(img.width,img.height)),canvas=document.createElement('canvas');
+      canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      pendingAccusedPhoto=canvas.toDataURL('image/jpeg',.72);updatePhotoPreview();showToast('Accused photo added.');
+    };img.src=reader.result};reader.readAsDataURL(file);
   }
 
   function openInDocuments(c){
@@ -413,6 +431,9 @@
     const item={id:uid(),crimeNo,crimeYear:'',policeStation:'',caseType:'Crime',sections:'',complainant:'',accused:'',ioName:'',priority:'Medium',court:'',courtCaseNo:'',stage:'Investigation',nextHearing:'',nextAction:'',notes:'',createdAt:now,updatedAt:now};
     cases.unshift(item);saveCases();selectedId=item.id;renderList();showDetail(item);pushCaseToCloud(item,false);showToast('Case created. Add details anytime.');
   });
+  $('choosePhotoBtn').addEventListener('click',()=>$('accusedPhotoInput').click());
+  $('accusedPhotoInput').addEventListener('change',e=>{if(e.target.files[0])processAccusedPhoto(e.target.files[0]);e.target.value=''});
+  $('removePhotoBtn').addEventListener('click',()=>{pendingAccusedPhoto='';updatePhotoPreview();showToast('Photo removed. Save changes to confirm.');});
   $('caseForm').addEventListener('submit',e=>{e.preventDefault();saveCurrent(false)});
   $('saveAndOpenBtn').addEventListener('click',()=>saveCurrent(true));
   $('newCaseBtn').addEventListener('click',()=>{clearForm();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'})});
