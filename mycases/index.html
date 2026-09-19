@@ -45,7 +45,8 @@
     .case-title{display:flex;flex-wrap:wrap;gap:7px;align-items:center;font-weight:850}.case-meta{margin-top:5px;color:var(--muted);font-size:.82rem;display:flex;flex-wrap:wrap;gap:8px 13px}
     .chip{display:inline-flex;align-items:center;min-height:24px;padding:3px 7px;border-radius:999px;font-size:.7rem;font-weight:800;background:#edf3f9;color:#405872}.chip.high{background:#fff0f0;color:#a02d2d}.chip.medium{background:#fff7e8;color:#9b6914}.chip.low{background:#eef8f3;color:#21704f}
     .row-actions{display:flex;flex-direction:column;gap:6px}.mini{min-height:34px;padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:#fff;font-weight:750;font-size:.76rem}
-    .form-wrap{padding:16px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-group{display:grid;gap:5px}.form-group.full{grid-column:1/-1}
+    .form-wrap{padding:16px}
+    .quick-create{padding:16px}.quick-create-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}.quick-create .helper{margin-top:7px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-group{display:grid;gap:5px}.form-group.full{grid-column:1/-1}
     label{font-size:.76rem;font-weight:800;color:#435870}.textarea{min-height:82px;resize:vertical}
     .form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.helper{font-size:.75rem;color:var(--muted);margin-top:8px}
     .detail{padding:16px;display:none}.detail.visible{display:block}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.detail-item{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}.detail-item.full{grid-column:1/-1}.detail-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:#7b8b9d;font-weight:800}.detail-value{margin-top:3px;white-space:pre-wrap;word-break:break-word}
@@ -62,7 +63,7 @@
     .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,90px);opacity:0;transition:.25s;z-index:120;background:#0e2944;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.82rem}.toast.show{transform:translate(-50%,0);opacity:1}
     .hidden{display:none!important}
     @media(max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.hero-row{align-items:start;flex-direction:column}}
-    @media(max-width:620px){.wrap{width:min(100% - 20px,1240px)}.nav{min-height:58px}.nav-actions .hide-mobile{display:none}.hero{padding:22px 0}.main{padding-top:14px}.stats{gap:7px}.stat{padding:13px}.stat strong{font-size:1.45rem}.toolbar{top:58px;grid-template-columns:1fr 1fr;gap:7px}.toolbar .btn{padding-inline:9px}.form-grid,.detail-grid{grid-template-columns:1fr}.form-group.full,.detail-item.full{grid-column:auto}.case-row{grid-template-columns:1fr}.row-actions{flex-direction:row}.row-actions .mini{flex:1}.panel{border-radius:13px}.panel-head{padding:14px}.form-wrap{padding:13px}.detail{padding:13px}.nav-link{padding:8px 9px}.brand span:last-child{display:none}}
+    @media(max-width:620px){.quick-create-row{grid-template-columns:1fr}.quick-create-row .btn{width:100%}.wrap{width:min(100% - 20px,1240px)}.nav{min-height:58px}.nav-actions .hide-mobile{display:none}.hero{padding:22px 0}.main{padding-top:14px}.stats{gap:7px}.stat{padding:13px}.stat strong{font-size:1.45rem}.toolbar{top:58px;grid-template-columns:1fr 1fr;gap:7px}.toolbar .btn{padding-inline:9px}.form-grid,.detail-grid{grid-template-columns:1fr}.form-group.full,.detail-item.full{grid-column:auto}.case-row{grid-template-columns:1fr}.row-actions{flex-direction:row}.row-actions .mini{flex:1}.panel{border-radius:13px}.panel-head{padding:14px}.form-wrap{padding:13px}.detail{padding:13px}.nav-link{padding:8px 9px}.brand span:last-child{display:none}}
   </style>
 </head>
 <body>
@@ -132,7 +133,14 @@
           <h2 id="editorTitle">Add Case</h2>
           <button class="btn btn-soft" id="clearFormBtn" type="button">Clear</button>
         </div>
-        <form class="form-wrap" id="caseForm">
+        <form class="quick-create" id="quickCaseForm">
+          <div class="quick-create-row">
+            <div class="form-group"><label for="quickCrimeNo">Crime / CSR / UDR No. <span style="color:#b63d3d">*</span></label><input class="input" id="quickCrimeNo" placeholder="e.g. 43" required inputmode="numeric" autocomplete="off"></div>
+            <button class="btn btn-primary" type="submit">Create Case</button>
+          </div>
+          <div class="helper">Create the case now with only the crime number. Add year, police station, sections, accused, court and other details afterwards.</div>
+        </form>
+        <form class="form-wrap hidden" id="caseForm">
           <input type="hidden" id="caseId">
           <div class="form-grid">
             <div class="form-group"><label for="crimeNo">Crime / CSR / UDR No. <span style="color:#b63d3d">*</span></label><input class="input" id="crimeNo" placeholder="e.g. 43" required></div>
@@ -331,11 +339,11 @@
   }
 
   function clearForm(){
-    $('caseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='Add Case';$('saveCaseBtn').textContent='Create Case';$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
+    $('caseForm').reset();$('quickCaseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='New Case';$('saveCaseBtn').textContent='Create Case';$('quickCaseForm').classList.remove('hidden');$('caseForm').classList.add('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
   }
 
   function fillForm(c){
-    $('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
+    $('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('quickCaseForm').classList.add('hidden');$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
   }
 
   function saveCurrent(openDocs=false){
@@ -349,7 +357,7 @@
   }
 
   function showDetail(c){
-    selectedId=c.id;$('caseForm').classList.add('hidden');$('caseDetail').classList.add('visible');$('editorTitle').textContent='Case Details';
+    selectedId=c.id;$('quickCaseForm').classList.add('hidden');$('caseForm').classList.add('hidden');$('caseDetail').classList.add('visible');$('editorTitle').textContent='Case Details';
     const rows=[
       ['Crime / Reference',(c.caseType||'Case')+' '+(c.crimeNo?c.crimeNo+'/'+(c.crimeYear||''):'—')],
       ['Police Station / Unit',c.policeStation||'—'],['Sections',c.sections||'—'],['Complainant',c.complainant||'—'],
@@ -397,6 +405,14 @@
     reader.readAsText(file);
   }
 
+  $('quickCaseForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const crimeNo=$('quickCrimeNo').value.trim();
+    if(!crimeNo){$('quickCrimeNo').focus();return}
+    const now=new Date().toISOString();
+    const item={id:uid(),crimeNo,crimeYear:'',policeStation:'',caseType:'Crime',sections:'',complainant:'',accused:'',ioName:'',priority:'Medium',court:'',courtCaseNo:'',stage:'Investigation',nextHearing:'',nextAction:'',notes:'',createdAt:now,updatedAt:now};
+    cases.unshift(item);saveCases();selectedId=item.id;renderList();showDetail(item);pushCaseToCloud(item,false);showToast('Case created. Add details anytime.');
+  });
   $('caseForm').addEventListener('submit',e=>{e.preventDefault();saveCurrent(false)});
   $('saveAndOpenBtn').addEventListener('click',()=>saveCurrent(true));
   $('newCaseBtn').addEventListener('click',()=>{clearForm();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'})});
