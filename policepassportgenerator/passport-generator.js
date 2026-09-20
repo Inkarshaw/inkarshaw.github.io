@@ -670,20 +670,111 @@ document.addEventListener('DOMContentLoaded', function() {
                 return isValid;
             }
 
-            function validateFirExportFields() {
-                if (passportTypeSelect.value !== 'FIR Filing Passport') {
-                    return true;
+            function getExportFieldLabel(field, fallbackLabel = '') {
+                if (!field) return fallbackLabel || 'Required field';
+
+                const fieldId = field.id || '';
+                const officerMatch = fieldId.match(/^(designation|fullName)(\d+)$/);
+                if (officerMatch) {
+                    const officerNumber = officerMatch[2];
+                    return officerMatch[1] === 'designation'
+                        ? `Officer ${officerNumber} Designation/No.`
+                        : `Officer ${officerNumber} Full Name`;
                 }
 
-                const checks = [
-                    { field: document.getElementById('firCrimeNumber'), label: 'Crime No.' },
-                    { field: document.getElementById('firSection'), label: 'Sections' },
-                    { field: courtSelect, label: 'Court' },
-                    { field: courtNumberInput, label: 'Court Number' },
-                    { field: document.getElementById('date'), label: 'Date' }
-                ];
+                const accusedMatch = fieldId.match(/^(accusedName|age|fatherName)(\d+)$/);
+                if (accusedMatch) {
+                    const accusedNumber = accusedMatch[2];
+                    const part = accusedMatch[1] === 'accusedName'
+                        ? 'Name'
+                        : accusedMatch[1] === 'age'
+                            ? 'Age'
+                            : 'Father Name';
+                    return `Accused ${accusedNumber} ${part}`;
+                }
 
-                const missing = checks.filter(({ field }) =>
+                const commonLabels = {
+                    passportType: 'Passport Type',
+                    court: 'Court',
+                    courtNumber: 'Court Number',
+                    date: 'Date',
+                    time: 'Time',
+                    firCrimeNumber: 'Crime No.',
+                    firSection: 'Sections',
+                    ptCrimeNumber: 'Crime No.',
+                    ptSection: 'Sections',
+                    escortCrimeNumber: 'Crime No.',
+                    escortSection: 'Sections',
+                    transferCrimeNumber: 'Crime No.',
+                    transferSection: 'Sections',
+                    viseraCrimeNumber: 'Crime No.',
+                    viseraSection: 'Sections',
+                    labCrimeNumber: 'Crime No.',
+                    labSection: 'Sections',
+                    arrestCrimeNumber: 'Crime No.',
+                    arrestSection: 'Sections',
+                    propertyCrimeNumber: 'Crime No.',
+                    propertySection: 'Sections'
+                };
+
+                return commonLabels[fieldId] || fallbackLabel || fieldId || 'Required field';
+            }
+
+            function addRequiredChecksFromContainer(container, checks) {
+                if (!container) return;
+
+                container.querySelectorAll('label.required[for]').forEach(label => {
+                    const field = document.getElementById(label.htmlFor);
+                    if (!field) return;
+
+                    const labelText = label.textContent.replace(/\s+/g, ' ').trim();
+                    checks.push({
+                        field,
+                        label: getExportFieldLabel(field, labelText)
+                    });
+                });
+            }
+
+            function validateExportRequiredFields() {
+                const checks = [];
+                const config = getSelectedPassportConfig();
+
+                checks.push({
+                    field: passportTypeSelect,
+                    label: 'Passport Type'
+                });
+
+                if (config?.available) {
+                    addRequiredChecksFromContainer(getSelectedPassportSection(), checks);
+
+                    if (config.showMainDateTime) {
+                        addRequiredChecksFromContainer(dateTimeSection, checks);
+                    }
+
+                    if (config.requiresCourt) {
+                        checks.push(
+                            { field: courtSelect, label: 'Court' },
+                            { field: courtNumberInput, label: 'Court Number' }
+                        );
+                    }
+
+                    addRequiredChecksFromContainer(policeOfficersContainer, checks);
+
+                    if (config.requiresAccused) {
+                        addRequiredChecksFromContainer(accusedPersonsContainer, checks);
+                    }
+                }
+
+                const uniqueChecks = [];
+                const seenIds = new Set();
+                checks.forEach(item => {
+                    const key = item.field?.id || item.label;
+                    if (!key || seenIds.has(key)) return;
+                    seenIds.add(key);
+                    uniqueChecks.push(item);
+                });
+
+                const missing = uniqueChecks.filter(({ field }) =>
                     !field || !String(field.value ?? '').trim()
                 );
 
@@ -698,8 +789,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 const labels = missing.map(item => item.label);
+                const passportName = passportTypeSelect.value || 'Passport';
                 showNotification(
-                    `Missing required field${labels.length === 1 ? '' : 's'}: ${labels.join(', ')}.`,
+                    `${passportName} — missing required field${labels.length === 1 ? '' : 's'}: ${labels.join(', ')}.`,
                     'error'
                 );
 
@@ -1393,7 +1485,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             function printDocument() {
-                if (!validateFirExportFields()) {
+                if (!validateExportRequiredFields()) {
                     return;
                 }
 
@@ -1445,7 +1537,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                if (!validateFirExportFields()) {
+                if (!validateExportRequiredFields()) {
                     return;
                 }
 
