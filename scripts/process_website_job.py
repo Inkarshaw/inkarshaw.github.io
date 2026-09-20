@@ -10,7 +10,7 @@ import tempfile
 import urllib.parse
 import urllib.request
 
-from current_affairs_pdf import publish_pdf
+from current_affairs_pdf import pdf_digest, publish_pdf
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 BLOCKED_PREFIXES = (
@@ -104,6 +104,7 @@ def main():
     ap.add_argument("--action", required=True)
     ap.add_argument("--source", default="")
     ap.add_argument("--target", default="")
+    ap.add_argument("--expected-sha256", default="")
     args = ap.parse_args()
     action = args.action.strip().upper()
 
@@ -113,6 +114,11 @@ def main():
             with tempfile.TemporaryDirectory(prefix="clearexams-pdf-") as temporary:
                 source_pdf = pathlib.Path(temporary) / "download.pdf"
                 download(args.source, source_pdf)
+                if args.expected_sha256:
+                    if not re.fullmatch(r"[0-9a-fA-F]{64}", args.expected_sha256):
+                        raise ValueError("Expected SHA-256 must contain 64 hexadecimal characters")
+                    if pdf_digest(source_pdf) != args.expected_sha256.lower():
+                        raise ValueError("Drive PDF no longer matches the queued edition; refusing to publish it under this date")
                 publish_pdf(source_pdf, target.stem, target.parent)
             rebuild_ca_index()
         else:

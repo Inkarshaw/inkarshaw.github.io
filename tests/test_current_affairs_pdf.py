@@ -1,6 +1,7 @@
 """Regression checks for stale Drive uploads and current-affairs archive dates."""
 
 import importlib.util
+import hashlib
 import json
 import shutil
 import subprocess
@@ -108,6 +109,24 @@ class PublishingTests(unittest.TestCase):
                 process_website_job.main()
             rebuild.assert_not_called()
         self.assertFalse((self.archive / "2026-09-20.pdf").exists())
+
+    def test_changed_drive_pdf_does_not_replace_the_queued_edition(self):
+        target = publish_pdf(self.source, "2026-09-19", self.archive)
+        before = target.read_bytes()
+        expected = hashlib.sha256(before).hexdigest()
+        def download(_url, destination):
+            destination.write_bytes(b"%PDF-1.4\nDifferent edition\n%%EOF")
+        with patch.object(process_website_job, "ROOT", self.root), \
+             patch.object(process_website_job, "download", side_effect=download), \
+             patch.object(process_website_job, "rebuild_ca_index") as rebuild, \
+             patch.object(sys, "argv", ["process_website_job.py", "--action", "PUBLISH_URL",
+                                       "--source", "https://example.com/latest.pdf",
+                                       "--target", "current-affairs/2026-09-19.pdf",
+                                       "--expected-sha256", expected]):
+            with self.assertRaisesRegex(ValueError, "no longer matches"):
+                process_website_job.main()
+            rebuild.assert_not_called()
+        self.assertEqual(target.read_bytes(), before)
 
 
 if __name__ == "__main__":

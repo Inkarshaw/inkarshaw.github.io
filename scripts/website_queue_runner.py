@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import hashlib
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import time
@@ -44,14 +46,35 @@ def derive_url(job):
         target = ""
     return SITE.rstrip("/") + "/" + urllib.parse.quote(target.lstrip("/"), safe="/._-")
 
-def verify_url(url, attempts=12, delay=5):
+def ca_publication_details(job):
+    target = (job.get("targetPath") or "").strip().replace("\\", "/")
+    match = re.fullmatch(r"current-affairs/(\d{4}-\d{2}-\d{2})\.pdf", target)
+    if job.get("action", "").upper() not in {"PUBLISH_URL", "PUBLISH_FILE"} or not match:
+        return {}
+    digest = re.search(r"(?:^|[\s;])sha256=([0-9a-fA-F]{64})(?=$|[\s;])", job.get("notes") or "")
+    if not digest:
+        raise ValueError("Current-affairs jobs require sha256=<verified PDF checksum> in Notes")
+    return {"expectedSha256": digest.group(1).lower(), "editionDate": match.group(1)}
+
+def verify_url(url, attempts=12, delay=5, expected_sha256=None, expected_edition=None):
     last = None
     for i in range(attempts):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent":"ClearExams-Site-Verify/2.0"})
+            req = urllib.request.Request(url, headers={"User-Agent":"ClearExams-Site-Verify/2.0", "Cache-Control":"no-cache"})
             with urllib.request.urlopen(req, timeout=30) as r:
                 code = r.getcode()
                 if 200 <= code < 400:
+                    if expected_sha256:
+                        body = r.read()
+                        if not body.startswith(b"%PDF-") or hashlib.sha256(body).hexdigest() != expected_sha256:
+                            raise RuntimeError("Live PDF does not match the verified edition")
+                    if expected_edition:
+                        entries = json.loads(r.read())
+                        if not isinstance(entries, list) or not any(
+                            isinstance(item, dict) and item.get("date") == expected_edition
+                            and item.get("file") == f"{expected_edition}.pdf" for item in entries
+                        ):
+                            raise RuntimeError("Edition is missing from the live current-affairs index")
                     print(f"Verified {url} — HTTP {code}")
                     return
                 last = f"HTTP {code}"
@@ -102,6 +125,7 @@ def prepare(manifest_path):
         token = job["token"]
         try:
             request("/claim", "POST", {"token":token,"githubRun":RUN_URL})
+            verification = ca_publication_details(job)
             args = [
                 sys.executable,
                 str(ROOT/"scripts"/"process_website_job.py"),
@@ -109,13 +133,16 @@ def prepare(manifest_path):
                 "--source", job.get("source",""),
                 "--target", job.get("targetPath",""),
             ]
+            if verification:
+                args.extend(["--expected-sha256", verification["expectedSha256"]])
             run(args)
             sha = git_commit(job)
             pending.append({
                 "jobId": job["jobId"],
                 "token": token,
                 "url": derive_url(job),
-                "commitSha": sha
+                "commitSha": sha,
+                **verification
             })
             print(f"Prepared {job['jobId']} at {sha}")
         except Exception as e:
@@ -133,9 +160,12 @@ def prepare(manifest_path):
 def finalize(manifest_path):
     pending = json.loads(pathlib.Path(manifest_path).read_text(encoding="utf-8"))
     errors = []
+    unacknowledged = []
     for item in pending:
         try:
-            verify_url(item["url"])
+            verify_url(item["url"], expected_sha256=item.get("expectedSha256"))
+            if item.get("editionDate"):
+                verify_url(SITE + "/current-affairs/pdfs.json", expected_edition=item["editionDate"])
             request("/complete","POST",{
                 "token":item["token"],
                 "githubRun":RUN_URL,
@@ -153,6 +183,9 @@ def finalize(manifest_path):
                 })
             except Exception as callback_error:
                 print(f"Failure callback also failed: {callback_error}", file=sys.stderr)
+                unacknowledged.append(item)
+    # A later workflow failure must not retry completed jobs or count one failure twice.
+    pathlib.Path(manifest_path).write_text(json.dumps(unacknowledged), encoding="utf-8")
     if errors:
         raise SystemExit("; ".join(errors))
 

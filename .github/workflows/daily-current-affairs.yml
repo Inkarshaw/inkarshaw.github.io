@@ -1,14 +1,14 @@
-name: Build daily current affairs PDF
+name: Build current affairs PDF from repository assets (manual)
 
 on:
   workflow_dispatch:
     inputs:
       date:
-        description: "Date in YYYY-MM-DD (defaults to current IST date)"
-        required: false
+        description: "Explicit edition date of the repository images (YYYY-MM-DD)"
+        required: true
         type: string
-  schedule:
-    - cron: "40 14 * * *"  # 20:10 IST
+  # Daily production uses the 21:30 IST ChatGPT task, Drive, and Website Queue.
+  # Keep this repository-assets builder available only for explicit manual runs.
 
 permissions:
   contents: write

@@ -2,6 +2,21 @@
 
 Private-sheet bridge used by GitHub Actions.
 
+## Daily current affairs
+
+The enabled ChatGPT tasks check news every two hours, create the cover at
+21:05 IST, and assemble/upload/publish the daily PDF at 21:30 IST. See
+[the current-affairs runbook](current-affairs-runbook.md) for the complete handoff.
+The old 20:10 repository-assets builder is manual-only.
+
+Each current-affairs queue entry uses `CA-YYYY-MM-DD`, action `PUBLISH_URL`,
+the public Drive PDF link, target `current-affairs/YYYY-MM-DD.pdf`, and a
+`sha256=<64-character checksum>` marker in Notes. The publisher checks the
+download against that checksum before replacing a PDF, then checks both the
+live PDF bytes and the dated website index before marking the row `PUBLISHED`.
+This prevents a delayed request from publishing a changed `current-affairs-latest.pdf`
+under an older edition date. Non-PDF website jobs keep their existing behavior.
+
 Flow:
 
 1. Add a row to **Website Queue**.
