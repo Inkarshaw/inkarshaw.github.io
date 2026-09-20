@@ -1444,9 +1444,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         crimeNumber = typeSection?.querySelector('input[id$="CrimeNumber"]')?.value || '';
                     }
 
+                    const typeLabel = passportTypeSelect.options[passportTypeSelect.selectedIndex]?.textContent?.trim()
+                        || passportTypeSelect.value;
                     const fileParts = [
-                        'Police_Passport',
-                        passportTypeSelect.value,
+                        typeLabel,
                         station,
                         crimeNumber,
                         getLocalDateStamp()
