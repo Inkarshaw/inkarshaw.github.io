@@ -366,6 +366,99 @@ document.addEventListener('DOMContentLoaded', function() {
                 K6: { court: 'MM', number: '5' }
             };
 
+            const chennaiPoliceStations = [
+                'AWPS பேரவள்ளூர்',
+                'B1 வடக்குக் கடற்கரை காவல் நிலையம்',
+                'B2 எஸ்பிளனேட் காவல் நிலையம்',
+                'B3 கோட்டை செயின்ட் ஜார்ஜ் காவல் நிலையம்',
+                'B4 உயர்நீதிமன்ற காவல் நிலையம்',
+                'C1 பூக்கடை காவல் நிலையம்',
+                'C2 எலிபெண்ட் கேட் காவல் நிலையம்',
+                'C3 செவன் வெல்ஸ் காவல் நிலையம்',
+                'C4 அரசு பொது மருத்துவமனை அவுட்போஸ்ட்',
+                'C5 கொத்தவால் சாவடி காவல் நிலையம்',
+                'D1 திருப்பள்ளிக்கேணி காவல் நிலையம்',
+                'D2 அண்ணா சாலை காவல் நிலையம்',
+                'D3 ஐஸ் ஹவுஸ் காவல் நிலையம்',
+                'D4 ஜாம் பஜார் காவல் நிலையம்',
+                'D5 மெரினா காவல் நிலையம்',
+                'D6 அண்ணா சதுக்கம் காவல் நிலையம்',
+                'D7 அரசு எஸ்டேட் காவல் நிலையம்',
+                'D8 கஸ்தூரிபாய் காந்தி மருத்துவமனை காவல் நிலையம்',
+                'E1 மயிலாப்பூர் காவல் நிலையம்',
+                'E2 ராயப்பேட்டை காவல் நிலையம்',
+                'E3 தேனாம்பேட்டை காவல் நிலையம்',
+                'E4 அபிராமபுரம் காவல் நிலையம்',
+                'F1 சிந்தாதிரிப்பேட்டை காவல் நிலையம்',
+                'F2 எழும்பூர் காவல் நிலையம்',
+                'F3 நுங்கம்பாக்கம் காவல் நிலையம்',
+                'F4 தௌசண்ட் லைட்ஸ் காவல் நிலையம்',
+                'F5 சேத்துப்பட்டு காவல் நிலையம்',
+                'G1 வேப்பேரி காவல் நிலையம்',
+                'G2 பெரியமேடு காவல் நிலையம்',
+                'G3 கிளிப்பாக் காவல் நிலையம்',
+                'G5 செயலக காலனி காவல் நிலையம்',
+                'G7 சேத்துபட்டு காவல் நிலையம்',
+                'H1 பழைய வண்ணாரப்பேட்டை காவல் நிலையம்',
+                'H3 தொண்டையார்பேட்டை காவல் நிலையம்',
+                'J1 சைதாப்பேட்டை காவல் நிலையம்',
+                'J2 அடையாறு காவல் நிலையம்',
+                'J3 கிண்டி காவல் நிலையம்',
+                'J5 சாஸ்திரி நகர் காவல் நிலையம்',
+                'J6 திருவான்மியூர் காவல் நிலையம்',
+                'J7 வேளச்சேரி காவல் நிலையம்',
+                'K1 செம்பியம் காவல் நிலையம்',
+                'K2 அயனாவரம் காவல் நிலையம்',
+                'K4 அண்ணா நகர் காவல் நிலையம்',
+                'K6 டிபி சத்திரம் காவல் நிலையம்',
+                'K8 அரும்பாக்கம் காவல் நிலையம்',
+                'M1 ஹார்பர் காவல் நிலையம்',
+                'N1 ராயபுரம் காவல் நிலையம்',
+                'P1 புளியந்தோப்பு காவல் நிலையம்',
+                'R1 மாம்பலம் காவல் நிலையம்',
+                'R2 கோடம்பாக்கம் காவல் நிலையம்',
+                'R3 அசோக் நகர் காவல் நிலையம்',
+                'V1 வில்லிவாக்கம் காவல் நிலையம்',
+                'V2 விருகம்பாக்கம் காவல் நிலையம்',
+                'W1 அனைத்து மகளிர் காவல் நிலையம் தௌசண்ட் லைட்ஸ்'
+            ];
+
+            function ensurePoliceStationOption(select, value, label = value) {
+                if (!select || select.tagName !== 'SELECT' || !value) return;
+                const exists = Array.from(select.options).some(option => option.value === value);
+                if (exists) return;
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                option.dataset.savedCustom = 'true';
+                select.appendChild(option);
+            }
+
+            function setPoliceStationFieldValue(field, value) {
+                if (!field) return;
+                const normalized = String(value ?? '').trim();
+                if (field.tagName === 'SELECT' && normalized) {
+                    ensurePoliceStationOption(field, normalized, normalized + ' (Saved)');
+                }
+                field.value = normalized;
+            }
+
+            function populatePoliceStationDropdowns() {
+                document.querySelectorAll('select[id$="PoliceStation"]').forEach(select => {
+                    const existingValue = select.value;
+                    select.innerHTML = '<option value="">Select Police Station</option>';
+                    chennaiPoliceStations.forEach(station => {
+                        const option = document.createElement('option');
+                        option.value = station;
+                        option.textContent = station;
+                        select.appendChild(option);
+                    });
+                    if (existingValue) {
+                        setPoliceStationFieldValue(select, existingValue);
+                    }
+                });
+            }
+
             function getPoliceStationCode(stationValue) {
                 const match = String(stationValue || '')
                     .trim()
@@ -942,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 const section = getSelectedPassportSection();
-                return section?.querySelector('input[id$="PoliceStation"]')?.value?.trim() || '';
+                return section?.querySelector('select[id$="PoliceStation"]')?.value?.trim() || '';
             }
 
             function saveCommonDefaults() {
@@ -984,9 +1077,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     if (defaults.station) {
-                        document.querySelectorAll('input[id$="PoliceStation"]').forEach(input => {
+                        document.querySelectorAll('select[id$="PoliceStation"]').forEach(input => {
                             if (!onlyIfBlank || !input.value.trim()) {
-                                input.value = defaults.station;
+                                setPoliceStationFieldValue(input, defaults.station);
                             }
                         });
                     }
@@ -1107,6 +1200,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (!field) return;
                             if (field.type === 'checkbox') {
                                 field.checked = Boolean(value);
+                            } else if (field.id.endsWith('PoliceStation')) {
+                                setPoliceStationFieldValue(field, value);
                             } else {
                                 field.value = value ?? '';
                             }
@@ -1121,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             document.getElementById('time').value = formData.time || '';
                         }
                         if (formData.escortPoliceStation) {
-                            document.getElementById('escortPoliceStation').value = formData.escortPoliceStation || '';
+                            setPoliceStationFieldValue(document.getElementById('escortPoliceStation'), formData.escortPoliceStation || '');
                             document.getElementById('escortCrimeNumber').value = formData.escortCrimeNumber || '';
                             document.getElementById('escortSection').value = formData.escortSection || '';
                         }
@@ -1188,7 +1283,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     const typeSection = getSelectedPassportSection();
                     if (typeSection) {
-                        const policeStation = typeSection.querySelector('input[id$="PoliceStation"]');
+                        const policeStation = typeSection.querySelector('select[id$="PoliceStation"]');
                         if (policeStation) policeStationValue = policeStation.value;
                     }
                 }
@@ -1662,7 +1757,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         crimeNumber = document.getElementById('escortCrimeNumber')?.value || '';
                     } else {
                         const typeSection = getSelectedPassportSection();
-                        station = typeSection?.querySelector('input[id$="PoliceStation"]')?.value || '';
+                        station = typeSection?.querySelector('select[id$="PoliceStation"]')?.value || '';
                         crimeNumber = typeSection?.querySelector('input[id$="CrimeNumber"]')?.value || '';
                     }
 
@@ -1743,16 +1838,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             function setupInputPresets(root = document) {
-                ensureDatalist('police-station-suggestions', [
-                    'G7 Chetpet PS',
-                    'G3 Kilpauk PS',
-                    'G5 Secretariat Colony PS',
-                    'K2 Ayanavaram PS',
-                    'K6 TP Chatram PS',
-                    'F3 Nungambakkam PS',
-                    'D1 Triplicane PS',
-                    'E1 Mylapore PS'
-                ]);
+                ensureDatalist('police-station-suggestions', chennaiPoliceStations);
                 ensureDatalist('prison-suggestions', [
                     'Puzhal Central Prison, Chennai'
                 ]);
@@ -1771,14 +1857,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Tamil Nadu Prohibition Act'
                 ]);
 
-                root.querySelectorAll('input[id$="PoliceStation"], #fromStation, #toStation').forEach(input => {
+                root.querySelectorAll('#fromStation, #toStation').forEach(input => {
                     input.setAttribute('list', 'police-station-suggestions');
                     input.setAttribute('autocomplete', 'off');
                     input.setAttribute('autocapitalize', 'words');
                     input.setAttribute('spellcheck', 'false');
                 });
 
-                root.querySelectorAll('input[id$="PoliceStation"]').forEach(input => {
+                root.querySelectorAll('select[id$="PoliceStation"]').forEach(input => {
                     if (input.dataset.courtPresetBound === 'true') return;
                     input.addEventListener('change', function() {
                         applyCourtPresetForStation(this.value, { notify: true });
@@ -2121,6 +2207,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Initialize the application
             function init() {
+                populatePoliceStationDropdowns();
                 updatePoliceOfficers();
                 updateAccusedPersons();
                 updateContentVisibility();
