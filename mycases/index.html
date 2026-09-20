@@ -64,6 +64,9 @@
     .hidden{display:none!important}
     @media(max-width:1100px){.attention{grid-template-columns:repeat(4,1fr)}}@media(max-width:900px){.attention{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.hero-row{align-items:start;flex-direction:column}}
     @media(max-width:620px){.check-item{grid-template-columns:auto minmax(0,1fr)}.check-item .check-date{grid-column:2}.hearing-form{grid-template-columns:1fr}.hearing-form .full{grid-column:auto}.attachment-form{grid-template-columns:1fr}.task-form{grid-template-columns:1fr}.timeline-form{grid-template-columns:1fr}.doc-shortcuts{grid-template-columns:1fr}.accused-card{grid-template-columns:64px minmax(0,1fr)}.accused-card img,.accused-avatar{width:64px;height:74px}.accused-remove{grid-column:1/-1;width:100%}.accused-fields{grid-template-columns:1fr}.accused-fields .full{grid-column:auto}.quick-create-row{grid-template-columns:1fr}.quick-create-row .btn{width:100%}.wrap{width:min(100% - 20px,1240px)}.nav{min-height:58px}.nav-actions .hide-mobile{display:none}.hero{padding:22px 0}.main{padding-top:14px}.stats{gap:7px}.stat{padding:13px}.stat strong{font-size:1.45rem}.toolbar{top:58px;grid-template-columns:1fr 1fr;gap:7px}.toolbar .btn{padding-inline:9px}.form-grid,.detail-grid{grid-template-columns:1fr}.form-group.full,.detail-item.full{grid-column:auto}.case-row{grid-template-columns:1fr}.row-actions{flex-direction:row}.row-actions .mini{flex:1}.panel{border-radius:13px}.panel-head{padding:14px}.form-wrap{padding:13px}.detail{padding:13px}.nav-link{padding:8px 9px}.brand span:last-child{display:none}}
+  
+    .brief-overlay{position:fixed;inset:0;background:rgba(5,18,34,.72);z-index:180;display:none;overflow:auto;padding:24px}.brief-overlay.open{display:block}.brief-sheet{width:min(900px,100%);margin:auto;background:#fff;border-radius:14px;padding:28px;box-shadow:0 24px 70px rgba(0,0,0,.3)}.brief-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:18px}.brief-sheet h2{margin:0 0 4px}.brief-sheet h3{margin:20px 0 8px;border-bottom:1px solid var(--line);padding-bottom:5px}.brief-table{width:100%;border-collapse:collapse;font-size:.82rem}.brief-table td,.brief-table th{border:1px solid var(--line);padding:7px;text-align:left;vertical-align:top}.brief-muted{color:var(--muted);font-size:.78rem}
+    @media print{body>*:not(#caseBriefOverlay){display:none!important}#caseBriefOverlay{display:block!important;position:static;background:#fff;padding:0}.brief-sheet{width:100%;box-shadow:none;border-radius:0;padding:8mm}.brief-actions{display:none!important}}
   </style>
 </head>
 <body>
@@ -121,7 +124,7 @@
       <select class="select" id="priorityFilter" aria-label="Filter by priority">
         <option value="">All Priority</option><option>High</option><option>Medium</option><option>Low</option>
       </select>
-      <button class="btn btn-primary" id="newCaseBtn" type="button">＋ New Case</button>
+      <button class="btn" id="caseBriefBtn" type="button">Case Brief</button><button class="btn btn-primary" id="newCaseBtn" type="button">＋ New Case</button>
     </div>
 
     <div class="grid">
@@ -239,7 +242,7 @@
   </div>
 </main>
 
-<div class="toast" id="toast"></div>
+<div class="brief-overlay" id="caseBriefOverlay"><div class="brief-sheet"><div class="brief-actions"><button class="btn" id="closeBriefBtn" type="button">Close</button><button class="btn btn-primary" id="printBriefBtn" type="button">Print / Save PDF</button></div><div id="caseBriefContent"></div></div></div><div class="toast" id="toast"></div>
 
 <div class="login-dialog" id="loginDialog" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
   <div class="login-card">
@@ -593,6 +596,9 @@
   $('timelineList').addEventListener('click',e=>{const b=e.target.closest('.timeline-delete');if(!b)return;timelineEntries=timelineEntries.filter(x=>x.id!==b.dataset.tid);renderTimeline();});
   $('timelineDate').value=new Date().toISOString().slice(0,10);
   document.querySelectorAll('[data-attention]').forEach(b=>b.addEventListener('click',()=>{attentionFilter=attentionFilter===b.dataset.attention?'':b.dataset.attention;renderCases();showToast(attentionFilter?'Showing '+b.querySelector('span').textContent:'Showing all cases');}));
+  $('caseBriefBtn').addEventListener('click',openCaseBrief);
+  $('closeBriefBtn').addEventListener('click',()=>$('caseBriefOverlay').classList.remove('open'));
+  $('printBriefBtn').addEventListener('click',()=>window.print());
   $('caseTabs').addEventListener('click',e=>{const b=e.target.closest('.case-tab');if(b)setCaseTab(b.dataset.tab);});
   $('openDocsFromEdit').addEventListener('click',()=>{const c=cases.find(x=>x.id===$('caseId').value)||formData();openInDocuments(c);});
   document.querySelectorAll('.doc-shortcut').forEach(btn=>btn.addEventListener('click',()=>{const c=cases.find(x=>x.id===$('caseId').value)||formData();openDocumentShortcut(c,btn.dataset.docq);}));
