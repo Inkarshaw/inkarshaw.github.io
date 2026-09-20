@@ -95,7 +95,7 @@
   <div class="wrap">
     <section class="cloudbar" aria-label="Google Sheets sync">
       <div class="cloud-status"><span class="cloud-dot" id="cloudDot"></span><span id="cloudStatusText">Local only</span></div>
-      <button class="btn" id="cloudLoginBtn" type="button">Cloud Login</button>
+      <button class="btn" id="cloudLoginBtn" type="button" onclick="var d=document.getElementById('loginDialog');if(d){d.classList.add('open');d.style.display='flex';setTimeout(function(){var p=document.getElementById('cloudPassword');if(p)p.focus();},50);}">Cloud Login</button>
       <button class="btn btn-primary" id="syncNowBtn" type="button" disabled>Sync Now</button>
       <div class="cloud-note">Local browser storage remains available offline. Cloud sync uses the private ClearExams My Cases Google Sheet.</div>
     </section>
@@ -250,7 +250,7 @@
     <p>Enter the private password configured in Railway. The password is sent only to the My Cases API and is not stored in GitHub.</p>
     <input id="cloudPassword" type="password" autocomplete="current-password" placeholder="Private My Cases password">
     <div class="login-actions">
-      <button class="btn" id="cancelLoginBtn" type="button">Cancel</button>
+      <button class="btn" id="cancelLoginBtn" type="button" onclick="var d=document.getElementById('loginDialog');if(d){d.classList.remove('open');d.style.display='';}">Cancel</button>
       <button class="btn btn-primary" id="submitLoginBtn" type="button">Login</button>
     </div>
   </div>
