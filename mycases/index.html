@@ -124,7 +124,7 @@
       <select class="select" id="priorityFilter" aria-label="Filter by priority">
         <option value="">All Priority</option><option>High</option><option>Medium</option><option>Low</option>
       </select>
-      <button class="btn" id="caseBriefBtn" type="button">Case Brief</button><button class="btn btn-primary" id="newCaseBtn" type="button">＋ New Case</button>
+      <button class="btn" id="caseBriefBtn" type="button">Case Brief</button><button class="btn btn-primary" id="newCaseBtn" type="button" onclick="startNewCase()">＋ New Case</button>
     </div>
 
     <div class="grid">
@@ -231,7 +231,7 @@
           <div class="detail-grid" id="detailGrid"></div>
           <div class="detail-actions">
             <button class="btn btn-primary" id="openDocsBtn" type="button">Open in Police Documents</button>
-            <button class="btn" id="editCaseBtn" type="button">Edit</button>
+            <button class="btn" id="editCaseBtn" type="button" onclick="editSelectedCase()">Edit</button>
             <button class="btn btn-danger" id="deleteCaseBtn" type="button">Delete</button>
           </div>
         </div>
@@ -456,6 +456,23 @@
     document.querySelectorAll('#caseTabs .case-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
     document.querySelectorAll('#caseForm .tab-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===name));
   }
+  function startNewCase(){
+    clearForm();
+    const q=$('quickCaseForm'), f=$('caseForm'), d=$('caseDetail');
+    if(q){q.classList.remove('hidden');q.style.display='';}
+    if(f){f.classList.add('hidden');f.style.display='';}
+    if(d)d.classList.remove('visible');
+    const input=$('quickCrimeNo'); if(input)setTimeout(()=>input.focus(),50);
+    const panel=$('editorPanel'); if(panel)window.scrollTo({top:Math.max(0,panel.offsetTop-110),behavior:'smooth'});
+  }
+
+  function editSelectedCase(){
+    const id=selectedId || ($('caseId')&&$('caseId').value);
+    const c=cases.find(x=>x.id===id);
+    if(!c){showToast('Select a case to edit.');return;}
+    fillForm(c);
+  }
+
   function fillForm(c){
     setCaseTab('case');pendingAccusedPhoto=c.accusedPhoto||'';accusedPersons=Array.isArray(c.accusedPersons)?JSON.parse(JSON.stringify(c.accusedPersons)):[];timelineEntries=Array.isArray(c.timeline)?JSON.parse(JSON.stringify(c.timeline)):[];caseTasks=Array.isArray(c.tasks)?JSON.parse(JSON.stringify(c.tasks)):[];caseAttachments=Array.isArray(c.attachments)?JSON.parse(JSON.stringify(c.attachments)):[];hearingHistory=Array.isArray(c.hearings)?JSON.parse(JSON.stringify(c.hearings)):[];investigationChecklist=Array.isArray(c.investigationChecklist)&&c.investigationChecklist.length?JSON.parse(JSON.stringify(c.investigationChecklist)):defaultChecklist();renderTimeline();renderTasks();renderAttachments();renderHearings();renderInvestigationChecklist();if(!accusedPersons.length&&c.accused)accusedPersons=[{id:uid(),name:c.accused,status:'Accused',photo:c.accusedPhoto||'',age:'',phone:'',address:'',idProof:'',arrestDate:'',hsCategory:'',remarks:''}];renderAccusedEditor();$('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('quickCaseForm').classList.add('hidden');$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
   }
@@ -604,14 +621,14 @@
   document.querySelectorAll('.doc-shortcut').forEach(btn=>btn.addEventListener('click',()=>{const c=cases.find(x=>x.id===$('caseId').value)||formData();openDocumentShortcut(c,btn.dataset.docq);}));
   $('caseForm').addEventListener('submit',e=>{e.preventDefault();saveCurrent(false)});
   $('saveAndOpenBtn').addEventListener('click',()=>saveCurrent(true));
-  $('newCaseBtn').addEventListener('click',()=>{clearForm();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'})});
+  // New Case uses direct mobile-safe startNewCase() handler.
   $('clearFormBtn').addEventListener('click',clearForm);
   $('searchInput').addEventListener('input',renderList);$('stageFilter').addEventListener('change',renderList);$('priorityFilter').addEventListener('change',renderList);
   $('caseList').addEventListener('click',e=>{
     const btn=e.target.closest('[data-action]');if(!btn)return;const c=cases.find(x=>x.id===btn.dataset.id);if(!c)return;
     btn.dataset.action==='docs'?openInDocuments(c):showDetail(c);
   });
-  $('editCaseBtn').addEventListener('click',()=>{const c=cases.find(x=>x.id===selectedId);if(c)fillForm(c)});
+  // Edit uses direct mobile-safe editSelectedCase() handler.
   $('deleteCaseBtn').addEventListener('click',deleteSelected);
   $('openDocsBtn').addEventListener('click',()=>{const c=cases.find(x=>x.id===selectedId);if(c)openInDocuments(c)});
   $('exportBtn').addEventListener('click',exportCases);
