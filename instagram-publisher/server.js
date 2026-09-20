@@ -117,7 +117,7 @@ async function graph(path, method = "GET", params = {}) {
   if (!ACCESS_TOKEN) throw new Error("INSTAGRAM_ACCESS_TOKEN is not configured");
   const url = new URL(`${GRAPH}/${path.replace(/^\//, "")}`);
   const body = new URLSearchParams();
-  for (const [k, v] of Object.entries({ ...params, access_token: ACCESS_TOKEN })) {
+  for (const [k, v] of Object.entries({ ...params, access_token: activeToken || ACCESS_TOKEN })) {
     if (v !== undefined && v !== null && v !== "") body.set(k, String(v));
   }
 
@@ -151,13 +151,20 @@ async function graph(path, method = "GET", params = {}) {
 async function resolveIgId() {
   if (CONFIGURED_IG_ID) return CONFIGURED_IG_ID;
   if (cachedIgId) return cachedIgId;
+
   try {
-    const me = await graph("me", "GET", { fields: "instagram_business_account" });
-    if (me.instagram_business_account?.id) return (cachedIgId = me.instagram_business_account.id);
+    const me = await graph("me", "GET", { fields: "id,name,instagram_business_account" });
+    if (me.instagram_business_account?.id) {
+      return (cachedIgId = me.instagram_business_account.id);
+    }
   } catch {}
-  const accounts = await graph("me/accounts", "GET", { fields: "id,name,instagram_business_account" });
+
+  const accounts = await graph("me/accounts", "GET", {
+    fields: "id,name,access_token,tasks,instagram_business_account"
+  });
   const found = (accounts.data || []).find(x => x.instagram_business_account?.id);
-  if (!found) throw new Error("Could not discover an Instagram professional account from this token");
+  if (!found) throw new Error("Could not discover a Facebook Page linked to an Instagram professional account from this token");
+  if (found.access_token) activeToken = found.access_token;
   return (cachedIgId = found.instagram_business_account.id);
 }
 
