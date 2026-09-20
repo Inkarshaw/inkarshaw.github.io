@@ -1,0 +1,74 @@
+name: ClearExams site health
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clearexams-site-health
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Validate current-affairs data
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool current-affairs/pdfs.json >/dev/null
+          echo "current-affairs/pdfs.json is valid JSON" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          urls=(
+            "https://clearexams.ink/"
+            "https://clearexams.ink/current-affairs/"
+            "https://clearexams.ink/policedocuments/"
+            "https://clearexams.ink/daily-quiz.html"
+          )
+
+          echo "## ClearExams production checks" >> "$GITHUB_STEP_SUMMARY"
+          for url in "${urls[@]}"; do
+            code=$(curl --location --silent --show-error --retry 3 \
+              --connect-timeout 15 --max-time 45 \
+              --output /dev/null --write-out "%{http_code}" "$url")
+            if [[ "$code" =~ ^2|3 ]]; then
+              echo "- ✅ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "- ❌ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+          done
+
+      - name: Report old domain references
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "## Legacy-domain scan" >> "$GITHUB_STEP_SUMMARY"
+          matches=$(grep -RIl \
+            --exclude-dir=.git \
+            --exclude='*.pdf' \
+            --exclude='*.png' \
+            --exclude='*.jpg' \
+            --exclude='*.jpeg' \
+            --exclude='*.webp' \
+            "clearexams.online" . || true)
+
+          if [ -z "$matches" ]; then
+            echo "- ✅ No clearexams.online references found." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- ⚠️ Old-domain references remain in:" >> "$GITHUB_STEP_SUMMARY"
+            while IFS= read -r file; do
+              echo "  - ${file#./}" >> "$GITHUB_STEP_SUMMARY"
+            done <<< "$matches"
+          fi
