@@ -28,7 +28,7 @@
     h1{margin:5px 0 6px;font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-.045em;line-height:1.05}.hero p{margin:0;color:#c8d7e7;max-width:720px}
     .privacy-note{margin-top:12px;display:inline-flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);font-size:.76rem;color:#d9e6f2}
     .main{padding:22px 0 56px}
-    .attention{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 16px}.attention-card{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px;cursor:pointer;text-align:left}.attention-card strong{display:block;font-size:1.25rem}.attention-card span{font-size:.76rem;color:var(--muted)}.attention-card.alert strong{color:var(--red)}.attention-card.warn strong{color:#a46709}.attention-card.info strong{color:var(--blue)}.attention-card.dark strong{color:var(--navy2)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+    .attention{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin:0 0 16px}.attention-card{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px;cursor:pointer;text-align:left}.attention-card strong{display:block;font-size:1.25rem}.attention-card span{font-size:.76rem;color:var(--muted)}.attention-card.alert strong{color:var(--red)}.attention-card.warn strong{color:#a46709}.attention-card.info strong{color:var(--blue)}.attention-card.dark strong{color:var(--navy2)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
     .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 3px 12px rgba(7,28,51,.04)}
     .stat strong{display:block;font-size:1.7rem;line-height:1;color:var(--navy2)}.stat span{display:block;margin-top:6px;color:var(--muted);font-size:.8rem}
     .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto auto auto;gap:8px;margin-bottom:16px;position:sticky;top:64px;z-index:60;background:rgba(245,248,252,.95);padding:8px 0;backdrop-filter:blur(10px)}
@@ -62,7 +62,7 @@
     .footer{padding:28px 0 44px;color:#607086;font-size:.8rem;text-align:center}
     .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,90px);opacity:0;transition:.25s;z-index:120;background:#0e2944;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.82rem}.toast.show{transform:translate(-50%,0);opacity:1}
     .hidden{display:none!important}
-    @media(max-width:900px){.attention{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.hero-row{align-items:start;flex-direction:column}}
+    @media(max-width:1100px){.attention{grid-template-columns:repeat(4,1fr)}}@media(max-width:900px){.attention{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.hero-row{align-items:start;flex-direction:column}}
     @media(max-width:620px){.task-form{grid-template-columns:1fr}.timeline-form{grid-template-columns:1fr}.doc-shortcuts{grid-template-columns:1fr}.accused-card{grid-template-columns:64px minmax(0,1fr)}.accused-card img,.accused-avatar{width:64px;height:74px}.accused-remove{grid-column:1/-1;width:100%}.accused-fields{grid-template-columns:1fr}.accused-fields .full{grid-column:auto}.quick-create-row{grid-template-columns:1fr}.quick-create-row .btn{width:100%}.wrap{width:min(100% - 20px,1240px)}.nav{min-height:58px}.nav-actions .hide-mobile{display:none}.hero{padding:22px 0}.main{padding-top:14px}.stats{gap:7px}.stat{padding:13px}.stat strong{font-size:1.45rem}.toolbar{top:58px;grid-template-columns:1fr 1fr;gap:7px}.toolbar .btn{padding-inline:9px}.form-grid,.detail-grid{grid-template-columns:1fr}.form-group.full,.detail-item.full{grid-column:auto}.case-row{grid-template-columns:1fr}.row-actions{flex-direction:row}.row-actions .mini{flex:1}.panel{border-radius:13px}.panel-head{padding:14px}.form-wrap{padding:13px}.detail{padding:13px}.nav-link{padding:8px 9px}.brand span:last-child{display:none}}
   </style>
 </head>
@@ -108,6 +108,9 @@
       <button class="attention-card info" type="button" data-attention="tomorrow"><strong id="hearTomorrowCount">0</strong><span>Hearings Tomorrow</span></button>
       <button class="attention-card alert" type="button" data-attention="absconding"><strong id="abscondingCount">0</strong><span>Absconding Accused</span></button>
       <button class="attention-card warn" type="button" data-attention="pending"><strong id="pendingAttentionCount">0</strong><span>FSL / Property Pending</span></button>
+      <button class="attention-card info" type="button" data-attention="tasksToday"><strong id="tasksTodayCount">0</strong><span>Tasks Due Today</span></button>
+      <button class="attention-card alert" type="button" data-attention="tasksOverdue"><strong id="tasksOverdueCount">0</strong><span>Overdue Tasks</span></button>
+      <button class="attention-card dark" type="button" data-attention="tasksUpcoming"><strong id="tasksUpcomingCount">0</strong><span>Tasks Next 7 Days</span></button>
     </section>
 
     <div class="toolbar">
