@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const mobilePdfBtn = document.getElementById('mobile-pdf');
             const passportTypeSelect = document.getElementById('passportType');
             const languageSelect = document.getElementById('language');
+            const districtSelect = document.getElementById('districtType');
             const notification = document.getElementById('notification');
             const officerCountInput = document.getElementById('officer-count');
             const addOfficerBtn = document.getElementById('add-officer');
@@ -434,42 +435,169 @@ document.addEventListener('DOMContentLoaded', function() {
                 select.appendChild(option);
             }
 
+            function getOtherDistrictStationInput(select) {
+                return select ? document.getElementById(select.id + 'OtherDistrict') : null;
+            }
+
+            function ensureOtherDistrictStationInput(select) {
+                if (!select) return null;
+
+                let input = getOtherDistrictStationInput(select);
+                if (input) return input;
+
+                input = document.createElement('input');
+                input.type = 'text';
+                input.id = select.id + 'OtherDistrict';
+                input.className = 'other-district-station-input';
+                input.placeholder = 'Enter police station name';
+                input.style.display = 'none';
+                input.setAttribute('autocomplete', 'off');
+                input.setAttribute('autocapitalize', 'words');
+
+                select.insertAdjacentElement('afterend', input);
+
+                input.addEventListener('input', function() {
+                    if (districtSelect.value !== 'other') return;
+                    const value = this.value.trim();
+                    if (value) {
+                        ensurePoliceStationOption(select, value, value);
+                        select.value = value;
+                        hideError(select.id);
+                    } else {
+                        select.value = '';
+                    }
+                });
+
+                return input;
+            }
+
             function setPoliceStationFieldValue(field, value) {
                 if (!field) return;
                 const normalized = String(value ?? '').trim();
+
                 if (field.tagName === 'SELECT' && normalized) {
-                    ensurePoliceStationOption(field, normalized, normalized + ' (Saved)');
+                    ensurePoliceStationOption(field, normalized, normalized);
                 }
                 field.value = normalized;
+
+                const manualInput = getOtherDistrictStationInput(field);
+                if (manualInput && districtSelect.value === 'other') {
+                    manualInput.value = normalized;
+                }
+            }
+
+            function isChennaiStationValue(value) {
+                const normalized = String(value || '').trim();
+                if (!normalized) return false;
+                if (chennaiPoliceStations.includes(normalized)) return true;
+
+                const code = getPoliceStationCode(normalized);
+                return Boolean(code && chennaiPoliceStations.some(station =>
+                    getPoliceStationCode(station) === code
+                ));
             }
 
             function populatePoliceStationDropdowns() {
                 document.querySelectorAll('select[id$="PoliceStation"]').forEach(select => {
                     const existingValue = select.value;
                     select.innerHTML = '<option value="">Select Police Station</option>';
+
                     chennaiPoliceStations.forEach(station => {
                         const option = document.createElement('option');
                         option.value = station;
                         option.textContent = station;
                         select.appendChild(option);
                     });
+
+                    ensureOtherDistrictStationInput(select);
+
                     if (existingValue) {
                         setPoliceStationFieldValue(select, existingValue);
                     }
                 });
             }
 
+            function updateDistrictStationMode({ applyPreset = true } = {}) {
+                const isChennai = districtSelect.value === 'chennai';
+
+                document.querySelectorAll('select[id$="PoliceStation"]').forEach(select => {
+                    const manualInput = ensureOtherDistrictStationInput(select);
+                    const currentValue = String(select.value || '').trim();
+
+                    if (isChennai) {
+                        select.style.display = '';
+                        manualInput.style.display = 'none';
+
+                        if (currentValue && !isChennaiStationValue(currentValue)) {
+                            select.value = '';
+                        }
+                    } else {
+                        if (currentValue && !isChennaiStationValue(currentValue) && !manualInput.value.trim()) {
+                            manualInput.value = currentValue;
+                        }
+
+                        select.style.display = 'none';
+                        manualInput.style.display = '';
+
+                        const manualValue = manualInput.value.trim();
+                        if (manualValue) {
+                            ensurePoliceStationOption(select, manualValue, manualValue);
+                            select.value = manualValue;
+                        } else {
+                            select.value = '';
+                        }
+                    }
+                });
+
+                if (!isChennai) {
+                    const wasAutoPreset =
+                        courtSelect.dataset.autoCourtPreset === 'true' ||
+                        courtNumberInput.dataset.autoCourtPreset === 'true';
+
+                    if (wasAutoPreset) {
+                        applyingCourtPreset = true;
+                        try {
+                            courtSelect.value = '';
+                            courtNumberInput.value = '';
+                            delete courtSelect.dataset.autoCourtPreset;
+                            delete courtNumberInput.dataset.autoCourtPreset;
+                            hideError('court');
+                            hideError('courtNumber');
+                        } finally {
+                            applyingCourtPreset = false;
+                        }
+                        courtPresetManuallyOverridden = false;
+                    }
+                } else if (applyPreset) {
+                    applyCourtPresetForStation(getCurrentStationValue(), { notify: false });
+                }
+
+                scheduleLivePreview();
+            }
+
+            function getVisibleValidationTarget(field) {
+                if (
+                    field &&
+                    districtSelect.value === 'other' &&
+                    field.id &&
+                    field.id.endsWith('PoliceStation')
+                ) {
+                    return getOtherDistrictStationInput(field) || field;
+                }
+                return field;
+            }
+
             function getPoliceStationCode(stationValue) {
                 const match = String(stationValue || '')
                     .trim()
                     .toUpperCase()
-                    .match(/^(G\d{1,2})\b/);
+                    .match(/^([A-Z]{1,4}\d{1,2})\b/);
                 return match ? match[1] : '';
             }
 
             function applyCourtPresetForStation(stationValue, { notify = true, force = false } = {}) {
                 const config = getSelectedPassportConfig();
-                if (!config?.requiresCourt) return false;
+                if (!config?.requiresCourt || districtSelect.value !== 'chennai') return false;
 
                 const stationCode = getPoliceStationCode(stationValue);
                 const preset = stationCourtPresets[stationCode];
@@ -954,9 +1082,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
 
                 const firstMissing = missing.find(item => item.field)?.field;
-                if (firstMissing) {
-                    firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    window.setTimeout(() => firstMissing.focus({ preventScroll: true }), 350);
+                const firstTarget = getVisibleValidationTarget(firstMissing);
+                if (firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    window.setTimeout(() => firstTarget.focus({ preventScroll: true }), 350);
                 }
 
                 return false;
@@ -1016,7 +1145,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (!isValid) {
                     const invalidFields = Array.from(document.querySelectorAll('[aria-invalid="true"]'))
-                        .filter(field => field.offsetParent !== null);
+                        .map(getVisibleValidationTarget)
+                        .filter(field => field && field.offsetParent !== null);
                     const count = invalidFields.length;
                     if (count) {
                         showNotification(`${count} field${count === 1 ? '' : 's'} need attention. Please complete the highlighted field${count === 1 ? '' : 's'}.`, 'error');
@@ -1043,8 +1173,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const officers = getOfficerData().filter(item => item.designation || item.fullName);
 
                 const defaults = {
-                    version: 1,
+                    version: 2,
                     savedAt: new Date().toISOString(),
+                    district: districtSelect.value || 'chennai',
                     station,
                     language: currentLanguage,
                     officers,
@@ -1075,6 +1206,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         languageSelect.value = defaults.language;
                         updateLanguageContent();
                     }
+
+                    const inferredDistrict = defaults.district ||
+                        (defaults.station && !isChennaiStationValue(defaults.station) ? 'other' : 'chennai');
+                    if (!onlyIfBlank || !districtSelect.value || defaults.district) {
+                        districtSelect.value = inferredDistrict;
+                    }
+                    updateDistrictStationMode({ applyPreset: false });
 
                     if (defaults.station) {
                         document.querySelectorAll('select[id$="PoliceStation"]').forEach(input => {
@@ -1221,6 +1359,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             document.getElementById('escortSection').value = formData.escortSection || '';
                         }
                     }
+
+                    updateDistrictStationMode({ applyPreset: false });
 
                     if (passportTypeSelect.value) {
                         fillDocumentPreview(true);
@@ -2021,6 +2161,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateLanguageContent();
                     autoSave();
                 });
+
+                districtSelect.addEventListener('change', function() {
+                    updateDistrictStationMode({ applyPreset: true });
+                    autoSave();
+                });
                 
                 officerCountInput.addEventListener('change', () => updatePoliceOfficers());
                 addOfficerBtn.addEventListener('click', addPoliceOfficer);
@@ -2208,6 +2353,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Initialize the application
             function init() {
                 populatePoliceStationDropdowns();
+                updateDistrictStationMode({ applyPreset: false });
                 updatePoliceOfficers();
                 updateAccusedPersons();
                 updateContentVisibility();
