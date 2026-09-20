@@ -1470,7 +1470,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Remove PDF mode class
                     element.classList.remove('pdf-mode', 'pdf-optimized');
                     
-                    showNotification('PDF generated successfully', 'success');
+                    showNotification('PDF generated successfully. Use New Passport to start the next document.', 'success');
+                    newPassportBtn.classList.add('next-action');
+                    window.setTimeout(() => newPassportBtn.classList.remove('next-action'), 5000);
                 } catch (error) {
                     console.error('Error generating PDF:', error);
                     showNotification('Error generating PDF. Please try again.', 'error');
