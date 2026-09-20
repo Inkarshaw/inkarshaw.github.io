@@ -1078,6 +1078,27 @@
                 return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
             }
         });
-    </script>
+    
+        // Prefill from ClearExams My Cases when opened from a selected case.
+        try {
+            const currentCase = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
+            if (currentCase) {
+                const setIfPresent = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el && value !== undefined && value !== null && String(value).trim() !== '') {
+                        el.value = value;
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                };
+                
+                setIfPresent('crimeNumber', [currentCase.crimeNo, currentCase.crimeYear].filter(Boolean).join('/'));
+                setIfPresent('sections', currentCase.sections);
+                setIfPresent('policeStation', currentCase.policeStation);
+                setIfPresent('caseType', currentCase.caseType);
+
+            }
+        } catch (e) { console.warn('My Cases prefill unavailable', e); }
+</script>
 </body>
 </html>
