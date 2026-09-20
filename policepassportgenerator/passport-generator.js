@@ -1643,6 +1643,13 @@ document.addEventListener('DOMContentLoaded', function() {
             function initializeEventListeners() {
                 // Event listeners for form fields
                 passportTypeSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        try {
+                            localStorage.setItem('policePassportLastType', this.value);
+                        } catch (error) {
+                            console.warn('Unable to remember passport type:', error);
+                        }
+                    }
                     updateContentVisibility();
 
                     // Reuse saved common details when switching between passport types.
@@ -1823,6 +1830,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 updatePdfAvailability();
 
                 const hadSavedDraft = Boolean(localStorage.getItem('policePassportFormData'));
+                if (!hadSavedDraft && !new URLSearchParams(window.location.search).get('type')) {
+                    try {
+                        const lastType = localStorage.getItem('policePassportLastType');
+                        if (lastType && passportConfig[lastType]?.available) {
+                            passportTypeSelect.value = lastType;
+                            updateContentVisibility();
+                        }
+                    } catch (error) {
+                        console.warn('Unable to restore passport type:', error);
+                    }
+                }
                 if (hadSavedDraft) {
                     loadSavedData();
                 } else {
