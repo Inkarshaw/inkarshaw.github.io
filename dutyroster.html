@@ -2133,11 +2133,11 @@
 </tr>
 <tr>
 <td class="place" colspan="8">S. Strength</td>
-<td colspan="42"><input data-field="sanctionedStrength" type="text" value="Ins 01 | SI 07 | SSI - | HC 10 | Gr.I 18 | Gr.II 40 | Total 76"/></td>
+<td colspan="42"><input class="locked-field" data-field="sanctionedStrength" readonly="" type="text" value="Ins 01 | SI 07 | SSI - | HC 10 | Gr.I 18 | Gr.II 40 | Total 76"/></td>
 </tr>
 <tr>
 <td class="place" colspan="8">Actual Strength</td>
-<td colspan="42"><input data-field="actualStrength" type="text" value="Ins 02 | SI 08 | SSI 05 | HC 16 | Gr.I 04 | Gr.II 18 | Total 53"/></td>
+<td colspan="42"><input class="locked-field" data-field="actualStrength" readonly="" type="text" value="Ins 01 | SI 08 | SSI 05 | HC 18 | Gr.I 04 | Gr.II 18 | Total 54"/></td>
 </tr>
 <tr>
 <th class="place" colspan="8">Place</th>
@@ -2556,10 +2556,12 @@ function loadData(data){
   }
   if(data.fields){
     document.querySelectorAll("[data-field]").forEach(el=>{
+      if(["sanctionedStrength","actualStrength"].includes(el.dataset.field)) return;
       if(Object.prototype.hasOwnProperty.call(data.fields,el.dataset.field)){
         el.value=data.fields[el.dataset.field];
       }
     });
+    updateStrengthFromNominalRoll();
   }
   document.getElementById("stationHeader").textContent=document.getElementById("stationName").value;
   syncTopInputsFromCells();
@@ -3906,7 +3908,44 @@ function rebuildDutySIOptions(){
   }
 }
 
+const SANCTIONED_STRENGTH_TEXT="Ins 01 | SI 07 | SSI - | HC 10 | Gr.I 18 | Gr.II 40 | Total 76";
+
+function nominalStrengthBucket(staff){
+  const code=rankCode(staff?.rank || "");
+  if(code==="ins") return "Ins";
+  if(code==="si" || code==="wsi") return "SI";
+  if(code==="ssi" || code==="wssi") return "SSI";
+  if(code==="hc" || code==="whc") return "HC";
+  if(code==="gri") return "Gr.I";
+  if(code==="pc" || code==="wpc" || code==="arpc") return "Gr.II";
+  return "";
+}
+
+function updateStrengthFromNominalRoll(){
+  const sanctioned=document.querySelector('[data-field="sanctionedStrength"]');
+  if(sanctioned) sanctioned.value=SANCTIONED_STRENGTH_TEXT;
+
+  const counts={"Ins":0,"SI":0,"SSI":0,"HC":0,"Gr.I":0,"Gr.II":0};
+
+  // Actual Strength is the G7 Station nominal roll only.
+  // MCR, AR and OD-from-other-stations personnel are attachments and are excluded.
+  const stationStaff=NOMINAL_STAFF.filter(s=>String(s.group || "").trim()==="Station");
+
+  stationStaff.forEach(staff=>{
+    const bucket=nominalStrengthBucket(staff);
+    if(bucket) counts[bucket]++;
+  });
+
+  const fmt=n=>String(n).padStart(2,"0");
+  const actual=document.querySelector('[data-field="actualStrength"]');
+  if(actual){
+    actual.value=
+      `Ins ${fmt(counts["Ins"])} | SI ${fmt(counts["SI"])} | SSI ${fmt(counts["SSI"])} | HC ${fmt(counts["HC"])} | Gr.I ${fmt(counts["Gr.I"])} | Gr.II ${fmt(counts["Gr.II"])} | Total ${fmt(stationStaff.length)}`;
+  }
+}
+
 function refreshNominalDependentUI(redrawNominal=true){
+  updateStrengthFromNominalRoll();
   updateNominalCountBadge();
   fillStaffSelect();
   rebuildDutySIOptions();
