@@ -48,7 +48,7 @@
     .form-wrap{padding:16px}
     .quick-create{padding:16px}.quick-create-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}.quick-create .helper{margin-top:7px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-group{display:grid;gap:5px}.form-group.full{grid-column:1/-1}
     label{font-size:.76rem;font-weight:800;color:#435870}.textarea{min-height:82px;resize:vertical}
-    .accused-list{display:grid;gap:9px}.accused-card{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fbfdff}.accused-card img,.accused-avatar{width:72px;height:82px;border-radius:9px;object-fit:cover;background:#edf3f9;border:1px solid var(--line)}.accused-avatar{display:grid;place-items:center;font-size:1.5rem}.accused-info strong{display:block}.accused-info span{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}.accused-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:7px}.accused-fields .full{grid-column:1/-1}.accused-fields .input,.accused-fields .select{min-height:38px;padding:7px 8px;font-size:.8rem}.accused-remove{align-self:start}.photo-box{display:flex;align-items:center;gap:12px;padding:10px;border:1px dashed #b9c8d8;border-radius:12px;background:#f9fbfe}.accused-photo{width:82px;height:96px;border-radius:10px;object-fit:cover;border:1px solid var(--line);background:#edf3f9}.photo-placeholder{width:82px;height:96px;border-radius:10px;display:grid;place-items:center;background:#edf3f9;color:#6d7f92;font-size:1.7rem;border:1px solid var(--line)}.photo-controls{display:flex;flex-wrap:wrap;gap:7px}.form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.helper{font-size:.75rem;color:var(--muted);margin-top:8px}
+    .case-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}.case-tabs::-webkit-scrollbar{display:none}.case-tab{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font-size:.78rem;font-weight:800;color:var(--muted);cursor:pointer}.case-tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}.tab-panel{display:none}.tab-panel.active{display:block}.accused-list{display:grid;gap:9px}.accused-card{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fbfdff}.accused-card img,.accused-avatar{width:72px;height:82px;border-radius:9px;object-fit:cover;background:#edf3f9;border:1px solid var(--line)}.accused-avatar{display:grid;place-items:center;font-size:1.5rem}.accused-info strong{display:block}.accused-info span{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}.accused-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:7px}.accused-fields .full{grid-column:1/-1}.accused-fields .input,.accused-fields .select{min-height:38px;padding:7px 8px;font-size:.8rem}.accused-remove{align-self:start}.photo-box{display:flex;align-items:center;gap:12px;padding:10px;border:1px dashed #b9c8d8;border-radius:12px;background:#f9fbfe}.accused-photo{width:82px;height:96px;border-radius:10px;object-fit:cover;border:1px solid var(--line);background:#edf3f9}.photo-placeholder{width:82px;height:96px;border-radius:10px;display:grid;place-items:center;background:#edf3f9;color:#6d7f92;font-size:1.7rem;border:1px solid var(--line)}.photo-controls{display:flex;flex-wrap:wrap;gap:7px}.form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.helper{font-size:.75rem;color:var(--muted);margin-top:8px}
     .detail{padding:16px;display:none}.detail.visible{display:block}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.detail-item{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}.detail-item.full{grid-column:1/-1}.detail-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:#7b8b9d;font-weight:800}.detail-value{margin-top:3px;white-space:pre-wrap;word-break:break-word}
     .detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 
@@ -141,26 +141,32 @@
           <div class="helper">Create the case now with only the crime number. Add year, police station, sections, accused, court and other details afterwards.</div>
         </form>
         <form class="form-wrap hidden" id="caseForm">
+          <div class="case-tabs" id="caseTabs">
+            <button class="case-tab active" type="button" data-tab="case">Case Details</button>
+            <button class="case-tab" type="button" data-tab="accused">Accused</button>
+            <button class="case-tab" type="button" data-tab="court">Court</button>
+            <button class="case-tab" type="button" data-tab="documents">Documents</button>
+          </div>
           <input type="hidden" id="caseId">
-          <div class="form-grid">
+          <div class="form-grid tab-panel active" data-panel="case">
             <div class="form-group"><label for="crimeNo">Crime / CSR / UDR No. <span style="color:#b63d3d">*</span></label><input class="input" id="crimeNo" placeholder="e.g. 43" required></div>
             <div class="form-group"><label for="crimeYear">Year</label><input class="input" id="crimeYear" inputmode="numeric" placeholder="2026"></div>
             <div class="form-group"><label for="policeStation">Police Station / Unit</label><input class="input" id="policeStation" placeholder="Police Station"></div>
             <div class="form-group"><label for="caseType">Case Type</label><select class="select" id="caseType"><option>Crime</option><option>CSR</option><option>UDR</option><option>Petition</option><option>Other</option></select></div>
             <div class="form-group full"><label for="sections">Sections / Offences</label><input class="input" id="sections" placeholder="e.g. BNS / BNSS / NDPS sections"></div>
             <div class="form-group"><label for="complainant">Complainant</label><input class="input" id="complainant"></div>
-            <div class="form-group full"><label>Accused / Suspects</label><div class="accused-list" id="accusedList"></div><button class="btn btn-soft" id="addAccusedBtn" type="button">＋ Add Accused</button><div class="helper">Add multiple accused persons separately with name, status and photo.</div></div>
+            </div><div class="form-grid tab-panel" data-panel="accused"><div class="form-group full"><label>Accused / Suspects</label><div class="accused-list" id="accusedList"></div><button class="btn btn-soft" id="addAccusedBtn" type="button">＋ Add Accused</button><div class="helper">Add multiple accused persons separately with name, status and photo.</div></div>
             <div class="form-group"><label for="accused">Primary / Legacy Accused</label><input class="input" id="accused" placeholder="Optional legacy field"></div>
             <div class="form-group"><label for="ioName">Investigating Officer</label><input class="input" id="ioName"></div>
             <div class="form-group"><label for="priority">Priority</label><select class="select" id="priority"><option>Medium</option><option>High</option><option>Low</option></select></div>
-            <div class="form-group"><label for="court">Court</label><input class="input" id="court" placeholder="Court / Establishment"></div>
+            </div><div class="form-grid tab-panel" data-panel="court"><div class="form-group"><label for="court">Court</label><input class="input" id="court" placeholder="Court / Establishment"></div>
             <div class="form-group"><label for="courtCaseNo">Court Case No.</label><input class="input" id="courtCaseNo" placeholder="e.g. CC 1001/2026"></div>
             <div class="form-group"><label for="stage">Stage</label><select class="select" id="stage"></select></div>
             <div class="form-group"><label for="nextHearing">Next Hearing / Action Date</label><input class="input" id="nextHearing" type="date"></div>
             <div class="form-group full"><label for="nextAction">Next Action</label><input class="input" id="nextAction" placeholder="What needs to be done next?"></div>
             <div class="form-group full"><label for="notes">Notes</label><textarea class="textarea" id="notes" placeholder="Short working notes"></textarea></div>
           </div>
-          <div class="form-actions">
+          </div><div class="tab-panel" data-panel="documents"><div class="card" style="box-shadow:none;margin:0"><div class="card-head"><div><h3>Case Documents</h3><p>Open Police Documents with this case selected.</p></div></div><div style="padding:14px"><button class="btn btn-primary" id="openDocsFromEdit" type="button">Open Police Documents</button><div class="helper" style="margin-top:8px">Document generators can use the currently selected case details.</div></div></div></div><div class="form-actions">
             <button class="btn btn-primary" type="submit" id="saveCaseBtn">Create Case</button>
             <button class="btn" type="button" id="saveAndOpenBtn">Save & Open Documents</button>
           </div>
@@ -345,8 +351,12 @@
     pendingAccusedPhoto='';accusedPersons=[];renderAccusedEditor();$('caseForm').reset();$('quickCaseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='New Case';$('saveCaseBtn').textContent='Create Case';$('quickCaseForm').classList.remove('hidden');$('caseForm').classList.add('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
   }
 
+  function setCaseTab(name){
+    document.querySelectorAll('#caseTabs .case-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+    document.querySelectorAll('#caseForm .tab-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===name));
+  }
   function fillForm(c){
-    pendingAccusedPhoto=c.accusedPhoto||'';accusedPersons=Array.isArray(c.accusedPersons)?JSON.parse(JSON.stringify(c.accusedPersons)):[];if(!accusedPersons.length&&c.accused)accusedPersons=[{id:uid(),name:c.accused,status:'Accused',photo:c.accusedPhoto||'',age:'',phone:'',address:'',idProof:'',arrestDate:'',hsCategory:'',remarks:''}];renderAccusedEditor();$('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('quickCaseForm').classList.add('hidden');$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
+    setCaseTab('case');pendingAccusedPhoto=c.accusedPhoto||'';accusedPersons=Array.isArray(c.accusedPersons)?JSON.parse(JSON.stringify(c.accusedPersons)):[];if(!accusedPersons.length&&c.accused)accusedPersons=[{id:uid(),name:c.accused,status:'Accused',photo:c.accusedPhoto||'',age:'',phone:'',address:'',idProof:'',arrestDate:'',hsCategory:'',remarks:''}];renderAccusedEditor();$('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('quickCaseForm').classList.add('hidden');$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
   }
 
   function saveCurrent(openDocs=false){
@@ -443,6 +453,8 @@
   $('accusedList').addEventListener('input',e=>{const i=Number(e.target.dataset.i),key=e.target.dataset.key;if(e.target.classList.contains('accused-field')&&accusedPersons[i]&&key)accusedPersons[i][key]=e.target.value;});
   $('accusedList').addEventListener('change',e=>{const i=Number(e.target.dataset.i),key=e.target.dataset.key;if(e.target.classList.contains('accused-field')&&accusedPersons[i]&&key)accusedPersons[i][key]=e.target.value;});
   $('accusedList').addEventListener('click',e=>{const i=Number(e.target.dataset.i);if(e.target.classList.contains('accused-remove')){accusedPersons.splice(i,1);renderAccusedEditor();return}if(e.target.classList.contains('accused-photo-btn')){const input=document.createElement('input');input.type='file';input.accept='image/*';input.capture='environment';input.onchange=()=>{if(input.files[0])compressPersonPhoto(input.files[0],i)};input.click();}});
+  $('caseTabs').addEventListener('click',e=>{const b=e.target.closest('.case-tab');if(b)setCaseTab(b.dataset.tab);});
+  $('openDocsFromEdit').addEventListener('click',()=>{const c=cases.find(x=>x.id===$('caseId').value)||formData();openInDocuments(c);});
   $('caseForm').addEventListener('submit',e=>{e.preventDefault();saveCurrent(false)});
   $('saveAndOpenBtn').addEventListener('click',()=>saveCurrent(true));
   $('newCaseBtn').addEventListener('click',()=>{clearForm();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'})});
