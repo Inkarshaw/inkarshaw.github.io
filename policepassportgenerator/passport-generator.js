@@ -1209,7 +1209,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     const inferredDistrict = defaults.district ||
                         (defaults.station && !isChennaiStationValue(defaults.station) ? 'other' : 'chennai');
-                    if (!onlyIfBlank || !districtSelect.value || defaults.district) {
+                    if (!onlyIfBlank || !districtSelect.value) {
                         districtSelect.value = inferredDistrict;
                     }
                     updateDistrictStationMode({ applyPreset: false });
