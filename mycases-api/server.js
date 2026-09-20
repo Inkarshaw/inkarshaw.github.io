@@ -95,22 +95,26 @@ const HEADERS = [
   'Case ID','Police Station / Unit','Case Type','Crime / CSR / UDR No.','Year',
   'Sections / Offences','Complainant','Accused / Suspect','Investigating Officer',
   'Priority','Court','Court Case No.','Stage','Next Hearing / Action Date',
-  'Next Action','Notes','Created At','Updated At'
+  'Next Action','Notes','Created At','Updated At','Accused JSON','Investigation JSON','Tasks JSON','Court Hearings JSON','Timeline JSON','Attachments JSON'
 ];
 
 const FIELDS = [
   'id','policeStation','caseType','crimeNo','crimeYear',
   'sections','complainant','accused','ioName','priority','court',
-  'courtCaseNo','stage','nextHearing','nextAction','notes','createdAt','updatedAt'
+  'courtCaseNo','stage','nextHearing','nextAction','notes','createdAt','updatedAt','accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments'
 ];
 
+const JSON_FIELDS = new Set(['accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments']);
 function caseToRow(item) {
-  return FIELDS.map(key => item[key] == null ? '' : String(item[key]));
+  return FIELDS.map(key => {
+    if (item[key] == null) return '';
+    return JSON_FIELDS.has(key) ? JSON.stringify(item[key]) : String(item[key]);
+  });
 }
 
 function rowToCase(row) {
   const item = {};
-  FIELDS.forEach((key, i) => item[key] = row[i] || '');
+  FIELDS.forEach((key, i) => { const v=row[i]||''; if(JSON_FIELDS.has(key)){try{item[key]=v?JSON.parse(v):[]}catch{item[key]=[]}}else item[key]=v; });
   return item;
 }
 
@@ -119,7 +123,7 @@ function cleanCase(input, existing = null) {
   const safe = {};
   FIELDS.forEach(key => {
     if (key === 'createdAt' || key === 'updatedAt') return;
-    safe[key] = input && input[key] != null ? String(input[key]).trim() : '';
+    safe[key] = JSON_FIELDS.has(key) ? (Array.isArray(input?.[key]) ? input[key] : []) : (input && input[key] != null ? String(input[key]).trim() : '');
   });
   safe.id = safe.id || existing?.id || ('case_' + crypto.randomUUID());
   safe.createdAt = existing?.createdAt || input?.createdAt || now;
@@ -131,7 +135,7 @@ async function readAllCases() {
   const sheets = await sheetsClient();
   const result = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:R`
+    range: `${SHEET_NAME}!A2:X`
   });
   return (result.data.values || []).filter(row => row.some(v => String(v || '').trim())).map(rowToCase);
 }
@@ -198,7 +202,7 @@ app.post('/api/cases', requireAuth, async (req, res, next) => {
     const sheets = await sheetsClient();
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A:R`,
+      range: `${SHEET_NAME}!A:X`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [caseToRow(item)] }
@@ -218,7 +222,7 @@ app.put('/api/cases/:id', requireAuth, async (req, res, next) => {
     const sheets = await sheetsClient();
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A${rowNumber}:R${rowNumber}`,
+      range: `${SHEET_NAME}!A${rowNumber}:X${rowNumber}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: { values: [caseToRow(item)] }
     });
