@@ -670,6 +670,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 return isValid;
             }
 
+            function validateFirExportFields() {
+                if (passportTypeSelect.value !== 'FIR Filing Passport') {
+                    return true;
+                }
+
+                const checks = [
+                    { field: document.getElementById('firCrimeNumber'), label: 'Crime No.' },
+                    { field: document.getElementById('firSection'), label: 'Sections' },
+                    { field: courtSelect, label: 'Court' },
+                    { field: courtNumberInput, label: 'Court Number' },
+                    { field: document.getElementById('date'), label: 'Date' }
+                ];
+
+                const missing = checks.filter(({ field }) =>
+                    !field || !String(field.value ?? '').trim()
+                );
+
+                if (!missing.length) {
+                    return true;
+                }
+
+                missing.forEach(({ field, label }) => {
+                    if (field) {
+                        showError(field.id, `${label} is required`);
+                    }
+                });
+
+                const labels = missing.map(item => item.label);
+                showNotification(
+                    `Missing required field${labels.length === 1 ? '' : 's'}: ${labels.join(', ')}.`,
+                    'error'
+                );
+
+                const firstMissing = missing.find(item => item.field)?.field;
+                if (firstMissing) {
+                    firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    window.setTimeout(() => firstMissing.focus({ preventScroll: true }), 350);
+                }
+
+                return false;
+            }
+
             function validateForm() {
                 let isValid = true;
                 const config = getSelectedPassportConfig();
@@ -1351,8 +1393,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             function printDocument() {
+                if (!validateFirExportFields()) {
+                    return;
+                }
+
                 if (!validateForm()) {
-                    showNotification('Please fix the errors in the form before printing', 'error');
+                    showNotification('Please fix the highlighted fields before printing', 'error');
                     return;
                 }
 
@@ -1399,8 +1445,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
+                if (!validateFirExportFields()) {
+                    return;
+                }
+
                 if (!validateForm()) {
-                    showNotification('Please fix the errors in the form before generating PDF', 'error');
+                    showNotification('Please fix the highlighted fields before generating PDF', 'error');
                     return;
                 }
 
