@@ -1,0 +1,61 @@
+name: Sync daily quiz fallback
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "27 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-quiz-fallback-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Download public Daily Quiz Feed
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/quizzes
+          tmp="$(mktemp)"
+          curl --fail --location --retry 3 \
+            --connect-timeout 15 --max-time 60 \
+            "https://docs.google.com/spreadsheets/d/1yhND5g2Q23eOXz3oakV7xX-pUuunw3i2GzES3yaFVVY/gviz/tq?tqx=out:csv&sheet=Daily%20Quiz%20Feed" \
+            --output "$tmp"
+
+          test -s "$tmp"
+          head -n 1 "$tmp" | grep -q "ID"
+          head -n 1 "$tmp" | grep -q "Question"
+          head -n 1 "$tmp" | grep -q "CorrectAnswer"
+          mv "$tmp" data/quizzes/daily-quiz.csv
+
+          rows=$(($(wc -l < data/quizzes/daily-quiz.csv)-1))
+          echo "Daily quiz fallback contains $rows question rows." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rows" -lt 10 ]; then
+            echo "Expected at least 10 question rows." >&2
+            exit 1
+          fi
+
+      - name: Commit fallback when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- data/quizzes/daily-quiz.csv; then
+            echo "Fallback is already synchronized." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/quizzes/daily-quiz.csv
+          git commit -m "Sync daily quiz fallback from Google Sheets"
+          git pull --rebase origin main
+          git push origin main
