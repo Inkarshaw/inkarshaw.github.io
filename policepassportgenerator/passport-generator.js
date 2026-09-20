@@ -424,6 +424,76 @@ document.addEventListener('DOMContentLoaded', function() {
                 'W1 அனைத்து மகளிர் காவல் நிலையம் தௌசண்ட் லைட்ஸ்'
             ];
 
+            const chennaiPoliceStationEnglishNames = {
+                AWPS: 'AWPS Peravallur',
+                B1: 'B1 North Beach Police Station',
+                B2: 'B2 Esplanade Police Station',
+                B3: 'B3 Fort St. George Police Station',
+                B4: 'B4 High Court Police Station',
+                C1: 'C1 Flower Bazaar Police Station',
+                C2: 'C2 Elephant Gate Police Station',
+                C3: 'C3 Seven Wells Police Station',
+                C4: 'C4 Government General Hospital Outpost',
+                C5: 'C5 Kothaval Chavadi Police Station',
+                D1: 'D1 Triplicane Police Station',
+                D2: 'D2 Anna Salai Police Station',
+                D3: 'D3 Ice House Police Station',
+                D4: 'D4 Jam Bazaar Police Station',
+                D5: 'D5 Marina Police Station',
+                D6: 'D6 Anna Square Police Station',
+                D7: 'D7 Government Estate Police Station',
+                D8: 'D8 Kasturba Gandhi Hospital Police Station',
+                E1: 'E1 Mylapore Police Station',
+                E2: 'E2 Royapettah Police Station',
+                E3: 'E3 Teynampet Police Station',
+                E4: 'E4 Abiramapuram Police Station',
+                F1: 'F1 Chintadripet Police Station',
+                F2: 'F2 Egmore Police Station',
+                F3: 'F3 Nungambakkam Police Station',
+                F4: 'F4 Thousand Lights Police Station',
+                F5: 'F5 Chetpet Police Station',
+                G1: 'G1 Vepery Police Station',
+                G2: 'G2 Periamet Police Station',
+                G3: 'G3 Kilpauk Police Station',
+                G5: 'G5 Secretariat Colony Police Station',
+                G7: 'G7 Chetpet Police Station',
+                H1: 'H1 Old Washermenpet Police Station',
+                H3: 'H3 Tondiarpet Police Station',
+                J1: 'J1 Saidapet Police Station',
+                J2: 'J2 Adyar Police Station',
+                J3: 'J3 Guindy Police Station',
+                J5: 'J5 Sastri Nagar Police Station',
+                J6: 'J6 Thiruvanmiyur Police Station',
+                J7: 'J7 Velachery Police Station',
+                K1: 'K1 Sembium Police Station',
+                K2: 'K2 Ayanavaram Police Station',
+                K4: 'K4 Anna Nagar Police Station',
+                K6: 'K6 TP Chatram Police Station',
+                K8: 'K8 Arumbakkam Police Station',
+                M1: 'M1 Harbour Police Station',
+                N1: 'N1 Royapuram Police Station',
+                P1: 'P1 Pulianthope Police Station',
+                R1: 'R1 Mambalam Police Station',
+                R2: 'R2 Kodambakkam Police Station',
+                R3: 'R3 Ashok Nagar Police Station',
+                V1: 'V1 Villivakkam Police Station',
+                V2: 'V2 Virugambakkam Police Station',
+                W1: 'W1 All Women Police Station, Thousand Lights'
+            };
+
+            function getLocalizedChennaiStationName(stationValue, language = currentLanguage) {
+                const code = getPoliceStationCode(stationValue);
+                if (!code) return stationValue;
+
+                if (language === 'english') {
+                    return chennaiPoliceStationEnglishNames[code] || stationValue;
+                }
+
+                return chennaiPoliceStations.find(station =>
+                    getPoliceStationCode(station) === code
+                ) || stationValue;
+            }
+
             function ensurePoliceStationOption(select, value, label = value) {
                 if (!select || select.tagName !== 'SELECT' || !value) return;
                 const exists = Array.from(select.options).some(option => option.value === value);
@@ -476,9 +546,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 const normalized = String(value ?? '').trim();
 
                 if (field.tagName === 'SELECT' && normalized) {
-                    ensurePoliceStationOption(field, normalized, normalized);
+                    const code = getPoliceStationCode(normalized);
+                    const matchingOption = code
+                        ? Array.from(field.options).find(option =>
+                            getPoliceStationCode(option.value) === code
+                        )
+                        : null;
+
+                    if (districtSelect.value === 'chennai' && matchingOption) {
+                        field.value = matchingOption.value;
+                    } else {
+                        ensurePoliceStationOption(field, normalized, normalized);
+                        field.value = normalized;
+                    }
+                } else {
+                    field.value = normalized;
                 }
-                field.value = normalized;
 
                 const manualInput = getOtherDistrictStationInput(field);
                 if (manualInput && districtSelect.value === 'other') {
@@ -500,18 +583,29 @@ document.addEventListener('DOMContentLoaded', function() {
             function populatePoliceStationDropdowns() {
                 document.querySelectorAll('select[id$="PoliceStation"]').forEach(select => {
                     const existingValue = select.value;
+                    const existingCode = getPoliceStationCode(existingValue);
                     select.innerHTML = '<option value="">Select Police Station</option>';
 
                     chennaiPoliceStations.forEach(station => {
+                        const localizedStation = getLocalizedChennaiStationName(station);
                         const option = document.createElement('option');
-                        option.value = station;
-                        option.textContent = station;
+                        option.value = localizedStation;
+                        option.textContent = localizedStation;
                         select.appendChild(option);
                     });
 
                     ensureOtherDistrictStationInput(select);
 
-                    if (existingValue) {
+                    if (existingCode) {
+                        const localizedMatch = Array.from(select.options).find(option =>
+                            getPoliceStationCode(option.value) === existingCode
+                        );
+                        if (localizedMatch) {
+                            select.value = localizedMatch.value;
+                        } else if (existingValue) {
+                            setPoliceStationFieldValue(select, existingValue);
+                        }
+                    } else if (existingValue) {
                         setPoliceStationFieldValue(select, existingValue);
                     }
                 });
@@ -591,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const match = String(stationValue || '')
                     .trim()
                     .toUpperCase()
-                    .match(/^([A-Z]{1,4}\d{1,2})\b/);
+                    .match(/^([A-Z]{1,4}\d{0,2})\b/);
                 return match ? match[1] : '';
             }
 
@@ -1204,6 +1298,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (defaults.language && (!onlyIfBlank || !languageSelect.value)) {
                         currentLanguage = defaults.language;
                         languageSelect.value = defaults.language;
+                        populatePoliceStationDropdowns();
                         updateLanguageContent();
                     }
 
@@ -1309,6 +1404,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     passportTypeSelect.value = formData.passportType || '';
                     currentLanguage = formData.language || 'tamil';
                     languageSelect.value = currentLanguage;
+                    populatePoliceStationDropdowns();
 
                     officerCountInput.value = formData.officerCount || 1;
                     updatePoliceOfficers(Array.isArray(formData.officers) ? formData.officers : []);
@@ -2158,7 +2254,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 languageSelect.addEventListener('change', function() {
                     currentLanguage = this.value;
+                    populatePoliceStationDropdowns();
+                    updateDistrictStationMode({ applyPreset: false });
                     updateLanguageContent();
+                    scheduleLivePreview();
                     autoSave();
                 });
 
