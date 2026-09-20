@@ -356,7 +356,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     : null;
             }
 
-            const secondMmStationCodes = new Set(['G1', 'G2', 'G3', 'G5', 'G7']);
+            const stationCourtPresets = {
+                G1: { court: 'MM', number: '2' },
+                G2: { court: 'MM', number: '2' },
+                G3: { court: 'MM', number: '2' },
+                G5: { court: 'MM', number: '2' },
+                G7: { court: 'MM', number: '2' },
+                K2: { court: 'MM', number: '5' },
+                K6: { court: 'MM', number: '5' }
+            };
 
             function getPoliceStationCode(stationValue) {
                 const match = String(stationValue || '')
@@ -371,7 +379,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!config?.requiresCourt) return false;
 
                 const stationCode = getPoliceStationCode(stationValue);
-                if (!secondMmStationCodes.has(stationCode)) return false;
+                const preset = stationCourtPresets[stationCode];
+                if (!preset) return false;
 
                 if (courtPresetManuallyOverridden && !force) {
                     return false;
@@ -389,8 +398,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 applyingCourtPreset = true;
                 try {
-                    courtSelect.value = 'MM';
-                    courtNumberInput.value = '2';
+                    courtSelect.value = preset.court;
+                    courtNumberInput.value = preset.number;
                     courtSelect.dataset.autoCourtPreset = 'true';
                     courtNumberInput.dataset.autoCourtPreset = 'true';
                     hideError('court');
@@ -402,7 +411,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 if (notify) {
-                    showNotification(stationCode + ' court preset applied: 2nd MM', 'success');
+                    showNotification(
+                        stationCode + ' court preset applied: ' + getOrdinalSuffix(parseInt(preset.number)) + ' ' + preset.court,
+                        'success'
+                    );
                 }
 
                 return true;
@@ -1735,6 +1747,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     'G7 Chetpet PS',
                     'G3 Kilpauk PS',
                     'G5 Secretariat Colony PS',
+                    'K2 Ayanavaram PS',
+                    'K6 TP Chatram PS',
                     'F3 Nungambakkam PS',
                     'D1 Triplicane PS',
                     'E1 Mylapore PS'
