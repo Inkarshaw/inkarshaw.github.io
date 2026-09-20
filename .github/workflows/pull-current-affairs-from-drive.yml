@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       date:
-        description: "Date in YYYY-MM-DD (defaults to current IST date)"
-        required: false
+        description: "Edition date printed on the PDF (YYYY-MM-DD), not the upload or run date"
+        required: true
         type: string
       file_id:
         description: "Public Google Drive file ID for the PDF"
@@ -22,41 +22,36 @@ concurrency:
 jobs:
   pull-and-publish:
     runs-on: ubuntu-latest
+    env:
+      EDITION_DATE: ${{ inputs.date }}
+      DRIVE_FILE_ID: ${{ inputs.file_id }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Resolve date
-        id: d
+      - name: Validate explicit edition date and Drive file ID
         shell: bash
         run: |
-          if [ -n "${{ inputs.date }}" ]; then
-            DATE="${{ inputs.date }}"
-          else
-            DATE=$(TZ=Asia/Kolkata date +%F)
-          fi
-          if ! [[ "$DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-            echo "Invalid publish date: $DATE"
-            exit 1
-          fi
-          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          python3 - <<'PY'
+          import os, re, sys
+          sys.path.insert(0, "scripts")
+          from current_affairs_pdf import edition_date
+          edition_date(os.environ["EDITION_DATE"])
+          if not re.fullmatch(r"[A-Za-z0-9_-]+", os.environ["DRIVE_FILE_ID"]):
+              raise SystemExit("Invalid Google Drive file ID")
+          PY
 
       - name: Download public PDF from Google Drive
         shell: bash
         run: |
           set -euo pipefail
-          DATE="${{ steps.d.outputs.date }}"
-          FILE_ID="${{ inputs.file_id }}"
-          OUT="current-affairs/$DATE.pdf"
-          mkdir -p current-affairs
+          OUT="$RUNNER_TEMP/current-affairs-download.pdf"
           curl --fail --location --retry 3 \
-            "https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&confirm=t" \
+            "https://drive.usercontent.google.com/download?id=${DRIVE_FILE_ID}&export=download&confirm=t" \
             --output "$OUT"
-          test -s "$OUT"
-          head -c 5 "$OUT" | grep -q '%PDF-'
-          echo "Downloaded $OUT ($(du -h "$OUT" | cut -f1))"
+          python3 scripts/current_affairs_pdf.py --source "$OUT" --date "$EDITION_DATE"
 
       - name: Rebuild current affairs PDF list
         run: python3 current-affairs/generate-pdf-list.py
@@ -64,7 +59,7 @@ jobs:
       - name: Commit PDF and updated list
         shell: bash
         run: |
-          DATE="${{ steps.d.outputs.date }}"
+          DATE="$EDITION_DATE"
           FILE="current-affairs/$DATE.pdf"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

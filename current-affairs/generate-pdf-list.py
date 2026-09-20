@@ -4,14 +4,16 @@
 from __future__ import annotations
 
 import json
-import re
+import sys
 from datetime import date
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from current_affairs_pdf import dated_pdfs, pdf_digest
 
 
 CURRENT_AFFAIRS_DIR = Path(__file__).resolve().parent
 MANIFEST_PATH = CURRENT_AFFAIRS_DIR / "pdfs.json"
-DATED_PDF = re.compile(r"^(\d{4}-\d{2}-\d{2})\.pdf$")
 TAMIL_MONTHS = (
     "",
     "ஜனவரி",
@@ -42,16 +44,18 @@ def manifest_entry(pdf_path: Path, published: date) -> dict[str, str]:
     }
 
 
-def build_manifest() -> list[dict[str, str]]:
+def build_manifest(directory: Path = CURRENT_AFFAIRS_DIR) -> list[dict[str, str]]:
     entries = []
-    for pdf_path in CURRENT_AFFAIRS_DIR.glob("*.pdf"):
-        match = DATED_PDF.fullmatch(pdf_path.name)
-        if not match:
+    seen = {}
+    for pdf_path, published in dated_pdfs(directory):
+        fingerprint = pdf_digest(pdf_path)
+        if fingerprint in seen:
+            print(
+                f"Skipping {pdf_path.name}: identical to {seen[fingerprint]}.",
+                file=sys.stderr,
+            )
             continue
-        try:
-            published = date.fromisoformat(match.group(1))
-        except ValueError as error:
-            raise SystemExit(f"Invalid date in PDF filename: {pdf_path.name}") from error
+        seen[fingerprint] = pdf_path.name
         entries.append(manifest_entry(pdf_path, published))
     return sorted(entries, key=lambda entry: entry["date"], reverse=True)
 

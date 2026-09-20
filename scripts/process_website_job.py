@@ -6,8 +6,11 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import urllib.parse
 import urllib.request
+
+from current_affairs_pdf import publish_pdf
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 BLOCKED_PREFIXES = (
@@ -106,9 +109,14 @@ def main():
 
     if action in {"PUBLISH_URL","PUBLISH_FILE"}:
         target = safe_target(args.target)
-        download(args.source, target)
-        if target.as_posix().endswith(".pdf") and "current-affairs/" in target.as_posix():
+        if target.parent == ROOT / "current-affairs" and target.suffix.lower() == ".pdf":
+            with tempfile.TemporaryDirectory(prefix="clearexams-pdf-") as temporary:
+                source_pdf = pathlib.Path(temporary) / "download.pdf"
+                download(args.source, source_pdf)
+                publish_pdf(source_pdf, target.stem, target.parent)
             rebuild_ca_index()
+        else:
+            download(args.source, target)
     elif action == "REPLACE_TEXT":
         replace_text(args.source, safe_target(args.target))
     elif action == "DELETE_PATH":
