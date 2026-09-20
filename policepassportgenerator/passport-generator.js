@@ -1097,7 +1097,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (passportType === 'Transfer Passport') {
                     updateTransferFields();
                 } else if (passportType === 'FIR Filing Passport') {
-                    updateFirFields(courtDisplayValue);
+                    const firCourtDisplayValue = courtValue && courtNumberValue
+                        ? `${getOrdinalSuffix(parseInt(courtNumberValue))} ${courtValue}`
+                        : courtValue;
+                    updateFirFields(firCourtDisplayValue);
                 } else if (passportType === 'Visera Report') {
                     updateViseraFields();
                 } else if (passportType === 'Lab Report') {
