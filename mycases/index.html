@@ -154,10 +154,10 @@
         </form>
         <form class="form-wrap hidden" id="caseForm">
           <div class="case-tabs" id="caseTabs">
-            <button class="case-tab active" type="button" data-tab="case">Case Details</button>
-            <button class="case-tab" type="button" data-tab="investigation">Investigation</button><button class="case-tab" type="button" data-tab="accused">Accused</button>
-            <button class="case-tab" type="button" data-tab="court">Court</button>
-            <button class="case-tab" type="button" data-tab="tasks">Tasks</button><button class="case-tab" type="button" data-tab="timeline">Timeline</button><button class="case-tab" type="button" data-tab="documents">Documents</button>
+            <button class="case-tab active" type="button" data-tab="case" onclick="setCaseTab('case')">Case Details</button>
+            <button class="case-tab" type="button" data-tab="investigation" onclick="setCaseTab('investigation')">Investigation</button><button class="case-tab" type="button" data-tab="accused" onclick="setCaseTab('accused')">Accused</button>
+            <button class="case-tab" type="button" data-tab="court" onclick="setCaseTab('court')">Court</button>
+            <button class="case-tab" type="button" data-tab="tasks" onclick="setCaseTab('tasks')">Tasks</button><button class="case-tab" type="button" data-tab="timeline" onclick="setCaseTab('timeline')">Timeline</button><button class="case-tab" type="button" data-tab="documents" onclick="setCaseTab('documents')">Documents</button>
           </div>
           <input type="hidden" id="caseId">
           <div class="form-grid tab-panel active" data-panel="case">
@@ -476,8 +476,18 @@
     box.innerHTML=sorted.map(e=>'<div class="timeline-item"><strong>'+esc(e.type||'Update')+'</strong><div class="timeline-meta">'+esc(e.date?fmtDate(e.date):new Date(e.createdAt).toLocaleString())+'</div><div class="timeline-text">'+esc(e.text||'')+'</div><button class="mini btn-danger timeline-delete" data-tid="'+esc(e.id)+'" type="button" style="margin-top:7px">Delete</button></div>').join('');
   }
   function setCaseTab(name){
-    document.querySelectorAll('#caseTabs .case-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
-    document.querySelectorAll('#caseForm .tab-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===name));
+    const form=$('caseForm');
+    if(!form)return;
+    document.querySelectorAll('#caseTabs .case-tab').forEach(b=>{
+      const on=b.dataset.tab===name;
+      b.classList.toggle('active',on);
+      b.setAttribute('aria-selected',on?'true':'false');
+    });
+    document.querySelectorAll('#caseForm .tab-panel').forEach(p=>{
+      const on=p.dataset.panel===name;
+      p.classList.toggle('active',on);
+      p.style.display=on?'':'none';
+    });
   }
   function startNewCase(){
     clearForm();
