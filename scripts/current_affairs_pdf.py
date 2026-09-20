@@ -61,6 +61,8 @@ def publish_pdf(source: Path, issue_date: str, directory: Path = CURRENT_AFFAIRS
         temporary = Path(handle.name)
     try:
         shutil.copyfile(source, temporary)
+        # Jekyll preserves this mode; the Pages artifact uploader runs as another user.
+        temporary.chmod(0o644)
         temporary.replace(target)
     finally:
         temporary.unlink(missing_ok=True)

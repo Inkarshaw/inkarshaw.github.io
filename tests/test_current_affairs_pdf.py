@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -40,6 +41,17 @@ class PublishingTests(unittest.TestCase):
     def test_delayed_upload_keeps_explicit_edition_date(self):
         result = publish_pdf(self.source, "2026-09-19", self.archive)
         self.assertEqual(result.name, "2026-09-19.pdf")
+
+    def test_published_pdf_remains_readable_after_static_site_copy(self):
+        self.source.chmod(0o600)
+        result = publish_pdf(self.source, "2026-09-19", self.archive)
+        built = self.root / "built.pdf"
+        shutil.copy2(result, built)
+        # The Jekyll container and Pages artifact uploader use different users.
+        self.assertEqual(built.stat().st_mode & 0o444, 0o444)
+        self.assertEqual(built.stat().st_mode & 0o022, 0)
+        self.assertEqual(built.read_bytes(), self.source.read_bytes())
+        self.assertEqual(self.source.stat().st_mode & 0o777, 0o600)
 
     def test_same_day_retry_and_corrected_edition_are_allowed(self):
         result = publish_pdf(self.source, "2026-09-19", self.archive)
