@@ -325,7 +325,9 @@
     try{
       const data=await cloudFetch('/api/login',{method:'POST',body:JSON.stringify({password})});
       sessionStorage.setItem(CLOUD_TOKEN_KEY,data.token);
-      $('cloudPassword').value='';$('loginDialog').classList.remove('open');
+      $('cloudPassword').value='';
+      const loginDialog=$('loginDialog');
+      if(loginDialog){loginDialog.classList.remove('open');loginDialog.style.display='none';loginDialog.setAttribute('aria-hidden','true');}
       setCloudState('Cloud connected','online');
       await syncFromCloud();
       showToast('Cloud sync connected.');
