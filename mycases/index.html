@@ -501,9 +501,10 @@
 
   function editSelectedCase(){
     const id=selectedId || ($('caseId')&&$('caseId').value);
-    const c=cases.find(x=>x.id===id);
+    const c=cases.find(x=>String(x.id||'')===String(id||''));
     if(!c){showToast('Select a case to edit.');return;}
-    fillForm(c);
+    localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c));
+    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id);
   }
 
   function fillForm(c){
