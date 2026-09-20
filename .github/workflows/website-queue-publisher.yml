@@ -1,0 +1,35 @@
+name: ClearExams website queue publisher
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+  push:
+    paths:
+      - ".github/website-queue-trigger"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clearexams-website-queue
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Process due Website Queue jobs
+        env:
+          WEBSITE_BRIDGE_URL: "https://website-automation-production-cd3b.up.railway.app"
+        run: python3 scripts/website_queue_runner.py
