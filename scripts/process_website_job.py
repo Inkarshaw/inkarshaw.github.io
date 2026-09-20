@@ -74,7 +74,7 @@ def fix_old_domain():
         if not p.is_file():
             continue
         rel = p.relative_to(ROOT).as_posix()
-        if any(rel.startswith(x) for x in (".git/","_site/","node_modules/")):
+        if any(rel.startswith(x) for x in (".git/",".github/","_site/","node_modules/","website-automation/","instagram-publisher/")):
             continue
         if p.suffix.lower() not in TEXT_EXTS:
             continue
