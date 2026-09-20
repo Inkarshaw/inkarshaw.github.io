@@ -1,0 +1,5193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.25, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
+<title>Police Station Duty Roster</title>
+<style>
+  :root{
+    --bg:#f3f5f7;
+    --panel:#ffffff;
+    --line:#222;
+    --muted:#6b7280;
+    --accent:#1f4e78;
+    --soft:#eaf2f8;
+    --danger:#b91c1c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Rockwell, "Rockwell Nova", "Roboto Slab", serif;
+    background:var(--bg);
+    color:#111;
+  }
+  .toolbar{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:#111827;
+    color:white;
+    padding:10px 12px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.18);
+  }
+  .toolbar .title{
+    font-weight:700;
+    margin-right:8px;
+  }
+  button{
+    border:0;
+    border-radius:8px;
+    padding:9px 12px;
+    font-weight:700;
+    cursor:pointer;
+    background:#fff;
+    color:#111827;
+  }
+  button.primary{background:#2563eb;color:white}
+  button.green{background:#059669;color:white}
+  button.orange{background:#d97706;color:white}
+  button.red{background:#dc2626;color:white}
+  .toolbar input[type="date"]{
+    border:0;
+    border-radius:8px;
+    padding:8px 10px;
+    font-weight:700;
+  }
+  .wrap{
+    width:210mm;
+    max-width:100%;
+    margin:18px auto;
+    padding:0 0 40px;
+  }
+  .hint{
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+    padding:10px 12px;
+    border-radius:10px;
+    margin-bottom:12px;
+    font-size:14px;
+  }
+  .sheet{
+    width:210mm;
+    min-height:297mm;
+    margin:0 auto;
+    padding:12.7mm;
+    background:white;
+    border:1px solid #c9c9c9;
+    box-shadow:0 3px 16px rgba(0,0,0,.12);
+  }
+  .roster-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+  }
+  .roster-table th,
+  .roster-table td{
+    border:1px solid #222;
+    padding:2px 4px;
+    vertical-align:top;
+    font-size:11px;
+  }
+  .roster-table th{
+    background:#f2f2f2;
+    text-align:center;
+  }
+  .main-title{
+    font-size:14px !important;
+    font-weight:800;
+    text-align:center;
+    padding:8px !important;
+    background:white !important;
+  }
+  .station-name{
+    font-size:12px !important;
+    font-weight:800;
+  }
+  .section-title{
+    background:#e5e7eb !important;
+    font-weight:800;
+    text-align:center;
+  }
+  .place{
+    width:15%;
+    font-weight:800;
+  }
+  .shift{
+    width:28.33%;
+  }
+  textarea, input[type="text"], input[type="number"]{
+    width:100%;
+    border:1px solid transparent;
+    background:transparent;
+    font:inherit;
+    color:inherit;
+    padding:3px 4px;
+    resize:vertical;
+    min-height:24px;
+  }
+  textarea:focus, input:focus{
+    outline:2px solid #93c5fd;
+    background:#eff6ff;
+    border-radius:4px;
+  }
+  .center textarea,.center input{text-align:center}
+  .personcell textarea{
+    min-height:48px;
+    text-align:center;
+    line-height:1.3;
+  }
+  .small textarea{min-height:34px}
+  .row-actions{
+    display:flex;
+    gap:5px;
+    margin:10px 0;
+    flex-wrap:wrap;
+  }
+  .mini{
+    font-size:12px;
+    padding:7px 9px;
+  }
+  .status{
+    margin-left:auto;
+    font-size:12px;
+    color:#d1fae5;
+    white-space:nowrap;
+  }
+  .edit-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .card{
+    background:white;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    padding:10px;
+  }
+  .card label{
+    display:block;
+    font-size:12px;
+    color:#4b5563;
+    margin-bottom:4px;
+    font-weight:700;
+  }
+  .card input,.card textarea,.card select{
+    width:100%;
+    border:1px solid #cbd5e1;
+    background:white;
+    border-radius:7px;
+    padding:7px;
+    font:inherit;
+  }
+  .locked-field{
+    background:#f1f5f9 !important;
+    color:#334155;
+    font-weight:700;
+  }
+  .muted{color:#6b7280}
+  .print-note{
+    font-size:12px;
+    color:#6b7280;
+    margin:8px 0;
+  }
+  @media(max-width:850px){
+    .edit-grid{grid-template-columns:1fr 1fr}
+    .toolbar{position:static}
+    .wrap{width:100%; overflow-x:auto; padding-bottom:20px}
+    .sheet{transform-origin:top left;}
+  }
+  @media print{
+    @page{
+      size:A4 portrait;
+      margin:12.7mm;
+    }
+    html,body{
+      width:210mm;
+      min-height:297mm;
+      background:white;
+      margin:0;
+      padding:0;
+    }
+    .toolbar,.hint,.edit-grid,.row-actions,.print-note{display:none !important}
+    .wrap{
+      width:auto;
+      max-width:none;
+      margin:0;
+      padding:0;
+    }
+    .sheet{
+      width:auto;
+      min-height:0;
+      margin:0;
+      padding:0;
+      border:0;
+      box-shadow:none;
+    }
+    .roster-table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+    }
+    .roster-table th,.roster-table td{
+      font-size:7.8pt;
+      line-height:1.05;
+      padding:1px 2px;
+      border:0.7pt solid #222;
+    }
+    .main-title{
+      font-size:10.5pt !important;
+      padding:3px !important;
+    }
+    .station-name{
+      font-size:9pt !important;
+    }
+    textarea,input[type="text"],input[type="number"],select{
+      border:0 !important;
+      outline:0 !important;
+      background:transparent !important;
+      color:#111 !important;
+      padding:0;
+      margin:0;
+      min-height:0 !important;
+      resize:none;
+      overflow:hidden;
+      line-height:1.05;
+      font-size:7.8pt;
+    }
+    .personcell textarea{
+      min-height:26px !important;
+    }
+    td textarea[data-field="misc"],
+    td textarea[data-field="inOD"]{
+      min-height:88px !important;
+    }
+    td textarea[data-field="casualties"]{
+      min-height:66px !important;
+    }
+  }
+
+  .nominal-panel{
+    background:#eef6ff;
+    border:1px solid #9ec5fe;
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:12px;
+  }
+  .nominal-title{
+    font-weight:800;
+    margin-bottom:7px;
+  }
+  .nominal-grid{
+    display:grid;
+    grid-template-columns:1.1fr 1.8fr 1.4fr auto auto;
+    gap:7px;
+    align-items:end;
+  }
+  .nominal-grid label{
+    display:block;
+    font-size:11px;
+    font-weight:700;
+    color:#475569;
+    margin-bottom:3px;
+  }
+  .nominal-grid select,.nominal-grid input{
+    width:100%;
+    padding:8px;
+    border:1px solid #b6c2cf;
+    border-radius:7px;
+    background:#fff;
+    font-size:13px;
+  }
+  .staff-preview{
+    margin-top:7px;
+    font-size:12px;
+    padding:7px 9px;
+    background:white;
+    border-radius:7px;
+    border:1px solid #d7e3f1;
+    min-height:31px;
+  }
+  .nominal-note{
+    margin-top:6px;
+    color:#64748b;
+    font-size:11px;
+  }
+  .present-badge{
+    display:inline-block;
+    border:1px solid #94a3b8;
+    border-radius:999px;
+    padding:2px 7px;
+    margin-left:6px;
+    font-size:10px;
+    background:white;
+  }
+  @media(max-width:900px){
+    .nominal-grid{grid-template-columns:1fr 1fr}
+  }
+
+
+  .conflict-warning{
+    display:none;
+    margin-top:6px;
+    padding:8px 10px;
+    border:2px solid #dc2626;
+    background:#fef2f2;
+    color:#991b1b;
+    border-radius:8px;
+    font-size:12px;
+    font-weight:800;
+    line-height:1.35;
+  }
+  .conflict-warning.show{display:block}
+  .shift-conflict-summary{
+    display:none;
+    margin:10px 0 12px;
+    padding:10px 12px;
+    border:2px solid #dc2626;
+    background:#fef2f2;
+    color:#991b1b;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:800;
+    line-height:1.45;
+  }
+  .shift-conflict-summary.show{display:block}
+  .conflict-cell{
+    background:#fee2e2 !important;
+    color:#b91c1c !important;
+    font-weight:800 !important;
+    outline:3px solid #dc2626 !important;
+    outline-offset:-3px;
+  }
+  .conflict-source{
+    background:#fee2e2 !important;
+    color:#b91c1c !important;
+    font-weight:800 !important;
+    outline:3px solid #dc2626 !important;
+    outline-offset:-3px;
+  }
+  #dutySI.conflict-source{
+    border:3px solid #dc2626 !important;
+    background:#fee2e2 !important;
+    color:#b91c1c !important;
+    font-weight:800 !important;
+  }
+  .conflict-cell::placeholder{color:#991b1b}
+  .conflict-badge{
+    display:inline-block;
+    margin-left:5px;
+    padding:1px 6px;
+    border-radius:999px;
+    background:#dc2626;
+    color:#fff;
+    font-size:10px;
+    font-weight:800;
+  }
+  @media print{
+    .conflict-warning,.shift-conflict-summary{display:none !important}
+    .conflict-cell,.conflict-source{
+      background:transparent !important;
+      color:#111 !important;
+      outline:0 !important;
+      font-weight:normal !important;
+    }
+  }
+}
+  .serial-duty-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+  }
+  .serial-duty-table th,.serial-duty-table td{
+    border:1px solid #222;
+    padding:3px 4px;
+    vertical-align:middle;
+    font-size:11px;
+  }
+  .serial-duty-table th{
+    background:#e5e7eb;
+    font-weight:800;
+    text-align:center;
+  }
+  .serial-duty-table .sn-col{width:7%;text-align:center}
+  .serial-duty-table .rank-col{width:23%}
+  .serial-duty-table .name-col{width:35%}
+  .serial-duty-table .detail-col{width:35%}
+  .serial-duty-table input{
+    width:100%;
+    min-height:24px;
+    border:1px solid transparent;
+    padding:2px 3px;
+    background:transparent;
+  }
+  .serial-duty-table input:focus{
+    outline:2px solid #93c5fd;
+    background:#eff6ff;
+    border-radius:3px;
+  }
+  .serial-section-wrap{
+    padding:0 !important;
+  }
+  .serial-actions{
+    display:flex;
+    gap:6px;
+    justify-content:flex-end;
+    padding:5px 6px;
+    background:#f8fafc;
+    border-top:1px solid #cbd5e1;
+  }
+  .serial-actions button,
+  .section-summary{
+    width:100%;
+    border:0;
+    border-bottom:1px solid #222;
+    padding:4px 6px;
+    font-weight:700;
+    font-size:11px;
+    background:#fff;
+  }
+  .section-store{display:none !important}
+  @media print{
+    .serial-actions{display:none !important}
+    .serial-duty-table th,.serial-duty-table td{
+      font-size:7.2pt;
+      padding:1px 2px;
+      line-height:1.0;
+    }
+    .serial-duty-table input,
+    .section-summary{
+      font-size:7.2pt !important;
+      line-height:1.0 !important;
+      min-height:0 !important;
+      padding:0 1px !important;
+    }
+  }
+
+
+  .nominal-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:rgba(15,23,42,.72);
+    padding:18px;
+  }
+  .nominal-modal.show{display:block}
+  .nominal-modal-card{
+    width:min(1100px,96vw);
+    max-height:92vh;
+    margin:0 auto;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .nominal-modal-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 14px;
+    background:#111827;
+    color:#fff;
+  }
+  .nominal-modal-head h2{
+    margin:0;
+    font-size:18px;
+  }
+  .nominal-modal-head .spacer{flex:1}
+  .nominal-modal-head button{
+    padding:7px 10px;
+  }
+  .nominal-modal-tools{
+    display:grid;
+    grid-template-columns:1.6fr .8fr auto;
+    gap:8px;
+    padding:10px 12px;
+    border-bottom:1px solid #d1d5db;
+    background:#f8fafc;
+  }
+  .nominal-modal-tools input,
+  .nominal-modal-tools select{
+    width:100%;
+    padding:8px 9px;
+    border:1px solid #cbd5e1;
+    border-radius:7px;
+    font:inherit;
+    background:#fff;
+  }
+  .nominal-count{
+    align-self:center;
+    font-size:12px;
+    font-weight:800;
+    color:#475569;
+    white-space:nowrap;
+  }
+  .nominal-table-wrap{
+    overflow:auto;
+    padding:0 0 8px;
+  }
+  .nominal-roll-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:auto;
+  }
+  .nominal-roll-table th,
+  .nominal-roll-table td{
+    border:1px solid #d1d5db;
+    padding:6px 7px;
+    font-size:12px;
+    vertical-align:top;
+  }
+  .nominal-roll-table th{
+    position:sticky;
+    top:0;
+    background:#e5e7eb;
+    z-index:1;
+    text-align:left;
+  }
+  .nominal-roll-table .sn{width:48px;text-align:center}
+  .nominal-roll-table .rank{white-space:nowrap}
+  .nominal-roll-table .phone{white-space:nowrap}
+  .nominal-group-row td{
+    background:#dbeafe;
+    font-weight:900;
+    color:#1e3a8a;
+  }
+  @media(max-width:700px){
+    .nominal-modal{padding:6px}
+    .nominal-modal-card{width:100%;max-height:96vh}
+    .nominal-modal-tools{grid-template-columns:1fr}
+    .nominal-roll-table th,.nominal-roll-table td{font-size:10px;padding:4px}
+  }
+  @media print{
+    .nominal-modal{display:none !important}
+  }
+
+
+  .person-readonly{
+    background:#f8fafc !important;
+    border:0 !important;
+    cursor:pointer;
+    font-weight:700;
+  }
+  .person-select-btn{
+    background:#2563eb;
+    color:#fff;
+    font-size:10px;
+    padding:5px 7px;
+    border-radius:5px;
+    white-space:nowrap;
+  }
+  .person-picker{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1200;
+    background:rgba(15,23,42,.72);
+    padding:18px;
+  }
+  .person-picker.show{display:block}
+  .person-picker-card{
+    width:min(760px,96vw);
+    max-height:88vh;
+    margin:3vh auto 0;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .person-picker-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#111827;
+    color:#fff;
+    padding:11px 12px;
+  }
+  .person-picker-head strong{font-size:16px}
+  .person-picker-head .spacer{flex:1}
+  .person-picker-search{
+    padding:10px 12px;
+    background:#f8fafc;
+    border-bottom:1px solid #d1d5db;
+  }
+  .person-picker-search input{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid #94a3b8;
+    border-radius:7px;
+    font:inherit;
+  }
+  .person-picker-results{
+    overflow:auto;
+    max-height:62vh;
+  }
+  .person-result{
+    width:100%;
+    display:grid;
+    grid-template-columns:110px 1fr 170px;
+    gap:8px;
+    align-items:center;
+    text-align:left;
+    padding:9px 11px;
+    border:0;
+    border-bottom:1px solid #e5e7eb;
+    border-radius:0;
+    background:#fff;
+    color:#111;
+    font-weight:400;
+  }
+  .person-result:hover{background:#eff6ff}
+  .person-result .r-rank{font-weight:800}
+  .person-result .r-name{font-weight:800}
+  .person-result .r-duty{font-size:11px;color:#64748b}
+  .person-result .r-phone{font-size:11px;color:#475569}
+  @media(max-width:650px){
+    .person-result{grid-template-columns:90px 1fr}
+    .person-result .r-phone{display:none}
+  }
+  @media print{
+    .person-picker,.person-select-btn{display:none !important}
+    .person-readonly{
+      background:transparent !important;
+      font-weight:normal !important;
+    }
+  }
+
+
+  .sector-team-box{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .sector-team-box textarea{
+    cursor:pointer;
+    background:#f8fafc;
+  }
+  .sector-team-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1300;
+    background:rgba(15,23,42,.72);
+    padding:16px;
+  }
+  .sector-team-modal.show{display:block}
+  .sector-team-card{
+    width:min(820px,96vw);
+    max-height:90vh;
+    margin:2vh auto 0;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .sector-team-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 12px;
+    background:#111827;
+    color:#fff;
+  }
+  .sector-team-head .spacer{flex:1}
+  .sector-current{
+    padding:10px 12px;
+    border-bottom:1px solid #d1d5db;
+    background:#f8fafc;
+  }
+  .sector-current-title,
+  .sector-search-title{
+    font-size:11px;
+    font-weight:900;
+    color:#475569;
+    margin-bottom:6px;
+    text-transform:uppercase;
+  }
+  .sector-current-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .sector-chip{
+    display:flex;
+    gap:6px;
+    align-items:center;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    padding:6px 7px;
+    background:#fff;
+    font-size:11px;
+  }
+  .sector-chip button{
+    padding:3px 6px;
+    font-size:10px;
+    background:#dc2626;
+    color:#fff;
+  }
+  .sector-search{
+    padding:10px 12px;
+    border-bottom:1px solid #d1d5db;
+  }
+  .sector-search input{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid #94a3b8;
+    border-radius:7px;
+  }
+  .sector-results{
+    overflow:auto;
+    max-height:50vh;
+  }
+  .sector-result{
+    display:grid;
+    grid-template-columns:120px 1fr 120px auto;
+    gap:8px;
+    align-items:center;
+    width:100%;
+    padding:8px 10px;
+    border-bottom:1px solid #e5e7eb;
+    font-size:11px;
+  }
+  .sector-result .rank,.sector-result .name{font-weight:800}
+  .sector-result .duty{color:#64748b;font-size:10px}
+  .sector-result button{
+    background:#059669;
+    color:#fff;
+    font-size:10px;
+    padding:5px 7px;
+  }
+  .sector-result.already{background:#f1f5f9}
+  .sector-result.already button{background:#94a3b8;cursor:default}
+  @media(max-width:700px){
+    .sector-result{grid-template-columns:95px 1fr auto}
+    .sector-result .phone{display:none}
+  }
+  @media print{
+    .sector-manage-btn,.sector-team-modal{display:none !important}
+    .sector-team-box textarea{background:transparent !important}
+  }
+
+
+  textarea[data-person-picker="true"],
+  textarea[onclick^="openFieldPersonPicker"]{
+    cursor:pointer !important;
+    background:#f8fafc !important;
+  }
+  textarea[onclick^="openFieldPersonPicker"]:hover{
+    background:#eff6ff !important;
+    box-shadow:inset 0 0 0 2px #60a5fa;
+  }
+  @media print{
+    textarea[onclick^="openFieldPersonPicker"]{
+      background:transparent !important;
+      box-shadow:none !important;
+    }
+  }
+
+
+  .allot-help{
+    display:block;
+    font-size:9px;
+    color:#64748b;
+    text-align:center;
+    margin-top:2px;
+  }
+  @media print{ .allot-help{display:none!important} }
+
+
+  .sector-team-box textarea[readonly]{
+    cursor:pointer !important;
+    background:#f8fafc !important;
+  }
+  .sector-team-box textarea[readonly]:hover{
+    background:#eff6ff !important;
+    box-shadow:inset 0 0 0 2px #60a5fa;
+  }
+  @media print{
+    .sector-team-box textarea[readonly]{
+      background:transparent !important;
+      box-shadow:none !important;
+    }
+  }
+
+
+  /* ===== Mobile phone layout ===== */
+  .mobile-tip{display:none}
+
+  @media (max-width: 700px){
+    html{
+      -webkit-text-size-adjust:100%;
+      text-size-adjust:100%;
+    }
+
+    body{
+      min-width:0;
+      overflow-x:hidden;
+    }
+
+    /* Keep the main controls compact instead of covering half the phone screen. */
+    .toolbar{
+      position:sticky;
+      top:0;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+      gap:6px;
+      padding:7px 8px;
+      scrollbar-width:none;
+    }
+    .toolbar::-webkit-scrollbar{display:none}
+    .toolbar .title,
+    .toolbar button,
+    .toolbar input[type="date"],
+    .toolbar .status{
+      flex:0 0 auto;
+      white-space:nowrap;
+    }
+    .toolbar .title{
+      font-size:13px;
+      margin-right:2px;
+    }
+    .toolbar button{
+      min-height:40px;
+      padding:8px 10px;
+      font-size:12px;
+    }
+    .toolbar input[type="date"]{
+      min-height:40px;
+      font-size:14px;
+    }
+    .status{margin-left:0}
+
+    .wrap{
+      width:100%;
+      max-width:100%;
+      margin:8px 0 0;
+      padding:0 0 24px;
+      overflow:visible;
+    }
+
+    .hint{
+      margin:0 8px 8px;
+      padding:8px 10px;
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .mobile-tip{
+      display:block;
+      margin:0 8px 8px;
+      padding:7px 9px;
+      border:1px solid #bfdbfe;
+      border-radius:8px;
+      background:#eff6ff;
+      color:#1e3a8a;
+      font-size:11px;
+      font-weight:700;
+    }
+
+    .edit-grid{
+      grid-template-columns:1fr;
+      gap:6px;
+      margin:0 8px 8px;
+    }
+    .card{
+      padding:8px;
+    }
+    .card select,
+    .card input,
+    .card textarea{
+      min-height:42px;
+      font-size:16px;
+    }
+
+    /* The printed roster keeps its four-column structure.
+       On phone it becomes a smooth horizontally-scrollable work area. */
+    .sheet{
+      width:100%;
+      min-height:0;
+      margin:0;
+      padding:0;
+      border-left:0;
+      border-right:0;
+      box-shadow:none;
+      overflow-x:auto;
+      overflow-y:visible;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-x:contain;
+    }
+    .roster-table{
+      width:760px;
+      min-width:760px;
+      table-layout:fixed;
+    }
+    .roster-table th,
+    .roster-table td{
+      font-size:11px;
+      padding:3px 4px;
+    }
+
+    /* Keep duty/place names visible while swiping across the 3 shifts. */
+    .roster-table .place{
+      position:sticky;
+      left:0;
+      z-index:5;
+      background:#fff;
+      box-shadow:1px 0 0 #222;
+    }
+    .roster-table th.place{
+      background:#f2f2f2;
+      z-index:6;
+    }
+
+    .personcell textarea{
+      min-height:54px;
+    }
+
+    .row-actions{
+      margin:8px;
+      gap:6px;
+    }
+    .row-actions button{
+      flex:1 1 calc(50% - 6px);
+      min-height:42px;
+    }
+
+    .print-note{
+      margin:8px;
+      font-size:11px;
+    }
+
+    /* Full-screen touch-friendly popups. */
+    .person-picker,
+    .sector-team-modal,
+    .nominal-modal{
+      padding:0;
+    }
+    .person-picker-card,
+    .sector-team-card,
+    .nominal-modal-card{
+      width:100%;
+      max-width:none;
+      height:100dvh;
+      max-height:100dvh;
+      margin:0;
+      border-radius:0;
+    }
+
+    .person-picker-head,
+    .sector-team-head,
+    .nominal-modal-head{
+      min-height:52px;
+      padding:8px 10px;
+    }
+    .person-picker-head button,
+    .sector-team-head button,
+    .nominal-modal-head button{
+      min-height:40px;
+      padding:7px 10px;
+    }
+
+    .person-picker-search,
+    .sector-search,
+    .nominal-modal-tools{
+      padding:8px;
+    }
+    .person-picker-search input,
+    .sector-search input,
+    .nominal-modal-tools input,
+    .nominal-modal-tools select{
+      min-height:44px;
+      font-size:16px;
+    }
+
+    .person-picker-results,
+    .sector-results{
+      max-height:none;
+      flex:1 1 auto;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    .person-result{
+      min-height:58px;
+      grid-template-columns:90px 1fr;
+      gap:7px;
+      padding:9px;
+    }
+    .person-result .r-phone{display:none}
+
+    .sector-current{
+      padding:8px;
+    }
+    .sector-current-list{
+      max-height:22vh;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .sector-chip{
+      min-height:38px;
+      font-size:11px;
+    }
+    .sector-chip button{
+      min-width:34px;
+      min-height:30px;
+    }
+    .sector-result{
+      grid-template-columns:88px 1fr auto;
+      min-height:56px;
+      padding:8px;
+    }
+    .sector-result .phone{display:none}
+    .sector-result button{
+      min-width:54px;
+      min-height:36px;
+    }
+
+    /* Nominal roll stays readable on phone and can be swiped horizontally. */
+    .nominal-table-wrap{
+      flex:1 1 auto;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .nominal-roll-table{
+      min-width:720px;
+    }
+    .nominal-roll-table th,
+    .nominal-roll-table td{
+      font-size:11px;
+      padding:5px;
+    }
+
+    /* Serial-number sections remain usable inside the A4-style table. */
+    .serial-duty-table input,
+    .section-summary{
+      min-height:30px;
+    }
+    .serial-actions button{
+      min-height:38px;
+    }
+  }
+
+  @media (max-width: 420px){
+    .toolbar .title{display:none}
+    .hint{font-size:11px}
+    .roster-table{
+      width:720px;
+      min-width:720px;
+    }
+  }
+
+
+  .row-remove-btn{
+    display:block;
+    margin:3px auto 0;
+    padding:2px 5px;
+    min-width:24px;
+    border-radius:4px;
+    background:#dc2626;
+    color:#fff;
+    font-size:10px;
+    line-height:1.1;
+  }
+  .row-remove-btn:hover{background:#b91c1c}
+  @media print{
+    .row-remove-btn{display:none !important}
+  }
+
+
+  /* ===== FINAL PRINT OVERRIDE ===== */
+  @media print{
+    @page{
+      size:A4 portrait;
+      margin:5mm;
+    }
+
+    html,body{
+      width:auto !important;
+      min-height:0 !important;
+      margin:0 !important;
+      padding:0 !important;
+      background:#fff !important;
+      overflow:visible !important;
+    }
+
+    /* Never print editing controls or explanatory panels. */
+    .toolbar{display:none !important}
+
+    .wrap{
+      width:auto !important;
+      max-width:none !important;
+      margin:0 !important;
+      padding:0 !important;
+      overflow:visible !important;
+    }
+
+    /* This is the key rule: print ONLY the roster sheet. */
+    .wrap > *{
+      display:none !important;
+    }
+    .wrap > .sheet{
+      display:block !important;
+    }
+
+    .sheet{
+      width:100% !important;
+      min-height:0 !important;
+      margin:0 !important;
+      padding:0 !important;
+      border:0 !important;
+      box-shadow:none !important;
+      overflow:visible !important;
+    }
+
+    .roster-table{
+      width:100% !important;
+      min-width:0 !important;
+      table-layout:fixed !important;
+      border-collapse:collapse !important;
+    }
+
+    .roster-table th,
+    .roster-table td{
+      border:0.65pt solid #222 !important;
+      padding:0.7px 1.4px !important;
+      font-size:6.65pt !important;
+      line-height:0.98 !important;
+      vertical-align:top !important;
+    }
+
+    .main-title{
+      font-size:9.5pt !important;
+      padding:2px !important;
+    }
+
+    .station-name{
+      font-size:8pt !important;
+    }
+
+    textarea,
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select{
+      font-size:6.65pt !important;
+      line-height:0.98 !important;
+      padding:0 !important;
+      margin:0 !important;
+      border:0 !important;
+      outline:0 !important;
+      background:transparent !important;
+      color:#111 !important;
+      min-height:0 !important;
+      box-shadow:none !important;
+    }
+
+    .personcell textarea{
+      min-height:22px !important;
+    }
+
+    .serial-duty-table th,
+    .serial-duty-table td{
+      font-size:6.1pt !important;
+      line-height:0.95 !important;
+      padding:0.5px 1px !important;
+    }
+
+    .serial-duty-table input,
+    .section-summary{
+      font-size:6.1pt !important;
+      line-height:0.95 !important;
+      min-height:0 !important;
+      padding:0 !important;
+    }
+
+    .section-title{
+      padding:1px !important;
+    }
+
+    .section-store,
+    .serial-actions,
+    .row-remove-btn,
+    .person-picker,
+    .sector-team-modal,
+    .nominal-modal,
+    .conflict-warning,
+    .shift-conflict-summary{
+      display:none !important;
+    }
+
+    /* Try not to split the final casualty block across pages. */
+    tr,
+    .serial-duty-table,
+    [data-serial-section="casualties"]{
+      break-inside:avoid !important;
+      page-break-inside:avoid !important;
+    }
+  }
+
+
+  .casualty-type-select{
+    width:100%;
+    min-height:28px;
+    border:1px solid #cbd5e1;
+    border-radius:4px;
+    background:#fff;
+    padding:2px 4px;
+    font:inherit;
+  }
+  .casualty-remarks-input{
+    width:100%;
+    min-height:28px;
+  }
+  @media print{
+    .casualty-type-select,
+    .casualty-remarks-input{
+      border:0 !important;
+      background:transparent !important;
+      min-height:0 !important;
+      padding:0 !important;
+      font-size:6.1pt !important;
+    }
+  }
+
+
+  @media print{
+    .section-store{display:none !important}
+    input::placeholder,
+    textarea::placeholder{
+      color:transparent !important;
+      opacity:0 !important;
+    }
+    .serial-duty-table th,
+    .serial-duty-table td{
+      font-size:5.8pt !important;
+      line-height:0.95 !important;
+      padding:0.45px 0.8px !important;
+      white-space:normal !important;
+      word-break:break-word !important;
+      overflow-wrap:anywhere !important;
+    }
+    .serial-duty-table input,
+    .serial-duty-table select{
+      font-size:5.8pt !important;
+      white-space:normal !important;
+    }
+    .section-summary{
+      display:block !important;
+      width:100% !important;
+      font-size:5.8pt !important;
+      line-height:1 !important;
+      white-space:normal !important;
+      overflow:visible !important;
+    }
+  }
+
+
+  /* Match the uploaded Word roster font */
+  body,
+  button,
+  input,
+  textarea,
+  select,
+  table,
+  th,
+  td,
+  .roster-table,
+  .serial-duty-table {
+    font-family:Rockwell, "Rockwell Nova", "Roboto Slab", serif !important;
+  }
+
+  @media print {
+    body,
+    input,
+    textarea,
+    select,
+    table,
+    th,
+    td,
+    .roster-table,
+    .serial-duty-table {
+      font-family:Rockwell, "Rockwell Nova", "Roboto Slab", serif !important;
+    }
+  }
+
+
+  /* Remove inner boxes around names/rank text inside roster tables */
+  .serial-duty-table input,
+  .serial-duty-table select,
+  .roster-table textarea,
+  .roster-table input[type="text"],
+  .roster-table input[type="number"],
+  .roster-table select {
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background:transparent !important;
+  }
+
+  .serial-duty-table input:focus,
+  .serial-duty-table select:focus,
+  .roster-table textarea:focus,
+  .roster-table input[type="text"]:focus,
+  .roster-table input[type="number"]:focus,
+  .roster-table select:focus {
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background:#f8fafc !important;
+  }
+
+  .person-readonly{
+    border:0 !important;
+    box-shadow:none !important;
+    background:transparent !important;
+  }
+
+
+  /* Prevent text overlap in MISCELLANEOUS / OD / CASUALITIES */
+  .serial-duty-table{
+    table-layout:fixed !important;
+  }
+
+  .serial-duty-table th,
+  .serial-duty-table td{
+    overflow:hidden;
+  }
+
+  .serial-duty-table input,
+  .serial-duty-table select{
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+
+  /* MISC, IN-OD and OUT-OD: balanced widths inside the half-page columns */
+  .serial-misc .sn-col,
+  .serial-inOD .sn-col,
+  .serial-outOD .sn-col{width:6% !important;}
+
+  .serial-misc .rank-col,
+  .serial-inOD .rank-col,
+  .serial-outOD .rank-col{width:24% !important;}
+
+  .serial-misc .name-col,
+  .serial-inOD .name-col,
+  .serial-outOD .name-col{width:38% !important;}
+
+  .serial-misc .detail-col,
+  .serial-inOD .detail-col,
+  .serial-outOD .detail-col{width:32% !important;}
+
+  /* Casualities must total exactly 100% to avoid column collision */
+  .serial-casualties .sn-col{width:5% !important;}
+  .serial-casualties .rank-col{width:18% !important;}
+  .serial-casualties .name-col{width:28% !important;}
+  .serial-casualties .leave-col{width:18% !important;}
+  .serial-casualties .remarks-col{width:28% !important;}
+
+  @media print{
+    .serial-duty-table{
+      table-layout:fixed !important;
+      width:100% !important;
+    }
+
+    .serial-duty-table th,
+    .serial-duty-table td{
+      overflow:hidden !important;
+      white-space:normal !important;
+      word-break:normal !important;
+      overflow-wrap:anywhere !important;
+      vertical-align:middle !important;
+    }
+
+    .serial-duty-table input,
+    .serial-duty-table select{
+      width:100% !important;
+      max-width:100% !important;
+      overflow:hidden !important;
+      text-overflow:clip !important;
+    }
+  }
+
+
+  /* Bottom sections: make the nested editor look like ONE continuous table.
+     The parent roster cell supplies the outside border; the inner table only
+     supplies the internal row/column separators, avoiding a "box inside box". */
+  .serial-section-wrap{
+    padding:0 !important;
+    border-spacing:0 !important;
+  }
+
+  .serial-duty-table{
+    width:100% !important;
+    margin:0 !important;
+    border:0 !important;
+    border-collapse:collapse !important;
+  }
+
+  .serial-duty-table th,
+  .serial-duty-table td{
+    border:0 !important;
+    border-right:1px solid #222 !important;
+    border-bottom:1px solid #222 !important;
+  }
+
+  .serial-duty-table tr > *:last-child{
+    border-right:0 !important;
+  }
+
+  .serial-duty-table tbody tr:last-child > td{
+    border-bottom:0 !important;
+  }
+
+  /* Keep the column-header separator, but do not draw another outside box. */
+  .serial-duty-table thead th{
+    border-top:0 !important;
+  }
+
+  /* OUT OD heading should be part of the same grid rather than a separate box. */
+  .serial-section-wrap > .section-title{
+    margin:0 !important;
+    border-left:0 !important;
+    border-right:0 !important;
+    border-bottom:1px solid #222 !important;
+  }
+
+  /* Add-person controls stay outside the printed table and do not create a box. */
+  .serial-actions{
+    border:0 !important;
+    border-top:1px solid #d1d5db !important;
+    background:transparent !important;
+    padding:3px 4px !important;
+  }
+
+  @media print{
+    .serial-duty-table th,
+    .serial-duty-table td{
+      border:0 !important;
+      border-right:1px solid #222 !important;
+      border-bottom:1px solid #222 !important;
+    }
+
+    .serial-duty-table tr > *:last-child{
+      border-right:0 !important;
+    }
+
+    .serial-duty-table tbody tr:last-child > td{
+      border-bottom:0 !important;
+    }
+
+    .serial-section-wrap > .section-title{
+      border-left:0 !important;
+      border-right:0 !important;
+    }
+  }
+
+
+  .table-picker-field{
+    cursor:pointer !important;
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background:transparent !important;
+    font-weight:700;
+  }
+  .table-picker-field:focus{
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+  }
+
+
+  /* Uniform font size throughout the roster.
+     Only ROUGH DUTY ROSTER remains larger. */
+  .roster-table,
+  .roster-table th,
+  .roster-table td,
+  .roster-table input,
+  .roster-table textarea,
+  .roster-table select,
+  .roster-table .station-name,
+  .roster-table .section-title,
+  .roster-table .section-summary,
+  .roster-table .serial-duty-table,
+  .roster-table .serial-duty-table th,
+  .roster-table .serial-duty-table td,
+  .roster-table .serial-duty-table input,
+  .roster-table .serial-duty-table select,
+  .roster-table .casualty-type-select,
+  .roster-table .casualty-remarks-input {
+    font-size:11px !important;
+  }
+
+  .roster-table .main-title {
+    font-size:14px !important;
+  }
+
+  @media print {
+    .roster-table,
+    .roster-table th,
+    .roster-table td,
+    .roster-table input,
+    .roster-table textarea,
+    .roster-table select,
+    .roster-table .station-name,
+    .roster-table .section-title,
+    .roster-table .section-summary,
+    .roster-table .serial-duty-table,
+    .roster-table .serial-duty-table th,
+    .roster-table .serial-duty-table td,
+    .roster-table .serial-duty-table input,
+    .roster-table .serial-duty-table select,
+    .roster-table .casualty-type-select,
+    .roster-table .casualty-remarks-input {
+      font-size:6.65pt !important;
+    }
+
+    .roster-table .main-title {
+      font-size:9.5pt !important;
+    }
+  }
+
+
+  /* PDF/Print: show plain text only — no input/select/textarea boxes */
+  @media print {
+    input,
+    textarea,
+    select,
+    .table-picker-field,
+    .person-readonly,
+    .casualty-type-select,
+    .casualty-remarks-input {
+      border:0 !important;
+      outline:0 !important;
+      box-shadow:none !important;
+      background:transparent !important;
+      border-radius:0 !important;
+      padding:0 !important;
+      margin:0 !important;
+      appearance:none !important;
+      -webkit-appearance:none !important;
+      color:#111 !important;
+    }
+
+    select {
+      background-image:none !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color:transparent !important;
+      opacity:0 !important;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border:0 !important;
+      outline:0 !important;
+      box-shadow:none !important;
+      background:transparent !important;
+    }
+  }
+
+
+  /* TRUE SINGLE-TABLE ROSTER
+     MISC / IN-OD / OUT OD / CASUALITIES are normal rows of .roster-table.
+     There are no tables nested inside roster cells. */
+  .roster-table{
+    table-layout:fixed !important;
+  }
+
+  .roster-table .place,
+  .roster-table .shift{
+    width:auto !important;
+  }
+
+  #serialRosterBody th,
+  #serialRosterBody td{
+    padding:2px 3px !important;
+    vertical-align:middle !important;
+    overflow:hidden;
+  }
+
+  #serialRosterBody input,
+  #serialRosterBody select{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background:transparent !important;
+    padding:1px 2px !important;
+  }
+
+  .single-section-title{
+    position:relative;
+    text-align:center !important;
+  }
+
+  .section-add-btn{
+    position:absolute;
+    right:4px;
+    top:50%;
+    transform:translateY(-50%);
+    width:20px;
+    height:20px;
+    border:0;
+    border-radius:4px;
+    background:#0f766e;
+    color:#fff;
+    font-weight:900;
+    line-height:18px;
+    padding:0;
+    cursor:pointer;
+  }
+
+  .serial-head{
+    font-weight:800 !important;
+    text-align:center !important;
+    background:#f2f2f2 !important;
+  }
+
+  .serial-sn-cell{
+    position:relative;
+    text-align:center;
+    padding-right:17px !important;
+  }
+
+  .serial-blank{
+    background:#fff;
+  }
+
+  .casualty-summary-cell{
+    padding:0 !important;
+  }
+
+  .section-summary-visible{
+    width:100% !important;
+    font-weight:700 !important;
+    border:0 !important;
+    background:transparent !important;
+    padding:2px 4px !important;
+  }
+
+  .serial-data-stores{
+    display:none !important;
+  }
+
+  @media print{
+    .section-add-btn,
+    .row-remove-btn{
+      display:none !important;
+    }
+
+    #serialRosterBody th,
+    #serialRosterBody td{
+      font-size:6.65pt !important;
+      line-height:0.98 !important;
+      padding:0.5px 1px !important;
+      white-space:normal !important;
+      overflow-wrap:anywhere !important;
+    }
+
+    #serialRosterBody input,
+    #serialRosterBody select,
+    .section-summary-visible{
+      font-size:6.65pt !important;
+      border:0 !important;
+      background:transparent !important;
+      padding:0 !important;
+      margin:0 !important;
+      appearance:none !important;
+      -webkit-appearance:none !important;
+    }
+  }
+
+
+  /* Equal top duty columns: Place 16%, each of the 3 working columns 28%. */
+  #shift1Head,
+  #shift2Head,
+  #shift3Head {
+    width:28% !important;
+  }
+
+  #shiftBody .personcell,
+  .roster-table tr > .personcell {
+    min-width:0 !important;
+  }
+
+
+  .required-move-modal{
+    position:fixed;
+    inset:0;
+    z-index:10050;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    background:rgba(15,23,42,.58);
+  }
+  .required-move-modal.show{display:flex}
+  .required-move-card{
+    width:min(520px,100%);
+    max-height:90vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 20px 55px rgba(0,0,0,.25);
+    padding:14px;
+  }
+  .required-move-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .required-move-head strong{
+    font-size:17px;
+  }
+  .required-move-head button{
+    margin-left:auto;
+  }
+  .required-move-note{
+    padding:9px 10px;
+    margin-bottom:10px;
+    border-radius:7px;
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+    font-size:12px;
+    font-weight:700;
+  }
+  .required-move-person{
+    display:grid;
+    gap:6px;
+    margin-bottom:12px;
+  }
+  .required-move-person > div{
+    display:grid;
+    grid-template-columns:55px 1fr;
+    gap:8px;
+    align-items:start;
+  }
+  .required-move-person span{
+    color:#64748b;
+    font-size:11px;
+  }
+  .required-move-label{
+    display:block;
+    font-size:12px;
+    font-weight:800;
+    margin-bottom:4px;
+  }
+  #requiredMoveDestination{
+    width:100%;
+    min-height:42px;
+    padding:7px 9px;
+    border:1px solid #94a3b8;
+    border-radius:7px;
+    background:#fff;
+    font:inherit;
+    margin-bottom:12px;
+  }
+  .required-move-confirm{
+    width:100%;
+    min-height:42px;
+    border:0;
+    border-radius:7px;
+    background:#0f766e;
+    color:#fff;
+    font-weight:900;
+    cursor:pointer;
+  }
+  @media print{
+    .required-move-modal{display:none !important}
+  }
+
+
+  .nominal-add-btn{
+    background:#0f766e !important;
+    color:#fff !important;
+    border-color:#0f766e !important;
+    font-weight:800;
+  }
+
+  .nominal-editor{
+    margin:10px 12px;
+    padding:12px;
+    border:1px solid #cbd5e1;
+    border-radius:9px;
+    background:#f8fafc;
+  }
+  .nominal-editor[hidden]{display:none !important}
+  .nominal-editor-title{
+    font-size:14px;
+    font-weight:900;
+    margin-bottom:8px;
+  }
+  .nominal-editor-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1.35fr 1.25fr 1fr;
+    gap:8px;
+  }
+  .nominal-editor-grid label{
+    display:block;
+    font-size:10px;
+    font-weight:800;
+    color:#475569;
+    margin-bottom:3px;
+  }
+  .nominal-editor-grid input,
+  .nominal-editor-grid select{
+    width:100%;
+    min-height:34px;
+    box-sizing:border-box;
+    border:1px solid #94a3b8;
+    border-radius:5px;
+    background:#fff;
+    padding:5px 7px;
+    font:inherit;
+  }
+  .nominal-editor-actions{
+    display:flex;
+    gap:7px;
+    margin-top:9px;
+  }
+  .nominal-editor-actions button{
+    min-height:34px;
+    padding:5px 12px;
+  }
+  .nominal-editor-note{
+    margin-top:7px;
+    font-size:10px;
+    color:#64748b;
+  }
+  .nominal-actions-col{
+    width:64px;
+    text-align:center !important;
+  }
+  .nominal-edit-row-btn{
+    border:1px solid #94a3b8;
+    border-radius:5px;
+    background:#fff;
+    padding:3px 8px;
+    font-size:10px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .nominal-roll-table td.nominal-action-cell{
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  @media(max-width:720px){
+    .nominal-editor{
+      margin:7px;
+      padding:10px;
+    }
+    .nominal-editor-grid{
+      grid-template-columns:1fr 1fr;
+    }
+    .nominal-editor-grid > div:nth-child(3),
+    .nominal-editor-grid > div:nth-child(4){
+      grid-column:span 2;
+    }
+    .nominal-modal-head{
+      flex-wrap:wrap;
+    }
+  }
+
+  @media print{
+    .nominal-editor,
+    .nominal-actions-col,
+    .nominal-action-cell,
+    .nominal-add-btn{
+      display:none !important;
+    }
+  }
+
+
+  /* ===== Mobile full-roster view with zoom ===== */
+  .mobile-zoom-bar{
+    display:none;
+  }
+
+  @media (max-width:700px){
+    html{
+      touch-action:manipulation;
+    }
+
+    body{
+      overflow-x:hidden !important;
+    }
+
+    .wrap{
+      width:100% !important;
+      max-width:none !important;
+      overflow:visible !important;
+    }
+
+    /*
+      Keep the roster at its real A4 editing width, then scale the whole sheet
+      to fit the phone. This preserves the exact desktop/table proportions.
+    */
+    .sheet{
+      width:210mm !important;
+      min-width:210mm !important;
+      max-width:none !important;
+      min-height:297mm !important;
+      margin:0 !important;
+      padding:12.7mm !important;
+      overflow:visible !important;
+      transform:none !important;
+      transform-origin:top left !important;
+      zoom:var(--mobile-roster-zoom, .46);
+      touch-action:pan-x pan-y pinch-zoom;
+    }
+
+    .roster-table{
+      width:100% !important;
+      min-width:0 !important;
+      max-width:none !important;
+      table-layout:fixed !important;
+    }
+
+    /* No sticky first column in full-sheet mode; all columns scale together. */
+    .roster-table .place,
+    .roster-table th.place{
+      position:static !important;
+      left:auto !important;
+      box-shadow:none !important;
+    }
+
+    .mobile-zoom-bar{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:7px;
+      margin:0 8px 8px;
+      padding:6px;
+      border:1px solid #cbd5e1;
+      border-radius:8px;
+      background:#fff;
+      position:sticky;
+      top:58px;
+      z-index:80;
+      box-shadow:0 2px 8px rgba(15,23,42,.08);
+    }
+
+    .mobile-zoom-bar button{
+      min-width:42px;
+      min-height:38px;
+      padding:6px 10px;
+      border:1px solid #94a3b8;
+      background:#fff;
+      font-size:17px;
+      line-height:1;
+    }
+
+    .mobile-zoom-bar .zoom-fit{
+      min-width:56px;
+      font-size:12px;
+    }
+
+    #mobileZoomValue{
+      min-width:48px;
+      text-align:center;
+      font-size:11px;
+      font-weight:900;
+      color:#334155;
+    }
+  }
+
+  @media (max-width:420px){
+    .sheet{
+      width:210mm !important;
+      min-width:210mm !important;
+    }
+
+    .roster-table{
+      width:100% !important;
+      min-width:0 !important;
+    }
+  }
+
+  @media print{
+    .mobile-zoom-bar{
+      display:none !important;
+    }
+
+    .sheet{
+      zoom:1 !important;
+    }
+  }
+
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="title">G7 Chetpet Duty Roster</div>
+  <input id="rosterDate" type="date" />
+  <button class="primary" onclick="applyDate()">Set Date</button>
+  <button class="orange" onclick="nextDayRotate(1)">Next Day + Rotate</button>
+  <button onclick="rotateShifts(1)">Apply Shift Rotation</button>
+  <button onclick="rotateShifts(-1)">Reverse Rotation</button>
+  <button onclick="openNominalRoll()">Nominal Roll</button>
+  <button class="green" onclick="saveRoster()">Save</button>
+  <button onclick="printDutyRoster()">Print / PDF</button>
+  <button onclick="downloadBackup()">Backup</button>
+  <button onclick="document.getElementById('restoreFile').click()">Restore</button>
+  <input id="restoreFile" type="file" accept=".json" style="display:none" onchange="restoreBackup(this.files[0])" />
+  <span class="status" id="status">Ready</span>
+</div>
+
+<div class="wrap">
+  <div class="hint">
+    Fast daily workflow: click the <b>Duty SI</b> or <b>SI</b> row inside the roster to select officers, change only names that differ, then use <b>Next Day + Rotate</b>.
+    Rotation is: <b>13.00–21.00 → 07.00–13.00</b>, <b>21.00–07.00 → 13.00–21.00</b>, and <b>07.00–13.00 → 21.00–07.00</b>.
+    Click any Station I/C, Patrol Vehicle, Gypsy Vehicle, Sector A/B/C or Vehicle Check duty cell to open the searchable personnel selector. Multiple personnel can be added where required. <b>Inspector, SI and WSI cannot be allotted to Station I/C or Sector A/B/C.</b> Press <b>Save</b> to keep the roster in this browser and <b>Print / PDF</b> for the final A4 copy.
+  </div>
+  <div class="nominal-panel">
+    <div class="nominal-title">Nominal Roll Quick Assignment <span class="present-badge" id="nominalLoadedBadge">59 personnel loaded</span></div>
+    <div class="nominal-grid">
+      <div>
+        <label>Filter staff</label>
+        <input id="staffSearch" type="text" placeholder="Name / rank / duty / phone" oninput="filterStaff()">
+      </div>
+      <div>
+        <label>Select staff</label>
+        <select id="staffSelect" onchange="showStaffPreview()"></select>
+      </div>
+      <div>
+        <label>Assign to</label>
+        <select id="targetSelect"></select>
+      </div>
+      <button class="primary" onclick="assignSelectedStaff('append')">Add</button>
+      <button onclick="assignSelectedStaff('replace')">Replace</button>
+    </div>
+    <div class="staff-preview" id="staffPreview">Select a person from the nominal roll.</div>
+    <div class="nominal-note">
+      <b>Personnel currently under IN–OD / OUT OD are automatically hidden from allotment dropdowns.</b><br>
+      Master identities are loaded from the nominal roll dated 15.08.2026 and can now be edited from the <b>Nominal Roll</b> window.
+      Edited rank, name, duty, phone and group are saved in this browser and included in Backup.
+    </div>
+  </div>
+
+  <div class="edit-grid" style="display:none !important" aria-hidden="true">
+    <input id="stationName" type="hidden" value="G7 CHETPET POLICE STATION (LAW & ORDER)">
+    <input id="sho" type="hidden" value="INS Tr. N. Thirumal (9788927989)">
+    <div class="card">
+      <label>Duty SI <span class="muted">(Select daily)</span></label>
+      <select id="dutySI" onchange="syncHeader(); saveRoster(false); runConflictChecks()">
+        <option value="SI.Tr.Inkarshaw Bell Abraham" data-staff-id="station-5">SI 132 Tr.Inkarshaw Bell Abraham — Present</option>
+        <option value="SI.Tr.S. Shanmugam" data-staff-id="station-6">SI 13564 Tr.S. Shanmugam — Present</option>
+        <option value="SI.Tr.Sureshkumar" data-staff-id="station-7">SI 35540 Tr. Sureshkumar — Present</option>
+        
+      </select>
+        <div id="dutySIWarning" class="conflict-warning"></div>
+    </div>
+    <div class="card">
+      <label>Other SIs</label>
+      <input id="otherSI" type="text" value="SI.Tr.Shanmugam, SI.Tr.Sureshkumar" oninput="syncHeader()">
+    </div>
+  </div>
+
+  <div id="shiftConflictWarning" class="shift-conflict-summary"></div>
+  <div style="margin:-4px 0 10px;font-size:11px;color:#64748b;">
+    Vehicle Check can use personnel already on Patrol Vehicle, Gypsy Vehicle or Sector A/B/C during the same shift. This is an allowed overlap.
+  </div>
+
+  <div class="mobile-tip">Phone view: the complete roster is fitted to the screen. Pinch with two fingers to zoom, or use the controls below. Tap any duty cell normally to edit.</div>
+
+  <div class="mobile-zoom-bar" aria-label="Roster zoom controls">
+    <button type="button" onclick="changeMobileRosterZoom(-0.08)" aria-label="Zoom out">−</button>
+    <button type="button" class="zoom-fit" onclick="fitMobileRoster()">Fit</button>
+    <span id="mobileZoomValue">Fit</span>
+    <button type="button" onclick="changeMobileRosterZoom(0.08)" aria-label="Zoom in">+</button>
+  </div>
+
+  <div class="sheet">
+    <table class="roster-table"><colgroup><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/><col style="width:2%"/></colgroup>
+<tr><th class="main-title" colspan="50">ROUGH DUTY ROSTER</th></tr>
+<tr>
+<td class="station-name" colspan="38" id="stationHeader">G7 CHETPET POLICE STATION (LAW &amp; ORDER)</td>
+<td class="station-name center" colspan="12">Date: <span id="dateLabel">13.09.2026 - Sunday</span></td>
+</tr>
+<tr><td class="place" colspan="8">SHO:-</td><td colspan="42"><input class="locked-field" id="shoCell" readonly="" type="text" value="INS Tr. N. Thirumal (9788927989)"/></td></tr>
+<tr><td class="place" colspan="8">Duty SI</td><td colspan="42"><input class="locked-field table-picker-field" id="dutySICell" onclick="openDutySIPicker()" readonly="" title="Click to select Duty SI" type="text" value="SI.Tr.Inkarshaw Bell Abraham"/></td></tr>
+<tr><td class="place" colspan="8">SI</td><td colspan="42"><input class="table-picker-field" id="otherSICell" onclick="openOtherSIManager()" readonly="" title="Click to select Other SIs" type="text" value="SI.Tr.Shanmugam, SI.Tr.Sureshkumar"/></td></tr>
+<tr>
+<th colspan="8">Details</th><th colspan="42">Strength</th>
+</tr>
+<tr>
+<td class="place" colspan="8">S. Strength</td>
+<td colspan="42"><input data-field="sanctionedStrength" type="text" value="Ins 01 | SI 07 | SSI - | HC 10 | Gr.I 18 | Gr.II 40 | Total 76"/></td>
+</tr>
+<tr>
+<td class="place" colspan="8">Actual Strength</td>
+<td colspan="42"><input data-field="actualStrength" type="text" value="Ins 02 | SI 08 | SSI 05 | HC 16 | Gr.I 04 | Gr.II 18 | Total 53"/></td>
+</tr>
+<tr>
+<th class="place" colspan="8">Place</th>
+<th class="shift" colspan="14" id="shift1Head">07.00 hrs to 13.00 hrs</th>
+<th class="shift" colspan="14" id="shift2Head">13.00 hrs to 21.00 hrs</th>
+<th class="shift" colspan="14" id="shift3Head">21.00 hrs to 07.00 hrs</th>
+</tr>
+<tbody id="shiftBody">
+<tr data-place="Station I/C">
+<td class="place" colspan="8">Station I/C</td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="1" onclick="openSectorTeamManager(0,'1')" readonly="">HC 25733 Tr.Sivakumar
+9884352703</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="2" onclick="openSectorTeamManager(0,'2')" readonly="">WPC 53556 Tmt.Anitha
+6381879492</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="3" onclick="openSectorTeamManager(0,'3')" readonly="">WPC 63328 Tmt.Sangeetha Devi
+7708806737</textarea></div></td>
+</tr>
+<tr data-place="Patrol Vehicle">
+<td class="place" colspan="8">PATROL VEHICLE<br/>(TN 01 AG 0061)</td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="1" onclick="openSectorTeamManager(1,'1')" readonly="">SSI.Tr.Thirunavukarasu (MCR)
+9840396927</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="2" onclick="openSectorTeamManager(1,'2')" readonly="">SI.Tr.Shanmugam (MCR)
+9841545570</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="3" onclick="openSectorTeamManager(1,'3')" readonly="">SI Tr.Subramani (MCR)
+9444619384</textarea></div></td>
+</tr>
+<tr data-place="Gypsy Vehicle">
+<td class="place" colspan="8">GYPSY VEHICLE<br/>(TN 01 G 6649)</td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="1" onclick="openSectorTeamManager(2,'1')" readonly="">SSI.Tr.Raja
+9042811451</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="2" onclick="openSectorTeamManager(2,'2')" readonly="">SSI.Tr.Elayaraja
+9898193035</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="3" onclick="openSectorTeamManager(2,'3')" readonly="">SSI.Tr.Sivalingam
+7010113089</textarea></div></td>
+</tr>
+<tr data-place="Sector A">
+<td class="place" colspan="8">SECTOR – A</td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="1" onclick="openSectorTeamManager(3,'1')" readonly="">PC 58159 Tr.Selvakumar
+9498150523</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="2" onclick="openSectorTeamManager(3,'2')" readonly="">HC 43606 Tr.Thirumurugan
+8667855804</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="3" onclick="openSectorTeamManager(3,'3')" readonly="">HC 31244 Tr.Arikarasubramaniyan
+9498132944</textarea></div></td>
+</tr>
+<tr data-place="Sector B">
+<td class="place" colspan="8">SECTOR – B</td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="1" onclick="openSectorTeamManager(4,'1')" readonly="">PC 62609 Tr. Sivappazham
+9790145579</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="2" onclick="openSectorTeamManager(4,'2')" readonly="">HC 50837 Tr. Vanchinathan
+81249 67658</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="3" onclick="openSectorTeamManager(4,'3')" readonly="">PC 63364 Tr.Santhoshkumar
+6383215955</textarea></div></td>
+</tr>
+<tr data-place="Sector C">
+<td class="place" colspan="8">SECTOR – C</td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="1" onclick="openSectorTeamManager(5,'1')" readonly="">HC 40879 Tr.Chermadurai
+9677896781</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="2" onclick="openSectorTeamManager(5,'2')" readonly="">HC 26133 Tr.Ramesh
+8825560213
+Gr1 43478 Tr.Sirajudeen
+9790119672</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="3" onclick="openSectorTeamManager(5,'3')" readonly="">PC 62652 Tr.Thangarasu
+9498210501</textarea></div></td>
+</tr>
+<tr data-place="Chetpet Signal Vehicle Check">
+<td class="place" colspan="8">Chetpet Signal<br/>Vehicle Check</td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="1" onclick="openSectorTeamManager(6,'1')" readonly="">-</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="2" onclick="openSectorTeamManager(6,'2')" readonly="">-</textarea></div></td>
+<td class="personcell" colspan="14"><div class="sector-team-box"><textarea data-shift="3" onclick="openSectorTeamManager(6,'3')" readonly="">SSI.Tr.Sivalingam
+7010113089</textarea></div></td>
+</tr>
+</tbody>
+<tr>
+<td class="place" colspan="8"><b>Court</b></td>
+<td class="personcell" colspan="14">
+<div style="font-weight:800;text-align:center;margin-bottom:2px;">MM Court</div>
+<textarea data-field="courtMM" onclick="openFieldPersonPicker('courtMM')" placeholder="" readonly="" title="Click to select personnel from Nominal Roll"></textarea><span class="allot-help"></span>
+</td>
+<td class="personcell" colspan="14">
+<div style="font-weight:800;text-align:center;margin-bottom:2px;">Sessions Court</div>
+<textarea data-field="courtSessions" onclick="openFieldPersonPicker('courtSessions')" placeholder="" readonly="" title="Click to select personnel from Nominal Roll"></textarea><span class="allot-help"></span>
+</td>
+<td class="personcell" colspan="14">
+<div style="font-weight:800;text-align:center;margin-bottom:2px;">NDPS Court</div>
+<textarea data-field="courtNDPS" onclick="openFieldPersonPicker('courtNDPS')" placeholder="" readonly="" title="Click to select personnel from Nominal Roll"></textarea><span class="allot-help"></span>
+</td>
+</tr>
+<tr><td class="place" colspan="8">Warrant</td><td colspan="42"><textarea data-field="warrant">SI.Tr.Inkarshaw BellAbraham, GrI 39770 Tr.Sivakumar, HC 44440 Tr.Ayyanar</textarea></td></tr>
+<tr>
+<th class="place" colspan="8">DRIVERS</th>
+<th colspan="14">Ins Driver</th>
+<th colspan="14">Patrol Driver</th>
+<th colspan="14">Gypsy Driver</th>
+</tr>
+<tr>
+<td class="place" colspan="8"><b>Present Drivers</b></td>
+<td class="personcell" colspan="14">
+<textarea data-field="insDriverDuty" onclick="openFieldPersonPicker('insDriverDuty')" readonly="" title="Click to select personnel from Nominal Roll">Gr I 65036 Tr.Sathishkumar</textarea>
+</td>
+<td class="personcell" colspan="14">
+<textarea data-field="patrolDriver" onclick="openFieldPersonPicker('patrolDriver')" readonly="" title="Click to select personnel from Nominal Roll">GrI 61150 Tr.Vasanthakumar (MCR)</textarea>
+</td>
+<td class="personcell" colspan="14">
+<textarea data-field="gypsyDriver" onclick="openFieldPersonPicker('gypsyDriver')" readonly="" title="Click to select personnel from Nominal Roll">ARPC 53157 Tr.Murugan</textarea>
+</td>
+</tr>
+<tr>
+<td class="place" colspan="8"><b>Rest Drivers</b></td>
+<td class="personcell" colspan="14">
+<textarea data-field="insDriverRest" onclick="openFieldPersonPicker('insDriverRest')" readonly="" title="Click to select personnel from Nominal Roll">PC 624974 Tr.P.Marimuthu</textarea>
+</td>
+<td class="personcell" colspan="14">
+<textarea data-field="patrolDriverRest" onclick="openFieldPersonPicker('patrolDriverRest')" placeholder="" readonly="" title="Click to select personnel from Nominal Roll"></textarea><span class="allot-help"></span>
+</td>
+<td class="personcell" colspan="14">
+<textarea data-field="gypsyDriverRest" onclick="openFieldPersonPicker('gypsyDriverRest')" readonly="" style="font-weight:800;text-align:center;background:#f8fafc;" title="Click to select personnel from Nominal Roll">VACANT</textarea>
+</td>
+</tr>
+<tr><td class="place" colspan="8">Receptionist</td><td colspan="42"><textarea data-field="receptionist">DEO Tmt.Banumathi (10.00 hrs to 17.00 hrs)</textarea></td></tr>
+<tbody id="serialRosterBody"></tbody></table>
+  <div id="serialDataStores" class="serial-data-stores" aria-hidden="true">
+    <textarea class="section-store" data-field="misc">SSI 18353	Tr.Gnanaprakash	SW
+WHC 43265	Tmt. Bommi	C/P
+PC 65005	Tr.S.Sathyaraj	ASW
+PC 56892	Tr. Venjeskumar	CCTNS
+WPC 62864	Sel.Asha	Computer
+PC 56872	Tr.Vengadesh	CCTNS</textarea>
+    <textarea class="section-store" data-field="outOD">GrI 62812	Tr.Purusothamann	TNOGA
+WPC 59399	Tmt.Annai Therasa	TNUSRB</textarea>
+    <textarea class="section-store" data-field="inOD">SI 61	Tr.Sivakumar	G3 L&amp;O
+SI 124	Tr.Karthikeyan	ANTF
+WSI 17589	Tmt.Muthulakshmi	SSF
+WSSI 63907	Tmt.Seema	DCK
+HC 27966	Tr. Rakesh	ACK Office
+HC 28651	Tr.A.Balaji	Singapen Spl - SF
+WHC 45241	Tmt. Jayalalitha	NIA Guard
+HC 62874	Tr.Sivaramakrishnan	JCOP Office
+PC 50525	Tr. Karthikeyan	ANTF
+WPC 53589	Sel.Menaka	DCK Office
+WPC 62464	Tmt.Deepika	Singapen Spl - SF
+WPC 53804	Sel.Vasanthi	JCOP Office</textarea>
+    <textarea class="section-store" data-field="casualties">SI 15575	Tr.Saravanan	ML – 53/55
+HC 29596	Tr.John Pritto	IP at Omanthurar Hospital
+WHC 38854	Tmt.P.Vasanthi	CL-02/03
+WHC 46000	Tmt.Karppakam	W/o
+PC 62716	Tr.Muruganantham	EL – 03/15
+PC 49316	Tr.Hema Chandra Raju	CL-02/02
+WPC 53640	Tmt.Poornima	CL-02/03
+HC 44647	Tr.Rajesh	Deserter - (08.04.25)</textarea>
+    <input class="section-store" data-field="casualtiesSummary" value="ML-02, EL – 01, CL -0, Deserter – 01, W/O –2, Absent - 02 = Total – 08">
+  </div>
+
+  </div>
+
+  <div class="row-actions">
+    <button class="mini primary" onclick="nextDayRotate(1)">Tomorrow + Rotate</button>
+    <button class="mini" onclick="duplicateToday()">Duplicate Today</button>
+    <button class="mini green" onclick="saveRoster()">Save Now</button>
+    <button class="mini" onclick="clearSaved()">Clear Browser Save</button>
+  </div>
+  <div class="print-note">Tip: Use Chrome/Edge → Print → Save as PDF. The toolbar is automatically hidden in print.</div>
+</div>
+
+<script>
+const STORAGE_KEY = "g7_chetpet_roster_v1";
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function niceDate(d){
+  const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()} - ${days[d.getDay()]}`;
+}
+function isoDate(d){
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function setStatus(msg){
+  const el=document.getElementById("status");
+  el.textContent=msg;
+  setTimeout(()=>{el.textContent="Ready";},1800);
+}
+function applyDate(){
+  const v=document.getElementById("rosterDate").value;
+  if(!v) return;
+  const [y,m,d]=v.split("-").map(Number);
+  const dt=new Date(y,m-1,d);
+  document.getElementById("dateLabel").textContent=niceDate(dt);
+  saveRoster(false);
+}
+
+function toggleSHOLock(){
+  const sho=document.getElementById("sho");
+  const cell=document.getElementById("shoCell");
+  const btn=document.getElementById("shoUnlockBtn");
+  const unlocking=sho.readOnly;
+  sho.readOnly=!unlocking;
+  cell.readOnly=!unlocking;
+  sho.classList.toggle("locked-field", !unlocking);
+  cell.classList.toggle("locked-field", !unlocking);
+  btn.textContent=unlocking ? "Lock" : "Change";
+  if(unlocking){
+    sho.focus();
+    sho.select();
+    setStatus("SHO unlocked for rare change");
+  }else{
+    syncHeader();
+    saveRoster(false);
+    setStatus("SHO locked");
+  }
+}
+
+function syncHeader(){
+  document.getElementById("stationHeader").textContent="G7 CHETPET POLICE STATION (LAW & ORDER)";
+  document.getElementById("shoCell").value="INS Tr. N. Thirumal (9788927989)";
+  document.getElementById("dutySICell").value=document.getElementById("dutySI").value;
+  document.getElementById("otherSICell").value=document.getElementById("otherSI").value;
+}
+function syncTopInputsFromCells(){
+  document.getElementById("sho").value=document.getElementById("shoCell").value;
+
+  const dutyCell=(document.getElementById("dutySICell").value || "").trim();
+  const dutySelect=document.getElementById("dutySI");
+  const aliases={
+    "SI.Tr.Shanmugam":"SI.Tr.S. Shanmugam",
+    "SI Tr.Shanmugam":"SI.Tr.S. Shanmugam",
+    "SI.Tr. Sureshkumar":"SI.Tr.Sureshkumar",
+    "SI.Tmt. Muthulakshmi":"WSI.Tmt.Muthulakshmi",
+    "SI.Tr. Saravanan":"SI.Tr.Saravanan"
+  };
+  const wanted=aliases[dutyCell] || dutyCell;
+  if([...dutySelect.options].some(o=>o.value===wanted)){
+    dutySelect.value=wanted;
+    document.getElementById("dutySICell").value=wanted;
+  }
+
+  document.getElementById("otherSI").value=document.getElementById("otherSICell").value;
+}
+function rotateShifts(direction=1){
+  document.querySelectorAll("#shiftBody tr").forEach(row=>{
+    const a=row.querySelector('[data-shift="1"]'); // 07.00-13.00
+    const b=row.querySelector('[data-shift="2"]'); // 13.00-21.00
+    const c=row.querySelector('[data-shift="3"]'); // 21.00-07.00
+    if(!a||!b||!c) return;
+
+    const av=a.value, bv=b.value, cv=c.value;
+
+    if(direction===1){
+      // DAILY ROTATION:
+      // 13.00-21.00 -> 07.00-13.00
+      // 21.00-07.00 -> 13.00-21.00
+      // 07.00-13.00 -> 21.00-07.00
+      a.value=bv;
+      b.value=cv;
+      c.value=av;
+    }else{
+      // Reverse rotation
+      a.value=cv;
+      b.value=av;
+      c.value=bv;
+    }
+  });
+  runConflictChecks();
+  setStatus(direction===1 ? "Daily shift rotation applied" : "Reverse rotation applied");
+}
+function nextDayRotate(direction=1){
+  let v=document.getElementById("rosterDate").value;
+  let dt;
+  if(v){
+    const [y,m,d]=v.split("-").map(Number);
+    dt=new Date(y,m-1,d);
+  }else{
+    dt=new Date();
+  }
+  dt.setDate(dt.getDate()+1);
+  document.getElementById("rosterDate").value=isoDate(dt);
+  document.getElementById("dateLabel").textContent=niceDate(dt);
+  rotateShifts(direction);
+  saveRoster(false);
+  setStatus("Tomorrow created + shifts rotated");
+}
+function duplicateToday(){
+  saveRoster(false);
+  setStatus("Current roster duplicated in browser");
+}
+function collectData(){
+  const data={
+    stationName:document.getElementById("stationName").value,
+    sho:document.getElementById("shoCell").value,
+    dutySI:document.getElementById("dutySICell").value,
+    otherSI:document.getElementById("otherSICell").value,
+    rosterDate:document.getElementById("rosterDate").value,
+    shiftRows:[],
+    fields:{},
+    nominalStaff:NOMINAL_STAFF.map(s=>({
+      id:s.id,
+      group:s.group,
+      rank:s.rank,
+      name:s.name,
+      duty:s.duty,
+      phone:s.phone
+    }))
+  };
+  document.querySelectorAll("#shiftBody tr").forEach(row=>{
+    data.shiftRows.push({
+      place:row.dataset.place || "",
+      s1:row.querySelector('[data-shift="1"]')?.value || "",
+      s2:row.querySelector('[data-shift="2"]')?.value || "",
+      s3:row.querySelector('[data-shift="3"]')?.value || ""
+    });
+  });
+  document.querySelectorAll("[data-field]").forEach(el=>{
+    data.fields[el.dataset.field]=el.value;
+  });
+  return data;
+}
+
+function migrateOldDriverLayout(data){
+  if(!data || !data.fields) return data;
+
+  // New structure:
+  // Ins Driver - Duty : Gr I 65036 Tr.Sathishkumar
+  // Ins Driver - Rest : PC 624974 Tr.P.Marimuthu
+  // Patrol Driver     : GrI 61150 Tr.Vasanthakumar (MCR)
+  // Gypsy Driver      : ARPC 53157 Tr.Murugan
+
+  if(!Object.prototype.hasOwnProperty.call(data.fields,"insDriverDuty")){
+    let duty="Gr I 65036 Tr.Sathishkumar";
+
+    if(Object.prototype.hasOwnProperty.call(data.fields,"insDriver")){
+      const oldIns=String(data.fields.insDriver || "");
+      if(/sathishkumar/i.test(oldIns)) duty="Gr I 65036 Tr.Sathishkumar";
+    }
+
+    data.fields.insDriverDuty=duty;
+  }
+
+  if(!Object.prototype.hasOwnProperty.call(data.fields,"insDriverRest")){
+    let rest="PC 624974 Tr.P.Marimuthu";
+
+    if(Object.prototype.hasOwnProperty.call(data.fields,"insDriver")){
+      const oldIns=String(data.fields.insDriver || "");
+      if(/marimuthu/i.test(oldIns)) rest="PC 624974 Tr.P.Marimuthu";
+    }
+
+    if(Object.prototype.hasOwnProperty.call(data.fields,"restDriver")){
+      const oldRest=String(data.fields.restDriver || "");
+      if(/marimuthu/i.test(oldRest)) rest="PC 624974 Tr.P.Marimuthu";
+    }
+
+    data.fields.insDriverRest=rest;
+  }
+
+  if(!Object.prototype.hasOwnProperty.call(data.fields,"patrolDriver")){
+    data.fields.patrolDriver="GrI 61150 Tr.Vasanthakumar (MCR)";
+  }
+
+  if(!Object.prototype.hasOwnProperty.call(data.fields,"gypsyDriver")){
+    data.fields.gypsyDriver="ARPC 53157 Tr.Murugan";
+  }
+
+  delete data.fields.insDriver;
+  delete data.fields.restDriver;
+
+
+  if(!Object.prototype.hasOwnProperty.call(data.fields,"patrolDriverRest")){
+    data.fields.patrolDriverRest="";
+  }
+
+  if(!Object.prototype.hasOwnProperty.call(data.fields,"gypsyDriverRest")){
+    data.fields.gypsyDriverRest="VACANT";
+  }
+
+  delete data.fields.gypsyDriverVacant;
+
+  return data;
+}
+
+function loadData(data){
+  data=migrateOldDriverLayout(data);
+  if(!data) return;
+
+  // Restore edited Nominal Roll from browser save / backup.
+  if(Array.isArray(data.nominalStaff) && data.nominalStaff.length){
+    NOMINAL_STAFF.splice(
+      0,
+      NOMINAL_STAFF.length,
+      ...data.nominalStaff.map(s=>({
+        id:String(s.id || ""),
+        group:String(s.group || "Station"),
+        rank:String(s.rank || ""),
+        name:String(s.name || ""),
+        duty:String(s.duty || ""),
+        phone:String(s.phone || "")
+      }))
+    );
+  }
+
+  document.getElementById("stationName").value="G7 CHETPET POLICE STATION (LAW & ORDER)";
+  document.getElementById("shoCell").value="INS Tr. N. Thirumal (9788927989)";
+  if(data.dutySI!==undefined) document.getElementById("dutySICell").value=data.dutySI;
+  if(data.otherSI!==undefined) document.getElementById("otherSICell").value=data.otherSI;
+  if(data.rosterDate){
+    document.getElementById("rosterDate").value=data.rosterDate;
+    const [y,m,d]=data.rosterDate.split("-").map(Number);
+    document.getElementById("dateLabel").textContent=niceDate(new Date(y,m-1,d));
+  }
+  if(Array.isArray(data.shiftRows)){
+    const rows=[...document.querySelectorAll("#shiftBody tr")];
+    data.shiftRows.forEach((r,i)=>{
+      if(!rows[i]) return;
+      const a=rows[i].querySelector('[data-shift="1"]');
+      const b=rows[i].querySelector('[data-shift="2"]');
+      const c=rows[i].querySelector('[data-shift="3"]');
+      if(a) a.value=r.s1 ?? "";
+      if(b) b.value=r.s2 ?? "";
+      if(c) c.value=r.s3 ?? "";
+    });
+  }
+  if(data.fields){
+    document.querySelectorAll("[data-field]").forEach(el=>{
+      if(Object.prototype.hasOwnProperty.call(data.fields,el.dataset.field)){
+        el.value=data.fields[el.dataset.field];
+      }
+    });
+  }
+  document.getElementById("stationHeader").textContent=document.getElementById("stationName").value;
+  syncTopInputsFromCells();
+  setTimeout(()=>{
+    if(typeof initSerialTables==="function") initSerialTables();
+    syncOtherSIsAgainstCasualties();
+    syncTopInputsFromCells();
+    if(typeof refreshNominalDependentUI==="function") refreshNominalDependentUI(false);
+    runConflictChecks();
+  },0);
+}
+function saveRoster(show=true){
+  syncTopInputsFromCells();
+  const data=collectData();
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+  if(show) setStatus("Saved in browser");
+}
+function clearSaved(){
+  if(confirm("Clear saved roster from this browser?")){
+    localStorage.removeItem(STORAGE_KEY);
+    setStatus("Browser save cleared");
+  }
+}
+function downloadBackup(){
+  const data=collectData();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  const d=(data.rosterDate||"roster");
+  a.download=`duty-roster-${d}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  setStatus("Backup downloaded");
+}
+function restoreBackup(file){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      loadData(data);
+      saveRoster(false);
+      runConflictChecks();
+      setStatus("Backup restored");
+    }catch(e){
+      alert("Invalid backup file.");
+    }
+  };
+  reader.readAsText(file);
+}
+document.addEventListener("input",(e)=>{
+  if(e.target.id==="otherSICell"){
+    syncTopInputsFromCells();
+  }
+});
+
+const CONFLICT_FIELDS = {
+  courtMM: "MM Court",
+  courtSessions: "Sessions Court",
+  courtNDPS: "NDPS Court",
+  warrant: "Warrant",
+  insDriverDuty: "Ins Driver - Duty",
+  insDriverRest: "Ins Driver - Rest",
+  patrolDriver: "Patrol Driver - Present",
+  patrolDriverRest: "Patrol Driver - Rest",
+  gypsyDriver: "Gypsy Driver - Present",
+  gypsyDriverRest: "Gypsy Driver - Rest",
+  receptionist: "Receptionist",
+  misc: "MISCELLANEOUS",
+  inOD: "IN – OD",
+  outOD: "OUT OD",
+  casualties: "CASUALITIES"
+};
+
+function compactText(v){
+  return String(v || "")
+    .toLowerCase()
+    .replace(/\s+/g,"")
+    .replace(/[^a-z0-9]/g,"");
+}
+
+function normalizeWords(v){
+  return String(v || "")
+    .toLowerCase()
+    .replace(/\b(tr|tmt|selvi|sel)\.?\b/gi," ")
+    .replace(/[^a-z0-9]+/g," ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function rankCode(rank){
+  const r=String(rank || "").toLowerCase().replace(/\s+/g,"");
+  if(r.startsWith("arpc")) return "arpc";
+  if(r.startsWith("whc")) return "whc";
+  if(r.startsWith("wpc")) return "wpc";
+  if(r.startsWith("wssi")) return "wssi";
+  if(r.startsWith("wsi")) return "wsi";
+  if(r.startsWith("ssi")) return "ssi";
+  if(r.startsWith("si")) return "si";
+  if(r.startsWith("hc")) return "hc";
+  if(r.startsWith("gri") || r.startsWith("gr1")) return "gri";
+  if(r.startsWith("pc")) return "pc";
+  if(r.startsWith("inspector") || r.startsWith("ins")) return "ins";
+  return "";
+}
+
+function serviceNumber(staff){
+  const nums=String(staff.rank || "").match(/\d+/g);
+  return nums && nums.length ? nums[nums.length-1] : "";
+}
+
+function containsServiceNumber(text, num){
+  if(!num) return false;
+  const escaped=String(num).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  return new RegExp(`(^|[^0-9])${escaped}([^0-9]|$)`).test(String(text || ""));
+}
+
+function containsExactWordSequence(textWords, wantedWords){
+  if(!wantedWords.length || textWords.length < wantedWords.length) return false;
+  outer:
+  for(let i=0;i<=textWords.length-wantedWords.length;i++){
+    for(let j=0;j<wantedWords.length;j++){
+      if(textWords[i+j] !== wantedWords[j]) continue outer;
+    }
+    return true;
+  }
+  return false;
+}
+
+function lineHasRank(line, code){
+  const t=String(line || "").toLowerCase();
+
+  if(code==="arpc") return /\bar\s*(?:pc|gri|gr1)\b|\barpc\b/.test(t);
+  if(code==="gri") return /\bgr\s*i\b|\bgr1\b|\bgri\b/.test(t);
+  if(code==="whc") return /\bwhc\b/.test(t);
+  if(code==="wpc") return /\bwpc\b/.test(t);
+  if(code==="ssi") return /\bssi\b/.test(t);
+  if(code==="si") return /\bsi\b/.test(t) && !/\bssi\b/.test(t);
+  if(code==="hc") return /\bhc\b/.test(t) && !/\bwhc\b/.test(t);
+  if(code==="pc") return /\bpc\b/.test(t) && !/\bwpc\b/.test(t) && !/\barpc\b/.test(t);
+  if(code==="ins") return /\bins(?:pector)?\b/.test(t);
+
+  return false;
+}
+
+function splitDutyEntries(text){
+  // Roster entries are normally separated by lines or commas.
+  // Keep each entry independent so one Sivakumar does not match another Sivakumar
+  // appearing elsewhere in the same field.
+  return String(text || "")
+    .split(/\n|,|;/)
+    .map(x=>x.trim())
+    .filter(Boolean);
+}
+
+function entryMatchesStaff(staff, entry){
+  const num=serviceNumber(staff);
+  const group=staff.group || "";
+  const entryText=String(entry || "");
+  const entryLower=entryText.toLowerCase();
+
+  // 1. Service / force number is the strongest identity key.
+  // This keeps SI 61, GrI 39770 and HC 25733 Sivakumar as three separate persons,
+  // and ARPC 53157 Murugan separate from PC 62716 Muruganantham.
+  if(num && containsServiceNumber(entryText,num)) return true;
+
+  // 2. MCR personnel must be identified as MCR when no service number is shown.
+  if(group==="MCR" && !/\bmcr\b/i.test(entryText)) return false;
+  if(group==="Station" && /\bmcr\b/i.test(entryText)) return false;
+
+  // 3. AR staff without a visible number should still need an AR marker.
+  if(group==="AR" && !/\bar\b|\barpc\b/i.test(entryText)) return false;
+
+  // 4. Fallback only to exact normalized name + matching rank.
+  // Exact word-sequence matching prevents "Murugan" matching "Muruganantham".
+  const wantedName=normalizeWords(staff.name || "");
+  const entryWords=normalizeWords(entryText);
+  if(!containsExactWordSequence(entryWords,wantedName)) return false;
+
+  const rcode=rankCode(staff.rank);
+  if(rcode && !lineHasRank(entryText,rcode)) return false;
+
+  return true;
+}
+
+function fieldConflictMap(){
+  const result = {};
+  Object.entries(CONFLICT_FIELDS).forEach(([key,label])=>{
+    const el=document.querySelector(`[data-field="${key}"]`);
+    result[key] = {
+      label,
+      text: el ? el.value : ""
+    };
+  });
+  return result;
+}
+
+function staffAppearsInText(staff, block){
+  return splitDutyEntries(block.text).some(entry=>entryMatchesStaff(staff,entry));
+}
+
+function staffMentionedInCell(staff, text){
+  return splitDutyEntries(text).some(entry=>entryMatchesStaff(staff,entry));
+}
+
+function conflictsForStaff(staff, cmap){
+  const hits=[];
+  Object.values(cmap).forEach(block=>{
+    if(staffAppearsInText(staff, block)) hits.push(block.label);
+  });
+  return hits;
+}
+
+function findStaffInCell(text){
+  return NOMINAL_STAFF.filter(s=>staffMentionedInCell(s,text));
+}
+
+function isUnavailableODStaff(staff){
+  if(!staff) return false;
+
+  // "OD from Other Stations" means personnel attached IN to G7,
+  // so they remain selectable.
+  if(String(staff.group || "").toLowerCase()==="od from other stations"){
+    return false;
+  }
+
+  // First check the live IN–OD / OUT OD tables.
+  for(const key of ["inOD","outOD"]){
+    const el=document.querySelector(`[data-field="${key}"]`);
+    if(el && staffMentionedInCell(staff,el.value)){
+      return true;
+    }
+  }
+
+  // Also respect nominal-roll duties explicitly marked as OD / Out OD.
+  const duty=String(staff.duty || "").toLowerCase();
+  if(/\bod\b/.test(duty)){
+    return true;
+  }
+
+  return false;
+}
+
+
+function checkDutySIConflict(){
+  const box=document.getElementById("dutySIWarning");
+  const dutySelect=document.getElementById("dutySI");
+  if(!box || !dutySelect) return;
+
+  dutySelect.classList.remove("conflict-source");
+  document.getElementById("dutySICell")?.classList.remove("conflict-source");
+
+  const selectedOption=dutySelect.options[dutySelect.selectedIndex];
+  const exactStaffId=selectedOption ? selectedOption.dataset.staffId : "";
+  const staff=NOMINAL_STAFF.find(s=>s.id===exactStaffId);
+
+  if(!staff){
+    box.classList.remove("show");
+    box.textContent="";
+    return;
+  }
+
+  const cmap=fieldConflictMap();
+  const hits=conflictsForStaff(staff,cmap);
+
+  if(hits.length){
+    dutySelect.classList.add("conflict-source");
+    document.getElementById("dutySICell")?.classList.add("conflict-source");
+
+    // Highlight the other side too: the exact lower heading(s)
+    Object.entries(cmap).forEach(([key,block])=>{
+      if(staffAppearsInText(staff,block)){
+        const el=document.querySelector(`[data-field="${key}"]`);
+        if(el) el.classList.add("conflict-source");
+        document.querySelectorAll(`[data-conflict-key="${key}"]`).forEach(h=>h.classList.add("conflict-source"));
+      }
+    });
+
+    box.innerHTML=`⚠ WARNING: ${escapeHtml(staff.rank)} ${escapeHtml(staff.name)} is already entered under <b>${hits.map(escapeHtml).join(", ")}</b>. Both entries are shown in red. Identity is checked by service number first, then exact rank + name.`;
+    box.classList.add("show");
+  }else{
+    box.classList.remove("show");
+    box.textContent="";
+  }
+}
+
+function checkShiftTeamConflicts(){
+  const cmap=fieldConflictMap();
+  const warnings=[];
+
+  // Clear old red marking from all lower conflict headings.
+  Object.keys(CONFLICT_FIELDS).forEach(key=>{
+    const el=document.querySelector(`[data-field="${key}"]`);
+    if(el) el.classList.remove("conflict-source");
+    document.querySelectorAll(`[data-conflict-key="${key}"]`).forEach(h=>h.classList.remove("conflict-source"));
+  });
+  const rows=[...document.querySelectorAll("#shiftBody tr")];
+  const shiftNames={
+    "1":"07.00–13.00",
+    "2":"13.00–21.00",
+    "3":"21.00–07.00"
+  };
+
+  document.querySelectorAll("#shiftBody textarea[data-shift]").forEach(el=>{
+    el.classList.remove("conflict-cell");
+    el.removeAttribute("title");
+  });
+
+  rows.forEach(row=>{
+    const place=(row.dataset.place || "Duty");
+    // IMPORTANT: We intentionally do NOT compare one active shift cell against another.
+    // Vehicle Check is allowed to reuse personnel from Patrol/Gypsy/Sector A/B/C
+    // in the SAME shift. Only conflicts with lower unavailable/special-duty headings
+    // are checked here.
+    ["1","2","3"].forEach(shift=>{
+      const el=row.querySelector(`[data-shift="${shift}"]`);
+      if(!el || !el.value.trim()) return;
+
+      const people=findStaffInCell(el.value);
+      const localWarnings=[];
+
+      people.forEach(staff=>{
+        const hits=conflictsForStaff(staff,cmap);
+        if(hits.length){
+          localWarnings.push(`${staff.rank} ${staff.name} → ${hits.join(", ")}`);
+          warnings.push(`${shiftNames[shift]} / ${place}: ${staff.rank} ${staff.name} is also under ${hits.join(", ")}`);
+
+          // Highlight the other side of the conflict too.
+          Object.entries(cmap).forEach(([key,block])=>{
+            if(staffAppearsInText(staff,block)){
+              const sourceEl=document.querySelector(`[data-field="${key}"]`);
+              if(sourceEl) sourceEl.classList.add("conflict-source");
+              document.querySelectorAll(`[data-conflict-key="${key}"]`).forEach(h=>h.classList.add("conflict-source"));
+            }
+          });
+        }
+      });
+
+      if(localWarnings.length){
+        el.classList.add("conflict-cell");
+        el.title="WARNING: " + localWarnings.join(" | ");
+      }
+    });
+  });
+
+  const box=document.getElementById("shiftConflictWarning");
+  if(!box) return;
+
+  if(warnings.length){
+    box.innerHTML="⚠ <b>SHIFT DUTY CONFLICT WARNING</b><br>" +
+      "Both the shift duty entry and the conflicting lower-heading entry are shown in red.<br>" +
+      "<span style='font-weight:600'>Vehicle Check may also use personnel from Patrol, Gypsy or Sector A/B/C in the same shift; that overlap is allowed and is not treated as a conflict.</span><br>" +
+      [...new Set(warnings)].map(w=>`• ${escapeHtml(w)}`).join("<br>");
+    box.classList.add("show");
+  }else{
+    box.classList.remove("show");
+    box.textContent="";
+  }
+}
+
+function runConflictChecks(){
+  checkShiftTeamConflicts();
+  checkDutySIConflict();
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>{ buildTargets(); fillStaffSelect(); initSerialTables(); runConflictChecks(); },0);
+  const saved=localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    try{ loadData(JSON.parse(saved)); }
+    catch(e){}
+  }else{
+    const dt=new Date(2026,8,13);
+    document.getElementById("rosterDate").value=isoDate(dt);
+    document.getElementById("dateLabel").textContent=niceDate(dt);
+  }
+  syncHeader();
+  setTimeout(()=>{
+    if(typeof refreshNominalDependentUI==="function") refreshNominalDependentUI(false);
+  },0);
+});
+
+const NOMINAL_STAFF = [{"id": "station-1", "group": "Station", "rank": "Inspector", "name": "Tr.Tirumal", "duty": "SHO", "phone": "9788927989"}, {"id": "station-2", "group": "Station", "rank": "SI 61", "name": "Tr.Sivakumar", "duty": "OD at G3 PS", "phone": "9498126175"}, {"id": "station-3", "group": "Station", "rank": "WSI 2147", "name": "Tmt.Mahalakshmi", "duty": "Present", "phone": "9626414833"}, {"id": "station-4", "group": "Station", "rank": "SI 124", "name": "Tr.Karthikeyan", "duty": "OD at ANTF", "phone": "8056547147"}, {"id": "station-5", "group": "Station", "rank": "SI 132", "name": "Tr.Inkarshaw Bell Abraham", "duty": "Present", "phone": "7358577751"}, {"id": "station-6", "group": "Station", "rank": "SI 13564", "name": "Tr.S. Shanmugam", "duty": "Present", "phone": "9498126858"}, {"id": "station-7", "group": "Station", "rank": "SI 35540", "name": "Tr. Sureshkumar", "duty": "Present", "phone": "9498128853"}, {"id": "station-8", "group": "Station", "rank": "WSI 17589", "name": "Tmt.Muthulakshmi", "duty": "SSF", "phone": "9498127226"}, {"id": "station-9", "group": "Station", "rank": "SI 15575", "name": "Tr. Saravanan", "duty": "Present", "phone": "9600014214"}, {"id": "station-10", "group": "Station", "rank": "WSSI 63907", "name": "Tmt.Seema", "duty": "DCK", "phone": "8610863746"}, {"id": "station-11", "group": "Station", "rank": "SSI 19981", "name": "Tr. Sivalingam", "duty": "Present", "phone": "7010113089"}, {"id": "station-12", "group": "Station", "rank": "SSI", "name": "Tr.Raja", "duty": "Present", "phone": "9042811451"}, {"id": "station-13", "group": "Station", "rank": "SSI 20412", "name": "Tr.T.Elayaraja", "duty": "Present", "phone": "9898193035"}, {"id": "station-14", "group": "Station", "rank": "SSI 18353", "name": "Tr.Gnanaprakash", "duty": "Present", "phone": "9360794079"}, {"id": "station-15", "group": "Station", "rank": "HC 11790", "name": "Tr. Ajith Kumar", "duty": "NIA Guard - G3 PS", "phone": "9498126252"}, {"id": "station-16", "group": "Station", "rank": "HC 24772", "name": "Tr.Ramesh", "duty": "Copist", "phone": "9498103107"}, {"id": "station-17", "group": "Station", "rank": "HC 25733", "name": "Tr.Sivakumar", "duty": "Present", "phone": "9884352703"}, {"id": "station-18", "group": "Station", "rank": "HC 26133", "name": "Tr. Ramesh", "duty": "MM Court", "phone": "8825560213"}, {"id": "station-19", "group": "Station", "rank": "HC 29596", "name": "Tr. John Preto", "duty": "Present", "phone": "638202359"}, {"id": "station-20", "group": "Station", "rank": "HC 27966", "name": "Tr.Rakesh", "duty": "ACK Office", "phone": "9176712839"}, {"id": "station-21", "group": "Station", "rank": "HC 38854", "name": "Tmt.T.Vasanthi", "duty": "Sessions Court", "phone": "9498137411"}, {"id": "station-22", "group": "Station", "rank": "WHC 43265", "name": "Tmt. Bommi", "duty": "Current Paper", "phone": "9444582334"}, {"id": "station-23", "group": "Station", "rank": "HC 62874", "name": "Tr. Sivarama Krishnan", "duty": "JCOP Office", "phone": "9498127696"}, {"id": "station-24", "group": "Station", "rank": "HC 44440", "name": "Tr. Ayyanar", "duty": "Present", "phone": "9498113603"}, {"id": "station-25", "group": "Station", "rank": "HC 44647", "name": "Tr. Rajesh", "duty": "Deserter", "phone": "8825887478"}, {"id": "station-26", "group": "Station", "rank": "WHC 46000", "name": "Tmt. Karpakam", "duty": "Present", "phone": "9498116371"}, {"id": "station-27", "group": "Station", "rank": "WHC 45241", "name": "Tmt. Jayalaitha", "duty": "NIA Guard - G3 PS", "phone": "9962407833"}, {"id": "station-28", "group": "Station", "rank": "HC 31244", "name": "Tr.S.ArikaraSubramaniyam", "duty": "Present (WC,PMC)", "phone": "9498132944"}, {"id": "station-29", "group": "Station", "rank": "HC 28651", "name": "Tr. Balaji", "duty": "Singapen Spl - SF", "phone": "9498141256"}, {"id": "station-30", "group": "Station", "rank": "HC 50837", "name": "Tr.R.Vanchinathan", "duty": "NDPS Court", "phone": "81249 67658"}, {"id": "station-31", "group": "Station", "rank": "HC 40879", "name": "Tr.S.Chermadurai", "duty": "DCK Office", "phone": "9677896781"}, {"id": "station-32", "group": "Station", "rank": "Gr1 39770", "name": "Tr.Sivakumar", "duty": "Ins Special Team", "phone": "9884352703"}, {"id": "station-33", "group": "Station", "rank": "HC 43606", "name": "Tr.Thirumurugan", "duty": "Present", "phone": "8667855804"}, {"id": "station-34", "group": "Station", "rank": "PC 58159", "name": "Tr.Selvakumar", "duty": "Allikulam Court", "phone": "9498150523"}, {"id": "station-35", "group": "Station", "rank": "GrI 43478", "name": "Tr.Sirajudeen", "duty": "Present", "phone": "9790119672"}, {"id": "station-36", "group": "Station", "rank": "GrI 62812", "name": "Tr.S.Purushothaman", "duty": "TNOGA - Out OD", "phone": "8838886448"}, {"id": "station-37", "group": "Station", "rank": "Gr I 65036", "name": "Tr. Sathishkumar", "duty": "INS Driver", "phone": "9498199717"}, {"id": "station-38", "group": "Station", "rank": "PC 49316", "name": "V.P.HemaChandraRaju", "duty": "Present", "phone": "9841409388"}, {"id": "station-39", "group": "Station", "rank": "PC 50525", "name": "Tr. Karthikeyan", "duty": "OD - ANTF", "phone": "7200560838"}, {"id": "station-40", "group": "Station", "rank": "WPC 62864", "name": "Selvi. Asha", "duty": "Present", "phone": "9087479808"}, {"id": "station-41", "group": "Station", "rank": "PC 63364", "name": "Tr. Santhosh Kumar", "duty": "Present", "phone": "6383215955"}, {"id": "station-42", "group": "Station", "rank": "PC 62716", "name": "Tr. Muruganantham", "duty": "Present", "phone": "9498216124"}, {"id": "station-43", "group": "Station", "rank": "PC 62609", "name": "Tr. Sivappazham", "duty": "MM Court", "phone": "9790145579"}, {"id": "station-44", "group": "Station", "rank": "PC 62652", "name": "Tr. Thangarasu", "duty": "Present", "phone": "9498210501"}, {"id": "station-45", "group": "Station", "rank": "PC 65005", "name": "Tr.S.Sathyaraj", "duty": "ASW", "phone": "9360206996"}, {"id": "station-46", "group": "Station", "rank": "PC 624974", "name": "Tr.P.Marimuthu", "duty": "INS Driver", "phone": "9442812092"}, {"id": "station-47", "group": "Station", "rank": "PC 56872", "name": "Tr.Vengadesh", "duty": "CCTNS", "phone": "8838044863"}, {"id": "station-48", "group": "Station", "rank": "WPC 53640", "name": "Sel.Poornima", "duty": "Present", "phone": "9994648153"}, {"id": "station-49", "group": "Station", "rank": "WPC 62464", "name": "Tmt.Deepika", "duty": "Singapen - SF", "phone": "9790634713"}, {"id": "station-50", "group": "Station", "rank": "WPC 59399", "name": "Tmt.Annai Terasa", "duty": "TNUSRB - Out OD", "phone": "8111059106"}, {"id": "station-51", "group": "Station", "rank": "WPC 53556", "name": "Tmt.Anitha", "duty": "Present", "phone": "6381879492"}, {"id": "station-52", "group": "Station", "rank": "WPC 53589", "name": "Sel.Menaka", "duty": "DCK Office", "phone": "9025572339"}, {"id": "station-53", "group": "Station", "rank": "WPC 63328", "name": "Tmt.Sangeetha Devi", "duty": "Present", "phone": "7708806737"}, {"id": "station-54", "group": "Station", "rank": "WPC 53804", "name": "Selvi.Vasanthi", "duty": "Present", "phone": "7548822447"}, {"id": "od-other-1", "group": "OD from Other Stations", "rank": "PC 56892", "name": "Tr.Venjeskumar", "duty": "G7 Chetpet Crime PS", "phone": ""}, {"id": "mcr-1", "group": "MCR", "rank": "SI", "name": "SI.Tr.Shanmugam (MCR)", "duty": "Patrol", "phone": "9841545570"}, {"id": "mcr-2", "group": "MCR", "rank": "SI", "name": "SI Tr.Subramani (MCR)", "duty": "Patrol", "phone": "9444619384"}, {"id": "mcr-3", "group": "MCR", "rank": "SSI", "name": "SSI.Tr.Thirunavukarasu (MCR)", "duty": "Patrol", "phone": "9840396927"}, {"id": "mcr-4", "group": "MCR", "rank": "GrI 61150", "name": "Tr.Vasanthakumar (MCR)", "duty": "Patrol Driver", "phone": "7200007473"}, {"id": "ar-1", "group": "AR", "rank": "ARPC 53157", "name": "Tr. Murugan", "duty": "Gypsy Driver", "phone": "9841545570"}];
+
+function staffDisplay(s){
+  const p = s.phone ? ` | ${s.phone}` : "";
+  const d = s.duty ? ` | ${s.duty}` : "";
+  return `[${s.group}] ${s.rank} ${s.name}${d}${p}`;
+}
+function fillStaffSelect(list=NOMINAL_STAFF){
+  const sel=document.getElementById("staffSelect");
+  const previous=sel.value;
+  sel.innerHTML="";
+  list.filter(s=>!isUnavailableODStaff(s)).forEach(s=>{
+    const o=document.createElement("option");
+    o.value=s.id;
+    o.textContent=staffDisplay(s);
+    sel.appendChild(o);
+  });
+  if([...sel.options].some(o=>o.value===previous)) sel.value=previous;
+  showStaffPreview();
+}
+function filterStaff(){
+  const q=(document.getElementById("staffSearch").value||"").trim().toLowerCase();
+  const filtered=NOMINAL_STAFF.filter(s=>
+    !isUnavailableODStaff(s) &&
+    (`${s.rank} ${s.name} ${s.duty} ${s.phone} ${s.group}`
+      .toLowerCase().includes(q))
+  );
+  fillStaffSelect(filtered);
+}
+function getSelectedStaff(){
+  const id=document.getElementById("staffSelect").value;
+  return NOMINAL_STAFF.find(s=>s.id===id);
+}
+function showStaffPreview(){
+  const s=getSelectedStaff();
+  const p=document.getElementById("staffPreview");
+  if(!s){ p.textContent="No matching personnel."; return; }
+  p.innerHTML=`<b>${escapeHtml(s.rank)} ${escapeHtml(s.name)}</b> &nbsp; • &nbsp; Nominal duty: ${escapeHtml(s.duty||"-")} &nbsp; • &nbsp; Phone: ${escapeHtml(s.phone||"-")} &nbsp; • &nbsp; ${escapeHtml(s.group)}`;
+}
+function escapeHtml(v){
+  return String(v??"").replace(/[&<>"']/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
+}
+function buildTargets(){
+  const sel=document.getElementById("targetSelect");
+  sel.innerHTML="";
+  const add=(value,label)=>{
+    const o=document.createElement("option");
+    o.value=value; o.textContent=label; sel.appendChild(o);
+  };
+  const rowNames=[
+    "Station I/C","Patrol Vehicle","Gypsy Vehicle","Sector A","Sector B","Sector C","Chetpet Signal / Vehicle Check"
+  ];
+  rowNames.forEach((name,rowIndex)=>{
+    add(`shift|${rowIndex}|1`, `${name} — 07.00–13.00`);
+    add(`shift|${rowIndex}|2`, `${name} — 13.00–21.00`);
+    add(`shift|${rowIndex}|3`, `${name} — 21.00–07.00`);
+  });
+  add("field|courtMM","MM Court");
+  add("field|courtSessions","Sessions Court");
+  add("field|courtNDPS","NDPS Court");
+  add("field|warrant","Warrant");
+  add("field|insDriverDuty","Ins Driver - Duty");
+  add("field|insDriverRest","Ins Driver - Rest");
+  add("field|patrolDriver","Patrol Driver - Present");
+  add("field|patrolDriverRest","Patrol Driver - Rest");
+  add("field|gypsyDriver","Gypsy Driver - Present");
+  add("field|gypsyDriverRest","Gypsy Driver - Rest");
+  add("field|receptionist","Receptionist");
+  add("field|misc","Miscellaneous");
+  add("field|inOD","IN – OD");
+  add("field|outOD","OUT OD");
+  add("field|casualties","Casualities / Leave");
+}
+function formatForTarget(s,type,key){
+  if(type==="shift") return `${s.rank} ${s.name}${s.phone ? "\n"+s.phone : ""}`;
+  if(type==="top" || key.startsWith("sector")) return `${s.rank} ${s.name}${s.phone ? " ("+s.phone+")" : ""}`;
+  if(["warrant","insDriverDuty","insDriverRest","patrolDriver","patrolDriverRest","gypsyDriver","gypsyDriverRest","receptionist"].includes(key))
+    return `${s.rank} ${s.name}${s.phone ? " - "+s.phone : ""}`;
+  return `${s.rank} ${s.name} — ${s.duty || ""}${s.phone ? " — "+s.phone : ""}`;
+}
+function setOrAppend(el,text,mode,separator){
+  if(mode==="replace" || !el.value.trim()) el.value=text;
+  else el.value=el.value.replace(/\s+$/,"") + separator + text;
+  el.dispatchEvent(new Event("input",{bubbles:true}));
+}
+function assignSelectedStaff(mode){
+  const s=getSelectedStaff();
+  if(!s) return;
+
+  if(isUnavailableODStaff(s)){
+    alert(`${s.rank} ${s.name} is on OD and is not available for allotment.`);
+    setStatus("OD person cannot be allotted");
+    return;
+  }
+  const raw=document.getElementById("targetSelect").value;
+  const parts=raw.split("|");
+  const type=parts[0];
+  if(type==="shift"){
+    const rowIndex=Number(parts[1]), shift=parts[2];
+
+    // Row 0 = Station I/C; Rows 3,4,5 = Sector A/B/C.
+    if([0,3,4,5].includes(rowIndex) && !isStationOrSectorEligible(s)){
+      alert(rankRestrictionMessage(s));
+      setStatus("Rank not eligible for this duty");
+      return;
+    }
+    const row=document.querySelectorAll("#shiftBody tr")[rowIndex];
+    const el=row?.querySelector(`[data-shift="${shift}"]`);
+    if(!el) return;
+    setOrAppend(el,formatForTarget(s,type,""),mode,"\n");
+  }else if(type==="field"){
+    const key=parts[1];
+    const el=document.querySelector(`[data-field="${key}"]`);
+    if(!el) return;
+    const sep=["misc","inOD","outOD","casualties"].includes(key) ? "\n" : ", ";
+    setOrAppend(el,formatForTarget(s,type,key),mode,sep);
+  }else if(type==="top"){
+    const key=parts[1];
+    let el;
+    if(key==="otherSI") el=document.getElementById("otherSICell");
+    if(!el) return;
+    setOrAppend(el,formatForTarget(s,type,key),mode,key==="otherSI" ? ", " : " ");
+    syncTopInputsFromCells();
+  }
+  saveRoster(false);
+  runConflictChecks();
+  setStatus(mode==="replace" ? "Duty replaced from nominal roll" : "Staff added from nominal roll");
+}
+
+
+document.addEventListener("input",(e)=>{
+  if(
+    e.target.matches("#shiftBody textarea[data-shift]") ||
+    e.target.matches('[data-field="courtMM"]') ||
+    e.target.matches('[data-field="courtSessions"]') ||
+    e.target.matches('[data-field="courtNDPS"]') ||
+    e.target.matches('[data-field="warrant"]') ||
+    e.target.matches('[data-field="insDriverDuty"]') ||
+    e.target.matches('[data-field="insDriverRest"]') ||
+    e.target.matches('[data-field="patrolDriver"]') ||
+    e.target.matches('[data-field="patrolDriverRest"]') ||
+    e.target.matches('[data-field="gypsyDriver"]') ||
+    e.target.matches('[data-field="gypsyDriverRest"]') ||
+    e.target.matches('[data-field="receptionist"]') ||
+    e.target.matches('[data-field="misc"]') ||
+    e.target.matches('[data-field="inOD"]') ||
+    e.target.matches('[data-field="outOD"]') ||
+    e.target.matches('[data-field="casualties"]')
+  ){
+    runConflictChecks();
+  }
+});
+
+
+
+
+const SERIAL_SECTION_CONFIG = {
+  misc:{detail:"Duty"},
+  inOD:{detail:"OD At"},
+  outOD:{detail:"OD At"},
+  casualties:{detail:"Leave / Remarks"}
+};
+
+function parseSerialStore(key){
+  const store=document.querySelector(`[data-field="${key}"].section-store`);
+  if(!store) return [];
+  return String(store.value||"")
+    .split("\n")
+    .map(line=>line.trim())
+    .filter(Boolean)
+    .map(line=>{
+      const parts=line.split("\t");
+      if(parts.length>=3){
+        return {rank:parts[0].trim(),name:parts[1].trim(),detail:parts.slice(2).join("\t").trim()};
+      }
+
+      const dash=line.split(/\s+[—-]\s+/);
+      const left=(dash.shift()||"").trim();
+      const detail=dash.join(" — ").trim();
+      const matched=NOMINAL_STAFF.find(s=>entryMatchesStaff(s,left));
+      if(matched) return {rank:matched.rank,name:matched.name,detail};
+      return {rank:"",name:left,detail};
+    });
+}
+
+function writeSerialStore(key,rows,dispatch=true){
+  const store=document.querySelector(`[data-field="${key}"].section-store`);
+  if(!store) return;
+
+  store.value=(rows||[])
+    .filter(r=>r && (String(r.rank||"").trim() || String(r.name||"").trim() || String(r.detail||"").trim()))
+    .map(r=>`${String(r.rank||"").trim()}\t${String(r.name||"").trim()}\t${String(r.detail||"").trim()}`)
+    .join("\n");
+
+  // An SI/WSI placed in CASUALITIES must not remain in the ordinary SI row.
+  if(key==="casualties"){
+    syncOtherSIsAgainstCasualties();
+  }
+
+  if(dispatch) store.dispatchEvent(new Event("input",{bubbles:true}));
+}
+
+function buildCasualtyDetail(type,remarks){
+  const t=String(type || "").trim();
+  const r=String(remarks || "").trim();
+
+  if(!t) return r;
+  if(t==="IP at hospital") return r ? `IP at ${r}` : "IP at hospital";
+  if(t==="W/O") return r ? `W/O - ${r}` : "W/O";
+  if(t==="Deserter") return r ? `Deserter - ${r}` : "Deserter";
+  return r ? `${t} - ${r}` : t;
+}
+
+function parseCasualtyDetail(detail){
+  const d=String(detail || "").trim();
+  if(!d) return {type:"",remarks:""};
+
+  let m;
+  if((m=d.match(/^CL\b[\s\-–—:]*(.*)$/i))) return {type:"CL",remarks:(m[1]||"").trim()};
+  if((m=d.match(/^ML\b[\s\-–—:]*(.*)$/i))) return {type:"ML",remarks:(m[1]||"").trim()};
+  if((m=d.match(/^EL\b[\s\-–—:]*(.*)$/i))) return {type:"EL",remarks:(m[1]||"").trim()};
+  if((m=d.match(/^(?:W\/O|W\/o|w\/o|Week\s*Off)\b[\s\-–—:]*(.*)$/i))) return {type:"W/O",remarks:(m[1]||"").trim()};
+  if((m=d.match(/^IP\s+at\s+(.*)$/i))){
+    const rest=(m[1]||"").trim();
+    return {type:"IP at hospital",remarks:/^hospital$/i.test(rest) ? "" : rest};
+  }
+  if((m=d.match(/^Deserter\b[\s\-–—:]*(.*)$/i))) return {type:"Deserter",remarks:(m[1]||"").trim()};
+  return {type:"",remarks:d};
+}
+
+function serialHeadingCell(key,label,span){
+  return `<th colspan="${span}" class="section-title single-section-title" data-conflict-key="${key}">
+    <span>${escapeHtml(label)}</span>
+    <button type="button" class="section-add-btn" onclick="addPersonSerialRow('${key}')" title="Add person">+</button>
+  </th>`;
+}
+
+function standardSerialHeaderCells(){
+  return `
+    <th colspan="2" class="serial-head">S.No</th>
+    <th colspan="4" class="serial-head">Rank / No.</th>
+    <th colspan="12" class="serial-head">Name</th>
+    <th colspan="7" class="serial-head">Duty</th>`;
+}
+
+function inOdSerialHeaderCells(){
+  return `
+    <th colspan="2" class="serial-head">S.No</th>
+    <th colspan="4" class="serial-head">Rank / No.</th>
+    <th colspan="12" class="serial-head">Name</th>
+    <th colspan="7" class="serial-head">OD At</th>`;
+}
+
+function serialPersonCells(key,row,index){
+  const detailLabel=SERIAL_SECTION_CONFIG[key]?.detail || "Details";
+  return `
+    <td colspan="2" class="sn-cell serial-sn-cell">
+      <div>${index+1}</div>
+      <button type="button" class="row-remove-btn"
+              data-section="${key}" data-index="${index}" title="Move this person to another duty">×</button>
+    </td>
+    <td colspan="4" class="serial-rank-cell">
+      <input class="person-readonly" data-serial-key="${key}" data-row-index="${index}" data-col="rank"
+             value="${escapeHtml(row?.rank || "")}" readonly
+             onclick="openPersonPicker('${key}',${index})">
+    </td>
+    <td colspan="12" class="serial-name-cell">
+      <input class="person-readonly" data-serial-key="${key}" data-row-index="${index}" data-col="name"
+             value="${escapeHtml(row?.name || "")}" readonly
+             onclick="openPersonPicker('${key}',${index})">
+    </td>
+    <td colspan="7" class="serial-detail-cell">
+      <input data-serial-key="${key}" data-row-index="${index}" data-col="detail"
+             aria-label="${escapeHtml(detailLabel)}"
+             value="${escapeHtml(row?.detail || "")}"
+             oninput="updateSerialDetail('${key}',${index},this.value)">
+    </td>`;
+}
+
+function halfBlankCells(){
+  return `<td colspan="25" class="serial-blank"></td>`;
+}
+
+function renderLeftEntry(entry){
+  if(!entry) return halfBlankCells();
+  if(entry.type==="heading") return serialHeadingCell(entry.key,entry.label,25);
+  if(entry.type==="header"){
+    return entry.key==="outOD"
+      ? inOdSerialHeaderCells()
+      : standardSerialHeaderCells();
+  }
+  if(entry.type==="row") return serialPersonCells(entry.key,entry.row,entry.index);
+  return halfBlankCells();
+}
+
+function renderRightEntry(entry){
+  if(!entry) return halfBlankCells();
+  if(entry.type==="heading") return serialHeadingCell(entry.key,entry.label,25);
+  if(entry.type==="header") return inOdSerialHeaderCells();
+  if(entry.type==="row") return serialPersonCells(entry.key,entry.row,entry.index);
+  return halfBlankCells();
+}
+
+function casualtyRowCells(row,index){
+  const parsed=parseCasualtyDetail(row?.detail || "");
+  const options=["","CL","ML","EL","W/O","IP at hospital","Deserter"]
+    .map(v=>`<option value="${escapeHtml(v)}"${v===parsed.type ? " selected" : ""}>${escapeHtml(v || "Select type")}</option>`)
+    .join("");
+
+  return `
+    <td colspan="2" class="sn-cell serial-sn-cell">
+      <div>${index+1}</div>
+      <button type="button" class="row-remove-btn"
+              data-section="casualties" data-index="${index}" title="Move this person to another duty">×</button>
+    </td>
+    <td colspan="5" class="serial-rank-cell">
+      <input class="person-readonly" data-serial-key="casualties" data-row-index="${index}" data-col="rank"
+             value="${escapeHtml(row?.rank || "")}" readonly
+             onclick="openPersonPicker('casualties',${index})">
+    </td>
+    <td colspan="12" class="serial-name-cell">
+      <input class="person-readonly" data-serial-key="casualties" data-row-index="${index}" data-col="name"
+             value="${escapeHtml(row?.name || "")}" readonly
+             onclick="openPersonPicker('casualties',${index})">
+    </td>
+    <td colspan="10" class="serial-leave-cell">
+      <select class="casualty-type-select" data-serial-key="casualties" data-row-index="${index}" data-col="leaveType"
+              onchange="updateCasualtyRow(${index})">${options}</select>
+    </td>
+    <td colspan="21" class="serial-remarks-cell">
+      <input class="casualty-remarks-input" data-serial-key="casualties" data-row-index="${index}" data-col="remarks"
+             value="${escapeHtml(parsed.remarks)}"
+             oninput="updateCasualtyRow(${index})">
+    </td>`;
+}
+
+function renderSerialRosterBody(overrides={}){
+  const body=document.getElementById("serialRosterBody");
+  if(!body) return;
+
+  const misc=overrides.misc || parseSerialStore("misc");
+  const outOD=overrides.outOD || parseSerialStore("outOD");
+  const inOD=overrides.inOD || parseSerialStore("inOD");
+  const casualties=overrides.casualties || parseSerialStore("casualties");
+
+  const left=[
+    {type:"heading",key:"misc",label:"MISCELLANEOUS"},
+    {type:"header",key:"misc"},
+    ...misc.map((row,index)=>({type:"row",key:"misc",row,index})),
+    {type:"heading",key:"outOD",label:"OUT OD"},
+    {type:"header",key:"outOD"},
+    ...outOD.map((row,index)=>({type:"row",key:"outOD",row,index}))
+  ];
+
+  const right=[
+    {type:"heading",key:"inOD",label:"IN – OD"},
+    {type:"header",key:"inOD"},
+    ...inOD.map((row,index)=>({type:"row",key:"inOD",row,index}))
+  ];
+
+  const rows=[];
+  const pairCount=Math.max(left.length,right.length);
+  for(let i=0;i<pairCount;i++){
+    rows.push(`<tr class="serial-pair-row">${renderLeftEntry(left[i])}${renderRightEntry(right[i])}</tr>`);
+  }
+
+  const summaryStore=document.querySelector('[data-field="casualtiesSummary"].section-store');
+  const summary=summaryStore?.value || "";
+
+  rows.push(`<tr>${serialHeadingCell("casualties","CASUALITIES",50)}</tr>`);
+  rows.push(`<tr>
+    <td colspan="50" class="casualty-summary-cell">
+      <input class="section-summary-visible" value="${escapeHtml(summary)}"
+             oninput="updateCasualtySummary(this.value)">
+    </td>
+  </tr>`);
+  rows.push(`<tr class="casualty-header-row">
+    <th colspan="2" class="serial-head">S.No</th>
+    <th colspan="5" class="serial-head">Rank / No.</th>
+    <th colspan="12" class="serial-head">Name</th>
+    <th colspan="10" class="serial-head">Leave Type</th>
+    <th colspan="21" class="serial-head">Remarks</th>
+  </tr>`);
+
+  casualties.forEach((row,index)=>{
+    rows.push(`<tr class="casualty-data-row">${casualtyRowCells(row,index)}</tr>`);
+  });
+
+  body.innerHTML=rows.join("");
+}
+
+function updateSerialDetail(key,index,value){
+  const rows=parseSerialStore(key);
+  if(!rows[index]) return;
+  rows[index].detail=value;
+  writeSerialStore(key,rows,false);
+  runConflictChecks();
+  saveRoster(false);
+}
+
+function updateCasualtyRow(index){
+  const rows=parseSerialStore("casualties");
+  if(!rows[index]) return;
+
+  const type=document.querySelector(`[data-serial-key="casualties"][data-row-index="${index}"][data-col="leaveType"]`)?.value || "";
+  const remarks=document.querySelector(`[data-serial-key="casualties"][data-row-index="${index}"][data-col="remarks"]`)?.value || "";
+
+  rows[index].detail=buildCasualtyDetail(type,remarks);
+  writeSerialStore("casualties",rows,false);
+  runConflictChecks();
+  saveRoster(false);
+}
+
+function updateCasualtySummary(value){
+  const store=document.querySelector('[data-field="casualtiesSummary"].section-store');
+  if(store) store.value=value;
+  saveRoster(false);
+}
+
+function serializeSerialSection(key,dispatch=true){
+  const rows=parseSerialStore(key);
+
+  rows.forEach((row,index)=>{
+    const rank=document.querySelector(`[data-serial-key="${key}"][data-row-index="${index}"][data-col="rank"]`)?.value;
+    const name=document.querySelector(`[data-serial-key="${key}"][data-row-index="${index}"][data-col="name"]`)?.value;
+
+    if(rank!==undefined) row.rank=rank;
+    if(name!==undefined) row.name=name;
+
+    if(key==="casualties"){
+      const type=document.querySelector(`[data-serial-key="${key}"][data-row-index="${index}"][data-col="leaveType"]`)?.value || "";
+      const remarks=document.querySelector(`[data-serial-key="${key}"][data-row-index="${index}"][data-col="remarks"]`)?.value || "";
+      row.detail=buildCasualtyDetail(type,remarks);
+    }else{
+      const detail=document.querySelector(`[data-serial-key="${key}"][data-row-index="${index}"][data-col="detail"]`)?.value;
+      if(detail!==undefined) row.detail=detail;
+    }
+  });
+
+  writeSerialStore(key,rows,dispatch);
+}
+
+function openMoveFromSerialRow(key,rowIndex){
+  const data=parseSerialStore(key);
+  const record=data[rowIndex];
+  if(!record) return;
+
+  const combined=`${record.rank || ""} ${record.name || ""}`;
+  const staff=NOMINAL_STAFF.find(s=>entryMatchesStaff(s,combined));
+  if(!staff){
+    alert("This row could not be matched to the nominal roll.");
+    return;
+  }
+
+  const personSel=document.getElementById("movePerson");
+  if(personSel && [...personSel.options].some(o=>o.value===staff.id)){
+    personSel.value=staff.id;
+  }
+  refreshPersonAssignments();
+
+  const fromSel=document.getElementById("moveFrom");
+  const sourceId=`field:${key}`;
+  if(fromSel && [...fromSel.options].some(o=>o.value===sourceId)){
+    fromSel.value=sourceId;
+  }
+
+  document.querySelector(".transfer-panel")?.scrollIntoView({behavior:"smooth",block:"start"});
+  refreshTransferButtons();
+}
+
+function removeSerialRow(button,key){
+  const index=Number(button?.dataset?.index);
+  if(!Number.isInteger(index)) return;
+
+  const rows=parseSerialStore(key);
+  const record=rows[index];
+  if(!record) return;
+
+  const combined=`${record.rank || ""} ${record.name || ""}`;
+  const staff=NOMINAL_STAFF.find(s=>entryMatchesStaff(s,combined));
+  if(!staff){
+    alert("This person could not be matched to the Nominal Roll, so the row was not removed.");
+    return;
+  }
+
+  // Special rule for CASUALITIES:
+  // when an SI / WSI comes off leave, automatically return them to the SI row.
+  if(key==="casualties" && ["si","wsi"].includes(rankCode(staff.rank))){
+    const otherCell=document.getElementById("otherSICell");
+    if(!otherCell) return;
+
+    const current=findStaffInCell(otherCell.value || "");
+    const alreadyThere=current.some(s=>s.id===staff.id);
+
+    if(!alreadyThere){
+      current.push(staff);
+      otherCell.value=current.map(formatHeaderSI).join(", ");
+
+      const hiddenOther=document.getElementById("otherSI");
+      if(hiddenOther) hiddenOther.value=otherCell.value;
+
+      otherCell.dispatchEvent(new Event("input",{bubbles:true}));
+    }
+
+    rows.splice(index,1);
+    writeSerialStore("casualties",rows,false);
+    renderSerialRosterBody();
+    runConflictChecks();
+    saveRoster(false);
+    setStatus(`${staff.name} removed from Casualities and moved to SI row`);
+    return;
+  }
+
+  // Everyone else must still be moved somewhere before being removed.
+  openRequiredMoveDialog({
+    type:"serial",
+    key,
+    index,
+    staffId:staff.id,
+    sourceValue:`field|${key}`
+  });
+}
+
+document.addEventListener("click",(e)=>{
+  const btn=e.target.closest ? e.target.closest(".row-remove-btn") : null;
+  if(!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const key=btn.dataset.section;
+  if(key) removeSerialRow(btn,key);
+});
+
+function addPersonSerialRow(key){
+  const data=parseSerialStore(key);
+  const temp=[...data,{rank:"",name:"",detail:""}];
+  const overrides={};
+  overrides[key]=temp;
+
+  renderSerialRosterBody(overrides);
+  openPersonPicker(key,data.length);
+}
+
+function renderSerialTable(key,data=null,updateStore=false){
+  if(Array.isArray(data) && updateStore){
+    writeSerialStore(key,data,false);
+    renderSerialRosterBody();
+    return;
+  }
+
+  if(Array.isArray(data)){
+    const overrides={};
+    overrides[key]=data;
+    renderSerialRosterBody(overrides);
+    return;
+  }
+
+  renderSerialRosterBody();
+}
+
+function isStaffInCasualties(staff){
+  const el=document.querySelector('[data-field="casualties"]');
+  return !!(el && staffMentionedInCell(staff,el.value));
+}
+
+function isAvailableHeaderSI(staff){
+  if(!staff) return false;
+  if(!["si","wsi"].includes(rankCode(staff.rank))) return false;
+  if(isUnavailableODStaff(staff)) return false;
+  if(isStaffInCasualties(staff)) return false;
+
+  // Duty SI / Other SI selector should show officers whose nominal duty is Present.
+  const duty=String(staff.duty || "").trim().toLowerCase();
+  return duty==="present" || duty.startsWith("present ");
+}
+
+function formatHeaderSI(staff){
+  if(!staff) return "";
+  const name=String(staff.name || "").trim();
+  const code=rankCode(staff.rank);
+  const prefix=code==="wsi" ? "WSI" : "SI";
+  return `${prefix}.${name}`.replace(/\s+/g," ");
+}
+
+
+function syncOtherSIsAgainstCasualties(){
+  const otherCell=document.getElementById("otherSICell");
+  if(!otherCell) return false;
+
+  const casualtyRows=parseSerialStore("casualties");
+  const casualtyIds=new Set();
+
+  casualtyRows.forEach(r=>{
+    const combined=`${r.rank || ""} ${r.name || ""}`.trim();
+    const staff=NOMINAL_STAFF.find(s=>entryMatchesStaff(s,combined));
+    if(staff && ["si","wsi"].includes(rankCode(staff.rank))){
+      casualtyIds.add(staff.id);
+    }
+  });
+
+  if(!casualtyIds.size) return false;
+
+  const current=findStaffInCell(otherCell.value || "");
+  const remaining=current.filter(s=>!casualtyIds.has(s.id));
+
+  if(remaining.length===current.length) return false;
+
+  otherCell.value=remaining.map(formatHeaderSI).join(", ");
+
+  const hiddenOther=document.getElementById("otherSI");
+  if(hiddenOther) hiddenOther.value=otherCell.value;
+
+  return true;
+}
+
+function ensureDutySIHiddenOption(staff){
+  const sel=document.getElementById("dutySI");
+  if(!sel || !staff) return;
+
+  let opt=[...sel.options].find(o=>o.dataset.staffId===staff.id);
+  if(!opt){
+    opt=document.createElement("option");
+    opt.dataset.staffId=staff.id;
+    opt.value=formatHeaderSI(staff);
+    opt.textContent=`${staff.rank} ${staff.name} — ${staff.duty || ""}`;
+    sel.appendChild(opt);
+  }
+  sel.value=opt.value;
+}
+
+function openDutySIPicker(){
+  PERSON_PICKER_TARGET={type:"dutySI"};
+
+  const modal=document.getElementById("personPicker");
+  const search=document.getElementById("personPickerSearch");
+  if(!modal) return;
+
+  if(search) search.value="";
+  renderPersonPickerResults();
+  modal.classList.add("show");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>search?.focus(),40);
+}
+
+let PERSON_PICKER_TARGET = null;
+
+function openPersonPicker(sectionKey,rowIndex){
+  PERSON_PICKER_TARGET={type:"serial",sectionKey,rowIndex};
+  const modal=document.getElementById("personPicker");
+  const search=document.getElementById("personPickerSearch");
+  if(!modal) return;
+  if(search) search.value="";
+  renderPersonPickerResults();
+  modal.classList.add("show");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>search?.focus(),40);
+}
+
+
+function openFieldPersonPicker(fieldKey){
+  const el=document.querySelector(`[data-field="${fieldKey}"]`);
+  if(!el) return;
+
+  PERSON_PICKER_TARGET={type:"field",fieldKey};
+
+  const modal=document.getElementById("personPicker");
+  const search=document.getElementById("personPickerSearch");
+  if(!modal) return;
+
+  if(search) search.value="";
+  renderPersonPickerResults();
+  modal.classList.add("show");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>search?.focus(),40);
+}
+
+function closePersonPicker(){
+  const target=PERSON_PICKER_TARGET;
+  const modal=document.getElementById("personPicker");
+  if(modal) modal.classList.remove("show");
+  document.body.style.overflow="";
+
+  // "+ Add Person" creates a temporary visual row only.
+  // Closing the picker without selecting somebody simply redraws from saved data.
+  if(target && target.type==="serial"){
+    renderSerialRosterBody();
+  }
+
+  PERSON_PICKER_TARGET=null;
+}
+
+function closePersonPickerOnBackdrop(e){
+  if(e.target && e.target.id==="personPicker") closePersonPicker();
+}
+
+function renderPersonPickerResults(){
+  const box=document.getElementById("personPickerResults");
+  if(!box) return;
+  const q=(document.getElementById("personPickerSearch")?.value || "").trim().toLowerCase();
+
+  const list=NOMINAL_STAFF.filter(s=>{
+    if(PERSON_PICKER_TARGET?.type==="dutySI"){
+      if(!isAvailableHeaderSI(s)) return false;
+    }else{
+      if(isUnavailableODStaff(s)) return false;
+    }
+
+    if(!q) return true;
+    return `${s.rank} ${s.name} ${s.duty} ${s.phone} ${s.group}`.toLowerCase().includes(q);
+  });
+
+  box.innerHTML="";
+  list.forEach(s=>{
+    const b=document.createElement("button");
+    b.type="button";
+    b.className="person-result";
+    b.onclick=()=>selectPersonFromPicker(s.id);
+    b.innerHTML=`
+      <div class="r-rank">${escapeHtml(s.rank)}</div>
+      <div>
+        <div class="r-name">${escapeHtml(s.name)}</div>
+        <div class="r-duty">${escapeHtml(s.group)} • ${escapeHtml(s.duty || "")}</div>
+      </div>
+      <div class="r-phone">${escapeHtml(s.phone || "")}</div>`;
+    box.appendChild(b);
+  });
+
+  if(!list.length){
+    box.innerHTML='<div style="padding:18px;text-align:center;color:#64748b">No matching personnel</div>';
+  }
+}
+
+function selectPersonFromPicker(staffId){
+  if(!PERSON_PICKER_TARGET) return;
+
+  const staff=NOMINAL_STAFF.find(s=>s.id===staffId);
+  if(!staff) return;
+
+  if(isUnavailableODStaff(staff)){
+    alert(`${staff.rank} ${staff.name} is on OD and is not available for allotment.`);
+    setStatus("OD person cannot be allotted");
+    return;
+  }
+
+  const target=PERSON_PICKER_TARGET;
+
+  if(target.type==="dutySI"){
+    if(!isAvailableHeaderSI(staff)){
+      alert(`${staff.rank} ${staff.name} is not available for Duty SI.`);
+      return;
+    }
+
+    const dutyCell=document.getElementById("dutySICell");
+    if(dutyCell) dutyCell.value=formatHeaderSI(staff);
+    ensureDutySIHiddenOption(staff);
+
+    // Duty SI should not simultaneously remain in the Other SIs row.
+    const otherCell=document.getElementById("otherSICell");
+    if(otherCell){
+      const remaining=findStaffInCell(otherCell.value).filter(s=>s.id!==staff.id);
+      otherCell.value=remaining.map(formatHeaderSI).join(", ");
+      const hiddenOther=document.getElementById("otherSI");
+      if(hiddenOther) hiddenOther.value=otherCell.value;
+    }
+
+    saveRoster(false);
+    runConflictChecks();
+
+    PERSON_PICKER_TARGET=null;
+    const modal=document.getElementById("personPicker");
+    if(modal) modal.classList.remove("show");
+    document.body.style.overflow="";
+    setStatus(`Duty SI selected: ${staff.name}`);
+    return;
+  }
+
+  if(target.type==="field"){
+    const el=document.querySelector(`[data-field="${target.fieldKey}"]`);
+    if(!el) return;
+
+    // Normal Court/Driver person fields show Rank/No. + Name.
+    el.value=`${staff.rank} ${staff.name}`.trim();
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+
+    saveRoster(false);
+    runConflictChecks();
+
+    PERSON_PICKER_TARGET=null;
+    const modal=document.getElementById("personPicker");
+    if(modal) modal.classList.remove("show");
+    document.body.style.overflow="";
+    setStatus(`Selected ${staff.name}`);
+    return;
+  }
+
+  // Serial-number sections (MISC, IN-OD, OUT OD, CASUALITIES).
+  const {sectionKey,rowIndex}=target;
+  const rows=parseSerialStore(sectionKey);
+
+  // The same person cannot be entered twice inside the same section.
+  const staffNo=serviceNumber(staff);
+  const staffRank=normalizeWords(staff.rank || "");
+  const staffName=normalizeWords(staff.name || "");
+
+  const duplicate=rows.some((r,idx)=>{
+    if(idx===Number(rowIndex)) return false;
+
+    const otherNo=(String(r.rank || "").match(/\d+/) || [""])[0];
+    if(staffNo && otherNo) return String(staffNo)===String(otherNo);
+
+    return normalizeWords(r.rank || "")===staffRank &&
+           normalizeWords(r.name || "")===staffName;
+  });
+
+  if(duplicate){
+    alert(`${staff.rank} ${staff.name} is already added in this section.`);
+    setStatus("Duplicate person not allowed in the same section");
+    return;
+  }
+
+  const idx=Number(rowIndex);
+  if(idx===rows.length){
+    rows.push({rank:staff.rank,name:staff.name,detail:""});
+  }else if(rows[idx]){
+    rows[idx].rank=staff.rank;
+    rows[idx].name=staff.name;
+  }else{
+    return;
+  }
+
+  writeSerialStore(sectionKey,rows,false);
+  renderSerialRosterBody();
+  runConflictChecks();
+  saveRoster(false);
+
+  if(sectionKey==="casualties" && ["si","wsi"].includes(rankCode(staff.rank))){
+    setStatus(`${staff.name} added to Casualities and removed from SI row`);
+  }
+
+  PERSON_PICKER_TARGET=null;
+  const modal=document.getElementById("personPicker");
+  if(modal) modal.classList.remove("show");
+  document.body.style.overflow="";
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && document.getElementById("personPicker")?.classList.contains("show")){
+    closePersonPicker();
+  }
+});
+
+
+function applyKnownPersonnelCorrections(){
+  const inOD=document.querySelector('[data-field="inOD"].section-store');
+  if(!inOD) return;
+
+  let lines=String(inOD.value || "")
+    .split("\n")
+    .map(x=>x.trim())
+    .filter(Boolean);
+
+  let foundMuthu=false;
+  let foundSeema=false;
+
+  lines=lines.map(line=>{
+    const c=compactText(line);
+
+    // Force Rank/No. into the Rank column and name into the Name column.
+    if(c.includes("muthulakshmi")){
+      foundMuthu=true;
+      return "WSI 17589\tTmt.Muthulakshmi\tSSF";
+    }
+
+    if(c.includes("seema")){
+      foundSeema=true;
+      return "WSSI 63907\tTmt.Seema\tDCK";
+    }
+
+    return line;
+  });
+
+  // If an old browser save omitted either person, restore the corrected row.
+  // Keep them as row 3 and row 4 in IN–OD.
+  if(!foundMuthu){
+    lines.splice(Math.min(2,lines.length),0,
+      "WSI 17589\tTmt.Muthulakshmi\tSSF");
+  }
+
+  if(!foundSeema){
+    const muthuIndex=lines.findIndex(x=>compactText(x).includes("muthulakshmi"));
+    lines.splice(Math.min(muthuIndex >= 0 ? muthuIndex+1 : 3,lines.length),0,
+      "WSSI 63907\tTmt.Seema\tDCK");
+  }
+
+  // Put the two corrected rows in positions 3 and 4 consistently.
+  const others=lines.filter(x=>{
+    const c=compactText(x);
+    return !c.includes("muthulakshmi") && !c.includes("seema");
+  });
+
+  const firstTwo=others.slice(0,2);
+  const rest=others.slice(2);
+
+  inOD.value=[
+    ...firstTwo,
+    "WSI 17589\tTmt.Muthulakshmi\tSSF",
+    "WSSI 63907\tTmt.Seema\tDCK",
+    ...rest
+  ].join("\n");
+}
+
+function initSerialTables(){
+  applyKnownPersonnelCorrections();
+  renderSerialRosterBody();
+
+  // If transfer logic changes a hidden section store, redraw the same main table.
+  document.querySelectorAll(".section-store").forEach(store=>{
+    store.addEventListener("input",()=>{
+      const key=store.dataset.field;
+      if(key && SERIAL_SECTION_CONFIG[key]){
+        renderSerialRosterBody();
+      }
+    });
+  });
+}
+
+
+
+let NOMINAL_EDIT_ID = null;
+
+function updateNominalCountBadge(){
+  const badge=document.getElementById("nominalLoadedBadge");
+  if(badge) badge.textContent=`${NOMINAL_STAFF.length} personnel loaded`;
+}
+
+function rebuildDutySIOptions(){
+  const sel=document.getElementById("dutySI");
+  if(!sel) return;
+
+  const dutyCell=document.getElementById("dutySICell");
+  const currentText=dutyCell?.value || "";
+  const currentStaff=findStaffInCell(currentText)[0] || null;
+
+  sel.innerHTML="";
+  NOMINAL_STAFF
+    .filter(isAvailableHeaderSI)
+    .forEach(staff=>{
+      const o=document.createElement("option");
+      o.value=formatHeaderSI(staff);
+      o.dataset.staffId=staff.id;
+      o.textContent=`${staff.rank} ${staff.name} — ${staff.duty || ""}`;
+      sel.appendChild(o);
+    });
+
+  if(currentStaff && [...sel.options].some(o=>o.dataset.staffId===currentStaff.id)){
+    const o=[...sel.options].find(o=>o.dataset.staffId===currentStaff.id);
+    sel.value=o.value;
+  }else if([...sel.options].some(o=>o.value===currentText)){
+    sel.value=currentText;
+  }
+}
+
+function refreshNominalDependentUI(redrawNominal=true){
+  updateNominalCountBadge();
+  fillStaffSelect();
+  rebuildDutySIOptions();
+
+  if(redrawNominal && document.getElementById("nominalRollModal")?.classList.contains("show")){
+    renderNominalRollTable();
+  }
+
+  if(document.getElementById("personPicker")?.classList.contains("show")){
+    renderPersonPickerResults();
+  }
+
+  if(document.getElementById("sectorTeamModal")?.classList.contains("show")){
+    renderSectorCurrentList();
+    renderSectorPersonResults();
+  }
+}
+
+function startAddNominalStaff(){
+  NOMINAL_EDIT_ID=null;
+
+  document.getElementById("nominalEditorTitle").textContent="Add Personnel";
+  document.getElementById("nominalEditGroup").value="Station";
+  document.getElementById("nominalEditRank").value="";
+  document.getElementById("nominalEditName").value="";
+  document.getElementById("nominalEditDuty").value="Present";
+  document.getElementById("nominalEditPhone").value="";
+
+  const editor=document.getElementById("nominalEditor");
+  editor.hidden=false;
+  editor.scrollIntoView({behavior:"smooth",block:"nearest"});
+  setTimeout(()=>document.getElementById("nominalEditRank")?.focus(),40);
+}
+
+function startNominalStaffEdit(id){
+  const staff=NOMINAL_STAFF.find(s=>s.id===id);
+  if(!staff) return;
+
+  NOMINAL_EDIT_ID=id;
+
+  document.getElementById("nominalEditorTitle").textContent=`Edit — ${staff.rank} ${staff.name}`;
+  document.getElementById("nominalEditGroup").value=staff.group || "Station";
+  document.getElementById("nominalEditRank").value=staff.rank || "";
+  document.getElementById("nominalEditName").value=staff.name || "";
+  document.getElementById("nominalEditDuty").value=staff.duty || "";
+  document.getElementById("nominalEditPhone").value=staff.phone || "";
+
+  const editor=document.getElementById("nominalEditor");
+  editor.hidden=false;
+  editor.scrollIntoView({behavior:"smooth",block:"nearest"});
+  setTimeout(()=>document.getElementById("nominalEditRank")?.focus(),40);
+}
+
+function cancelNominalStaffEdit(){
+  NOMINAL_EDIT_ID=null;
+  const editor=document.getElementById("nominalEditor");
+  if(editor) editor.hidden=true;
+}
+
+function nominalIdentityDuplicate(rank,name,excludeId=null){
+  const temp={rank:String(rank||"").trim(),name:String(name||"").trim()};
+  const no=serviceNumber(temp);
+  const r=normalizeWords(temp.rank).join(" ");
+  const n=normalizeWords(temp.name).join(" ");
+
+  return NOMINAL_STAFF.some(s=>{
+    if(excludeId && s.id===excludeId) return false;
+
+    const otherNo=serviceNumber(s);
+    if(no && otherNo) return no===otherNo;
+
+    return normalizeWords(s.rank).join(" ")===r &&
+           normalizeWords(s.name).join(" ")===n;
+  });
+}
+
+function syncEditedStaffInCurrentRoster(oldStaff,newStaff){
+  if(!oldStaff || !newStaff) return;
+
+  // Duty SI row.
+  const dutyCell=document.getElementById("dutySICell");
+  if(dutyCell && entryMatchesStaff(oldStaff,dutyCell.value || "")){
+    dutyCell.value=formatHeaderSI(newStaff);
+  }
+
+  // Other SI / WSI row.
+  const otherCell=document.getElementById("otherSICell");
+  if(otherCell){
+    const oldOther=findStaffInCell(otherCell.value || "");
+    if(oldOther.some(s=>s.id===oldStaff.id)){
+      const updated=oldOther.map(s=>s.id===oldStaff.id ? newStaff : s);
+      otherCell.value=updated.map(formatHeaderSI).join(", ");
+      const hiddenOther=document.getElementById("otherSI");
+      if(hiddenOther) hiddenOther.value=otherCell.value;
+    }
+  }
+
+  // Shift/team cells: rebuild their matched staff using the new identity.
+  document.querySelectorAll("#shiftBody [data-shift]").forEach(el=>{
+    const before=findStaffInCell(el.value || "");
+    if(!before.some(s=>s.id===oldStaff.id)) return;
+
+    const updated=before.map(s=>s.id===oldStaff.id ? newStaff : s);
+    el.value=updated
+      .map(s=>`${s.rank} ${s.name}${s.phone ? "\n"+s.phone : ""}`)
+      .join("\n");
+  });
+
+  // Structured serial sections.
+  ["misc","inOD","outOD","casualties"].forEach(key=>{
+    const rows=parseSerialStore(key);
+    let changed=false;
+
+    rows.forEach(r=>{
+      if(entryMatchesStaff(oldStaff,`${r.rank || ""} ${r.name || ""}`)){
+        r.rank=newStaff.rank;
+        r.name=newStaff.name;
+        changed=true;
+      }
+    });
+
+    if(changed) writeSerialStore(key,rows,false);
+  });
+
+  // Remaining named duty fields. Preserve layout but update rank/name/phone text.
+  document.querySelectorAll("[data-field]").forEach(el=>{
+    const key=el.dataset.field;
+    if(["misc","inOD","outOD","casualties","casualtiesSummary"].includes(key)) return;
+
+    const value=String(el.value || "");
+    if(!entryMatchesStaff(oldStaff,value)) return;
+
+    let next=value;
+
+    if(oldStaff.rank) next=next.split(oldStaff.rank).join(newStaff.rank || oldStaff.rank);
+    if(oldStaff.name) next=next.split(oldStaff.name).join(newStaff.name || oldStaff.name);
+
+    if(oldStaff.phone){
+      next=next.split(oldStaff.phone).join(newStaff.phone || "");
+    }
+
+    el.value=next.replace(/\s+-\s*$/,"").trim();
+  });
+
+  renderSerialRosterBody();
+  syncTopInputsFromCells();
+}
+
+function saveNominalStaffEdit(){
+  const group=document.getElementById("nominalEditGroup").value.trim();
+  const rank=document.getElementById("nominalEditRank").value.trim();
+  const name=document.getElementById("nominalEditName").value.trim();
+  const duty=document.getElementById("nominalEditDuty").value.trim();
+  const phone=document.getElementById("nominalEditPhone").value.trim();
+
+  if(!group || !rank || !name){
+    alert("Group, Rank / No. and Name are required.");
+    return;
+  }
+
+  if(nominalIdentityDuplicate(rank,name,NOMINAL_EDIT_ID)){
+    alert("This service number or personnel identity already exists in the Nominal Roll.");
+    return;
+  }
+
+  if(NOMINAL_EDIT_ID){
+    const staff=NOMINAL_STAFF.find(s=>s.id===NOMINAL_EDIT_ID);
+    if(!staff) return;
+
+    const oldStaff={...staff};
+    const updated={
+      ...staff,
+      group,
+      rank,
+      name,
+      duty,
+      phone
+    };
+
+    // Update current roster references while the old identity is still available.
+    syncEditedStaffInCurrentRoster(oldStaff,updated);
+
+    Object.assign(staff,updated);
+    setStatus("Nominal Roll personnel updated");
+  }else{
+    const id=`custom-${Date.now()}`;
+    NOMINAL_STAFF.push({id,group,rank,name,duty,phone});
+    setStatus("Personnel added to Nominal Roll");
+  }
+
+  cancelNominalStaffEdit();
+  refreshNominalDependentUI(true);
+  runConflictChecks();
+  saveRoster(false);
+}
+
+
+function openNominalRoll(){
+  const modal=document.getElementById("nominalRollModal");
+  if(!modal) return;
+  renderNominalRollTable();
+  modal.classList.add("show");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>document.getElementById("nominalViewSearch")?.focus(),50);
+}
+
+function closeNominalRoll(){
+  const modal=document.getElementById("nominalRollModal");
+  if(!modal) return;
+  cancelNominalStaffEdit();
+  modal.classList.remove("show");
+  document.body.style.overflow="";
+}
+
+function nominalBackdropClose(e){
+  if(e.target && e.target.id==="nominalRollModal") closeNominalRoll();
+}
+
+function renderNominalRollTable(){
+  const body=document.getElementById("nominalRollTableBody");
+  const count=document.getElementById("nominalViewCount");
+  if(!body) return;
+
+  const q=(document.getElementById("nominalViewSearch")?.value || "").trim().toLowerCase();
+  const group=(document.getElementById("nominalGroupFilter")?.value || "");
+
+  const filtered=NOMINAL_STAFF.filter(s=>{
+    if(group && s.group!==group) return false;
+    if(!q) return true;
+    return `${s.rank} ${s.name} ${s.duty} ${s.phone} ${s.group}`.toLowerCase().includes(q);
+  });
+
+  body.innerHTML="";
+  let sn=1;
+  let lastGroup=null;
+
+  filtered.forEach(s=>{
+    if(!group && s.group!==lastGroup){
+      const gr=document.createElement("tr");
+      gr.className="nominal-group-row";
+      gr.innerHTML=`<td colspan="6">${escapeHtml(s.group)} Strength</td>`;
+      body.appendChild(gr);
+      lastGroup=s.group;
+    }
+
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td class="sn">${sn++}</td>
+      <td class="rank">${escapeHtml(s.rank)}</td>
+      <td>${escapeHtml(s.name)}</td>
+      <td>${escapeHtml(s.duty || "")}</td>
+      <td class="phone">${escapeHtml(s.phone || "")}</td>
+      <td class="nominal-action-cell">
+        <button type="button" class="nominal-edit-row-btn"
+                onclick="startNominalStaffEdit('${escapeHtml(s.id)}')">Edit</button>
+      </td>`;
+    body.appendChild(tr);
+  });
+
+  if(!filtered.length){
+    const tr=document.createElement("tr");
+    tr.innerHTML='<td colspan="6" style="text-align:center;padding:18px;color:#6b7280">No matching personnel</td>';
+    body.appendChild(tr);
+  }
+
+  if(count) count.textContent=`${filtered.length} personnel`;
+  updateNominalCountBadge();
+}
+
+function printNominalRoll(){
+  const q=(document.getElementById("nominalViewSearch")?.value || "").trim().toLowerCase();
+  const group=document.getElementById("nominalGroupFilter")?.value || "";
+
+  const filtered=NOMINAL_STAFF.filter(s=>{
+    if(group && s.group!==group) return false;
+    if(!q) return true;
+    return `${s.rank} ${s.name} ${s.duty} ${s.phone} ${s.group}`.toLowerCase().includes(q);
+  });
+
+  const rows=filtered.map((s,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${escapeHtml(s.rank)}</td>
+      <td>${escapeHtml(s.name)}</td>
+      <td>${escapeHtml(s.duty||"")}</td>
+      <td>${escapeHtml(s.phone||"")}</td>
+    </tr>`).join("");
+
+  const frame=document.createElement("iframe");
+  frame.style.position="fixed";
+  frame.style.right="0";
+  frame.style.bottom="0";
+  frame.style.width="0";
+  frame.style.height="0";
+  frame.style.border="0";
+  document.body.appendChild(frame);
+
+  const d=frame.contentDocument || frame.contentWindow.document;
+  d.open();
+  d.write(`<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>G7 PS Nominal Roll</title>
+<style>
+  @page{size:A4 portrait;margin:10mm}
+  body{font-family:Rockwell, "Rockwell Nova", "Roboto Slab", serif;font-size:10px;margin:0}
+  h2{text-align:center;margin:0 0 8px;font-size:15px}
+  table{width:100%;border-collapse:collapse}
+  th,td{border:1px solid #222;padding:3px 4px;text-align:left;vertical-align:top}
+  th{background:#eee}
+</style>
+</head>
+<body>
+  <h2>G7 PS – NOMINAL ROLL</h2>
+  <table>
+    <thead><tr><th>S.No</th><th>Rank</th><th>Name</th><th>Duty</th><th>Phone No.</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+</body>
+</html>`);
+  d.close();
+
+  setTimeout(()=>{
+    try{
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    }finally{
+      setTimeout(()=>frame.remove(),1500);
+    }
+  },250);
+}
+
+function printDutyRoster(){
+  try{
+    saveRoster(false);
+    syncHeader();
+
+    const source=document.querySelector(".sheet");
+    if(!source){
+      alert("Roster page could not be found.");
+      return;
+    }
+
+    const clone=source.cloneNode(true);
+
+    // Hidden section stores contain the same data used to build the visible
+    // MISC / IN-OD / OUT OD / CASUALITIES tables. Remove them first so the
+    // raw data is not printed a second time.
+    clone.querySelectorAll(".section-store").forEach(el=>el.remove());
+
+    // Convert live form controls to ordinary printable text.
+    clone.querySelectorAll("textarea").forEach(el=>{
+      const div=document.createElement("div");
+      div.textContent=el.value || "";
+      div.style.whiteSpace="pre-line";
+      div.style.minHeight="10px";
+      div.style.lineHeight="1.02";
+      div.style.wordBreak="normal";
+      div.style.overflowWrap="anywhere";
+      el.replaceWith(div);
+    });
+
+    clone.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]').forEach(el=>{
+      const printable=document.createElement(el.classList.contains("section-summary") ? "div" : "span");
+      printable.textContent=el.value || "";
+      printable.style.whiteSpace="normal";
+      printable.style.wordBreak="normal";
+      printable.style.overflowWrap="anywhere";
+      if(el.classList.contains("section-summary")){
+        printable.style.display="block";
+        printable.style.width="100%";
+        printable.style.fontWeight="700";
+      }
+      el.replaceWith(printable);
+    });
+
+    clone.querySelectorAll("select").forEach(el=>{
+      const span=document.createElement("span");
+      span.textContent=el.options[el.selectedIndex]?.text || el.value || "";
+      el.replaceWith(span);
+    });
+
+    // Buttons used only for on-screen editing must never appear on the print copy.
+    clone.querySelectorAll("button").forEach(btn=>btn.remove());
+    clone.querySelectorAll(".sector-manage-btn,.manage-sector-btn,.serial-actions,.action-col,.select-col")
+         .forEach(el=>el.remove());
+
+    const frame=document.createElement("iframe");
+    frame.setAttribute("aria-hidden","true");
+    frame.style.position="fixed";
+    frame.style.right="0";
+    frame.style.bottom="0";
+    frame.style.width="0";
+    frame.style.height="0";
+    frame.style.border="0";
+    document.body.appendChild(frame);
+
+    const d=frame.contentDocument || frame.contentWindow.document;
+    d.open();
+    d.write(`<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>G7 Chetpet Duty Roster</title>
+<style>
+  @page{size:A4 portrait;margin:5mm}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff}
+  body{font-family:Rockwell, "Rockwell Nova", "Roboto Slab", serif;color:#111}
+  .sheet{width:100%;margin:0;padding:0;border:0;box-shadow:none}
+  table{width:100%;border-collapse:collapse;table-layout:fixed}
+  th,td{border:0.65pt solid #222;padding:0.7px 1.4px;vertical-align:top;font-size:6.65pt;line-height:0.98}
+  th{background:#f2f2f2;text-align:center;font-weight:700}
+  .main-title{font-size:9.5pt!important;text-align:center;font-weight:800;padding:2px!important}
+  .station-name{font-size:6.65pt!important;font-weight:800}
+  .section-title{background:#e5e7eb!important;font-weight:800;text-align:center}
+  .place{font-weight:800}
+  .shift{}
+  .personcell{white-space:pre-line}
+  .section-store,.conflict-warning,.shift-conflict-summary,
+  .serial-actions,.nominal-panel,.hint,.toolbar,.print-note,
+  .person-picker,.sector-team-modal,.nominal-modal{display:none!important}
+  .serial-duty-table{width:100%;border-collapse:collapse;table-layout:fixed}
+  .serial-duty-table th,.serial-duty-table td{font-size:6.65pt;padding:0.4px 0.7px;line-height:0.98;white-space:normal;word-break:normal;overflow-wrap:anywhere;overflow:hidden}
+  .serial-duty-table td span,.serial-duty-table td div{display:block;white-space:normal;word-break:normal;overflow-wrap:anywhere}
+  .section-summary{font-size:6.65pt;font-weight:700;border:0;display:block;width:100%;white-space:normal;word-break:normal;overflow-wrap:anywhere}
+  .serial-misc .sn-col,.serial-inOD .sn-col,.serial-outOD .sn-col{width:6%!important}
+  .serial-misc .rank-col,.serial-inOD .rank-col,.serial-outOD .rank-col{width:24%!important}
+  .serial-misc .name-col,.serial-inOD .name-col,.serial-outOD .name-col{width:38%!important}
+  .serial-misc .detail-col,.serial-inOD .detail-col,.serial-outOD .detail-col{width:32%!important}
+  .serial-casualties .sn-col{width:5%!important}
+  .serial-casualties .rank-col{width:18%!important}
+  .serial-casualties .name-col{width:30%!important}
+  .serial-casualties .leave-col{width:18%!important}
+  .serial-casualties .remarks-col{width:29%!important}
+  input,textarea,select{
+    font-size:6.65pt!important;
+    font-family:inherit!important;
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+    border-radius:0!important;
+    padding:0!important;
+    margin:0!important;
+    appearance:none!important;
+    -webkit-appearance:none!important;
+    color:#111!important;
+  }
+  select{background-image:none!important}
+
+  input::placeholder,textarea::placeholder{color:transparent!important}
+  #serialRosterBody th,#serialRosterBody td{font-size:6.65pt!important;line-height:.98!important;padding:.5px 1px!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #serialRosterBody input,#serialRosterBody select,.section-summary-visible{font-size:6.65pt!important;border:0!important;background:transparent!important;padding:0!important;margin:0!important;appearance:none!important;-webkit-appearance:none!important}
+  .section-add-btn,.row-remove-btn,.serial-data-stores{display:none!important}
+  .conflict-cell,.conflict-source{background:transparent!important;color:#111!important;outline:0!important}
+</style>
+</head>
+<body>
+${clone.outerHTML}
+</body>
+</html>`);
+    d.close();
+
+    setTimeout(()=>{
+      try{
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+      }catch(err){
+        alert("The browser blocked printing. Please press Ctrl+P.");
+      }finally{
+        setTimeout(()=>frame.remove(),1800);
+      }
+    },300);
+  }catch(err){
+    console.error(err);
+    alert("Print could not start. Please press Ctrl+P as a fallback.");
+  }
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && document.getElementById("nominalRollModal")?.classList.contains("show")){
+    closeNominalRoll();
+  }
+});
+
+
+
+function isStationOrSectorEligible(staff){
+  if(!staff) return false;
+  const code=rankCode(staff.rank);
+  // Inspector, SI and WSI are not eligible for Station I/C or Sector duties.
+  return !["ins","si","wsi"].includes(code);
+}
+
+function rankRestrictionMessage(staff){
+  return `${staff.rank} ${staff.name} cannot be allotted to Station I/C or Sector A/B/C. Inspector, SI and WSI are not eligible for these duties.`;
+}
+
+function currentTeamNeedsRankRestriction(){
+  if(!SECTOR_TEAM_TARGET) return false;
+  const place=String(SECTOR_TEAM_TARGET.place || "");
+  return place==="Station I/C" || /^Sector [ABC]$/i.test(place);
+}
+
+function isEligibleForCurrentManagedDuty(staff){
+  if(!staff) return false;
+
+  if(SECTOR_TEAM_TARGET?.mode==="otherSI"){
+    if(!isAvailableHeaderSI(staff)) return false;
+
+    const dutySI=findStaffInCell(document.getElementById("dutySICell")?.value || "")[0];
+    if(dutySI && dutySI.id===staff.id) return false;
+
+    return true;
+  }
+
+  if(currentTeamNeedsRankRestriction()){
+    return isStationOrSectorEligible(staff);
+  }
+  return true;
+}
+
+function managedDutyEligibilityNote(){
+  if(!SECTOR_TEAM_TARGET) return "";
+  const place=String(SECTOR_TEAM_TARGET.place || "");
+
+  if(SECTOR_TEAM_TARGET.mode==="otherSI"){
+    return "Select one or more Present SI / WSI officers. The Duty SI is automatically excluded.";
+  }
+
+  if(place==="Station I/C"){
+    return "Inspector, SI and WSI are excluded from Station I/C duty.";
+  }
+  if(/^Sector [ABC]$/i.test(place)){
+    return "Inspector, SI and WSI are excluded from Sector duty.";
+  }
+  if(/Vehicle Check/i.test(place)){
+    return "Vehicle Check may additionally use personnel from Patrol, Gypsy or Sector A/B/C in the same shift.";
+  }
+  return "Select one or more personnel from the Nominal Roll for this duty.";
+}
+
+
+let SECTOR_TEAM_TARGET = null;
+
+function sectorShiftLabel(shift){
+  return ({"1":"07.00–13.00","2":"13.00–21.00","3":"21.00–07.00"})[shift] || shift;
+}
+
+function getSectorTargetCell(){
+  if(!SECTOR_TEAM_TARGET) return null;
+
+  if(SECTOR_TEAM_TARGET.mode==="otherSI"){
+    return document.getElementById("otherSICell");
+  }
+
+  const rows=document.querySelectorAll("#shiftBody tr");
+  const row=rows[SECTOR_TEAM_TARGET.rowIndex];
+  return row?.querySelector(`[data-shift="${SECTOR_TEAM_TARGET.shift}"]`) || null;
+}
+
+
+function openOtherSIManager(){
+  SECTOR_TEAM_TARGET={mode:"otherSI",place:"Other SIs"};
+
+  const title=document.getElementById("sectorTeamTitle");
+  if(title) title.textContent="Select Other SIs";
+
+  const note=document.getElementById("teamEligibilityNote");
+  if(note) note.textContent=managedDutyEligibilityNote();
+
+  const search=document.getElementById("sectorPersonSearch");
+  if(search) search.value="";
+
+  renderSectorCurrentList();
+  renderSectorPersonResults();
+
+  document.getElementById("sectorTeamModal")?.classList.add("show");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>search?.focus(),40);
+}
+
+function openSectorTeamManager(rowIndex,shift){
+  const rows=document.querySelectorAll("#shiftBody tr");
+  const row=rows[rowIndex];
+  if(!row) return;
+
+  SECTOR_TEAM_TARGET={rowIndex,shift,place:row.dataset.place || "Duty"};
+
+  document.getElementById("sectorTeamTitle").textContent=
+    `Manage Persons — ${SECTOR_TEAM_TARGET.place} — ${sectorShiftLabel(shift)}`;
+
+  const note=document.getElementById("teamEligibilityNote");
+  if(note) note.textContent=managedDutyEligibilityNote();
+
+  const search=document.getElementById("sectorPersonSearch");
+  if(search) search.value="";
+
+  renderSectorCurrentList();
+  renderSectorPersonResults();
+
+  document.getElementById("sectorTeamModal")?.classList.add("show");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>search?.focus(),40);
+}
+
+function closeSectorTeamManager(){
+  document.getElementById("sectorTeamModal")?.classList.remove("show");
+  document.body.style.overflow="";
+  SECTOR_TEAM_TARGET=null;
+}
+
+function sectorModalBackdrop(e){
+  if(e.target?.id==="sectorTeamModal") closeSectorTeamManager();
+}
+
+function sectorAssignedStaff(){
+  const cell=getSectorTargetCell();
+  if(!cell) return [];
+  return findStaffInCell(cell.value);
+}
+
+function formatSectorStaff(staff){
+  if(SECTOR_TEAM_TARGET?.mode==="otherSI"){
+    return formatHeaderSI(staff);
+  }
+  return `${staff.rank} ${staff.name}${staff.phone ? "\n"+staff.phone : ""}`;
+}
+
+function rebuildSectorCell(staffList){
+  const cell=getSectorTargetCell();
+  if(!cell) return;
+
+  if(SECTOR_TEAM_TARGET?.mode==="otherSI"){
+    cell.value=staffList.map(formatHeaderSI).join(", ");
+    const hiddenOther=document.getElementById("otherSI");
+    if(hiddenOther) hiddenOther.value=cell.value;
+  }else{
+    cell.value=staffList.map(formatSectorStaff).join("\n");
+  }
+
+  cell.dispatchEvent(new Event("input",{bubbles:true}));
+  saveRoster(false);
+  runConflictChecks();
+}
+
+function renderSectorCurrentList(){
+  const box=document.getElementById("sectorCurrentList");
+  if(!box) return;
+  const assigned=sectorAssignedStaff();
+  box.innerHTML="";
+  if(!assigned.length){
+    box.innerHTML='<span style="font-size:11px;color:#64748b">No person allotted.</span>';
+    return;
+  }
+  assigned.forEach(s=>{
+    const chip=document.createElement("div");
+    chip.className="sector-chip";
+    chip.innerHTML=`<span><b>${escapeHtml(s.rank)} ${escapeHtml(s.name)}</b></span><button type="button">Move</button>`;
+    chip.querySelector("button").onclick=()=>removePersonFromSector(s.id);
+    box.appendChild(chip);
+  });
+}
+
+function renderSectorPersonResults(){
+  const box=document.getElementById("sectorPersonResults");
+  if(!box) return;
+  const q=(document.getElementById("sectorPersonSearch")?.value || "").trim().toLowerCase();
+  const assignedIds=new Set(sectorAssignedStaff().map(s=>s.id));
+  const list=NOMINAL_STAFF.filter(s=>{
+    if(isUnavailableODStaff(s)) return false;
+    if(!isEligibleForCurrentManagedDuty(s)) return false;
+    if(!q) return true;
+    return `${s.rank} ${s.name} ${s.duty} ${s.phone} ${s.group}`.toLowerCase().includes(q);
+  });
+  box.innerHTML="";
+  list.forEach(s=>{
+    const already=assignedIds.has(s.id);
+    const row=document.createElement("div");
+    row.className="sector-result"+(already ? " already" : "");
+    row.innerHTML=`
+      <div class="rank">${escapeHtml(s.rank)}</div>
+      <div><div class="name">${escapeHtml(s.name)}</div><div class="duty">${escapeHtml(s.group)} • ${escapeHtml(s.duty || "")}</div></div>
+      <div class="phone">${escapeHtml(s.phone || "")}</div>
+      <button type="button">${already ? "Added" : "Add"}</button>`;
+    if(!already) row.querySelector("button").onclick=()=>addPersonToSector(s.id);
+    box.appendChild(row);
+  });
+  if(!list.length){
+    box.innerHTML='<div style="padding:18px;text-align:center;color:#64748b">No matching personnel</div>';
+  }
+}
+
+function addPersonToSector(staffId){
+  const staff=NOMINAL_STAFF.find(s=>s.id===staffId);
+  if(!staff) return;
+
+  if(isUnavailableODStaff(staff)){
+    alert(`${staff.rank} ${staff.name} is on OD and cannot be allotted to shift duty.`);
+    setStatus("OD person cannot be allotted");
+    return;
+  }
+
+  if(!isEligibleForCurrentManagedDuty(staff)){
+    alert(rankRestrictionMessage(staff));
+    setStatus("Rank not eligible for this duty");
+    return;
+  }
+
+  const assigned=sectorAssignedStaff();
+  if(assigned.some(s=>s.id===staff.id)) return;
+  assigned.push(staff);
+  rebuildSectorCell(assigned);
+  renderSectorCurrentList();
+  renderSectorPersonResults();
+  setStatus(`${staff.name} added to ${SECTOR_TEAM_TARGET?.place || "duty"}`);
+}
+
+function removePersonFromSector(staffId){
+  const assigned=sectorAssignedStaff();
+  const staff=assigned.find(s=>s.id===staffId);
+  if(!staff || !SECTOR_TEAM_TARGET) return;
+
+  const targetSnapshot={...SECTOR_TEAM_TARGET};
+  const sourceValue=targetSnapshot.mode==="otherSI"
+    ? "top|otherSI"
+    : `shift|${targetSnapshot.rowIndex}|${targetSnapshot.shift}`;
+
+  openRequiredMoveDialog({
+    type:"managed",
+    staffId:staff.id,
+    managedTarget:targetSnapshot,
+    sourceValue
+  });
+}
+
+
+let REQUIRED_MOVE = null;
+
+function moveSectionLabel(key){
+  return ({
+    misc:"MISCELLANEOUS",
+    inOD:"IN – OD",
+    outOD:"OUT OD",
+    casualties:"CASUALITIES"
+  })[key] || key;
+}
+
+function buildRequiredMoveDestinations(sourceValue){
+  const sel=document.getElementById("requiredMoveDestination");
+  if(!sel) return;
+
+  sel.innerHTML="";
+  const add=(value,label)=>{
+    if(value===sourceValue) return;
+    const o=document.createElement("option");
+    o.value=value;
+    o.textContent=label;
+    sel.appendChild(o);
+  };
+
+  const rowNames=[
+    "Station I/C","Patrol Vehicle","Gypsy Vehicle",
+    "Sector A","Sector B","Sector C","Chetpet Signal / Vehicle Check"
+  ];
+
+  rowNames.forEach((name,rowIndex)=>{
+    add(`shift|${rowIndex}|1`,`${name} — 07.00–13.00`);
+    add(`shift|${rowIndex}|2`,`${name} — 13.00–21.00`);
+    add(`shift|${rowIndex}|3`,`${name} — 21.00–07.00`);
+  });
+
+  add("field|courtMM","MM Court");
+  add("field|courtSessions","Sessions Court");
+  add("field|courtNDPS","NDPS Court");
+  add("field|warrant","Warrant");
+
+  add("field|insDriverDuty","Ins Driver — Present");
+  add("field|insDriverRest","Ins Driver — Rest");
+  add("field|patrolDriver","Patrol Driver — Present");
+  add("field|patrolDriverRest","Patrol Driver — Rest");
+  add("field|gypsyDriver","Gypsy Driver — Present");
+  add("field|gypsyDriverRest","Gypsy Driver — Rest");
+
+  add("field|receptionist","Receptionist");
+  add("top|otherSI","Other SIs");
+
+  add("field|misc","MISCELLANEOUS");
+  add("field|inOD","IN – OD");
+  add("field|outOD","OUT OD");
+  add("field|casualties","CASUALITIES");
+}
+
+function requiredMoveSourceLabel(source){
+  if(!source) return "";
+
+  if(source.type==="serial"){
+    return moveSectionLabel(source.key);
+  }
+
+  if(source.type==="managed"){
+    const t=source.managedTarget || {};
+    if(t.mode==="otherSI") return "Other SIs";
+    return `${t.place || "Duty"} — ${({"1":"07.00–13.00","2":"13.00–21.00","3":"21.00–07.00"})[t.shift] || ""}`;
+  }
+
+  return "";
+}
+
+function openRequiredMoveDialog(source){
+  const staff=NOMINAL_STAFF.find(s=>s.id===source?.staffId);
+  if(!staff) return;
+
+  REQUIRED_MOVE={...source};
+
+  const person=document.getElementById("requiredMovePerson");
+  const from=document.getElementById("requiredMoveFrom");
+  if(person) person.textContent=`${staff.rank} ${staff.name}`;
+  if(from) from.textContent=requiredMoveSourceLabel(source);
+
+  buildRequiredMoveDestinations(source.sourceValue || "");
+
+  document.getElementById("requiredMoveModal")?.classList.add("show");
+  document.body.style.overflow="hidden";
+}
+
+function closeRequiredMoveDialog(){
+  REQUIRED_MOVE=null;
+  document.getElementById("requiredMoveModal")?.classList.remove("show");
+  document.body.style.overflow="";
+}
+
+function requiredMoveBackdrop(e){
+  if(e.target?.id==="requiredMoveModal"){
+    closeRequiredMoveDialog();
+  }
+}
+
+function moveTargetAlreadyHasStaff(el,staff){
+  if(!el || !staff) return false;
+  return findStaffInCell(el.value || "").some(s=>s.id===staff.id);
+}
+
+function addStaffToRequiredMoveTarget(staff,raw){
+  if(!staff || !raw) return false;
+
+  const parts=raw.split("|");
+  const type=parts[0];
+
+  if(type==="shift"){
+    const rowIndex=Number(parts[1]);
+    const shift=parts[2];
+
+    if([0,3,4,5].includes(rowIndex) && !isStationOrSectorEligible(staff)){
+      alert(rankRestrictionMessage(staff));
+      return false;
+    }
+
+    const row=document.querySelectorAll("#shiftBody tr")[rowIndex];
+    const el=row?.querySelector(`[data-shift="${shift}"]`);
+    if(!el) return false;
+
+    if(moveTargetAlreadyHasStaff(el,staff)){
+      alert(`${staff.rank} ${staff.name} is already in that duty.`);
+      return false;
+    }
+
+    const current=findStaffInCell(el.value || "");
+    current.push(staff);
+    el.value=current.map(s=>`${s.rank} ${s.name}${s.phone ? "\n"+s.phone : ""}`).join("\n");
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+    return true;
+  }
+
+  if(type==="top" && parts[1]==="otherSI"){
+    if(!["si","wsi"].includes(rankCode(staff.rank))){
+      alert("Only SI / WSI personnel can be added under Other SIs.");
+      return false;
+    }
+
+    const el=document.getElementById("otherSICell");
+    if(!el) return false;
+
+    if(moveTargetAlreadyHasStaff(el,staff)){
+      alert(`${staff.rank} ${staff.name} is already under Other SIs.`);
+      return false;
+    }
+
+    const current=findStaffInCell(el.value || "");
+    current.push(staff);
+    el.value=current.map(formatHeaderSI).join(", ");
+
+    const hiddenOther=document.getElementById("otherSI");
+    if(hiddenOther) hiddenOther.value=el.value;
+
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+    return true;
+  }
+
+  if(type==="field"){
+    const key=parts[1];
+
+    // Serial-number sections are stored structurally.
+    if(["misc","inOD","outOD","casualties"].includes(key)){
+      const rows=parseSerialStore(key);
+      const duplicate=rows.some(r=>{
+        const combined=`${r.rank || ""} ${r.name || ""}`;
+        return entryMatchesStaff(staff,combined);
+      });
+
+      if(duplicate){
+        alert(`${staff.rank} ${staff.name} is already in ${moveSectionLabel(key)}.`);
+        return false;
+      }
+
+      rows.push({rank:staff.rank,name:staff.name,detail:""});
+      writeSerialStore(key,rows,false);
+      return true;
+    }
+
+    const el=document.querySelector(`[data-field="${key}"]`);
+    if(!el) return false;
+
+    if(moveTargetAlreadyHasStaff(el,staff)){
+      alert(`${staff.rank} ${staff.name} is already in that duty.`);
+      return false;
+    }
+
+    // Driver positions are single-person slots. Never overwrite another person.
+    const singlePersonFields=[
+      "insDriverDuty","insDriverRest",
+      "patrolDriver","patrolDriverRest",
+      "gypsyDriver","gypsyDriverRest"
+    ];
+
+    const existing=findStaffInCell(el.value || "");
+    if(singlePersonFields.includes(key) && existing.length){
+      alert("That driver slot is already occupied. Choose another destination so nobody is displaced.");
+      return false;
+    }
+
+    const text=formatForTarget(staff,"field",key);
+    const sep=["warrant","receptionist"].includes(key) ? ", " : "\n";
+    if(!String(el.value || "").trim() || String(el.value || "").trim()==="VACANT"){
+      el.value=text;
+    }else{
+      el.value=String(el.value).replace(/\s+$/,"") + sep + text;
+    }
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+    return true;
+  }
+
+  return false;
+}
+
+function removeRequiredMoveSource(source,staff){
+  if(!source || !staff) return false;
+
+  if(source.type==="serial"){
+    const rows=parseSerialStore(source.key);
+    const index=Number(source.index);
+    if(index<0 || index>=rows.length) return false;
+
+    // Re-check identity before removing.
+    const r=rows[index];
+    if(!entryMatchesStaff(staff,`${r.rank || ""} ${r.name || ""}`)){
+      return false;
+    }
+
+    rows.splice(index,1);
+    writeSerialStore(source.key,rows,false);
+    return true;
+  }
+
+  if(source.type==="managed"){
+    const target=source.managedTarget || {};
+    let cell=null;
+
+    if(target.mode==="otherSI"){
+      cell=document.getElementById("otherSICell");
+    }else{
+      const row=document.querySelectorAll("#shiftBody tr")[target.rowIndex];
+      cell=row?.querySelector(`[data-shift="${target.shift}"]`) || null;
+    }
+
+    if(!cell) return false;
+
+    const remaining=findStaffInCell(cell.value || "").filter(s=>s.id!==staff.id);
+
+    if(target.mode==="otherSI"){
+      cell.value=remaining.map(formatHeaderSI).join(", ");
+      const hiddenOther=document.getElementById("otherSI");
+      if(hiddenOther) hiddenOther.value=cell.value;
+    }else{
+      cell.value=remaining.map(s=>`${s.rank} ${s.name}${s.phone ? "\n"+s.phone : ""}`).join("\n");
+    }
+
+    cell.dispatchEvent(new Event("input",{bubbles:true}));
+    return true;
+  }
+
+  return false;
+}
+
+function confirmRequiredMove(){
+  const source=REQUIRED_MOVE;
+  if(!source) return;
+
+  const staff=NOMINAL_STAFF.find(s=>s.id===source.staffId);
+  const destination=document.getElementById("requiredMoveDestination")?.value || "";
+  if(!staff || !destination) return;
+
+  // Add first. The source is removed only after the destination succeeds.
+  if(!addStaffToRequiredMoveTarget(staff,destination)){
+    return;
+  }
+
+  if(!removeRequiredMoveSource(source,staff)){
+    alert("The new destination was selected, but the original assignment could not be removed. Please review the roster.");
+    runConflictChecks();
+    saveRoster(false);
+    return;
+  }
+
+  renderSerialRosterBody();
+
+  if(document.getElementById("sectorTeamModal")?.classList.contains("show")){
+    renderSectorCurrentList();
+    renderSectorPersonResults();
+  }
+
+  runConflictChecks();
+  saveRoster(false);
+  closeRequiredMoveDialog();
+  setStatus(`${staff.name} moved successfully`);
+}
+
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && document.getElementById("sectorTeamModal")?.classList.contains("show")){
+    closeSectorTeamManager();
+  }
+});
+
+
+
+let MOBILE_ROSTER_ZOOM = null;
+
+function mobileRosterNaturalWidth(){
+  // 210 mm A4 width at CSS reference 96 dpi.
+  return 210 * 96 / 25.4;
+}
+
+function updateMobileZoomLabel(scale, isFit=false){
+  const label=document.getElementById("mobileZoomValue");
+  if(!label) return;
+  label.textContent=isFit ? "Fit" : `${Math.round(scale*100)}%`;
+}
+
+function applyMobileRosterZoom(scale, isFit=false){
+  const sheet=document.querySelector(".sheet");
+  if(!sheet) return;
+
+  if(window.innerWidth>700){
+    sheet.style.removeProperty("--mobile-roster-zoom");
+    sheet.style.zoom="";
+    MOBILE_ROSTER_ZOOM=null;
+    return;
+  }
+
+  const safe=Math.max(0.28,Math.min(1.6,Number(scale) || 0.46));
+  MOBILE_ROSTER_ZOOM=safe;
+  sheet.style.setProperty("--mobile-roster-zoom",String(safe));
+  sheet.style.zoom=String(safe);
+  updateMobileZoomLabel(safe,isFit);
+}
+
+function fitMobileRoster(){
+  if(window.innerWidth>700) return;
+
+  const available=Math.max(260,document.documentElement.clientWidth-8);
+  const natural=mobileRosterNaturalWidth();
+  const scale=Math.min(1,available/natural);
+
+  applyMobileRosterZoom(scale,true);
+
+  // Return to the left edge so the entire page starts visibly aligned.
+  if(window.scrollX>0) window.scrollTo({left:0,top:window.scrollY,behavior:"auto"});
+}
+
+function changeMobileRosterZoom(delta){
+  if(window.innerWidth>700) return;
+
+  const sheet=document.querySelector(".sheet");
+  const current=MOBILE_ROSTER_ZOOM ||
+    parseFloat(sheet?.style?.zoom) ||
+    Math.min(1,(document.documentElement.clientWidth-8)/mobileRosterNaturalWidth());
+
+  applyMobileRosterZoom(current+Number(delta || 0),false);
+}
+
+window.addEventListener("load",()=>{
+  setTimeout(fitMobileRoster,60);
+});
+
+window.addEventListener("resize",()=>{
+  if(window.innerWidth<=700){
+    clearTimeout(window.__rosterFitTimer);
+    window.__rosterFitTimer=setTimeout(fitMobileRoster,120);
+  }else{
+    const sheet=document.querySelector(".sheet");
+    if(sheet){
+      sheet.style.zoom="";
+      sheet.style.removeProperty("--mobile-roster-zoom");
+    }
+    MOBILE_ROSTER_ZOOM=null;
+  }
+});
+
+window.addEventListener("orientationchange",()=>{
+  setTimeout(fitMobileRoster,220);
+});
+
+</script>
+
+
+
+<div id="requiredMoveModal" class="required-move-modal" onclick="requiredMoveBackdrop(event)">
+  <div class="required-move-card">
+    <div class="required-move-head">
+      <strong>Move Person</strong>
+      <button type="button" onclick="closeRequiredMoveDialog()">Cancel</button>
+    </div>
+
+    <div class="required-move-note">
+      A person cannot be removed without being assigned somewhere else.
+    </div>
+
+    <div class="required-move-person">
+      <div><span>Person</span><b id="requiredMovePerson"></b></div>
+      <div><span>From</span><b id="requiredMoveFrom"></b></div>
+    </div>
+
+    <label class="required-move-label" for="requiredMoveDestination">Move to</label>
+    <select id="requiredMoveDestination"></select>
+
+    <button type="button" class="required-move-confirm" onclick="confirmRequiredMove()">
+      Move Person
+    </button>
+  </div>
+</div>
+
+<div id="personPicker" class="person-picker" onclick="closePersonPickerOnBackdrop(event)">
+  <div class="person-picker-card">
+    <div class="person-picker-head">
+      <strong>Select Personnel</strong>
+      <div class="spacer"></div>
+      <button type="button" onclick="closePersonPicker()">Close</button>
+    </div>
+    <div class="person-picker-search">
+      <input id="personPickerSearch" type="text"
+             placeholder="Search by name, rank, number, duty or phone"
+             oninput="renderPersonPickerResults()">
+    </div>
+    <div id="personPickerResults" class="person-picker-results"></div>
+  </div>
+</div>
+
+<div id="sectorTeamModal" class="sector-team-modal" onclick="sectorModalBackdrop(event)">
+  <div class="sector-team-card">
+    <div class="sector-team-head">
+      <strong id="sectorTeamTitle">Manage Persons</strong>
+      <div class="spacer"></div>
+      <button type="button" onclick="closeSectorTeamManager()">Close</button>
+    </div>
+    <div class="sector-current">
+      <div class="sector-current-title">Currently Allotted</div>
+      <div id="sectorCurrentList" class="sector-current-list"></div>
+    </div>
+    <div id="teamEligibilityNote"
+         style="padding:7px 10px;background:#fff7ed;border-bottom:1px solid #fed7aa;
+                color:#9a3412;font-size:11px;font-weight:800;">
+      Select personnel from the Nominal Roll.
+    </div>
+    <div class="sector-search">
+      <div class="sector-search-title">Add Person from Nominal Roll</div>
+      <input id="sectorPersonSearch" type="text"
+             placeholder="Search name / rank / number / duty / phone"
+             oninput="renderSectorPersonResults()">
+    </div>
+    <div id="sectorPersonResults" class="sector-results"></div>
+  </div>
+</div>
+
+<div id="nominalRollModal" class="nominal-modal" onclick="nominalBackdropClose(event)">
+  <div class="nominal-modal-card">
+    <div class="nominal-modal-head">
+      <h2>G7 PS – Nominal Roll</h2>
+      <div class="spacer"></div>
+      <button class="nominal-add-btn" onclick="startAddNominalStaff()">+ Add Person</button>
+      <button onclick="printNominalRoll()">Print</button>
+      <button onclick="closeNominalRoll()">Close</button>
+    </div>
+
+    <div class="nominal-modal-tools">
+      <input id="nominalViewSearch" type="text"
+        placeholder="Search name / rank / duty / phone"
+        oninput="renderNominalRollTable()">
+      <select id="nominalGroupFilter" onchange="renderNominalRollTable()">
+        <option value="">All Groups</option>
+        <option value="Station">Station</option>
+        <option value="OD from Other Stations">OD from Other Stations</option>
+        <option value="MCR">MCR</option>
+        <option value="AR">AR</option>
+      </select>
+      <div id="nominalViewCount" class="nominal-count"></div>
+    </div>
+
+
+    <div id="nominalEditor" class="nominal-editor" hidden>
+      <div class="nominal-editor-title" id="nominalEditorTitle">Edit Personnel</div>
+      <div class="nominal-editor-grid">
+        <div>
+          <label>Group</label>
+          <select id="nominalEditGroup">
+            <option value="Station">Station</option>
+            <option value="OD from Other Stations">OD from Other Stations</option>
+            <option value="MCR">MCR</option>
+            <option value="AR">AR</option>
+          </select>
+        </div>
+        <div>
+          <label>Rank / No.</label>
+          <input id="nominalEditRank" type="text" placeholder="e.g. WSI 2147">
+        </div>
+        <div>
+          <label>Name</label>
+          <input id="nominalEditName" type="text" placeholder="e.g. Tmt.Mahalakshmi">
+        </div>
+        <div>
+          <label>Duty</label>
+          <input id="nominalEditDuty" type="text" placeholder="e.g. Present">
+        </div>
+        <div>
+          <label>Phone No.</label>
+          <input id="nominalEditPhone" type="text" inputmode="tel" placeholder="Phone number">
+        </div>
+      </div>
+      <div class="nominal-editor-actions">
+        <button type="button" class="primary" onclick="saveNominalStaffEdit()">Save Personnel</button>
+        <button type="button" onclick="cancelNominalStaffEdit()">Cancel</button>
+      </div>
+      <div class="nominal-editor-note">
+        Changes are saved in this browser and are also included in the roster Backup JSON.
+        Rank, name, duty, phone and group can be edited.
+      </div>
+    </div>
+
+    <div class="nominal-table-wrap">
+      <table class="nominal-roll-table">
+        <thead>
+          <tr>
+            <th class="sn">S.No</th>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Duty</th>
+            <th>Phone No.</th>
+            <th class="nominal-actions-col">Action</th>
+          </tr>
+        </thead>
+        <tbody id="nominalRollTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
