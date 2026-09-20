@@ -722,6 +722,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     isValid = false;
                 }
 
+                if (!isValid) {
+                    const invalidFields = Array.from(document.querySelectorAll('[aria-invalid="true"]'))
+                        .filter(field => field.offsetParent !== null);
+                    const count = invalidFields.length;
+                    if (count) {
+                        showNotification(`${count} field${count === 1 ? '' : 's'} need attention. Please complete the highlighted field${count === 1 ? '' : 's'}.`, 'error');
+                        const firstInvalid = invalidFields[0];
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        window.setTimeout(() => firstInvalid.focus({ preventScroll: true }), 350);
+                    }
+                }
+
                 return isValid;
             }
             
