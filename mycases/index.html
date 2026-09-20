@@ -382,6 +382,19 @@
     });
   }
 
+  function openCaseById(id){
+    const key=String(id||'');
+    const c=cases.find(x=>String(x.id||'')===key);
+    if(!c){showToast('Case could not be opened. Sync and try again.');return;}
+    showDetail(c);
+    const panel=$('editorPanel');if(panel)setTimeout(()=>window.scrollTo({top:Math.max(0,panel.offsetTop-110),behavior:'smooth'}),30);
+  }
+  function openCaseDocsById(id){
+    const key=String(id||'');
+    const c=cases.find(x=>String(x.id||'')===key);
+    if(c)openInDocuments(c);
+  }
+
   function renderList(){
     const list=$('caseList'),data=filteredCases();
     if(!data.length){list.innerHTML='<div class="empty">No matching cases. Tap <strong>New Case</strong> to add one.</div>';updateStats();return}
@@ -394,7 +407,7 @@
         '<div><div class="case-title"><span>'+esc(title)+'</span><span class="chip '+esc((c.priority||'medium').toLowerCase())+'">'+esc(c.priority||'Medium')+'</span><span class="chip">'+esc(c.stage||'Investigation')+'</span></div>'+
         '<div class="case-meta"><span>🏢 '+esc(c.policeStation||'Police Station not set')+'</span><span>⚖️ '+esc(c.court||'Court not set')+'</span><span>📅 '+esc(dateText)+'</span></div>'+
         '<div class="case-meta"><span>Sections: '+esc(c.sections||'—')+'</span><span>Accused: '+esc(c.accused||'—')+'</span></div></div>'+
-        '<div class="row-actions"><button class="mini" data-action="view" data-id="'+esc(c.id)+'">View</button><button class="mini" data-action="docs" data-id="'+esc(c.id)+'">Documents</button></div></article>'
+        '<div class="row-actions"><button class="mini" type="button" data-action="view" data-id="'+esc(c.id)+'" onclick="openCaseById(this.dataset.id)">View</button><button class="mini" type="button" data-action="docs" data-id="'+esc(c.id)+'" onclick="openCaseDocsById(this.dataset.id)">Documents</button></div></article>'
     }).join('');
     updateStats();
   }
@@ -625,7 +638,9 @@
   $('clearFormBtn').addEventListener('click',clearForm);
   $('searchInput').addEventListener('input',renderList);$('stageFilter').addEventListener('change',renderList);$('priorityFilter').addEventListener('change',renderList);
   $('caseList').addEventListener('click',e=>{
-    const btn=e.target.closest('[data-action]');if(!btn)return;const c=cases.find(x=>x.id===btn.dataset.id);if(!c)return;
+    const btn=e.target.closest('[data-action]');if(!btn)return;
+    if(btn.onclick)return;
+    const c=cases.find(x=>String(x.id||'')===String(btn.dataset.id||''));if(!c)return;
     btn.dataset.action==='docs'?openInDocuments(c):showDetail(c);
   });
   // Edit uses direct mobile-safe editSelectedCase() handler.
