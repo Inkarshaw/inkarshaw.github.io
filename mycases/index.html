@@ -383,6 +383,19 @@
     setCaseTab('case');pendingAccusedPhoto=c.accusedPhoto||'';accusedPersons=Array.isArray(c.accusedPersons)?JSON.parse(JSON.stringify(c.accusedPersons)):[];timelineEntries=Array.isArray(c.timeline)?JSON.parse(JSON.stringify(c.timeline)):[];renderTimeline();if(!accusedPersons.length&&c.accused)accusedPersons=[{id:uid(),name:c.accused,status:'Accused',photo:c.accusedPhoto||'',age:'',phone:'',address:'',idProof:'',arrestDate:'',hsCategory:'',remarks:''}];renderAccusedEditor();$('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('quickCaseForm').classList.add('hidden');$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
   }
 
+  function addAutoTimeline(type,text,date){
+    if(!text)return;
+    timelineEntries.push({id:uid(),date:date||new Date().toISOString().slice(0,10),type,text,createdAt:new Date().toISOString(),auto:true});
+  }
+  function addChangeTimeline(previous,next){
+    if(!previous)return;
+    if((previous.stage||'')!==(next.stage||'')) addAutoTimeline('Status Change','Stage changed from '+(previous.stage||'Not set')+' to '+(next.stage||'Not set'));
+    if((previous.nextHearing||'')!==(next.nextHearing||'') && next.nextHearing) addAutoTimeline('Court Hearing','Next hearing fixed for '+fmtDate(next.nextHearing),next.nextHearing);
+    if((previous.court||'')!==(next.court||'') && next.court) addAutoTimeline('Court Hearing','Court updated to '+next.court);
+    const prevAcc=Array.isArray(previous.accusedPersons)?previous.accusedPersons:[];
+    const nextAcc=Array.isArray(next.accusedPersons)?next.accusedPersons:[];
+    nextAcc.forEach(a=>{const old=prevAcc.find(x=>x.id===a.id);if(old&&(old.status||'')!==(a.status||''))addAutoTimeline(a.status==='Arrested'?'Arrest':(a.status==='Bail'?'Bail':(a.status==='Remand'?'Remand':'Investigation')),(a.name||'Accused')+' status changed from '+(old.status||'Not set')+' to '+(a.status||'Not set'),a.arrestDate||'');});
+  }
   function saveCurrent(openDocs=false){
     const c=formData();
     if(!c.crimeNo){showToast('Enter the Crime / CSR / UDR number to create the case.');$('crimeNo').focus();return false}
@@ -430,6 +443,14 @@
   }
 
   function openDocumentShortcut(c,query){
+    if(c&&c.id){
+      const idx=cases.findIndex(x=>x.id===c.id);
+      if(idx>=0){
+        const tl=Array.isArray(cases[idx].timeline)?cases[idx].timeline:[];
+        tl.push({id:uid(),date:new Date().toISOString().slice(0,10),type:'Document',text:(query||'Police document')+' opened from My Cases',createdAt:new Date().toISOString(),auto:true});
+        cases[idx].timeline=tl;saveCases();c=cases[idx];pushCaseToCloud(c,false);
+      }
+    }
     try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c))}catch(e){}
     const id=encodeURIComponent(c.id||'');
     location.href='/policedocuments/?case='+id+'&q='+encodeURIComponent(query||'');
