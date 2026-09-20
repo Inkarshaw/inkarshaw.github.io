@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: clearexams-website-queue
@@ -18,6 +20,9 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout main
         uses: actions/checkout@v5
@@ -29,7 +34,53 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Process due Website Queue jobs
+      - name: Prepare due Website Queue jobs
+        id: queue
         env:
           WEBSITE_BRIDGE_URL: "https://website-automation-production-cd3b.up.railway.app"
-        run: python3 scripts/website_queue_runner.py
+        run: |
+          python3 scripts/website_queue_runner.py prepare \
+            --manifest "$RUNNER_TEMP/website-jobs.json"
+
+      - name: Validate site metadata
+        if: steps.queue.outputs.has_jobs == 'true'
+        run: |
+          python3 -m json.tool current-affairs/pdfs.json >/dev/null
+          test "$(tr -d '\r\n' < CNAME)" = "clearexams.ink"
+
+      - name: Setup Pages
+        if: steps.queue.outputs.has_jobs == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Build with Jekyll
+        if: steps.queue.outputs.has_jobs == 'true'
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+      - name: Upload Pages artifact
+        if: steps.queue.outputs.has_jobs == 'true'
+        uses: actions/upload-pages-artifact@v3
+
+      - name: Deploy Pages
+        if: steps.queue.outputs.has_jobs == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Mark Website Queue jobs published
+        if: steps.queue.outputs.has_jobs == 'true' && success()
+        env:
+          WEBSITE_BRIDGE_URL: "https://website-automation-production-cd3b.up.railway.app"
+        run: |
+          python3 scripts/website_queue_runner.py finalize \
+            --manifest "$RUNNER_TEMP/website-jobs.json"
+
+      - name: Return failed deployment to retry queue
+        if: steps.queue.outputs.has_jobs == 'true' && failure()
+        env:
+          WEBSITE_BRIDGE_URL: "https://website-automation-production-cd3b.up.railway.app"
+        run: |
+          python3 scripts/website_queue_runner.py fail-pending \
+            --manifest "$RUNNER_TEMP/website-jobs.json" \
+            --message "GitHub Pages deployment failed in $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
