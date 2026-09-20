@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let currentLanguage = 'tamil';
             let autoSaveTimeout;
             let previewRefreshTimeout;
+            let applyingCourtPreset = false;
+            let courtPresetManuallyOverridden = false;
             
             const passportConfig = {
                 'Lab Report': {
@@ -354,6 +356,57 @@ document.addEventListener('DOMContentLoaded', function() {
                     : null;
             }
 
+            const secondMmStationCodes = new Set(['G1', 'G2', 'G3', 'G5', 'G7']);
+
+            function getPoliceStationCode(stationValue) {
+                const match = String(stationValue || '')
+                    .trim()
+                    .toUpperCase()
+                    .match(/^(G\d{1,2})\b/);
+                return match ? match[1] : '';
+            }
+
+            function applyCourtPresetForStation(stationValue, { notify = true, force = false } = {}) {
+                const config = getSelectedPassportConfig();
+                if (!config?.requiresCourt) return false;
+
+                const stationCode = getPoliceStationCode(stationValue);
+                if (!secondMmStationCodes.has(stationCode)) return false;
+
+                if (courtPresetManuallyOverridden && !force) {
+                    return false;
+                }
+
+                const courtIsBlank = !courtSelect.value;
+                const courtNumberIsBlank = !String(courtNumberInput.value || '').trim();
+                const isExistingAutoPreset =
+                    courtSelect.dataset.autoCourtPreset === 'true' &&
+                    courtNumberInput.dataset.autoCourtPreset === 'true';
+
+                if (!force && !(courtIsBlank && courtNumberIsBlank) && !isExistingAutoPreset) {
+                    return false;
+                }
+
+                applyingCourtPreset = true;
+                try {
+                    courtSelect.value = 'MM';
+                    courtNumberInput.value = '2';
+                    courtSelect.dataset.autoCourtPreset = 'true';
+                    courtNumberInput.dataset.autoCourtPreset = 'true';
+                    hideError('court');
+                    hideError('courtNumber');
+                    dispatchFieldUpdate(courtSelect);
+                    dispatchFieldUpdate(courtNumberInput);
+                } finally {
+                    applyingCourtPreset = false;
+                }
+
+                if (notify) {
+                    showNotification(stationCode + ' court preset applied: 2nd MM', 'success');
+                }
+
+                return true;
+            }
             function updateContentVisibility() {
                 const config = getSelectedPassportConfig();
 
@@ -1711,6 +1764,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     input.setAttribute('spellcheck', 'false');
                 });
 
+                root.querySelectorAll('input[id$="PoliceStation"]').forEach(input => {
+                    if (input.dataset.courtPresetBound === 'true') return;
+                    input.addEventListener('change', function() {
+                        applyCourtPresetForStation(this.value, { notify: true });
+                    });
+                    input.dataset.courtPresetBound = 'true';
+                });
+
                 root.querySelectorAll('#centralPrison, #arrestPrison').forEach(input => {
                     input.setAttribute('list', 'prison-suggestions');
                     input.setAttribute('autocomplete', 'off');
@@ -1832,6 +1893,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Only blank fields are populated, so case-specific values already
                     // entered by the user are never overwritten.
                     applyCommonDefaults({ notify: false, onlyIfBlank: true });
+                    applyCourtPresetForStation(getCurrentStationValue(), { notify: false });
 
                     // Make a newly selected passport immediately ready for routine use.
                     // Date/time values are filled only when the selected type displays
@@ -1886,6 +1948,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         });
 
+                        courtPresetManuallyOverridden = false;
+                        delete courtSelect.dataset.autoCourtPreset;
+                        delete courtNumberInput.dataset.autoCourtPreset;
+
                         currentLanguage = 'tamil';
                         languageSelect.value = currentLanguage;
                         officerCountInput.value = 1;
@@ -1896,6 +1962,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateLanguageContent();
 
                         const defaultsApplied = applyCommonDefaults({ notify: false, onlyIfBlank: false });
+                        applyCourtPresetForStation(getCurrentStationValue(), { notify: false, force: true });
                         updateContentVisibility();
                         updateLanguageContent();
                         scheduleLivePreview();
@@ -1979,6 +2046,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Add event listener for court number validation when court is selected
                 courtSelect.addEventListener('change', function() {
+                    if (!applyingCourtPreset) {
+                        courtPresetManuallyOverridden = true;
+                        delete courtSelect.dataset.autoCourtPreset;
+                        delete courtNumberInput.dataset.autoCourtPreset;
+                    }
+
                     if (this.value) {
                         document.getElementById('courtNumber').setAttribute('required', 'required');
                     } else {
@@ -1988,6 +2061,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 courtNumberInput.addEventListener('input', function() {
+                    if (!applyingCourtPreset) {
+                        courtPresetManuallyOverridden = true;
+                        delete courtSelect.dataset.autoCourtPreset;
+                        delete courtNumberInput.dataset.autoCourtPreset;
+                    }
+
                     if (courtSelect.value) {
                         this.setAttribute('required', 'required');
                     } else {
@@ -2009,6 +2088,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 passportTypeSelect.value = requestedType;
                 updateContentVisibility();
                 updateLanguageContent();
+                applyCourtPresetForStation(getCurrentStationValue(), {
+                    notify: false,
+                    force: !localStorage.getItem('policePassportFormData')
+                });
                 scheduleLivePreview();
                 autoSave();
 
@@ -2046,6 +2129,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     loadSavedData();
                 } else {
                     applyCommonDefaults({ notify: false, onlyIfBlank: false });
+                    applyCourtPresetForStation(getCurrentStationValue(), { notify: false, force: true });
                 }
 
                 const selectedFromUrl = applyPassportTypeFromUrl();
