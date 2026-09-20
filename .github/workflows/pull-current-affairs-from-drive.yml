@@ -7,11 +7,10 @@ on:
         description: "Date in YYYY-MM-DD (defaults to current IST date)"
         required: false
         type: string
-  push:
-    paths:
-      - ".github/current-affairs-publish-trigger"
-  schedule:
-    - cron: "15 16 * * *"  # 21:45 IST; runs after the 21:30 Drive PDF update
+      file_id:
+        description: "Public Google Drive file ID for the PDF"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -47,8 +46,9 @@ jobs:
       - name: Download public PDF from Google Drive
         shell: bash
         run: |
+          set -euo pipefail
           DATE="${{ steps.d.outputs.date }}"
-          FILE_ID="1BVklPd77i1fb_dIQUjKe7N6QE2jYUIcd"
+          FILE_ID="${{ inputs.file_id }}"
           OUT="current-affairs/$DATE.pdf"
           mkdir -p current-affairs
           curl --fail --location --retry 3 \
