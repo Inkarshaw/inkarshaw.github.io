@@ -1753,6 +1753,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     localStorage.removeItem('policePassportFormData');
                     showNotification('Saved browser draft cleared. Current form has not been changed.', 'success');
                 });
+                // Protect an in-progress passport from accidental browser/tab navigation.
+                window.addEventListener('beforeunload', function(event) {
+                    const savedDraft = localStorage.getItem('policePassportFormData');
+                    if (!savedDraft) return;
+
+                    try {
+                        const draft = JSON.parse(savedDraft);
+                        const hasCaseData = Boolean(
+                            draft.passportType ||
+                            draft.date ||
+                            draft.time ||
+                            draft.escortCrimeNumber ||
+                            (draft.fields && Object.values(draft.fields).some(value =>
+                                String(value ?? '').trim() !== ''
+                            ))
+                        );
+                        if (!hasCaseData) return;
+                    } catch (error) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.returnValue = '';
+                });
+
                 printBtn.addEventListener('click', printDocument);
                 generateBtn.addEventListener('click', generatePDF);
 
