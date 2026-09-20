@@ -1534,6 +1534,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     'HC',
                     'PC'
                 ]);
+                ensureDatalist('section-suggestions', [
+                    'BNS',
+                    'BNSS',
+                    'NDPS Act',
+                    'POCSO Act',
+                    'Arms Act',
+                    'Information Technology Act',
+                    'Tamil Nadu Prohibition Act'
+                ]);
 
                 root.querySelectorAll('input[id$="PoliceStation"], #fromStation, #toStation').forEach(input => {
                     input.setAttribute('list', 'police-station-suggestions');
@@ -1545,6 +1554,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 root.querySelectorAll('#centralPrison, #arrestPrison').forEach(input => {
                     input.setAttribute('list', 'prison-suggestions');
                     input.setAttribute('autocomplete', 'off');
+                });
+
+                root.querySelectorAll('input[id$="Section"]').forEach(input => {
+                    input.setAttribute('list', 'section-suggestions');
+                    input.setAttribute('autocomplete', 'off');
+                    input.setAttribute('autocapitalize', 'words');
+                    input.setAttribute('spellcheck', 'false');
                 });
 
                 root.querySelectorAll('input[id^="designation"]').forEach(input => {
