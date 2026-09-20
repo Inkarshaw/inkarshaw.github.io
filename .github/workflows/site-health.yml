@@ -19,12 +19,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Validate current-affairs data
+      - name: Validate repository health
         shell: bash
         run: |
           set -euo pipefail
+          test "$(tr -d '\r\n' < CNAME)" = "clearexams.ink"
           python3 -m json.tool current-affairs/pdfs.json >/dev/null
-          echo "current-affairs/pdfs.json is valid JSON" >> "$GITHUB_STEP_SUMMARY"
+          python3 - <<'PY'
+          import csv, pathlib, xml.etree.ElementTree as ET
+          tree = ET.parse("sitemap.xml")
+          root = tree.getroot()
+          if len(root) < 5:
+              raise SystemExit("sitemap.xml contains too few URLs")
+
+          p = pathlib.Path("data/quizzes/daily-quiz.csv")
+          with p.open(encoding="utf-8", newline="") as f:
+              rows = list(csv.DictReader(f))
+          if len(rows) < 10:
+              raise SystemExit("daily-quiz.csv has fewer than 10 question rows")
+          required = {"ID","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer"}
+          if not rows or not required.issubset(rows[0].keys()):
+              raise SystemExit("daily-quiz.csv is missing required columns")
+          PY
+          echo "Repository metadata checks passed." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Check production pages
         shell: bash
@@ -33,30 +50,43 @@ jobs:
           urls=(
             "https://clearexams.ink/"
             "https://clearexams.ink/current-affairs/"
-            "https://clearexams.ink/policedocuments/"
             "https://clearexams.ink/daily-quiz.html"
+            "https://clearexams.ink/exam-notifications.html"
+            "https://clearexams.ink/exam-preparation.html"
+            "https://clearexams.ink/syllabus.html"
+            "https://clearexams.ink/tnpsc.html"
+            "https://clearexams.ink/tnusrb.html"
+            "https://clearexams.ink/upsc.html"
+            "https://clearexams.ink/policedocuments/"
+            "https://clearexams.ink/sitemap.xml"
+            "https://clearexams.ink/robots.txt"
           )
 
           echo "## ClearExams production checks" >> "$GITHUB_STEP_SUMMARY"
+          failed=0
           for url in "${urls[@]}"; do
             code=$(curl --location --silent --show-error --retry 3 \
               --connect-timeout 15 --max-time 45 \
-              --output /dev/null --write-out "%{http_code}" "$url")
-            if [[ "$code" =~ ^2|3 ]]; then
+              --output /dev/null --write-out "%{http_code}" "$url" || true)
+            if [[ "$code" =~ ^[23] ]]; then
               echo "- ✅ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"
             else
               echo "- ❌ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"
-              exit 1
+              failed=1
             fi
           done
+          exit "$failed"
 
-      - name: Report old domain references
+      - name: Enforce current domain
         shell: bash
         run: |
           set -euo pipefail
           echo "## Legacy-domain scan" >> "$GITHUB_STEP_SUMMARY"
           matches=$(grep -RIl \
             --exclude-dir=.git \
+            --exclude-dir=.github \
+            --exclude-dir=website-automation \
+            --exclude-dir=instagram-publisher \
             --exclude='*.pdf' \
             --exclude='*.png' \
             --exclude='*.jpg' \
@@ -67,8 +97,9 @@ jobs:
           if [ -z "$matches" ]; then
             echo "- ✅ No clearexams.online references found." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- ⚠️ Old-domain references remain in:" >> "$GITHUB_STEP_SUMMARY"
+            echo "- ❌ Old-domain references remain in:" >> "$GITHUB_STEP_SUMMARY"
             while IFS= read -r file; do
               echo "  - ${file#./}" >> "$GITHUB_STEP_SUMMARY"
             done <<< "$matches"
+            exit 1
           fi
