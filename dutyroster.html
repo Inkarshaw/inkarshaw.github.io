@@ -3627,6 +3627,7 @@ function openDutySIPicker(){
   if(!modal) return;
 
   if(search) search.value="";
+  renderPersonPickerCurrent();
   renderPersonPickerResults();
   modal.classList.add("show");
   document.body.style.overflow="hidden";
@@ -3641,6 +3642,7 @@ function openPersonPicker(sectionKey,rowIndex){
   const search=document.getElementById("personPickerSearch");
   if(!modal) return;
   if(search) search.value="";
+  renderPersonPickerCurrent();
   renderPersonPickerResults();
   modal.classList.add("show");
   document.body.style.overflow="hidden";
@@ -3659,6 +3661,7 @@ function openFieldPersonPicker(fieldKey){
   if(!modal) return;
 
   if(search) search.value="";
+  renderPersonPickerCurrent();
   renderPersonPickerResults();
   modal.classList.add("show");
   document.body.style.overflow="hidden";
@@ -3682,6 +3685,167 @@ function closePersonPicker(){
 
 function closePersonPickerOnBackdrop(e){
   if(e.target && e.target.id==="personPicker") closePersonPicker();
+}
+
+
+function personPickerCurrentEntries(){
+  const target=PERSON_PICKER_TARGET;
+  if(!target) return [];
+
+  if(target.type==="dutySI"){
+    const cell=document.getElementById("dutySICell");
+    const staff=findStaffInCell(cell ? cell.value : "")[0];
+    return staff ? [{staffId:staff.id,label:(staff.rank+" "+staff.name).trim()}] : [];
+  }
+
+  if(target.type==="field"){
+    const el=document.querySelector('[data-field="'+target.fieldKey+'"]');
+    if(!el) return [];
+    return findStaffInCell(el.value || "").map(function(s){
+      return {staffId:s.id,label:(s.rank+" "+s.name).replace(/\s+/g," ").trim()};
+    });
+  }
+
+  if(target.type==="serial"){
+    return parseSerialStore(target.sectionKey).map(function(r,index){
+      const combined=((r.rank || "")+" "+(r.name || "")).trim();
+      const staff=NOMINAL_STAFF.find(function(s){ return entryMatchesStaff(s,combined); });
+      return {index:index,staffId:staff ? staff.id : "",label:combined || ("Row "+(index+1))};
+    });
+  }
+
+  return [];
+}
+
+function renderPersonPickerCurrent(){
+  const box=document.getElementById("personPickerCurrentList");
+  if(!box) return;
+
+  const target=PERSON_PICKER_TARGET;
+  const entries=personPickerCurrentEntries();
+  box.innerHTML="";
+
+  if(!entries.length){
+    box.innerHTML='<span style="font-size:11px;color:#64748b">No person allotted.</span>';
+  }else{
+    entries.forEach(function(entry){
+      const chip=document.createElement("div");
+      chip.className="person-picker-current-chip";
+
+      const label=document.createElement("span");
+      label.innerHTML="<b>"+escapeHtml(entry.label)+"</b>";
+
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.textContent="Remove";
+      btn.onclick=function(){ removePersonPickerAssignment(entry); };
+
+      chip.append(label,btn);
+      box.appendChild(chip);
+    });
+  }
+
+  if(target && target.type==="field"){
+    const el=document.querySelector('[data-field="'+target.fieldKey+'"]');
+    if(el && String(el.value || "").trim()){
+      const clear=document.createElement("button");
+      clear.type="button";
+      clear.className="person-picker-clear-btn";
+      clear.textContent="Clear field";
+      clear.onclick=clearPersonPickerField;
+      box.appendChild(clear);
+    }
+  }
+}
+
+function clearPersonPickerField(){
+  const target=PERSON_PICKER_TARGET;
+  if(!target || target.type!=="field") return;
+
+  const el=document.querySelector('[data-field="'+target.fieldKey+'"]');
+  if(!el) return;
+
+  el.value="";
+  el.dispatchEvent(new Event("input",{bubbles:true}));
+  saveRoster(false);
+  runConflictChecks();
+  renderPersonPickerCurrent();
+  renderPersonPickerResults();
+  setStatus("Field cleared");
+}
+
+function removeSerialAssignment(sectionKey,index){
+  const rows=parseSerialStore(sectionKey);
+  const row=rows[index];
+  if(!row) return;
+
+  const combined=((row.rank || "")+" "+(row.name || "")).trim();
+  const staff=NOMINAL_STAFF.find(function(s){ return entryMatchesStaff(s,combined); });
+
+  if(sectionKey==="casualties" && staff && ["si","wsi"].includes(rankCode(staff.rank))){
+    const otherCell=document.getElementById("otherSICell");
+    if(otherCell){
+      const current=findStaffInCell(otherCell.value || "");
+      if(!current.some(function(s){ return s.id===staff.id; })){
+        current.push(staff);
+        otherCell.value=current.map(formatHeaderSI).join(", ");
+        const hiddenOther=document.getElementById("otherSI");
+        if(hiddenOther) hiddenOther.value=otherCell.value;
+        otherCell.dispatchEvent(new Event("input",{bubbles:true}));
+      }
+    }
+  }
+
+  rows.splice(index,1);
+  writeSerialStore(sectionKey,rows,false);
+  renderSerialRosterBody();
+  runConflictChecks();
+  saveRoster(false);
+}
+
+function removePersonPickerAssignment(entry){
+  const target=PERSON_PICKER_TARGET;
+  if(!target) return;
+
+  if(target.type==="dutySI"){
+    const cell=document.getElementById("dutySICell");
+    if(cell) cell.value="";
+    const sel=document.getElementById("dutySI");
+    if(sel) sel.value="";
+    saveRoster(false);
+    runConflictChecks();
+    renderPersonPickerCurrent();
+    renderPersonPickerResults();
+    setStatus("Duty SI removed");
+    return;
+  }
+
+  if(target.type==="field"){
+    const el=document.querySelector('[data-field="'+target.fieldKey+'"]');
+    const staff=NOMINAL_STAFF.find(function(s){ return s.id===entry.staffId; });
+    if(!el || !staff) return;
+
+    const parts=String(el.value || "").split(/\s*(?:\n|,)\s*/).filter(Boolean);
+    const kept=parts.filter(function(part){ return !entryMatchesStaff(staff,part); });
+    el.value=kept.join(", ");
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+
+    saveRoster(false);
+    runConflictChecks();
+    renderPersonPickerCurrent();
+    renderPersonPickerResults();
+    setStatus("Person removed");
+    return;
+  }
+
+  if(target.type==="serial"){
+    const removedIndex=Number(entry.index);
+    removeSerialAssignment(target.sectionKey,removedIndex);
+    if(Number(target.rowIndex)>removedIndex) target.rowIndex=Number(target.rowIndex)-1;
+    renderPersonPickerCurrent();
+    renderPersonPickerResults();
+    setStatus("Person removed");
+  }
 }
 
 function renderPersonPickerResults(){
@@ -3766,21 +3930,30 @@ function selectPersonFromPicker(staffId){
   }
 
   if(target.type==="field"){
-    const el=document.querySelector(`[data-field="${target.fieldKey}"]`);
+    const el=document.querySelector('[data-field="'+target.fieldKey+'"]');
     if(!el) return;
 
-    // Normal Court/Driver person fields show Rank/No. + Name.
-    el.value=`${staff.rank} ${staff.name}`.trim();
-    el.dispatchEvent(new Event("input",{bubbles:true}));
+    const current=findStaffInCell(el.value || "");
+    if(current.some(function(s){ return s.id===staff.id; })){
+      setStatus(staff.name+" is already added");
+      return;
+    }
 
+    const selectedText=(staff.rank+" "+staff.name).replace(/\s+/g," ").trim();
+    const raw=String(el.value || "").trim();
+
+    if(!raw || /^VACANT$/i.test(raw)){
+      el.value=selectedText;
+    }else{
+      el.value=raw.replace(/\s+$/,"")+", "+selectedText;
+    }
+
+    el.dispatchEvent(new Event("input",{bubbles:true}));
     saveRoster(false);
     runConflictChecks();
-
-    PERSON_PICKER_TARGET=null;
-    const modal=document.getElementById("personPicker");
-    if(modal) modal.classList.remove("show");
-    document.body.style.overflow="";
-    setStatus(`Selected ${staff.name}`);
+    renderPersonPickerCurrent();
+    renderPersonPickerResults();
+    setStatus("Added "+staff.name);
     return;
   }
 
@@ -3998,6 +4171,7 @@ function refreshNominalDependentUI(redrawNominal=true){
   }
 
   if(document.getElementById("personPicker")?.classList.contains("show")){
+    renderPersonPickerCurrent();
     renderPersonPickerResults();
   }
 
