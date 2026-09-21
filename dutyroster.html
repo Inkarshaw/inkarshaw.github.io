@@ -2085,7 +2085,6 @@
       <button class="primary" onclick="assignSelectedStaff('append')">Add</button>
       <button onclick="assignSelectedStaff('replace')">Replace</button>
     </div>
-    <div class="staff-preview" id="staffPreview">Select a person from the nominal roll.</div>
   </div>
 
   <div class="edit-grid" style="display:none !important" aria-hidden="true">
@@ -2989,10 +2988,8 @@ function getSelectedStaff(){
   return NOMINAL_STAFF.find(s=>s.id===id);
 }
 function showStaffPreview(){
-  const s=getSelectedStaff();
-  const p=document.getElementById("staffPreview");
-  if(!s){ p.textContent="No matching personnel."; return; }
-  p.innerHTML=`<b>${escapeHtml(s.rank)} ${escapeHtml(s.name)}</b> &nbsp; • &nbsp; Nominal duty: ${escapeHtml(s.duty||"-")} &nbsp; • &nbsp; Phone: ${escapeHtml(s.phone||"-")} &nbsp; • &nbsp; ${escapeHtml(s.group)}`;
+  // Staff preview line removed from the allotment panel.
+  return;
 }
 function escapeHtml(v){
   return String(v??"").replace(/[&<>"']/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
