@@ -4295,7 +4295,15 @@ function buildDutyRosterPrintDocument(){
   const value=id=>document.getElementById(id)?.value || "";
   const text=id=>document.getElementById(id)?.textContent || "";
   const cell=(content,span=1,cls="")=>`<td colspan="${span}" class="${cls}">${content}</td>`;
-  const plain=(v,span=1,cls="")=>cell(esc(v),span,cls);
+  // Keep VACANT visible in the editor, but omit it from printed/PDF output.
+  const printable=v=>String(v ?? "")
+    .replace(/\\bVACANT\\b/gi,"")
+    .replace(/[ \\t]+([,;])/g,"$1")
+    .replace(/(^|\\n)\\s*[,;]\\s*/g,"$1")
+    .replace(/[,;]\\s*(?=\\n|$)/g,"")
+    .replace(/\\n\\s*\\n+/g,"\\n")
+    .trim();
+  const plain=(v,span=1,cls="")=>cell(esc(printable(v)),span,cls);
   const row=(cells,cls="",height="")=>`<tr class="${cls}"${height ? ` style="height:${height}mm"` : ""}>${cells}</tr>`;
   const cols=widths=>`<colgroup>${widths.map(w=>`<col style="width:${w/11335*100}%">`).join("")}</colgroup>`;
   const table=(widths,rows,cls="")=>`<table class="${cls}">${cols(widths)}<tbody>${rows}</tbody></table>`;
