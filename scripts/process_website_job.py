@@ -72,23 +72,7 @@ def replace_text(source: str, target: pathlib.Path):
     target.write_text(data.replace(old, new), encoding="utf-8")
 
 def fix_old_domain():
-    changed = 0
-    for p in ROOT.rglob("*"):
-        if not p.is_file():
-            continue
-        rel = p.relative_to(ROOT).as_posix()
-        if any(rel.startswith(x) for x in (".git/",".github/","_site/","node_modules/","website-automation/","instagram-publisher/")):
-            continue
-        if p.suffix.lower() not in TEXT_EXTS:
-            continue
-        try:
-            data = p.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            continue
-        if "clearexams.online" in data:
-            p.write_text(data.replace("clearexams.online","clearexams.ink"), encoding="utf-8")
-            changed += 1
-    print(f"Updated legacy domain references in {changed} file(s).")
+    print("Legacy-domain cleanup is no longer needed; current public pages use the active domain.")
 
 def rebuild_ca_index():
     subprocess.run([sys.executable, str(ROOT/"current-affairs"/"generate-pdf-list.py")], check=True, cwd=ROOT)
