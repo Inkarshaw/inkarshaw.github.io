@@ -4601,7 +4601,119 @@ function buildDutyRosterPrintDocument(){
   </style></head><body><main class="print-sheet">${table(headWidths,top)}${table([421,1133,1985,1418,708,1418,2410,1842],lower,"lower")}${table([421,2976,1560,427,4109,1842],casual,"casualties")}</main></body></html>`;
 }
 
+async function printDutyRosterMobile(){
+  // Android/mobile browsers can size hidden iframes against the phone viewport.
+  // Use a real top-level preview and measure CSS millimetres inside that document.
+  const preview=window.open("", "_blank");
+  if(!preview){
+    alert("Allow pop-ups for this page, then tap Print / PDF again.");
+    return;
+  }
+
+  try{
+    saveRoster(false);
+    syncHeader();
+
+    const d=preview.document;
+    d.open();
+    d.write(buildDutyRosterPrintDocument());
+    d.close();
+
+    const meta=d.createElement("meta");
+    meta.name="viewport";
+    meta.content="width=device-width, initial-scale=1";
+    d.head.prepend(meta);
+
+    const controls=d.createElement("div");
+    controls.className="mobile-print-controls";
+
+    const button=d.createElement("button");
+    button.type="button";
+    button.textContent="Preparing A4 PDF…";
+    button.disabled=true;
+
+    const note=d.createElement("div");
+    note.textContent="A4 • Portrait • 100% / Default scale • Headers and footers off";
+
+    controls.append(button,note);
+    d.body.prepend(controls);
+
+    const style=d.createElement("style");
+    style.textContent=`
+      .mobile-print-controls{
+        position:relative;
+        z-index:10;
+        padding:10px 12px;
+        margin:0 0 8px;
+        font:14px/1.35 Arial,sans-serif;
+        background:#eef2ff;
+        border:1px solid #cbd5e1;
+      }
+      .mobile-print-controls button{
+        min-height:44px;
+        padding:10px 16px;
+        font:700 15px Arial,sans-serif;
+      }
+      .mobile-print-controls div{margin-top:6px}
+      @media print{
+        .mobile-print-controls{display:none!important}
+        html,body{width:200mm!important;max-width:none!important}
+        .print-sheet{width:200mm!important;max-width:none!important}
+      }
+    `;
+    d.head.append(style);
+
+    await d.fonts.ready;
+    await new Promise(resolve=>preview.requestAnimationFrame(()=>preview.requestAnimationFrame(resolve)));
+
+    const sheet=d.querySelector(".print-sheet");
+    if(!sheet) throw new Error("Print sheet not found");
+
+    // Measure the actual CSS px/mm ratio used by this mobile browser instead
+    // of assuming the desktop CSS reference of 96 px/in.
+    const probe=d.createElement("div");
+    probe.style.cssText="position:absolute;visibility:hidden;pointer-events:none;width:100mm;height:1mm;left:0;top:0";
+    d.body.appendChild(probe);
+    const pxPerMm=probe.getBoundingClientRect().width/100;
+    probe.remove();
+
+    const usableHeightMm=297-2.24-12.7;
+    const sheetHeightPx=sheet.getBoundingClientRect().height;
+    const usableHeightPx=usableHeightMm*pxPerMm;
+    const scale=Math.min(1,usableHeightPx/sheetHeightPx);
+
+    sheet.style.zoom=String(scale);
+    d.body.dataset.printScale=String(scale);
+    d.body.dataset.pxPerMm=String(pxPerMm);
+
+    button.textContent="Print / Save PDF";
+    button.disabled=false;
+
+    const startPrint=()=>{
+      preview.focus();
+      preview.print();
+    };
+    button.addEventListener("click",startPrint);
+
+    // Try to open the Android print sheet automatically. If the browser blocks
+    // an asynchronous print call, the visible button above remains available.
+    setTimeout(startPrint,80);
+  }catch(err){
+    console.error(err);
+    preview.close();
+    alert("Mobile print preview could not be prepared. Please try Print / PDF again.");
+  }
+}
+
 async function printDutyRoster(){
+  const mobilePrint=
+    window.matchMedia("(max-width: 700px)").matches ||
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+
+  if(mobilePrint){
+    return printDutyRosterMobile();
+  }
+
   let frame;
   try{
     saveRoster(false);
