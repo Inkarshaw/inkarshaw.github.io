@@ -33,17 +33,38 @@ jobs:
             --output "$tmp"
 
           test -s "$tmp"
-          head -n 1 "$tmp" | grep -q "ID"
-          head -n 1 "$tmp" | grep -q "Question"
-          head -n 1 "$tmp" | grep -q "CorrectAnswer"
-          mv "$tmp" data/quizzes/daily-quiz.csv
+          python3 - "$tmp" <<'PY'
+          import csv, sys
+          path = sys.argv[1]
+          with open(path, encoding="utf-8-sig", newline="") as f:
+              reader = csv.DictReader(f)
+              if not reader.fieldnames:
+                  raise SystemExit("Daily Quiz Feed has no header row")
+              normalized = {h.strip(): h for h in reader.fieldnames}
+              required = ["Active","Topic","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer","ExplanationA","ExplanationB","ExplanationC","ExplanationD"]
+              missing = [h for h in required if h not in normalized]
+              if missing:
+                  raise SystemExit("Daily Quiz Feed is missing columns: " + ", ".join(missing))
+              valid = 0
+              for raw in reader:
+                  row = {k.strip(): (v or "").strip() for k, v in raw.items() if k is not None}
+                  if row.get("Active","").lower() == "false":
+                      continue
+                  if not row.get("Question") or not row.get("Topic"):
+                      continue
+                  if row.get("CorrectAnswer","").upper() not in {"A","B","C","D"}:
+                      continue
+                  if not all(row.get("Option"+x) and row.get("Explanation"+x) for x in "ABCD"):
+                      continue
+                  valid += 1
+              if valid < 10:
+                  raise SystemExit(f"Daily Quiz Feed has only {valid} valid active questions; refusing to overwrite the working fallback")
+              print(valid)
+          PY
 
+          mv "$tmp" data/quizzes/daily-quiz.csv
           rows=$(($(wc -l < data/quizzes/daily-quiz.csv)-1))
-          echo "Daily quiz fallback contains $rows question rows." >> "$GITHUB_STEP_SUMMARY"
-          if [ "$rows" -lt 10 ]; then
-            echo "Expected at least 10 question rows." >&2
-            exit 1
-          fi
+          echo "Daily quiz fallback synchronized with $rows source rows after validation." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit fallback when changed
         shell: bash
