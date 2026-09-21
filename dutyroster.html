@@ -4606,7 +4606,7 @@ function renderSectorCurrentList(){
   assigned.forEach(s=>{
     const chip=document.createElement("div");
     chip.className="sector-chip";
-    chip.innerHTML=`<span><b>${escapeHtml(s.rank)} ${escapeHtml(s.name)}</b></span><button type="button">Move</button>`;
+    chip.innerHTML=`<span><b>${escapeHtml(s.rank)} ${escapeHtml(s.name)}</b></span><button type="button">Remove</button>`;
     chip.querySelector("button").onclick=()=>removePersonFromSector(s.id);
     box.appendChild(chip);
   });
@@ -4672,15 +4672,27 @@ function removePersonFromSector(staffId){
   if(!staff || !SECTOR_TEAM_TARGET) return;
 
   const targetSnapshot={...SECTOR_TEAM_TARGET};
-  const sourceValue=targetSnapshot.mode==="otherSI"
-    ? "top|otherSI"
-    : `shift|${targetSnapshot.rowIndex}|${targetSnapshot.shift}`;
 
+  // Shift-duty places may intentionally be left vacant.
+  // Removing a person from Station I/C, Patrol, Gypsy, Sector A/B/C or
+  // Vehicle Check does not require moving that person elsewhere.
+  if(targetSnapshot.mode!=="otherSI"){
+    const remaining=assigned.filter(s=>s.id!==staff.id);
+    rebuildSectorCell(remaining);
+    renderSectorCurrentList();
+    renderSectorPersonResults();
+    runConflictChecks();
+    saveRoster(false);
+    setStatus(`${staff.name} removed; ${targetSnapshot.place || "duty"} may remain vacant`);
+    return;
+  }
+
+  // Preserve the existing reassignment workflow for the Other SIs header.
   openRequiredMoveDialog({
     type:"managed",
     staffId:staff.id,
     managedTarget:targetSnapshot,
-    sourceValue
+    sourceValue:"top|otherSI"
   });
 }
 
