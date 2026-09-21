@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
@@ -29,9 +30,12 @@ def merge(items: list[dict], output: Path, title: str) -> None:
         src = ROOT / item["file"]
         if not src.exists():
             continue
-        reader = PdfReader(str(src))
-        for page in reader.pages:
-            writer.add_page(page)
+        try:
+            reader = PdfReader(str(src))
+            for page in reader.pages:
+                writer.add_page(page)
+        except Exception as exc:
+            print(f"Skipping unreadable PDF {src.name}: {exc}", file=sys.stderr)
     if not writer.pages:
         return
     writer.add_metadata({
