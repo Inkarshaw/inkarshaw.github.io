@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#09233e">
+<meta name="description" content="Search ClearExams study resources, exam pages, current affairs, notifications, syllabus, PYQs and quizzes.">
+<link rel="canonical" href="https://clearexams.ink/search.html"><title>Search ClearExams</title>
+<link rel="stylesheet" href="assets/css/exam-pages.css"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/clearexams-icon.svg" type="image/svg+xml"><script src="assets/js/pwa.js" defer></script>
+<style>
+.searchbar{display:flex;gap:9px;margin:18px 0}.searchbar input{flex:1;min-height:52px;padding:0 15px;border:1px solid #b8c8da;border-radius:12px;background:#fff;font-size:1rem}.searchbar button{min-height:52px;padding:0 20px;border:0;border-radius:12px;background:#1463ff;color:#fff;font-weight:850}.result-list{display:grid;gap:12px}.result{padding:18px;border:1px solid var(--line);border-radius:13px;background:#fff}.result h3{margin:4px 0}.result .type{font-size:.72rem;font-weight:850;color:#174b96;text-transform:uppercase}.result p{margin:5px 0 10px;color:var(--muted);font-size:.9rem}.result a{font-weight:800;text-decoration:none}.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed #c6d4e3;border-radius:12px}@media(max-width:700px){.searchbar{display:grid}.searchbar button{width:100%}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-nav"><a class="brand" href="index.html">ClearExams</a><nav><a href="daily-quiz.html">Daily Quiz</a><a href="current-affairs/">Current Affairs</a><a href="exam-calendar.html">Calendar</a><a href="pyq-hub.html">PYQs</a><a href="dashboard.html">Dashboard</a><a href="index.html">Home</a></nav></div></header>
+<section class="hero"><div class="wrap"><p class="eyebrow">Find it fast</p><h1>Search ClearExams</h1><p>Search exam hubs, syllabus, PYQs, current affairs, notifications, mocks and preparation resources.</p></div></section>
+<main class="wrap"><section class="panel"><div class="searchbar"><input id="q" type="search" placeholder="Try: TNPSC Group IV, Indian Polity, TNUSRB, current affairs…" autocomplete="off"><button id="go" type="button">Search</button></div><p id="count" class="source">Type a topic or exam to search.</p><div id="results" class="result-list" aria-live="polite"></div></section></main>
+<footer class="footer">© 2026 ClearExams.ink · Search study resources</footer>
+<script>
+const base=[
+{title:'Daily Quiz',type:'Practice',url:'daily-quiz.html',desc:'10 daily questions with explanations, streak and retry.',keys:'quiz mcq practice daily questions'},
+{title:'Current Affairs',type:'Current Affairs',url:'current-affairs/',desc:'Daily exam-ready current affairs PDFs and study pages.',keys:'current affairs daily pdf tamil english'},
+{title:'Government Exam Calendar',type:'Calendar',url:'exam-calendar.html',desc:'Application deadlines, notification dates and exam dates.',keys:'exam calendar deadline application date upcoming'},
+{title:'Previous Year Questions',type:'PYQ',url:'pyq-hub.html',desc:'TNUSRB, TNPSC and UPSC previous papers and mocks.',keys:'pyq previous year question paper mock'},
+{title:'Study Dashboard',type:'Progress',url:'dashboard.html',desc:'Streak, 7-day accuracy, recent attempts and wrong-question notebook.',keys:'dashboard progress streak wrong questions accuracy'},
+{title:'Exam Syllabus',type:'Syllabus',url:'syllabus.html',desc:'Stage-wise syllabus with official sources and completion tracking.',keys:'syllabus tnpsc tnusrb upsc ssc rrb banking'},
+{title:'TNPSC',type:'Exam Hub',url:'tnpsc.html',desc:'TNPSC Group exams, syllabus, preparation and practice.',keys:'tnpsc group 1 group 2 group 2a group 4 tamil nadu'},
+{title:'TNPSC Indian Polity',type:'Subject',url:'tnpsc/indian_polity.html',desc:'Indian Polity study and practice for TNPSC.',keys:'polity constitution article indian polity tnpsc'},
+{title:'TNPSC Group IV Mocks',type:'Mock Tests',url:'tnpsc-group4-mocks.html',desc:'Group IV mock tests with feedback.',keys:'tnpsc group iv group 4 mock test'},
+{title:'TNUSRB',type:'Exam Hub',url:'tnusrb.html',desc:'Police recruitment preparation and practice.',keys:'tnusrb police sub inspector si constable pc'},
+{title:'TNUSRB Previous Questions',type:'PYQ',url:'tnusrb/previous_year_questions.html',desc:'Previous-year TNUSRB police recruitment questions.',keys:'tnusrb pyq previous police constable'},
+{title:'UPSC',type:'Exam Hub',url:'upsc.html',desc:'UPSC Civil Services preparation, syllabus and current affairs.',keys:'upsc civil services prelims mains ias ips'},
+{title:'Exam Notifications',type:'Notifications',url:'exam-notifications.html',desc:'Current and upcoming government exam notifications.',keys:'notification recruitment application deadline'},
+{title:'Exam Preparation',type:'Preparation',url:'exam-preparation.html',desc:'Choose an exam and follow focused preparation resources.',keys:'preparation study plan exam'}
+];let items=[...base];
+const q=document.getElementById('q'),box=document.getElementById('results'),count=document.getElementById('count');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(){const term=q.value.trim().toLowerCase(),words=term.split(/\s+/).filter(Boolean);if(!term){count.textContent='Type a topic or exam to search.';box.innerHTML='';return}const scored=items.map(x=>{const hay=(x.title+' '+x.type+' '+x.desc+' '+(x.keys||'')).toLowerCase();return{x,score:words.reduce((n,w)=>n+(hay.includes(w)?1:0),0)}}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.x.title.localeCompare(b.x.title));count.textContent=scored.length+' result'+(scored.length===1?'':'s')+' for “'+term+'”';box.innerHTML=scored.length?scored.slice(0,30).map(({x})=>'<article class="result"><span class="type">'+esc(x.type)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.desc)+'</p><a href="'+esc(x.url)+'">Open resource →</a></article>').join(''):'<div class="empty">No matching resource yet. Try the exam name, subject or a broader keyword.</div>';if(window.gtag)gtag('event','site_search',{search_term:term,result_count:scored.length})}
+document.getElementById('go').onclick=render;q.addEventListener('input',()=>{clearTimeout(window.__st);window.__st=setTimeout(render,180)});q.addEventListener('keydown',e=>{if(e.key==='Enter')render()});
+Promise.allSettled([fetch('current-affairs/pdfs.json',{cache:'no-store'}).then(r=>r.json()),fetch('data/exams/exam-notifications.json',{cache:'no-store'}).then(r=>r.json())]).then(([ca,notices])=>{if(ca.status==='fulfilled'&&Array.isArray(ca.value))items.push(...ca.value.slice(0,25).map(e=>({title:e.title_en,type:'Current Affairs',url:'current-affairs/daily.html?date='+e.date,desc:e.description_en,keys:'current affairs '+e.date})));if(notices.status==='fulfilled')items.push(...(notices.value.entries||[]).map(e=>({title:e.title,type:'Exam Notification',url:'exam-notifications.html',desc:e.note||'',keys:(e.category||'')+' '+(e.exams||[]).join(' ')})));const initial=new URLSearchParams(location.search).get('q');if(initial){q.value=initial;render()}});</script>
+</body></html>
