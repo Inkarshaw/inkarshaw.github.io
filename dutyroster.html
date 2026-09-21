@@ -2098,7 +2098,7 @@
   <button onclick="rotateShifts(-1)">Reverse Rotation</button>
   <button onclick="openNominalRoll()">Nominal Roll</button>
   <button class="green" onclick="saveRoster()">Save</button>
-  <button onclick="printDutyRoster()">Print / PDF</button>
+  <button id="pdfActionButton" onclick="printDutyRoster()">Print / PDF</button>
   <button onclick="downloadBackup()">Backup</button>
   <button onclick="document.getElementById('restoreFile').click()">Restore</button>
   <input id="restoreFile" type="file" accept=".json" style="display:none" onchange="restoreBackup(this.files[0])" />
@@ -4601,6 +4601,145 @@ function buildDutyRosterPrintDocument(){
   </style></head><body><main class="print-sheet">${table(headWidths,top)}${table([421,1133,1985,1418,708,1418,2410,1842],lower,"lower")}${table([421,2976,1560,427,4109,1842],casual,"casualties")}</main></body></html>`;
 }
 
+
+function isMobilePdfMode(){
+  return window.matchMedia("(max-width: 700px)").matches ||
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+}
+
+function loadPdfLibrary(src,test){
+  if(test()) return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const existing=[...document.scripts].find(s=>s.src===src);
+    if(existing){
+      existing.addEventListener("load",()=>test() ? resolve() : reject(new Error("PDF library unavailable")),{once:true});
+      existing.addEventListener("error",()=>reject(new Error("PDF library failed to load")),{once:true});
+      return;
+    }
+    const script=document.createElement("script");
+    script.src=src;
+    script.async=true;
+    script.onload=()=>test() ? resolve() : reject(new Error("PDF library unavailable"));
+    script.onerror=()=>reject(new Error("PDF library failed to load"));
+    document.head.appendChild(script);
+  });
+}
+
+function loadFrameScript(doc,src,test){
+  if(test()) return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const script=doc.createElement("script");
+    script.src=src;
+    script.async=true;
+    script.onload=()=>test() ? resolve() : reject(new Error("PDF renderer unavailable"));
+    script.onerror=()=>reject(new Error("PDF renderer failed to load"));
+    doc.head.appendChild(script);
+  });
+}
+
+async function downloadDutyRosterPdf(){
+  let frame=null;
+  try{
+    saveRoster(false);
+    syncHeader();
+    setStatus("Preparing A4 PDF…");
+
+    await loadPdfLibrary(
+      "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+      ()=>!!(window.jspdf && window.jspdf.jsPDF)
+    );
+
+    frame=document.createElement("iframe");
+    frame.title="Duty roster PDF renderer";
+    frame.setAttribute("aria-hidden","true");
+    frame.style.cssText="position:fixed;left:-12000px;top:0;width:200mm;height:420mm;border:0;pointer-events:none;background:#fff";
+    document.body.appendChild(frame);
+
+    const d=frame.contentDocument;
+    d.open();
+    d.write(buildDutyRosterPrintDocument());
+    d.close();
+
+    await loadFrameScript(
+      d,
+      "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+      ()=>!!frame.contentWindow.html2canvas
+    );
+
+    await d.fonts.ready;
+    await new Promise(resolve=>
+      frame.contentWindow.requestAnimationFrame(()=>
+        frame.contentWindow.requestAnimationFrame(resolve)
+      )
+    );
+
+    const sheet=d.querySelector(".print-sheet");
+    if(!sheet) throw new Error("Duty roster PDF sheet not found");
+
+    // Do not inherit any browser-print scaling. The PDF library receives the
+    // finished roster as one image and places it on a true A4 page in mm.
+    sheet.style.zoom="1";
+    sheet.style.width="200mm";
+    sheet.style.maxWidth="none";
+
+    const canvas=await frame.contentWindow.html2canvas(sheet,{
+      scale:2.5,
+      backgroundColor:"#ffffff",
+      logging:false,
+      useCORS:true,
+      allowTaint:false,
+      scrollX:0,
+      scrollY:0,
+      windowWidth:Math.ceil(sheet.scrollWidth),
+      windowHeight:Math.ceil(sheet.scrollHeight)
+    });
+
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({
+      orientation:"portrait",
+      unit:"mm",
+      format:"a4",
+      compress:true
+    });
+
+    const pageWidth=210;
+    const marginX=5;
+    const marginTop=2.24;
+    const marginBottom=12.7;
+    const maxWidth=pageWidth-(marginX*2);
+    const maxHeight=297-marginTop-marginBottom;
+
+    let drawWidth=maxWidth;
+    let drawHeight=drawWidth*(canvas.height/canvas.width);
+
+    if(drawHeight>maxHeight){
+      const factor=maxHeight/drawHeight;
+      drawHeight=maxHeight;
+      drawWidth*=factor;
+    }
+
+    const x=(pageWidth-drawWidth)/2;
+    const image=canvas.toDataURL("image/jpeg",0.98);
+    pdf.addImage(image,"JPEG",x,marginTop,drawWidth,drawHeight,undefined,"MEDIUM");
+
+    const date=document.getElementById("rosterDate")?.value || new Date().toISOString().slice(0,10);
+    pdf.save("Duty_Roster_"+date+".pdf");
+
+    setStatus("A4 PDF downloaded");
+  }catch(err){
+    console.error(err);
+    setStatus("PDF download failed");
+    alert("PDF could not be generated. Please check the internet connection once and try again.");
+  }finally{
+    frame?.remove();
+  }
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const btn=document.getElementById("pdfActionButton");
+  if(btn && isMobilePdfMode()) btn.textContent="Download PDF";
+});
+
 async function printDutyRosterMobile(){
   // Android/mobile browsers can size hidden iframes against the phone viewport.
   // Use a real top-level preview and measure CSS millimetres inside that document.
@@ -4706,12 +4845,8 @@ async function printDutyRosterMobile(){
 }
 
 async function printDutyRoster(){
-  const mobilePrint=
-    window.matchMedia("(max-width: 700px)").matches ||
-    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
-
-  if(mobilePrint){
-    return printDutyRosterMobile();
+  if(isMobilePdfMode()){
+    return downloadDutyRosterPdf();
   }
 
   let frame;
