@@ -627,6 +627,46 @@
     border-radius:7px;
     font:inherit;
   }
+  .person-picker-current{
+    padding:9px 12px;
+    border-bottom:1px solid #d1d5db;
+    background:#f8fafc;
+  }
+  .person-picker-current-title{
+    font-size:11px;
+    font-weight:900;
+    color:#475569;
+    margin-bottom:6px;
+    text-transform:uppercase;
+  }
+  .person-picker-current-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .person-picker-current-chip{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    padding:6px 7px;
+    background:#fff;
+    font-size:11px;
+  }
+  .person-picker-current-chip button{
+    background:#dc2626;
+    color:#fff;
+    padding:4px 7px;
+    font-size:10px;
+  }
+  .person-picker-clear-btn{
+    background:#64748b !important;
+    color:#fff !important;
+    padding:5px 8px !important;
+    font-size:10px !important;
+  }
+
   .person-picker-results{
     overflow:auto;
     max-height:62vh;
@@ -2254,7 +2294,7 @@ Gr1 43478 Tr.Sirajudeen
 <textarea data-field="gypsyDriverRest" onclick="openFieldPersonPicker('gypsyDriverRest')" readonly="" style="font-weight:800;text-align:center;background:#f8fafc;" title="Click to select personnel from Nominal Roll">VACANT</textarea>
 </td>
 </tr>
-<tr><td class="place" colspan="8">Receptionist</td><td colspan="42"><textarea data-field="receptionist">DEO Tmt.Banumathi (10.00 hrs to 17.00 hrs)</textarea></td></tr>
+<tr><td class="place" colspan="8">Receptionist</td><td colspan="42"><textarea data-field="receptionist" onclick="openFieldPersonPicker('receptionist')" readonly="" title="Click to add or remove personnel">DEO Tmt.Banumathi (10.00 hrs to 17.00 hrs)</textarea></td></tr>
 <tbody id="serialRosterBody"></tbody></table>
   <div id="serialDataStores" class="serial-data-stores" aria-hidden="true">
     <textarea class="section-store" data-field="misc">SSI 18353	Tr.Gnanaprakash	SW
@@ -3210,8 +3250,6 @@ function serialPersonCells(key,row,index){
   return `
     <td colspan="2" class="sn-cell serial-sn-cell">
       <div>${index+1}</div>
-      <button type="button" class="row-remove-btn"
-              data-section="${key}" data-index="${index}" title="Move this person to another duty">×</button>
     </td>
     <td colspan="4" class="serial-rank-cell">
       <input class="person-readonly" data-serial-key="${key}" data-row-index="${index}" data-col="rank"
@@ -3264,8 +3302,6 @@ function casualtyRowCells(row,index){
   return `
     <td colspan="2" class="sn-cell serial-sn-cell">
       <div>${index+1}</div>
-      <button type="button" class="row-remove-btn"
-              data-section="casualties" data-index="${index}" title="Move this person to another duty">×</button>
     </td>
     <td colspan="5" class="serial-rank-cell">
       <input class="person-readonly" data-serial-key="casualties" data-row-index="${index}" data-col="rank"
@@ -5150,6 +5186,10 @@ window.addEventListener("orientationchange",()=>{
       <strong>Select Personnel</strong>
       <div class="spacer"></div>
       <button type="button" onclick="closePersonPicker()">Close</button>
+    </div>
+    <div class="person-picker-current">
+      <div class="person-picker-current-title">Currently allotted</div>
+      <div id="personPickerCurrentList" class="person-picker-current-list"></div>
     </div>
     <div class="person-picker-search">
       <input id="personPickerSearch" type="text"
