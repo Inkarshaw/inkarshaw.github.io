@@ -4300,6 +4300,18 @@ function printDutyRoster(){
 
     const clone=source.cloneNode(true);
 
+    // Printing must always start from the full desktop/A4 sheet.
+    // Mobile view adds inline zoom to .sheet; if copied into the print iframe
+    // it shrinks the PDF and can clip the 3rd shift / NDPS / Gypsy columns.
+    clone.style.zoom="1";
+    clone.style.removeProperty("--mobile-roster-zoom");
+    clone.style.width="100%";
+    clone.style.minWidth="0";
+    clone.style.maxWidth="none";
+    clone.style.transform="none";
+    clone.style.transformOrigin="top left";
+    clone.removeAttribute("data-mobile-zoom");
+
     // Hidden section stores contain the same data used to build the visible
     // MISC / IN-OD / OUT OD / CASUALITIES tables. Remove them first so the
     // raw data is not printed a second time.
@@ -4311,6 +4323,7 @@ function printDutyRoster(){
       div.textContent=el.value || "";
       div.style.whiteSpace="pre-line";
       div.style.minHeight="0";
+      div.style.height="auto";
       div.style.lineHeight="1";
       div.style.wordBreak="normal";
       div.style.overflowWrap="anywhere";
@@ -4366,6 +4379,9 @@ function printDutyRoster(){
   body{font-family:Rockwell, "Rockwell Nova", "Roboto Slab", serif;color:#111}
   .sheet{width:100%;margin:0;padding:0;border:0;box-shadow:none}
   table{width:100%;border-collapse:collapse;table-layout:fixed}
+  .roster-table{width:100%!important;max-width:100%!important;min-width:0!important;table-layout:fixed!important}
+  .roster-table>colgroup>col{width:2%!important}
+  #shift1Head,#shift2Head,#shift3Head{width:auto!important}
   th,td{border:0.55pt solid #222;padding:0.55px 1.15px;vertical-align:top;font-size:7.15pt;line-height:1.00}
   th{background:#fff;text-align:center;font-weight:700}
   .main-title{font-size:9.3pt!important;text-align:center;font-weight:800;padding:1.4px!important;line-height:1!important}
@@ -4442,10 +4458,23 @@ ${clone.outerHTML}
           const printableHeight=(297-8)*pxPerMm; // A4 height minus 4 mm top/bottom margins
           const measuredHeight=printableSheet.getBoundingClientRect().height;
 
+          const targetHeight=printableHeight*0.90;
+          let scale=1;
+
           if(measuredHeight>printableHeight){
-            const scale=Math.max(0.78,Math.min(1,printableHeight/measuredHeight));
-            // Compensate width before zoom so the final printed width still fills A4.
+            // Too tall: reduce just enough to stay on one A4 page.
+            scale=Math.max(0.78,printableHeight/measuredHeight);
+          }else if(measuredHeight<targetHeight){
+            // Too short: enlarge gently so the roster fills the page more like
+            // the Word duty-roster format without becoming oversized.
+            scale=Math.min(1.28,targetHeight/measuredHeight);
+          }
+
+          if(Math.abs(scale-1)>0.01){
+            // Widen the layout box inversely, then zoom, so final visual width
+            // remains within the A4 printable area.
             printableSheet.style.width=(100/scale)+"%";
+            printableSheet.style.maxWidth="none";
             printableSheet.style.zoom=String(scale);
           }
         }
