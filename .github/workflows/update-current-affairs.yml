@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: current-affairs-pdf-list
@@ -47,3 +48,10 @@ jobs:
           git status --short
           git pull --rebase --autostash origin main
           git push
+
+      - name: Trigger Pages deployment and production health check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run jekyll-gh-pages.yml --ref main
+          gh workflow run site-health.yml --ref main
