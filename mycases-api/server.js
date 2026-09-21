@@ -13,6 +13,9 @@ const APP_PASSWORD = process.env.MYCASES_PASSWORD;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const COOKIE_NAME = 'clearexams_mycases_session';
 const SESSION_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_MAX_ATTEMPTS = 10;
+const loginAttempts = new Map();
 
 const ALLOWED_ORIGINS = new Set([
   'https://clearexams.ink',
@@ -34,6 +37,25 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '256kb' }));
 app.use(cookieParser());
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  res.set('Pragma', 'no-cache');
+  next();
+});
+
+function loginRateLimit(req, res, next) {
+  const key = req.ip || req.socket?.remoteAddress || 'unknown';
+  const now = Date.now();
+  let state = loginAttempts.get(key);
+  if (!state || now >= state.resetAt) state = { count: 0, resetAt: now + LOGIN_WINDOW_MS };
+  state.count += 1;
+  loginAttempts.set(key, state);
+  if (state.count > LOGIN_MAX_ATTEMPTS) {
+    res.set('Retry-After', String(Math.ceil((state.resetAt - now) / 1000)));
+    return res.status(429).json({ error: 'Too many login attempts. Try again later.' });
+  }
+  next();
+}
 
 function timingSafeEqualText(a, b) {
   const aa = Buffer.from(String(a || ''));
@@ -155,7 +177,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', loginRateLimit, (req, res) => {
   if (!APP_PASSWORD || !SESSION_SECRET) {
     return res.status(503).json({ error: 'Authentication is not configured' });
   }
@@ -163,6 +185,8 @@ app.post('/api/login', (req, res) => {
     return res.status(401).json({ error: 'Invalid password' });
   }
 
+  const key = req.ip || req.socket?.remoteAddress || 'unknown';
+  loginAttempts.delete(key);
   const token = signSession({ exp: Date.now() + SESSION_MAX_AGE_MS });
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
