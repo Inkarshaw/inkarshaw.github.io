@@ -4384,40 +4384,74 @@ function buildDutyRosterPrintDocument(){
   </style></head><body><main class="print-sheet">${table(headWidths,top)}${table([421,1133,1985,1418,708,1418,2410,1842],lower,"lower")}${table([421,2976,1560,427,4109,1842],casual,"casualties")}</main></body></html>`;
 }
 
-async function printDutyRoster(){
-  let frame;
+function printDutyRoster(){
+  // Open during the click itself; Android can ignore iframe print settings.
+  const preview=window.open("", "_blank");
+  if(!preview){
+    alert("Allow pop-ups for this page, then tap Print / PDF again to open the full roster preview.");
+    return;
+  }
   try{
     saveRoster(false);
     syncHeader();
-    frame=document.createElement("iframe");
-    frame.title="Duty roster print preview";
-    frame.setAttribute("aria-hidden","true");
-    // Measure at the real print width, even when the editor is zoomed on a phone.
-    frame.style.cssText="position:fixed;left:-10000px;top:0;width:200mm;height:282mm;border:0;pointer-events:none";
-    document.body.appendChild(frame);
-    const d=frame.contentDocument;
+    const d=preview.document;
     d.open();d.write(buildDutyRosterPrintDocument());d.close();
-    await d.fonts.ready;
-    await new Promise(resolve=>frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.requestAnimationFrame(resolve)));
+    const controls=d.createElement("div");
+    controls.className="print-controls";
+    const button=d.createElement("button");
+    button.type="button";
+    button.textContent="Preparing preview…";
+    button.disabled=true;
+    const note=d.createElement("p");
+    note.textContent="Check that the full roster is below. Then choose Save as PDF, A4, Portrait, All pages, 100% scale, default margins, and turn headers/footers off.";
+    controls.append(button,note);
+    d.body.prepend(controls);
+    const styles=d.createElement("style");
+    styles.textContent=`
+      .print-controls{font:14px/1.4 Arial,sans-serif;padding:12px;background:#eef2ff;border-bottom:1px solid #cbd5e1;max-width:200mm}
+      .print-controls button{font:700 16px Arial,sans-serif;padding:12px 18px;cursor:pointer}
+      .print-controls p{margin:8px 0 0}
+      .print-sheet{break-inside:avoid;page-break-inside:avoid}
+      @media print{.print-controls{display:none!important}}
+    `;
+    d.head.append(styles);
     const sheet=d.querySelector(".print-sheet");
-    const available=(297-2.24-12.7)*96/25.4-2;
-    // Normal rosters retain Word's 9-point type and dimensions. Unusually large
-    // rosters shrink uniformly, preserving all rows instead of clipping them.
-    const scale=Math.min(1,available/sheet.getBoundingClientRect().height);
-    sheet.style.zoom=String(scale);
-    d.body.dataset.printScale=String(scale);
-    const cleanup=()=>frame?.remove();
-    frame.contentWindow.addEventListener("afterprint",cleanup,{once:true});
-    frame.contentWindow.focus();
-    frame.contentWindow.print();
-    // Keep the frame alive while an asynchronous mobile print preview is open.
-    setTimeout(cleanup,300000);
+    const fit=()=>{
+      sheet.style.zoom="1";
+      const available=(297-2.24-12.7)*96/25.4-4;
+      const height=sheet.getBoundingClientRect().height;
+      if(!height || !Number.isFinite(height)) throw new Error("Could not measure the full roster");
+      const scale=Math.min(1,available/height);
+      sheet.style.zoom=String(scale);
+      d.body.dataset.printScale=String(scale);
+    };
+    const ready=async()=>{
+      await d.fonts.ready;
+      await new Promise(resolve=>preview.requestAnimationFrame(()=>preview.requestAnimationFrame(resolve)));
+      if(preview.closed) return;
+      fit();
+      button.textContent="Print / Save PDF";
+      button.disabled=false;
+    };
+    button.addEventListener("click",()=>{
+      fit();
+      preview.focus();
+      preview.print();
+    });
+    preview.addEventListener("beforeprint",fit);
+    // Keep the visible preview open after printing so no asynchronous Android
+    // print job loses its source document and the user can inspect/retry it.
+    ready().catch(err=>{
+      console.error(err);
+      note.textContent="The print preview could not be prepared. Close this tab and try Print / PDF again.";
+    });
   }catch(err){
-    frame?.remove();
+    preview.close();
     console.error(err);
-    alert("Print could not start. Please try Print / PDF again.");
+    alert("Print preview could not open. Please try Print / PDF again.");
   }
 }
+
 
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape" && document.getElementById("nominalRollModal")?.classList.contains("show")){
