@@ -23,8 +23,10 @@
     if (item.kind === 'archive') return {label:'Archived · applications closed', className:'closed'};
     if (item.kind === 'planned') return {label: now > new Date(item.notificationDate + 'T23:59:59+05:30') ? 'Planner date passed · check official notice' : 'Tentative annual plan', className:'planned'};
     if (!item.applicationStart || !item.applicationEnd) return {label:'Check official notice',className:'planned'};
-    if (now > new Date(item.applicationEnd)) return {label:'Applications closed',className:'closed'};
+    const deadline = new Date(item.applicationEnd);
+    if (now > deadline) return {label:'Applications closed',className:'closed'};
     if (now < new Date(item.applicationStart + 'T00:00:00+05:30')) return {label:'Applications upcoming',className:'planned'};
+    if (deadline - now <= 3 * 24 * 60 * 60 * 1000) return {label:'Closing soon · verify deadline',className:'open'};
     return {label:'Applications open · check amendments',className:'open'};
   }
   function notificationHTML(item) {
