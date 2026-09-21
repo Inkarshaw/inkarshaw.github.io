@@ -2233,7 +2233,7 @@ Gr1 43478 Tr.Sirajudeen
 <textarea data-field="courtNDPS" onclick="openFieldPersonPicker('courtNDPS')" placeholder="" readonly="" title="Click to select personnel from Nominal Roll"></textarea><span class="allot-help"></span>
 </td>
 </tr>
-<tr><td class="place" colspan="8">Warrant</td><td colspan="42"><textarea data-field="warrant">SI.Tr.Inkarshaw BellAbraham, GrI 39770 Tr.Sivakumar, HC 44440 Tr.Ayyanar</textarea></td></tr>
+<tr><td class="place" colspan="8">Warrant</td><td colspan="42"><textarea data-field="warrant" onclick="openWarrantManager()" readonly="" title="Click to select Warrant personnel from Nominal Roll">SI.Tr.Inkarshaw BellAbraham, GrI 39770 Tr.Sivakumar, HC 44440 Tr.Ayyanar</textarea></td></tr>
 <tr>
 <th class="place" colspan="8">DRIVERS</th>
 <th colspan="14">Ins Driver</th>
@@ -4478,6 +4478,10 @@ function managedDutyEligibilityNote(){
     return "Select one or more Present SI / WSI officers. The Duty SI is automatically excluded.";
   }
 
+  if(SECTOR_TEAM_TARGET.mode==="warrant"){
+    return "Select one or more available personnel of any rank from the Nominal Roll.";
+  }
+
   if(place==="Station I/C"){
     return "Inspector, SI and WSI are excluded from Station I/C duty.";
   }
@@ -4504,6 +4508,10 @@ function getSectorTargetCell(){
     return document.getElementById("otherSICell");
   }
 
+  if(SECTOR_TEAM_TARGET.mode==="warrant"){
+    return document.querySelector('[data-field="warrant"]');
+  }
+
   const rows=document.querySelectorAll("#shiftBody tr");
   const row=rows[SECTOR_TEAM_TARGET.rowIndex];
   return row?.querySelector(`[data-shift="${SECTOR_TEAM_TARGET.shift}"]`) || null;
@@ -4515,6 +4523,26 @@ function openOtherSIManager(){
 
   const title=document.getElementById("sectorTeamTitle");
   if(title) title.textContent="Select Other SIs";
+
+  const note=document.getElementById("teamEligibilityNote");
+  if(note) note.textContent=managedDutyEligibilityNote();
+
+  const search=document.getElementById("sectorPersonSearch");
+  if(search) search.value="";
+
+  renderSectorCurrentList();
+  renderSectorPersonResults();
+
+  document.getElementById("sectorTeamModal")?.classList.add("show");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>search?.focus(),40);
+}
+
+function openWarrantManager(){
+  SECTOR_TEAM_TARGET={mode:"warrant",place:"Warrant"};
+
+  const title=document.getElementById("sectorTeamTitle");
+  if(title) title.textContent="Select Warrant Personnel";
 
   const note=document.getElementById("teamEligibilityNote");
   if(note) note.textContent=managedDutyEligibilityNote();
@@ -4574,6 +4602,9 @@ function formatSectorStaff(staff){
   if(SECTOR_TEAM_TARGET?.mode==="otherSI"){
     return formatHeaderSI(staff);
   }
+  if(SECTOR_TEAM_TARGET?.mode==="warrant"){
+    return `${staff.rank} ${staff.name}`.replace(/\s+/g," ").trim();
+  }
   return `${staff.rank} ${staff.name}${staff.phone ? "\n"+staff.phone : ""}`;
 }
 
@@ -4585,6 +4616,8 @@ function rebuildSectorCell(staffList){
     cell.value=staffList.map(formatHeaderSI).join(", ");
     const hiddenOther=document.getElementById("otherSI");
     if(hiddenOther) hiddenOther.value=cell.value;
+  }else if(SECTOR_TEAM_TARGET?.mode==="warrant"){
+    cell.value=staffList.map(formatSectorStaff).join(", ");
   }else{
     cell.value=staffList.map(formatSectorStaff).join("\n");
   }
