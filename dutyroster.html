@@ -4929,13 +4929,14 @@ function removePersonFromSector(staffId){
     return;
   }
 
-  // Preserve the existing reassignment workflow for the Other SIs header.
-  openRequiredMoveDialog({
-    type:"managed",
-    staffId:staff.id,
-    managedTarget:targetSnapshot,
-    sourceValue:"top|otherSI"
-  });
+  // Other SIs may also be removed directly.
+  const remaining=assigned.filter(s=>s.id!==staff.id);
+  rebuildSectorCell(remaining);
+  renderSectorCurrentList();
+  renderSectorPersonResults();
+  runConflictChecks();
+  saveRoster(false);
+  setStatus(`${staff.name} removed from Other SIs`);
 }
 
 
