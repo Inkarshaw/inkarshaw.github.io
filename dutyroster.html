@@ -4297,11 +4297,11 @@ function buildDutyRosterPrintDocument(){
   const cell=(content,span=1,cls="")=>`<td colspan="${span}" class="${cls}">${content}</td>`;
   // Keep VACANT visible in the editor, but omit it from printed/PDF output.
   const printable=v=>String(v ?? "")
-    .replace(/\\bVACANT\\b/gi,"")
-    .replace(/[ \\t]+([,;])/g,"$1")
-    .replace(/(^|\\n)\\s*[,;]\\s*/g,"$1")
-    .replace(/[,;]\\s*(?=\\n|$)/g,"")
-    .replace(/\\n\\s*\\n+/g,"\\n")
+    .replace(/\bVACANT\b/gi,"")
+    .replace(/[ \t]+([,;])/g,"$1")
+    .replace(/(^|\n)\s*[,;]\s*/g,"$1")
+    .replace(/[,;]\s*(?=\n|$)/g,"")
+    .replace(/\n\s*\n+/g,"\n")
     .trim();
   const plain=(v,span=1,cls="")=>cell(esc(printable(v)),span,cls);
   const row=(cells,cls="",height="")=>`<tr class="${cls}"${height ? ` style="height:${height}mm"` : ""}>${cells}</tr>`;
