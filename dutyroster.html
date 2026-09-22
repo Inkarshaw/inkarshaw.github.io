@@ -2771,6 +2771,7 @@ function loadData(data){
   document.getElementById("stationHeader").textContent=document.getElementById("stationName").value;
   syncTopInputsFromCells();
   setTimeout(()=>{
+    if(typeof renderExtraWarrantRows==="function") renderExtraWarrantRows();
     if(typeof initSerialTables==="function") initSerialTables();
     syncOtherSIsAgainstCasualties();
     syncTopInputsFromCells();
@@ -3359,7 +3360,7 @@ function runConflictChecks(){
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(()=>{ buildTargets(); fillStaffSelect(); initSerialTables(); runConflictChecks(); },0);
+  setTimeout(()=>{ buildTargets(); fillStaffSelect(); renderExtraWarrantRows(); initSerialTables(); runConflictChecks(); },0);
   const saved=localStorage.getItem(STORAGE_KEY);
   if(saved){
     try{ loadData(JSON.parse(saved)); }
@@ -5076,6 +5077,12 @@ function buildDutyRosterPrintDocument(){
   const courts=[["courtMM","MM"],["courtSessions","Sessions"],["courtNDPS","NDPS"]].filter(([key])=>field(key).trim());
   top+=row(plain("Court",1,"label")+plain(courts.map(([key,label])=>`${label}: ${field(key).replace(/\n/g,", ")}`).join("; "),3));
   top+=row(plain("Warrant",1,"label")+plain(field("warrant").replace(/\n/g,", "),3));
+  readExtraWarrantRows().forEach(extra=>{
+    top+=row(
+      plain(extra.label || "Additional Duty",1,"label")+
+      plain(String(extra.persons || "").replace(/\n/g,", "),3)
+    );
+  });
   top+=row(plain("Ins Driver",1,"label")+plain(field("insDriverDuty"),3));
   top+=row(plain("Rest Driver",1,"label")+plain(["insDriverRest","patrolDriverRest","gypsyDriverRest"].map(field).filter(Boolean).join(", "),3));
   top+=row(plain("Receptionist",1,"label")+plain(field("receptionist"),3));
