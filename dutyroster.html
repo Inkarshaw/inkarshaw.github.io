@@ -3088,8 +3088,10 @@ function lineHasRank(line, code){
   if(code==="gri") return /\bgr\s*i\b|\bgr1\b|\bgri\b/.test(t);
   if(code==="whc") return /\bwhc\b/.test(t);
   if(code==="wpc") return /\bwpc\b/.test(t);
-  if(code==="ssi") return /\bssi\b/.test(t);
-  if(code==="si") return /\bsi\b/.test(t) && !/\bssi\b/.test(t);
+  if(code==="wssi") return /\bwssi\b/.test(t);
+  if(code==="wsi") return /\bwsi\b/.test(t) && !/\bwssi\b/.test(t);
+  if(code==="ssi") return /\bssi\b/.test(t) && !/\bwssi\b/.test(t);
+  if(code==="si") return /\bsi\b/.test(t) && !/\bssi\b/.test(t) && !/\bwsi\b/.test(t) && !/\bwssi\b/.test(t);
   if(code==="hc") return /\bhc\b/.test(t) && !/\bwhc\b/.test(t);
   if(code==="pc") return /\bpc\b/.test(t) && !/\bwpc\b/.test(t) && !/\barpc\b/.test(t);
   if(code==="ins") return /\bins(?:pector)?\b/.test(t);
