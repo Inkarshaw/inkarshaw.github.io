@@ -3517,11 +3517,46 @@ function parseSerialStore(key){
     });
 }
 
+function serialRankSortWeight(row){
+  const code=rankCode(row?.rank || "");
+  if(code==="ins") return 0;
+  if(code==="si" || code==="wsi") return 10;
+  if(code==="ssi" || code==="wssi") return 20;
+  if(code==="hc" || code==="whc") return 30;
+  if(code==="gri") return 40;
+  if(code==="pc" || code==="wpc" || code==="arpc") return 50;
+  return 90;
+}
+
+function sortSerialRowsByRank(rows){
+  return (rows || [])
+    .map((row,index)=>({row,index}))
+    .sort((a,b)=>{
+      const diff=serialRankSortWeight(a.row)-serialRankSortWeight(b.row);
+      return diff || a.index-b.index;
+    })
+    .map(item=>item.row);
+}
+
+function normalizeSerialSectionOrder(){
+  Object.keys(SERIAL_SECTION_CONFIG).forEach(key=>{
+    const rows=parseSerialStore(key);
+    const sorted=sortSerialRowsByRank(rows);
+    const store=document.querySelector(`[data-field="${key}"].section-store`);
+    if(!store) return;
+    store.value=sorted
+      .filter(r=>r && (String(r.rank||"").trim() || String(r.name||"").trim() || String(r.detail||"").trim()))
+      .map(r=>`${String(r.rank||"").trim()}\t${String(r.name||"").trim()}\t${String(r.detail||"").trim()}`)
+      .join("\n");
+  });
+}
+
 function writeSerialStore(key,rows,dispatch=true){
   const store=document.querySelector(`[data-field="${key}"].section-store`);
   if(!store) return;
 
-  store.value=(rows||[])
+  const ordered=sortSerialRowsByRank(rows||[]);
+  store.value=ordered
     .filter(r=>r && (String(r.rank||"").trim() || String(r.name||"").trim() || String(r.detail||"").trim()))
     .map(r=>`${String(r.rank||"").trim()}\t${String(r.name||"").trim()}\t${String(r.detail||"").trim()}`)
     .join("\n");
@@ -4523,6 +4558,7 @@ function applyKnownPersonnelCorrections(){
 
 function initSerialTables(){
   applyKnownPersonnelCorrections();
+  normalizeSerialSectionOrder();
   renderSerialRosterBody();
 
   // If transfer logic changes a hidden section store, redraw the same main table.
