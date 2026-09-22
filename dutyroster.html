@@ -3559,6 +3559,7 @@ function parseCasualtyDetail(detail){
     return {type:"IP at hospital",remarks:/^hospital$/i.test(rest) ? "" : rest};
   }
   if((m=d.match(/^Deserter\b[\s\-–—:]*(.*)$/i))) return {type:"Deserter",remarks:(m[1]||"").trim()};
+  if((m=d.match(/^Absent\b[\s\-–—:]*(.*)$/i))) return {type:"Absent",remarks:(m[1]||"").trim()};
   return {type:"",remarks:d};
 }
 
@@ -3635,7 +3636,7 @@ function renderRightEntry(entry){
 
 function casualtyRowCells(row,index){
   const parsed=parseCasualtyDetail(row?.detail || "");
-  const options=["","CL","ML","EL","W/O","IP at hospital","Deserter"]
+  const options=["","CL","ML","EL","W/O","Absent","IP at hospital","Deserter"]
     .map(v=>`<option value="${escapeHtml(v)}"${v===parsed.type ? " selected" : ""}>${escapeHtml(v || "Select type")}</option>`)
     .join("");
 
