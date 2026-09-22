@@ -5423,6 +5423,78 @@ function isStationOrSectorEligible(staff){
   return !["ins","si","wsi"].includes(code);
 }
 
+
+function readExtraWarrantRows(){
+  const store=document.querySelector('[data-field="extraWarrantRows"]');
+  if(!store) return [];
+  try{
+    const parsed=JSON.parse(store.value || "[]");
+    return Array.isArray(parsed) ? parsed.map(function(r){
+      return {label:String((r && r.label) || ""),persons:String((r && r.persons) || "")};
+    }) : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function writeExtraWarrantRows(rows,render){
+  const store=document.querySelector('[data-field="extraWarrantRows"]');
+  if(!store) return;
+  store.value=JSON.stringify((rows || []).map(function(r){
+    return {label:String((r && r.label) || ""),persons:String((r && r.persons) || "")};
+  }));
+  if(render!==false) renderExtraWarrantRows();
+  saveRoster(false);
+  runConflictChecks();
+}
+
+function renderExtraWarrantRows(){
+  const body=document.getElementById("extraWarrantRowsBody");
+  if(!body) return;
+  const rows=readExtraWarrantRows();
+  body.innerHTML=rows.map(function(r,index){
+    return '<tr class="extra-warrant-row" data-extra-warrant-row="'+index+'">'+
+      '<td class="place" colspan="8"><div class="extra-warrant-place">'+
+      '<input type="text" value="'+escapeHtml(r.label)+'" placeholder="Duty / Place" aria-label="Additional duty or place" oninput="updateExtraWarrantLabel('+index+',this.value)">'+
+      '<button type="button" class="extra-warrant-remove" onclick="removeExtraWarrantRow('+index+')">Remove Row</button>'+
+      '</div></td>'+
+      '<td colspan="42"><textarea data-extra-warrant-persons="'+index+'" readonly title="Double-tap to add or remove personnel" onclick="handleRosterPersonnelTap(event,function(){openExtraWarrantManager('+index+')})">'+escapeHtml(r.persons)+'</textarea></td>'+
+      '</tr>';
+  }).join("");
+}
+
+function addExtraWarrantRow(){
+  const rows=readExtraWarrantRows();
+  rows.push({label:"",persons:""});
+  writeExtraWarrantRows(rows,true);
+  const index=rows.length-1;
+  const input=document.querySelector('[data-extra-warrant-row="'+index+'"] .extra-warrant-place input');
+  setStatus("Additional row added below Warrant");
+  if(input && !isRosterTouchMode()) input.focus();
+}
+
+function removeExtraWarrantRow(index){
+  const rows=readExtraWarrantRows();
+  if(!rows[index]) return;
+  rows.splice(index,1);
+  writeExtraWarrantRows(rows,true);
+  setStatus("Additional row removed");
+}
+
+function updateExtraWarrantLabel(index,value){
+  const rows=readExtraWarrantRows();
+  if(!rows[index]) return;
+  rows[index].label=String(value || "");
+  writeExtraWarrantRows(rows,false);
+}
+
+function syncExtraWarrantPersons(index,value){
+  const rows=readExtraWarrantRows();
+  if(!rows[index]) return;
+  rows[index].persons=String(value || "");
+  writeExtraWarrantRows(rows,false);
+}
+
 function rankRestrictionMessage(staff){
   return `${staff.rank} ${staff.name} cannot be allotted to Station I/C or Sector A/B/C. Inspector, SI and WSI are not eligible for these duties.`;
 }
