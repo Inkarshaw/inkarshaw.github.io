@@ -3658,6 +3658,67 @@ function handleRosterPersonnelTap(event,action){
   setStatus("Double-tap the name / duty cell to edit");
 }
 
+
+function fitPersonnelSelectionToVisualViewport(){
+  if(!isRosterTouchMode() || !window.visualViewport) return;
+
+  const vv=window.visualViewport;
+  const scale=Math.max(1,Number(vv.scale) || 1);
+  const roots=[
+    document.getElementById("personPicker"),
+    document.getElementById("sectorTeamModal")
+  ];
+
+  roots.forEach(function(modal){
+    if(!modal || !modal.classList.contains("show")) return;
+
+    // Counter the roster's pinch zoom without changing that zoom.
+    // The unscaled box is enlarged first, then inversely scaled so the
+    // resulting popup exactly matches the currently visible phone viewport.
+    modal.style.position="absolute";
+    modal.style.inset="auto";
+    modal.style.left=(vv.pageLeft || 0)+"px";
+    modal.style.top=(vv.pageTop || 0)+"px";
+    modal.style.width=(vv.width*scale)+"px";
+    modal.style.height=(vv.height*scale)+"px";
+    modal.style.maxWidth="none";
+    modal.style.maxHeight="none";
+    modal.style.transformOrigin="top left";
+    modal.style.transform="scale("+(1/scale)+")";
+    modal.style.padding="0";
+
+    const card=modal.querySelector(".person-picker-card, .sector-team-card");
+    if(card){
+      card.style.width="100%";
+      card.style.maxWidth="none";
+      card.style.height="100%";
+      card.style.maxHeight="none";
+      card.style.margin="0";
+      card.style.borderRadius="0";
+    }
+  });
+}
+
+function resetPersonnelSelectionViewport(modal){
+  if(!modal) return;
+
+  [
+    "position","inset","left","top","width","height","maxWidth","maxHeight",
+    "transformOrigin","transform","padding"
+  ].forEach(function(prop){ modal.style[prop]=""; });
+
+  const card=modal.querySelector(".person-picker-card, .sector-team-card");
+  if(card){
+    ["width","maxWidth","height","maxHeight","margin","borderRadius"]
+      .forEach(function(prop){ card.style[prop]=""; });
+  }
+}
+
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",fitPersonnelSelectionToVisualViewport);
+  window.visualViewport.addEventListener("scroll",fitPersonnelSelectionToVisualViewport);
+}
+
 function openDutySIPicker(){
   PERSON_PICKER_TARGET={type:"dutySI"};
 
@@ -3670,7 +3731,11 @@ function openDutySIPicker(){
   renderPersonPickerResults();
   modal.classList.add("show");
   document.body.style.overflow="hidden";
-  setTimeout(()=>search?.focus(),40);
+  fitPersonnelSelectionToVisualViewport();
+  setTimeout(()=>{
+    fitPersonnelSelectionToVisualViewport();
+    search?.focus();
+  },40);
 }
 
 let PERSON_PICKER_TARGET = null;
@@ -3685,7 +3750,11 @@ function openPersonPicker(sectionKey,rowIndex){
   renderPersonPickerResults();
   modal.classList.add("show");
   document.body.style.overflow="hidden";
-  setTimeout(()=>search?.focus(),40);
+  fitPersonnelSelectionToVisualViewport();
+  setTimeout(()=>{
+    fitPersonnelSelectionToVisualViewport();
+    search?.focus();
+  },40);
 }
 
 
@@ -3704,13 +3773,20 @@ function openFieldPersonPicker(fieldKey){
   renderPersonPickerResults();
   modal.classList.add("show");
   document.body.style.overflow="hidden";
-  setTimeout(()=>search?.focus(),40);
+  fitPersonnelSelectionToVisualViewport();
+  setTimeout(()=>{
+    fitPersonnelSelectionToVisualViewport();
+    search?.focus();
+  },40);
 }
 
 function closePersonPicker(){
   const target=PERSON_PICKER_TARGET;
   const modal=document.getElementById("personPicker");
-  if(modal) modal.classList.remove("show");
+  if(modal){
+    modal.classList.remove("show");
+    resetPersonnelSelectionViewport(modal);
+  }
   document.body.style.overflow="";
 
   // "+ Add Person" creates a temporary visual row only.
@@ -5030,7 +5106,11 @@ function openOtherSIManager(){
 
   document.getElementById("sectorTeamModal")?.classList.add("show");
   document.body.style.overflow="hidden";
-  setTimeout(()=>search?.focus(),40);
+  fitPersonnelSelectionToVisualViewport();
+  setTimeout(()=>{
+    fitPersonnelSelectionToVisualViewport();
+    search?.focus();
+  },40);
 }
 
 function openWarrantManager(){
@@ -5050,7 +5130,11 @@ function openWarrantManager(){
 
   document.getElementById("sectorTeamModal")?.classList.add("show");
   document.body.style.overflow="hidden";
-  setTimeout(()=>search?.focus(),40);
+  fitPersonnelSelectionToVisualViewport();
+  setTimeout(()=>{
+    fitPersonnelSelectionToVisualViewport();
+    search?.focus();
+  },40);
 }
 
 function openSectorTeamManager(rowIndex,shift){
@@ -5074,11 +5158,19 @@ function openSectorTeamManager(rowIndex,shift){
 
   document.getElementById("sectorTeamModal")?.classList.add("show");
   document.body.style.overflow="hidden";
-  setTimeout(()=>search?.focus(),40);
+  fitPersonnelSelectionToVisualViewport();
+  setTimeout(()=>{
+    fitPersonnelSelectionToVisualViewport();
+    search?.focus();
+  },40);
 }
 
 function closeSectorTeamManager(){
-  document.getElementById("sectorTeamModal")?.classList.remove("show");
+  const modal=document.getElementById("sectorTeamModal");
+  if(modal){
+    modal.classList.remove("show");
+    resetPersonnelSelectionViewport(modal);
+  }
   document.body.style.overflow="";
   SECTOR_TEAM_TARGET=null;
 }
