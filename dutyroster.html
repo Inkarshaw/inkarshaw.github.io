@@ -2095,6 +2095,78 @@
     padding-top:0.7px;
     padding-bottom:0.7px;
   }
+
+  .cloud-roster-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1500;
+    background:rgba(15,23,42,.72);
+    padding:16px;
+  }
+  .cloud-roster-modal.show{display:block}
+  .cloud-roster-card{
+    width:min(900px,96vw);
+    max-height:92vh;
+    margin:2vh auto 0;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .cloud-roster-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 12px;
+    background:#111827;
+    color:#fff;
+  }
+  .cloud-roster-head strong{font-size:16px}
+  .cloud-roster-head .spacer{flex:1}
+  .cloud-roster-list{
+    overflow:auto;
+    padding:10px;
+    background:#f8fafc;
+  }
+  .cloud-roster-item{
+    display:grid;
+    grid-template-columns:120px minmax(180px,1fr) minmax(160px,1fr) minmax(160px,1fr) auto;
+    gap:8px;
+    align-items:center;
+    padding:9px 10px;
+    margin-bottom:8px;
+    border:1px solid #d1d5db;
+    border-radius:9px;
+    background:#fff;
+    font-size:12px;
+  }
+  .cloud-roster-item .cloud-date{font-weight:900}
+  .cloud-roster-item .cloud-summary{color:#334155;line-height:1.35}
+  .cloud-roster-empty{padding:24px;text-align:center;color:#64748b}
+  @media(max-width:700px){
+    .cloud-roster-modal{padding:0}
+    .cloud-roster-card{
+      width:100%;
+      max-width:none;
+      height:100dvh;
+      max-height:100dvh;
+      margin:0;
+      border-radius:0;
+    }
+    .cloud-roster-list{flex:1 1 auto}
+    .cloud-roster-item{
+      grid-template-columns:1fr auto;
+      gap:7px;
+    }
+    .cloud-roster-item .cloud-summary{grid-column:1 / -1}
+  }
+  @media print{
+    .cloud-roster-modal{display:none!important}
+  }
+
 </style>
 </head>
 <body>
@@ -2107,6 +2179,7 @@
   <button onclick="rotateShifts(-1)">Reverse Rotation</button>
   <button onclick="openNominalRoll()">Nominal Roll</button>
   <button class="green" onclick="saveRoster()">Save</button>
+  <button onclick="openCloudRosters()">Cloud Rosters</button>
   <button id="pdfActionButton" onclick="printDutyRoster()">Print / PDF</button>
   <button onclick="downloadBackup()">Backup</button>
   <button onclick="document.getElementById('restoreFile').click()">Restore</button>
@@ -2631,11 +2704,234 @@ function loadData(data){
     runConflictChecks();
   },0);
 }
+
+const ROSTER_CLOUD_API_BASE="https://cdr-pdf-bot-production.up.railway.app";
+const ROSTER_CLOUD_TOKEN_KEY="clearexamsMyCasesCloudTokenV1";
+
+function rosterCloudToken(){
+  return sessionStorage.getItem(ROSTER_CLOUD_TOKEN_KEY) || "";
+}
+
+async function rosterCloudFetch(path,options={}){
+  const headers={...(options.headers || {})};
+  if(options.body && !headers["Content-Type"]) headers["Content-Type"]="application/json";
+  const token=rosterCloudToken();
+  if(token) headers.Authorization="Bearer "+token;
+
+  const response=await fetch(ROSTER_CLOUD_API_BASE+path,{...options,headers});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok){
+    const error=new Error(data.error || ("Cloud request failed ("+response.status+")"));
+    error.status=response.status;
+    throw error;
+  }
+  return data;
+}
+
+async function ensureRosterCloudLogin(){
+  if(rosterCloudToken()){
+    try{
+      const session=await rosterCloudFetch("/api/session");
+      if(session.authenticated) return true;
+    }catch(e){}
+    sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+  }
+
+  const password=prompt("Enter cloud password to access saved Duty Rosters:");
+  if(password===null || !String(password).trim()) return false;
+
+  const response=await fetch(ROSTER_CLOUD_API_BASE+"/api/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({password:String(password)})
+  });
+  const data=await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    throw new Error(data.error || "Cloud login failed");
+  }
+
+  sessionStorage.setItem(ROSTER_CLOUD_TOKEN_KEY,data.token || "");
+  return Boolean(data.token);
+}
+
+function rosterCloudPersonLabel(row){
+  return [row?.rank,row?.name].filter(Boolean).join(" ").replace(/\s+/g," ").trim();
+}
+
+function buildRosterCloudSummary(data){
+  const casualties=parseSerialStore("casualties");
+  const clPersonnel=casualties
+    .filter(r=>parseCasualtyDetail(r?.detail || "").type==="CL")
+    .map(rosterCloudPersonLabel)
+    .filter(Boolean);
+
+  const weeklyOffPersonnel=casualties
+    .filter(r=>parseCasualtyDetail(r?.detail || "").type==="W/O")
+    .map(rosterCloudPersonLabel)
+    .filter(Boolean);
+
+  return {
+    dutySI:String(document.getElementById("dutySICell")?.value || "").trim(),
+    clPersonnel,
+    weeklyOffPersonnel,
+    rosterData:data
+  };
+}
+
+async function saveRosterToCloud(data){
+  if(!data?.rosterDate){
+    setStatus("Saved in browser · set a date for cloud save");
+    return false;
+  }
+
+  try{
+    const loggedIn=await ensureRosterCloudLogin();
+    if(!loggedIn){
+      setStatus("Saved in browser · cloud login cancelled");
+      return false;
+    }
+
+    const summary=buildRosterCloudSummary(data);
+    const result=await rosterCloudFetch(
+      "/api/duty-rosters/"+encodeURIComponent(data.rosterDate),
+      {
+        method:"PUT",
+        body:JSON.stringify(summary)
+      }
+    );
+
+    const saved=result.roster || {};
+    setStatus(
+      "Saved in browser + cloud · CL "+(saved.clCount ?? summary.clPersonnel.length)+
+      " · W/O "+(saved.weeklyOffCount ?? summary.weeklyOffPersonnel.length)
+    );
+    return true;
+  }catch(err){
+    console.error(err);
+    if(err?.status===401) sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+    setStatus("Saved in browser · cloud pending");
+    return false;
+  }
+}
+
+function closeCloudRosters(){
+  const modal=document.getElementById("cloudRosterModal");
+  if(modal){
+    modal.classList.remove("show");
+    if(typeof resetPersonnelSelectionViewport==="function"){
+      resetPersonnelSelectionViewport(modal);
+    }
+  }
+  document.body.style.overflow="";
+}
+
+function cloudRosterBackdrop(e){
+  if(e.target?.id==="cloudRosterModal") closeCloudRosters();
+}
+
+function renderCloudRosterList(items){
+  const box=document.getElementById("cloudRosterList");
+  if(!box) return;
+  box.innerHTML="";
+
+  if(!Array.isArray(items) || !items.length){
+    box.innerHTML='<div class="cloud-roster-empty">No cloud duty rosters saved yet.</div>';
+    return;
+  }
+
+  items.forEach(item=>{
+    const row=document.createElement("div");
+    row.className="cloud-roster-item";
+
+    const date=document.createElement("div");
+    date.className="cloud-date";
+    date.textContent=item.date || "";
+
+    const si=document.createElement("div");
+    si.className="cloud-summary";
+    si.innerHTML="<b>Duty SI</b><br>"+escapeHtml(item.dutySI || "—");
+
+    const cl=document.createElement("div");
+    cl.className="cloud-summary";
+    cl.innerHTML="<b>CL: "+Number(item.clCount || 0)+"</b><br>"+
+      escapeHtml((item.clPersonnel || []).join(", ") || "—");
+
+    const wo=document.createElement("div");
+    wo.className="cloud-summary";
+    wo.innerHTML="<b>Weekly Off: "+Number(item.weeklyOffCount || 0)+"</b><br>"+
+      escapeHtml((item.weeklyOffPersonnel || []).join(", ") || "—");
+
+    const load=document.createElement("button");
+    load.type="button";
+    load.textContent="Load";
+    load.onclick=()=>loadCloudRoster(item.date);
+
+    row.append(date,si,cl,wo,load);
+    box.appendChild(row);
+  });
+}
+
+async function openCloudRosters(){
+  try{
+    const loggedIn=await ensureRosterCloudLogin();
+    if(!loggedIn) return;
+
+    const modal=document.getElementById("cloudRosterModal");
+    const box=document.getElementById("cloudRosterList");
+    if(!modal || !box) return;
+
+    box.innerHTML='<div class="cloud-roster-empty">Loading saved rosters…</div>';
+    modal.classList.add("show");
+    document.body.style.overflow="hidden";
+
+    if(typeof fitPersonnelSelectionToVisualViewport==="function"){
+      fitPersonnelSelectionToVisualViewport();
+    }
+
+    const data=await rosterCloudFetch("/api/duty-rosters");
+    renderCloudRosterList(data.rosters || []);
+
+    if(typeof fitPersonnelSelectionToVisualViewport==="function"){
+      fitPersonnelSelectionToVisualViewport();
+    }
+  }catch(err){
+    console.error(err);
+    if(err?.status===401) sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+    closeCloudRosters();
+    alert(err.message || "Cloud rosters could not be loaded.");
+  }
+}
+
+async function loadCloudRoster(date){
+  if(!date) return;
+
+  try{
+    const data=await rosterCloudFetch("/api/duty-rosters/"+encodeURIComponent(date));
+    const roster=data.roster || {};
+    if(!roster.rosterData || typeof roster.rosterData!=="object"){
+      throw new Error("Saved roster data is unavailable.");
+    }
+
+    loadData(roster.rosterData);
+    saveRoster(false);
+    runConflictChecks();
+    closeCloudRosters();
+    setStatus("Loaded "+date+" from cloud");
+  }catch(err){
+    console.error(err);
+    alert(err.message || "Duty roster could not be loaded.");
+  }
+}
+
 function saveRoster(show=true){
   syncTopInputsFromCells();
   const data=collectData();
   localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
-  if(show) setStatus("Saved in browser");
+  if(show){
+    setStatus("Saved in browser · syncing cloud…");
+    saveRosterToCloud(data);
+  }
 }
 function clearSaved(){
   if(confirm("Clear saved roster from this browser?")){
@@ -3666,7 +3962,8 @@ function fitPersonnelSelectionToVisualViewport(){
   const scale=Math.max(1,Number(vv.scale) || 1);
   const roots=[
     document.getElementById("personPicker"),
-    document.getElementById("sectorTeamModal")
+    document.getElementById("sectorTeamModal"),
+    document.getElementById("cloudRosterModal")
   ];
 
   roots.forEach(function(modal){
@@ -3687,7 +3984,7 @@ function fitPersonnelSelectionToVisualViewport(){
     modal.style.transform="scale("+(1/scale)+")";
     modal.style.padding="0";
 
-    const card=modal.querySelector(".person-picker-card, .sector-team-card");
+    const card=modal.querySelector(".person-picker-card, .sector-team-card, .cloud-roster-card");
     if(card){
       card.style.width="100%";
       card.style.maxWidth="none";
@@ -3707,7 +4004,7 @@ function resetPersonnelSelectionViewport(modal){
     "transformOrigin","transform","padding"
   ].forEach(function(prop){ modal.style[prop]=""; });
 
-  const card=modal.querySelector(".person-picker-card, .sector-team-card");
+  const card=modal.querySelector(".person-picker-card, .sector-team-card, .cloud-roster-card");
   if(card){
     ["width","maxWidth","height","maxHeight","margin","borderRadius"]
       .forEach(function(prop){ card.style[prop]=""; });
@@ -5858,6 +6155,18 @@ window.addEventListener("orientationchange",()=>{
         <tbody id="nominalRollTableBody"></tbody>
       </table>
     </div>
+  </div>
+</div>
+
+
+<div id="cloudRosterModal" class="cloud-roster-modal" onclick="cloudRosterBackdrop(event)">
+  <div class="cloud-roster-card">
+    <div class="cloud-roster-head">
+      <strong>Saved Duty Rosters</strong>
+      <div class="spacer"></div>
+      <button type="button" onclick="closeCloudRosters()">Close</button>
+    </div>
+    <div id="cloudRosterList" class="cloud-roster-list"></div>
   </div>
 </div>
 
