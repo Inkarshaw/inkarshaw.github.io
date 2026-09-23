@@ -2120,12 +2120,25 @@
     min-width:0;
     font-weight:800;
   }
+  .extra-warrant-persons-wrap{
+    display:flex;
+    align-items:stretch;
+    gap:4px;
+    width:100%;
+  }
+  .extra-warrant-persons-wrap textarea{
+    flex:1 1 auto;
+    min-width:0;
+  }
   .extra-warrant-remove{
     flex:0 0 auto;
+    margin-left:auto;
+    align-self:center;
     padding:3px 6px !important;
     font-size:10px !important;
     background:#fee2e2 !important;
     color:#991b1b !important;
+    white-space:nowrap;
   }
   @media print{
     .extra-warrant-add-row,
@@ -5465,9 +5478,11 @@ function renderExtraWarrantRows(){
     return '<tr class="extra-warrant-row" data-extra-warrant-row="'+index+'">'+
       '<td class="place" colspan="8"><div class="extra-warrant-place">'+
       '<input type="text" value="'+escapeHtml(r.label)+'" placeholder="Duty / Place" aria-label="Additional duty or place" oninput="updateExtraWarrantLabel('+index+',this.value)">'+
+      '</div></td>'+
+      '<td colspan="42"><div class="extra-warrant-persons-wrap">'+
+      '<textarea data-extra-warrant-persons="'+index+'" readonly title="Double-tap to add or remove personnel" onclick="handleRosterPersonnelTap(event,function(){openExtraWarrantManager('+index+')})">'+escapeHtml(r.persons)+'</textarea>'+
       '<button type="button" class="extra-warrant-remove" onclick="removeExtraWarrantRow('+index+')">Remove Row</button>'+
       '</div></td>'+
-      '<td colspan="42"><textarea data-extra-warrant-persons="'+index+'" readonly title="Double-tap to add or remove personnel" onclick="handleRosterPersonnelTap(event,function(){openExtraWarrantManager('+index+')})">'+escapeHtml(r.persons)+'</textarea></td>'+
       '</tr>';
   }).join("");
 }
