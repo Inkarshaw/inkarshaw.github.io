@@ -201,7 +201,17 @@
     try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
   }
   function saveCases(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cases))}
-  function cloudToken(){return sessionStorage.getItem(CLOUD_TOKEN_KEY)||''}
+  function cloudToken(){
+    const saved=localStorage.getItem(CLOUD_TOKEN_KEY)||'';
+    if(saved)return saved;
+    const legacy=sessionStorage.getItem(CLOUD_TOKEN_KEY)||'';
+    if(legacy){
+      localStorage.setItem(CLOUD_TOKEN_KEY,legacy);
+      sessionStorage.removeItem(CLOUD_TOKEN_KEY);
+      return legacy;
+    }
+    return '';
+  }
   function setCloudState(text,state='idle'){
     $('cloudStatusText').textContent=text;
     $('cloudDot').className='cloud-dot'+(state==='online'?' online':state==='error'?' error':'');
@@ -222,7 +232,7 @@
       const data=await cloudFetch('/api/session');
       if(data.authenticated){setCloudState('Cloud connected','online');return true}
     }catch(e){}
-    sessionStorage.removeItem(CLOUD_TOKEN_KEY);setCloudState('Local only');return false;
+    localStorage.removeItem(CLOUD_TOKEN_KEY);sessionStorage.removeItem(CLOUD_TOKEN_KEY);setCloudState('Local only');return false;
   }
   async function cloudLogin(){
     const password=$('cloudPassword').value;
@@ -230,7 +240,7 @@
     $('submitLoginBtn').disabled=true;
     try{
       const data=await cloudFetch('/api/login',{method:'POST',body:JSON.stringify({password})});
-      sessionStorage.setItem(CLOUD_TOKEN_KEY,data.token);
+      localStorage.setItem(CLOUD_TOKEN_KEY,data.token);sessionStorage.removeItem(CLOUD_TOKEN_KEY);
       $('cloudPassword').value='';$('loginDialog').classList.remove('open');
       setCloudState('Cloud connected','online');
       await syncFromCloud();
