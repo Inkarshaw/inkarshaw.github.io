@@ -81,6 +81,10 @@
     .stat-button:hover{border-color:#b8c8da;box-shadow:0 6px 18px rgba(7,28,51,.08)}
     .stat-button:focus-visible{outline:3px solid rgba(20,99,255,.22);outline-offset:2px}
     #exportBtn,#importBtn{display:none!important}
+    .deleted-case-row{background:#fffafa}
+    .deleted-case-row .case-title{opacity:.82}
+    .danger-mini{color:#9e2e2e;border-color:#e5bcbc;background:#fffafa}
+    .restore-mini{color:#176548;border-color:#b7d9ca;background:#f6fcf9}
     @media(max-width:1100px){.attention{grid-template-columns:repeat(4,1fr)}}@media(max-width:900px){.attention{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.hero-row{align-items:start;flex-direction:column}}
     @media(max-width:620px){.check-item{grid-template-columns:auto minmax(0,1fr)}.check-item .check-date{grid-column:2}.hearing-form{grid-template-columns:1fr}.hearing-form .full{grid-column:auto}.attachment-form{grid-template-columns:1fr}.task-form{grid-template-columns:1fr}.timeline-form{grid-template-columns:1fr}.doc-shortcuts{grid-template-columns:1fr}.accused-card{grid-template-columns:64px minmax(0,1fr)}.accused-card img,.accused-avatar{width:64px;height:74px}.accused-remove{grid-column:1/-1;width:100%}.accused-fields{grid-template-columns:1fr}.accused-fields .full{grid-column:auto}.quick-create-row{grid-template-columns:1fr}.quick-create-row .btn{width:100%}.wrap{width:min(100% - 20px,1240px)}.nav{min-height:58px}.nav-actions .hide-mobile{display:none}.hero{padding:22px 0}.main{padding-top:14px}.stats{gap:7px}.stat{padding:13px}.stat strong{font-size:1.45rem}.toolbar{top:58px;grid-template-columns:1fr 1fr;gap:7px}.toolbar .btn{padding-inline:9px}.form-grid,.detail-grid{grid-template-columns:1fr}.form-group.full,.detail-item.full{grid-column:auto}.case-row{grid-template-columns:1fr}.row-actions{flex-direction:row}.row-actions .mini{flex:1}.panel{border-radius:13px}.panel-head{padding:14px}.form-wrap{padding:13px}.detail{padding:13px}.nav-link{padding:8px 9px}.brand span:last-child{display:none}}
   
@@ -149,8 +153,9 @@
     <div class="grid" id="caseListGrid">
       <section class="panel">
         <div class="panel-head">
-          <h2>Case List</h2>
+          <h2 id="caseListTitle">Case List</h2>
           <div>
+            <button class="btn" id="deletedCasesBtn" type="button" onclick="toggleDeletedCases()">Deleted Cases (<span id="deletedCount">0</span>)</button>
             <button class="btn" id="closeCaseListBtn" type="button" onclick="closeCaseList()">Close</button>
             <button class="btn" id="exportBtn" type="button">Export</button>
             <button class="btn" id="importBtn" type="button">Import</button>
@@ -288,6 +293,7 @@
 
 <script>
   const STORAGE_KEY='clearexamsMyCasesV1';
+  const DELETED_STORAGE_KEY='clearexamsMyCasesDeletedV1';
   const CLOUD_TOKEN_KEY='clearexamsMyCasesCloudTokenV1';
   const API_BASE='https://cdr-pdf-bot-production.up.railway.app';
   const CURRENT_CASE_KEY='clearexamsCurrentCaseV1';
@@ -300,6 +306,8 @@
   const $=id=>document.getElementById(id);
   const fields=['crimeNo','crimeYear','dateOccurrence','dateRegistration','sceneOfCrime','policeStation','caseType','sections','complainant','accused','ioName','priority','court','courtCaseNo','stage','nextHearing','nextAction','notes'];
   let cases=loadCases();
+  let deletedCases=loadDeletedCases();
+  let showingDeletedCases=false;
   let selectedId=null;
   let pendingAccusedPhoto='';
   let accusedPersons=[];
@@ -314,7 +322,11 @@
   function loadCases(){
     try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
   }
+  function loadDeletedCases(){
+    try{const v=JSON.parse(localStorage.getItem(DELETED_STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
+  }
   function saveCases(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cases))}
+  function saveDeletedCases(){localStorage.setItem(DELETED_STORAGE_KEY,JSON.stringify(deletedCases))}
   function cloudToken(){return sessionStorage.getItem(CLOUD_TOKEN_KEY)||''}
   function setCloudState(text,state='idle'){
     $('cloudStatusText').textContent=text;
@@ -359,13 +371,30 @@
     if(!cloudToken())return;
     const data=await cloudFetch('/api/cases');
     const remote=Array.isArray(data.cases)?data.cases:[];
+    const deletedIds=new Set(deletedCases.map(x=>String(x.id||'')));
     const map=new Map();
     [...cases,...remote].forEach(item=>{
-      if(!item||!item.id)return;
+      if(!item||!item.id||deletedIds.has(String(item.id)))return;
       const prev=map.get(item.id);
       if(!prev||String(item.updatedAt||'')>=String(prev.updatedAt||''))map.set(item.id,item);
     });
-    cases=[...map.values()];saveCases();renderList();setCloudState('Cloud connected','online');
+    cases=[...map.values()];saveCases();
+
+    try{
+      const deletedData=await cloudFetch('/api/deleted-cases');
+      const remoteDeleted=Array.isArray(deletedData.cases)?deletedData.cases:[];
+      const dmap=new Map(deletedCases.map(x=>[String(x.id||''),x]));
+      remoteDeleted.forEach(item=>{
+        if(!item||!item.id)return;
+        const key=String(item.id);
+        const prev=dmap.get(key);
+        if(!prev||String(item.deletedAt||'')>=String(prev.deletedAt||''))dmap.set(key,item);
+      });
+      deletedCases=[...dmap.values()];
+      saveDeletedCases();
+    }catch(e){}
+
+    renderList();updateDeletedCount();setCloudState('Cloud connected','online');
   }
   async function pushCaseToCloud(item,wasExisting){
     if(!cloudToken())return;
@@ -417,6 +446,8 @@
   function openCaseList(){
     const grid=$('caseListGrid');
     if(!grid)return;
+    showingDeletedCases=false;
+    const title=$('caseListTitle');if(title)title.textContent='Case List';
     grid.classList.add('show-case-list');
     const card=$('totalCasesCard');if(card)card.setAttribute('aria-expanded','true');
     renderList();
@@ -426,6 +457,64 @@
     const grid=$('caseListGrid');
     if(grid)grid.classList.remove('show-case-list');
     const card=$('totalCasesCard');if(card)card.setAttribute('aria-expanded','false');
+  }
+
+  function updateDeletedCount(){
+    const el=$('deletedCount');if(el)el.textContent=deletedCases.length;
+  }
+  function toggleDeletedCases(){
+    showingDeletedCases=!showingDeletedCases;
+    const title=$('caseListTitle');if(title)title.textContent=showingDeletedCases?'Deleted Cases':'Case List';
+    const btn=$('deletedCasesBtn');if(btn)btn.firstChild.nodeValue=showingDeletedCases?'Active Cases (':'Deleted Cases (';
+    renderList();
+  }
+  async function softDeleteCaseById(id){
+    const c=cases.find(x=>String(x.id||'')===String(id||''));
+    if(!c)return;
+    const label=(c.caseType||'Case')+' '+(c.crimeNo||'')+(c.crimeYear?'/'+c.crimeYear:'');
+    if(!confirm('Delete '+label+'?\n\nThe case will be moved to Deleted Cases and can be restored later.'))return;
+    const archived={...c,deletedAt:new Date().toISOString()};
+    deletedCases=[archived,...deletedCases.filter(x=>String(x.id||'')!==String(c.id||''))];
+    cases=cases.filter(x=>String(x.id||'')!==String(c.id||''));
+    saveCases();saveDeletedCases();renderList();updateStats();updateDeletedCount();
+    showToast('Case moved to Deleted Cases.');
+    if(cloudToken()){
+      try{await cloudFetch('/api/cases/'+encodeURIComponent(c.id),{method:'DELETE'});setCloudState('Cloud connected','online')}
+      catch(e){setCloudState('Deleted locally · cloud archive pending','error')}
+    }
+  }
+  async function restoreDeletedCaseById(id){
+    const c=deletedCases.find(x=>String(x.id||'')===String(id||''));
+    if(!c)return;
+    const restored={...c};delete restored.deletedAt;restored.updatedAt=new Date().toISOString();
+    deletedCases=deletedCases.filter(x=>String(x.id||'')!==String(c.id||''));
+    const existing=cases.findIndex(x=>String(x.id||'')===String(c.id||''));
+    if(existing>=0)cases[existing]=restored;else cases.unshift(restored);
+    saveDeletedCases();saveCases();renderList();updateStats();updateDeletedCount();
+    showToast('Case restored.');
+    if(cloudToken()){
+      try{
+        const data=await cloudFetch('/api/deleted-cases/'+encodeURIComponent(c.id)+'/restore',{method:'POST'});
+        if(data.case){
+          const i=cases.findIndex(x=>String(x.id||'')===String(data.case.id||''));
+          if(i>=0)cases[i]=data.case;
+          saveCases();
+        }
+        setCloudState('Cloud connected','online');
+      }catch(e){setCloudState('Restored locally · cloud pending','error')}
+    }
+  }
+  async function permanentlyDeleteCaseById(id){
+    const c=deletedCases.find(x=>String(x.id||'')===String(id||''));
+    if(!c)return;
+    const label=(c.caseType||'Case')+' '+(c.crimeNo||'')+(c.crimeYear?'/'+c.crimeYear:'');
+    if(!confirm('Permanently delete '+label+'?\n\nThis cannot be undone.'))return;
+    deletedCases=deletedCases.filter(x=>String(x.id||'')!==String(c.id||''));
+    saveDeletedCases();renderList();updateDeletedCount();showToast('Case permanently deleted.');
+    if(cloudToken()){
+      try{await cloudFetch('/api/deleted-cases/'+encodeURIComponent(c.id),{method:'DELETE'});setCloudState('Cloud connected','online')}
+      catch(e){setCloudState('Deleted locally · cloud cleanup pending','error')}
+    }
   }
   function openCaseById(id){
     const key=String(id||'');
@@ -441,7 +530,23 @@
   }
 
   function renderList(){
-    const list=$('caseList'),data=filteredCases();
+    const list=$('caseList');
+    updateDeletedCount();
+    if(showingDeletedCases){
+      const data=[...deletedCases].sort((a,b)=>String(b.deletedAt||'').localeCompare(String(a.deletedAt||'')));
+      if(!data.length){list.innerHTML='<div class="empty">No deleted cases.</div>';return}
+      list.innerHTML=data.map(c=>{
+        const title=(c.caseType||'Case')+' '+(c.crimeNo?c.crimeNo+'/'+(c.crimeYear||''):'');
+        const deletedText=c.deletedAt?new Date(c.deletedAt).toLocaleString('en-IN'):'Date not recorded';
+        return '<article class="case-row deleted-case-row" data-id="'+esc(c.id)+'">'+
+          '<div><div class="case-title"><span>'+esc(title)+'</span><span class="chip">Deleted</span></div>'+
+          '<div class="case-meta"><span>🏢 '+esc(c.policeStation||'Police Station not set')+'</span><span>🗑️ '+esc(deletedText)+'</span></div>'+
+          '<div class="case-meta"><span>Sections: '+esc(c.sections||'—')+'</span><span>Accused: '+esc(c.accused||'—')+'</span></div></div>'+
+          '<div class="row-actions"><button class="mini restore-mini" type="button" onclick="restoreDeletedCaseById(this.dataset.id)" data-id="'+esc(c.id)+'">Restore</button><button class="mini danger-mini" type="button" onclick="permanentlyDeleteCaseById(this.dataset.id)" data-id="'+esc(c.id)+'">Delete Permanently</button></div></article>';
+      }).join('');
+      return;
+    }
+    const data=filteredCases();
     if(!data.length){list.innerHTML='<div class="empty">No matching cases. Tap <strong>New Case</strong> to add one.</div>';updateStats();return}
     list.innerHTML=data.map(c=>{
       const title=(c.caseType||'Case')+' '+(c.crimeNo?c.crimeNo+'/'+(c.crimeYear||''):'');
@@ -452,7 +557,7 @@
         '<div><div class="case-title"><span>'+esc(title)+'</span><span class="chip '+esc((c.priority||'medium').toLowerCase())+'">'+esc(c.priority||'Medium')+'</span><span class="chip">'+esc(c.stage||'Investigation')+'</span></div>'+
         '<div class="case-meta"><span>🏢 '+esc(c.policeStation||'Police Station not set')+'</span><span>⚖️ '+esc(c.court||'Court not set')+'</span><span>📅 '+esc(dateText)+'</span></div>'+
         '<div class="case-meta"><span>Sections: '+esc(c.sections||'—')+'</span><span>Accused: '+esc(c.accused||'—')+'</span></div></div>'+
-        '<div class="row-actions"><button class="mini" type="button" data-action="view" data-id="'+esc(c.id)+'" onclick="openCaseById(this.dataset.id)">View</button><button class="mini" type="button" data-action="docs" data-id="'+esc(c.id)+'" onclick="openCaseDocsById(this.dataset.id)">Documents</button></div></article>'
+        '<div class="row-actions"><button class="mini" type="button" data-action="view" data-id="'+esc(c.id)+'" onclick="openCaseById(this.dataset.id)">View</button><button class="mini" type="button" data-action="docs" data-id="'+esc(c.id)+'" onclick="openCaseDocsById(this.dataset.id)">Documents</button><button class="mini danger-mini" type="button" data-id="'+esc(c.id)+'" onclick="softDeleteCaseById(this.dataset.id)">Delete</button></div></article>'
     }).join('');
     updateStats();
   }
@@ -742,7 +847,7 @@
   $('syncNowBtn').addEventListener('click',async()=>{try{await syncFromCloud();showToast('Cloud sync complete.')}catch(e){setCloudState('Cloud sync failed','error');alert(e.message)}});
   $('loginDialog').addEventListener('click',e=>{if(e.target===$('loginDialog'))$('loginDialog').classList.remove('open')});
 
-  populateStages();clearForm();renderList();checkCloudSession();
+  populateStages();clearForm();renderList();updateDeletedCount();checkCloudSession();
 </script>
 </body>
 </html>
