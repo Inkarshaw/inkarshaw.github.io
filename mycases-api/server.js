@@ -9,6 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_NAME = process.env.GOOGLE_SHEET_NAME || 'Cases';
+const DELETED_SHEET_NAME = process.env.GOOGLE_DELETED_SHEET_NAME || 'Deleted Cases';
 const APP_PASSWORD = process.env.MYCASES_PASSWORD;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const COOKIE_NAME = 'clearexams_mycases_session';
@@ -120,6 +121,8 @@ const HEADERS = [
   'Next Action','Notes','Created At','Updated At','Accused JSON','Investigation JSON','Tasks JSON','Court Hearings JSON','Timeline JSON','Attachments JSON'
 ];
 
+const DELETED_HEADERS = [...HEADERS, 'Deleted At'];
+
 const FIELDS = [
   'id','policeStation','caseType','crimeNo','crimeYear',
   'sections','complainant','accused','ioName','priority','court',
@@ -138,6 +141,79 @@ function rowToCase(row) {
   const item = {};
   FIELDS.forEach((key, i) => { const v=row[i]||''; if(JSON_FIELDS.has(key)){try{item[key]=v?JSON.parse(v):[]}catch{item[key]=[]}}else item[key]=v; });
   return item;
+}
+
+function columnName(n) {
+  let out = '';
+  while (n > 0) {
+    n -= 1;
+    out = String.fromCharCode(65 + (n % 26)) + out;
+    n = Math.floor(n / 26);
+  }
+  return out;
+}
+
+function a1SheetName(name) {
+  return "'" + String(name).replace(/'/g, "''") + "'";
+}
+
+async function ensureSheet(sheets, sheetName, headers) {
+  const metadata = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+  let sheet = metadata.data.sheets.find(s => s.properties.title === sheetName);
+  if (!sheet) {
+    const created = await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: { requests: [{ addSheet: { properties: { title: sheetName } } }] }
+    });
+    sheet = { properties: created.data.replies[0].addSheet.properties };
+  }
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SHEET_ID,
+    range: `${a1SheetName(sheetName)}!A1:${columnName(headers.length)}1`,
+    valueInputOption: 'RAW',
+    requestBody: { values: [headers] }
+  });
+  return sheet.properties.sheetId;
+}
+
+async function readDeletedCases() {
+  const sheets = await sheetsClient();
+  await ensureSheet(sheets, DELETED_SHEET_NAME, DELETED_HEADERS);
+  const result = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `${a1SheetName(DELETED_SHEET_NAME)}!A2:Y`
+  });
+  return (result.data.values || [])
+    .filter(row => row.some(v => String(v || '').trim()))
+    .map(row => ({ ...rowToCase(row.slice(0, FIELDS.length)), deletedAt: row[FIELDS.length] || '' }));
+}
+
+async function findDeletedCaseRow(id) {
+  const cases = await readDeletedCases();
+  const index = cases.findIndex(item => item.id === id);
+  return { cases, index, rowNumber: index >= 0 ? index + 2 : null };
+}
+
+async function deleteSheetRow(sheetName, rowNumber) {
+  const sheets = await sheetsClient();
+  const metadata = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+  const sheet = metadata.data.sheets.find(s => s.properties.title === sheetName);
+  if (!sheet) throw new Error(sheetName + ' sheet not found');
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: {
+      requests: [{
+        deleteDimension: {
+          range: {
+            sheetId: sheet.properties.sheetId,
+            dimension: 'ROWS',
+            startIndex: rowNumber - 1,
+            endIndex: rowNumber
+          }
+        }
+      }]
+    }
+  });
 }
 
 function cleanCase(input, existing = null) {
@@ -258,30 +334,63 @@ app.put('/api/cases/:id', requireAuth, async (req, res, next) => {
 
 app.delete('/api/cases/:id', requireAuth, async (req, res, next) => {
   try {
-    const { index, rowNumber } = await findCaseRow(req.params.id);
+    const { cases, index, rowNumber } = await findCaseRow(req.params.id);
     if (index < 0) return res.status(404).json({ error: 'Case not found' });
 
+    const item = cases[index];
+    const deletedAt = new Date().toISOString();
     const sheets = await sheetsClient();
-    const metadata = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
-    const sheet = metadata.data.sheets.find(s => s.properties.title === SHEET_NAME);
-    if (!sheet) return res.status(500).json({ error: 'Cases sheet not found' });
-
-    await sheets.spreadsheets.batchUpdate({
+    await ensureSheet(sheets, DELETED_SHEET_NAME, DELETED_HEADERS);
+    await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      requestBody: {
-        requests: [{
-          deleteDimension: {
-            range: {
-              sheetId: sheet.properties.sheetId,
-              dimension: 'ROWS',
-              startIndex: rowNumber - 1,
-              endIndex: rowNumber
-            }
-          }
-        }]
-      }
+      range: `${a1SheetName(DELETED_SHEET_NAME)}!A:Y`,
+      valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: { values: [[...caseToRow(item), deletedAt]] }
     });
+    await deleteSheetRow(SHEET_NAME, rowNumber);
 
+    res.json({ ok: true, deletedAt });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get('/api/deleted-cases', requireAuth, async (req, res, next) => {
+  try {
+    res.json({ cases: await readDeletedCases() });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/deleted-cases/:id/restore', requireAuth, async (req, res, next) => {
+  try {
+    const { cases, index, rowNumber } = await findDeletedCaseRow(req.params.id);
+    if (index < 0) return res.status(404).json({ error: 'Deleted case not found' });
+
+    const restored = cleanCase(cases[index], cases[index]);
+    const sheets = await sheetsClient();
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: `${a1SheetName(SHEET_NAME)}!A:X`,
+      valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: { values: [caseToRow(restored)] }
+    });
+    await deleteSheetRow(DELETED_SHEET_NAME, rowNumber);
+
+    res.json({ ok: true, case: restored });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete('/api/deleted-cases/:id', requireAuth, async (req, res, next) => {
+  try {
+    const { index, rowNumber } = await findDeletedCaseRow(req.params.id);
+    if (index < 0) return res.status(404).json({ error: 'Deleted case not found' });
+    await deleteSheetRow(DELETED_SHEET_NAME, rowNumber);
     res.json({ ok: true });
   } catch (error) {
     next(error);
