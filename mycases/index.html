@@ -73,6 +73,8 @@
     .footer{padding:28px 0 44px;color:#607086;font-size:.8rem;text-align:center}
     .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,90px);opacity:0;transition:.25s;z-index:120;background:#0e2944;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:.82rem}.toast.show{transform:translate(-50%,0);opacity:1}
     .hidden{display:none!important}
+    /* Main dashboard: legacy Case List / Case Details panels intentionally removed from view. */
+    .grid{display:none!important}
     @media(max-width:1100px){.attention{grid-template-columns:repeat(4,1fr)}}@media(max-width:900px){.attention{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.hero-row{align-items:start;flex-direction:column}}
     @media(max-width:620px){.check-item{grid-template-columns:auto minmax(0,1fr)}.check-item .check-date{grid-column:2}.hearing-form{grid-template-columns:1fr}.hearing-form .full{grid-column:auto}.attachment-form{grid-template-columns:1fr}.task-form{grid-template-columns:1fr}.timeline-form{grid-template-columns:1fr}.doc-shortcuts{grid-template-columns:1fr}.accused-card{grid-template-columns:64px minmax(0,1fr)}.accused-card img,.accused-avatar{width:64px;height:74px}.accused-remove{grid-column:1/-1;width:100%}.accused-fields{grid-template-columns:1fr}.accused-fields .full{grid-column:auto}.quick-create-row{grid-template-columns:1fr}.quick-create-row .btn{width:100%}.wrap{width:min(100% - 20px,1240px)}.nav{min-height:58px}.nav-actions .hide-mobile{display:none}.hero{padding:22px 0}.main{padding-top:14px}.stats{gap:7px}.stat{padding:13px}.stat strong{font-size:1.45rem}.toolbar{top:58px;grid-template-columns:1fr 1fr;gap:7px}.toolbar .btn{padding-inline:9px}.form-grid,.detail-grid{grid-template-columns:1fr}.form-group.full,.detail-item.full{grid-column:auto}.case-row{grid-template-columns:1fr}.row-actions{flex-direction:row}.row-actions .mini{flex:1}.panel{border-radius:13px}.panel-head{padding:14px}.form-wrap{padding:13px}.detail{padding:13px}.nav-link{padding:8px 9px}.brand span:last-child{display:none}}
   
@@ -503,13 +505,7 @@
     });
   }
   function startNewCase(){
-    clearForm();
-    const q=$('quickCaseForm'), f=$('caseForm'), d=$('caseDetail');
-    if(q){q.classList.remove('hidden');q.style.display='';}
-    if(f){f.classList.add('hidden');f.style.display='';}
-    if(d)d.classList.remove('visible');
-    const input=$('quickCrimeNo'); if(input)setTimeout(()=>input.focus(),50);
-    const panel=$('editorPanel'); if(panel)window.scrollTo({top:Math.max(0,panel.offsetTop-110),behavior:'smooth'});
+    window.location.href='/mycases/edit/?new=1';
   }
 
   function editSelectedCase(){
