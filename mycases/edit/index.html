@@ -82,7 +82,7 @@
 </head>
 <body>
 <header class="topbar"><div class="wrap"><div class="brand"><div class="brand-mark">CE</div><div><h1>Edit Case</h1><p>ClearExams • My Cases</p></div></div><button class="btn" type="button" onclick="history.length>1?history.back():location.href='/mycases/'">← Back</button></div></header>
-<main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><button class="btn" type="button" onclick="location.href='/mycases/'">Case List</button></div>
+<main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><button class="btn" type="button" onclick="location.href='/mycases/'">Dashboard</button></div>
 <form class="quick-create hidden" id="quickCaseForm"><input id="quickCrimeNo"></form>
 <form class="form-wrap" id="caseForm">
           <div class="case-tabs" id="caseTabs">
@@ -626,17 +626,26 @@
 (function(){
   const params=new URLSearchParams(location.search);
   const id=params.get('id');
+  const isNew=params.get('new')==='1'||!id;
   let item=null;
-  try{item=JSON.parse(localStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
-  if(!item||String(item.id)!==String(id)){
-    item=cases.find(x=>String(x.id||'')===String(id||''));
-  }
-  if(item){
-    fillForm(item);
+  if(isNew){
+    clearForm();
+    document.getElementById('quickCaseForm').classList.add('hidden');
     document.getElementById('caseForm').classList.remove('hidden');
+    document.getElementById('editorTitle').textContent='New Case';
+    document.getElementById('saveCaseBtn').textContent='Create Case';
   }else{
-    document.getElementById('editorTitle').textContent='Case not found';
-    showToast('Return to My Cases and select the case again.');
+    try{item=JSON.parse(localStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
+    if(!item||String(item.id)!==String(id)){
+      item=cases.find(x=>String(x.id||'')===String(id||''));
+    }
+    if(item){
+      fillForm(item);
+      document.getElementById('caseForm').classList.remove('hidden');
+    }else{
+      document.getElementById('editorTitle').textContent='Case not found';
+      showToast('Return to My Cases and select the case again.');
+    }
   }
   const originalSave=saveCurrent;
   window.saveCurrent=function(openDocs=false){
