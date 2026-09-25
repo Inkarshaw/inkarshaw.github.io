@@ -348,7 +348,15 @@
   }
 
   function clearForm(){
-    pendingAccusedPhoto='';accusedPersons=[];timelineEntries=[];caseTasks=[];caseAttachments=[];hearingHistory=[];investigationChecklist=defaultChecklist();renderAccusedEditor();renderTimeline();renderTasks();renderAttachments();renderHearings();renderInvestigationChecklist();$('caseForm').reset();$('quickCaseForm').reset();$('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';$('editorTitle').textContent='New Case';$('saveCaseBtn').textContent='Create Case';$('quickCaseForm').classList.remove('hidden');$('caseForm').classList.add('hidden');$('caseDetail').classList.remove('visible');selectedId=null;renderList();
+    pendingAccusedPhoto='';accusedPersons=[];timelineEntries=[];caseTasks=[];caseAttachments=[];hearingHistory=[];investigationChecklist=defaultChecklist();
+    renderAccusedEditor();renderTimeline();renderTasks();renderAttachments();renderHearings();renderInvestigationChecklist();
+    $('caseForm').reset();if($('quickCaseForm'))$('quickCaseForm').reset();
+    $('caseId').value='';$('priority').value='Medium';$('stage').value='Investigation';$('caseType').value='Crime';
+    $('editorTitle').textContent='New Case';$('saveCaseBtn').textContent='Create Case';
+    if($('quickCaseForm'))$('quickCaseForm').classList.add('hidden');
+    $('caseForm').classList.remove('hidden');
+    $('caseDetail').classList.remove('visible');
+    selectedId=null;setCaseTab('case');renderList();
   }
 
   function investigationProgress(c){
@@ -407,12 +415,8 @@
   }
   function startNewCase(){
     clearForm();
-    const q=$('quickCaseForm'), f=$('caseForm'), d=$('caseDetail');
-    if(q){q.classList.remove('hidden');q.style.display='';}
-    if(f){f.classList.add('hidden');f.style.display='';}
-    if(d)d.classList.remove('visible');
-    const input=$('quickCrimeNo'); if(input)setTimeout(()=>input.focus(),50);
-    const panel=$('editorPanel'); if(panel)window.scrollTo({top:Math.max(0,panel.offsetTop-110),behavior:'smooth'});
+    const input=$('crimeNo');if(input)setTimeout(()=>input.focus(),50);
+    const panel=$('editorPanel');if(panel)window.scrollTo({top:Math.max(0,panel.offsetTop-110),behavior:'smooth'});
   }
 
   function editSelectedCase(){
@@ -639,10 +643,10 @@
   let item=null;
   if(isNew){
     clearForm();
-    document.getElementById('quickCaseForm').classList.add('hidden');
-    document.getElementById('caseForm').classList.remove('hidden');
+    setCaseTab('case');
     document.getElementById('editorTitle').textContent='New Case';
     document.getElementById('saveCaseBtn').textContent='Create Case';
+    const crimeInput=document.getElementById('crimeNo');if(crimeInput)setTimeout(()=>crimeInput.focus(),50);
   }else{
     try{item=JSON.parse(localStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
     if(!item||String(item.id)!==String(id)){
