@@ -139,6 +139,7 @@
         <button class="tab" data-tab="devices">Devices</button>
         <button class="tab" data-tab="incident">Incident Timeline</button>
         <button class="tab" data-tab="days">Day Summary</button>
+        <button class="tab" data-tab="patterns">Patterns</button>
         <button class="tab" data-tab="movement">Movement</button>
         <button class="tab" data-tab="leads">Review Leads</button>
         <button class="tab" data-tab="network">Network</button>
@@ -186,6 +187,7 @@
       </section>
 
       <section id="days" class="view hidden"><div class="panel"><div class="panel-title"><h2>Day-wise summary</h2><span class="muted">One row per day from the current filters</span></div><div class="tablewrap"><table class="table" id="daySummaryTable"></table></div></div></section>
+      <section id="patterns" class="view hidden"><div class="panel"><div class="panel-title"><h2>Activity pattern matrix</h2><span class="muted">Date × hour event density</span></div><div id="hourMatrix" class="tablewrap"></div><div id="contactDayMatrix" style="margin-top:18px"></div></div></section>
       <section id="movement" class="view hidden">
         <div class="panel">
           <div class="panel-title"><h2>Movement / tower timeline</h2><span class="muted">Chronological tower associations from CDR events</span></div>
@@ -352,7 +354,7 @@
   function aggregateLocations(data=state.filtered){const m=new Map();for(const r of data){const k=r.firstCellId||r.firstAddress||`${r.lat||''},${r.lng||''}`;if(!k)continue;let x=m.get(k);if(!x)x={cellId:r.firstCellId,address:r.firstAddress,lat:r.lat,lng:r.lng,az:r.azimuth,records:0,duration:0,contacts:new Set(),first:null,last:null,cdrs:new Set(),roaming:new Set()};x.records++;x.duration+=r.duration;if(r.bparty)x.contacts.add(r.bparty);if(r.cdrNo)x.cdrs.add(r.cdrNo);if(r.roaming)x.roaming.add(r.roaming);if(r.dt&&(!x.first||r.dt<x.first))x.first=r.dt;if(r.dt&&(!x.last||r.dt>x.last))x.last=r.dt;m.set(k,x);}return [...m.values()].sort((a,b)=>b.records-a.records);}
   function aggregateDevices(data=state.filtered){const m=new Map();for(const r of data){const k=`${r.imei||'—'}|${r.imsi||'—'}`;if(k==='—|—')continue;let x=m.get(k);if(!x)x={imei:r.imei,imsi:r.imsi,manufacturer:r.manufacturer,deviceType:r.deviceType,records:0,contacts:new Set(),towers:new Set(),cdrs:new Set(),first:null,last:null};x.records++;if(r.bparty)x.contacts.add(r.bparty);if(r.firstCellId)x.towers.add(r.firstCellId);if(r.cdrNo)x.cdrs.add(r.cdrNo);if(r.dt&&(!x.first||r.dt<x.first))x.first=r.dt;if(r.dt&&(!x.last||r.dt>x.last))x.last=r.dt;m.set(k,x);}return [...m.values()].sort((a,b)=>b.records-a.records);}
 
-  function renderAll(){renderDashboard();renderRecords();renderContacts();renderLocations();renderDevices();renderIncident();renderDaySummary();renderMovement();renderLeads();renderNetwork();renderCompare();renderFlags();}
+  function renderAll(){renderDashboard();renderRecords();renderContacts();renderLocations();renderDevices();renderIncident();renderDaySummary();renderPatterns();renderMovement();renderLeads();renderNetwork();renderCompare();renderFlags();}
   function renderDashboard(){
     const d=state.filtered, contacts=aggregateContacts(d), locs=aggregateLocations(d), devs=aggregateDevices(d), calls=d.filter(r=>normalize(r.callType).includes('call')), sms=d.filter(r=>normalize(r.callType).includes('sms')), duration=calls.reduce((s,r)=>s+r.duration,0), dates=d.filter(r=>r.dt).map(r=>r.dt);
     const min=dates.length?new Date(Math.min(...dates)):null,max=dates.length?new Date(Math.max(...dates)):null; const uniqueImei=new Set(d.map(r=>r.imei).filter(Boolean)).size, uniqueImsi=new Set(d.map(r=>r.imsi).filter(Boolean)).size;
@@ -435,6 +437,12 @@
   function renderDaySummary(){
     const m=new Map();for(const r of state.filtered){if(!r.dt)continue;const d=r.dt.toISOString().slice(0,10);let x=m.get(d)||{date:d,first:null,last:null,events:0,calls:0,sms:0,contacts:new Set(),towers:new Set(),imei:new Set(),imsi:new Set(),night:0};x.events++;const t=normalize(r.callType);if(t.includes('call'))x.calls++;if(t.includes('sms'))x.sms++;if(r.bparty)x.contacts.add(r.bparty);if(r.firstCellId)x.towers.add(r.firstCellId);if(r.imei)x.imei.add(r.imei);if(r.imsi)x.imsi.add(r.imsi);if(!x.first||r.dt<x.first)x.first=r.dt;if(!x.last||r.dt>x.last)x.last=r.dt;if(r.dt.getHours()>=20||r.dt.getHours()<6)x.night++;m.set(d,x);}
     const rows=[...m.values()].sort((a,b)=>a.date.localeCompare(b.date));$('daySummaryTable').innerHTML=`<thead><tr><th>Date</th><th>First activity</th><th>Last activity</th><th>Events</th><th>Calls</th><th>SMS</th><th>Contacts</th><th>Towers</th><th>IMEI</th><th>IMSI</th><th>Night events</th></tr></thead><tbody>${rows.map(x=>`<tr><td><button class="btn secondary small day-filter" data-date="${x.date}">${x.date}</button></td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td>${fmtInt(x.events)}</td><td>${fmtInt(x.calls)}</td><td>${fmtInt(x.sms)}</td><td>${fmtInt(x.contacts.size)}</td><td>${fmtInt(x.towers.size)}</td><td>${fmtInt(x.imei.size)}</td><td>${fmtInt(x.imsi.size)}</td><td>${fmtInt(x.night)}</td></tr>`).join('')}</tbody>`;
+  }
+  function renderPatterns(){
+    const days=[...new Set(state.filtered.filter(r=>r.dt).map(r=>r.dt.toISOString().slice(0,10)))].sort().slice(-31),matrix={};let max=1;
+    for(const d of days)matrix[d]=Array(24).fill(0);
+    for(const r of state.filtered){if(!r.dt)continue;const d=r.dt.toISOString().slice(0,10);if(matrix[d]){matrix[d][r.dt.getHours()]++;max=Math.max(max,matrix[d][r.dt.getHours()]);}}
+    $('hourMatrix').innerHTML=`<table class="table"><thead><tr><th>Date</th>${Array.from({length:24},(_,h)=>`<th>${String(h).padStart(2,'0')}</th>`).join('')}</tr></thead><tbody>${days.map(d=>`<tr><td>${d}</td>${matrix[d].map(v=>`<td title="${v} event(s)" style="text-align:center;background:rgba(21,94,239,${v?0.08+0.72*v/max:0})">${v||''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   }
   function renderMovementMap(rows){
     const el=$('movementMap'); if(!el)return;movementPlaybackRows=rows;movementPlaybackMarkers=[];
@@ -549,7 +557,7 @@
   }
   function renderFlags(){const rows=state.records.filter(r=>state.flags.has(r.id));$('flagList').innerHTML=rows.length?rows.map(r=>`<div class="note-card"><div class="record-summary"><b title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(contactLabel(r.bparty))}</b> • ${escapeHtml(dtFmt(r.dt)||`${r.date} ${r.time}`)} • ${escapeHtml(r.callType)} • ${fmtDur(r.duration)} <button class="lead-action lead-view-record" data-id="${r.id}">View record</button><br>${escapeHtml(r.firstAddress||r.firstCellId||'')}</div><textarea class="row-note" data-id="${r.id}" placeholder="Note for this record…">${escapeHtml(state.notes[r.id]||'')}</textarea><div style="margin-top:6px"><button class="btn secondary small unflag" data-id="${r.id}">Remove flag</button></div></div>`).join(''):`<div class="empty">No records flagged yet.</div>`;}
 
-  function switchTab(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!==id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));if(id==='dashboard')renderDashboard();if(id==='incident')renderIncident();if(id==='days')renderDaySummary();if(id==='movement')requestAnimationFrame(()=>renderMovement());if(id==='leads')renderLeads();if(id==='network')requestAnimationFrame(renderNetwork);if(id==='compare')renderCompare();}
+  function switchTab(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!==id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));if(id==='dashboard')renderDashboard();if(id==='incident')renderIncident();if(id==='days')renderDaySummary();if(id==='patterns')renderPatterns();if(id==='movement')requestAnimationFrame(()=>renderMovement());if(id==='leads')renderLeads();if(id==='network')requestAnimationFrame(renderNetwork);if(id==='compare')renderCompare();}
   function contactFilter(num){$('bparty').value=num;applyFilters();switchTab('records');}
   function csvCell(v){const s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
   function download(name,text,type='text/plain;charset=utf-8'){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
