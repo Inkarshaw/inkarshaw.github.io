@@ -178,6 +178,7 @@
             <button class="btn secondary small" id="incidentRefreshBtn">Refresh</button>
           </div>
           <div id="incidentSummary"></div>
+          <h3>Baseline vs incident</h3><div id="baselineCompare"></div>
           <div class="tablewrap" style="margin-top:12px"><table class="table" id="incidentTable"></table></div>
         </div>
       </section>
@@ -399,12 +400,19 @@
   }
   function renderIncident(){
     const inc=incidentDateTime();
-    if(!inc){$('incidentSummary').innerHTML='<div class="notice">Enter Incident Date and Incident Time at the top first.</div>';$('incidentTable').innerHTML='';return;}
+    if(!inc){$('incidentSummary').innerHTML='<div class="notice">Enter Incident Date and Incident Time at the top first.</div>';$('baselineCompare').innerHTML='';$('incidentTable').innerHTML='';return;}
     const beforeH=+$('incidentBeforeHours').value||6,duringM=+$('incidentDuringMins').value||30,afterH=+$('incidentAfterHours').value||6;
     const start=new Date(inc-beforeH*3600000),duringStart=new Date(inc-duringM*60000),duringEnd=new Date(inc+duringM*60000),end=new Date(inc+afterH*3600000);
     const rows=state.records.filter(r=>r.dt&&r.dt>=start&&r.dt<=end).sort((a,b)=>a.dt-b.dt);
     const before=rows.filter(r=>r.dt<duringStart),during=rows.filter(r=>r.dt>=duringStart&&r.dt<=duringEnd),after=rows.filter(r=>r.dt>duringEnd);
     $('incidentSummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(before.length)}</div><div class="l">Before</div><div class="s">${beforeH} hours</div></div><div class="kpi"><div class="v">${fmtInt(during.length)}</div><div class="l">During</div><div class="s">±${duringM} min</div></div><div class="kpi"><div class="v">${fmtInt(after.length)}</div><div class="l">After</div><div class="s">${afterH} hours</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(r=>r.bparty).filter(Boolean)).size)}</div><div class="l">Contacts</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(r=>r.firstCellId).filter(Boolean)).size)}</div><div class="l">Towers</div></div></div>`;
+    const baseStart=new Date(inc-30*86400000),baseRows=state.records.filter(r=>r.dt&&r.dt>=baseStart&&r.dt<start);
+    const baseDays=Math.max(1,new Set(baseRows.map(r=>r.dt.toISOString().slice(0,10))).size);
+    const incidentContacts=new Set(rows.map(r=>r.bparty).filter(Boolean)),baseContacts=new Set(baseRows.map(r=>r.bparty).filter(Boolean));
+    const incidentTowers=new Set(rows.map(r=>r.firstCellId).filter(Boolean)),baseTowers=new Set(baseRows.map(r=>r.firstCellId).filter(Boolean));
+    const newContacts=[...incidentContacts].filter(x=>!baseContacts.has(x)),newTowers=[...incidentTowers].filter(x=>!baseTowers.has(x));
+    $('baselineCompare').innerHTML=simpleTable(['Metric','30-day baseline','Incident window'],[['Events',fmtInt(baseRows.length)+' total / '+(baseRows.length/baseDays).toFixed(1)+' per day',fmtInt(rows.length)],['Unique contacts',fmtInt(baseContacts.size),fmtInt(incidentContacts.size)],['Unique towers',fmtInt(baseTowers.size),fmtInt(incidentTowers.size)],['Contacts not in baseline','—',fmtInt(newContacts.length)],['Towers not in baseline','—',fmtInt(newTowers.length)]]);
+
     $('incidentTable').innerHTML=`<thead><tr><th>Period</th><th>Date / Time</th><th>Subject</th><th>Contact</th><th>Type</th><th>Duration</th><th>Tower</th><th>IMEI</th><th>IMSI</th><th>Source</th></tr></thead><tbody>${rows.slice(0,2000).map(r=>{const period=r.dt<duringStart?'Before':r.dt<=duringEnd?'During':'After';return `<tr><td><span class="pill">${period}</span></td><td>${escapeHtml(dtFmt(r.dt))}</td><td>${escapeHtml(r.cdrNo)}</td><td><a href="#" class="link contact-filter" data-num="${escAttr(r.bparty)}" title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(contactLabel(r.bparty))}</a></td><td>${typePill(r.callType)}</td><td>${fmtDur(r.duration)}</td><td class="details">${escapeHtml(r.firstAddress||r.firstCellId)}</td><td>${escapeHtml(r.imei)}</td><td>${escapeHtml(r.imsi)}</td><td>${escapeHtml(r.sourceFile)} • row ${r.rowNumber}</td></tr>`}).join('')}</tbody>`;
   }
 
