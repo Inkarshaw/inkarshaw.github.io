@@ -173,7 +173,7 @@
 
       <section id="contacts" class="view hidden"><div class="panel"><div class="panel-title"><h2>Contact analysis</h2><div class="group"><button class="btn secondary small" id="exportDirectoryBtn">Export directory</button><button class="btn secondary small" id="importDirectoryBtn">Import directory</button><input id="directoryInput" type="file" accept=".json,application/json" hidden></div></div><div class="tiny" style="margin-bottom:8px">Click a number to filter the record view. Directory entries stay in this browser and can be reused across CDR files.</div><div class="tablewrap"><table class="table" id="contactsTable"></table></div><div id="contactProfilePanel" style="margin-top:14px"></div></div></section>
       <section id="locations" class="view hidden"><div class="panel"><div class="panel-title"><h2>Location / tower analysis</h2><span class="muted">Based on first cell ID / first tower address</span></div><div class="tablewrap"><table class="table" id="locationsTable"></table></div></div></section>
-      <section id="devices" class="view hidden"><div class="panel"><div class="panel-title"><h2>IMEI / IMSI usage</h2><span class="muted">Useful for identifying device or SIM changes over the loaded period</span></div><div class="tablewrap"><table class="table" id="devicesTable"></table></div><h3>Identifier change timeline</h3><div class="tablewrap" style="max-height:360px"><table class="table" id="deviceChangeTable"></table></div></div></section>
+      <section id="devices" class="view hidden"><div class="panel"><div class="panel-title"><h2>IMEI / IMSI usage</h2><span class="muted">Useful for identifying device or SIM changes over the loaded period</span></div><div class="tablewrap"><table class="table" id="devicesTable"></table></div><h3>Identifier change timeline</h3><div class="tablewrap" style="max-height:360px"><table class="table" id="deviceChangeTable"></table></div><h3>IMEI ↔ IMSI relationship matrix</h3><div id="imeiImsiMatrix" class="tablewrap"></div></div></section>
       <section id="incident" class="view hidden">
         <div class="panel">
           <div class="panel-title"><h2>Before / During / After Incident</h2><span class="muted">Chronological CDR events around the incident time</span></div>
@@ -408,6 +408,10 @@
       if(r.imei)p.imei=r.imei;if(r.imsi)p.imsi=r.imsi;by.set(r.cdrNo,p);
     }
     $('deviceChangeTable').innerHTML=`<thead><tr><th>Subject</th><th>Type</th><th>From</th><th>To</th><th>First record on new ID</th></tr></thead><tbody>${changes.map(x=>`<tr><td>${escapeHtml(x.cdr)}</td><td>${x.type}</td><td>${escapeHtml(x.from)}</td><td>${escapeHtml(x.to)}</td><td>${dtFmt(x.at)}</td></tr>`).join('')}</tbody>`;
+    const imeis=[...new Set(state.filtered.map(r=>r.imei).filter(Boolean))].slice(0,25),imsis=[...new Set(state.filtered.map(r=>r.imsi).filter(Boolean))].slice(0,25),pair={};
+    for(const r of state.filtered){if(!r.imei||!r.imsi)continue;pair[r.imei+'|'+r.imsi]=(pair[r.imei+'|'+r.imsi]||0)+1;}
+    $('imeiImsiMatrix').innerHTML=`<table class="table"><thead><tr><th>IMEI \ IMSI</th>${imsis.map(x=>`<th>${escapeHtml(x)}</th>`).join('')}</tr></thead><tbody>${imeis.map(i=>`<tr><td>${escapeHtml(i)}</td>${imsis.map(s=>`<td style="text-align:center">${pair[i+'|'+s]||''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+
   }
   function movementRows(){
     let data=state.filtered.filter(r=>r.dt&&(r.firstCellId||r.firstAddress));
