@@ -74,7 +74,7 @@
       <div id="loadStatus" class="status"></div>
       <div class="file-list" id="fileList"></div>
       <div style="margin-top:8px"><button class="btn secondary small" id="clearFilesBtn">Clear Loaded CDRs</button></div>
-      <div class="privacy">CDR rows are processed in this browser. This page does not contain code that uploads the selected CDR file to a server. The XLSX and chart libraries themselves are loaded from a public CDN.</div>
+      <div class="privacy">CDR rows are processed in this browser. This page does not contain code that uploads the selected CDR file to a server. The XLSX, chart and map libraries are loaded from public CDNs and are cached for offline reuse after the first successful visit.</div>
 
       <div class="incident-focus">
         <div class="field"><label>Incident focus ± hours</label><input id="incidentWindowHours" type="number" min="1" max="168" value="6" /></div>
@@ -604,6 +604,7 @@
   try{state.contactTags=JSON.parse(localStorage.getItem('cdrAnalyzer:contactTags')||'{}')||{};}catch{state.contactTags={};}try{state.contactNames=JSON.parse(localStorage.getItem('cdrAnalyzer:contactNames')||'{}')||{};}catch{state.contactNames={};}
   ['caseTitle','caseNo','station','analyst','incidentDate','incidentTime','incidentWindowHours','generalNote'].forEach(id=>{const el=$(id);const key='cdrAnalyzer:'+id;el.value=localStorage.getItem(key)||'';el.addEventListener('input',()=>localStorage.setItem(key,el.value));});
   if(typeof XLSX==='undefined')showStatus('The XLSX library did not load. Internet access is needed once to load the spreadsheet library from the CDN.','error');
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('/cdranalysis/sw.js').catch(()=>{});}
   renderAll();
 })();
 </script>
