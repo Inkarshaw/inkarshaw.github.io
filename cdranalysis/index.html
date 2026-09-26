@@ -443,6 +443,9 @@
     for(const d of days)matrix[d]=Array(24).fill(0);
     for(const r of state.filtered){if(!r.dt)continue;const d=r.dt.toISOString().slice(0,10);if(matrix[d]){matrix[d][r.dt.getHours()]++;max=Math.max(max,matrix[d][r.dt.getHours()]);}}
     $('hourMatrix').innerHTML=`<table class="table"><thead><tr><th>Date</th>${Array.from({length:24},(_,h)=>`<th>${String(h).padStart(2,'0')}</th>`).join('')}</tr></thead><tbody>${days.map(d=>`<tr><td>${d}</td>${matrix[d].map(v=>`<td title="${v} event(s)" style="text-align:center;background:rgba(21,94,239,${v?0.08+0.72*v/max:0})">${v||''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    const top=aggregateContacts(state.filtered).slice(0,20),cd={};let cmax=1;for(const x of top){cd[x.bparty]={};for(const d of days)cd[x.bparty][d]=0;}for(const r of state.filtered){if(!r.dt||!cd[r.bparty])continue;const d=r.dt.toISOString().slice(0,10);if(d in cd[r.bparty]){cd[r.bparty][d]++;cmax=Math.max(cmax,cd[r.bparty][d]);}}
+    $('contactDayMatrix').innerHTML=`<h3>Contact-by-day matrix</h3><div class="tablewrap"><table class="table"><thead><tr><th>Contact</th>${days.map(d=>`<th>${d.slice(5)}</th>`).join('')}</tr></thead><tbody>${top.map(x=>`<tr><td title="${escAttr(contactTitle(x.bparty))}">${escapeHtml(contactLabel(x.bparty))}</td>${days.map(d=>{const v=cd[x.bparty][d]||0;return `<td title="${v} event(s)" style="text-align:center;background:rgba(181,71,8,${v?0.08+0.72*v/cmax:0})">${v||''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
+
   }
   function renderMovementMap(rows){
     const el=$('movementMap'); if(!el)return;movementPlaybackRows=rows;movementPlaybackMarkers=[];
