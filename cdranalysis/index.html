@@ -84,7 +84,7 @@
       </div>
 
       <h3>Quick filters</h3>
-      <div class="field"><label>Any text</label><input id="q" placeholder="Number, address, cell ID, city…" /></div>
+      <div class="field"><label>Any text</label><input id="q" placeholder="Text or imei:… tower:… after:2026-01-01" /><div class="tiny">Smart filters: name:, tag:, imei:, imsi:, tower:, after:, before:</div></div>
       <div class="row2">
         <div class="field"><label>Date from</label><input type="date" id="dateFrom" /></div>
         <div class="field"><label>Date to</label><input type="date" id="dateTo" /></div>
@@ -333,6 +333,17 @@
   function fillSelect(id,items,label){const el=$(id),cur=el.value;el.innerHTML=`<option value="">${label}</option>`+items.map(x=>`<option>${escapeHtml(x)}</option>`).join('');if(items.includes(cur))el.value=cur;}
   function refreshSelectors(){fillSelect('callType',uniq('callType'),'All event types');fillSelect('cdrNo',uniq('cdrNo'),'All CDR numbers');fillSelect('sourceFile',uniq('sourceFile'),'All files');const mc=uniq('cdrNo');fillSelect('movementCdr',mc,'Select subject');if(!$('movementCdr').value&&mc.length)$('movementCdr').value=mc[0];}
 
+  function matchesSmartQuery(r,q){
+    q=String(q||'').trim();if(!q)return true;const tokens=q.match(/"[^"]*"|\S+/g)||[];
+    for(let token of tokens){token=token.replace(/^"|"$/g,'');const p=token.indexOf(':');
+      if(p>0){const key=normalize(token.slice(0,p)),v=normalize(token.slice(p+1));
+        if(key==='imei'&&!normalize(r.imei).includes(v))return false;if(key==='imsi'&&!normalize(r.imsi).includes(v))return false;
+        if(key==='tower'&&!normalize((r.firstAddress||'')+' '+(r.firstCellId||'')).includes(v))return false;
+        if(key==='name'&&!normalize(contactLabel(r.bparty)).includes(v))return false;if(key==='tag'&&!normalize(state.contactTags[r.bparty]||'').includes(v))return false;
+        if(key==='after'){const d=new Date(v);if(!r.dt||isNaN(d)||r.dt<d)return false;}if(key==='before'){const d=new Date(v+'T23:59:59');if(!r.dt||isNaN(d)||r.dt>d)return false;}
+      }else{const hay=normalize(r.search+' '+contactLabel(r.bparty)+' '+(state.contactTags[r.bparty]||''));if(!hay.includes(normalize(token)))return false;}
+    }return true;
+  }
   function withinNight(mins,start,end){if(start===null||end===null||mins===null)return true; return start<=end?(mins>=start&&mins<=end):(mins>=start||mins<=end);}
   function applyFilters(){
     const f={q:normalize($('q').value),dateFrom:$('dateFrom').value?new Date($('dateFrom').value+'T00:00:00'):null,dateTo:$('dateTo').value?new Date($('dateTo').value+'T23:59:59'):null,
@@ -340,7 +351,7 @@
       callType:$('callType').value,callsOnly:$('callsOnly').checked,smsOnly:$('smsOnly').checked,nightOnly:$('nightOnly').checked,weekendOnly:$('weekendOnly').checked,nightFrom:timeMins($('nightFrom').value),nightTo:timeMins($('nightTo').value),
       cellId:normalize($('cellId').value),tower:normalize($('tower').value),city:normalize($('city').value),subcity:normalize($('subcity').value),roaming:normalize($('roaming').value),imei:normalize($('imei').value),imsi:normalize($('imsi').value),provider:normalize($('provider').value),operator:normalize($('operator').value),cdrNo:$('cdrNo').value,sourceFile:$('sourceFile').value};
     state.filtered=state.records.filter(r=>{
-      if(f.q && !r.search.includes(f.q))return false; if(f.dateFrom && (!r.dt||r.dt<f.dateFrom))return false; if(f.dateTo && (!r.dt||r.dt>f.dateTo))return false;
+      if(f.q && !matchesSmartQuery(r,$('q').value))return false; if(f.dateFrom && (!r.dt||r.dt<f.dateFrom))return false; if(f.dateTo && (!r.dt||r.dt>f.dateTo))return false;
       const mins=r.dt?r.dt.getHours()*60+r.dt.getMinutes():timeMins(r.time); if(f.timeFrom!==null&&f.timeTo!==null&&!withinNight(mins,f.timeFrom,f.timeTo))return false; else {if(f.timeFrom!==null&&f.timeTo===null&&mins<f.timeFrom)return false;if(f.timeTo!==null&&f.timeFrom===null&&mins>f.timeTo)return false;}
       if(f.bparty&&!normalize(r.bparty).includes(f.bparty))return false;if(f.durMin!==null&&r.duration<f.durMin)return false;if(f.durMax!==null&&r.duration>f.durMax)return false;if(f.callType&&r.callType!==f.callType)return false;
       const typ=normalize(r.callType);if(f.callsOnly&&!typ.includes('call'))return false;if(f.smsOnly&&!typ.includes('sms'))return false;if(f.nightOnly&&!withinNight(mins,f.nightFrom,f.nightTo))return false;if(f.weekendOnly&&(!r.dt||![0,6].includes(r.dt.getDay())))return false;
