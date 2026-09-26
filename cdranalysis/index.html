@@ -167,7 +167,7 @@
 
       <section id="contacts" class="view hidden"><div class="panel"><div class="panel-title"><h2>Contact analysis</h2><span class="muted">Click a number to filter the record view</span></div><div class="tablewrap"><table class="table" id="contactsTable"></table></div></div></section>
       <section id="locations" class="view hidden"><div class="panel"><div class="panel-title"><h2>Location / tower analysis</h2><span class="muted">Based on first cell ID / first tower address</span></div><div class="tablewrap"><table class="table" id="locationsTable"></table></div></div></section>
-      <section id="devices" class="view hidden"><div class="panel"><div class="panel-title"><h2>IMEI / IMSI usage</h2><span class="muted">Useful for identifying device or SIM changes over the loaded period</span></div><div class="tablewrap"><table class="table" id="devicesTable"></table></div></div></section>
+      <section id="devices" class="view hidden"><div class="panel"><div class="panel-title"><h2>IMEI / IMSI usage</h2><span class="muted">Useful for identifying device or SIM changes over the loaded period</span></div><div class="tablewrap"><table class="table" id="devicesTable"></table></div><h3>Identifier change timeline</h3><div class="tablewrap" style="max-height:360px"><table class="table" id="deviceChangeTable"></table></div></div></section>
       <section id="incident" class="view hidden">
         <div class="panel">
           <div class="panel-title"><h2>Before / During / After Incident</h2><span class="muted">Chronological CDR events around the incident time</span></div>
@@ -371,6 +371,16 @@
   function mapLink(x){if(x.lat!==null&&x.lng!==null)return `<a class="link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${encodeURIComponent(x.lat+','+x.lng)}">Open map</a>`;return ''}
   function renderLocations(){const rows=aggregateLocations();$('locationsTable').innerHTML=`<thead><tr><th>Cell ID</th><th>Tower address</th><th>Records</th><th>Contacts</th><th>Call duration</th><th>First</th><th>Last</th><th>Lat</th><th>Long</th><th>Azimuth</th><th>Roaming</th><th>CDRs</th><th>Map</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${escapeHtml(x.cellId)}</td><td class="details">${escapeHtml(x.address)}</td><td class="num">${fmtInt(x.records)}</td><td class="num">${fmtInt(x.contacts.size)}</td><td class="num">${fmtDur(x.duration)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td>${x.lat??''}</td><td>${x.lng??''}</td><td>${escapeHtml(x.az)}</td><td>${escapeHtml([...x.roaming].join(', '))}</td><td>${escapeHtml([...x.cdrs].join(', '))}</td><td>${mapLink(x)}</td></tr>`).join('')}</tbody>`;}
   function renderDevices(){const rows=aggregateDevices();$('devicesTable').innerHTML=`<thead><tr><th>IMEI</th><th>IMSI</th><th>Manufacturer / device</th><th>Records</th><th>Contacts</th><th>Towers</th><th>CDRs</th><th>First seen</th><th>Last seen</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${escapeHtml(x.imei||'—')}</td><td>${escapeHtml(x.imsi||'—')}</td><td class="details">${escapeHtml([x.manufacturer,x.deviceType].filter(Boolean).join(' • '))}</td><td class="num">${fmtInt(x.records)}</td><td class="num">${fmtInt(x.contacts.size)}</td><td class="num">${fmtInt(x.towers.size)}</td><td>${escapeHtml([...x.cdrs].join(', '))}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td></tr>`).join('')}</tbody>`;}
+
+    const changes=[];const by=new Map();
+    for(const r of state.filtered.filter(r=>r.dt&&r.cdrNo).sort((a,b)=>a.dt-b.dt)){
+      let p=by.get(r.cdrNo)||{imei:'',imsi:''};
+      if(r.imei&&p.imei&&r.imei!==p.imei)changes.push({cdr:r.cdrNo,type:'IMEI',from:p.imei,to:r.imei,at:r.dt});
+      if(r.imsi&&p.imsi&&r.imsi!==p.imsi)changes.push({cdr:r.cdrNo,type:'IMSI',from:p.imsi,to:r.imsi,at:r.dt});
+      if(r.imei)p.imei=r.imei;if(r.imsi)p.imsi=r.imsi;by.set(r.cdrNo,p);
+    }
+    $('deviceChangeTable').innerHTML=`<thead><tr><th>Subject</th><th>Type</th><th>From</th><th>To</th><th>First record on new ID</th></tr></thead><tbody>${changes.map(x=>`<tr><td>${escapeHtml(x.cdr)}</td><td>${x.type}</td><td>${escapeHtml(x.from)}</td><td>${escapeHtml(x.to)}</td><td>${dtFmt(x.at)}</td></tr>`).join('')}</tbody>`;
+  }
   function movementRows(){
     let data=state.filtered.filter(r=>r.dt&&(r.firstCellId||r.firstAddress));
     const cdr=$('movementCdr')?.value||''; if(cdr)data=data.filter(r=>r.cdrNo===cdr);
