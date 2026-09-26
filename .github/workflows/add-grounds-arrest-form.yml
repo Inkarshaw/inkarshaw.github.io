@@ -1,1 +1,38 @@
-PLACEHOLDER
+name: Add Grounds of Arrest form
+on:
+  push:
+    paths:
+      - '.github/workflows/add-grounds-arrest-form.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build PDF and add Remand Forms entry
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-core
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          if [ -z "$CHROME" ]; then echo "Chrome/Chromium not found"; exit 1; fi
+          "$CHROME" --headless --no-sandbox --disable-gpu --print-to-pdf="$(pwd)/policedocuments/remandforms/grounds_of_arrest.pdf" --no-pdf-header-footer "file://$(pwd)/policedocuments/remandforms/grounds_of_arrest_print.html"
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('policedocuments/index.html')
+          s=p.read_text(encoding='utf-8')
+          if 'data-title="Grounds of Arrest"' not in s:
+              marker='<ul class="document-list" id="remandDocumentsList">'
+              item='''\n                    <li class="document-item" data-title="Grounds of Arrest" data-desc="Notice on Grounds of Arrest under Article 22 of the Constitution of India and Section 47 BNSS">\n                        <div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>Grounds of Arrest</div><div class="doc-desc">Editable Word form, PDF form and auto-fill PDF generator</div></div>\n                        <div class="doc-actions"><a href="/policedocuments/remandforms/grounds_of_arrest.doc" target="_blank" class="btn btn-word">📝 Word</a><a href="/policedocuments/remandforms/grounds_of_arrest.pdf" target="_blank" class="btn btn-pdf">📄 PDF</a><a href="/policedocuments/remandforms/grounds_of_arrest_generator.html" class="btn btn-generate">⚙️ Generate PDF</a></div>\n                    </li>'''
+              if marker not in s: raise SystemExit('Remand Documents list marker not found')
+              s=s.replace(marker, marker+item, 1)
+              p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit site update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add policedocuments/index.html policedocuments/remandforms/grounds_of_arrest.pdf
+          git commit -m "Publish Grounds of Arrest under Remand Forms" || exit 0
+          git push
