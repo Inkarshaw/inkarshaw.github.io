@@ -19,6 +19,10 @@
     const group4 = id === 'tnpsc-group-4';
     const quizURL = 'daily-quiz.html?exam=' + encodeURIComponent(route.quizExam || body.name);
     const pyqURL = route.pyqRoute || '#papers';
+    const quizSubjects = Array.isArray(route.quizSubjects) ? route.quizSubjects : [];
+    const subjectQuizLinks = quizSubjects.length
+      ? '<div class="actions">' + quizSubjects.map(subject => link(subject, quizURL + '&subject=' + encodeURIComponent(subject))).join('') + '</div>'
+      : '';
     const primaryStudyResource = exam.category === 'tnpsc' ? `<article class="resource"><h3>Indian Polity</h3><p>Constitution, institutions, rights, governance and article-wise revision.</p>${link('Open Polity study material','tnpsc/indian_polity.html')}</article>` : `<article class="resource"><h3>Syllabus-first study</h3><p>Use this exam’s syllabus as the checklist for notes, revision and practice.</p>${link('Open this exam syllabus',syllabusURL(exam))}</article>`;
     const extraPracticeLinks = exam.category === 'tnpsc' ? `${link('Article-wise Polity Practice','exam/indian_polity/all_articles.html')}${link('Prehistoric India Practice','exam/history/prehistoric_india.html')}` : `${link('Open PYQ practice',pyqURL)}`;
     document.title = exam.title + ' Preparation | ClearExams';
@@ -55,7 +59,7 @@
 
       <section class="panel" id="notes"><p class="eyebrow">Step 2</p><h2>Study materials & revision</h2><p>Study the syllabus topic by topic. Keep one revision page for every topic and add mistakes from practice sessions.</p><div class="grid">${primaryStudyResource}<article class="resource"><h3>Current Affairs</h3><p>Daily exam-ready PDF revision material.</p>${link('Open Current Affairs','current-affairs/')}</article><article class="resource"><h3>NCERT foundation</h3><p>Use official school textbooks for science, social science and mathematics fundamentals.</p>${link('Official NCERT textbooks ↗','https://ncert.nic.in/textbook.php')}</article><article class="resource"><h3>Revision method</h3><p>Write definitions, formulas, dates and one worked example per syllabus topic. Revisit errors before starting the next set.</p></article></div></section>
 
-      <section class="panel" id="practice"><p class="eyebrow">Step 3</p><h2>Topic quiz</h2><p>Use short topic-wise quizzes for active recall. Every answer should teach you why the correct option is right and the other options are wrong.</p><div class="actions">${link('Start Daily 10-question Quiz',quizURL,'button')}${extraPracticeLinks}</div></section>
+      <section class="panel" id="practice"><p class="eyebrow">Step 3</p><h2>Topic quiz</h2><p>Use short topic-wise quizzes for active recall. Every answer should teach you why the correct option is right and the other options are wrong.</p><div class="actions">${link('Start Daily 10-question Quiz',quizURL,'button')}${extraPracticeLinks}</div>${quizSubjects.length ? '<h3>Quick subject practice</h3><p class="source">Open a complete 10-question subject bank for this exam.</p>'+subjectQuizLinks : ''}</section>
 
       <section class="panel" id="papers"><p class="eyebrow">Step 4</p><h2>Previous-year questions (PYQs)</h2>${papers(exam,pyqURL)}</section>
 
