@@ -382,7 +382,7 @@
             <input type="range" id="movementSlider" min="0" max="0" value="0" style="flex:1;min-width:180px">
             <span class="tiny" id="movementPlaybackLabel">No movement selected</span>
           </div>
-          <div class="panel" style="margin-top:12px"><div class="panel-title"><h2>Movement map</h2><span class="tiny">Numbered tower associations in chronological order • OpenStreetMap</span></div><div id="movementMap"><div class="map-empty">Select a subject/date with tower coordinates to display movement.</div></div><div class="tiny" style="margin-top:8px">Lines connect recorded tower coordinates in time order. They are straight tower-to-tower links, not the actual road travelled or precise handset location.</div></div>
+          <div class="panel" style="margin-top:12px"><div class="panel-title"><h2>Movement map</h2><span class="tiny">Numbered tower associations in chronological order • OpenStreetMap</span></div><div id="movementMap"><div class="map-empty">Select a subject/date with tower coordinates to display movement.</div></div><div id="movementMapStatus" class="metric-row" style="margin-top:8px"></div><div class="tiny" style="margin-top:8px">Lines connect recorded tower coordinates in time order. They are straight tower-to-tower links, not the actual road travelled or precise handset location.</div></div>
           <div class="panel chartbox" style="height:290px;margin-top:12px"><div class="panel-title"><h2>Tower sequence plot</h2><span class="tiny">Latitude / longitude of recorded first-cell towers</span></div><canvas id="movementChart"></canvas></div>
           <h3>Tower stay analysis</h3><div class="tablewrap" style="margin-top:8px"><table class="table" id="towerStayTable"></table></div>
           <div class="tablewrap" style="margin-top:12px"><table class="table" id="movementTable"></table></div>
@@ -673,8 +673,10 @@
     $('qualitySummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(total)}</div><div class="l">Records</div></div><div class="kpi"><div class="v">${fmtInt(duplicateGroups)}</div><div class="l">Duplicate signatures</div></div><div class="kpi"><div class="v">${fmtInt(missingDate)}</div><div class="l">Missing date/time</div></div><div class="kpi"><div class="v">${fmtInt(missingSubject)}</div><div class="l">Missing subject</div></div><div class="kpi"><div class="v">${fmtInt(missingParty)}</div><div class="l">Missing connected party</div></div><div class="kpi"><div class="v">${fmtInt(missingTower)}</div><div class="l">Missing tower</div></div><div class="kpi"><div class="v">${fmtInt(missingCoords)}</div><div class="l">Missing coordinates</div></div></div>`;
   }
   function renderMovementMap(rows){
-    const el=$('movementMap'); if(!el)return;movementPlaybackRows=rows;movementPlaybackMarkers=[];
+    const el=$('movementMap'); if(!el)return;movementPlaybackMarkers=[];
     const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180);
+    movementPlaybackRows=pts.map(p=>p.x);
+    if($('movementMapStatus'))$('movementMapStatus').innerHTML=`<span class="metric-chip">Segments: ${fmtInt(rows.length)}</span><span class="metric-chip">Mapped: ${fmtInt(pts.length)}</span><span class="metric-chip">Without coordinates: ${fmtInt(rows.length-pts.length)}</span>`;
     if(typeof L==='undefined'){el.innerHTML='<div class="map-empty">Map library could not load. Internet access is required to load the OpenStreetMap/Leaflet map.</div>';return;}
     if(!movementMap){
       el.innerHTML='';
@@ -695,7 +697,7 @@
       if(source.length){movementHeatLayer=L.heatLayer(source.map(r=>[r.lat,r.lng,.65]),{radius:24,blur:18,maxZoom:17}).addTo(movementMap);}
     }
     if(!pts.length){
-      movementMap.setView([13.0827,80.2707],10);
+      movementMap.setView([13.0827,80.2707],10);if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">No usable coordinates found</span>`;
       setTimeout(()=>movementMap.invalidateSize(),50);
       return;
     }
@@ -703,13 +705,13 @@
     if(latlngs.length>1)L.polyline(latlngs,{weight:4,opacity:.72,dashArray:'10,7'}).addTo(movementLayer);
     pts.forEach(({x,i},j)=>{
       const icon=L.divIcon({className:'sequence-marker',html:`<span>${i+1}</span>`,iconSize:[30,30],iconAnchor:[15,15]});
-      const marker=L.marker([x.lat,x.lng],{icon,title:`#${i+1} ${x.cellId||x.address||'Tower'}`}).addTo(movementLayer);movementPlaybackMarkers[i]=marker;
+      const marker=L.marker([x.lat,x.lng],{icon,title:`#${i+1} ${x.cellId||x.address||'Tower'}`}).addTo(movementLayer);movementPlaybackMarkers[j]=marker;
       const next=x.nextDistance==null?'—':x.nextDistance.toFixed(1)+' km';
       const gap=x.nextMinutes==null?'—':Math.round(x.nextMinutes)+' min';
       const contacts=[...x.contacts].slice(0,12).map(n=>escapeHtml(contactLabel(n))).join(', ');
       marker.bindPopup(`<div style="min-width:230px"><b>Stop #${i+1}</b><br><b>Time:</b> ${escapeHtml(dtFmt(x.start))}${x.end&&+x.end!==+x.start?' – '+escapeHtml(dtFmt(x.end)):''}<br><b>Cell ID:</b> ${escapeHtml(x.cellId||'—')}<br><b>Tower:</b> ${escapeHtml(x.address||'—')}<br><b>Events:</b> ${fmtInt(x.events)} &nbsp; <b>Duration:</b> ${fmtDur(x.duration)}<br><b>Contacts:</b> ${contacts||'—'}<br><b>Next tower:</b> ${escapeHtml(next)} &nbsp; <b>Gap:</b> ${escapeHtml(gap)}<br><b>Coordinates:</b> ${Number(x.lat).toFixed(6)}, ${Number(x.lng).toFixed(6)}</div>`);
     });
-    const slider=$('movementSlider');if(slider){slider.max=Math.max(0,rows.length-1);if(+slider.value>+slider.max)slider.value=0;updateMovementPlayback(+slider.value||0,false);}
+    const slider=$('movementSlider');if(slider){slider.max=Math.max(0,movementPlaybackRows.length-1);if(+slider.value>+slider.max)slider.value=0;updateMovementPlayback(+slider.value||0,false);}
     if(latlngs.length===1)movementMap.setView(latlngs[0],15);
     else movementMap.fitBounds(L.latLngBounds(latlngs).pad(.12),{maxZoom:16});
     setTimeout(()=>movementMap.invalidateSize(),80);
