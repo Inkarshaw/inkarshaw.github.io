@@ -181,6 +181,14 @@
     .network-wrap{background:radial-gradient(circle at 50% 50%,rgba(19,56,77,.38),rgba(4,11,18,.96) 72%);border-color:rgba(51,221,255,.17)}
     #movementMap{background:#07121d;border-color:rgba(51,221,255,.22);box-shadow:inset 0 0 30px rgba(0,0,0,.3)}
     .movement-playback-pulse{animation:movementPulse 1s ease-in-out infinite}
+    .movement-map-legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11px;color:#91b7c8}
+    .movement-map-legend span{display:inline-flex;align-items:center;gap:5px}
+    .movement-map-dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid #dffcff}
+    .movement-map-dot.tower{background:#24c7e8;box-shadow:0 0 8px rgba(36,199,232,.75)}
+    .movement-map-dot.start{background:#31f7a8;box-shadow:0 0 8px rgba(49,247,168,.75)}
+    .movement-map-dot.end{background:#ff5d78;box-shadow:0 0 8px rgba(255,93,120,.75)}
+    .movement-map-line{width:20px;height:0;border-top:3px dashed #33ddff;display:inline-block}
+
     @keyframes movementPulse{0%,100%{filter:drop-shadow(0 0 2px #ffb454)}50%{filter:drop-shadow(0 0 10px #ffb454)}}
 
     .sequence-marker span{
@@ -406,7 +414,7 @@
             <input type="range" id="movementSlider" min="0" max="0" value="0" style="flex:1;min-width:180px">
             <span class="tiny" id="movementPlaybackLabel">No movement selected</span>
           </div>
-          <div class="panel" style="margin-top:12px"><div class="panel-title"><h2>Movement map</h2><span class="tiny">Numbered tower associations in chronological order • OpenStreetMap</span></div><div id="movementMap"><div class="map-empty">Select a subject/date with tower coordinates to display movement.</div></div><div id="movementMapStatus" class="metric-row" style="margin-top:8px"></div><div class="tiny" style="margin-top:8px">Lines connect recorded tower coordinates in time order. They are straight tower-to-tower links, not the actual road travelled or precise handset location.</div></div>
+          <div class="panel" style="margin-top:12px"><div class="panel-title"><h2>Movement map</h2><span class="tiny">Numbered tower associations in chronological order • OpenStreetMap</span></div><div id="movementMap"><div class="map-empty">Select a subject/date with tower coordinates to display movement.</div></div><div id="movementMapStatus" class="metric-row" style="margin-top:8px"></div><div class="movement-map-legend"><span><i class="movement-map-line"></i>Route</span><span><i class="movement-map-dot tower"></i>Tower</span><span><i class="movement-map-dot start"></i>Start</span><span><i class="movement-map-dot end"></i>End</span></div><div class="tiny" style="margin-top:8px">Lines connect recorded tower coordinates in time order. They are straight tower-to-tower links, not the actual road travelled or precise handset location.</div></div>
           <div class="panel chartbox" style="height:290px;margin-top:12px"><div class="panel-title"><h2>Tower sequence plot</h2><span class="tiny">Latitude / longitude of recorded first-cell towers</span></div><canvas id="movementChart"></canvas></div>
           <h3>Tower stay analysis</h3><div class="tablewrap" style="margin-top:8px"><table class="table" id="towerStayTable"></table></div>
           <div class="tablewrap" style="margin-top:12px"><table class="table" id="movementTable"></table></div>
@@ -450,7 +458,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, fileSeq:0, pendingWorkspace:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null};
-  let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null, movementPlaybackMarker=null, movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null, networkNodes=[], networkEdges=[], networkSelected=null;
+  let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null, movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null, movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null, networkNodes=[], networkEdges=[], networkSelected=null;
   const FIELDS = {
     cdrNo:['cdrno','a party','aparty','a-party','msisdn','subscriber number','mobile number'],
     bparty:['b party','bparty','b-party','other party','connected number','called number','calling number'],
@@ -829,7 +837,10 @@
 
     if(!movementMap){
       el.innerHTML='';
-      movementMap=L.map(el,{preferCanvas:true,zoomControl:true});
+      movementMap=L.map(el,{preferCanvas:false,zoomControl:true});
+      movementMap.createPane('movementRoutePane');movementMap.getPane('movementRoutePane').style.zIndex='430';movementMap.getPane('movementRoutePane').style.pointerEvents='none';
+      movementMap.createPane('movementTowerPane');movementMap.getPane('movementTowerPane').style.zIndex='440';
+      movementMap.createPane('movementAnchorPane');movementMap.getPane('movementAnchorPane').style.zIndex='650';
       movementCanvasRenderer=L.canvas({padding:.5});
       movementTileLayer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
         maxZoom:19,
@@ -841,7 +852,7 @@
       movementTileLayer.on('tileerror',()=>{const chip=$('tileStatusChip');if(chip){chip.textContent='Map tile error — route overlay still available';chip.classList.add('warntext');}});
       movementLayer=L.layerGroup().addTo(movementMap);
     }else{
-      movementLayer.clearLayers();
+      movementLayer.clearLayers();movementStartMarker=null;movementEndMarker=null;
       const chip=$('tileStatusChip');if(chip)chip.textContent='Map ready';
     }
 
@@ -869,13 +880,13 @@
     const maxRoutePoints=2500,step=Math.max(1,Math.ceil(pts.length/maxRoutePoints));
     const routePts=pts.filter((_,i)=>i%step===0||i===pts.length-1);
     const latlngs=routePts.map(p=>[p.x.lat,p.x.lng]);
-    if(latlngs.length>1)L.polyline(latlngs,{weight:3,opacity:.78,dashArray:'8,6',color:'#33ddff',renderer:movementCanvasRenderer}).addTo(movementLayer);
+    if(latlngs.length>1)L.polyline(latlngs,{pane:'movementRoutePane',weight:4,opacity:.95,dashArray:'9,6',color:'#18d9ff',lineCap:'round',lineJoin:'round'}).addTo(movementLayer);
 
     // Small datasets retain chronological numbered markers. Large datasets use one Canvas marker per distinct tower.
     if(pts.length<=500){
       pts.forEach(({x,i},j)=>{
         const icon=L.divIcon({className:'sequence-marker',html:`<span>${i+1}</span>`,iconSize:[30,30],iconAnchor:[15,15]});
-        const marker=L.marker([x.lat,x.lng],{icon,title:`#${i+1} ${x.cellId||x.address||'Tower'}`}).addTo(movementLayer);
+        const marker=L.marker([x.lat,x.lng],{pane:'movementAnchorPane',icon,title:`#${i+1} ${x.cellId||x.address||'Tower'}`}).addTo(movementLayer);
         movementPlaybackMarkers[j]=marker;
         const next=x.nextDistance==null?'—':x.nextDistance.toFixed(1)+' km',gap=x.nextMinutes==null?'—':Math.round(x.nextMinutes)+' min';
         const contacts=[...x.contacts].slice(0,12).map(n=>escapeHtml(contactLabel(n))).join(', ');
@@ -893,11 +904,22 @@
       }
       for(const t of towers.values()){
         const radius=Math.max(4,Math.min(10,4+Math.log2(1+t.segments)));
-        const marker=L.circleMarker([t.lat,t.lng],{renderer:movementCanvasRenderer,radius,color:'#8aefff',weight:1,fillColor:'#24c7e8',fillOpacity:.68}).addTo(movementLayer);
+        const marker=L.circleMarker([t.lat,t.lng],{pane:'movementTowerPane',radius,color:'#d9fbff',weight:1.5,fillColor:'#17c9e8',fillOpacity:.88}).addTo(movementLayer);
         marker.bindPopup(`<div style="min-width:230px"><b>${escapeHtml(t.cellId||'Tower')}</b><br><b>Address:</b> ${escapeHtml(t.address||'—')}<br><b>Movement segments:</b> ${fmtInt(t.segments)}<br><b>Events:</b> ${fmtInt(t.events)}<br><b>First:</b> ${escapeHtml(dtFmt(t.first))}<br><b>Last:</b> ${escapeHtml(dtFmt(t.last))}<br><b>Contacts:</b> ${[...t.contacts].slice(0,10).map(n=>escapeHtml(contactLabel(n))).join(', ')||'—'}</div>`);
       }
       if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">High-volume mode: ${fmtInt(towers.size)} tower markers</span>`;
     }
+
+    const firstPt=pts[0]?.x,lastPt=pts[pts.length-1]?.x;
+    if(firstPt){
+      movementStartMarker=L.circleMarker([firstPt.lat,firstPt.lng],{pane:'movementAnchorPane',radius:10,color:'#ffffff',weight:3,fillColor:'#31f7a8',fillOpacity:1}).addTo(movementLayer);
+      movementStartMarker.bindTooltip('START',{permanent:false,direction:'top'});
+    }
+    if(lastPt){
+      movementEndMarker=L.circleMarker([lastPt.lat,lastPt.lng],{pane:'movementAnchorPane',radius:10,color:'#ffffff',weight:3,fillColor:'#ff5d78',fillOpacity:1}).addTo(movementLayer);
+      movementEndMarker.bindTooltip('END',{permanent:false,direction:'top'});
+    }
+    if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip goodtext">Overlay: route + ${pts.length<=500?fmtInt(pts.length):'tower'} markers</span>`;
 
     const slider=$('movementSlider');if(slider){slider.max=Math.max(0,movementPlaybackRows.length-1);if(+slider.value>+slider.max)slider.value=0;updateMovementPlayback(+slider.value||0,false);}
     const fullBounds=L.latLngBounds(pts.map(p=>[p.x.lat,p.x.lng]));
@@ -923,8 +945,8 @@
       const ll=[r.lat,r.lng];
       if(!movementPlaybackMarker){
         movementPlaybackMarker=L.circleMarker(ll,{
-          renderer:movementCanvasRenderer,radius:10,color:'#ffffff',weight:3,
-          fillColor:'#ffb454',fillOpacity:1,pane:'markerPane'
+          pane:'movementAnchorPane',radius:11,color:'#ffffff',weight:3,
+          fillColor:'#ffb454',fillOpacity:1
         }).addTo(movementMap);
         const el=movementPlaybackMarker.getElement?.();if(el)el.classList.add('movement-playback-pulse');
       }else movementPlaybackMarker.setLatLng(ll);
