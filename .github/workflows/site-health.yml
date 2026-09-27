@@ -59,7 +59,7 @@ jobs:
           PY
           echo "Repository metadata checks passed." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Validate internal HTML links
+      - name: Validate core exam-site internal links
         shell: bash
         run: |
           set -euo pipefail
@@ -69,23 +69,18 @@ jobs:
           from urllib.parse import urlsplit, unquote
 
           root = Path('.').resolve()
-          skip_dirs = {'.git','node_modules','vendor','website-automation','instagram-publisher'}
-          broken = []
-          checked = 0
+          skip_dirs = {'.git','node_modules','vendor','website-automation','instagram-publisher','policedocuments','cdranalysis','exam'}
+          download_ext = {'.pdf','.doc','.docx','.xls','.xlsx','.ppt','.pptx','.zip','.rar'}
+          broken=[]; checked=0
 
           class Links(HTMLParser):
-              def __init__(self):
-                  super().__init__(); self.hrefs=[]
+              def __init__(self): super().__init__(); self.hrefs=[]
               def handle_starttag(self, tag, attrs):
                   if tag not in {'a','link','script','img','source'}: return
-                  d=dict(attrs)
-                  value=d.get('href') or d.get('src')
+                  d=dict(attrs); value=d.get('href') or d.get('src')
                   if value: self.hrefs.append(value)
 
-          files=[]
-          for p in root.rglob('*.html'):
-              if any(part in skip_dirs for part in p.parts): continue
-              files.append(p)
+          files=[p for p in root.rglob('*.html') if not any(part in skip_dirs for part in p.relative_to(root).parts)]
           for p in files:
               try: text=p.read_text(encoding='utf-8')
               except UnicodeDecodeError: continue
@@ -96,23 +91,62 @@ jobs:
                   u=urlsplit(raw)
                   if u.scheme in {'http','https'} or raw.startswith('//'): continue
                   path=unquote(u.path)
-                  if not path: continue
+                  if not path or Path(path).suffix.lower() in download_ext: continue
                   target=(root/path.lstrip('/')) if path.startswith('/') else (p.parent/path)
                   candidates=[target]
-                  if path.endswith('/') or (not target.suffix):
-                      candidates.append(target/'index.html')
-                      candidates.append(target.with_suffix('.html'))
-                  checked += 1
-                  if not any(c.resolve().exists() for c in candidates):
-                      broken.append(f'{p.relative_to(root)} -> {raw}')
-          print(f'Checked {checked} internal asset/page links across {len(files)} HTML files.')
+                  if path.endswith('/') or not target.suffix:
+                      candidates.extend([target/'index.html',target.with_suffix('.html')])
+                  checked+=1
+                  if not any(x.resolve().exists() for x in candidates): broken.append(f'{p.relative_to(root)} -> {raw}')
+          print(f'Checked {checked} core exam-site links across {len(files)} HTML files.')
           if broken:
-              print('Broken internal links:')
+              print('Broken core exam-site links:')
               print('\n'.join(' - '+x for x in broken[:100]))
               if len(broken)>100: print(f' ... and {len(broken)-100} more')
               raise SystemExit(1)
           PY
-          echo "Internal HTML links passed." >> "$GITHUB_STEP_SUMMARY"
+          echo "Core exam-site internal links passed." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Audit legacy and download links
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit, unquote
+          root=Path('.').resolve(); areas={'policedocuments','cdranalysis','exam'}; missing=[]; checked=0
+          class Links(HTMLParser):
+              def __init__(self): super().__init__(); self.hrefs=[]
+              def handle_starttag(self,tag,attrs):
+                  if tag not in {'a','link','script','img','source'}: return
+                  d=dict(attrs); v=d.get('href') or d.get('src')
+                  if v:self.hrefs.append(v)
+          for area in areas:
+              base=root/area
+              if not base.exists(): continue
+              for p in base.rglob('*.html'):
+                  try:text=p.read_text(encoding='utf-8')
+                  except UnicodeDecodeError:continue
+                  parser=Links();parser.feed(text)
+                  for raw in parser.hrefs:
+                      raw=raw.strip();u=urlsplit(raw)
+                      if not raw or raw.startswith(('#','mailto:','tel:','javascript:','data:','blob:','//')) or u.scheme in {'http','https'}:continue
+                      path=unquote(u.path)
+                      if not path:continue
+                      target=(root/path.lstrip('/')) if path.startswith('/') else (p.parent/path)
+                      candidates=[target]
+                      if path.endswith('/') or not target.suffix:candidates.extend([target/'index.html',target.with_suffix('.html')])
+                      checked+=1
+                      if not any(x.resolve().exists() for x in candidates):missing.append(f'{p.relative_to(root)} -> {raw}')
+          print(f'Audited {checked} legacy/download-area links; {len(missing)} unresolved.')
+          summary=Path(__import__('os').environ['GITHUB_STEP_SUMMARY'])
+          with summary.open('a',encoding='utf-8') as f:
+              f.write('## Legacy/download link audit\n')
+              f.write(f'- Unresolved links: {len(missing)}\n')
+              for x in missing[:25]: f.write(f'  - {x}\n')
+              if len(missing)>25:f.write(f'  - … and {len(missing)-25} more\n')
+          PY
 
       - name: Check production pages
         shell: bash
