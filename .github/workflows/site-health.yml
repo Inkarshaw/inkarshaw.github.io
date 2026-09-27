@@ -31,9 +31,23 @@ jobs:
           import csv, pathlib, xml.etree.ElementTree as ET
           tree = ET.parse("sitemap.xml")
           root = tree.getroot()
-          if len(root) < 5:
+          if len(root) < 10:
               raise SystemExit("sitemap.xml contains too few URLs")
-
+          urls = [x.text for x in root.iter() if x.tag.endswith('loc') and x.text]
+          required_urls = {
+              'https://clearexams.ink/',
+              'https://clearexams.ink/start.html',
+              'https://clearexams.ink/daily-quiz.html',
+              'https://clearexams.ink/pyq-hub.html',
+              'https://clearexams.ink/dashboard.html',
+              'https://clearexams.ink/syllabus.html',
+              'https://clearexams.ink/tnpsc.html',
+              'https://clearexams.ink/tnusrb.html',
+              'https://clearexams.ink/upsc.html',
+          }
+          missing = sorted(required_urls - set(urls))
+          if missing:
+              raise SystemExit('Required sitemap URLs missing: ' + ', '.join(missing))
           p = pathlib.Path("data/quizzes/daily-quiz.csv")
           with p.open(encoding="utf-8", newline="") as f:
               rows = list(csv.DictReader(f))
@@ -45,12 +59,68 @@ jobs:
           PY
           echo "Repository metadata checks passed." >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Validate internal HTML links
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit, unquote
+
+          root = Path('.').resolve()
+          skip_dirs = {'.git','node_modules','vendor','website-automation','instagram-publisher'}
+          broken = []
+          checked = 0
+
+          class Links(HTMLParser):
+              def __init__(self):
+                  super().__init__(); self.hrefs=[]
+              def handle_starttag(self, tag, attrs):
+                  if tag not in {'a','link','script','img','source'}: return
+                  d=dict(attrs)
+                  value=d.get('href') or d.get('src')
+                  if value: self.hrefs.append(value)
+
+          files=[]
+          for p in root.rglob('*.html'):
+              if any(part in skip_dirs for part in p.parts): continue
+              files.append(p)
+          for p in files:
+              try: text=p.read_text(encoding='utf-8')
+              except UnicodeDecodeError: continue
+              parser=Links(); parser.feed(text)
+              for raw in parser.hrefs:
+                  raw=raw.strip()
+                  if not raw or raw.startswith(('#','mailto:','tel:','javascript:','data:','blob:')): continue
+                  u=urlsplit(raw)
+                  if u.scheme in {'http','https'} or raw.startswith('//'): continue
+                  path=unquote(u.path)
+                  if not path: continue
+                  target=(root/path.lstrip('/')) if path.startswith('/') else (p.parent/path)
+                  candidates=[target]
+                  if path.endswith('/') or (not target.suffix):
+                      candidates.append(target/'index.html')
+                      candidates.append(target.with_suffix('.html'))
+                  checked += 1
+                  if not any(c.resolve().exists() for c in candidates):
+                      broken.append(f'{p.relative_to(root)} -> {raw}')
+          print(f'Checked {checked} internal asset/page links across {len(files)} HTML files.')
+          if broken:
+              print('Broken internal links:')
+              print('\n'.join(' - '+x for x in broken[:100]))
+              if len(broken)>100: print(f' ... and {len(broken)-100} more')
+              raise SystemExit(1)
+          PY
+          echo "Internal HTML links passed." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Check production pages
         shell: bash
         run: |
           set -euo pipefail
           urls=(
             "https://clearexams.ink/"
+            "https://clearexams.ink/start.html"
             "https://clearexams.ink/current-affairs/"
             "https://clearexams.ink/daily-quiz.html"
             "https://clearexams.ink/exam-notifications.html"
@@ -71,27 +141,19 @@ jobs:
             "https://clearexams.ink/sitemap.xml"
             "https://clearexams.ink/robots.txt"
           )
-
           echo "## ClearExams production checks" >> "$GITHUB_STEP_SUMMARY"
           failed=0
           for url in "${urls[@]}"; do
             code="000"
             for attempt in 1 2 3 4 5 6; do
-              code=$(curl --location --silent --show-error \
-                --connect-timeout 15 --max-time 45 \
-                --output /dev/null --write-out "%{http_code}" "$url" || true)
-              if [[ "$code" =~ ^[23] ]]; then
-                break
-              fi
-              if [ "$attempt" -lt 6 ]; then
-                sleep 10
-              fi
+              code=$(curl --location --silent --show-error --connect-timeout 15 --max-time 45 --output /dev/null --write-out "%{http_code}" "$url" || true)
+              if [[ "$code" =~ ^[23] ]]; then break; fi
+              if [ "$attempt" -lt 6 ]; then sleep 10; fi
             done
             if [[ "$code" =~ ^[23] ]]; then
               echo "- ✅ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"
             else
-              echo "- ❌ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"
-              failed=1
+              echo "- ❌ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"; failed=1
             fi
           done
           exit "$failed"
@@ -101,24 +163,11 @@ jobs:
         run: |
           set -euo pipefail
           echo "## Legacy-domain scan" >> "$GITHUB_STEP_SUMMARY"
-          matches=$(grep -RIl \
-            --exclude-dir=.git \
-            --exclude-dir=.github \
-            --exclude-dir=website-automation \
-            --exclude-dir=instagram-publisher \
-            --exclude='*.pdf' \
-            --exclude='*.png' \
-            --exclude='*.jpg' \
-            --exclude='*.jpeg' \
-            --exclude='*.webp' \
-            "clearexams.online" . || true)
-
+          matches=$(grep -RIl --exclude-dir=.git --exclude-dir=.github --exclude-dir=website-automation --exclude-dir=instagram-publisher --exclude='*.pdf' --exclude='*.png' --exclude='*.jpg' --exclude='*.jpeg' --exclude='*.webp' "clearexams.online" . || true)
           if [ -z "$matches" ]; then
             echo "- ✅ No clearexams.online references found." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "- ❌ Old-domain references remain in:" >> "$GITHUB_STEP_SUMMARY"
-            while IFS= read -r file; do
-              echo "  - ${file#./}" >> "$GITHUB_STEP_SUMMARY"
-            done <<< "$matches"
+            while IFS= read -r file; do echo "  - ${file#./}" >> "$GITHUB_STEP_SUMMARY"; done <<< "$matches"
             exit 1
           fi
