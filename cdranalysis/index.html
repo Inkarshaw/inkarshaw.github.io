@@ -434,7 +434,23 @@
       </section>
 
       <section id="days" class="view hidden"><div class="panel"><div class="panel-title"><h2>Day-wise summary</h2><span class="muted">One row per day from the current filters</span></div><div class="tablewrap"><table class="table" id="daySummaryTable"></table></div></div></section>
-      <section id="patterns" class="view hidden"><div class="panel"><div class="panel-title"><h2>Activity pattern matrix</h2><span class="muted">Date × hour event density</span></div><div id="hourMatrix" class="tablewrap"></div><div id="contactDayMatrix" style="margin-top:18px"></div></div></section>
+      <section id="patterns" class="view hidden"><div class="panel">
+        <div class="panel-title"><h2>Activity patterns</h2><span class="muted">Time, weekday, event-type and recurring-contact patterns from the current filters</span></div>
+        <div class="notice">Pattern summaries are descriptive CDR metadata. “Lower-frequency hours” means hours used much less often than the subject's own peak activity hour within the current filtered period; it is not an assessment of intent or significance.</div>
+        <div id="patternSummary" style="margin-top:10px"></div>
+        <div class="split" style="margin-top:14px">
+          <div><h3>Weekday pattern</h3><div class="tablewrap"><table class="table" id="patternWeekdayTable"></table></div></div>
+          <div><h3>Event-type pattern</h3><div class="tablewrap"><table class="table" id="patternEventTypeTable"></table></div></div>
+        </div>
+        <div class="split" style="margin-top:14px">
+          <div><h3>Recurring contacts</h3><div class="tiny" style="margin-bottom:6px">Contacts ranked by the number of separate active dates on which they appear.</div><div class="tablewrap"><table class="table" id="patternRegularContactsTable"></table></div></div>
+          <div><h3>Lower-frequency-hour activity</h3><div class="tiny" style="margin-bottom:6px">Hours with activity at or below 20% of the peak-hour count, shown for review.</div><div class="tablewrap"><table class="table" id="patternUnusualHoursTable"></table></div></div>
+        </div>
+        <h3 style="margin-top:18px">Date × hour activity matrix</h3>
+        <div class="tiny" style="margin-bottom:6px">Latest 31 filtered dates. Darker cells indicate more CDR events in that hour.</div>
+        <div id="hourMatrix" class="tablewrap"></div>
+        <div id="contactDayMatrix" style="margin-top:18px"></div>
+      </div></section>
       <section id="quality" class="view hidden"><div class="panel"><div class="panel-title"><h2>Data quality summary</h2><span class="muted">Aggregate structural checks of loaded CDR data</span></div><div id="qualitySummary"></div></div></section>
       <section id="movement" class="view hidden">
         <div class="panel">
@@ -1302,13 +1318,61 @@
     const rows=[...m.values()].sort((a,b)=>a.date.localeCompare(b.date));$('daySummaryTable').innerHTML=`<thead><tr><th>Date</th><th>First activity</th><th>Last activity</th><th>Events</th><th>Calls</th><th>SMS</th><th>Contacts</th><th>Towers</th><th>IMEI</th><th>IMSI</th><th>Night events</th></tr></thead><tbody>${rows.map(x=>`<tr><td><button class="btn secondary small day-filter" data-date="${x.date}">${x.date}</button></td><td>${dtFmt(x.first)} <span class="tiny">•</span> ${typePill(x.firstType)}</td><td>${dtFmt(x.last)} <span class="tiny">•</span> ${typePill(x.lastType)}</td><td>${fmtInt(x.events)}</td><td>${fmtInt(x.calls)}</td><td>${fmtInt(x.sms)}</td><td>${fmtInt(x.contacts.size)}</td><td>${fmtInt(x.towers.size)}</td><td>${fmtInt(x.imei.size)}</td><td>${fmtInt(x.imsi.size)}</td><td>${fmtInt(x.night)}</td></tr>`).join('')}</tbody>`;
   }
   function renderPatterns(){
-    const days=[...new Set(state.filtered.filter(r=>r.dt).map(r=>localDateKey(r.dt)))].sort().slice(-31),matrix={};let max=1;
-    for(const d of days)matrix[d]=Array(24).fill(0);
-    for(const r of state.filtered){if(!r.dt)continue;const d=localDateKey(r.dt);if(matrix[d]){matrix[d][r.dt.getHours()]++;max=Math.max(max,matrix[d][r.dt.getHours()]);}}
-    $('hourMatrix').innerHTML=`<table class="table"><thead><tr><th>Date</th>${Array.from({length:24},(_,h)=>`<th>${String(h).padStart(2,'0')}</th>`).join('')}</tr></thead><tbody>${days.map(d=>`<tr><td>${d}</td>${matrix[d].map(v=>`<td title="${v} event(s)" style="text-align:center;background:rgba(21,94,239,${v?0.08+0.72*v/max:0})">${v||''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-    const top=aggregateContacts(state.filtered).slice(0,20),cd={};let cmax=1;for(const x of top){cd[x.bparty]={};for(const d of days)cd[x.bparty][d]=0;}for(const r of state.filtered){if(!r.dt||!cd[r.bparty])continue;const d=localDateKey(r.dt);if(d in cd[r.bparty]){cd[r.bparty][d]++;cmax=Math.max(cmax,cd[r.bparty][d]);}}
-    $('contactDayMatrix').innerHTML=`<h3>Contact-by-day matrix</h3><div class="tablewrap"><table class="table"><thead><tr><th>Contact</th>${days.map(d=>`<th>${d.slice(5)}</th>`).join('')}</tr></thead><tbody>${top.map(x=>`<tr><td title="${escAttr(contactTitle(x.bparty))}">${escapeHtml(contactLabel(x.bparty))}</td>${days.map(d=>{const v=cd[x.bparty][d]||0;return `<td title="${v} event(s)" style="text-align:center;background:rgba(181,71,8,${v?0.08+0.72*v/cmax:0})">${v||''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const data=state.filtered.filter(r=>r.dt),total=data.length,dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    if(!total){
+      $('patternSummary').innerHTML='<div class="empty">No dated records match the current filters.</div>';
+      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable'].forEach(id=>$(id).innerHTML='');
+      $('hourMatrix').innerHTML='';$('contactDayMatrix').innerHTML='';return;
+    }
 
+    const activeDates=[...new Set(data.map(r=>localDateKey(r.dt)))].sort(),activeDayCount=activeDates.length;
+    const hourCounts=Array(24).fill(0),weekdayCounts=Array(7).fill(0),weekdayDates=Array.from({length:7},()=>new Set()),typeMap=new Map(),nightRows=[],weekendRows=[];
+    for(const r of data){
+      const h=r.dt.getHours(),w=r.dt.getDay(),date=localDateKey(r.dt),type=String(r.callType||'—');
+      hourCounts[h]++;weekdayCounts[w]++;weekdayDates[w].add(date);
+      if(h>=20||h<6)nightRows.push(r);if(w===0||w===6)weekendRows.push(r);
+      let t=typeMap.get(type);if(!t)t={type,count:0,days:new Set(),hours:Array(24).fill(0)};t.count++;t.days.add(date);t.hours[h]++;typeMap.set(type,t);
+    }
+    const peakHour=Math.max(...hourCounts),peakHourIndex=hourCounts.indexOf(peakHour),peakWeekday=Math.max(...weekdayCounts),peakWeekdayIndex=weekdayCounts.indexOf(peakWeekday);
+    const pct=n=>total?(100*n/total):0;
+    const weekdayEvents=total-weekendRows.length;
+    const commonHourThreshold=Math.max(1,Math.ceil(peakHour*.2));
+    const lowHours=hourCounts.map((count,h)=>({h,count})).filter(x=>x.count>0&&x.count<=commonHourThreshold).sort((a,b)=>a.count-b.count||a.h-b.h);
+    const lowHourSet=new Set(lowHours.map(x=>x.h)),lowHourEvents=data.filter(r=>lowHourSet.has(r.dt.getHours())).length;
+
+    $('patternSummary').innerHTML=`<div class="kpis">
+      <div class="kpi"><div class="v">${String(peakHourIndex).padStart(2,'0')}:00–${String((peakHourIndex+1)%24).padStart(2,'0')}:00</div><div class="l">Most active hour</div><div class="s">${fmtInt(peakHour)} event(s) • ${pct(peakHour).toFixed(1)}%</div></div>
+      <div class="kpi"><div class="v">${dayNames[peakWeekdayIndex]}</div><div class="l">Most active weekday</div><div class="s">${fmtInt(peakWeekday)} event(s) • ${pct(peakWeekday).toFixed(1)}%</div></div>
+      <div class="kpi"><div class="v">${pct(nightRows.length).toFixed(1)}%</div><div class="l">Night activity</div><div class="s">20:00–05:59 • ${fmtInt(nightRows.length)} event(s)</div></div>
+      <div class="kpi"><div class="v">${pct(weekendRows.length).toFixed(1)}%</div><div class="l">Weekend activity</div><div class="s">${fmtInt(weekendRows.length)} weekend • ${fmtInt(weekdayEvents)} weekday</div></div>
+      <div class="kpi"><div class="v">${fmtInt(activeDayCount)}</div><div class="l">Active dates</div><div class="s">${fmtInt(total)} filtered event(s)</div></div>
+      <div class="kpi"><div class="v">${pct(lowHourEvents).toFixed(1)}%</div><div class="l">Lower-frequency-hour events</div><div class="s">${fmtInt(lowHourEvents)} event(s) across ${fmtInt(lowHours.length)} hour band(s)</div></div>
+    </div>`;
+
+    $('patternWeekdayTable').innerHTML=`<thead><tr><th>Weekday</th><th>Events</th><th>%</th><th>Active dates</th><th>Avg / active date</th></tr></thead><tbody>${dayNames.map((name,w)=>`<tr><td>${name}</td><td class="num">${fmtInt(weekdayCounts[w])}</td><td class="num">${pct(weekdayCounts[w]).toFixed(1)}%</td><td class="num">${fmtInt(weekdayDates[w].size)}</td><td class="num">${weekdayDates[w].size?(weekdayCounts[w]/weekdayDates[w].size).toFixed(1):'0.0'}</td></tr>`).join('')}</tbody>`;
+
+    const types=[...typeMap.values()].sort((a,b)=>b.count-a.count);
+    $('patternEventTypeTable').innerHTML=`<thead><tr><th>Event type</th><th>Events</th><th>%</th><th>Active dates</th><th>Peak hour</th></tr></thead><tbody>${types.map(x=>{const mx=Math.max(...x.hours),h=x.hours.indexOf(mx);return `<tr><td>${typePill(x.type)}</td><td class="num">${fmtInt(x.count)}</td><td class="num">${pct(x.count).toFixed(1)}%</td><td class="num">${fmtInt(x.days.size)}</td><td>${String(h).padStart(2,'0')}:00 <span class="tiny">(${fmtInt(mx)})</span></td></tr>`}).join('')}</tbody>`;
+
+    const contacts=new Map();
+    for(const r of data){
+      if(!r.bparty)continue;let x=contacts.get(r.bparty);if(!x)x={num:r.bparty,count:0,days:new Set(),first:null,last:null,types:new Set()};
+      x.count++;x.days.add(localDateKey(r.dt));x.types.add(r.callType||'—');if(!x.first||r.dt<x.first)x.first=r.dt;if(!x.last||r.dt>x.last)x.last=r.dt;contacts.set(r.bparty,x);
+    }
+    const recurring=[...contacts.values()].sort((a,b)=>b.days.size-a.days.size||b.count-a.count).slice(0,20);
+    $('patternRegularContactsTable').innerHTML=`<thead><tr><th>Contact</th><th>Active dates</th><th>Date coverage</th><th>Events</th><th>Types</th><th>First</th><th>Last</th></tr></thead><tbody>${recurring.map(x=>`<tr><td><a href="#" class="link contact-filter" data-num="${escAttr(x.num)}" title="${escAttr(contactTitle(x.num))}">${escapeHtml(contactLabel(x.num))}</a></td><td class="num">${fmtInt(x.days.size)}</td><td class="num">${activeDayCount?(100*x.days.size/activeDayCount).toFixed(1):'0.0'}%</td><td class="num">${fmtInt(x.count)}</td><td class="details">${escapeHtml([...x.types].join(', '))}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td></tr>`).join('')}</tbody>`;
+
+    $('patternUnusualHoursTable').innerHTML=`<thead><tr><th>Hour</th><th>Events</th><th>% of total</th><th>% of peak-hour count</th><th>Active dates</th></tr></thead><tbody>${lowHours.length?lowHours.map(x=>{const ds=new Set(data.filter(r=>r.dt.getHours()===x.h).map(r=>localDateKey(r.dt)));return `<tr><td>${String(x.h).padStart(2,'0')}:00–${String((x.h+1)%24).padStart(2,'0')}:00</td><td class="num">${fmtInt(x.count)}</td><td class="num">${pct(x.count).toFixed(1)}%</td><td class="num">${peakHour?(100*x.count/peakHour).toFixed(1):'0.0'}%</td><td class="num">${fmtInt(ds.size)}</td></tr>`}).join(''):`<tr><td colspan="5" class="empty">No lower-frequency active hours under the current 20% threshold.</td></tr>`}</tbody>`;
+
+    const days=activeDates.slice(-31),matrix={};let max=1;
+    for(const d of days)matrix[d]=Array(24).fill(0);
+    for(const r of data){const d=localDateKey(r.dt);if(matrix[d]){matrix[d][r.dt.getHours()]++;max=Math.max(max,matrix[d][r.dt.getHours()]);}}
+    $('hourMatrix').innerHTML=`<table class="table"><thead><tr><th>Date</th>${Array.from({length:24},(_,h)=>`<th>${String(h).padStart(2,'0')}</th>`).join('')}</tr></thead><tbody>${days.map(d=>`<tr><td>${d}</td>${matrix[d].map(v=>`<td title="${v} event(s)" style="text-align:center;background:rgba(21,94,239,${v?0.08+0.72*v/max:0})">${v||''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+
+    const top=aggregateContacts(data).slice(0,20),cd={};let cmax=1;
+    for(const x of top){cd[x.bparty]={};for(const d of days)cd[x.bparty][d]=0;}
+    for(const r of data){if(!cd[r.bparty])continue;const d=localDateKey(r.dt);if(d in cd[r.bparty]){cd[r.bparty][d]++;cmax=Math.max(cmax,cd[r.bparty][d]);}}
+    $('contactDayMatrix').innerHTML=`<h3>Contact-by-day matrix</h3><div class="tiny" style="margin-bottom:6px">Top 20 contacts within the current filters across the latest 31 filtered dates.</div><div class="tablewrap"><table class="table"><thead><tr><th>Contact</th>${days.map(d=>`<th>${d.slice(5)}</th>`).join('')}</tr></thead><tbody>${top.map(x=>`<tr><td title="${escAttr(contactTitle(x.bparty))}">${escapeHtml(contactLabel(x.bparty))}</td>${days.map(d=>{const v=cd[x.bparty][d]||0;return `<td title="${v} event(s)" style="text-align:center;background:rgba(181,71,8,${v?0.08+0.72*v/cmax:0})">${v||''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
   }
   function renderDataQuality(){
     const data=subjectEventScopedRecords(state.records);
