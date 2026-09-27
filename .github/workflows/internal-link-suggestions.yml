@@ -1,0 +1,47 @@
+name: ClearExams internal link audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Find missing preparation links
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          rules = {
+              "tnpsc.html": ["daily-quiz.html", "pyq-hub.html", "syllabus.html", "study-plan-30.html"],
+              "tnusrb.html": ["daily-quiz.html", "pyq-hub.html", "syllabus.html", "study-plan-30.html"],
+              "upsc.html": ["daily-quiz.html", "pyq-hub.html", "syllabus.html", "answer-writing.html"],
+          }
+
+          out=[]
+          for page, expected in rules.items():
+              p=Path(page)
+              if not p.exists():
+                  continue
+              text=p.read_text(encoding='utf-8',errors='ignore')
+              for link in expected:
+                  if link not in text:
+                      out.append(f"{page} missing suggested link: {link}")
+
+          summary=Path(__import__('os').environ['GITHUB_STEP_SUMMARY'])
+          with summary.open('a',encoding='utf-8') as f:
+              f.write('# Internal link opportunities\n')
+              if out:
+                  for item in out:
+                      f.write('- ⚠️ '+item+'\n')
+              else:
+                  f.write('- ✅ Major exam hubs contain expected preparation routes.\n')
+          PY
