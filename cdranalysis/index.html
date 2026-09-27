@@ -841,12 +841,32 @@
   function exportCsv(records,name){const h=['CDR No','B Party','Date/Time','Duration Seconds','Call Type','First Cell ID','First Tower Address','Last Cell ID','Last Tower Address','IMEI','IMSI','Roaming','Provider','Main City','Sub City','Operator','Latitude','Longitude','Azimuth','Source File','Source Sheet','Source Row'];const lines=[h.join(',')];records.forEach(r=>lines.push([r.cdrNo,r.bparty,dtFmt(r.dt)||`${r.date} ${r.time}`,r.duration,r.callType,r.firstCellId,r.firstAddress,r.lastCellId,r.lastAddress,r.imei,r.imsi,r.roaming,r.provider,r.mainCity,r.subCity,r.operator,r.lat??'',r.lng??'',r.azimuth,r.sourceFile,r.sourceSheet,r.rowNumber].map(csvCell).join(',')));download(name,'\ufeff'+lines.join('\r\n'),'text/csv;charset=utf-8');}
   function exportWorkbook(){
     if(typeof XLSX==='undefined'){showStatus('Excel library is unavailable.','error');return;}
-    const wb=XLSX.utils.book_new();
+    const wb=XLSX.utils.book_new(),add=(name,data)=>{if(data&&data.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),name);};
     const rec=state.filtered.map(r=>({'CDR No':r.cdrNo,'B Party':contactLabel(r.bparty),'B Party Number':r.bparty,'Date/Time':dtFmt(r.dt)||`${r.date} ${r.time}`,'Duration Seconds':r.duration,'Call Type':r.callType,'First Cell ID':r.firstCellId,'First Tower Address':r.firstAddress,'Last Cell ID':r.lastCellId,'Last Tower Address':r.lastAddress,'IMEI':r.imei,'IMSI':r.imsi,'Roaming':r.roaming,'Provider':r.provider,'Main City':r.mainCity,'Sub City':r.subCity,'Operator':r.operator,'Latitude':r.lat??'','Longitude':r.lng??'','Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber}));
-    const contacts=aggregateContacts().map(x=>({'Contact':contactLabel(x.bparty),'Number':x.bparty,'Tag':state.contactTags[x.bparty]||'','Records':x.records,'Calls':x.calls,'Incoming':x.in,'Outgoing':x.out,'SMS':x.sms,'Total Duration Seconds':x.duration,'First':dtFmt(x.first),'Last':dtFmt(x.last),'Towers':x.towers.size,'Providers':[...x.providers].join(', '),'CDRs':[...x.cdrs].join(', ')}));
+    const contacts=aggregateContacts().map(x=>({'Contact':contactLabel(x.bparty),'Number':x.bparty,'Aliases':[...(x.aliases||[])].join(', '),'Tag':state.contactTags[x.bparty]||'','Records':x.records,'Calls':x.calls,'Incoming':x.in,'Outgoing':x.out,'SMS':x.sms,'Total Duration Seconds':x.duration,'First':dtFmt(x.first),'Last':dtFmt(x.last),'Towers':x.towers.size,'Providers':[...x.providers].join(', '),'CDRs':[...x.cdrs].join(', ')}));
     const locs=aggregateLocations().map(x=>({'Cell ID':x.cellId,'Tower Address':x.address,'Records':x.records,'Contacts':x.contacts.size,'Duration Seconds':x.duration,'First':dtFmt(x.first),'Last':dtFmt(x.last),'Latitude':x.lat??'','Longitude':x.lng??'','Azimuth':x.az,'Roaming':[...x.roaming].join(', '),'CDRs':[...x.cdrs].join(', ')}));
     const devs=aggregateDevices().map(x=>({'IMEI':x.imei,'IMSI':x.imsi,'Device':[x.manufacturer,x.deviceType].filter(Boolean).join(' • '),'Records':x.records,'Contacts':x.contacts.size,'Towers':x.towers.size,'CDRs':[...x.cdrs].join(', '),'First':dtFmt(x.first),'Last':dtFmt(x.last)}));
-    for(const [name,data] of [['Records',rec],['Contacts',contacts],['Towers',locs],['Devices',devs]])XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),name);
+    const movement=movementRows().map((x,i)=>({'#':i+1,'Start':dtFmt(x.start),'End':dtFmt(x.end),'Cell ID':x.cellId,'Tower Address':x.address,'Events':x.events,'Contacts':[...x.contacts].map(contactLabel).join(', '),'Duration Seconds':x.duration,'Latitude':x.lat??'','Longitude':x.lng??'','Next Distance km':x.nextDistance==null?'':+x.nextDistance.toFixed(2),'Gap Minutes':x.nextMinutes==null?'':Math.round(x.nextMinutes)}));
+    const overlaps=colocationMatches(state.filtered,+$('colocationMins').value||30).map(x=>({'Subject A':x.a,'Subject B':x.b,'Cell ID':x.cell,'Tower Address':x.address,'Matches':x.count,'Closest Gap Minutes':+x.minGap.toFixed(2),'First':dtFmt(x.first),'Last':dtFmt(x.last)}));
+    const flags=state.records.filter(r=>state.flags.has(r.id)).map(r=>({'Contact':contactLabel(r.bparty),'Number':r.bparty,'Date/Time':dtFmt(r.dt),'Type':r.callType,'Duration Seconds':r.duration,'Cell ID':r.firstCellId,'Tower':r.firstAddress,'IMEI':r.imei,'IMSI':r.imsi,'Note':state.notes[r.id]||'','Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber}));
+    const chronology=[...state.chronology].sort((a,b)=>a.time-b.time).map(x=>({'Date/Time':dtFmt(new Date(x.time)),'Source':x.source,'Event':x.text,'Reference':x.reference||''}));
+    const inc=incidentDateTime();let incident=[];
+    if(inc){
+      const beforeH=+$('incidentBeforeHours').value||6,duringM=+$('incidentDuringMins').value||30,afterH=+$('incidentAfterHours').value||6;
+      const startI=new Date(inc-beforeH*3600000),d1=new Date(inc-duringM*60000),d2=new Date(inc+duringM*60000),endI=new Date(inc+afterH*3600000);
+      incident=state.records.filter(r=>r.dt&&r.dt>=startI&&r.dt<=endI).sort((a,b)=>a.dt-b.dt).map(r=>({'Period':r.dt<d1?'Before':r.dt<=d2?'During':'After','Date/Time':dtFmt(r.dt),'Subject':r.cdrNo,'Contact':contactLabel(r.bparty),'Number':r.bparty,'Type':r.callType,'Duration Seconds':r.duration,'Cell ID':r.firstCellId,'Tower':r.firstAddress,'IMEI':r.imei,'IMSI':r.imsi,'Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber}));
+    }
+    const seen=new Map();for(const r of state.records){const k=[r.cdrNo,r.bparty,r.dt?+r.dt:'',r.duration,r.callType,r.firstCellId].join('|');seen.set(k,(seen.get(k)||0)+1);}
+    const quality=[
+      {'Metric':'Loaded Records','Value':state.records.length},
+      {'Metric':'Duplicate Signatures','Value':[...seen.values()].filter(n=>n>1).length},
+      {'Metric':'Missing Date/Time','Value':state.records.filter(r=>!r.dt).length},
+      {'Metric':'Missing Subject','Value':state.records.filter(r=>!r.cdrNo).length},
+      {'Metric':'Missing Connected Party','Value':state.records.filter(r=>!r.bparty).length},
+      {'Metric':'Missing Tower','Value':state.records.filter(r=>!r.firstCellId&&!r.firstAddress).length},
+      {'Metric':'Missing Coordinates','Value':state.records.filter(r=>r.lat==null||r.lng==null).length}
+    ];
+    add('Records',rec);add('Contacts',contacts);add('Towers',locs);add('Devices',devs);add('Movement',movement);add('Cross-CDR',overlaps);add('Flags',flags);add('Chronology',chronology);add('Incident',incident);add('Data Quality',quality);
     XLSX.writeFile(wb,`${safeName($('caseNo').value||$('caseTitle').value)}_cdr_analysis.xlsx`);
   }
   function safeName(s){return String(s||'cdr_case').replace(/[^a-z0-9_-]+/gi,'_').replace(/^_+|_+$/g,'').slice(0,60)||'cdr_case';}
