@@ -1450,8 +1450,10 @@
     const seen=new Map();for(const r of data){const k=[r.cdrNo,r.bparty,r.dt?+r.dt:'',r.duration,r.callType,r.firstCellId].join('|');seen.set(k,(seen.get(k)||0)+1);}const duplicateGroups=[...seen.values()].filter(n=>n>1).length;
     $('qualitySummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(total)}</div><div class="l">Records</div></div><div class="kpi"><div class="v">${fmtInt(duplicateGroups)}</div><div class="l">Duplicate signatures</div></div><div class="kpi"><div class="v">${fmtInt(missingDate)}</div><div class="l">Missing date/time</div></div><div class="kpi"><div class="v">${fmtInt(missingSubject)}</div><div class="l">Missing subject</div></div><div class="kpi"><div class="v">${fmtInt(missingParty)}</div><div class="l">Missing connected party</div></div><div class="kpi"><div class="v">${fmtInt(missingTower)}</div><div class="l">Missing tower</div></div><div class="kpi"><div class="v">${fmtInt(missingCoords)}</div><div class="l">Missing coordinates</div></div></div>`;
   }
-  function renderMovementMap(rows){
+  function renderMovementMap(rows,attempt=0){
     const el=$('movementMap');if(!el)return;
+    const rect=el.getBoundingClientRect();
+    if((rect.width<80||rect.height<80)&&attempt<5){setTimeout(()=>renderMovementMap(rows,attempt+1),80);return;}
     movementPlaybackMarkers=[];movementPlaybackMarker=null;
     const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180);
     movementPlaybackRows=pts.map(p=>p.x);
@@ -1459,23 +1461,44 @@
     if(typeof L==='undefined'){el.innerHTML='<div class="map-empty">Map library could not load. Internet access is required to load the map.</div>';return;}
 
     if(!movementMap){
-      el.innerHTML='';
-      movementMap=L.map(el,{preferCanvas:false,zoomControl:true});
-      movementMap.createPane('movementRoutePane');movementMap.getPane('movementRoutePane').style.zIndex='430';movementMap.getPane('movementRoutePane').style.pointerEvents='none';
-      movementMap.createPane('movementTowerPane');movementMap.getPane('movementTowerPane').style.zIndex='440';
-      movementMap.createPane('movementAnchorPane');movementMap.getPane('movementAnchorPane').style.zIndex='650';
-      movementCanvasRenderer=L.canvas({padding:.5});
-      movementTileLayer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-        maxZoom:19,
-        attribution:'&copy; OpenStreetMap contributors',
-        crossOrigin:true
-      }).addTo(movementMap);
-      let tileOk=false;
-      movementTileLayer.on('tileload',()=>{if(tileOk)return;tileOk=true;const chip=$('tileStatusChip');if(chip){chip.textContent='Map tiles loaded';chip.classList.add('goodtext');}});
-      movementTileLayer.on('tileerror',()=>{const chip=$('tileStatusChip');if(chip){chip.textContent='Map tile error — route overlay still available';chip.classList.add('warntext');}});
-      movementLayer=L.layerGroup().addTo(movementMap);
+      try{
+        el.innerHTML='';
+        movementMap=L.map(el,{preferCanvas:false,zoomControl:true});
+        movementMap.createPane('movementRoutePane');movementMap.getPane('movementRoutePane').style.zIndex='430';movementMap.getPane('movementRoutePane').style.pointerEvents='none';
+        movementMap.createPane('movementTowerPane');movementMap.getPane('movementTowerPane').style.zIndex='440';
+        movementMap.createPane('movementAnchorPane');movementMap.getPane('movementAnchorPane').style.zIndex='650';
+        movementCanvasRenderer=L.canvas({padding:.5});
+        movementMap.setView([13.0827,80.2707],10);
+        let tileOk=false,tileErrors=0,fallbackUsed=false;
+        const wireTiles=layer=>{
+          layer.on('tileload',()=>{if(tileOk)return;tileOk=true;const chip=$('tileStatusChip');if(chip){chip.textContent=fallbackUsed?'Fallback map tiles loaded':'Map tiles loaded';chip.classList.remove('warntext');chip.classList.add('goodtext');}});
+          layer.on('tileerror',()=>{
+            tileErrors++;
+            const chip=$('tileStatusChip');if(chip){chip.textContent='Map tile loading issue…';chip.classList.add('warntext');}
+            if(!tileOk&&!fallbackUsed&&tileErrors>=4){
+              fallbackUsed=true;
+              try{movementMap.removeLayer(movementTileLayer)}catch{}
+              movementTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,attribution:'&copy; OpenStreetMap contributors &copy; CARTO'});
+              wireTiles(movementTileLayer);movementTileLayer.addTo(movementMap);
+              const chip2=$('tileStatusChip');if(chip2)chip2.textContent='Trying fallback map tiles…';
+            }
+          });
+        };
+        movementTileLayer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'});
+        wireTiles(movementTileLayer);movementTileLayer.addTo(movementMap);
+        movementLayer=L.layerGroup().addTo(movementMap);
+        movementMap.invalidateSize({pan:false});
+      }catch(err){
+        try{movementMap?.remove()}catch{}
+        movementMap=null;movementLayer=null;movementTileLayer=null;
+        el.innerHTML='<div class="map-empty">Movement map could not initialize. Use Refresh after opening the Movement tab.</div>';
+        if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip warntext">Map initialization error</span>`;
+        return;
+      }
     }else{
-      movementLayer.clearLayers();movementStartMarker=null;movementEndMarker=null;
+      if(!movementLayer)movementLayer=L.layerGroup().addTo(movementMap);else movementLayer.clearLayers();
+      movementStartMarker=null;movementEndMarker=null;
+      movementMap.invalidateSize({pan:false});
       const chip=$('tileStatusChip');if(chip)chip.textContent='Map ready';
     }
 
@@ -1493,9 +1516,10 @@
     }
 
     if(!pts.length){
+      movementMap.invalidateSize({pan:false});
       movementMap.setView([13.0827,80.2707],10);
-      if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">No usable coordinates found</span>`;
-      setTimeout(()=>movementMap.invalidateSize(),80);
+      if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip warntext">No usable tower coordinates in the current selection</span>`;
+      setTimeout(()=>movementMap.invalidateSize({pan:false}),120);
       return;
     }
 
@@ -1546,8 +1570,10 @@
 
     const slider=$('movementSlider');if(slider){slider.max=Math.max(0,movementPlaybackRows.length-1);if(+slider.value>+slider.max)slider.value=0;updateMovementPlayback(+slider.value||0,false);}
     const fullBounds=L.latLngBounds(pts.map(p=>[p.x.lat,p.x.lng]));
+    movementMap.invalidateSize({pan:false});
     if(pts.length===1)movementMap.setView([pts[0].x.lat,pts[0].x.lng],15);else movementMap.fitBounds(fullBounds.pad(.08),{maxZoom:16});
-    setTimeout(()=>movementMap.invalidateSize(),120);
+    requestAnimationFrame(()=>movementMap?.invalidateSize({pan:false}));
+    setTimeout(()=>{movementMap?.invalidateSize({pan:false});if(pts.length>1)movementMap?.fitBounds(fullBounds.pad(.08),{maxZoom:16});},180);
   }
 
   function updateMovementPlayback(i,openPopup=true,pan=true){
