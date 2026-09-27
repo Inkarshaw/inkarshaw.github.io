@@ -1035,7 +1035,7 @@
     $('kpis').innerHTML=k.map(x=>`<div class="kpi"><div class="v">${x[1]}</div><div class="l">${x[0]}</div><div class="s">${x[2]}</div></div>`).join(''); $('topContactBadge').textContent=contacts.length;
     renderCharts(d,contacts);
     $('dashLocations').innerHTML=simpleTable(['Cell ID / location','Records','Contacts'],locs.slice(0,8).map(x=>[escapeHtml(x.cellId||x.address||'—'),fmtInt(x.records),fmtInt(x.contacts.size)]));
-    $('dashDevices').innerHTML=simpleTable(['IMEI','TAC / model','IMSI','Records'],devs.slice(0,8).map(x=>[escapeHtml(x.imei||'—'),escapeHtml([x.tac,[x.manufacturer,x.model].filter(Boolean).join(' ')].filter(Boolean).join(' • ')||'Unknown TAC'),escapeHtml(x.imsi||'—'),fmtInt(x.records)]));
+    $('dashDevices').innerHTML=simpleTable(['IMEI','Model','IMSI','Records'],devs.slice(0,8).map(x=>[escapeHtml(x.imei||'—'),escapeHtml([x.manufacturer,x.model].filter(Boolean).join(' ')||'Unknown model'),escapeHtml(x.imsi||'—'),fmtInt(x.records)]));
   }
   function simpleTable(headers,rows){return rows.length?`<div class="tablewrap" style="max-height:350px"><table class="table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:`<div class="empty">No matching data</div>`;}
   function newChart(id,config){if(state.charts[id])state.charts[id].destroy(); if(typeof Chart==='undefined')return; state.charts[id]=new Chart($(id),config);}
