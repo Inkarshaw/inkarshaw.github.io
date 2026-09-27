@@ -28,7 +28,7 @@ jobs:
           test "$(tr -d '\r\n' < CNAME)" = "clearexams.ink"
           python3 -m json.tool current-affairs/pdfs.json >/dev/null
           python3 - <<'PY'
-          import csv, pathlib, xml.etree.ElementTree as ET
+          import csv, json, pathlib, re, urllib.parse, xml.etree.ElementTree as ET
           tree = ET.parse("sitemap.xml")
           root = tree.getroot()
           if len(root) < 10:
@@ -56,6 +56,36 @@ jobs:
           required = {"ID","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer"}
           if not rows or not required.issubset(rows[0].keys()):
               raise SystemExit("daily-quiz.csv is missing required columns")
+
+          routes = json.loads(pathlib.Path("data/exams/exam-routes.json").read_text(encoding="utf-8"))
+          catalog = json.loads(pathlib.Path("data/exams/exam-catalog.json").read_text(encoding="utf-8"))
+          catalog_ids = {item["id"] for body in catalog.values() for item in body.get("items", [])}
+          syllabus_text = pathlib.Path("syllabus.html").read_text(encoding="utf-8")
+          syllabus_ids = set(re.findall(r"""\bid\s*:\s*['"]([^'"]+)['"]""", syllabus_text))
+
+          if set(routes) - set(catalog):
+              raise SystemExit("exam-routes.json contains unknown exam families: " + ", ".join(sorted(set(routes) - set(catalog))))
+
+          route_fields = ("hubRoute","syllabusRoute","pyqRoute","preparationRoute","currentAffairsRoute")
+          for family, route in routes.items():
+              for field in route_fields:
+                  value = route.get(field)
+                  if not value:
+                      raise SystemExit(f"{family}.{field} is missing")
+                  parsed = urllib.parse.urlsplit(value)
+                  path = pathlib.Path(urllib.parse.unquote(parsed.path))
+                  candidates = [path]
+                  if str(path).endswith("/") or not path.suffix:
+                      candidates += [path / "index.html", path.with_suffix(".html")]
+                  if not any(candidate.exists() for candidate in candidates):
+                      raise SystemExit(f"{family}.{field} points to missing path: {value}")
+              prep = urllib.parse.urlsplit(route["preparationRoute"])
+              prep_exam = urllib.parse.parse_qs(prep.query).get("exam", [""])[0]
+              if prep_exam not in catalog_ids:
+                  raise SystemExit(f"{family}.preparationRoute uses unknown exam id: {prep_exam}")
+              syllabus = urllib.parse.urlsplit(route["syllabusRoute"])
+              if syllabus.fragment and syllabus.fragment not in syllabus_ids:
+                  raise SystemExit(f"{family}.syllabusRoute uses unknown syllabus fragment: {syllabus.fragment}")
           PY
           echo "Repository metadata checks passed." >> "$GITHUB_STEP_SUMMARY"
 
