@@ -163,6 +163,42 @@ jobs:
           PY
           echo "Repository metadata checks passed." >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check assets/js/exam-common.js
+          node --check assets/js/exam-preparation.js
+          node --check assets/js/exam-posts.js
+          python3 - <<'PY'
+          import pathlib, re, subprocess, tempfile
+          pages = [
+              "daily-quiz.html",
+              "dashboard.html",
+              "index.html",
+              "start.html",
+              "current-affairs/index.html",
+              "current-affairs/daily.html",
+          ]
+          checked = 0
+          for page in pages:
+              text = pathlib.Path(page).read_text(encoding="utf-8")
+              for i, match in enumerate(re.finditer(r"<script([^>]*)>(.*?)</script>", text, re.I | re.S), 1):
+                  attrs, body = match.groups()
+                  if re.search(r"\bsrc\s*=", attrs, re.I):
+                      continue
+                  if "application/ld+json" in attrs.lower():
+                      continue
+                  if not body.strip():
+                      continue
+                  path = pathlib.Path(tempfile.gettempdir()) / f"clearexams-{pathlib.Path(page).stem}-{i}.js"
+                  path.write_text(body, encoding="utf-8")
+                  subprocess.run(["node","--check",str(path)], check=True)
+                  checked += 1
+          print(f"Validated {checked} inline JavaScript block(s).")
+          PY
+          echo "JavaScript syntax checks passed." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Validate core exam-site internal links
         shell: bash
         run: |
