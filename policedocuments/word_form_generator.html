@@ -283,6 +283,206 @@ function aliasMatch(node,aliases){
    return n && (txt===n || txt.startsWith(n+':') || txt.startsWith(n+' :') || txt.includes(n));
  });
 }
+
+function directChildren(node,local){
+ return Array.from(node.childNodes||[]).filter(n=>n.nodeType===1 && (n.localName===local || n.nodeName==='w:'+local));
+}
+function getTable(doc,tableIndex){
+ return Array.from(doc.getElementsByTagName('w:tbl'))[tableIndex]||null;
+}
+function getTableCell(doc,tableIndex,rowIndex,cellIndex){
+ const table=getTable(doc,tableIndex); if(!table)return null;
+ const rows=directChildren(table,'tr'); const row=rows[rowIndex]; if(!row)return null;
+ return directChildren(row,'tc')[cellIndex]||null;
+}
+function setCellValue(doc,tableIndex,rowIndex,cellIndex,value){
+ if(!value)return false;
+ const cell=getTableCell(doc,tableIndex,rowIndex,cellIndex); if(!cell)return false;
+ const texts=Array.from(cell.getElementsByTagName('w:t'));
+ if(texts.length){
+   texts[0].textContent=value; texts[0].setAttribute('xml:space','preserve');
+   for(let i=1;i<texts.length;i++)texts[i].textContent='';
+ }else{
+   appendValueToCell(doc,cell,value);
+ }
+ return true;
+}
+function setParagraphValue(p,value){
+ if(!p||value===undefined||value===null)return false;
+ const texts=Array.from(p.getElementsByTagName('w:t'));
+ if(texts.length){
+   texts[0].textContent=String(value); texts[0].setAttribute('xml:space','preserve');
+   for(let i=1;i<texts.length;i++)texts[i].textContent='';
+ }else{
+   const r=p.ownerDocument.createElementNS(WORD_NS,'w:r');
+   const t=p.ownerDocument.createElementNS(WORD_NS,'w:t');
+   t.setAttribute('xml:space','preserve');t.textContent=String(value);r.appendChild(t);p.appendChild(r);
+ }
+ return true;
+}
+function findParagraph(doc,needle){
+ const n=normalizeText(needle);
+ return Array.from(doc.getElementsByTagName('w:p')).find(p=>normalizeText(nodeText(p)).includes(n))||null;
+}
+function formatDateDisplay(value){
+ if(!value)return '';
+ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+ return m?m[3]+'.'+m[2]+'.'+m[1]:value;
+}
+function formatDateWords(value){
+ if(!value)return '';
+ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(value); if(!m)return value;
+ const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+ return String(Number(m[3]))+' day of '+months[Number(m[2])-1]+' '+m[1];
+}
+function fieldValue(fields,id){return fields[id]?.value||''}
+function markIf(used,id,value){if(value)used.add(id)}
+function setNumberedArticleRows(doc,items){
+ const lines=String(items||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,8);
+ for(let i=0;i<lines.length;i++){
+   setCellValue(doc,1,i+1,0,String(i+1));
+   setCellValue(doc,1,i+1,1,lines[i]);
+ }
+ return lines.length;
+}
+function applyPreciseTemplate(doc,fields){
+ const used=new Set(); let count=0;
+ const put=(ok,id,value)=>{if(ok){count++;markIf(used,id,value)}};
+
+ if(file==='panchanama_ii.docx'){
+   const serial=fieldValue(fields,'serialNo')||'1';
+   put(setCellValue(doc,0,1,0,serial),'serialNo',serial);
+   put(setCellValue(doc,0,1,1,fieldValue(fields,'aNo')),'aNo',fieldValue(fields,'aNo'));
+   put(setCellValue(doc,0,1,2,fieldValue(fields,'crimeNo')),'crimeNo',fieldValue(fields,'crimeNo'));
+   put(setCellValue(doc,0,1,3,fieldValue(fields,'caseNo')),'caseNo',fieldValue(fields,'caseNo'));
+   put(setCellValue(doc,0,1,4,fieldValue(fields,'ccdAmount')),'ccdAmount',fieldValue(fields,'ccdAmount'));
+
+   const amount=fieldValue(fields,'ccdAmount');
+   if(amount){
+     const p=findParagraph(doc,'cash amount of Rs.');
+     put(setParagraphValue(p,'The above mentioned “A” Property cash amount of Rs. '+amount),'ccdAmount',amount);
+   }
+   const words=fieldValue(fields,'amountWords');
+   if(words){
+     const p=findParagraph(doc,'Rupees');
+     put(setParagraphValue(p,'(Rupees '+words+' only)'),'amountWords',words);
+   }
+   const remarks=fieldValue(fields,'depositRemarks');
+   if(remarks){
+     const p=findParagraph(doc,'For orders');
+     put(setParagraphValue(p,'For orders — '+remarks),'depositRemarks',remarks);
+   }
+ }
+
+ if(file==='mm_pt_warrant.docx'){
+   const cc=fieldValue(fields,'caseNo');
+   if(cc){
+     const p=findParagraph(doc,'CC.No:');
+     put(setParagraphValue(p,'CC.No: '+cc),'caseNo',cc);
+   }
+   const station=fieldValue(fields,'station');
+   if(station){
+     const p=findParagraph(doc,'POLICE STATION:');
+     put(setParagraphValue(p,'POLICE STATION: '+station),'station',station);
+   }
+   const accused=fieldValue(fields,'accused');
+   const remanded=fieldValue(fields,'remandedIn')||cc;
+   const prison=fieldValue(fields,'prison');
+   const crime=fieldValue(fields,'crimeNo');
+   const sections=fieldValue(fields,'sections');
+   const production=formatDateDisplay(fieldValue(fields,'productionDate'));
+   const body=findParagraph(doc,'WHEREAS one');
+   if(body && (accused||remanded||prison||crime||sections||production)){
+     const bodyText='WHEREAS one '+(accused||'____________________')+
+       ' who had been remanded in '+(remanded||'____________________')+
+       '. Now the prisoner contained in the '+(prison||'____________________')+
+       ' Puzhal Central Jail at Chennai aforesaid, is required personally to appear at the Chief Metropolitan Magistrate’s Court, Egmore, Chennai-08, aforesaid to be examined in connection with Police Station Cr. No. '+
+       (crime||'____________________')+' U/s '+(sections||'____________________')+
+       '. You are hereby required to bring the said accused to the Court aforesaid at 10.30 am, in the forenoon of the '+
+       (production||'____________________')+
+       ' and there to be so examined as aforesaid and to be further dealt with according to law.';
+     setParagraphValue(body,bodyText);count++;
+     ['accused','remandedIn','prison','crimeNo','sections','productionDate'].forEach(id=>markIf(used,id,fieldValue(fields,id)));
+     if(!fieldValue(fields,'remandedIn')&&cc)used.add('caseNo');
+   }
+   const warrantDate=formatDateDisplay(fieldValue(fields,'warrantDate')||fieldValue(fields,'date'));
+   if(warrantDate){
+     const p=findParagraph(doc,'Dated this');
+     if(setParagraphValue(p,'Dated this '+warrantDate)){count++; if(fieldValue(fields,'warrantDate'))used.add('warrantDate');else used.add('date')}
+   }
+ }
+
+ if(file==='panchanama_judicial_form_82.docx'){
+   const caseNo=fieldValue(fields,'caseNo');
+   if(caseNo){
+     const p=findParagraph(doc,'Case No.');
+     put(setParagraphValue(p,'Case No. '+caseNo),'caseNo',caseNo);
+   }
+   put(setCellValue(doc,0,0,1,fieldValue(fields,'station')),'station',fieldValue(fields,'station'));
+   put(setCellValue(doc,0,1,1,fieldValue(fields,'crimeNo')),'crimeNo',fieldValue(fields,'crimeNo'));
+   put(setCellValue(doc,0,2,1,fieldValue(fields,'sections')),'sections',fieldValue(fields,'sections'));
+   put(setCellValue(doc,0,3,1,fieldValue(fields,'accused')),'accused',fieldValue(fields,'accused'));
+   put(setCellValue(doc,0,4,1,formatDateDisplay(fieldValue(fields,'seizedOn'))),'seizedOn',fieldValue(fields,'seizedOn'));
+   put(setCellValue(doc,0,5,1,formatDateDisplay(fieldValue(fields,'receivedOn'))),'receivedOn',fieldValue(fields,'receivedOn'));
+
+   const item=fieldValue(fields,'propertyItemNo');
+   const year=fieldValue(fields,'propertyYear')||(fieldValue(fields,'formDate')||fieldValue(fields,'date')||'').slice(0,4)||String(new Date().getFullYear());
+   if(item||year){
+     const p=findParagraph(doc,'as Item No.');
+     if(p){
+       const text='The undermentioned Articles / Properties which are produced by the police, are checked, received and entered in the Property Register in Administrative Form No. 19 (C.R. No. 19) (in case of Judicial Magistrate court) or in Judicial Form No. 70 (in case of Metropolitan Magistrate Court) as Item No. '+(item||'........................')+' of '+year+' and they have been photographed.';
+       setParagraphValue(p,text);count++;markIf(used,'propertyItemNo',item);markIf(used,'propertyYear',fieldValue(fields,'propertyYear'));
+     }
+   }
+   const articles=fieldValue(fields,'articles');
+   if(articles){const n=setNumberedArticleRows(doc,articles);if(n){count+=n;used.add('articles')}}
+   const remarks=fieldValue(fields,'otherRemarks');
+   if(remarks){
+     const p=findParagraph(doc,'Other remarks');
+     put(setParagraphValue(p,'Other remarks: '+remarks),'otherRemarks',remarks);
+   }
+   const w1=fieldValue(fields,'witness1'),w2=fieldValue(fields,'witness2');
+   if(w1){
+     const p=Array.from(doc.getElementsByTagName('w:p')).find(x=>normalizeText(nodeText(x))==='1.');
+     put(setParagraphValue(p,'1. '+w1),'witness1',w1);
+   }
+   if(w2){
+     const p=Array.from(doc.getElementsByTagName('w:p')).find(x=>normalizeText(nodeText(x))==='2.');
+     put(setParagraphValue(p,'2. '+w2),'witness2',w2);
+   }
+   const fd=fieldValue(fields,'formDate')||fieldValue(fields,'date');
+   if(fd){
+     const p=findParagraph(doc,'Date this');
+     if(setParagraphValue(p,'Date this '+formatDateWords(fd)+'.')){count++;if(fieldValue(fields,'formDate'))used.add('formDate');else used.add('date')}
+   }
+ }
+
+ if(file==='withdrawal_report.docx'){
+   const crimeSection=[fieldValue(fields,'crimeNo'),fieldValue(fields,'sections')?('U/s '+fieldValue(fields,'sections')):''].filter(Boolean).join(' — ');
+   const finalReport=[fieldValue(fields,'finalReportDate')?formatDateDisplay(fieldValue(fields,'finalReportDate')):'',fieldValue(fields,'caseNo')?('C.C. No. '+fieldValue(fields,'caseNo')):''].filter(Boolean).join(' — ');
+   const rows=[
+    ['station',fieldValue(fields,'station')],
+    ['crimeNo',crimeSection],
+    ['offenceDate',formatDateDisplay(fieldValue(fields,'offenceDate'))],
+    ['complainant',fieldValue(fields,'complainant')],
+    ['accused',fieldValue(fields,'accused')],
+    ['finalReportDate',finalReport],
+    ['reason',fieldValue(fields,'reason')],
+    ['inspectorRecommendation',fieldValue(fields,'inspectorRecommendation')],
+    ['acRecommendation',fieldValue(fields,'acRecommendation')],
+    ['dcRecommendation',fieldValue(fields,'dcRecommendation')],
+    ['appOpinion',fieldValue(fields,'appOpinion')]
+   ];
+   rows.forEach(([id,value],row)=>{
+     if(value && setCellValue(doc,0,row,2,value)){count++;used.add(id)}
+   });
+   if(crimeSection){markIf(used,'sections',fieldValue(fields,'sections'))}
+   if(finalReport){markIf(used,'caseNo',fieldValue(fields,'caseNo'))}
+ }
+
+ return {used,count};
+}
+
 async function downloadExactWord(){
  if(!template || !/\.docx$/i.test(template)){
    alert('Exact-layout filling is available for .docx templates. Use Quick Word for older .doc files.');
@@ -307,8 +507,9 @@ async function downloadExactWord(){
 
    const doc=new DOMParser().parseFromString(xml,'application/xml');
    if(doc.getElementsByTagName('parsererror').length) throw new Error('Could not read the Word template XML.');
-   let labelCount=0;
-   const used=new Set();
+   const precise=applyPreciseTemplate(doc,fields);
+   let labelCount=precise.count;
+   const used=precise.used;
    const cells=Array.from(doc.getElementsByTagName('w:tc'));
 
    for(const [id,spec] of Object.entries(fields)){
