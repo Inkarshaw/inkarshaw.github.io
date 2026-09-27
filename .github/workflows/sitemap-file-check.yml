@@ -1,0 +1,57 @@
+name: Sitemap file existence check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "37 */12 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  sitemap-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Validate sitemap URLs exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          root = Path('.')
+          base = 'https://clearexams.ink/'
+          tree = ET.parse('sitemap.xml')
+          urls = [x.text for x in tree.getroot().iter() if x.tag.endswith('loc') and x.text]
+
+          missing = []
+          checked = 0
+          for url in urls:
+              if not url.startswith(base):
+                  continue
+              rel = url[len(base):]
+              if not rel:
+                  rel = 'index.html'
+              path = root / rel
+              candidates = [path]
+              if path.suffix == '':
+                  candidates += [path / 'index.html', path.with_suffix('.html')]
+              checked += 1
+              if not any(p.exists() for p in candidates):
+                  missing.append(url)
+
+          print(f'Checked {checked} sitemap URLs.')
+          if missing:
+              print('Missing sitemap files:')
+              for item in missing:
+                  print(' - ' + item)
+              raise SystemExit(1)
+          print('Sitemap file existence check passed.')
+          PY
