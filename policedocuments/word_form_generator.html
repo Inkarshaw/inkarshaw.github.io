@@ -234,12 +234,7 @@ function fillAdjacentTableCell(doc,cell,value){
  }
  return false;
 }
-function escapeRegExp(s){return s.replace(/[\\^$.*+?()[\]{}|]/g,'\\async function downloadPdf(){
- updatePreview();
- const opt={margin:0,filename:fileBase()+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}};
- await html2pdf().set(opt).from($('paper')).save();
-}
-')}
+function escapeRegExp(s){return s.replace(/[\\^$.*+?()[\]{}|]/g,'\\$&')}
 function replacePlaceholders(xml,id,value){
  const safe=value.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[m]));
  const tokens=['{{'+id+'}}','[['+id+']]','<<'+id+'>>','__'+id.toUpperCase()+'__','{{'+id.toUpperCase()+'}}','[['+id.toUpperCase()+']]'];
@@ -319,6 +314,7 @@ async function downloadExactWord(){
    status.textContent='⚠️ Exact Word could not be generated: '+err.message+' Use Quick Word/PDF instead.';
  }
 }
+
 function saveDefaults(){
  const d={station:val('station'),district:val('district'),court:val('court'),officer:val('officer'),rank:val('rank')};
  localStorage.setItem('policeDocDefaults',JSON.stringify(d)); alert('Defaults saved on this device.');
