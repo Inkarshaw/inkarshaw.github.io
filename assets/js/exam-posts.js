@@ -7,6 +7,7 @@
     const routes=await json('data/exams/exam-routes.json').catch(()=>({}));
     const requested=new URLSearchParams(location.search).get('exam');
     const selected=Object.hasOwn(bodies,requested)?requested:'upsc',body=bodies[selected],route=routes[selected]||{};
+    localStorage.setItem('clearexamsTargetExamV1',selected);
     document.getElementById('tabs').innerHTML=Object.entries(bodies).map(([key,item])=>`<a class="tab${key===selected?' active':''}" ${key===selected?'aria-current="page"':''} href="exam-posts.html?exam=${key}">${escape(item.name)}</a>`).join('');
     document.title=`${body.name} Posts & Details | ClearExams`;
     document.getElementById('bodyName').textContent=body.name;document.getElementById('pageTitle').textContent=body.title;document.getElementById('intro').textContent=body.intro;
