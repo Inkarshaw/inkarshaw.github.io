@@ -1332,7 +1332,7 @@
     const data=state.filtered.filter(r=>r.dt),total=data.length,dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     if(!total){
       $('patternSummary').innerHTML='<div class="empty">No dated records match the current filters.</div>';
-      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable','patternTimeBandTable','patternHighDatesTable','patternContactHourTable'].forEach(id=>$(id).innerHTML='');
+      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable','patternTimeBandTable','patternHighDatesTable','patternContactHourTable','patternWeekdayContactHourTable'].forEach(id=>$(id).innerHTML='');
       $('patternNarrative').innerHTML='';
       $('hourMatrix').innerHTML='';$('contactDayMatrix').innerHTML='';return;
     }
@@ -1375,6 +1375,23 @@
     const contactHourMinDays=Math.max(2,Math.min(5,Math.ceil(activeDayCount*.20)));
     const recurringContactHours=[...contactHourMap.values()].filter(x=>x.days.size>=contactHourMinDays).sort((a,b)=>b.days.size-a.days.size||b.count-a.count||a.h-b.h);
     const topRecurringContactHour=recurringContactHours[0]||null;
+    const weekdayContactHourMap=new Map();
+    for(const r of data){
+      if(!r.bparty)continue;
+      const w=r.dt.getDay(),h=r.dt.getHours(),key=r.bparty+'|'+w+'|'+h;
+      let x=weekdayContactHourMap.get(key);
+      if(!x)x={num:r.bparty,w,h,count:0,days:new Set(),types:new Set(),first:null,last:null};
+      x.count++;x.days.add(localDateKey(r.dt));x.types.add(r.callType||'—');
+      if(!x.first||r.dt<x.first)x.first=r.dt;if(!x.last||r.dt>x.last)x.last=r.dt;
+      weekdayContactHourMap.set(key,x);
+    }
+    const recurringWeekdayContactHours=[...weekdayContactHourMap.values()].map(x=>{
+      x.possible=weekdayDates[x.w].size;
+      x.minDays=Math.max(2,Math.min(4,Math.ceil(x.possible*.35)));
+      x.coverage=x.possible?100*x.days.size/x.possible:0;
+      return x;
+    }).filter(x=>x.possible>=2&&x.days.size>=x.minDays).sort((a,b)=>b.coverage-a.coverage||b.days.size-a.days.size||b.count-a.count||a.w-b.w||a.h-b.h);
+    const topWeekdayContactHour=recurringWeekdayContactHours[0]||null;
 
     $('patternSummary').innerHTML=`<div class="kpis">
       <div class="kpi"><div class="v">${String(peakHourIndex).padStart(2,'0')}:00–${String((peakHourIndex+1)%24).padStart(2,'0')}:00</div><div class="l">Most active hour</div><div class="s">${fmtInt(peakHour)} event(s) • ${pct(peakHour).toFixed(1)}%</div></div>
@@ -1384,6 +1401,7 @@
       <div class="kpi"><div class="v">${fmtInt(activeDayCount)}</div><div class="l">Active dates</div><div class="s">${fmtInt(total)} filtered event(s)</div></div>
       <div class="kpi"><div class="v">${pct(lowHourEvents).toFixed(1)}%</div><div class="l">Lower-frequency-hour events</div><div class="s">${fmtInt(lowHourEvents)} event(s) across ${fmtInt(lowHours.length)} hour band(s)</div></div>
       <div class="kpi"><div class="v">${fmtInt(recurringContactHours.length)}</div><div class="l">Recurring contact-hour patterns</div><div class="s">At least ${fmtInt(contactHourMinDays)} separate active dates</div></div>
+      <div class="kpi"><div class="v">${fmtInt(recurringWeekdayContactHours.length)}</div><div class="l">Weekday + contact + hour patterns</div><div class="s">Adaptive threshold from active same-weekday dates</div></div>
     </div>`;
 
     $('patternWeekdayTable').innerHTML=`<thead><tr><th>Weekday</th><th>Events</th><th>%</th><th>Active dates</th><th>Avg / active date</th></tr></thead><tbody>${dayNames.map((name,w)=>`<tr><td>${name}</td><td class="num">${fmtInt(weekdayCounts[w])}</td><td class="num">${pct(weekdayCounts[w]).toFixed(1)}%</td><td class="num">${fmtInt(weekdayDates[w].size)}</td><td class="num">${weekdayDates[w].size?(weekdayCounts[w]/weekdayDates[w].size).toFixed(1):'0.0'}</td></tr>`).join('')}</tbody>`;
