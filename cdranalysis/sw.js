@@ -1,12 +1,13 @@
-const CACHE='cdr-analyzer-v3';
+const CACHE='cdr-analyzer-v4';
 const CORE=[
   '/cdranalysis/',
   '/cdranalysis/index.html',
-  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
-  'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js',
-  'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css',
-  'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
-  'https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js'
+  '/cdranalysis/vendor/xlsx.full.min.js',
+  '/cdranalysis/vendor/chart.umd.js',
+  '/cdranalysis/vendor/leaflet.css',
+  '/cdranalysis/vendor/leaflet.js',
+  '/cdranalysis/vendor/leaflet-heat.js',
+  '/cdranalysis/cdr-parser-worker.js'
 ];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(async cache=>{for(const url of CORE){try{await cache.add(url)}catch{}}}).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
