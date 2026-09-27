@@ -439,7 +439,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, fileSeq:0, pendingWorkspace:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null};
-  let movementMap=null, movementLayer=null, movementHeatLayer=null, movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null, networkNodes=[], networkEdges=[], networkSelected=null;
+  let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null, movementPlaybackMarker=null, movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null, networkNodes=[], networkEdges=[], networkSelected=null;
   const FIELDS = {
     cdrNo:['cdrno','a party','aparty','a-party','msisdn','subscriber number','mobile number'],
     bparty:['b party','bparty','b-party','other party','connected number','called number','calling number'],
@@ -743,17 +743,31 @@
     $('qualitySummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(total)}</div><div class="l">Records</div></div><div class="kpi"><div class="v">${fmtInt(duplicateGroups)}</div><div class="l">Duplicate signatures</div></div><div class="kpi"><div class="v">${fmtInt(missingDate)}</div><div class="l">Missing date/time</div></div><div class="kpi"><div class="v">${fmtInt(missingSubject)}</div><div class="l">Missing subject</div></div><div class="kpi"><div class="v">${fmtInt(missingParty)}</div><div class="l">Missing connected party</div></div><div class="kpi"><div class="v">${fmtInt(missingTower)}</div><div class="l">Missing tower</div></div><div class="kpi"><div class="v">${fmtInt(missingCoords)}</div><div class="l">Missing coordinates</div></div></div>`;
   }
   function renderMovementMap(rows){
-    const el=$('movementMap'); if(!el)return;movementPlaybackMarkers=[];
+    const el=$('movementMap');if(!el)return;
+    movementPlaybackMarkers=[];movementPlaybackMarker=null;
     const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180);
     movementPlaybackRows=pts.map(p=>p.x);
-    if($('movementMapStatus'))$('movementMapStatus').innerHTML=`<span class="metric-chip">Segments: ${fmtInt(rows.length)}</span><span class="metric-chip">Mapped: ${fmtInt(pts.length)}</span><span class="metric-chip">Without coordinates: ${fmtInt(rows.length-pts.length)}</span>`;
-    if(typeof L==='undefined'){el.innerHTML='<div class="map-empty">Map library could not load. Internet access is required to load the OpenStreetMap/Leaflet map.</div>';return;}
+    if($('movementMapStatus'))$('movementMapStatus').innerHTML=`<span class="metric-chip">Segments: ${fmtInt(rows.length)}</span><span class="metric-chip">Mapped: ${fmtInt(pts.length)}</span><span class="metric-chip">Without coordinates: ${fmtInt(rows.length-pts.length)}</span><span class="metric-chip" id="tileStatusChip">Loading map tiles…</span>`;
+    if(typeof L==='undefined'){el.innerHTML='<div class="map-empty">Map library could not load. Internet access is required to load the map.</div>';return;}
+
     if(!movementMap){
       el.innerHTML='';
       movementMap=L.map(el,{preferCanvas:true,zoomControl:true});
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(movementMap);
+      movementCanvasRenderer=L.canvas({padding:.5});
+      movementTileLayer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19,
+        attribution:'&copy; OpenStreetMap contributors',
+        crossOrigin:true
+      }).addTo(movementMap);
+      let tileOk=false;
+      movementTileLayer.on('tileload',()=>{if(tileOk)return;tileOk=true;const chip=$('tileStatusChip');if(chip){chip.textContent='Map tiles loaded';chip.classList.add('goodtext');}});
+      movementTileLayer.on('tileerror',()=>{const chip=$('tileStatusChip');if(chip){chip.textContent='Map tile error — route overlay still available';chip.classList.add('warntext');}});
       movementLayer=L.layerGroup().addTo(movementMap);
-    }else movementLayer.clearLayers();
+    }else{
+      movementLayer.clearLayers();
+      const chip=$('tileStatusChip');if(chip)chip.textContent='Map ready';
+    }
+
     if(movementHeatLayer){try{movementMap.removeLayer(movementHeatLayer)}catch{}movementHeatLayer=null;}
     const heatMode=$('movementHeatMode')?.value||'off';
     if(heatMode!=='off'&&typeof L.heatLayer==='function'){
@@ -764,34 +778,71 @@
         if(heatMode==='incident')return inc&&r.dt&&Math.abs(r.dt-inc)<=win;
         return true;
       });
-      if(source.length){movementHeatLayer=L.heatLayer(source.map(r=>[r.lat,r.lng,.65]),{radius:24,blur:18,maxZoom:17}).addTo(movementMap);}
+      if(source.length)movementHeatLayer=L.heatLayer(source.map(r=>[r.lat,r.lng,.65]),{radius:24,blur:18,maxZoom:17}).addTo(movementMap);
     }
+
     if(!pts.length){
-      movementMap.setView([13.0827,80.2707],10);if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">No usable coordinates found</span>`;
-      setTimeout(()=>movementMap.invalidateSize(),50);
+      movementMap.setView([13.0827,80.2707],10);
+      if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">No usable coordinates found</span>`;
+      setTimeout(()=>movementMap.invalidateSize(),80);
       return;
     }
-    const latlngs=pts.map(p=>[p.x.lat,p.x.lng]);
-    if(latlngs.length>1)L.polyline(latlngs,{weight:4,opacity:.72,dashArray:'10,7'}).addTo(movementLayer);
-    pts.forEach(({x,i},j)=>{
-      const icon=L.divIcon({className:'sequence-marker',html:`<span>${i+1}</span>`,iconSize:[30,30],iconAnchor:[15,15]});
-      const marker=L.marker([x.lat,x.lng],{icon,title:`#${i+1} ${x.cellId||x.address||'Tower'}`}).addTo(movementLayer);movementPlaybackMarkers[j]=marker;
-      const next=x.nextDistance==null?'—':x.nextDistance.toFixed(1)+' km';
-      const gap=x.nextMinutes==null?'—':Math.round(x.nextMinutes)+' min';
-      const contacts=[...x.contacts].slice(0,12).map(n=>escapeHtml(contactLabel(n))).join(', ');
-      marker.bindPopup(`<div style="min-width:230px"><b>Stop #${i+1}</b><br><b>Time:</b> ${escapeHtml(dtFmt(x.start))}${x.end&&+x.end!==+x.start?' – '+escapeHtml(dtFmt(x.end)):''}<br><b>Cell ID:</b> ${escapeHtml(x.cellId||'—')}<br><b>Tower:</b> ${escapeHtml(x.address||'—')}<br><b>Events:</b> ${fmtInt(x.events)} &nbsp; <b>Duration:</b> ${fmtDur(x.duration)}<br><b>Contacts:</b> ${contacts||'—'}<br><b>Next tower:</b> ${escapeHtml(next)} &nbsp; <b>Gap:</b> ${escapeHtml(gap)}<br><b>Coordinates:</b> ${Number(x.lat).toFixed(6)}, ${Number(x.lng).toFixed(6)}</div>`);
-    });
+
+    // Keep route drawing lightweight on very large CDRs.
+    const maxRoutePoints=2500,step=Math.max(1,Math.ceil(pts.length/maxRoutePoints));
+    const routePts=pts.filter((_,i)=>i%step===0||i===pts.length-1);
+    const latlngs=routePts.map(p=>[p.x.lat,p.x.lng]);
+    if(latlngs.length>1)L.polyline(latlngs,{weight:3,opacity:.78,dashArray:'8,6',color:'#33ddff',renderer:movementCanvasRenderer}).addTo(movementLayer);
+
+    // Small datasets retain chronological numbered markers. Large datasets use one Canvas marker per distinct tower.
+    if(pts.length<=500){
+      pts.forEach(({x,i},j)=>{
+        const icon=L.divIcon({className:'sequence-marker',html:`<span>${i+1}</span>`,iconSize:[30,30],iconAnchor:[15,15]});
+        const marker=L.marker([x.lat,x.lng],{icon,title:`#${i+1} ${x.cellId||x.address||'Tower'}`}).addTo(movementLayer);
+        movementPlaybackMarkers[j]=marker;
+        const next=x.nextDistance==null?'—':x.nextDistance.toFixed(1)+' km',gap=x.nextMinutes==null?'—':Math.round(x.nextMinutes)+' min';
+        const contacts=[...x.contacts].slice(0,12).map(n=>escapeHtml(contactLabel(n))).join(', ');
+        marker.bindPopup(`<div style="min-width:230px"><b>Stop #${i+1}</b><br><b>Time:</b> ${escapeHtml(dtFmt(x.start))}${x.end&&+x.end!==+x.start?' – '+escapeHtml(dtFmt(x.end)):''}<br><b>Cell ID:</b> ${escapeHtml(x.cellId||'—')}<br><b>Tower:</b> ${escapeHtml(x.address||'—')}<br><b>Events:</b> ${fmtInt(x.events)}<br><b>Contacts:</b> ${contacts||'—'}<br><b>Next tower:</b> ${escapeHtml(next)} • <b>Gap:</b> ${escapeHtml(gap)}</div>`);
+      });
+    }else{
+      const towers=new Map();
+      for(const {x} of pts){
+        const k=x.key||x.cellId||x.address||`${x.lat.toFixed(5)},${x.lng.toFixed(5)}`;
+        let t=towers.get(k);
+        if(!t)t={lat:x.lat,lng:x.lng,cellId:x.cellId,address:x.address,segments:0,events:0,first:x.start,last:x.end,contacts:new Set()};
+        t.segments++;t.events+=x.events||0;if(x.start<t.first)t.first=x.start;if(x.end>t.last)t.last=x.end;
+        for(const n of x.contacts||[])t.contacts.add(n);
+        towers.set(k,t);
+      }
+      for(const t of towers.values()){
+        const radius=Math.max(4,Math.min(10,4+Math.log2(1+t.segments)));
+        const marker=L.circleMarker([t.lat,t.lng],{renderer:movementCanvasRenderer,radius,color:'#8aefff',weight:1,fillColor:'#24c7e8',fillOpacity:.68}).addTo(movementLayer);
+        marker.bindPopup(`<div style="min-width:230px"><b>${escapeHtml(t.cellId||'Tower')}</b><br><b>Address:</b> ${escapeHtml(t.address||'—')}<br><b>Movement segments:</b> ${fmtInt(t.segments)}<br><b>Events:</b> ${fmtInt(t.events)}<br><b>First:</b> ${escapeHtml(dtFmt(t.first))}<br><b>Last:</b> ${escapeHtml(dtFmt(t.last))}<br><b>Contacts:</b> ${[...t.contacts].slice(0,10).map(n=>escapeHtml(contactLabel(n))).join(', ')||'—'}</div>`);
+      }
+      if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">High-volume mode: ${fmtInt(towers.size)} tower markers</span>`;
+    }
+
     const slider=$('movementSlider');if(slider){slider.max=Math.max(0,movementPlaybackRows.length-1);if(+slider.value>+slider.max)slider.value=0;updateMovementPlayback(+slider.value||0,false);}
-    if(latlngs.length===1)movementMap.setView(latlngs[0],15);
-    else movementMap.fitBounds(L.latLngBounds(latlngs).pad(.12),{maxZoom:16});
-    setTimeout(()=>movementMap.invalidateSize(),80);
+    const fullBounds=L.latLngBounds(pts.map(p=>[p.x.lat,p.x.lng]));
+    if(pts.length===1)movementMap.setView([pts[0].x.lat,pts[0].x.lng],15);else movementMap.fitBounds(fullBounds.pad(.08),{maxZoom:16});
+    setTimeout(()=>movementMap.invalidateSize(),120);
   }
+
   function updateMovementPlayback(i,openPopup=true){
     if(!movementPlaybackRows.length){$('movementPlaybackLabel').textContent='No movement selected';return;}
     movementPlaybackIndex=Math.max(0,Math.min(i,movementPlaybackRows.length-1));
     const r=movementPlaybackRows[movementPlaybackIndex];$('movementSlider').value=movementPlaybackIndex;
     $('movementPlaybackLabel').textContent=`#${movementPlaybackIndex+1} • ${dtFmt(r.start)} • ${r.address||r.cellId||'Tower'}`;
-    const m=movementPlaybackMarkers[movementPlaybackIndex];if(m&&movementMap){movementMap.panTo(m.getLatLng());if(openPopup)m.openPopup();}
+    const m=movementPlaybackMarkers[movementPlaybackIndex];
+    if(m&&movementMap){movementMap.panTo(m.getLatLng());if(openPopup)m.openPopup();return;}
+    if(movementMap){
+      const ll=[r.lat,r.lng];
+      if(!movementPlaybackMarker){
+        movementPlaybackMarker=L.circleMarker(ll,{renderer:movementCanvasRenderer,radius:9,color:'#ffffff',weight:3,fillColor:'#ffb454',fillOpacity:1}).addTo(movementMap);
+      }else movementPlaybackMarker.setLatLng(ll);
+      movementPlaybackMarker.bindPopup(`<b>Playback #${movementPlaybackIndex+1}</b><br>${escapeHtml(dtFmt(r.start))}<br>${escapeHtml(r.address||r.cellId||'Tower')}`);
+      movementMap.panTo(ll);if(openPopup)movementPlaybackMarker.openPopup();
+    }
   }
   function stopMovementPlayback(){if(movementPlaybackTimer){clearInterval(movementPlaybackTimer);movementPlaybackTimer=null;}$('movementPlayBtn').textContent='▶ Play';}
   function toggleMovementPlayback(){
