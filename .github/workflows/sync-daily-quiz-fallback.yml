@@ -33,50 +33,89 @@ jobs:
             --output "$tmp"
 
           test -s "$tmp"
-          python3 - "$tmp" <<'PY'
-          import csv, sys
-          path = sys.argv[1]
-          with open(path, encoding="utf-8-sig", newline="") as f:
-              reader = csv.DictReader(f)
-              if not reader.fieldnames:
-                  raise SystemExit("Daily Quiz Feed has no header row")
-              normalized = {h.strip(): h for h in reader.fieldnames}
-              required = ["Active","Exam","Topic","Subtopic","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer","ExplanationA","ExplanationB","ExplanationC","ExplanationD"]
-              missing = [h for h in required if h not in normalized]
-              if missing:
-                  raise SystemExit("Daily Quiz Feed is missing columns: " + ", ".join(missing))
-              from collections import Counter
-              valid = 0
-              coverage = Counter()
-              for raw in reader:
-                  row = {k.strip(): (v or "").strip() for k, v in raw.items() if k is not None}
-                  if row.get("Active","").lower() == "false":
-                      continue
-                  if not row.get("Question") or not row.get("Exam") or not row.get("Topic") or not row.get("Subtopic"):
-                      continue
-                  if row.get("CorrectAnswer","").upper() not in {"A","B","C","D"}:
-                      continue
-                  if not all(row.get("Option"+x) and row.get("Explanation"+x) for x in "ABCD"):
-                      continue
-                  valid += 1
-                  coverage[row["Exam"]] += 1
-              required_coverage = {
-                  "TNPSC Group IV": 10,
-                  "TNUSRB": 10,
-                  "UPSC": 10,
-                  "SSC": 10,
-                  "Banking": 10,
-                  "Railways": 10,
-              }
-              missing = [f"{exam}: {coverage.get(exam,0)}/{minimum}" for exam, minimum in required_coverage.items() if coverage.get(exam,0) < minimum]
-              if missing:
-                  raise SystemExit("Daily Quiz Feed lacks required multi-exam coverage; refusing to overwrite fallback: " + ", ".join(missing))
-              print(valid)
+          python3 - "$tmp" "data/quizzes/daily-quiz.csv" "$tmp.merged" > "$tmp.report" <<'PY'
+          import csv, hashlib, sys
+          from collections import Counter, defaultdict
+
+          source_path, fallback_path, output_path = sys.argv[1:4]
+          required = ["Active","Exam","Topic","Subtopic","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer","ExplanationA","ExplanationB","ExplanationC","ExplanationD"]
+          expected = ["TNPSC Group IV","TNUSRB","UPSC","SSC","Banking","Railways"]
+
+          def read_rows(path, encoding):
+              with open(path, encoding=encoding, newline="") as f:
+                  reader = csv.DictReader(f)
+                  if not reader.fieldnames:
+                      raise SystemExit(f"{path} has no header row")
+                  fields = [h.strip() for h in reader.fieldnames if h]
+                  missing = [h for h in required if h not in fields]
+                  if missing:
+                      raise SystemExit(f"{path} is missing columns: " + ", ".join(missing))
+                  rows = []
+                  for raw in reader:
+                      row = {str(k).strip(): (v or "").strip() for k, v in raw.items() if k is not None}
+                      rows.append(row)
+                  return fields, rows
+
+          def valid(row):
+              if row.get("Active","").lower() == "false":
+                  return False
+              if not row.get("Question") or not row.get("Exam") or not row.get("Topic") or not row.get("Subtopic"):
+                  return False
+              if row.get("CorrectAnswer","").upper() not in {"A","B","C","D"}:
+                  return False
+              return all(row.get("Option"+x) and row.get("Explanation"+x) for x in "ABCD")
+
+          fallback_fields, fallback_rows = read_rows(fallback_path, "utf-8")
+          _, source_rows = read_rows(source_path, "utf-8-sig")
+
+          for row in source_rows:
+              if not row.get("ID"):
+                  seed = "|".join(row.get(k,"") for k in ("Exam","Subtopic","Topic","Question"))
+                  row["ID"] = "SHEET-" + hashlib.sha1(seed.encode("utf-8")).hexdigest()[:12]
+              row.setdefault("PublishDate","")
+
+          coverage = Counter(row.get("Exam","") for row in source_rows if valid(row))
+          source_by_exam = defaultdict(list)
+          fallback_by_exam = defaultdict(list)
+          for row in source_rows:
+              if valid(row):
+                  source_by_exam[row.get("Exam","")].append(row)
+          for row in fallback_rows:
+              fallback_by_exam[row.get("Exam","")].append(row)
+
+          merged = []
+          print("## Daily quiz sync coverage")
+          for exam in expected:
+              if coverage.get(exam,0) >= 10:
+                  merged.extend(source_by_exam[exam])
+                  print(f"- ✅ {exam}: Sheet bank used ({coverage[exam]} valid rows)")
+              else:
+                  kept = fallback_by_exam.get(exam,[])
+                  if sum(1 for row in kept if valid(row)) < 10:
+                      raise SystemExit(f"Neither Sheet nor fallback has 10 valid rows for {exam}")
+                  merged.extend(kept)
+                  print(f"- ↩️ {exam}: fallback preserved; Sheet has {coverage.get(exam,0)}/10 valid rows")
+
+          handled = set(expected)
+          extra_exams = sorted((set(source_by_exam) | set(fallback_by_exam)) - handled - {""})
+          for exam in extra_exams:
+              chosen = source_by_exam.get(exam) or fallback_by_exam.get(exam,[])
+              merged.extend(chosen)
+              print(f"- ➕ {exam}: {len(chosen)} rows retained")
+
+          output_fields = list(fallback_fields)
+          for field in ["ID","Active","Exam","Topic","Subtopic","PublishDate","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer","ExplanationA","ExplanationB","ExplanationC","ExplanationD"]:
+              if field not in output_fields:
+                  output_fields.append(field)
+          with open(output_path, "w", encoding="utf-8", newline="") as f:
+              writer = csv.DictWriter(f, fieldnames=output_fields, extrasaction="ignore", quoting=csv.QUOTE_ALL)
+              writer.writeheader()
+              writer.writerows(merged)
+          print(f"- Final fallback rows: {len(merged)}")
           PY
 
-          mv "$tmp" data/quizzes/daily-quiz.csv
-          rows=$(($(wc -l < data/quizzes/daily-quiz.csv)-1))
-          echo "Daily quiz fallback synchronized with $rows source rows after validation." >> "$GITHUB_STEP_SUMMARY"
+          cat "$tmp.report" >> "$GITHUB_STEP_SUMMARY"
+          mv "$tmp.merged" data/quizzes/daily-quiz.csv
 
       - name: Commit fallback when changed
         shell: bash
