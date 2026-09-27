@@ -15,6 +15,7 @@
     }
 
     const body = catalog[exam.category], route = routes[exam.category] || {};
+    localStorage.setItem('clearexamsTargetExamV1', exam.category);
     const group4 = id === 'tnpsc-group-4';
     const quizURL = 'daily-quiz.html?exam=' + encodeURIComponent(route.quizExam || body.name);
     const pyqURL = route.pyqRoute || '#papers';
