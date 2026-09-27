@@ -117,6 +117,21 @@ jobs:
           for topic, minimum in shared_topic_requirements.items():
               if shared_topic_coverage.get(topic, 0) < minimum:
                   raise SystemExit(f"Shared UPSC/TNPSC topic bank {topic} has only {shared_topic_coverage.get(topic,0)} rows; need {minimum}")
+
+          for family, route in routes.items():
+              subjects = route.get("quizSubjects") or []
+              if not subjects:
+                  raise SystemExit(f"{family}.quizSubjects is missing or empty")
+              if len(subjects) != len(set(subjects)):
+                  raise SystemExit(f"{family}.quizSubjects contains duplicates")
+              quiz_exam = route.get("quizExam","")
+              for subject in subjects:
+                  if family in {"tnpsc","upsc"}:
+                      count = shared_topic_coverage.get(subject,0) + subject_coverage.get((quiz_exam,subject),0)
+                  else:
+                      count = subject_coverage.get((quiz_exam,subject),0)
+                  if count < 10:
+                      raise SystemExit(f"{family}.quizSubjects entry {subject} has only {count} valid questions; need 10")
           catalog = json.loads(pathlib.Path("data/exams/exam-catalog.json").read_text(encoding="utf-8"))
           catalog_ids = {item["id"] for body in catalog.values() for item in body.get("items", [])}
           syllabus_text = pathlib.Path("syllabus.html").read_text(encoding="utf-8")
