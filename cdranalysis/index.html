@@ -485,7 +485,7 @@
             <span class="tiny" id="movementPlaybackLabel">No movement selected</span>
           </div>
           <div class="panel" style="margin-top:12px"><div class="panel-title"><h2>Movement map</h2><span class="tiny">Numbered tower associations in chronological order • OpenStreetMap</span></div><div id="movementMap"><div class="map-empty">Select a subject/date range with tower coordinates to display movement.</div></div><div id="movementMapStatus" class="metric-row" style="margin-top:8px"></div><div class="movement-map-legend"><span><i class="movement-map-line"></i>Route</span><span><i class="movement-map-dot tower"></i>Tower</span><span><i class="movement-map-dot start"></i>Start</span><span><i class="movement-map-dot end"></i>End</span></div><div class="tiny" style="margin-top:8px">Lines connect recorded tower coordinates in time order. They are straight tower-to-tower links, not the actual road travelled or precise handset location.</div></div>
-          <div class="panel chartbox" style="height:290px;margin-top:12px"><div class="panel-title"><h2>Tower sequence plot</h2><span class="tiny">Latitude / longitude of recorded first-cell towers</span></div><canvas id="movementChart"></canvas></div>
+          <div class="panel chartbox" style="height:290px;margin-top:12px"><div class="panel-title"><h2>Tower sequence plot</h2><span class="tiny">Chronological tower coordinates • connected sequence with Start / End markers</span></div><canvas id="movementChart"></canvas></div>
           <h3>Tower stay analysis</h3><div class="tablewrap" style="margin-top:8px"><table class="table" id="towerStayTable"></table></div>
           <div class="tablewrap" style="margin-top:12px"><table class="table" id="movementTable"></table></div>
         </div>
@@ -1647,7 +1647,23 @@
     const stayRows=[...stays.values()].sort((a,b)=>b.spanMs-a.spanMs||b.events-a.events);
     $('towerStayTable').innerHTML=`<thead><tr><th>Cell ID</th><th>Tower</th><th>Segments</th><th>Events</th><th>Approx. observed span</th><th>First</th><th>Last</th></tr></thead><tbody>${stayRows.slice(0,200).map(s=>`<tr><td>${escapeHtml(s.cellId)}</td><td class="details">${escapeHtml(s.address)}</td><td>${s.segments}</td><td>${s.events}</td><td>${fmtDur(Math.round(s.spanMs/1000))}</td><td>${dtFmt(s.first)}</td><td>${dtFmt(s.last)}</td></tr>`).join('')}</tbody>`;
 
-    const pts=rows.filter(x=>x.lat!=null&&x.lng!=null).slice(0,1000);newChart('movementChart',{type:'scatter',data:{datasets:[{label:'Tower sequence',data:pts.map((p,i)=>({x:p.lng,y:p.lat,seq:i+1}))}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`#${c.raw.seq} ${Number(c.raw.y).toFixed(5)}, ${Number(c.raw.x).toFixed(5)}`}}},scales:{x:{title:{display:true,text:'Longitude'}},y:{title:{display:true,text:'Latitude'}}}}});
+    const pts=rows.filter(x=>x.lat!=null&&x.lng!=null).slice(0,1000);
+    const seqPoints=pts.map((p,i)=>({x:p.lng,y:p.lat,seq:i+1,start:p.start,end:p.end,cellId:p.cellId,address:p.address,events:p.events}));
+    const startPoint=seqPoints[0],endPoint=seqPoints[seqPoints.length-1];
+    const sequenceLabelPlugin={id:'movementSequenceLabels',afterDatasetsDraw(chart){
+      const ctx=chart.ctx;ctx.save();ctx.font='600 11px system-ui, sans-serif';ctx.textBaseline='middle';
+      const drawLabel=(datasetIndex,text,dx,dy)=>{const el=chart.getDatasetMeta(datasetIndex)?.data?.[0];if(!el)return;const p=el.getProps(['x','y'],true);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#172033';ctx.fillText(text,p.x+dx,p.y+dy);};
+      if(startPoint)drawLabel(1,'Start',9,-9);if(endPoint)drawLabel(2,'End',9,9);ctx.restore();
+    }};
+    newChart('movementChart',{type:'scatter',data:{datasets:[
+      {label:'Sequence',data:seqPoints,showLine:true,borderWidth:2,pointRadius:3,pointHoverRadius:6,tension:0},
+      {label:'Start',data:startPoint?[startPoint]:[],showLine:false,pointRadius:7,pointHoverRadius:9,pointStyle:'triangle'},
+      {label:'End',data:endPoint?[endPoint]:[],showLine:false,pointRadius:7,pointHoverRadius:9,pointStyle:'rectRot'}
+    ]},plugins:[sequenceLabelPlugin],options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{usePointStyle:true,boxWidth:10}},tooltip:{callbacks:{
+      title:items=>{const r=items?.[0]?.raw;return r?(`#${r.seq} • ${dtFmt(r.start)}`):'';},
+      label:c=>{const r=c.raw;return `${r.cellId||'Tower'} • ${r.address||'No tower address'}`;},
+      afterLabel:c=>{const r=c.raw;return [`Coordinates: ${Number(r.y).toFixed(5)}, ${Number(r.x).toFixed(5)}`,`Events in segment: ${fmtInt(r.events||0)}`,r.end&&r.start&&+r.end!==+r.start?`Segment end: ${dtFmt(r.end)}`:''].filter(Boolean);}
+    }}},scales:{x:{title:{display:true,text:'Longitude'}},y:{title:{display:true,text:'Latitude'}}}}});
     if(!$('movement').classList.contains('hidden'))requestAnimationFrame(()=>renderMovementMap(rows));
   }
   function findBursts(data,mins,minCount){const by=new Map();for(const r of data){if(!r.dt||!r.bparty)continue;const k=`${r.cdrNo}|${r.bparty}`;if(!by.has(k))by.set(k,[]);by.get(k).push(r);}const out=[];const win=mins*60000;for(const [k,a] of by){a.sort((x,y)=>x.dt-y.dt);let left=0,best=null;for(let right=0;right<a.length;right++){while(a[right].dt-a[left].dt>win)left++;const count=right-left+1;if(count>=minCount&&(!best||count>best.count))best={count,start:a[left].dt,end:a[right].dt,records:a.slice(left,right+1)};}if(best){const [cdr,bparty]=k.split('|');out.push({cdr,bparty,...best});}}return out.sort((a,b)=>b.count-a.count||a.start-b.start);}
