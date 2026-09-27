@@ -740,6 +740,82 @@
                 }
             });
             
+            // Import a one-time selection from the CDR Analyzer.
+            function loadCdrAnalyzerDraft() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('from') !== 'cdr-analyzer') return;
+
+                let draft = null;
+                try {
+                    draft = JSON.parse(localStorage.getItem('cdrAnalyzer:requestDraftV1') || 'null');
+                } catch (error) {
+                    draft = null;
+                }
+                localStorage.removeItem('cdrAnalyzer:requestDraftV1');
+
+                if (!draft || !Array.isArray(draft.entries) || !draft.entries.length) return;
+
+                // Reuse case/station context when it maps cleanly to the existing form.
+                const station = String(draft.case?.station || '').trim();
+                if (station) {
+                    const wanted = station.toLowerCase();
+                    const matchingOption = Array.from(policeStationSelect.options).find(option => {
+                        const value = String(option.value || '').trim().toLowerCase();
+                        return value && value !== 'other' && (value === wanted || wanted.includes(value) || value.includes(wanted));
+                    });
+                    if (matchingOption) {
+                        policeStationSelect.value = matchingOption.value;
+                        policeStationSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+
+                const caseNo = String(draft.case?.caseNo || '').trim();
+                const caseMatch = caseNo.match(/(\d{1,6})\D+(20\d{2})/);
+                if (caseMatch) {
+                    document.getElementById('crimeCrNo').value = caseMatch[1];
+                    document.getElementById('crimeYear').value = caseMatch[2];
+                }
+
+                while (mobileNumbersContainer.children.length < draft.entries.length) {
+                    addRowBtn.click();
+                }
+
+                const cards = Array.from(mobileNumbersContainer.querySelectorAll('.mobile-number-card'));
+                draft.entries.forEach((entry, index) => {
+                    const card = cards[index];
+                    if (!card) return;
+
+                    const mobileInput = card.querySelector('.mobile-number');
+                    const fromInput = card.querySelector('.from-date');
+                    const toInput = card.querySelector('.to-date');
+                    const relationInput = card.querySelector('.relation');
+                    const tillCheck = card.querySelector('.till-date-check');
+                    const tillDisplay = card.querySelector('.till-date-display');
+
+                    if (mobileInput) mobileInput.value = String(entry.number || '');
+                    if (fromInput) fromInput.value = entry.fromDate || today;
+                    if (relationInput) relationInput.value = entry.relation || 'CDR Contact';
+
+                    if (entry.toDate) {
+                        if (toInput) toInput.value = entry.toDate;
+                        if (tillCheck) tillCheck.checked = false;
+                    } else {
+                        if (tillCheck) tillCheck.checked = true;
+                    }
+                    if (tillCheck && toInput && tillDisplay) {
+                        handleTillDateChange(tillCheck, toInput, tillDisplay);
+                    }
+                });
+
+                const banner = document.getElementById('caseLoadBanner');
+                if (banner) {
+                    banner.textContent = 'Loaded ' + draft.entries.length + ' number(s) from CDR Analyzer. Review dates, relation and case details before generating the PDF.';
+                    banner.classList.add('visible');
+                }
+            }
+
+            setTimeout(loadCdrAnalyzerDraft, 0);
+
             // Add event listener to the initial Till Date checkbox
             const initialTillDateCheck = document.querySelector('.till-date-check');
             const initialToDateInput = document.querySelector('.to-date');
