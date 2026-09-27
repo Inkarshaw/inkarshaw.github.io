@@ -348,7 +348,7 @@
       <section id="dashboard" class="view">
         <div class="panel no-print" style="padding:10px 12px">
           <div class="subtoolbar" style="margin:0">
-            <div class="field" style="min-width:260px"><label>Dashboard subject</label><select id="dashboardCdr"><option value="">All subjects</option></select></div>
+            <div class="field" style="min-width:260px"><label>Subject / MSISDN</label><select id="dashboardCdr"><option value="">All subjects</option></select></div>
             <div class="field" style="min-width:220px"><label>Event type</label><select id="dashboardEventType"><option value="">All event types</option></select></div>
             <div class="tiny" id="dashboardScopeText">Showing all subjects and event types within the current filters.</div>
           </div>
@@ -593,7 +593,7 @@
   function isSmsRecord(r){return !!smsRecordBasis(r);}
   function smsIntelRows(){
     const subject=$('smsIntelCdr')?.value||'',from=$('smsIntelFrom')?.value||'',to=$('smsIntelTo')?.value||'';
-    return state.records.filter(r=>{
+    return subjectEventScopedRecords(state.records).filter(r=>{
       if(!r.dt||!smsRecordBasis(r))return false;
       if(subject&&r.cdrNo!==subject)return false;
       const d=localDateKey(r.dt);if(from&&d<from)return false;if(to&&d>to)return false;
@@ -839,16 +839,56 @@
   function renderFileList(){$('fileList').innerHTML=state.files.map(f=>`<div class="file-item"><b title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</b><span>${f.inferredCdr?escapeHtml(f.inferredCdr)+' • ':''}${escapeHtml(f.sheet)} • ${fmtInt(f.rows)} <button class="file-remove" data-remove-file="${f.id}" title="Remove file">×</button></span></div>`).join('');}
   function uniq(key){return [...new Set(state.records.map(r=>r[key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));}
   function fillSelect(id,items,label){const el=$(id),cur=el.value;el.innerHTML=`<option value="">${label}</option>`+items.map(x=>`<option>${escapeHtml(x)}</option>`).join('');if(items.includes(cur))el.value=cur;}
+  function subjectEventScopedRecords(data=state.records){
+    const subject=$('cdrNo')?.value||'',eventType=$('callType')?.value||'';
+    return data.filter(r=>(!subject||r.cdrNo===subject)&&(!eventType||r.callType===eventType));
+  }
+  function installViewScopeToolbars(){
+    document.querySelectorAll('.view').forEach(view=>{
+      if(view.id==='dashboard'||view.querySelector(':scope > .view-scope-toolbar'))return;
+      const bar=document.createElement('div');
+      bar.className='panel no-print view-scope-toolbar';
+      bar.style.padding='10px 12px';
+      bar.innerHTML='<div class="subtoolbar" style="margin:0"><div class="field" style="min-width:240px"><label>Subject / MSISDN</label><select class="view-scope-subject"><option value="">All subjects</option></select></div><div class="field" style="min-width:210px"><label>Event type</label><select class="view-scope-event"><option value="">All event types</option></select></div><button class="btn secondary small view-scope-clear" type="button">Clear subject/event</button><span class="tiny view-scope-status"></span></div>';
+      view.insertBefore(bar,view.firstChild);
+    });
+  }
+  function syncViewScopeControls(rebuild=false){
+    const subjects=uniq('cdrNo'),events=uniq('callType'),subject=$('cdrNo')?.value||'',eventType=$('callType')?.value||'';
+    const fill=(el,items,label,value)=>{
+      if(!el)return;
+      if(rebuild||el.options.length!==items.length+1){
+        el.innerHTML='<option value="">'+label+'</option>'+items.map(x=>'<option value="'+escAttr(x)+'">'+escapeHtml(x)+'</option>').join('');
+      }
+      el.value=items.includes(value)?value:'';
+    };
+    document.querySelectorAll('.view-scope-subject').forEach(el=>fill(el,subjects,'All subjects',subject));
+    document.querySelectorAll('.view-scope-event').forEach(el=>fill(el,events,'All event types',eventType));
+    fill($('dashboardCdr'),subjects,'All subjects',subject);
+    fill($('dashboardEventType'),events,'All event types',eventType);
+    // Keep the older tab-specific subject controls aligned so they cannot silently narrow to a different subject.
+    if($('movementCdr')){fill($('movementCdr'),subjects,'All subjects',subject);}
+    if($('smsIntelCdr')){fill($('smsIntelCdr'),subjects,'All subjects',subject);}
+    const scopeText=(subject||'All subjects')+' • '+(eventType||'All event types')+' • '+fmtInt(state.filtered.length)+' filtered records';
+    document.querySelectorAll('.view-scope-status').forEach(el=>el.textContent=scopeText);
+  }
+  function setSubjectEventScope(subject,eventType){
+    if($('cdrNo'))$('cdrNo').value=subject||'';
+    if($('callType'))$('callType').value=eventType||'';
+    applyFilters();
+  }
+
   function refreshSelectors(){
     fillSelect('callType',uniq('callType'),'All event types');
     fillSelect('cdrNo',uniq('cdrNo'),'All CDR numbers');
     fillSelect('sourceFile',uniq('sourceFile'),'All files');
     const mc=uniq('cdrNo');
-    fillSelect('movementCdr',mc,'Select subject');
+    fillSelect('movementCdr',mc,'All subjects');
     fillSelect('dashboardCdr',mc,'All subjects');
     fillSelect('dashboardEventType',uniq('callType'),'All event types');
     fillSelect('smsIntelCdr',mc,'All subjects');
-    if(!$('movementCdr').value&&mc.length)$('movementCdr').value=mc[0];
+    installViewScopeToolbars();
+    syncViewScopeControls(true);
   }
 
   function matchesSmartQuery(r,q){
@@ -887,7 +927,7 @@
       if(f.cellId&&!normalize(`${r.firstCellId} ${r.lastCellId}`).includes(f.cellId))return false;if(f.tower&&!normalize(`${r.firstAddress} ${r.lastAddress}`).includes(f.tower))return false;if(f.city&&!normalize(r.mainCity).includes(f.city))return false;if(f.subcity&&!normalize(r.subCity).includes(f.subcity))return false;if(f.roaming&&!normalize(r.roaming).includes(f.roaming))return false;
       if(f.imei&&!normalize(r.imei).includes(f.imei))return false;if(f.imsi&&!normalize(r.imsi).includes(f.imsi))return false;if(f.provider&&!normalize(r.provider).includes(f.provider))return false;if(f.operator&&!normalize(r.operator).includes(f.operator))return false;if(f.cdrNo&&r.cdrNo!==f.cdrNo)return false;if(f.sourceFile&&r.sourceFile!==f.sourceFile)return false;return true;
     });
-    state.page=1;updateFilterCount(); renderAll();
+    state.page=1;updateFilterCount();syncViewScopeControls(false);renderAll();
   }
   function resetFilters(){state.exactIncidentRange=null;if($('exactIncidentStatus'))$('exactIncidentStatus').textContent='Uses the incident date/time entered at the top.';['q','dateFrom','dateTo','timeFrom','timeTo','bparty','durMin','durMax','cellId','tower','city','subcity','roaming','imei','imsi','provider','operator'].forEach(id=>$(id).value='');['callType','cdrNo','sourceFile'].forEach(id=>$(id).selectedIndex=0);['callsOnly','smsOnly','nightOnly','weekendOnly','excludeServiceSenders'].forEach(id=>$(id).checked=false);$('nightFrom').value='20:00';$('nightTo').value='06:00';applyFilters();}
 
@@ -915,9 +955,8 @@
   function saveCaseSnapshot(){const rows=caseSnapshots();rows.unshift({title:$('caseTitle').value,caseNo:$('caseNo').value,station:$('station').value,analyst:$('analyst').value,incidentDate:$('incidentDate').value,incidentTime:$('incidentTime').value,savedAt:new Date().toISOString()});persistLocal('cdrAnalyzer:caseSnapshots',JSON.stringify(rows.slice(0,50)));renderCaseSnapshots();}
   function renderDashboard(){
     renderCaseSnapshots();
-    const selected=$('dashboardCdr')?.value||'',eventType=$('dashboardEventType')?.value||'';
-    let d=selected?state.filtered.filter(r=>r.cdrNo===selected):state.filtered;
-    if(eventType)d=d.filter(r=>r.callType===eventType);
+    const selected=$('cdrNo')?.value||'',eventType=$('callType')?.value||'';
+    const d=state.filtered;
     if($('dashboardScopeText')){
       const subjectText=selected?selected:'All subjects',eventText=eventType||'All event types';
       $('dashboardScopeText').textContent=`${subjectText} • ${eventText} • ${fmtInt(d.length)} records within current filters.`;
@@ -1126,16 +1165,17 @@
     if(!inc){$('incidentSummary').innerHTML='<div class="notice">Enter Incident Date and Incident Time at the top first.</div>';$('baselineCompare').innerHTML='';$('contactChanges').innerHTML='';$('incidentTable').innerHTML='';return;}
     const beforeH=+$('incidentBeforeHours').value||6,duringM=+$('incidentDuringMins').value||30,afterH=+$('incidentAfterHours').value||6;
     const start=new Date(inc-beforeH*3600000),duringStart=new Date(inc-duringM*60000),duringEnd=new Date(inc+duringM*60000),end=new Date(inc+afterH*3600000);
-    const rows=state.records.filter(r=>r.dt&&r.dt>=start&&r.dt<=end).sort((a,b)=>a.dt-b.dt);
+    const scoped=subjectEventScopedRecords(state.records);
+    const rows=scoped.filter(r=>r.dt&&r.dt>=start&&r.dt<=end).sort((a,b)=>a.dt-b.dt);
     const before=rows.filter(r=>r.dt<duringStart),during=rows.filter(r=>r.dt>=duringStart&&r.dt<=duringEnd),after=rows.filter(r=>r.dt>duringEnd);
     $('incidentSummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(before.length)}</div><div class="l">Before</div><div class="s">${beforeH} hours</div></div><div class="kpi"><div class="v">${fmtInt(during.length)}</div><div class="l">During</div><div class="s">±${duringM} min</div></div><div class="kpi"><div class="v">${fmtInt(after.length)}</div><div class="l">After</div><div class="s">${afterH} hours</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(r=>r.bparty).filter(Boolean)).size)}</div><div class="l">Contacts</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(r=>r.firstCellId).filter(Boolean)).size)}</div><div class="l">Towers</div></div></div>`;
-    const baseStart=new Date(inc-30*86400000),baseRows=state.records.filter(r=>r.dt&&r.dt>=baseStart&&r.dt<start);
+    const baseStart=new Date(inc-30*86400000),baseRows=scoped.filter(r=>r.dt&&r.dt>=baseStart&&r.dt<start);
     const baseDays=Math.max(1,new Set(baseRows.map(r=>localDateKey(r.dt))).size);
     const incidentContacts=new Set(rows.map(r=>r.bparty).filter(Boolean)),baseContacts=new Set(baseRows.map(r=>r.bparty).filter(Boolean));
     const incidentTowers=new Set(rows.map(r=>r.firstCellId).filter(Boolean)),baseTowers=new Set(baseRows.map(r=>r.firstCellId).filter(Boolean));
     const newContacts=[...incidentContacts].filter(x=>!baseContacts.has(x)),newTowers=[...incidentTowers].filter(x=>!baseTowers.has(x));
     $('baselineCompare').innerHTML=simpleTable(['Metric','30-day baseline','Incident window'],[['Events',fmtInt(baseRows.length)+' total / '+(baseRows.length/baseDays).toFixed(1)+' per day',fmtInt(rows.length)],['Unique contacts',fmtInt(baseContacts.size),fmtInt(incidentContacts.size)],['Unique towers',fmtInt(baseTowers.size),fmtInt(incidentTowers.size)],['Contacts not in baseline','—',fmtInt(newContacts.length)],['Towers not in baseline','—',fmtInt(newTowers.length)]]);
-    const allContacts=aggregateContacts(state.records),near=7*86400000;
+    const allContacts=aggregateContacts(scoped),near=7*86400000;
     const changed=allContacts.filter(x=>(x.first&&Math.abs(x.first-inc)<=near)||(x.last&&Math.abs(x.last-inc)<=near)).slice(0,80);
     $('contactChanges').innerHTML=simpleTable(['Contact','First seen','Last seen','Indicator'],changed.map(x=>{const firstNear=x.first&&Math.abs(x.first-inc)<=near,lastNear=x.last&&Math.abs(x.last-inc)<=near;const label=firstNear&&lastNear?'Short-window contact':firstNear?'First seen near incident':'Last seen near incident';return [`<a href="#" class="link contact-filter" data-num="${escAttr(x.bparty)}">${escapeHtml(contactLabel(x.bparty))}</a>`,dtFmt(x.first),dtFmt(x.last),label];}));
 
@@ -1157,8 +1197,9 @@
 
   }
   function renderDataQuality(){
-    const total=state.records.length,missingDate=state.records.filter(r=>!r.dt).length,missingSubject=state.records.filter(r=>!r.cdrNo).length,missingParty=state.records.filter(r=>!r.bparty).length,missingTower=state.records.filter(r=>!r.firstCellId&&!r.firstAddress).length,missingCoords=state.records.filter(r=>r.lat==null||r.lng==null).length;
-    const seen=new Map();for(const r of state.records){const k=[r.cdrNo,r.bparty,r.dt?+r.dt:'',r.duration,r.callType,r.firstCellId].join('|');seen.set(k,(seen.get(k)||0)+1);}const duplicateGroups=[...seen.values()].filter(n=>n>1).length;
+    const data=subjectEventScopedRecords(state.records);
+    const total=data.length,missingDate=data.filter(r=>!r.dt).length,missingSubject=data.filter(r=>!r.cdrNo).length,missingParty=data.filter(r=>!r.bparty).length,missingTower=data.filter(r=>!r.firstCellId&&!r.firstAddress).length,missingCoords=data.filter(r=>r.lat==null||r.lng==null).length;
+    const seen=new Map();for(const r of data){const k=[r.cdrNo,r.bparty,r.dt?+r.dt:'',r.duration,r.callType,r.firstCellId].join('|');seen.set(k,(seen.get(k)||0)+1);}const duplicateGroups=[...seen.values()].filter(n=>n>1).length;
     $('qualitySummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(total)}</div><div class="l">Records</div></div><div class="kpi"><div class="v">${fmtInt(duplicateGroups)}</div><div class="l">Duplicate signatures</div></div><div class="kpi"><div class="v">${fmtInt(missingDate)}</div><div class="l">Missing date/time</div></div><div class="kpi"><div class="v">${fmtInt(missingSubject)}</div><div class="l">Missing subject</div></div><div class="kpi"><div class="v">${fmtInt(missingParty)}</div><div class="l">Missing connected party</div></div><div class="kpi"><div class="v">${fmtInt(missingTower)}</div><div class="l">Missing tower</div></div><div class="kpi"><div class="v">${fmtInt(missingCoords)}</div><div class="l">Missing coordinates</div></div></div>`;
   }
   function renderMovementMap(rows){
@@ -1455,9 +1496,9 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
       <div class="split"><div><h3>Common contacts</h3>${simpleTable(['B Party','CDR numbers'],commonContacts.slice(0,200).map(([k,o])=>[`<a href="#" class="link contact-filter" data-num="${escapeHtml(o.display)}" title="${escAttr(contactTitle(o.display))}">${escapeHtml(contactLabel(o.display))}</a>`,escapeHtml([...o.set].join(', '))]))}</div><div><h3>Common towers</h3>${simpleTable(['Cell ID / address','CDR numbers'],commonTowers.slice(0,200).map(([k,o])=>[escapeHtml(k+' • '+(o.address||'')),escapeHtml([...o.set].join(', '))]))}</div></div>
       <div class="split"><div><h3>Shared IMEI</h3>${simpleTable(['IMEI','CDR numbers'],commonImei.slice(0,100).map(([k,s])=>[escapeHtml(k),escapeHtml([...s].join(', '))]))}</div><div><h3>Shared IMSI</h3>${simpleTable(['IMSI','CDR numbers'],commonImsi.slice(0,100).map(([k,s])=>[escapeHtml(k),escapeHtml([...s].join(', '))]))}</div></div>`;
   }
-  function renderFlags(){const rows=state.records.filter(r=>state.flags.has(r.id));$('flagList').innerHTML=rows.length?rows.map(r=>`<div class="note-card"><div class="record-summary"><b title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(contactLabel(r.bparty))}</b> • ${escapeHtml(dtFmt(r.dt)||`${r.date} ${r.time}`)} • ${escapeHtml(r.callType)} • ${fmtDur(r.duration)} <button class="lead-action lead-view-record" data-id="${r.id}">View record</button><br>${escapeHtml(r.firstAddress||r.firstCellId||'')}</div><textarea class="row-note" data-id="${r.id}" placeholder="Note for this record…">${escapeHtml(state.notes[r.id]||'')}</textarea><div style="margin-top:6px"><button class="btn secondary small add-chronology" data-id="${r.id}">Add to chronology</button> <button class="btn secondary small unflag" data-id="${r.id}">Remove flag</button></div></div>`).join(''):`<div class="empty">No records flagged yet.</div>`;}
+  function renderFlags(){const rows=state.filtered.filter(r=>state.flags.has(r.id));$('flagList').innerHTML=rows.length?rows.map(r=>`<div class="note-card"><div class="record-summary"><b title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(contactLabel(r.bparty))}</b> • ${escapeHtml(dtFmt(r.dt)||`${r.date} ${r.time}`)} • ${escapeHtml(r.callType)} • ${fmtDur(r.duration)} <button class="lead-action lead-view-record" data-id="${r.id}">View record</button><br>${escapeHtml(r.firstAddress||r.firstCellId||'')}</div><textarea class="row-note" data-id="${r.id}" placeholder="Note for this record…">${escapeHtml(state.notes[r.id]||'')}</textarea><div style="margin-top:6px"><button class="btn secondary small add-chronology" data-id="${r.id}">Add to chronology</button> <button class="btn secondary small unflag" data-id="${r.id}">Remove flag</button></div></div>`).join(''):`<div class="empty">No records flagged yet.</div>`;}
 
-  function renderChronology(){const rows=[...state.chronology].sort((a,b)=>a.time-b.time);$('chronologyTable').innerHTML=`<thead><tr><th>Date/time</th><th>Source</th><th>Event</th><th>Reference</th><th></th></tr></thead><tbody>${rows.map(x=>`<tr><td>${dtFmt(new Date(x.time))}</td><td>${escapeHtml(x.source)}</td><td class="details">${escapeHtml(x.text)}</td><td>${escapeHtml(x.reference||'')}</td><td><button class="file-remove remove-chronology" data-id="${x.id}">×</button></td></tr>`).join('')}</tbody>`;}
+  function renderChronology(){const allowed=new Set(subjectEventScopedRecords(state.records).map(r=>r.id));const rows=state.chronology.filter(x=>x.source==='Manual'||!x.recordId||allowed.has(x.recordId)).sort((a,b)=>a.time-b.time);$('chronologyTable').innerHTML=`<thead><tr><th>Date/time</th><th>Source</th><th>Event</th><th>Reference</th><th></th></tr></thead><tbody>${rows.map(x=>`<tr><td>${dtFmt(new Date(x.time))}</td><td>${escapeHtml(x.source)}</td><td class="details">${escapeHtml(x.text)}</td><td>${escapeHtml(x.reference||'')}</td><td><button class="file-remove remove-chronology" data-id="${x.id}">×</button></td></tr>`).join('')}</tbody>`;}
   function switchTab(id){document.querySelectorAll('.view').forEach(v=>{v.setAttribute('role','tabpanel');v.classList.toggle('hidden',v.id!==id)});document.querySelectorAll('.tab').forEach(t=>{const active=t.dataset.tab===id;t.classList.toggle('active',active);t.setAttribute('aria-selected',String(active));});if(id==='dashboard')renderDashboard();else if(id==='records')renderRecords();else if(id==='contacts')renderContacts();else if(id==='locations')renderLocations();else if(id==='devices')renderDevices();else if(id==='smsintel')renderSmsIntelligence();else if(id==='incident')renderIncident();else if(id==='days')renderDaySummary();else if(id==='patterns')renderPatterns();else if(id==='quality')renderDataQuality();else if(id==='movement'){requestAnimationFrame(()=>renderMovement());setTimeout(()=>{try{movementMap?.invalidateSize()}catch{}},300);}else if(id==='leads')renderLeads();else if(id==='network')requestAnimationFrame(renderNetwork);else if(id==='compare')renderCompare();else if(id==='chronology')renderChronology();else if(id==='flags')renderFlags();}
   function contactFilter(num){$('bparty').value=num;applyFilters();switchTab('records');}
   function csvCell(v){const s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
@@ -1547,19 +1588,27 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
   $('mobileFiltersBtn').onclick=()=>setFilterDrawer(true);$('closeFiltersBtn').onclick=()=>setFilterDrawer(false);$('filterBackdrop').onclick=()=>setFilterDrawer(false);
   $('privateSessionBtn').onclick=()=>{state.privateSession=!state.privateSession;updatePrivacyUi();showStatus(state.privateSession?'Private Session enabled. New local persistence is paused.':'Private Session disabled. Local persistence is enabled.','ok');};
   $('clearLocalDataBtn').onclick=()=>{if(!confirm('Clear locally saved CDR Analyzer case metadata, contact names/tags and case snapshots from this browser? Loaded CDR rows in the current session will remain open.'))return;for(const k of Object.keys(localStorage)){if(k.startsWith('cdrAnalyzer:'))localStorage.removeItem(k);}state.contactTags={};state.contactNames={};state.globalContactTags={};state.globalContactNames={};['caseTitle','caseNo','station','analyst','incidentDate','incidentTime','generalNote'].forEach(id=>{if($(id))$(id).value='';});renderCaseSnapshots();renderAll();showStatus('Local case data cleared from this browser.','ok');};
-  updatePrivacyUi();updateFilterCount();
+  installViewScopeToolbars();syncViewScopeControls(true);
+    updatePrivacyUi();updateFilterCount();
   $('addChronologyManualBtn').onclick=()=>{const t=$('chronologyText').value.trim();if(!t)return;const d=$('chronologyDt').value?new Date($('chronologyDt').value):new Date();state.chronology.push({id:'m'+Date.now(),time:+d,source:'Manual',text:t,reference:''});$('chronologyText').value='';renderChronology();};$('saveCaseSnapshotBtn').onclick=saveCaseSnapshot;$('applyBtn').onclick=()=>{applyFilters();if(window.innerWidth<=1100)setFilterDrawer(false);};$('resetBtn').onclick=resetFilters;$('printBtn').onclick=()=>window.print();$('reportBtn').onclick=exportCaseReport;$('saveWorkspaceBtn').onclick=saveWorkspace;$('loadWorkspaceBtn').onclick=()=>$('workspaceInput').click();$('clearFilesBtn').onclick=clearLoaded;$('focusIncidentBtn').onclick=applyIncidentWindow;$('movementRefreshBtn').onclick=()=>{stopMovementPlayback();renderMovement();};$('movementDateFrom').onchange=()=>{stopMovementPlayback();renderMovement();};$('movementDateTo').onchange=()=>{stopMovementPlayback();renderMovement();};$('movementHeatMode').onchange=renderMovement;$('movementPlayBtn').onclick=toggleMovementPlayback;$('movementPrevBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex-1,true,true)};$('movementNextBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex+1,true,true)};$('movementSlider').oninput=e=>{stopMovementPlayback();updateMovementPlayback(+e.target.value,true,true)};$('movementSpeed').onchange=()=>{if(movementPlaybackTimer){clearTimeout(movementPlaybackTimer);movementPlaybackTimer=-1;scheduleMovementPlayback();}};$('importTacBtn').onclick=()=>$('tacInput').click();
   $('exportTacBtn').onclick=exportTacCache;
   $('tacInput').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{await importTacDatabase(f);}catch(err){showStatus('TAC import failed: '+err.message,'error');}e.target.value='';});
-  $('smsIntelRefreshBtn').onclick=renderSmsIntelligence;$('smsIntelCdr').onchange=renderSmsIntelligence;$('smsIntelFrom').onchange=renderSmsIntelligence;$('smsIntelTo').onchange=renderSmsIntelligence;$('incidentRefreshBtn').onclick=renderIncident;$('leadsRefreshBtn').onclick=renderLeads;$('networkRefreshBtn').onclick=()=>{networkSelected=null;renderNetwork();};$('networkMinEvents').onchange=renderNetwork;$('networkSharedOnly').onchange=renderNetwork;$('networkCanvas').addEventListener('click',e=>{const rect=$('networkCanvas').getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;let hit=null,best=24;for(const n of networkNodes){const d=Math.hypot(n.x-x,n.y-y);if(d<best){best=d;hit=n;}}networkSelected=hit?hit.id:null;renderNetwork();});$('compareRefreshBtn').onclick=renderCompare;$('exportBtn').onclick=()=>exportCsv(state.filtered,`${safeName($('caseNo').value||$('caseTitle').value)}_filtered_cdr.csv`);$('exportFlagsBtn').onclick=()=>exportCsv(state.records.filter(r=>state.flags.has(r.id)),`${safeName($('caseNo').value||$('caseTitle').value)}_flagged_cdr.csv`);$('exportXlsxBtn').onclick=exportWorkbook;
+  $('smsIntelRefreshBtn').onclick=renderSmsIntelligence;$('smsIntelCdr').onchange=e=>setSubjectEventScope(e.target.value,$('callType')?.value||'');$('smsIntelFrom').onchange=renderSmsIntelligence;$('smsIntelTo').onchange=renderSmsIntelligence;$('incidentRefreshBtn').onclick=renderIncident;$('leadsRefreshBtn').onclick=renderLeads;$('networkRefreshBtn').onclick=()=>{networkSelected=null;renderNetwork();};$('networkMinEvents').onchange=renderNetwork;$('networkSharedOnly').onchange=renderNetwork;$('networkCanvas').addEventListener('click',e=>{const rect=$('networkCanvas').getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;let hit=null,best=24;for(const n of networkNodes){const d=Math.hypot(n.x-x,n.y-y);if(d<best){best=d;hit=n;}}networkSelected=hit?hit.id:null;renderNetwork();});$('compareRefreshBtn').onclick=renderCompare;$('exportBtn').onclick=()=>exportCsv(state.filtered,`${safeName($('caseNo').value||$('caseTitle').value)}_filtered_cdr.csv`);$('exportFlagsBtn').onclick=()=>exportCsv(state.records.filter(r=>state.flags.has(r.id)),`${safeName($('caseNo').value||$('caseTitle').value)}_flagged_cdr.csv`);$('exportXlsxBtn').onclick=exportWorkbook;
   $('exportNotesBtn').onclick=()=>{const payload={case:{title:$('caseTitle').value,caseNo:$('caseNo').value,station:$('station').value,analyst:$('analyst').value},generalNote:$('generalNote').value,recordNotes:state.notes,flagged:[...state.flags]};download(`${safeName($('caseNo').value||$('caseTitle').value)}_notes.json`,JSON.stringify(payload,null,2),'application/json');};
   $('workspaceInput').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{loadWorkspaceObject(JSON.parse(await f.text()));}catch(err){showStatus('Workspace load failed: '+err.message,'error');}e.target.value='';});
   $('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)switchTab(b.dataset.tab)});$('tabs').addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;const tabs=[...document.querySelectorAll('.tab')],cur=tabs.indexOf(document.activeElement);if(cur<0)return;e.preventDefault();let n=e.key==='Home'?0:e.key==='End'?tabs.length-1:e.key==='ArrowRight'?(cur+1)%tabs.length:(cur-1+tabs.length)%tabs.length;tabs[n].focus();switchTab(tabs[n].dataset.tab);});document.addEventListener('click',e=>{const j=e.target.closest('[data-jump]');if(j)switchTab(j.dataset.jump);const c=e.target.closest('.contact-filter');if(c){e.preventDefault();contactFilter(c.dataset.num);}const f=e.target.closest('.flag-btn');if(f){const id=f.dataset.id;state.flags.has(id)?state.flags.delete(id):state.flags.add(id);renderRecords();renderFlags();}const u=e.target.closest('.unflag');if(u){state.flags.delete(u.dataset.id);renderRecords();renderFlags();}const cp=e.target.closest('.contact-profile-btn');if(cp){e.preventDefault();renderContactProfile(cp.dataset.num);$('contactProfilePanel').scrollIntoView({behavior:'smooth',block:'start'});}const lcr=e.target.closest('.lead-contact-records');if(lcr){e.preventDefault();contactFilter(lcr.dataset.num);}const lvr=e.target.closest('.lead-view-record');if(lvr){e.preventDefault();jumpToRecord(state.records.find(r=>r.id===lvr.dataset.id));}const fl=e.target.closest('.contact-first-last');if(fl){const rr=state.records.filter(r=>samePhone(r.bparty,fl.dataset.num)&&r.dt).sort((a,b)=>a.dt-b.dt);jumpToRecord(fl.dataset.which==='last'?rr[rr.length-1]:rr[0]);}const cs=e.target.closest('.load-case-snapshot');if(cs){const x=caseSnapshots()[+cs.dataset.i];if(x){$('caseTitle').value=x.title||'';$('caseNo').value=x.caseNo||'';$('station').value=x.station||'';$('analyst').value=x.analyst||'';$('incidentDate').value=x.incidentDate||'';$('incidentTime').value=x.incidentTime||'';renderIncident();}}const cd=e.target.closest('.delete-case-snapshot');if(cd){const rows=caseSnapshots();rows.splice(+cd.dataset.i,1);persistLocal('cdrAnalyzer:caseSnapshots',JSON.stringify(rows));renderCaseSnapshots();}const df=e.target.closest('.day-filter');if(df){$('dateFrom').value=df.dataset.date;$('dateTo').value=df.dataset.date;applyFilters();switchTab('records');}const ac=e.target.closest('.add-chronology');if(ac){const r=state.records.find(x=>x.id===ac.dataset.id);if(r&&!state.chronology.some(x=>x.recordId===r.id)){state.chronology.push({id:'r'+r.id,recordId:r.id,time:+(r.dt||new Date()),source:'CDR',text:`${contactLabel(r.bparty)} • ${r.callType} • ${fmtDur(r.duration)}`,reference:`${r.sourceFile} / ${r.sourceSheet} / row ${r.rowNumber}`});}switchTab('chronology');}const rc=e.target.closest('.remove-chronology');if(rc){state.chronology=state.chronology.filter(x=>x.id!==rc.dataset.id);renderChronology();}const rm=e.target.closest('[data-remove-file]');if(rm){const id=+rm.dataset.removeFile;state.records=state.records.filter(r=>r.fileId!==id);state.files=state.files.filter(f=>f.id!==id);refreshSelectors();renderFileList();applyFilters();showStatus('File removed from this browser session.','ok');}});
   $('recordsTable').addEventListener('click',e=>{const th=e.target.closest('th[data-sort]');if(!th)return;const k=th.dataset.sort;if(k==='flag')return;if(state.sort.key===k)state.sort.dir=state.sort.dir==='asc'?'desc':'asc';else state.sort={key:k,dir:k==='dt'?'asc':'desc'};renderRecords();});
   $('prevPage').onclick=()=>{if(state.page>1){state.page--;renderRecords();}};$('nextPage').onclick=()=>{const p=Math.ceil(state.filtered.length/state.pageSize);if(state.page<p){state.page++;renderRecords();}};$('pageSize').onchange=()=>{state.page=1;renderRecords();};
   $('flagList').addEventListener('input',e=>{if(e.target.classList.contains('row-note'))state.notes[e.target.dataset.id]=e.target.value;});
-  $('dashboardCdr').onchange=renderDashboard;
-  $('dashboardEventType').onchange=renderDashboard;
+  document.addEventListener('change',e=>{
+    if(e.target.classList.contains('view-scope-subject')){setSubjectEventScope(e.target.value,$('callType')?.value||'');}
+    else if(e.target.classList.contains('view-scope-event')){setSubjectEventScope($('cdrNo')?.value||'',e.target.value);}
+  });
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('.view-scope-clear');if(!b)return;setSubjectEventScope('','');
+  });
+  $('dashboardCdr').onchange=e=>setSubjectEventScope(e.target.value,$('callType')?.value||'');
+  $('dashboardEventType').onchange=e=>setSubjectEventScope($('cdrNo')?.value||'',e.target.value);
   $('selectRequestContactsBtn').onclick=selectRequestContacts;
   $('clearRequestContactsBtn').onclick=()=>{state.requestSelected.clear();renderContacts();};
   $('openCdrRequestBtn').onclick=openCdrRequestGenerator;
