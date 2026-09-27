@@ -340,7 +340,8 @@
         <div class="panel no-print" style="padding:10px 12px">
           <div class="subtoolbar" style="margin:0">
             <div class="field" style="min-width:260px"><label>Dashboard subject</label><select id="dashboardCdr"><option value="">All subjects</option></select></div>
-            <div class="tiny" id="dashboardScopeText">Showing all subjects within the current filters.</div>
+            <div class="field" style="min-width:220px"><label>Event type</label><select id="dashboardEventType"><option value="">All event types</option></select></div>
+            <div class="tiny" id="dashboardScopeText">Showing all subjects and event types within the current filters.</div>
           </div>
         </div>
         <div class="kpis" id="kpis"></div>
@@ -610,6 +611,7 @@
     const mc=uniq('cdrNo');
     fillSelect('movementCdr',mc,'Select subject');
     fillSelect('dashboardCdr',mc,'All subjects');
+    fillSelect('dashboardEventType',uniq('callType'),'All event types');
     if(!$('movementCdr').value&&mc.length)$('movementCdr').value=mc[0];
   }
 
@@ -665,12 +667,16 @@
   function saveCaseSnapshot(){const rows=caseSnapshots();rows.unshift({title:$('caseTitle').value,caseNo:$('caseNo').value,station:$('station').value,analyst:$('analyst').value,incidentDate:$('incidentDate').value,incidentTime:$('incidentTime').value,savedAt:new Date().toISOString()});persistLocal('cdrAnalyzer:caseSnapshots',JSON.stringify(rows.slice(0,50)));renderCaseSnapshots();}
   function renderDashboard(){
     renderCaseSnapshots();
-    const selected=$('dashboardCdr')?.value||'';
-    const d=selected?state.filtered.filter(r=>r.cdrNo===selected):state.filtered;
-    if($('dashboardScopeText'))$('dashboardScopeText').textContent=selected?`Showing dashboard for ${selected} • ${fmtInt(d.length)} records within current filters.`:`Showing all subjects • ${fmtInt(d.length)} records within current filters.`;
+    const selected=$('dashboardCdr')?.value||'',eventType=$('dashboardEventType')?.value||'';
+    let d=selected?state.filtered.filter(r=>r.cdrNo===selected):state.filtered;
+    if(eventType)d=d.filter(r=>r.callType===eventType);
+    if($('dashboardScopeText')){
+      const subjectText=selected?selected:'All subjects',eventText=eventType||'All event types';
+      $('dashboardScopeText').textContent=`${subjectText} • ${eventText} • ${fmtInt(d.length)} records within current filters.`;
+    }
     const contacts=aggregateContacts(d), locs=aggregateLocations(d), devs=aggregateDevices(d), calls=d.filter(r=>normalize(r.callType).includes('call')), sms=d.filter(r=>normalize(r.callType).includes('sms')), duration=calls.reduce((s,r)=>s+r.duration,0), dates=d.filter(r=>r.dt).map(r=>r.dt);
     const min=dates.length?new Date(Math.min(...dates)):null,max=dates.length?new Date(Math.max(...dates)):null; const uniqueImei=new Set(d.map(r=>r.imei).filter(Boolean)).size, uniqueImsi=new Set(d.map(r=>r.imsi).filter(Boolean)).size;
-    const k=[['Dashboard records',fmtInt(d.length),selected?`Subject ${selected}`:`${fmtInt(state.records.length)} loaded`],['Unique contacts',fmtInt(contacts.length),`${fmtInt(calls.length)} call records`],['Total call duration',fmtDur(duration),`${fmtInt(sms.length)} SMS records`],['Unique towers',fmtInt(locs.length),min&&max?`${dateFmt(min)} – ${dateFmt(max)}`:'—'],['IMEI',fmtInt(uniqueImei),`${fmtInt(uniqueImsi)} IMSI`],['CDR numbers',fmtInt(new Set(d.map(r=>r.cdrNo).filter(Boolean)).size),`${fmtInt(state.files.length)} file(s)`]];
+    const k=[['Dashboard records',fmtInt(d.length),[selected?`Subject ${selected}`:'All subjects',eventType||'All event types'].join(' • ')],['Unique contacts',fmtInt(contacts.length),`${fmtInt(calls.length)} call records`],['Total call duration',fmtDur(duration),`${fmtInt(sms.length)} SMS records`],['Unique towers',fmtInt(locs.length),min&&max?`${dateFmt(min)} – ${dateFmt(max)}`:'—'],['IMEI',fmtInt(uniqueImei),`${fmtInt(uniqueImsi)} IMSI`],['CDR numbers',fmtInt(new Set(d.map(r=>r.cdrNo).filter(Boolean)).size),`${fmtInt(state.files.length)} file(s)`]];
     $('kpis').innerHTML=k.map(x=>`<div class="kpi"><div class="v">${x[1]}</div><div class="l">${x[0]}</div><div class="s">${x[2]}</div></div>`).join(''); $('topContactBadge').textContent=contacts.length;
     renderCharts(d,contacts);
     $('dashLocations').innerHTML=simpleTable(['Cell ID / location','Records','Contacts'],locs.slice(0,8).map(x=>[escapeHtml(x.cellId||x.address||'—'),fmtInt(x.records),fmtInt(x.contacts.size)]));
@@ -1152,6 +1158,7 @@
   $('prevPage').onclick=()=>{if(state.page>1){state.page--;renderRecords();}};$('nextPage').onclick=()=>{const p=Math.ceil(state.filtered.length/state.pageSize);if(state.page<p){state.page++;renderRecords();}};$('pageSize').onchange=()=>{state.page=1;renderRecords();};
   $('flagList').addEventListener('input',e=>{if(e.target.classList.contains('row-note'))state.notes[e.target.dataset.id]=e.target.value;});
   $('dashboardCdr').onchange=renderDashboard;
+  $('dashboardEventType').onchange=renderDashboard;
   $('identityScope').onchange=renderContacts;
   $('contactsTable').addEventListener('change',e=>{
     if(e.target.classList.contains('contact-tag')){
