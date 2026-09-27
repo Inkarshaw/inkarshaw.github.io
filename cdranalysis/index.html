@@ -1326,7 +1326,8 @@
     const data=state.filtered.filter(r=>r.dt),total=data.length,dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     if(!total){
       $('patternSummary').innerHTML='<div class="empty">No dated records match the current filters.</div>';
-      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable','patternTimeBandTable','patternHighDatesTable'].forEach(id=>$(id).innerHTML='');\n      $('patternNarrative').innerHTML='';
+      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable','patternTimeBandTable','patternHighDatesTable'].forEach(id=>$(id).innerHTML='');
+      $('patternNarrative').innerHTML='';
       $('hourMatrix').innerHTML='';$('contactDayMatrix').innerHTML='';return;
     }
 
@@ -1343,7 +1344,8 @@
     const weekdayEvents=total-weekendRows.length;
     const commonHourThreshold=Math.max(1,Math.ceil(peakHour*.2));
     const lowHours=hourCounts.map((count,h)=>({h,count})).filter(x=>x.count>0&&x.count<=commonHourThreshold).sort((a,b)=>a.count-b.count||a.h-b.h);
-    const lowHourSet=new Set(lowHours.map(x=>x.h)),lowHourEvents=data.filter(r=>lowHourSet.has(r.dt.getHours())).length;\n    const weekdayActiveDates=new Set(data.filter(r=>![0,6].includes(r.dt.getDay())).map(r=>localDateKey(r.dt))).size;
+    const lowHourSet=new Set(lowHours.map(x=>x.h)),lowHourEvents=data.filter(r=>lowHourSet.has(r.dt.getHours())).length;
+    const weekdayActiveDates=new Set(data.filter(r=>![0,6].includes(r.dt.getDay())).map(r=>localDateKey(r.dt))).size;
     const weekendActiveDates=new Set(data.filter(r=>[0,6].includes(r.dt.getDay())).map(r=>localDateKey(r.dt))).size;
     const weekdayRate=weekdayActiveDates?weekdayEvents/weekdayActiveDates:0,weekendRate=weekendActiveDates?weekendRows.length/weekendActiveDates:0;
     const weekendRateRatio=weekdayRate?weekendRate/weekdayRate:null;
