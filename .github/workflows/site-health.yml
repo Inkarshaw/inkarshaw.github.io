@@ -74,6 +74,23 @@ jobs:
               quiz_exam = route.get("quizExam")
               if coverage.get(quiz_exam, 0) < 10:
                   raise SystemExit(f"{family}.quizExam has only {coverage.get(quiz_exam,0)} valid fallback questions: {quiz_exam}")
+
+          subject_requirements = {
+              ("TNUSRB","General Knowledge"): 10,
+              ("TNUSRB","Psychology & Aptitude"): 10,
+              ("SSC","General Awareness"): 10,
+              ("SSC","Quantitative Aptitude"): 10,
+              ("SSC","English"): 10,
+          }
+          subject_coverage = Counter()
+          for row in rows:
+              if str(row.get("Active","")).lower() == "false":
+                  continue
+              if row.get("Exam") and row.get("Subtopic") and row.get("Question"):
+                  subject_coverage[(row["Exam"], row["Subtopic"])] += 1
+          for key, minimum in subject_requirements.items():
+              if subject_coverage.get(key, 0) < minimum:
+                  raise SystemExit(f"Quiz subject bank {key[0]} → {key[1]} has only {subject_coverage.get(key,0)} rows; need {minimum}")
           catalog = json.loads(pathlib.Path("data/exams/exam-catalog.json").read_text(encoding="utf-8"))
           catalog_ids = {item["id"] for body in catalog.values() for item in body.get("items", [])}
           syllabus_text = pathlib.Path("syllabus.html").read_text(encoding="utf-8")
