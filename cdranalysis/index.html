@@ -623,7 +623,27 @@
   function renderCharts(data,contacts){
     const top=contacts.slice(0,12);newChart('contactsChart',{type:'bar',data:{labels:top.map(x=>contactLabel(x.bparty)),datasets:[{label:'Records',data:top.map(x=>x.records)}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
     const hours=Array(24).fill(0);data.forEach(r=>{if(r.dt)hours[r.dt.getHours()]++;else{const t=parseTime(r.time);if(t)hours[t.h]++;}});newChart('hourChart',{type:'bar',data:{labels:hours.map((_,i)=>String(i).padStart(2,'0')),datasets:[{label:'Records',data:hours}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
-    const tm={};data.forEach(r=>{const k=r.callType||'Unknown';tm[k]=(tm[k]||0)+1});const entries=Object.entries(tm).sort((a,b)=>b[1]-a[1]).slice(0,10);newChart('typeChart',{type:'doughnut',data:{labels:entries.map(x=>x[0]),datasets:[{data:entries.map(x=>x[1])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:10}}}}}});
+    const tm={};data.forEach(r=>{const k=r.callType||'Unknown';tm[k]=(tm[k]||0)+1});
+    const entries=Object.entries(tm).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const eventColor=(label,i)=>{
+      const n=normalize(label).replace(/\s+/g,'_');
+      if(n.includes('call_in')||(n.includes('call')&&n.includes('in')))return '#31f7a8';
+      if(n.includes('call_out')||(n.includes('call')&&n.includes('out')))return '#33ddff';
+      if(n.includes('sms_in')||(n.includes('sms')&&n.includes('in')))return '#a78bfa';
+      if(n.includes('sms_out')||(n.includes('sms')&&n.includes('out')))return '#ffb454';
+      const palette=['#ff5d78','#4ade80','#60a5fa','#f472b6','#facc15','#22d3ee','#c084fc','#fb7185','#34d399','#f97316'];
+      return palette[i%palette.length];
+    };
+    const typeColors=entries.map((x,i)=>eventColor(x[0],i));
+    newChart('typeChart',{type:'doughnut',data:{labels:entries.map(x=>x[0]),datasets:[{
+      data:entries.map(x=>x[1]),
+      backgroundColor:typeColors,
+      borderColor:'#07111d',
+      borderWidth:3,
+      hoverBorderColor:'#e7fbff',
+      hoverBorderWidth:3,
+      hoverOffset:8
+    }]},options:{responsive:true,maintainAspectRatio:false,cutout:'56%',plugins:{legend:{position:'bottom',labels:{boxWidth:12,boxHeight:12,usePointStyle:true,pointStyle:'rectRounded',padding:12,color:'#9fc6d6',font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtInt(ctx.raw)}`}}}}});
   }
 
   const cols=[['flag','★'],['cdrNo','CDR No'],['bparty','B Party'],['dt','Date / Time'],['duration','Duration'],['callType','Type'],['firstCellId','First Cell ID'],['firstAddress','First Tower Address'],['lastCellId','Last Cell ID'],['lastAddress','Last Tower Address'],['imei','IMEI'],['imsi','IMSI'],['roaming','Roaming'],['provider','B Party Provider'],['mainCity','Main City'],['subCity','Sub City'],['operator','Operator'],['sourceFile','Source File'],['sourceSheet','Source Sheet'],['rowNumber','Source Row']];
