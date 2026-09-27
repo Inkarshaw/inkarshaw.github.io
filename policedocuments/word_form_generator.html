@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fill & Generate Police Document</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Tahoma,sans-serif;background:#0d1b2a;color:#eef5fb}
+.top{background:#132a3f;padding:16px 20px;position:sticky;top:0;z-index:20;border-bottom:1px solid #294b67;display:flex;gap:12px;align-items:center;justify-content:space-between}
+.top a{color:#bfe3ff;text-decoration:none;font-weight:700}.top h1{font-size:20px;margin:0}.wrap{max-width:1250px;margin:auto;padding:18px;display:grid;grid-template-columns:minmax(320px,520px) 1fr;gap:18px}
+.panel{background:#14283b;border:1px solid #2d506b;border-radius:14px;padding:18px;box-shadow:0 8px 28px #0003}
+h2{margin:0 0 14px;color:#bfe3ff}.note{font-size:13px;color:#b8cad8;background:#102131;border:1px solid #294b67;padding:10px;border-radius:8px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:5px;color:#d7e7f2}
+input,textarea,select{width:100%;border:1px solid #456b87;background:#f9fbfd;color:#13202b;border-radius:8px;padding:11px;font:inherit}
+textarea{min-height:92px;resize:vertical}.section{margin:18px 0 8px;padding-top:12px;border-top:1px solid #36566d;font-weight:800;color:#9ed2f5}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:8px;padding:11px 14px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.primary{background:#3f8f62;color:white}.word{background:#245a9a;color:white}.pdf{background:#9a4b24;color:white}.ghost{background:#263f52;color:#eef5fb;border:1px solid #456b87}
+.previewWrap{background:#d8e0e7;border-radius:12px;padding:18px;overflow:auto;min-height:70vh}
+.paper{background:white;color:#111;width:210mm;min-height:297mm;margin:auto;padding:20mm 18mm;box-shadow:0 3px 16px #0003;font-family:"Times New Roman",serif;font-size:14pt;line-height:1.55}
+.paper h1{text-align:center;font-size:16pt;text-transform:uppercase;margin:0 0 20px}.paper .meta{margin-bottom:14px}.paper .row{display:flex;gap:8px;margin:4px 0}.paper .k{font-weight:bold;min-width:145px}.paper .body{white-space:pre-wrap;text-align:justify;margin-top:16px}.signature{text-align:right;margin-top:42px}.muted{color:#666;font-size:10pt}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.previewWrap{min-height:auto}.paper{width:100%;min-height:auto;padding:22px 18px}.top{position:static}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+@media print{body{background:white}.top,.panel:first-child{display:none!important}.wrap{display:block;padding:0}.panel{border:0;box-shadow:none;padding:0}.previewWrap{padding:0;background:white}.paper{box-shadow:none;width:210mm;min-height:297mm;margin:0}}
+</style>
+</head>
+<body>
+<div class="top"><a href="/policedocuments/">← Police Documents</a><h1>Fill & Generate Word / PDF</h1><span></span></div>
+<div class="wrap">
+<section class="panel">
+<h2 id="formTitle">Document Generator</h2>
+<div class="note">Fill the required details. You can edit the generated body before export. Your saved officer/station defaults stay only in this browser.</div>
+<div class="grid">
+<div class="full"><label>Document / Form</label><input id="docTitle"></div>
+<div><label>Police Station</label><input id="station" placeholder="e.g. G7 Chetpet PS"></div>
+<div><label>District / City</label><input id="district" placeholder="Chennai"></div>
+<div><label>Crime / CSR No.</label><input id="crimeNo" placeholder="123/2026"></div>
+<div><label>Sections</label><input id="sections"></div>
+<div><label>Court</label><input id="court"></div>
+<div><label>CC / PRC / Case No.</label><input id="caseNo"></div>
+<div class="full"><label>Accused / Person concerned</label><input id="accused"></div>
+<div><label>Date</label><input id="date" type="date"></div>
+<div><label>Time</label><input id="time" type="time"></div>
+<div class="full"><label>Place / Location</label><input id="place"></div>
+</div>
+<div id="dynamicFields"></div>
+<div class="section">Officer & document details</div>
+<div class="grid">
+<div><label>Officer Name</label><input id="officer"></div>
+<div><label>Rank</label><input id="rank" placeholder="Sub-Inspector of Police"></div>
+<div><label>Reference / Rc. No.</label><input id="reference"></div>
+<div><label>Subject</label><input id="subject"></div>
+<div class="full"><label>Document Body / Proceedings</label><textarea id="bodyText" rows="10"></textarea></div>
+<div class="full"><label>Remarks / Enclosures</label><textarea id="remarks" rows="3"></textarea></div>
+</div>
+<div class="actions">
+<button class="btn primary" id="previewBtn">↻ Update Preview</button>
+<button class="btn word" id="wordBtn">📝 Generate Word</button>
+<button class="btn pdf" id="pdfBtn">📄 Generate PDF</button>
+<button class="btn ghost" id="saveBtn">💾 Save Defaults</button>
+<a class="btn ghost" id="originalBtn" href="#" target="_blank">⬇ Original Word</a>
+</div>
+</section>
+<section class="panel"><div class="previewWrap"><article class="paper" id="paper"></article></div></section>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+const template=params.get('template')||'';
+const passedTitle=params.get('title')||'';
+const file=(template.split('/').pop()||'').toLowerCase();
+
+const presets={
+'panchanama_ii.docx':{
+ title:'Panchanama II',
+ fields:[['witness1','Panchayatdar / Witness 1'],['witness2','Panchayatdar / Witness 2'],['property','Property / Articles / Material Objects','textarea']],
+ body:'Panchanama proceedings were conducted at the above place, date and time in the presence of the witnesses mentioned below. The facts, observations, articles/property and other particulars noticed during the proceedings are recorded as follows:\n\n'
+},
+'panchanama_judicial_form_82.docx':{
+ title:'Judicial Panchanama Form 82',
+ fields:[['witness1','Panchayatdar / Witness 1'],['witness2','Panchayatdar / Witness 2'],['proceedings','Judicial proceedings / observations','textarea']],
+ body:'Judicial Panchanama proceedings were conducted in connection with the above case. The proceedings and observations are recorded below:\n\n'
+},
+'mm_pt_warrant.docx':{
+ title:'MM PT Warrant',
+ fields:[['prison','Prison / Place of custody'],['productionDate','Date required for production','date'],['prisonerNo','Prisoner / Remand No.']],
+ body:'It is requested that the above accused/prisoner be produced before the Hon\'ble Court on the date stated above in connection with the case mentioned herein.'
+},
+'withdrawal_report.docx':{
+ title:'Withdrawal Report',
+ fields:[['complainant','Complainant'],['reason','Reason / grounds for withdrawal','textarea']],
+ body:'The above case/report is submitted with the following facts and grounds for appropriate orders regarding withdrawal/disposal:\n\n'
+},
+'warrant_form.docx':{
+ title:'Warrant Form',
+ fields:[['personAddress','Address of person concerned','textarea'],['purpose','Purpose / direction','textarea']],
+ body:'The warrant is prepared in respect of the above matter with the following particulars and directions:\n\n'
+},
+'parent_intimation_form.docx':{
+ title:'Parent Intimation Form',
+ fields:[['juvenile','Child / Juvenile name'],['parent','Parent / Guardian name'],['parentAddress','Parent / Guardian address','textarea']],
+ body:'Intimation is hereby given to the parent/guardian regarding the apprehension and proceedings concerning the child named above.'
+},
+'form_ii_(home).docx':{
+ title:'Form II (Home)',
+ fields:[['juvenile','Child / Juvenile name'],['home','Children Home / Institution'],['guardian','Parent / Guardian']],
+ body:'Form II particulars are submitted with the details entered above for the placement/production of the child before the competent authority.'
+}
+};
+
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function prettyFile(){return (passedTitle||file.replace(/\.(docx?|DOCX?)$/,'').replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase())||'Police Document')}
+function addFields(def){
+ const host=$('dynamicFields'); host.innerHTML='';
+ if(!def?.fields?.length)return;
+ const sec=document.createElement('div');sec.className='section';sec.textContent='Form-specific details';host.appendChild(sec);
+ const grid=document.createElement('div');grid.className='grid';host.appendChild(grid);
+ def.fields.forEach(([id,label,type='text'])=>{
+   const d=document.createElement('div'); if(type==='textarea')d.className='full';
+   d.innerHTML='<label>'+esc(label)+'</label>'+(type==='textarea'?'<textarea id="'+id+'"></textarea>':'<input id="'+id+'" type="'+type+'">');
+   grid.appendChild(d);
+ });
+}
+function val(id){return $(id)?.value?.trim()||''}
+function labelRows(){
+ const rows=[['Police Station',val('station')],['District / City',val('district')],['Crime / CSR No.',val('crimeNo')],['Sections',val('sections')],['Court',val('court')],['Case No.',val('caseNo')],['Accused / Person',val('accused')],['Date',val('date')],['Time',val('time')],['Place',val('place')],['Reference',val('reference')],['Subject',val('subject')]];
+ const def=presets[file]; (def?.fields||[]).forEach(([id,label])=>rows.push([label,val(id)]));
+ return rows.filter(x=>x[1]);
+}
+function updatePreview(){
+ const rows=labelRows().map(([k,v])=>'<div class="row"><span class="k">'+esc(k)+'</span><span>: '+esc(v)+'</span></div>').join('');
+ const remarks=val('remarks');
+ $('paper').innerHTML='<h1>'+esc(val('docTitle'))+'</h1><div class="meta">'+rows+'</div><div class="body">'+esc(val('bodyText'))+'</div>'+(remarks?'<div class="body"><b>Remarks / Enclosures:</b> '+esc(remarks)+'</div>':'')+'<div class="signature"><div>'+esc(val('officer'))+'</div><b>'+esc(val('rank'))+'</b><div>'+esc(val('station'))+'</div></div><div class="muted">Generated using ClearExams Police Documents</div>';
+}
+function fileBase(){return (val('docTitle')||'police_document').replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,'')}
+function downloadWord(){
+ updatePreview();
+ const html='<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:"Times New Roman";font-size:14pt;line-height:1.5;margin:1in}h1{text-align:center;font-size:16pt}.row{margin:4px 0}.k{font-weight:bold;display:inline-block;width:160px}.body{white-space:pre-wrap;text-align:justify;margin-top:18px}.signature{text-align:right;margin-top:45px}</style></head><body>'+$('paper').innerHTML+'</body></html>';
+ const blob=new Blob(['\ufeff',html],{type:'application/msword'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileBase()+'.doc';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function downloadPdf(){
+ updatePreview();
+ const opt={margin:0,filename:fileBase()+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}};
+ await html2pdf().set(opt).from($('paper')).save();
+}
+function saveDefaults(){
+ const d={station:val('station'),district:val('district'),court:val('court'),officer:val('officer'),rank:val('rank')};
+ localStorage.setItem('policeDocDefaults',JSON.stringify(d)); alert('Defaults saved on this device.');
+}
+function loadDefaults(){
+ try{const d=JSON.parse(localStorage.getItem('policeDocDefaults')||'{}');Object.entries(d).forEach(([k,v])=>{if($(k))$(k).value=v||''})}catch(e){}
+}
+const def=presets[file];
+$('docTitle').value=def?.title||prettyFile(); $('formTitle').textContent='Fill '+$('docTitle').value;
+$('bodyText').value=def?.body||'Enter the document contents / proceedings here.\n\n';
+$('date').value=new Date().toISOString().slice(0,10);
+if(template){$('originalBtn').href=template}else{$('originalBtn').style.display='none'}
+addFields(def); loadDefaults(); updatePreview();
+document.addEventListener('input',e=>{if(e.target.matches('input,textarea,select'))updatePreview()});
+$('previewBtn').onclick=updatePreview;$('wordBtn').onclick=downloadWord;$('pdfBtn').onclick=downloadPdf;$('saveBtn').onclick=saveDefaults;
+</script>
+</body>
+</html>
