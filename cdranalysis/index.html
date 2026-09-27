@@ -1329,7 +1329,7 @@
     const data=state.filtered.filter(r=>r.dt),total=data.length,dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     if(!total){
       $('patternSummary').innerHTML='<div class="empty">No dated records match the current filters.</div>';
-      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable','patternTimeBandTable','patternHighDatesTable'].forEach(id=>$(id).innerHTML='');
+      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable','patternTimeBandTable','patternHighDatesTable','patternContactHourTable'].forEach(id=>$(id).innerHTML='');
       $('patternNarrative').innerHTML='';
       $('hourMatrix').innerHTML='';$('contactDayMatrix').innerHTML='';return;
     }
@@ -1359,6 +1359,19 @@
     const dateCounts=activeDates.map(date=>({date,count:dateCountMap.get(date)||0}));
     const dayMean=activeDayCount?total/activeDayCount:0,daySd=activeDayCount?Math.sqrt(dateCounts.reduce((s,x)=>s+(x.count-dayMean)**2,0)/activeDayCount):0,highDateThreshold=dayMean+2*daySd;
     const highDates=activeDayCount>=5?dateCounts.filter(x=>x.count>highDateThreshold).sort((a,b)=>b.count-a.count||a.date.localeCompare(b.date)):[];
+    const contactHourMap=new Map();
+    for(const r of data){
+      if(!r.bparty)continue;
+      const h=r.dt.getHours(),key=r.bparty+'|'+h;
+      let x=contactHourMap.get(key);
+      if(!x)x={num:r.bparty,h,count:0,days:new Set(),types:new Set(),first:null,last:null};
+      x.count++;x.days.add(localDateKey(r.dt));x.types.add(r.callType||'—');
+      if(!x.first||r.dt<x.first)x.first=r.dt;if(!x.last||r.dt>x.last)x.last=r.dt;
+      contactHourMap.set(key,x);
+    }
+    const contactHourMinDays=Math.max(2,Math.min(5,Math.ceil(activeDayCount*.20)));
+    const recurringContactHours=[...contactHourMap.values()].filter(x=>x.days.size>=contactHourMinDays).sort((a,b)=>b.days.size-a.days.size||b.count-a.count||a.h-b.h);
+    const topRecurringContactHour=recurringContactHours[0]||null;
 
     $('patternSummary').innerHTML=`<div class="kpis">
       <div class="kpi"><div class="v">${String(peakHourIndex).padStart(2,'0')}:00–${String((peakHourIndex+1)%24).padStart(2,'0')}:00</div><div class="l">Most active hour</div><div class="s">${fmtInt(peakHour)} event(s) • ${pct(peakHour).toFixed(1)}%</div></div>
