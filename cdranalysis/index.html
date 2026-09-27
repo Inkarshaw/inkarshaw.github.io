@@ -1326,7 +1326,7 @@
     const data=state.filtered.filter(r=>r.dt),total=data.length,dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     if(!total){
       $('patternSummary').innerHTML='<div class="empty">No dated records match the current filters.</div>';
-      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable'].forEach(id=>$(id).innerHTML='');
+      ['patternWeekdayTable','patternEventTypeTable','patternRegularContactsTable','patternUnusualHoursTable','patternTimeBandTable','patternHighDatesTable'].forEach(id=>$(id).innerHTML='');\n      $('patternNarrative').innerHTML='';
       $('hourMatrix').innerHTML='';$('contactDayMatrix').innerHTML='';return;
     }
 
@@ -1343,7 +1343,17 @@
     const weekdayEvents=total-weekendRows.length;
     const commonHourThreshold=Math.max(1,Math.ceil(peakHour*.2));
     const lowHours=hourCounts.map((count,h)=>({h,count})).filter(x=>x.count>0&&x.count<=commonHourThreshold).sort((a,b)=>a.count-b.count||a.h-b.h);
-    const lowHourSet=new Set(lowHours.map(x=>x.h)),lowHourEvents=data.filter(r=>lowHourSet.has(r.dt.getHours())).length;
+    const lowHourSet=new Set(lowHours.map(x=>x.h)),lowHourEvents=data.filter(r=>lowHourSet.has(r.dt.getHours())).length;\n    const weekdayActiveDates=new Set(data.filter(r=>![0,6].includes(r.dt.getDay())).map(r=>localDateKey(r.dt))).size;
+    const weekendActiveDates=new Set(data.filter(r=>[0,6].includes(r.dt.getDay())).map(r=>localDateKey(r.dt))).size;
+    const weekdayRate=weekdayActiveDates?weekdayEvents/weekdayActiveDates:0,weekendRate=weekendActiveDates?weekendRows.length/weekendActiveDates:0;
+    const weekendRateRatio=weekdayRate?weekendRate/weekdayRate:null;
+    const topHours=hourCounts.map((count,h)=>({h,count})).sort((a,b)=>b.count-a.count||a.h-b.h).slice(0,3),top3Events=topHours.reduce((s,x)=>s+x.count,0);
+    const bandDefs=[['Overnight','00:00–05:59',0,6],['Morning','06:00–11:59',6,12],['Afternoon','12:00–17:59',12,18],['Evening','18:00–23:59',18,24]];
+    const timeBands=bandDefs.map(([name,label,start,end])=>{const rows=data.filter(r=>{const h=r.dt.getHours();return h>=start&&h<end});return {name,label,count:rows.length,days:new Set(rows.map(r=>localDateKey(r.dt))).size};}).sort((a,b)=>b.count-a.count);
+    const dateCountMap=new Map();for(const r of data){const d=localDateKey(r.dt);dateCountMap.set(d,(dateCountMap.get(d)||0)+1);}
+    const dateCounts=activeDates.map(date=>({date,count:dateCountMap.get(date)||0}));
+    const dayMean=activeDayCount?total/activeDayCount:0,daySd=activeDayCount?Math.sqrt(dateCounts.reduce((s,x)=>s+(x.count-dayMean)**2,0)/activeDayCount):0,highDateThreshold=dayMean+2*daySd;
+    const highDates=activeDayCount>=5?dateCounts.filter(x=>x.count>highDateThreshold).sort((a,b)=>b.count-a.count||a.date.localeCompare(b.date)):[];
 
     $('patternSummary').innerHTML=`<div class="kpis">
       <div class="kpi"><div class="v">${String(peakHourIndex).padStart(2,'0')}:00–${String((peakHourIndex+1)%24).padStart(2,'0')}:00</div><div class="l">Most active hour</div><div class="s">${fmtInt(peakHour)} event(s) • ${pct(peakHour).toFixed(1)}%</div></div>
@@ -1364,15 +1374,21 @@
       if(!r.bparty)continue;let x=contacts.get(r.bparty);if(!x)x={num:r.bparty,count:0,days:new Set(),first:null,last:null,types:new Set()};
       x.count++;x.days.add(localDateKey(r.dt));x.types.add(r.callType||'—');if(!x.first||r.dt<x.first)x.first=r.dt;if(!x.last||r.dt>x.last)x.last=r.dt;contacts.set(r.bparty,x);
     }
-    const recurring=[...contacts.values()].sort((a,b)=>b.days.size-a.days.size||b.count-a.count).slice(0,20);
+    const allRecurring=[...contacts.values()].sort((a,b)=>b.days.size-a.days.size||b.count-a.count),recurring=allRecurring.slice(0,20);
+    const recurringThreshold=Math.max(2,Math.ceil(activeDayCount*.30)),regularContacts=allRecurring.filter(x=>x.days.size>=recurringThreshold),topContact=allRecurring[0]||null;
+    const weekendComparison=weekendRateRatio===null?'No weekday active-date baseline is available.':weekendRateRatio>1.15?`Weekend activity is ${weekendRateRatio.toFixed(2)}x the weekday active-date rate.`:weekendRateRatio<0.85?`Weekend activity is ${weekendRateRatio.toFixed(2)}x the weekday active-date rate.`:`Weekend and weekday active-date rates are broadly similar (${weekendRateRatio.toFixed(2)}x).`;
+    const highDateText=activeDayCount<5?'At least 5 active dates are needed for the high-activity-date check.':highDates.length?`${highDates.length} date(s) exceed the mean + 2 SD threshold (${highDateThreshold.toFixed(1)} events).`:`No active date exceeds the mean + 2 SD threshold (${highDateThreshold.toFixed(1)} events).`;
+    $('patternNarrative').innerHTML=`<b>Automatic pattern summary</b><div style='margin-top:6px;line-height:1.65'>Peak activity is <b>${String(peakHourIndex).padStart(2,'0')}:00–${String((peakHourIndex+1)%24).padStart(2,'0')}:00</b>; the three busiest hours contain <b>${pct(top3Events).toFixed(1)}%</b> of filtered events.<br><b>${dayNames[peakWeekdayIndex]}</b> has the highest raw event count. ${escapeHtml(weekendComparison)}<br>Night activity (20:00–05:59) is <b>${pct(nightRows.length).toFixed(1)}%</b>. The leading six-hour band is <b>${escapeHtml(timeBands[0]?.name||'—')}</b> (${escapeHtml(timeBands[0]?.label||'')}).<br>${topContact?`Most recurrent contact: <b>${escapeHtml(contactLabel(topContact.num))}</b> on ${fmtInt(topContact.days.size)} of ${fmtInt(activeDayCount)} active dates (${(100*topContact.days.size/activeDayCount).toFixed(1)}%). `:''}${fmtInt(regularContacts.length)} contact(s) appear on at least ${fmtInt(recurringThreshold)} active dates (30% baseline).<br>${escapeHtml(highDateText)}</div>`;
+    $('patternTimeBandTable').innerHTML=`<thead><tr><th>Time band</th><th>Events</th><th>%</th><th>Active dates</th><th>Avg / active date</th></tr></thead><tbody>${timeBands.map(x=>`<tr><td>${escapeHtml(x.name)} <span class='tiny'>• ${escapeHtml(x.label)}</span></td><td class='num'>${fmtInt(x.count)}</td><td class='num'>${pct(x.count).toFixed(1)}%</td><td class='num'>${fmtInt(x.days)}</td><td class='num'>${x.days?(x.count/x.days).toFixed(1):'0.0'}</td></tr>`).join('')}</tbody>`;
+    $('patternHighDatesTable').innerHTML=`<thead><tr><th>Date</th><th>Events</th><th>Vs active-date mean</th></tr></thead><tbody>${activeDayCount<5?`<tr><td colspan='3' class='empty'>Need at least 5 active dates for this statistical check.</td></tr>`:highDates.length?highDates.map(x=>`<tr><td><button class='link day-filter' data-date='${x.date}'>${x.date}</button></td><td class='num'>${fmtInt(x.count)}</td><td class='num'>${dayMean?(x.count/dayMean).toFixed(2)+'x':'—'}</td></tr>`).join(''):`<tr><td colspan='3' class='empty'>No date exceeds mean + 2 SD (${highDateThreshold.toFixed(1)} events).</td></tr>`}</tbody>`;
     $('patternRegularContactsTable').innerHTML=`<thead><tr><th>Contact</th><th>Active dates</th><th>Date coverage</th><th>Events</th><th>Types</th><th>First</th><th>Last</th></tr></thead><tbody>${recurring.map(x=>`<tr><td><a href="#" class="link contact-filter" data-num="${escAttr(x.num)}" title="${escAttr(contactTitle(x.num))}">${escapeHtml(contactLabel(x.num))}</a></td><td class="num">${fmtInt(x.days.size)}</td><td class="num">${activeDayCount?(100*x.days.size/activeDayCount).toFixed(1):'0.0'}%</td><td class="num">${fmtInt(x.count)}</td><td class="details">${escapeHtml([...x.types].join(', '))}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td></tr>`).join('')}</tbody>`;
 
-    $('patternUnusualHoursTable').innerHTML=`<thead><tr><th>Hour</th><th>Events</th><th>% of total</th><th>% of peak-hour count</th><th>Active dates</th></tr></thead><tbody>${lowHours.length?lowHours.map(x=>{const ds=new Set(data.filter(r=>r.dt.getHours()===x.h).map(r=>localDateKey(r.dt)));return `<tr><td>${String(x.h).padStart(2,'0')}:00–${String((x.h+1)%24).padStart(2,'0')}:00</td><td class="num">${fmtInt(x.count)}</td><td class="num">${pct(x.count).toFixed(1)}%</td><td class="num">${peakHour?(100*x.count/peakHour).toFixed(1):'0.0'}%</td><td class="num">${fmtInt(ds.size)}</td></tr>`}).join(''):`<tr><td colspan="5" class="empty">No lower-frequency active hours under the current 20% threshold.</td></tr>`}</tbody>`;
+    $('patternUnusualHoursTable').innerHTML=`<thead><tr><th>Hour</th><th>Events</th><th>% of total</th><th>% of peak-hour count</th><th>Active dates</th></tr></thead><tbody>${lowHours.length?lowHours.map(x=>{const ds=new Set(data.filter(r=>r.dt.getHours()===x.h).map(r=>localDateKey(r.dt)));return `<tr><td><button class='link pattern-hour-filter' data-hour='${x.h}'>${String(x.h).padStart(2,'0')}:00–${String((x.h+1)%24).padStart(2,'0')}:00</button></td><td class="num">${fmtInt(x.count)}</td><td class="num">${pct(x.count).toFixed(1)}%</td><td class="num">${peakHour?(100*x.count/peakHour).toFixed(1):'0.0'}%</td><td class="num">${fmtInt(ds.size)}</td></tr>`}).join(''):`<tr><td colspan="5" class="empty">No lower-frequency active hours under the current 20% threshold.</td></tr>`}</tbody>`;
 
     const days=activeDates.slice(-31),matrix={};let max=1;
     for(const d of days)matrix[d]=Array(24).fill(0);
     for(const r of data){const d=localDateKey(r.dt);if(matrix[d]){matrix[d][r.dt.getHours()]++;max=Math.max(max,matrix[d][r.dt.getHours()]);}}
-    $('hourMatrix').innerHTML=`<table class="table"><thead><tr><th>Date</th>${Array.from({length:24},(_,h)=>`<th>${String(h).padStart(2,'0')}</th>`).join('')}</tr></thead><tbody>${days.map(d=>`<tr><td>${d}</td>${matrix[d].map(v=>`<td title="${v} event(s)" style="text-align:center;background:rgba(21,94,239,${v?0.08+0.72*v/max:0})">${v||''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    $('hourMatrix').innerHTML=`<table class="table"><thead><tr><th>Date</th>${Array.from({length:24},(_,h)=>`<th>${String(h).padStart(2,'0')}</th>`).join('')}</tr></thead><tbody>${days.map(d=>`<tr><td><button class='link day-filter' data-date='${d}'>${d}</button></td>${matrix[d].map((v,h)=>`<td title="${v} event(s)" style="text-align:center;background:rgba(21,94,239,${v?0.08+0.72*v/max:0})">${v?`<button class='link pattern-hour-date-filter' data-date='${d}' data-hour='${h}' title='Open ${v} matching record(s)'>${v}</button>`:''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 
     const top=aggregateContacts(data).slice(0,20),cd={};let cmax=1;
     for(const x of top){cd[x.bparty]={};for(const d of days)cd[x.bparty][d]=0;}
