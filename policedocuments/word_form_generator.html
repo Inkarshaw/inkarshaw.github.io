@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fill & Generate Police Document</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.8/pizzip.min.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Tahoma,sans-serif;background:#0d1b2a;color:#eef5fb}
 .top{background:#132a3f;padding:16px 20px;position:sticky;top:0;z-index:20;border-bottom:1px solid #294b67;display:flex;gap:12px;align-items:center;justify-content:space-between}
@@ -29,7 +30,8 @@ textarea{min-height:92px;resize:vertical}.section{margin:18px 0 8px;padding-top:
 <div class="wrap">
 <section class="panel">
 <h2 id="formTitle">Document Generator</h2>
-<div class="note">Fill the required details. You can edit the generated body before export. Your saved officer/station defaults stay only in this browser.</div>
+<div class="note">Fill the required details. <b>Exact Word</b> fills the existing .docx while preserving its original formatting, tables and page setup. <b>Quick Word/PDF</b> uses the preview layout. Your saved officer/station defaults stay only in this browser.</div>
+<div class="note" id="exactStatus" style="display:none"></div>
 <div class="grid">
 <div class="full"><label>Document / Form</label><input id="docTitle"></div>
 <div><label>Police Station</label><input id="station" placeholder="e.g. G7 Chetpet PS"></div>
@@ -55,7 +57,8 @@ textarea{min-height:92px;resize:vertical}.section{margin:18px 0 8px;padding-top:
 </div>
 <div class="actions">
 <button class="btn primary" id="previewBtn">↻ Update Preview</button>
-<button class="btn word" id="wordBtn">📝 Generate Word</button>
+<button class="btn word" id="exactWordBtn">🧩 Exact Word — Original Layout</button>
+<button class="btn word" id="wordBtn">📝 Quick Word</button>
 <button class="btn pdf" id="pdfBtn">📄 Generate PDF</button>
 <button class="btn ghost" id="saveBtn">💾 Save Defaults</button>
 <a class="btn ghost" id="originalBtn" href="#" target="_blank">⬇ Original Word</a>
@@ -144,6 +147,178 @@ async function downloadPdf(){
  const opt={margin:0,filename:fileBase()+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}};
  await html2pdf().set(opt).from($('paper')).save();
 }
+
+const WORD_NS='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+
+function exactFieldMap(){
+ const map={
+  station:{value:val('station'),aliases:['Police Station','P.S.','P.S','PS Name','Station']},
+  district:{value:val('district'),aliases:['District','City','Commissionerate']},
+  crimeNo:{value:val('crimeNo'),aliases:['Crime No','Crime No.','Cr.No','Cr. No','Cr No','Crime Number']},
+  sections:{value:val('sections'),aliases:['Sections','Section','U/s','U/S','Under Section']},
+  court:{value:val('court'),aliases:['Court','Name of Court','Honble Court',"Hon'ble Court"]},
+  caseNo:{value:val('caseNo'),aliases:['Case No','C.C.No','C.C. No','CC No','P.R.C.No','P.R.C. No','PRC No']},
+  accused:{value:val('accused'),aliases:['Accused','Name of Accused','Accused Name','Name of the Accused']},
+  date:{value:val('date'),aliases:['Date','Dated']},
+  time:{value:val('time'),aliases:['Time']},
+  place:{value:val('place'),aliases:['Place','Location','Place of Occurrence','Place of occurrence']},
+  officer:{value:val('officer'),aliases:['Officer Name','Name of Officer','Investigating Officer','Investigation Officer']},
+  rank:{value:val('rank'),aliases:['Rank','Designation']},
+  reference:{value:val('reference'),aliases:['Reference','Ref.No','Ref. No','Rc.No','Rc. No']},
+  subject:{value:val('subject'),aliases:['Subject','Sub']},
+  bodyText:{value:val('bodyText'),aliases:['Proceedings','Narration','Brief Facts','Facts','Details']},
+  remarks:{value:val('remarks'),aliases:['Remarks','Enclosures']}
+ };
+ const def=presets[file];
+ (def?.fields||[]).forEach(([id,label])=>{
+   const aliases=[label];
+   if(id==='witness1') aliases.push('Witness 1','Witness No.1','Witness No. 1','Panchayatdar 1','Panch Witness 1');
+   if(id==='witness2') aliases.push('Witness 2','Witness No.2','Witness No. 2','Panchayatdar 2','Panch Witness 2');
+   if(id==='property') aliases.push('Property','Articles','Material Objects','Property Details');
+   if(id==='proceedings') aliases.push('Proceedings','Observations','Judicial Proceedings');
+   if(id==='prison') aliases.push('Prison','Place of Custody','Jail');
+   if(id==='productionDate') aliases.push('Production Date','Date of Production','Produce On');
+   if(id==='prisonerNo') aliases.push('Prisoner No','Remand No','Prisoner Number');
+   if(id==='complainant') aliases.push('Complainant','Petitioner');
+   if(id==='reason') aliases.push('Reason','Grounds','Reason for Withdrawal');
+   if(id==='personAddress') aliases.push('Address','Address of Person');
+   if(id==='purpose') aliases.push('Purpose','Direction');
+   if(id==='juvenile') aliases.push('Child Name','Juvenile Name','Name of Child');
+   if(id==='parent') aliases.push('Parent','Guardian','Parent / Guardian');
+   if(id==='parentAddress') aliases.push('Parent Address','Guardian Address');
+   if(id==='home') aliases.push('Home','Institution','Children Home');
+   if(id==='guardian') aliases.push('Guardian','Parent / Guardian');
+   map[id]={value:val(id),aliases};
+ });
+ return map;
+}
+
+function nodeText(node){
+ return Array.from(node.getElementsByTagName('w:t')).map(n=>n.textContent||'').join('');
+}
+function normalizeText(s){return String(s||'').replace(/\s+/g,' ').trim().toLowerCase()}
+function looksBlank(s){
+ const x=String(s||'').replace(/\s+/g,'').trim();
+ return !x || /^[_\.\-:()\/]*$/.test(x);
+}
+function appendValueToCell(doc,cell,value){
+ let p=cell.getElementsByTagName('w:p')[0];
+ if(!p){p=doc.createElementNS(WORD_NS,'w:p');cell.appendChild(p)}
+ const r=doc.createElementNS(WORD_NS,'w:r');
+ const t=doc.createElementNS(WORD_NS,'w:t');
+ t.setAttribute('xml:space','preserve');
+ t.textContent=value;
+ r.appendChild(t);p.appendChild(r);
+}
+function replaceBlankRuns(node,value){
+ const texts=Array.from(node.getElementsByTagName('w:t'));
+ for(const t of texts){
+   const original=t.textContent||'';
+   if(/_{2,}|\.{4,}|…{2,}/.test(original)){
+     t.textContent=original.replace(/_{2,}|\.{4,}|…{2,}/,value);
+     return true;
+   }
+ }
+ return false;
+}
+function fillAdjacentTableCell(doc,cell,value){
+ const row=cell.parentNode;
+ const cells=Array.from(row.childNodes).filter(n=>n.nodeType===1 && (n.localName==='tc'||n.nodeName==='w:tc'));
+ const idx=cells.indexOf(cell);
+ if(idx<0 || idx>=cells.length-1) return false;
+ for(let i=idx+1;i<Math.min(cells.length,idx+3);i++){
+   const candidate=cells[i];
+   const txt=nodeText(candidate);
+   if(looksBlank(txt)){appendValueToCell(doc,candidate,value);return true}
+   if(replaceBlankRuns(candidate,value)) return true;
+ }
+ return false;
+}
+function escapeRegExp(s){return s.replace(/[\\^$.*+?()[\]{}|]/g,'\\async function downloadPdf(){
+ updatePreview();
+ const opt={margin:0,filename:fileBase()+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}};
+ await html2pdf().set(opt).from($('paper')).save();
+}
+')}
+function replacePlaceholders(xml,id,value){
+ const safe=value.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[m]));
+ const tokens=['{{'+id+'}}','[['+id+']]','<<'+id+'>>','__'+id.toUpperCase()+'__','{{'+id.toUpperCase()+'}}','[['+id.toUpperCase()+']]'];
+ let n=0;
+ for(const token of tokens){
+   const re=new RegExp(escapeRegExp(token),'g');
+   const matches=xml.match(re);
+   if(matches){n+=matches.length;xml=xml.replace(re,safe)}
+ }
+ return {xml,count:n};
+}
+function aliasMatch(node,aliases){
+ const txt=normalizeText(nodeText(node));
+ return aliases.some(a=>{
+   const n=normalizeText(a);
+   return n && (txt===n || txt.startsWith(n+':') || txt.startsWith(n+' :') || txt.includes(n));
+ });
+}
+async function downloadExactWord(){
+ if(!template || !/\.docx$/i.test(template)){
+   alert('Exact-layout filling is available for .docx templates. Use Quick Word for older .doc files.');
+   return;
+ }
+ const status=$('exactStatus');status.style.display='block';status.textContent='Preparing original Word template…';
+ try{
+   if(typeof PizZip==='undefined') throw new Error('Word template engine did not load.');
+   const response=await fetch(template,{cache:'no-store'});
+   if(!response.ok) throw new Error('Could not load the original Word file.');
+   const zip=new PizZip(await response.arrayBuffer());
+   const part=zip.file('word/document.xml');
+   if(!part) throw new Error('This file does not contain a standard Word document body.');
+   let xml=part.asText();
+   const fields=exactFieldMap();
+   let placeholderCount=0;
+   Object.entries(fields).forEach(([id,spec])=>{
+     if(!spec.value)return;
+     const result=replacePlaceholders(xml,id,spec.value);
+     xml=result.xml;placeholderCount+=result.count;
+   });
+
+   const doc=new DOMParser().parseFromString(xml,'application/xml');
+   if(doc.getElementsByTagName('parsererror').length) throw new Error('Could not read the Word template XML.');
+   let labelCount=0;
+   const used=new Set();
+   const cells=Array.from(doc.getElementsByTagName('w:tc'));
+
+   for(const [id,spec] of Object.entries(fields)){
+     if(!spec.value || used.has(id)) continue;
+     for(const cell of cells){
+       if(!aliasMatch(cell,spec.aliases)) continue;
+       if(replaceBlankRuns(cell,spec.value) || fillAdjacentTableCell(doc,cell,spec.value)){
+         labelCount++;used.add(id);break;
+       }
+     }
+   }
+
+   const paragraphs=Array.from(doc.getElementsByTagName('w:p'));
+   for(const [id,spec] of Object.entries(fields)){
+     if(!spec.value || used.has(id)) continue;
+     for(const p of paragraphs){
+       if(!aliasMatch(p,spec.aliases)) continue;
+       if(replaceBlankRuns(p,spec.value)){labelCount++;used.add(id);break}
+     }
+   }
+
+   zip.file('word/document.xml',new XMLSerializer().serializeToString(doc));
+   const blob=zip.generate({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+   const a=document.createElement('a');
+   a.href=URL.createObjectURL(blob);
+   a.download=fileBase()+'_filled_exact.docx';
+   a.click();
+   setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+   const total=placeholderCount+labelCount;
+   status.innerHTML='✅ Exact Word generated from the original template. <b>'+total+'</b> field location'+(total===1?'':'s')+' filled automatically. Review the file once before official use.';
+ }catch(err){
+   console.error(err);
+   status.textContent='⚠️ Exact Word could not be generated: '+err.message+' Use Quick Word/PDF instead.';
+ }
+}
 function saveDefaults(){
  const d={station:val('station'),district:val('district'),court:val('court'),officer:val('officer'),rank:val('rank')};
  localStorage.setItem('policeDocDefaults',JSON.stringify(d)); alert('Defaults saved on this device.');
@@ -158,7 +333,7 @@ $('date').value=new Date().toISOString().slice(0,10);
 if(template){$('originalBtn').href=template}else{$('originalBtn').style.display='none'}
 addFields(def); loadDefaults(); updatePreview();
 document.addEventListener('input',e=>{if(e.target.matches('input,textarea,select'))updatePreview()});
-$('previewBtn').onclick=updatePreview;$('wordBtn').onclick=downloadWord;$('pdfBtn').onclick=downloadPdf;$('saveBtn').onclick=saveDefaults;
+$('previewBtn').onclick=updatePreview;$('exactWordBtn').onclick=downloadExactWord;$('wordBtn').onclick=downloadWord;$('pdfBtn').onclick=downloadPdf;$('saveBtn').onclick=saveDefaults;
 </script>
 </body>
 </html>
