@@ -6,6 +6,8 @@
 <title>Fill & Generate Police Document</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.8/pizzip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.4.1/dist/docx-preview.min.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Tahoma,sans-serif;background:#0d1b2a;color:#eef5fb}
 .top{background:#132a3f;padding:16px 20px;position:sticky;top:0;z-index:20;border-bottom:1px solid #294b67;display:flex;gap:12px;align-items:center;justify-content:space-between}
@@ -22,6 +24,9 @@ textarea{min-height:92px;resize:vertical}.section{margin:18px 0 8px;padding-top:
 .paper{background:white;color:#111;width:210mm;min-height:297mm;margin:auto;padding:20mm 18mm;box-shadow:0 3px 16px #0003;font-family:"Times New Roman",serif;font-size:14pt;line-height:1.55}
 .paper h1{text-align:center;font-size:16pt;text-transform:uppercase;margin:0 0 20px}.paper .meta{margin-bottom:14px}.paper .row{display:flex;gap:8px;margin:4px 0}.paper .k{font-weight:bold;min-width:145px}.paper .body{white-space:pre-wrap;text-align:justify;margin-top:16px}.signature{text-align:right;margin-top:42px}.muted{color:#666;font-size:10pt}
 @media(max-width:900px){.wrap{grid-template-columns:1fr}.previewWrap{min-height:auto}.paper{width:100%;min-height:auto;padding:22px 18px}.top{position:static}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+#exactRenderHost{position:fixed;left:-100000px;top:0;background:#fff;z-index:-1}
+#exactRenderHost .docx-wrapper{background:#fff!important;padding:0!important}
+#exactRenderHost section.docx{box-shadow:none!important;margin:0!important}
 @media print{body{background:white}.top,.panel:first-child{display:none!important}.wrap{display:block;padding:0}.panel{border:0;box-shadow:none;padding:0}.previewWrap{padding:0;background:white}.paper{box-shadow:none;width:210mm;min-height:297mm;margin:0}}
 </style>
 </head>
@@ -58,14 +63,16 @@ textarea{min-height:92px;resize:vertical}.section{margin:18px 0 8px;padding-top:
 <div class="actions">
 <button class="btn primary" id="previewBtn">↻ Update Preview</button>
 <button class="btn word" id="exactWordBtn">🧩 Exact Word — Original Layout</button>
+<button class="btn pdf" id="exactPdfBtn">🧩 Exact PDF — Original Layout</button>
 <button class="btn word" id="wordBtn">📝 Quick Word</button>
-<button class="btn pdf" id="pdfBtn">📄 Generate PDF</button>
+<button class="btn pdf" id="pdfBtn">📄 Quick PDF</button>
 <button class="btn ghost" id="saveBtn">💾 Save Defaults</button>
 <a class="btn ghost" id="originalBtn" href="#" target="_blank">⬇ Original Word</a>
 </div>
 </section>
 <section class="panel"><div class="previewWrap"><article class="paper" id="paper"></article></div></section>
 </div>
+<div id="exactRenderHost" aria-hidden="true"></div>
 <script>
 const $=id=>document.getElementById(id);
 const params=new URLSearchParams(location.search);
@@ -483,66 +490,109 @@ function applyPreciseTemplate(doc,fields){
  return {used,count};
 }
 
-async function downloadExactWord(){
- if(!template || !/\.docx$/i.test(template)){
-   alert('Exact-layout filling is available for .docx templates. Use Quick Word for older .doc files.');
-   return;
+
+async function buildExactDocx(){
+ if(!template || !/\.docx$/i.test(template)) throw new Error('Exact-layout generation is available for .docx templates only.');
+ if(typeof PizZip==='undefined') throw new Error('Word template engine did not load.');
+ const response=await fetch(template,{cache:'no-store'});
+ if(!response.ok) throw new Error('Could not load the original Word file.');
+ const zip=new PizZip(await response.arrayBuffer());
+ const part=zip.file('word/document.xml');
+ if(!part) throw new Error('This file does not contain a standard Word document body.');
+
+ let xml=part.asText();
+ const fields=exactFieldMap();
+ let placeholderCount=0;
+ Object.entries(fields).forEach(([id,spec])=>{
+   if(!spec.value)return;
+   const result=replacePlaceholders(xml,id,spec.value);
+   xml=result.xml;placeholderCount+=result.count;
+ });
+
+ const doc=new DOMParser().parseFromString(xml,'application/xml');
+ if(doc.getElementsByTagName('parsererror').length) throw new Error('Could not read the Word template XML.');
+
+ const precise=applyPreciseTemplate(doc,fields);
+ let labelCount=precise.count;
+ const used=precise.used;
+ const cells=Array.from(doc.getElementsByTagName('w:tc'));
+
+ for(const [id,spec] of Object.entries(fields)){
+   if(!spec.value || used.has(id)) continue;
+   for(const cell of cells){
+     if(!aliasMatch(cell,spec.aliases)) continue;
+     if(replaceBlankRuns(cell,spec.value) || fillAdjacentTableCell(doc,cell,spec.value)){
+       labelCount++;used.add(id);break;
+     }
+   }
  }
+
+ const paragraphs=Array.from(doc.getElementsByTagName('w:p'));
+ for(const [id,spec] of Object.entries(fields)){
+   if(!spec.value || used.has(id)) continue;
+   for(const p of paragraphs){
+     if(!aliasMatch(p,spec.aliases)) continue;
+     if(replaceBlankRuns(p,spec.value)){labelCount++;used.add(id);break}
+   }
+ }
+
+ zip.file('word/document.xml',new XMLSerializer().serializeToString(doc));
+ const blob=zip.generate({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+ return {blob,total:placeholderCount+labelCount};
+}
+
+async function downloadExactWord(){
  const status=$('exactStatus');status.style.display='block';status.textContent='Preparing original Word template…';
  try{
-   if(typeof PizZip==='undefined') throw new Error('Word template engine did not load.');
-   const response=await fetch(template,{cache:'no-store'});
-   if(!response.ok) throw new Error('Could not load the original Word file.');
-   const zip=new PizZip(await response.arrayBuffer());
-   const part=zip.file('word/document.xml');
-   if(!part) throw new Error('This file does not contain a standard Word document body.');
-   let xml=part.asText();
-   const fields=exactFieldMap();
-   let placeholderCount=0;
-   Object.entries(fields).forEach(([id,spec])=>{
-     if(!spec.value)return;
-     const result=replacePlaceholders(xml,id,spec.value);
-     xml=result.xml;placeholderCount+=result.count;
-   });
-
-   const doc=new DOMParser().parseFromString(xml,'application/xml');
-   if(doc.getElementsByTagName('parsererror').length) throw new Error('Could not read the Word template XML.');
-   const precise=applyPreciseTemplate(doc,fields);
-   let labelCount=precise.count;
-   const used=precise.used;
-   const cells=Array.from(doc.getElementsByTagName('w:tc'));
-
-   for(const [id,spec] of Object.entries(fields)){
-     if(!spec.value || used.has(id)) continue;
-     for(const cell of cells){
-       if(!aliasMatch(cell,spec.aliases)) continue;
-       if(replaceBlankRuns(cell,spec.value) || fillAdjacentTableCell(doc,cell,spec.value)){
-         labelCount++;used.add(id);break;
-       }
-     }
-   }
-
-   const paragraphs=Array.from(doc.getElementsByTagName('w:p'));
-   for(const [id,spec] of Object.entries(fields)){
-     if(!spec.value || used.has(id)) continue;
-     for(const p of paragraphs){
-       if(!aliasMatch(p,spec.aliases)) continue;
-       if(replaceBlankRuns(p,spec.value)){labelCount++;used.add(id);break}
-     }
-   }
-
-   zip.file('word/document.xml',new XMLSerializer().serializeToString(doc));
-   const blob=zip.generate({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+   const built=await buildExactDocx();
    const a=document.createElement('a');
-   a.href=URL.createObjectURL(blob);
+   a.href=URL.createObjectURL(built.blob);
    a.download=fileBase()+'_filled_exact.docx';
    a.click();
    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
-   const total=placeholderCount+labelCount;
-   status.innerHTML='✅ Exact Word generated from the original template. <b>'+total+'</b> field location'+(total===1?'':'s')+' filled automatically. Review the file once before official use.';
+   status.innerHTML='✅ Exact Word generated from the original template. <b>'+built.total+'</b> field location'+(built.total===1?'':'s')+' filled automatically.';
  }catch(err){
    console.error(err);
    status.textContent='⚠️ Exact Word could not be generated: '+err.message+' Use Quick Word/PDF instead.';
+ }
+}
+
+async function downloadExactPdf(){
+ const status=$('exactStatus');status.style.display='block';status.textContent='Rendering filled original Word layout to PDF…';
+ const host=$('exactRenderHost');
+ try{
+   if(!window.docx || typeof window.docx.renderAsync!=='function') throw new Error('DOCX preview renderer did not load.');
+   const built=await buildExactDocx();
+   host.innerHTML='';
+   await window.docx.renderAsync(
+     await built.blob.arrayBuffer(),
+     host,
+     host,
+     {
+       inWrapper:true,
+       breakPages:true,
+       ignoreWidth:false,
+       ignoreHeight:false,
+       ignoreFonts:false,
+       ignoreLastRenderedPageBreak:false
+     }
+   );
+   const rendered=host.querySelector('.docx-wrapper')||host;
+   const option={
+     margin:0,
+     filename:fileBase()+'_filled_exact.pdf',
+     image:{type:'jpeg',quality:.99},
+     html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
+     jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+     pagebreak:{mode:['css','legacy'],before:'.docx-page-break'}
+   };
+   await html2pdf().set(option).from(rendered).save();
+   status.innerHTML='✅ Exact PDF generated from the filled original DOCX layout. <b>'+built.total+'</b> field location'+(built.total===1?'':'s')+' filled.';
+   host.innerHTML='';
+ }catch(err){
+   console.error(err);
+   status.textContent='⚠️ Exact PDF could not be generated: '+err.message+' Use Quick PDF instead.';
+   host.innerHTML='';
  }
 }
 
@@ -560,7 +610,7 @@ $('date').value=new Date().toISOString().slice(0,10);
 if(template){$('originalBtn').href=template}else{$('originalBtn').style.display='none'}
 addFields(def); loadDefaults(); updatePreview();
 document.addEventListener('input',e=>{if(e.target.matches('input,textarea,select'))updatePreview()});
-$('previewBtn').onclick=updatePreview;$('exactWordBtn').onclick=downloadExactWord;$('wordBtn').onclick=downloadWord;$('pdfBtn').onclick=downloadPdf;$('saveBtn').onclick=saveDefaults;
+$('previewBtn').onclick=updatePreview;$('exactWordBtn').onclick=downloadExactWord;$('exactPdfBtn').onclick=downloadExactPdf;$('wordBtn').onclick=downloadWord;$('pdfBtn').onclick=downloadPdf;$('saveBtn').onclick=saveDefaults;
 </script>
 </body>
 </html>
