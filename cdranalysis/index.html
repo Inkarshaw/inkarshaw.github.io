@@ -337,6 +337,12 @@
       </div>
 
       <section id="dashboard" class="view">
+        <div class="panel no-print" style="padding:10px 12px">
+          <div class="subtoolbar" style="margin:0">
+            <div class="field" style="min-width:260px"><label>Dashboard subject</label><select id="dashboardCdr"><option value="">All subjects</option></select></div>
+            <div class="tiny" id="dashboardScopeText">Showing all subjects within the current filters.</div>
+          </div>
+        </div>
         <div class="kpis" id="kpis"></div>
         <div class="panel no-print"><div class="panel-title"><h2>Case dashboard</h2><button class="btn secondary small" id="saveCaseSnapshotBtn">Save case snapshot</button></div><div id="caseSnapshots" class="tiny"></div></div>
         <div class="charts">
@@ -597,7 +603,15 @@
   function renderFileList(){$('fileList').innerHTML=state.files.map(f=>`<div class="file-item"><b title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</b><span>${f.inferredCdr?escapeHtml(f.inferredCdr)+' • ':''}${escapeHtml(f.sheet)} • ${fmtInt(f.rows)} <button class="file-remove" data-remove-file="${f.id}" title="Remove file">×</button></span></div>`).join('');}
   function uniq(key){return [...new Set(state.records.map(r=>r[key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));}
   function fillSelect(id,items,label){const el=$(id),cur=el.value;el.innerHTML=`<option value="">${label}</option>`+items.map(x=>`<option>${escapeHtml(x)}</option>`).join('');if(items.includes(cur))el.value=cur;}
-  function refreshSelectors(){fillSelect('callType',uniq('callType'),'All event types');fillSelect('cdrNo',uniq('cdrNo'),'All CDR numbers');fillSelect('sourceFile',uniq('sourceFile'),'All files');const mc=uniq('cdrNo');fillSelect('movementCdr',mc,'Select subject');if(!$('movementCdr').value&&mc.length)$('movementCdr').value=mc[0];}
+  function refreshSelectors(){
+    fillSelect('callType',uniq('callType'),'All event types');
+    fillSelect('cdrNo',uniq('cdrNo'),'All CDR numbers');
+    fillSelect('sourceFile',uniq('sourceFile'),'All files');
+    const mc=uniq('cdrNo');
+    fillSelect('movementCdr',mc,'Select subject');
+    fillSelect('dashboardCdr',mc,'All subjects');
+    if(!$('movementCdr').value&&mc.length)$('movementCdr').value=mc[0];
+  }
 
   function matchesSmartQuery(r,q){
     q=String(q||'').trim();if(!q)return true;const tokens=q.match(/"[^"]*"|\S+/g)||[];
@@ -650,9 +664,13 @@
   function renderCaseSnapshots(){const rows=caseSnapshots();const el=$('caseSnapshots');if(!el)return;el.innerHTML=rows.length?rows.map((x,i)=>`<div class="file-item"><b>${escapeHtml(x.caseNo||x.title||'Untitled case')}</b><span>${escapeHtml(x.title||'')} • ${escapeHtml(x.station||'')} • ${escapeHtml(x.incidentDate||'')} <button class="btn secondary small load-case-snapshot" data-i="${i}">Open</button> <button class="file-remove delete-case-snapshot" data-i="${i}">×</button></span></div>`).join(''):'No case snapshots saved yet.';}
   function saveCaseSnapshot(){const rows=caseSnapshots();rows.unshift({title:$('caseTitle').value,caseNo:$('caseNo').value,station:$('station').value,analyst:$('analyst').value,incidentDate:$('incidentDate').value,incidentTime:$('incidentTime').value,savedAt:new Date().toISOString()});persistLocal('cdrAnalyzer:caseSnapshots',JSON.stringify(rows.slice(0,50)));renderCaseSnapshots();}
   function renderDashboard(){
-    renderCaseSnapshots();const d=state.filtered, contacts=aggregateContacts(d), locs=aggregateLocations(d), devs=aggregateDevices(d), calls=d.filter(r=>normalize(r.callType).includes('call')), sms=d.filter(r=>normalize(r.callType).includes('sms')), duration=calls.reduce((s,r)=>s+r.duration,0), dates=d.filter(r=>r.dt).map(r=>r.dt);
+    renderCaseSnapshots();
+    const selected=$('dashboardCdr')?.value||'';
+    const d=selected?state.filtered.filter(r=>r.cdrNo===selected):state.filtered;
+    if($('dashboardScopeText'))$('dashboardScopeText').textContent=selected?`Showing dashboard for ${selected} • ${fmtInt(d.length)} records within current filters.`:`Showing all subjects • ${fmtInt(d.length)} records within current filters.`;
+    const contacts=aggregateContacts(d), locs=aggregateLocations(d), devs=aggregateDevices(d), calls=d.filter(r=>normalize(r.callType).includes('call')), sms=d.filter(r=>normalize(r.callType).includes('sms')), duration=calls.reduce((s,r)=>s+r.duration,0), dates=d.filter(r=>r.dt).map(r=>r.dt);
     const min=dates.length?new Date(Math.min(...dates)):null,max=dates.length?new Date(Math.max(...dates)):null; const uniqueImei=new Set(d.map(r=>r.imei).filter(Boolean)).size, uniqueImsi=new Set(d.map(r=>r.imsi).filter(Boolean)).size;
-    const k=[['Filtered records',fmtInt(d.length),`${fmtInt(state.records.length)} loaded`],['Unique contacts',fmtInt(contacts.length),`${fmtInt(calls.length)} call records`],['Total call duration',fmtDur(duration),`${fmtInt(sms.length)} SMS records`],['Unique towers',fmtInt(locs.length),min&&max?`${dateFmt(min)} – ${dateFmt(max)}`:'—'],['IMEI',fmtInt(uniqueImei),`${fmtInt(uniqueImsi)} IMSI`],['CDR numbers',fmtInt(new Set(d.map(r=>r.cdrNo).filter(Boolean)).size),`${fmtInt(state.files.length)} file(s)`]];
+    const k=[['Dashboard records',fmtInt(d.length),selected?`Subject ${selected}`:`${fmtInt(state.records.length)} loaded`],['Unique contacts',fmtInt(contacts.length),`${fmtInt(calls.length)} call records`],['Total call duration',fmtDur(duration),`${fmtInt(sms.length)} SMS records`],['Unique towers',fmtInt(locs.length),min&&max?`${dateFmt(min)} – ${dateFmt(max)}`:'—'],['IMEI',fmtInt(uniqueImei),`${fmtInt(uniqueImsi)} IMSI`],['CDR numbers',fmtInt(new Set(d.map(r=>r.cdrNo).filter(Boolean)).size),`${fmtInt(state.files.length)} file(s)`]];
     $('kpis').innerHTML=k.map(x=>`<div class="kpi"><div class="v">${x[1]}</div><div class="l">${x[0]}</div><div class="s">${x[2]}</div></div>`).join(''); $('topContactBadge').textContent=contacts.length;
     renderCharts(d,contacts);
     $('dashLocations').innerHTML=simpleTable(['Cell ID / location','Records','Contacts'],locs.slice(0,8).map(x=>[escapeHtml(x.cellId||x.address||'—'),fmtInt(x.records),fmtInt(x.contacts.size)]));
@@ -1133,6 +1151,7 @@
   $('recordsTable').addEventListener('click',e=>{const th=e.target.closest('th[data-sort]');if(!th)return;const k=th.dataset.sort;if(k==='flag')return;if(state.sort.key===k)state.sort.dir=state.sort.dir==='asc'?'desc':'asc';else state.sort={key:k,dir:k==='dt'?'asc':'desc'};renderRecords();});
   $('prevPage').onclick=()=>{if(state.page>1){state.page--;renderRecords();}};$('nextPage').onclick=()=>{const p=Math.ceil(state.filtered.length/state.pageSize);if(state.page<p){state.page++;renderRecords();}};$('pageSize').onchange=()=>{state.page=1;renderRecords();};
   $('flagList').addEventListener('input',e=>{if(e.target.classList.contains('row-note'))state.notes[e.target.dataset.id]=e.target.value;});
+  $('dashboardCdr').onchange=renderDashboard;
   $('identityScope').onchange=renderContacts;
   $('contactsTable').addEventListener('change',e=>{
     if(e.target.classList.contains('contact-tag')){
