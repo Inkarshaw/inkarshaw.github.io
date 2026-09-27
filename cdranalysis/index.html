@@ -380,7 +380,7 @@
       <section id="smsintel" class="view hidden">
         <div class="panel">
           <div class="panel-title"><h2>SMS Sender Intelligence</h2><span class="muted">Brand-like sender IDs and timing metadata</span></div>
-          <div class="notice"><b>SMS metadata inference only.</b> A sender ID such as VM-SWIGGY, AD-AMAZON or VK-ZOMATO can indicate that an SMS associated with that sender label was recorded. It does not prove that an order, delivery, payment, login, booking or other underlying action actually occurred. Correlations below are based only on timestamps and CDR metadata and require independent corroboration.</div>
+          <div class="notice"><b>SMS metadata inference only.</b> A sender ID such as VM-SWIGGY, AD-AMAZON or VK-ZOMATO can indicate that an SMS associated with that sender label was recorded. It does not prove that an order, delivery, payment, login, booking or other underlying action actually occurred. Rows with an explicit SMS event are labelled accordingly; recognizable sender-ID rows without a usable event label are included as <b>Sender-ID inference</b>. This tab uses the loaded raw CDR records and its own filters, so the global “Exclude service / OTP-like senders” filter does not hide these rows.</div>
           <div class="subtoolbar no-print">
             <div class="field"><label>Subject / MSISDN</label><select id="smsIntelCdr"><option value="">All subjects</option></select></div>
             <div class="field"><label>From date</label><input type="date" id="smsIntelFrom"></div>
@@ -569,11 +569,19 @@
     const label=brand.length<=4?brand:brand.charAt(0)+brand.slice(1).toLowerCase();
     return {raw,key:brand,label};
   }
-  function isSmsRecord(r){return normalize(r?.callType).includes('sms');}
+  function smsRecordBasis(r){
+    const typ=normalize(r?.callType),bi=senderBrandInfo(r?.bparty);
+    if(!bi)return '';
+    if(typ.includes('sms'))return 'Explicit SMS event';
+    if(typ.includes('call'))return '';
+    if(isServiceSender(r?.bparty)||/[A-Za-z]/.test(String(r?.bparty||'')))return 'Sender-ID inference';
+    return '';
+  }
+  function isSmsRecord(r){return !!smsRecordBasis(r);}
   function smsIntelRows(){
     const subject=$('smsIntelCdr')?.value||'',from=$('smsIntelFrom')?.value||'',to=$('smsIntelTo')?.value||'';
-    return state.filtered.filter(r=>{
-      if(!r.dt||!isSmsRecord(r)||!senderBrandInfo(r.bparty))return false;
+    return state.records.filter(r=>{
+      if(!r.dt||!smsRecordBasis(r))return false;
       if(subject&&r.cdrNo!==subject)return false;
       const d=localDateKey(r.dt);if(from&&d<from)return false;if(to&&d>to)return false;
       return true;
@@ -582,8 +590,8 @@
   function smsSenderIntelligence(data=smsIntelRows()){
     const callWindow=(+$('smsIntelCallMins')?.value||10)*60000,idWindow=(+$('smsIntelIdMins')?.value||60)*60000;
     const nightFrom=timeMins($('smsIntelNightFrom')?.value||'22:00'),nightTo=timeMins($('smsIntelNightTo')?.value||'06:00');
-    const calls=state.filtered.filter(r=>r.dt&&normalize(r.callType).includes('call')).sort((a,b)=>a.dt-b.dt);
-    const idChanges=analyzeIdentifiers(state.filtered).events;
+    const calls=state.records.filter(r=>r.dt&&normalize(r.callType).includes('call')).sort((a,b)=>a.dt-b.dt);
+    const idChanges=analyzeIdentifiers(state.records).events;
     const brands=new Map(),timeline=[];
     for(const r of data){
       const bi=senderBrandInfo(r.bparty);if(!bi)continue;
@@ -594,7 +602,7 @@
       if(!b)b={key:bi.key,label:bi.label,senderIds:new Set(),count:0,first:null,last:null,days:new Set(),unusual:0,subjects:new Set(),towers:new Set(),nearCalls:0,nearIds:0};
       b.senderIds.add(r.bparty);b.count++;b.days.add(localDateKey(r.dt));if(unusual)b.unusual++;if(r.cdrNo)b.subjects.add(r.cdrNo);if(r.firstCellId||r.firstAddress)b.towers.add(r.firstCellId||r.firstAddress);b.nearCalls+=nearbyCalls.length;b.nearIds+=nearbyIds.length;
       if(!b.first||r.dt<b.first)b.first=r.dt;if(!b.last||r.dt>b.last)b.last=r.dt;brands.set(bi.key,b);
-      timeline.push({record:r,brand:bi.label,senderId:r.bparty,unusual,nearbyCalls:nearbyCalls.length,nearbyIds:nearbyIds.length});
+      timeline.push({record:r,brand:bi.label,senderId:r.bparty,basis:smsRecordBasis(r),unusual,nearbyCalls:nearbyCalls.length,nearbyIds:nearbyIds.length});
     }
     return {brands:[...brands.values()].sort((a,b)=>b.count-a.count||a.label.localeCompare(b.label)),timeline,callWindowMin:callWindow/60000,idWindowMin:idWindow/60000};
   }
@@ -1041,9 +1049,12 @@
       $('smsIntelBrandTable').innerHTML='';$('smsIntelTimelineTable').innerHTML='';return;
     }
     const rows=smsIntelRows(),A=smsSenderIntelligence(rows),unusual=A.timeline.filter(x=>x.unusual).length,callLinked=A.timeline.filter(x=>x.nearbyCalls>0).length,idLinked=A.timeline.filter(x=>x.nearbyIds>0).length;
-    $('smsIntelSummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(rows.length)}</div><div class="l">Sender-ID SMS</div></div><div class="kpi"><div class="v">${fmtInt(A.brands.length)}</div><div class="l">Recognizable brands</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(r=>r.bparty)).size)}</div><div class="l">Raw sender IDs</div></div><div class="kpi"><div class="v">${fmtInt(unusual)}</div><div class="l">Unusual-time SMS</div></div><div class="kpi"><div class="v">${fmtInt(callLinked)}</div><div class="l">SMS with call ±${A.callWindowMin}m</div></div><div class="kpi"><div class="v">${fmtInt(idLinked)}</div><div class="l">SMS near ID change ±${A.idWindowMin}m</div></div></div>`;
+    const explicit=A.timeline.filter(x=>x.basis==='Explicit SMS event').length,inferred=A.timeline.filter(x=>x.basis==='Sender-ID inference').length;
+    const recognizableLoaded=state.records.filter(r=>senderBrandInfo(r.bparty)).length,recognizableWithDt=state.records.filter(r=>r.dt&&senderBrandInfo(r.bparty)).length;
+    $('smsIntelSummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(rows.length)}</div><div class="l">Sender-ID SMS candidates</div></div><div class="kpi"><div class="v">${fmtInt(explicit)}</div><div class="l">Explicit SMS events</div></div><div class="kpi"><div class="v">${fmtInt(inferred)}</div><div class="l">Sender-ID inferred</div></div><div class="kpi"><div class="v">${fmtInt(A.brands.length)}</div><div class="l">Recognizable brands</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(r=>r.bparty)).size)}</div><div class="l">Raw sender IDs</div></div><div class="kpi"><div class="v">${fmtInt(unusual)}</div><div class="l">Unusual-time SMS</div></div><div class="kpi"><div class="v">${fmtInt(callLinked)}</div><div class="l">SMS with call ±${A.callWindowMin}m</div></div><div class="kpi"><div class="v">${fmtInt(idLinked)}</div><div class="l">SMS near ID change ±${A.idWindowMin}m</div></div></div>`+
+      (rows.length?'':`<div class="notice" style="margin-top:10px">No sender-ID records match the SMS Intelligence filters. Loaded data contains ${fmtInt(recognizableLoaded)} recognizable sender-ID row(s), of which ${fmtInt(recognizableWithDt)} have a parsed date/time. Clear the SMS Intelligence subject/date range if needed.</div>`);
     $('smsIntelBrandTable').innerHTML=`<thead><tr><th>Brand inference</th><th>Raw sender ID(s)</th><th>SMS</th><th>First seen</th><th>Last seen</th><th>Active days</th><th>Unusual-time</th><th>Subjects</th><th>Towers</th><th>Nearby calls</th><th>Nearby IMSI/IMEI changes</th></tr></thead><tbody>${A.brands.map(x=>`<tr><td><b>${escapeHtml(x.label)}</b></td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td><td class="num">${fmtInt(x.count)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td class="num">${fmtInt(x.days.size)}</td><td class="num">${fmtInt(x.unusual)}</td><td class="details">${escapeHtml([...x.subjects].join(', ')||'—')}</td><td class="num">${fmtInt(x.towers.size)}</td><td class="num">${fmtInt(x.nearCalls)}</td><td class="num">${fmtInt(x.nearIds)}</td></tr>`).join('')}</tbody>`;
-    $('smsIntelTimelineTable').innerHTML=`<thead><tr><th>Date / Time</th><th>Subject</th><th>Sender ID</th><th>Brand inference</th><th>Timing</th><th>Tower metadata</th><th>IMEI</th><th>IMSI</th><th>Calls ±${A.callWindowMin}m</th><th>ID changes ±${A.idWindowMin}m</th><th>Source</th></tr></thead><tbody>${A.timeline.slice(0,3000).map(x=>{const r=x.record;return `<tr><td>${dtFmt(r.dt)}</td><td>${escapeHtml(r.cdrNo||'—')}</td><td>${escapeHtml(x.senderId)}</td><td><b>${escapeHtml(x.brand)}</b></td><td>${x.unusual?'<span class="pill">Unusual-time</span>':'Normal window'}</td><td class="details">${escapeHtml(r.firstAddress||r.firstCellId||'—')}</td><td>${escapeHtml(r.imei||'—')}</td><td>${escapeHtml(r.imsi||'—')}</td><td class="num">${fmtInt(x.nearbyCalls)}</td><td class="num">${fmtInt(x.nearbyIds)}</td><td>${escapeHtml(r.sourceFile||'')} • row ${r.rowNumber||''}</td></tr>`}).join('')}</tbody>`;
+    $('smsIntelTimelineTable').innerHTML=`<thead><tr><th>Date / Time</th><th>Subject</th><th>Sender ID</th><th>Brand inference</th><th>Basis</th><th>Timing</th><th>Tower metadata</th><th>IMEI</th><th>IMSI</th><th>Calls ±${A.callWindowMin}m</th><th>ID changes ±${A.idWindowMin}m</th><th>Source</th></tr></thead><tbody>${A.timeline.slice(0,3000).map(x=>{const r=x.record;return `<tr><td>${dtFmt(r.dt)}</td><td>${escapeHtml(r.cdrNo||'—')}</td><td>${escapeHtml(x.senderId)}</td><td><b>${escapeHtml(x.brand)}</b></td><td>${escapeHtml(x.basis)}</td><td>${x.unusual?'<span class="pill">Unusual-time</span>':'Normal window'}</td><td class="details">${escapeHtml(r.firstAddress||r.firstCellId||'—')}</td><td>${escapeHtml(r.imei||'—')}</td><td>${escapeHtml(r.imsi||'—')}</td><td class="num">${fmtInt(x.nearbyCalls)}</td><td class="num">${fmtInt(x.nearbyIds)}</td><td>${escapeHtml(r.sourceFile||'')} • row ${r.rowNumber||''}</td></tr>`}).join('')}</tbody>`;
   }
 
   function renderIncident(){
@@ -1403,7 +1414,7 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
     const repeatedIdentifierChanges=ident.repeatedSwaps.map(x=>({'MSISDN / Subject':x.msisdn,'Transition Count':x.count,'IMSIs':[...x.imsis].join(', '),'IMEIs':[...x.imeis].join(', ')}));
     const smsIntel=smsSenderIntelligence();
     const smsSenderSummary=smsIntel.brands.map(x=>({'Brand Inference':x.label,'Raw Sender IDs':[...x.senderIds].join(', '),'SMS Count':x.count,'First Seen':dtFmt(x.first),'Last Seen':dtFmt(x.last),'Active Days':x.days.size,'Unusual-time SMS':x.unusual,'Subjects / MSISDN':[...x.subjects].join(', '),'Distinct Towers':x.towers.size,'Nearby Calls':x.nearCalls,'Nearby IMSI/IMEI Changes':x.nearIds,'Inference Note':'SMS metadata inference only; not proof of underlying transaction/action'}));
-    const smsSenderTimeline=smsIntel.timeline.map(x=>{const r=x.record;return {'Date/Time':dtFmt(r.dt),'Subject / MSISDN':r.cdrNo,'Raw Sender ID':x.senderId,'Brand Inference':x.brand,'Unusual-time':x.unusual?'Yes':'No','Tower':r.firstAddress||r.firstCellId,'IMEI':r.imei,'IMSI':r.imsi,'Calls Nearby':x.nearbyCalls,'ID Changes Nearby':x.nearbyIds,'Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber};});
+    const smsSenderTimeline=smsIntel.timeline.map(x=>{const r=x.record;return {'Date/Time':dtFmt(r.dt),'Subject / MSISDN':r.cdrNo,'Raw Sender ID':x.senderId,'Brand Inference':x.brand,'Basis':x.basis,'Unusual-time':x.unusual?'Yes':'No','Tower':r.firstAddress||r.firstCellId,'IMEI':r.imei,'IMSI':r.imsi,'Calls Nearby':x.nearbyCalls,'ID Changes Nearby':x.nearbyIds,'Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber};});
     const movement=movementRows().map((x,i)=>({'#':i+1,'Start':dtFmt(x.start),'End':dtFmt(x.end),'Cell ID':x.cellId,'Tower Address':x.address,'Events':x.events,'Contacts':[...x.contacts].map(contactLabel).join(', '),'Duration Seconds':x.duration,'Latitude':x.lat??'','Longitude':x.lng??'','Next Distance km':x.nextDistance==null?'':+x.nextDistance.toFixed(2),'Gap Minutes':x.nextMinutes==null?'':Math.round(x.nextMinutes)}));
     const overlaps=colocationEpisodes(state.filtered,+$('colocationMins').value||30,+$('episodeGapMins').value||60).map(x=>({'Subject A':x.a,'Subject B':x.b,'Cell ID':x.cell,'Tower Address':x.address,'Episode Start':dtFmt(x.start),'Episode End':dtFmt(x.end),'Records A':x.recordsA,'Records B':x.recordsB,'Raw Candidate Matches':x.rawMatches,'Closest Gap Minutes':+x.minGap.toFixed(2)}));
     const flags=state.records.filter(r=>state.flags.has(r.id)).map(r=>({'Contact':contactLabel(r.bparty),'Number':r.bparty,'Date/Time':dtFmt(r.dt),'Type':r.callType,'Duration Seconds':r.duration,'Cell ID':r.firstCellId,'Tower':r.firstAddress,'IMEI':r.imei,'IMSI':r.imsi,'Note':state.notes[r.id]||'','Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber}));
