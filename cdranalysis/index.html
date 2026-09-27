@@ -558,7 +558,7 @@
       const id=++parserWorkerSeq;
       const cleanup=()=>{try{worker.terminate()}catch{}};
       worker.onmessage=e=>{const m=e.data||{};if(m.id!==id)return;cleanup();m.ok?resolve({sheetName:m.sheetName,rows:m.rows}):reject(new Error(m.error||'Worker parsing failed'));};
-      worker.onerror=e=>{cleanup();try{resolve(parseFileOnMain(buffer));}catch(err){reject(err);}};
+      worker.onerror=e=>{cleanup();file.arrayBuffer().then(b=>resolve(parseFileOnMain(b))).catch(reject);};
       worker.postMessage({id,buffer,name:file.name},[buffer]);
     });
   }
