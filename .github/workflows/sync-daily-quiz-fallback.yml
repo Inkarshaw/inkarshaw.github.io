@@ -45,7 +45,9 @@ jobs:
               missing = [h for h in required if h not in normalized]
               if missing:
                   raise SystemExit("Daily Quiz Feed is missing columns: " + ", ".join(missing))
+              from collections import Counter
               valid = 0
+              coverage = Counter()
               for raw in reader:
                   row = {k.strip(): (v or "").strip() for k, v in raw.items() if k is not None}
                   if row.get("Active","").lower() == "false":
@@ -57,8 +59,18 @@ jobs:
                   if not all(row.get("Option"+x) and row.get("Explanation"+x) for x in "ABCD"):
                       continue
                   valid += 1
-              if valid < 10:
-                  raise SystemExit(f"Daily Quiz Feed has only {valid} valid active questions; refusing to overwrite the working fallback")
+                  coverage[row["Exam"]] += 1
+              required_coverage = {
+                  "TNPSC Group IV": 10,
+                  "TNUSRB": 10,
+                  "UPSC": 10,
+                  "SSC": 10,
+                  "Banking": 10,
+                  "Railways": 10,
+              }
+              missing = [f"{exam}: {coverage.get(exam,0)}/{minimum}" for exam, minimum in required_coverage.items() if coverage.get(exam,0) < minimum]
+              if missing:
+                  raise SystemExit("Daily Quiz Feed lacks required multi-exam coverage; refusing to overwrite fallback: " + ", ".join(missing))
               print(valid)
           PY
 
