@@ -2476,6 +2476,35 @@
             renderRecents();
         }
 
+        function setupWordFormGenerators() {
+            document.querySelectorAll('.document-item').forEach(item => {
+                const actions = item.querySelector('.doc-actions');
+                if (!actions || actions.querySelector('.btn-fill-generate')) return;
+
+                const wordLink = Array.from(actions.querySelectorAll('a')).find(link => {
+                    const href = (link.getAttribute('href') || '').split('?')[0].toLowerCase();
+                    return href.endsWith('.doc') || href.endsWith('.docx');
+                });
+                if (!wordLink) return;
+
+                const title = item.getAttribute('data-title') ||
+                    item.querySelector('.doc-title')?.textContent?.trim() ||
+                    'Police Document';
+                const template = wordLink.getAttribute('href');
+
+                const generateLink = document.createElement('a');
+                generateLink.className = 'btn btn-generate btn-fill-generate';
+                generateLink.textContent = '✍️ Fill & Generate';
+                generateLink.href = '/policedocuments/word_form_generator.html?template=' +
+                    encodeURIComponent(template) + '&title=' + encodeURIComponent(title);
+                generateLink.target = '_blank';
+                generateLink.rel = 'noopener';
+                generateLink.dataset.document = title + ' - Fill & Generate';
+                generateLink.title = 'Fill details and generate an editable Word file or PDF';
+                actions.appendChild(generateLink);
+            });
+        }
+
         function setupGlobalLinkHandlers() {
             document.querySelectorAll('.doc-actions a').forEach(link => {
                 if (link.getAttribute('href') === '#' || link.getAttribute('href') === 'javascript:void(0)' || link
@@ -2528,6 +2557,7 @@
             const searchButton = document.getElementById('searchButton');
             if (searchInput) searchInput.addEventListener('input', performSearch);
             if (searchButton) searchButton.addEventListener('click', performSearch);
+            setupWordFormGenerators();
             setupGlobalLinkHandlers();
             updateDashboardStats();
             setupMobileNavigation();
