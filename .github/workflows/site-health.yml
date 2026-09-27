@@ -29,6 +29,7 @@ jobs:
           python3 -m json.tool current-affairs/pdfs.json >/dev/null
           python3 - <<'PY'
           import csv, json, pathlib, re, urllib.parse, xml.etree.ElementTree as ET
+          from collections import Counter
           tree = ET.parse("sitemap.xml")
           root = tree.getroot()
           if len(root) < 10:
@@ -53,11 +54,26 @@ jobs:
               rows = list(csv.DictReader(f))
           if len(rows) < 10:
               raise SystemExit("daily-quiz.csv has fewer than 10 question rows")
-          required = {"ID","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer"}
+          required = {"ID","Active","Exam","Topic","Subtopic","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer","ExplanationA","ExplanationB","ExplanationC","ExplanationD"}
           if not rows or not required.issubset(rows[0].keys()):
               raise SystemExit("daily-quiz.csv is missing required columns")
 
           routes = json.loads(pathlib.Path("data/exams/exam-routes.json").read_text(encoding="utf-8"))
+          coverage = Counter()
+          for row in rows:
+              if str(row.get("Active","")).lower() == "false":
+                  continue
+              if not row.get("Exam") or not row.get("Topic") or not row.get("Subtopic") or not row.get("Question"):
+                  continue
+              if str(row.get("CorrectAnswer","")).upper() not in {"A","B","C","D"}:
+                  continue
+              if not all(row.get("Option"+x) and row.get("Explanation"+x) for x in "ABCD"):
+                  continue
+              coverage[row["Exam"]] += 1
+          for family, route in routes.items():
+              quiz_exam = route.get("quizExam")
+              if coverage.get(quiz_exam, 0) < 10:
+                  raise SystemExit(f"{family}.quizExam has only {coverage.get(quiz_exam,0)} valid fallback questions: {quiz_exam}")
           catalog = json.loads(pathlib.Path("data/exams/exam-catalog.json").read_text(encoding="utf-8"))
           catalog_ids = {item["id"] for body in catalog.values() for item in body.get("items", [])}
           syllabus_text = pathlib.Path("syllabus.html").read_text(encoding="utf-8")
