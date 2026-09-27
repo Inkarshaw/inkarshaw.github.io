@@ -96,6 +96,27 @@ jobs:
           for key, minimum in subject_requirements.items():
               if subject_coverage.get(key, 0) < minimum:
                   raise SystemExit(f"Quiz subject bank {key[0]} → {key[1]} has only {subject_coverage.get(key,0)} rows; need {minimum}")
+
+          shared_topic_requirements = {
+              "Indian Polity": 10,
+              "History": 10,
+              "Geography": 10,
+              "Indian Economy": 10,
+              "Science & Technology": 10,
+              "Environment": 10,
+              "Current Affairs": 10,
+              "Tamil Nadu GK": 10,
+              "Aptitude": 10,
+              "English": 10,
+              "Tamil": 10,
+          }
+          shared_topic_coverage = Counter()
+          for row in rows:
+              if row.get("Exam") == "UPSC/TNPSC" and row.get("Topic") and row.get("Question"):
+                  shared_topic_coverage[row["Topic"]] += 1
+          for topic, minimum in shared_topic_requirements.items():
+              if shared_topic_coverage.get(topic, 0) < minimum:
+                  raise SystemExit(f"Shared UPSC/TNPSC topic bank {topic} has only {shared_topic_coverage.get(topic,0)} rows; need {minimum}")
           catalog = json.loads(pathlib.Path("data/exams/exam-catalog.json").read_text(encoding="utf-8"))
           catalog_ids = {item["id"] for body in catalog.values() for item in body.get("items", [])}
           syllabus_text = pathlib.Path("syllabus.html").read_text(encoding="utf-8")
