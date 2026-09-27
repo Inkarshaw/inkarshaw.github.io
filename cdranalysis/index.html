@@ -636,6 +636,20 @@
   }
   function imeiDigits(v){return String(v??'').replace(/\D/g,'');}
   function tacFromImei(v){const d=imeiDigits(v);return d.length>=14&&d.length<=16?d.slice(0,8):'';}
+  const BUILTIN_TAC_MAP={
+    '35499663':{tac:'35499663',manufacturer:'Samsung',model:'Galaxy A05',deviceType:'SM-A055F/DS (2023)',source:'Built-in verified TAC mapping'},
+    '35738339':{tac:'35738339',manufacturer:'Samsung',model:'Galaxy A05',deviceType:'SM-A055F/DS (2023)',source:'Built-in verified TAC mapping'}
+  };
+  function seedBuiltinTacMappings(){
+    let changed=false;
+    for(const [tac,entry] of Object.entries(BUILTIN_TAC_MAP)){
+      if(state.tacCache[tac])continue;
+      state.tacCache[tac]={...entry,updatedAt:new Date().toISOString()};
+      changed=true;
+    }
+    if(changed)saveTacCache();else updateTacStatus();
+  }
+
   function normalizeTacEntry(tac,manufacturer,model,deviceType,source='Imported'){
     const t=String(tac??'').replace(/\D/g,'').slice(0,8);if(!/^\d{8}$/.test(t))return null;
     const mfr=String(manufacturer??'').trim(),mdl=String(model??'').trim(),typ=String(deviceType??'').trim();
@@ -1538,6 +1552,7 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
   window.addEventListener('resize',()=>{const n=document.getElementById('network');if(n&&!n.classList.contains('hidden'))renderNetwork();});
   try{state.globalContactTags=JSON.parse(localStorage.getItem('cdrAnalyzer:globalContactTags')||localStorage.getItem('cdrAnalyzer:contactTags')||'{}')||{};}catch{state.globalContactTags={};}
   try{state.tacCache=JSON.parse(localStorage.getItem('cdrAnalyzer:tacCache')||'{}')||{};}catch{state.tacCache={};}
+  seedBuiltinTacMappings();
   try{state.globalContactNames=JSON.parse(localStorage.getItem('cdrAnalyzer:globalContactNames')||localStorage.getItem('cdrAnalyzer:contactNames')||'{}')||{};}catch{state.globalContactNames={};}
   state.contactTags={};state.contactNames={};
   if(!localStorage.getItem('cdrAnalyzer:globalContactTags')&&Object.keys(state.globalContactTags).length)persistLocal('cdrAnalyzer:globalContactTags',JSON.stringify(state.globalContactTags));
