@@ -528,12 +528,31 @@
   }
   function detectSheet(wb){if(wb.Sheets.Mapping)return 'Mapping'; let best=wb.SheetNames[0],max=0; wb.SheetNames.forEach(n=>{const ws=wb.Sheets[n]; const ref=ws['!ref']; if(ref){const r=XLSX.utils.decode_range(ref);const rows=r.e.r-r.s.r+1;if(rows>max){max=rows;best=n;}}}); return best;}
 
+  function parseFileOnMain(buffer){
+    const wb=XLSX.read(buffer,{type:'array',cellDates:true});const sheetName=detectSheet(wb),ws=wb.Sheets[sheetName];
+    return {sheetName,rows:XLSX.utils.sheet_to_json(ws,{defval:'',raw:false})};
+  }
+  let parserWorkerSeq=0;
+  function parseFileInWorker(file){
+    return new Promise(async(resolve,reject)=>{
+      const buffer=await file.arrayBuffer();
+      if(typeof Worker==='undefined'){try{return resolve(parseFileOnMain(buffer));}catch(e){return reject(e);}}
+      const worker=new Worker('/cdranalysis/cdr-parser-worker.js');
+      const id=++parserWorkerSeq;
+      const cleanup=()=>{try{worker.terminate()}catch{}};
+      worker.onmessage=e=>{const m=e.data||{};if(m.id!==id)return;cleanup();m.ok?resolve({sheetName:m.sheetName,rows:m.rows}):reject(new Error(m.error||'Worker parsing failed'));};
+      worker.onerror=e=>{cleanup();try{resolve(parseFileOnMain(buffer));}catch(err){reject(err);}};
+      worker.postMessage({id,buffer,name:file.name},[buffer]);
+    });
+  }
+
   async function loadFiles(files){
     if(!files.length)return; showStatus(`Reading ${files.length} file(s)…`,'');
     for(const file of files){
       try{
-        const data=await file.arrayBuffer(); const wb=XLSX.read(data,{type:'array',cellDates:true}); const sheetName=detectSheet(wb); const ws=wb.Sheets[sheetName];
-        const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false}); if(!rows.length)throw new Error('No rows found');
+        showStatus(`Parsing ${file.name} in background…`,'');
+        const parsed=await parseFileInWorker(file),sheetName=parsed.sheetName,rows=parsed.rows;
+        if(!rows.length)throw new Error('No rows found');
         const headers=Object.keys(rows[0]); const map=mapHeaders(headers); if(!map.bparty && !map.cdrNo && !map.date)throw new Error('Could not identify standard CDR columns');
         const fileId=++state.fileSeq; const inferredCdr=inferCdrFromFilename(file.name); let added=0;
         rows.forEach((r,idx)=>{
