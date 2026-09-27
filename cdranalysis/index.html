@@ -634,17 +634,42 @@
     if(/^\d{15}$/.test(digits))return digits;
     return '';
   }
+  function parseCdrDeviceMetadata(manufacturerRaw,deviceTypeRaw=''){
+    const raw=String(manufacturerRaw??'').trim(),fallbackType=String(deviceTypeRaw??'').trim();
+    if(!raw)return {manufacturer:'',model:'',deviceType:fallbackType,os:''};
+    const parts=raw.split('|').map(x=>x.trim()).filter(Boolean);
+    const head=parts[0]||raw;
+    let manufacturer=head,model='';
+    const comma=head.indexOf(',');
+    if(comma>0){manufacturer=head.slice(0,comma).trim();model=head.slice(comma+1).trim();}
+    const deviceType=parts[1]||fallbackType;
+    const os=parts[2]||'';
+    // Several provider exports repeat the marketing model later in the descriptor.
+    if(!model){
+      const candidates=[parts[5],parts[3]].filter(Boolean);
+      model=candidates.find(x=>!/^android$|^ios$|^smartphone$/i.test(x))||'';
+    }
+    return {manufacturer,model,deviceType,os};
+  }
   function imeiDigits(v){return String(v??'').replace(/\D/g,'');}
   function tacFromImei(v){const d=imeiDigits(v);return d.length>=14&&d.length<=16?d.slice(0,8):'';}
   const BUILTIN_TAC_MAP={
+    '35856015':{tac:'35856015',manufacturer:'Apple',model:'iPhone 15 Pro Max',deviceType:'A3106',source:'Built-in verified TAC mapping'},
     '35499663':{tac:'35499663',manufacturer:'Samsung',model:'Galaxy A05',deviceType:'SM-A055F/DS (2023)',source:'Built-in verified TAC mapping'},
-    '35738339':{tac:'35738339',manufacturer:'Samsung',model:'Galaxy A05',deviceType:'SM-A055F/DS (2023)',source:'Built-in verified TAC mapping'}
+    '35738339':{tac:'35738339',manufacturer:'Samsung',model:'Galaxy A05',deviceType:'SM-A055F/DS (2023)',source:'Built-in verified TAC mapping'},
+    '35170735':{tac:'35170735',manufacturer:'Nothing',model:'Phone (3a)',deviceType:'A059',source:'Built-in verified TAC mapping'},
+    '35836178':{tac:'35836178',manufacturer:'Apple',model:'iPhone 17 Pro Max',deviceType:'A3526',source:'Built-in verified TAC mapping'},
+    '35613774':{tac:'35613774',manufacturer:'Samsung',model:'Galaxy A17',deviceType:'SM-A176B/DS',source:'Built-in verified TAC mapping'},
+    '35498230':{tac:'35498230',manufacturer:'GAMMA',model:'K2',deviceType:'',source:'Built-in verified TAC mapping'},
+    '86984307':{tac:'86984307',manufacturer:'OPPO',model:'A3X 5G',deviceType:'CPH2681',source:'Built-in verified TAC mapping'}
   };
   function seedBuiltinTacMappings(){
     let changed=false;
     for(const [tac,entry] of Object.entries(BUILTIN_TAC_MAP)){
-      if(state.tacCache[tac])continue;
-      state.tacCache[tac]={...entry,updatedAt:new Date().toISOString()};
+      const current=state.tacCache[tac];
+      const weak=!current||current.source==='CDR metadata'||(!current.manufacturer&&!current.model);
+      if(!weak)continue;
+      state.tacCache[tac]={...current,...entry,updatedAt:new Date().toISOString()};
       changed=true;
     }
     if(changed)saveTacCache();else updateTacStatus();
@@ -662,9 +687,12 @@
     let changed=false;
     for(const r of data){
       const tac=tacFromImei(r.imei);if(!tac)continue;
-      const mfr=String(r.manufacturer||'').trim(),model=String(r.deviceType||'').trim();
-      if(!mfr&&!model)continue;
-      const current=state.tacCache[tac]||{},next=normalizeTacEntry(tac,current.manufacturer||mfr,current.model||model,current.deviceType||r.deviceType,'CDR metadata');
+      const mfr=String(r.manufacturer||'').trim(),model=String(r.model||'').trim(),deviceType=String(r.deviceType||'').trim();
+      if(!mfr&&!model&&!deviceType)continue;
+      const current=state.tacCache[tac]||{};
+      // Do not overwrite imported or built-in mappings with weaker CDR metadata.
+      if(current.source&&current.source!=='CDR metadata')continue;
+      const next=normalizeTacEntry(tac,mfr,model,deviceType,'CDR metadata');
       if(next&&(!state.tacCache[tac]||JSON.stringify({...state.tacCache[tac],updatedAt:''})!==JSON.stringify({...next,updatedAt:''}))){state.tacCache[tac]=next;changed=true;}
     }
     if(changed)saveTacCache();else updateTacStatus();
@@ -786,17 +814,18 @@
         const fileId=++state.fileSeq; const inferredCdr=inferCdrFromFilename(file.name); let added=0;
         rows.forEach((r,idx)=>{
           const dt=parseDateTime(val(r,map,'date'),val(r,map,'time')); const loc=parseLatLong(val(r,map,'latlong'),val(r,map,'location'));
+          const deviceMeta=parseCdrDeviceMetadata(val(r,map,'manufacturer'),val(r,map,'deviceType'));
           const rec={
             id:`${fileId}:${idx+2}`, fileId, sourceFile:file.name, sourceSheet:sheetName, rowNumber:idx+2,
             cdrNo:String(val(r,map,'cdrNo')??'').trim()||inferredCdr, bparty:String(val(r,map,'bparty')??'').trim(), date:val(r,map,'date'), time:val(r,map,'time'), dt,
             duration:parseDuration(val(r,map,'duration')), callType:String(val(r,map,'callType')??'').trim(),
             firstCellId:String(val(r,map,'firstCellId')??'').trim(), firstAddress:String(val(r,map,'firstAddress')??'').trim(), lastCellId:String(val(r,map,'lastCellId')??'').trim(), lastAddress:String(val(r,map,'lastAddress')??'').trim(),
-            imei:String(val(r,map,'imei')??'').trim(), manufacturer:String(val(r,map,'manufacturer')??'').trim(), deviceType:String(val(r,map,'deviceType')??'').trim(), imsi:String(val(r,map,'imsi')??'').trim(), roaming:String(val(r,map,'roaming')??'').trim(), provider:String(val(r,map,'provider')??'').trim(),
+            imei:String(val(r,map,'imei')??'').trim(), manufacturer:deviceMeta.manufacturer, model:deviceMeta.model, deviceType:deviceMeta.deviceType, os:deviceMeta.os, imsi:String(val(r,map,'imsi')??'').trim(), roaming:String(val(r,map,'roaming')??'').trim(), provider:String(val(r,map,'provider')??'').trim(),
             mainCity:String(val(r,map,'mainCity')??'').trim(), subCity:String(val(r,map,'subCity')??'').trim(), latlong:String(val(r,map,'latlong')??'').trim(), lat:loc?.lat??null,lng:loc?.lng??null,azimuth:loc?.az??'',
             caseName:String(val(r,map,'caseName')??'').trim(), circle:String(val(r,map,'circle')??'').trim(), operator:String(val(r,map,'operator')??'').trim(), lrn:String(val(r,map,'lrn')??'').trim(), callForward:String(val(r,map,'callForward')??'').trim(), location:String(val(r,map,'location')??'').trim()
           };
           rec.cdrKey=phoneKey(rec.cdrNo);rec.bpartyKey=phoneKey(rec.bparty);
-          rec.search=normalize([rec.cdrNo,rec.bparty,rec.callType,rec.firstCellId,rec.firstAddress,rec.lastCellId,rec.lastAddress,rec.imei,rec.imsi,rec.roaming,rec.provider,rec.mainCity,rec.subCity,rec.operator,rec.sourceFile].join(' | '));
+          rec.search=normalize([rec.cdrNo,rec.bparty,rec.callType,rec.firstCellId,rec.firstAddress,rec.lastCellId,rec.lastAddress,rec.imei,rec.imsi,rec.manufacturer,rec.model,rec.deviceType,rec.os,rec.roaming,rec.provider,rec.mainCity,rec.subCity,rec.operator,rec.sourceFile].join(' | '));
           state.records.push(rec); added++;
         });
         state.files.push({id:fileId,name:file.name,sheet:sheetName,rows:added,map,inferredCdr});
@@ -871,8 +900,8 @@
       const k=`${r.imei||'—'}|${r.imsi||'—'}`;if(k==='—|—')continue;
       let x=m.get(k);
       if(!x){
-        const d=resolveDevice(r.imei,r.manufacturer,r.deviceType);
-        x={imei:r.imei,imsi:r.imsi,tac:d.tac,manufacturer:d.manufacturer,model:d.model,deviceType:r.deviceType,lookupStatus:d.status,records:0,contacts:new Set(),towers:new Set(),cdrs:new Set(),first:null,last:null};
+        const d=resolveDevice(r.imei,r.manufacturer,r.model);
+        x={imei:r.imei,imsi:r.imsi,tac:d.tac,manufacturer:d.manufacturer,model:d.model,deviceType:r.deviceType,os:r.os||'',lookupStatus:d.status,records:0,contacts:new Set(),towers:new Set(),cdrs:new Set(),first:null,last:null};
       }
       x.records++;if(r.bparty)x.contacts.add(r.bparty);if(r.firstCellId)x.towers.add(r.firstCellId);if(r.cdrNo)x.cdrs.add(r.cdrNo);if(r.dt&&(!x.first||r.dt<x.first))x.first=r.dt;if(r.dt&&(!x.last||r.dt>x.last))x.last=r.dt;m.set(k,x);
     }
@@ -1034,7 +1063,7 @@
     const data=state.filtered,A=analyzeIdentifiers(data),rows=aggregateDevices(data);
     const uniqueSubjects=new Set(data.map(r=>r.cdrNo).filter(Boolean)).size,uniqueImsi=A.byImsi.size,uniqueImei=A.byImei.size;
     $('identifierSummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(uniqueSubjects)}</div><div class="l">MSISDN / subjects</div></div><div class="kpi"><div class="v">${fmtInt(uniqueImsi)}</div><div class="l">Unique IMSI</div></div><div class="kpi"><div class="v">${fmtInt(uniqueImei)}</div><div class="l">Unique IMEI</div></div><div class="kpi"><div class="v">${fmtInt(A.msisdnNewImsi.length)}</div><div class="l">MSISDN with multiple IMSIs</div></div><div class="kpi"><div class="v">${fmtInt(A.imsiNewImei.length)}</div><div class="l">IMSI with multiple IMEIs</div></div><div class="kpi"><div class="v">${fmtInt(A.imeiMultiImsi.length)}</div><div class="l">IMEI with multiple IMSIs</div></div></div>`;
-    $('resolvedDeviceTable').innerHTML=`<thead><tr><th>IMEI</th><th>TAC</th><th>Manufacturer</th><th>Model</th><th>IMSI</th><th>Lookup status</th><th>Records</th><th>First</th><th>Last</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${escapeHtml(x.imei||'—')}</td><td>${escapeHtml(x.tac||'—')}</td><td>${escapeHtml(x.manufacturer||'—')}</td><td class="details">${escapeHtml(x.model||'—')}</td><td>${escapeHtml(x.imsi||'—')}</td><td>${escapeHtml(x.lookupStatus||'Unknown TAC')}</td><td class="num">${fmtInt(x.records)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td></tr>`).join('')}</tbody>`;
+    $('resolvedDeviceTable').innerHTML=`<thead><tr><th>IMEI</th><th>TAC</th><th>Manufacturer</th><th>Model</th><th>Device type</th><th>OS</th><th>IMSI</th><th>Lookup status</th><th>Records</th><th>First</th><th>Last</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${escapeHtml(x.imei||'—')}</td><td>${escapeHtml(x.tac||'—')}</td><td>${escapeHtml(x.manufacturer||'—')}</td><td class="details">${escapeHtml(x.model||'—')}</td><td>${escapeHtml(x.deviceType||'—')}</td><td>${escapeHtml(x.os||'—')}</td><td>${escapeHtml(x.imsi||'—')}</td><td>${escapeHtml(x.lookupStatus||'Unknown TAC')}</td><td class="num">${fmtInt(x.records)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td></tr>`).join('')}</tbody>`;
 
 
     const relationships=[...A.byMsisdn.values()].sort((a,b)=>b.records-a.records);
@@ -1439,7 +1468,7 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
     const rec=state.filtered.map(r=>({'CDR No':r.cdrNo,'B Party':contactLabel(r.bparty),'B Party Number':r.bparty,'Date/Time':dtFmt(r.dt)||`${r.date} ${r.time}`,'Duration Seconds':r.duration,'Call Type':r.callType,'First Cell ID':r.firstCellId,'First Tower Address':r.firstAddress,'Last Cell ID':r.lastCellId,'Last Tower Address':r.lastAddress,'IMEI':r.imei,'IMSI':r.imsi,'Roaming':r.roaming,'Provider':r.provider,'Main City':r.mainCity,'Sub City':r.subCity,'Operator':r.operator,'Latitude':r.lat??'','Longitude':r.lng??'','Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber}));
     const contacts=aggregateContacts().map(x=>({'Contact':contactLabel(x.bparty),'Number':x.bparty,'Aliases':[...(x.aliases||[])].join(', '),'Tag':contactTag(x.bparty),'Sender Type':serviceSenderType(x.bparty),'Records':x.records,'Calls':x.calls,'Incoming':x.in,'Outgoing':x.out,'SMS':x.sms,'Total Duration Seconds':x.duration,'First':dtFmt(x.first),'Last':dtFmt(x.last),'Towers':x.towers.size,'Providers':[...x.providers].join(', '),'CDRs':[...x.cdrs].join(', ')}));
     const locs=aggregateLocations().map(x=>({'Cell ID':x.cellId,'Tower Address':x.address,'Records':x.records,'Contacts':x.contacts.size,'Duration Seconds':x.duration,'First':dtFmt(x.first),'Last':dtFmt(x.last),'Latitude':x.lat??'','Longitude':x.lng??'','Azimuth':x.az,'Roaming':[...x.roaming].join(', '),'CDRs':[...x.cdrs].join(', ')}));
-    const devs=aggregateDevices().map(x=>({'IMEI':x.imei,'TAC':x.tac,'Manufacturer':x.manufacturer,'Model':x.model,'IMSI':x.imsi,'Lookup Status':x.lookupStatus,'Device':[x.manufacturer,x.model||x.deviceType].filter(Boolean).join(' • '),'Records':x.records,'Contacts':x.contacts.size,'Towers':x.towers.size,'CDRs':[...x.cdrs].join(', '),'First':dtFmt(x.first),'Last':dtFmt(x.last)}));
+    const devs=aggregateDevices().map(x=>({'IMEI':x.imei,'TAC':x.tac,'Manufacturer':x.manufacturer,'Model':x.model,'Device Type':x.deviceType,'OS':x.os,'IMSI':x.imsi,'Lookup Status':x.lookupStatus,'Device':[x.manufacturer,x.model||x.deviceType].filter(Boolean).join(' • '),'Records':x.records,'Contacts':x.contacts.size,'Towers':x.towers.size,'CDRs':[...x.cdrs].join(', '),'First':dtFmt(x.first),'Last':dtFmt(x.last)}));
     const ident=analyzeIdentifiers(state.filtered);
     const identifierRelationships=[...ident.byMsisdn.values()].map(x=>({'MSISDN / Subject':x.msisdn,'IMSIs':[...x.imsis].join(', '),'IMEIs':[...x.imeis].join(', '),'Records':x.records,'Imported Files':x.files.size,'First':dtFmt(x.first),'Last':dtFmt(x.last),'SIM / Subscription Change':x.imsis.size>1?'Yes':'No','Handset Change':x.imeis.size>1?'Yes':'No'}));
     const identifierChanges=ident.events.map(x=>({'MSISDN / Subject':x.msisdn,'Detection':x.type,'Date/Time':dtFmt(x.at),'Previous IMSI':x.fromImsi,'New IMSI':x.toImsi,'Previous IMEI':x.fromImei,'New IMEI':x.toImei,'Interpretation':x.interpretation,'Source File':x.record.sourceFile,'Source Sheet':x.record.sourceSheet,'Source Row':x.record.rowNumber}));
