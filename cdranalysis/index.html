@@ -373,7 +373,7 @@
         </div>
       </section>
 
-      <section id="contacts" class="view hidden"><div class="panel"><div class="panel-title"><h2>Contact analysis</h2><div class="group"><select id="identityScope" title="Choose where name/tag edits are saved"><option value="case" selected>Case identity</option><option value="global">Global directory</option></select><button class="btn secondary small" id="exportDirectoryBtn">Export Global Directory</button><button class="btn secondary small" id="importDirectoryBtn">Import Global Directory</button><input id="directoryInput" type="file" accept=".json,application/json" hidden></div></div><div class="tiny" style="margin-bottom:8px"><b>Case identity</b> overrides the reusable Global Directory only inside this workspace. Click a number to filter the record view.</div><div class="tablewrap"><table class="table" id="contactsTable"></table></div><div id="contactProfilePanel" style="margin-top:14px"></div></div></section>
+      <section id="contacts" class="view hidden"><div class="panel"><div class="panel-title"><h2>Contact analysis</h2><div class="group"><select id="identityScope" title="Choose where name/tag edits are saved"><option value="case" selected>Case identity</option><option value="global">Global directory</option></select><button class="btn secondary small" id="exportDirectoryBtn">Export Global Directory</button><button class="btn secondary small" id="importDirectoryBtn">Import Global Directory</button><input id="directoryInput" type="file" accept=".json,application/json" hidden></div></div><div class="tiny" style="margin-bottom:8px"><b>Case identity</b> overrides the reusable Global Directory only inside this workspace. Click a number to filter the record view.</div><div class="subtoolbar no-print" style="margin-bottom:10px"><div class="field"><label>CDR request from</label><input type="date" id="cdrRequestFrom"></div><div class="field"><label>CDR request to</label><input type="date" id="cdrRequestTo"></div><button class="btn secondary small" id="selectRequestContactsBtn">Select numeric contacts</button><button class="btn secondary small" id="clearRequestContactsBtn">Clear selection</button><button class="btn small" id="openCdrRequestBtn">Create CDR Request <span class="badge" id="cdrRequestCount">0</span></button></div><div class="tiny" style="margin-bottom:8px">Select mobile/IMEI-like numeric identifiers below, then open the existing CDR Request Generator with the numbers prefilled.</div><div class="tablewrap"><table class="table" id="contactsTable"></table></div><div id="contactProfilePanel" style="margin-top:14px"></div></div></section>
       <section id="locations" class="view hidden"><div class="panel"><div class="panel-title"><h2>Location / tower analysis</h2><span class="muted">Based on first cell ID / first tower address</span></div><div class="tablewrap"><table class="table" id="locationsTable"></table></div></div></section>
       <section id="devices" class="view hidden"><div class="panel"><div class="panel-title"><h2>IMEI / IMSI usage</h2><span class="muted">Useful for identifying device or SIM changes over the loaded period</span></div><div class="tablewrap"><table class="table" id="devicesTable"></table></div><h3>Identifier change timeline</h3><div class="tablewrap" style="max-height:360px"><table class="table" id="deviceChangeTable"></table></div><h3>IMEI ↔ IMSI relationship matrix</h3><div id="imeiImsiMatrix" class="tablewrap"></div></div></section>
       <section id="incident" class="view hidden">
@@ -458,7 +458,7 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, fileSeq:0, pendingWorkspace:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null};
+  const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, fileSeq:0, pendingWorkspace:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null, requestSelected:new Set()};
   let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null, movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null, movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null, networkNodes=[], networkEdges=[], networkSelected=null;
   const FIELDS = {
     cdrNo:['cdrno','a party','aparty','a-party','msisdn','subscriber number','mobile number'],
@@ -531,6 +531,22 @@
     return '';
   }
   function isServiceSender(v){return !!serviceSenderType(v);}
+  function requestIdentifier(v){
+    const raw=String(v??'').trim(),digits=raw.replace(/\D/g,'');
+    if(isServiceSender(raw))return '';
+    if(/^91\d{10}$/.test(digits)||^0\d{10}$/.test(digits))return digits.slice(-10);
+    if(/^\d{10}$/.test(digits))return digits;
+    if(/^\d{15}$/.test(digits))return digits;
+    return '';
+  }
+  function updateCdrRequestCount(){if($('cdrRequestCount'))$('cdrRequestCount').textContent=fmtInt(state.requestSelected.size);}
+  function defaultCdrRequestDates(){
+    const dates=state.filtered.filter(r=>r.dt).map(r=>r.dt).sort((a,b)=>a-b);
+    if(!$('cdrRequestFrom')||!dates.length)return;
+    if(!$('cdrRequestFrom').value)$('cdrRequestFrom').value=localDateKey(dates[0]);
+    if(!$('cdrRequestTo').value)$('cdrRequestTo').value=localDateKey(dates[dates.length-1]);
+  }
+
 
   function parseDateTime(dateVal,timeVal){
     if(dateVal instanceof Date){const d=new Date(dateVal); if(timeVal){const t=parseTime(timeVal); if(t){d.setHours(t.h,t.m,t.s,0);}} return d;}
@@ -749,8 +765,29 @@
   function renderContacts(){
     const rows=aggregateContacts(),opts=['','Suspect','Victim','Witness','Associate','Service','Other'];
     const names=identityStore('name'),tags=identityStore('tag'),scope=$('identityScope')?.value==='global'?'Global':'Case';
-    $('contactsTable').innerHTML=`<thead><tr><th>B Party</th><th>${scope} Tag</th><th>${scope} Name</th><th>Effective identity</th><th>Sender type</th><th>Records</th><th>Calls</th><th>Incoming</th><th>Outgoing</th><th>SMS</th><th>Total duration</th><th>First</th><th>Last</th><th>Towers</th><th>Providers</th><th>CDRs</th></tr></thead><tbody>${rows.map(x=>{const tag=tags[x.bparty]||'',name=names[x.bparty]||'';return `<tr><td><a href="#" class="link contact-filter" data-num="${escapeHtml(x.bparty)}" title="${escAttr(contactTitle(x.bparty))}">${escapeHtml(contactLabel(x.bparty))}</a> <button class="btn secondary small contact-profile-btn" data-num="${escAttr(x.bparty)}">Profile</button></td><td><select class="tag-select contact-tag" data-num="${escAttr(x.bparty)}">${opts.map(o=>`<option ${tag===o?'selected':''}>${o||'Unclassified'}</option>`).join('')}</select></td><td><input class="contact-name" data-num="${escAttr(x.bparty)}" value="${escAttr(name)}" placeholder="Type known name" style="min-width:150px;padding:6px 8px;border:1px solid #d0d5dd;border-radius:7px"></td><td title="${escAttr(contactTitle(x.bparty))}">${escapeHtml(contactLabel(x.bparty))}${contactTag(x.bparty)?' • '+escapeHtml(contactTag(x.bparty)):''}</td><td>${serviceSenderType(x.bparty)?`<span class="pill sms">${escapeHtml(serviceSenderType(x.bparty))}</span>`:'—'}</td><td class="num">${fmtInt(x.records)}</td><td class="num">${fmtInt(x.calls)}</td><td class="num">${fmtInt(x.in)}</td><td class="num">${fmtInt(x.out)}</td><td class="num">${fmtInt(x.sms)}</td><td class="num">${fmtDur(x.duration)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td class="num">${fmtInt(x.towers.size)}</td><td>${escapeHtml([...x.providers].join(', '))}</td><td>${escapeHtml([...x.cdrs].join(', '))}</td></tr>`}).join('')}</tbody>`;
+    defaultCdrRequestDates();updateCdrRequestCount();
+    $('contactsTable').innerHTML=`<thead><tr><th>Request</th><th>B Party</th><th>${scope} Tag</th><th>${scope} Name</th><th>Effective identity</th><th>Sender type</th><th>Records</th><th>Calls</th><th>Incoming</th><th>Outgoing</th><th>SMS</th><th>Total duration</th><th>First</th><th>Last</th><th>Towers</th><th>Providers</th><th>CDRs</th></tr></thead><tbody>${rows.map(x=>{const tag=tags[x.bparty]||'',name=names[x.bparty]||'',req=requestIdentifier(x.bparty);return `<tr><td style="text-align:center">${req?`<input type="checkbox" class="cdr-request-check" data-num="${escAttr(req)}" ${state.requestSelected.has(req)?'checked':''} title="Include in CDR request">`:'—'}</td><td><a href="#" class="link contact-filter" data-num="${escapeHtml(x.bparty)}" title="${escAttr(contactTitle(x.bparty))}">${escapeHtml(contactLabel(x.bparty))}</a> <button class="btn secondary small contact-profile-btn" data-num="${escAttr(x.bparty)}">Profile</button></td><td><select class="tag-select contact-tag" data-num="${escAttr(x.bparty)}">${opts.map(o=>`<option ${tag===o?'selected':''}>${o||'Unclassified'}</option>`).join('')}</select></td><td><input class="contact-name" data-num="${escAttr(x.bparty)}" value="${escAttr(name)}" placeholder="Type known name" style="min-width:150px;padding:6px 8px;border:1px solid #d0d5dd;border-radius:7px"></td><td title="${escAttr(contactTitle(x.bparty))}">${escapeHtml(contactLabel(x.bparty))}${contactTag(x.bparty)?' • '+escapeHtml(contactTag(x.bparty)):''}</td><td>${serviceSenderType(x.bparty)?`<span class="pill sms">${escapeHtml(serviceSenderType(x.bparty))}</span>`:'—'}</td><td class="num">${fmtInt(x.records)}</td><td class="num">${fmtInt(x.calls)}</td><td class="num">${fmtInt(x.in)}</td><td class="num">${fmtInt(x.out)}</td><td class="num">${fmtInt(x.sms)}</td><td class="num">${fmtDur(x.duration)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td class="num">${fmtInt(x.towers.size)}</td><td>${escapeHtml([...x.providers].join(', '))}</td><td>${escapeHtml([...x.cdrs].join(', '))}</td></tr>`}).join('')}</tbody>`;
   }
+  function selectRequestContacts(){
+    for(const x of aggregateContacts()){const id=requestIdentifier(x.bparty);if(id)state.requestSelected.add(id);}
+    renderContacts();showStatus(`${state.requestSelected.size} numeric contact(s) selected for CDR request.`,'ok');
+  }
+  function openCdrRequestGenerator(){
+    if(!state.requestSelected.size){showStatus('Select at least one numeric contact for the CDR request.','error');return;}
+    const from=$('cdrRequestFrom').value,to=$('cdrRequestTo').value;
+    if(from&&to&&from>to){showStatus('CDR request From date cannot be later than To date.','error');return;}
+    const entries=[];
+    for(const number of state.requestSelected){
+      const rows=state.records.filter(r=>requestIdentifier(r.bparty)===number),raw=rows[0]?.bparty||number;
+      const relation=[contactTag(raw),contactName(raw)].filter(Boolean).join(' - ')||'CDR Contact';
+      const dates=rows.filter(r=>r.dt).map(r=>r.dt).sort((a,b)=>a-b);
+      entries.push({number,relation,fromDate:from||(dates.length?localDateKey(dates[0]):''),toDate:to||(dates.length?localDateKey(dates[dates.length-1]):'')});
+    }
+    const draft={version:1,source:'cdr-analyzer',createdAt:new Date().toISOString(),case:{title:$('caseTitle').value||'',caseNo:$('caseNo').value||'',station:$('station').value||'',analyst:$('analyst').value||''},entries};
+    localStorage.setItem('cdrAnalyzer:requestDraftV1',JSON.stringify(draft));
+    window.open('/policedocuments/cdr_request_generator.html?from=cdr-analyzer','_blank','noopener');
+  }
+
   function renderContactProfile(num){
     const rows=state.records.filter(r=>r.bparty===num).sort((a,b)=>(a.dt?.getTime?.()||0)-(b.dt?.getTime?.()||0));
     const a=aggregateContacts(rows)[0];if(!a){$('contactProfilePanel').innerHTML='<div class="empty">No contact data.</div>';return;}
@@ -1220,8 +1257,12 @@
   $('flagList').addEventListener('input',e=>{if(e.target.classList.contains('row-note'))state.notes[e.target.dataset.id]=e.target.value;});
   $('dashboardCdr').onchange=renderDashboard;
   $('dashboardEventType').onchange=renderDashboard;
+  $('selectRequestContactsBtn').onclick=selectRequestContacts;
+  $('clearRequestContactsBtn').onclick=()=>{state.requestSelected.clear();renderContacts();};
+  $('openCdrRequestBtn').onclick=openCdrRequestGenerator;
   $('identityScope').onchange=renderContacts;
   $('contactsTable').addEventListener('change',e=>{
+    if(e.target.classList.contains('cdr-request-check')){e.target.checked?state.requestSelected.add(e.target.dataset.num):state.requestSelected.delete(e.target.dataset.num);updateCdrRequestCount();return;}
     if(e.target.classList.contains('contact-tag')){
       const v=e.target.value==='Unclassified'?'':e.target.value,store=identityStore('tag');store[e.target.dataset.num]=v;
       if($('identityScope').value==='global')persistLocal('cdrAnalyzer:globalContactTags',JSON.stringify(state.globalContactTags));
