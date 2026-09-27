@@ -4,7 +4,7 @@
   const host = document.getElementById('content');
 
   try {
-    const catalog = await json('data/exams/exam-catalog.json');
+    const [catalog,routes] = await Promise.all([json('data/exams/exam-catalog.json'),json('data/exams/exam-routes.json')]);
     const id = new URLSearchParams(location.search).get('exam') || 'tnpsc-group-4';
     const exam = Object.values(catalog).flatMap(body => body.items).find(item => item.id === id);
 
@@ -14,8 +14,10 @@
       return;
     }
 
-    const body = catalog[exam.category];
+    const body = catalog[exam.category], route = routes[exam.category] || {};
     const group4 = id === 'tnpsc-group-4';
+    const quizURL = 'daily-quiz.html?exam=' + encodeURIComponent(route.quizExam || body.name);
+    const pyqURL = route.pyqRoute || '#papers';
     document.title = exam.title + ' Preparation | ClearExams';
     document.getElementById('examTitle').textContent = exam.title;
     document.getElementById('examIntro').textContent = 'Follow the preparation path from syllabus to practice, previous papers and mock-test readiness.';
@@ -30,7 +32,7 @@
 
     const mockBlock = group4
       ? `<p>Four TNPSC Group IV practice mocks are available. Each has 25 questions, a 30-minute timer, a question palette, mark-for-review, results and explanations.</p><div class="grid"><article class="resource"><h3>Mock Test 1</h3><p>Mixed General Studies, Aptitude and Tamil practice.</p>${link('Start Mock Test 1','tnpsc-group4-mock-1.html','button')}</article><article class="resource"><h3>Mock Test 2</h3><p>Polity, History, Geography, Science, Aptitude, Tamil and Tamil Nadu practice.</p>${link('Start Mock Test 2','tnpsc-group4-mock-2.html','button')}</article><article class="resource"><h3>Mock Test 3</h3><p>Another mixed set covering core Group IV preparation areas.</p>${link('Start Mock Test 3','tnpsc-group4-mock-3.html','button')}</article><article class="resource"><h3>Mock Test 4</h3><p>Aptitude and reasoning practice with worked solutions and topic-wise results.</p>${link('Start Mock Test 4','tnpsc-group4-mock-4.html','button')}</article></div><div class="actions">${link('View mock series & saved scores','tnpsc-group4-mocks.html')}</div><p class="source">These are shorter ClearExams practice mocks. A full-length simulation is planned. Completion status and best scores are saved in the browser and device used to take the tests.</p>`
-      : `<p>A dedicated full-length ${escape(exam.title)} mock-test series is not yet published on ClearExams. Until it is added, use this sequence:</p><ol><li>Finish one full syllabus revision.</li><li>Complete topic quizzes without notes.</li><li>Solve an official previous-year paper under the real time limit.</li><li>Record score, weak topics and time lost.</li><li>Revise only the weak areas and repeat another paper.</li></ol><div class="actions">${link('Practise Daily Quiz','daily-quiz.html','button')}${link('Go to PYQs','#papers')}</div><p class="source">Dedicated exam-wise mock tests are coming soon.</p>`;
+      : `<p>A dedicated full-length ${escape(exam.title)} mock-test series is not yet published on ClearExams. Until it is added, use this sequence:</p><ol><li>Finish one full syllabus revision.</li><li>Complete topic quizzes without notes.</li><li>Solve an official previous-year paper under the real time limit.</li><li>Record score, weak topics and time lost.</li><li>Revise only the weak areas and repeat another paper.</li></ol><div class="actions">${link('Practise Daily Quiz',quizURL,'button')}${link('Go to PYQs',pyqURL)}</div><p class="source">Dedicated exam-wise mock tests are coming soon.</p>`;
 
     host.innerHTML = `
       <section class="panel" aria-labelledby="path-title"><p class="eyebrow">Your study roadmap</p><h2 id="path-title">6-step preparation path</h2><div class="grid">
@@ -50,9 +52,9 @@
 
       <section class="panel" id="notes"><p class="eyebrow">Step 2</p><h2>Study materials & revision</h2><p>Study the syllabus topic by topic. Keep one revision page for every topic and add mistakes from practice sessions.</p><div class="grid"><article class="resource"><h3>Indian Polity</h3><p>Constitution, institutions, rights, governance and article-wise revision.</p>${link('Open Polity study material','tnpsc/indian_polity.html')}</article><article class="resource"><h3>Current Affairs</h3><p>Daily exam-ready PDF revision material.</p>${link('Open Current Affairs','current-affairs/')}</article><article class="resource"><h3>NCERT foundation</h3><p>Use official school textbooks for science, social science and mathematics fundamentals.</p>${link('Official NCERT textbooks ↗','https://ncert.nic.in/textbook.php')}</article><article class="resource"><h3>Revision method</h3><p>Write definitions, formulas, dates and one worked example per syllabus topic. Revisit errors before starting the next set.</p></article></div></section>
 
-      <section class="panel" id="practice"><p class="eyebrow">Step 3</p><h2>Topic quiz</h2><p>Use short topic-wise quizzes for active recall. Every answer should teach you why the correct option is right and the other options are wrong.</p><div class="actions">${link('Start Daily 10-question Quiz','daily-quiz.html','button')}${link('Article-wise Polity Practice','exam/indian_polity/all_articles.html')}${link('Prehistoric India Practice','exam/history/prehistoric_india.html')}</div></section>
+      <section class="panel" id="practice"><p class="eyebrow">Step 3</p><h2>Topic quiz</h2><p>Use short topic-wise quizzes for active recall. Every answer should teach you why the correct option is right and the other options are wrong.</p><div class="actions">${link('Start Daily 10-question Quiz',quizURL,'button')}${link('Article-wise Polity Practice','exam/indian_polity/all_articles.html')}${link('Prehistoric India Practice','exam/history/prehistoric_india.html')}</div></section>
 
-      <section class="panel" id="papers"><p class="eyebrow">Step 4</p><h2>Previous-year questions (PYQs)</h2>${papers(exam)}</section>
+      <section class="panel" id="papers"><p class="eyebrow">Step 4</p><h2>Previous-year questions (PYQs)</h2>${papers(exam,pyqURL)}</section>
 
       <section class="panel" id="mocks"><p class="eyebrow">Step 5</p><h2>${group4 ? 'TNPSC Group IV mock tests' : 'Mock-test readiness'}</h2>${mockBlock}</section>
 
@@ -73,12 +75,12 @@
 
   function pathCard(number,title,text,href) {return `<article class="resource"><span class="status-tag open">Step ${number}</span><h3>${escape(title)}</h3><p>${escape(text)}</p><div class="actions"><a class="button secondary" href="${href}">Open step</a></div></article>`;}
 
-  function papers(exam) {
+  function papers(exam,pyqURL) {
     if (exam.id === 'tnpsc-group-4') return '<p>Use official TNPSC papers and final answer keys to learn the real question style.</p><div class="actions">' + link('2025 Tamil + General Studies paper ↗','https://www.tnpsc.gov.in/Tentative/Document/07_2025_GENEAL_TAMIL_GS.pdf') + link('2025 permitted English + GS paper ↗','https://www.tnpsc.gov.in/Tentative/Document/07_2025_GENEARAL_ENGLISH_GS.pdf') + link('2025 final answer key ↗','https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/07_2025_CCSE_IV_FINAL_ANSWER_KEY.pdf') + link('TNPSC archive ↗','https://www.tnpsc.gov.in/English/answerkeys.aspx') + '</div>';
     if (exam.category === 'tnpsc') return '<p>Select the exact group, stage and year in TNPSC’s official question-paper archive.</p>' + link('TNPSC question-paper archive ↗','https://www.tnpsc.gov.in/English/answerkeys.aspx');
     if (exam.category === 'upsc') return '<p>Select the relevant examination and year from UPSC’s official previous-question-paper collection.</p>' + link('UPSC previous question papers ↗','https://upsc.gov.in/examinations/previous-question-papers');
-    if (exam.category === 'tnusrb') return '<p>Choose the recruitment and year. Police Constable and SI papers have different patterns.</p>' + link('TNUSRB PYQ collection','tnusrb/previous_year_questions.html') + ' ' + link('TNUSRB official notices ↗',exam.official);
-    return '<p>No downloaded past-paper collection is listed here yet. Check the recruiting body for question papers, answer keys, response sheets or information handouts.</p>' + link('Official papers / answer-key notices ↗',exam.official);
+    if (exam.category === 'tnusrb') return '<p>Choose the recruitment and year. Police Constable and SI papers have different patterns.</p>' + link('TNUSRB PYQ collection',pyqURL) + ' ' + link('TNUSRB official notices ↗',exam.official);
+    return '<p>No downloaded past-paper collection is listed here yet. Check the recruiting body for question papers, answer keys, response sheets or information handouts.</p>' + link('ClearExams PYQ route',pyqURL) + ' ' + link('Official papers / answer-key notices ↗',exam.official);
   }
 
   async function loadGroup4Posts() {
