@@ -162,7 +162,7 @@
     movementMap.invalidateSize({pan:false});
     if(pts.length===1)movementMap.setView([pts[0].x.lat,pts[0].x.lng],15);else movementMap.fitBounds(fullBounds.pad(.08),{maxZoom:16});
     requestAnimationFrame(()=>movementMap?.invalidateSize({pan:false}));
-    setTimeout(()=>{movementMap?.invalidateSize({pan:false});if(pts.length>1)movementMap?.fitBounds(fullBounds.pad(.08),{maxZoom:16});},180);
+    setTimeout(()=>{movementMap?.invalidateSize({pan:false});if(pts.length>1)movementMap?.fitBounds(fullBounds.pad(.08),{maxZoom:16});const f=state.smsMovementFocus;if(f&&f.at&&movementPlaybackRows.length&&(!f.subject||f.subject===($('movementCdr')?.value||''))){const target=+f.at;let best=0,gapBest=Infinity;movementPlaybackRows.forEach((x,i)=>{const a=+(x.start||0),b=+(x.end||x.start||0),g=target>=a&&target<=b?0:Math.min(Math.abs(target-a),Math.abs(target-b));if(g<gapBest){gapBest=g;best=i;}});updateMovementPlayback(best,true,true);}},220);
   }
 
   function updateMovementPlayback(i,openPopup=true,pan=true){
