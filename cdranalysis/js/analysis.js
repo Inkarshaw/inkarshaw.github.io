@@ -213,7 +213,7 @@
     if(!inc){$('incidentSummary').innerHTML='<div class="notice">Enter Incident Date and Incident Time at the top first.</div>';$('baselineCompare').innerHTML='';$('contactChanges').innerHTML='';$('incidentTable').innerHTML='';return;}
     const beforeH=+$('incidentBeforeHours').value||6,duringM=+$('incidentDuringMins').value||30,afterH=+$('incidentAfterHours').value||6;
     const start=new Date(inc-beforeH*3600000),duringStart=new Date(inc-duringM*60000),duringEnd=new Date(inc+duringM*60000),end=new Date(inc+afterH*3600000);
-    const scoped=subjectEventScopedRecords(state.records);
+    const scoped=subjectEventScopedRecords();
     const rows=scoped.filter(r=>r.dt&&r.dt>=start&&r.dt<=end).sort((a,b)=>a.dt-b.dt);
     const before=rows.filter(r=>r.dt<duringStart),during=rows.filter(r=>r.dt>=duringStart&&r.dt<=duringEnd),after=rows.filter(r=>r.dt>duringEnd);
     $('incidentSummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(before.length)}</div><div class="l">Before</div><div class="s">${beforeH} hours</div></div><div class="kpi"><div class="v">${fmtInt(during.length)}</div><div class="l">During</div><div class="s">±${duringM} min</div></div><div class="kpi"><div class="v">${fmtInt(after.length)}</div><div class="l">After</div><div class="s">${afterH} hours</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(r=>r.bparty).filter(Boolean)).size)}</div><div class="l">Contacts</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(r=>r.firstCellId).filter(Boolean)).size)}</div><div class="l">Towers</div></div></div>`;
