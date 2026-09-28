@@ -1,9 +1,9 @@
 (() => {
   'use strict';
   window.CDRFiltersFactory = function(ctx){
-    const {$,state,normalize,contactLabel,contactTag,escAttr,escapeHtml,fill,fillSelect,fmtInt,isServiceSender,renderAll,timeMins,uniq}=ctx;
+    const {$,state,normalize,contactLabel,contactTag,escAttr,escapeHtml,fill,fillSelect,fmtInt,isServiceSender,renderAll,timeMins,uniq,analysisRecords,rebuildIndexes,audit}=ctx;
 
-  function subjectEventScopedRecords(data=state.records){
+  function subjectEventScopedRecords(data=analysisRecords()){
     const subject=$('cdrNo')?.value||'',eventType=$('callType')?.value||'';
     return data.filter(r=>(!subject||r.cdrNo===subject)&&(!eventType||r.callType===eventType));
   }
@@ -85,7 +85,7 @@
       timeFrom:timeMins($('timeFrom').value),timeTo:timeMins($('timeTo').value),bparty:normalize($('bparty').value),durMin:$('durMin').value===''?null:+$('durMin').value,durMax:$('durMax').value===''?null:+$('durMax').value,
       callType:$('callType').value,callsOnly:$('callsOnly').checked,smsOnly:$('smsOnly').checked,nightOnly:$('nightOnly').checked,weekendOnly:$('weekendOnly').checked,excludeServiceSenders:$('excludeServiceSenders').checked,nightFrom:timeMins($('nightFrom').value),nightTo:timeMins($('nightTo').value),
       cellId:normalize($('cellId').value),tower:normalize($('tower').value),city:normalize($('city').value),subcity:normalize($('subcity').value),roaming:normalize($('roaming').value),imei:normalize($('imei').value),imsi:normalize($('imsi').value),provider:normalize($('provider').value),operator:normalize($('operator').value),cdrNo:$('cdrNo').value,sourceFile:$('sourceFile').value};
-    state.filtered=state.records.filter(r=>{
+    const base=analysisRecords();state.filtered=base.filter(r=>{
       if(state.exactIncidentRange&&(!r.dt||r.dt<state.exactIncidentRange.start||r.dt>state.exactIncidentRange.end))return false;
       if(f.q && !matchesSmartQuery(r,$('q').value))return false; if(f.dateFrom && (!r.dt||r.dt<f.dateFrom))return false; if(f.dateTo && (!r.dt||r.dt>f.dateTo))return false;
       const mins=r.dt?r.dt.getHours()*60+r.dt.getMinutes():timeMins(r.time); if(f.timeFrom!==null&&f.timeTo!==null&&!withinNight(mins,f.timeFrom,f.timeTo))return false; else {if(f.timeFrom!==null&&f.timeTo===null&&mins<f.timeFrom)return false;if(f.timeTo!==null&&f.timeFrom===null&&mins>f.timeTo)return false;}
@@ -94,7 +94,7 @@
       if(f.cellId&&!normalize(`${r.firstCellId} ${r.lastCellId}`).includes(f.cellId))return false;if(f.tower&&!normalize(`${r.firstAddress} ${r.lastAddress}`).includes(f.tower))return false;if(f.city&&!normalize(r.mainCity).includes(f.city))return false;if(f.subcity&&!normalize(r.subCity).includes(f.subcity))return false;if(f.roaming&&!normalize(r.roaming).includes(f.roaming))return false;
       if(f.imei&&!normalize(r.imei).includes(f.imei))return false;if(f.imsi&&!normalize(r.imsi).includes(f.imsi))return false;if(f.provider&&!normalize(r.provider).includes(f.provider))return false;if(f.operator&&!normalize(r.operator).includes(f.operator))return false;if(f.cdrNo&&r.cdrNo!==f.cdrNo)return false;if(f.sourceFile&&r.sourceFile!==f.sourceFile)return false;return true;
     });
-    state.page=1;updateFilterCount();syncViewScopeControls(false);renderAll();window.dispatchEvent(new Event('cdr:updated'));
+    state.page=1;updateFilterCount();syncViewScopeControls(false);if($('analysisIntegrityStatus'))$('analysisIntegrityStatus').textContent=(state.analysisMode==='unique'?'Duplicate candidates excluded from analysis':'Raw records used for analysis')+' • '+fmtInt(state.filtered.length)+' filtered / '+fmtInt(base.length)+' analysis rows / '+fmtInt(state.records.length)+' raw rows.';renderAll();window.dispatchEvent(new Event('cdr:updated'));
   }
   function resetFilters(){state.exactIncidentRange=null;if($('exactIncidentStatus'))$('exactIncidentStatus').textContent='Uses the incident date/time entered at the top.';['q','dateFrom','dateTo','timeFrom','timeTo','bparty','durMin','durMax','cellId','tower','city','subcity','roaming','imei','imsi','provider','operator'].forEach(id=>$(id).value='');['callType','cdrNo','sourceFile'].forEach(id=>$(id).selectedIndex=0);['callsOnly','smsOnly','nightOnly','weekendOnly','excludeServiceSenders'].forEach(id=>$(id).checked=false);$('nightFrom').value='20:00';$('nightTo').value='06:00';applyFilters();}
 
@@ -106,6 +106,8 @@
       $('filterBackdrop').onclick=()=>setFilterDrawer(false);
       $('applyBtn').onclick=()=>{applyFilters();if(window.innerWidth<=1100)setFilterDrawer(false);};
       $('resetBtn').onclick=resetFilters;
+      if($('analysisMode')){$('analysisMode').value=state.analysisMode||'raw';$('analysisMode').onchange=e=>{state.analysisMode=e.target.value==='unique'?'unique':'raw';rebuildIndexes();audit('Analysis dataset mode changed',state.analysisMode);applyFilters();};}
+      if($('sourceTimezone')){$('sourceTimezone').value=state.sourceTimezone||'Asia/Kolkata';$('sourceTimezone').onchange=e=>{state.sourceTimezone=e.target.value||'Asia/Kolkata';audit('Source timezone changed',state.sourceTimezone+' (applies to future imports; existing parsed timestamps are preserved)');if($('analysisIntegrityStatus'))$('analysisIntegrityStatus').textContent='Source timezone set to '+state.sourceTimezone+'. Existing imported timestamps are preserved; re-import to reinterpret them.';};}
 
       document.addEventListener('change',e=>{
         if(e.target.classList.contains('view-scope-subject'))setSubjectEventScope(e.target.value,$('callType')?.value||'');
