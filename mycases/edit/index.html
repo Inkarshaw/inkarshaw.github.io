@@ -265,6 +265,8 @@
   let caseTasks=[];
   let caseAttachments=[];
   let hearingHistory=[];
+  let autoSaveTimer=null;
+  let saveInFlight=null;
   const INVESTIGATION_STEPS=['Complainant examined','Witnesses examined','Scene of crime inspected','CCTV footage collected','CDR / SDR obtained','Bank records obtained','Property seized','Property sent to FSL','FSL report received','Accused identified','Accused arrested','Accused remanded / bail status updated','Documents / records collected','Final report / charge sheet prepared','Final report / charge sheet filed'];
   const CASE_HEAD_STEPS={
     'NDPS':['Seizure mahazar completed','Sampling / inventory completed','Drug weight and seal particulars verified','FSL / chemical analysis follow-up','NDPS compliance documents verified'],
@@ -653,7 +655,6 @@
       return null;
     }
   }
-  let saveInFlight=null;
   async function saveCurrent(openDocs=false){
     clearTimeout(autoSaveTimer);
     let c;
@@ -710,7 +711,7 @@
   function goToDashboard(){
     clearTimeout(autoSaveTimer);
     persistCurrentFormSnapshot();
-    window.location.href='/mycases/?view=dashboard&v=20260928-11';
+    window.location.href='/mycases/?view=dashboard&v=20260928-12';
   }
 
   function linkedRequestsHtml(c){
@@ -915,7 +916,6 @@
     if(meta)meta.textContent=ps+' · '+stage+(next?' · Next '+fmtDate(next):'');
     if(pills)pills.innerHTML='<span>Investigation '+p.pct+'%</span><span>'+pendingTasks+' pending task'+(pendingTasks===1?'':'s')+'</span><span>'+accusedPersons.length+' accused</span><span>'+esc(($('finalResult')?.value||'Active')||'Active')+'</span>';
   }
-  let autoSaveTimer=null;
   async function autoSaveExisting(){
     const id=$('caseId')?.value;
     if(!id||!$('crimeNo')?.value.trim())return false;
@@ -1020,7 +1020,7 @@
     try{
       if(typeof persistCurrentFormSnapshot==='function')persistCurrentFormSnapshot();
     }catch(e){console.error('Navigation snapshot failed',e)}
-    location.href='/mycases/?view=dashboard&v=20260928-11';
+    location.href='/mycases/?view=dashboard&v=20260928-12';
   }
 
   if(oldSave){
