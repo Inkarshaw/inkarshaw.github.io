@@ -198,11 +198,42 @@
             <div class="field"><label>ID-change proximity ± min</label><input type="number" id="smsIntelIdMins" min="1" max="1440" value="60"></div>
             <div class="field"><label>Event context ± min</label><input type="number" id="smsIntelContextMins" min="1" max="360" value="30"></div>
             <div class="field"><label>SMS burst gap (min)</label><input type="number" id="smsIntelBurstMins" min="1" max="240" value="15"></div>
+            <div class="field"><label>Burst minimum events</label><input type="number" id="smsIntelBurstMinCount" min="2" max="50" value="3"></div>
+            <div class="field"><label>Burst mode</label><select id="smsIntelBurstMode"><option value="any">Any senders</option><option value="same">Same sender/brand</option><option value="multi">Multiple senders/brands</option></select></div>
             <div class="field"><label>Incident proximity ± min</label><input type="number" id="smsIntelIncidentMins" min="1" max="1440" value="60"></div>
             <button class="btn secondary small" id="smsIntelRefreshBtn">Refresh</button>
             <button class="btn secondary small" id="smsIntelExportBtn">Export SMS Review CSV</button>
           </div>
+          <div class="subtoolbar no-print" style="margin:10px 0">
+            <div class="field" style="min-width:220px"><label>Search sender / brand</label><input id="smsIntelSearch" placeholder="e.g. SWIGGY, AMAZON"></div>
+            <div class="field"><label>Category</label><select id="smsIntelFilterCategory"><option value="">All categories</option></select></div>
+            <div class="field"><label>Recognition</label><select id="smsIntelFilterRecognition"><option value="">All recognition</option><option>Recognized</option><option>Probable</option><option>Manual</option><option>Unclassified</option></select></div>
+            <label class="check"><input type="checkbox" id="smsIntelFirstOnly"> First observed only</label>
+            <label class="check"><input type="checkbox" id="smsIntelIncidentOnly"> Incident-near only</label>
+            <label class="check"><input type="checkbox" id="smsIntelUnusualOnly"> Unusual-time only</label>
+            <button class="btn secondary small" id="smsIntelClearReviewFilters">Clear review filters</button>
+          </div>
+          <details class="panel no-print" style="padding:10px 12px;margin:10px 0">
+            <summary style="cursor:pointer;font-weight:800">Sender Dictionary / Manual Correction</summary>
+            <div class="subtoolbar" style="margin-top:10px">
+              <div class="field"><label>Raw sender ID</label><input id="smsSenderRaw" placeholder="VM-SWIGGY"></div>
+              <div class="field"><label>Display label</label><input id="smsSenderLabel" placeholder="Swiggy"></div>
+              <div class="field"><label>Category</label><select id="smsSenderCategory"><option>Banking</option><option>Payments / Wallet</option><option>Food Delivery</option><option>Ride-hailing / Transport</option><option>SIM / Telecom</option><option>E-commerce</option><option>Logistics / Courier</option><option>Travel / Booking</option><option>Healthcare</option><option>Insurance</option><option>Education</option><option>Utilities</option><option>Internet / Social</option><option>Government / Public Service</option><option>Other / Unclassified</option></select></div>
+              <button class="btn small" id="smsSenderSaveBtn">Save sender mapping</button>
+              <button class="btn secondary small" id="smsSenderClearBtn">Remove manual mapping</button>
+              <span class="tiny" id="smsSenderMappingStatus">Click “Edit sender” in a table row to load a sender here.</span>
+            </div>
+          </details>
           <div id="smsIntelSummary"></div>
+          <h3>Unknown / unclassified sender review</h3>
+          <div class="tablewrap"><table class="table" id="smsIntelUnknownTable"></table></div>
+          <h3 style="margin-top:16px">Incident baseline comparison</h3>
+          <div class="tiny" style="margin-bottom:6px">Compares sender activity near the entered incident time with the preceding 7-day and 30-day windows. Counts are descriptive metadata only.</div>
+          <div class="tablewrap"><table class="table" id="smsIntelBaselineTable"></table></div>
+          <h3 style="margin-top:16px">Sender × subject matrix</h3>
+          <div class="tablewrap" id="smsIntelSubjectMatrix"></div>
+          <h3 style="margin-top:16px">Sender × day matrix</h3>
+          <div class="tablewrap" id="smsIntelDayMatrix"></div>
           <h3>Service category summary</h3>
           <div class="tablewrap"><table class="table" id="smsIntelCategoryTable"></table></div>
           <h3>Brand / sender summary</h3>
@@ -212,8 +243,10 @@
           <h3 style="margin-top:16px">SMS bursts</h3>
           <div class="tablewrap"><table class="table" id="smsIntelBurstsTable"></table></div>
           <h3 style="margin-top:16px">Chronological SMS metadata</h3>
+          <div class="subtoolbar no-print" style="margin-bottom:8px"><button class="btn secondary small" id="smsSelectDisplayedBtn">Select displayed</button><button class="btn secondary small" id="smsClearSelectedBtn">Clear selection</button><button class="btn small" id="smsAddSelectedChronologyBtn">Add selected to Chronology <span class="badge" id="smsSelectedCount">0</span></button></div>
           <div class="tablewrap" style="max-height:620px"><table class="table" id="smsIntelTimelineTable"></table></div>
           <h3 style="margin-top:16px">Selected SMS event context</h3>
+          <div class="subtoolbar no-print"><span class="tiny">Context preset:</span><button class="btn secondary small sms-context-preset" data-mins="5">±5m</button><button class="btn secondary small sms-context-preset" data-mins="15">±15m</button><button class="btn secondary small sms-context-preset" data-mins="30">±30m</button><button class="btn secondary small sms-context-preset" data-mins="60">±1h</button><button class="btn secondary small sms-context-preset" data-mins="360">±6h</button></div>
           <div id="smsIntelContextPanel" class="empty">Use “Show context” on an SMS row to inspect nearby calls, SMS records, towers and identifier metadata.</div>
         </div>
       </section>
