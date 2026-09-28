@@ -99,7 +99,7 @@
 <header class="topbar"><div class="wrap"><div class="brand"><div class="brand-mark">CE</div><div><h1>Edit Case</h1><p>ClearExams • My Cases</p></div></div><a class="btn" href="/mycases/?view=dashboard&v=20260928-8">← Back</a></div></header>
 <main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><a class="btn" href="/mycases/?view=dashboard&v=20260928-8">Dashboard</a></div>
 <form class="quick-create hidden" id="quickCaseForm"><input id="quickCrimeNo"></form>
-<form class="form-wrap" id="caseForm">
+<form class="form-wrap" id="caseForm" onsubmit="event.preventDefault(); saveCurrent(false); return false;">
           <div class="case-status-strip" id="caseStatusStrip">
             <div><strong id="caseStatusPrimary">New Case</strong><span id="caseStatusMeta">Add the basic case details below.</span></div>
             <div class="case-status-pills" id="caseStatusPills"></div>
@@ -215,8 +215,8 @@
   </div>
   <div id="attachmentList" style="margin-top:10px"></div>
 </div></div></div></div><div class="form-actions">
-            <button class="btn btn-primary" type="submit" id="saveCaseBtn">Create Case</button>
-            <button class="btn" type="button" id="saveAndOpenBtn">Save & Open Documents</button>
+            <button class="btn btn-primary" type="button" id="saveCaseBtn" onclick="saveCurrent(false); return false;">Create Case</button>
+            <button class="btn" type="button" id="saveAndOpenBtn" onclick="saveCurrent(true); return false;">Save & Open Documents</button>
             <span class="save-state save-state-inline" id="saveStateInline">Not saved yet</span>
           </div>
           <div class="helper"><strong>Only the Crime / CSR / UDR No. is required to create a case.</strong> All other information can be added or updated later. Case data is saved locally and can also sync to your private cloud when connected.</div>
@@ -821,8 +821,6 @@
   $('finalResult').addEventListener('change',()=>{const v=$('finalResult').value;if(v){const stageMap={'Committed to Higher Court':'Case Disposed','Other Disposal':'Case Disposed'};$('stage').value=stageMap[v]||v;}updateCaseStatusStrip();scheduleAutoSave();});
   $('openDocsFromEdit').addEventListener('click',()=>{const c=cases.find(x=>x.id===$('caseId').value)||formData();openInDocuments(c);});
   document.querySelectorAll('.doc-shortcut').forEach(btn=>btn.addEventListener('click',()=>{const c=cases.find(x=>x.id===$('caseId').value)||formData();openDocumentShortcut(c,btn.dataset.docq);}));
-  $('caseForm').addEventListener('submit',async e=>{e.preventDefault();await saveCurrent(false)});
-  $('saveAndOpenBtn').addEventListener('click',async()=>{await saveCurrent(true)});
   // New Case uses direct mobile-safe startNewCase() handler.
   $('clearFormBtn').addEventListener('click',clearForm);
   $('searchInput').addEventListener('input',renderList);$('stageFilter').addEventListener('change',renderList);$('priorityFilter').addEventListener('change',renderList);
