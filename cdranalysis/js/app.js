@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, tacCache:{}, fileSeq:0, pendingWorkspace:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null, requestSelected:new Set(), locationMatchSelected:new Set()};
   let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null, movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null, movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null, networkNodes=[], networkEdges=[], networkSelected=null;
-  let recordsModule=null, contactsModule=null;
+  let recordsModule=null, contactsModule=null, locationsModule=null;
   const FIELDS = {
     cdrNo:['cdrno','a party','aparty','a-party','msisdn','subscriber number','mobile number'],
     bparty:['b party','bparty','b-party','other party','connected number','called number','calling number'],
@@ -570,115 +570,14 @@
   }
 
   function renderContactProfile(num){return contactsModule?.renderProfile(num);}
-  function mapLink(x){if(x.lat!==null&&x.lng!==null)return `<a class="link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${encodeURIComponent(x.lat+','+x.lng)}">Open map</a>`;return ''}
-  function renderLocationMatchSubjects(){
-    const el=$('locationMatchSubjects');if(!el)return;
-    const subjects=uniq('cdrNo'),available=new Set(subjects);
-    state.locationMatchSelected=new Set([...state.locationMatchSelected].filter(x=>available.has(x)));
-    el.innerHTML=subjects.length?subjects.map(n=>`<label class="check" style="min-width:190px"><input type="checkbox" class="location-match-subject" value="${escAttr(n)}" ${state.locationMatchSelected.has(n)?'checked':''}> ${escapeHtml(n)}</label>`).join(''):'<span class="tiny">Load CDR files to select subjects.</span>';
-  }
-  function locationMatchBaseRows(){
-    const eventType=$('callType')?.value||'',from=$('locationMatchFrom')?.value||'',to=$('locationMatchTo')?.value||'';
-    return state.records.filter(r=>{
-      if(!r.dt||!r.cdrNo||!r.firstCellId)return false;
-      if(eventType&&r.callType!==eventType)return false;
-      const d=localDateKey(r.dt);if(from&&d<from)return false;if(to&&d>to)return false;
-      return state.locationMatchSelected.has(r.cdrNo);
-    });
-  }
-  function locationPairEvents(data,windowMin){
-    const groups=new Map(),out=[],win=Math.max(0,+windowMin||0)*60000;
-    for(const r of data){const k=locationTowerKey(r);if(!k)continue;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);}
-    for(const [towerKey,a] of groups){
-      a.sort((x,y)=>x.dt-y.dt);
-      for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length&&a[j].dt-a[i].dt<=win;j++){
-        if(a[i].cdrNo===a[j].cdrNo)continue;
-        const first=a[i],second=a[j],cell=first.firstCellId||second.firstCellId,address=first.firstAddress||second.firstAddress||'',operator=first.operator||second.operator||'';
-        out.push({a:first,b:second,towerKey,cell,address,operator,gap:Math.abs(second.dt-first.dt)/60000,time:first.dt<second.dt?first.dt:second.dt});
-      }
-    }
-    return out.sort((a,b)=>a.time-b.time);
-  }
-  function locationEpisodes(events,episodeGapMin){
-    const gapMs=Math.max(1,+episodeGapMin||60)*60000,groups=new Map(),out=[];
-    for(const e of events){
-      const pair=[e.a.cdrNo,e.b.cdrNo].sort(),k=pair.join('|')+'|'+e.towerKey;
-      if(!groups.has(k))groups.set(k,[]);groups.get(k).push({...e,pair});
-    }
-    for(const arr of groups.values()){
-      arr.sort((a,b)=>a.time-b.time);let ep=null;
-      const flush=()=>{if(!ep)return;ep.recordsA=ep.recordsA.size;ep.recordsB=ep.recordsB.size;out.push(ep);ep=null;};
-      for(const e of arr){
-        if(!ep||e.time-ep.lastEvent>gapMs){flush();ep={a:e.pair[0],b:e.pair[1],towerKey:e.towerKey,cell:e.cell,address:e.address,operator:e.operator,start:e.time,end:e.time,lastEvent:e.time,rawMatches:0,minGap:Infinity,recordsA:new Set(),recordsB:new Set(),lat:e.a.lat??e.b.lat,lng:e.a.lng??e.b.lng};}
-        ep.rawMatches++;ep.minGap=Math.min(ep.minGap,e.gap);ep.end=e.time;ep.lastEvent=e.time;
-        const ra=e.a.cdrNo===ep.a?e.a:e.b,rb=e.a.cdrNo===ep.b?e.a:e.b;if(ra?.id)ep.recordsA.add(ra.id);if(rb?.id)ep.recordsB.add(rb.id);
-      }
-      flush();
-    }
-    return out.sort((a,b)=>a.start-b.start);
-  }
-  function multiSubjectSameCellMatches(data,subjects,windowMin){
-    const selected=[...subjects],need=selected.length,win=Math.max(0,+windowMin||0)*60000,groups=new Map(),out=[];
-    for(const r of data){const k=locationTowerKey(r);if(!k)continue;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);}
-    for(const [towerKey,events] of groups){
-      events.sort((a,b)=>a.dt-b.dt);let left=0,have=0;const counts=new Map();
-      for(let right=0;right<events.length;right++){
-        const sr=events[right].cdrNo,prev=counts.get(sr)||0;counts.set(sr,prev+1);if(prev===0)have++;
-        while(left<=right&&events[right].dt-events[left].dt>win){const sl=events[left].cdrNo,n=(counts.get(sl)||0)-1;if(n<=0){counts.delete(sl);have--;}else counts.set(sl,n);left++;}
-        if(have!==need)continue;
-        while(left<right&&(counts.get(events[left].cdrNo)||0)>1){const sl=events[left].cdrNo;counts.set(sl,counts.get(sl)-1);left++;}
-        if(have!==need)continue;
-        const slice=events.slice(left,right+1),mid=(+events[left].dt + +events[right].dt)/2,chosen=new Map();
-        for(const s of selected){const candidates=slice.filter(r=>r.cdrNo===s);if(!candidates.length)continue;candidates.sort((a,b)=>Math.abs(+a.dt-mid)-Math.abs(+b.dt-mid));chosen.set(s,candidates[0]);}
-        if(chosen.size!==need)continue;
-        const picked=[...chosen.values()].sort((a,b)=>a.dt-b.dt),start=picked[0].dt,end=picked[picked.length-1].dt,first=picked[0];
-        const key=towerKey+'|'+picked.map(r=>r.id).sort().join('|');if(out.some(x=>x.key===key))continue;
-        out.push({key,towerKey,cell:first.firstCellId,address:picked.find(r=>r.firstAddress)?.firstAddress||'',operator:first.operator||'',start,end,spread:(end-start)/60000,records:picked,lat:picked.find(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lng))?.lat??null,lng:picked.find(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lng))?.lng??null});
-        const sl=events[left].cdrNo,n=(counts.get(sl)||0)-1;if(n<=0){counts.delete(sl);have--;}else counts.set(sl,n);left++;
-      }
-    }
-    return out.sort((a,b)=>a.start-b.start||a.spread-b.spread);
-  }
-  function locationSharedSummary(episodes){
-    const m=new Map();
-    for(const e of episodes){
-      const k=e.towerKey||e.cell;let x=m.get(k);
-      if(!x)x={towerKey:k,cell:e.cell,address:e.address,operator:e.operator,episodes:0,dates:new Set(),subjects:new Set(),minGap:Infinity,rawMatches:0,lat:e.lat,lng:e.lng};
-      x.episodes++;x.dates.add(localDateKey(e.start));x.subjects.add(e.a);x.subjects.add(e.b);x.minGap=Math.min(x.minGap,e.minGap);x.rawMatches+=e.rawMatches||1;m.set(k,x);
-    }
-    return [...m.values()].sort((a,b)=>b.episodes-a.episodes||b.dates.size-a.dates.size||a.minGap-b.minGap);
-  }
-  function renderLocationMatches(){
-    const summary=$('locationMatchSummary'),table=$('locationMatchTable'),shared=$('locationSharedTowerSummary');if(!summary||!table)return;
-    if(shared)shared.innerHTML='';
-    const selected=[...state.locationMatchSelected],from=$('locationMatchFrom').value,to=$('locationMatchTo').value;
-    if(from&&to&&from>to){summary.innerHTML='<div class="notice">From date cannot be later than To date.</div>';table.innerHTML='';return;}
-    if(!selected.length){summary.innerHTML='<div class="empty">Select one or more subject numbers above.</div>';table.innerHTML='';return;}
-    const data=locationMatchBaseRows(),win=Math.max(0,+$('locationMatchMins').value||0),episodeGap=Math.max(1,+$('locationEpisodeGapMins')?.value||60),mode=$('locationMatchMode').value||'all';
-    if(selected.length===1){
-      const rows=data.sort((a,b)=>a.dt-b.dt);
-      summary.innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(rows.length)}</div><div class="l">Location events</div></div><div class="kpi"><div class="v">${fmtInt(new Set(rows.map(locationTowerKey)).size)}</div><div class="l">Distinct tower identities</div></div><div class="kpi"><div class="v">1</div><div class="l">Selected subject</div></div></div>`;
-      table.innerHTML=`<thead><tr><th>Date / time</th><th>Subject</th><th>Operator</th><th>Cell ID</th><th>Tower address</th><th>Event type</th><th>IMEI</th><th>IMSI</th><th>Map</th></tr></thead><tbody>${rows.slice(0,3000).map(r=>`<tr><td>${dtFmt(r.dt)}</td><td>${escapeHtml(r.cdrNo)}</td><td>${escapeHtml(r.operator||'—')}</td><td>${escapeHtml(r.firstCellId)}</td><td class="details">${escapeHtml(r.firstAddress||'—')}</td><td>${escapeHtml(r.callType||'—')}</td><td>${escapeHtml(r.imei||'—')}</td><td>${escapeHtml(r.imsi||'—')}</td><td>${mapLink({lat:r.lat,lng:r.lng})}</td></tr>`).join('')}</tbody>`;
-      return;
-    }
-    if(mode==='pair'){
-      const events=locationPairEvents(data,win),episodes=locationEpisodes(events,episodeGap),towerSummary=locationSharedSummary(episodes);
-      summary.innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(selected.length)}</div><div class="l">Selected subjects</div></div><div class="kpi"><div class="v">${fmtInt(episodes.length)}</div><div class="l">Match episodes</div></div><div class="kpi"><div class="v">${fmtInt(events.length)}</div><div class="l">Supporting raw matches</div></div><div class="kpi"><div class="v">${fmtInt(towerSummary.length)}</div><div class="l">Shared tower identities</div></div><div class="kpi"><div class="v">${win}</div><div class="l">Max pair gap (min)</div></div><div class="kpi"><div class="v">${episodeGap}</div><div class="l">Episode break gap (min)</div></div></div>`;
-      table.innerHTML=`<thead><tr><th>Subjects</th><th>Start</th><th>End</th><th>Closest gap</th><th>Operator</th><th>Cell ID</th><th>Tower address</th><th>Records A / B</th><th>Raw matches</th><th>Map</th></tr></thead><tbody>${episodes.slice(0,2000).map(e=>`<tr><td>${escapeHtml(e.a+' ↔ '+e.b)}</td><td>${dtFmt(e.start)}</td><td>${dtFmt(e.end)}</td><td>${e.minGap.toFixed(1)} min</td><td>${escapeHtml(e.operator||'—')}</td><td>${escapeHtml(e.cell)}</td><td class="details">${escapeHtml(e.address||'—')}</td><td>${fmtInt(e.recordsA)} / ${fmtInt(e.recordsB)}</td><td>${fmtInt(e.rawMatches)}</td><td>${mapLink(e)}</td></tr>`).join('')}</tbody>`;
-      if(shared)shared.innerHTML=`<thead><tr><th>Tower</th><th>Operator</th><th>Subjects</th><th>Match episodes</th><th>Separate dates</th><th>Closest gap</th><th>Supporting matches</th><th>Map</th></tr></thead><tbody>${towerSummary.slice(0,500).map(x=>`<tr><td><b>${escapeHtml(x.cell||'—')}</b><div class="tiny">${escapeHtml(x.address||'')}</div></td><td>${escapeHtml(x.operator||'—')}</td><td class="details">${escapeHtml([...x.subjects].join(', '))}</td><td class="num">${fmtInt(x.episodes)}</td><td class="num">${fmtInt(x.dates.size)}</td><td class="num">${x.minGap.toFixed(1)} min</td><td class="num">${fmtInt(x.rawMatches)}</td><td>${mapLink(x)}</td></tr>`).join('')}</tbody>`;
-      return;
-    }
-    const matches=multiSubjectSameCellMatches(data,selected,win),pseudoEpisodes=matches.map(x=>({a:selected[0],b:selected[1]||selected[0],towerKey:x.towerKey,cell:x.cell,address:x.address,operator:x.operator,start:x.start,minGap:x.spread,rawMatches:1,lat:x.lat,lng:x.lng})),towerSummary=locationSharedSummary(pseudoEpisodes);
-    summary.innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(selected.length)}</div><div class="l">Selected subjects</div></div><div class="kpi"><div class="v">${fmtInt(matches.length)}</div><div class="l">All-subject matches</div></div><div class="kpi"><div class="v">${fmtInt(new Set(matches.map(x=>x.towerKey)).size)}</div><div class="l">Matched tower identities</div></div><div class="kpi"><div class="v">${win}</div><div class="l">Maximum spread (min)</div></div></div>`;
-    table.innerHTML=`<thead><tr><th>Start</th><th>End</th><th>Time spread</th><th>Operator</th><th>Cell ID</th><th>Tower address</th><th>Subjects / timestamps</th><th>Event types</th><th>Map</th></tr></thead><tbody>${matches.slice(0,2000).map(x=>`<tr><td>${dtFmt(x.start)}</td><td>${dtFmt(x.end)}</td><td>${x.spread.toFixed(1)} min</td><td>${escapeHtml(x.operator||'—')}</td><td>${escapeHtml(x.cell)}</td><td class="details">${escapeHtml(x.address||'—')}</td><td class="details">${x.records.map(r=>escapeHtml(r.cdrNo)+' — '+dtFmt(r.dt)).join('<br>')}</td><td class="details">${x.records.map(r=>escapeHtml(r.cdrNo)+': '+escapeHtml(r.callType||'—')).join('<br>')}</td><td>${mapLink(x)}</td></tr>`).join('')}</tbody>`;
-    if(shared)shared.innerHTML=`<thead><tr><th>Tower</th><th>Operator</th><th>Selected subjects</th><th>Matches</th><th>Separate dates</th><th>Best spread</th><th>Map</th></tr></thead><tbody>${towerSummary.slice(0,500).map(x=>`<tr><td><b>${escapeHtml(x.cell||'—')}</b><div class="tiny">${escapeHtml(x.address||'')}</div></td><td>${escapeHtml(x.operator||'—')}</td><td>${escapeHtml(selected.join(', '))}</td><td class="num">${fmtInt(x.episodes)}</td><td class="num">${fmtInt(x.dates.size)}</td><td class="num">${x.minGap.toFixed(1)} min</td><td>${mapLink(x)}</td></tr>`).join('')}</tbody>`;
-  }
-  function renderLocations(){
-    renderLocationMatchSubjects();renderLocationMatches();
-    const rows=aggregateLocations(),mapped=rows.filter(x=>Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lng))),subjects=new Set(state.filtered.map(r=>r.cdrNo).filter(Boolean)),sharedTowers=rows.filter(x=>x.cdrs.size>1);
-    if($('locationKpis'))$('locationKpis').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(rows.length)}</div><div class="l">Distinct tower identities</div></div><div class="kpi"><div class="v">${fmtInt(mapped.length)}</div><div class="l">Towers with coordinates</div></div><div class="kpi"><div class="v">${fmtInt(rows.length-mapped.length)}</div><div class="l">Without coordinates</div></div><div class="kpi"><div class="v">${fmtInt(subjects.size)}</div><div class="l">Subjects represented</div></div><div class="kpi"><div class="v">${fmtInt(sharedTowers.length)}</div><div class="l">Towers used by multiple subjects</div></div></div>`;
-    $('locationsTable').innerHTML=`<thead><tr><th>Cell ID / tower</th><th>Operator</th><th>Records</th><th>Active dates</th><th>Subjects</th><th>Contacts</th><th>Call duration</th><th>First</th><th>Last</th><th>Coordinates</th><th>Roaming</th><th>Actions</th></tr></thead><tbody>${rows.map(x=>{const subject=x.cdrs.size===1?[...x.cdrs][0]:'';return `<tr><td><a href="#" class="link location-records-filter" data-cell="${escAttr(x.cellId||'')}" data-tower="${escAttr(x.address||'')}" data-operator="${escAttr([...x.operators][0]||'')}">${escapeHtml(x.cellId||x.address||'—')}</a>${x.cellId&&x.address?`<div class="tiny">${escapeHtml(x.address)}</div>`:''}</td><td>${escapeHtml([...x.operators].join(', ')||'—')}</td><td class="num">${fmtInt(x.records)}</td><td class="num">${fmtInt(x.dates.size)}</td><td class="num" title="${escAttr([...x.cdrs].join(', '))}">${fmtInt(x.cdrs.size)}</td><td class="num">${fmtInt(x.contacts.size)}</td><td class="num">${fmtDur(x.duration)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td>${Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lng))?'<span class="goodtext">Mapped</span>':'<span class="warntext">No coordinates</span>'}</td><td>${escapeHtml([...x.roaming].join(', '))}</td><td>${mapLink(x)}${subject?` <button class="btn secondary small location-movement" data-subject="${escAttr(subject)}">Movement</button>`:''}</td></tr>`}).join('')}</tbody>`;
-  }
+  function mapLink(x){return locationsModule?.mapLink(x)||'';}
+  function renderLocationMatchSubjects(){return locationsModule?.renderLocationMatchSubjects();}
+  function locationPairEvents(data,windowMin){return locationsModule?.locationPairEvents(data,windowMin)||[];}
+  function locationEpisodes(events,episodeGapMin){return locationsModule?.locationEpisodes(events,episodeGapMin)||[];}
+  function multiSubjectSameCellMatches(data,subjects,windowMin){return locationsModule?.multiSubjectSameCellMatches(data,subjects,windowMin)||[];}
+  function locationSharedSummary(episodes){return locationsModule?.locationSharedSummary(episodes)||[];}
+  function renderLocationMatches(){return locationsModule?.renderLocationMatches();}
+  function renderLocations(){return locationsModule?.renderLocations();}
 
   function analyzeIdentifiers(data=state.filtered){
     const byMsisdn=new Map(),byImsi=new Map(),byImei=new Map(),events=[],transitionsBySubject=new Map();
@@ -1414,6 +1313,11 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
     escAttr,escapeHtml,contactTitle,contactLabel,contactTag,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable
   })||null;
 
+  locationsModule=window.CDRLocationsFactory?.({
+    $,state,uniq,escAttr,escapeHtml,localDateKey,locationTowerKey,fmtInt,dtFmt,aggregateLocations,fmtDur
+  })||null;
+  locationsModule?.bind();
+
   $('chooseBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>loadFiles([...e.target.files]); const dz=$('dropZone');['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
   $('mobileFiltersBtn').onclick=()=>setFilterDrawer(true);$('closeFiltersBtn').onclick=()=>setFilterDrawer(false);$('filterBackdrop').onclick=()=>setFilterDrawer(false);
   $('privateSessionBtn').onclick=()=>{state.privateSession=!state.privateSession;updatePrivacyUi();showStatus(state.privateSession?'Private Session enabled. New local persistence is paused.':'Private Session disabled. Local persistence is enabled.','ok');};
@@ -1423,12 +1327,7 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
   $('addChronologyManualBtn').onclick=()=>{const t=$('chronologyText').value.trim();if(!t)return;const d=$('chronologyDt').value?new Date($('chronologyDt').value):new Date();state.chronology.push({id:'m'+Date.now(),time:+d,source:'Manual',text:t,reference:''});$('chronologyText').value='';renderChronology();};$('saveCaseSnapshotBtn').onclick=saveCaseSnapshot;$('applyBtn').onclick=()=>{applyFilters();if(window.innerWidth<=1100)setFilterDrawer(false);};$('resetBtn').onclick=resetFilters;$('printBtn').onclick=()=>window.print();$('reportBtn').onclick=exportCaseReport;$('saveWorkspaceBtn').onclick=saveWorkspace;$('loadWorkspaceBtn').onclick=()=>$('workspaceInput').click();$('clearFilesBtn').onclick=clearLoaded;$('focusIncidentBtn').onclick=applyIncidentWindow;$('movementRefreshBtn').onclick=()=>{stopMovementPlayback();renderMovement();};$('movementDateFrom').onchange=()=>{stopMovementPlayback();renderMovement();};$('movementDateTo').onchange=()=>{stopMovementPlayback();renderMovement();};$('movementHeatMode').onchange=renderMovement;$('movementPlayBtn').onclick=toggleMovementPlayback;$('movementPrevBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex-1,true,true)};$('movementNextBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex+1,true,true)};$('movementSlider').oninput=e=>{stopMovementPlayback();updateMovementPlayback(+e.target.value,true,true)};$('movementSpeed').onchange=()=>{if(movementPlaybackTimer){clearTimeout(movementPlaybackTimer);movementPlaybackTimer=-1;scheduleMovementPlayback();}};$('importTacBtn').onclick=()=>$('tacInput').click();
   $('exportTacBtn').onclick=exportTacCache;
   $('tacInput').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{await importTacDatabase(f);}catch(err){showStatus('TAC import failed: '+err.message,'error');}e.target.value='';});
-  $('smsIntelRefreshBtn').onclick=renderSmsIntelligence;$('smsIntelCdr').onchange=e=>setSubjectEventScope(e.target.value,$('callType')?.value||'');$('smsIntelFrom').onchange=renderSmsIntelligence;$('smsIntelTo').onchange=renderSmsIntelligence;$('incidentRefreshBtn').onclick=renderIncident;$('leadsRefreshBtn').onclick=renderLeads;$('networkRefreshBtn').onclick=()=>{networkSelected=null;renderNetwork();};$('networkMinEvents').onchange=renderNetwork;$('networkSharedOnly').onchange=renderNetwork;$('networkCanvas').addEventListener('click',e=>{const rect=$('networkCanvas').getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;let hit=null,best=24;for(const n of networkNodes){const d=Math.hypot(n.x-x,n.y-y);if(d<best){best=d;hit=n;}}networkSelected=hit?hit.id:null;renderNetwork();});$('locationMatchRunBtn').onclick=renderLocationMatches;
-  $('locationMatchSelectAllBtn').onclick=()=>{state.locationMatchSelected=new Set(uniq('cdrNo'));renderLocationMatchSubjects();renderLocationMatches();};
-  $('locationMatchClearBtn').onclick=()=>{state.locationMatchSelected.clear();renderLocationMatchSubjects();renderLocationMatches();};
-  $('locationMatchMode').onchange=renderLocationMatches;$('locationMatchMins').onchange=renderLocationMatches;$('locationMatchFrom').onchange=renderLocationMatches;$('locationMatchTo').onchange=renderLocationMatches;
-  $('locationMatchSubjects').addEventListener('change',e=>{if(!e.target.classList.contains('location-match-subject'))return;e.target.checked?state.locationMatchSelected.add(e.target.value):state.locationMatchSelected.delete(e.target.value);renderLocationMatches();});
-  $('compareRefreshBtn').onclick=renderCompare;$('exportBtn').onclick=()=>exportCsv(state.filtered,`${safeName($('caseNo').value||$('caseTitle').value)}_filtered_cdr.csv`);$('exportFlagsBtn').onclick=()=>exportCsv(state.records.filter(r=>state.flags.has(r.id)),`${safeName($('caseNo').value||$('caseTitle').value)}_flagged_cdr.csv`);$('exportXlsxBtn').onclick=exportWorkbook;
+  $('smsIntelRefreshBtn').onclick=renderSmsIntelligence;$('smsIntelCdr').onchange=e=>setSubjectEventScope(e.target.value,$('callType')?.value||'');$('smsIntelFrom').onchange=renderSmsIntelligence;$('smsIntelTo').onchange=renderSmsIntelligence;$('incidentRefreshBtn').onclick=renderIncident;$('leadsRefreshBtn').onclick=renderLeads;$('networkRefreshBtn').onclick=()=>{networkSelected=null;renderNetwork();};$('networkMinEvents').onchange=renderNetwork;$('networkSharedOnly').onchange=renderNetwork;$('networkCanvas').addEventListener('click',e=>{const rect=$('networkCanvas').getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;let hit=null,best=24;for(const n of networkNodes){const d=Math.hypot(n.x-x,n.y-y);if(d<best){best=d;hit=n;}}networkSelected=hit?hit.id:null;renderNetwork();});$('compareRefreshBtn').onclick=renderCompare;$('exportBtn').onclick=()=>exportCsv(state.filtered,`${safeName($('caseNo').value||$('caseTitle').value)}_filtered_cdr.csv`);$('exportFlagsBtn').onclick=()=>exportCsv(state.records.filter(r=>state.flags.has(r.id)),`${safeName($('caseNo').value||$('caseTitle').value)}_flagged_cdr.csv`);$('exportXlsxBtn').onclick=exportWorkbook;
   $('exportNotesBtn').onclick=()=>{const payload={case:{title:$('caseTitle').value,caseNo:$('caseNo').value,station:$('station').value,analyst:$('analyst').value},generalNote:$('generalNote').value,recordNotes:state.notes,flagged:[...state.flags]};download(`${safeName($('caseNo').value||$('caseTitle').value)}_notes.json`,JSON.stringify(payload,null,2),'application/json');};
   $('workspaceInput').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{loadWorkspaceObject(JSON.parse(await f.text()));}catch(err){showStatus('Workspace load failed: '+err.message,'error');}e.target.value='';});
   $('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)switchTab(b.dataset.tab)});$('tabs').addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;const tabs=[...document.querySelectorAll('.tab')],cur=tabs.indexOf(document.activeElement);if(cur<0)return;e.preventDefault();let n=e.key==='Home'?0:e.key==='End'?tabs.length-1:e.key==='ArrowRight'?(cur+1)%tabs.length:(cur-1+tabs.length)%tabs.length;tabs[n].focus();switchTab(tabs[n].dataset.tab);});document.addEventListener('click',e=>{const j=e.target.closest('[data-jump]');if(j)switchTab(j.dataset.jump);const lr=e.target.closest('.location-records-filter');if(lr){e.preventDefault();$('cellId').value=lr.dataset.cell||'';$('tower').value=lr.dataset.tower||'';$('operator').value=lr.dataset.operator||'';applyFilters();switchTab('records');}const lm=e.target.closest('.location-movement');if(lm){e.preventDefault();$('cdrNo').value=lm.dataset.subject||'';$('cellId').value='';$('tower').value='';$('operator').value='';applyFilters();syncViewScopeControls(false);if($('movementCdr'))$('movementCdr').value=lm.dataset.subject||'';switchTab('movement');}const dl=e.target.closest('.dashboard-location-filter');if(dl){e.preventDefault();$('cellId').value=dl.dataset.cell||'';$('tower').value=dl.dataset.tower||'';applyFilters();switchTab('records');}const dd=e.target.closest('.dashboard-device-filter');if(dd){e.preventDefault();$('imei').value=dd.dataset.imei||'';$('imsi').value=dd.dataset.imsi||'';applyFilters();switchTab('devices');}const c=e.target.closest('.contact-filter');if(c){e.preventDefault();contactFilter(c.dataset.num);}const f=e.target.closest('.flag-btn');if(f){const id=f.dataset.id;state.flags.has(id)?state.flags.delete(id):state.flags.add(id);renderRecords();renderFlags();}const u=e.target.closest('.unflag');if(u){state.flags.delete(u.dataset.id);renderRecords();renderFlags();}const cp=e.target.closest('.contact-profile-btn');if(cp){e.preventDefault();renderContactProfile(cp.dataset.num);$('contactProfilePanel').scrollIntoView({behavior:'smooth',block:'start'});}const lcr=e.target.closest('.lead-contact-records');if(lcr){e.preventDefault();contactFilter(lcr.dataset.num);}const lvr=e.target.closest('.lead-view-record');if(lvr){e.preventDefault();jumpToRecord(state.records.find(r=>r.id===lvr.dataset.id));}const fl=e.target.closest('.contact-first-last');if(fl){const rr=state.records.filter(r=>samePhone(r.bparty,fl.dataset.num)&&r.dt).sort((a,b)=>a.dt-b.dt);jumpToRecord(fl.dataset.which==='last'?rr[rr.length-1]:rr[0]);}const cs=e.target.closest('.load-case-snapshot');if(cs){const x=caseSnapshots()[+cs.dataset.i];if(x){$('caseTitle').value=x.title||'';$('caseNo').value=x.caseNo||'';$('station').value=x.station||'';$('analyst').value=x.analyst||'';$('incidentDate').value=x.incidentDate||'';$('incidentTime').value=x.incidentTime||'';renderIncident();}}const cd=e.target.closest('.delete-case-snapshot');if(cd){const rows=caseSnapshots();rows.splice(+cd.dataset.i,1);persistLocal('cdrAnalyzer:caseSnapshots',JSON.stringify(rows));renderCaseSnapshots();}const df=e.target.closest('.day-filter');if(df){$('dateFrom').value=df.dataset.date;$('dateTo').value=df.dataset.date;applyFilters();switchTab('records');}const ph=e.target.closest('.pattern-hour-filter');if(ph){const h=String(+ph.dataset.hour).padStart(2,'0');$('timeFrom').value=h+':00';$('timeTo').value=h+':59';applyFilters();switchTab('records');}const phd=e.target.closest('.pattern-hour-date-filter');if(phd){const h=String(+phd.dataset.hour).padStart(2,'0');$('dateFrom').value=phd.dataset.date;$('dateTo').value=phd.dataset.date;$('timeFrom').value=h+':00';$('timeTo').value=h+':59';applyFilters();switchTab('records');}const pch=e.target.closest('.pattern-contact-hour-filter');if(pch){const h=String(+pch.dataset.hour).padStart(2,'0');$('bparty').value=pch.dataset.num;$('timeFrom').value=h+':00';$('timeTo').value=h+':59';applyFilters();switchTab('records');}const pwch=e.target.closest('.pattern-weekday-contact-hour-filter');if(pwch){const h=String(+pwch.dataset.hour).padStart(2,'0'),w=+pwch.dataset.weekday;$('bparty').value=pwch.dataset.num;$('timeFrom').value=h+':00';$('timeTo').value=h+':59';applyFilters();state.filtered=state.filtered.filter(r=>r.dt&&r.dt.getDay()===w);state.page=1;switchTab('records');showStatus('Showing '+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][w]+' records for '+contactLabel(pwch.dataset.num)+' during '+h+':00–'+h+':59.','ok');}const ns=e.target.closest('.night-stay-filter');if(ns){e.preventDefault();const startKey=ns.dataset.night,endKey=shiftLocalDateKey(startKey,1);$('cdrNo').value=ns.dataset.subject||'';$('dateFrom').value=startKey;$('dateTo').value=(timeMins($('nightFrom').value)>timeMins($('nightTo').value))?endKey:startKey;$('nightOnly').checked=true;$('cellId').value='';$('tower').value='';if(ns.dataset.cell)$('cellId').value=ns.dataset.cell;else if(ns.dataset.tower)$('tower').value=ns.dataset.tower;applyFilters();switchTab('records');showStatus('Showing records for the selected subject, night window and main recorded tower.','ok');}const ac=e.target.closest('.add-chronology');if(ac){const r=state.records.find(x=>x.id===ac.dataset.id);if(r&&!state.chronology.some(x=>x.recordId===r.id)){state.chronology.push({id:'r'+r.id,recordId:r.id,time:+(r.dt||new Date()),source:'CDR',text:`${contactLabel(r.bparty)} • ${r.callType} • ${fmtDur(r.duration)}`,reference:`${r.sourceFile} / ${r.sourceSheet} / row ${r.rowNumber}`});}switchTab('chronology');}const rc=e.target.closest('.remove-chronology');if(rc){state.chronology=state.chronology.filter(x=>x.id!==rc.dataset.id);renderChronology();}const rm=e.target.closest('[data-remove-file]');if(rm){const id=+rm.dataset.removeFile;state.records=state.records.filter(r=>r.fileId!==id);state.files=state.files.filter(f=>f.id!==id);refreshSelectors();renderFileList();applyFilters();showStatus('File removed from this browser session.','ok');}});
