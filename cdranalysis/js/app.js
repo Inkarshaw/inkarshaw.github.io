@@ -178,7 +178,7 @@
 
   workspaceModule=window.CDRWorkspaceFactory?.({
     $,state,download,dtFmt,applyFilters,incidentDateTime,refreshSelectors,renderAll,renderFileList,
-    safeName,showStatus,stableKey
+    safeName,showStatus,stableKey,audit,rebuildIndexes
   })||null;
 
   caseModule=window.CDRCaseFactory?.({
