@@ -37,12 +37,12 @@
     const ids=['q','dateFrom','dateTo','timeFrom','timeTo','bparty','durMin','durMax','callType','cdrNo','sourceFile','movementCdr','movementDateFrom','movementDateTo','smsIntelCdr','smsIntelFrom','smsIntelTo','relationshipA','relationshipB','relationshipFrom','relationshipTo','relationshipEvent'];
     const dom={};for(const id of ids){const el=document.getElementById(id);if(el)dom[id]=el.value;}
     const checksDom=['callsOnly','smsOnly','nightOnly','weekendOnly','excludeServiceSenders','relationshipNightOnly'];const domChecks={};for(const id of checksDom){const el=document.getElementById(id);if(el)domChecks[id]=el.checked;}
-    const backup={records:state.records,filtered:state.filtered,files:state.files,analysisMode:state.analysisMode,indexes:state.indexes,chronology:state.chronology,exactIncidentRange:state.exactIncidentRange,page:state.page};
+    const backup={records:state.records,filtered:state.filtered,files:state.files,analysisMode:state.analysisMode,sourceTimezone:state.sourceTimezone,indexes:state.indexes,chronology:state.chronology,exactIncidentRange:state.exactIncidentRange,page:state.page};
     try{
       const dt=new Date('2026-09-29T04:30:00Z');
       const mk=(id,subject,bparty,mins,cell,type='Outgoing Call')=>({id,cdrNo:subject,cdrKey:String(subject),bparty,bpartyKey:String(bparty).replace(/\D/g,'').slice(-10)||String(bparty).toLowerCase(),dt:new Date(+dt+mins*60000),date:'29-09-2026',time:'10:00:00',rawDate:'29-09-2026',rawTime:'10:00:00',sourceTimezone:'Asia/Kolkata',duration:type.includes('Call')?30:0,callType:type,firstCellId:cell,firstAddress:'Test Tower '+cell,lastCellId:cell,lastAddress:'Test Tower '+cell,lat:13.08+(mins/10000),lng:80.27+(mins/10000),imei:'123456789012345',imsi:'404000000000001',operator:'TEST',provider:'TEST',sourceFile:'synthetic.xlsx',sourceSheet:'CDR',rowNumber:+id||1,search:''});
       const r1=mk('1','9000000001','9000000002',0,'A'),r2={...r1,id:'2',rowNumber:2},r3=mk('3','9000000001','9000000003',5,'B'),r4=mk('4','9000000004','9000000002',7,'A'),r5=mk('5','9000000001','VM-SWIGGY',10,'B','SMS');
-      state.records=[r1,r2,r3,r4,r5];state.files=[{id:1,name:'synthetic.xlsx',sheet:'CDR',rows:5,sha256:'synthetic',sourceTimezone:'Asia/Kolkata'}];state.analysisMode='unique';state.exactIncidentRange=null;state.chronology=[];core.rebuildIndexes();
+      state.records=[r1,r2,r3,r4,r5];state.files=[{id:1,name:'synthetic.xlsx',sheet:'CDR',rows:5,sha256:'synthetic',sourceTimezone:'Asia/Kolkata'}];state.analysisMode='unique';state.sourceTimezone='Asia/Kolkata';state.exactIncidentRange=null;state.chronology=[];core.rebuildIndexes();
       for(const id of ids){const el=document.getElementById(id);if(el)el.value='';}for(const id of checksDom){const el=document.getElementById(id);if(el)el.checked=false;}
       window.CDRApp?.refresh?.();
 
@@ -73,7 +73,7 @@
     }catch(err){
       checks.push({type:'functional',name:'Synthetic workflow exception: '+(err?.message||err),ok:false});
     }finally{
-      state.records=backup.records;state.filtered=backup.filtered;state.files=backup.files;state.analysisMode=backup.analysisMode;state.indexes=backup.indexes;state.chronology=backup.chronology;state.exactIncidentRange=backup.exactIncidentRange;state.page=backup.page;
+      state.records=backup.records;state.filtered=backup.filtered;state.files=backup.files;state.analysisMode=backup.analysisMode;state.sourceTimezone=backup.sourceTimezone;state.indexes=backup.indexes;state.chronology=backup.chronology;state.exactIncidentRange=backup.exactIncidentRange;state.page=backup.page;
       for(const [id,v] of Object.entries(dom)){const el=document.getElementById(id);if(el)el.value=v;}for(const [id,v] of Object.entries(domChecks)){const el=document.getElementById(id);if(el)el.checked=v;}
       try{window.CDRApp?.refresh?.();}catch{}
       for(const [id,v] of Object.entries(dom)){const el=document.getElementById(id);if(el&&[...el.options||[]].some?.(o=>o.value===v))el.value=v;else if(el&&el.tagName!=='SELECT')el.value=v;}
