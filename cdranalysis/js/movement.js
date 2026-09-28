@@ -87,8 +87,8 @@
     if(heatMode!=='off'&&typeof L.heatLayer==='function'){
       const inc=incidentDateTime(),win=(+$('incidentWindowHours')?.value||6)*3600000,subject=$('movementCdr')?.value||'';
       const source=state.filtered.filter(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lng)&&(!subject||r.cdrNo===subject)&&movementDateMatch(r)).filter(r=>{
-        if(heatMode==='day')return r.dt&&r.dt.getHours()>=6&&r.dt.getHours()<20;
-        if(heatMode==='night')return r.dt&&(r.dt.getHours()>=20||r.dt.getHours()<6);
+        if(heatMode==='day')return r.dt&&window.CDRCore.sourceHour(r.dt)>=6&&window.CDRCore.sourceHour(r.dt)<20;
+        if(heatMode==='night')return r.dt&&(window.CDRCore.sourceHour(r.dt)>=20||window.CDRCore.sourceHour(r.dt)<6);
         if(heatMode==='incident')return inc&&r.dt&&Math.abs(r.dt-inc)<=win;
         return true;
       });
@@ -260,7 +260,7 @@
     const selected=$('movementCdr')?.value||'';if(selected)data=data.filter(r=>r.cdrNo===selected);
     const groups=new Map();
     for(const r of data){
-      const mins=r.dt.getHours()*60+r.dt.getMinutes();if(!withinNight(mins,start,end))continue;
+      const mins=window.CDRCore.sourceHour(r.dt)*60+r.dt.getMinutes();if(!withinNight(mins,start,end))continue;
       let nightKey=localDateKey(r.dt);if(wrap&&mins<=end)nightKey=shiftLocalDateKey(nightKey,-1);
       if(range.from&&nightKey<range.from)continue;if(range.to&&nightKey>range.to)continue;
       const subject=r.cdrNo||'—',groupKey=subject+'|'+nightKey,towerKey=r.firstCellId||r.firstAddress;
