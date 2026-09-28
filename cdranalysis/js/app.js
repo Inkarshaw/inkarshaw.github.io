@@ -18,6 +18,9 @@
   function serviceSenderType(v){return identityModule?.serviceSenderType(v)||'';}
   function isServiceSender(v){return identityModule?.isServiceSender(v)||false;}
   function senderBrandInfo(v){return identityModule?.senderBrandInfo(v)||null;}
+  function getSmsSenderOverride(v){return identityModule?.getSmsSenderOverride(v)||null;}
+  function setSmsSenderOverride(v,patch){return identityModule?.setSmsSenderOverride(v,patch)||null;}
+  function clearSmsSenderOverride(v){return identityModule?.clearSmsSenderOverride(v)||false;}
   function smsIntelRows(){return identityModule?.smsIntelRows()||[];}
   function smsSenderIntelligence(data=smsIntelRows()){return identityModule?.smsSenderIntelligence(data)||{categories:[],brands:[],timeline:[],callWindowMin:0,idWindowMin:0};}
   function requestIdentifier(v){return identityModule?.requestIdentifier(v)||'';}
@@ -158,7 +161,7 @@
   networkModule?.bind();
 
   analysisModule=window.CDRAnalysisFactory?.({
-    $,state,smsIntelRows,smsSenderIntelligence,senderBrandInfo,fmtInt,escapeHtml,dtFmt,
+    $,state,smsIntelRows,smsSenderIntelligence,senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,fmtInt,escapeHtml,dtFmt,
     incidentDateTime,subjectEventScopedRecords,localDateKey,aggregateContacts,simpleTable,
     escAttr,contactLabel,contactTitle,typePill,fmtDur,normalize,analyzeIdentifiers,percentile,
     setSubjectEventScope
@@ -207,6 +210,7 @@
     formatDateTime:dtFmt,
     formatDuration:fmtDur,
     contactLabel,
+    senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,
     switchTab,
     openPairRecords:(subject,other)=>{if($('cdrNo'))$('cdrNo').value=subject||'';if($('bparty'))$('bparty').value=other||'';applyFilters();switchTab('records');},
     refresh:()=>{refreshSelectors();applyFilters();}
