@@ -243,19 +243,57 @@
     box.innerHTML=`<div class="panel-title"><h3>${escapeHtml(issue.label)}</h3><span class="muted">${fmtInt(issue.rows.length)} affected row(s)${issue.rows.length>300?' • showing first 300':''}</span></div><div class="notice">${escapeHtml(issue.impact)}</div><div class="tablewrap"><table class="table"><thead><tr><th>Date / Time</th><th>Subject</th><th>B Party</th><th>Event</th><th>Cell / Tower</th><th>Source</th><th>Action</th></tr></thead><tbody>${rows.length?rows.map(r=>`<tr><td>${escapeHtml(dtFmt(r.dt)||((r.date||'')+' '+(r.time||'')).trim()||'—')}</td><td>${escapeHtml(r.cdrNo||'—')}</td><td title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(r.bparty?contactLabel(r.bparty):'—')}</td><td>${escapeHtml(r.callType||'—')}</td><td class="details">${escapeHtml([r.firstCellId,r.firstAddress].filter(Boolean).join(' • ')||'—')}</td><td class="details">${escapeHtml([r.sourceFile,r.sourceSheet,r.rowNumber?('row '+r.rowNumber):''].filter(Boolean).join(' / ')||'—')}</td><td><button class="btn secondary small lead-view-record" data-id="${escAttr(r.id)}">View record</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No affected records.</td></tr>'}</tbody></table></div>`;
   }
 
+  function qualityMappingWarnings(fileRows){
+    const checks=[
+      ['missingDate','Date / time','Timeline, chronology, night activity and movement ordering'],
+      ['missingSubject','Subject / CDR No.','Subject-wise, Cross-CDR and relationship analysis'],
+      ['missingParty','B Party / connected number','Contact, network and relationship analysis'],
+      ['missingTower','Tower / Cell ID','Movement, location match, common towers and night stay']
+    ];
+    const out=[];
+    for(const x of fileRows){
+      if(x.total<5)continue;
+      for(const [field,label,impact] of checks){
+        const n=Number(x[field]||0),share=x.total?n/x.total:0;
+        if(share>=0.8)out.push({file:x.key,field,label,impact,count:n,total:x.total,share});
+      }
+    }
+    return out.sort((a,b)=>b.share-a.share||b.count-a.count||String(a.file).localeCompare(String(b.file)));
+  }
+
+  function exportQualityCsv(){
+    const q=qualitySnapshot();
+    const issueNames=new Map();
+    for(const [key,x] of Object.entries(q.issues))for(const r of x.rows){if(!issueNames.has(r.id))issueNames.set(r.id,[]);issueNames.get(r.id).push(x.label);}
+    const cell=v=>{const s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const headers=['Issues','CDR No','B Party','Date/Time','Event Type','Duration Seconds','First Cell ID','First Tower Address','Latitude','Longitude','IMEI','IMSI','Source File','Source Sheet','Source Row'];
+    const lines=[headers.join(',')];
+    for(const r of q.data){
+      const issues=issueNames.get(r.id)||[];
+      if(!issues.length)continue;
+      lines.push([issues.join(' | '),r.cdrNo,r.bparty,dtFmt(r.dt)||((r.date||'')+' '+(r.time||'')).trim(),r.callType,r.duration,r.firstCellId,r.firstAddress,r.lat??'',r.lng??'',r.imei,r.imsi,r.sourceFile,r.sourceSheet,r.rowNumber].map(cell).join(','));
+    }
+    const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download='cdr_data_quality_issues.csv';link.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
   function renderDataQuality(){
     const q=qualitySnapshot(),total=q.data.length,affected=q.issueIds.size,clean=Math.max(0,total-affected);
     const pct=n=>total?((n*100/total).toFixed(1)+'%'):'0.0%';
     const issueOrder=['duplicates','missingDate','missingSubject','missingParty','missingTower','missingCoords'];
     const subjectRows=qualityGroupRows(q,'cdrNo','— Missing subject —').slice(0,100);
     const fileRows=qualityGroupRows(q,'sourceFile','— Unknown source file —').slice(0,100);
-    const groupTable=rows=>`<div class="tablewrap"><table class="table"><thead><tr><th>Name</th><th>Records</th><th>Missing date</th><th>Missing subject</th><th>Missing B Party</th><th>Missing tower</th><th>Missing coordinates</th><th>Duplicate-group rows</th></tr></thead><tbody>${rows.length?rows.map(x=>`<tr><td class="details">${escapeHtml(x.key)}</td><td>${fmtInt(x.total)}</td><td>${fmtInt(x.missingDate)}</td><td>${fmtInt(x.missingSubject)}</td><td>${fmtInt(x.missingParty)}</td><td>${fmtInt(x.missingTower)}</td><td>${fmtInt(x.missingCoords)}</td><td>${fmtInt(x.duplicateRows)}</td></tr>`).join(''):'<tr><td colspan="8" class="empty">No data.</td></tr>'}</tbody></table></div>`;
+    const mappingWarnings=qualityMappingWarnings(fileRows);
+    const groupTable=(rows,kind)=>`<div class="tablewrap"><table class="table"><thead><tr><th>Name</th><th>Records</th><th>Missing date</th><th>Missing subject</th><th>Missing B Party</th><th>Missing tower</th><th>Missing coordinates</th><th>Duplicate-group rows</th><th>Action</th></tr></thead><tbody>${rows.length?rows.map(x=>`<tr><td class="details">${escapeHtml(x.key)}</td><td>${fmtInt(x.total)}</td><td>${fmtInt(x.missingDate)}</td><td>${fmtInt(x.missingSubject)}</td><td>${fmtInt(x.missingParty)}</td><td>${fmtInt(x.missingTower)}</td><td>${fmtInt(x.missingCoords)}</td><td>${fmtInt(x.duplicateRows)}</td><td>${((kind==='subject'&&x.key!=='— Missing subject —')||(kind==='file'&&x.key!=='— Unknown source file —'))?`<button class="btn secondary small quality-scope-records" data-kind="${kind}" data-value="${escAttr(x.key)}">Open records</button>`:'—'}</td></tr>`).join(''):'<tr><td colspan="9" class="empty">No data.</td></tr>'}</tbody></table></div>`;
     const dupRows=q.duplicateGroups.slice(0,100).map(([,rows])=>{
       const r=rows[0];
       return `<tr><td>${fmtInt(rows.length)}</td><td>${escapeHtml(r.cdrNo||'—')}</td><td title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(r.bparty?contactLabel(r.bparty):'—')}</td><td>${escapeHtml(dtFmt(r.dt)||((r.date||'')+' '+(r.time||'')).trim()||'—')}</td><td>${escapeHtml(r.callType||'—')}</td><td>${escapeHtml(r.firstCellId||'—')}</td><td class="details">${escapeHtml(rows.map(x=>[x.sourceFile,x.sourceSheet,x.rowNumber?('row '+x.rowNumber):''].filter(Boolean).join(' / ')).join(' | '))}</td><td><button class="btn secondary small lead-view-record" data-id="${escAttr(r.id)}">View sample</button></td></tr>`;
     }).join('');
     $('qualitySummary').innerHTML=`
       <div class="notice">These checks describe the structure of the loaded CDR rows. A missing field does not automatically make an entire CDR unusable; it indicates which downstream analyses may be incomplete or unavailable for the affected rows.</div>
+      <div class="subtoolbar no-print" style="margin:10px 0"><button class="btn secondary small" id="qualityExportBtn">Export quality issues CSV</button><span class="tiny">Exports only rows that have at least one listed quality issue.</span></div>
       <div class="kpis">
         <div class="kpi"><div class="v">${fmtInt(total)}</div><div class="l">Records checked</div></div>
         <div class="kpi"><div class="v">${fmtInt(affected)}</div><div class="l">Rows with ≥1 issue</div><div class="s">${pct(affected)}</div></div>
@@ -268,15 +306,18 @@
         ${issueOrder.map(k=>{const x=q.issues[k];return `<tr><td><b>${escapeHtml(x.label)}</b></td><td>${fmtInt(x.rows.length)}</td><td>${pct(x.rows.length)}</td><td class="details">${escapeHtml(x.impact)}</td><td><button class="btn secondary small quality-review" data-issue="${k}">View affected</button></td></tr>`}).join('')}
       </tbody></table></div>
       <div id="qualityDrilldown" style="margin-top:16px"><div class="empty">Choose “View affected” to inspect the source rows for an issue.</div></div>
+      <h3 style="margin-top:20px">Potential file mapping / metadata problems</h3>
+      <div class="tiny" style="margin-bottom:6px">A warning appears when at least 80% of a file's rows (minimum 5 rows) are missing the same key field. This is a prompt to review the source export or column mapping, not proof that the file was parsed incorrectly.</div>
+      <div class="tablewrap"><table class="table"><thead><tr><th>File</th><th>Field</th><th>Affected</th><th>Share</th><th>Analysis affected</th><th>Action</th></tr></thead><tbody>${mappingWarnings.length?mappingWarnings.map(x=>`<tr><td class="details">${escapeHtml(x.file)}</td><td><b>${escapeHtml(x.label)}</b></td><td>${fmtInt(x.count)} / ${fmtInt(x.total)}</td><td>${(x.share*100).toFixed(1)}%</td><td class="details">${escapeHtml(x.impact)}</td><td>${x.file!=='— Unknown source file —'?`<button class="btn secondary small quality-scope-records" data-kind="file" data-value="${escAttr(x.file)}">Open file records</button>`:'—'}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No strong file-level missing-field concentration detected.</td></tr>'}</tbody></table></div>
       <h3 style="margin-top:20px">Likely duplicate groups</h3>
       <div class="tiny" style="margin-bottom:6px">A duplicate signature uses Subject + B Party + Date/Time + Duration + Event Type + First Cell ID. Matching signatures can be genuine repeated records in some provider exports, so review the source rows before removing anything.</div>
       <div class="tablewrap"><table class="table"><thead><tr><th>Rows</th><th>Subject</th><th>B Party</th><th>Date / Time</th><th>Event</th><th>Cell ID</th><th>Sources</th><th>Action</th></tr></thead><tbody>${dupRows||'<tr><td colspan="8" class="empty">No duplicate-signature groups found.</td></tr>'}</tbody></table></div>
       <h3 style="margin-top:20px">Quality by subject</h3>
       <div class="tiny" style="margin-bottom:6px">Use this to identify whether missing fields are concentrated in one subject/CDR rather than across the whole upload.</div>
-      ${groupTable(subjectRows)}
+      ${groupTable(subjectRows,'subject')}
       <h3 style="margin-top:20px">Quality by imported file</h3>
       <div class="tiny" style="margin-bottom:6px">Useful for spotting a provider/export file whose column mapping or metadata is incomplete.</div>
-      ${groupTable(fileRows)}
+      ${groupTable(fileRows,'file')}
     `;
   }
 
@@ -321,11 +362,20 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
       $('smsIntelTo').onchange=renderSmsIntelligence;
       $('incidentRefreshBtn').onclick=renderIncident;
       $('leadsRefreshBtn').onclick=renderLeads;
-      document.addEventListener('click',e=>{const q=e.target.closest('.quality-review');if(q){e.preventDefault();renderQualityDrilldown(q.dataset.issue||'');}});
+      document.addEventListener('click',e=>{
+        const q=e.target.closest('.quality-review');if(q){e.preventDefault();renderQualityDrilldown(q.dataset.issue||'');return;}
+        if(e.target.closest('#qualityExportBtn')){e.preventDefault();exportQualityCsv();return;}
+        const scope=e.target.closest('.quality-scope-records');if(scope){
+          e.preventDefault();
+          if(scope.dataset.kind==='subject'){if($('cdrNo'))$('cdrNo').value=scope.dataset.value||'';if($('sourceFile'))$('sourceFile').value='';}
+          if(scope.dataset.kind==='file'){if($('sourceFile'))$('sourceFile').value=scope.dataset.value||'';if($('cdrNo'))$('cdrNo').value='';}
+          $('applyBtn')?.click();window.CDRApp?.switchTab?.('records');
+        }
+      });
     }
 
     return {
-      renderSmsIntelligence,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,
+      renderSmsIntelligence,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,exportQualityCsv,
       findBursts,identifierUsage,deviceChangeDetailsHtml,buildLeads,renderLeads,bind
     };
   };
