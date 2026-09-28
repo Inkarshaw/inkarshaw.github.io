@@ -1057,6 +1057,14 @@
   renderList();
   updateStats();
   updateDeletedCount();
+
+  if(!cases.length&&cloudToken()){
+    ['totalCount','activeCount','upcomingCount','overdueCount'].forEach(id=>{const el=$(id);if(el)el.textContent='…'});
+    const list=$('caseList');if(list)list.innerHTML='<div class="empty">Loading cloud cases…</div>';
+    const recent=$('recentCases');if(recent)recent.innerHTML='<div class="empty">Restoring your cases…</div>';
+    setCloudState('Restoring cloud cases…','idle');
+  }
+
   (async()=>{
     const ok=await checkCloudSession();
     if(ok){
@@ -1065,8 +1073,13 @@
         mergeCurrentCaseHandoff();
         renderList();updateStats();updateDeletedCount();
       }catch(e){
+        mergeCurrentCaseHandoff();
+        renderList();updateStats();updateDeletedCount();
         setCloudState('Cloud temporarily unavailable · local data shown','error');
       }
+    }else{
+      mergeCurrentCaseHandoff();
+      renderList();updateStats();updateDeletedCount();
     }
   })();
 </script>
