@@ -144,7 +144,7 @@
   })||null;
 
   locationsModule=window.CDRLocationsFactory?.({
-    $,state,uniq,escAttr,escapeHtml,localDateKey,locationTowerKey,fmtInt,dtFmt,aggregateLocations,fmtDur
+    $,state,uniq,escAttr,escapeHtml,localDateKey,locationTowerKey,fmtInt,dtFmt,aggregateLocations,fmtDur,analysisRecords
   })||null;
   locationsModule?.bind();
 
