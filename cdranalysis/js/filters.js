@@ -69,6 +69,7 @@
       }else{const hay=normalize(r.search+' '+contactLabel(r.bparty)+' '+(contactTag(r.bparty)));if(!hay.includes(normalize(token)))return false;}
     }return true;
   }
+  function sourceDateBoundary(value,end=false){if(!value)return null;const [y,m,d]=String(value).split('-').map(Number);return window.CDRCore.dateFromSourceParts(y,m-1,d,end?23:0,end?59:0,end?59:0,state.sourceTimezone);}
   function withinNight(mins,start,end){if(start===null||end===null||mins===null)return true; return start<=end?(mins>=start&&mins<=end):(mins>=start||mins<=end);}
   function activeFilterCount(){
     const ids=['q','dateFrom','dateTo','timeFrom','timeTo','bparty','durMin','durMax','cellId','tower','city','subcity','roaming','imei','imsi','provider','operator'];
@@ -81,7 +82,7 @@
   function updateFilterCount(){if($('activeFilterCount'))$('activeFilterCount').textContent=activeFilterCount();}
   function setFilterDrawer(open){$('filterSidebar')?.classList.toggle('open',open);$('filterBackdrop')?.classList.toggle('show',open);$('mobileFiltersBtn')?.setAttribute('aria-expanded',String(open));$('filterSidebar')?.setAttribute('aria-hidden',String(window.innerWidth<=1100?!open:false));}
   function applyFilters(){
-    const f={q:normalize($('q').value),dateFrom:$('dateFrom').value?new Date($('dateFrom').value+'T00:00:00'):null,dateTo:$('dateTo').value?new Date($('dateTo').value+'T23:59:59'):null,
+    const f={q:normalize($('q').value),dateFrom:sourceDateBoundary($('dateFrom').value,false),dateTo:sourceDateBoundary($('dateTo').value,true),
       timeFrom:timeMins($('timeFrom').value),timeTo:timeMins($('timeTo').value),bparty:normalize($('bparty').value),durMin:$('durMin').value===''?null:+$('durMin').value,durMax:$('durMax').value===''?null:+$('durMax').value,
       callType:$('callType').value,callsOnly:$('callsOnly').checked,smsOnly:$('smsOnly').checked,nightOnly:$('nightOnly').checked,weekendOnly:$('weekendOnly').checked,excludeServiceSenders:$('excludeServiceSenders').checked,nightFrom:timeMins($('nightFrom').value),nightTo:timeMins($('nightTo').value),
       cellId:normalize($('cellId').value),tower:normalize($('tower').value),city:normalize($('city').value),subcity:normalize($('subcity').value),roaming:normalize($('roaming').value),imei:normalize($('imei').value),imsi:normalize($('imsi').value),provider:normalize($('provider').value),operator:normalize($('operator').value),cdrNo:$('cdrNo').value,sourceFile:$('sourceFile').value};
