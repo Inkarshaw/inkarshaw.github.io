@@ -96,8 +96,8 @@
 </style>
 </head>
 <body>
-<header class="topbar"><div class="wrap"><div class="brand"><div class="brand-mark">CE</div><div><h1>Edit Case</h1><p>ClearExams • My Cases</p></div></div><button class="btn" type="button" onclick="history.length>1?history.back():location.href='/mycases/?v=20260928-3'">← Back</button></div></header>
-<main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><button class="btn" type="button" onclick="location.href='/mycases/?v=20260928-3'">Dashboard</button></div>
+<header class="topbar"><div class="wrap"><div class="brand"><div class="brand-mark">CE</div><div><h1>Edit Case</h1><p>ClearExams • My Cases</p></div></div><button class="btn" type="button" onclick="goToDashboard()">← Back</button></div></header>
+<main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><button class="btn" type="button" onclick="goToDashboard()">Dashboard</button></div>
 <form class="quick-create hidden" id="quickCaseForm"><input id="quickCrimeNo"></form>
 <form class="form-wrap" id="caseForm">
           <div class="case-status-strip" id="caseStatusStrip">
@@ -573,14 +573,54 @@
     const nextAcc=Array.isArray(next.accusedPersons)?next.accusedPersons:[];
     nextAcc.forEach(a=>{const old=prevAcc.find(x=>x.id===a.id);if(old&&(old.status||'')!==(a.status||''))addAutoTimeline(a.status==='Arrested'?'Arrest':(a.status==='Bail'?'Bail':(a.status==='Remand'?'Remand':'Investigation')),(a.name||'Accused')+' status changed from '+(old.status||'Not set')+' to '+(a.status||'Not set'),a.arrestDate||'');});
   }
-  function saveCurrent(openDocs=false){
+  let saveInFlight=null;
+  async function saveCurrent(openDocs=false){
+    clearTimeout(autoSaveTimer);
     const c=formData();
     if(!c.crimeNo){showToast('Enter the Crime / CSR / UDR number to create the case.');$('crimeNo').focus();return false}
-    const i=cases.findIndex(x=>x.id===c.id);const wasExisting=i>=0;if(wasExisting)cases[i]=c;else cases.unshift(c);
-    saveCases();selectedId=c.id;renderList();showDetail(c);showToast('Case saved.');
-    pushCaseToCloud(c,wasExisting);
-    if(openDocs)setTimeout(()=>openInDocuments(c),250);
+    const i=cases.findIndex(x=>String(x.id)===String(c.id));
+    const wasExisting=i>=0;
+    if(wasExisting)cases[i]=c;else cases.unshift(c);
+    saveCases();
+    selectedId=c.id;
+    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c))}catch(e){}
+    setSaveState('✓ Saved locally','local');
+    updateCaseStatusStrip();
+    renderList();
+
+    const run=async()=>{
+      let cloudOk=true;
+      if(cloudToken()){
+        setSaveState('Saving to cloud…','saving');
+        cloudOk=await pushCaseToCloud(c,wasExisting);
+        const latest=cases.find(x=>String(x.id)===String(c.id))||c;
+        try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(latest))}catch(e){}
+        setSaveState(cloudOk?'☁ Synced':'⚠ Cloud sync pending',cloudOk?'cloud':'error');
+      }else{
+        setSaveState('✓ Saved locally · cloud login required','local');
+      }
+      showToast(cloudOk&&cloudToken()?'Case saved and synced.':'Case saved locally.');
+      if(openDocs){
+        const latest=cases.find(x=>String(x.id)===String(c.id))||c;
+        openInDocuments(latest);
+      }
+      return cloudOk;
+    };
+    saveInFlight=run();
+    try{await saveInFlight;}finally{saveInFlight=null}
     return true;
+  }
+
+  async function goToDashboard(){
+    clearTimeout(autoSaveTimer);
+    const id=$('caseId')?.value||'';
+    if(id&&$('crimeNo')?.value.trim()){
+      await autoSaveExisting();
+    }else if(!id&&$('crimeNo')?.value.trim()){
+      await saveCurrent(false);
+    }
+    if(saveInFlight)try{await saveInFlight}catch(e){}
+    window.location.href='/mycases/?view=dashboard&v=20260928-4';
   }
 
   function linkedRequestsHtml(c){
@@ -745,8 +785,8 @@
   $('finalResult').addEventListener('change',()=>{const v=$('finalResult').value;if(v){const stageMap={'Committed to Higher Court':'Case Disposed','Other Disposal':'Case Disposed'};$('stage').value=stageMap[v]||v;}updateCaseStatusStrip();scheduleAutoSave();});
   $('openDocsFromEdit').addEventListener('click',()=>{const c=cases.find(x=>x.id===$('caseId').value)||formData();openInDocuments(c);});
   document.querySelectorAll('.doc-shortcut').forEach(btn=>btn.addEventListener('click',()=>{const c=cases.find(x=>x.id===$('caseId').value)||formData();openDocumentShortcut(c,btn.dataset.docq);}));
-  $('caseForm').addEventListener('submit',e=>{e.preventDefault();saveCurrent(false)});
-  $('saveAndOpenBtn').addEventListener('click',()=>saveCurrent(true));
+  $('caseForm').addEventListener('submit',async e=>{e.preventDefault();await saveCurrent(false)});
+  $('saveAndOpenBtn').addEventListener('click',async()=>{await saveCurrent(true)});
   // New Case uses direct mobile-safe startNewCase() handler.
   $('clearFormBtn').addEventListener('click',clearForm);
   $('searchInput').addEventListener('input',renderList);$('stageFilter').addEventListener('change',renderList);$('priorityFilter').addEventListener('change',renderList);
@@ -809,6 +849,18 @@
   $('caseForm').addEventListener('click',e=>{if(e.target.closest('#addTaskBtn,#addTimelineBtn,#addHearingBtn,.task-delete,.timeline-delete,.hearing-delete,.accused-remove'))setTimeout(scheduleAutoSave,30);});
   document.querySelectorAll('[data-mobile-tab]').forEach(b=>b.addEventListener('click',()=>{setCaseTab(b.dataset.mobileTab);updateMobileNav(b.dataset.mobileTab);window.scrollTo({top:0,behavior:'smooth'});}));
   $('mobileMoreBtn').addEventListener('click',()=>$('mobileMoreMenu').classList.toggle('open'));
+
+  window.addEventListener('beforeunload',()=>{
+    try{
+      const id=$('caseId')?.value||'';
+      if(!id||!$('crimeNo')?.value.trim())return;
+      clearTimeout(autoSaveTimer);
+      const c=formData(),i=cases.findIndex(x=>String(x.id)===String(id));
+      if(i>=0)cases[i]=c;
+      saveCases();
+      localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c));
+    }catch(e){}
+  });
 
   populateStages();clearForm();renderList();updateCaseStatusStrip();checkCloudSession();
 </script>
