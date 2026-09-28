@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   window.CDRContactsFactory = function(ctx){
-    const {$,state,aggregateContacts,aggregateLocations,identityStore,defaultCdrRequestDates,updateCdrRequestCount,requestIdentifier,escAttr,escapeHtml,contactTitle,contactLabel,contactTag,contactName,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable,showStatus,localDateKey}=ctx;
+    const {$,state,aggregateContacts,aggregateLocations,identityStore,defaultCdrRequestDates,updateCdrRequestCount,requestIdentifier,escAttr,escapeHtml,contactTitle,contactLabel,contactTag,contactName,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable,showStatus,localDateKey,analysisRecords}=ctx;
 
     function render(){
       const rows=aggregateContacts(),opts=['','Suspect','Victim','Witness','Associate','Service','Other'];
@@ -33,13 +33,13 @@
     }
 
     function renderProfile(num){
-      const rows=state.records.filter(r=>r.bparty===num).sort((a,b)=>(a.dt?.getTime?.()||0)-(b.dt?.getTime?.()||0));
+      const rows=(analysisRecords?analysisRecords():state.records).filter(r=>r.bparty===num).sort((a,b)=>(a.dt?.getTime?.()||0)-(b.dt?.getTime?.()||0));
       const a=aggregateContacts(rows)[0];
       if(!a){
         $('contactProfilePanel').innerHTML='<div class="empty">No contact data.</div>';
         return;
       }
-      const night=rows.filter(r=>r.dt&&(r.dt.getHours()>=22||r.dt.getHours()<6)).length;
+      const night=rows.filter(r=>r.dt&&(window.CDRCore.sourceHour(r.dt)>=22||window.CDRCore.sourceHour(r.dt)<6)).length;
       const towers=aggregateLocations(rows).slice(0,8),subjects=[...new Set(rows.map(r=>r.cdrNo).filter(Boolean))];
       $('contactProfilePanel').innerHTML=`<div class="panel" style="box-shadow:none"><div class="panel-title"><h2>${escapeHtml(contactLabel(num))}</h2><span class="muted">${escapeHtml(num)}</span></div><div class="kpis"><div class="kpi"><div class="v">${a.records}</div><div class="l">Events</div></div><div class="kpi"><div class="v">${a.calls}</div><div class="l">Calls</div></div><div class="kpi"><div class="v">${a.sms}</div><div class="l">SMS</div></div><div class="kpi"><div class="v">${fmtDur(a.duration)}</div><div class="l">Duration</div></div><div class="kpi"><div class="v">${night}</div><div class="l">Night events</div></div></div><p><b>First:</b> ${dtFmt(a.first)||'—'} <button class="btn secondary small contact-first-last" data-num="${escAttr(num)}" data-which="first">View first</button> &nbsp; <b>Last:</b> ${dtFmt(a.last)||'—'} <button class="btn secondary small contact-first-last" data-num="${escAttr(num)}" data-which="last">View last</button><br><b>Subjects:</b> ${escapeHtml(subjects.join(', ')||'—')}<br><b>Sender classification:</b> ${escapeHtml(serviceSenderType(num)||'Ordinary/unknown')}</p><p><button class="btn secondary small relationship-open" data-num="${escAttr(num)}">Check Relationship</button></p><h3>Most-used towers</h3>${simpleTable(['Tower','Events','First','Last'],towers.map(t=>[escapeHtml(t.address||t.cellId||'—'),fmtInt(t.records),dtFmt(t.first),dtFmt(t.last)]))}</div>`;
     }
