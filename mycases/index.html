@@ -6,6 +6,15 @@
     <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
   <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#071c33">
+  <script>
+  (function canonicalizeMyCasesOrigin(){
+    const host=location.hostname.toLowerCase();
+    if(host==='www.clearexams.ink'||host==='inkarshaw.github.io'){
+      const target='https://clearexams.ink'+location.pathname+location.search+location.hash;
+      location.replace(target);
+    }
+  })();
+  </script>
   <meta name="description" content="My Cases is a browser-based police case workspace for tracking case details, stages, court information and upcoming hearings.">
   <link rel="canonical" href="https://clearexams.ink/mycases/">
   <title>My Cases | ClearExams Police Tools</title>
@@ -379,12 +388,14 @@
   function saveDeletedCases(){localStorage.setItem(DELETED_STORAGE_KEY,JSON.stringify(deletedCases))}
   function cloudToken(){
     const saved=localStorage.getItem(CLOUD_TOKEN_KEY)||'';
-    if(saved)return saved;
-    const legacy=sessionStorage.getItem(CLOUD_TOKEN_KEY)||'';
-    if(legacy){
-      localStorage.setItem(CLOUD_TOKEN_KEY,legacy);
-      sessionStorage.removeItem(CLOUD_TOKEN_KEY);
-      return legacy;
+    const sessionSaved=sessionStorage.getItem(CLOUD_TOKEN_KEY)||'';
+    if(saved){
+      if(sessionSaved!==saved)sessionStorage.setItem(CLOUD_TOKEN_KEY,saved);
+      return saved;
+    }
+    if(sessionSaved){
+      localStorage.setItem(CLOUD_TOKEN_KEY,sessionSaved);
+      return sessionSaved;
     }
     return '';
   }
@@ -455,7 +466,7 @@
     $('submitLoginBtn').disabled=true;
     try{
       const data=await cloudFetch('/api/login',{method:'POST',body:JSON.stringify({password})});
-      localStorage.setItem(CLOUD_TOKEN_KEY,data.token);sessionStorage.removeItem(CLOUD_TOKEN_KEY);
+      localStorage.setItem(CLOUD_TOKEN_KEY,data.token);sessionStorage.setItem(CLOUD_TOKEN_KEY,data.token);
       $('cloudPassword').value='';
       const loginDialog=$('loginDialog');
       if(loginDialog){loginDialog.classList.remove('open');loginDialog.style.display='none';loginDialog.setAttribute('aria-hidden','true');}
