@@ -43,6 +43,19 @@
   function phoneish(v){const s=String(v??'').trim(),d=s.replace(/\D/g,'');return d.length>=10?d.slice(-10):s.toLowerCase().replace(/\s+/g,'');}
   function getIndex(name,key){const idx=(state.indexes?.mode===state.analysisMode&&state.indexes?.rawCount===state.records.length)?state.indexes:rebuildIndexes();return idx?.[name]?.get(key)||[];}
   function audit(action,details=''){const entry={at:new Date().toISOString(),caseNo:$('caseNo')?.value||'',caseTitle:$('caseTitle')?.value||'',action:String(action||''),details:String(details||'')};state.auditTrail.push(entry);if(state.auditTrail.length>5000)state.auditTrail.splice(0,state.auditTrail.length-5000);if(!state.privateSession){try{localStorage.setItem('cdrAnalyzer:auditTrail',JSON.stringify(state.auditTrail));}catch{}}return entry;}
+  function sourceDateParts(d){
+    if(!(d instanceof Date)||isNaN(d))return null;
+    const tz=displayTz();
+    if(!tz)return {year:d.getFullYear(),month:d.getMonth()+1,day:d.getDate(),hour:d.getHours(),minute:d.getMinutes(),second:d.getSeconds(),weekday:d.getDay()};
+    try{
+      const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short',hourCycle:'h23'}).formatToParts(d).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
+      const wd={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+      return {year:+parts.year,month:+parts.month,day:+parts.day,hour:+parts.hour,minute:+parts.minute,second:+parts.second,weekday:wd[parts.weekday]??0};
+    }catch{return {year:d.getFullYear(),month:d.getMonth()+1,day:d.getDate(),hour:d.getHours(),minute:d.getMinutes(),second:d.getSeconds(),weekday:d.getDay()};}
+  }
+  function sourceMinutes(d){const p=sourceDateParts(d);return p?p.hour*60+p.minute:null;}
+  function sourceHour(d){const p=sourceDateParts(d);return p?.hour??null;}
+  function sourceWeekday(d){const p=sourceDateParts(d);return p?.weekday??null;}
   function sourceTimezoneOffsetMinutes(tz){if(tz==='UTC')return 0;if(tz==='Asia/Kolkata')return 330;return null;}
   function dateFromSourceParts(y,m,d,h=0,min=0,sec=0,tz=state.sourceTimezone){const off=sourceTimezoneOffsetMinutes(tz);return off==null?new Date(y,m,d,h,min,sec,0):new Date(Date.UTC(y,m,d,h,min,sec,0)-off*60000);}
 
@@ -59,6 +72,6 @@
   window.CDRCore={
     $,state,FIELDS,normalize,escapeHtml,fmtInt,fmtDur,dateFmt,dtFmt,val,stableKey,localDateKey,
     haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,uniq,fillSelect,
-    sortData,typePill,safeName,duplicateSignature,uniqueRecords,analysisRecords,rebuildIndexes,getIndex,audit,sourceTimezoneOffsetMinutes,dateFromSourceParts
+    sortData,typePill,safeName,duplicateSignature,uniqueRecords,analysisRecords,rebuildIndexes,getIndex,audit,sourceDateParts,sourceMinutes,sourceHour,sourceWeekday,sourceTimezoneOffsetMinutes,dateFromSourceParts
   };
 })();
