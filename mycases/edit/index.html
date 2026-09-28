@@ -280,7 +280,29 @@
   function loadCases(){
     try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
   }
-  function saveCases(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cases))}
+  function compactCaseForLocal(item){
+    const safe=JSON.parse(JSON.stringify(item||{}));
+    delete safe.accusedPhoto;
+    if(Array.isArray(safe.accusedPersons))safe.accusedPersons.forEach(p=>delete p.photo);
+    if(Array.isArray(safe.attachments))safe.attachments.forEach(a=>delete a.data);
+    return safe;
+  }
+  function saveCases(){
+    try{
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(cases));
+      return true;
+    }catch(e){
+      try{
+        const compact=cases.map(compactCaseForLocal);
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(compact));
+        cases=cases.map((item,i)=>mergeCloudCase(item,compact[i]));
+        return true;
+      }catch(e2){
+        console.error('My Cases local save failed',e2);
+        return false;
+      }
+    }
+  }
   function cookieToken(){
     try{
       const prefix=CLOUD_TOKEN_COOKIE+'=';
@@ -595,10 +617,10 @@
     const i=cases.findIndex(x=>String(x.id)===String(c.id));
     const wasExisting=i>=0;
     if(wasExisting)cases[i]=c;else cases.unshift(c);
-    saveCases();
+    const localSaved=saveCases();
     selectedId=c.id;
     try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c))}catch(e){}
-    setSaveState('✓ Saved locally','local');
+    setSaveState(localSaved?'✓ Saved locally':'⚠ Local storage full · saving to cloud','local');
     updateCaseStatusStrip();
     renderList();
 
@@ -842,8 +864,8 @@
   async function autoSaveExisting(){
     const id=$('caseId')?.value;if(!id||!$('crimeNo')?.value.trim())return;
     const c=formData(),i=cases.findIndex(x=>String(x.id)===String(id));if(i<0)return;
-    cases[i]=c;saveCases();try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c))}catch(e){}
-    setSaveState('✓ Saved locally','local');updateCaseStatusStrip();
+    cases[i]=c;const localSaved=saveCases();try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)))}catch(e){}
+    setSaveState(localSaved?'✓ Saved locally':'⚠ Local storage full · saving to cloud','local');updateCaseStatusStrip();
     if(cloudToken()){
       const ok=await pushCaseToCloud(c,true);
       setSaveState(ok?'☁ Synced':'⚠ Cloud sync pending',ok?'cloud':'error');
