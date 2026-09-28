@@ -102,6 +102,35 @@
     panel.scrollIntoView({behavior:'smooth',block:'start'});
   }
 
+  function smsCrossSubjectClosestGap(timeline,brandKey){
+    const rows=timeline.filter(x=>x.brandKey===brandKey&&x.record?.dt&&x.record?.cdrNo).sort((a,b)=>a.record.dt-b.record.dt);
+    let best=Infinity;
+    for(let i=0;i<rows.length;i++){
+      for(let j=i+1;j<rows.length;j++){
+        if(rows[i].record.cdrNo===rows[j].record.cdrNo)continue;
+        const gap=Math.abs(rows[j].record.dt-rows[i].record.dt)/60000;
+        if(gap<best)best=gap;
+        if(rows[j].record.dt-rows[i].record.dt>best*60000&&Number.isFinite(best))break;
+      }
+    }
+    return Number.isFinite(best)?best:null;
+  }
+
+  function exportSmsIntelCsv(){
+    const rows=smsIntelRows(),A=smsSenderIntelligence(rows),firstMap=smsFirstObservationMap();
+    const inc=incidentDateTime(),incidentMin=Math.max(1,+$('smsIntelIncidentMins')?.value||60),incidentMs=incidentMin*60000;
+    const cell=v=>{const s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const headers=['Date/Time','Subject','Raw Sender ID','Brand Inference','Recognition','Service Category','Basis','First Observed','Unusual Time','Near Incident','Nearby Calls','Nearby IMSI/IMEI Changes','Cell ID','Tower Address','IMEI','IMSI','Source File','Source Sheet','Source Row'];
+    const lines=[headers.join(',')];
+    for(const x of A.timeline){
+      const r=x.record,first=firstMap.get(String(r.cdrNo||'')+'|'+String(x.brandKey||''));
+      const firstObserved=!!first&&first.id===r.id,nearIncident=!!inc&&Math.abs(r.dt-inc)<=incidentMs;
+      lines.push([dtFmt(r.dt),r.cdrNo,x.senderId,x.brand,x.recognition,x.category,x.basis,firstObserved?'Yes':'No',x.unusual?'Yes':'No',nearIncident?'Yes':'No',x.nearbyCalls,x.nearbyIds,r.firstCellId,r.firstAddress,r.imei,r.imsi,r.sourceFile,r.sourceSheet,r.rowNumber].map(cell).join(','));
+    }
+    const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download='sms_intelligence_review.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
   function renderSmsIntelligence(){
     if(!$('smsIntelSummary'))return;
     const from=$('smsIntelFrom').value,to=$('smsIntelTo').value;
@@ -141,13 +170,13 @@
 
     const firstRows=decorated.filter(x=>x.firstObserved).slice(0,20);
     const incidentRows=decorated.filter(x=>x.incidentNear).sort((a,b)=>Math.abs(a.record.dt-inc)-Math.abs(b.record.dt-inc)).slice(0,20);
-    const crossRows=A.brands.filter(x=>x.subjects.size>1).slice(0,20);
+    const crossRows=A.brands.filter(x=>x.subjects.size>1).slice(0,20).map(x=>({...x,closestGap:smsCrossSubjectClosestGap(decorated,x.key)}));
     $('smsIntelInsights').innerHTML=`<div class="split">
       <div><h4>First-observed senders in current view</h4>${firstRows.length?firstRows.map(x=>`<div class="note-card"><b>${escapeHtml(x.brand)}</b> • ${escapeHtml(x.category)} • ${escapeHtml(dtFmt(x.record.dt))}<br><span class="tiny">${escapeHtml(x.record.cdrNo||'—')} • ${escapeHtml(x.senderId)} • ${escapeHtml(x.recognition)}</span> <button class="lead-action sms-context" data-id="${escAttr(x.record.id)}">Show context</button></div>`).join(''):'<div class="empty">No first-observed sender falls inside the current SMS filters.</div>'}</div>
       <div><h4>Incident-near SMS metadata</h4>${inc?(incidentRows.length?incidentRows.map(x=>`<div class="note-card"><b>${escapeHtml(x.brand)}</b> • ${escapeHtml(dtFmt(x.record.dt))} • ${Math.round((x.record.dt-inc)/60000)>=0?'+':''}${fmtInt(Math.round((x.record.dt-inc)/60000))} min<br><span class="tiny">${escapeHtml(x.record.cdrNo||'—')} • ${escapeHtml(x.senderId)}</span> <button class="lead-action sms-context" data-id="${escAttr(x.record.id)}">Show context</button></div>`).join(''):'<div class="empty">No SMS candidate falls within the selected incident proximity.</div>'):'<div class="empty">Enter the Incident Date and Time at the top to populate this comparison.</div>'}</div>
     </div>
     <h4 style="margin-top:14px">Cross-subject sender overlap</h4>
-    ${crossRows.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Brand inference</th><th>Category</th><th>Subjects</th><th>SMS candidates</th><th>Raw sender IDs</th></tr></thead><tbody>${crossRows.map(x=>`<tr><td><b>${escapeHtml(x.label)}</b></td><td>${escapeHtml(x.category)}</td><td class="details">${escapeHtml([...x.subjects].join(', '))}</td><td>${fmtInt(x.count)}</td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No recognizable brand appears under more than one loaded subject in this SMS view.</div>'}`;
+    ${crossRows.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Brand inference</th><th>Category</th><th>Subjects</th><th>SMS candidates</th><th>Closest cross-subject gap</th><th>Raw sender IDs</th></tr></thead><tbody>${crossRows.map(x=>`<tr><td><b>${escapeHtml(x.label)}</b></td><td>${escapeHtml(x.category)}</td><td class="details">${escapeHtml([...x.subjects].join(', '))}</td><td>${fmtInt(x.count)}</td><td>${x.closestGap==null?'—':x.closestGap.toFixed(1)+' min'}</td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No recognizable brand appears under more than one loaded subject in this SMS view.</div>'}`;
 
     $('smsIntelCategoryTable').innerHTML=`<thead><tr><th>Service category inference</th><th>SMS candidates</th><th>Brands</th><th>Raw sender IDs</th><th>First SMS</th><th>Last SMS</th><th>Unusual-time</th></tr></thead><tbody>${A.categories.map(x=>`<tr><td><b>${escapeHtml(x.category)}</b></td><td class="num">${fmtInt(x.count)}</td><td class="details">${escapeHtml([...x.brands].join(', '))}</td><td class="num">${fmtInt(x.senderIds.size)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td class="num">${fmtInt(x.unusual)}</td></tr>`).join('')}</tbody>`;
 
@@ -494,6 +523,7 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
 
     function bind(){
       $('smsIntelRefreshBtn').onclick=renderSmsIntelligence;
+      if($('smsIntelExportBtn'))$('smsIntelExportBtn').onclick=exportSmsIntelCsv;
       $('smsIntelCdr').onchange=e=>setSubjectEventScope(e.target.value,$('callType')?.value||'');
       ['smsIntelFrom','smsIntelTo','smsIntelNightFrom','smsIntelNightTo','smsIntelCallMins','smsIntelIdMins','smsIntelContextMins','smsIntelBurstMins','smsIntelIncidentMins'].forEach(id=>{if($(id))$(id).onchange=renderSmsIntelligence;});
       document.addEventListener('click',e=>{
@@ -517,7 +547,7 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
     }
 
     return {
-      renderSmsIntelligence,renderSmsContext,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,exportQualityCsv,
+      renderSmsIntelligence,renderSmsContext,exportSmsIntelCsv,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,exportQualityCsv,
       findBursts,identifierUsage,deviceChangeDetailsHtml,buildLeads,renderLeads,bind
     };
   };
