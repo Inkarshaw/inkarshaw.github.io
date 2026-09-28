@@ -217,14 +217,14 @@
   parserModule?.bind();
 
   filtersModule=window.CDRFiltersFactory?.({
-    $,state,normalize,contactLabel,contactTag,escAttr,escapeHtml,fill,fillSelect,fmtInt,isServiceSender,
+    $,state,normalize,contactLabel,contactTag,escAttr,escapeHtml,fillSelect,fmtInt,isServiceSender,
     renderAll,timeMins,uniq
   })||null;
   filtersModule?.bind();
 
   dashboardModule=window.CDRDashboardFactory?.({
     $,state,normalize,phoneKey,localDateKey,resolveDevice,persistLocal,escapeHtml,escAttr,fmtInt,fmtDur,
-    dtFmt,dateFmt,contactLabel,eventColor,parseTime,applyFilters,switchTab
+    dtFmt,dateFmt,contactLabel,parseTime,applyFilters,switchTab
   })||null;
   dashboardModule?.bind();
 
