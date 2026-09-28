@@ -2,7 +2,7 @@
   'use strict';
   window.CDRAnalysisFactory = function(ctx){
     const {
-      $,state,smsIntelRows,smsSenderIntelligence,senderBrandInfo,fmtInt,escapeHtml,dtFmt,
+      $,state,smsIntelRows,smsSenderIntelligence,senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,fmtInt,escapeHtml,dtFmt,
       incidentDateTime,subjectEventScopedRecords,localDateKey,aggregateContacts,simpleTable,
       escAttr,contactLabel,contactTitle,typePill,fmtDur,normalize,analyzeIdentifiers,percentile,
       setSubjectEventScope
@@ -27,8 +27,8 @@
     return m;
   }
 
-  function smsBurstGroups(timeline,gapMin){
-    const by=new Map(),gap=Math.max(1,Number(gapMin)||15)*60000;
+  function smsBurstGroups(timeline,gapMin,minCount=3,mode='any'){
+    const by=new Map(),gap=Math.max(1,Number(gapMin)||15)*60000,min=Math.max(2,Number(minCount)||3);
     for(const x of timeline){
       const s=String(x.record.cdrNo||'—');
       if(!by.has(s))by.set(s,[]);
@@ -39,16 +39,10 @@
       arr.sort((p,q)=>p.record.dt-q.record.dt);
       let group=[];
       const flush=()=>{
-        if(group.length>=2){
-          out.push({
-            subject,
-            start:group[0].record.dt,
-            end:group[group.length-1].record.dt,
-            events:group.slice(),
-            senderIds:new Set(group.map(x=>x.senderId)),
-            brands:new Set(group.map(x=>x.brand)),
-            categories:new Set(group.map(x=>x.category))
-          });
+        if(group.length>=min){
+          const brands=new Set(group.map(x=>x.brandKey||x.brand)),senderIds=new Set(group.map(x=>x.senderId));
+          const qualifies=mode==='same'?brands.size===1:mode==='multi'?brands.size>1:true;
+          if(qualifies)out.push({subject,start:group[0].record.dt,end:group[group.length-1].record.dt,events:group.slice(),senderIds,brands:new Set(group.map(x=>x.brand)),categories:new Set(group.map(x=>x.category))});
         }
         group=[];
       };
@@ -63,133 +57,138 @@
     return out.sort((x,y)=>y.events.length-x.events.length||x.start-y.start);
   }
 
-  function renderSmsContext(recordId){
-    const panel=$('smsIntelContextPanel');if(!panel)return;
-    const focus=state.records.find(r=>String(r.id)===String(recordId));
-    if(!focus||!focus.dt){panel.innerHTML='<div class="empty">The selected SMS record is unavailable or has no parsed date/time.</div>';return;}
-    const mins=Math.max(1,+$('smsIntelContextMins')?.value||30),span=mins*60000;
-    const subject=focus.cdrNo||'',all=state.records.filter(r=>r.dt&&r.cdrNo===subject).sort((a,b)=>a.dt-b.dt);
-    const nearby=all.filter(r=>Math.abs(r.dt-focus.dt)<=span);
-    const pos=all.findIndex(r=>r.id===focus.id);
-    const towerText=r=>r?[r.firstCellId,r.firstAddress].filter(Boolean).join(' • ')||'—':'—';
-    let prevTower=null,nextTower=null;
-    for(let i=pos-1;i>=0;i--){if(all[i].firstCellId||all[i].firstAddress){prevTower=all[i];break;}}
-    for(let i=pos+1;i<all.length;i++){if(all[i].firstCellId||all[i].firstAddress){nextTower=all[i];break;}}
-    const calls=nearby.filter(r=>normalize(r.callType).includes('call')).length;
-    const sms=nearby.filter(r=>smsLikeRecord(r)).length;
-    const otherSenders=new Set(nearby.filter(r=>smsLikeRecord(r)&&r.id!==focus.id).map(r=>r.bparty).filter(Boolean));
-    const idSet=new Set(nearby.map(r=>[r.imsi,r.imei].filter(Boolean).join('|')).filter(Boolean));
-    const bi=senderBrandInfo(focus.bparty);
-    const rel=r=>{const d=Math.round((r.dt-focus.dt)/60000);return d===0?'0 min':(d>0?'+':'')+d+' min';};
-    panel.innerHTML=`
-      <div class="panel-title"><h3>${escapeHtml(bi?.label||focus.bparty||'SMS event')} context</h3><span class="muted">${escapeHtml(dtFmt(focus.dt))} • ±${fmtInt(mins)} min • ${escapeHtml(subject||'—')}</span></div>
-      <div class="notice"><b>Context only:</b> nearby calls, tower records and identifier metadata are time correlations. They do not establish what the SMS contained or what action, if any, caused it.</div>
-      <div class="kpis">
-        <div class="kpi"><div class="v">${fmtInt(nearby.length)}</div><div class="l">Nearby CDR events</div></div>
-        <div class="kpi"><div class="v">${fmtInt(calls)}</div><div class="l">Calls in window</div></div>
-        <div class="kpi"><div class="v">${fmtInt(sms)}</div><div class="l">SMS-like events</div></div>
-        <div class="kpi"><div class="v">${fmtInt(otherSenders.size)}</div><div class="l">Other sender IDs</div></div>
-        <div class="kpi"><div class="v">${fmtInt(idSet.size)}</div><div class="l">IMSI/IMEI states</div></div>
-      </div>
-      <div class="metric-row">
-        <span class="metric-chip"><b>Focus tower:</b> ${escapeHtml(towerText(focus))}</span>
-        <span class="metric-chip"><b>Previous tower:</b> ${escapeHtml(towerText(prevTower))}${prevTower?' • '+escapeHtml(dtFmt(prevTower.dt)):''}</span>
-        <span class="metric-chip"><b>Next tower:</b> ${escapeHtml(towerText(nextTower))}${nextTower?' • '+escapeHtml(dtFmt(nextTower.dt)):''}</span>
-      </div>
-      <div class="tablewrap" style="margin-top:10px"><table class="table"><thead><tr><th>Offset</th><th>Date / Time</th><th>Event</th><th>Connected party / sender</th><th>Duration</th><th>Tower</th><th>IMEI</th><th>IMSI</th><th>Source</th><th>Action</th></tr></thead><tbody>
-      ${nearby.map(r=>`<tr class="${r.id===focus.id?'record-highlight':''}"><td><b>${escapeHtml(rel(r))}</b></td><td>${escapeHtml(dtFmt(r.dt))}</td><td>${typePill(r.callType||'—')}</td><td title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(contactLabel(r.bparty))}</td><td>${fmtDur(r.duration)}</td><td class="details">${escapeHtml(towerText(r))}</td><td>${escapeHtml(r.imei||'—')}</td><td>${escapeHtml(r.imsi||'—')}</td><td class="details">${escapeHtml((r.sourceFile||'')+(r.rowNumber?' • row '+r.rowNumber:''))}</td><td><button class="btn secondary small lead-view-record" data-id="${escAttr(r.id)}">View</button></td></tr>`).join('')}
-      </tbody></table></div>`;
-    panel.scrollIntoView({behavior:'smooth',block:'start'});
+  function smsPreviousNextActivity(r){
+    if(!r?.dt)return {prev:null,next:null,prevMin:null,nextMin:null};
+    const a=state.records.filter(x=>x.dt&&x.cdrNo===r.cdrNo&&x.id!==r.id).sort((x,y)=>x.dt-y.dt);
+    let prev=null,next=null;
+    for(const x of a){if(x.dt<r.dt)prev=x;else if(x.dt>r.dt){next=x;break;}}
+    return {prev,next,prevMin:prev?Math.round((r.dt-prev.dt)/60000):null,nextMin:next?Math.round((next.dt-r.dt)/60000):null};
   }
 
   function smsCrossSubjectClosestGap(timeline,brandKey){
     const rows=timeline.filter(x=>x.brandKey===brandKey&&x.record?.dt&&x.record?.cdrNo).sort((a,b)=>a.record.dt-b.record.dt);
     let best=Infinity;
-    for(let i=0;i<rows.length;i++){
-      for(let j=i+1;j<rows.length;j++){
-        if(rows[i].record.cdrNo===rows[j].record.cdrNo)continue;
-        const gap=Math.abs(rows[j].record.dt-rows[i].record.dt)/60000;
-        if(gap<best)best=gap;
-        if(rows[j].record.dt-rows[i].record.dt>best*60000&&Number.isFinite(best))break;
-      }
+    for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){
+      if(rows[i].record.cdrNo===rows[j].record.cdrNo)continue;
+      const gap=Math.abs(rows[j].record.dt-rows[i].record.dt)/60000;
+      if(gap<best)best=gap;
+      if(Number.isFinite(best)&&rows[j].record.dt-rows[i].record.dt>best*60000)break;
     }
     return Number.isFinite(best)?best:null;
   }
 
-  function exportSmsIntelCsv(){
+  function smsReviewFilter(decorated){
+    const q=normalize($('smsIntelSearch')?.value||''),cat=$('smsIntelFilterCategory')?.value||'',rec=$('smsIntelFilterRecognition')?.value||'';
+    const firstOnly=!!$('smsIntelFirstOnly')?.checked,incidentOnly=!!$('smsIntelIncidentOnly')?.checked,unusualOnly=!!$('smsIntelUnusualOnly')?.checked;
+    return decorated.filter(x=>{
+      if(q&&!normalize([x.senderId,x.brand,x.category,x.record.cdrNo].join(' ')).includes(q))return false;
+      if(cat&&x.category!==cat)return false;
+      if(rec&&x.recognition!==rec)return false;
+      if(firstOnly&&!x.firstObserved)return false;
+      if(incidentOnly&&!x.incidentNear)return false;
+      if(unusualOnly&&!x.unusual)return false;
+      return true;
+    });
+  }
+
+  function smsBaselineRows(incidentMin){
+    const inc=incidentDateTime();if(!inc)return [];
+    const subject=$('smsIntelCdr')?.value||'',allRows=state.records.filter(r=>smsLikeRecord(r)&&(!subject||r.cdrNo===subject));
+    const A=smsSenderIntelligence(allRows),nearMs=Math.max(1,incidentMin)*60000,nearStart=new Date(inc-nearMs),nearEnd=new Date(inc+nearMs),d7=new Date(inc-7*86400000),d30=new Date(inc-30*86400000);
+    const keys=new Map();
+    for(const x of A.timeline){
+      let z=keys.get(x.brandKey);if(!z)z={key:x.brandKey,label:x.brand,category:x.category,near:0,prior7:0,prior30:0,beforeEver:0,first:null,last:null};
+      const t=x.record.dt;
+      if(t>=nearStart&&t<=nearEnd)z.near++;
+      if(t>=d7&&t<nearStart)z.prior7++;
+      if(t>=d30&&t<nearStart)z.prior30++;
+      if(t<nearStart)z.beforeEver++;
+      if(!z.first||t<z.first)z.first=t;if(!z.last||t>z.last)z.last=t;keys.set(x.brandKey,z);
+    }
+    return [...keys.values()].filter(x=>x.near>0).map(x=>({...x,firstNear:x.beforeEver===0,delta7:x.near-x.prior7,delta30:x.near-x.prior30})).sort((a,b)=>b.near-a.near||a.label.localeCompare(b.label));
+  }
+
+  function smsAnalysisSnapshot(){
     const rows=smsIntelRows(),A=smsSenderIntelligence(rows),firstMap=smsFirstObservationMap();
     const inc=incidentDateTime(),incidentMin=Math.max(1,+$('smsIntelIncidentMins')?.value||60),incidentMs=incidentMin*60000;
-    const cell=v=>{const s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
-    const headers=['Date/Time','Subject','Raw Sender ID','Brand Inference','Recognition','Service Category','Basis','First Observed','Unusual Time','Near Incident','Nearby Calls','Nearby IMSI/IMEI Changes','Cell ID','Tower Address','IMEI','IMSI','Source File','Source Sheet','Source Row'];
+    const burstMin=Math.max(1,+$('smsIntelBurstMins')?.value||15),burstCount=Math.max(2,+$('smsIntelBurstMinCount')?.value||3),burstMode=$('smsIntelBurstMode')?.value||'any';
+    const decorated=A.timeline.map(x=>{
+      const first=firstMap.get(String(x.record.cdrNo||'')+'|'+String(x.brandKey||''));
+      const pn=smsPreviousNextActivity(x.record);
+      return {...x,firstObserved:!!first&&first.id===x.record.id,incidentNear:!!inc&&Math.abs(x.record.dt-inc)<=incidentMs,...pn};
+    });
+    const filtered=smsReviewFilter(decorated),bursts=smsBurstGroups(filtered,burstMin,burstCount,burstMode),baseline=smsBaselineRows(incidentMin);
+    return {rows,A,decorated,filtered,bursts,baseline,inc,incidentMin,burstMin,burstCount,burstMode};
+  }
+
+  function renderSmsContext(recordId){
+    const panel=$('smsIntelContextPanel');if(!panel)return;
+    const focus=state.records.find(r=>String(r.id)===String(recordId));
+    if(!focus||!focus.dt){panel.innerHTML='<div class="empty">The selected SMS record is unavailable or has no parsed date/time.</div>';return;}
+    state.smsContextRecordId=focus.id;
+    const mins=Math.max(1,+$('smsIntelContextMins')?.value||30),span=mins*60000;
+    const subject=focus.cdrNo||'',all=state.records.filter(r=>r.dt&&r.cdrNo===subject).sort((a,b)=>a.dt-b.dt),nearby=all.filter(r=>Math.abs(r.dt-focus.dt)<=span),pos=all.findIndex(r=>r.id===focus.id);
+    const towerText=r=>r?[r.firstCellId,r.firstAddress].filter(Boolean).join(' • ')||'—':'—';
+    let prevTower=null,nextTower=null;
+    for(let i=pos-1;i>=0;i--){if(all[i].firstCellId||all[i].firstAddress){prevTower=all[i];break;}}
+    for(let i=pos+1;i<all.length;i++){if(all[i].firstCellId||all[i].firstAddress){nextTower=all[i];break;}}
+    const calls=nearby.filter(r=>normalize(r.callType).includes('call')).length,sms=nearby.filter(r=>smsLikeRecord(r)).length,otherSenders=new Set(nearby.filter(r=>smsLikeRecord(r)&&r.id!==focus.id).map(r=>r.bparty).filter(Boolean)),idSet=new Set(nearby.map(r=>[r.imsi,r.imei].filter(Boolean).join('|')).filter(Boolean)),bi=senderBrandInfo(focus.bparty);
+    const rel=r=>{const d=Math.round((r.dt-focus.dt)/60000);return d===0?'0 min':(d>0?'+':'')+d+' min';};
+    panel.innerHTML=`<div class="panel-title"><h3>${escapeHtml(bi?.label||focus.bparty||'SMS event')} context</h3><span class="muted">${escapeHtml(dtFmt(focus.dt))} • ±${fmtInt(mins)} min • ${escapeHtml(subject||'—')}</span></div><div class="notice"><b>Context only:</b> nearby calls, tower records and identifier metadata are time correlations. They do not establish what the SMS contained or what action, if any, caused it.</div><div class="kpis"><div class="kpi"><div class="v">${fmtInt(nearby.length)}</div><div class="l">Nearby CDR events</div></div><div class="kpi"><div class="v">${fmtInt(calls)}</div><div class="l">Calls in window</div></div><div class="kpi"><div class="v">${fmtInt(sms)}</div><div class="l">SMS-like events</div></div><div class="kpi"><div class="v">${fmtInt(otherSenders.size)}</div><div class="l">Other sender IDs</div></div><div class="kpi"><div class="v">${fmtInt(idSet.size)}</div><div class="l">IMSI/IMEI states</div></div></div><div class="metric-row"><span class="metric-chip"><b>Focus tower:</b> ${escapeHtml(towerText(focus))}</span><span class="metric-chip"><b>Previous tower:</b> ${escapeHtml(towerText(prevTower))}${prevTower?' • '+escapeHtml(dtFmt(prevTower.dt)):''}</span><span class="metric-chip"><b>Next tower:</b> ${escapeHtml(towerText(nextTower))}${nextTower?' • '+escapeHtml(dtFmt(nextTower.dt)):''}</span></div><div class="tablewrap" style="margin-top:10px"><table class="table"><thead><tr><th>Offset</th><th>Date / Time</th><th>Event</th><th>Connected party / sender</th><th>Duration</th><th>Tower</th><th>IMEI</th><th>IMSI</th><th>Source</th><th>Action</th></tr></thead><tbody>${nearby.map(r=>`<tr class="${r.id===focus.id?'record-highlight':''}"><td><b>${escapeHtml(rel(r))}</b></td><td>${escapeHtml(dtFmt(r.dt))}</td><td>${typePill(r.callType||'—')}</td><td title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(contactLabel(r.bparty))}</td><td>${fmtDur(r.duration)}</td><td class="details">${escapeHtml(towerText(r))}</td><td>${escapeHtml(r.imei||'—')}</td><td>${escapeHtml(r.imsi||'—')}</td><td class="details">${escapeHtml((r.sourceFile||'')+(r.rowNumber?' • row '+r.rowNumber:''))}</td><td><button class="btn secondary small lead-view-record" data-id="${escAttr(r.id)}">View</button></td></tr>`).join('')}</tbody></table></div>`;
+    panel.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  function exportSmsIntelCsv(){
+    const S=smsAnalysisSnapshot(),cell=v=>{const s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const headers=['Date/Time','Subject','Raw Sender ID','Brand Inference','Recognition','Service Category','Basis','First Observed','Unusual Time','Near Incident','Previous Activity Gap Min','Next Activity Gap Min','Nearby Calls','Nearby IMSI/IMEI Changes','Cell ID','Tower Address','IMEI','IMSI','Source File','Source Sheet','Source Row'];
     const lines=[headers.join(',')];
-    for(const x of A.timeline){
-      const r=x.record,first=firstMap.get(String(r.cdrNo||'')+'|'+String(x.brandKey||''));
-      const firstObserved=!!first&&first.id===r.id,nearIncident=!!inc&&Math.abs(r.dt-inc)<=incidentMs;
-      lines.push([dtFmt(r.dt),r.cdrNo,x.senderId,x.brand,x.recognition,x.category,x.basis,firstObserved?'Yes':'No',x.unusual?'Yes':'No',nearIncident?'Yes':'No',x.nearbyCalls,x.nearbyIds,r.firstCellId,r.firstAddress,r.imei,r.imsi,r.sourceFile,r.sourceSheet,r.rowNumber].map(cell).join(','));
-    }
-    const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
-    link.href=url;link.download='sms_intelligence_review.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    for(const x of S.filtered){const r=x.record;lines.push([dtFmt(r.dt),r.cdrNo,x.senderId,x.brand,x.recognition,x.category,x.basis,x.firstObserved?'Yes':'No',x.unusual?'Yes':'No',x.incidentNear?'Yes':'No',x.prevMin??'',x.nextMin??'',x.nearbyCalls,x.nearbyIds,r.firstCellId,r.firstAddress,r.imei,r.imsi,r.sourceFile,r.sourceSheet,r.rowNumber].map(cell).join(','));}
+    const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='sms_intelligence_review.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
+  function renderSmsMatrices(S){
+    const timeline=S.filtered,subjects=[...new Set(timeline.map(x=>x.record.cdrNo).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true})).slice(0,20);
+    const brands=[...new Map(timeline.map(x=>[x.brandKey,{key:x.brandKey,label:x.brand,category:x.category}])).values()].sort((a,b)=>{
+      const ca=timeline.filter(x=>x.brandKey===a.key).length,cb=timeline.filter(x=>x.brandKey===b.key).length;return cb-ca||a.label.localeCompare(b.label);
+    }).slice(0,30);
+    $('smsIntelSubjectMatrix').innerHTML=subjects.length&&brands.length?`<table class="table"><thead><tr><th>Sender / brand</th>${subjects.map(s=>`<th>${escapeHtml(s)}</th>`).join('')}</tr></thead><tbody>${brands.map(b=>`<tr><td><b>${escapeHtml(b.label)}</b><div class="tiny">${escapeHtml(b.category)}</div></td>${subjects.map(s=>`<td class="num">${fmtInt(timeline.filter(x=>x.brandKey===b.key&&x.record.cdrNo===s).length)||''}</td>`).join('')}</tr>`).join('')}</tbody></table>`:'<div class="empty">Load SMS metadata from one or more subjects to build the matrix.</div>';
+
+    const dates=[...new Set(timeline.map(x=>localDateKey(x.record.dt)).filter(Boolean))].sort().slice(-31),topBrands=brands.slice(0,20);
+    $('smsIntelDayMatrix').innerHTML=dates.length&&topBrands.length?`<table class="table"><thead><tr><th>Sender / brand</th>${dates.map(d=>`<th title="${escapeHtml(d)}">${escapeHtml(d.slice(5))}</th>`).join('')}</tr></thead><tbody>${topBrands.map(b=>`<tr><td><b>${escapeHtml(b.label)}</b></td>${dates.map(d=>{const n=timeline.filter(x=>x.brandKey===b.key&&localDateKey(x.record.dt)===d).length;return `<td class="num">${n||''}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`:'<div class="empty">No dated SMS metadata is available for the day matrix.</div>';
   }
 
   function renderSmsIntelligence(){
     if(!$('smsIntelSummary'))return;
     const from=$('smsIntelFrom').value,to=$('smsIntelTo').value;
-    if(from&&to&&from>to){
-      $('smsIntelSummary').innerHTML='<div class="notice">SMS Intelligence From date cannot be later than To date.</div>';
-      ['smsIntelCategoryTable','smsIntelBrandTable','smsIntelTimelineTable','smsIntelBurstsTable'].forEach(id=>$(id).innerHTML='');
-      if($('smsIntelInsights'))$('smsIntelInsights').innerHTML='';
-      return;
-    }
-    const rows=smsIntelRows(),A=smsSenderIntelligence(rows),firstMap=smsFirstObservationMap();
-    const inc=incidentDateTime(),incidentMin=Math.max(1,+$('smsIntelIncidentMins')?.value||60),incidentMs=incidentMin*60000;
-    const burstMin=Math.max(1,+$('smsIntelBurstMins')?.value||15),bursts=smsBurstGroups(A.timeline,burstMin);
-    const decorated=A.timeline.map(x=>{
-      const first=firstMap.get(String(x.record.cdrNo||'')+'|'+String(x.brandKey||''));
-      return {...x,firstObserved:!!first&&first.id===x.record.id,incidentNear:!!inc&&Math.abs(x.record.dt-inc)<=incidentMs};
-    });
-    const unusual=decorated.filter(x=>x.unusual).length,callLinked=decorated.filter(x=>x.nearbyCalls>0).length,idLinked=decorated.filter(x=>x.nearbyIds>0).length;
-    const explicit=decorated.filter(x=>x.basis==='Explicit SMS event').length,inferred=decorated.filter(x=>x.basis==='Sender-ID inference').length;
-    const firstObserved=decorated.filter(x=>x.firstObserved).length,incidentNear=decorated.filter(x=>x.incidentNear).length;
-    const crossSubject=A.brands.filter(x=>x.subjects.size>1).length;
-    const unknown=decorated.filter(x=>x.recognition==='Unclassified').length;
-    const recognizableLoaded=state.records.filter(r=>senderBrandInfo(r.bparty)).length,recognizableWithDt=state.records.filter(r=>r.dt&&senderBrandInfo(r.bparty)).length;
+    if(from&&to&&from>to){$('smsIntelSummary').innerHTML='<div class="notice">SMS Intelligence From date cannot be later than To date.</div>';['smsIntelCategoryTable','smsIntelBrandTable','smsIntelTimelineTable','smsIntelBurstsTable','smsIntelUnknownTable','smsIntelBaselineTable'].forEach(id=>{if($(id))$(id).innerHTML='';});return;}
+    const S=smsAnalysisSnapshot(),A=S.A,decorated=S.filtered,inc=S.inc;
+    const categories=[...new Set(S.decorated.map(x=>x.category).filter(Boolean))].sort(),catEl=$('smsIntelFilterCategory'),curCat=catEl?.value||'';
+    if(catEl){catEl.innerHTML='<option value="">All categories</option>'+categories.map(x=>`<option value="${escAttr(x)}">${escapeHtml(x)}</option>`).join('');if(categories.includes(curCat))catEl.value=curCat;}
+    const unusual=decorated.filter(x=>x.unusual).length,callLinked=decorated.filter(x=>x.nearbyCalls>0).length,idLinked=decorated.filter(x=>x.nearbyIds>0).length,explicit=decorated.filter(x=>x.basis==='Explicit SMS event').length,inferred=decorated.filter(x=>x.basis==='Sender-ID inference').length,firstObserved=decorated.filter(x=>x.firstObserved).length,incidentNear=decorated.filter(x=>x.incidentNear).length,crossSubject=A.brands.filter(x=>x.subjects.size>1).length,unknown=decorated.filter(x=>x.recognition==='Unclassified').length;
+    $('smsIntelSummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(A.rawCount)}</div><div class="l">Raw SMS candidates</div></div><div class="kpi"><div class="v">${fmtInt(A.uniqueCount)}</div><div class="l">Unique SMS events</div></div><div class="kpi"><div class="v">${fmtInt(A.duplicateCount)}</div><div class="l">Duplicate rows excluded</div></div><div class="kpi"><div class="v">${fmtInt(decorated.length)}</div><div class="l">Displayed after review filters</div></div><div class="kpi"><div class="v">${fmtInt(explicit)}</div><div class="l">Explicit SMS events</div></div><div class="kpi"><div class="v">${fmtInt(inferred)}</div><div class="l">Sender-ID inferred</div></div><div class="kpi"><div class="v">${fmtInt(firstObserved)}</div><div class="l">First-observed senders</div></div><div class="kpi"><div class="v">${fmtInt(S.bursts.length)}</div><div class="l">SMS bursts</div><div class="s">${fmtInt(S.burstCount)}+ • ≤ ${fmtInt(S.burstMin)} min</div></div><div class="kpi"><div class="v">${fmtInt(incidentNear)}</div><div class="l">Near incident</div><div class="s">±${fmtInt(S.incidentMin)} min</div></div><div class="kpi"><div class="v">${fmtInt(crossSubject)}</div><div class="l">Cross-subject brands</div></div><div class="kpi"><div class="v">${fmtInt(unknown)}</div><div class="l">Unclassified senders</div></div><div class="kpi"><div class="v">${fmtInt(unusual)}</div><div class="l">Unusual-time SMS</div></div><div class="kpi"><div class="v">${fmtInt(callLinked)}</div><div class="l">SMS with call ±${A.callWindowMin}m</div></div><div class="kpi"><div class="v">${fmtInt(idLinked)}</div><div class="l">SMS near ID change ±${A.idWindowMin}m</div></div></div>`;
 
-    $('smsIntelSummary').innerHTML=`<div class="kpis">
-      <div class="kpi"><div class="v">${fmtInt(rows.length)}</div><div class="l">SMS candidates</div></div>
-      <div class="kpi"><div class="v">${fmtInt(explicit)}</div><div class="l">Explicit SMS events</div></div>
-      <div class="kpi"><div class="v">${fmtInt(inferred)}</div><div class="l">Sender-ID inferred</div></div>
-      <div class="kpi"><div class="v">${fmtInt(firstObserved)}</div><div class="l">First-observed senders</div></div>
-      <div class="kpi"><div class="v">${fmtInt(bursts.length)}</div><div class="l">SMS bursts</div><div class="s">gap ≤ ${fmtInt(burstMin)} min</div></div>
-      <div class="kpi"><div class="v">${fmtInt(incidentNear)}</div><div class="l">Near incident</div><div class="s">±${fmtInt(incidentMin)} min</div></div>
-      <div class="kpi"><div class="v">${fmtInt(crossSubject)}</div><div class="l">Cross-subject brands</div></div>
-      <div class="kpi"><div class="v">${fmtInt(unknown)}</div><div class="l">Unclassified senders</div></div>
-      <div class="kpi"><div class="v">${fmtInt(unusual)}</div><div class="l">Unusual-time SMS</div></div>
-      <div class="kpi"><div class="v">${fmtInt(callLinked)}</div><div class="l">SMS with call ±${A.callWindowMin}m</div></div>
-      <div class="kpi"><div class="v">${fmtInt(idLinked)}</div><div class="l">SMS near ID change ±${A.idWindowMin}m</div></div>
-    </div>`+(rows.length?'':`<div class="notice" style="margin-top:10px">No sender-ID records match the SMS Intelligence filters. Loaded data contains ${fmtInt(recognizableLoaded)} recognizable sender-ID row(s), of which ${fmtInt(recognizableWithDt)} have a parsed date/time. Clear the SMS Intelligence subject/date range if needed.</div>`);
+    const unknownMap=new Map();
+    for(const x of S.decorated.filter(x=>x.recognition==='Unclassified')){let z=unknownMap.get(x.senderId);if(!z)z={sender:x.senderId,count:0,subjects:new Set(),days:new Set(),first:null,last:null};z.count++;if(x.record.cdrNo)z.subjects.add(x.record.cdrNo);z.days.add(localDateKey(x.record.dt));if(!z.first||x.record.dt<z.first)z.first=x.record.dt;if(!z.last||x.record.dt>z.last)z.last=x.record.dt;unknownMap.set(x.senderId,z);}
+    const unknownRows=[...unknownMap.values()].sort((a,b)=>b.count-a.count||a.sender.localeCompare(b.sender));
+    $('smsIntelUnknownTable').innerHTML=`<thead><tr><th>Raw sender ID</th><th>Events</th><th>Subjects</th><th>Active days</th><th>First</th><th>Last</th><th>Action</th></tr></thead><tbody>${unknownRows.length?unknownRows.map(x=>`<tr><td><b>${escapeHtml(x.sender)}</b></td><td>${fmtInt(x.count)}</td><td class="details">${escapeHtml([...x.subjects].join(', ')||'—')}</td><td>${fmtInt(x.days.size)}</td><td>${escapeHtml(dtFmt(x.first))}</td><td>${escapeHtml(dtFmt(x.last))}</td><td><button class="btn secondary small sms-edit-sender" data-sender="${escAttr(x.sender)}">Edit sender</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No unclassified sender IDs in the current loaded data.</td></tr>'}</tbody>`;
 
-    const firstRows=decorated.filter(x=>x.firstObserved).slice(0,20);
-    const incidentRows=decorated.filter(x=>x.incidentNear).sort((a,b)=>Math.abs(a.record.dt-inc)-Math.abs(b.record.dt-inc)).slice(0,20);
-    const crossRows=A.brands.filter(x=>x.subjects.size>1).slice(0,20).map(x=>({...x,closestGap:smsCrossSubjectClosestGap(decorated,x.key)}));
-    $('smsIntelInsights').innerHTML=`<div class="split">
-      <div><h4>First-observed senders in current view</h4>${firstRows.length?firstRows.map(x=>`<div class="note-card"><b>${escapeHtml(x.brand)}</b> • ${escapeHtml(x.category)} • ${escapeHtml(dtFmt(x.record.dt))}<br><span class="tiny">${escapeHtml(x.record.cdrNo||'—')} • ${escapeHtml(x.senderId)} • ${escapeHtml(x.recognition)}</span> <button class="lead-action sms-context" data-id="${escAttr(x.record.id)}">Show context</button></div>`).join(''):'<div class="empty">No first-observed sender falls inside the current SMS filters.</div>'}</div>
-      <div><h4>Incident-near SMS metadata</h4>${inc?(incidentRows.length?incidentRows.map(x=>`<div class="note-card"><b>${escapeHtml(x.brand)}</b> • ${escapeHtml(dtFmt(x.record.dt))} • ${Math.round((x.record.dt-inc)/60000)>=0?'+':''}${fmtInt(Math.round((x.record.dt-inc)/60000))} min<br><span class="tiny">${escapeHtml(x.record.cdrNo||'—')} • ${escapeHtml(x.senderId)}</span> <button class="lead-action sms-context" data-id="${escAttr(x.record.id)}">Show context</button></div>`).join(''):'<div class="empty">No SMS candidate falls within the selected incident proximity.</div>'):'<div class="empty">Enter the Incident Date and Time at the top to populate this comparison.</div>'}</div>
-    </div>
-    <h4 style="margin-top:14px">Cross-subject sender overlap</h4>
-    ${crossRows.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Brand inference</th><th>Category</th><th>Subjects</th><th>SMS candidates</th><th>Closest cross-subject gap</th><th>Raw sender IDs</th></tr></thead><tbody>${crossRows.map(x=>`<tr><td><b>${escapeHtml(x.label)}</b></td><td>${escapeHtml(x.category)}</td><td class="details">${escapeHtml([...x.subjects].join(', '))}</td><td>${fmtInt(x.count)}</td><td>${x.closestGap==null?'—':x.closestGap.toFixed(1)+' min'}</td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No recognizable brand appears under more than one loaded subject in this SMS view.</div>'}`;
+    $('smsIntelBaselineTable').innerHTML=inc?`<thead><tr><th>Sender / brand</th><th>Category</th><th>Near incident</th><th>Prior 7 days</th><th>Prior 30 days</th><th>First ever near incident</th><th>Interpretation prompt</th></tr></thead><tbody>${S.baseline.length?S.baseline.map(x=>`<tr><td><b>${escapeHtml(x.label)}</b></td><td>${escapeHtml(x.category)}</td><td>${fmtInt(x.near)}</td><td>${fmtInt(x.prior7)}</td><td>${fmtInt(x.prior30)}</td><td>${x.firstNear?'Yes':'No'}</td><td class="details">${x.firstNear?'No earlier event for this sender was found before the incident-near window.':x.near>x.prior7?'More incident-near events than in the preceding 7-day window.':'Previously observed sender; review timing and context.'}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">No SMS candidates fall within the selected incident proximity.</td></tr>'}</tbody>`:'<tbody><tr><td class="empty">Enter Incident Date and Time at the top to compare against 7-day and 30-day baselines.</td></tr></tbody>';
 
-    $('smsIntelCategoryTable').innerHTML=`<thead><tr><th>Service category inference</th><th>SMS candidates</th><th>Brands</th><th>Raw sender IDs</th><th>First SMS</th><th>Last SMS</th><th>Unusual-time</th></tr></thead><tbody>${A.categories.map(x=>`<tr><td><b>${escapeHtml(x.category)}</b></td><td class="num">${fmtInt(x.count)}</td><td class="details">${escapeHtml([...x.brands].join(', '))}</td><td class="num">${fmtInt(x.senderIds.size)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td class="num">${fmtInt(x.unusual)}</td></tr>`).join('')}</tbody>`;
+    renderSmsMatrices(S);
 
-    const brandStats=new Map();
-    for(const x of decorated){
-      let z=brandStats.get(x.brandKey);if(!z)z={hours:Array(24).fill(0),firstObserved:0,incidentNear:0,recognition:x.recognition};
-      z.hours[x.record.dt.getHours()]++;if(x.firstObserved)z.firstObserved++;if(x.incidentNear)z.incidentNear++;brandStats.set(x.brandKey,z);
-    }
-    $('smsIntelBrandTable').innerHTML=`<thead><tr><th>Brand inference</th><th>Recognition</th><th>Service category</th><th>Raw sender ID(s)</th><th>SMS</th><th>First SMS</th><th>Last SMS</th><th>Active days</th><th>Peak hour</th><th>First observed</th><th>Incident-near</th><th>Unusual-time</th><th>Subjects</th><th>Towers</th><th>Nearby calls</th><th>Nearby ID changes</th></tr></thead><tbody>${A.brands.map(x=>{const z=brandStats.get(x.key)||{hours:Array(24).fill(0),firstObserved:0,incidentNear:0,recognition:'Unclassified'};const mx=Math.max(...z.hours),h=mx?z.hours.indexOf(mx):null;return `<tr><td><b>${escapeHtml(x.label)}</b></td><td>${escapeHtml(z.recognition)}</td><td>${escapeHtml(x.category)}</td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td><td class="num">${fmtInt(x.count)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td class="num">${fmtInt(x.days.size)}</td><td>${h===null?'—':String(h).padStart(2,'0')+':00 ('+fmtInt(mx)+')'}</td><td class="num">${fmtInt(z.firstObserved)}</td><td class="num">${fmtInt(z.incidentNear)}</td><td class="num">${fmtInt(x.unusual)}</td><td class="details">${escapeHtml([...x.subjects].join(', ')||'—')}</td><td class="num">${fmtInt(x.towers.size)}</td><td class="num">${fmtInt(x.nearCalls)}</td><td class="num">${fmtInt(x.nearIds)}</td></tr>`}).join('')}</tbody>`;
+    const firstRows=decorated.filter(x=>x.firstObserved).slice(0,20),incidentRows=decorated.filter(x=>x.incidentNear).sort((a,b)=>Math.abs(a.record.dt-inc)-Math.abs(b.record.dt-inc)).slice(0,20),crossRows=A.brands.filter(x=>x.subjects.size>1).slice(0,20).map(x=>({...x,closestGap:smsCrossSubjectClosestGap(S.decorated,x.key)}));
+    $('smsIntelInsights').innerHTML=`<div class="split"><div><h4>First-observed senders in current view</h4>${firstRows.length?firstRows.map(x=>`<div class="note-card"><b>${escapeHtml(x.brand)}</b> • ${escapeHtml(x.category)} • ${escapeHtml(dtFmt(x.record.dt))}<br><span class="tiny">${escapeHtml(x.record.cdrNo||'—')} • ${escapeHtml(x.senderId)} • ${escapeHtml(x.recognition)}</span> <button class="lead-action sms-context" data-id="${escAttr(x.record.id)}">Show context</button></div>`).join(''):'<div class="empty">No first-observed sender matches the current review filters.</div>'}</div><div><h4>Incident-near SMS metadata</h4>${inc?(incidentRows.length?incidentRows.map(x=>`<div class="note-card"><b>${escapeHtml(x.brand)}</b> • ${escapeHtml(dtFmt(x.record.dt))} • ${Math.round((x.record.dt-inc)/60000)>=0?'+':''}${fmtInt(Math.round((x.record.dt-inc)/60000))} min<br><span class="tiny">${escapeHtml(x.record.cdrNo||'—')} • ${escapeHtml(x.senderId)}</span> <button class="lead-action sms-context" data-id="${escAttr(x.record.id)}">Show context</button></div>`).join(''):'<div class="empty">No SMS candidate falls within the selected incident proximity.</div>'):'<div class="empty">Enter Incident Date and Time at the top.</div>'}</div></div><h4 style="margin-top:14px">Cross-subject sender overlap</h4>${crossRows.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Brand inference</th><th>Category</th><th>Subjects</th><th>SMS candidates</th><th>Closest cross-subject gap</th><th>Raw sender IDs</th></tr></thead><tbody>${crossRows.map(x=>`<tr><td><b>${escapeHtml(x.label)}</b></td><td>${escapeHtml(x.category)}</td><td class="details">${escapeHtml([...x.subjects].join(', '))}</td><td>${fmtInt(x.count)}</td><td>${x.closestGap==null?'—':x.closestGap.toFixed(1)+' min'}</td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No recognizable brand appears under more than one loaded subject.</div>'}`;
 
-    $('smsIntelBurstsTable').innerHTML=`<thead><tr><th>Subject</th><th>Start</th><th>End</th><th>SMS events</th><th>Brands</th><th>Categories</th><th>Raw senders</th><th>Action</th></tr></thead><tbody>${bursts.length?bursts.slice(0,200).map(x=>`<tr><td>${escapeHtml(x.subject)}</td><td>${escapeHtml(dtFmt(x.start))}</td><td>${escapeHtml(dtFmt(x.end))}</td><td>${fmtInt(x.events.length)}</td><td class="details">${escapeHtml([...x.brands].join(', '))}</td><td class="details">${escapeHtml([...x.categories].join(', '))}</td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td><td><button class="btn secondary small sms-context" data-id="${escAttr(x.events[0].record.id)}">Show context</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No burst of two or more SMS candidates found within the selected gap.</td></tr>'}</tbody>`;
+    const catMap=new Map();for(const x of decorated){let z=catMap.get(x.category);if(!z)z={category:x.category,count:0,brands:new Set(),senderIds:new Set(),first:null,last:null,unusual:0};z.count++;z.brands.add(x.brand);z.senderIds.add(x.senderId);if(x.unusual)z.unusual++;if(!z.first||x.record.dt<z.first)z.first=x.record.dt;if(!z.last||x.record.dt>z.last)z.last=x.record.dt;catMap.set(x.category,z);}
+    $('smsIntelCategoryTable').innerHTML=`<thead><tr><th>Service category inference</th><th>SMS candidates</th><th>Brands</th><th>Raw sender IDs</th><th>First SMS</th><th>Last SMS</th><th>Unusual-time</th></tr></thead><tbody>${[...catMap.values()].sort((a,b)=>b.count-a.count).map(x=>`<tr><td><b>${escapeHtml(x.category)}</b></td><td class="num">${fmtInt(x.count)}</td><td class="details">${escapeHtml([...x.brands].join(', '))}</td><td class="num">${fmtInt(x.senderIds.size)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td class="num">${fmtInt(x.unusual)}</td></tr>`).join('')}</tbody>`;
 
-    $('smsIntelTimelineTable').innerHTML=`<thead><tr><th>Date / Time</th><th>Subject</th><th>Sender ID</th><th>Brand inference</th><th>Recognition</th><th>Service category</th><th>Basis</th><th>Flags</th><th>Tower metadata</th><th>IMEI</th><th>IMSI</th><th>Calls ±${A.callWindowMin}m</th><th>ID changes ±${A.idWindowMin}m</th><th>Source</th><th>Actions</th></tr></thead><tbody>${decorated.slice(0,3000).map(x=>{const r=x.record;const flags=[x.firstObserved?'First observed':'',x.unusual?'Unusual time':'',x.incidentNear?'Near incident':''].filter(Boolean);return `<tr><td>${dtFmt(r.dt)}</td><td>${escapeHtml(r.cdrNo||'—')}</td><td>${escapeHtml(x.senderId)}</td><td><b>${escapeHtml(x.brand)}</b></td><td>${escapeHtml(x.recognition)}</td><td>${escapeHtml(x.category)}</td><td>${escapeHtml(x.basis)}</td><td class="details">${flags.length?flags.map(f=>'<span class="pill">'+escapeHtml(f)+'</span>').join(' '):'—'}</td><td class="details">${escapeHtml(r.firstAddress||r.firstCellId||'—')}</td><td>${escapeHtml(r.imei||'—')}</td><td>${escapeHtml(r.imsi||'—')}</td><td class="num">${fmtInt(x.nearbyCalls)}</td><td class="num">${fmtInt(x.nearbyIds)}</td><td>${escapeHtml(r.sourceFile||'')} • row ${r.rowNumber||''}</td><td style="white-space:nowrap"><button class="btn secondary small sms-context" data-id="${escAttr(r.id)}">Show context</button> <button class="btn secondary small lead-view-record" data-id="${escAttr(r.id)}">Record</button> <button class="btn secondary small sms-open-movement" data-subject="${escAttr(r.cdrNo||'')}">Movement</button> <button class="btn secondary small sms-add-chronology" data-id="${escAttr(r.id)}">Chronology</button> <button class="btn secondary small sms-filter-sender" data-subject="${escAttr(r.cdrNo||'')}" data-sender="${escAttr(r.bparty||'')}">Sender records</button></td></tr>`}).join('')}</tbody>`;
+    const brandMap=new Map();for(const x of decorated){let z=brandMap.get(x.brandKey);if(!z)z={key:x.brandKey,label:x.brand,recognition:x.recognition,category:x.category,senderIds:new Set(),count:0,first:null,last:null,days:new Set(),hours:Array(24).fill(0),firstObserved:0,incidentNear:0,unusual:0,subjects:new Set(),towers:new Set(),nearCalls:0,nearIds:0};z.senderIds.add(x.senderId);z.count++;z.days.add(localDateKey(x.record.dt));z.hours[x.record.dt.getHours()]++;if(x.firstObserved)z.firstObserved++;if(x.incidentNear)z.incidentNear++;if(x.unusual)z.unusual++;if(x.record.cdrNo)z.subjects.add(x.record.cdrNo);if(x.record.firstCellId||x.record.firstAddress)z.towers.add(x.record.firstCellId||x.record.firstAddress);z.nearCalls+=x.nearbyCalls;z.nearIds+=x.nearbyIds;if(!z.first||x.record.dt<z.first)z.first=x.record.dt;if(!z.last||x.record.dt>z.last)z.last=x.record.dt;brandMap.set(x.brandKey,z);}
+    $('smsIntelBrandTable').innerHTML=`<thead><tr><th>Brand inference</th><th>Recognition</th><th>Service category</th><th>Raw sender ID(s)</th><th>SMS</th><th>First SMS</th><th>Last SMS</th><th>Active days</th><th>Peak hour</th><th>First observed</th><th>Incident-near</th><th>Unusual-time</th><th>Subjects</th><th>Towers</th><th>Nearby calls</th><th>Nearby ID changes</th><th>Edit</th></tr></thead><tbody>${[...brandMap.values()].sort((a,b)=>b.count-a.count||a.label.localeCompare(b.label)).map(x=>{const mx=Math.max(...x.hours),h=mx?x.hours.indexOf(mx):null,raw=[...x.senderIds][0]||'';return `<tr><td><b>${escapeHtml(x.label)}</b></td><td>${escapeHtml(x.recognition)}</td><td>${escapeHtml(x.category)}</td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td><td class="num">${fmtInt(x.count)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td><td class="num">${fmtInt(x.days.size)}</td><td>${h===null?'—':String(h).padStart(2,'0')+':00 ('+fmtInt(mx)+')'}</td><td class="num">${fmtInt(x.firstObserved)}</td><td class="num">${fmtInt(x.incidentNear)}</td><td class="num">${fmtInt(x.unusual)}</td><td class="details">${escapeHtml([...x.subjects].join(', ')||'—')}</td><td class="num">${fmtInt(x.towers.size)}</td><td class="num">${fmtInt(x.nearCalls)}</td><td class="num">${fmtInt(x.nearIds)}</td><td><button class="btn secondary small sms-edit-sender" data-sender="${escAttr(raw)}">Edit sender</button></td></tr>`}).join('')}</tbody>`;
+
+    $('smsIntelBurstsTable').innerHTML=`<thead><tr><th>Subject</th><th>Start</th><th>End</th><th>SMS events</th><th>Brands</th><th>Categories</th><th>Raw senders</th><th>Action</th></tr></thead><tbody>${S.bursts.length?S.bursts.slice(0,200).map(x=>`<tr><td>${escapeHtml(x.subject)}</td><td>${escapeHtml(dtFmt(x.start))}</td><td>${escapeHtml(dtFmt(x.end))}</td><td>${fmtInt(x.events.length)}</td><td class="details">${escapeHtml([...x.brands].join(', '))}</td><td class="details">${escapeHtml([...x.categories].join(', '))}</td><td class="details">${escapeHtml([...x.senderIds].join(', '))}</td><td><button class="btn secondary small sms-context" data-id="${escAttr(x.events[0].record.id)}">Show context</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No burst matches the selected gap, minimum-event count and burst mode.</td></tr>'}</tbody>`;
+
+    $('smsIntelTimelineTable').innerHTML=`<thead><tr><th>Select</th><th>Date / Time</th><th>Subject</th><th>Sender ID</th><th>Brand inference</th><th>Recognition</th><th>Service category</th><th>Basis</th><th>Flags</th><th>Prev gap</th><th>Next gap</th><th>Tower metadata</th><th>IMEI</th><th>IMSI</th><th>Calls ±${A.callWindowMin}m</th><th>ID changes ±${A.idWindowMin}m</th><th>Source</th><th>Actions</th></tr></thead><tbody>${decorated.slice(0,3000).map(x=>{const r=x.record,flags=[x.firstObserved?'First observed':'',x.unusual?'Unusual time':'',x.incidentNear?'Near incident':''].filter(Boolean);return `<tr><td><input type="checkbox" class="sms-review-check" data-id="${escAttr(r.id)}" ${state.smsReviewSelected.has(r.id)?'checked':''}></td><td>${dtFmt(r.dt)}</td><td>${escapeHtml(r.cdrNo||'—')}</td><td>${escapeHtml(x.senderId)}</td><td><b>${escapeHtml(x.brand)}</b></td><td>${escapeHtml(x.recognition)}</td><td>${escapeHtml(x.category)}</td><td>${escapeHtml(x.basis)}</td><td class="details">${flags.length?flags.map(f=>'<span class="pill">'+escapeHtml(f)+'</span>').join(' '):'—'}</td><td>${x.prevMin==null?'—':fmtInt(x.prevMin)+' min'}</td><td>${x.nextMin==null?'—':fmtInt(x.nextMin)+' min'}</td><td class="details">${escapeHtml(r.firstAddress||r.firstCellId||'—')}</td><td>${escapeHtml(r.imei||'—')}</td><td>${escapeHtml(r.imsi||'—')}</td><td class="num">${fmtInt(x.nearbyCalls)}</td><td class="num">${fmtInt(x.nearbyIds)}</td><td>${escapeHtml(r.sourceFile||'')} • row ${r.rowNumber||''}</td><td style="white-space:nowrap"><button class="btn secondary small sms-context" data-id="${escAttr(r.id)}">Context</button> <button class="btn secondary small lead-view-record" data-id="${escAttr(r.id)}">Record</button> <button class="btn secondary small sms-open-movement" data-id="${escAttr(r.id)}" data-subject="${escAttr(r.cdrNo||'')}">Movement @ time</button> <button class="btn secondary small sms-add-chronology" data-id="${escAttr(r.id)}">Chronology</button> <button class="btn secondary small sms-filter-sender" data-subject="${escAttr(r.cdrNo||'')}" data-sender="${escAttr(r.bparty||'')}">Sender records</button> <button class="btn secondary small sms-edit-sender" data-sender="${escAttr(r.bparty||'')}">Edit sender</button></td></tr>`}).join('')}</tbody>`;
+    if($('smsSelectedCount'))$('smsSelectedCount').textContent=fmtInt(state.smsReviewSelected.size);
   }
 
   function renderIncident(){
@@ -525,12 +524,22 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
       $('smsIntelRefreshBtn').onclick=renderSmsIntelligence;
       if($('smsIntelExportBtn'))$('smsIntelExportBtn').onclick=exportSmsIntelCsv;
       $('smsIntelCdr').onchange=e=>setSubjectEventScope(e.target.value,$('callType')?.value||'');
-      ['smsIntelFrom','smsIntelTo','smsIntelNightFrom','smsIntelNightTo','smsIntelCallMins','smsIntelIdMins','smsIntelContextMins','smsIntelBurstMins','smsIntelIncidentMins'].forEach(id=>{if($(id))$(id).onchange=renderSmsIntelligence;});
+      ['smsIntelFrom','smsIntelTo','smsIntelNightFrom','smsIntelNightTo','smsIntelCallMins','smsIntelIdMins','smsIntelContextMins','smsIntelBurstMins','smsIntelBurstMinCount','smsIntelBurstMode','smsIntelIncidentMins','smsIntelFilterCategory','smsIntelFilterRecognition','smsIntelFirstOnly','smsIntelIncidentOnly','smsIntelUnusualOnly'].forEach(id=>{if($(id))$(id).onchange=renderSmsIntelligence;});
+      if($('smsIntelSearch'))$('smsIntelSearch').oninput=renderSmsIntelligence;
+      if($('smsIntelClearReviewFilters'))$('smsIntelClearReviewFilters').onclick=()=>{['smsIntelSearch','smsIntelFilterCategory','smsIntelFilterRecognition'].forEach(id=>{if($(id))$(id).value='';});['smsIntelFirstOnly','smsIntelIncidentOnly','smsIntelUnusualOnly'].forEach(id=>{if($(id))$(id).checked=false;});renderSmsIntelligence();};
+      document.addEventListener('change',e=>{if(e.target.classList.contains('sms-review-check')){const id=e.target.dataset.id;e.target.checked?state.smsReviewSelected.add(id):state.smsReviewSelected.delete(id);if($('smsSelectedCount'))$('smsSelectedCount').textContent=fmtInt(state.smsReviewSelected.size);}});
       document.addEventListener('click',e=>{
         const ctx=e.target.closest('.sms-context');if(ctx){e.preventDefault();renderSmsContext(ctx.dataset.id);return;}
-        const mov=e.target.closest('.sms-open-movement');if(mov){e.preventDefault();setSubjectEventScope(mov.dataset.subject||'','');if($('movementCdr'))$('movementCdr').value=mov.dataset.subject||'';window.CDRApp?.switchTab?.('movement');return;}
+        const preset=e.target.closest('.sms-context-preset');if(preset){e.preventDefault();if($('smsIntelContextMins'))$('smsIntelContextMins').value=preset.dataset.mins||30;if(state.smsContextRecordId)renderSmsContext(state.smsContextRecordId);return;}
+        const mov=e.target.closest('.sms-open-movement');if(mov){e.preventDefault();const r=state.records.find(x=>String(x.id)===String(mov.dataset.id));if(r?.dt){state.smsMovementFocus={recordId:r.id,subject:r.cdrNo,at:+r.dt};if($('cdrNo'))$('cdrNo').value=r.cdrNo||'';if($('movementCdr'))$('movementCdr').value=r.cdrNo||'';if($('movementDateFrom'))$('movementDateFrom').value=localDateKey(r.dt);if($('movementDateTo'))$('movementDateTo').value=localDateKey(r.dt);setSubjectEventScope(r.cdrNo||'','');window.CDRApp?.switchTab?.('movement');}return;}
         const chr=e.target.closest('.sms-add-chronology');if(chr){e.preventDefault();const r=state.records.find(x=>String(x.id)===String(chr.dataset.id));if(r&&!state.chronology.some(x=>x.recordId===r.id)){state.chronology.push({id:'sms'+r.id,recordId:r.id,time:+r.dt,source:'SMS Intelligence',text:`${r.bparty||'Sender'} • ${r.callType||'SMS metadata'}`,reference:`${r.sourceFile||''} / ${r.sourceSheet||''} / row ${r.rowNumber||''}`});}window.CDRApp?.switchTab?.('chronology');return;}
         const sf=e.target.closest('.sms-filter-sender');if(sf){e.preventDefault();if($('bparty'))$('bparty').value=sf.dataset.sender||'';setSubjectEventScope(sf.dataset.subject||'','');window.CDRApp?.switchTab?.('records');return;}
+        const edit=e.target.closest('.sms-edit-sender');if(edit){e.preventDefault();const raw=edit.dataset.sender||'',bi=senderBrandInfo(raw);if($('smsSenderRaw'))$('smsSenderRaw').value=raw;if($('smsSenderLabel'))$('smsSenderLabel').value=bi?.label||'';if($('smsSenderCategory'))$('smsSenderCategory').value=bi?.category||'Other / Unclassified';if($('smsSenderMappingStatus'))$('smsSenderMappingStatus').textContent=(getSmsSenderOverride(raw)?'Manual mapping loaded for ':'Auto inference loaded for ')+raw;return;}
+        if(e.target.closest('#smsSenderSaveBtn')){e.preventDefault();const raw=$('smsSenderRaw')?.value.trim()||'',label=$('smsSenderLabel')?.value.trim()||'',category=$('smsSenderCategory')?.value||'Other / Unclassified';if(raw){setSmsSenderOverride(raw,{label,category,recognition:'Manual'});if($('smsSenderMappingStatus'))$('smsSenderMappingStatus').textContent='Saved manual mapping for '+raw+'.';renderSmsIntelligence();}return;}
+        if(e.target.closest('#smsSenderClearBtn')){e.preventDefault();const raw=$('smsSenderRaw')?.value.trim()||'';if(raw){clearSmsSenderOverride(raw);if($('smsSenderMappingStatus'))$('smsSenderMappingStatus').textContent='Removed manual mapping for '+raw+'.';renderSmsIntelligence();}return;}
+        if(e.target.closest('#smsSelectDisplayedBtn')){e.preventDefault();for(const x of smsAnalysisSnapshot().filtered.slice(0,3000))state.smsReviewSelected.add(x.record.id);renderSmsIntelligence();return;}
+        if(e.target.closest('#smsClearSelectedBtn')){e.preventDefault();state.smsReviewSelected.clear();renderSmsIntelligence();return;}
+        if(e.target.closest('#smsAddSelectedChronologyBtn')){e.preventDefault();for(const id of state.smsReviewSelected){const r=state.records.find(x=>String(x.id)===String(id));if(r&&!state.chronology.some(x=>x.recordId===r.id))state.chronology.push({id:'sms'+r.id,recordId:r.id,time:+(r.dt||new Date()),source:'SMS Intelligence',text:`${r.bparty||'Sender'} • ${r.callType||'SMS metadata'}`,reference:`${r.sourceFile||''} / ${r.sourceSheet||''} / row ${r.rowNumber||''}`});}window.CDRApp?.switchTab?.('chronology');return;}
       });
       $('incidentRefreshBtn').onclick=renderIncident;
       $('leadsRefreshBtn').onclick=renderLeads;
@@ -547,7 +556,7 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
     }
 
     return {
-      renderSmsIntelligence,renderSmsContext,exportSmsIntelCsv,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,exportQualityCsv,
+      renderSmsIntelligence,renderSmsContext,smsAnalysisSnapshot,exportSmsIntelCsv,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,exportQualityCsv,
       findBursts,identifierUsage,deviceChangeDetailsHtml,buildLeads,renderLeads,bind
     };
   };
