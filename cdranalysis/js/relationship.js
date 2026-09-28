@@ -33,8 +33,9 @@
   }
 
   function relationshipFilters(){
-    const from=$('relationshipFrom')?.value?new Date($('relationshipFrom').value+'T00:00:00'):null;
-    const to=$('relationshipTo')?.value?new Date($('relationshipTo').value+'T23:59:59.999'):null;
+    const parse=(v,end=false)=>{if(!v)return null;const [y,m,d]=String(v).split('-').map(Number);return window.CDRCore.dateFromSourceParts(y,m-1,d,end?23:0,end?59:0,end?59:0,window.CDRCore.state.sourceTimezone);};
+    const from=parse($('relationshipFrom')?.value,false);
+    const to=parse($('relationshipTo')?.value,true);
     return {from,to,event:$('relationshipEvent')?.value||'',nightOnly:!!$('relationshipNightOnly')?.checked};
   }
   function scopedRows(data=records()){
