@@ -1,4 +1,4 @@
-const CACHE='cdr-analyzer-v21';
+const CACHE='cdr-analyzer-v22';
 const CORE=[
   '/cdranalysis/',
   '/cdranalysis/index.html',
@@ -25,6 +25,7 @@ const CORE=[
   '/cdranalysis/js/reports.js',
   '/cdranalysis/js/workspace.js',
   '/cdranalysis/js/case.js',
+  '/cdranalysis/js/router.js',
   '/cdranalysis/js/ui.js',
   '/cdranalysis/js/app.js',
   '/cdranalysis/js/relationship.js'
