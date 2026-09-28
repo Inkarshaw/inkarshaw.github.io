@@ -101,17 +101,17 @@
     if($('relationshipScope'))$('relationshipScope').textContent=`A: ${a} • B: ${b} • ${fmtInt(rows.length)} direct event(s)`;
   }
 
-  function openFromContact(num){
+  function openFromContact(num,subject=''){
     fillInputs();
     const subs=subjects(),current=window.CDRApp?.currentSubject?.()||'';
-    $('relationshipA').value=subs.includes(current)?current:(subs[0]||'');
+    $('relationshipA').value=subs.includes(subject)?subject:(subs.includes(current)?current:(subs[0]||''));
     $('relationshipB').value=num||'';
     window.CDRApp?.switchTab?.('relationship');
     render();
   }
 
   document.addEventListener('click',e=>{
-    const rel=e.target.closest('.relationship-open');if(rel){e.preventDefault();openFromContact(rel.dataset.num||'');return;}
+    const rel=e.target.closest('.relationship-open');if(rel){e.preventDefault();openFromContact(rel.dataset.num||'',rel.dataset.subject||'');return;}
     if(e.target.closest('#relationshipAnalyse')){render();return;}
     if(e.target.closest('#relationshipSwap')){const a=$('relationshipA').value,b=$('relationshipB').value;const subs=subjects();if(subs.includes(b))$('relationshipA').value=b;$('relationshipB').value=a;render();return;}
     if(e.target.closest('#relationshipClear')){$('relationshipB').value='';if($('relationshipScope'))$('relationshipScope').textContent='Select a pair to analyse.';render();return;}
