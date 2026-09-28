@@ -31,14 +31,26 @@
     return out;
   }
 
+  function addMovementTiles(){
+    if(!movementMap||movementTileLayer)return;
+    let tileOk=false,tileErrors=0,fallbackUsed=false;
+    const wireTiles=layer=>{
+      layer.on('tileload',()=>{if(tileOk)return;tileOk=true;const chip=$('tileStatusChip');if(chip){chip.textContent=fallbackUsed?'Fallback map tiles loaded':'Map tiles loaded';chip.classList.remove('warntext');chip.classList.add('goodtext');}});
+      layer.on('tileerror',()=>{tileErrors++;const chip=$('tileStatusChip');if(chip){chip.textContent='Map tile loading issue…';chip.classList.add('warntext');}if(!tileOk&&!fallbackUsed&&tileErrors>=4&&!state.mapPrivacyMode){fallbackUsed=true;try{movementMap.removeLayer(movementTileLayer)}catch{}movementTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,attribution:'&copy; OpenStreetMap contributors &copy; CARTO'});wireTiles(movementTileLayer);movementTileLayer.addTo(movementMap);const chip2=$('tileStatusChip');if(chip2)chip2.textContent='Trying fallback map tiles…';}});
+    };
+    movementTileLayer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'});
+    wireTiles(movementTileLayer);movementTileLayer.addTo(movementMap);
+  }
+
   function renderMovementMap(rows,attempt=0){
     const el=$('movementMap');if(!el)return;
     const rect=el.getBoundingClientRect();
     if((rect.width<80||rect.height<80)&&attempt<5){setTimeout(()=>renderMovementMap(rows,attempt+1),80);return;}
     movementPlaybackMarkers=[];movementPlaybackMarker=null;
+    state.mapPrivacyMode=!!$('mapPrivacyMode')?.checked;
     const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180);
     movementPlaybackRows=pts.map(p=>p.x);
-    if($('movementMapStatus'))$('movementMapStatus').innerHTML=`<span class="metric-chip">Segments: ${fmtInt(rows.length)}</span><span class="metric-chip">Mapped: ${fmtInt(pts.length)}</span><span class="metric-chip">Without coordinates: ${fmtInt(rows.length-pts.length)}</span><span class="metric-chip" id="tileStatusChip">Loading map tiles…</span>`;
+    if($('movementMapStatus'))$('movementMapStatus').innerHTML=`<span class="metric-chip">Segments: ${fmtInt(rows.length)}</span><span class="metric-chip">Mapped: ${fmtInt(pts.length)}</span><span class="metric-chip">Without coordinates: ${fmtInt(rows.length-pts.length)}</span><span class="metric-chip" id="tileStatusChip">${state.mapPrivacyMode?'Privacy mode: external map tiles disabled':'Loading map tiles…'}</span>`;
     if(typeof L==='undefined'){el.innerHTML='<div class="map-empty">Map library could not load. Internet access is required to load the map.</div>';return;}
 
     if(!movementMap){
@@ -50,23 +62,8 @@
         movementMap.createPane('movementAnchorPane');movementMap.getPane('movementAnchorPane').style.zIndex='650';
         movementCanvasRenderer=L.canvas({padding:.5});
         movementMap.setView([13.0827,80.2707],10);
-        let tileOk=false,tileErrors=0,fallbackUsed=false;
-        const wireTiles=layer=>{
-          layer.on('tileload',()=>{if(tileOk)return;tileOk=true;const chip=$('tileStatusChip');if(chip){chip.textContent=fallbackUsed?'Fallback map tiles loaded':'Map tiles loaded';chip.classList.remove('warntext');chip.classList.add('goodtext');}});
-          layer.on('tileerror',()=>{
-            tileErrors++;
-            const chip=$('tileStatusChip');if(chip){chip.textContent='Map tile loading issue…';chip.classList.add('warntext');}
-            if(!tileOk&&!fallbackUsed&&tileErrors>=4){
-              fallbackUsed=true;
-              try{movementMap.removeLayer(movementTileLayer)}catch{}
-              movementTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,attribution:'&copy; OpenStreetMap contributors &copy; CARTO'});
-              wireTiles(movementTileLayer);movementTileLayer.addTo(movementMap);
-              const chip2=$('tileStatusChip');if(chip2)chip2.textContent='Trying fallback map tiles…';
-            }
-          });
-        };
-        movementTileLayer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'});
-        wireTiles(movementTileLayer);movementTileLayer.addTo(movementMap);
+        if(!state.mapPrivacyMode)addMovementTiles();
+
         movementLayer=L.layerGroup().addTo(movementMap);
         movementMap.invalidateSize({pan:false});
       }catch(err){
@@ -80,7 +77,9 @@
       if(!movementLayer)movementLayer=L.layerGroup().addTo(movementMap);else movementLayer.clearLayers();
       movementStartMarker=null;movementEndMarker=null;
       movementMap.invalidateSize({pan:false});
-      const chip=$('tileStatusChip');if(chip)chip.textContent='Map ready';
+      if(state.mapPrivacyMode&&movementTileLayer){try{movementMap.removeLayer(movementTileLayer)}catch{}movementTileLayer=null;}
+      else if(!state.mapPrivacyMode&&!movementTileLayer)addMovementTiles();
+      const chip=$('tileStatusChip');if(chip)chip.textContent=state.mapPrivacyMode?'Privacy mode: route/towers only':'Map ready';
     }
 
     if(movementHeatLayer){try{movementMap.removeLayer(movementHeatLayer)}catch{}movementHeatLayer=null;}
@@ -329,6 +328,7 @@
       $('movementDateFrom').onchange=()=>{stopMovementPlayback();renderMovement();};
       $('movementDateTo').onchange=()=>{stopMovementPlayback();renderMovement();};
       $('movementHeatMode').onchange=renderMovement;
+      if($('mapPrivacyMode')){$('mapPrivacyMode').checked=!!state.mapPrivacyMode;$('mapPrivacyMode').onchange=e=>{state.mapPrivacyMode=!!e.target.checked;renderMovement();};}
       $('movementPlayBtn').onclick=toggleMovementPlayback;
       $('movementPrevBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex-1,true,true);};
       $('movementNextBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex+1,true,true);};
