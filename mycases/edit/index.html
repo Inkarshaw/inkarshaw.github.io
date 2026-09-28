@@ -9,6 +9,15 @@
     <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
   <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#071c33">
+  <script>
+  (function canonicalizeMyCasesOrigin(){
+    const host=location.hostname.toLowerCase();
+    if(host==='www.clearexams.ink'||host==='inkarshaw.github.io'){
+      const target='https://clearexams.ink'+location.pathname+location.search+location.hash;
+      location.replace(target);
+    }
+  })();
+  </script>
   <meta name="description" content="My Cases is a browser-based police case workspace for tracking case details, stages, court information and upcoming hearings.">
   <link rel="canonical" href="https://clearexams.ink/mycases/">
   <title>My Cases | ClearExams Police Tools</title>
@@ -87,8 +96,8 @@
 </style>
 </head>
 <body>
-<header class="topbar"><div class="wrap"><div class="brand"><div class="brand-mark">CE</div><div><h1>Edit Case</h1><p>ClearExams • My Cases</p></div></div><button class="btn" type="button" onclick="history.length>1?history.back():location.href='/mycases/'">← Back</button></div></header>
-<main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><button class="btn" type="button" onclick="location.href='/mycases/'">Dashboard</button></div>
+<header class="topbar"><div class="wrap"><div class="brand"><div class="brand-mark">CE</div><div><h1>Edit Case</h1><p>ClearExams • My Cases</p></div></div><button class="btn" type="button" onclick="history.length>1?history.back():location.href='/mycases/?v=20260928-3'">← Back</button></div></header>
+<main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><button class="btn" type="button" onclick="location.href='/mycases/?v=20260928-3'">Dashboard</button></div>
 <form class="quick-create hidden" id="quickCaseForm"><input id="quickCrimeNo"></form>
 <form class="form-wrap" id="caseForm">
           <div class="case-status-strip" id="caseStatusStrip">
@@ -273,12 +282,14 @@
   function saveCases(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cases))}
   function cloudToken(){
     const saved=localStorage.getItem(CLOUD_TOKEN_KEY)||'';
-    if(saved)return saved;
-    const legacy=sessionStorage.getItem(CLOUD_TOKEN_KEY)||'';
-    if(legacy){
-      localStorage.setItem(CLOUD_TOKEN_KEY,legacy);
-      sessionStorage.removeItem(CLOUD_TOKEN_KEY);
-      return legacy;
+    const sessionSaved=sessionStorage.getItem(CLOUD_TOKEN_KEY)||'';
+    if(saved){
+      if(sessionSaved!==saved)sessionStorage.setItem(CLOUD_TOKEN_KEY,saved);
+      return saved;
+    }
+    if(sessionSaved){
+      localStorage.setItem(CLOUD_TOKEN_KEY,sessionSaved);
+      return sessionSaved;
     }
     return '';
   }
@@ -349,7 +360,7 @@
     $('submitLoginBtn').disabled=true;
     try{
       const data=await cloudFetch('/api/login',{method:'POST',body:JSON.stringify({password})});
-      localStorage.setItem(CLOUD_TOKEN_KEY,data.token);sessionStorage.removeItem(CLOUD_TOKEN_KEY);
+      localStorage.setItem(CLOUD_TOKEN_KEY,data.token);sessionStorage.setItem(CLOUD_TOKEN_KEY,data.token);
       $('cloudPassword').value='';$('loginDialog').classList.remove('open');
       setCloudState('Cloud connected','online');
       await syncFromCloud();
@@ -827,12 +838,7 @@
       showToast('Return to My Cases and select the case again.');
     }
   }
-  const originalSave=saveCurrent;
-  window.saveCurrent=function(openDocs=false){
-    const ok=originalSave(openDocs);
-    if(ok&&!openDocs)setTimeout(()=>location.href='/mycases/',350);
-    return ok;
-  };
+
 })();
 </script>
 </body></html>
