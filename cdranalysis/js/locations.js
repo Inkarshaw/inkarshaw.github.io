@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   window.CDRLocationsFactory = function(ctx){
-    const {$,state,uniq,escAttr,escapeHtml,localDateKey,locationTowerKey,fmtInt,dtFmt,aggregateLocations,fmtDur}=ctx;
+    const {$,state,uniq,escAttr,escapeHtml,localDateKey,locationTowerKey,fmtInt,dtFmt,aggregateLocations,fmtDur,analysisRecords}=ctx;
   function mapLink(x){if(x.lat!==null&&x.lng!==null)return `<a class="link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${encodeURIComponent(x.lat+','+x.lng)}">Open map</a>`;return ''}
   function renderLocationMatchSubjects(){
     const el=$('locationMatchSubjects');if(!el)return;
@@ -11,7 +11,7 @@
   }
   function locationMatchBaseRows(){
     const eventType=$('callType')?.value||'',from=$('locationMatchFrom')?.value||'',to=$('locationMatchTo')?.value||'';
-    return state.records.filter(r=>{
+    return (analysisRecords?analysisRecords():state.records).filter(r=>{
       if(!r.dt||!r.cdrNo||!r.firstCellId)return false;
       if(eventType&&r.callType!==eventType)return false;
       const d=localDateKey(r.dt);if(from&&d<from)return false;if(to&&d>to)return false;
