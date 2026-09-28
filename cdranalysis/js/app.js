@@ -2,7 +2,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, tacCache:{}, fileSeq:0, pendingWorkspace:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null, requestSelected:new Set(), locationMatchSelected:new Set()};
-  let recordsModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, reportsModule=null;
+  let recordsModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, reportsModule=null, workspaceModule=null;
   const FIELDS = {
     cdrNo:['cdrno','a party','aparty','a-party','msisdn','subscriber number','mobile number'],
     bparty:['b party','bparty','b-party','other party','connected number','called number','calling number'],
@@ -811,14 +811,15 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
 
   function safeName(s){return String(s||'cdr_case').replace(/[^a-z0-9_-]+/gi,'_').replace(/^_+|_+$/g,'').slice(0,60)||'cdr_case';}
 
-  function filterSnapshot(){const ids=['q','dateFrom','dateTo','timeFrom','timeTo','bparty','durMin','durMax','callType','cellId','tower','city','subcity','roaming','imei','imsi','provider','operator','cdrNo','sourceFile','nightFrom','nightTo','episodeGapMins','movementDateFrom','movementDateTo','smsIntelCdr','smsIntelFrom','smsIntelTo','smsIntelNightFrom','smsIntelNightTo','smsIntelCallMins','smsIntelIdMins','locationMatchMode','locationMatchMins','locationEpisodeGapMins','locationMatchFrom','locationMatchTo'];const o={};ids.forEach(id=>o[id]=$(id)?.value??'');['callsOnly','smsOnly','nightOnly','weekendOnly','excludeServiceSenders'].forEach(id=>o[id]=!!$(id)?.checked);return o;}
-  function applyFilterSnapshot(o={}){for(const [id,v] of Object.entries(o)){const el=$(id);if(!el)continue;if(el.type==='checkbox')el.checked=!!v;else el.value=v;}}
-  function workspacePayload(){const noteByKey={},flagKeys=[];for(const r of state.records){const k=stableKey(r);if(state.flags.has(r.id))flagKeys.push(k);if(state.notes[r.id])noteByKey[k]=state.notes[r.id];}return {version:3,savedAt:new Date().toISOString(),case:{title:$('caseTitle').value,caseNo:$('caseNo').value,station:$('station').value,analyst:$('analyst').value,incidentDate:$('incidentDate').value,incidentTime:$('incidentTime').value,incidentWindowHours:$('incidentWindowHours').value},filters:filterSnapshot(),generalNote:$('generalNote').value,caseContactTags:state.contactTags,caseContactNames:state.contactNames,locationMatchSelected:[...state.locationMatchSelected],chronology:state.chronology,exactIncidentRange:state.exactIncidentRange?{start:state.exactIncidentRange.start.toISOString(),end:state.exactIncidentRange.end.toISOString()}:null,flagKeys,noteByKey,files:state.files.map(f=>({name:f.name,rows:f.rows,inferredCdr:f.inferredCdr}))};}
-  function saveWorkspace(){download(`${safeName($('caseNo').value||$('caseTitle').value)}_cdr_workspace.json`,JSON.stringify(workspacePayload(),null,2),'application/json');}
-  function restorePendingWorkspace(){const w=state.pendingWorkspace;if(!w)return;const byKey=new Map(state.records.map(r=>[stableKey(r),r]));state.flags.clear();state.notes={};for(const k of w.flagKeys||[]){const r=byKey.get(k);if(r)state.flags.add(r.id);}for(const [k,note] of Object.entries(w.noteByKey||{})){const r=byKey.get(k);if(r)state.notes[r.id]=note;}}
-  function loadWorkspaceObject(w){if(!w||typeof w!=='object')throw new Error('Invalid workspace JSON');state.pendingWorkspace=w;const c=w.case||{};$('caseTitle').value=c.title||'';$('caseNo').value=c.caseNo||'';$('station').value=c.station||'';$('analyst').value=c.analyst||'';$('incidentDate').value=c.incidentDate||'';$('incidentTime').value=c.incidentTime||'';$('incidentWindowHours').value=c.incidentWindowHours||6;$('generalNote').value=w.generalNote||'';state.contactTags=w.caseContactTags||w.contactTags||{};state.contactNames=w.caseContactNames||w.contactNames||{};state.locationMatchSelected=new Set(Array.isArray(w.locationMatchSelected)?w.locationMatchSelected:[]);state.chronology=Array.isArray(w.chronology)?w.chronology:[];state.exactIncidentRange=w.exactIncidentRange?{start:new Date(w.exactIncidentRange.start),end:new Date(w.exactIncidentRange.end)}:null;if($('exactIncidentStatus')&&state.exactIncidentRange)$('exactIncidentStatus').textContent=`Exact filter active: ${dtFmt(state.exactIncidentRange.start)} → ${dtFmt(state.exactIncidentRange.end)}`;applyFilterSnapshot(w.filters||{});restorePendingWorkspace();applyFilters();showStatus(`Workspace restored${state.records.length?' and matched to loaded CDR rows':' — now load the referenced CDR file(s)'}.`,'ok');}
-  function clearLoaded(){for(const c of Object.values(state.charts)){try{c.destroy()}catch{}}state.charts={};state.records=[];state.filtered=[];state.files=[];state.flags.clear();state.notes={};state.chronology=state.chronology.filter(x=>x.source==='Manual');state.exactIncidentRange=null;state.fileSeq=0;refreshSelectors();renderFileList();renderAll();showStatus('Loaded CDR data cleared. Case metadata and notes fields were left in place.','ok');}
-  function applyIncidentWindow(){const inc=incidentDateTime();if(!inc){showStatus('Enter incident date and time at the top first.','error');return;}const hours=+$('incidentWindowHours').value||6,h=hours*3600000;const a=new Date(inc-h),b=new Date(inc+h);state.exactIncidentRange={start:a,end:b};$('dateFrom').value='';$('dateTo').value='';$('timeFrom').value='';$('timeTo').value='';if($('exactIncidentStatus'))$('exactIncidentStatus').textContent=`Exact filter active: ${dtFmt(a)} → ${dtFmt(b)}`;applyFilters();showStatus(`Applied exact ±${hours} hour incident window (${dtFmt(a)} to ${dtFmt(b)}).`,'ok');}
+  function filterSnapshot(){return workspaceModule?.filterSnapshot()||{};}
+  function applyFilterSnapshot(f){return workspaceModule?.applyFilterSnapshot(f);}
+  function workspacePayload(){return workspaceModule?.workspacePayload()||{};}
+  function saveWorkspace(){return workspaceModule?.saveWorkspace();}
+  function restorePendingWorkspace(){return workspaceModule?.restorePendingWorkspace();}
+  function loadWorkspaceObject(obj){return workspaceModule?.loadWorkspaceObject(obj);}
+  function clearLoaded(){return workspaceModule?.clearLoaded();}
+  function applyIncidentWindow(){return workspaceModule?.applyIncidentWindow();}
+
   function reportTable(headers,rows){return reportsModule?.reportTable(headers,rows)||'';}
   function reportSection(on,title,body){return reportsModule?.reportSection(on,title,body)||'';}
   function exportCaseReport(){return reportsModule?.exportCaseReport();}
@@ -861,6 +862,11 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
     contactTag,serviceSenderType,imeiStructure,resolveDevice,analyzeIdentifiers,
     smsSenderIntelligence,movementRows,colocationEpisodes,incidentDateTime,showStatus,
     safeName,buildLeads,escapeHtml,fmtInt,fmtDur,localDateKey
+  })||null;
+
+  workspaceModule=window.CDRWorkspaceFactory?.({
+    $,state,download,dtFmt,applyFilters,incidentDateTime,refreshSelectors,renderAll,renderFileList,
+    safeName,showStatus,stableKey
   })||null;
 
   $('chooseBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>loadFiles([...e.target.files]); const dz=$('dropZone');['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
