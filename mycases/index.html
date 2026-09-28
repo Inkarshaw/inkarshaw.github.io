@@ -700,8 +700,8 @@
     const key=String(id||'');
     const c=cases.find(x=>String(x.id||'')===key);
     if(!c){showToast('Case could not be opened. Sync and try again.');return;}
-    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c))}catch(e){}
-    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id)+'&v=20260928-6';
+    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)))}catch(e){}
+    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id)+'&v=20260928-8';
   }
   function openCaseDocsById(id){
     const key=String(id||'');
@@ -846,14 +846,14 @@
   }
 
   function startNewCase(){
-    window.location.href='/mycases/edit/?new=1&v=20260928-6';
+    window.location.href='/mycases/edit/?new=1&v=20260928-8';
   }
 
   function editSelectedCase(){
     const id=selectedId || ($('caseId')&&$('caseId').value);
     const c=cases.find(x=>String(x.id||'')===String(id||''));
     if(!c){showToast('Select a case to edit.');return;}
-    localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c));
+    localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)));
     window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id);
   }
 
@@ -971,12 +971,12 @@
         cases[idx].timeline=tl;saveCases();c=cases[idx];pushCaseToCloud(c,false);
       }
     }
-    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c))}catch(e){}
+    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)))}catch(e){}
     const id=encodeURIComponent(c.id||'');
     location.href='/policedocuments/?case='+id+'&q='+encodeURIComponent(query||'');
   }
   function openInDocuments(c){
-    localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c));
+    localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)));
     window.location.href='/policedocuments/?case='+encodeURIComponent(c.id);
   }
 
