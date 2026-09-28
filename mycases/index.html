@@ -385,7 +385,29 @@
   function loadDeletedCases(){
     try{const v=JSON.parse(localStorage.getItem(DELETED_STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
   }
-  function saveCases(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cases))}
+  function compactCaseForLocal(item){
+    const safe=JSON.parse(JSON.stringify(item||{}));
+    delete safe.accusedPhoto;
+    if(Array.isArray(safe.accusedPersons))safe.accusedPersons.forEach(p=>delete p.photo);
+    if(Array.isArray(safe.attachments))safe.attachments.forEach(a=>delete a.data);
+    return safe;
+  }
+  function saveCases(){
+    try{
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(cases));
+      return true;
+    }catch(e){
+      try{
+        const compact=cases.map(compactCaseForLocal);
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(compact));
+        cases=cases.map((item,i)=>mergeCloudCase(item,compact[i]));
+        return true;
+      }catch(e2){
+        console.error('My Cases local save failed',e2);
+        return false;
+      }
+    }
+  }
   function saveDeletedCases(){localStorage.setItem(DELETED_STORAGE_KEY,JSON.stringify(deletedCases))}
   function cookieToken(){
     try{
