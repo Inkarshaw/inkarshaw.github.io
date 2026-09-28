@@ -60,7 +60,16 @@
   ['caseTitle','caseNo','station','analyst','incidentDate','incidentTime','incidentWindowHours','generalNote'].forEach(id=>{const el=$(id);const key='cdrAnalyzer:'+id;el.value=localStorage.getItem(key)||'';el.addEventListener('input',()=>persistLocal(key,el.value));});
   document.querySelectorAll('.view').forEach(v=>v.setAttribute('role','tabpanel'));document.querySelectorAll('.tab').forEach(t=>t.setAttribute('tabindex',t.classList.contains('active')?'0':'-1'));
   if(typeof XLSX==='undefined')showStatus('The local XLSX library did not load. Refresh the analyzer files.','error');
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('/cdranalysis/sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});}
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/cdranalysis/sw.js',{updateViaCache:'none'}).then(reg=>{
+      const banner=$('appUpdateBanner'),showUpdate=()=>{if(banner)banner.style.display='block';};
+      if(reg.waiting)showUpdate();
+      reg.addEventListener('updatefound',()=>{const w=reg.installing;if(w)w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)showUpdate();});});
+      if($('reloadUpdateBtn'))$('reloadUpdateBtn').onclick=()=>{const w=reg.waiting;if(w)w.postMessage({type:'SKIP_WAITING'});else location.reload();};
+      let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload();});
+      reg.update().catch(()=>{});
+    }).catch(()=>{});
+  }
 
     }
 
