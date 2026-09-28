@@ -182,7 +182,7 @@
   })||null;
 
   caseModule=window.CDRCaseFactory?.({
-    $,state,subjectEventScopedRecords,dtFmt,escapeHtml,escAttr,contactTitle,contactLabel,fmtDur
+    $,state,subjectEventScopedRecords,dtFmt,escapeHtml,escAttr,contactTitle,contactLabel,fmtDur,audit
   })||null;
   caseModule?.bind();
   routerModule=window.CDRRouterFactory?.({
