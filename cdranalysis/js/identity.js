@@ -13,6 +13,28 @@
   function identityStore(kind){const global=$('identityScope')?.value==='global';return kind==='name'?(global?state.globalContactNames:state.contactNames):(global?state.globalContactTags:state.contactTags);}
 
   function persistLocal(key,value){if(!state.privateSession)localStorage.setItem(key,value);}
+  function smsSenderOverrideKey(v){return String(v??'').trim().toUpperCase().replace(/\s+/g,'');}
+  function loadSmsSenderOverrides(){
+    try{state.smsSenderOverrides=JSON.parse(localStorage.getItem('cdrAnalyzer:smsSenderOverrides')||'{}')||{};}catch{state.smsSenderOverrides={};}
+    return state.smsSenderOverrides;
+  }
+  function saveSmsSenderOverrides(){persistLocal('cdrAnalyzer:smsSenderOverrides',JSON.stringify(state.smsSenderOverrides||{}));}
+  function getSmsSenderOverride(raw){return state.smsSenderOverrides?.[smsSenderOverrideKey(raw)]||null;}
+  function setSmsSenderOverride(raw,patch={}){
+    const key=smsSenderOverrideKey(raw);if(!key)return null;
+    const current=state.smsSenderOverrides[key]||{};
+    const next={
+      raw:String(raw??'').trim(),
+      label:String(patch.label??current.label??'').trim(),
+      category:String(patch.category??current.category??'').trim(),
+      recognition:String(patch.recognition??current.recognition??'Manual').trim()||'Manual',
+      updatedAt:new Date().toISOString()
+    };
+    if(!next.label&&!next.category){delete state.smsSenderOverrides[key];saveSmsSenderOverrides();return null;}
+    state.smsSenderOverrides[key]=next;saveSmsSenderOverrides();return next;
+  }
+  function clearSmsSenderOverride(raw){const key=smsSenderOverrideKey(raw);if(key&&state.smsSenderOverrides[key]){delete state.smsSenderOverrides[key];saveSmsSenderOverrides();return true;}return false;}
+  loadSmsSenderOverrides();
   function updatePrivacyUi(){
     if(!$('privateSessionBtn'))return;
     $('privateSessionBtn').textContent=`Private Session: ${state.privateSession?'On':'Off'}`;
@@ -61,22 +83,29 @@
   }
   function senderBrandInfo(v){
     const raw=String(v??'').trim();if(!raw||!/[A-Za-z]/.test(raw))return null;
+    const override=getSmsSenderOverride(raw);
     const compact=raw.toUpperCase().replace(/\s+/g,'');
     let brand='';
     const parts=compact.split(/[-_]/).filter(Boolean);
-    if(parts.length>1){
-      brand=parts.slice(1).join('');
-    }else{
+    if(parts.length>1)brand=parts.slice(1).join('');
+    else{
       brand=compact.replace(/[^A-Z0-9]/g,'');
       if(/^[A-Z]{2}[A-Z0-9]{3,12}$/.test(brand)&&serviceSenderType(raw))brand=brand.slice(2);
     }
     brand=brand.replace(/[^A-Z0-9]/g,'');
     if(!brand||brand.length<2)return null;
-    const label=brand.length<=4?brand:brand.charAt(0)+brand.slice(1).toLowerCase();
-    const category=senderServiceCategory(brand,raw);
+    const autoLabel=brand.length<=4?brand:brand.charAt(0)+brand.slice(1).toLowerCase();
+    const autoCategory=senderServiceCategory(brand,raw);
     const structured=/^[A-Z]{2,3}[-_][A-Z0-9]{3,12}$/.test(compact);
-    const recognition=category!=='Other / Unclassified'?(structured?'Recognized':'Probable'):'Unclassified';
-    return {raw,key:brand,label,category,recognition};
+    const autoRecognition=autoCategory!=='Other / Unclassified'?(structured?'Recognized':'Probable'):'Unclassified';
+    return {
+      raw,
+      key:brand,
+      label:override?.label||autoLabel,
+      category:override?.category||autoCategory,
+      recognition:override?'Manual':autoRecognition,
+      override:override||null
+    };
   }
   function smsRecordBasis(r){
     const typ=normalize(r?.callType),bi=senderBrandInfo(r?.bparty);
@@ -96,20 +125,29 @@
       return true;
     }).sort((a,b)=>a.dt-b.dt);
   }
+  function smsEventSignature(r){
+    return [String(r?.cdrNo||''),String(r?.bparty||''),r?.dt instanceof Date&&!isNaN(r.dt)?Math.round(r.dt.getTime()/1000):String(r?.date||'')+' '+String(r?.time||''),Number(r?.duration)||0,String(r?.callType||'').toLowerCase(),String(r?.firstCellId||''),String(r?.imei||''),String(r?.imsi||'')].join('|');
+  }
+  function dedupeSmsRows(data=[]){
+    const seen=new Set(),unique=[],duplicates=[];
+    for(const r of data){const k=smsEventSignature(r);if(seen.has(k)){duplicates.push(r);continue;}seen.add(k);unique.push(r);}
+    return {unique,duplicates,rawCount:data.length,uniqueCount:unique.length};
+  }
   function smsSenderIntelligence(data=smsIntelRows()){
+    const dedupe=dedupeSmsRows(data),uniqueData=dedupe.unique;
     const callWindow=(+$('smsIntelCallMins')?.value||10)*60000,idWindow=(+$('smsIntelIdMins')?.value||60)*60000;
     const nightFrom=timeMins($('smsIntelNightFrom')?.value||'22:00'),nightTo=timeMins($('smsIntelNightTo')?.value||'06:00');
     const calls=state.records.filter(r=>r.dt&&normalize(r.callType).includes('call')).sort((a,b)=>a.dt-b.dt);
     const idChanges=analyzeIdentifiers(state.records).events;
     const brands=new Map(),timeline=[];
-    for(const r of data){
+    for(const r of uniqueData){
       const bi=senderBrandInfo(r.bparty);if(!bi)continue;
       const mins=r.dt.getHours()*60+r.dt.getMinutes(),unusual=withinNight(mins,nightFrom,nightTo);
       const nearbyCalls=calls.filter(x=>x.cdrNo===r.cdrNo&&Math.abs(x.dt-r.dt)<=callWindow);
       const nearbyIds=idChanges.filter(x=>x.msisdn===r.cdrNo&&Math.abs(x.at-r.dt)<=idWindow);
       let b=brands.get(bi.key);
-      if(!b)b={key:bi.key,label:bi.label,category:bi.category,senderIds:new Set(),count:0,first:null,last:null,days:new Set(),unusual:0,subjects:new Set(),towers:new Set(),nearCalls:0,nearIds:0};
-      b.senderIds.add(r.bparty);b.count++;b.days.add(localDateKey(r.dt));if(unusual)b.unusual++;if(r.cdrNo)b.subjects.add(r.cdrNo);if(r.firstCellId||r.firstAddress)b.towers.add(r.firstCellId||r.firstAddress);b.nearCalls+=nearbyCalls.length;b.nearIds+=nearbyIds.length;
+      if(!b)b={key:bi.key,label:bi.label,category:bi.category,recognition:bi.recognition,senderIds:new Set(),count:0,first:null,last:null,days:new Set(),unusual:0,subjects:new Set(),towers:new Set(),nearCalls:0,nearIds:0};
+      b.label=bi.label;b.category=bi.category;b.recognition=bi.recognition;b.senderIds.add(r.bparty);b.count++;b.days.add(localDateKey(r.dt));if(unusual)b.unusual++;if(r.cdrNo)b.subjects.add(r.cdrNo);if(r.firstCellId||r.firstAddress)b.towers.add(r.firstCellId||r.firstAddress);b.nearCalls+=nearbyCalls.length;b.nearIds+=nearbyIds.length;
       if(!b.first||r.dt<b.first)b.first=r.dt;if(!b.last||r.dt>b.last)b.last=r.dt;brands.set(bi.key,b);
       timeline.push({record:r,brand:bi.label,brandKey:bi.key,category:bi.category,recognition:bi.recognition||'Unclassified',senderId:r.bparty,basis:smsRecordBasis(r),unusual,nearbyCalls:nearbyCalls.length,nearbyIds:nearbyIds.length});
     }
@@ -119,7 +157,7 @@
       x.count+=b.count;x.brands.add(b.label);for(const s of b.senderIds)x.senderIds.add(s);x.unusual+=b.unusual;
       if(!x.first||b.first<x.first)x.first=b.first;if(!x.last||b.last>x.last)x.last=b.last;categories.set(b.category,x);
     }
-    return {brands:[...brands.values()].sort((a,b)=>b.count-a.count||a.label.localeCompare(b.label)),categories:[...categories.values()].sort((a,b)=>b.count-a.count),timeline,callWindowMin:callWindow/60000,idWindowMin:idWindow/60000};
+    return {brands:[...brands.values()].sort((a,b)=>b.count-a.count||a.label.localeCompare(b.label)),categories:[...categories.values()].sort((a,b)=>b.count-a.count),timeline,callWindowMin:callWindow/60000,idWindowMin:idWindow/60000,rawCount:dedupe.rawCount,uniqueCount:dedupe.uniqueCount,duplicateCount:dedupe.duplicates.length,duplicateRows:dedupe.duplicates};
   }
 
   function requestIdentifier(v){
@@ -276,7 +314,8 @@
     return {
       contactName,contactTag,contactLabel,contactTitle,identityStore,persistLocal,updatePrivacyUi,
       phoneKey,samePhone,serviceSenderType,isServiceSender,senderServiceCategory,senderBrandInfo,
-      smsRecordBasis,isSmsRecord,smsIntelRows,smsSenderIntelligence,requestIdentifier,
+      smsSenderOverrideKey,loadSmsSenderOverrides,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,
+      smsRecordBasis,isSmsRecord,smsIntelRows,smsEventSignature,dedupeSmsRows,smsSenderIntelligence,requestIdentifier,
       parseCdrDeviceMetadata,imeiDigits,luhnValidImei,imeiStructure,tacFromImei,seedBuiltinTacMappings,
       normalizeTacEntry,saveTacCache,updateTacStatus,learnTacFromRecords,resolveDevice,tacField,
       importTacDatabase,exportTacCache,updateCdrRequestCount,defaultCdrRequestDates
