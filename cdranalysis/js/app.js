@@ -215,6 +215,7 @@
     contactLabel,
     analysisRecords,getIndex,audit,
     senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,
+    applyFilters,smsAnalysisSnapshot,movementRows,exportWorkbook,renderChronology,
     switchTab,
     openPairRecords:(subject,other)=>{if($('cdrNo'))$('cdrNo').value=subject||'';if($('bparty'))$('bparty').value=other||'';applyFilters();switchTab('records');},
     refresh:()=>{refreshSelectors();applyFilters();}
