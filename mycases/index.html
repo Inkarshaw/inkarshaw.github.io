@@ -397,9 +397,18 @@
     const headers={...(options.headers||{})};
     if(options.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
     const token=cloudToken(); if(token) headers.Authorization='Bearer '+token;
-    const response=await fetch(API_BASE+path,{...options,headers});
+    let response;
+    try{
+      response=await fetch(API_BASE+path,{...options,headers});
+    }catch(networkError){
+      const err=new Error('Cloud connection temporarily unavailable.');
+      err.status=0;err.cause=networkError;throw err;
+    }
     const data=await response.json().catch(()=>({}));
-    if(!response.ok) throw new Error(data.error||('Cloud request failed ('+response.status+')'));
+    if(!response.ok){
+      const err=new Error(data.error||('Cloud request failed ('+response.status+')'));
+      err.status=response.status;err.data=data;throw err;
+    }
     return data;
   }
   function cloudSafeCase(item){
@@ -421,9 +430,24 @@
     if(!cloudToken()){setCloudState('Local only');return false}
     try{
       const data=await cloudFetch('/api/session');
-      if(data.authenticated){setCloudState('Cloud connected','online');return true}
-    }catch(e){}
-    localStorage.removeItem(CLOUD_TOKEN_KEY);sessionStorage.removeItem(CLOUD_TOKEN_KEY);setCloudState('Local only');return false;
+      if(data.authenticated){
+        setCloudState('Cloud connected','online');
+        return true;
+      }
+      localStorage.removeItem(CLOUD_TOKEN_KEY);
+      sessionStorage.removeItem(CLOUD_TOKEN_KEY);
+      setCloudState('Session expired · login again','error');
+      return false;
+    }catch(e){
+      if(e&&e.status===401){
+        localStorage.removeItem(CLOUD_TOKEN_KEY);
+        sessionStorage.removeItem(CLOUD_TOKEN_KEY);
+        setCloudState('Session expired · login again','error');
+        return false;
+      }
+      setCloudState('Cloud temporarily unavailable · session kept','error');
+      return null;
+    }
   }
   async function cloudLogin(){
     const password=$('cloudPassword').value;
