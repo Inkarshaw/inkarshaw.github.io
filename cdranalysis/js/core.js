@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, tacCache:{}, smsSenderOverrides:{}, smsReviewSelected:new Set(), smsMovementFocus:null, fileSeq:0, pendingWorkspace:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null, requestSelected:new Set(), locationMatchSelected:new Set()};
+  const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, tacCache:{}, smsSenderOverrides:{}, smsReviewSelected:new Set(), smsMovementFocus:null, analysisMode:'raw', sourceTimezone:'Asia/Kolkata', indexes:{source:null,bySubject:new Map(),byBparty:new Map(),byTower:new Map(),byDate:new Map(),byImei:new Map(),byImsi:new Map()}, auditTrail:[], appVersion:'v31', mapPrivacyMode:false, fileSeq:0, pendingWorkspace:null, pendingImport:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null, requestSelected:new Set(), locationMatchSelected:new Set()};
   const FIELDS = {
     cdrNo:['cdrno','a party','aparty','a-party','msisdn','subscriber number','mobile number'],
     bparty:['b party','bparty','b-party','other party','connected number','called number','calling number'],
@@ -29,6 +29,21 @@
   function haversineKm(a,b){if(a?.lat==null||a?.lng==null||b?.lat==null||b?.lng==null)return null;const R=6371,rad=x=>x*Math.PI/180,dLat=rad(b.lat-a.lat),dLon=rad(b.lng-a.lng),s=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(s)));}
   function percentile(arr,p){const a=arr.filter(Number.isFinite).sort((x,y)=>x-y);if(!a.length)return 0;const i=(a.length-1)*p,lo=Math.floor(i),hi=Math.ceil(i);return lo===hi?a[lo]:a[lo]+(a[hi]-a[lo])*(i-lo);}
   function incidentDateTime(){if(!$('incidentDate').value)return null;const t=$('incidentTime').value||'00:00';const d=new Date(`${$('incidentDate').value}T${t}:00`);return isNaN(d)?null:d;}
+  function duplicateSignature(r){return [r?.cdrNo||'',r?.bparty||'',r?.dt?+r.dt:`${r?.date||''} ${r?.time||''}`,Number(r?.duration)||0,r?.callType||'',r?.firstCellId||''].join('|');}
+  function uniqueRecords(data=state.records){const seen=new Set();return data.filter(r=>{const k=duplicateSignature(r);if(seen.has(k))return false;seen.add(k);return true;});}
+  function analysisRecords(){return state.analysisMode==='unique'?uniqueRecords(state.records):state.records;}
+  function rebuildIndexes(data=analysisRecords()){
+    const idx={source:data,bySubject:new Map(),byBparty:new Map(),byTower:new Map(),byDate:new Map(),byImei:new Map(),byImsi:new Map()};
+    const push=(map,key,r)=>{if(!key)return;let a=map.get(key);if(!a){a=[];map.set(key,a);}a.push(r);};
+    for(const r of data){push(idx.bySubject,r.cdrNo,r);push(idx.byBparty,r.bpartyKey||phoneish(r.bparty),r);push(idx.byTower,[r.operator,r.firstCellId||r.firstAddress].filter(Boolean).join('|'),r);push(idx.byDate,localDateKey(r.dt),r);push(idx.byImei,r.imei,r);push(idx.byImsi,r.imsi,r);}
+    state.indexes=idx;return idx;
+  }
+  function phoneish(v){const s=String(v??'').trim(),d=s.replace(/\D/g,'');return d.length>=10?d.slice(-10):s.toLowerCase().replace(/\s+/g,'');}
+  function getIndex(name,key){const idx=state.indexes?.source===analysisRecords()?state.indexes:rebuildIndexes();return idx?.[name]?.get(key)||[];}
+  function audit(action,details=''){const entry={at:new Date().toISOString(),action:String(action||''),details:String(details||'')};state.auditTrail.push(entry);if(state.auditTrail.length>5000)state.auditTrail.splice(0,state.auditTrail.length-5000);return entry;}
+  function sourceTimezoneOffsetMinutes(tz){if(tz==='UTC')return 0;if(tz==='Asia/Kolkata')return 330;return null;}
+  function dateFromSourceParts(y,m,d,h=0,min=0,sec=0,tz=state.sourceTimezone){const off=sourceTimezoneOffsetMinutes(tz);return off==null?new Date(y,m,d,h,min,sec,0):new Date(Date.UTC(y,m,d,h,min,sec,0)-off*60000);}
+
   function escAttr(s){return escapeHtml(s).replace(/'/g,'&#39;');}
   function showStatus(msg,type){const el=$('loadStatus');el.textContent=msg;el.className='status show'+(type?` ${type}`:'');}
   function renderFileList(){$('fileList').innerHTML=state.files.map(f=>`<div class="file-item"><b title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</b><span>${f.inferredCdr?escapeHtml(f.inferredCdr)+' • ':''}${escapeHtml(f.sheet)} • ${fmtInt(f.rows)} <button class="file-remove" data-remove-file="${f.id}" title="Remove file">×</button></span></div>`).join('');}
@@ -42,6 +57,6 @@
   window.CDRCore={
     $,state,FIELDS,normalize,escapeHtml,fmtInt,fmtDur,dateFmt,dtFmt,val,stableKey,localDateKey,
     haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,uniq,fillSelect,
-    sortData,typePill,safeName
+    sortData,typePill,safeName,duplicateSignature,uniqueRecords,analysisRecords,rebuildIndexes,getIndex,audit,sourceTimezoneOffsetMinutes,dateFromSourceParts
   };
 })();
