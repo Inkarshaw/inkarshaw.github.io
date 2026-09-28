@@ -3,7 +3,7 @@
   window.CDRIdentityFactory = function(ctx){
     const {
       $,state,normalize,analyzeIdentifiers,download,fmtInt,localDateKey,renderDevices,showStatus,
-      subjectEventScopedRecords,timeMins,withinNight
+      subjectEventScopedRecords,timeMins,withinNight,analysisRecords,getIndex
     }=ctx;
 
   function contactName(num){const n=String(num??'').trim();return String(state.contactNames[n]??state.globalContactNames[n]??'').trim();}
@@ -123,7 +123,7 @@
   function isSmsRecord(r){return !!smsRecordBasis(r);}
   function smsIntelRows(){
     const subject=$('smsIntelCdr')?.value||'',from=$('smsIntelFrom')?.value||'',to=$('smsIntelTo')?.value||'';
-    return subjectEventScopedRecords(state.records).filter(r=>{
+    return subjectEventScopedRecords().filter(r=>{
       if(!r.dt||!smsRecordBasis(r))return false;
       if(subject&&r.cdrNo!==subject)return false;
       const d=localDateKey(r.dt);if(from&&d<from)return false;if(to&&d>to)return false;
@@ -142,8 +142,8 @@
     const dedupe=dedupeSmsRows(data),uniqueData=dedupe.unique;
     const callWindow=(+$('smsIntelCallMins')?.value||10)*60000,idWindow=(+$('smsIntelIdMins')?.value||60)*60000;
     const nightFrom=timeMins($('smsIntelNightFrom')?.value||'22:00'),nightTo=timeMins($('smsIntelNightTo')?.value||'06:00');
-    const calls=state.records.filter(r=>r.dt&&normalize(r.callType).includes('call')).sort((a,b)=>a.dt-b.dt);
-    const idChanges=analyzeIdentifiers(state.records).events;
+    const base=analysisRecords?analysisRecords():state.records,calls=base.filter(r=>r.dt&&normalize(r.callType).includes('call')).sort((a,b)=>a.dt-b.dt);
+    const idChanges=analyzeIdentifiers(base).events;
     const brands=new Map(),timeline=[];
     for(const r of uniqueData){
       const bi=senderBrandInfo(r.bparty);if(!bi)continue;
