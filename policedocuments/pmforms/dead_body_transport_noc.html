@@ -63,22 +63,22 @@ textarea{min-height:66px;resize:vertical}input:focus,select:focus,textarea:focus
 <fieldset>
 <legend>Deceased person</legend>
 <div class="grid">
- <div class="full"><label for="deceasedName">Name</label><input id="deceasedName" value="Saddam Ali"></div>
- <div><label for="deceasedAge">Age</label><input id="deceasedAge" value="36"></div>
+ <div class="full"><label for="deceasedName">Name</label><input id="deceasedName" placeholder="Enter deceased name"></div>
+ <div><label for="deceasedAge">Age</label><input id="deceasedAge" inputmode="numeric" placeholder="Age"></div>
  <div><label for="deceasedRelation">Relation prefix</label><select id="deceasedRelation"><option>S/o</option><option>D/o</option><option>W/o</option><option>H/o</option><option>C/o</option></select></div>
- <div class="full"><label for="deceasedGuardian">Father / spouse / guardian name</label><input id="deceasedGuardian" value="Nurislam"></div>
- <div class="full"><label for="deceasedAddress">Address</label><textarea id="deceasedAddress">Shuramani mahakal Bona, Gazole Maida, West Bengal - 732102</textarea></div>
- <div class="full"><label for="aadhaar">Aadhaar No. (optional)</label><input id="aadhaar" inputmode="numeric" value="7887 7224 7005"></div>
+ <div class="full"><label for="deceasedGuardian">Father / spouse / guardian name</label><input id="deceasedGuardian" placeholder="Father / spouse / guardian name"></div>
+ <div class="full"><label for="deceasedAddress">Address</label><textarea id="deceasedAddress" placeholder="Full address"></textarea></div>
+ <div class="full"><label for="aadhaar">Aadhaar No. (optional)</label><input id="aadhaar" inputmode="numeric" placeholder="Optional"></div>
 </div>
 </fieldset>
 
 <fieldset>
 <legend>Death / case details</legend>
 <div class="grid">
- <div class="full"><label for="foundAt">Place where found dead</label><textarea id="foundAt">No.3, GK Shetty Builders in Chetpet, Chennai – 31</textarea></div>
+ <div class="full"><label for="foundAt">Place where found dead</label><textarea id="foundAt" placeholder="Place / premises / locality"></textarea></div>
  <div><label for="caseDate">Case registered date</label><input id="caseDate" type="date"></div>
  <div><label for="caseTime">Time</label><input id="caseTime" type="time" value="17:00"></div>
- <div><label for="crimeNo">Crime No.</label><input id="crimeNo" value="168/2026"></div>
+ <div><label for="crimeNo">Crime No.</label><input id="crimeNo" placeholder="e.g. 168/2026"></div>
  <div><label for="section">Section</label><input id="section" value="194 BNSS"></div>
 </div>
 </fieldset>
@@ -87,12 +87,12 @@ textarea{min-height:66px;resize:vertical}input:focus,select:focus,textarea:focus
 <legend>Body handed over to</legend>
 <div class="grid">
  <div><label for="possessive">Possessive word</label><select id="possessive"><option>his</option><option>her</option><option>their</option></select></div>
- <div><label for="handoverRelation">Relation</label><input id="handoverRelation" value="Brother in Law"></div>
- <div class="full"><label for="handoverName">Name</label><input id="handoverName" value="M.D Saheb"></div>
- <div><label for="handoverAge">Age</label><input id="handoverAge" value="22"></div>
+ <div><label for="handoverRelation">Relation</label><input id="handoverRelation" placeholder="e.g. Brother in Law"></div>
+ <div class="full"><label for="handoverName">Name</label><input id="handoverName" placeholder="Name of person receiving body"></div>
+ <div><label for="handoverAge">Age</label><input id="handoverAge" inputmode="numeric" placeholder="Age"></div>
  <div><label for="handoverPrefix">Relation prefix</label><select id="handoverPrefix"><option>S/o</option><option>D/o</option><option>W/o</option><option>H/o</option><option>C/o</option></select></div>
- <div class="full"><label for="handoverGuardian">Father / spouse / guardian name</label><input id="handoverGuardian" value="Ataur"></div>
- <div class="full"><label for="handoverAddress">Address</label><textarea id="handoverAddress">Bhagabanpur, samshi, Malda, West Bengal-732139</textarea></div>
+ <div class="full"><label for="handoverGuardian">Father / spouse / guardian name</label><input id="handoverGuardian" placeholder="Father / spouse / guardian name"></div>
+ <div class="full"><label for="handoverAddress">Address</label><textarea id="handoverAddress" placeholder="Full address"></textarea></div>
 </div>
 </fieldset>
 
@@ -100,7 +100,7 @@ textarea{min-height:66px;resize:vertical}input:focus,select:focus,textarea:focus
 <legend>Transport permission</legend>
 <div class="grid">
  <div><label for="fromCity">From</label><input id="fromCity" value="CHENNAI"></div>
- <div><label for="toCity">To</label><input id="toCity" value="KOLKATA"></div>
+ <div><label for="toCity">To</label><input id="toCity" placeholder="Destination city"></div>
  <div class="full"><label for="transportMode">Mode</label><select id="transportMode"><option>Air</option><option>Road</option><option>Train</option><option>Ambulance</option></select></div>
 </div>
 </fieldset>
@@ -148,7 +148,7 @@ textarea{min-height:66px;resize:vertical}input:focus,select:focus,textarea:focus
  ids.forEach(function(id){$(id).addEventListener("input",update);$(id).addEventListener("change",update)});
  var today=new Date();var y=today.getFullYear();var m=String(today.getMonth()+1).padStart(2,"0");var d=String(today.getDate()).padStart(2,"0");
  if(!$("certificateDate").value)$("certificateDate").value=y+"-"+m+"-"+d;
- if(!$("caseDate").value)$("caseDate").value="2026-09-27";
+
  $("printBtn").addEventListener("click",function(){update();window.print()});
  $("copyBtn").addEventListener("click",async function(){
    var txt=v("officeLine")+",\n"+v("station")+",\n"+v("stationAddress")+", "+v("stationCity")+".\nDate: "+prettyDate(v("certificateDate"))+"\n\nNO OBJECTION CERTIFICATE\n\n"+textParts();
