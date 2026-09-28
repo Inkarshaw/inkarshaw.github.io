@@ -147,7 +147,7 @@
     const brands=new Map(),timeline=[];
     for(const r of uniqueData){
       const bi=senderBrandInfo(r.bparty);if(!bi)continue;
-      const mins=r.dt.getHours()*60+r.dt.getMinutes(),unusual=withinNight(mins,nightFrom,nightTo);
+      const mins=window.CDRCore.sourceMinutes(r.dt),unusual=withinNight(mins,nightFrom,nightTo);
       const nearbyCalls=calls.filter(x=>x.cdrNo===r.cdrNo&&Math.abs(x.dt-r.dt)<=callWindow);
       const nearbyIds=idChanges.filter(x=>x.msisdn===r.cdrNo&&Math.abs(x.at-r.dt)<=idWindow);
       let b=brands.get(bi.key);
