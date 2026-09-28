@@ -5,7 +5,7 @@
       $,state,smsIntelRows,smsSenderIntelligence,senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,fmtInt,escapeHtml,dtFmt,
       incidentDateTime,subjectEventScopedRecords,localDateKey,aggregateContacts,simpleTable,
       escAttr,contactLabel,contactTitle,typePill,fmtDur,normalize,analyzeIdentifiers,percentile,
-      setSubjectEventScope
+      setSubjectEventScope,getIndex,analysisRecords,audit
     }=ctx;
 
   function smsLikeRecord(r){
@@ -17,7 +17,7 @@
 
   function smsFirstObservationMap(){
     const m=new Map();
-    for(const r of state.records){
+    for(const r of analysisRecords()){
       if(!smsLikeRecord(r))continue;
       const bi=senderBrandInfo(r.bparty);if(!bi)continue;
       const k=String(r.cdrNo||'')+'|'+bi.key;
@@ -59,7 +59,7 @@
 
   function smsPreviousNextActivity(r){
     if(!r?.dt)return {prev:null,next:null,prevMin:null,nextMin:null};
-    const a=state.records.filter(x=>x.dt&&x.cdrNo===r.cdrNo&&x.id!==r.id).sort((x,y)=>x.dt-y.dt);
+    const a=getIndex('bySubject',r.cdrNo).filter(x=>x.dt&&x.id!==r.id).sort((x,y)=>x.dt-y.dt);
     let prev=null,next=null;
     for(const x of a){if(x.dt<r.dt)prev=x;else if(x.dt>r.dt){next=x;break;}}
     return {prev,next,prevMin:prev?Math.round((r.dt-prev.dt)/60000):null,nextMin:next?Math.round((next.dt-r.dt)/60000):null};
@@ -93,7 +93,7 @@
 
   function smsBaselineRows(incidentMin){
     const inc=incidentDateTime();if(!inc)return [];
-    const subject=$('smsIntelCdr')?.value||'',allRows=state.records.filter(r=>smsLikeRecord(r)&&(!subject||r.cdrNo===subject));
+    const subject=$('smsIntelCdr')?.value||'',allRows=analysisRecords().filter(r=>smsLikeRecord(r)&&(!subject||r.cdrNo===subject));
     const A=smsSenderIntelligence(allRows),nearMs=Math.max(1,incidentMin)*60000,nearStart=new Date(inc-nearMs),nearEnd=new Date(inc+nearMs),d7=new Date(inc-7*86400000),d30=new Date(inc-30*86400000);
     const keys=new Map();
     for(const x of A.timeline){
@@ -128,7 +128,7 @@
     if(!focus||!focus.dt){panel.innerHTML='<div class="empty">The selected SMS record is unavailable or has no parsed date/time.</div>';return;}
     state.smsContextRecordId=focus.id;
     const mins=Math.max(1,+$('smsIntelContextMins')?.value||30),span=mins*60000;
-    const subject=focus.cdrNo||'',all=state.records.filter(r=>r.dt&&r.cdrNo===subject).sort((a,b)=>a.dt-b.dt),nearby=all.filter(r=>Math.abs(r.dt-focus.dt)<=span),pos=all.findIndex(r=>r.id===focus.id);
+    const subject=focus.cdrNo||'',all=getIndex('bySubject',subject).filter(r=>r.dt).sort((a,b)=>a.dt-b.dt),nearby=all.filter(r=>Math.abs(r.dt-focus.dt)<=span),pos=all.findIndex(r=>r.id===focus.id);
     const towerText=r=>r?[r.firstCellId,r.firstAddress].filter(Boolean).join(' • ')||'—':'—';
     let prevTower=null,nextTower=null;
     for(let i=pos-1;i>=0;i--){if(all[i].firstCellId||all[i].firstAddress){prevTower=all[i];break;}}
@@ -162,8 +162,8 @@
     const panel=$('smsIncidentContextPanel');if(!panel)return;
     const inc=incidentDateTime();if(!inc){panel.innerHTML='<div class="notice">Enter Incident Date and Time at the top first.</div>';return;}
     const mins=Math.max(1,+$('smsIntelIncidentMins')?.value||60),span=mins*60000,subject=$('smsIntelCdr')?.value||'',start=new Date(inc-span),end=new Date(inc+span);
-    const rows=state.records.filter(r=>r.dt&&r.dt>=start&&r.dt<=end&&(!subject||r.cdrNo===subject)).sort((x,y)=>x.dt-y.dt);
-    const idEvents=(analyzeIdentifiers(state.records).events||[]).filter(x=>x.at>=start&&x.at<=end&&(!subject||x.msisdn===subject)).sort((x,y)=>x.at-y.at);
+    const rows=analysisRecords().filter(r=>r.dt&&r.dt>=start&&r.dt<=end&&(!subject||r.cdrNo===subject)).sort((x,y)=>x.dt-y.dt);
+    const idEvents=(analyzeIdentifiers(analysisRecords()).events||[]).filter(x=>x.at>=start&&x.at<=end&&(!subject||x.msisdn===subject)).sort((x,y)=>x.at-y.at);
     let towerChanges=0,prevTower='';
     for(const r of rows){const t=String(r.firstCellId||r.firstAddress||'');if(t&&prevTower&&t!==prevTower)towerChanges++;if(t)prevTower=t;}
     const smsCount=rows.filter(smsLikeRecord).length,callCount=rows.filter(r=>normalize(r.callType).includes('call')).length,contacts=new Set(rows.map(r=>r.bparty).filter(Boolean));
