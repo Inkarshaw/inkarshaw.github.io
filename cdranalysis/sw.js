@@ -1,4 +1,4 @@
-const CACHE='cdr-analyzer-v4';
+const CACHE='cdr-analyzer-v5';
 const CORE=[
   '/cdranalysis/',
   '/cdranalysis/index.html',
@@ -7,7 +7,11 @@ const CORE=[
   '/cdranalysis/vendor/leaflet.css',
   '/cdranalysis/vendor/leaflet.js',
   '/cdranalysis/vendor/leaflet-heat.js',
-  '/cdranalysis/cdr-parser-worker.js'
+  '/cdranalysis/cdr-parser-worker.js',
+  '/cdranalysis/css/cdr-components.css',
+  '/cdranalysis/css/nexus-ui.css',
+  '/cdranalysis/js/app.js',
+  '/cdranalysis/js/relationship.js'
 ];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(async cache=>{for(const url of CORE){try{await cache.add(url)}catch{}}}).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
