@@ -83,25 +83,8 @@
   function jumpToRecord(rec){return recordsModule?.jumpToRecord(rec);}
   function renderRecords(){return recordsModule?.render();}
   function renderContacts(){return contactsModule?.render();}
-  function selectRequestContacts(){
-    for(const x of aggregateContacts()){const id=requestIdentifier(x.bparty);if(id)state.requestSelected.add(id);}
-    renderContacts();showStatus(`${state.requestSelected.size} numeric contact(s) selected for CDR request.`,'ok');
-  }
-  function openCdrRequestGenerator(){
-    if(!state.requestSelected.size){showStatus('Select at least one numeric contact for the CDR request.','error');return;}
-    const from=$('cdrRequestFrom').value,to=$('cdrRequestTo').value;
-    if(from&&to&&from>to){showStatus('CDR request From date cannot be later than To date.','error');return;}
-    const entries=[];
-    for(const number of state.requestSelected){
-      const rows=state.records.filter(r=>requestIdentifier(r.bparty)===number),raw=rows[0]?.bparty||number;
-      const relation=[contactTag(raw),contactName(raw)].filter(Boolean).join(' - ')||'CDR Contact';
-      const dates=rows.filter(r=>r.dt).map(r=>r.dt).sort((a,b)=>a-b);
-      entries.push({number,relation,fromDate:from||(dates.length?localDateKey(dates[0]):''),toDate:to||(dates.length?localDateKey(dates[dates.length-1]):'')});
-    }
-    const draft={version:1,source:'cdr-analyzer',createdAt:new Date().toISOString(),case:{title:$('caseTitle').value||'',caseNo:$('caseNo').value||'',station:$('station').value||'',analyst:$('analyst').value||''},entries};
-    localStorage.setItem('cdrAnalyzer:requestDraftV1',JSON.stringify(draft));
-    window.open('/policedocuments/cdr_request_generator.html?from=cdr-analyzer','_blank','noopener');
-  }
+  function selectRequestContacts(){return contactsModule?.selectRequestContacts();}
+  function openCdrRequestGenerator(){return contactsModule?.openCdrRequestGenerator();}
 
   function renderContactProfile(num){return contactsModule?.renderProfile(num);}
   function mapLink(x){return locationsModule?.mapLink(x)||'';}
@@ -200,7 +183,8 @@
 
   contactsModule=window.CDRContactsFactory?.({
     $,state,aggregateContacts,aggregateLocations,identityStore,defaultCdrRequestDates,updateCdrRequestCount,requestIdentifier,
-    escAttr,escapeHtml,contactTitle,contactLabel,contactTag,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable
+    escAttr,escapeHtml,contactTitle,contactLabel,contactTag,contactName,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable,
+    showStatus,localDateKey
   })||null;
 
   locationsModule=window.CDRLocationsFactory?.({
