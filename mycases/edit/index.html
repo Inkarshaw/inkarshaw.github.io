@@ -241,6 +241,7 @@
 <script>
   const STORAGE_KEY='clearexamsMyCasesV1';
   const CLOUD_TOKEN_KEY='clearexamsMyCasesCloudTokenV1';
+  const CLOUD_TOKEN_COOKIE='clearexamsMyCasesCloudTokenV1';
   const API_BASE='https://cdr-pdf-bot-production.up.railway.app';
   const CURRENT_CASE_KEY='clearexamsCurrentCaseV1';
   const STAGES=[
@@ -280,18 +281,32 @@
     try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
   }
   function saveCases(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cases))}
+  function cookieToken(){
+    try{
+      const prefix=CLOUD_TOKEN_COOKIE+'=';
+      const part=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(prefix));
+      return part?decodeURIComponent(part.slice(prefix.length)):'';
+    }catch(e){return ''}
+  }
+  function rememberCloudToken(token){
+    if(!token)return;
+    try{localStorage.setItem(CLOUD_TOKEN_KEY,token)}catch(e){}
+    try{sessionStorage.setItem(CLOUD_TOKEN_KEY,token)}catch(e){}
+    try{document.cookie=CLOUD_TOKEN_COOKIE+'='+encodeURIComponent(token)+'; Max-Age=604800; Path=/mycases; SameSite=Lax; Secure'}catch(e){}
+  }
+  function forgetCloudToken(){
+    try{localStorage.removeItem(CLOUD_TOKEN_KEY)}catch(e){}
+    try{sessionStorage.removeItem(CLOUD_TOKEN_KEY)}catch(e){}
+    try{document.cookie=CLOUD_TOKEN_COOKIE+'=; Max-Age=0; Path=/mycases; SameSite=Lax; Secure'}catch(e){}
+  }
   function cloudToken(){
-    const saved=localStorage.getItem(CLOUD_TOKEN_KEY)||'';
-    const sessionSaved=sessionStorage.getItem(CLOUD_TOKEN_KEY)||'';
-    if(saved){
-      if(sessionSaved!==saved)sessionStorage.setItem(CLOUD_TOKEN_KEY,saved);
-      return saved;
-    }
-    if(sessionSaved){
-      localStorage.setItem(CLOUD_TOKEN_KEY,sessionSaved);
-      return sessionSaved;
-    }
-    return '';
+    let saved='',sessionSaved='';
+    try{saved=localStorage.getItem(CLOUD_TOKEN_KEY)||''}catch(e){}
+    try{sessionSaved=sessionStorage.getItem(CLOUD_TOKEN_KEY)||''}catch(e){}
+    const cookieSaved=cookieToken();
+    const token=saved||sessionSaved||cookieSaved||'';
+    if(token)rememberCloudToken(token);
+    return token;
   }
   function setCloudState(text,state='idle'){
     $('cloudStatusText').textContent=text;
@@ -339,8 +354,7 @@
         setCloudState('Cloud connected','online');
         return true;
       }
-      localStorage.removeItem(CLOUD_TOKEN_KEY);
-      sessionStorage.removeItem(CLOUD_TOKEN_KEY);
+      forgetCloudToken();
       setCloudState('Session expired · login again','error');
       return false;
     }catch(e){
@@ -360,7 +374,7 @@
     $('submitLoginBtn').disabled=true;
     try{
       const data=await cloudFetch('/api/login',{method:'POST',body:JSON.stringify({password})});
-      localStorage.setItem(CLOUD_TOKEN_KEY,data.token);sessionStorage.setItem(CLOUD_TOKEN_KEY,data.token);
+      rememberCloudToken(data.token);
       $('cloudPassword').value='';$('loginDialog').classList.remove('open');
       setCloudState('Cloud connected','online');
       await syncFromCloud();
