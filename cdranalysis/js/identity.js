@@ -305,6 +305,17 @@
     download('cdr_analyzer_tac_cache.json',JSON.stringify({version:1,exportedAt:new Date().toISOString(),entries:rows},null,2),'application/json');
   }
 
+  function exportSmsSenderDictionary(){
+    const payload={version:1,exportedAt:new Date().toISOString(),entries:state.smsSenderOverrides||{}};
+    download('cdr_sms_sender_dictionary.json',JSON.stringify(payload,null,2),'application/json');
+  }
+  async function importSmsSenderDictionary(file){
+    const obj=JSON.parse(await file.text()),entries=obj?.entries||obj;
+    if(!entries||typeof entries!=='object'||Array.isArray(entries))throw new Error('Invalid sender dictionary JSON');
+    let n=0;for(const [k,v] of Object.entries(entries)){if(!v||typeof v!=='object')continue;state.smsSenderOverrides[k]={...v,updatedAt:v.updatedAt||new Date().toISOString()};n++;}
+    saveSmsSenderOverrides();return n;
+  }
+
   function updateCdrRequestCount(){if($('cdrRequestCount'))$('cdrRequestCount').textContent=fmtInt(state.requestSelected.size);}
   function defaultCdrRequestDates(){
     const dates=state.filtered.filter(r=>r.dt).map(r=>r.dt).sort((a,b)=>a-b);
@@ -323,7 +334,7 @@
       smsRecordBasis,isSmsRecord,smsIntelRows,smsEventSignature,dedupeSmsRows,smsSenderIntelligence,requestIdentifier,
       parseCdrDeviceMetadata,imeiDigits,luhnValidImei,imeiStructure,tacFromImei,seedBuiltinTacMappings,
       normalizeTacEntry,saveTacCache,updateTacStatus,learnTacFromRecords,resolveDevice,tacField,
-      importTacDatabase,exportTacCache,updateCdrRequestCount,defaultCdrRequestDates
+      importTacDatabase,exportTacCache,exportSmsSenderDictionary,importSmsSenderDictionary,updateCdrRequestCount,defaultCdrRequestDates
     };
   };
 })();
