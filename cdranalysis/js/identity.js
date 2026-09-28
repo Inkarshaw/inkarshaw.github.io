@@ -82,9 +82,13 @@
     return 'Other / Unclassified';
   }
   function senderBrandInfo(v){
-    const raw=String(v??'').trim();if(!raw||!/[A-Za-z]/.test(raw))return null;
-    const override=getSmsSenderOverride(raw);
-    const compact=raw.toUpperCase().replace(/\s+/g,'');
+    const raw=String(v??'').trim();if(!raw)return null;
+    const override=getSmsSenderOverride(raw),compact=raw.toUpperCase().replace(/\s+/g,''),digits=compact.replace(/\D/g,'');
+    if(!/[A-Za-z]/.test(raw)){
+      if(!/^\d{3,8}$/.test(digits))return null;
+      const key='SHORT'+digits,autoLabel=raw,autoCategory='Other / Unclassified';
+      return {raw,key,label:override?.label||autoLabel,category:override?.category||autoCategory,recognition:override?'Manual':'Unclassified',classificationBasis:override?'Manual sender dictionary':'Numeric service short code; no category dictionary match',override:override||null};
+    }
     let brand='';
     const parts=compact.split(/[-_]/).filter(Boolean);
     if(parts.length>1)brand=parts.slice(1).join('');
