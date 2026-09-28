@@ -75,6 +75,7 @@
   function movementRows(){return movementModule?.movementRows()||[];}
 
   function renderSmsIntelligence(){return analysisModule?.renderSmsIntelligence();}
+  function smsAnalysisSnapshot(){return analysisModule?.smsAnalysisSnapshot?.()||null;}
   function renderIncident(){return analysisModule?.renderIncident();}
   function renderDaySummary(){return analysisModule?.renderDaySummary();}
   function renderPatterns(){return analysisModule?.renderPatterns();}
@@ -171,7 +172,7 @@
   reportsModule=window.CDRReportsFactory?.({
     $,state,dtFmt,contactLabel,aggregateContacts,aggregateLocations,aggregateDevices,
     contactTag,serviceSenderType,imeiStructure,resolveDevice,analyzeIdentifiers,
-    smsSenderIntelligence,movementRows,colocationEpisodes,incidentDateTime,showStatus,
+    smsSenderIntelligence,smsAnalysisSnapshot,movementRows,colocationEpisodes,incidentDateTime,showStatus,
     safeName,buildLeads,escapeHtml,fmtInt,fmtDur,localDateKey
   })||null;
 
