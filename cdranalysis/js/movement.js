@@ -51,7 +51,7 @@
     const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180);
     movementPlaybackRows=pts.map(p=>p.x);
     if($('movementMapStatus'))$('movementMapStatus').innerHTML=`<span class="metric-chip">Segments: ${fmtInt(rows.length)}</span><span class="metric-chip">Mapped: ${fmtInt(pts.length)}</span><span class="metric-chip">Without coordinates: ${fmtInt(rows.length-pts.length)}</span><span class="metric-chip" id="tileStatusChip">${state.mapPrivacyMode?'Privacy mode: external map tiles disabled':'Loading map tiles…'}</span>`;
-    if(typeof L==='undefined'){el.innerHTML='<div class="map-empty">Map library could not load. Internet access is required to load the map.</div>';return;}
+    if(typeof L==='undefined'){el.innerHTML='<div class="map-empty">Map library is unavailable. The movement table remains usable, but the route/tower map cannot be drawn.</div>';return;}
 
     if(!movementMap){
       try{
