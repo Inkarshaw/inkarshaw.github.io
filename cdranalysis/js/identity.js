@@ -104,6 +104,7 @@
       label:override?.label||autoLabel,
       category:override?.category||autoCategory,
       recognition:override?'Manual':autoRecognition,
+      classificationBasis:override?'Manual sender dictionary':(autoCategory!=='Other / Unclassified'?`Sender-ID token “${brand}” matched the category dictionary`:`Sender-ID token “${brand}” parsed; no category dictionary match`),
       override:override||null
     };
   }
