@@ -165,7 +165,7 @@
     $,state,smsIntelRows,smsSenderIntelligence,senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,fmtInt,escapeHtml,dtFmt,
     incidentDateTime,subjectEventScopedRecords,localDateKey,aggregateContacts,simpleTable,
     escAttr,contactLabel,contactTitle,typePill,fmtDur,normalize,analyzeIdentifiers,percentile,
-    setSubjectEventScope
+    setSubjectEventScope,getIndex,analysisRecords,audit
   })||null;
   analysisModule?.bind();
 
