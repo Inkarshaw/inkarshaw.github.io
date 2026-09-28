@@ -6,8 +6,6 @@
     sortData,typePill,safeName
   }=window.CDRCore;
   let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null, routerModule=null, uiModule=null;
-  function parseDuration(v){return parserModule?.parseDuration(v)||0;}
-  function inferCdrFromFilename(name){return parserModule?.inferCdrFromFilename(name)||'';}
   function contactName(num){return identityModule?.contactName(num)||'';}
   function contactTag(num){return identityModule?.contactTag(num)||'';}
   function contactLabel(num){return identityModule?.contactLabel(num)||String(num??'');}
@@ -19,52 +17,32 @@
   function samePhone(a,b){return identityModule?.samePhone(a,b)||false;}
   function serviceSenderType(v){return identityModule?.serviceSenderType(v)||'';}
   function isServiceSender(v){return identityModule?.isServiceSender(v)||false;}
-  function senderServiceCategory(v){return identityModule?.senderServiceCategory(v)||'';}
   function senderBrandInfo(v){return identityModule?.senderBrandInfo(v)||null;}
-  function smsRecordBasis(r){return identityModule?.smsRecordBasis(r)||'';}
-  function isSmsRecord(r){return identityModule?.isSmsRecord(r)||false;}
   function smsIntelRows(){return identityModule?.smsIntelRows()||[];}
   function smsSenderIntelligence(data=smsIntelRows()){return identityModule?.smsSenderIntelligence(data)||{categories:[],brands:[],timeline:[],callWindowMin:0,idWindowMin:0};}
   function requestIdentifier(v){return identityModule?.requestIdentifier(v)||'';}
   function parseCdrDeviceMetadata(a,b){return identityModule?.parseCdrDeviceMetadata(a,b)||{manufacturer:'',model:'',deviceType:'',os:''};}
-  function imeiDigits(v){return identityModule?.imeiDigits(v)||'';}
-  function luhnValidImei(v){return identityModule?.luhnValidImei(v)??null;}
   function imeiStructure(v){return identityModule?.imeiStructure(v)||{format:'',tac:'',reportingBody:'',modelIdentifier:'',serial:'',checkDigit:'',svn:'',luhn:null};}
-  function tacFromImei(v){return identityModule?.tacFromImei(v)||'';}
   function seedBuiltinTacMappings(){return identityModule?.seedBuiltinTacMappings();}
-  function normalizeTacEntry(v){return identityModule?.normalizeTacEntry(v)||null;}
-  function saveTacCache(){return identityModule?.saveTacCache();}
   function updateTacStatus(){return identityModule?.updateTacStatus();}
   function learnTacFromRecords(rows){return identityModule?.learnTacFromRecords(rows);}
   function resolveDevice(v){return identityModule?.resolveDevice(v)||{manufacturer:'',model:'',deviceType:'',os:'',status:'Unknown TAC'};}
-  function tacField(r,names){return identityModule?.tacField(r,names)||'';}
   function importTacDatabase(file){return identityModule?.importTacDatabase(file);}
   function exportTacCache(){return identityModule?.exportTacCache();}
   function updateCdrRequestCount(){return identityModule?.updateCdrRequestCount();}
   function defaultCdrRequestDates(){return identityModule?.defaultCdrRequestDates();}
 
-  function parseDateTime(dateVal,timeVal){return parserModule?.parseDateTime(dateVal,timeVal)||null;}
   function parseTime(v){return parserModule?.parseTime(v)||null;}
   function timeMins(v){return parserModule?.timeMins(v)??null;}
-  function mapHeaders(headers){return parserModule?.mapHeaders(headers)||{};}
-  function parseLatLong(v,link){return parserModule?.parseLatLong(v,link)||null;}
-  function detectSheet(wb){return parserModule?.detectSheet(wb)||wb?.SheetNames?.[0]||'';}
-  function parseFileOnMain(buffer){return parserModule?.parseFileOnMain(buffer);}
-  function parseFileInWorker(file){return parserModule?.parseFileInWorker(file);}
-  function loadFiles(files){return parserModule?.loadFiles(files);}
 
   function subjectEventScopedRecords(data=state.filtered){return filtersModule?.subjectEventScopedRecords(data)||data;}
   function installViewScopeToolbars(){return filtersModule?.installViewScopeToolbars();}
   function syncViewScopeControls(force=false){return filtersModule?.syncViewScopeControls(force);}
   function setSubjectEventScope(subject,eventType){return filtersModule?.setSubjectEventScope(subject,eventType);}
   function refreshSelectors(){return filtersModule?.refreshSelectors();}
-  function matchesSmartQuery(r,q){return filtersModule?.matchesSmartQuery(r,q)??true;}
   function withinNight(mins,from,to){return filtersModule?.withinNight(mins,from,to)??true;}
-  function activeFilterCount(){return filtersModule?.activeFilterCount()||0;}
   function updateFilterCount(){return filtersModule?.updateFilterCount();}
-  function setFilterDrawer(open){return filtersModule?.setFilterDrawer(open);}
   function applyFilters(){return filtersModule?.applyFilters();}
-  function resetFilters(){return filtersModule?.resetFilters();}
 
   function aggregateContacts(data=state.filtered){return dashboardModule?.aggregateContacts(data)||[];}
   function locationTowerKey(r){return dashboardModule?.locationTowerKey(r)||'';}
@@ -74,11 +52,9 @@
   function renderAll(){return routerModule?.renderAll();}
   function caseSnapshots(){return dashboardModule?.caseSnapshots()||[];}
   function renderCaseSnapshots(){return dashboardModule?.renderCaseSnapshots();}
-  function saveCaseSnapshot(){return dashboardModule?.saveCaseSnapshot();}
   function renderDashboard(){return dashboardModule?.renderDashboard();}
   function simpleTable(headers,rows){return dashboardModule?.simpleTable(headers,rows)||'';}
   function newChart(id,config){return dashboardModule?.newChart(id,config);}
-  function renderCharts(data,contacts){return dashboardModule?.renderCharts(data,contacts);}
 
   function jumpToRecord(rec){return recordsModule?.jumpToRecord(rec);}
   function renderRecords(){return recordsModule?.render();}
@@ -88,19 +64,12 @@
 
   function renderContactProfile(num){return contactsModule?.renderProfile(num);}
   function mapLink(x){return locationsModule?.mapLink(x)||'';}
-  function renderLocationMatchSubjects(){return locationsModule?.renderLocationMatchSubjects();}
-  function locationPairEvents(data,windowMin){return locationsModule?.locationPairEvents(data,windowMin)||[];}
   function locationEpisodes(events,episodeGapMin){return locationsModule?.locationEpisodes(events,episodeGapMin)||[];}
-  function multiSubjectSameCellMatches(data,subjects,windowMin){return locationsModule?.multiSubjectSameCellMatches(data,subjects,windowMin)||[];}
-  function locationSharedSummary(episodes){return locationsModule?.locationSharedSummary(episodes)||[];}
-  function renderLocationMatches(){return locationsModule?.renderLocationMatches();}
   function renderLocations(){return locationsModule?.renderLocations();}
 
   function analyzeIdentifiers(data=state.filtered){return devicesModule?.analyzeIdentifiers(data)||{byMsisdn:new Map(),byImsi:new Map(),byImei:new Map(),events:[],msisdnNewImsi:[],imsiNewImei:[],imeiMultiImsi:[],imsiCrossCdr:[],repeatedSwaps:[]};}
   function renderDevices(){return devicesModule?.renderDevices();}
 
-  function movementDateRange(){return movementModule?.movementDateRange()||{from:'',to:'',valid:true};}
-  function movementDateMatch(r){return movementModule?.movementDateMatch(r)??false;}
   function movementRows(){return movementModule?.movementRows()||[];}
 
   function renderSmsIntelligence(){return analysisModule?.renderSmsIntelligence();}
@@ -108,26 +77,14 @@
   function renderDaySummary(){return analysisModule?.renderDaySummary();}
   function renderPatterns(){return analysisModule?.renderPatterns();}
   function renderDataQuality(){return analysisModule?.renderDataQuality();}
-  function renderMovementMap(rows,attempt=0){return movementModule?.renderMovementMap(rows,attempt);}
-  function updateMovementPlayback(i,openPopup=true,pan=true){return movementModule?.updateMovementPlayback(i,openPopup,pan);}
-  function stopMovementPlayback(){return movementModule?.stopMovementPlayback();}
-  function scheduleMovementPlayback(){return movementModule?.scheduleMovementPlayback();}
-  function toggleMovementPlayback(){return movementModule?.toggleMovementPlayback();}
   function shiftLocalDateKey(key,days){return movementModule?.shiftLocalDateKey(key,days)||key;}
-  function displayLocalDateKey(key){return movementModule?.displayLocalDateKey(key)||key||'—';}
-  function nightStayAnalysis(){return movementModule?.nightStayAnalysis()||{rows:[],start:1200,end:360,wrap:true,recurring:null,totalEvents:0,distinctMain:0};}
   function renderMovement(){return movementModule?.renderMovement();}
 
-  function findBursts(data,mins,minCount){return analysisModule?.findBursts(data,mins,minCount)||[];}
-  function identifierUsage(cdr,field){return analysisModule?.identifierUsage(cdr,field)||[];}
-  function deviceChangeDetailsHtml(cdr){return analysisModule?.deviceChangeDetailsHtml(cdr)||'';}
   function buildLeads(){return analysisModule?.buildLeads()||{high:[],p95:0,bursts:[],night:[],longCalls:[],cf:[],deviceChanges:[],identifierAnalysis:analyzeIdentifiers([]),roam:{},incident:[],inc:null};}
   function renderLeads(){return analysisModule?.renderLeads();}
 
   function renderNetwork(){return networkModule?.renderNetwork();}
-  function colocationEvents(data=state.filtered,windowMin=30){return networkModule?.colocationEvents(data,windowMin)||[];}
   function colocationEpisodes(data=state.filtered,windowMin=30,episodeGapMin=60){return networkModule?.colocationEpisodes(data,windowMin,episodeGapMin)||[];}
-  function colocationMatches(data=state.filtered,windowMin=30){return networkModule?.colocationMatches(data,windowMin)||[];}
   function renderCompare(){return networkModule?.renderCompare();}
 
   function renderFlags(){return caseModule?.renderFlags();}
@@ -135,22 +92,16 @@
 
   function switchTab(id){return routerModule?.switchTab(id);}
   function contactFilter(num){return routerModule?.contactFilter(num);}
-  function csvCell(v){return reportsModule?.csvCell(v)??String(v??'');}
   function download(name,text,type='text/plain;charset=utf-8'){return reportsModule?.download(name,text,type);}
   function exportCsv(records,name){return reportsModule?.exportCsv(records,name);}
   function exportWorkbook(){return reportsModule?.exportWorkbook();}
 
-  function filterSnapshot(){return workspaceModule?.filterSnapshot()||{};}
-  function applyFilterSnapshot(f){return workspaceModule?.applyFilterSnapshot(f);}
-  function workspacePayload(){return workspaceModule?.workspacePayload()||{};}
   function saveWorkspace(){return workspaceModule?.saveWorkspace();}
   function restorePendingWorkspace(){return workspaceModule?.restorePendingWorkspace();}
   function loadWorkspaceObject(obj){return workspaceModule?.loadWorkspaceObject(obj);}
   function clearLoaded(){return workspaceModule?.clearLoaded();}
   function applyIncidentWindow(){return workspaceModule?.applyIncidentWindow();}
 
-  function reportTable(headers,rows){return reportsModule?.reportTable(headers,rows)||'';}
-  function reportSection(on,title,body){return reportsModule?.reportSection(on,title,body)||'';}
   function exportCaseReport(){return reportsModule?.exportCaseReport();}
 
   identityModule=window.CDRIdentityFactory?.({
