@@ -1,37 +1,13 @@
 (() => {
   'use strict';
-  const $ = id => document.getElementById(id);
-  const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, tacCache:{}, fileSeq:0, pendingWorkspace:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null, requestSelected:new Set(), locationMatchSelected:new Set()};
+  const {
+    $,state,FIELDS,normalize,escapeHtml,fmtInt,fmtDur,dateFmt,dtFmt,val,stableKey,localDateKey,
+    haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,uniq,fillSelect,
+    sortData,typePill,safeName
+  }=window.CDRCore;
   let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null;
-  const FIELDS = {
-    cdrNo:['cdrno','a party','aparty','a-party','msisdn','subscriber number','mobile number'],
-    bparty:['b party','bparty','b-party','other party','connected number','called number','calling number'],
-    date:['date','call date','event date'], time:['time','call time','event time'], duration:['duration','call duration','duration sec','duration seconds'],
-    callType:['call type','event type','direction','type'], firstCellId:['first cell id','first cellid','cell id','first cell'], firstAddress:['first cell id address','first cellid address','first tower address','tower address'],
-    lastCellId:['last cell id','last cellid','last cell'], lastAddress:['last cell id address','last cellid address','last tower address'], imei:['imei'], manufacturer:['imei manufacturer','manufacturer'], deviceType:['device type'], imsi:['imsi'], roaming:['roaming'],
-    provider:['b party provider','bparty provider','provider'], mainCity:['main city(first cellid)','main city','city'], subCity:['sub city(first cellid)','sub city','subcity'], latlong:['lat-long-azimuth (first cellid)','lat long azimuth','lat-long-azimuth','latitude longitude azimuth'],
-    caseName:['case'], circle:['circle'], operator:['operator'], lrn:['lrn'], callForward:['callforward','call forward'], location:['location','map','map link']
-  };
-  const normalize = s => String(s ?? '').toLowerCase().replace(/[\n\r]+/g,' ').replace(/[_]+/g,' ').replace(/\s+/g,' ').trim();
-  const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const fmtInt = n => Number(n||0).toLocaleString('en-IN');
-  const fmtDur = sec => {sec=Number(sec)||0; const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=Math.floor(sec%60); return h?`${h}h ${m}m ${s}s`:m?`${m}m ${s}s`:`${s}s`;};
-  const dateFmt = d => d instanceof Date && !isNaN(d) ? d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '';
-  const dtFmt = d => d instanceof Date && !isNaN(d) ? d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '';
-  const val = (obj,map,key) => {const h=map[key]; return h ? obj[h] : '';};
-  const stableKey = r => [r.sourceFile,r.sourceSheet,r.rowNumber,r.cdrNo,r.bparty,r.dt instanceof Date&&!isNaN(r.dt)?r.dt.toISOString():`${r.date} ${r.time}`].join('|');
-  function localDateKey(d){if(!(d instanceof Date)||isNaN(d))return '';return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
   function parseDuration(v){return parserModule?.parseDuration(v)||0;}
-  if(typeof Chart!=='undefined'){
-    Chart.defaults.color='#86a9b8';
-    Chart.defaults.borderColor='rgba(97,163,187,.14)';
-    Chart.defaults.font.family='Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
-  }
   function inferCdrFromFilename(name){return parserModule?.inferCdrFromFilename(name)||'';}
-  function haversineKm(a,b){if(a?.lat==null||a?.lng==null||b?.lat==null||b?.lng==null)return null;const R=6371,rad=x=>x*Math.PI/180,dLat=rad(b.lat-a.lat),dLon=rad(b.lng-a.lng),s=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(s)));}
-  function percentile(arr,p){const a=arr.filter(Number.isFinite).sort((x,y)=>x-y);if(!a.length)return 0;const i=(a.length-1)*p,lo=Math.floor(i),hi=Math.ceil(i);return lo===hi?a[lo]:a[lo]+(a[hi]-a[lo])*(i-lo);}
-  function incidentDateTime(){if(!$('incidentDate').value)return null;const t=$('incidentTime').value||'00:00';const d=new Date(`${$('incidentDate').value}T${t}:00`);return isNaN(d)?null:d;}
-  function escAttr(s){return escapeHtml(s).replace(/'/g,'&#39;');}
   function contactName(num){return identityModule?.contactName(num)||'';}
   function contactTag(num){return identityModule?.contactTag(num)||'';}
   function contactLabel(num){return identityModule?.contactLabel(num)||String(num??'');}
@@ -77,10 +53,6 @@
   function parseFileInWorker(file){return parserModule?.parseFileInWorker(file);}
   function loadFiles(files){return parserModule?.loadFiles(files);}
 
-  function showStatus(msg,type){const el=$('loadStatus');el.textContent=msg;el.className='status show'+(type?` ${type}`:'');}
-  function renderFileList(){$('fileList').innerHTML=state.files.map(f=>`<div class="file-item"><b title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</b><span>${f.inferredCdr?escapeHtml(f.inferredCdr)+' • ':''}${escapeHtml(f.sheet)} • ${fmtInt(f.rows)} <button class="file-remove" data-remove-file="${f.id}" title="Remove file">×</button></span></div>`).join('');}
-  function uniq(key){return [...new Set(state.records.map(r=>r[key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));}
-  function fillSelect(id,items,label){const el=$(id),cur=el.value;el.innerHTML=`<option value="">${label}</option>`+items.map(x=>`<option>${escapeHtml(x)}</option>`).join('');if(items.includes(cur))el.value=cur;}
   function subjectEventScopedRecords(data=state.filtered){return filtersModule?.subjectEventScopedRecords(data)||data;}
   function installViewScopeToolbars(){return filtersModule?.installViewScopeToolbars();}
   function syncViewScopeControls(force=false){return filtersModule?.syncViewScopeControls(force);}
@@ -108,8 +80,6 @@
   function newChart(id,config){return dashboardModule?.newChart(id,config);}
   function renderCharts(data,contacts){return dashboardModule?.renderCharts(data,contacts);}
 
-  function sortData(arr){const {key,dir}=state.sort;const mul=dir==='asc'?1:-1;return [...arr].sort((a,b)=>{let x=a[key],y=b[key];if(key==='dt'){x=x?.getTime?.()||0;y=y?.getTime?.()||0;}else if(key==='duration'){x=+x||0;y=+y||0;}else{x=String(x??'').toLowerCase();y=String(y??'').toLowerCase();}return x<y?-mul:x>y?mul:0;});}
-  function typePill(t){const n=normalize(t);const cls=n.includes('sms')?'sms':n.includes('in')?'in':n.includes('out')?'out':'';return `<span class="pill ${cls}">${escapeHtml(t||'—')}</span>`;}
   function jumpToRecord(rec){return recordsModule?.jumpToRecord(rec);}
   function renderRecords(){return recordsModule?.render();}
   function renderContacts(){return contactsModule?.render();}
@@ -186,8 +156,6 @@
   function download(name,text,type='text/plain;charset=utf-8'){return reportsModule?.download(name,text,type);}
   function exportCsv(records,name){return reportsModule?.exportCsv(records,name);}
   function exportWorkbook(){return reportsModule?.exportWorkbook();}
-
-  function safeName(s){return String(s||'cdr_case').replace(/[^a-z0-9_-]+/gi,'_').replace(/^_+|_+$/g,'').slice(0,60)||'cdr_case';}
 
   function filterSnapshot(){return workspaceModule?.filterSnapshot()||{};}
   function applyFilterSnapshot(f){return workspaceModule?.applyFilterSnapshot(f);}
