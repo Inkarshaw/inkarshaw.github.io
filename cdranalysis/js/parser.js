@@ -59,8 +59,9 @@
 
     function currentMapping(sheetName){
       const p=state.pendingImport,sheet=p?.sheets.find(x=>x.name===sheetName);if(!sheet)return {};
-      const dom={};document.querySelectorAll('.import-map-select[data-sheet="'+CSS.escape(sheetName)+'"]').forEach(el=>{if(el.value)dom[el.dataset.field]=el.value;});
-      return Object.keys(dom).length?dom:(p.mappings[sheetName]||savedMapping(sheet.headers)||mapHeaders(sheet.headers));
+      const base={...(p.mappings[sheetName]||savedMapping(sheet.headers)||mapHeaders(sheet.headers))};
+      document.querySelectorAll('.import-map-select[data-sheet="'+CSS.escape(sheetName)+'"]').forEach(el=>{if(el.value)base[el.dataset.field]=el.value;else delete base[el.dataset.field];});
+      return base;
     }
 
     function renderImportReview(){
@@ -70,7 +71,7 @@
       const selected=p.sheets.filter(s=>p.selected.has(s.name));
       $('importMappingControls').innerHTML=selected.map(sheet=>{
         const map=p.mappings[sheet.name]||savedMapping(sheet.headers)||mapHeaders(sheet.headers);p.mappings[sheet.name]=map;
-        const important=['cdrNo','bparty','date','time','duration','callType','firstCellId','firstAddress','lastCellId','lastAddress','imei','imsi','provider','operator','latlong','location'];
+        const important=Object.keys(FIELDS);
         const opts=(val)=>'<option value="">— Not mapped —</option>'+sheet.headers.map(x=>'<option value="'+String(x).replace(/"/g,'&quot;')+'" '+(x===val?'selected':'')+'>'+String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</option>').join('');
         return '<details '+(selected.length===1?'open':'')+'><summary><b>'+sheet.name+'</b> • verify column mapping</summary><div class="checks" style="grid-template-columns:repeat(2,minmax(160px,1fr));margin:8px 0">'+important.map(k=>'<label class="field"><span>'+k+'</span><select class="import-map-select" data-sheet="'+sheet.name.replace(/"/g,'&quot;')+'" data-field="'+k+'">'+opts(map[k]||'')+'</select></label>').join('')+'</div></details>';
       }).join('');
