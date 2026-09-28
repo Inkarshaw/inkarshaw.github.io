@@ -257,6 +257,15 @@
   const $=id=>document.getElementById(id);
   const fields=['crimeNo','crimeYear','dateOccurrence','dateRegistration','sceneOfCrime','policeStation','caseType','sections','complainant','accused','ioName','priority','courtComplex','court','courtCaseType','courtCaseNo','stage','accusedPresentDetails','nbwStatus','fsStatus','finalResult','nextHearing','nextAction','notes'];
   let cases=loadCases();
+  (function recoverHandoffAtStartup(){
+    try{
+      const item=readCurrentCaseHandoff();
+      if(!item||!item.id)return;
+      const i=cases.findIndex(x=>String(x.id||'')===String(item.id||''));
+      if(i<0)cases.unshift(item);
+      else if(String(item.updatedAt||'')>=String(cases[i].updatedAt||''))cases[i]={...cases[i],...item};
+    }catch(e){console.error('My Cases startup handoff recovery failed',e)}
+  })();
   let selectedId=null;
   let pendingAccusedPhoto='';
   let accusedPersons=[];
@@ -281,11 +290,17 @@
   let investigationChecklist=[];
 
   function loadCases(){
-    let local=[];
+    let local=[],session=[];
     try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');local=Array.isArray(v)?v:[]}catch(e){}
-    if(local.length)return local;
-    try{const v=JSON.parse(sessionStorage.getItem(SESSION_CASES_KEY)||'[]');if(Array.isArray(v)&&v.length)return v}catch(e){}
-    return local;
+    try{const v=JSON.parse(sessionStorage.getItem(SESSION_CASES_KEY)||'[]');session=Array.isArray(v)?v:[]}catch(e){}
+    const map=new Map();
+    [...local,...session].forEach(item=>{
+      if(!item||!item.id)return;
+      const key=String(item.id);
+      const prev=map.get(key);
+      if(!prev||String(item.updatedAt||'')>=String(prev.updatedAt||''))map.set(key,item);
+    });
+    return [...map.values()];
   }
   function compactCaseForLocal(item){
     const safe=JSON.parse(JSON.stringify(item||{}));
@@ -315,16 +330,25 @@
   }
   function rememberCurrentCase(item){
     const safe=compactCaseForLocal(item);
-    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(safe))}catch(e){}
-    try{sessionStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(safe))}catch(e){}
+    const serialized=JSON.stringify(safe);
+    try{localStorage.setItem(CURRENT_CASE_KEY,serialized)}catch(e){}
+    try{sessionStorage.setItem(CURRENT_CASE_KEY,serialized)}catch(e){}
+    try{window.name='MYCASES_HANDOFF_V1:'+encodeURIComponent(serialized)}catch(e){}
     return safe;
   }
   function readCurrentCaseHandoff(){
-    let local=null,session=null;
+    let local=null,session=null,navigation=null;
     try{local=JSON.parse(localStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
     try{session=JSON.parse(sessionStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
-    if(local&&session)return String(session.updatedAt||'')>String(local.updatedAt||'')?session:local;
-    return session||local;
+    try{
+      const prefix='MYCASES_HANDOFF_V1:';
+      if(String(window.name||'').startsWith(prefix)){
+        navigation=JSON.parse(decodeURIComponent(String(window.name).slice(prefix.length)));
+      }
+    }catch(e){}
+    const candidates=[local,session,navigation].filter(x=>x&&x.id);
+    if(!candidates.length)return null;
+    return candidates.sort((a,b)=>String(b.updatedAt||'').localeCompare(String(a.updatedAt||'')))[0];
   }
   function cookieToken(){
     try{
@@ -711,7 +735,7 @@
   function goToDashboard(){
     clearTimeout(autoSaveTimer);
     persistCurrentFormSnapshot();
-    window.location.href='/mycases/?view=dashboard&v=20260928-12';
+    window.location.href='/mycases/?view=dashboard&v=20260929-13';
   }
 
   function linkedRequestsHtml(c){
@@ -1020,7 +1044,7 @@
     try{
       if(typeof persistCurrentFormSnapshot==='function')persistCurrentFormSnapshot();
     }catch(e){console.error('Navigation snapshot failed',e)}
-    location.href='/mycases/?view=dashboard&v=20260928-12';
+    location.href='/mycases/?view=dashboard&v=20260929-13';
   }
 
   if(oldSave){
