@@ -68,7 +68,9 @@
   }
 
   function directRows(a,b){
-    return scopedRows(records()).filter(r=>(same(r.cdrNo,a)&&same(r.bparty,b))||(same(r.cdrNo,b)&&same(r.bparty,a))).sort((x,y)=>(x.dt?.getTime?.()||0)-(y.dt?.getTime?.()||0));
+    const ia=window.CDRApp?.getIndex?.('bySubject',a)||[],ib=window.CDRApp?.getIndex?.('bySubject',b)||[];
+    const pool=(ia.length||ib.length)?[...ia,...ib.filter(x=>!ia.includes(x))]:records();
+    return scopedRows(pool).filter(r=>(same(r.cdrNo,a)&&same(r.bparty,b))||(same(r.cdrNo,b)&&same(r.bparty,a))).sort((x,y)=>(x.dt?.getTime?.()||0)-(y.dt?.getTime?.()||0));
   }
 
   function dedupe(rows,a,b){
@@ -105,8 +107,15 @@
 
   function connectedSubjects(b){
     if(!b)return [];
-    return subjects().filter(s=>!same(s,b)).map(subject=>{
-      const rows=dedupe(directRows(subject,b),subject,b);
+    const candidates=(window.CDRApp?.getIndex?.('byBparty',key(b))||records().filter(r=>same(r.bparty,b)));
+    const by=new Map();
+    for(const r of scopedRows(candidates)){
+      if(!same(r.bparty,b)||!r.cdrNo||same(r.cdrNo,b))continue;
+      if(!by.has(r.cdrNo))by.set(r.cdrNo,[]);
+      by.get(r.cdrNo).push(r);
+    }
+    return [...by.entries()].map(([subject,raw])=>{
+      const rows=dedupe(raw.sort((x,y)=>(x.dt?.getTime?.()||0)-(y.dt?.getTime?.()||0)),subject,b);
       const calls=rows.filter(r=>String(r.callType||'').toLowerCase().includes('call')).length;
       const sms=rows.filter(r=>String(r.callType||'').toLowerCase().includes('sms')).length;
       const dur=rows.reduce((sum,r)=>sum+(Number(r.duration)||0),0);
