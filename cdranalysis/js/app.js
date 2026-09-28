@@ -5,7 +5,7 @@
     haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,uniq,fillSelect,
     sortData,typePill,safeName
   }=window.CDRCore;
-  let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null, uiModule=null;
+  let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null, routerModule=null, uiModule=null;
   function parseDuration(v){return parserModule?.parseDuration(v)||0;}
   function inferCdrFromFilename(name){return parserModule?.inferCdrFromFilename(name)||'';}
   function contactName(num){return identityModule?.contactName(num)||'';}
@@ -71,7 +71,7 @@
   function aggregateLocations(data=state.filtered){return dashboardModule?.aggregateLocations(data)||[];}
   function aggregateDevices(data=state.filtered){return dashboardModule?.aggregateDevices(data)||[];}
 
-  function renderAll(){const active=document.querySelector('.tab.active')?.dataset.tab||'dashboard';if(active==='dashboard')renderDashboard();else if(active==='records')renderRecords();else if(active==='contacts')renderContacts();else if(active==='locations')renderLocations();else if(active==='devices')renderDevices();else if(active==='smsintel')renderSmsIntelligence();else if(active==='incident')renderIncident();else if(active==='days')renderDaySummary();else if(active==='patterns')renderPatterns();else if(active==='quality')renderDataQuality();else if(active==='movement')renderMovement();else if(active==='leads')renderLeads();else if(active==='network')requestAnimationFrame(renderNetwork);else if(active==='compare')renderCompare();else if(active==='chronology')renderChronology();else if(active==='flags')renderFlags();}
+  function renderAll(){return routerModule?.renderAll();}
   function caseSnapshots(){return dashboardModule?.caseSnapshots()||[];}
   function renderCaseSnapshots(){return dashboardModule?.renderCaseSnapshots();}
   function saveCaseSnapshot(){return dashboardModule?.saveCaseSnapshot();}
@@ -133,8 +133,8 @@
   function renderFlags(){return caseModule?.renderFlags();}
   function renderChronology(){return caseModule?.renderChronology();}
 
-  function switchTab(id){document.querySelectorAll('.view').forEach(v=>{v.setAttribute('role','tabpanel');v.classList.toggle('hidden',v.id!==id)});document.querySelectorAll('.tab').forEach(t=>{const active=t.dataset.tab===id;t.classList.toggle('active',active);t.setAttribute('aria-selected',String(active));});if(id==='dashboard')renderDashboard();else if(id==='records')renderRecords();else if(id==='contacts')renderContacts();else if(id==='locations')renderLocations();else if(id==='devices')renderDevices();else if(id==='smsintel')renderSmsIntelligence();else if(id==='incident')renderIncident();else if(id==='days')renderDaySummary();else if(id==='patterns')renderPatterns();else if(id==='quality')renderDataQuality();else if(id==='movement'){requestAnimationFrame(()=>renderMovement());setTimeout(()=>movementModule?.invalidateMap(),300);}else if(id==='leads')renderLeads();else if(id==='network')requestAnimationFrame(renderNetwork);else if(id==='compare')renderCompare();else if(id==='relationship'){window.CDRRelationship?.render?.();}else if(id==='chronology')renderChronology();else if(id==='flags')renderFlags();}
-  function contactFilter(num){$('bparty').value=num;applyFilters();switchTab('records');}
+  function switchTab(id){return routerModule?.switchTab(id);}
+  function contactFilter(num){return routerModule?.contactFilter(num);}
   function csvCell(v){return reportsModule?.csvCell(v)??String(v??'');}
   function download(name,text,type='text/plain;charset=utf-8'){return reportsModule?.download(name,text,type);}
   function exportCsv(records,name){return reportsModule?.exportCsv(records,name);}
@@ -231,6 +231,13 @@
     $,state,subjectEventScopedRecords,dtFmt,escapeHtml,escAttr,contactTitle,contactLabel,fmtDur
   })||null;
   caseModule?.bind();
+  routerModule=window.CDRRouterFactory?.({
+    $,applyFilters,renderDashboard,renderRecords,renderContacts,renderLocations,renderDevices,
+    renderSmsIntelligence,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,
+    renderMovement,invalidateMovementMap:()=>movementModule?.invalidateMap(),renderLeads,
+    renderNetwork,renderCompare,renderChronology,renderFlags
+  })||null;
+
   uiModule=window.CDRUIFactory?.({
     $,state,updatePrivacyUi,showStatus,renderCaseSnapshots,renderAll,installViewScopeToolbars,
     syncViewScopeControls,updateFilterCount,exportCaseReport,saveWorkspace,loadWorkspaceObject,
