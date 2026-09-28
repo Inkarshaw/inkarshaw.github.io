@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>No Objection Certificate | Dead Body Transport | Section 194 BNSS</title>
-<meta name="description" content="Editable No Objection Certificate generator for transport of a dead body in a Section 194 BNSS death inquiry workflow.">
+<meta name="description" content="Editable No Objection Certificate generator for transport of a dead body in a Section 194 BNSS death inquiry workflow.">\n<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>\n<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{--navy:#0b2545;--blue:#1463ff;--bg:#eef3f8;--line:#d7e0ea;--muted:#617187;--danger:#b42318}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#172033;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
@@ -18,7 +18,7 @@ fieldset{border:1px solid var(--line);border-radius:10px;margin:0 0 14px;padding
 label{display:block;font-size:.78rem;font-weight:750;color:#34455b;margin-bottom:4px}
 input,select,textarea{width:100%;border:1px solid #bdc9d7;border-radius:8px;padding:9px 10px;font:inherit;background:#fff;color:#172033}
 textarea{min-height:66px;resize:vertical}input:focus,select:focus,textarea:focus{outline:2px solid rgba(20,99,255,.18);border-color:var(--blue)}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer}.primary{background:var(--navy);color:#fff}.secondary{background:#eaf1fb;color:#15375d}.danger{background:#fff0ee;color:var(--danger)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.6;cursor:wait}.primary{background:var(--navy);color:#fff}.pdf{background:#18794e;color:#fff}.secondary{background:#eaf1fb;color:#15375d}.danger{background:#fff0ee;color:var(--danger)}
 .note{margin-top:12px;font-size:.78rem;color:var(--muted);line-height:1.45}
 .preview-panel{padding:14px;overflow:auto}.preview-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.preview-head strong{color:var(--navy)}
 .paper{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#000;padding:20mm 18mm 22mm;font-family:"Times New Roman",Times,serif;box-shadow:0 5px 24px rgba(0,0,0,.16)}
@@ -106,7 +106,8 @@ textarea{min-height:66px;resize:vertical}input:focus,select:focus,textarea:focus
 </fieldset>
 
 <div class="actions">
- <button class="btn primary" id="printBtn" type="button">Print / Save PDF</button>
+ <button class="btn primary" id="printBtn" type="button">🖨️ Print</button>
+ <button class="btn pdf" id="pdfBtn" type="button">⬇️ Save PDF</button>
  <button class="btn secondary" id="copyBtn" type="button">Copy certificate text</button>
  <button class="btn danger" id="clearBtn" type="button">Clear personal fields</button>
 </div>
@@ -150,6 +151,66 @@ textarea{min-height:66px;resize:vertical}input:focus,select:focus,textarea:focus
  if(!$("certificateDate").value)$("certificateDate").value=y+"-"+m+"-"+d;
 
  $("printBtn").addEventListener("click",function(){update();window.print()});
+
+ $("pdfBtn").addEventListener("click",async function(){
+   update();
+   var btn=$("pdfBtn");
+   var originalText=btn.textContent;
+   btn.disabled=true;
+   btn.textContent="Creating PDF…";
+   var paper=$("certificate");
+   var oldStyle={
+     width:paper.style.width,
+     minHeight:paper.style.minHeight,
+     padding:paper.style.padding,
+     boxShadow:paper.style.boxShadow
+   };
+   try{
+     if(!window.html2canvas || !window.jspdf){throw new Error("PDF library not loaded");}
+     paper.style.width="210mm";
+     paper.style.minHeight="297mm";
+     paper.style.padding="20mm 18mm 22mm";
+     paper.style.boxShadow="none";
+     await new Promise(function(resolve){requestAnimationFrame(function(){requestAnimationFrame(resolve)})});
+     var canvas=await html2canvas(paper,{
+       scale:2,
+       useCORS:true,
+       backgroundColor:"#ffffff",
+       logging:false,
+       windowWidth:paper.scrollWidth,
+       windowHeight:paper.scrollHeight
+     });
+     var img=canvas.toDataURL("image/jpeg",0.96);
+     var jsPDF=window.jspdf.jsPDF;
+     var pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+     var pageW=210,pageH=297;
+     var imgW=pageW;
+     var imgH=canvas.height*imgW/canvas.width;
+     if(imgH>pageH){
+       var ratio=pageH/imgH;
+       imgH=pageH;
+       imgW=imgW*ratio;
+     }
+     var x=(pageW-imgW)/2;
+     var y=(pageH-imgH)/2;
+     pdf.addImage(img,"JPEG",x,y,imgW,imgH,undefined,"FAST");
+     var cr=v("crimeNo").replace(/[^a-zA-Z0-9_-]+/g,"_");
+     var name=v("deceasedName").replace(/[^a-zA-Z0-9_-]+/g,"_");
+     var filename="Dead_Body_Transport_NOC"+(cr?"_"+cr:"")+(name?"_"+name:"")+".pdf";
+     pdf.save(filename);
+   }catch(err){
+     console.error(err);
+     alert("Could not create the PDF. Please use Print and choose Save as PDF, or try again.");
+   }finally{
+     paper.style.width=oldStyle.width;
+     paper.style.minHeight=oldStyle.minHeight;
+     paper.style.padding=oldStyle.padding;
+     paper.style.boxShadow=oldStyle.boxShadow;
+     btn.disabled=false;
+     btn.textContent=originalText;
+   }
+ });
+
  $("copyBtn").addEventListener("click",async function(){
    var txt=v("officeLine")+",\n"+v("station")+",\n"+v("stationAddress")+", "+v("stationCity")+".\nDate: "+prettyDate(v("certificateDate"))+"\n\nNO OBJECTION CERTIFICATE\n\n"+textParts();
    try{await navigator.clipboard.writeText(txt);$("copyStatus").textContent="Copied";setTimeout(function(){$("copyStatus").textContent=""},1500)}catch(e){alert("Copy failed. Select the preview text manually.")}
