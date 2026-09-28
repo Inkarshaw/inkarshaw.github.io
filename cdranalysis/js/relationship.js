@@ -189,6 +189,13 @@
     if($('relationshipScope'))$('relationshipScope').textContent=`A: ${a} • B: ${b} • ${fmtInt(rows.length)} direct event(s)`;
   }
 
+  function snapshot(){
+    const a=$('relationshipA')?.value||'',b=$('relationshipB')?.value.trim()||'';
+    if(!a||!b)return null;
+    const rows=dedupe(directRows(a,b),a,b),dirs=rows.map(r=>direction(r,a,b)),towers=towerSummary(a,b),ids=sharedIds(a,b);
+    return {a,b,filters:relationshipFilters(),rows,towers,ids,metrics:{interactions:rows.length,aToB:dirs.filter(x=>x==='A → B').length,bToA:dirs.filter(x=>x==='B → A').length,undirected:dirs.filter(x=>x==='A ↔ B').length,duration:rows.reduce((s,r)=>s+(Number(r.duration)||0),0),activeDays:new Set(rows.map(r=>localDate(r.dt)).filter(Boolean)).size,night:rows.filter(r=>r.dt&&((r.dt.getHours()>=20)||(r.dt.getHours()<6))).length}};
+  }
+
   function openFromContact(num,subject=''){
     fillInputs();
     const subs=subjects(),current=window.CDRApp?.currentSubject?.()||'';
@@ -210,6 +217,6 @@
   });
   document.addEventListener('change',e=>{if(['relationshipA','relationshipFrom','relationshipTo','relationshipEvent','relationshipNightOnly'].includes(e.target.id))render();});
   window.addEventListener('cdr:updated',fillInputs);
-  window.CDRRelationship={render,openFromContact,fillInputs};
+  window.CDRRelationship={render,openFromContact,fillInputs,snapshot};
   fillInputs();
 })();
