@@ -344,6 +344,7 @@
   const CLOUD_TOKEN_COOKIE='clearexamsMyCasesCloudTokenV1';
   const API_BASE='https://cdr-pdf-bot-production.up.railway.app';
   const CURRENT_CASE_KEY='clearexamsCurrentCaseV1';
+  const SESSION_CASES_KEY='clearexamsMyCasesSessionBackupV1';
   const STAGES=[
     'Investigation','FIR Registered','Notice / Enquiry','Accused Search','Arrested','Remand','Bail',
     'Property / FSL Pending','Charge Sheet Preparation','Charge Sheet Filed','Cognizance','Summons',
@@ -380,7 +381,11 @@
   let investigationChecklist=[];
 
   function loadCases(){
-    try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
+    let local=[];
+    try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');local=Array.isArray(v)?v:[]}catch(e){}
+    if(local.length)return local;
+    try{const v=JSON.parse(sessionStorage.getItem(SESSION_CASES_KEY)||'[]');if(Array.isArray(v)&&v.length)return v}catch(e){}
+    return local;
   }
   function loadDeletedCases(){
     try{const v=JSON.parse(localStorage.getItem(DELETED_STORAGE_KEY)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}
@@ -393,20 +398,36 @@
     return safe;
   }
   function saveCases(){
+    let sessionOk=false;
+    try{
+      sessionStorage.setItem(SESSION_CASES_KEY,JSON.stringify(cases.map(compactCaseForLocal)));
+      sessionOk=true;
+    }catch(e){}
     try{
       localStorage.setItem(STORAGE_KEY,JSON.stringify(cases));
       return true;
     }catch(e){
       try{
-        const compact=cases.map(compactCaseForLocal);
-        localStorage.setItem(STORAGE_KEY,JSON.stringify(compact));
-        cases=cases.map((item,i)=>mergeCloudCase(item,compact[i]));
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(cases.map(compactCaseForLocal)));
         return true;
       }catch(e2){
         console.error('My Cases local save failed',e2);
-        return false;
+        return sessionOk;
       }
     }
+  }
+  function rememberCurrentCase(item){
+    const safe=compactCaseForLocal(item);
+    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(safe))}catch(e){}
+    try{sessionStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(safe))}catch(e){}
+    return safe;
+  }
+  function readCurrentCaseHandoff(){
+    let local=null,session=null;
+    try{local=JSON.parse(localStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
+    try{session=JSON.parse(sessionStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
+    if(local&&session)return String(session.updatedAt||'')>String(local.updatedAt||'')?session:local;
+    return session||local;
   }
   function saveDeletedCases(){localStorage.setItem(DELETED_STORAGE_KEY,JSON.stringify(deletedCases))}
   function cookieToken(){
@@ -700,8 +721,8 @@
     const key=String(id||'');
     const c=cases.find(x=>String(x.id||'')===key);
     if(!c){showToast('Case could not be opened. Sync and try again.');return;}
-    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)))}catch(e){}
-    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id)+'&v=20260928-9';
+    rememberCurrentCase(c)
+    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id)+'&v=20260928-10';
   }
   function openCaseDocsById(id){
     const key=String(id||'');
@@ -835,8 +856,7 @@
   }
 
   function mergeCurrentCaseHandoff(){
-    let item=null;
-    try{item=JSON.parse(localStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
+    const item=readCurrentCaseHandoff();
     if(!item||!item.id)return false;
     const i=cases.findIndex(x=>String(x.id||'')===String(item.id||''));
     if(i<0)cases.unshift(item);
@@ -846,15 +866,15 @@
   }
 
   function startNewCase(){
-    window.location.href='/mycases/edit/?new=1&v=20260928-9';
+    window.location.href='/mycases/edit/?new=1&v=20260928-10';
   }
 
   function editSelectedCase(){
     const id=selectedId || ($('caseId')&&$('caseId').value);
     const c=cases.find(x=>String(x.id||'')===String(id||''));
     if(!c){showToast('Select a case to edit.');return;}
-    localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)));
-    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id);
+    rememberCurrentCase(c);
+    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id)+'&v=20260928-10';
   }
 
   function fillForm(c){
@@ -971,12 +991,12 @@
         cases[idx].timeline=tl;saveCases();c=cases[idx];pushCaseToCloud(c,false);
       }
     }
-    try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)))}catch(e){}
+    rememberCurrentCase(c)
     const id=encodeURIComponent(c.id||'');
     location.href='/policedocuments/?case='+id+'&q='+encodeURIComponent(query||'');
   }
   function openInDocuments(c){
-    localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(compactCaseForLocal(c)));
+    rememberCurrentCase(c);
     window.location.href='/policedocuments/?case='+encodeURIComponent(c.id);
   }
 
