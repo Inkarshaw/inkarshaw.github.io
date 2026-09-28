@@ -196,6 +196,9 @@
             <div class="field"><label>Unusual time to</label><input type="time" id="smsIntelNightTo" value="06:00"></div>
             <div class="field"><label>Call proximity ± min</label><input type="number" id="smsIntelCallMins" min="1" max="240" value="10"></div>
             <div class="field"><label>ID-change proximity ± min</label><input type="number" id="smsIntelIdMins" min="1" max="1440" value="60"></div>
+            <div class="field"><label>Event context ± min</label><input type="number" id="smsIntelContextMins" min="1" max="360" value="30"></div>
+            <div class="field"><label>SMS burst gap (min)</label><input type="number" id="smsIntelBurstMins" min="1" max="240" value="15"></div>
+            <div class="field"><label>Incident proximity ± min</label><input type="number" id="smsIntelIncidentMins" min="1" max="1440" value="60"></div>
             <button class="btn secondary small" id="smsIntelRefreshBtn">Refresh</button>
           </div>
           <div id="smsIntelSummary"></div>
@@ -203,8 +206,14 @@
           <div class="tablewrap"><table class="table" id="smsIntelCategoryTable"></table></div>
           <h3>Brand / sender summary</h3>
           <div class="tablewrap"><table class="table" id="smsIntelBrandTable"></table></div>
+          <h3 style="margin-top:16px">SMS review leads</h3>
+          <div id="smsIntelInsights"></div>
+          <h3 style="margin-top:16px">SMS bursts</h3>
+          <div class="tablewrap"><table class="table" id="smsIntelBurstsTable"></table></div>
           <h3 style="margin-top:16px">Chronological SMS metadata</h3>
-          <div class="tablewrap" style="max-height:520px"><table class="table" id="smsIntelTimelineTable"></table></div>
+          <div class="tablewrap" style="max-height:620px"><table class="table" id="smsIntelTimelineTable"></table></div>
+          <h3 style="margin-top:16px">Selected SMS event context</h3>
+          <div id="smsIntelContextPanel" class="empty">Use “Show context” on an SMS row to inspect nearby calls, SMS records, towers and identifier metadata.</div>
         </div>
       </section>
       <section id="incident" class="view hidden">
