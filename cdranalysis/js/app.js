@@ -140,7 +140,7 @@
   contactsModule=window.CDRContactsFactory?.({
     $,state,aggregateContacts,aggregateLocations,identityStore,defaultCdrRequestDates,updateCdrRequestCount,requestIdentifier,
     escAttr,escapeHtml,contactTitle,contactLabel,contactTag,contactName,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable,
-    showStatus,localDateKey
+    showStatus,localDateKey,analysisRecords
   })||null;
 
   locationsModule=window.CDRLocationsFactory?.({
