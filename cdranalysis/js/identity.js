@@ -150,7 +150,7 @@
       if(!b)b={key:bi.key,label:bi.label,category:bi.category,recognition:bi.recognition,senderIds:new Set(),count:0,first:null,last:null,days:new Set(),unusual:0,subjects:new Set(),towers:new Set(),nearCalls:0,nearIds:0};
       b.label=bi.label;b.category=bi.category;b.recognition=bi.recognition;b.senderIds.add(r.bparty);b.count++;b.days.add(localDateKey(r.dt));if(unusual)b.unusual++;if(r.cdrNo)b.subjects.add(r.cdrNo);if(r.firstCellId||r.firstAddress)b.towers.add(r.firstCellId||r.firstAddress);b.nearCalls+=nearbyCalls.length;b.nearIds+=nearbyIds.length;
       if(!b.first||r.dt<b.first)b.first=r.dt;if(!b.last||r.dt>b.last)b.last=r.dt;brands.set(bi.key,b);
-      timeline.push({record:r,brand:bi.label,brandKey:bi.key,category:bi.category,recognition:bi.recognition||'Unclassified',senderId:r.bparty,basis:smsRecordBasis(r),unusual,nearbyCalls:nearbyCalls.length,nearbyIds:nearbyIds.length});
+      timeline.push({record:r,brand:bi.label,brandKey:bi.key,category:bi.category,recognition:bi.recognition||'Unclassified',classificationBasis:bi.classificationBasis||'',senderId:r.bparty,basis:smsRecordBasis(r),unusual,nearbyCalls:nearbyCalls.length,nearbyIds:nearbyIds.length});
     }
     const categories=new Map();
     for(const b of brands.values()){
