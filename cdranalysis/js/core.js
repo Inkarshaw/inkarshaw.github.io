@@ -33,13 +33,13 @@
   function uniqueRecords(data=state.records){const seen=new Set();return data.filter(r=>{const k=duplicateSignature(r);if(seen.has(k))return false;seen.add(k);return true;});}
   function analysisRecords(){return state.analysisMode==='unique'?uniqueRecords(state.records):state.records;}
   function rebuildIndexes(data=analysisRecords()){
-    const idx={source:data,bySubject:new Map(),byBparty:new Map(),byTower:new Map(),byDate:new Map(),byImei:new Map(),byImsi:new Map()};
+    const idx={source:data,mode:state.analysisMode,rawCount:state.records.length,bySubject:new Map(),byBparty:new Map(),byTower:new Map(),byDate:new Map(),byImei:new Map(),byImsi:new Map()};
     const push=(map,key,r)=>{if(!key)return;let a=map.get(key);if(!a){a=[];map.set(key,a);}a.push(r);};
     for(const r of data){push(idx.bySubject,r.cdrNo,r);push(idx.byBparty,r.bpartyKey||phoneish(r.bparty),r);push(idx.byTower,[r.operator,r.firstCellId||r.firstAddress].filter(Boolean).join('|'),r);push(idx.byDate,localDateKey(r.dt),r);push(idx.byImei,r.imei,r);push(idx.byImsi,r.imsi,r);}
     state.indexes=idx;return idx;
   }
   function phoneish(v){const s=String(v??'').trim(),d=s.replace(/\D/g,'');return d.length>=10?d.slice(-10):s.toLowerCase().replace(/\s+/g,'');}
-  function getIndex(name,key){const idx=state.indexes?.source===analysisRecords()?state.indexes:rebuildIndexes();return idx?.[name]?.get(key)||[];}
+  function getIndex(name,key){const idx=(state.indexes?.mode===state.analysisMode&&state.indexes?.rawCount===state.records.length)?state.indexes:rebuildIndexes();return idx?.[name]?.get(key)||[];}
   function audit(action,details=''){const entry={at:new Date().toISOString(),action:String(action||''),details:String(details||'')};state.auditTrail.push(entry);if(state.auditTrail.length>5000)state.auditTrail.splice(0,state.auditTrail.length-5000);return entry;}
   function sourceTimezoneOffsetMinutes(tz){if(tz==='UTC')return 0;if(tz==='Asia/Kolkata')return 330;return null;}
   function dateFromSourceParts(y,m,d,h=0,min=0,sec=0,tz=state.sourceTimezone){const off=sourceTimezoneOffsetMinutes(tz);return off==null?new Date(y,m,d,h,min,sec,0):new Date(Date.UTC(y,m,d,h,min,sec,0)-off*60000);}
