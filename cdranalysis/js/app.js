@@ -3,7 +3,7 @@
   const {
     $,state,FIELDS,normalize,escapeHtml,fmtInt,fmtDur,dateFmt,dtFmt,val,stableKey,localDateKey,
     haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,uniq,fillSelect,
-    sortData,typePill,safeName
+    sortData,typePill,safeName,duplicateSignature,uniqueRecords,analysisRecords,rebuildIndexes,getIndex,audit,dateFromSourceParts
   }=window.CDRCore;
   let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null, routerModule=null, uiModule=null;
   function contactName(num){return identityModule?.contactName(num)||'';}
@@ -114,13 +114,13 @@
 
   parserModule=window.CDRParserFactory?.({
     $,state,FIELDS,val,normalize,parseCdrDeviceMetadata,phoneKey,refreshSelectors,renderFileList,
-    applyFilters,restorePendingWorkspace,showStatus,fmtInt
+    applyFilters,restorePendingWorkspace,showStatus,fmtInt,rebuildIndexes,audit,dateFromSourceParts
   })||null;
   parserModule?.bind();
 
   filtersModule=window.CDRFiltersFactory?.({
     $,state,normalize,contactLabel,contactTag,escAttr,escapeHtml,fillSelect,fmtInt,isServiceSender,
-    renderAll,timeMins,uniq
+    renderAll,timeMins,uniq,analysisRecords,rebuildIndexes,audit
   })||null;
   filtersModule?.bind();
 
@@ -205,12 +205,13 @@
   uiModule?.bind();
 
   window.CDRApp={
-    getRecords:()=>state.records,
+    getRecords:()=>analysisRecords(),
     getFilteredRecords:()=>state.filtered,
     currentSubject:()=>$('cdrNo')?.value||'',
     formatDateTime:dtFmt,
     formatDuration:fmtDur,
     contactLabel,
+    analysisRecords,getIndex,audit,
     senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,
     switchTab,
     openPairRecords:(subject,other)=>{if($('cdrNo'))$('cdrNo').value=subject||'';if($('bparty'))$('bparty').value=other||'';applyFilters();switchTab('records');},
