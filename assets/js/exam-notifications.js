@@ -8,7 +8,9 @@
     const filter = document.getElementById('categoryFilter');
     Object.entries(catalog).forEach(([key,body])=> {const option=document.createElement('option');option.value=key;option.textContent=body.name;filter.appendChild(option);});
     const initial = new URLSearchParams(location.search).get('category');
+    const savedTarget = localStorage.getItem('clearexamsTargetExamV1') || '';
     if (initial && catalog[initial]) filter.value = initial;
+    else if (catalog[savedTarget]) filter.value = savedTarget;
     function render() {
       const selected = filter.value;
       const entries = data.entries.filter(item=>selected==='all'||item.category===selected);
