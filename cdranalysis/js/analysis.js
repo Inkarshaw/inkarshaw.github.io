@@ -172,11 +172,112 @@
     $('contactDayMatrix').innerHTML=`<h3>Contact-by-day matrix</h3><div class="tiny" style="margin-bottom:6px">Top 20 contacts within the current filters across the latest 31 filtered dates.</div><div class="tablewrap"><table class="table"><thead><tr><th>Contact</th>${days.map(d=>`<th>${d.slice(5)}</th>`).join('')}</tr></thead><tbody>${top.map(x=>`<tr><td title="${escAttr(contactTitle(x.bparty))}">${escapeHtml(contactLabel(x.bparty))}</td>${days.map(d=>{const v=cd[x.bparty][d]||0;return `<td title="${v} event(s)" style="text-align:center;background:rgba(181,71,8,${v?0.08+0.72*v/cmax:0})">${v||''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
   }
 
-  function renderDataQuality(){
+  function qualitySnapshot(){
     const data=subjectEventScopedRecords(state.records);
-    const total=data.length,missingDate=data.filter(r=>!r.dt).length,missingSubject=data.filter(r=>!r.cdrNo).length,missingParty=data.filter(r=>!r.bparty).length,missingTower=data.filter(r=>!r.firstCellId&&!r.firstAddress).length,missingCoords=data.filter(r=>r.lat==null||r.lng==null).length;
-    const seen=new Map();for(const r of data){const k=[r.cdrNo,r.bparty,r.dt?+r.dt:'',r.duration,r.callType,r.firstCellId].join('|');seen.set(k,(seen.get(k)||0)+1);}const duplicateGroups=[...seen.values()].filter(n=>n>1).length;
-    $('qualitySummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(total)}</div><div class="l">Records</div></div><div class="kpi"><div class="v">${fmtInt(duplicateGroups)}</div><div class="l">Duplicate signatures</div></div><div class="kpi"><div class="v">${fmtInt(missingDate)}</div><div class="l">Missing date/time</div></div><div class="kpi"><div class="v">${fmtInt(missingSubject)}</div><div class="l">Missing subject</div></div><div class="kpi"><div class="v">${fmtInt(missingParty)}</div><div class="l">Missing connected party</div></div><div class="kpi"><div class="v">${fmtInt(missingTower)}</div><div class="l">Missing tower</div></div><div class="kpi"><div class="v">${fmtInt(missingCoords)}</div><div class="l">Missing coordinates</div></div></div>`;
+    const signature=r=>[r.cdrNo,r.bparty,r.dt?+r.dt:'',Number(r.duration)||0,r.callType,r.firstCellId].join('|');
+    const groups=new Map();
+    for(const r of data){const k=signature(r);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);}
+    const duplicateGroups=[...groups.entries()].filter(([,rows])=>rows.length>1);
+    const duplicateKeys=new Set(duplicateGroups.map(([k])=>k));
+    const issues={
+      duplicates:{
+        label:'Rows in duplicate-signature groups',
+        rows:data.filter(r=>duplicateKeys.has(signature(r))),
+        impact:'Can inflate event counts, contact frequency, duration totals and pattern summaries when the same records were imported more than once.'
+      },
+      missingDate:{
+        label:'Missing date / time',
+        rows:data.filter(r=>!r.dt),
+        impact:'Weakens chronology, incident-window analysis, night activity, peak-hour analysis and movement sequencing.'
+      },
+      missingSubject:{
+        label:'Missing subject / CDR No.',
+        rows:data.filter(r=>!r.cdrNo),
+        impact:'Prevents reliable attribution to an A-party and weakens subject-wise, Cross-CDR and relationship analysis.'
+      },
+      missingParty:{
+        label:'Missing connected party / B Party',
+        rows:data.filter(r=>!r.bparty),
+        impact:'Weakens contact frequency, relationship analysis, communication network and pair-level review.'
+      },
+      missingTower:{
+        label:'Missing tower',
+        rows:data.filter(r=>!r.firstCellId&&!r.firstAddress),
+        impact:'Weakens movement, common-tower, location-match and night-stay analysis.'
+      },
+      missingCoords:{
+        label:'Missing coordinates',
+        rows:data.filter(r=>r.lat==null||r.lng==null),
+        impact:'Prevents map plotting and distance calculations for those rows. Cell-ID/address based tower analysis may still remain usable.'
+      }
+    };
+    const issueIds=new Set();
+    for(const x of Object.values(issues))for(const r of x.rows)issueIds.add(r.id);
+    const extraDuplicateRows=duplicateGroups.reduce((sum,[,rows])=>sum+Math.max(0,rows.length-1),0);
+    return {data,signature,groups,duplicateGroups,issues,issueIds,extraDuplicateRows};
+  }
+
+  function qualityGroupRows(q,field,missingLabel){
+    const m=new Map();
+    for(const r of q.data){
+      const key=String(r[field]||'').trim()||missingLabel;
+      let x=m.get(key);
+      if(!x)x={key,total:0,missingDate:0,missingSubject:0,missingParty:0,missingTower:0,missingCoords:0,duplicateRows:0};
+      x.total++;
+      if(!r.dt)x.missingDate++;
+      if(!r.cdrNo)x.missingSubject++;
+      if(!r.bparty)x.missingParty++;
+      if(!r.firstCellId&&!r.firstAddress)x.missingTower++;
+      if(r.lat==null||r.lng==null)x.missingCoords++;
+      if((q.groups.get(q.signature(r))||[]).length>1)x.duplicateRows++;
+      m.set(key,x);
+    }
+    return [...m.values()].sort((a,b)=>b.total-a.total||String(a.key).localeCompare(String(b.key),undefined,{numeric:true}));
+  }
+
+  function renderQualityDrilldown(issueKey){
+    const box=$('qualityDrilldown');if(!box)return;
+    const q=qualitySnapshot(),issue=q.issues[issueKey];
+    if(!issue){box.innerHTML='<div class="empty">Choose an issue above to inspect its affected records.</div>';return;}
+    const rows=issue.rows.slice(0,300);
+    box.innerHTML=`<div class="panel-title"><h3>${escapeHtml(issue.label)}</h3><span class="muted">${fmtInt(issue.rows.length)} affected row(s)${issue.rows.length>300?' • showing first 300':''}</span></div><div class="notice">${escapeHtml(issue.impact)}</div><div class="tablewrap"><table class="table"><thead><tr><th>Date / Time</th><th>Subject</th><th>B Party</th><th>Event</th><th>Cell / Tower</th><th>Source</th><th>Action</th></tr></thead><tbody>${rows.length?rows.map(r=>`<tr><td>${escapeHtml(dtFmt(r.dt)||((r.date||'')+' '+(r.time||'')).trim()||'—')}</td><td>${escapeHtml(r.cdrNo||'—')}</td><td title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(r.bparty?contactLabel(r.bparty):'—')}</td><td>${escapeHtml(r.callType||'—')}</td><td class="details">${escapeHtml([r.firstCellId,r.firstAddress].filter(Boolean).join(' • ')||'—')}</td><td class="details">${escapeHtml([r.sourceFile,r.sourceSheet,r.rowNumber?('row '+r.rowNumber):''].filter(Boolean).join(' / ')||'—')}</td><td><button class="btn secondary small lead-view-record" data-id="${escAttr(r.id)}">View record</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No affected records.</td></tr>'}</tbody></table></div>`;
+  }
+
+  function renderDataQuality(){
+    const q=qualitySnapshot(),total=q.data.length,affected=q.issueIds.size,clean=Math.max(0,total-affected);
+    const pct=n=>total?((n*100/total).toFixed(1)+'%'):'0.0%';
+    const issueOrder=['duplicates','missingDate','missingSubject','missingParty','missingTower','missingCoords'];
+    const subjectRows=qualityGroupRows(q,'cdrNo','— Missing subject —').slice(0,100);
+    const fileRows=qualityGroupRows(q,'sourceFile','— Unknown source file —').slice(0,100);
+    const groupTable=rows=>`<div class="tablewrap"><table class="table"><thead><tr><th>Name</th><th>Records</th><th>Missing date</th><th>Missing B Party</th><th>Missing tower</th><th>Missing coordinates</th><th>Duplicate-group rows</th></tr></thead><tbody>${rows.length?rows.map(x=>`<tr><td class="details">${escapeHtml(x.key)}</td><td>${fmtInt(x.total)}</td><td>${fmtInt(x.missingDate)}</td><td>${fmtInt(x.missingParty)}</td><td>${fmtInt(x.missingTower)}</td><td>${fmtInt(x.missingCoords)}</td><td>${fmtInt(x.duplicateRows)}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">No data.</td></tr>'}</tbody></table></div>`;
+    const dupRows=q.duplicateGroups.slice(0,100).map(([,rows])=>{
+      const r=rows[0];
+      return `<tr><td>${fmtInt(rows.length)}</td><td>${escapeHtml(r.cdrNo||'—')}</td><td title="${escAttr(contactTitle(r.bparty))}">${escapeHtml(r.bparty?contactLabel(r.bparty):'—')}</td><td>${escapeHtml(dtFmt(r.dt)||((r.date||'')+' '+(r.time||'')).trim()||'—')}</td><td>${escapeHtml(r.callType||'—')}</td><td>${escapeHtml(r.firstCellId||'—')}</td><td class="details">${escapeHtml(rows.map(x=>[x.sourceFile,x.sourceSheet,x.rowNumber?('row '+x.rowNumber):''].filter(Boolean).join(' / ')).join(' | '))}</td><td><button class="btn secondary small lead-view-record" data-id="${escAttr(r.id)}">View sample</button></td></tr>`;
+    }).join('');
+    $('qualitySummary').innerHTML=`
+      <div class="notice">These checks describe the structure of the loaded CDR rows. A missing field does not automatically make an entire CDR unusable; it indicates which downstream analyses may be incomplete or unavailable for the affected rows.</div>
+      <div class="kpis">
+        <div class="kpi"><div class="v">${fmtInt(total)}</div><div class="l">Records checked</div></div>
+        <div class="kpi"><div class="v">${fmtInt(affected)}</div><div class="l">Rows with ≥1 issue</div><div class="s">${pct(affected)}</div></div>
+        <div class="kpi"><div class="v">${fmtInt(clean)}</div><div class="l">Rows without listed issues</div><div class="s">${pct(clean)}</div></div>
+        <div class="kpi"><div class="v">${fmtInt(q.duplicateGroups.length)}</div><div class="l">Duplicate groups</div></div>
+        <div class="kpi"><div class="v">${fmtInt(q.extraDuplicateRows)}</div><div class="l">Extra duplicate rows</div></div>
+      </div>
+      <h3>Issues requiring review</h3>
+      <div class="tablewrap"><table class="table"><thead><tr><th>Check</th><th>Affected rows</th><th>Share</th><th>Why it matters</th><th>Review</th></tr></thead><tbody>
+        ${issueOrder.map(k=>{const x=q.issues[k];return `<tr><td><b>${escapeHtml(x.label)}</b></td><td>${fmtInt(x.rows.length)}</td><td>${pct(x.rows.length)}</td><td class="details">${escapeHtml(x.impact)}</td><td><button class="btn secondary small quality-review" data-issue="${k}">View affected</button></td></tr>`}).join('')}
+      </tbody></table></div>
+      <div id="qualityDrilldown" style="margin-top:16px"><div class="empty">Choose “View affected” to inspect the source rows for an issue.</div></div>
+      <h3 style="margin-top:20px">Likely duplicate groups</h3>
+      <div class="tiny" style="margin-bottom:6px">A duplicate signature uses Subject + B Party + Date/Time + Duration + Event Type + First Cell ID. Matching signatures can be genuine repeated records in some provider exports, so review the source rows before removing anything.</div>
+      <div class="tablewrap"><table class="table"><thead><tr><th>Rows</th><th>Subject</th><th>B Party</th><th>Date / Time</th><th>Event</th><th>Cell ID</th><th>Sources</th><th>Action</th></tr></thead><tbody>${dupRows||'<tr><td colspan="8" class="empty">No duplicate-signature groups found.</td></tr>'}</tbody></table></div>
+      <h3 style="margin-top:20px">Quality by subject</h3>
+      <div class="tiny" style="margin-bottom:6px">Use this to identify whether missing fields are concentrated in one subject/CDR rather than across the whole upload.</div>
+      ${groupTable(subjectRows)}
+      <h3 style="margin-top:20px">Quality by imported file</h3>
+      <div class="tiny" style="margin-bottom:6px">Useful for spotting a provider/export file whose column mapping or metadata is incomplete.</div>
+      ${groupTable(fileRows)}
+    `;
   }
 
   function findBursts(data,mins,minCount){const by=new Map();for(const r of data){if(!r.dt||!r.bparty)continue;const k=`${r.cdrNo}|${r.bparty}`;if(!by.has(k))by.set(k,[]);by.get(k).push(r);}const out=[];const win=mins*60000;for(const [k,a] of by){a.sort((x,y)=>x.dt-y.dt);let left=0,best=null;for(let right=0;right<a.length;right++){while(a[right].dt-a[left].dt>win)left++;const count=right-left+1;if(count>=minCount&&(!best||count>best.count))best={count,start:a[left].dt,end:a[right].dt,records:a.slice(left,right+1)};}if(best){const [cdr,bparty]=k.split('|');out.push({cdr,bparty,...best});}}return out.sort((a,b)=>b.count-a.count||a.start-b.start);}
@@ -220,6 +321,7 @@ html.push(leadCard('Repeated identifier changes',fmtInt(L.identifierAnalysis.rep
       $('smsIntelTo').onchange=renderSmsIntelligence;
       $('incidentRefreshBtn').onclick=renderIncident;
       $('leadsRefreshBtn').onclick=renderLeads;
+      document.addEventListener('click',e=>{const q=e.target.closest('.quality-review');if(q){e.preventDefault();renderQualityDrilldown(q.dataset.issue||'');}});
     }
 
     return {
