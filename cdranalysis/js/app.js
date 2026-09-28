@@ -32,6 +32,8 @@
   function resolveDevice(v){return identityModule?.resolveDevice(v)||{manufacturer:'',model:'',deviceType:'',os:'',status:'Unknown TAC'};}
   function importTacDatabase(file){return identityModule?.importTacDatabase(file);}
   function exportTacCache(){return identityModule?.exportTacCache();}
+  function exportSmsSenderDictionary(){return identityModule?.exportSmsSenderDictionary();}
+  function importSmsSenderDictionary(file){return identityModule?.importSmsSenderDictionary(file);}
   function updateCdrRequestCount(){return identityModule?.updateCdrRequestCount();}
   function defaultCdrRequestDates(){return identityModule?.defaultCdrRequestDates();}
 
@@ -165,7 +167,7 @@
     $,state,smsIntelRows,smsSenderIntelligence,senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,fmtInt,escapeHtml,dtFmt,
     incidentDateTime,subjectEventScopedRecords,localDateKey,aggregateContacts,simpleTable,
     escAttr,contactLabel,contactTitle,typePill,fmtDur,normalize,analyzeIdentifiers,percentile,
-    setSubjectEventScope,getIndex,analysisRecords,audit
+    setSubjectEventScope,getIndex,analysisRecords,audit,exportSmsSenderDictionary,importSmsSenderDictionary
   })||null;
   analysisModule?.bind();
 
