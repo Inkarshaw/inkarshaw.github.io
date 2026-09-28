@@ -31,7 +31,7 @@ html[data-ce-theme="dark"] .ce-more-sheet{background:#0f2030;border-color:#29415
 }
 `;document.head.appendChild(style);
 
-function activeFor(path,href){if(href==='/index.html')return path==='/'||path.endsWith('/index.html');return path.includes(href.replace(/^//,''))}
+function activeFor(path,href){if(href==='/index.html')return path==='/'||path.endsWith('/index.html');const needle=href.startsWith('/')?href.slice(1):href;return path.includes(needle)}
 function initShell(){
  if(document.querySelector('.ce-bottom-nav'))return;
  const path=location.pathname;
