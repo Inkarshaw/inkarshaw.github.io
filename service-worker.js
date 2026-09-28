@@ -1,8 +1,8 @@
-const CACHE='clearexams-shell-v5';
+const CACHE='clearexams-shell-v6';
 const CORE=['/','/index.html','/start.html','/404.html','/daily-quiz.html','/current-affairs/','/exam-calendar.html','/exam-notifications.html','/pyq-hub.html','/dashboard.html','/search.html','/study-plan-30.html','/answer-writing.html','/exam-preparation.html','/exam-posts.html','/current-affairs/compilations.html','/syllabus.html','/tnpsc.html','/tnusrb.html','/upsc.html','/assets/css/exam-pages.css','/assets/js/pwa.js','/assets/clearexams-icon.svg','/manifest.webmanifest','/data/quizzes/daily-quiz.csv','/data/exams/exam-notifications.json','/current-affairs/pdfs.json'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(async cache=>{for(const url of CORE){try{await cache.add(url)}catch{}}}));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
-self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.origin!==location.origin)return;if(url.pathname.endsWith('.pdf'))return;
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.origin!==location.origin)return;if(url.pathname.startsWith('/mycases/'))return;if(url.pathname.endsWith('.pdf'))return;
   const isPage=event.request.mode==='navigate';
   if(isPage){event.respondWith(fetch(event.request).then(response=>{if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{})}return response}).catch(async()=>await caches.match(event.request)||await caches.match('/start.html')||await caches.match('/index.html')));return}
   event.respondWith(caches.match(event.request).then(cached=>{const network=fetch(event.request).then(response=>{if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{})}return response}).catch(()=>cached);return cached||network}));
