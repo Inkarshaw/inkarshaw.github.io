@@ -96,8 +96,8 @@
 </style>
 </head>
 <body>
-<header class="topbar"><div class="wrap"><div class="brand"><div class="brand-mark">CE</div><div><h1>Edit Case</h1><p>ClearExams • My Cases</p></div></div><button class="btn" type="button" onclick="goToDashboard()">← Back</button></div></header>
-<main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><button class="btn" type="button" onclick="goToDashboard()">Dashboard</button></div>
+<header class="topbar"><div class="wrap"><div class="brand"><div class="brand-mark">CE</div><div><h1>Edit Case</h1><p>ClearExams • My Cases</p></div></div><button class="btn" type="button" id="backToDashboardBtn">← Back</button></div></header>
+<main class="main"><div class="wrap"><section class="panel" id="editorPanel"><div class="panel-head"><h2 id="editorTitle">Edit Case</h2><button class="btn" type="button" id="dashboardBtn">Dashboard</button></div>
 <form class="quick-create hidden" id="quickCaseForm"><input id="quickCrimeNo"></form>
 <form class="form-wrap" id="caseForm">
           <div class="case-status-strip" id="caseStatusStrip">
@@ -634,54 +634,83 @@
     const nextAcc=Array.isArray(next.accusedPersons)?next.accusedPersons:[];
     nextAcc.forEach(a=>{const old=prevAcc.find(x=>x.id===a.id);if(old&&(old.status||'')!==(a.status||''))addAutoTimeline(a.status==='Arrested'?'Arrest':(a.status==='Bail'?'Bail':(a.status==='Remand'?'Remand':'Investigation')),(a.name||'Accused')+' status changed from '+(old.status||'Not set')+' to '+(a.status||'Not set'),a.arrestDate||'');});
   }
+  function safeUi(fn){
+    try{return fn()}catch(e){console.error('My Cases UI update failed',e);return null}
+  }
+  function persistCurrentFormSnapshot(){
+    try{
+      const id=$('caseId')?.value||'';
+      const crime=($('crimeNo')?.value||'').trim();
+      if(!crime)return null;
+      const c=formData();
+      const i=cases.findIndex(x=>String(x.id)===String(c.id));
+      if(i>=0)cases[i]=c;else cases.unshift(c);
+      saveCases();
+      rememberCurrentCase(c);
+      return c;
+    }catch(e){
+      console.error('My Cases snapshot save failed',e);
+      return null;
+    }
+  }
   let saveInFlight=null;
   async function saveCurrent(openDocs=false){
     clearTimeout(autoSaveTimer);
-    const c=formData();
-    if(!c.crimeNo){showToast('Enter the Crime / CSR / UDR number to create the case.');$('crimeNo').focus();return false}
+    let c;
+    try{
+      c=formData();
+    }catch(e){
+      console.error('My Cases form read failed',e);
+      safeUi(()=>setSaveState('⚠ Could not read form','error'));
+      safeUi(()=>showToast('Could not read case details.'));
+      return false;
+    }
+    if(!c.crimeNo){
+      safeUi(()=>showToast('Enter the Crime / CSR / UDR number to create the case.'));
+      safeUi(()=>$('crimeNo').focus());
+      return false;
+    }
+
     const i=cases.findIndex(x=>String(x.id)===String(c.id));
     const wasExisting=i>=0;
     if(wasExisting)cases[i]=c;else cases.unshift(c);
+
     const localSaved=saveCases();
     selectedId=c.id;
-    rememberCurrentCase(c)
-    setSaveState(localSaved?'✓ Saved locally':'⚠ Local storage full · saving to cloud','local');
-    updateCaseStatusStrip();
-    renderList();
+    rememberCurrentCase(c);
 
-    const run=async()=>{
-      let cloudOk=true;
-      if(cloudToken()){
-        setSaveState('Saving to cloud…','saving');
+    safeUi(()=>setSaveState(localSaved?'✓ Saved locally':'✓ Saved in session','local'));
+    safeUi(()=>updateCaseStatusStrip());
+    safeUi(()=>renderList());
+
+    let cloudOk=true;
+    if(cloudToken()){
+      safeUi(()=>setSaveState('Saving to cloud…','saving'));
+      try{
         cloudOk=await pushCaseToCloud(c,wasExisting);
-        const latest=cases.find(x=>String(x.id)===String(c.id))||c;
-        rememberCurrentCase(latest)
-        setSaveState(cloudOk?'☁ Synced':'⚠ Cloud sync pending',cloudOk?'cloud':'error');
-      }else{
-        setSaveState('✓ Saved locally · cloud login required','local');
+      }catch(e){
+        console.error('My Cases cloud save failed',e);
+        cloudOk=false;
       }
-      showToast(cloudOk&&cloudToken()?'Case saved and synced.':'Case saved locally.');
-      if(openDocs){
-        const latest=cases.find(x=>String(x.id)===String(c.id))||c;
-        openInDocuments(latest);
-      }
-      return cloudOk;
-    };
-    saveInFlight=run();
-    try{await saveInFlight;}finally{saveInFlight=null}
+      const latest=cases.find(x=>String(x.id)===String(c.id))||c;
+      rememberCurrentCase(latest);
+      safeUi(()=>setSaveState(cloudOk?'☁ Synced':'⚠ Saved locally · cloud pending',cloudOk?'cloud':'error'));
+    }else{
+      safeUi(()=>setSaveState('✓ Saved locally · cloud login required','local'));
+    }
+
+    safeUi(()=>showToast(cloudOk&&cloudToken()?'Case saved and synced.':'Case saved locally.'));
+    if(openDocs){
+      const latest=cases.find(x=>String(x.id)===String(c.id))||c;
+      safeUi(()=>openInDocuments(latest));
+    }
     return true;
   }
 
-  async function goToDashboard(){
+  function goToDashboard(){
     clearTimeout(autoSaveTimer);
-    const id=$('caseId')?.value||'';
-    if(id&&$('crimeNo')?.value.trim()){
-      await autoSaveExisting();
-    }else if(!id&&$('crimeNo')?.value.trim()){
-      await saveCurrent(false);
-    }
-    if(saveInFlight)try{await saveInFlight}catch(e){}
-    window.location.href='/mycases/?view=dashboard&v=20260928-10';
+    persistCurrentFormSnapshot();
+    window.location.href='/mycases/?view=dashboard&v=20260928-11';
   }
 
   function linkedRequestsHtml(c){
@@ -888,15 +917,25 @@
   }
   let autoSaveTimer=null;
   async function autoSaveExisting(){
-    const id=$('caseId')?.value;if(!id||!$('crimeNo')?.value.trim())return;
-    const c=formData(),i=cases.findIndex(x=>String(x.id)===String(id));if(i<0)return;
-    cases[i]=c;const localSaved=saveCases();rememberCurrentCase(c)
-    setSaveState(localSaved?'✓ Saved locally':'⚠ Local storage full · saving to cloud','local');updateCaseStatusStrip();
+    const id=$('caseId')?.value;
+    if(!id||!$('crimeNo')?.value.trim())return false;
+    let c;
+    try{c=formData()}catch(e){console.error('Autosave form read failed',e);return false}
+    const i=cases.findIndex(x=>String(x.id)===String(id));
+    if(i>=0)cases[i]=c;else cases.unshift(c);
+    const localSaved=saveCases();
+    rememberCurrentCase(c);
+    safeUi(()=>setSaveState(localSaved?'✓ Saved locally':'✓ Saved in session','local'));
+    safeUi(()=>updateCaseStatusStrip());
     if(cloudToken()){
-      const ok=await pushCaseToCloud(c,true);
-      setSaveState(ok?'☁ Synced':'⚠ Cloud sync pending',ok?'cloud':'error');
+      let ok=false;
+      try{ok=await pushCaseToCloud(c,true)}catch(e){console.error('Autosave cloud failed',e)}
+      safeUi(()=>setSaveState(ok?'☁ Synced':'⚠ Saved locally · cloud pending',ok?'cloud':'error'));
+      return ok;
     }
+    return true;
   }
+
   function scheduleAutoSave(){
     updateCaseStatusStrip();
     if(!$('caseId')?.value)return;
@@ -960,14 +999,30 @@
   const form=document.getElementById('caseForm');
   const oldSave=document.getElementById('saveCaseBtn');
   const oldSaveOpen=document.getElementById('saveAndOpenBtn');
+  const back=document.getElementById('backToDashboardBtn');
+  const dash=document.getElementById('dashboardBtn');
+
   function runSave(openDocs){
-    if(typeof saveCurrent!=='function')return;
+    if(typeof saveCurrent!=='function'){
+      const msg='Save function unavailable';
+      console.error(msg);
+      const state=document.getElementById('saveStateInline');
+      if(state)state.textContent='⚠ '+msg;
+      return;
+    }
     Promise.resolve(saveCurrent(Boolean(openDocs))).catch(err=>{
       console.error('My Cases rescue save failed',err);
-      if(typeof setSaveState==='function')setSaveState('⚠ Save failed','error');
-      if(typeof showToast==='function')showToast('Save failed. Please try again.');
+      if(typeof setSaveState==='function')setSaveState('⚠ Save error: '+(err&&err.message?err.message:'Unknown error'),'error');
+      if(typeof showToast==='function')showToast('Save error: '+(err&&err.message?err.message:'Unknown error'));
     });
   }
+  function leaveEditor(){
+    try{
+      if(typeof persistCurrentFormSnapshot==='function')persistCurrentFormSnapshot();
+    }catch(e){console.error('Navigation snapshot failed',e)}
+    location.href='/mycases/?view=dashboard&v=20260928-11';
+  }
+
   if(oldSave){
     const save=oldSave.cloneNode(true);
     oldSave.replaceWith(save);
@@ -984,11 +1039,13 @@
     form.onsubmit=e=>{e.preventDefault();runSave(false);return false;};
     if(!form.dataset.rescueAutosave){
       form.dataset.rescueAutosave='1';
-      const autosave=()=>{if(typeof scheduleAutoSave==='function')scheduleAutoSave();};
+      const autosave=()=>{try{if(typeof scheduleAutoSave==='function')scheduleAutoSave()}catch(e){console.error('Autosave schedule failed',e)}};
       form.addEventListener('input',autosave);
       form.addEventListener('change',autosave);
     }
   }
+  if(back)back.addEventListener('click',leaveEditor);
+  if(dash)dash.addEventListener('click',leaveEditor);
 })();
 </script>
 </body></html>
