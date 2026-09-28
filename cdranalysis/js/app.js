@@ -109,7 +109,7 @@
 
   identityModule=window.CDRIdentityFactory?.({
     $,state,normalize,analyzeIdentifiers,download,fmtInt,localDateKey,renderDevices,showStatus,
-    subjectEventScopedRecords,timeMins,withinNight
+    subjectEventScopedRecords,timeMins,withinNight,analysisRecords,getIndex
   })||null;
 
   parserModule=window.CDRParserFactory?.({
