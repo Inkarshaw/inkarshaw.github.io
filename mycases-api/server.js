@@ -13,7 +13,7 @@ const DELETED_SHEET_NAME = process.env.GOOGLE_DELETED_SHEET_NAME || 'Deleted Cas
 const APP_PASSWORD = process.env.MYCASES_PASSWORD;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const COOKIE_NAME = 'clearexams_mycases_session';
-const SESSION_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_MAX_ATTEMPTS = 10;
 const loginAttempts = new Map();
@@ -34,7 +34,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '256kb' }));
 app.use(cookieParser());
@@ -86,8 +86,15 @@ function verifySession(token) {
   }
 }
 
+function requestSessionToken(req) {
+  const cookieToken = req.cookies?.[COOKIE_NAME] || '';
+  const auth = String(req.get('authorization') || '');
+  const bearerToken = /^Bearer\s+(.+)$/i.test(auth) ? auth.replace(/^Bearer\s+/i, '').trim() : '';
+  return bearerToken || cookieToken;
+}
+
 function requireAuth(req, res, next) {
-  if (verifySession(req.cookies[COOKIE_NAME])) return next();
+  if (verifySession(requestSessionToken(req))) return next();
   return res.status(401).json({ error: 'Authentication required' });
 }
 
@@ -118,7 +125,9 @@ const HEADERS = [
   'Case ID','Police Station / Unit','Case Type','Crime / CSR / UDR No.','Year',
   'Sections / Offences','Complainant','Accused / Suspect','Investigating Officer',
   'Priority','Court','Court Case No.','Stage','Next Hearing / Action Date',
-  'Next Action','Notes','Created At','Updated At','Accused JSON','Investigation JSON','Tasks JSON','Court Hearings JSON','Timeline JSON','Attachments JSON'
+  'Next Action','Notes','Created At','Updated At','Accused JSON','Investigation JSON','Tasks JSON','Court Hearings JSON','Timeline JSON','Attachments JSON',
+  'Date of Occurrence','Date of Registration','Scene of Crime','Court Complex','Court Case Type',
+  'Accused Present Details','NBW Status','FS Status','Final Result'
 ];
 
 const DELETED_HEADERS = [...HEADERS, 'Deleted At'];
@@ -126,13 +135,34 @@ const DELETED_HEADERS = [...HEADERS, 'Deleted At'];
 const FIELDS = [
   'id','policeStation','caseType','crimeNo','crimeYear',
   'sections','complainant','accused','ioName','priority','court',
-  'courtCaseNo','stage','nextHearing','nextAction','notes','createdAt','updatedAt','accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments'
+  'courtCaseNo','stage','nextHearing','nextAction','notes','createdAt','updatedAt','accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments',
+  'dateOccurrence','dateRegistration','sceneOfCrime','courtComplex','courtCaseType',
+  'accusedPresentDetails','nbwStatus','fsStatus','finalResult'
 ];
 
 const JSON_FIELDS = new Set(['accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments']);
+
+function sanitizeAccusedForCloud(list) {
+  return (Array.isArray(list) ? list : []).map(person => {
+    const copy = { ...person };
+    delete copy.photo;
+    return copy;
+  });
+}
+
+function sanitizeAttachmentsForCloud(list) {
+  return (Array.isArray(list) ? list : []).map(file => {
+    const copy = { ...file };
+    delete copy.data;
+    return copy;
+  });
+}
+
 function caseToRow(item) {
   return FIELDS.map(key => {
     if (item[key] == null) return '';
+    if (key === 'accusedPersons') return JSON.stringify(sanitizeAccusedForCloud(item[key]));
+    if (key === 'attachments') return JSON.stringify(sanitizeAttachmentsForCloud(item[key]));
     return JSON_FIELDS.has(key) ? JSON.stringify(item[key]) : String(item[key]);
   });
 }
@@ -181,7 +211,7 @@ async function readDeletedCases() {
   await ensureSheet(sheets, DELETED_SHEET_NAME, DELETED_HEADERS);
   const result = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${a1SheetName(DELETED_SHEET_NAME)}!A2:Y`
+    range: `${a1SheetName(DELETED_SHEET_NAME)}!A2:${columnName(DELETED_HEADERS.length)}`
   });
   return (result.data.values || [])
     .filter(row => row.some(v => String(v || '').trim()))
@@ -221,7 +251,9 @@ function cleanCase(input, existing = null) {
   const safe = {};
   FIELDS.forEach(key => {
     if (key === 'createdAt' || key === 'updatedAt') return;
-    safe[key] = JSON_FIELDS.has(key) ? (Array.isArray(input?.[key]) ? input[key] : []) : (input && input[key] != null ? String(input[key]).trim() : '');
+    if (key === 'accusedPersons') safe[key] = sanitizeAccusedForCloud(input?.[key]);
+    else if (key === 'attachments') safe[key] = sanitizeAttachmentsForCloud(input?.[key]);
+    else safe[key] = JSON_FIELDS.has(key) ? (Array.isArray(input?.[key]) ? input[key] : []) : (input && input[key] != null ? String(input[key]).trim() : '');
   });
   safe.id = safe.id || existing?.id || ('case_' + crypto.randomUUID());
   safe.createdAt = existing?.createdAt || input?.createdAt || now;
@@ -233,7 +265,7 @@ async function readAllCases() {
   const sheets = await sheetsClient();
   const result = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:X`
+    range: `${a1SheetName(SHEET_NAME)}!A2:${columnName(HEADERS.length)}`
   });
   return (result.data.values || []).filter(row => row.some(v => String(v || '').trim())).map(rowToCase);
 }
@@ -271,7 +303,7 @@ app.post('/api/login', loginRateLimit, (req, res) => {
     maxAge: SESSION_MAX_AGE_MS,
     path: '/'
   });
-  res.json({ ok: true });
+  res.json({ ok: true, token, expiresAt: new Date(Date.now() + SESSION_MAX_AGE_MS).toISOString() });
 });
 
 app.post('/api/logout', (req, res) => {
@@ -285,7 +317,7 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/session', (req, res) => {
-  res.json({ authenticated: verifySession(req.cookies[COOKIE_NAME]) });
+  res.json({ authenticated: verifySession(requestSessionToken(req)) });
 });
 
 app.get('/api/cases', requireAuth, async (req, res, next) => {
@@ -302,7 +334,7 @@ app.post('/api/cases', requireAuth, async (req, res, next) => {
     const sheets = await sheetsClient();
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A:X`,
+      range: `${a1SheetName(SHEET_NAME)}!A:${columnName(HEADERS.length)}`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [caseToRow(item)] }
@@ -322,7 +354,7 @@ app.put('/api/cases/:id', requireAuth, async (req, res, next) => {
     const sheets = await sheetsClient();
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A${rowNumber}:X${rowNumber}`,
+      range: `${a1SheetName(SHEET_NAME)}!A${rowNumber}:${columnName(HEADERS.length)}${rowNumber}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: { values: [caseToRow(item)] }
     });
@@ -343,7 +375,7 @@ app.delete('/api/cases/:id', requireAuth, async (req, res, next) => {
     await ensureSheet(sheets, DELETED_SHEET_NAME, DELETED_HEADERS);
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: `${a1SheetName(DELETED_SHEET_NAME)}!A:Y`,
+      range: `${a1SheetName(DELETED_SHEET_NAME)}!A:${columnName(DELETED_HEADERS.length)}`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [[...caseToRow(item), deletedAt]] }
