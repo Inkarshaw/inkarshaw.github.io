@@ -66,7 +66,7 @@
     if(inc){
       const beforeH=+$('incidentBeforeHours').value||6,duringM=+$('incidentDuringMins').value||30,afterH=+$('incidentAfterHours').value||6;
       const startI=new Date(inc-beforeH*3600000),d1=new Date(inc-duringM*60000),d2=new Date(inc+duringM*60000),endI=new Date(inc+afterH*3600000);
-      incident=state.records.filter(r=>r.dt&&r.dt>=startI&&r.dt<=endI).sort((a,b)=>a.dt-b.dt).map(r=>({'Period':r.dt<d1?'Before':r.dt<=d2?'During':'After','Date/Time':dtFmt(r.dt),'Subject':r.cdrNo,'Contact':contactLabel(r.bparty),'Number':r.bparty,'Type':r.callType,'Duration Seconds':r.duration,'Cell ID':r.firstCellId,'Tower':r.firstAddress,'IMEI':r.imei,'IMSI':r.imsi,'Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber}));
+      incident=state.filtered.filter(r=>r.dt&&r.dt>=startI&&r.dt<=endI).sort((a,b)=>a.dt-b.dt).map(r=>({'Period':r.dt<d1?'Before':r.dt<=d2?'During':'After','Date/Time':dtFmt(r.dt),'Subject':r.cdrNo,'Contact':contactLabel(r.bparty),'Number':r.bparty,'Type':r.callType,'Duration Seconds':r.duration,'Cell ID':r.firstCellId,'Tower':r.firstAddress,'IMEI':r.imei,'IMSI':r.imsi,'Source File':r.sourceFile,'Source Sheet':r.sourceSheet,'Source Row':r.rowNumber}));
     }
     const seen=new Map();for(const r of state.records){const k=[r.cdrNo,r.bparty,r.dt?+r.dt:'',r.duration,r.callType,r.firstCellId].join('|');seen.set(k,(seen.get(k)||0)+1);}
     const quality=[
@@ -102,7 +102,7 @@
       if(inc){
         const beforeH=+$('incidentBeforeHours').value||6,duringM=+$('incidentDuringMins').value||30,afterH=+$('incidentAfterHours').value||6;
         const startI=new Date(inc-beforeH*3600000),d1=new Date(inc-duringM*60000),d2=new Date(inc+duringM*60000),endI=new Date(inc+afterH*3600000);
-        const ir=state.records.filter(r=>r.dt&&r.dt>=startI&&r.dt<=endI).sort((a,b)=>a.dt-b.dt).slice(0,1000);
+        const ir=data.filter(r=>r.dt&&r.dt>=startI&&r.dt<=endI).sort((a,b)=>a.dt-b.dt).slice(0,1000);
         extraReport+=`<h2>Incident Timeline</h2>${reportTable(['Period','Date/time','Subject','Contact','Type','Duration','Tower'],ir.map(r=>[r.dt<d1?'Before':r.dt<=d2?'During':'After',dtFmt(r.dt),escapeHtml(r.cdrNo),escapeHtml(contactLabel(r.bparty)),escapeHtml(r.callType),fmtDur(r.duration),escapeHtml(r.firstAddress||r.firstCellId)]))}`;
       }
     }
