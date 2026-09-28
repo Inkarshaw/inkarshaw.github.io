@@ -260,7 +260,7 @@
     const selected=$('movementCdr')?.value||'';if(selected)data=data.filter(r=>r.cdrNo===selected);
     const groups=new Map();
     for(const r of data){
-      const mins=window.CDRCore.sourceHour(r.dt)*60+r.dt.getMinutes();if(!withinNight(mins,start,end))continue;
+      const mins=window.CDRCore.sourceMinutes(r.dt);if(!withinNight(mins,start,end))continue;
       let nightKey=localDateKey(r.dt);if(wrap&&mins<=end)nightKey=shiftLocalDateKey(nightKey,-1);
       if(range.from&&nightKey<range.from)continue;if(range.to&&nightKey>range.to)continue;
       const subject=r.cdrNo||'—',groupKey=subject+'|'+nightKey,towerKey=r.firstCellId||r.firstAddress;
