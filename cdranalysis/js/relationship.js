@@ -77,14 +77,47 @@
     return {imei:intersect('imei'),imsi:intersect('imsi')};
   }
 
+  function connectedSubjects(b){
+    if(!b)return [];
+    return subjects().filter(s=>!same(s,b)).map(subject=>{
+      const rows=dedupe(directRows(subject,b),subject,b);
+      const calls=rows.filter(r=>String(r.callType||'').toLowerCase().includes('call')).length;
+      const sms=rows.filter(r=>String(r.callType||'').toLowerCase().includes('sms')).length;
+      const dur=rows.reduce((sum,r)=>sum+(Number(r.duration)||0),0);
+      const night=rows.filter(r=>r.dt&&((r.dt.getHours()>=20)||(r.dt.getHours()<6))).length;
+      return {subject,rows,calls,sms,dur,night,first:rows[0]?.dt,last:rows[rows.length-1]?.dt};
+    }).filter(x=>x.rows.length).sort((a,b)=>b.rows.length-a.rows.length||b.dur-a.dur||String(a.subject).localeCompare(String(b.subject),undefined,{numeric:true}));
+  }
+
+  function renderSubjectMatches(b){
+    const table=$('relationshipSubjects');if(!table)return [];
+    const matches=connectedSubjects(b);
+    if(!b){
+      table.innerHTML='<tbody><tr><td class="empty">Enter Person B to search across all loaded CDR subjects.</td></tr></tbody>';
+      return matches;
+    }
+    table.innerHTML=matches.length?`<thead><tr><th>Loaded subject</th><th>Interactions</th><th>Calls</th><th>SMS</th><th>Total duration</th><th>Night events</th><th>First</th><th>Last</th><th>Action</th></tr></thead><tbody>${matches.map(x=>`<tr><td>${esc(x.subject)}</td><td>${fmtInt(x.rows.length)}</td><td>${fmtInt(x.calls)}</td><td>${fmtInt(x.sms)}</td><td>${esc(fmtDur(x.dur))}</td><td>${fmtInt(x.night)}</td><td>${esc(fmtDt(x.first)||'—')}</td><td>${esc(fmtDt(x.last)||'—')}</td><td><button class="btn secondary small relationship-pick-subject" type="button" data-subject="${esc(x.subject)}" data-num="${esc(b)}">Analyse pair</button></td></tr>`).join('')}</tbody>`:'<tbody><tr><td class="empty">No loaded CDR subject has a direct record with this B Party number.</td></tr></tbody>';
+    return matches;
+  }
+
   function render(){
     fillInputs();
     const a=$('relationshipA')?.value||'',b=$('relationshipB')?.value.trim()||'';
-    if(!a||!b){
-      if($('relationshipSummary'))$('relationshipSummary').innerHTML='<div class="empty">Select Person A and enter Person B, then click Analyse.</div>';
+    const matches=renderSubjectMatches(b);
+    if(!b){
+      if($('relationshipSummary'))$('relationshipSummary').innerHTML='<div class="empty">Enter Person B to find which loaded CDR subjects contacted that number.</div>';
       if($('relationshipTimeline'))$('relationshipTimeline').innerHTML='';
       if($('relationshipTowers'))$('relationshipTowers').innerHTML='';
       if($('relationshipDevices'))$('relationshipDevices').innerHTML='';
+      if($('relationshipScope'))$('relationshipScope').textContent='Enter a B Party number to search all loaded subjects.';
+      return;
+    }
+    if(!a){
+      if($('relationshipSummary'))$('relationshipSummary').innerHTML='<div class="notice"><b>'+fmtInt(matches.length)+'</b> loaded subject(s) have direct records with <b>'+esc(b)+'</b>. Choose a subject below or select Person A to open the full pair analysis.</div>';
+      if($('relationshipTimeline'))$('relationshipTimeline').innerHTML='';
+      if($('relationshipTowers'))$('relationshipTowers').innerHTML='';
+      if($('relationshipDevices'))$('relationshipDevices').innerHTML='';
+      if($('relationshipScope'))$('relationshipScope').textContent=`B: ${b} • ${fmtInt(matches.length)} connected loaded subject(s)`;
       return;
     }
     const raw=directRows(a,b),rows=dedupe(raw,a,b),dirs=rows.map(r=>direction(r,a,b));
@@ -112,6 +145,7 @@
 
   document.addEventListener('click',e=>{
     const rel=e.target.closest('.relationship-open');if(rel){e.preventDefault();openFromContact(rel.dataset.num||'',rel.dataset.subject||'');return;}
+    const pick=e.target.closest('.relationship-pick-subject');if(pick){e.preventDefault();fillInputs();$('relationshipA').value=pick.dataset.subject||'';$('relationshipB').value=pick.dataset.num||'';render();return;}
     if(e.target.closest('#relationshipAnalyse')){render();return;}
     if(e.target.closest('#relationshipSwap')){const a=$('relationshipA').value,b=$('relationshipB').value;const subs=subjects();if(subs.includes(b))$('relationshipA').value=b;$('relationshipB').value=a;render();return;}
     if(e.target.closest('#relationshipClear')){$('relationshipB').value='';if($('relationshipScope'))$('relationshipScope').textContent='Select a pair to analyse.';render();return;}
