@@ -16,11 +16,12 @@
   const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const fmtInt = n => Number(n||0).toLocaleString('en-IN');
   const fmtDur = sec => {sec=Number(sec)||0; const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=Math.floor(sec%60); return h?`${h}h ${m}m ${s}s`:m?`${m}m ${s}s`:`${s}s`;};
-  const dateFmt = d => d instanceof Date && !isNaN(d) ? d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '';
-  const dtFmt = d => d instanceof Date && !isNaN(d) ? d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '';
+  const displayTz=()=>state.sourceTimezone&&state.sourceTimezone!=='browser'?state.sourceTimezone:undefined;
+  const dateFmt = d => d instanceof Date && !isNaN(d) ? d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',...(displayTz()?{timeZone:displayTz()}:{})}) : '';
+  const dtFmt = d => d instanceof Date && !isNaN(d) ? d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',...(displayTz()?{timeZone:displayTz()}:{})}) : '';
   const val = (obj,map,key) => {const h=map[key]; return h ? obj[h] : '';};
   const stableKey = r => [r.sourceFile,r.sourceSheet,r.rowNumber,r.cdrNo,r.bparty,r.dt instanceof Date&&!isNaN(r.dt)?r.dt.toISOString():`${r.date} ${r.time}`].join('|');
-  function localDateKey(d){if(!(d instanceof Date)||isNaN(d))return '';return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+  function localDateKey(d){if(!(d instanceof Date)||isNaN(d))return '';const tz=displayTz();if(!tz)return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;try{const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`;}catch{return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}}
 
   if(typeof Chart!=='undefined'){
     Chart.defaults.color='#86a9b8';
@@ -29,7 +30,7 @@
   }
   function haversineKm(a,b){if(a?.lat==null||a?.lng==null||b?.lat==null||b?.lng==null)return null;const R=6371,rad=x=>x*Math.PI/180,dLat=rad(b.lat-a.lat),dLon=rad(b.lng-a.lng),s=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(s)));}
   function percentile(arr,p){const a=arr.filter(Number.isFinite).sort((x,y)=>x-y);if(!a.length)return 0;const i=(a.length-1)*p,lo=Math.floor(i),hi=Math.ceil(i);return lo===hi?a[lo]:a[lo]+(a[hi]-a[lo])*(i-lo);}
-  function incidentDateTime(){if(!$('incidentDate').value)return null;const t=$('incidentTime').value||'00:00';const d=new Date(`${$('incidentDate').value}T${t}:00`);return isNaN(d)?null:d;}
+  function incidentDateTime(){if(!$('incidentDate').value)return null;const [y,m,d]=String($('incidentDate').value).split('-').map(Number),[h,min]=String($('incidentTime').value||'00:00').split(':').map(Number);const out=dateFromSourceParts(y,m-1,d,h||0,min||0,0,state.sourceTimezone);return isNaN(out)?null:out;}
   function duplicateSignature(r){return [r?.cdrNo||'',r?.bparty||'',r?.dt?+r.dt:`${r?.date||''} ${r?.time||''}`,Number(r?.duration)||0,r?.callType||'',r?.firstCellId||''].join('|');}
   function uniqueRecords(data=state.records){const seen=new Set();return data.filter(r=>{const k=duplicateSignature(r);if(seen.has(k))return false;seen.add(k);return true;});}
   function analysisRecords(){return state.analysisMode==='unique'?uniqueRecords(state.records):state.records;}
