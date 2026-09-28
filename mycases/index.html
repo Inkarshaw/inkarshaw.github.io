@@ -665,7 +665,7 @@
     const c=cases.find(x=>String(x.id||'')===key);
     if(!c){showToast('Case could not be opened. Sync and try again.');return;}
     try{localStorage.setItem(CURRENT_CASE_KEY,JSON.stringify(c))}catch(e){}
-    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id);
+    window.location.href='/mycases/edit/?id='+encodeURIComponent(c.id)+'&v=20260928-4';
   }
   function openCaseDocsById(id){
     const key=String(id||'');
@@ -780,8 +780,37 @@
       p.style.display=on?'':'none';
     });
   }
+  function showDashboardHome(){
+    const panel=$('editorPanel');
+    if(panel)panel.style.display='none';
+    const grid=$('caseListGrid');
+    if(grid)grid.style.gridTemplateColumns='1fr';
+    if($('quickCaseForm'))$('quickCaseForm').classList.add('hidden');
+    if($('caseForm'))$('caseForm').classList.add('hidden');
+    if($('caseDetail'))$('caseDetail').classList.remove('visible');
+    selectedId=null;
+  }
+
+  function showDashboardEditor(){
+    const panel=$('editorPanel');
+    if(panel)panel.style.display='';
+    const grid=$('caseListGrid');
+    if(grid)grid.style.gridTemplateColumns='';
+  }
+
+  function mergeCurrentCaseHandoff(){
+    let item=null;
+    try{item=JSON.parse(localStorage.getItem(CURRENT_CASE_KEY)||'null')}catch(e){}
+    if(!item||!item.id)return false;
+    const i=cases.findIndex(x=>String(x.id||'')===String(item.id||''));
+    if(i<0)cases.unshift(item);
+    else if(String(item.updatedAt||'')>=String(cases[i].updatedAt||''))cases[i]=mergeCloudCase(cases[i],item);
+    saveCases();
+    return true;
+  }
+
   function startNewCase(){
-    window.location.href='/mycases/edit/?new=1&v=20260925-2';
+    window.location.href='/mycases/edit/?new=1&v=20260928-4';
   }
 
   function editSelectedCase(){
@@ -793,6 +822,7 @@
   }
 
   function fillForm(c){
+    showDashboardEditor();
     setCaseTab('case');pendingAccusedPhoto=c.accusedPhoto||'';accusedPersons=Array.isArray(c.accusedPersons)?JSON.parse(JSON.stringify(c.accusedPersons)):[];timelineEntries=Array.isArray(c.timeline)?JSON.parse(JSON.stringify(c.timeline)):[];caseTasks=Array.isArray(c.tasks)?JSON.parse(JSON.stringify(c.tasks)):[];caseAttachments=Array.isArray(c.attachments)?JSON.parse(JSON.stringify(c.attachments)):[];hearingHistory=Array.isArray(c.hearings)?JSON.parse(JSON.stringify(c.hearings)):[];investigationChecklist=Array.isArray(c.investigationChecklist)&&c.investigationChecklist.length?JSON.parse(JSON.stringify(c.investigationChecklist)):defaultChecklist();renderTimeline();renderTasks();renderAttachments();renderHearings();renderInvestigationChecklist();if(!accusedPersons.length&&c.accused)accusedPersons=[{id:uid(),name:c.accused,status:'Accused',photo:c.accusedPhoto||'',age:'',phone:'',address:'',idProof:'',arrestDate:'',hsCategory:'',remarks:''}];renderAccusedEditor();$('caseId').value=c.id;fields.forEach(k=>$(k).value=c[k]||'');$('editorTitle').textContent='Edit Case';$('saveCaseBtn').textContent='Save Changes';$('quickCaseForm').classList.add('hidden');$('caseForm').classList.remove('hidden');$('caseDetail').classList.remove('visible');selectedId=c.id;renderList();window.scrollTo({top:$('editorPanel').offsetTop-110,behavior:'smooth'});
   }
 
@@ -843,6 +873,7 @@
   }
 
   function showDetail(c){
+    showDashboardEditor();
     selectedId=c.id;$('quickCaseForm').classList.add('hidden');$('caseForm').classList.add('hidden');$('caseDetail').classList.add('visible');$('editorTitle').textContent='Case Details';
     const rows=[
       ['Crime / Reference',(c.caseType||'Case')+' '+(c.crimeNo?c.crimeNo+'/'+(c.crimeYear||''):'—')],
@@ -1005,7 +1036,25 @@
   $('syncNowBtn').addEventListener('click',async()=>{try{await syncFromCloud();showToast('Cloud sync complete.')}catch(e){setCloudState('Cloud sync failed','error');alert(e.message)}});
   $('loginDialog').addEventListener('click',e=>{if(e.target===$('loginDialog'))$('loginDialog').classList.remove('open')});
 
-  populateStages();clearForm();renderList();updateStats();updateDeletedCount();checkCloudSession();
+  populateStages();
+  clearForm();
+  mergeCurrentCaseHandoff();
+  showDashboardHome();
+  renderList();
+  updateStats();
+  updateDeletedCount();
+  (async()=>{
+    const ok=await checkCloudSession();
+    if(ok){
+      try{
+        await syncFromCloud();
+        mergeCurrentCaseHandoff();
+        renderList();updateStats();updateDeletedCount();
+      }catch(e){
+        setCloudState('Cloud temporarily unavailable · local data shown','error');
+      }
+    }
+  })();
 </script>
 </body>
 </html>
