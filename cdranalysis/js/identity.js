@@ -44,11 +44,19 @@
     const key=String(brandKey||'').toUpperCase().replace(/[^A-Z0-9]/g,''),src=(key+' '+String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,''));
     const has=(...tokens)=>tokens.some(t=>src.includes(t));
     if(has('KOTAK','IDFC','SBI','HDFC','ICICI','AXIS','CANARA','PNB','PUNJABNATIONAL','BANKOFBARODA','BOB','BANKOFINDIA','BOI','UNIONBANK','INDIANBANK','INDUSIND','YESBANK','FEDERALBANK','FEDERAL','RBL','BANDHAN','UCOBANK','CITYUNION','CUB','IOB','INDIANOVERSEAS','KARURVYSYA','KVB','SOUTINDIANBANK','SIB'))return 'Banking';
+    if(has('PAYTM','PHONEPE','GPAY','GOOGLEPAY','MOBIKWIK','FREECHARGE','BHIM','NPCI','UPI'))return 'Payments / Wallet';
     if(has('SWIGGY','ZOMATO'))return 'Food Delivery';
-    if(has('RAPIDO','UBER','OLA'))return 'Cab / Transport';
-    if(has('AIRTEL','BHARTIAIRTEL','JIO','RELIANCEJIO','VODAFONE','IDEA','VODAFONEIDEA','VIINDIA')||key==='VI')return 'SIM / Telecom';
-    if(has('AMAZON','FLIPKART','MYNTRA','MEESHO','AJIO'))return 'E-commerce';
-    if(has('PAYTM','PHONEPE','GPAY','GOOGLEPAY','MOBIKWIK','FREECHARGE'))return 'Payments / Wallet';
+    if(has('RAPIDO','UBER','OLA','NAMMAYATRI'))return 'Ride-hailing / Transport';
+    if(has('AIRTEL','BHARTIAIRTEL','JIO','RELIANCEJIO','VODAFONE','IDEA','VODAFONEIDEA','VIINDIA','BSNL')||key==='VI')return 'SIM / Telecom';
+    if(has('AMAZON','FLIPKART','MYNTRA','MEESHO','AJIO','SNAPDEAL'))return 'E-commerce';
+    if(has('DELHIVERY','BLUEDART','DTDC','EKART','XPRESSBEES','ECOMEXPRESS','SHIPROCKET','INDIAPOST'))return 'Logistics / Courier';
+    if(has('IRCTC','INDIGO','AIRINDIA','AKASA','SPICEJET','MAKEMYTRIP','GOIBIBO','CLEARTRIP','REDBUS','ABHIBUS'))return 'Travel / Booking';
+    if(has('APOLLO','PHARMEASY','NETMEDS','TATA1MG','1MG','PRACTO','MEDIBUDDY'))return 'Healthcare';
+    if(has('LIC','HDFCLIFE','ICICIPRU','SBI LIFE','SBILIFE','STARHEALTH','POLICYBAZAAR'))return 'Insurance';
+    if(has('BYJUS','UNACADEMY','VEDANTU','COURSE','EDUCATION','COLLEGE','SCHOOL'))return 'Education';
+    if(has('TNEB','TANGEDCO','ELECTRICITY','EBBILL','GAS','WATER','FASTAG'))return 'Utilities';
+    if(has('WHATSAPP','FACEBOOK','INSTAGRAM','META','TELEGRAM','GOOGLE','MICROSOFT','APPLE'))return 'Internet / Social';
+    if(has('AADHAAR','UIDAI','DIGILOCKER','EPFO','INCOMETAX','GST','GOVT','GOVERNMENT'))return 'Government / Public Service';
     return 'Other / Unclassified';
   }
   function senderBrandInfo(v){
@@ -65,7 +73,10 @@
     brand=brand.replace(/[^A-Z0-9]/g,'');
     if(!brand||brand.length<2)return null;
     const label=brand.length<=4?brand:brand.charAt(0)+brand.slice(1).toLowerCase();
-    return {raw,key:brand,label,category:senderServiceCategory(brand,raw)};
+    const category=senderServiceCategory(brand,raw);
+    const structured=/^[A-Z]{2,3}[-_][A-Z0-9]{3,12}$/.test(compact);
+    const recognition=category!=='Other / Unclassified'?(structured?'Recognized':'Probable'):'Unclassified';
+    return {raw,key:brand,label,category,recognition};
   }
   function smsRecordBasis(r){
     const typ=normalize(r?.callType),bi=senderBrandInfo(r?.bparty);
@@ -100,7 +111,7 @@
       if(!b)b={key:bi.key,label:bi.label,category:bi.category,senderIds:new Set(),count:0,first:null,last:null,days:new Set(),unusual:0,subjects:new Set(),towers:new Set(),nearCalls:0,nearIds:0};
       b.senderIds.add(r.bparty);b.count++;b.days.add(localDateKey(r.dt));if(unusual)b.unusual++;if(r.cdrNo)b.subjects.add(r.cdrNo);if(r.firstCellId||r.firstAddress)b.towers.add(r.firstCellId||r.firstAddress);b.nearCalls+=nearbyCalls.length;b.nearIds+=nearbyIds.length;
       if(!b.first||r.dt<b.first)b.first=r.dt;if(!b.last||r.dt>b.last)b.last=r.dt;brands.set(bi.key,b);
-      timeline.push({record:r,brand:bi.label,category:bi.category,senderId:r.bparty,basis:smsRecordBasis(r),unusual,nearbyCalls:nearbyCalls.length,nearbyIds:nearbyIds.length});
+      timeline.push({record:r,brand:bi.label,brandKey:bi.key,category:bi.category,recognition:bi.recognition||'Unclassified',senderId:r.bparty,basis:smsRecordBasis(r),unusual,nearbyCalls:nearbyCalls.length,nearbyIds:nearbyIds.length});
     }
     const categories=new Map();
     for(const b of brands.values()){
