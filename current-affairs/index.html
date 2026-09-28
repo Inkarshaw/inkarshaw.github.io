@@ -60,7 +60,7 @@
   const TARGET_KEY='clearexamsTargetExamV1';
   const rootHref=v=>/^https?:/.test(v)?v:'../'+v;
   fetch('../data/exams/exam-routes.json',{cache:'no-store'}).then(r=>r.json()).then(routes=>{const key=localStorage.getItem(TARGET_KEY)||'',route=routes[key];if(!route)return;document.getElementById('targetText').innerHTML='<strong>Your target: '+esc(route.displayName||key.toUpperCase())+'</strong> · Read the same daily current affairs, then continue with your target-specific preparation.';document.getElementById('targetPrep').textContent='Continue '+(route.displayName||key.toUpperCase());document.getElementById('targetPrep').href=rootHref(route.preparationRoute||route.hubRoute||'dashboard.html');document.getElementById('targetQuiz').href='../daily-quiz.html?exam='+encodeURIComponent(route.quizExam||route.displayName||key);}).catch(()=>{});
-  fetch('pdfs.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Could not load list');return r.json()}).then(data=>{entries=Array.isArray(data)?data:[];entries.sort((a,b)=>String(b.date).localeCompare(String(a.date)));render()}).catch(()=>{status.textContent='Unable to load current affairs.';list.innerHTML='<div class="error">The PDF list could not be loaded. Please try again.</div>'});
+  fetch('pdfs.json?v='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Could not load list');return r.json()}).then(data=>{entries=Array.isArray(data)?data:[];entries.sort((a,b)=>String(b.date).localeCompare(String(a.date)));render()}).catch(()=>{status.textContent='Unable to load current affairs.';list.innerHTML='<div class="error">The PDF list could not be loaded. Please try again.</div>'});
 </script>
 </body>
 </html>
