@@ -62,7 +62,6 @@
   function selectRequestContacts(){return contactsModule?.selectRequestContacts();}
   function openCdrRequestGenerator(){return contactsModule?.openCdrRequestGenerator();}
 
-  function renderContactProfile(num){return contactsModule?.renderProfile(num);}
   function mapLink(x){return locationsModule?.mapLink(x)||'';}
   function locationEpisodes(events,episodeGapMin){return locationsModule?.locationEpisodes(events,episodeGapMin)||[];}
   function renderLocations(){return locationsModule?.renderLocations();}
@@ -194,7 +193,7 @@
     syncViewScopeControls,updateFilterCount,exportCaseReport,saveWorkspace,loadWorkspaceObject,
     clearLoaded,applyIncidentWindow,exportTacCache,importTacDatabase,exportCsv,safeName,
     exportWorkbook,download,switchTab,applyFilters,refreshSelectors,renderFileList,renderRecords,
-    renderFlags,renderContactProfile,jumpToRecord,samePhone,contactFilter,caseSnapshots,persistLocal,
+    renderFlags,renderContactProfile:num=>contactsModule?.renderProfile(num),jumpToRecord,samePhone,contactFilter,caseSnapshots,persistLocal,
     renderIncident,contactLabel,timeMins,shiftLocalDateKey,fmtDur,renderChronology,
     selectRequestContacts,renderContacts,openCdrRequestGenerator,updateCdrRequestCount,
     identityStore,renderNetwork,seedBuiltinTacMappings
