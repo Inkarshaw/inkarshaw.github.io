@@ -6,7 +6,7 @@
       syncViewScopeControls,updateFilterCount,exportCaseReport,saveWorkspace,loadWorkspaceObject,
       clearLoaded,applyIncidentWindow,exportTacCache,importTacDatabase,exportCsv,safeName,
       exportWorkbook,download,switchTab,applyFilters,refreshSelectors,renderFileList,renderRecords,
-      renderFlags,renderContactProfile,jumpToRecord,samePhone,caseSnapshots,persistLocal,
+      renderFlags,renderContactProfile,jumpToRecord,samePhone,contactFilter,caseSnapshots,persistLocal,
       renderIncident,contactLabel,timeMins,shiftLocalDateKey,fmtDur,renderChronology,
       selectRequestContacts,renderContacts,openCdrRequestGenerator,updateCdrRequestCount,
       identityStore,renderNetwork,seedBuiltinTacMappings
