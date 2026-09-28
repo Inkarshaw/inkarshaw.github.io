@@ -45,7 +45,7 @@
       if(f.event&&r.callType!==f.event)return false;
       if(f.nightOnly){
         if(!r.dt)return false;
-        const h=r.dt.getHours();
+        const h=window.CDRCore.sourceHour(r.dt);
         if(!(h>=20||h<6))return false;
       }
       return true;
@@ -119,7 +119,7 @@
       const calls=rows.filter(r=>String(r.callType||'').toLowerCase().includes('call')).length;
       const sms=rows.filter(r=>String(r.callType||'').toLowerCase().includes('sms')).length;
       const dur=rows.reduce((sum,r)=>sum+(Number(r.duration)||0),0);
-      const night=rows.filter(r=>r.dt&&((r.dt.getHours()>=20)||(r.dt.getHours()<6))).length;
+      const night=rows.filter(r=>r.dt&&((window.CDRCore.sourceHour(r.dt)>=20)||(window.CDRCore.sourceHour(r.dt)<6))).length;
       return {subject,rows,calls,sms,dur,night,first:rows[0]?.dt,last:rows[rows.length-1]?.dt};
     }).filter(x=>x.rows.length).sort((a,b)=>b.rows.length-a.rows.length||b.dur-a.dur||String(a.subject).localeCompare(String(b.subject),undefined,{numeric:true}));
   }
@@ -172,12 +172,12 @@
     const raw=directRows(a,b),rows=dedupe(raw,a,b),dirs=rows.map(r=>direction(r,a,b));
     const ab=dirs.filter(x=>x==='A → B').length,ba=dirs.filter(x=>x==='B → A').length,amb=dirs.filter(x=>x==='A ↔ B').length;
     const dur=rows.reduce((s,r)=>s+(Number(r.duration)||0),0),dates=new Set(rows.map(r=>localDate(r.dt)).filter(Boolean));
-    const night=rows.filter(r=>r.dt&&((r.dt.getHours()>=20)||(r.dt.getHours()<6))).length;
+    const night=rows.filter(r=>r.dt&&((window.CDRCore.sourceHour(r.dt)>=20)||(window.CDRCore.sourceHour(r.dt)<6))).length;
     const towers=towerSummary(a,b),ids=sharedIds(a,b);
     const first=rows[0]?.dt,last=rows[rows.length-1]?.dt;
     const callRows=rows.filter(r=>String(r.callType||'').toLowerCase().includes('call'));
     const longest=callRows.reduce((m,r)=>Math.max(m,Number(r.duration)||0),0);
-    const hours=new Map();for(const r of rows){if(!r.dt)continue;const h=r.dt.getHours();hours.set(h,(hours.get(h)||0)+1);}
+    const hours=new Map();for(const r of rows){if(!r.dt)continue;const h=window.CDRCore.sourceHour(r.dt);hours.set(h,(hours.get(h)||0)+1);}
     const peak=[...hours.entries()].sort((x,y)=>y[1]-x[1]||x[0]-y[0])[0];
     const f=relationshipFilters();
     const scope=[f.from?'From '+$('relationshipFrom').value:'',f.to?'To '+$('relationshipTo').value:'',f.event||'',f.nightOnly?'Night only':''].filter(Boolean).join(' • ');
@@ -193,7 +193,7 @@
     const a=$('relationshipA')?.value||'',b=$('relationshipB')?.value.trim()||'';
     if(!a||!b)return null;
     const rows=dedupe(directRows(a,b),a,b),dirs=rows.map(r=>direction(r,a,b)),towers=towerSummary(a,b),ids=sharedIds(a,b);
-    return {a,b,filters:relationshipFilters(),rows,towers,ids,metrics:{interactions:rows.length,aToB:dirs.filter(x=>x==='A → B').length,bToA:dirs.filter(x=>x==='B → A').length,undirected:dirs.filter(x=>x==='A ↔ B').length,duration:rows.reduce((s,r)=>s+(Number(r.duration)||0),0),activeDays:new Set(rows.map(r=>localDate(r.dt)).filter(Boolean)).size,night:rows.filter(r=>r.dt&&((r.dt.getHours()>=20)||(r.dt.getHours()<6))).length}};
+    return {a,b,filters:relationshipFilters(),rows,towers,ids,metrics:{interactions:rows.length,aToB:dirs.filter(x=>x==='A → B').length,bToA:dirs.filter(x=>x==='B → A').length,undirected:dirs.filter(x=>x==='A ↔ B').length,duration:rows.reduce((s,r)=>s+(Number(r.duration)||0),0),activeDays:new Set(rows.map(r=>localDate(r.dt)).filter(Boolean)).size,night:rows.filter(r=>r.dt&&((window.CDRCore.sourceHour(r.dt)>=20)||(window.CDRCore.sourceHour(r.dt)<6))).length}};
   }
 
   function openFromContact(num,subject=''){
