@@ -1,4 +1,4 @@
-const CACHE='cdr-analyzer-v7';
+const CACHE='cdr-analyzer-v8';
 const CORE=[
   '/cdranalysis/',
   '/cdranalysis/index.html',
@@ -12,6 +12,7 @@ const CORE=[
   '/cdranalysis/css/nexus-ui.css',
   '/cdranalysis/js/records.js',
   '/cdranalysis/js/contacts.js',
+  '/cdranalysis/js/locations.js',
   '/cdranalysis/js/app.js',
   '/cdranalysis/js/relationship.js'
 ];
