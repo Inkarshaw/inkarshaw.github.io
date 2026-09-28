@@ -197,6 +197,20 @@ async function ensureSheet(sheets, sheetName, headers) {
     });
     sheet = { properties: created.data.replies[0].addSheet.properties };
   }
+  const currentColumns = Number(sheet.properties?.gridProperties?.columnCount || 0);
+  if (currentColumns < headers.length) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: {
+        requests: [{
+          updateSheetProperties: {
+            properties: { sheetId: sheet.properties.sheetId, gridProperties: { columnCount: headers.length } },
+            fields: 'gridProperties.columnCount'
+          }
+        }]
+      }
+    });
+  }
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
     range: `${a1SheetName(sheetName)}!A1:${columnName(headers.length)}1`,
