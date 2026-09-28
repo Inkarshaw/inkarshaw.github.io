@@ -2,6 +2,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const state = {records:[], filtered:[], files:[], page:1, pageSize:100, sort:{key:'dt',dir:'asc'}, charts:{}, flags:new Set(), notes:{}, chronology:[], contactTags:{}, contactNames:{}, globalContactTags:{}, globalContactNames:{}, tacCache:{}, smsSenderOverrides:{}, smsReviewSelected:new Set(), smsMovementFocus:null, analysisMode:'raw', sourceTimezone:'Asia/Kolkata', indexes:{source:null,bySubject:new Map(),byBparty:new Map(),byTower:new Map(),byDate:new Map(),byImei:new Map(),byImsi:new Map()}, auditTrail:[], appVersion:'v31', mapPrivacyMode:false, fileSeq:0, pendingWorkspace:null, pendingImport:null, exactIncidentRange:null, privateSession:false, highlightRecordId:null, requestSelected:new Set(), locationMatchSelected:new Set()};
+  try{state.auditTrail=JSON.parse(localStorage.getItem('cdrAnalyzer:auditTrail')||'[]')||[];}catch{state.auditTrail=[];}
   const FIELDS = {
     cdrNo:['cdrno','a party','aparty','a-party','msisdn','subscriber number','mobile number'],
     bparty:['b party','bparty','b-party','other party','connected number','called number','calling number'],
@@ -40,7 +41,7 @@
   }
   function phoneish(v){const s=String(v??'').trim(),d=s.replace(/\D/g,'');return d.length>=10?d.slice(-10):s.toLowerCase().replace(/\s+/g,'');}
   function getIndex(name,key){const idx=(state.indexes?.mode===state.analysisMode&&state.indexes?.rawCount===state.records.length)?state.indexes:rebuildIndexes();return idx?.[name]?.get(key)||[];}
-  function audit(action,details=''){const entry={at:new Date().toISOString(),action:String(action||''),details:String(details||'')};state.auditTrail.push(entry);if(state.auditTrail.length>5000)state.auditTrail.splice(0,state.auditTrail.length-5000);return entry;}
+  function audit(action,details=''){const entry={at:new Date().toISOString(),caseNo:$('caseNo')?.value||'',caseTitle:$('caseTitle')?.value||'',action:String(action||''),details:String(details||'')};state.auditTrail.push(entry);if(state.auditTrail.length>5000)state.auditTrail.splice(0,state.auditTrail.length-5000);if(!state.privateSession){try{localStorage.setItem('cdrAnalyzer:auditTrail',JSON.stringify(state.auditTrail));}catch{}}return entry;}
   function sourceTimezoneOffsetMinutes(tz){if(tz==='UTC')return 0;if(tz==='Asia/Kolkata')return 330;return null;}
   function dateFromSourceParts(y,m,d,h=0,min=0,sec=0,tz=state.sourceTimezone){const off=sourceTimezoneOffsetMinutes(tz);return off==null?new Date(y,m,d,h,min,sec,0):new Date(Date.UTC(y,m,d,h,min,sec,0)-off*60000);}
 
