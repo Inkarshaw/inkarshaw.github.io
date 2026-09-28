@@ -202,7 +202,7 @@
     renderFlags,renderContactProfile:num=>contactsModule?.renderProfile(num),jumpToRecord,samePhone,contactFilter,caseSnapshots,persistLocal,
     renderIncident,contactLabel,timeMins,shiftLocalDateKey,fmtDur,renderChronology,
     selectRequestContacts,renderContacts,openCdrRequestGenerator,updateCdrRequestCount,
-    identityStore,renderNetwork,seedBuiltinTacMappings
+    identityStore,renderNetwork,seedBuiltinTacMappings,audit
   })||null;
   uiModule?.bind();
 
