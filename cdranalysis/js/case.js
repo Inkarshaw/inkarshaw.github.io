@@ -16,7 +16,7 @@
       if($('clearAuditBtn'))$('clearAuditBtn').onclick=()=>{state.auditTrail=[];try{localStorage.removeItem('cdrAnalyzer:auditTrail');}catch{}renderAudit();};
       $('addChronologyManualBtn').onclick=()=>{
         const t=$('chronologyText').value.trim();if(!t)return;
-        const d=$('chronologyDt').value?new Date($('chronologyDt').value):new Date();
+        const cv=$('chronologyDt').value;let d=new Date();if(cv){const [date,time='00:00']=cv.split('T'),[y,m,day]=date.split('-').map(Number),[h,min]=time.split(':').map(Number);d=window.CDRCore.dateFromSourceParts(y,m-1,day,h||0,min||0,0,state.sourceTimezone);}
         state.chronology.push({id:'m'+Date.now(),time:+d,source:'Manual',text:t,reference:''});audit('Manual chronology event added',t);
         $('chronologyText').value='';
         renderChronology();
