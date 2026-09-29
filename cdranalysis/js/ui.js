@@ -45,7 +45,7 @@
   $('clearLocalDataBtn').onclick=()=>{if(!confirm('Clear locally saved CDR Analyzer case metadata, contact names/tags and case snapshots from this browser? Loaded CDR rows in the current session will remain open.'))return;for(const k of Object.keys(localStorage)){if(k.startsWith('cdrAnalyzer:'))localStorage.removeItem(k);}state.contactTags={};state.contactNames={};state.globalContactTags={};state.globalContactNames={};state.smsSenderOverrides={};state.smsReviewSelected?.clear?.();state.auditTrail=[];['caseTitle','caseNo','station','analyst','incidentDate','incidentTime','generalNote'].forEach(id=>{if($(id))$(id).value='';});renderCaseSnapshots();renderAll();showStatus('Local case data cleared from this browser.','ok');};
   installViewScopeToolbars();syncViewScopeControls(true);
     updatePrivacyUi();updateFilterCount();
-  $('printBtn').onclick=()=>window.print();$('reportBtn').onclick=exportCaseReport;$('saveWorkspaceBtn').onclick=()=>openCaseSaveDialog('workspace');$('loadWorkspaceBtn').onclick=()=>$('workspaceInput').click();$('clearFilesBtn').onclick=clearLoaded;$('focusIncidentBtn').onclick=applyIncidentWindow;$('importTacBtn').onclick=()=>$('tacInput').click();
+  $('printBtn').onclick=()=>window.print();$('reportBtn').onclick=exportCaseReport;$('saveWorkspaceBtn').onclick=()=>openCaseSaveDialog('workspace');$('loadWorkspaceBtn').onclick=()=>$('workspaceInput').click();$('clearFilesBtn').onclick=clearLoaded;if($('focusIncidentBtn'))$('focusIncidentBtn').onclick=applyIncidentWindow;$('importTacBtn').onclick=()=>$('tacInput').click();
   $('caseSaveCancelBtn').onclick=cancelCaseSaveDialog;
   $('caseSaveForm').addEventListener('submit',e=>{e.preventDefault();persistCaseMeta();closeCaseSaveDialog();if(caseSaveMode==='snapshot')saveCaseSnapshot?.();else saveWorkspace();});
   $('exportTacBtn').onclick=exportTacCache;
@@ -81,7 +81,7 @@
   state.contactTags={};state.contactNames={};
   if(!localStorage.getItem('cdrAnalyzer:globalContactTags')&&Object.keys(state.globalContactTags).length)persistLocal('cdrAnalyzer:globalContactTags',JSON.stringify(state.globalContactTags));
   if(!localStorage.getItem('cdrAnalyzer:globalContactNames')&&Object.keys(state.globalContactNames).length)persistLocal('cdrAnalyzer:globalContactNames',JSON.stringify(state.globalContactNames));
-  ['incidentWindowHours','generalNote'].forEach(id=>{const el=$(id);const key='cdrAnalyzer:'+id;if(!el)return;el.value=localStorage.getItem(key)||el.value||'';el.addEventListener('input',()=>persistLocal(key,el.value));});
+  ['generalNote'].forEach(id=>{const el=$(id);const key='cdrAnalyzer:'+id;if(!el)return;el.value=localStorage.getItem(key)||el.value||'';el.addEventListener('input',()=>persistLocal(key,el.value));});
   document.querySelectorAll('.view').forEach(v=>v.setAttribute('role','tabpanel'));document.querySelectorAll('.tab').forEach(t=>t.setAttribute('tabindex',t.classList.contains('active')?'0':'-1'));
   if(typeof XLSX==='undefined')showStatus('The local XLSX library did not load. Refresh the analyzer files.','error');
   if('serviceWorker' in navigator){navigator.serviceWorker.register('/cdranalysis/sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});}
