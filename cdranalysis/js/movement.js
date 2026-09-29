@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   window.CDRMovementFactory = function(ctx){
-    const {$,state,localDateKey,haversineKm,fmtInt,fmtDur,dtFmt,dateFmt,escapeHtml,escAttr,mapLink,newChart,incidentDateTime,contactLabel,showStatus,timeMins,withinNight}=ctx;
+    const {$,state,localDateKey,haversineKm,fmtInt,fmtDur,dtFmt,dateFmt,escapeHtml,escAttr,mapLink,incidentDateTime,contactLabel,showStatus,timeMins,withinNight}=ctx;
     let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null;
     let movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null;
     let movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null;
@@ -302,23 +302,6 @@
     }
     if($('nightStayTable'))$('nightStayTable').innerHTML=night.rows.length?`<thead><tr><th>Night</th><th>Subject</th><th>Main recorded night tower</th><th>First night event</th><th>Last night event</th><th>Night events</th><th>Main tower events</th><th>Main share</th><th>Distinct towers</th><th>Repeated as main tower</th></tr></thead><tbody>${night.rows.map(n=>{const endKey=night.wrap?shiftLocalDateKey(n.nightKey,1):n.nightKey;return `<tr><td>${escapeHtml(displayLocalDateKey(n.nightKey))}${night.wrap?' → '+escapeHtml(displayLocalDateKey(endKey)):''}</td><td>${escapeHtml(n.subject)}</td><td class="details"><a href="#" class="link night-stay-filter" data-subject="${escAttr(n.subject)}" data-night="${escAttr(n.nightKey)}" data-cell="${escAttr(n.main.cellId||'')}" data-tower="${escAttr(n.main.address||'')}">${escapeHtml(n.main.cellId||n.main.address||'—')}</a>${n.main.cellId&&n.main.address?`<div class="tiny">${escapeHtml(n.main.address)}</div>`:''}</td><td>${dtFmt(n.first)}</td><td>${dtFmt(n.last)}</td><td class="num">${fmtInt(n.events)}</td><td class="num">${fmtInt(n.main.events)}</td><td class="num">${n.share.toFixed(1)}%</td><td class="num">${fmtInt(n.distinctTowers)}</td><td class="num">${fmtInt(n.repeatedMainNights)} night(s)</td></tr>`}).join('')}</tbody>`:`<tbody><tr><td colspan="10" class="empty">No nighttime tower records match the current subject, filters and Movement date range.</td></tr></tbody>`;
 
-    const pts=rows.filter(x=>x.lat!=null&&x.lng!=null).slice(0,1000);
-    const seqPoints=pts.map((p,i)=>({x:p.lng,y:p.lat,seq:i+1,start:p.start,end:p.end,cellId:p.cellId,address:p.address,events:p.events}));
-    const startPoint=seqPoints[0],endPoint=seqPoints[seqPoints.length-1];
-    const sequenceLabelPlugin={id:'movementSequenceLabels',afterDatasetsDraw(chart){
-      const ctx=chart.ctx;ctx.save();ctx.font='600 11px system-ui, sans-serif';ctx.textBaseline='middle';
-      const drawLabel=(datasetIndex,text,dx,dy)=>{const el=chart.getDatasetMeta(datasetIndex)?.data?.[0];if(!el)return;const p=el.getProps(['x','y'],true);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#172033';ctx.fillText(text,p.x+dx,p.y+dy);};
-      if(startPoint)drawLabel(1,'Start',9,-9);if(endPoint)drawLabel(2,'End',9,9);ctx.restore();
-    }};
-    newChart('movementChart',{type:'scatter',data:{datasets:[
-      {label:'Sequence',data:seqPoints,showLine:true,borderWidth:2,pointRadius:3,pointHoverRadius:6,tension:0},
-      {label:'Start',data:startPoint?[startPoint]:[],showLine:false,pointRadius:7,pointHoverRadius:9,pointStyle:'triangle'},
-      {label:'End',data:endPoint?[endPoint]:[],showLine:false,pointRadius:7,pointHoverRadius:9,pointStyle:'rectRot'}
-    ]},plugins:[sequenceLabelPlugin],options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{usePointStyle:true,boxWidth:10}},tooltip:{callbacks:{
-      title:items=>{const r=items?.[0]?.raw;return r?(`#${r.seq} • ${dtFmt(r.start)}`):'';},
-      label:c=>{const r=c.raw;return `${r.cellId||'Tower'} • ${r.address||'No tower address'}`;},
-      afterLabel:c=>{const r=c.raw;return [`Coordinates: ${Number(r.y).toFixed(5)}, ${Number(r.x).toFixed(5)}`,`Events in segment: ${fmtInt(r.events||0)}`,r.end&&r.start&&+r.end!==+r.start?`Segment end: ${dtFmt(r.end)}`:''].filter(Boolean);}
-    }}},scales:{x:{title:{display:true,text:'Longitude'}},y:{title:{display:true,text:'Latitude'}}}}});
     if(!$('movement').classList.contains('hidden'))requestAnimationFrame(()=>renderMovementMap(rows));
   }
 
