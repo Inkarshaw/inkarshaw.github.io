@@ -9,7 +9,7 @@
     }=ctx;
 
     function renderView(id){
-      if(id==='dashboard'){renderDashboard();renderLeads();}
+      if(id==='dashboard'){renderDashboard();renderLeads();renderDataQuality();}
       else if(id==='records')renderRecords();
       else if(id==='excelview')renderExcelView();
       else if(id==='contacts')renderContacts();
@@ -18,7 +18,6 @@
       else if(id==='smsintel')renderSmsIntelligence();
       else if(id==='incident')renderIncident();
       else if(id==='patterns'){renderDaySummary();renderPatterns();}
-      else if(id==='quality')renderDataQuality();
       else if(id==='movement'){requestAnimationFrame(()=>renderMovement());setTimeout(()=>invalidateMovementMap?.(),300);}
       else if(id==='multinumber'){
         renderCompare();
