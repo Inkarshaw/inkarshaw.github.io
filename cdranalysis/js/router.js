@@ -9,7 +9,7 @@
     }=ctx;
 
     function renderView(id){
-      if(id==='dashboard'){renderDashboard();renderLeads();renderDataQuality();}
+      if(id==='dashboard'){renderDashboard();renderLeads();}
       else if(id==='records')renderRecords();
       else if(id==='excelview')renderExcelView();
       else if(id==='contacts')renderContacts();
