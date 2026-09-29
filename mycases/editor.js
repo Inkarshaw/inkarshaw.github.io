@@ -21,7 +21,7 @@
 
   function defaults(){
     const t=Core.now();
-    return Core.normalizeCase({id:Core.uid(),crimeNo:'',crimeYear:String(new Date().getFullYear()),policeStation:'',caseType:'',dateOccurrence:'',dateRegistration:'',sceneOfCrime:'',sections:'',complainant:'',accused:'',ioName:'',priority:'Medium',courtComplex:'',court:'',courtCaseType:'',courtCaseNo:'',stage:'Investigation',accusedPresentDetails:'',nbwStatus:'',fsStatus:'',finalResult:'',nextHearing:'',nextAction:'',notes:'',createdAt:t,updatedAt:t,accusedPersons:[],investigationChecklist:BASE_INVESTIGATION.map((label,i)=>({id:'inv-'+i,label,done:false,date:''})),tasks:[],hearings:[],timeline:[],attachments:[]});
+    return Core.normalizeCase({id:Core.uid(),crimeNo:'',crimeYear:String(new Date().getFullYear()),policeStation:'',caseType:'',dateOccurrence:'',dateRegistration:'',sceneOfCrime:'',sections:'',complainant:'',accused:'',ioName:'',priority:'Medium',courtComplex:'',court:'',courtCaseType:'',courtCaseNo:'',stage:'Investigation',accusedPresentDetails:'',nbwStatus:'',fsStatus:'',finalResult:'',nextHearing:'',nextAction:'',notes:'',createdAt:t,updatedAt:t,accusedPersons:[],investigationChecklist:BASE_INVESTIGATION.map((label,i)=>({id:'inv-'+i,label,done:false,date:''})),propertyItems:[],tasks:[],hearings:[],timeline:[],attachments:[]});
   }
   const clone=v=>JSON.parse(JSON.stringify(v));
 
@@ -49,7 +49,7 @@
     $('#caseRef').textContent=ref;
     $('#caseMeta').textContent=(state.policeStation||'Police station not set')+' · '+(state.stage||'Investigation')+(state.nextHearing?' · Next '+fmt(state.nextHearing):'');
     const done=(state.investigationChecklist||[]).filter(x=>x.done).length,total=(state.investigationChecklist||[]).length;
-    $('#casePills').innerHTML='<span>Investigation '+(total?Math.round(done*100/total):0)+'%</span><span>'+((state.tasks||[]).filter(x=>!x.done).length)+' pending tasks</span><span>'+((state.accusedPersons||[]).length)+' accused</span>';
+    $('#casePills').innerHTML='<span>Investigation '+(total?Math.round(done*100/total):0)+'%</span><span>'+((state.tasks||[]).filter(x=>!x.done).length)+' pending tasks</span><span>'+((state.accusedPersons||[]).length)+' accused</span><span>'+((state.propertyItems||[]).length)+' properties</span>';
   }
   function setSave(text,kind='local'){
     const el=$('#saveState');el.textContent=text;el.dataset.state=kind;
@@ -69,6 +69,57 @@
     $('#investigationProgress').textContent=done+'/'+total+' completed';
     $('#checklist').innerHTML=state.investigationChecklist.map(x=>'<div class="check-row '+(x.done?'done':'')+'"><input type="checkbox" data-check="'+esc(x.id)+'" '+(x.done?'checked':'')+'><div>'+esc(x.label)+'</div><input type="date" data-check-date="'+esc(x.id)+'" value="'+esc(x.date||'')+'"></div>').join('');
   }
+  function propertySeized(){
+    const step=(state.investigationChecklist||[]).find(x=>String(x.label||'').toLowerCase()==='property seized');
+    return Boolean(step&&step.done)||Boolean((state.propertyItems||[]).length);
+  }
+  function newProperty(){
+    return {id:Core.uid(),description:'',category:'',quantity:'',seizureDate:new Date().toISOString().slice(0,10),seizurePlace:'',photo:'',custodyLocation:'Police Station',courtSubmissionRequired:'',courtSubmissionStatus:'Pending',courtSentDate:'',courtName:'',propertyNumberReceived:'',propertyNumber:'',propertyNumberDate:'',fslRequired:'',fslStatus:'',disposalStatus:'In Custody',remarks:''};
+  }
+  function renderProperties(){
+    if(!Array.isArray(state.propertyItems))state.propertyItems=[];
+    const register=$('#propertyRegister'),box=$('#propertyList'),summary=$('#propertySummary');
+    const visible=propertySeized();
+    register.classList.toggle('hidden',!visible);
+    if(!visible)return;
+    const pending=state.propertyItems.filter(p=>p.courtSubmissionRequired==='Yes'&&p.courtSubmissionStatus!=='Sent').length;
+    const sent=state.propertyItems.filter(p=>p.courtSubmissionStatus==='Sent').length;
+    const prPending=state.propertyItems.filter(p=>p.courtSubmissionRequired==='Yes'&&p.courtSubmissionStatus==='Sent'&&p.propertyNumberReceived!=='Yes').length;
+    summary.textContent=state.propertyItems.length+' item(s) · '+pending+' court submission pending · '+sent+' sent · '+prPending+' Property/PR No. pending';
+    if(!state.propertyItems.length){box.innerHTML='<div class="empty small">Property seized is marked complete. Add each seized item here.</div>';return}
+    box.innerHTML=state.propertyItems.map((p,i)=>{
+      const courtRequired=p.courtSubmissionRequired==='Yes';
+      const sent=p.courtSubmissionStatus==='Sent';
+      const numberReceived=p.propertyNumberReceived==='Yes';
+      const fslRequired=p.fslRequired==='Yes';
+      return '<article class="property-card" data-property-id="'+esc(p.id)+'">'+
+        '<div class="property-photo">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="Seized property photo">':'<div class="placeholder">📦</div>')+
+        '<button type="button" data-property-photo="'+i+'">'+(p.photo?'Change Photo':'Add Photo')+'</button></div>'+
+        '<div class="property-fields">'+
+          '<input class="wide" value="'+esc(p.description||'')+'" data-property-field="description" data-pi="'+i+'" placeholder="Property description *">'+
+          '<select data-property-field="category" data-pi="'+i+'"><option value="">Property type</option>'+['Cash','Jewellery','Vehicle','Mobile / Electronic','Weapon','Drug / Contraband','Document','Stolen Property','Other'].map(v=>'<option '+(p.category===v?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
+          '<input value="'+esc(p.quantity||'')+'" data-property-field="quantity" data-pi="'+i+'" placeholder="Quantity / weight / value">'+
+          '<input type="date" value="'+esc(p.seizureDate||'')+'" data-property-field="seizureDate" data-pi="'+i+'" title="Seizure date">'+
+          '<input value="'+esc(p.seizurePlace||'')+'" data-property-field="seizurePlace" data-pi="'+i+'" placeholder="Place of seizure">'+
+          '<input class="wide" value="'+esc(p.custodyLocation||'')+'" data-property-field="custodyLocation" data-pi="'+i+'" placeholder="Present custody / storage location">'+
+          '<div class="property-status">'+
+            '<select data-property-field="courtSubmissionRequired" data-pi="'+i+'"><option value="">Send to court?</option><option '+(p.courtSubmissionRequired==='Yes'?'selected':'')+'>Yes</option><option '+(p.courtSubmissionRequired==='No'?'selected':'')+'>No</option></select>'+
+            '<select data-property-field="courtSubmissionStatus" data-pi="'+i+'" '+(!courtRequired?'disabled':'')+'><option '+(p.courtSubmissionStatus==='Pending'?'selected':'')+'>Pending</option><option '+(p.courtSubmissionStatus==='Sent'?'selected':'')+'>Sent</option><option '+(p.courtSubmissionStatus==='Returned by Court'?'selected':'')+'>Returned by Court</option><option '+(p.courtSubmissionStatus==='Not required'?'selected':'')+'>Not required</option></select>'+
+            '<input type="date" value="'+esc(p.courtSentDate||'')+'" data-property-field="courtSentDate" data-pi="'+i+'" title="Sent to court date" '+(!sent?'disabled':'')+'>'+
+            '<input value="'+esc(p.courtName||'')+'" data-property-field="courtName" data-pi="'+i+'" placeholder="Court / receiving authority" '+(!courtRequired?'disabled':'')+'>'+
+            '<select data-property-field="propertyNumberReceived" data-pi="'+i+'" '+(!sent?'disabled':'')+'><option value="">Property/PR No. received?</option><option '+(p.propertyNumberReceived==='Yes'?'selected':'')+'>Yes</option><option '+(p.propertyNumberReceived==='No'?'selected':'')+'>No</option></select>'+
+            '<input value="'+esc(p.propertyNumber||'')+'" data-property-field="propertyNumber" data-pi="'+i+'" placeholder="Property / PR Number" '+(!numberReceived?'disabled':'')+'>'+
+            '<input type="date" value="'+esc(p.propertyNumberDate||'')+'" data-property-field="propertyNumberDate" data-pi="'+i+'" title="Property number received date" '+(!numberReceived?'disabled':'')+'>'+
+            '<select data-property-field="fslRequired" data-pi="'+i+'"><option value="">FSL / expert test?</option><option '+(p.fslRequired==='Yes'?'selected':'')+'>Yes</option><option '+(p.fslRequired==='No'?'selected':'')+'>No</option></select>'+
+            '<select data-property-field="fslStatus" data-pi="'+i+'" '+(!fslRequired?'disabled':'')+'><option value="">FSL status</option><option '+(p.fslStatus==='Pending dispatch'?'selected':'')+'>Pending dispatch</option><option '+(p.fslStatus==='Sent'?'selected':'')+'>Sent</option><option '+(p.fslStatus==='Report awaited'?'selected':'')+'>Report awaited</option><option '+(p.fslStatus==='Report received'?'selected':'')+'>Report received</option></select>'+
+            '<select data-property-field="disposalStatus" data-pi="'+i+'"><option '+(p.disposalStatus==='In Custody'?'selected':'')+'>In Custody</option><option '+(p.disposalStatus==='With Court'?'selected':'')+'>With Court</option><option '+(p.disposalStatus==='Returned to Owner'?'selected':'')+'>Returned to Owner</option><option '+(p.disposalStatus==='Disposed'?'selected':'')+'>Disposed</option><option '+(p.disposalStatus==='Confiscated'?'selected':'')+'>Confiscated</option></select>'+
+          '</div>'+
+          '<textarea class="textarea wide" data-property-field="remarks" data-pi="'+i+'" placeholder="Property remarks / mahazar reference / seal details">'+esc(p.remarks||'')+'</textarea>'+
+          '<div class="property-actions"><button type="button" data-property-delete="'+i+'">Remove Property</button></div>'+
+        '</div></article>';
+    }).join('');
+  }
+
   function renderAccused(){
     const box=$('#accusedList');
     if(!state.accusedPersons.length){box.innerHTML='<div class="empty small">No accused added.</div>';return}
@@ -108,7 +159,7 @@
     box.innerHTML=state.attachments.map(a=>'<article class="list-card"><div><strong>'+esc(a.name||a.type||'Document')+'</strong><p>'+esc(a.type||'')+(a.sizeLabel?' · '+esc(a.sizeLabel):'')+'</p></div><div class="row-btns">'+((a.url||a.data)?'<button type="button" data-attachment-open="'+esc(a.id)+'">Open</button>':'')+'<button type="button" class="danger" data-attachment-delete="'+esc(a.id)+'">Delete</button></div></article>').join('');
   }
   function renderAll(){
-    bindFields();renderChecklist();renderAccused();renderHearings();renderTasks();renderTimeline();renderAttachments();status();
+    bindFields();renderChecklist();renderProperties();renderAccused();renderHearings();renderTasks();renderTimeline();renderAttachments();status();
   }
   function addAudit(before,after){
     if(!before){
@@ -168,10 +219,23 @@
     state.accusedPersons[index].photo=cv.toDataURL('image/jpeg',.7);renderAccused();scheduleAutosave();
   }
 
+  async function setPropertyPhoto(index,file){
+    if(!file||!file.type.startsWith('image/')||!state.propertyItems[index])return;
+    const raw=await fileToData(file);
+    const img=new Image();
+    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=raw});
+    const max=900,scale=Math.min(1,max/Math.max(img.width,img.height)),cv=document.createElement('canvas');
+    cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    state.propertyItems[index].photo=cv.toDataURL('image/jpeg',.68);
+    renderProperties();scheduleAutosave();
+  }
+
   document.addEventListener('input',e=>{
     if(e.target.matches('[data-field]'))scheduleAutosave();
     const i=Number(e.target.dataset.i),key=e.target.dataset.personField;
     if(key&&state.accusedPersons[i]){state.accusedPersons[i][key]=e.target.value;scheduleAutosave()}
+    const pi=Number(e.target.dataset.pi),pkey=e.target.dataset.propertyField;
+    if(pkey&&state.propertyItems[pi]){state.propertyItems[pi][pkey]=e.target.value;scheduleAutosave()}
   });
   document.addEventListener('change',e=>{
     if(e.target.matches('[data-field]')){
@@ -185,7 +249,7 @@
     const i=Number(e.target.dataset.i),key=e.target.dataset.personField;
     if(key&&state.accusedPersons[i]){state.accusedPersons[i][key]=e.target.value;scheduleAutosave()}
     if(e.target.dataset.check){
-      const x=state.investigationChecklist.find(v=>v.id===e.target.dataset.check);if(x){x.done=e.target.checked;if(x.done&&!x.date)x.date=new Date().toISOString().slice(0,10);renderChecklist();scheduleAutosave()}
+      const x=state.investigationChecklist.find(v=>v.id===e.target.dataset.check);if(x){x.done=e.target.checked;if(x.done&&!x.date)x.date=new Date().toISOString().slice(0,10);renderChecklist();renderProperties();scheduleAutosave()}
     }
     if(e.target.dataset.checkDate){
       const x=state.investigationChecklist.find(v=>v.id===e.target.dataset.checkDate);if(x){x.date=e.target.value;scheduleAutosave()}
@@ -193,11 +257,26 @@
     if(e.target.dataset.taskCheck){
       const t=state.tasks.find(v=>v.id===e.target.dataset.taskCheck);if(t){t.done=e.target.checked;t.completedAt=t.done?Core.now():'';renderTasks();scheduleAutosave()}
     }
+    const pi=Number(e.target.dataset.pi),pkey=e.target.dataset.propertyField;
+    if(pkey&&state.propertyItems[pi]){
+      const p=state.propertyItems[pi],before=p[pkey]||'',after=e.target.value;p[pkey]=after;
+      if(pkey==='courtSubmissionRequired'&&after==='No'){p.courtSubmissionStatus='Not required';p.courtSentDate='';p.propertyNumberReceived='';p.propertyNumber='';p.propertyNumberDate=''}
+      if(pkey==='courtSubmissionRequired'&&after==='Yes'&&p.courtSubmissionStatus==='Not required')p.courtSubmissionStatus='Pending';
+      if(pkey==='courtSubmissionStatus'&&after==='Sent'&&!p.courtSentDate)p.courtSentDate=new Date().toISOString().slice(0,10);
+      if(pkey==='courtSubmissionStatus'&&after==='Sent'&&before!=='Sent')state.timeline.push({id:Core.uid(),type:'Property',text:'Property sent to court: '+(p.description||'Seized property'),date:p.courtSentDate||new Date().toISOString().slice(0,10),createdAt:Core.now(),auto:true});
+      if(pkey==='propertyNumberReceived'&&after==='Yes'&&!p.propertyNumberDate)p.propertyNumberDate=new Date().toISOString().slice(0,10);
+      if(pkey==='propertyNumberReceived'&&after==='Yes'&&before!=='Yes')state.timeline.push({id:Core.uid(),type:'Property',text:'Property / PR Number received for '+(p.description||'seized property'),date:p.propertyNumberDate||new Date().toISOString().slice(0,10),createdAt:Core.now(),auto:true});
+      renderProperties();renderTimeline();scheduleAutosave();
+    }
   });
   document.addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b)return;
     if(b.dataset.tab){setTab(b.dataset.tab);return}
-    if(b.dataset.personDelete!==undefined){state.accusedPersons.splice(Number(b.dataset.personDelete),1);renderAccused();scheduleAutosave()}
+    if(b.dataset.propertyDelete!==undefined){state.propertyItems.splice(Number(b.dataset.propertyDelete),1);renderProperties();scheduleAutosave()}
+    else if(b.dataset.propertyPhoto!==undefined){
+      const input=document.createElement('input');input.type='file';input.accept='image/*';input.capture='environment';input.onchange=()=>setPropertyPhoto(Number(b.dataset.propertyPhoto),input.files[0]);input.click();
+    }
+    else if(b.dataset.personDelete!==undefined){state.accusedPersons.splice(Number(b.dataset.personDelete),1);renderAccused();scheduleAutosave()}
     else if(b.dataset.photo!==undefined){
       const input=document.createElement('input');input.type='file';input.accept='image/*';input.capture='environment';input.onchange=()=>setPersonPhoto(Number(b.dataset.photo),input.files[0]);input.click();
     }else if(b.dataset.hearingDelete){state.hearings=state.hearings.filter(x=>x.id!==b.dataset.hearingDelete);renderHearings();scheduleAutosave()}
@@ -228,6 +307,11 @@
     $('#saveBtn').addEventListener('click',()=>explicitSave(false));
     $('#saveDocsBtn').addEventListener('click',()=>explicitSave(true));
     $('#dashboardBtn').addEventListener('click',leave);
+    $('#addProperty').addEventListener('click',()=>{
+      const step=state.investigationChecklist.find(x=>String(x.label||'').toLowerCase()==='property seized');
+      if(step){step.done=true;if(!step.date)step.date=new Date().toISOString().slice(0,10)}
+      state.propertyItems.push(newProperty());renderChecklist();renderProperties();scheduleAutosave();
+    });
     $('#addAccused').addEventListener('click',()=>{state.accusedPersons.push({id:Core.uid(),name:'',alias:'',dob:'',status:'Accused',photo:'',age:'',phone:'',address:'',idProof:'',arrestDate:'',hsCategory:'',remarks:''});renderAccused();scheduleAutosave()});
     $('#addHearing').addEventListener('click',()=>{
       const date=$('#hearingDate').value;if(!date){$('#hearingDate').focus();return}
