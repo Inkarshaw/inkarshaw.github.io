@@ -75,12 +75,20 @@
     const hearings=(c.hearings||[]).map(h=>'<div class="read-card"><strong>'+esc(fmt(h.date))+(h.purpose?' · '+esc(h.purpose):'')+'</strong><div>'+esc(h.proceedings||h.witness||'')+'</div><small>Next: '+esc(fmt(h.next))+(h.result?' · '+esc(h.result):'')+'</small></div>').join('')||'<div class="muted">No hearing history</div>';
     const tasks=(c.tasks||[]).map(t=>'<div class="read-card"><strong>'+(t.done?'✓ ':'')+esc(t.text||'Task')+'</strong><small>'+esc(t.due?fmt(t.due):'No due date')+'</small></div>').join('')||'<div class="muted">No tasks</div>';
     const investigation=(c.investigationChecklist||[]).map(x=>'<div class="read-card"><strong>'+(x.done?'✓ ':'○ ')+esc(x.label||'')+'</strong><small>'+esc(x.date?fmt(x.date):'')+'</small></div>').join('')||'<div class="muted">No investigation checklist</div>';
+    const properties=(c.propertyItems||[]).map(p=>'<div class="read-card" style="display:grid;grid-template-columns:'+(p.photo?'84px ':'')+'1fr;gap:10px">'+
+      (p.photo?'<img src="'+esc(p.photo)+'" alt="Seized property" style="width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid #dce5ef">':'')+
+      '<div><strong>'+esc(p.description||'Seized property')+'</strong><div>'+esc([p.category,p.quantity,p.custodyLocation].filter(Boolean).join(' · '))+'</div>'+
+      '<small>Seized: '+esc(fmt(p.seizureDate))+(p.seizurePlace?' · '+esc(p.seizurePlace):'')+'</small>'+
+      '<small>Court: '+esc(p.courtSubmissionRequired||'Not set')+(p.courtSubmissionRequired==='Yes'?' · '+esc(p.courtSubmissionStatus||'Pending'):'')+(p.courtSentDate?' · '+esc(fmt(p.courtSentDate)):'')+'</small>'+
+      '<small>Property/PR No.: '+esc(p.propertyNumberReceived||'Not received')+(p.propertyNumber?' · '+esc(p.propertyNumber):'')+(p.propertyNumberDate?' · '+esc(fmt(p.propertyNumberDate)):'')+'</small>'+
+      '<small>FSL: '+esc(p.fslRequired||'Not set')+(p.fslStatus?' · '+esc(p.fslStatus):'')+' · Disposal: '+esc(p.disposalStatus||'In Custody')+'</small>'+
+      (p.remarks?'<div style="margin-top:4px">'+esc(p.remarks)+'</div>':'')+'</div></div>').join('')||'<div class="muted">No seized property recorded</div>';
     const timeline=(c.timeline||[]).slice().sort((a,b)=>String(b.date||b.createdAt).localeCompare(String(a.date||a.createdAt))).map(x=>'<div class="read-card"><strong>'+esc(x.type||'Update')+'</strong><div>'+esc(x.text||'')+'</div><small>'+esc(x.date?fmt(x.date):new Date(x.createdAt||Date.now()).toLocaleString('en-IN'))+'</small></div>').join('')||'<div class="muted">No timeline entries</div>';
     const docs=(c.attachments||[]).map(a=>'<div class="read-card"><strong>'+esc(a.name||a.type||'Document')+'</strong><small>'+esc(a.type||'')+(a.sizeLabel?' · '+esc(a.sizeLabel):'')+'</small></div>').join('')||'<div class="muted">No documents</div>';
     const requests=c.requests?'<pre>'+esc(JSON.stringify(c.requests,null,2))+'</pre>':'';
     $('#viewBody').innerHTML=section('Overview','<div class="kv-grid">'+overview+'</div>')+
       section('Accused',accused)+section('Court','<div class="kv-grid">'+court+'</div>'+hearings)+
-      section('Tasks',tasks)+section('Investigation',investigation)+section('Timeline',timeline)+section('Documents',docs)+
+      section('Tasks',tasks)+section('Investigation',investigation)+section('Seized Property',properties)+section('Timeline',timeline)+section('Documents',docs)+
       (requests?section('Linked Requests',requests):'');
     $('#viewPanel').classList.add('open');
     $('#viewPanel').scrollTop=0;
