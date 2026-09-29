@@ -2,12 +2,12 @@
   'use strict';
   const EXPECTED_GLOBALS=[
     'CDRCore','CDRIdentityFactory','CDRParserFactory','CDRFiltersFactory','CDRDashboardFactory',
-    'CDRRecordsFactory','CDRContactsFactory','CDRLocationsFactory','CDRDevicesFactory',
+    'CDRRecordsFactory','CDRExcelViewFactory','CDRContactsFactory','CDRLocationsFactory','CDRDevicesFactory',
     'CDRMovementFactory','CDRNetworkFactory','CDRAnalysisFactory','CDRReportsFactory',
     'CDRWorkspaceFactory','CDRCaseFactory','CDRRouterFactory','CDRUIFactory','CDRApp','CDRRelationship'
   ];
   const REQUIRED_IDS=[
-    'fileInput','dropZone','recordsTable','contactsTable','locationsTable','devicesTable',
+    'fileInput','dropZone','recordsTable','excelViewSubject','excelViewTable','contactsTable','locationsTable','devicesTable',
     'movementMap','networkCanvas','relationship','tabs','applyBtn','resetBtn','bparty','callType','cdrNo',
     'analysisMode','sourceTimezone','mapPrivacyMode','auditTrailTable'
   ];
