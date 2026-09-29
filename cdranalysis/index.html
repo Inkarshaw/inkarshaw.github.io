@@ -38,28 +38,80 @@
       <input type="time" id="incidentTime" title="Incident time" />
     </div>
   </header>
-  <details class="panel no-print" style="margin:12px 16px 0"><summary style="cursor:pointer;font-weight:800">Report Options</summary><div class="checks" style="margin-top:10px;grid-template-columns:repeat(4,minmax(150px,1fr))"><label class="check"><input type="checkbox" id="reportContacts" checked> Contacts</label><label class="check"><input type="checkbox" id="reportTowers" checked> Towers</label><label class="check"><input type="checkbox" id="reportDevices" checked> Devices</label><label class="check"><input type="checkbox" id="reportMovement" checked> Movement</label><label class="check"><input type="checkbox" id="reportCross" checked> Cross-CDR</label><label class="check"><input type="checkbox" id="reportSms" checked> SMS Intelligence</label><label class="check"><input type="checkbox" id="reportLeads" checked> Review Leads</label><label class="check"><input type="checkbox" id="reportFlags" checked> Flagged Records</label><label class="check"><input type="checkbox" id="reportIncident" checked> Incident Timeline</label><label class="check"><input type="checkbox" id="reportDays" checked> Day Summary</label><label class="check"><input type="checkbox" id="reportChronology" checked> Chronology</label><label class="check"><input type="checkbox" id="reportQuality" checked> Data Quality</label><label class="check"><input type="checkbox" id="reportNotes" checked> Case Note</label></div><div class="subtoolbar" style="margin-top:10px"><button class="btn secondary small" id="runSelfTestBtn">Run Functional Self-Test</button><span class="tiny" id="selfTestStatus">Tests core analysis with synthetic in-memory rows without changing your loaded case.</span></div></details>
+  <details class="panel no-print report-options-panel" style="margin:12px 16px 0">
+    <summary style="cursor:pointer;font-weight:800">Case Report Options <span class="badge" id="reportOptionCount">0 selected</span></summary>
+    <div class="tiny" style="margin-top:8px"><b>Applies to Export Case Report only.</b> Excel export always contains the complete analysis workbook. Summary, Analysis Settings and Import Manifest are always included in the Case Report for reproducibility.</div>
+    <div class="subtoolbar" style="margin-top:10px">
+      <button class="btn secondary small" id="reportRecommendedBtn" type="button">Recommended</button>
+      <button class="btn secondary small" id="reportSelectAllBtn" type="button">Select all</button>
+      <button class="btn secondary small" id="reportClearOptionalBtn" type="button">Clear optional</button>
+    </div>
+    <div class="report-option-groups">
+      <div><h3>Primary analysis</h3><div class="checks report-checks">
+        <label class="check"><input type="checkbox" class="report-option" id="reportContacts" checked> Contacts</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportTowers" checked> Towers</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportDevices" checked> Devices / SIM</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportMovement" checked> Movement</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportNightStay" checked> Night Stay</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportLocation" checked> Shared Location</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportPatterns" checked> Patterns</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportNetwork" checked> Network</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportRelationship" checked> Relationship</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportCross" checked> Cross-CDR</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportSms" checked> SMS Intelligence</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportLeads" checked> Review Leads</label>
+      </div></div>
+      <div><h3>Case review & evidence</h3><div class="checks report-checks">
+        <label class="check"><input type="checkbox" class="report-option" id="reportIncident" checked> Incident Timeline</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportDays" checked> Day Summary</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportChronology" checked> Chronology</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportFlags" checked> Flagged Records</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportQuality" checked> Data Quality</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportAudit" checked> Audit Trail</label>
+        <label class="check"><input type="checkbox" class="report-option" id="reportNotes" checked> Case Note</label>
+      </div></div>
+    </div>
+  </details>
+  <details class="panel no-print" style="margin:10px 16px 0"><summary style="cursor:pointer;font-weight:800">Analyzer Tools</summary><div class="subtoolbar" style="margin-top:10px"><button class="btn secondary small" id="runSelfTestBtn">Run Functional Self-Test</button><span class="tiny" id="selfTestStatus">Tests core analysis with synthetic in-memory rows without changing your loaded case.</span></div></details>
 
   <div id="appUpdateBanner" class="notice no-print" style="display:none;margin:10px 16px 0"><b>Analyzer update available.</b> <button class="btn small" id="reloadUpdateBtn">Reload updated version</button></div>
+  <section id="importReviewPanel" class="panel no-print import-review-panel" style="display:none;margin:10px 16px 0">
+    <div class="panel-title"><div><h2>Import Review</h2><span class="tiny">Nothing is added to the case until you confirm this review.</span></div><span class="badge" id="importReviewFileName"></span></div>
+    <div id="importReviewMeta" class="metric-row"></div>
+    <div id="importDuplicateWarning"></div>
+    <div class="import-review-toolbar">
+      <div class="field"><label>Source timezone for this import</label><select id="importTimezone"><option value="Asia/Kolkata">Asia/Kolkata (UTC+05:30)</option><option value="UTC">UTC</option><option value="browser">Browser local timezone</option></select></div>
+      <div class="field"><label>Preview worksheet</label><select id="importPreviewSheet"></select></div>
+      <button class="btn secondary small" id="importSelectLikelyBtn" type="button">Select likely CDR sheets</button>
+      <button class="btn secondary small" id="importSelectAllBtn" type="button">Select all sheets</button>
+      <button class="btn secondary small" id="importSelectNoneBtn" type="button">Clear selection</button>
+    </div>
+    <h3>1. Worksheets</h3>
+    <div id="importSheetChoices" class="import-sheet-grid"></div>
+    <h3>2. Column mapping</h3>
+    <div class="tiny">Required for normal analysis: <b>B Party</b> and <b>Date</b>; Subject/CDR No. must be mapped or inferable from the filename. Optional fields improve device, tower and network analysis.</div>
+    <div id="importValidationSummary" class="notice" style="margin:8px 0"></div>
+    <div id="importMappingControls"></div>
+    <h3>3. Source preview</h3>
+    <div class="tablewrap import-preview-wrap"><table class="table" id="importPreviewTable"></table></div>
+    <div class="subtoolbar import-review-actions">
+      <label class="check" id="importAllowDuplicateWrap" style="display:none"><input type="checkbox" id="importAllowDuplicate"> Allow exact file/worksheet re-import</label>
+      <span class="tiny" id="importQueueStatus"></span>
+      <button class="btn small" id="confirmImportBtn">Import selected sheets</button>
+      <button class="btn secondary small" id="cancelImportBtn">Cancel this file</button>
+    </div>
+  </section>
   <div class="layout">
     <aside class="sidebar no-print" id="filterSidebar" aria-label="CDR filters" aria-hidden="false"><div class="mobile-filter-head"><b>Filters</b><button class="btn secondary small" id="closeFiltersBtn">Close ✕</button></div>
       <div class="uploadbox" id="dropZone">
         <strong>Upload CDR file(s)</strong>
-        <div class="tiny">Choose one or more .xlsx, .xls or .csv files.<br>“Mapping” is preferred automatically when present.</div>
+        <div class="tiny">Choose one or more .xlsx, .xls or .csv files.<br>Files are inspected first; you choose the worksheet(s) and verify column mapping before import.</div>
         <div style="margin-top:10px"><button class="btn" id="chooseBtn">Choose Files</button></div>
         <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" />
       </div>
       <div id="loadStatus" class="status"></div>
       <div class="file-list" id="fileList"></div>
       <div style="margin-top:8px"><button class="btn secondary small" id="clearFilesBtn">Clear Loaded CDRs</button></div>
-      <div id="importReviewPanel" class="panel" style="display:none;margin-top:10px;padding:10px">
-        <div class="panel-title"><h3>Import review</h3><span class="badge" id="importReviewFileName"></span></div>
-        <div class="tiny">Select worksheet(s), verify detected columns, preview source rows, then import. Mapping changes are remembered for matching header layouts.</div>
-        <div id="importSheetChoices" class="checks" style="margin:8px 0"></div>
-        <div id="importMappingControls"></div>
-        <div class="tablewrap" style="max-height:220px"><table class="table" id="importPreviewTable"></table></div>
-        <div class="subtoolbar"><button class="btn small" id="confirmImportBtn">Import selected sheets</button><button class="btn secondary small" id="cancelImportBtn">Cancel</button></div>
-      </div>
       <h3>Analysis integrity</h3>
       <div class="field"><label>Analysis dataset</label><select id="analysisMode"><option value="raw">Raw records</option><option value="unique">Exclude duplicate candidates</option></select></div>
       <div class="field"><label>Source timezone</label><select id="sourceTimezone"><option value="Asia/Kolkata">Asia/Kolkata (UTC+05:30)</option><option value="UTC">UTC</option><option value="browser">Browser local timezone</option></select></div>
