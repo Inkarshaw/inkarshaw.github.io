@@ -31,9 +31,7 @@
       closeCaseSaveDialog();
     }
     function persistCaseMeta(){
-      ['caseTitle','caseNo','station','analyst','incidentDate','incidentTime'].forEach(id=>{
-        const el=$(id);if(el)persistLocal('cdrAnalyzer:'+id,el.value||'');
-      });
+      // Case metadata is retained in the current session and explicit workspace/snapshot saves only.
     }
 
     function bind(){
@@ -83,7 +81,6 @@
   state.contactTags={};state.contactNames={};
   if(!localStorage.getItem('cdrAnalyzer:globalContactTags')&&Object.keys(state.globalContactTags).length)persistLocal('cdrAnalyzer:globalContactTags',JSON.stringify(state.globalContactTags));
   if(!localStorage.getItem('cdrAnalyzer:globalContactNames')&&Object.keys(state.globalContactNames).length)persistLocal('cdrAnalyzer:globalContactNames',JSON.stringify(state.globalContactNames));
-  ['caseTitle','caseNo','station','analyst','incidentDate','incidentTime'].forEach(id=>{const el=$(id);if(el)el.value=localStorage.getItem('cdrAnalyzer:'+id)||'';});
   ['incidentWindowHours','generalNote'].forEach(id=>{const el=$(id);const key='cdrAnalyzer:'+id;if(!el)return;el.value=localStorage.getItem(key)||el.value||'';el.addEventListener('input',()=>persistLocal(key,el.value));});
   document.querySelectorAll('.view').forEach(v=>v.setAttribute('role','tabpanel'));document.querySelectorAll('.tab').forEach(t=>t.setAttribute('tabindex',t.classList.contains('active')?'0':'-1'));
   if(typeof XLSX==='undefined')showStatus('The local XLSX library did not load. Refresh the analyzer files.','error');
