@@ -24,7 +24,6 @@
         requestAnimationFrame(renderNetwork);
         window.CDRRelationship?.render?.();
       }
-      else if(id==='casereview'){renderChronology();renderFlags();}
     }
 
     function renderAll(){
