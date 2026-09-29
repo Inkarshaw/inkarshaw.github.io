@@ -12,8 +12,9 @@
       identityStore,renderNetwork,seedBuiltinTacMappings,audit
     }=ctx;
 
-    let caseSaveMode='workspace';
+    let caseSaveMode='workspace',caseSaveBackup={};
     function openCaseSaveDialog(mode='workspace'){
+      caseSaveBackup={};['caseTitle','caseNo','station','analyst','incidentDate','incidentTime'].forEach(id=>{caseSaveBackup[id]=$(id)?.value||'';});
       caseSaveMode=mode==='snapshot'?'snapshot':'workspace';
       const dlg=$('caseSaveDialog');if(!dlg)return;
       if($('caseSaveDialogTitle'))$('caseSaveDialogTitle').textContent=caseSaveMode==='snapshot'?'Save Case Snapshot':'Save Case Workspace';
@@ -24,6 +25,10 @@
     function closeCaseSaveDialog(){
       const dlg=$('caseSaveDialog');if(!dlg)return;
       if(typeof dlg.close==='function'&&dlg.open)dlg.close();else dlg.removeAttribute('open');
+    }
+    function cancelCaseSaveDialog(){
+      Object.entries(caseSaveBackup).forEach(([id,value])=>{if($(id))$(id).value=value;});
+      closeCaseSaveDialog();
     }
     function persistCaseMeta(){
       ['caseTitle','caseNo','station','analyst','incidentDate','incidentTime'].forEach(id=>{
@@ -43,7 +48,7 @@
   installViewScopeToolbars();syncViewScopeControls(true);
     updatePrivacyUi();updateFilterCount();
   $('printBtn').onclick=()=>window.print();$('reportBtn').onclick=exportCaseReport;$('saveWorkspaceBtn').onclick=()=>openCaseSaveDialog('workspace');$('loadWorkspaceBtn').onclick=()=>$('workspaceInput').click();$('clearFilesBtn').onclick=clearLoaded;$('focusIncidentBtn').onclick=applyIncidentWindow;$('importTacBtn').onclick=()=>$('tacInput').click();
-  $('caseSaveCancelBtn').onclick=closeCaseSaveDialog;
+  $('caseSaveCancelBtn').onclick=cancelCaseSaveDialog;
   $('caseSaveForm').addEventListener('submit',e=>{e.preventDefault();persistCaseMeta();closeCaseSaveDialog();if(caseSaveMode==='snapshot')saveCaseSnapshot?.();else saveWorkspace();});
   $('exportTacBtn').onclick=exportTacCache;
   $('tacInput').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{await importTacDatabase(f);}catch(err){showStatus('TAC import failed: '+err.message,'error');}e.target.value='';});
@@ -78,7 +83,8 @@
   state.contactTags={};state.contactNames={};
   if(!localStorage.getItem('cdrAnalyzer:globalContactTags')&&Object.keys(state.globalContactTags).length)persistLocal('cdrAnalyzer:globalContactTags',JSON.stringify(state.globalContactTags));
   if(!localStorage.getItem('cdrAnalyzer:globalContactNames')&&Object.keys(state.globalContactNames).length)persistLocal('cdrAnalyzer:globalContactNames',JSON.stringify(state.globalContactNames));
-  ['caseTitle','caseNo','station','analyst','incidentDate','incidentTime','incidentWindowHours','generalNote'].forEach(id=>{const el=$(id);const key='cdrAnalyzer:'+id;el.value=localStorage.getItem(key)||'';el.addEventListener('input',()=>persistLocal(key,el.value));});
+  ['caseTitle','caseNo','station','analyst','incidentDate','incidentTime'].forEach(id=>{const el=$(id);if(el)el.value=localStorage.getItem('cdrAnalyzer:'+id)||'';});
+  ['incidentWindowHours','generalNote'].forEach(id=>{const el=$(id);const key='cdrAnalyzer:'+id;if(!el)return;el.value=localStorage.getItem(key)||el.value||'';el.addEventListener('input',()=>persistLocal(key,el.value));});
   document.querySelectorAll('.view').forEach(v=>v.setAttribute('role','tabpanel'));document.querySelectorAll('.tab').forEach(t=>t.setAttribute('tabindex',t.classList.contains('active')?'0':'-1'));
   if(typeof XLSX==='undefined')showStatus('The local XLSX library did not load. Refresh the analyzer files.','error');
   if('serviceWorker' in navigator){navigator.serviceWorker.register('/cdranalysis/sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});}
