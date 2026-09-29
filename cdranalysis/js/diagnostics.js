@@ -88,12 +88,9 @@
     const failed=result.failed;box.innerHTML='<div style="display:flex;gap:10px;align-items:center;justify-content:space-between"><b>CDR Analyzer diagnostics: '+(result.ok?'PASS':'FAIL')+'</b><button type="button" id="cdrDiagnosticsClose">×</button></div><div>'+result.checks.length+' checks • '+failed.length+' failed</div>'+(failed.length?'<ul>'+failed.map(x=>'<li>'+x.type+': '+x.name+'</li>').join(''):'<div>All expected modules, APIs, integrity controls and synthetic checks passed.</div>');document.getElementById('cdrDiagnosticsClose').onclick=()=>box.remove();
   }
 
-  function bindSelfTest(){
-    const btn=document.getElementById('runSelfTestBtn'),status=document.getElementById('selfTestStatus');if(!btn)return;
-    btn.onclick=()=>{const result=runFunctional();if(status)status.textContent=result.ok?'PASS • '+result.checks.length+' checks • loaded case restored unchanged':'FAIL • '+result.failed.length+' check(s) failed';show(result);};
-  }
+
 
   window.CDRDiagnostics={run,runFunctional,show,version:'2.0'};
   const params=new URLSearchParams(location.search);
-  window.addEventListener('load',()=>{bindSelfTest();if(params.get('debug')==='1')setTimeout(()=>{const result=runFunctional();console.group('CDR Analyzer diagnostics');console.table(result.checks);console.log(result);console.groupEnd();show(result);},0);},{once:true});
+  window.addEventListener('load',()=>{if(params.get('debug')==='1')setTimeout(()=>{const result=runFunctional();console.group('CDR Analyzer diagnostics');console.table(result.checks);console.log(result);console.groupEnd();show(result);},0);},{once:true});
 })();
