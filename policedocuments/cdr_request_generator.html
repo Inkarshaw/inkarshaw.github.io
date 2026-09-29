@@ -753,6 +753,14 @@
                 }
                 localStorage.removeItem('cdrAnalyzer:requestDraftV1');
 
+                const directNumber = String(params.get('number') || '').trim();
+                if ((!draft || !Array.isArray(draft.entries) || !draft.entries.length) && directNumber) {
+                    draft = {
+                        entries: [{ number: directNumber, relation: 'CDR Contact' }],
+                        case: {}
+                    };
+                }
+
                 if (!draft || !Array.isArray(draft.entries) || !draft.entries.length) return;
 
                 // Reuse case/station context when it maps cleanly to the existing form.
