@@ -9,7 +9,7 @@
   const REQUIRED_IDS=[
     'fileInput','dropZone','recordsTable','contactsTable','locationsTable','devicesTable',
     'movementMap','networkCanvas','relationship','tabs','applyBtn','resetBtn','bparty','callType','cdrNo',
-    'analysisMode','sourceTimezone','importReviewPanel','runSelfTestBtn','mapPrivacyMode','auditTrailTable'
+    'analysisMode','sourceTimezone','runSelfTestBtn','mapPrivacyMode','auditTrailTable'
   ];
 
   function run(){
