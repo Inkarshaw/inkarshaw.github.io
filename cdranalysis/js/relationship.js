@@ -9,6 +9,19 @@
     return s.toLowerCase().replace(/\s+/g,'');
   };
   const same=(a,b)=>!!key(a)&&key(a)===key(b);
+  const invalidPair=(a,b)=>!!a&&!!b&&same(a,b);
+  function showPairValidation(a,b){
+    if(!invalidPair(a,b))return false;
+    if($('relationshipSummary'))$('relationshipSummary').innerHTML='<div class="notice" style="border-color:rgba(255,93,120,.45)"><b>Person A and Person B cannot be the same number.</b><br>Select a different B Party number to run Relationship Analysis.</div>';
+    if($('relationshipTimeline'))$('relationshipTimeline').innerHTML='';
+    if($('relationshipTowers'))$('relationshipTowers').innerHTML='';
+    if($('relationshipDevices'))$('relationshipDevices').innerHTML='';
+    if($('relationshipSubjects'))$('relationshipSubjects').innerHTML='';
+    if($('relationshipScope'))$('relationshipScope').textContent='Invalid pair • A and B are the same number';
+    const bEl=$('relationshipB');if(bEl){bEl.setCustomValidity('Person A and Person B cannot be the same number.');bEl.setAttribute('aria-invalid','true');}
+    return true;
+  }
+  function clearPairValidation(){const bEl=$('relationshipB');if(bEl){bEl.setCustomValidity('');bEl.removeAttribute('aria-invalid');}}
   const localDate=d=>d instanceof Date&&!isNaN(d)?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:'';
   const fmtInt=n=>Number(n||0).toLocaleString('en-IN');
   const fmtDur=sec=>window.CDRApp?.formatDuration?window.CDRApp.formatDuration(sec):`${Number(sec||0)}s`;
@@ -140,6 +153,8 @@
   function exportPair(){
     const a=$('relationshipA')?.value||'',b=$('relationshipB')?.value.trim()||'';
     if(!a||!b)return;
+    if(showPairValidation(a,b))return;
+    clearPairValidation();
     const rows=dedupe(directRows(a,b),a,b);
     const headers=['Person A','Person B','Date/Time','Direction','Event Type','Duration Seconds','CDR Subject','B Party','First Cell ID','First Tower Address','Last Cell ID','Last Tower Address','IMEI','IMSI','Operator','Source File','Source Sheet','Source Row'];
     const lines=[headers.join(',')];
@@ -153,6 +168,8 @@
   function render(){
     fillInputs();
     const a=$('relationshipA')?.value||'',b=$('relationshipB')?.value.trim()||'';
+    clearPairValidation();
+    if(showPairValidation(a,b))return;
     const matches=renderSubjectMatches(b);
     if(!b){
       if($('relationshipSummary'))$('relationshipSummary').innerHTML='<div class="empty">Enter Person B to find which loaded CDR subjects contacted that number.</div>';
@@ -192,7 +209,7 @@
 
   function snapshot(){
     const a=$('relationshipA')?.value||'',b=$('relationshipB')?.value.trim()||'';
-    if(!a||!b)return null;
+    if(!a||!b||invalidPair(a,b))return null;
     const rows=dedupe(directRows(a,b),a,b),dirs=rows.map(r=>direction(r,a,b)),towers=towerSummary(a,b),ids=sharedIds(a,b);
     return {a,b,filters:relationshipFilters(),rows,towers,ids,metrics:{interactions:rows.length,aToB:dirs.filter(x=>x==='A → B').length,bToA:dirs.filter(x=>x==='B → A').length,undirected:dirs.filter(x=>x==='A ↔ B').length,duration:rows.reduce((s,r)=>s+(Number(r.duration)||0),0),activeDays:new Set(rows.map(r=>localDate(r.dt)).filter(Boolean)).size,night:rows.filter(r=>r.dt&&((window.CDRCore.sourceHour(r.dt)>=20)||(window.CDRCore.sourceHour(r.dt)<6))).length}};
   }
@@ -213,10 +230,11 @@
     if(e.target.closest('#relationshipExport')){exportPair();return;}
     if(e.target.closest('#relationshipSwap')){const a=$('relationshipA').value,b=$('relationshipB').value;const subs=subjects();if(subs.includes(b))$('relationshipA').value=b;$('relationshipB').value=a;render();return;}
     if(e.target.closest('#relationshipClear')){$('relationshipB').value='';if($('relationshipFrom'))$('relationshipFrom').value='';if($('relationshipTo'))$('relationshipTo').value='';if($('relationshipEvent'))$('relationshipEvent').value='';if($('relationshipNightOnly'))$('relationshipNightOnly').checked=false;if($('relationshipScope'))$('relationshipScope').textContent='Select a pair to analyse.';render();return;}
-    if(e.target.closest('#relationshipOpenARecords')){const a=$('relationshipA').value,b=$('relationshipB').value.trim();if(a&&b)window.CDRApp?.openPairRecords?.(a,b);return;}
-    if(e.target.closest('#relationshipOpenBRecords')){const a=$('relationshipA').value,b=$('relationshipB').value.trim();if(a&&b&&subjects().some(x=>same(x,b)))window.CDRApp?.openPairRecords?.(b,a);return;}
+    if(e.target.closest('#relationshipOpenARecords')){const a=$('relationshipA').value,b=$('relationshipB').value.trim();if(showPairValidation(a,b))return;if(a&&b)window.CDRApp?.openPairRecords?.(a,b);return;}
+    if(e.target.closest('#relationshipOpenBRecords')){const a=$('relationshipA').value,b=$('relationshipB').value.trim();if(showPairValidation(a,b))return;if(a&&b&&subjects().some(x=>same(x,b)))window.CDRApp?.openPairRecords?.(b,a);return;}
   });
-  document.addEventListener('change',e=>{if(['relationshipA','relationshipFrom','relationshipTo','relationshipEvent','relationshipNightOnly'].includes(e.target.id))render();});
+  document.addEventListener('change',e=>{if(['relationshipA','relationshipB','relationshipFrom','relationshipTo','relationshipEvent','relationshipNightOnly'].includes(e.target.id))render();});
+  document.addEventListener('input',e=>{if(e.target.id==='relationshipB'){const a=$('relationshipA')?.value||'',b=e.target.value.trim();if(invalidPair(a,b))showPairValidation(a,b);else clearPairValidation();}});
   window.addEventListener('cdr:updated',fillInputs);
   window.CDRRelationship={render,openFromContact,fillInputs,snapshot};
   fillInputs();
