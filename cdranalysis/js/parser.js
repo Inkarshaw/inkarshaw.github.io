@@ -87,14 +87,15 @@
         const sheets=ins.sheets||[];if(!sheets.length)throw new Error('No worksheets found');
         const selected=new Set(chooseInitialSheets(sheets)),mappings={};for(const s of sheets)mappings[s.name]=savedMapping(s.headers)||mapHeaders(s.headers);
         state.pendingImport={file,sha256,sheets,selected,mappings,inspectedAt:new Date().toISOString()};
-        renderImportReview();showStatus('Review worksheet selection and column mapping for '+file.name+'.','ok');
+        showStatus('Importing '+file.name+' using automatic worksheet and column mapping…','');
+        await confirmImport();
       }catch(err){console.error(err);showStatus('Could not inspect '+file.name+': '+err.message,'error');inspectNext();}
     }
 
     async function confirmImport(){
       const p=state.pendingImport;if(!p)return;
       const selected=[...p.selected];if(!selected.length){showStatus('Select at least one worksheet to import.','error');return;}
-      for(const name of selected){p.mappings[name]=currentMapping(name);const sheet=p.sheets.find(x=>x.name===name);saveMapping(sheet.headers,p.mappings[name]);}
+      for(const name of selected){const sheet=p.sheets.find(x=>x.name===name);p.mappings[name]=p.mappings[name]||savedMapping(sheet?.headers||[])||mapHeaders(sheet?.headers||[]);if(sheet)saveMapping(sheet.headers,p.mappings[name]);}
       showStatus('Importing '+selected.length+' worksheet(s) from '+p.file.name+'…','');
       try{
         const parsed=await workerCall(p.file,'parse',selected),timezone=$('sourceTimezone')?.value||state.sourceTimezone||'Asia/Kolkata';state.sourceTimezone=timezone;
@@ -111,11 +112,11 @@
           state.files.push({id:fileId,name:p.file.name,sheet:sh.sheetName,rows:added,map,headers:info.headers||[],inferredCdr,sha256:p.sha256,size:p.file.size,lastModified:p.file.lastModified?new Date(p.file.lastModified).toISOString():'',importedAt:new Date().toISOString(),sourceTimezone:timezone});
           audit('CDR worksheet imported',p.file.name+' / '+sh.sheetName+' • '+added+' rows • SHA-256 '+p.sha256);
         }
-        state.pendingImport=null;renderImportReview();rebuildIndexes();refreshSelectors();renderFileList();restorePendingWorkspace();applyFilters();showStatus('Loaded '+fmtInt(state.records.length)+' raw records from '+state.files.length+' worksheet import(s).','ok');inspectNext();
+        state.pendingImport=null;rebuildIndexes();refreshSelectors();renderFileList();restorePendingWorkspace();applyFilters();showStatus('Loaded '+fmtInt(state.records.length)+' raw records from '+state.files.length+' worksheet import(s).','ok');inspectNext();
       }catch(err){console.error(err);showStatus('Import failed: '+err.message,'error');}
     }
 
-    function cancelImport(){if(state.pendingImport)audit('CDR import cancelled',state.pendingImport.file?.name||'');state.pendingImport=null;renderImportReview();inspectNext();}
+    function cancelImport(){if(state.pendingImport)audit('CDR import cancelled',state.pendingImport.file?.name||'');state.pendingImport=null;inspectNext();}
     function loadFiles(files){if(!files?.length)return;importQueue.push(...files);inspectNext();}
     function detectSheet(wb){if(wb.Sheets.Mapping)return 'Mapping';let best=wb.SheetNames[0],max=0;wb.SheetNames.forEach(n=>{const ref=wb.Sheets[n]?.['!ref'];if(ref){const r=XLSX.utils.decode_range(ref),rows=r.e.r-r.s.r+1;if(rows>max){max=rows;best=n;}}});return best;}
     function parseFileOnMain(buffer){const sheets=inspectBuffer(buffer),name=chooseInitialSheets(sheets)[0]||sheets[0]?.name;return {sheetName:name,rows:parseBufferSheets(buffer,[name])[0]?.rows||[]};}
@@ -124,9 +125,6 @@
     function bind(){
       $('chooseBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
       const dz=$('dropZone');['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
-      $('confirmImportBtn').onclick=confirmImport;$('cancelImportBtn').onclick=cancelImport;
-      $('importSheetChoices').addEventListener('change',e=>{if(e.target.classList.contains('import-sheet-check')&&state.pendingImport){e.target.checked?state.pendingImport.selected.add(e.target.dataset.sheet):state.pendingImport.selected.delete(e.target.dataset.sheet);renderImportReview();}});
-      $('importMappingControls').addEventListener('change',e=>{if(e.target.classList.contains('import-map-select')&&state.pendingImport){const s=e.target.dataset.sheet,f=e.target.dataset.field;state.pendingImport.mappings[s]=state.pendingImport.mappings[s]||{};if(e.target.value)state.pendingImport.mappings[s][f]=e.target.value;else delete state.pendingImport.mappings[s][f];}});
     }
 
     return {parseDuration,inferCdrFromFilename,parseDateTime,parseTime,timeMins,mapHeaders,parseLatLong,detectSheet,parseFileOnMain,parseFileInWorker,hashFile,loadFiles,confirmImport,cancelImport,renderImportReview,bind};
