@@ -29,6 +29,7 @@
   function seedBuiltinTacMappings(){return identityModule?.seedBuiltinTacMappings();}
   function updateTacStatus(){return identityModule?.updateTacStatus();}
   function learnTacFromRecords(rows){return identityModule?.learnTacFromRecords(rows);}
+  function ensureRemoteTacMatches(rows){return identityModule?.ensureRemoteTacMatches?.(rows)||Promise.resolve({requested:0,matched:0,changed:false});}
   function resolveDevice(v){return identityModule?.resolveDevice(v)||{manufacturer:'',model:'',deviceType:'',os:'',status:'Unknown TAC'};}
   function importTacDatabase(file){return identityModule?.importTacDatabase(file);}
   function exportTacCache(){return identityModule?.exportTacCache();}
@@ -156,7 +157,7 @@
   locationsModule?.bind();
 
   devicesModule=window.CDRDevicesFactory?.({
-    $,state,learnTacFromRecords,updateTacStatus,aggregateDevices,fmtInt,escapeHtml,dtFmt,imeiStructure,resolveDevice
+    $,state,learnTacFromRecords,updateTacStatus,ensureRemoteTacMatches,aggregateDevices,fmtInt,escapeHtml,dtFmt,imeiStructure,resolveDevice
   })||null;
 
   movementModule=window.CDRMovementFactory?.({
