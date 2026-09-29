@@ -16,6 +16,7 @@ const CORE=[
   '/cdranalysis/js/filters.js',
   '/cdranalysis/js/dashboard.js',
   '/cdranalysis/js/records.js',
+  '/cdranalysis/js/excelview.js',
   '/cdranalysis/js/contacts.js',
   '/cdranalysis/js/locations.js',
   '/cdranalysis/js/devices.js',
