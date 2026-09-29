@@ -40,30 +40,35 @@
   </header>
   
   <div class="layout">
-    <aside class="sidebar no-print" id="filterSidebar" aria-label="CDR filters" aria-hidden="false"><div class="mobile-filter-head"><b>Filters</b><button class="btn secondary small" id="closeFiltersBtn">Close ✕</button></div>
+    <aside class="sidebar no-print" id="filterSidebar" aria-label="CDR filters" aria-hidden="false">
+      <div class="mobile-filter-head"><b>Filters</b><button class="btn secondary small" id="closeFiltersBtn">Close ✕</button></div>
       <div class="uploadbox" id="dropZone">
         <strong>Upload CDR file(s)</strong>
-        <div class="tiny">Choose one or more .xlsx, .xls or .csv files.<br>Files are inspected first; you choose the worksheet(s) and verify column mapping before import.</div>
+        <div class="tiny">Choose one or more .xlsx, .xls or .csv files. The analyzer automatically selects likely CDR worksheets and maps recognized columns.</div>
         <div style="margin-top:10px"><button class="btn" id="chooseBtn">Choose Files</button></div>
         <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" />
       </div>
       <div id="loadStatus" class="status"></div>
       <div class="file-list" id="fileList"></div>
       <div style="margin-top:8px"><button class="btn secondary small" id="clearFilesBtn">Clear Loaded CDRs</button></div>
-      <h3>Analysis integrity</h3>
-      <div class="field"><label>Analysis dataset</label><select id="analysisMode"><option value="raw">Raw records</option><option value="unique">Exclude duplicate candidates</option></select></div>
-      <div class="field"><label>Source timezone</label><select id="sourceTimezone"><option value="Asia/Kolkata">Asia/Kolkata (UTC+05:30)</option><option value="UTC">UTC</option><option value="browser">Browser local timezone</option></select></div>
-      <div class="tiny" id="analysisIntegrityStatus">Raw imported records are preserved. Duplicate-safe mode only changes analysis calculations.</div>
-      <div class="privacy">CDR rows are processed in this browser. This page does not contain code that uploads the selected CDR file to a server. The XLSX, chart and map libraries are self-hosted with this analyzer. OpenStreetMap tiles are requested only when the map is used.<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="btn secondary small" id="privateSessionBtn">Private Session: Off</button><button class="btn secondary small" id="clearLocalDataBtn">Clear Local Case Data</button></div><div class="tiny" id="privacyModeStatus" style="margin-top:6px">Case metadata, names and tags may be remembered on this device.</div></div>
 
-      <div class="incident-focus">
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:800">Analysis Integrity</summary>
+        <div class="field" style="margin-top:8px"><label>Analysis dataset</label><select id="analysisMode"><option value="raw">Raw records</option><option value="unique">Exclude duplicate candidates</option></select></div>
+        <div class="field"><label>Source timezone</label><select id="sourceTimezone"><option value="Asia/Kolkata">Asia/Kolkata (UTC+05:30)</option><option value="UTC">UTC</option><option value="browser">Browser local timezone</option></select></div>
+        <div class="tiny" id="analysisIntegrityStatus">Raw imported records are preserved. Duplicate-safe mode only changes analysis calculations.</div>
+      </details>
+
+      <div class="incident-focus" style="margin-top:12px">
         <div class="field"><label>Incident focus ± hours</label><input id="incidentWindowHours" type="number" min="1" max="168" value="6" /></div>
         <button class="btn secondary small" id="focusIncidentBtn">Apply Incident Window</button>
         <div class="tiny" id="exactIncidentStatus" style="margin-top:6px">Uses the incident date/time entered at the top.</div>
       </div>
 
       <h3>Quick filters</h3>
-      <div class="field"><label>Any text</label><input id="q" placeholder="Text or imei:… tower:… after:2026-01-01" /><div class="tiny">Smart filters: name:, tag:, imei:, imsi:, tower:, after:, before:</div></div>
+      <div class="field"><label>Any text</label><input id="q" placeholder="Number, tower, IMEI, name…" /></div>
+      <div class="field"><label>CDR / A Party</label><select id="cdrNo"><option value="">All CDR numbers</option></select></div>
+      <div class="field"><label>B Party / connected number</label><input id="bparty" placeholder="Number or sender ID" /></div>
       <div class="row2">
         <div class="field"><label>Date from</label><input type="date" id="dateFrom" /></div>
         <div class="field"><label>Date to</label><input type="date" id="dateTo" /></div>
@@ -72,41 +77,50 @@
         <div class="field"><label>Time from</label><input type="time" id="timeFrom" /></div>
         <div class="field"><label>Time to</label><input type="time" id="timeTo" /></div>
       </div>
-      <div class="field"><label>B Party / connected number</label><input id="bparty" placeholder="Contains number / sender ID" /></div>
-      <div class="row2">
-        <div class="field"><label>Min duration (sec)</label><input type="number" min="0" id="durMin" /></div>
-        <div class="field"><label>Max duration (sec)</label><input type="number" min="0" id="durMax" /></div>
-      </div>
       <div class="field"><label>Event type</label><select id="callType"><option value="">All event types</option></select></div>
+      <div class="field"><label>IMEI</label><input id="imei" /></div>
+      <div class="field"><label>IMSI</label><input id="imsi" /></div>
       <div class="checks">
         <label class="check"><input type="checkbox" id="callsOnly"> Calls only</label>
         <label class="check"><input type="checkbox" id="smsOnly"> SMS only</label>
-        <label class="check"><input type="checkbox" id="nightOnly"> Night activity</label>
-        <label class="check"><input type="checkbox" id="weekendOnly"> Weekends only</label><label class="check"><input type="checkbox" id="excludeServiceSenders"> Exclude service / OTP-like senders</label>
-      </div>
-      <div class="row2" style="margin-top:8px">
-        <div class="field"><label>Night from</label><input type="time" id="nightFrom" value="20:00" /></div>
-        <div class="field"><label>Night to</label><input type="time" id="nightTo" value="06:00" /></div>
+        <label class="check"><input type="checkbox" id="nightOnly"> Night</label>
+        <label class="check"><input type="checkbox" id="weekendOnly"> Weekend</label>
+        <label class="check"><input type="checkbox" id="excludeServiceSenders"> Exclude service senders</label>
       </div>
 
-      <h3>Location</h3>
-      <div class="field"><label>Cell ID</label><input id="cellId" placeholder="First / last cell ID" /></div>
-      <div class="field"><label>Tower address</label><input id="tower" placeholder="Address contains…" /></div>
-      <div class="row2">
-        <div class="field"><label>Main city</label><input id="city" /></div>
-        <div class="field"><label>Sub city</label><input id="subcity" /></div>
-      </div>
-      <div class="field"><label>Roaming</label><input id="roaming" placeholder="Kerala, Chennai…" /></div>
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:800">Advanced Filters</summary>
+        <div class="row2" style="margin-top:8px">
+          <div class="field"><label>Min duration (sec)</label><input type="number" min="0" id="durMin" /></div>
+          <div class="field"><label>Max duration (sec)</label><input type="number" min="0" id="durMax" /></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Night from</label><input type="time" id="nightFrom" value="20:00" /></div>
+          <div class="field"><label>Night to</label><input type="time" id="nightTo" value="06:00" /></div>
+        </div>
+        <h3>Location</h3>
+        <div class="field"><label>Cell ID</label><input id="cellId" placeholder="First / last cell ID" /></div>
+        <div class="field"><label>Tower address</label><input id="tower" placeholder="Address contains…" /></div>
+        <div class="row2">
+          <div class="field"><label>Main city</label><input id="city" /></div>
+          <div class="field"><label>Sub city</label><input id="subcity" /></div>
+        </div>
+        <div class="field"><label>Roaming</label><input id="roaming" /></div>
+        <h3>Network / source</h3>
+        <div class="row2">
+          <div class="field"><label>Provider</label><input id="provider" /></div>
+          <div class="field"><label>Operator</label><input id="operator" /></div>
+        </div>
+        <div class="field"><label>Source file</label><select id="sourceFile"><option value="">All files</option></select></div>
+      </details>
 
-      <h3>Device & network</h3>
-      <div class="field"><label>IMEI</label><input id="imei" /></div>
-      <div class="field"><label>IMSI</label><input id="imsi" /></div>
-      <div class="row2">
-        <div class="field"><label>Provider</label><input id="provider" /></div>
-        <div class="field"><label>Operator</label><input id="operator" /></div>
-      </div>
-      <div class="field"><label>CDR / A Party</label><select id="cdrNo"><option value="">All CDR numbers</option></select></div>
-      <div class="field"><label>Source file</label><select id="sourceFile"><option value="">All files</option></select></div>
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:800">Privacy & Local Data</summary>
+        <div class="privacy" style="margin-top:8px">CDR rows are processed in this browser. OpenStreetMap tiles are requested only when the map is used.
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="btn secondary small" id="privateSessionBtn">Private Session: Off</button><button class="btn secondary small" id="clearLocalDataBtn">Clear Local Case Data</button></div>
+          <div class="tiny" id="privacyModeStatus" style="margin-top:6px">Case metadata, names and tags may be remembered on this device.</div>
+        </div>
+      </details>
 
       <div class="filter-actions"><button class="btn" id="applyBtn">Apply</button><button class="btn secondary" id="resetBtn">Reset</button></div>
     </aside>
