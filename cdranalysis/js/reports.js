@@ -96,13 +96,13 @@
     extraReport+=`<h2>Analysis Settings</h2>${reportTable(['Setting','Value'],settings.map(x=>[escapeHtml(x.Setting),escapeHtml(x.Value)]))}<h2>Import Manifest</h2>${reportTable(['File / worksheet','SHA-256','Rows','Size','Imported','Timezone'],manifest.map(x=>[escapeHtml(x.File+' / '+x.Worksheet),escapeHtml(x['SHA-256']),fmtInt(x.Rows),fmtInt(x['File Size Bytes']),escapeHtml(x['Imported At']),escapeHtml(x['Source Timezone'])]))}`;
     if(relSnap)extraReport+=`<h2>Relationship Analysis</h2>${reportTable(['Metric','Value'],[['Pair',escapeHtml(relSnap.a+' ↔ '+relSnap.b)],['Interactions',fmtInt(relSnap.metrics.interactions)],['A → B',fmtInt(relSnap.metrics.aToB)],['B → A',fmtInt(relSnap.metrics.bToA)],['Total duration',fmtDur(relSnap.metrics.duration)],['Active days',fmtInt(relSnap.metrics.activeDays)],['Night events',fmtInt(relSnap.metrics.night)],['Common towers',fmtInt(relSnap.towers.length)],['Shared IMEI',fmtInt(relSnap.ids.imei.length)],['Shared IMSI',fmtInt(relSnap.ids.imsi.length)]])}`;
     extraReport+=`<h2>Night Stay Review</h2>${reportTable(['Night','Subject','Main recorded tower','Night events','Main share','First','Last'],night.slice(0,100).map(x=>[escapeHtml(x.Night),escapeHtml(x.Subject),escapeHtml(x['Main Recorded Tower']),fmtInt(x['Night Events']),x['Main Share %']+'%',escapeHtml(x['First Night Event']),escapeHtml(x['Last Night Event'])]))}<h2>Shared Location Review</h2>${reportTable(['Tower','Subjects','Events','First','Last'],shared.slice(0,100).map(x=>[escapeHtml((x['Cell ID']||'')+' • '+(x.Tower||'')),escapeHtml(x.Subjects),fmtInt(x.Events),escapeHtml(x.First),escapeHtml(x.Last)]))}<h2>Pattern Summary</h2>${reportTable(['Pattern','Key','Events','Detail'],pats.slice(0,120).map(x=>[escapeHtml(x.Pattern),escapeHtml(x.Key),fmtInt(x.Events),escapeHtml(x.Detail)]))}<h2>Network Summary</h2>${reportTable(['Subject','Contact','Events','Duration','First','Last'],net.slice(0,100).map(x=>[escapeHtml(x.Subject),escapeHtml(x.Contact),fmtInt(x.Events),fmtDur(x['Duration Seconds']),escapeHtml(x.First),escapeHtml(x.Last)]))}<h2>Audit Trail</h2>${reportTable(['Date/time','Action','Details'],auditRows().slice(-200).map(x=>[escapeHtml(x['Date/Time']),escapeHtml(x.Action),escapeHtml(x.Details)]))}`;
-    if($('reportSms')?.checked&&sms){
+    if(sms){
       const smsSummaryRows=[['Raw SMS candidates',fmtInt(sms.A?.rawCount??0)],['Unique SMS events',fmtInt(sms.A?.uniqueCount??0)],['Duplicate rows excluded',fmtInt(sms.A?.duplicateCount??0)],['Displayed review events',fmtInt(sms.filtered?.length??0)],['SMS bursts',fmtInt(sms.bursts?.length??0)],['Incident-near sender baselines',fmtInt(sms.baseline?.length??0)]];
       const senderRows=(sms.A?.brands||[]).slice(0,40).map(x=>[escapeHtml(x.label),escapeHtml(x.recognition||''),escapeHtml(x.classificationBasis||''),escapeHtml(x.category),fmtInt(x.count),escapeHtml([...x.subjects].join(', ')||'—'),dtFmt(x.first),dtFmt(x.last)]);
       const baselineRows=(sms.baseline||[]).slice(0,60).map(x=>[escapeHtml(x.label),escapeHtml(x.category),fmtInt(x.near),fmtInt(x.prior7),fmtInt(x.prior30),x.expected7.toFixed(2),x.ratio7==null?'—':x.ratio7.toFixed(1)+'×',escapeHtml(x.status)]);
       extraReport+=`<h2>SMS Intelligence</h2><div class="warn"><b>Metadata interpretation:</b> sender ID classification, timing proximity, bursts and baseline differences are review aids. They do not establish the SMS content or prove an underlying transaction, booking, payment, delivery, login or other action.</div>${reportTable(['Metric','Value'],smsSummaryRows)}<h3>Sender summary</h3>${reportTable(['Sender / brand','Recognition','Classification basis','Category','Unique events','Subjects','First','Last'],senderRows)}<h3>Incident baseline</h3>${reportTable(['Sender / brand','Category','Near incident','Prior 7 days','Prior 30 days','Expected from 7-day rate','Rate ratio','Status'],baselineRows)}`;
     }
-    if($('reportIncident').checked){
+    if(true){
       const inc=incidentDateTime();
       if(inc){
         const beforeH=+$('incidentBeforeHours').value||6,duringM=+$('incidentDuringMins').value||30,afterH=+$('incidentAfterHours').value||6;
@@ -111,20 +111,20 @@
         extraReport+=`<h2>Incident Timeline</h2>${reportTable(['Period','Date/time','Subject','Contact','Type','Duration','Tower'],ir.map(r=>[r.dt<d1?'Before':r.dt<=d2?'During':'After',dtFmt(r.dt),escapeHtml(r.cdrNo),escapeHtml(contactLabel(r.bparty)),escapeHtml(r.callType),fmtDur(r.duration),escapeHtml(r.firstAddress||r.firstCellId)]))}`;
       }
     }
-    if($('reportDays').checked){
+    if(true){
       const dm=new Map();for(const r of data){if(!r.dt)continue;const d=localDateKey(r.dt);let x=dm.get(d)||{date:d,first:null,last:null,events:0,contacts:new Set(),towers:new Set()};x.events++;if(r.bparty)x.contacts.add(r.bparty);if(r.firstCellId)x.towers.add(r.firstCellId);if(!x.first||r.dt<x.first)x.first=r.dt;if(!x.last||r.dt>x.last)x.last=r.dt;dm.set(d,x);}
       extraReport+=`<h2>Day Summary</h2>${reportTable(['Date','First','Last','Events','Contacts','Towers'],[...dm.values()].sort((a,b)=>a.date.localeCompare(b.date)).map(x=>[x.date,dtFmt(x.first),dtFmt(x.last),fmtInt(x.events),fmtInt(x.contacts.size),fmtInt(x.towers.size)]))}`;
     }
-    if($('reportChronology').checked){
+    if(true){
       const cr=[...state.chronology].sort((a,b)=>a.time-b.time);
       extraReport+=`<h2>Chronology</h2>${reportTable(['Date/time','Source','Event','Reference'],cr.map(x=>[dtFmt(new Date(x.time)),escapeHtml(x.source),escapeHtml(x.text),escapeHtml(x.reference||'')]))}`;
     }
-    if($('reportQuality').checked){
+    if(true){
       const seen=new Map();for(const r of state.records){const k=[r.cdrNo,r.bparty,r.dt?+r.dt:'',r.duration,r.callType,r.firstCellId].join('|');seen.set(k,(seen.get(k)||0)+1);}
       extraReport+=`<h2>Data Quality</h2>${reportTable(['Metric','Value'],[['Loaded records',fmtInt(state.records.length)],['Duplicate signatures',fmtInt([...seen.values()].filter(n=>n>1).length)],['Missing date/time',fmtInt(state.records.filter(r=>!r.dt).length)],['Missing subject',fmtInt(state.records.filter(r=>!r.cdrNo).length)],['Missing connected party',fmtInt(state.records.filter(r=>!r.bparty).length)],['Missing tower',fmtInt(state.records.filter(r=>!r.firstCellId&&!r.firstAddress).length)],['Missing coordinates',fmtInt(state.records.filter(r=>r.lat==null||r.lng==null).length)]])}<h3>Affected records</h3>${reportTable(['Issues','Subject','B Party','Raw date/time','Source'],qualityDetailRows().slice(0,300).map(x=>[escapeHtml(x.Issues),escapeHtml(x.Subject),escapeHtml(x['B Party']),escapeHtml(String(x['Raw Date']||'')+' '+String(x['Raw Time']||'')),escapeHtml(x['Source File']+' / '+x['Source Sheet']+' / row '+x['Source Row'])]))}`;
     }
     if(extraReport)html=html.replace('</body>',extraReport+'</body>');
-    const omit=[];if(!$('reportContacts').checked)omit.push('Top contacts');if(!$('reportTowers').checked)omit.push('Top towers');if(!$('reportDevices').checked)omit.push('Device / SIM usage');if(!$('reportMovement').checked)omit.push('Movement timeline');if(!$('reportCross').checked)omit.push('Cross-CDR same-cell overlaps');if(!$('reportLeads').checked)omit.push('Review leads');if(!$('reportFlags').checked)omit.push('Flagged records');if(!$('reportNotes').checked)omit.push('Case note');if(omit.length){const d=new DOMParser().parseFromString(html,'text/html');for(const title of omit){const h=[...d.querySelectorAll('h2')].find(x=>x.textContent.trim()===title);if(!h)continue;let n=h.nextSibling;while(n&&!(n.nodeType===1&&n.tagName==='H2')){const next=n.nextSibling;n.remove();n=next;}h.remove();}html='<!doctype html>'+d.documentElement.outerHTML;}download(`${safeName($('caseNo').value||$('caseTitle').value)}_cdr_case_report.html`,html,'text/html;charset=utf-8');}
+    download(`${safeName($('caseNo').value||$('caseTitle').value)}_cdr_case_report.html`,html,'text/html;charset=utf-8');}
 
 
     return {csvCell,download,exportCsv,exportWorkbook,reportTable,reportSection,exportCaseReport};
