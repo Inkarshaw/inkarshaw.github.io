@@ -2,7 +2,7 @@
   'use strict';
   window.CDRUIFactory = function(ctx){
     const {
-      $,state,updatePrivacyUi,showStatus,renderCaseSnapshots,saveCaseSnapshot,renderAll,installViewScopeToolbars,
+      $,state,showStatus,renderCaseSnapshots,saveCaseSnapshot,renderAll,installViewScopeToolbars,
       syncViewScopeControls,updateFilterCount,exportCaseReport,saveWorkspace,loadWorkspaceObject,
       clearLoaded,applyIncidentWindow,exportTacCache,importTacDatabase,exportCsv,safeName,
       exportWorkbook,download,switchTab,applyFilters,refreshSelectors,renderFileList,renderRecords,
@@ -41,10 +41,8 @@
 
 
 
-  $('privateSessionBtn').onclick=()=>{state.privateSession=!state.privateSession;updatePrivacyUi();showStatus(state.privateSession?'Private Session enabled. New local persistence is paused.':'Private Session disabled. Local persistence is enabled.','ok');};
-  $('clearLocalDataBtn').onclick=()=>{if(!confirm('Clear locally saved CDR Analyzer case metadata, contact names/tags and case snapshots from this browser? Loaded CDR rows in the current session will remain open.'))return;for(const k of Object.keys(localStorage)){if(k.startsWith('cdrAnalyzer:'))localStorage.removeItem(k);}state.contactTags={};state.contactNames={};state.globalContactTags={};state.globalContactNames={};state.smsSenderOverrides={};state.smsReviewSelected?.clear?.();state.auditTrail=[];['caseTitle','caseNo','station','analyst','incidentDate','incidentTime','generalNote'].forEach(id=>{if($(id))$(id).value='';});renderCaseSnapshots();renderAll();showStatus('Local case data cleared from this browser.','ok');};
   installViewScopeToolbars();syncViewScopeControls(true);
-    updatePrivacyUi();updateFilterCount();
+    updateFilterCount();
   $('printBtn').onclick=()=>window.print();$('reportBtn').onclick=exportCaseReport;$('saveWorkspaceBtn').onclick=()=>openCaseSaveDialog('workspace');$('loadWorkspaceBtn').onclick=()=>$('workspaceInput').click();$('clearFilesBtn').onclick=clearLoaded;$('importTacBtn').onclick=()=>$('tacInput').click();
   $('caseSaveCancelBtn').onclick=cancelCaseSaveDialog;
   $('caseSaveForm').addEventListener('submit',e=>{e.preventDefault();persistCaseMeta();closeCaseSaveDialog();if(caseSaveMode==='snapshot')saveCaseSnapshot?.();else saveWorkspace();});
