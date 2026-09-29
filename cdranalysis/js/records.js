@@ -77,7 +77,7 @@
       if(!rec)return;
       state.highlightRecordId=rec.id;
       state.exactIncidentRange=null;
-      if($('exactIncidentStatus'))$('exactIncidentStatus').textContent='Uses the incident date/time entered at the top.';
+      if($('exactIncidentStatus'))$('exactIncidentStatus').textContent='Uses the incident date/time saved with the case.';
       $('bparty').value=rec.bparty||'';
       $('timeFrom').value='';
       $('timeTo').value='';
