@@ -2,7 +2,7 @@
   'use strict';
   window.CDRRouterFactory = function(ctx){
     const {
-      $,applyFilters,renderDashboard,renderRecords,renderContacts,renderLocations,renderDevices,
+      $,applyFilters,renderDashboard,renderRecords,renderExcelView,renderContacts,renderLocations,renderDevices,
       renderSmsIntelligence,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,
       renderMovement,invalidateMovementMap,renderLeads,renderNetwork,renderCompare,
       renderChronology,renderFlags
@@ -11,6 +11,7 @@
     function renderView(id){
       if(id==='dashboard')renderDashboard();
       else if(id==='records')renderRecords();
+      else if(id==='excelview')renderExcelView();
       else if(id==='contacts')renderContacts();
       else if(id==='locations')renderLocations();
       else if(id==='devices')renderDevices();
