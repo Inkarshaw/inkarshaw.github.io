@@ -42,9 +42,47 @@
     function mapHeaders(headers){const byNorm={};headers.forEach(h=>byNorm[normalize(h)]=h);const map={};Object.entries(FIELDS).forEach(([k,aliases])=>{for(const a of aliases){if(byNorm[normalize(a)]!==undefined){map[k]=byNorm[normalize(a)];break;}}if(!map[k]){const candidates=headers.filter(h=>aliases.some(a=>normalize(h).includes(normalize(a))||normalize(a).includes(normalize(h))));if(candidates.length===1)map[k]=candidates[0];}});return map;}
     function parseLatLong(s,link){const text=String(s??'').trim(),url=String(link??'').trim();let lat=null,lng=null,az='';let m=text.match(/(?:lat(?:itude)?\s*[:=]?\s*)?(-?\d{1,2}(?:\.\d+)?)\s*[,;|\s]+\s*(?:lon(?:gitude)?\s*[:=]?\s*)?(-?\d{1,3}(?:\.\d+)?)(?:\s*[,;|\s]+\s*(?:az(?:imuth)?\s*[:=]?\s*)?(-?\d+(?:\.\d+)?))?/i);if(m){lat=+m[1];lng=+m[2];az=m[3]??'';}if(lat==null||lng==null){m=text.match(/^\s*(\d{1,2}(?:\.\d+)?)\s*-\s*(\d{2,3}(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?\s*$/);if(m){lat=+m[1];lng=+m[2];az=m[3]??'';}}if((lat==null||lng==null)&&url){m=url.match(/[?&](?:q|query|ll)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i)||url.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);if(m){lat=+m[1];lng=+m[2];}}if(!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180)return null;return {lat,lng,az};}
 
-    function inspectBuffer(buffer){const wb=XLSX.read(buffer,{type:'array',cellDates:true});return wb.SheetNames.map(name=>{const ws=wb.Sheets[name],ref=ws&&ws['!ref'];let rowCount=0;if(ref){const r=XLSX.utils.decode_range(ref);rowCount=r.e.r-r.s.r+1;}const preview=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false}).slice(0,8);return {name,rowCount,headers:preview[0]?Object.keys(preview[0]):[],preview};});}
-    function parseBufferSheets(buffer,sheetNames){const wb=XLSX.read(buffer,{type:'array',cellDates:true});return sheetNames.filter(n=>wb.Sheets[n]).map(sheetName=>({sheetName,rows:XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{defval:'',raw:false})}));}
-    function workerCall(file,action,sheetNames=[]){return new Promise(async(resolve,reject)=>{const buffer=await file.arrayBuffer();if(typeof Worker==='undefined'){try{return resolve(action==='inspect'?{sheets:inspectBuffer(buffer)}:{sheets:parseBufferSheets(buffer,sheetNames)});}catch(e){return reject(e);}}const worker=new Worker('/cdranalysis/cdr-parser-worker.js'),id=++parserWorkerSeq,cleanup=()=>{try{worker.terminate()}catch{}};worker.onmessage=e=>{const m=e.data||{};if(m.id!==id)return;cleanup();m.ok?resolve(m):reject(new Error(m.error||'Worker parsing failed'));};worker.onerror=()=>{cleanup();file.arrayBuffer().then(b=>resolve(action==='inspect'?{sheets:inspectBuffer(b)}:{sheets:parseBufferSheets(b,sheetNames)})).catch(reject);};worker.postMessage({id,buffer,name:file.name,action,sheetNames},[buffer]);});}
+    function detectHeaderRow(ws){
+      const ref=ws&&ws['!ref'];if(!ref)return 0;
+      const rr=XLSX.utils.decode_range(ref),endRow=Math.min(rr.e.r,rr.s.r+11);
+      const sample=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:false,range:{s:{r:rr.s.r,c:rr.s.c},e:{r:endRow,c:rr.e.c}}});
+      let bestRow=rr.s.r,bestScore=-1;
+      sample.forEach((row,i)=>{
+        const headers=(row||[]).map(v=>String(v??'').trim()).filter(Boolean),map=mapHeaders(headers);
+        const coreHits=['cdrNo','bparty','date','time','callType','firstCellId','imei','imsi'].filter(k=>map[k]).length;
+        const score=coreHits*10+Object.keys(map).length;
+        if(score>bestScore){bestScore=score;bestRow=rr.s.r+i;}
+      });
+      return bestScore>=20?bestRow:rr.s.r;
+    }
+    function inspectBuffer(buffer){
+      const wb=XLSX.read(buffer,{type:'array',cellDates:true});
+      return wb.SheetNames.map(name=>{
+        const ws=wb.Sheets[name],ref=ws&&ws['!ref'];let rowCount=0;
+        if(ref){const r=XLSX.utils.decode_range(ref);rowCount=r.e.r-r.s.r+1;}
+        const headerRow=detectHeaderRow(ws),preview=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,range:headerRow}).slice(0,8);
+        return {name,rowCount,headerRow,headers:preview[0]?Object.keys(preview[0]):[],preview};
+      });
+    }
+    function parseBufferSheets(buffer,sheetNames,headerRows={}){
+      const wb=XLSX.read(buffer,{type:'array',cellDates:true});
+      return sheetNames.filter(n=>wb.Sheets[n]).map(sheetName=>{
+        const ws=wb.Sheets[sheetName],headerRow=Number.isInteger(headerRows?.[sheetName])?headerRows[sheetName]:detectHeaderRow(ws);
+        return {sheetName,headerRow,rows:XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,range:headerRow})};
+      });
+    }
+    function workerCall(file,action,sheetNames=[],headerRows={}){
+      return new Promise(async(resolve,reject)=>{
+        const buffer=await file.arrayBuffer();
+        if(typeof Worker==='undefined'){
+          try{return resolve(action==='inspect'?{sheets:inspectBuffer(buffer)}:{sheets:parseBufferSheets(buffer,sheetNames,headerRows)});}catch(e){return reject(e);}
+        }
+        const worker=new Worker('/cdranalysis/cdr-parser-worker.js'),id=++parserWorkerSeq,cleanup=()=>{try{worker.terminate()}catch{}};
+        worker.onmessage=e=>{const m=e.data||{};if(m.id!==id)return;cleanup();m.ok?resolve(m):reject(new Error(m.error||'Worker parsing failed'));};
+        worker.onerror=()=>{cleanup();file.arrayBuffer().then(b=>resolve(action==='inspect'?{sheets:inspectBuffer(b)}:{sheets:parseBufferSheets(b,sheetNames,headerRows)})).catch(reject);};
+        worker.postMessage({id,buffer,name:file.name,action,sheetNames,headerRows},[buffer]);
+      });
+    }
 
     async function hashFile(file){try{if(!crypto?.subtle)return 'Unavailable';const buf=await file.arrayBuffer(),hash=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');}catch{return 'Unavailable';}}
     function mappingSignature(headers){let h=2166136261;for(const c of headers.map(normalize).sort().join('|')){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return (h>>>0).toString(16);}
@@ -53,9 +91,23 @@
 
     function likelySheet(sheet){
       const map=savedMapping(sheet.headers)||mapHeaders(sheet.headers),hits=['cdrNo','bparty','date','time','callType'].filter(k=>map[k]).length;
-      return sheet.name.toLowerCase()==='mapping'||hits>=2;
+      return hits>=2;
     }
-    function chooseInitialSheets(sheets){let chosen=sheets.filter(likelySheet).map(x=>x.name);if(!chosen.length&&sheets.length)chosen=[...sheets].sort((a,b)=>b.rowCount-a.rowCount)[0].name;return chosen;}
+    function isDerivedReportSheet(name){
+      const n=normalize(name);
+      return /^(summary|maxcalls|maxduration|maxstay|otherstatecontactsummary|roamingperiod|imeiperiod|imsiperiod|nightmapping|nightmaxstay|daymapping|daymaxstay|workhomelocation|homelocationbasedondayfirstand|isdcalls)$/.test(n);
+    }
+    function chooseInitialSheets(sheets){
+      const exactMapping=sheets.find(x=>normalize(x.name)==='mapping'&&likelySheet(x));
+      if(exactMapping)return [exactMapping.name];
+      let chosen=sheets.filter(x=>likelySheet(x)&&!isDerivedReportSheet(x.name)).map(x=>x.name);
+      if(!chosen.length){
+        const candidates=sheets.filter(x=>likelySheet(x));
+        if(candidates.length)chosen=[...candidates].sort((a,b)=>b.rowCount-a.rowCount)[0].name;
+      }
+      if(!chosen.length&&sheets.length)chosen=[...sheets].sort((a,b)=>b.rowCount-a.rowCount)[0].name;
+      return chosen;
+    }
 
 
     async function inspectNext(){
@@ -77,7 +129,8 @@
       for(const name of selected){const sheet=p.sheets.find(x=>x.name===name);p.mappings[name]=p.mappings[name]||savedMapping(sheet?.headers||[])||mapHeaders(sheet?.headers||[]);if(sheet)saveMapping(sheet.headers,p.mappings[name]);}
       showStatus('Importing '+selected.length+' worksheet(s) from '+p.file.name+'…','');
       try{
-        const parsed=await workerCall(p.file,'parse',selected),timezone=$('sourceTimezone')?.value||state.sourceTimezone||'Asia/Kolkata';state.sourceTimezone=timezone;
+        const headerRows=Object.fromEntries((p.sheets||[]).map(x=>[x.name,Number.isInteger(x.headerRow)?x.headerRow:0]));
+        const parsed=await workerCall(p.file,'parse',selected,headerRows),timezone=$('sourceTimezone')?.value||state.sourceTimezone||'Asia/Kolkata';state.sourceTimezone=timezone;
         for(const sh of parsed.sheets||[]){
           const rows=sh.rows||[],map=p.mappings[sh.sheetName]||{};if(!rows.length)continue;
           if(!map.bparty&&!map.cdrNo&&!map.date)throw new Error('No standard CDR columns mapped for '+sh.sheetName);
@@ -88,7 +141,7 @@
             rec.cdrKey=phoneKey(rec.cdrNo);rec.bpartyKey=phoneKey(rec.bparty);rec.search=normalize([rec.cdrNo,rec.bparty,rec.callType,rec.firstCellId,rec.firstAddress,rec.lastCellId,rec.lastAddress,rec.imei,rec.imsi,rec.manufacturer,rec.model,rec.deviceType,rec.os,rec.roaming,rec.provider,rec.mainCity,rec.subCity,rec.operator,rec.sourceFile].join(' | '));state.records.push(rec);added++;
           });
           const info=p.sheets.find(x=>x.name===sh.sheetName)||{};
-          state.files.push({id:fileId,name:p.file.name,sheet:sh.sheetName,rows:added,map,headers:info.headers||[],inferredCdr,sha256:p.sha256,size:p.file.size,lastModified:p.file.lastModified?new Date(p.file.lastModified).toISOString():'',importedAt:new Date().toISOString(),sourceTimezone:timezone});
+          state.files.push({id:fileId,name:p.file.name,sheet:sh.sheetName,rows:added,map,headers:info.headers||[],headerRow:Number.isInteger(info.headerRow)?info.headerRow:0,inferredCdr,sha256:p.sha256,size:p.file.size,lastModified:p.file.lastModified?new Date(p.file.lastModified).toISOString():'',importedAt:new Date().toISOString(),sourceTimezone:timezone});
           audit('CDR worksheet imported',p.file.name+' / '+sh.sheetName+' • '+added+' rows • SHA-256 '+p.sha256);
         }
         state.pendingImport=null;rebuildIndexes();refreshSelectors();renderFileList();restorePendingWorkspace();applyFilters();showStatus('Loaded '+fmtInt(state.records.length)+' raw records from '+state.files.length+' worksheet import(s).','ok');inspectNext();
@@ -98,8 +151,8 @@
     function cancelImport(){if(state.pendingImport)audit('CDR import cancelled',state.pendingImport.file?.name||'');state.pendingImport=null;inspectNext();}
     function loadFiles(files){if(!files?.length)return;importQueue.push(...files);inspectNext();}
     function detectSheet(wb){if(wb.Sheets.Mapping)return 'Mapping';let best=wb.SheetNames[0],max=0;wb.SheetNames.forEach(n=>{const ref=wb.Sheets[n]?.['!ref'];if(ref){const r=XLSX.utils.decode_range(ref),rows=r.e.r-r.s.r+1;if(rows>max){max=rows;best=n;}}});return best;}
-    function parseFileOnMain(buffer){const sheets=inspectBuffer(buffer),name=chooseInitialSheets(sheets)[0]||sheets[0]?.name;return {sheetName:name,rows:parseBufferSheets(buffer,[name])[0]?.rows||[]};}
-    async function parseFileInWorker(file){const ins=await workerCall(file,'inspect'),name=chooseInitialSheets(ins.sheets||[])[0];const p=await workerCall(file,'parse',[name]);return {sheetName:name,rows:p.sheets?.[0]?.rows||[]};}
+    function parseFileOnMain(buffer){const sheets=inspectBuffer(buffer),name=chooseInitialSheets(sheets)[0]||sheets[0]?.name,headerRows=Object.fromEntries(sheets.map(x=>[x.name,x.headerRow||0]));return {sheetName:name,rows:parseBufferSheets(buffer,[name],headerRows)[0]?.rows||[]};}
+    async function parseFileInWorker(file){const ins=await workerCall(file,'inspect'),name=chooseInitialSheets(ins.sheets||[])[0],headerRows=Object.fromEntries((ins.sheets||[]).map(x=>[x.name,x.headerRow||0]));const p=await workerCall(file,'parse',[name],headerRows);return {sheetName:name,rows:p.sheets?.[0]?.rows||[]};}
 
     function bind(){
       $('chooseBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
