@@ -29,15 +29,26 @@
         <input type="file" id="workspaceInput" accept=".json,application/json" hidden />
       </div>
     </div>
-    <div class="casebar">
-      <input id="caseTitle" placeholder="Case title / subject" />
-      <input id="caseNo" placeholder="Crime / CSR / Case No." />
-      <input id="station" placeholder="Police station / unit" />
-      <input id="analyst" placeholder="Investigating officer / analyst" />
-      <input type="date" id="incidentDate" title="Incident date" />
-      <input type="time" id="incidentTime" title="Incident time" />
-    </div>
   </header>
+
+  <dialog id="caseSaveDialog" class="case-save-dialog">
+    <form id="caseSaveForm">
+      <div class="panel-title"><h2 id="caseSaveDialogTitle">Save Case</h2><span class="muted">Case details are requested only when saving.</span></div>
+      <div class="case-save-grid">
+        <div class="field"><label>Case title / subject</label><input id="caseTitle" placeholder="Case title / subject" /></div>
+        <div class="field"><label>Crime / CSR / Case No.</label><input id="caseNo" placeholder="Crime / CSR / Case No." /></div>
+        <div class="field"><label>Police station / unit</label><input id="station" placeholder="Police station / unit" /></div>
+        <div class="field"><label>Investigating officer / analyst</label><input id="analyst" placeholder="Name / rank" /></div>
+        <div class="field"><label>Incident date</label><input type="date" id="incidentDate" /></div>
+        <div class="field"><label>Incident time</label><input type="time" id="incidentTime" /></div>
+      </div>
+      <div class="tiny" style="margin-top:8px">These details are used for the saved workspace, case reports and case snapshots. Source CDR files are not embedded in a saved workspace.</div>
+      <div class="subtoolbar" style="justify-content:flex-end;margin-top:14px">
+        <button type="button" class="btn secondary" id="caseSaveCancelBtn">Cancel</button>
+        <button type="submit" class="btn" id="caseSaveConfirmBtn">Save Case Workspace</button>
+      </div>
+    </form>
+  </dialog>
   
   <div class="layout">
     <aside class="sidebar no-print" id="filterSidebar" aria-label="CDR filters" aria-hidden="false">
@@ -63,7 +74,7 @@
       <div class="incident-focus" style="margin-top:12px">
         <div class="field"><label>Incident focus ± hours</label><input id="incidentWindowHours" type="number" min="1" max="168" value="6" /></div>
         <button class="btn secondary small" id="focusIncidentBtn">Apply Incident Window</button>
-        <div class="tiny" id="exactIncidentStatus" style="margin-top:6px">Uses the incident date/time entered at the top.</div>
+        <div class="tiny" id="exactIncidentStatus" style="margin-top:6px">Uses the incident date/time saved with the case.</div>
       </div>
 
       <h3>Quick filters</h3>
