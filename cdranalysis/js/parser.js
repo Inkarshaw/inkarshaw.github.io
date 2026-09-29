@@ -57,27 +57,6 @@
     }
     function chooseInitialSheets(sheets){let chosen=sheets.filter(likelySheet).map(x=>x.name);if(!chosen.length&&sheets.length)chosen=[...sheets].sort((a,b)=>b.rowCount-a.rowCount)[0].name;return chosen;}
 
-    function currentMapping(sheetName){
-      const p=state.pendingImport,sheet=p?.sheets.find(x=>x.name===sheetName);if(!sheet)return {};
-      const base={...(p.mappings[sheetName]||savedMapping(sheet.headers)||mapHeaders(sheet.headers))};
-      document.querySelectorAll('.import-map-select[data-sheet="'+CSS.escape(sheetName)+'"]').forEach(el=>{if(el.value)base[el.dataset.field]=el.value;else delete base[el.dataset.field];});
-      return base;
-    }
-
-    function renderImportReview(){
-      const p=state.pendingImport,panel=$('importReviewPanel');if(!p||!panel){if(panel)panel.style.display='none';return;}
-      panel.style.display='block';$('importReviewFileName').textContent=p.file.name+' • '+(p.sha256==='Unavailable'?'hash unavailable':p.sha256.slice(0,12)+'…');
-      $('importSheetChoices').innerHTML=p.sheets.map(s=>`<label class="check"><input type="checkbox" class="import-sheet-check" data-sheet="${String(s.name).replace(/"/g,'&quot;')}" ${p.selected.has(s.name)?'checked':''}> ${String(s.name).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))} <span class="tiny">(${fmtInt(s.rowCount)} rows)</span></label>`).join('');
-      const selected=p.sheets.filter(s=>p.selected.has(s.name));
-      $('importMappingControls').innerHTML=selected.map(sheet=>{
-        const map=p.mappings[sheet.name]||savedMapping(sheet.headers)||mapHeaders(sheet.headers);p.mappings[sheet.name]=map;
-        const important=Object.keys(FIELDS);
-        const opts=(val)=>'<option value="">— Not mapped —</option>'+sheet.headers.map(x=>'<option value="'+String(x).replace(/"/g,'&quot;')+'" '+(x===val?'selected':'')+'>'+String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</option>').join('');
-        return '<details '+(selected.length===1?'open':'')+'><summary><b>'+sheet.name+'</b> • verify column mapping</summary><div class="checks" style="grid-template-columns:repeat(2,minmax(160px,1fr));margin:8px 0">'+important.map(k=>'<label class="field"><span>'+k+'</span><select class="import-map-select" data-sheet="'+sheet.name.replace(/"/g,'&quot;')+'" data-field="'+k+'">'+opts(map[k]||'')+'</select></label>').join('')+'</div></details>';
-      }).join('');
-      const first=selected[0];if(!first){$('importPreviewTable').innerHTML='<tbody><tr><td class="empty">Select at least one worksheet.</td></tr></tbody>';return;}
-      const headers=first.headers.slice(0,12);$('importPreviewTable').innerHTML='<thead><tr>'+headers.map(x=>'<th>'+String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</th>').join('')+'</tr></thead><tbody>'+first.preview.slice(0,5).map(r=>'<tr>'+headers.map(x=>'<td>'+String(r[x]??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</td>').join('')+'</tr>').join('')+'</tbody>';
-    }
 
     async function inspectNext(){
       if(state.pendingImport||!importQueue.length)return;
@@ -127,6 +106,6 @@
       const dz=$('dropZone');['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
     }
 
-    return {parseDuration,inferCdrFromFilename,parseDateTime,parseTime,timeMins,mapHeaders,parseLatLong,detectSheet,parseFileOnMain,parseFileInWorker,hashFile,loadFiles,confirmImport,cancelImport,renderImportReview,bind};
+    return {parseDuration,inferCdrFromFilename,parseDateTime,parseTime,timeMins,mapHeaders,parseLatLong,detectSheet,parseFileOnMain,parseFileInWorker,hashFile,loadFiles,confirmImport,cancelImport,bind};
   };
 })();
