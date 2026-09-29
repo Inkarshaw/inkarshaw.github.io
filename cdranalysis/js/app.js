@@ -5,7 +5,7 @@
     haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,uniq,fillSelect,
     sortData,typePill,safeName,duplicateSignature,uniqueRecords,analysisRecords,rebuildIndexes,getIndex,audit,dateFromSourceParts
   }=window.CDRCore;
-  let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null, routerModule=null, uiModule=null;
+  let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, excelViewModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null, routerModule=null, uiModule=null;
   function contactName(num){return identityModule?.contactName(num)||'';}
   function contactTag(num){return identityModule?.contactTag(num)||'';}
   function contactLabel(num){return identityModule?.contactLabel(num)||String(num??'');}
@@ -63,6 +63,7 @@
 
   function jumpToRecord(rec){return recordsModule?.jumpToRecord(rec);}
   function renderRecords(){return recordsModule?.render();}
+  function renderExcelView(){return excelViewModule?.render();}
   function renderContacts(){return contactsModule?.render();}
   function selectRequestContacts(){return contactsModule?.selectRequestContacts();}
   function openCdrRequestGenerator(){return contactsModule?.openCdrRequestGenerator();}
@@ -137,6 +138,11 @@
   })||null;
   recordsModule?.bind();
 
+  excelViewModule=window.CDRExcelViewFactory?.({
+    $,state,escapeHtml,escAttr,fmtInt,phoneKey,showStatus
+  })||null;
+  excelViewModule?.bind();
+
   contactsModule=window.CDRContactsFactory?.({
     $,state,aggregateContacts,aggregateLocations,identityStore,defaultCdrRequestDates,updateCdrRequestCount,requestIdentifier,
     escAttr,escapeHtml,contactTitle,contactLabel,contactTag,contactName,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable,
@@ -188,7 +194,7 @@
   })||null;
   caseModule?.bind();
   routerModule=window.CDRRouterFactory?.({
-    $,applyFilters,renderDashboard,renderRecords,renderContacts,renderLocations,renderDevices,
+    $,applyFilters,renderDashboard,renderRecords,renderExcelView,renderContacts,renderLocations,renderDevices,
     renderSmsIntelligence,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,
     renderMovement,invalidateMovementMap:()=>movementModule?.invalidateMap(),renderLeads,
     renderNetwork,renderCompare,renderChronology,renderFlags
@@ -215,7 +221,7 @@
     contactLabel,
     analysisRecords,getIndex,audit,
     senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,
-    applyFilters,smsAnalysisSnapshot,movementRows,exportWorkbook,renderChronology,
+    applyFilters,smsAnalysisSnapshot,movementRows,exportWorkbook,renderChronology,renderExcelView,
     switchTab,
     openPairRecords:(subject,other)=>{if($('cdrNo'))$('cdrNo').value=subject||'';if($('bparty'))$('bparty').value=other||'';applyFilters();switchTab('records');},
     refresh:()=>{refreshSelectors();applyFilters();}
