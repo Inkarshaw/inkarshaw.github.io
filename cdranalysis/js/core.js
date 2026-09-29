@@ -61,7 +61,21 @@
 
   function escAttr(s){return escapeHtml(s).replace(/'/g,'&#39;');}
   function showStatus(msg,type){const el=$('loadStatus');el.textContent=msg;el.className='status show'+(type?` ${type}`:'');}
-  function renderFileList(){$('fileList').innerHTML=state.files.map(f=>`<div class="file-item"><b title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</b><span>${f.inferredCdr?escapeHtml(f.inferredCdr)+' • ':''}${escapeHtml(f.sheet)} • ${fmtInt(f.rows)} rows <button class="file-remove" data-remove-file="${f.id}" title="Remove worksheet import">×</button></span><span class="tiny" title="${escapeHtml(f.sha256||'')}">${f.sha256?'SHA-256 '+escapeHtml(f.sha256.slice(0,12))+'… • ':''}${escapeHtml(f.sourceTimezone||'')}${f.size?' • '+fmtInt(f.size)+' bytes':''}</span></div>`).join('');}
+  function renderImportHealth(){
+    const el=$('importHealthStatus');if(!el)return;
+    const rows=state.records,total=rows.length;
+    if(!total){el.innerHTML='No CDR rows loaded.';return;}
+    const coverage=(label,test)=>{const n=rows.reduce((s,r)=>s+(test(r)?1:0),0),pct=Math.round(n*100/total),cls=pct>=95?'goodtext':pct>=60?'warntext':'badtext';return '<span class="metric-chip '+cls+'">'+label+' '+pct+'%</span>';};
+    const dup=Math.max(0,total-uniqueRecords(rows).length);
+    el.innerHTML='<div style="margin-bottom:4px"><b>Import health:</b> '+fmtInt(total)+' rows'+(dup?' • '+fmtInt(dup)+' duplicate candidate row(s)':'')+'</div><div class="metric-row">'+[
+      coverage('A Party',r=>!!r.cdrNo),coverage('B Party',r=>!!r.bparty),coverage('Date/Time',r=>!!r.dt),
+      coverage('Tower',r=>!!(r.firstCellId||r.firstAddress)),coverage('IMEI',r=>!!r.imei),coverage('IMSI',r=>!!r.imsi)
+    ].join('')+'</div>';
+  }
+  function renderFileList(){
+    $('fileList').innerHTML=state.files.map(f=>`<div class="file-item"><b title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</b><span>${f.inferredCdr?escapeHtml(f.inferredCdr)+' • ':''}${escapeHtml(f.sheet)} • ${fmtInt(f.rows)} rows <button class="file-remove" data-remove-file="${f.id}" title="Remove worksheet import">×</button></span><span class="tiny" title="${escapeHtml(f.sha256||'')}">${f.sha256?'SHA-256 '+escapeHtml(f.sha256.slice(0,12))+'… • ':''}${escapeHtml(f.sourceTimezone||'')}${f.size?' • '+fmtInt(f.size)+' bytes':''}</span></div>`).join('');
+    renderImportHealth();
+  }
   function uniq(key){return [...new Set(state.records.map(r=>r[key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));}
   function fillSelect(id,items,label){const el=$(id),cur=el.value;el.innerHTML=`<option value="">${label}</option>`+items.map(x=>`<option>${escapeHtml(x)}</option>`).join('');if(items.includes(cur))el.value=cur;}
   function sortData(arr){const {key,dir}=state.sort;const mul=dir==='asc'?1:-1;return [...arr].sort((a,b)=>{let x=a[key],y=b[key];if(key==='dt'){x=x?.getTime?.()||0;y=y?.getTime?.()||0;}else if(key==='duration'){x=+x||0;y=+y||0;}else{x=String(x??'').toLowerCase();y=String(y??'').toLowerCase();}return x<y?-mul:x>y?mul:0;});}
@@ -71,7 +85,7 @@
 
   window.CDRCore={
     $,state,FIELDS,normalize,escapeHtml,fmtInt,fmtDur,dateFmt,dtFmt,val,stableKey,localDateKey,
-    haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,uniq,fillSelect,
+    haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,renderImportHealth,uniq,fillSelect,
     sortData,typePill,safeName,duplicateSignature,uniqueRecords,analysisRecords,rebuildIndexes,getIndex,audit,sourceDateParts,sourceMinutes,sourceHour,sourceWeekday,sourceTimezoneOffsetMinutes,dateFromSourceParts
   };
 })();
