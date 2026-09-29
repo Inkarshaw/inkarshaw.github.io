@@ -2,7 +2,7 @@
   'use strict';
   window.CDRUIFactory = function(ctx){
     const {
-      $,state,updatePrivacyUi,showStatus,renderCaseSnapshots,renderAll,installViewScopeToolbars,
+      $,state,updatePrivacyUi,showStatus,renderCaseSnapshots,saveCaseSnapshot,renderAll,installViewScopeToolbars,
       syncViewScopeControls,updateFilterCount,exportCaseReport,saveWorkspace,loadWorkspaceObject,
       clearLoaded,applyIncidentWindow,exportTacCache,importTacDatabase,exportCsv,safeName,
       exportWorkbook,download,switchTab,applyFilters,refreshSelectors,renderFileList,renderRecords,
@@ -11,6 +11,25 @@
       selectRequestContacts,renderContacts,openCdrRequestGenerator,updateCdrRequestCount,
       identityStore,renderNetwork,seedBuiltinTacMappings,audit
     }=ctx;
+
+    let caseSaveMode='workspace';
+    function openCaseSaveDialog(mode='workspace'){
+      caseSaveMode=mode==='snapshot'?'snapshot':'workspace';
+      const dlg=$('caseSaveDialog');if(!dlg)return;
+      if($('caseSaveDialogTitle'))$('caseSaveDialogTitle').textContent=caseSaveMode==='snapshot'?'Save Case Snapshot':'Save Case Workspace';
+      if($('caseSaveConfirmBtn'))$('caseSaveConfirmBtn').textContent=caseSaveMode==='snapshot'?'Save Snapshot':'Save Case Workspace';
+      if(typeof dlg.showModal==='function'){if(!dlg.open)dlg.showModal();}else dlg.setAttribute('open','');
+      setTimeout(()=>$('caseTitle')?.focus(),0);
+    }
+    function closeCaseSaveDialog(){
+      const dlg=$('caseSaveDialog');if(!dlg)return;
+      if(typeof dlg.close==='function'&&dlg.open)dlg.close();else dlg.removeAttribute('open');
+    }
+    function persistCaseMeta(){
+      ['caseTitle','caseNo','station','analyst','incidentDate','incidentTime'].forEach(id=>{
+        const el=$(id);if(el)persistLocal('cdrAnalyzer:'+id,el.value||'');
+      });
+    }
 
     function bind(){
   $('exportDirectoryBtn').onclick=()=>download('cdr_contact_directory.json',JSON.stringify({version:2,exportedAt:new Date().toISOString(),contactTags:state.globalContactTags,contactNames:state.globalContactNames},null,2),'application/json');
@@ -23,7 +42,9 @@
   $('clearLocalDataBtn').onclick=()=>{if(!confirm('Clear locally saved CDR Analyzer case metadata, contact names/tags and case snapshots from this browser? Loaded CDR rows in the current session will remain open.'))return;for(const k of Object.keys(localStorage)){if(k.startsWith('cdrAnalyzer:'))localStorage.removeItem(k);}state.contactTags={};state.contactNames={};state.globalContactTags={};state.globalContactNames={};state.smsSenderOverrides={};state.smsReviewSelected?.clear?.();state.auditTrail=[];['caseTitle','caseNo','station','analyst','incidentDate','incidentTime','generalNote'].forEach(id=>{if($(id))$(id).value='';});renderCaseSnapshots();renderAll();showStatus('Local case data cleared from this browser.','ok');};
   installViewScopeToolbars();syncViewScopeControls(true);
     updatePrivacyUi();updateFilterCount();
-  $('printBtn').onclick=()=>window.print();$('reportBtn').onclick=exportCaseReport;$('saveWorkspaceBtn').onclick=saveWorkspace;$('loadWorkspaceBtn').onclick=()=>$('workspaceInput').click();$('clearFilesBtn').onclick=clearLoaded;$('focusIncidentBtn').onclick=applyIncidentWindow;$('importTacBtn').onclick=()=>$('tacInput').click();
+  $('printBtn').onclick=()=>window.print();$('reportBtn').onclick=exportCaseReport;$('saveWorkspaceBtn').onclick=()=>openCaseSaveDialog('workspace');$('loadWorkspaceBtn').onclick=()=>$('workspaceInput').click();$('clearFilesBtn').onclick=clearLoaded;$('focusIncidentBtn').onclick=applyIncidentWindow;$('importTacBtn').onclick=()=>$('tacInput').click();
+  $('caseSaveCancelBtn').onclick=closeCaseSaveDialog;
+  $('caseSaveForm').addEventListener('submit',e=>{e.preventDefault();persistCaseMeta();closeCaseSaveDialog();if(caseSaveMode==='snapshot')saveCaseSnapshot?.();else saveWorkspace();});
   $('exportTacBtn').onclick=exportTacCache;
   $('tacInput').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{await importTacDatabase(f);}catch(err){showStatus('TAC import failed: '+err.message,'error');}e.target.value='';});
   $('exportBtn').onclick=()=>exportCsv(state.filtered,`${safeName($('caseNo').value||$('caseTitle').value)}_filtered_cdr.csv`);$('exportFlagsBtn').onclick=()=>exportCsv(state.records.filter(r=>state.flags.has(r.id)),`${safeName($('caseNo').value||$('caseTitle').value)}_flagged_cdr.csv`);$('exportXlsxBtn').onclick=exportWorkbook;
@@ -64,6 +85,6 @@
 
     }
 
-    return {bind};
+    return {bind,openCaseSaveDialog};
   };
 })();
