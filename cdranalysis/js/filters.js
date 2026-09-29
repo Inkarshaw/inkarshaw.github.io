@@ -97,7 +97,7 @@
     });
     state.page=1;updateFilterCount();syncViewScopeControls(false);if($('analysisIntegrityStatus'))$('analysisIntegrityStatus').textContent=(state.analysisMode==='unique'?'Duplicate candidates excluded from analysis':'Raw records used for analysis')+' • '+fmtInt(state.filtered.length)+' filtered / '+fmtInt(base.length)+' analysis rows / '+fmtInt(state.records.length)+' raw rows.';renderAll();window.dispatchEvent(new Event('cdr:updated'));
   }
-  function resetFilters(){state.exactIncidentRange=null;if($('exactIncidentStatus'))$('exactIncidentStatus').textContent='Uses the incident date/time entered at the top.';['q','dateFrom','dateTo','timeFrom','timeTo','bparty','durMin','durMax','cellId','tower','city','subcity','roaming','imei','imsi','provider','operator'].forEach(id=>$(id).value='');['callType','cdrNo','sourceFile'].forEach(id=>$(id).selectedIndex=0);['callsOnly','smsOnly','nightOnly','weekendOnly','excludeServiceSenders'].forEach(id=>$(id).checked=false);$('nightFrom').value='20:00';$('nightTo').value='06:00';applyFilters();}
+  function resetFilters(){state.exactIncidentRange=null;if($('exactIncidentStatus'))$('exactIncidentStatus').textContent='Uses the incident date/time saved with the case.';['q','dateFrom','dateTo','timeFrom','timeTo','bparty','durMin','durMax','cellId','tower','city','subcity','roaming','imei','imsi','provider','operator'].forEach(id=>$(id).value='');['callType','cdrNo','sourceFile'].forEach(id=>$(id).selectedIndex=0);['callsOnly','smsOnly','nightOnly','weekendOnly','excludeServiceSenders'].forEach(id=>$(id).checked=false);$('nightFrom').value='20:00';$('nightTo').value='06:00';applyFilters();}
 
 
 
