@@ -77,7 +77,7 @@
 
 
     function bind(){
-      $('saveCaseSnapshotBtn').onclick=saveCaseSnapshot;
+      $('saveCaseSnapshotBtn').onclick=()=>{if(window.CDRApp?.openCaseSaveDialog)window.CDRApp.openCaseSaveDialog('snapshot');else saveCaseSnapshot();};
     }
 
     return {
