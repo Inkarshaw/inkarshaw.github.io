@@ -39,10 +39,8 @@
     }
 
     function actionsCell(r){
-      const added=state.chronology.some(x=>x.recordId===r.id);
       return `<div class="record-actions">
         <button class="btn secondary small flag-btn" data-id="${escAttr(r.id)}" title="Flag / unflag">${state.flags.has(r.id)?'★':'☆'}</button>
-        <button class="btn secondary small add-chronology" data-id="${escAttr(r.id)}" title="Add to case timeline">${added?'✓ Timeline':'+ Timeline'}</button>
         <button class="btn secondary small relationship-open" type="button" data-subject="${escAttr(r.cdrNo)}" data-num="${escAttr(r.bparty)}" title="Analyse A Party and B Party">↔</button>
       </div>`;
     }
