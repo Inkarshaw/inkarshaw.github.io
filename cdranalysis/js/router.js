@@ -20,9 +20,11 @@
       else if(id==='patterns'){renderDaySummary();renderPatterns();}
       else if(id==='quality')renderDataQuality();
       else if(id==='movement'){requestAnimationFrame(()=>renderMovement());setTimeout(()=>invalidateMovementMap?.(),300);}
-      else if(id==='network')requestAnimationFrame(renderNetwork);
-      else if(id==='compare')renderCompare();
-      else if(id==='relationship')window.CDRRelationship?.render?.();
+      else if(id==='multinumber'){
+        renderCompare();
+        requestAnimationFrame(renderNetwork);
+        window.CDRRelationship?.render?.();
+      }
       else if(id==='casereview'){renderChronology();renderFlags();}
     }
 
