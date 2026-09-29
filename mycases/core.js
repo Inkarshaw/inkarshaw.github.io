@@ -19,7 +19,7 @@
     'id','policeStation','caseType','crimeNo','crimeYear','dateOccurrence','dateRegistration',
     'sceneOfCrime','sections','complainant','accused','ioName','priority','court','courtCaseNo',
     'stage','nextHearing','nextAction','notes','createdAt','updatedAt','accusedPersons',
-    'investigationChecklist','tasks','hearings','timeline','attachments','courtComplex',
+    'investigationChecklist','tasks','hearings','timeline','attachments','propertyItems','courtComplex',
     'courtCaseType','accusedPresentDetails','nbwStatus','fsStatus','finalResult'
   ];
 
@@ -59,6 +59,10 @@
     if(Array.isArray(out.attachments)){
       out.attachments=out.attachments.map(a=>({...a,data:localFiles.get(String(a.id||''))?.data||a.data||''}));
     }
+    const localProperties=new Map((Array.isArray(local.propertyItems)?local.propertyItems:[]).map(x=>[String(x.id||''),x]));
+    if(Array.isArray(out.propertyItems)){
+      out.propertyItems=out.propertyItems.map(p=>({...p,photo:localProperties.get(String(p.id||''))?.photo||p.photo||''}));
+    }
     return out;
   }
   function compactCase(item){
@@ -66,6 +70,7 @@
     delete safe.accusedPhoto;
     if(Array.isArray(safe.accusedPersons))safe.accusedPersons.forEach(p=>delete p.photo);
     if(Array.isArray(safe.attachments))safe.attachments.forEach(a=>delete a.data);
+    if(Array.isArray(safe.propertyItems))safe.propertyItems.forEach(p=>delete p.photo);
     return safe;
   }
   function normalizeCase(item){
@@ -73,7 +78,7 @@
     c.id=String(c.id||uid());
     c.createdAt=c.createdAt||now();
     c.updatedAt=c.updatedAt||c.createdAt;
-    ['accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments'].forEach(k=>{
+    ['accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments','propertyItems'].forEach(k=>{
       if(!Array.isArray(c[k]))c[k]=[];
     });
     if(!c.priority)c.priority='Medium';
