@@ -35,12 +35,16 @@
   }
   function caseKey(id){return CASE_PREFIX+String(id)}
   function readIndex(){
-    const v=parse(localStorage.getItem(INDEX_KEY)||'[]',[]);
-    return Array.isArray(v)?v.filter(Boolean).map(String):[];
+    let local=[],session=[];
+    try{const v=parse(localStorage.getItem(INDEX_KEY)||'[]',[]);local=Array.isArray(v)?v:[]}catch(e){}
+    try{const v=parse(sessionStorage.getItem(INDEX_KEY)||'[]',[]);session=Array.isArray(v)?v:[]}catch(e){}
+    return [...new Set([...local,...session].filter(Boolean).map(String))];
   }
   function writeIndex(ids){
     const clean=[...new Set((ids||[]).filter(Boolean).map(String))];
-    localStorage.setItem(INDEX_KEY,JSON.stringify(clean));
+    const text=JSON.stringify(clean);
+    try{localStorage.setItem(INDEX_KEY,text)}catch(e){}
+    try{sessionStorage.setItem(INDEX_KEY,text)}catch(e){}
     return clean;
   }
   function localAssets(base,local){
@@ -147,11 +151,16 @@
   }
 
   function readQueue(){
-    const q=parse(localStorage.getItem(SYNC_KEY)||'[]',[]);
-    return Array.isArray(q)?q:[];
+    let local=[],session=[];
+    try{const q=parse(localStorage.getItem(SYNC_KEY)||'[]',[]);local=Array.isArray(q)?q:[]}catch(e){}
+    try{const q=parse(sessionStorage.getItem(SYNC_KEY)||'[]',[]);session=Array.isArray(q)?q:[]}catch(e){}
+    const source=local.length?local:session;
+    return Array.isArray(source)?source:[];
   }
   function writeQueue(q){
-    localStorage.setItem(SYNC_KEY,JSON.stringify(q||[]));
+    const text=JSON.stringify(q||[]);
+    try{localStorage.setItem(SYNC_KEY,text)}catch(e){}
+    try{sessionStorage.setItem(SYNC_KEY,text)}catch(e){}
     emit('mycases:sync',{pending:(q||[]).length,lastSync:lastSync()});
   }
   function enqueue(caseId,action,payload){
@@ -162,7 +171,10 @@
     writeQueue(q);
   }
   function pendingCount(){return readQueue().length}
-  function lastSync(){return localStorage.getItem(LAST_SYNC_KEY)||''}
+  function lastSync(){
+    try{return localStorage.getItem(LAST_SYNC_KEY)||sessionStorage.getItem(LAST_SYNC_KEY)||''}
+    catch(e){try{return sessionStorage.getItem(LAST_SYNC_KEY)||''}catch(e2){return''}}
+  }
 
   function cookieToken(){
     try{
@@ -270,7 +282,7 @@
           }
           q.shift();
           writeQueue(q);
-          localStorage.setItem(LAST_SYNC_KEY,now());
+          try{localStorage.setItem(LAST_SYNC_KEY,now())}catch(e){};try{sessionStorage.setItem(LAST_SYNC_KEY,now())}catch(e){};
         }catch(e){
           task.attempts=(task.attempts||0)+1;
           task.lastError=String(e.message||e);
@@ -306,7 +318,7 @@
         setCaseRaw(merged);
       });
     }catch(e){}
-    localStorage.setItem(LAST_SYNC_KEY,now());
+    try{localStorage.setItem(LAST_SYNC_KEY,now())}catch(e){};try{sessionStorage.setItem(LAST_SYNC_KEY,now())}catch(e){};
     emit('mycases:changed',{reason:'pull'});
     return true;
   }
