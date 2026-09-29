@@ -22,8 +22,13 @@
       return rows.sort((a,b)=>(a.fileId-b.fileId)||(String(a.sourceSheet||'').localeCompare(String(b.sourceSheet||'')))||((a.rowNumber||0)-(b.rowNumber||0)));
     }
     function headersFor(rows){
-      const out=[],seen=new Set();
-      for(const r of rows){for(const h of Object.keys(r.rawRow||{})){if(!seen.has(h)){seen.add(h);out.push(h);}}}
+      const out=[],seen=new Set(),placeholder=/^__EMPTY(?:_\d+)?$/i;
+      for(const r of rows){
+        for(const h of Object.keys(r.rawRow||{})){
+          if(placeholder.test(String(h).trim()))continue;
+          if(!seen.has(h)){seen.add(h);out.push(h);}
+        }
+      }
       return out;
     }
     function refreshSelectors(){
