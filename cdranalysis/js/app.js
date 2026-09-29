@@ -57,6 +57,7 @@
   function renderAll(){return routerModule?.renderAll();}
   function caseSnapshots(){return dashboardModule?.caseSnapshots()||[];}
   function renderCaseSnapshots(){return dashboardModule?.renderCaseSnapshots();}
+  function saveCaseSnapshot(){return dashboardModule?.saveCaseSnapshot();}
   function renderDashboard(){return dashboardModule?.renderDashboard();}
   function simpleTable(headers,rows){return dashboardModule?.simpleTable(headers,rows)||'';}
   function newChart(id,config){return dashboardModule?.newChart(id,config);}
@@ -201,7 +202,7 @@
   })||null;
 
   uiModule=window.CDRUIFactory?.({
-    $,state,updatePrivacyUi,showStatus,renderCaseSnapshots,renderAll,installViewScopeToolbars,
+    $,state,updatePrivacyUi,showStatus,renderCaseSnapshots,saveCaseSnapshot,renderAll,installViewScopeToolbars,
     syncViewScopeControls,updateFilterCount,exportCaseReport,saveWorkspace,loadWorkspaceObject,
     clearLoaded,applyIncidentWindow,exportTacCache,importTacDatabase,exportCsv,safeName,
     exportWorkbook,download,switchTab,applyFilters,refreshSelectors,renderFileList,renderRecords,
@@ -223,6 +224,7 @@
     senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,
     applyFilters,smsAnalysisSnapshot,movementRows,exportWorkbook,renderChronology,renderExcelView,
     switchTab,
+    openCaseSaveDialog:mode=>uiModule?.openCaseSaveDialog?.(mode),
     openPairRecords:(subject,other)=>{if($('cdrNo'))$('cdrNo').value=subject||'';if($('bparty'))$('bparty').value=other||'';applyFilters();switchTab('records');},
     refresh:()=>{refreshSelectors();applyFilters();}
   };
