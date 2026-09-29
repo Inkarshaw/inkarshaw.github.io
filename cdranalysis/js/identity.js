@@ -210,6 +210,71 @@
     return {digits:d,format:'IMEI body (14 digits)',tac,reportingBody:tac.slice(0,2),modelIdentifier:tac.slice(2,8),serial,checkDigit:'',svn:'',luhn:null};
   }
   function tacFromImei(v){const d=imeiDigits(v);return d.length>=14&&d.length<=16?d.slice(0,8):'';}
+  const REMOTE_TAC_URL='https://raw.githubusercontent.com/MoazEb/tac-database/main/tac_full.csv';
+  const REMOTE_TAC_SOURCE='MoazEb/tac-database';
+  let remoteTacLoading=null,remoteTacLast='',remoteTacChecked=new Set();
+
+  function parseCsvLine(line){
+    const out=[];let cur='',quoted=false;
+    for(let i=0;i<String(line||'').length;i++){
+      const ch=line[i];
+      if(ch==='"'){
+        if(quoted&&line[i+1]==='"'){cur+='"';i++;}
+        else quoted=!quoted;
+      }else if(ch===','&&!quoted){out.push(cur);cur='';}
+      else cur+=ch;
+    }
+    out.push(cur);return out;
+  }
+  function remoteTacNeeded(data=state.records){
+    const needed=new Set();
+    for(const r of data||[]){
+      const tac=tacFromImei(r.imei);if(!tac||remoteTacChecked.has(tac))continue;
+      const current=state.tacCache[tac];
+      if(!current||current.source==='CDR metadata')needed.add(tac);
+    }
+    return needed;
+  }
+  async function ensureRemoteTacMatches(data=state.records){
+    const requested=remoteTacNeeded(data);
+    if(!requested.size){updateTacStatus();return {requested:0,matched:0,changed:false};}
+    if(remoteTacLoading)return remoteTacLoading;
+    const wanted=new Set(requested);
+    remoteTacLast=`Checking ${wanted.size} TAC${wanted.size===1?'':'s'}…`;updateTacStatus();
+    remoteTacLoading=(async()=>{
+      let matched=0,changed=false;
+      try{
+        const res=await fetch(REMOTE_TAC_URL,{cache:'force-cache'});
+        if(!res.ok)throw new Error('HTTP '+res.status);
+        const text=await res.text(),lines=text.split(/\r?\n/);
+        if(!lines.length)throw new Error('Empty TAC database');
+        const header=parseCsvLine(lines[0]).map(x=>normalize(x));
+        const tacIndex=header.indexOf('tac'),brandIndex=header.indexOf('brand'),specsIndex=header.indexOf('specs');
+        if(tacIndex<0||brandIndex<0||specsIndex<0)throw new Error('Unsupported TAC database schema');
+        for(let i=1;i<lines.length&&wanted.size;i++){
+          if(!lines[i])continue;
+          const row=parseCsvLine(lines[i]),tac=String(row[tacIndex]||'').replace(/\D/g,'').slice(0,8);
+          if(!wanted.has(tac))continue;
+          const entry=normalizeTacEntry(tac,row[brandIndex]||'',row[specsIndex]||'','',REMOTE_TAC_SOURCE);
+          if(entry){
+            state.tacCache[tac]={...state.tacCache[tac],...entry};
+            matched++;changed=true;
+          }
+          wanted.delete(tac);
+        }
+        for(const tac of requested)remoteTacChecked.add(tac);
+        remoteTacLast=matched?`Remote TAC matches: ${matched}`:`No remote match for ${requested.size} TAC${requested.size===1?'':'s'}`;
+        if(changed)saveTacCache();else updateTacStatus();
+        return {requested:requested.size,matched,changed};
+      }catch(err){
+        remoteTacLast='Remote TAC source unavailable';
+        updateTacStatus();
+        console.warn('Remote TAC lookup failed',err);
+        return {requested:requested.size,matched:0,changed:false,error:err?.message||String(err)};
+      }finally{remoteTacLoading=null;}
+    })();
+    return remoteTacLoading;
+  }
   const BUILTIN_TAC_MAP={
     '35856015':{tac:'35856015',manufacturer:'Apple',model:'iPhone 15 Pro Max',deviceType:'A3106',source:'Built-in verified TAC mapping'},
     '35499663':{tac:'35499663',manufacturer:'Samsung',model:'Galaxy A05',deviceType:'SM-A055F/DS (2023)',source:'Built-in verified TAC mapping'},
@@ -245,7 +310,7 @@
     return {tac:t,manufacturer:mfr,model:mdl,deviceType:typ,source:String(source||'Imported'),updatedAt:new Date().toISOString()};
   }
   function saveTacCache(){persistLocal('cdrAnalyzer:tacCache',JSON.stringify(state.tacCache));updateTacStatus();}
-  function updateTacStatus(){if($('tacCacheStatus'))$('tacCacheStatus').textContent=`TAC cache: ${fmtInt(Object.keys(state.tacCache||{}).length)} entries`;}
+  function updateTacStatus(){if($('tacCacheStatus'))$('tacCacheStatus').textContent=`TAC cache: ${fmtInt(Object.keys(state.tacCache||{}).length)} entries${remoteTacLast?' • '+remoteTacLast:''}`;}
   function learnTacFromRecords(data=state.records){
     let changed=false;
     for(const r of data){
@@ -334,7 +399,7 @@
       smsRecordBasis,isSmsRecord,smsIntelRows,smsEventSignature,dedupeSmsRows,smsSenderIntelligence,requestIdentifier,
       parseCdrDeviceMetadata,imeiDigits,luhnValidImei,imeiStructure,tacFromImei,seedBuiltinTacMappings,
       normalizeTacEntry,saveTacCache,updateTacStatus,learnTacFromRecords,resolveDevice,tacField,
-      importTacDatabase,exportTacCache,exportSmsSenderDictionary,importSmsSenderDictionary,updateCdrRequestCount,defaultCdrRequestDates
+      ensureRemoteTacMatches,importTacDatabase,exportTacCache,exportSmsSenderDictionary,importSmsSenderDictionary,updateCdrRequestCount,defaultCdrRequestDates
     };
   };
 })();
