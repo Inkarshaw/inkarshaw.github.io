@@ -116,6 +116,7 @@
       <div class="tabs no-print" id="tabs" role="tablist" aria-label="CDR analysis views">
         <button class="tab active" role="tab" aria-selected="true" data-tab="dashboard">Dashboard</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="records">Records</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="excelview">Excel View</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="contacts">Contacts</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="locations">Locations</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="devices">Devices</button>
@@ -159,6 +160,22 @@
           <div class="panel-title"><h2>Filtered CDR records</h2><span class="muted" id="recordCount"></span></div>
           <div class="tablewrap"><table class="table" id="recordsTable"></table></div>
           <div class="pager"><div class="group"><button class="btn secondary small" id="prevPage">Previous</button><span id="pageInfo" class="tiny"></span><button class="btn secondary small" id="nextPage">Next</button></div><div class="group tiny">Rows/page <select id="pageSize"><option>50</option><option selected>100</option><option>250</option><option>500</option></select></div></div>
+        </div>
+      </section>
+
+      <section id="excelview" class="view hidden">
+        <div class="panel">
+          <div class="panel-title"><h2>Excel View</h2><span class="muted" id="excelViewScope">Select one loaded CDR / A-party number.</span></div>
+          <div class="notice">Displays the original column names and cell values retained from the uploaded Excel worksheet for the selected number. This view uses raw imported rows and is not affected by duplicate-safe analysis mode.</div>
+          <div class="subtoolbar no-print">
+            <div class="field" style="min-width:220px"><label>CDR / A-party number</label><select id="excelViewSubject"><option value="">Select number</option></select></div>
+            <div class="field" style="min-width:260px"><label>Source worksheet</label><select id="excelViewSource"><option value="">All source worksheets</option></select></div>
+            <div class="field" style="min-width:220px"><label>Search source rows</label><input id="excelViewSearch" placeholder="Search any original Excel value"></div>
+            <div class="field"><label>Rows per page</label><select id="excelViewPageSize"><option>50</option><option selected>100</option><option>250</option><option>500</option></select></div>
+            <button class="btn secondary small" id="excelViewExport">Export selected rows CSV</button>
+          </div>
+          <div class="tablewrap" style="max-height:68vh"><table class="table" id="excelViewTable"></table></div>
+          <div class="subtoolbar no-print" id="excelViewPager" style="justify-content:flex-end;margin-top:10px"></div>
         </div>
       </section>
 
@@ -374,6 +391,7 @@
 <script src="/cdranalysis/js/filters.js"></script>
 <script src="/cdranalysis/js/dashboard.js"></script>
 <script src="/cdranalysis/js/records.js"></script>
+<script src="/cdranalysis/js/excelview.js"></script>
 <script src="/cdranalysis/js/contacts.js"></script>
 <script src="/cdranalysis/js/locations.js"></script>
 <script src="/cdranalysis/js/devices.js"></script>
