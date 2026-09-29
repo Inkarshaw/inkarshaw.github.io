@@ -219,7 +219,7 @@
     const subs=subjects(),current=window.CDRApp?.currentSubject?.()||'';
     $('relationshipA').value=subs.includes(subject)?subject:(subs.includes(current)?current:(subs[0]||''));
     $('relationshipB').value=num||'';
-    window.CDRApp?.switchTab?.('relationship');
+    window.CDRApp?.switchTab?.('multinumber');
     render();
   }
 
