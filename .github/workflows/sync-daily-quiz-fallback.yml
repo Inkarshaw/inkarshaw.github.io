@@ -59,6 +59,8 @@ jobs:
           def valid(row):
               if row.get("Active","").lower() == "false":
                   return False
+              if row.get("Status","").strip() and row.get("Status","").strip() != "Published":
+                  return False
               if not row.get("Question") or not row.get("Exam") or not row.get("Topic") or not row.get("Subtopic"):
                   return False
               if row.get("CorrectAnswer","").upper() not in {"A","B","C","D"}:
