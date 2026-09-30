@@ -6,7 +6,23 @@
       applyFilters,restorePendingWorkspace,showStatus,fmtInt,rebuildIndexes,audit,dateFromSourceParts
     }=ctx;
 
-    let parserWorkerSeq=0,importQueue=[];
+    let parserWorkerSeq=0,importQueue=[],importBatchTotal=0,importBatchDone=0;
+
+    function showImportLoading(file){
+      const overlay=$('importLoadingOverlay'),count=$('importLoadingCount'),name=$('importLoadingFile');
+      if(!overlay)return;
+      const current=Math.min(importBatchDone+1,Math.max(importBatchTotal,1));
+      if(count)count.textContent='Loading '+current+' of '+Math.max(importBatchTotal,1);
+      if(name)name.textContent=file?.name||'Preparing CDR…';
+      overlay.hidden=false;
+    }
+    function finishImportStep(){
+      importBatchDone++;
+      if(importBatchDone>=importBatchTotal&&!importQueue.length&&!state.pendingImport){
+        const overlay=$('importLoadingOverlay');if(overlay)overlay.hidden=true;
+        importBatchDone=0;importBatchTotal=0;
+      }
+    }
 
     function parseDuration(v){
       if(v==null||v==='')return 0;if(typeof v==='number'&&Number.isFinite(v))return v<1&&v>0?Math.round(v*86400):Math.max(0,v);
@@ -112,7 +128,7 @@
 
     async function inspectNext(){
       if(state.pendingImport||!importQueue.length)return;
-      const file=importQueue.shift();showStatus('Inspecting '+file.name+'…','');
+      const file=importQueue.shift();showImportLoading(file);showStatus('Inspecting '+file.name+'…','');
       try{
         const [ins,sha256]=await Promise.all([workerCall(file,'inspect'),hashFile(file)]);
         const sheets=ins.sheets||[];if(!sheets.length)throw new Error('No worksheets found');
@@ -120,7 +136,7 @@
         state.pendingImport={file,sha256,sheets,selected,mappings,inspectedAt:new Date().toISOString()};
         showStatus('Importing '+file.name+' using automatic worksheet and column mapping…','');
         await confirmImport();
-      }catch(err){console.error(err);showStatus('Could not inspect '+file.name+': '+err.message,'error');inspectNext();}
+      }catch(err){console.error(err);showStatus('Could not inspect '+file.name+': '+err.message,'error');finishImportStep();inspectNext();}
     }
 
     async function confirmImport(){
@@ -145,12 +161,12 @@
           state.files.push({id:fileId,name:p.file.name,sheet:sh.sheetName,rows:added,map,headers:info.headers||[],headerRow:Number.isInteger(info.headerRow)?info.headerRow:0,inferredCdr,sha256:p.sha256,size:p.file.size,lastModified:p.file.lastModified?new Date(p.file.lastModified).toISOString():'',importedAt:new Date().toISOString(),sourceTimezone:timezone});
           audit('CDR worksheet imported',p.file.name+' / '+sh.sheetName+' • '+added+' rows • SHA-256 '+p.sha256);
         }
-        state.pendingImport=null;rebuildIndexes();refreshSelectors();renderFileList();restorePendingWorkspace();applyFilters();showStatus('Loaded '+fmtInt(state.records.length)+' raw records from '+state.files.length+' worksheet import(s).','ok');inspectNext();
-      }catch(err){console.error(err);showStatus('Import failed: '+err.message,'error');}
+        state.pendingImport=null;rebuildIndexes();refreshSelectors();renderFileList();restorePendingWorkspace();applyFilters();showStatus('Loaded '+fmtInt(state.records.length)+' raw records from '+state.files.length+' worksheet import(s).','ok');finishImportStep();inspectNext();
+      }catch(err){console.error(err);showStatus('Import failed: '+err.message,'error');state.pendingImport=null;finishImportStep();inspectNext();}
     }
 
-    function cancelImport(){if(state.pendingImport)audit('CDR import cancelled',state.pendingImport.file?.name||'');state.pendingImport=null;inspectNext();}
-    function loadFiles(files){if(!files?.length)return;importQueue.push(...files);inspectNext();}
+    function cancelImport(){if(state.pendingImport)audit('CDR import cancelled',state.pendingImport.file?.name||'');state.pendingImport=null;finishImportStep();inspectNext();}
+    function loadFiles(files){if(!files?.length)return;if(importBatchTotal===0){importBatchDone=0;importBatchTotal=files.length;}else importBatchTotal+=files.length;importQueue.push(...files);inspectNext();}
     function detectSheet(wb){if(wb.Sheets.Mapping)return 'Mapping';let best=wb.SheetNames[0],max=0;wb.SheetNames.forEach(n=>{const ref=wb.Sheets[n]?.['!ref'];if(ref){const r=XLSX.utils.decode_range(ref),rows=r.e.r-r.s.r+1;if(rows>max){max=rows;best=n;}}});return best;}
     function parseFileOnMain(buffer){const sheets=inspectBuffer(buffer),name=chooseInitialSheets(sheets)[0]||sheets[0]?.name,headerRows=Object.fromEntries(sheets.map(x=>[x.name,x.headerRow||0]));return {sheetName:name,rows:parseBufferSheets(buffer,[name],headerRows)[0]?.rows||[]};}
     async function parseFileInWorker(file){const ins=await workerCall(file,'inspect'),name=chooseInitialSheets(ins.sheets||[])[0],headerRows=Object.fromEntries((ins.sheets||[]).map(x=>[x.name,x.headerRow||0]));const p=await workerCall(file,'parse',[name],headerRows);return {sheetName:name,rows:p.sheets?.[0]?.rows||[]};}
