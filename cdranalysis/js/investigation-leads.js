@@ -116,14 +116,6 @@
         'No common contacts found between loaded subjects.'
       ));
 
-      rows.push(section('Incident activity',
-        inc?[
-          ...incident.pre.slice(-5).reverse().map(r=>'<tr><td>Before</td><td>'+esc(dt(r.dt))+'</td><td>'+esc(r.cdrNo||'—')+' ↔ '+esc(r.bparty||'—')+'</td><td class="tiny">'+esc(r.firstAddress||r.firstCellId||'—')+'</td></tr>'),
-          ...incident.post.slice(0,5).map(r=>'<tr><td>After</td><td>'+esc(dt(r.dt))+'</td><td>'+esc(r.cdrNo||'—')+' ↔ '+esc(r.bparty||'—')+'</td><td class="tiny">'+esc(r.firstAddress||r.firstCellId||'—')+'</td></tr>')
-        ]:[],
-        inc?'No activity found within 60 minutes of the incident.':'Save incident date/time in the case to show this.'
-      ));
-
       rows.push(section('Device / SIM changes',
         devices.map(x=>'<tr><td><b>'+esc(x.cdr)+'</b></td><td>'+fmt(x.imei)+' IMEI</td><td>'+fmt(x.imsi)+' IMSI</td></tr>'),
         'No multiple IMEI/IMSI use found in the current filter.'
