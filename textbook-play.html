@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071c33"><meta name="robots" content="index,follow">
+<title>Textbook Quiz | ClearExams</title>
+<style>
+:root{--navy:#071c33;--blue:#1463ff;--ink:#10233b;--muted:#607086;--line:#dfe7f0;--bg:#f5f8fc;--green:#0f7a55;--red:#b93652}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,a{font:inherit}a{text-decoration:none;color:inherit}.wrap{width:min(900px,calc(100% - 22px));margin:auto}
+header{background:#fff;border-bottom:1px solid var(--line)}nav{min-height:62px;display:flex;align-items:center;gap:10px}.brand{font-weight:900}.spacer{flex:1}.lang{display:flex;border:1px solid #cbd7e5;border-radius:10px;overflow:hidden}.lang button{border:0;background:#fff;padding:9px 11px;font-weight:850;cursor:pointer}.lang button.active{background:#eef5ff;color:#1357c4}
+main{padding:18px 0 56px}.crumb{font-size:.78rem;color:var(--muted);font-weight:800;margin-bottom:9px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.badge{font-size:.74rem;font-weight:900;color:#1555bc;background:#eef5ff;border-radius:999px;padding:5px 9px}.source{font-size:.76rem;color:var(--muted)}.progress{height:7px;background:#edf2f7;border-radius:99px;overflow:hidden;margin:14px 0 18px}.progress i{display:block;height:100%;background:var(--blue);width:0}
+h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9px}.option{width:100%;text-align:left;border:1px solid #d5e0eb;background:#fff;border-radius:11px;padding:12px;cursor:pointer;color:var(--ink)}.option:hover{border-color:#9bbdff}.option.selected{border-color:#1463ff;background:#eef5ff}.option.correct{border-color:#8ac8ab;background:#eef9f3}.option.wrong{border-color:#e5a7b4;background:#fff2f5}.feedback{display:none;margin-top:14px;padding:13px;border-radius:11px;background:#f7f9fc;color:#405970}.feedback.show{display:block}.feedback strong{color:var(--ink)}
+.actions{display:flex;justify-content:space-between;gap:9px;margin-top:16px}.btn{min-height:44px;padding:0 14px;border:1px solid #cbd7e5;border-radius:10px;background:#fff;color:#29445f;font-weight:850;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn:disabled{opacity:.45}.result{display:none;text-align:center}.result.show{display:block}.score{font-size:3rem;font-weight:950;line-height:1;margin:10px 0}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:16px 0}.stat{padding:12px;border:1px solid var(--line);border-radius:12px}.stat strong{display:block;font-size:1.25rem}.stat span{font-size:.75rem;color:var(--muted)}
+.review{margin-top:18px;text-align:left}.review-item{padding:12px 0;border-top:1px solid var(--line)}.review-item strong{display:block}.review-item small{color:var(--muted)}.review-item .bad{color:var(--red)}.review-item .good{color:var(--green)}
+@media(max-width:560px){.card{padding:14px}.actions{display:grid;grid-template-columns:1fr 1fr}.btn{width:100%}.stats{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+<header><nav class="wrap"><a class="brand" href="textbook-quiz.html">← Textbook Quiz</a><div class="spacer"></div><div class="lang"><button id="enBtn" class="active">English</button><button id="taBtn">தமிழ்</button></div></nav></header>
+<main class="wrap">
+<div class="crumb" id="crumb">Loading textbook quiz…</div>
+<section class="card" id="quizCard">
+<div class="top"><span class="badge" id="setBadge">Quiz</span><span class="source" id="source"></span></div>
+<div class="progress"><i id="bar"></i></div>
+<h1 id="question"></h1>
+<div class="options" id="options"></div>
+<div class="feedback" id="feedback"></div>
+<div class="actions"><button class="btn" id="prev">Previous</button><button class="btn primary" id="next">Check answer</button></div>
+</section>
+<section class="card result" id="result">
+<div class="badge" id="resultBadge">Completed</div><div class="score" id="score"></div><h2 id="resultTitle"></h2>
+<div class="stats"><div class="stat"><strong id="correctN">0</strong><span>Correct</span></div><div class="stat"><strong id="wrongN">0</strong><span>Wrong</span></div><div class="stat"><strong id="accuracy">0%</strong><span>Accuracy</span></div></div>
+<div class="actions"><a class="btn" href="textbook-quiz.html">All textbook quizzes</a><button class="btn primary" id="retry">Retry quiz</button></div>
+<div class="review" id="review"></div>
+</section>
+</main>
+<script>
+const p=new URLSearchParams(location.search),unit=Number(p.get('unit')||1),quizNo=Number(p.get('quiz')||1),DATA='data/textbook/class-6/science/term-1/unit-'+unit+'.json',KEY='clearexamsTextbookProgressV1';
+let lang=localStorage.getItem('clearexamsTextbookLang')||'en',meta=null,qs=[],idx=0,answers=[],checked=[];
+const $=id=>document.getElementById(id);
+function txt(en,ta){return lang==='ta'?ta:en}
+function setLang(v){lang=v;localStorage.setItem('clearexamsTextbookLang',v);$('enBtn').classList.toggle('active',v==='en');$('taBtn').classList.toggle('active',v==='ta');render()}
+$('enBtn').onclick=()=>setLang('en');$('taBtn').onclick=()=>setLang('ta');
+function save(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}'),id='c6-sci-t1-u'+unit+'-q'+quizNo;all[id]={idx,answers,checked,ts:Date.now()};localStorage.setItem(KEY,JSON.stringify(all))}catch{}}
+function loadSaved(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}'),s=all['c6-sci-t1-u'+unit+'-q'+quizNo];if(s&&Array.isArray(s.answers)&&s.answers.length===qs.length){idx=Math.min(Number(s.idx)||0,qs.length-1);answers=s.answers;checked=s.checked||Array(qs.length).fill(false)}}catch{}}
+function render(){if(!qs.length)return;const q=qs[idx],set=meta.quiz_sets.find(x=>x.id===quizNo);document.documentElement.lang=lang==='ta'?'ta':'en';$('crumb').textContent=lang==='ta'?'6ஆம் வகுப்பு → அறிவியல் → முதல் பருவம் → அலகு '+meta.unit+' · '+meta.unit_ta:'6th Standard → Science → Term I → Unit '+meta.unit+' · '+meta.unit_en;$('setBadge').textContent=txt(set.title_en,set.title_ta)+' · '+(idx+1)+' / '+qs.length;$('source').textContent=(lang==='ta'?'பாடநூல் பக்கம் ':'Textbook page ')+q.page;$('bar').style.width=((idx+1)/qs.length*100)+'%';$('question').textContent=txt(q.q_en,q.q_ta);const box=$('options');box.innerHTML='';const opts=lang==='ta'?q.opts_ta:q.opts_en;opts.forEach((o,i)=>{const b=document.createElement('button');b.className='option';b.textContent=String.fromCharCode(65+i)+'. '+o;if(answers[idx]===i)b.classList.add('selected');if(checked[idx]){if(i===q.correct)b.classList.add('correct');else if(i===answers[idx])b.classList.add('wrong');b.disabled=true}else b.onclick=()=>{answers[idx]=i;render()};box.appendChild(b)});const fb=$('feedback');if(checked[idx]){fb.classList.add('show');fb.innerHTML='<strong>'+txt('Explanation','விளக்கம்')+':</strong> '+txt(q.exp_en,q.exp_ta)}else{fb.classList.remove('show');fb.textContent=''}$('prev').disabled=idx===0;$('next').textContent=checked[idx]?(idx===qs.length-1?txt('Finish','முடி'):txt('Next','அடுத்து')):txt('Check answer','விடையை சரிபார்');save()}
+$('prev').onclick=()=>{if(idx>0){idx--;render()}};
+$('next').onclick=()=>{if(!checked[idx]){if(answers[idx]==null){alert(txt('Choose an answer first.','முதலில் ஒரு விடையைத் தேர்ந்தெடுக்கவும்.'));return}checked[idx]=true;render();return}if(idx<qs.length-1){idx++;render()}else finish()};
+function finish(){const correct=qs.reduce((n,q,i)=>n+(answers[i]===q.correct?1:0),0),wrong=qs.length-correct,pct=Math.round(correct/qs.length*100);$('quizCard').style.display='none';$('result').classList.add('show');$('score').textContent=correct+' / '+qs.length;$('correctN').textContent=correct;$('wrongN').textContent=wrong;$('accuracy').textContent=pct+'%';$('resultTitle').textContent=lang==='ta'?(pct>=80?'சிறப்பு!':'மீண்டும் பயிற்சி செய்க'):(pct>=80?'Excellent work!':'Review and practise again');const r=$('review');r.innerHTML='<h3>'+txt('Review','மீளாய்வு')+'</h3>';qs.forEach((q,i)=>{const d=document.createElement('div');d.className='review-item';d.innerHTML='<strong>'+(i+1)+'. '+txt(q.q_en,q.q_ta)+'</strong><small class="'+(answers[i]===q.correct?'good':'bad')+'">'+txt(answers[i]===q.correct?'Correct':'Wrong',''+(answers[i]===q.correct?'சரி':'தவறு'))+' · '+txt('Page ','பக்கம் ')+q.page+'</small>';r.appendChild(d)});window.scrollTo({top:0,behavior:'smooth'})}
+$('retry').onclick=()=>{idx=0;answers=Array(qs.length).fill(null);checked=Array(qs.length).fill(false);$('quizCard').style.display='block';$('result').classList.remove('show');render()};
+fetch(DATA,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Question bank unavailable');return r.json()}).then(d=>{meta=d.meta;qs=d.questions.filter(q=>q.quiz===quizNo);answers=Array(qs.length).fill(null);checked=Array(qs.length).fill(false);loadSaved();setLang(lang)}).catch(e=>{$('quizCard').innerHTML='<p>Could not load this textbook quiz.</p>'});
+</script>
+</body></html>
