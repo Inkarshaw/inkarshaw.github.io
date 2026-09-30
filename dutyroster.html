@@ -3005,15 +3005,41 @@ async function loadCloudRoster(date){
   }
 }
 
-function saveRoster(show=true){
+let rosterAutoSaveTimer=null;
+
+function persistRosterToBrowser(){
   syncTopInputsFromCells();
   const data=collectData();
   localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+  return data;
+}
+
+function flushPendingRosterSave(){
+  if(rosterAutoSaveTimer){
+    clearTimeout(rosterAutoSaveTimer);
+    rosterAutoSaveTimer=null;
+  }
+  return persistRosterToBrowser();
+}
+
+function saveRoster(show=true){
   if(show){
+    const data=flushPendingRosterSave();
     setStatus("Saved in browser · syncing cloud…");
     saveRosterToCloud(data);
+    return;
   }
+
+  clearTimeout(rosterAutoSaveTimer);
+  rosterAutoSaveTimer=setTimeout(()=>{
+    rosterAutoSaveTimer=null;
+    persistRosterToBrowser();
+  },180);
 }
+
+window.addEventListener("pagehide",()=>{
+  if(rosterAutoSaveTimer) flushPendingRosterSave();
+});
 function clearSaved(){
   if(confirm("Clear saved roster from this browser?")){
     localStorage.removeItem(STORAGE_KEY);
@@ -3360,22 +3386,43 @@ function checkShiftTeamConflicts(){
   }
 }
 
+let conflictCheckFrame=0;
 function runConflictChecks(){
-  checkShiftTeamConflicts();
-  checkDutySIConflict();
+  if(conflictCheckFrame) return;
+  const run=()=>{
+    conflictCheckFrame=0;
+    checkShiftTeamConflicts();
+    checkDutySIConflict();
+  };
+  if(typeof requestAnimationFrame==="function"){
+    conflictCheckFrame=requestAnimationFrame(run);
+  }else{
+    run();
+  }
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(()=>{ buildTargets(); fillStaffSelect(); renderExtraWarrantRows(); initSerialTables(); runConflictChecks(); },0);
+  buildTargets();
+  fillStaffSelect();
+
   const saved=localStorage.getItem(STORAGE_KEY);
+  let loadedSaved=false;
   if(saved){
-    try{ loadData(JSON.parse(saved)); }
-    catch(e){}
-  }else{
+    try{
+      loadData(JSON.parse(saved));
+      loadedSaved=true;
+    }catch(e){}
+  }
+
+  if(!loadedSaved){
     const dt=new Date(2026,8,13);
     document.getElementById("rosterDate").value=isoDate(dt);
     document.getElementById("dateLabel").textContent=niceDate(dt);
+    renderExtraWarrantRows();
+    initSerialTables();
+    runConflictChecks();
   }
+
   syncHeader();
   setTimeout(()=>{
     if(typeof refreshNominalDependentUI==="function") refreshNominalDependentUI(false);
