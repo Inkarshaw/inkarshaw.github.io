@@ -156,7 +156,7 @@
     async function parseFileInWorker(file){const ins=await workerCall(file,'inspect'),name=chooseInitialSheets(ins.sheets||[])[0],headerRows=Object.fromEntries((ins.sheets||[]).map(x=>[x.name,x.headerRow||0]));const p=await workerCall(file,'parse',[name],headerRows);return {sheetName:name,rows:p.sheets?.[0]?.rows||[]};}
 
     function bind(){
-      $('chooseBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
+      const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
       const dz=$('dropZone');['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
     }
 
