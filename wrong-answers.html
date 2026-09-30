@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071c33">
+<meta name="description" content="ClearExams Wrong Answer Notebook: review saved mistakes, retry weak questions and track mastered questions.">
+<link rel="canonical" href="https://clearexams.ink/wrong-answers.html">
+<title>Wrong Answer Notebook | ClearExams</title>
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/clearexams-icon.svg" type="image/svg+xml"><script src="assets/js/pwa.js" defer></script>
+<style>
+:root{--navy:#071c33;--blue:#1463ff;--ink:#10233b;--muted:#607086;--line:#dfe7f0;--bg:#f5f8fc;--green:#0f7a55;--red:#b93652}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}a{text-decoration:none;color:inherit}button,select{font:inherit}.wrap{width:min(980px,calc(100% - 24px));margin:auto}
+header{position:sticky;top:0;z-index:20;background:#fffffff2;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}nav{min-height:64px;display:flex;align-items:center;gap:18px}.brand{font-weight:900;font-size:1.15rem}.links{margin-left:auto;display:flex;gap:16px;font-weight:800;color:#38516c}
+.hero{background:linear-gradient(135deg,#071c33,#0d3b67);color:#fff}.hero .wrap{padding:40px 0}.hero h1{margin:0;font-size:clamp(2.1rem,6vw,3.7rem);line-height:1.02}.hero p{max-width:680px;margin:12px 0 0;color:#cad9e8}
+main{padding:24px 0 64px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat,.panel,.item{background:#fff;border:1px solid var(--line);border-radius:15px}.stat{padding:14px}.stat span{display:block;color:var(--muted);font-size:.72rem;font-weight:850;text-transform:uppercase}.stat strong{display:block;margin-top:3px;font-size:1.3rem}.panel{margin-top:16px;padding:16px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar select{min-height:44px;padding:0 11px;border:1px solid #cbd7e5;border-radius:10px;background:#fff}.toolbar .spacer{flex:1}.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 14px;border:1px solid #cbd7e5;border-radius:10px;background:#fff;color:#2c465f;font-weight:850;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{color:var(--red);border-color:#edb9c5;background:#fff5f7}.btn:disabled{opacity:.45;cursor:not-allowed}
+.list{display:grid;gap:10px;margin-top:16px}.item{padding:15px}.top{display:flex;justify-content:space-between;gap:12px}.meta{color:var(--muted);font-size:.78rem;font-weight:750}.status{white-space:nowrap;padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:900}.status.need{background:#fff0f3;color:var(--red)}.status.done{background:#eaf8f1;color:var(--green)}.item h3{margin:8px 0 7px;font-size:1rem}.answer{color:#35516d;font-size:.86rem}.empty{padding:42px 18px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--ink);font-size:1.1rem;margin-bottom:4px}
+footer{padding:28px 0;background:#061629;color:#cbd8e5}
+@media(max-width:680px){.links{display:none}.stats{grid-template-columns:1fr 1fr}.toolbar{display:grid;grid-template-columns:1fr 1fr}.toolbar select,.toolbar .btn{width:100%}.toolbar .spacer{display:none}.top{display:block}.status{display:inline-block;margin-top:6px}}
+</style>
+</head>
+<body>
+<header><nav class="wrap"><a class="brand" href="index.html">ClearExams.</a><div class="links"><a href="practice.html">Practice</a><a href="wrong-answers.html">Wrong Answers</a><a href="dashboard.html">Dashboard</a></div></nav></header>
+<section class="hero"><div class="wrap"><h1>Wrong Answer Notebook</h1><p>Every mistake can become revision material. Retry pending questions, keep mastered questions for history, and focus on repeated errors.</p></div></section>
+<main class="wrap">
+<section class="stats"><div class="stat"><span>Saved</span><strong id="saved">0</strong></div><div class="stat"><span>Needs review</span><strong id="needs">0</strong></div><div class="stat"><span>Mastered</span><strong id="mastered">0</strong></div><div class="stat"><span>Repeat mistakes</span><strong id="repeat">0</strong></div></section>
+<section class="panel">
+<div class="toolbar">
+<select id="statusFilter"><option value="needs-review">Needs review</option><option value="all">All saved</option><option value="mastered">Mastered</option></select>
+<select id="subjectFilter"><option value="">All subjects</option></select>
+<div class="spacer"></div>
+<button class="btn primary" id="practiceBtn" type="button">Practise visible mistakes</button>
+<button class="btn danger" id="clearMastered" type="button">Clear mastered</button>
+</div>
+<div class="list" id="list"></div>
+</section>
+</main>
+<footer><div class="wrap">© 2026 ClearExams.ink · Wrong Answer Revision</div></footer>
+<script>
+const WRONG_KEY='clearexamsWrongAnswersV1',QUEUE_KEY='clearexamsWrongPracticeQueueV1';
+const $=id=>document.getElementById(id);function load(){try{return JSON.parse(localStorage.getItem(WRONG_KEY)||'[]')}catch{return[]}}function save(v){localStorage.setItem(WRONG_KEY,JSON.stringify(v))}
+let data=load();
+function escText(v){return String(v??'')}
+function filtered(){const status=$('statusFilter').value,subject=$('subjectFilter').value;return data.filter(x=>(status==='all'||x.status===status)&&(!subject||x.subject===subject)).sort((a,b)=>(b.lastWrong||b.lastReviewed||0)-(a.lastWrong||a.lastReviewed||0))}
+function refreshFilters(){const current=$('subjectFilter').value,subjects=[...new Set(data.map(x=>x.subject).filter(Boolean))].sort();$('subjectFilter').innerHTML='<option value="">All subjects</option>';subjects.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;$('subjectFilter').appendChild(o)});if(subjects.includes(current))$('subjectFilter').value=current}
+function render(){data=load();refreshFilters();const needs=data.filter(x=>x.status!=='mastered').length,mastered=data.filter(x=>x.status==='mastered').length,repeat=data.filter(x=>(x.mistakes||0)>1).length;$('saved').textContent=data.length;$('needs').textContent=needs;$('mastered').textContent=mastered;$('repeat').textContent=repeat;const rows=filtered(),box=$('list');box.innerHTML='';$('practiceBtn').disabled=!rows.some(x=>x.status!=='mastered');$('clearMastered').disabled=!mastered;if(!rows.length){box.innerHTML='<div class="empty"><strong>No questions here yet.</strong>Incorrect answers from new practice sessions will be saved automatically.</div>';return}rows.forEach(x=>{const d=document.createElement('article');d.className='item';const top=document.createElement('div');top.className='top';const left=document.createElement('div');left.className='meta';left.textContent=[x.exam,x.subject,x.topic].filter(Boolean).join(' · ')+(x.mistakes?' · '+x.mistakes+' mistake'+(x.mistakes===1?'':'s'):'');const st=document.createElement('span');st.className='status '+(x.status==='mastered'?'done':'need');st.textContent=x.status==='mastered'?'Mastered':'Needs review';top.append(left,st);const h=document.createElement('h3');h.textContent=escText(x.question);const ans=document.createElement('div');ans.className='answer';const letter=String(x.correctAnswer||'').toUpperCase();ans.textContent=letter?'Correct: '+letter+' — '+escText(x['option'+letter]||x['option'+letter.toUpperCase()]||x['option'+letter.toLowerCase()]||x['option'+letter]):'Correct answer saved';d.append(top,h,ans);box.appendChild(d)})}
+$('statusFilter').onchange=render;$('subjectFilter').onchange=render;
+$('practiceBtn').onclick=()=>{const ids=filtered().filter(x=>x.status!=='mastered').map(x=>x.id).slice(0,100);if(!ids.length)return;localStorage.setItem(QUEUE_KEY,JSON.stringify(ids));location.href='daily-quiz.html?mode=wrong'};
+$('clearMastered').onclick=()=>{if(!confirm('Remove mastered questions from this notebook? Pending mistakes will be kept.'))return;data=data.filter(x=>x.status!=='mastered');save(data);render()};
+render();
+</script>
+</body></html>
