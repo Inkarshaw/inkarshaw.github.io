@@ -155,7 +155,13 @@
     function parseFileOnMain(buffer){const sheets=inspectBuffer(buffer),name=chooseInitialSheets(sheets)[0]||sheets[0]?.name,headerRows=Object.fromEntries(sheets.map(x=>[x.name,x.headerRow||0]));return {sheetName:name,rows:parseBufferSheets(buffer,[name],headerRows)[0]?.rows||[]};}
     async function parseFileInWorker(file){const ins=await workerCall(file,'inspect'),name=chooseInitialSheets(ins.sheets||[])[0],headerRows=Object.fromEntries((ins.sheets||[]).map(x=>[x.name,x.headerRow||0]));const p=await workerCall(file,'parse',[name],headerRows);return {sheetName:name,rows:p.sheets?.[0]?.rows||[]};}
 
+    function syncLoadedUi(){
+      document.body.classList.toggle('cdr-loaded',state.records.length>0);
+    }
+
     function bind(){
+      syncLoadedUi();
+      window.addEventListener('cdr:updated',syncLoadedUi);
       const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
       const dz=$('dropZone');['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
     }
