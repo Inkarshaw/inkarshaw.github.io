@@ -68,7 +68,7 @@
 
     const imeis=[...A.byImei.keys()].slice(0,25),imsis=[...A.byImsi.keys()].slice(0,25),pair={};
     for(const r of data){if(!r.imei||!r.imsi)continue;pair[r.imei+'|'+r.imsi]=(pair[r.imei+'|'+r.imsi]||0)+1;}
-    $('imeiImsiMatrix').innerHTML=`<table class="table"><thead><tr><th>IMEI \ IMSI</th>${imsis.map(x=>`<th>${escapeHtml(x)}</th>`).join('')}</tr></thead><tbody>${imeis.map(i=>`<tr><td>${escapeHtml(i)}</td>${imsis.map(s=>`<td style="text-align:center">${pair[i+'|'+s]||''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    $('imeiImsiMatrix').innerHTML=`<table class="table"><thead><tr><th>IMEI / Mobile model \\ IMSI</th>${imsis.map(x=>`<th>${escapeHtml(x)}</th>`).join('')}</tr></thead><tbody>${imeis.map(i=>{const d=resolveDevice(i),model=[d.manufacturer,d.model].filter(Boolean).join(' ')||'Unknown model';return `<tr><td><b>${escapeHtml(i)}</b><div class="tiny">${escapeHtml(model)}</div></td>${imsis.map(s=>`<td style="text-align:center">${pair[i+'|'+s]||''}</td>`).join('')}</tr>`}).join('')}</tbody></table>`;
     if(ensureRemoteTacMatches){
       Promise.resolve(ensureRemoteTacMatches(state.records)).then(result=>{
         if(result?.changed&&!$('devices')?.classList.contains('hidden'))renderDevices();
