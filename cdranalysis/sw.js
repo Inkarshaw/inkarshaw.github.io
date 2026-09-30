@@ -1,4 +1,4 @@
-const CACHE='cdr-analyzer-v51';
+const CACHE='cdr-analyzer-v52';
 const CORE=[
   '/cdranalysis/',
   '/cdranalysis/index.html',
@@ -30,7 +30,8 @@ const CORE=[
   '/cdranalysis/js/diagnostics.js',
   '/cdranalysis/js/ui.js',
   '/cdranalysis/js/app.js',
-  '/cdranalysis/js/relationship.js'
+  '/cdranalysis/js/relationship.js',
+  '/cdranalysis/js/investigation-leads.js'
 ];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
