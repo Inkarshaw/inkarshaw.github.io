@@ -101,7 +101,7 @@ footer{padding:26px 0;background:#061629;color:#cbd8e5}
 
 <footer><div class="wrap">ClearExams Question Bank Admin · local browser workspace</div></footer>
 <script>
-const LIVE_URL='data/quizzes/daily-quiz.csv',WORK_KEY='clearexamsQuestionAdminV1',PAGE_SIZE=50;
+const LIVE_URL='data/quizzes/daily-quiz.csv',GOOGLE_SHEET_CSV_URL='https://docs.google.com/spreadsheets/d/1yhND5g2Q23eOXz3oakV7xX-pUuunw3i2GzES3yaFVVY/gviz/tq?tqx=out:csv&sheet=Daily%20Quiz%20Feed',WORK_KEY='clearexamsQuestionAdminV1',PAGE_SIZE=50;
 const EXPORT_FIELDS=['ID','Active','Status','Exam','Topic','Subtopic','PublishDate','Question','OptionA','OptionB','OptionC','OptionD','CorrectAnswer','ExplanationA','ExplanationB','ExplanationC','ExplanationD'];
 const STATUSES=['Draft','Reviewed','Published','Needs Correction'],REQUIRED=['ID','Exam','Topic','Subtopic','Question','OptionA','OptionB','OptionC','OptionD','CorrectAnswer','ExplanationA','ExplanationB','ExplanationC','ExplanationD'];
 const $=id=>document.getElementById(id);let base=[],workspace={imports:[],overrides:{},deleted:[]},page=1,editingKey=null,analysis=null;
@@ -156,6 +156,6 @@ function exportRows(){return analysis.rows.map(r=>{const out={};EXPORT_FIELDS.fo
 $('workspaceExport').onclick=()=>download('clearexams-question-bank-workspace.csv',toCSV(exportRows()))
 $('publishExport').onclick=()=>{if(analysis.blockers.length){alert('Fix '+analysis.blockers.length+' published blocker(s) before creating the publish-ready file. Use Issues only to find them.');return}download('daily-quiz-publish-ready.csv',toCSV(exportRows()))}
 $('clearWorkspace').onclick=()=>{if(!workspace.imports.length&&!Object.keys(workspace.overrides).length)return;if(!confirm('Clear all local imports and edits? The live question bank will remain unchanged.'))return;workspace={imports:[],overrides:{},deleted:[]};saveWorkspace();$('importNote').textContent='Local workspace cleared.';page=1;render()}
-loadWorkspace();fetch(LIVE_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(t=>{base=parseCSV(t);$('importNote').textContent='Loaded '+base.length+' live row(s).';render()}).catch(err=>{$('importNote').textContent='Could not load live bank: '+err.message;base=[];render()})
+loadWorkspace();Promise.allSettled([LIVE_URL,GOOGLE_SHEET_CSV_URL].map(url=>fetch(url,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}))).then(results=>{const merged=new Map();results.forEach(res=>{if(res.status!=='fulfilled')return;parseCSV(res.value).forEach(q=>merged.set(q.ID||[q.Exam,q.Subtopic,q.Topic,q.Question].join('|'),q))});base=[...merged.values()];$('importNote').textContent='Loaded '+base.length+' merged live row(s) from Sheet + fallback.';render()}).catch(err=>{$('importNote').textContent='Could not load live bank: '+err.message;base=[];render()})
 </script>
 </body></html>
