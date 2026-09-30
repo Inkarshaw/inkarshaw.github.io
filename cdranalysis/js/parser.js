@@ -159,11 +159,36 @@
       document.body.classList.toggle('cdr-loaded',state.records.length>0);
     }
 
+    function removeImportedFile(fileId){
+      const id=Number(fileId),file=state.files.find(x=>Number(x.id)===id);
+      if(!file)return;
+      state.records=state.records.filter(r=>Number(r.fileId)!==id);
+      state.files=state.files.filter(x=>Number(x.id)!==id);
+      rebuildIndexes();
+      refreshSelectors();
+      renderFileList();
+      applyFilters();
+      audit('CDR worksheet removed',(file.name||'')+' / '+(file.sheet||''));
+      showStatus(state.records.length
+        ? 'Removed '+(file.inferredCdr||file.name)+'. '+fmtInt(state.records.length)+' records remain.'
+        : 'Removed the last loaded CDR. Choose a file to start again.','ok');
+    }
+
     function bind(){
       syncLoadedUi();
       window.addEventListener('cdr:updated',syncLoadedUi);
-      const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
-      const dz=$('dropZone');['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
+      const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput').click();
+      $('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
+      const dz=$('dropZone');
+      ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+      ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+      dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
+      const list=$('fileList');
+      if(list)list.addEventListener('click',e=>{
+        const btn=e.target.closest('[data-remove-file]');
+        if(!btn)return;
+        removeImportedFile(btn.dataset.removeFile);
+      });
     }
 
     return {parseDuration,inferCdrFromFilename,parseDateTime,parseTime,timeMins,mapHeaders,parseLatLong,detectSheet,parseFileOnMain,parseFileInWorker,hashFile,loadFiles,confirmImport,cancelImport,bind};
