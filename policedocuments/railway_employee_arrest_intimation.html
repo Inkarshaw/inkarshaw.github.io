@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Railway Employee Arrest Intimation Generator</title>
+<meta name="description" content="Generate an official intimation to Railway authorities regarding registration of a criminal case, arrest and judicial remand of a Railway employee.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--navy:#0b2545;--blue:#1463ff;--bg:#eef3f8;--line:#d7e0ea;--muted:#617187;--green:#18794e;--danger:#b42318}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#172033;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.topbar{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.topbar a{color:var(--blue);text-decoration:none;font-weight:800}.topbar strong{font-size:1rem}.status{margin-left:auto;font-size:.78rem;color:var(--green);background:#e9f8ef;border:1px solid #bfe7cc;padding:5px 9px;border-radius:999px}
+.shell{max-width:1400px;margin:18px auto;padding:0 14px;display:grid;grid-template-columns:minmax(330px,500px) minmax(0,1fr);gap:18px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(13,38,76,.08)}
+.form-panel{padding:18px}.form-panel h1{font-size:1.3rem;margin:0 0 4px;color:var(--navy)}.sub{color:var(--muted);font-size:.9rem;margin:0 0 16px;line-height:1.45}
+fieldset{border:1px solid var(--line);border-radius:10px;margin:0 0 14px;padding:12px}legend{font-weight:850;color:var(--navy);padding:0 6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
+label{display:block;font-size:.78rem;font-weight:750;color:#34455b;margin-bottom:4px}
+input,select,textarea{width:100%;border:1px solid #bdc9d7;border-radius:8px;padding:9px 10px;font:inherit;background:#fff;color:#172033}
+textarea{min-height:70px;resize:vertical}input:focus,select:focus,textarea:focus{outline:2px solid rgba(20,99,255,.18);border-color:var(--blue)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.6;cursor:wait}.primary{background:var(--navy);color:#fff}.pdf{background:var(--green);color:#fff}.secondary{background:#eaf1fb;color:#15375d}.danger{background:#fff0ee;color:var(--danger)}
+.note{margin-top:12px;font-size:.78rem;color:var(--muted);line-height:1.45}
+.preview-panel{padding:14px;overflow:auto}.preview-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.preview-head strong{color:var(--navy)}
+.paper{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#000;padding:18mm 18mm 20mm;font-family:"Times New Roman",Times,serif;box-shadow:0 5px 24px rgba(0,0,0,.16)}
+.fromto{font-size:13.5pt;line-height:1.55}.block{margin-bottom:16px}.label{font-weight:700}.subject{font-size:13.5pt;line-height:1.55;margin:14px 0}.ref{font-size:13.5pt;line-height:1.55;margin:8px 0 18px}
+.bodytext{font-size:13.5pt;line-height:1.75;text-align:justify;margin:0 0 13px;text-indent:1.2cm}
+.details{border-collapse:collapse;width:100%;font-size:12.5pt;margin:12px 0 16px}.details td{padding:4px 5px;vertical-align:top}.details td:first-child{width:39%;font-weight:700}.signature{text-align:right;margin-top:35px;font-size:13.5pt;line-height:1.55}.enclosures{font-size:12pt;margin-top:28px}
+.empty{display:inline-block;min-width:50px;border-bottom:1px dotted #555}
+@media(max-width:980px){.shell{grid-template-columns:1fr}.preview-panel{padding:8px}.paper{width:100%;min-height:auto;padding:28px 22px}.status{margin-left:0}.grid{grid-template-columns:1fr}.full{grid-column:auto}.fromto,.subject,.ref,.bodytext,.signature{font-size:12.5pt}.bodytext{line-height:1.65}.details{font-size:12pt}}
+@media print{
+ body{background:#fff}.topbar,.form-panel,.preview-head{display:none!important}.shell{display:block;margin:0;padding:0}.preview-panel,.panel{border:0;box-shadow:none;padding:0}.paper{box-shadow:none;width:210mm;min-height:297mm;margin:0;padding:18mm 18mm 20mm}
+ @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/policedocuments/">← Police Documents</a>
+  <strong>Railway Employee Arrest / FIR Intimation</strong>
+  <span class="status">Local-only form</span>
+</div>
+
+<main class="shell">
+<section class="panel form-panel">
+<h1>Railway Employee Arrest Intimation Generator</h1>
+<p class="sub">Fill the case, employee, arrest and remand details. The official A4 letter updates instantly. Use Print for a hard copy or Save PDF for a downloadable file.</p>
+
+<fieldset>
+<legend>Police office</legend>
+<div class="grid">
+ <div><label for="fromRank">From - Rank / Officer</label><input id="fromRank" value="The Inspector of Police"></div>
+ <div><label for="station">Police Station</label><input id="station" placeholder="e.g. G7 Chetpet Police Station"></div>
+ <div><label for="city">City / District</label><input id="city" value="Chennai"></div>
+ <div><label for="letterDate">Letter date</label><input id="letterDate" type="date"></div>
+ <div class="full"><label for="officeRef">Office Ref. / Rc. No. (optional)</label><input id="officeRef" placeholder="Optional"></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Railway addressee</legend>
+<div class="grid">
+ <div class="full"><label for="toOfficer">To - Controlling / Personnel Officer</label><input id="toOfficer" value="The Divisional Personnel Officer"></div>
+ <div><label for="division">Railway Division</label><input id="division" placeholder="e.g. Chennai Division"></div>
+ <div><label for="railway">Railway</label><input id="railway" value="Southern Railway"></div>
+ <div class="full"><label for="railwayAddress">Office / Address (optional)</label><textarea id="railwayAddress" placeholder="Railway office address"></textarea></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Case details</legend>
+<div class="grid">
+ <div><label for="crimeNo">Crime No.</label><input id="crimeNo" placeholder="e.g. 123/2026"></div>
+ <div><label for="firDate">FIR date</label><input id="firDate" type="date"></div>
+ <div class="full"><label for="sections">Sections of law</label><input id="sections" placeholder="e.g. Sections ... BNS / Special Act"></div>
+ <div class="full"><label for="caseNature">Brief case description (optional)</label><textarea id="caseNature" placeholder="Short neutral description, if required"></textarea></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Railway employee / accused</legend>
+<div class="grid">
+ <div class="full"><label for="accusedName">Name</label><input id="accusedName" placeholder="Name of accused"></div>
+ <div><label for="age">Age</label><input id="age" inputmode="numeric" placeholder="Age"></div>
+ <div><label for="designation">Designation</label><input id="designation" value="Clerk"></div>
+ <div><label for="employeeId">Employee ID (optional)</label><input id="employeeId" placeholder="Employee / PF No."></div>
+ <div><label for="placePosting">Place of posting</label><input id="placePosting" placeholder="Station / office"></div>
+ <div class="full"><label for="residentialAddress">Residential address (optional)</label><textarea id="residentialAddress" placeholder="Address"></textarea></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Arrest & remand</legend>
+<div class="grid">
+ <div><label for="arrestDate">Arrest date</label><input id="arrestDate" type="date"></div>
+ <div><label for="arrestTime">Arrest time</label><input id="arrestTime" type="time"></div>
+ <div class="full"><label for="court">Court produced before</label><input id="court" placeholder="Hon'ble ... Court, Chennai"></div>
+ <div><label for="productionDate">Produced before court</label><input id="productionDate" type="date"></div>
+ <div><label for="remandTill">Remanded till</label><input id="remandTill" type="date"></div>
+ <div class="full"><label for="prison">Prison / place of judicial custody (optional)</label><input id="prison" placeholder="e.g. Central Prison, Puzhal"></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Letter wording</legend>
+<div class="grid">
+ <div class="full"><label for="subject">Subject</label><textarea id="subject">Police – Intimation regarding registration of criminal case, arrest and judicial remand of Railway employee – Reg.</textarea></div>
+ <div class="full"><label for="actionLine">Department action line</label><textarea id="actionLine">The above facts are hereby intimated to your office for official information and for taking necessary action, if any, as per the applicable departmental rules.</textarea></div>
+ <div class="full"><label for="enclosures">Enclosures (optional)</label><textarea id="enclosures" placeholder="e.g. Copy of FIR / Remand order"></textarea></div>
+</div>
+</fieldset>
+
+<div class="actions">
+ <button class="btn primary" id="printBtn" type="button">🖨️ Print</button>
+ <button class="btn pdf" id="pdfBtn" type="button">⬇️ Save PDF</button>
+ <button class="btn secondary" id="saveDefaultsBtn" type="button">💾 Save Office Defaults</button>
+ <button class="btn danger" id="clearBtn" type="button">Clear Case Details</button>
+</div>
+<p class="note">Case information stays in this browser and is not uploaded by this page. Verify names, sections, dates, court/remand particulars and the correct Railway controlling authority before issue.</p>
+</section>
+
+<section class="panel preview-panel">
+<div class="preview-head"><strong>A4 Preview</strong><span id="saveStatus"></span></div>
+<article class="paper" id="paper">
+  <div class="fromto block">
+    <div><span class="label">From</span></div>
+    <div id="pFromRank"></div>
+    <div id="pStation"></div>
+    <div id="pCity"></div>
+    <div id="pLetterDate"></div>
+  </div>
+
+  <div class="fromto block">
+    <div><span class="label">To</span></div>
+    <div id="pToOfficer"></div>
+    <div id="pDivision"></div>
+    <div id="pRailway"></div>
+    <div id="pRailwayAddress"></div>
+  </div>
+
+  <div class="subject"><span class="label">Sir/Madam,</span></div>
+  <div class="subject"><span class="label">Sub:</span> <span id="pSubject"></span></div>
+  <div class="ref"><span class="label">Ref:</span> <span id="pRef"></span></div>
+
+  <p class="bodytext" id="pPara1"></p>
+
+  <table class="details" aria-label="Railway employee particulars">
+    <tr><td>Name of accused</td><td>: <span id="pAccusedName"></span></td></tr>
+    <tr><td>Age</td><td>: <span id="pAge"></span></td></tr>
+    <tr><td>Designation</td><td>: <span id="pDesignation"></span></td></tr>
+    <tr id="rowEmployeeId"><td>Employee ID</td><td>: <span id="pEmployeeId"></span></td></tr>
+    <tr><td>Place of posting</td><td>: <span id="pPlacePosting"></span></td></tr>
+    <tr id="rowAddress"><td>Residential address</td><td>: <span id="pResidentialAddress"></span></td></tr>
+  </table>
+
+  <p class="bodytext" id="pPara2"></p>
+  <p class="bodytext" id="pActionLine"></p>
+  <p class="bodytext">The case is under investigation.</p>
+
+  <div class="signature">
+    <div>Yours faithfully,</div>
+    <br><br>
+    <div id="pSignRank"></div>
+    <div id="pSignStation"></div>
+  </div>
+
+  <div class="enclosures" id="pEnclosuresWrap" style="display:none">
+    <span class="label">Encl:</span> <span id="pEnclosures"></span>
+  </div>
+</article>
+</section>
+</main>
+
+<script>
+(function(){
+ const $=id=>document.getElementById(id);
+ const ids=["fromRank","station","city","letterDate","officeRef","toOfficer","division","railway","railwayAddress","crimeNo","firDate","sections","caseNature","accusedName","age","designation","employeeId","placePosting","residentialAddress","arrestDate","arrestTime","court","productionDate","remandTill","prison","subject","actionLine","enclosures"];
+ const v=id=>($(id).value||"").trim();
+ const blank=()=>'<span class="empty">&nbsp;</span>';
+ const safe=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+ const show=id=>{const x=v(id);return x?safe(x):blank()};
+ function prettyDate(s){
+   if(!s)return "";
+   const d=new Date(s+"T00:00:00");
+   if(Number.isNaN(d.getTime()))return s;
+   return d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"});
+ }
+ function prettyTime(s){
+   if(!s)return "";
+   const [h,m]=s.split(":").map(Number);
+   if(Number.isNaN(h)||Number.isNaN(m))return s;
+   const suffix=h>=12?"PM":"AM"; const hh=((h+11)%12)+1;
+   return String(hh).padStart(2,"0")+":"+String(m).padStart(2,"0")+" "+suffix;
+ }
+ function dateOrBlank(id){const d=prettyDate(v(id));return d?safe(d):blank()}
+ function refText(){
+   const parts=[];
+   if(v("officeRef"))parts.push(v("officeRef"));
+   let crime=(v("station")?v("station")+" ":"")+"Crime No. "+(v("crimeNo")||"__________/20__");
+   if(v("sections"))crime+=" u/s "+v("sections");
+   if(v("firDate"))crime+=" dated "+prettyDate(v("firDate"));
+   parts.push(crime+".");
+   return parts.join(" | ");
+ }
+ function update(){
+   $("pFromRank").innerHTML=show("fromRank");
+   $("pStation").innerHTML=show("station");
+   $("pCity").innerHTML=show("city");
+   $("pLetterDate").innerHTML="Date: "+dateOrBlank("letterDate");
+   $("pToOfficer").innerHTML=show("toOfficer");
+   $("pDivision").innerHTML=show("division");
+   $("pRailway").innerHTML=show("railway");
+   $("pRailwayAddress").innerHTML=v("railwayAddress")?safe(v("railwayAddress")).replace(/\n/g,"<br>"):"";
+   $("pSubject").innerHTML=show("subject");
+   $("pRef").textContent=refText();
+
+   $("pAccusedName").innerHTML=show("accusedName");
+   $("pAge").innerHTML=show("age");
+   $("pDesignation").innerHTML=show("designation");
+   $("pEmployeeId").innerHTML=show("employeeId");
+   $("pPlacePosting").innerHTML=show("placePosting");
+   $("pResidentialAddress").innerHTML=v("residentialAddress")?safe(v("residentialAddress")).replace(/\n/g,"<br>"):blank();
+   $("rowEmployeeId").style.display=v("employeeId")?"table-row":"none";
+   $("rowAddress").style.display=v("residentialAddress")?"table-row":"none";
+
+   const nature=v("caseNature")?" The case relates to "+v("caseNature")+".":"";
+   $("pPara1").textContent="It is submitted that a case in "+(v("station")||"the Police Station")+" Crime No. "+(v("crimeNo")||"__________/20__")+(v("sections")?" under "+v("sections"):"")+" was registered"+(v("firDate")?" on "+prettyDate(v("firDate")):"")+"."+nature+" During the course of investigation, the following accused was ascertained to be employed in the Railway Department.";
+
+   let para2="The above accused was arrested";
+   if(v("arrestDate"))para2+=" on "+prettyDate(v("arrestDate"));
+   if(v("arrestTime"))para2+=" at "+prettyTime(v("arrestTime"));
+   para2+=" after following the prescribed procedure.";
+   if(v("court")||v("productionDate")){
+     para2+=" Thereafter, the accused was produced before "+(v("court")||"the jurisdictional Court");
+     if(v("productionDate"))para2+=" on "+prettyDate(v("productionDate"));
+     para2+=".";
+   }
+   if(v("remandTill"))para2+=" The accused was remanded to judicial custody till "+prettyDate(v("remandTill"))+".";
+   else para2+=" The accused was remanded to judicial custody.";
+   if(v("prison"))para2+=" The accused was lodged at "+v("prison")+".";
+   $("pPara2").textContent=para2;
+
+   $("pActionLine").textContent=v("actionLine")||"The above facts are hereby intimated to your office for official information.";
+   $("pSignRank").innerHTML=show("fromRank");
+   $("pSignStation").innerHTML=show("station");
+
+   const enc=v("enclosures");
+   $("pEnclosuresWrap").style.display=enc?"block":"none";
+   $("pEnclosures").textContent=enc;
+ }
+ ids.forEach(id=>$(id).addEventListener("input",update));
+
+ const today=new Date();
+ const y=today.getFullYear(),m=String(today.getMonth()+1).padStart(2,"0"),d=String(today.getDate()).padStart(2,"0");
+ $("letterDate").value=y+"-"+m+"-"+d;
+
+ const DEFAULT_KEY="policedocs_railway_arrest_defaults_v1";
+ try{
+   const saved=JSON.parse(localStorage.getItem(DEFAULT_KEY)||"{}");
+   ["fromRank","station","city","toOfficer","division","railway","railwayAddress"].forEach(id=>{if(saved[id])$(id).value=saved[id]});
+ }catch(e){}
+
+ $("saveDefaultsBtn").addEventListener("click",function(){
+   const data={};["fromRank","station","city","toOfficer","division","railway","railwayAddress"].forEach(id=>data[id]=v(id));
+   localStorage.setItem(DEFAULT_KEY,JSON.stringify(data));
+   $("saveStatus").textContent="Office defaults saved";
+   setTimeout(()=>$("saveStatus").textContent="",1800);
+ });
+
+ $("clearBtn").addEventListener("click",function(){
+   ["officeRef","crimeNo","firDate","sections","caseNature","accusedName","age","designation","employeeId","placePosting","residentialAddress","arrestDate","arrestTime","court","productionDate","remandTill","prison","enclosures"].forEach(id=>$(id).value="");
+   $("designation").value="Clerk";
+   update();
+ });
+
+ $("printBtn").addEventListener("click",function(){update();window.print()});
+
+ $("pdfBtn").addEventListener("click",async function(){
+   update();
+   const btn=this, original=btn.textContent;
+   btn.disabled=true;btn.textContent="Creating PDF…";
+   const paper=$("paper");
+   const old={width:paper.style.width,minHeight:paper.style.minHeight,padding:paper.style.padding,boxShadow:paper.style.boxShadow};
+   try{
+     paper.style.width="210mm";paper.style.minHeight="297mm";paper.style.padding="18mm 18mm 20mm";paper.style.boxShadow="none";
+     const canvas=await html2canvas(paper,{scale:2,useCORS:true,backgroundColor:"#ffffff",windowWidth:paper.scrollWidth,windowHeight:paper.scrollHeight});
+     const img=canvas.toDataURL("image/jpeg",0.96);
+     const jsPDF=window.jspdf.jsPDF;
+     const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+     const pageW=210,pageH=297;
+     const imgW=pageW;
+     const imgH=canvas.height*imgW/canvas.width;
+     if(imgH<=pageH){
+       pdf.addImage(img,"JPEG",0,0,imgW,imgH,undefined,"FAST");
+     }else{
+       const pxPerMm=canvas.width/pageW;
+       const pagePx=Math.floor(pageH*pxPerMm);
+       let yPx=0,page=0;
+       while(yPx<canvas.height){
+         const slice=document.createElement("canvas");
+         slice.width=canvas.width; slice.height=Math.min(pagePx,canvas.height-yPx);
+         const ctx=slice.getContext("2d");
+         ctx.drawImage(canvas,0,yPx,canvas.width,slice.height,0,0,canvas.width,slice.height);
+         const sliceImg=slice.toDataURL("image/jpeg",0.96);
+         if(page>0)pdf.addPage();
+         const sliceHmm=slice.height/pxPerMm;
+         pdf.addImage(sliceImg,"JPEG",0,0,pageW,sliceHmm,undefined,"FAST");
+         yPx+=pagePx;page++;
+       }
+     }
+     const cr=v("crimeNo").replace(/[^a-zA-Z0-9_-]+/g,"_");
+     const nm=v("accusedName").replace(/[^a-zA-Z0-9_-]+/g,"_");
+     pdf.save("Railway_Employee_Arrest_Intimation"+(cr?"_"+cr:"")+(nm?"_"+nm:"")+".pdf");
+   }catch(err){
+     console.error(err);
+     alert("Could not create the PDF. Please use Print and choose Save as PDF, or try again.");
+   }finally{
+     Object.assign(paper.style,old);btn.disabled=false;btn.textContent=original;
+   }
+ });
+
+ update();
+})();
+</script>
+</body>
+</html>
