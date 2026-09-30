@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071c33">
+<meta name="description" content="ClearExams Practice: choose an exam, subject and topic, then start a focused 10-question test with explanations, wrong-answer retry and progress tracking.">
+<link rel="canonical" href="https://clearexams.ink/practice.html">
+<title>Practice Tests | ClearExams</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/clearexams-icon.svg" type="image/svg+xml">
+<script src="assets/js/pwa.js" defer></script>
+<style>
+:root{--navy:#071c33;--blue:#1463ff;--ink:#10233b;--muted:#607086;--line:#dfe7f0;--bg:#f5f8fc;--white:#fff;--green:#0f7a55}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}a{text-decoration:none;color:inherit}button,select{font:inherit}
+.wrap{width:min(980px,calc(100% - 24px));margin:auto}
+header{position:sticky;top:0;z-index:20;background:#fffffff2;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+nav{min-height:64px;display:flex;align-items:center;gap:18px}.brand{font-size:1.15rem;font-weight:900}.links{margin-left:auto;display:flex;gap:16px;font-weight:800;color:#38516c}
+.hero{background:linear-gradient(135deg,#071c33,#0d3b67);color:#fff}.hero .wrap{padding:46px 0 56px}.eyebrow{margin:0 0 8px;color:#7bd2ff;font-size:.77rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase}.hero h1{margin:0;font-size:clamp(2.2rem,7vw,4.2rem);line-height:1.02;letter-spacing:-.04em}.hero p{max-width:680px;margin:14px 0 0;color:#cbd9e8;font-size:1rem}
+main{padding:0 0 64px}.setup{margin-top:-26px;padding:20px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:0 16px 45px rgba(7,28,51,.10)}
+.setup h2{margin:0 0 4px;font-size:1.35rem}.setup>p{margin:0 0 16px;color:var(--muted)}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.field{display:grid;gap:6px}.field label{font-size:.74rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#4a6077}.field select{width:100%;min-height:48px;padding:0 12px;border:1px solid #cbd7e5;border-radius:11px;background:#fff;color:var(--ink)}
+.startrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}.availability{color:var(--muted);font-size:.86rem}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 17px;border:1px solid #cbd7e5;border-radius:11px;background:#fff;color:#29435e;font-weight:850;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn:disabled{opacity:.5;cursor:not-allowed}
+.resume{display:none;margin:16px 0 0;padding:14px;border:1px solid #bad4f5;border-radius:13px;background:#eef6ff;align-items:center;justify-content:space-between;gap:12px}.resume.show{display:flex}.resume strong,.resume span{display:block}.resume span{margin-top:2px;color:#526a83;font-size:.82rem}
+.section{margin-top:30px}.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}.sectionhead h2{margin:0;font-size:1.45rem}.sectionhead p{margin:3px 0 0;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{padding:16px;border:1px solid var(--line);border-radius:15px;background:#fff}.card small{font-size:.72rem;font-weight:900;text-transform:uppercase;color:#607086}.card strong{display:block;margin:6px 0 4px;font-size:1rem}.card p{margin:0 0 12px;color:var(--muted);font-size:.84rem}.card a{color:var(--blue);font-weight:850}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff}.stat span{display:block;color:var(--muted);font-size:.73rem;font-weight:800;text-transform:uppercase}.stat strong{display:block;margin-top:3px;font-size:1.25rem}.weak{margin-top:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;display:flex;justify-content:space-between;gap:12px;align-items:center}.weak p{margin:3px 0 0;color:var(--muted);font-size:.85rem}
+.note{margin-top:20px;padding:13px 14px;border:1px solid #d8e2ed;border-radius:12px;background:#f9fbfd;color:#53677c;font-size:.84rem}
+footer{padding:28px 0;background:#061629;color:#cbd8e5}
+@media(max-width:760px){.links{display:none}.hero .wrap{padding:32px 0 46px}.fields,.cards,.stats{grid-template-columns:1fr 1fr}.startrow,.resume,.weak{align-items:stretch;flex-direction:column}.btn{width:100%}}
+@media(max-width:480px){.fields,.cards{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.setup{padding:15px;border-radius:17px}.hero h1{font-size:2.35rem}}
+</style>
+</head>
+<body>
+<header><nav class="wrap"><a class="brand" href="index.html">ClearExams.</a><div class="links"><a href="practice.html">Practice</a><a href="pyq-hub.html">PYQs</a><a href="current-affairs/">Current Affairs</a><a href="dashboard.html">Dashboard</a></div></nav></header>
+<section class="hero"><div class="wrap"><p class="eyebrow">Practice engine</p><h1>Choose. Practise. Improve.</h1><p>Start a focused 10-question test, review every answer, retry mistakes and let your dashboard identify weak subjects.</p></div></section>
+<main class="wrap">
+<section class="setup" aria-labelledby="practiceTitle">
+<h2 id="practiceTitle">Start a focused test</h2><p>Pick an exam and subject. Only complete 10-question sets are shown.</p>
+<div class="fields">
+<div class="field"><label for="exam">Exam</label><select id="exam"><option>Loading…</option></select></div>
+<div class="field"><label for="subject">Subject</label><select id="subject"><option>Loading…</option></select></div>
+<div class="field"><label for="topic">Topic</label><select id="topic"><option>Loading…</option></select></div>
+</div>
+<div class="startrow"><div class="availability" id="availability">Loading question bank…</div><button class="btn primary" id="startBtn" type="button" disabled>Start 10 questions</button></div>
+<div class="resume" id="resume"><div><strong id="resumeTitle">Resume quiz</strong><span id="resumeText"></span></div><a class="btn primary" id="resumeLink" href="daily-quiz.html">Resume</a></div>
+</section>
+
+<section class="section">
+<div class="sectionhead"><div><h2>Practice modes</h2><p>Use the shortest useful path for the time you have.</p></div></div>
+<div class="cards">
+<article class="card"><small>Daily</small><strong>10 Questions</strong><p>Quick recall with explanations and wrong-answer retry.</p><a id="dailyLink" href="daily-quiz.html">Start daily set →</a></article>
+<article class="card"><small>Exam mode</small><strong>TNPSC Group IV Mocks</strong><p>Longer timed practice with review and retry.</p><a href="tnpsc/mocks/">Open mocks →</a></article>
+<article class="card"><small>Pattern</small><strong>Previous Questions</strong><p>Practise from previous-question collections and exam patterns.</p><a href="pyq-hub.html">Open PYQs →</a></article>
+<article class="card"><small>Review</small><strong>Weak Areas</strong><p>See recent accuracy and continue your weakest subject.</p><a href="dashboard.html">Open dashboard →</a></article>
+</div>
+</section>
+
+<section class="section">
+<div class="sectionhead"><div><h2>Your practice snapshot</h2><p>Saved locally on this device.</p></div></div>
+<div class="stats">
+<div class="stat"><span>Attempts</span><strong id="attempts">0</strong></div>
+<div class="stat"><span>Questions</span><strong id="questions">0</strong></div>
+<div class="stat"><span>Accuracy</span><strong id="accuracy">—</strong></div>
+<div class="stat"><span>Best</span><strong id="best">—</strong></div>
+</div>
+<div class="weak"><div><strong id="weakTitle">No weak subject yet</strong><p id="weakText">Complete a few quizzes and ClearExams will suggest what to revise.</p></div><a class="btn" id="weakLink" href="daily-quiz.html" hidden>Practise weak subject</a></div>
+</section>
+<div class="note"><strong>Current release:</strong> focused 10-question practice, full TNPSC Group IV mocks, history and weak-subject review. Larger custom 25/50/100-question sets can be enabled after each subject has enough reviewed questions.</div>
+</main>
+<footer><div class="wrap">© 2026 ClearExams.ink · Practice • Review • Improve</div></footer>
+
+<script>
+const BANK_URL='data/quizzes/daily-quiz.csv',HISTORY_KEY='clearexamsQuizHistoryV2',SESSION_KEY='clearexamsQuizSessionV1',TARGET_KEY='clearexamsTargetExamV1',MIN=10;
+const $=id=>document.getElementById(id);let bank=[];
+function parseCSV(text){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(ch==='"'&&quoted&&next==='"'){cell+='"';i++}else if(ch==='"')quoted=!quoted;else if(ch===','&&!quoted){row.push(cell);cell=''}else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&next==='\n')i++;row.push(cell);if(row.some(v=>v.trim()!==''))rows.push(row);row=[];cell=''}else cell+=ch}row.push(cell);if(row.some(v=>v.trim()!==''))rows.push(row);const headers=(rows.shift()||[]).map(x=>x.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||'').trim()])))}
+function active(q){return String(q.Active||'TRUE').toUpperCase()!=='FALSE'&&q.Exam&&q.Question}
+function family(v){const s=String(v||'').toLowerCase();if(s.includes('tnpsc'))return'tnpsc';if(s.includes('tnusrb'))return'tnusrb';if(s.includes('upsc'))return'upsc';if(s.includes('ssc'))return'ssc';if(s.includes('bank'))return'banking';if(s.includes('rail'))return'railways';return''}
+function examRows(exam){const exact=bank.filter(q=>q.Exam===exam);if(exam==='UPSC'||exam==='TNPSC Group IV')return exact.concat(bank.filter(q=>q.Exam==='UPSC/TNPSC'));return exact}
+function subjectFor(q){return q.Exam==='UPSC/TNPSC'?(q.Topic||'General Studies'):(q.Subtopic||q.Topic||'General')}
+function topicFor(q){return q.Exam==='UPSC/TNPSC'?((q.Topic||'General Studies')+' Mixed Practice'):(q.Topic||q.Subtopic||'Mixed Practice')}
+function counts(values){const m=new Map();values.forEach(v=>m.set(v,(m.get(v)||0)+1));return m}
+function options(select,items,placeholder){select.innerHTML='';if(placeholder){const o=document.createElement('option');o.value='';o.textContent=placeholder;select.appendChild(o)}items.forEach(([value,count])=>{const o=document.createElement('option');o.value=value;o.textContent=value+(count!=null?' ('+count+')':'');select.appendChild(o)})}
+function fillExams(){const raw=[...new Set(bank.map(q=>q.Exam).filter(Boolean))].sort(),hasU=raw.includes('UPSC'),hasT=raw.includes('TNPSC Group IV'),exams=raw.filter(x=>x!=='UPSC/TNPSC'||!(hasU&&hasT));options($('exam'),exams.map(e=>[e,examRows(e).length]));const saved=localStorage.getItem(TARGET_KEY)||'tnpsc',preferred=exams.find(e=>family(e)===saved)||exams[0]||'';$('exam').value=preferred;fillSubjects()}
+function fillSubjects(){const rows=examRows($('exam').value),m=counts(rows.map(subjectFor).filter(Boolean)),items=[...m.entries()].filter(([,n])=>n>=MIN).sort((a,b)=>a[0].localeCompare(b[0]));options($('subject'),items,'All subjects');fillTopics()}
+function fillTopics(){let rows=examRows($('exam').value);if($('subject').value)rows=rows.filter(q=>subjectFor(q)===$('subject').value);const m=counts(rows.map(topicFor).filter(Boolean)),items=[...m.entries()].filter(([,n])=>n>=MIN).sort((a,b)=>a[0].localeCompare(b[0]));options($('topic'),items);updateStart(m)}
+function updateStart(m){const topic=$('topic').value,n=m.get(topic)||0;$('availability').textContent=topic?n+' questions available for this set':'No complete 10-question set is available for this selection.';$('startBtn').disabled=n<MIN;const p=new URLSearchParams();if($('exam').value)p.set('exam',$('exam').value);if($('subject').value)p.set('subject',$('subject').value);if(topic)p.set('topic',topic);const href='daily-quiz.html?'+p.toString();$('dailyLink').href=href;$('startBtn').onclick=()=>{const f=family($('exam').value);if(f)localStorage.setItem(TARGET_KEY,f);location.href=href}}
+function sessionHref(s){const p=new URLSearchParams();['exam','subject','topic','date'].forEach(k=>{if(s&&s[k])p.set(k,s[k])});return'daily-quiz.html'+(p.toString()?'?'+p.toString():'')}
+function loadPersonal(){let h=[],s=null;try{h=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]')}catch{}try{s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch{}if(s&&s.exam&&s.topic){$('resume').classList.add('show');$('resumeTitle').textContent='Resume '+(s.subject||s.topic);$('resumeText').textContent=s.exam+' · Continue from question '+((Number(s.current)||0)+1)+' of 10';$('resumeLink').href=sessionHref(s)}
+$('attempts').textContent=h.length;const total=h.reduce((n,x)=>n+(+x.total||0),0),got=h.reduce((n,x)=>n+(+x.score||0),0),best=h.reduce((m,x)=>Math.max(m,+x.score||0),-1);$('questions').textContent=total;$('accuracy').textContent=total?Math.round(got/total*100)+'%':'—';$('best').textContent=best>=0?best+'/10':'—';
+const by=new Map();h.forEach(x=>{if(!x.subject)return;const v=by.get(x.subject)||{s:0,t:0,exam:x.exam||''};v.s+=+x.score||0;v.t+=+x.total||0;by.set(x.subject,v)});const weak=[...by.entries()].filter(([,v])=>v.t>=10).map(([subject,v])=>({subject,accuracy:Math.round(v.s/v.t*100),exam:v.exam})).sort((a,b)=>a.accuracy-b.accuracy)[0];if(weak){$('weakTitle').textContent=weak.subject+' · '+weak.accuracy+'%';$('weakText').textContent='This is currently your lowest-accuracy practiced subject.';$('weakLink').hidden=false;$('weakLink').href='daily-quiz.html?exam='+encodeURIComponent(weak.exam||$('exam').value)+'&subject='+encodeURIComponent(weak.subject)}}
+$('exam').addEventListener('change',()=>{const f=family($('exam').value);if(f)localStorage.setItem(TARGET_KEY,f);fillSubjects()});$('subject').addEventListener('change',fillTopics);$('topic').addEventListener('change',fillTopics);
+fetch(BANK_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Question bank unavailable');return r.text()}).then(t=>{bank=parseCSV(t).filter(active);fillExams();loadPersonal()}).catch(e=>{$('availability').textContent='Could not load the question bank. Try Daily Quiz directly.';$('exam').innerHTML='<option>Unavailable</option>';$('subject').innerHTML='<option>Unavailable</option>';$('topic').innerHTML='<option>Unavailable</option>'});
+</script>
+</body>
+</html>
