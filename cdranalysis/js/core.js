@@ -73,7 +73,7 @@
     ].join('')+'</div>';
   }
   function renderFileList(){
-    $('fileList').innerHTML=state.files.map(f=>`<div class="file-item"><b title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</b><span>${f.inferredCdr?escapeHtml(f.inferredCdr)+' • ':''}${escapeHtml(f.sheet)} • ${fmtInt(f.rows)} rows <button class="file-remove" data-remove-file="${f.id}" title="Remove worksheet import">×</button></span><span class="tiny" title="${escapeHtml(f.sha256||'')}">${f.sha256?'SHA-256 '+escapeHtml(f.sha256.slice(0,12))+'… • ':''}${escapeHtml(f.sourceTimezone||'')}${f.size?' • '+fmtInt(f.size)+' bytes':''}</span></div>`).join('');
+    $('fileList').innerHTML=state.files.map(f=>`<div class="file-item"><b title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</b><span>${f.inferredCdr?escapeHtml(f.inferredCdr)+' • ':''}${escapeHtml(f.sheet)} • ${fmtInt(f.rows)} rows <button class="file-remove" data-remove-file="${f.id}" title="Remove this loaded CDR">Remove</button></span><span class="tiny" title="${escapeHtml(f.sha256||'')}">${f.sha256?'SHA-256 '+escapeHtml(f.sha256.slice(0,12))+'… • ':''}${escapeHtml(f.sourceTimezone||'')}${f.size?' • '+fmtInt(f.size)+' bytes':''}</span></div>`).join('');
     renderImportHealth();
   }
   function uniq(key){return [...new Set(state.records.map(r=>r[key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));}
