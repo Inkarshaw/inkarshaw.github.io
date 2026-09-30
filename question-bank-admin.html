@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071c33">
+<meta name="robots" content="noindex,nofollow">
+<title>Question Bank Admin | ClearExams</title>
+<style>
+:root{--navy:#071c33;--blue:#1463ff;--ink:#10233b;--muted:#607086;--line:#dfe7f0;--bg:#f5f8fc;--white:#fff;--green:#13795b;--red:#b93652;--amber:#9a650e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}a{color:inherit;text-decoration:none}.wrap{width:min(1220px,calc(100% - 24px));margin:auto}
+header{position:sticky;top:0;z-index:20;background:#fffffff2;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}nav{min-height:64px;display:flex;align-items:center;gap:16px}.brand{font-size:1.15rem;font-weight:900}.badge{padding:4px 8px;border-radius:999px;background:#eef4ff;color:#1555bc;font-size:.72rem;font-weight:900}.links{margin-left:auto;display:flex;gap:14px;font-weight:800;color:#39536e}
+.hero{background:linear-gradient(135deg,#071c33,#0d3b67);color:#fff}.hero .wrap{padding:36px 0}.hero h1{margin:0;font-size:clamp(2rem,5vw,3.4rem);line-height:1.03}.hero p{max-width:790px;margin:10px 0 0;color:#c9d8e7}
+main{padding:22px 0 70px}.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding:0 13px;border:1px solid #c8d6e5;border-radius:10px;background:#fff;color:#29445f;font-weight:850;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.good{color:var(--green);border-color:#a9d6c5;background:#eef9f4}.btn.warn{color:var(--amber);border-color:#e5cb91;background:#fff8e9}.btn.danger{color:var(--red);border-color:#e8b7c2;background:#fff5f7}.btn:disabled{opacity:.45;cursor:not-allowed}
+.notice{margin-bottom:14px;padding:12px 14px;border:1px solid #c5d8ee;border-radius:12px;background:#eef6ff;color:#365675}.notice strong{color:#123d70}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}.stat{padding:13px;border:1px solid var(--line);border-radius:14px;background:#fff}.stat span{display:block;color:var(--muted);font-size:.69rem;font-weight:850;text-transform:uppercase}.stat strong{display:block;margin-top:3px;font-size:1.2rem}
+.panel{margin-top:15px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff}.panel h2{margin:0 0 4px;font-size:1.2rem}.panel>p{margin:0 0 13px;color:var(--muted)}
+.upload{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.filepick{position:relative;overflow:hidden}.filepick input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.filters{display:grid;grid-template-columns:1.4fr repeat(4,minmax(130px,.7fr));gap:9px}.filters input,.filters select,.editor input,.editor select,.editor textarea{width:100%;border:1px solid #cbd7e5;border-radius:9px;background:#fff;color:var(--ink)}.filters input,.filters select,.editor input,.editor select{min-height:42px;padding:0 10px}.editor textarea{min-height:84px;padding:9px 10px;resize:vertical}
+.bulkbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}.bulkbar span{color:var(--muted);font-size:.8rem}
+.readiness{overflow:auto}.readytable,.qtable{width:100%;border-collapse:collapse}.readytable th,.readytable td,.qtable th,.qtable td{padding:10px;border-bottom:1px solid #edf1f5;text-align:left;vertical-align:top}.readytable th,.qtable th{position:sticky;top:64px;background:#f8fafc;color:#52677c;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;z-index:2}.readytable td{white-space:nowrap}.chip{display:inline-flex;min-width:38px;justify-content:center;padding:3px 7px;border-radius:999px;font-size:.7rem;font-weight:900}.chip.yes{background:#e8f7ef;color:var(--green)}.chip.no{background:#f1f3f6;color:#788797}.chip.issue{background:#fff0f3;color:var(--red)}.status{display:inline-block;padding:3px 7px;border-radius:999px;font-size:.68rem;font-weight:900;white-space:nowrap}.status.Published{background:#e8f7ef;color:var(--green)}.status.Reviewed{background:#eef4ff;color:#1555bc}.status.Draft{background:#f0f2f5;color:#59697a}.status.Needs-Correction{background:#fff0f3;color:var(--red)}
+.qwrap{overflow:auto;max-height:720px;border:1px solid var(--line);border-radius:12px}.qtable{min-width:980px}.qtable td.question{min-width:320px}.qtable small{display:block;color:var(--muted);margin-top:3px}.issue-text{color:var(--red);font-size:.73rem;font-weight:750}.ok-text{color:var(--green);font-size:.73rem;font-weight:750}.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;color:var(--muted)}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.overlay{position:fixed;inset:0;z-index:60;background:#071c3370;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow:auto}.overlay.show{display:flex}.editor{width:min(920px,100%);margin:auto;background:#fff;border-radius:18px;padding:18px;box-shadow:0 24px 70px #071c3340}.editor-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.editor-head h2{margin:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}.field.half{grid-column:span 2}.field label{color:#52677c;font-size:.72rem;font-weight:850;text-transform:uppercase}.editor-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+footer{padding:26px 0;background:#061629;color:#cbd8e5}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.filters{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr 1fr}.field.half{grid-column:span 1}}
+@media(max-width:560px){.links{display:none}.stats{grid-template-columns:1fr 1fr}.filters,.grid{grid-template-columns:1fr}.field.full,.field.half{grid-column:1}.upload,.actions{display:grid}.btn{width:100%}.panel{padding:13px}.hero .wrap{padding:28px 0}}
+</style>
+</head>
+<body>
+<header><nav class="wrap"><a class="brand" href="index.html">ClearExams.</a><span class="badge">Local Admin</span><div class="links"><a href="practice.html">Practice</a><a href="daily-quiz.html">Quiz</a><a href="dashboard.html">Dashboard</a></div></nav></header>
+<section class="hero"><div class="wrap"><h1>Question Bank Admin</h1><p>Audit coverage, import questions in bulk, detect duplicates and validation errors, review status, edit rows, and export a CSV compatible with the existing ClearExams quiz feed.</p></div></section>
+<main class="wrap">
+<div class="notice"><strong>Local-first:</strong> edits on this page are stored only in this browser until you export the CSV. The live website question bank is not changed automatically.</div>
+
+<section class="stats">
+<div class="stat"><span>Total rows</span><strong id="sTotal">0</strong></div>
+<div class="stat"><span>Published usable</span><strong id="sUsable">0</strong></div>
+<div class="stat"><span>Draft / review</span><strong id="sDraft">0</strong></div>
+<div class="stat"><span>Needs correction</span><strong id="sCorrection">0</strong></div>
+<div class="stat"><span>Duplicate groups</span><strong id="sDup">0</strong></div>
+<div class="stat"><span>Publish blockers</span><strong id="sBlockers">0</strong></div>
+</section>
+
+<section class="panel">
+<h2>Bulk import & export</h2><p>CSV imports are added to this browser workspace. Existing live rows remain untouched until you export and publish the resulting file through your normal feed workflow.</p>
+<div class="upload">
+<label class="btn primary filepick">Import CSV<input id="csvFile" type="file" accept=".csv,text/csv"></label>
+<button class="btn" id="templateBtn" type="button">Download CSV template</button>
+<button class="btn" id="workspaceExport" type="button">Export workspace CSV</button>
+<button class="btn good" id="publishExport" type="button">Export publish-ready CSV</button>
+<button class="btn danger" id="clearWorkspace" type="button">Clear local imports & edits</button>
+<span id="importNote" style="color:var(--muted);font-size:.82rem"></span>
+</div>
+</section>
+
+<section class="panel">
+<h2>Coverage & test readiness</h2><p>Counts use only rows that are Published, valid, and not blocked by a published duplicate. This shows where 10/25/50/100-question practice is genuinely ready.</p>
+<div class="readiness"><table class="readytable"><thead><tr><th>Exam</th><th>Subject</th><th>Topic</th><th>Usable</th><th>10</th><th>25</th><th>50</th><th>100</th></tr></thead><tbody id="readinessBody"></tbody></table></div>
+</section>
+
+<section class="panel">
+<h2>Question review</h2><p>Search or filter the bank, then edit one row or apply a review status to all visible rows.</p>
+<div class="filters">
+<input id="search" type="search" placeholder="Search ID, question, subject or topic">
+<select id="examFilter"><option value="">All exams</option></select>
+<select id="subjectFilter"><option value="">All subjects</option></select>
+<select id="statusFilter"><option value="">All statuses</option><option>Draft</option><option>Reviewed</option><option>Published</option><option>Needs Correction</option></select>
+<select id="issueFilter"><option value="">All rows</option><option value="issues">Issues only</option><option value="duplicates">Duplicates only</option><option value="invalid">Invalid only</option></select>
+</div>
+<div class="bulkbar"><span id="visibleCount">0 visible</span><button class="btn" data-bulk="Draft">Mark Draft</button><button class="btn" data-bulk="Reviewed">Mark Reviewed</button><button class="btn good" data-bulk="Published">Mark Published</button><button class="btn warn" data-bulk="Needs Correction">Needs Correction</button><button class="btn primary" id="addQuestion" type="button">Add question</button></div>
+<div class="qwrap"><table class="qtable"><thead><tr><th>ID</th><th>Exam / Subject</th><th>Question</th><th>Status</th><th>Quality</th><th></th></tr></thead><tbody id="questionBody"></tbody></table></div>
+<div class="pager"><span id="pageInfo"></span><div class="actions"><button class="btn" id="prevPage">Previous</button><button class="btn" id="nextPage">Next</button></div></div>
+</section>
+</main>
+
+<div class="overlay" id="overlay" aria-hidden="true">
+<form class="editor" id="editor">
+<div class="editor-head"><h2 id="editorTitle">Edit question</h2><button class="btn" id="closeEditor" type="button">Close</button></div>
+<div class="grid">
+<div class="field"><label>ID<input name="ID" required></label></div>
+<div class="field"><label>Status<select name="Status"><option>Draft</option><option>Reviewed</option><option>Published</option><option>Needs Correction</option></select></label></div>
+<div class="field"><label>Publish date<input name="PublishDate" type="date"></label></div>
+<div class="field"><label>Exam<input name="Exam" required></label></div>
+<div class="field"><label>Topic<input name="Topic" required></label></div>
+<div class="field"><label>Subtopic<input name="Subtopic" required></label></div>
+<div class="field full"><label>Question<textarea name="Question" required></textarea></label></div>
+<div class="field"><label>Option A<textarea name="OptionA" required></textarea></label></div>
+<div class="field"><label>Option B<textarea name="OptionB" required></textarea></label></div>
+<div class="field"><label>Option C<textarea name="OptionC" required></textarea></label></div>
+<div class="field"><label>Option D<textarea name="OptionD" required></textarea></label></div>
+<div class="field"><label>Correct answer<select name="CorrectAnswer"><option>A</option><option>B</option><option>C</option><option>D</option></select></label></div>
+<div class="field half"><label>Explanation A<textarea name="ExplanationA" required></textarea></label></div>
+<div class="field half"><label>Explanation B<textarea name="ExplanationB" required></textarea></label></div>
+<div class="field half"><label>Explanation C<textarea name="ExplanationC" required></textarea></label></div>
+<div class="field half"><label>Explanation D<textarea name="ExplanationD" required></textarea></label></div>
+</div>
+<div class="editor-actions"><button class="btn danger" id="deleteRow" type="button">Delete local row</button><button class="btn primary" type="submit">Save changes</button></div>
+</form>
+</div>
+
+<footer><div class="wrap">ClearExams Question Bank Admin · local browser workspace</div></footer>
+<script>
+const LIVE_URL='data/quizzes/daily-quiz.csv',WORK_KEY='clearexamsQuestionAdminV1',PAGE_SIZE=50;
+const EXPORT_FIELDS=['ID','Active','Status','Exam','Topic','Subtopic','PublishDate','Question','OptionA','OptionB','OptionC','OptionD','CorrectAnswer','ExplanationA','ExplanationB','ExplanationC','ExplanationD'];
+const STATUSES=['Draft','Reviewed','Published','Needs Correction'],REQUIRED=['ID','Exam','Topic','Subtopic','Question','OptionA','OptionB','OptionC','OptionD','CorrectAnswer','ExplanationA','ExplanationB','ExplanationC','ExplanationD'];
+const $=id=>document.getElementById(id);let base=[],workspace={imports:[],overrides:{},deleted:[]},page=1,editingKey=null,analysis=null;
+
+function parseCSV(text){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(ch==='"'&&quoted&&next==='"'){cell+='"';i++}else if(ch==='"')quoted=!quoted;else if(ch===','&&!quoted){row.push(cell);cell=''}else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&next==='\n')i++;row.push(cell);if(row.some(v=>v.trim()!==''))rows.push(row);row=[];cell=''}else cell+=ch}row.push(cell);if(row.some(v=>v.trim()!==''))rows.push(row);if(!rows.length)return[];const headers=rows.shift().map(h=>h.trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||'').trim()])))}
+function csvCell(v){const s=String(v??'');return '"'+s.replaceAll('"','""')+'"'}
+function toCSV(rows){return EXPORT_FIELDS.map(csvCell).join(',')+'\r\n'+rows.map(r=>EXPORT_FIELDS.map(f=>csvCell(r[f]||'')).join(',')).join('\r\n')+'\r\n'}
+function download(name,text){const b=new Blob([text],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function loadWorkspace(){try{const v=JSON.parse(localStorage.getItem(WORK_KEY)||'null');if(v&&Array.isArray(v.imports)&&v.overrides)workspace=v}catch{}}
+function saveWorkspace(){localStorage.setItem(WORK_KEY,JSON.stringify(workspace))}
+function statusOf(row,source){const explicit=String(row.Status||'').trim();if(STATUSES.includes(explicit))return explicit;if(source==='base')return String(row.Active||'').toLowerCase()==='false'?'Draft':'Published';return String(row.Active||'').toLowerCase()==='true'?'Published':'Draft'}
+function makeKey(source,index,row){return source+':'+index+':'+(row.ID||'noid')}
+function effectiveRows(){const out=[];base.forEach((r,i)=>{const key=makeKey('base',i,r);if(workspace.deleted.includes(key))return;out.push({...r,...(workspace.overrides[key]||{}),__key:key,__source:'base',__index:i})});workspace.imports.forEach((r,i)=>{const key=makeKey('import',i,r);if(workspace.deleted.includes(key))return;out.push({...r,...(workspace.overrides[key]||{}),__key:key,__source:'import',__index:i})});return out.map(r=>({...r,Status:statusOf(r,r.__source)}))}
+function normalizeQuestion(v){return String(v||'').toLowerCase().normalize('NFKC').replace(/[^a-z0-9\u0B80-\u0BFF]+/g,' ').trim().replace(/\s+/g,' ')}
+function validate(r){const issues=[];REQUIRED.forEach(f=>{if(!String(r[f]||'').trim())issues.push('Missing '+f)});if(r.CorrectAnswer&&!['A','B','C','D'].includes(String(r.CorrectAnswer).toUpperCase()))issues.push('CorrectAnswer must be A-D');return issues}
+function buildAnalysis(){
+ const rows=effectiveRows(),idMap=new Map(),qMap=new Map();rows.forEach(r=>{const id=String(r.ID||'').trim();if(id){if(!idMap.has(id))idMap.set(id,[]);idMap.get(id).push(r.__key)}const nq=normalizeQuestion(r.Question);if(nq){if(!qMap.has(nq))qMap.set(nq,[]);qMap.get(nq).push(r.__key)}});
+ const dupKeys=new Set(),dupGroups=[];for(const [value,keys] of idMap)if(keys.length>1){keys.forEach(k=>dupKeys.add(k));dupGroups.push({type:'ID',value,keys})}for(const [value,keys] of qMap)if(keys.length>1){keys.forEach(k=>dupKeys.add(k));dupGroups.push({type:'Question',value,keys})}
+ const rowInfo=new Map(),publishedDupBlockers=new Set();rows.forEach(r=>{const invalid=validate(r);const duplicate=dupKeys.has(r.__key);rowInfo.set(r.__key,{invalid,duplicate});if(r.Status==='Published'&&duplicate)publishedDupBlockers.add(r.__key)});
+ const usable=rows.filter(r=>r.Status==='Published'&&!rowInfo.get(r.__key).invalid.length&&!publishedDupBlockers.has(r.__key));
+ const blockers=rows.filter(r=>r.Status==='Published'&&(rowInfo.get(r.__key).invalid.length||publishedDupBlockers.has(r.__key)));
+ return {rows,idMap,qMap,dupKeys,dupGroups,rowInfo,usable,blockers}
+}
+function subjectFor(r){return r.Exam==='UPSC/TNPSC'?(r.Topic||'General Studies'):(r.Subtopic||r.Topic||'General')}
+function topicFor(r){return r.Exam==='UPSC/TNPSC'?((r.Topic||'General Studies')+' Mixed Practice'):(r.Topic||r.Subtopic||'Mixed Practice')}
+function readinessRows(){const m=new Map();analysis.usable.forEach(r=>{const exam=r.Exam||'Unspecified',subject=subjectFor(r),topic=topicFor(r),key=[exam,subject,topic].join('\u0001');if(!m.has(key)){m.set(key,{exam,subject,topic,count:0})}m.get(key).count++});return [...m.values()].sort((a,b)=>a.exam.localeCompare(b.exam)||a.subject.localeCompare(b.subject)||a.topic.localeCompare(b.topic))}
+function renderReadiness(){const body=$('readinessBody'),rows=readinessRows();body.innerHTML='';if(!rows.length){body.innerHTML='<tr><td colspan="8" class="empty">No publish-ready topic sets yet.</td></tr>';return}rows.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML='<td></td><td></td><td></td><td><strong>'+r.count+'</strong></td>'+[10,25,50,100].map(n=>'<td><span class="chip '+(r.count>=n?'yes':'no')+'">'+(r.count>=n?'Ready':'—')+'</span></td>').join('');tr.children[0].textContent=r.exam;tr.children[1].textContent=r.subject;tr.children[2].textContent=r.topic;body.appendChild(tr)})}
+function fillSelect(id,values,label){const el=$(id),cur=el.value;el.innerHTML='<option value="">'+label+'</option>';values.sort().forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o)});if(values.includes(cur))el.value=cur}
+function filteredRows(){let rows=analysis.rows,q=$('search').value.trim().toLowerCase(),exam=$('examFilter').value,subject=$('subjectFilter').value,status=$('statusFilter').value,issue=$('issueFilter').value;if(q)rows=rows.filter(r=>[r.ID,r.Exam,subjectFor(r),r.Topic,r.Subtopic,r.Question].some(v=>String(v||'').toLowerCase().includes(q)));if(exam)rows=rows.filter(r=>r.Exam===exam);if(subject)rows=rows.filter(r=>subjectFor(r)===subject);if(status)rows=rows.filter(r=>r.Status===status);if(issue)rows=rows.filter(r=>{const info=analysis.rowInfo.get(r.__key);if(issue==='duplicates')return info.duplicate;if(issue==='invalid')return info.invalid.length;return info.duplicate||info.invalid.length});return rows}
+function statusClass(s){return s.replaceAll(' ','-')}
+function renderTable(){
+ const rows=filteredRows(),pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));page=Math.min(page,pages);const start=(page-1)*PAGE_SIZE,shown=rows.slice(start,start+PAGE_SIZE),body=$('questionBody');body.innerHTML='';$('visibleCount').textContent=rows.length+' visible';$('pageInfo').textContent='Page '+page+' of '+pages+' · showing '+(shown.length?start+1:0)+'–'+(start+shown.length)+' of '+rows.length;$('prevPage').disabled=page<=1;$('nextPage').disabled=page>=pages;
+ if(!shown.length){body.innerHTML='<tr><td colspan="6" class="empty">No questions match these filters.</td></tr>';return}
+ shown.forEach(r=>{const info=analysis.rowInfo.get(r.__key),tr=document.createElement('tr');const quality=info.invalid.length?'<span class="issue-text">'+info.invalid.length+' validation issue'+(info.invalid.length===1?'':'s')+'</span>':info.duplicate?'<span class="issue-text">Duplicate</span>':'<span class="ok-text">OK</span>';tr.innerHTML='<td><strong></strong><small></small></td><td><strong></strong><small></small></td><td class="question"></td><td><span class="status '+statusClass(r.Status)+'"></span></td><td>'+quality+'</td><td><button class="btn edit" type="button">Edit</button></td>';tr.children[0].querySelector('strong').textContent=r.ID||'—';tr.children[0].querySelector('small').textContent=r.__source==='base'?'Live base':'Local import';tr.children[1].querySelector('strong').textContent=r.Exam||'—';tr.children[1].querySelector('small').textContent=[subjectFor(r),topicFor(r)].filter(Boolean).join(' · ');tr.children[2].textContent=r.Question||'—';tr.children[3].querySelector('span').textContent=r.Status;tr.querySelector('.edit').onclick=()=>openEditor(r.__key);body.appendChild(tr)})
+}
+function render(){
+ analysis=buildAnalysis();const rows=analysis.rows;$('sTotal').textContent=rows.length;$('sUsable').textContent=analysis.usable.length;$('sDraft').textContent=rows.filter(r=>r.Status==='Draft'||r.Status==='Reviewed').length;$('sCorrection').textContent=rows.filter(r=>r.Status==='Needs Correction').length;$('sDup').textContent=analysis.dupGroups.length;$('sBlockers').textContent=analysis.blockers.length;$('publishExport').disabled=analysis.blockers.length>0;$('publishExport').title=analysis.blockers.length?analysis.blockers.length+' published row(s) have validation or duplicate blockers':'Ready to export';fillSelect('examFilter',[...new Set(rows.map(r=>r.Exam).filter(Boolean))],'All exams');fillSelect('subjectFilter',[...new Set(rows.map(subjectFor).filter(Boolean))],'All subjects');renderReadiness();renderTable()
+}
+function rowByKey(key){return analysis.rows.find(r=>r.__key===key)}
+function openEditor(key){editingKey=key;let r=key?rowByKey(key):null;if(!r){const stamp=Date.now().toString(36).toUpperCase();r={ID:'NEW-'+stamp,Status:'Draft',Active:'FALSE',Exam:'TNPSC Group IV',Topic:'',Subtopic:'',PublishDate:'',Question:'',OptionA:'',OptionB:'',OptionC:'',OptionD:'',CorrectAnswer:'A',ExplanationA:'',ExplanationB:'',ExplanationC:'',ExplanationD:''};workspace.imports.push(r);saveWorkspace();render();editingKey=makeKey('import',workspace.imports.length-1,r);r=rowByKey(editingKey)}$('editorTitle').textContent=(r.__source==='base'?'Edit live row':'Edit local row')+' · '+(r.ID||'');EXPORT_FIELDS.concat(['Status']).forEach(name=>{const el=$('editor').elements[name];if(el)el.value=r[name]||''});$('deleteRow').style.visibility=r.__source==='import'?'visible':'hidden';$('overlay').classList.add('show');$('overlay').setAttribute('aria-hidden','false')}
+function closeEditor(){$('overlay').classList.remove('show');$('overlay').setAttribute('aria-hidden','true');editingKey=null}
+function applyOverride(key,data){workspace.overrides[key]={...(workspace.overrides[key]||{}),...data};saveWorkspace();render()}
+$('editor').onsubmit=e=>{e.preventDefault();if(!editingKey)return;const fd=new FormData(e.currentTarget),data={};EXPORT_FIELDS.concat(['Status']).forEach(f=>{if(f!=='Active')data[f]=String(fd.get(f)||'').trim()});data.Active=data.Status==='Published'?'TRUE':'FALSE';applyOverride(editingKey,data);closeEditor()}
+$('deleteRow').onclick=()=>{if(!editingKey)return;const r=rowByKey(editingKey);if(!r||r.__source!=='import')return;if(!confirm('Delete this locally imported question?'))return;workspace.deleted.push(editingKey);saveWorkspace();closeEditor();render()}
+$('closeEditor').onclick=closeEditor;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeEditor()});$('addQuestion').onclick=()=>openEditor(null)
+function bulkStatus(status){const rows=filteredRows();if(!rows.length)return;if(!confirm('Mark '+rows.length+' visible row(s) as '+status+'?'))return;rows.forEach(r=>workspace.overrides[r.__key]={...(workspace.overrides[r.__key]||{}),Status:status,Active:status==='Published'?'TRUE':'FALSE'});saveWorkspace();render()}
+document.querySelectorAll('[data-bulk]').forEach(b=>b.onclick=()=>bulkStatus(b.dataset.bulk))
+;['search','examFilter','subjectFilter','statusFilter','issueFilter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>{page=1;renderTable()}));$('prevPage').onclick=()=>{if(page>1){page--;renderTable()}};$('nextPage').onclick=()=>{page++;renderTable()}
+$('csvFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const rows=parseCSV(await file.text());if(!rows.length)throw new Error('No rows found');rows.forEach(r=>{r.Status=statusOf(r,'import');r.Active=r.Status==='Published'?'TRUE':'FALSE'});workspace.imports.push(...rows);saveWorkspace();$('importNote').textContent='Imported '+rows.length+' row(s) from '+file.name+'.';page=1;render()}catch(err){$('importNote').textContent='Import failed: '+err.message}e.target.value=''}
+$('templateBtn').onclick=()=>{const sample={ID:'TNPSC-POL-001',Active:'FALSE',Status:'Draft',Exam:'TNPSC Group IV',Topic:'Indian Polity',Subtopic:'Fundamental Rights',PublishDate:'',Question:'Sample question?',OptionA:'Option A',OptionB:'Option B',OptionC:'Option C',OptionD:'Option D',CorrectAnswer:'A',ExplanationA:'Explain A',ExplanationB:'Explain B',ExplanationC:'Explain C',ExplanationD:'Explain D'};download('clearexams-question-template.csv',toCSV([sample]))}
+function exportRows(){return analysis.rows.map(r=>{const out={};EXPORT_FIELDS.forEach(f=>out[f]=r[f]||'');out.Status=r.Status;out.Active=r.Status==='Published'?'TRUE':'FALSE';return out})}
+$('workspaceExport').onclick=()=>download('clearexams-question-bank-workspace.csv',toCSV(exportRows()))
+$('publishExport').onclick=()=>{if(analysis.blockers.length){alert('Fix '+analysis.blockers.length+' published blocker(s) before creating the publish-ready file. Use Issues only to find them.');return}download('daily-quiz-publish-ready.csv',toCSV(exportRows()))}
+$('clearWorkspace').onclick=()=>{if(!workspace.imports.length&&!Object.keys(workspace.overrides).length)return;if(!confirm('Clear all local imports and edits? The live question bank will remain unchanged.'))return;workspace={imports:[],overrides:{},deleted:[]};saveWorkspace();$('importNote').textContent='Local workspace cleared.';page=1;render()}
+loadWorkspace();fetch(LIVE_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(t=>{base=parseCSV(t);$('importNote').textContent='Loaded '+base.length+' live row(s).';render()}).catch(err=>{$('importNote').textContent='Could not load live bank: '+err.message;base=[];render()})
+</script>
+</body></html>
