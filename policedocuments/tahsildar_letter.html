@@ -715,7 +715,35 @@
             <style>
                 body { font-family: 'Latha', 'Noto Sans Tamil', serif; margin: 20mm; padding:0; width: 210mm; }
                 @media print { @page { size: A4; margin: 20mm; } }
-            </style></head><body>${content}</body></html>
+            </style></head><body>${content}<script>
+/* clearExamsCaseAutofillV1 */
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const c = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
+    if (!c) return;
+    const set = (id, value) => {
+      const el = document.getElementById(id);
+      if (!el || value === undefined || value === null || String(value).trim() === '') return;
+      el.value = String(value);
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+      el.dispatchEvent(new Event('change', {bubbles:true}));
+    };
+    set('caseNumber', [c.crimeNo, c.crimeYear].filter(Boolean).join('/'));
+    set('caseSections', c.sections);
+    const station = c.policeStation || '';
+    const dropdown = document.getElementById('policeStationDropdown');
+    if (dropdown && station) {
+      const option = Array.from(dropdown.options).find(o => o.text.trim().toLowerCase() === station.trim().toLowerCase() || o.value.trim().toLowerCase() === station.trim().toLowerCase());
+      if (option) {
+        dropdown.value = option.value;
+        dropdown.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+    }
+    set('policeStationText', station);
+  } catch (_) {}
+});
+</script>
+</body></html>
         `);
         printWin.document.close();
         printWin.focus();
