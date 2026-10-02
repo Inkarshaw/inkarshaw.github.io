@@ -1283,7 +1283,35 @@
                 </head>
                 <body>
                     ${document.getElementById('previewContent').innerHTML}
-                </body>
+                <script>
+/* clearExamsCaseAutofillV1 */
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const c = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
+    if (!c) return;
+    const set = (id, value) => {
+      const el = document.getElementById(id);
+      if (!el || value === undefined || value === null || String(value).trim() === '') return;
+      el.value = String(value);
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+      el.dispatchEvent(new Event('change', {bubbles:true}));
+    };
+    set('crimeNumber', [c.crimeNo, c.crimeYear].filter(Boolean).join('/'));
+    set('policeOfficerDetails', c.io || c.investigatingOfficer);
+    const station = c.policeStation || '';
+    const dropdown = document.getElementById('policeStationDropdown');
+    if (dropdown && station) {
+      const option = Array.from(dropdown.options).find(o => o.text.trim().toLowerCase() === station.trim().toLowerCase() || o.value.trim().toLowerCase() === station.trim().toLowerCase());
+      if (option) {
+        dropdown.value = option.value;
+        dropdown.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+    }
+    set('policeStationText', station);
+  } catch (_) {}
+});
+</script>
+</body>
                 </html>
             `;
 
