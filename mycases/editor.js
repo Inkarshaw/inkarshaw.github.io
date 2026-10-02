@@ -79,14 +79,12 @@
   function renderProperties(){
     if(!Array.isArray(state.propertyItems))state.propertyItems=[];
     const register=$('#propertyRegister'),box=$('#propertyList'),summary=$('#propertySummary');
-    const visible=propertySeized();
-    register.classList.toggle('hidden',!visible);
-    if(!visible)return;
+    register.classList.remove('hidden');
     const pending=state.propertyItems.filter(p=>p.courtSubmissionRequired==='Yes'&&p.courtSubmissionStatus!=='Sent').length;
     const sent=state.propertyItems.filter(p=>p.courtSubmissionStatus==='Sent').length;
     const prPending=state.propertyItems.filter(p=>p.courtSubmissionRequired==='Yes'&&p.courtSubmissionStatus==='Sent'&&p.propertyNumberReceived!=='Yes').length;
     summary.textContent=state.propertyItems.length+' item(s) · '+pending+' court submission pending · '+sent+' sent · '+prPending+' Property/PR No. pending';
-    if(!state.propertyItems.length){box.innerHTML='<div class="empty small">Property seized is marked complete. Add each seized item here.</div>';return}
+    if(!state.propertyItems.length){box.innerHTML='<div class="empty small">No property details recorded. Use “Add Property” to add seized, recovered or case property.</div>';return}
     box.innerHTML=state.propertyItems.map((p,i)=>{
       const courtRequired=p.courtSubmissionRequired==='Yes';
       const sent=p.courtSubmissionStatus==='Sent';
