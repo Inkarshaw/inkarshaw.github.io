@@ -1,0 +1,77 @@
+name: Police Documents link check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "policedocuments/**"
+      - ".github/workflows/check-police-documents-links.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Validate Police Documents homepage links
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit, unquote
+
+          root = Path('.').resolve()
+          page = root / 'policedocuments' / 'index.html'
+
+          class Links(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.hrefs = []
+              def handle_starttag(self, tag, attrs):
+                  if tag != 'a':
+                      return
+                  value = dict(attrs).get('href')
+                  if value:
+                      self.hrefs.append(value)
+
+          parser = Links()
+          parser.feed(page.read_text(encoding='utf-8'))
+
+          broken = []
+          checked = 0
+          for raw in parser.hrefs:
+              raw = raw.strip()
+              if not raw or raw.startswith(('#','mailto:','tel:','javascript:','data:','blob:','//')):
+                  continue
+              u = urlsplit(raw)
+              if u.scheme in {'http','https'}:
+                  continue
+              path = unquote(u.path)
+              if not path.startswith('/policedocuments/'):
+                  continue
+
+              target = root / path.lstrip('/')
+              candidates = [target]
+              if path.endswith('/') or not target.suffix:
+                  candidates.extend([target / 'index.html', target.with_suffix('.html')])
+
+              checked += 1
+              if not any(p.exists() for p in candidates):
+                  broken.append(raw)
+
+          print(f'Checked {checked} Police Documents links.')
+          if broken:
+              print('Broken links:')
+              for item in sorted(set(broken)):
+                  print(' -', item)
+              raise SystemExit(1)
+
+          print('All Police Documents homepage links resolve to repository files.')
+          PY
