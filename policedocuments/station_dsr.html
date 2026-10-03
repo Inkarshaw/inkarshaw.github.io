@@ -29,22 +29,22 @@
   </div>
 
   <div class="toolbar">
-    <button class="btn green" onclick="renderReport()">Update Preview</button>
-    <button class="btn" onclick="window.print()">Print / Save PDF</button>
-    <button class="btn" onclick="downloadWord()">Download Word</button>
-    <button class="btn secondary" onclick="saveDraft()">Save Draft</button>
-    <button class="btn secondary" onclick="loadDraft()">Load Draft</button>
-    <button class="btn danger" onclick="clearDraft()">Clear</button>
+    <button type="button" class="btn green" onclick="renderReport()">Update Preview</button>
+    <button type="button" class="btn" onclick="window.print()">Print / Save PDF</button>
+    <button type="button" class="btn" onclick="downloadWord()">Download Word</button>
+    <button type="button" class="btn secondary" onclick="saveDraft()">Save Draft</button>
+    <button type="button" class="btn secondary" onclick="loadDraft()">Load Draft</button>
+    <button type="button" class="btn danger" onclick="clearDraft()">Clear</button>
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="basic">Basic</button>
-    <button class="tab" data-tab="offence">Cases / Heads</button>
-    <button class="tab" data-tab="nbw">NBW</button>
-    <button class="tab" data-tab="prc">PRC</button>
-    <button class="tab" data-tab="hs">HS Checked</button>
-    <button class="tab" data-tab="abstract">CSR & FIR Abstract</button>
-    <button class="tab" data-tab="forecast">Forecast</button>
+    <button type="button" class="tab active" data-tab="basic">Basic</button>
+    <button type="button" class="tab" data-tab="offence">Cases / Heads</button>
+    <button type="button" class="tab" data-tab="nbw">NBW</button>
+    <button type="button" class="tab" data-tab="prc">PRC</button>
+    <button type="button" class="tab" data-tab="hs">HS Checked</button>
+    <button type="button" class="tab" data-tab="abstract">CSR & FIR Abstract</button>
+    <button type="button" class="tab" data-tab="forecast">Forecast</button>
   </div>
 
   <div id="basic" class="panel active">
@@ -60,7 +60,7 @@
     <div class="section-head">Cases / Offence Heads</div>
     <div class="hint">Add as many cases as required. Cases with the same head are grouped together automatically in the final report. Different heads are shown as separate sections.</div>
     <div id="caseList"></div>
-    <button class="btn green" onclick="addCase()">+ Add Case</button>
+    <button type="button" class="btn green" onclick="addCase()">+ Add Case</button>
   </div>
 
   <div id="nbw" class="panel">
@@ -105,7 +105,7 @@
 
 <script>
 const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])).replace(/\n/g,"<br>");
+function esc(s){if(s===null||s===undefined)s="";return String(s).replace(/[&<>"]/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m];}).replace(/\n/g,"<br>");}
 const fmt=d=>{if(!d)return "";const [y,m,day]=d.split("-");return day+"."+m+"."+y};
 const prevDate=d=>{if(!d)return "";const x=new Date(d+"T00:00:00");x.setDate(x.getDate()-1);return String(x.getDate()).padStart(2,"0")+"."+String(x.getMonth()+1).padStart(2,"0")+"."+x.getFullYear()};
 const nextDate=d=>{if(!d)return "";const x=new Date(d+"T00:00:00");x.setDate(x.getDate()+1);return String(x.getDate()).padStart(2,"0")+"."+String(x.getMonth()+1).padStart(2,"0")+"."+x.getFullYear()};
@@ -113,7 +113,7 @@ document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelect
 $("reportDate").value=new Date().toISOString().slice(0,10);
 
 let caseSeq=0;
-function caseTemplate(v={}){
+function caseTemplate(v){v=v||{};
   const id=++caseSeq;
   return '<div class="case-card" data-case-id="'+id+'">'+
     '<div class="case-head"><div class="case-title"><span class="case-no"></span>Case</div><div class="case-actions"><button class="btn secondary" type="button" onclick="duplicateCase(this)">Duplicate</button><button class="btn danger" type="button" onclick="removeCase(this)">Remove</button></div></div>'+
@@ -129,7 +129,7 @@ function caseTemplate(v={}){
       '<div class="field span4"><label>Property Image (optional)</label><input class="c-image" type="file" accept="image/*"></div>'+
     '</div></div>';
 }
-function addCase(v={}){$("caseList").insertAdjacentHTML("beforeend",caseTemplate(v));wireCases();renumberCases();renderReport()}
+function addCase(v){v=v||{};$("caseList").insertAdjacentHTML("beforeend",caseTemplate(v));wireCases();renumberCases();if(window.dsrReady){renderReport();}}
 function removeCase(btn){if($("caseList").children.length===1)return alert("At least one case must remain.");btn.closest(".case-card").remove();renumberCases();renderReport()}
 function duplicateCase(btn){const v=readCase(btn.closest(".case-card"));addCase(v)}
 function renumberCases(){[...$("caseList").children].forEach((c,i)=>c.querySelector(".case-no").textContent="Case "+(i+1))}
@@ -158,10 +158,10 @@ function getCases(){return [...$("caseList").children].map(readCase)}
 
 function rowInputs(values){return values.map((v,i)=>'<td><textarea data-k="'+i+'">'+esc(v||"")+'</textarea></td>').join("")}
 function delBtn(){return '<td class="no-print"><button type="button" class="btn danger" onclick="this.closest(\'tr\').remove();renderReport()">×</button></td>'}
-function addNBW(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("nbwBody").appendChild(tr);renumber("nbwBody");wireDynamic()}
-function addPRC(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("prcBody").appendChild(tr);renumber("prcBody");wireDynamic()}
-function addHS(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("hsBody").appendChild(tr);renumber("hsBody");wireDynamic()}
-function addForecast(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("forecastBody").appendChild(tr);renumber("forecastBody");wireDynamic()}
+function addNBW(v){v=v||[];const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("nbwBody").appendChild(tr);renumber("nbwBody");wireDynamic()}
+function addPRC(v){v=v||[];const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("prcBody").appendChild(tr);renumber("prcBody");wireDynamic()}
+function addHS(v){v=v||[];const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("hsBody").appendChild(tr);renumber("hsBody");wireDynamic()}
+function addForecast(v){v=v||[];const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("forecastBody").appendChild(tr);renumber("forecastBody");wireDynamic()}
 function renumber(id){[...$(id).rows].forEach((r,i)=>r.querySelector(".idx").textContent=i+1)}
 function getRows(id){return [...$(id).rows].map(r=>[...r.querySelectorAll("textarea")].map(x=>x.value))}
 function tableRows(rows){return rows.map((r,i)=>'<tr><td class="center">'+(i+1)+'</td>'+r.map(x=>'<td>'+esc(x)+'</td>').join("")+'</tr>').join("")}
@@ -172,8 +172,9 @@ addNBW([]);
 addPRC([]);
 addHS(["G7","","","","",""]);
 addForecast(["G7","","","","","",""]);
+window.dsrReady=true;
 
-let renderTimer;
+var renderTimer;
 function debouncedRender(){clearTimeout(renderTimer);renderTimer=setTimeout(renderReport,220)}
 
 function renderReport(){
@@ -220,7 +221,7 @@ function renderReport(){
 function snapshot(){
  const ids=["ps","reportDate","complPrev","complToday","csrDisposed","csrPending","firPrev","firToday","lastFir"];
  const data={};ids.forEach(id=>data[id]=$(id).value);
- data.cases=getCases().map(c=>({...c,imageData:""}));
+ data.cases=getCases().map(function(c){return {head:c.head,crsec:c.crsec,dosoc:c.dosoc,complainant:c.complainant,accused:c.accused,property:c.property,io:c.io,gist:c.gist,imageData:""};});
  data.nbw=getRows("nbwBody");data.prc=getRows("prcBody");data.hs=getRows("hsBody");data.forecast=getRows("forecastBody");
  return data
 }
@@ -236,10 +237,11 @@ function clearDraft(){if(!confirm("Clear all entered DSR data?"))return;localSto
 function downloadWord(){
  renderReport();
  const blob=new Blob(['<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:"Times New Roman"}table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:5px;vertical-align:top}h1{text-align:center;font-size:15pt}h2{font-size:12pt;text-decoration:underline}img{max-width:100%;max-height:170px}</style></head><body>'+$("report").innerHTML+'</body></html>'],{type:"application/msword"});
- const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Daily_Situation_Report_"+($("reportDate").value||"").replaceAll("-","_")+".doc";a.click();URL.revokeObjectURL(a.href)
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Daily_Situation_Report_"+($("reportDate").value||"").split("-").join("_")+".doc";a.click();URL.revokeObjectURL(a.href)
 }
 document.querySelectorAll("#basic input,#abstract input").forEach(x=>x.addEventListener("input",debouncedRender));
-renderReport();
+try{renderReport();}catch(e){console.error("DSR init error:",e);}
+window.addEventListener("error",function(e){console.error("DSR error:",e.error||e.message);});
 </script>
 </body>
 </html>
