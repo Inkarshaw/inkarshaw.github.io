@@ -12,11 +12,12 @@
 .tabs{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.tab{border:1px solid #b7c3cf;background:#fff;padding:9px 12px;border-radius:8px;cursor:pointer;font:600 13px Arial}.tab.active{background:#17324d;color:#fff}
 .panel{display:none;background:#fff;border:1px solid #ccd6df;border-radius:10px;padding:16px}.panel.active{display:block}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field label{display:block;font:600 12px Arial;margin-bottom:4px}.field input,.field textarea,.field select{width:100%;padding:9px;border:1px solid #bbc6d1;border-radius:6px;font:14px Arial}.field textarea{min-height:80px;resize:vertical}.span2{grid-column:span 2}.span4{grid-column:span 4}
+.case-card{border:1px solid #aeb8c1;border-radius:10px;padding:14px;margin:0 0 14px;background:#f9fbfd}.case-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.case-title{font:700 16px Arial}.case-actions{display:flex;gap:6px}.case-no{display:inline-block;background:#17324d;color:#fff;border-radius:999px;padding:3px 8px;font:700 12px Arial;margin-right:6px}
 .editor-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}.editor-table th,.editor-table td{border:1px solid #aeb8c1;padding:5px;vertical-align:top}.editor-table th{background:#e8eef3}.editor-table input,.editor-table textarea{width:100%;border:0;padding:5px;font:13px Arial;resize:vertical}.editor-table textarea{min-height:60px}
 .section-head{font:bold 17px Arial;margin:8px 0}.hint{font:12px Arial;color:#59636e;margin-bottom:8px}
 .report-wrap{background:#d9dee3;padding:18px;border-radius:10px;margin-top:16px;overflow:auto}.report{background:#fff;width:210mm;min-height:297mm;margin:auto;padding:12mm 10mm;font-size:11pt}
-.report h1{text-align:center;font-size:15pt;margin:0 0 8px}.report h2{text-align:left;font-size:12pt;margin:14px 0 5px;text-decoration:underline}.report table{width:100%;border-collapse:collapse;table-layout:fixed}.report th,.report td{border:1px solid #000;padding:5px;vertical-align:top;word-wrap:break-word}.report th{text-align:center}.report .summary{width:55%;margin:0 auto 12px}.report .gist{border:1px solid #000;padding:6px;margin-top:-1px}.report .small{font-size:9.5pt}.report .center{text-align:center}.report img{max-width:100%;max-height:170px;object-fit:contain}
-@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.span4{grid-column:span 2}.report-wrap{padding:5px}.report{transform-origin:top left}}
+.report h1{text-align:center;font-size:15pt;margin:0 0 8px}.report h2{text-align:left;font-size:12pt;margin:14px 0 5px;text-decoration:underline}.report table{width:100%;border-collapse:collapse;table-layout:fixed}.report th,.report td{border:1px solid #000;padding:5px;vertical-align:top;word-wrap:break-word}.report th{text-align:center}.report .summary{width:60%;margin:0 auto 12px}.report .gist{border:1px solid #000;padding:6px;margin-top:-1px}.report .small{font-size:9.5pt}.report .center{text-align:center}.report img{max-width:100%;max-height:170px;object-fit:contain}.report .case-block{margin-bottom:10px}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.span4{grid-column:span 2}.report-wrap{padding:5px}.report{transform-origin:top left}.case-head{align-items:flex-start;flex-direction:column}}
 @media print{body{background:#fff}.top,.toolbar,.tabs,.panel,.no-print{display:none!important}.app{padding:0;max-width:none}.report-wrap{padding:0;background:#fff;margin:0}.report{box-shadow:none;margin:0;width:auto;min-height:auto;padding:8mm}@page{size:A4;margin:8mm}}
 </style>
 </head>
@@ -24,7 +25,7 @@
 <div class="app">
   <div class="top">
     <h1>DAILY SITUATION REPORT (DSR) MAKER</h1>
-    <p>Matched to the G7 L&O PS Daily Situation Report format. Duty Roster is intentionally left out.</p>
+    <p>Supports multiple offence heads and multiple cases on the same day. Duty Roster is left out.</p>
   </div>
 
   <div class="toolbar">
@@ -37,8 +38,8 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="basic">Basic & Summary</button>
-    <button class="tab" data-tab="offence">Offence / FIR</button>
+    <button class="tab active" data-tab="basic">Basic</button>
+    <button class="tab" data-tab="offence">Cases / Heads</button>
     <button class="tab" data-tab="nbw">NBW</button>
     <button class="tab" data-tab="prc">PRC</button>
     <button class="tab" data-tab="hs">HS Checked</button>
@@ -51,28 +52,15 @@
     <div class="grid">
       <div class="field"><label>Police Station</label><input id="ps" value="G7 L&O PS"></div>
       <div class="field"><label>Report Date</label><input id="reportDate" type="date"></div>
-      <div class="field"><label>Offence Head</label><input id="offenceHead" value="NDPS Act"></div>
-      <div class="field"><label>Offence Count</label><input id="offenceCount" type="number" value="1"></div>
-      <div class="field"><label>NBW Received & Recall</label><input id="nbwCount" type="number" value="1"></div>
-      <div class="field"><label>PRC No. Received</label><input id="prcCount" type="number" value="1"></div>
-      <div class="field"><label>Forecast Count</label><input id="forecastCount" type="number" value="2"></div>
-      <div class="field"><label>HS Checked Count</label><input id="hsCount" type="number" value="0"></div>
     </div>
+    <div class="hint" style="margin-top:10px">The summary table is generated automatically from all cases added in the Cases / Heads tab, together with NBW, PRC and Forecast counts.</div>
   </div>
 
   <div id="offence" class="panel">
-    <div class="section-head">Offence / FIR Details</div>
-    <div class="hint">The columns follow the uploaded DSR: Cr.No/Sec, D/O-D/R-SOC, Complainant, Accused, Property, I.O.</div>
-    <div class="grid">
-      <div class="field"><label>Cr.No. & Sections</label><textarea id="crsec">G7 L&O Cr.No: 170/2026 U/s 8(c) r/w 22(b) NDPS Act</textarea></div>
-      <div class="field"><label>D/O, D/R & SOC</label><textarea id="dosoc"></textarea></div>
-      <div class="field"><label>Complainant</label><textarea id="complainant"></textarea></div>
-      <div class="field"><label>I.O</label><textarea id="io"></textarea></div>
-      <div class="field span2"><label>Accused</label><textarea id="accused"></textarea></div>
-      <div class="field span2"><label>Property</label><textarea id="property"></textarea></div>
-      <div class="field span4"><label>Gist of the Case</label><textarea id="gist"></textarea></div>
-      <div class="field span4"><label>Property Image (optional)</label><input id="propertyImage" type="file" accept="image/*"></div>
-    </div>
+    <div class="section-head">Cases / Offence Heads</div>
+    <div class="hint">Add as many cases as required. Cases with the same head are grouped together automatically in the final report. Different heads are shown as separate sections.</div>
+    <div id="caseList"></div>
+    <button class="btn green" onclick="addCase()">+ Add Case</button>
   </div>
 
   <div id="nbw" class="panel">
@@ -124,63 +112,133 @@ const nextDate=d=>{if(!d)return "";const x=new Date(d+"T00:00:00");x.setDate(x.g
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab,.panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active")});
 $("reportDate").value=new Date().toISOString().slice(0,10);
 
-function rowInputs(values, widths){
-  return values.map((v,i)=>'<td><textarea data-k="'+i+'">'+esc(v||"")+'</textarea></td>').join("");
+let caseSeq=0;
+function caseTemplate(v={}){
+  const id=++caseSeq;
+  return '<div class="case-card" data-case-id="'+id+'">'+
+    '<div class="case-head"><div class="case-title"><span class="case-no"></span>Case</div><div class="case-actions"><button class="btn secondary" type="button" onclick="duplicateCase(this)">Duplicate</button><button class="btn danger" type="button" onclick="removeCase(this)">Remove</button></div></div>'+
+    '<div class="grid">'+
+      '<div class="field"><label>Head of Offence</label><input class="c-head" value="'+esc(v.head||"NDPS Act")+'"></div>'+
+      '<div class="field"><label>Cr.No. & Sections</label><textarea class="c-crsec">'+esc(v.crsec||"")+'</textarea></div>'+
+      '<div class="field"><label>D/O, D/R & SOC</label><textarea class="c-dosoc">'+esc(v.dosoc||"")+'</textarea></div>'+
+      '<div class="field"><label>Complainant</label><textarea class="c-complainant">'+esc(v.complainant||"")+'</textarea></div>'+
+      '<div class="field span2"><label>Accused</label><textarea class="c-accused">'+esc(v.accused||"")+'</textarea></div>'+
+      '<div class="field span2"><label>Property</label><textarea class="c-property">'+esc(v.property||"")+'</textarea></div>'+
+      '<div class="field"><label>I.O</label><textarea class="c-io">'+esc(v.io||"")+'</textarea></div>'+
+      '<div class="field span4"><label>Gist of the Case</label><textarea class="c-gist">'+esc(v.gist||"")+'</textarea></div>'+
+      '<div class="field span4"><label>Property Image (optional)</label><input class="c-image" type="file" accept="image/*"></div>'+
+    '</div></div>';
 }
+function addCase(v={}){$("caseList").insertAdjacentHTML("beforeend",caseTemplate(v));wireCases();renumberCases();renderReport()}
+function removeCase(btn){if($("caseList").children.length===1)return alert("At least one case must remain.");btn.closest(".case-card").remove();renumberCases();renderReport()}
+function duplicateCase(btn){const v=readCase(btn.closest(".case-card"));addCase(v)}
+function renumberCases(){[...$("caseList").children].forEach((c,i)=>c.querySelector(".case-no").textContent="Case "+(i+1))}
+function wireCases(){
+  $("caseList").querySelectorAll("input,textarea").forEach(x=>{
+    if(x.dataset.wired)return;x.dataset.wired="1";
+    x.addEventListener("input",debouncedRender);
+  });
+  $("caseList").querySelectorAll(".c-image").forEach(inp=>{
+    if(inp.dataset.imagewired)return;inp.dataset.imagewired="1";
+    inp.addEventListener("change",e=>{const card=e.target.closest(".case-card");const f=e.target.files[0];if(!f){card.dataset.imageData="";renderReport();return}const r=new FileReader();r.onload=()=>{card.dataset.imageData=r.result;renderReport()};r.readAsDataURL(f)});
+  });
+}
+function readCase(card){return{
+  head:card.querySelector(".c-head").value.trim()||"Other",
+  crsec:card.querySelector(".c-crsec").value,
+  dosoc:card.querySelector(".c-dosoc").value,
+  complainant:card.querySelector(".c-complainant").value,
+  accused:card.querySelector(".c-accused").value,
+  property:card.querySelector(".c-property").value,
+  io:card.querySelector(".c-io").value,
+  gist:card.querySelector(".c-gist").value,
+  imageData:card.dataset.imageData||""
+}}
+function getCases(){return [...$("caseList").children].map(readCase)}
+
+function rowInputs(values){return values.map((v,i)=>'<td><textarea data-k="'+i+'">'+esc(v||"")+'</textarea></td>').join("")}
 function delBtn(){return '<td class="no-print"><button type="button" class="btn danger" onclick="this.closest(\'tr\').remove();renderReport()">×</button></td>'}
-function addNBW(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("nbwBody").appendChild(tr);renumber("nbwBody")}
-function addPRC(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("prcBody").appendChild(tr);renumber("prcBody")}
-function addHS(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("hsBody").appendChild(tr);renumber("hsBody")}
-function addForecast(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("forecastBody").appendChild(tr);renumber("forecastBody")}
+function addNBW(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("nbwBody").appendChild(tr);renumber("nbwBody");wireDynamic()}
+function addPRC(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("prcBody").appendChild(tr);renumber("prcBody");wireDynamic()}
+function addHS(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("hsBody").appendChild(tr);renumber("hsBody");wireDynamic()}
+function addForecast(v=[]){const tr=document.createElement("tr");tr.innerHTML='<td class="idx"></td>'+rowInputs(v)+delBtn();$("forecastBody").appendChild(tr);renumber("forecastBody");wireDynamic()}
 function renumber(id){[...$(id).rows].forEach((r,i)=>r.querySelector(".idx").textContent=i+1)}
 function getRows(id){return [...$(id).rows].map(r=>[...r.querySelectorAll("textarea")].map(x=>x.value))}
 function tableRows(rows){return rows.map((r,i)=>'<tr><td class="center">'+(i+1)+'</td>'+r.map(x=>'<td>'+esc(x)+'</td>').join("")+'</tr>').join("")}
+function wireDynamic(){document.querySelectorAll(".editor-table textarea").forEach(x=>{if(x.dataset.wired)return;x.dataset.wired="1";x.addEventListener("input",debouncedRender)})}
 
-addNBW(["G7 PS Cr.No: 20/2023 U/s 294(b), 323, 395 r/w 397, 336, 427 IPC","SC No.815/2025, 4th Addl Sessions Court","Dinakaran M/a 36, S/o Perumal, Tiruvannamalai","01.10.2026","01.10.2026"]);
-addPRC(["G7 PS Cr.No: 133/2024 u/s 126(2),296(b),115(2),309(4),311,351(3) BNS","25.10.2024 @ 21.30 hrs\n26.10.2024 @ 08.30 hrs\nShenoy Nagar, Vaithiyanathan Street","Anish Ritik M/a 18, S/o Sivalingam, Chetpet, Chennai-31","PRC no obtained 228/26 on 01.10.2026"]);
+addCase({head:"NDPS Act",crsec:"G7 L&O Cr.No: 170/2026 U/s 8(c) r/w 22(b) NDPS Act"});
+addNBW([]);
+addPRC([]);
 addHS(["G7","","","","",""]);
 addForecast(["G7","","","","","",""]);
 
-let imageData="";
-$("propertyImage").addEventListener("change",e=>{const f=e.target.files[0];if(!f){imageData="";return}const r=new FileReader();r.onload=()=>{imageData=r.result;renderReport()};r.readAsDataURL(f)});
+let renderTimer;
+function debouncedRender(){clearTimeout(renderTimer);renderTimer=setTimeout(renderReport,220)}
 
 function renderReport(){
   renumber("nbwBody");renumber("prcBody");renumber("hsBody");renumber("forecastBody");
   const d=$("reportDate").value, date=fmt(d), pdate=prevDate(d), ndate=nextDate(d), ps=$("ps").value;
-  const totalCompl=(+$("complPrev").value||0)+(+$("complToday").value||0);
-  let summary=[
-    [$("offenceHead").value,$("offenceCount").value],
-    ["NBW Received & Recall",$("nbwCount").value],
-    ["PRC No: Received",$("prcCount").value],
-    ["Forecast",$("forecastCount").value]
-  ].filter(x=>String(x[1])!=="0" && String(x[1])!=="");
+  const totalCompl=(+$("complPrev").value||0)+(+$( "complToday").value||0);
+  const cases=getCases();
+  const headMap=new Map();
+  cases.forEach(c=>headMap.set(c.head,(headMap.get(c.head)||0)+1));
+  const nbw=getRows("nbwBody").filter(r=>r.some(x=>x.trim()));
+  const prc=getRows("prcBody").filter(r=>r.some(x=>x.trim()));
+  const hs=getRows("hsBody").filter(r=>r.some(x=>x.trim()));
+  const fc=getRows("forecastBody").filter(r=>r.some(x=>x.trim()));
+
+  let summary=[...headMap.entries()];
+  if(nbw.length)summary.push(["NBW Received & Recall",nbw.length]);
+  if(prc.length)summary.push(["PRC No: Received",prc.length]);
+  if(fc.length)summary.push(["Forecast",fc.length]);
 
   let h='<h1>'+esc(ps)+' DAILY SITUATION REPORT ON '+date+'</h1>';
   h+='<table class="summary"><tr><th style="width:14%">S.No.</th><th>Head of offences</th><th style="width:20%">Total</th></tr>'+summary.map((r,i)=>'<tr><td class="center">'+(i+1)+'.</td><td>'+esc(r[0])+'</td><td class="center">'+esc(r[1])+'</td></tr>').join("")+'</table>';
 
-  h+='<h2>'+esc($("offenceHead").value)+' - '+String($("offenceCount").value).padStart(2,"0")+'</h2>';
-  h+='<table class="small"><tr><th style="width:4%">Sl.No</th><th style="width:13%">Cr.No Sec</th><th style="width:17%">D/O, D/R & SOC</th><th style="width:11%">Complainant</th><th style="width:25%">Accused</th><th style="width:18%">Property</th><th style="width:12%">I.O</th></tr><tr><td class="center">1.</td><td>'+esc($("crsec").value)+'</td><td>'+esc($("dosoc").value)+'</td><td>'+esc($("complainant").value)+'</td><td>'+esc($("accused").value)+'</td><td>'+esc($("property").value)+(imageData?'<div class="center"><img src="'+imageData+'"></div>':"")+'</td><td>'+esc($("io").value)+'</td></tr></table>';
-  if($("gist").value.trim())h+='<div class="gist"><b>Gist of the Case:</b> '+esc($("gist").value)+'</div>';
+  for(const [head,count] of headMap.entries()){
+    const group=cases.filter(c=>c.head===head);
+    h+='<div class="case-block"><h2>'+esc(head)+' - '+String(count).padStart(2,"0")+'</h2>';
+    h+='<table class="small"><tr><th style="width:4%">Sl.No</th><th style="width:13%">Cr.No Sec</th><th style="width:17%">D/O, D/R & SOC</th><th style="width:11%">Complainant</th><th style="width:25%">Accused</th><th style="width:18%">Property</th><th style="width:12%">I.O</th></tr>';
+    group.forEach((c,i)=>{
+      h+='<tr><td class="center">'+(i+1)+'.</td><td>'+esc(c.crsec)+'</td><td>'+esc(c.dosoc)+'</td><td>'+esc(c.complainant)+'</td><td>'+esc(c.accused)+'</td><td>'+esc(c.property)+(c.imageData?'<div class="center"><img src="'+c.imageData+'"></div>':"")+'</td><td>'+esc(c.io)+'</td></tr>';
+      if(c.gist.trim())h+='<tr><td colspan="7" class="gist"><b>Gist of the Case:</b> '+esc(c.gist)+'</td></tr>';
+    });
+    h+='</table></div>';
+  }
 
-  const nbw=getRows("nbwBody"); h+='<h2>NBW Received & Recall – '+nbw.length+'</h2><table class="small"><tr><th>S.No</th><th>PS, Cr. No & Sec</th><th>Court & CC/SC/PRC No</th><th>Accused Details</th><th>NBW Received Date</th><th>NBW Execute Details</th></tr>'+tableRows(nbw)+'</table>';
-  const prc=getRows("prcBody"); h+='<h2>PRC.No Received :'+String(prc.length).padStart(2,"0")+'</h2><table class="small"><tr><th>S.No.</th><th>Cr.No. Sec</th><th>D/O,D/R-SOC</th><th>Accused</th><th>PRC.No; Received</th></tr>'+tableRows(prc)+'</table>';
-  const hs=getRows("hsBody").filter(r=>r.some(x=>x.trim())); h+='<h2>HS Checked Details – '+hs.length+'</h2><table class="small"><tr><th>S.No</th><th>PS</th><th>HS Name</th><th>Present/OV/Jail</th><th>Category</th><th>Checking officer name & no</th><th>ACTION TAKEN DETAILS<br><small>(SECURITY PROCEEDINGS DETAILS, REMAND DETAILS, REASON FOR OV)</small></th></tr>'+tableRows(hs.length?hs:[["","","","","",""]])+'</table>';
+  h+='<h2>NBW Received & Recall – '+nbw.length+'</h2><table class="small"><tr><th>S.No</th><th>PS, Cr. No & Sec</th><th>Court & CC/SC/PRC No</th><th>Accused Details</th><th>NBW Received Date</th><th>NBW Execute Details</th></tr>'+tableRows(nbw.length?nbw:[["","","","",""]])+'</table>';
+  h+='<h2>PRC.No Received :'+String(prc.length).padStart(2,"0")+'</h2><table class="small"><tr><th>S.No.</th><th>Cr.No. Sec</th><th>D/O,D/R-SOC</th><th>Accused</th><th>PRC.No; Received</th></tr>'+tableRows(prc.length?prc:[["","","",""]])+'</table>';
+  h+='<h2>HS Checked Details – '+hs.length+'</h2><table class="small"><tr><th>S.No</th><th>PS</th><th>HS Name</th><th>Present/OV/Jail</th><th>Category</th><th>Checking officer name & no</th><th>ACTION TAKEN DETAILS<br><small>(SECURITY PROCEEDINGS DETAILS, REMAND DETAILS, REASON FOR OV)</small></th></tr>'+tableRows(hs.length?hs:[["","","","","",""]])+'</table>';
 
   h+='<h2>CSR & FIR Abstract:</h2><table class="small"><tr><th>PS</th><th>No of complaint received as on '+pdate+'</th><th>No. of Complaint today '+date+'</th><th>Total Complaint received as on '+date+'</th><th>CSR Disposed Today '+date+'</th><th>Total pending CSR</th><th>No. of Cases Registered up to '+pdate+'</th><th>No. of Cases Registered on '+date+'</th><th>Last FIR Cr.No. on '+date+'</th></tr><tr><td><b>'+esc(ps.replace(" L&O",""))+'</b></td><td class="center">'+esc($("complPrev").value)+'</td><td class="center">'+esc($("complToday").value)+'</td><td class="center">'+totalCompl+'</td><td class="center">'+esc($("csrDisposed").value)+'</td><td class="center">'+esc($("csrPending").value)+'</td><td class="center">'+esc($("firPrev").value)+'</td><td class="center">'+esc($("firToday").value)+'</td><td class="center">'+esc($("lastFir").value)+'</td></tr></table>';
 
-  const fc=getRows("forecastBody").filter(r=>r.some(x=>x.trim())); h+='<h2>Forecast ('+ndate+') – '+fc.length+'</h2><table class="small"><tr><th>S.No</th><th>PS</th><th>Place of Agitation/Forecast</th><th>Date & Timing</th><th>Organizer Name</th><th>No of Person Attending (Approx)</th><th>Type of Agitation</th><th>Bandobust Arrangement</th></tr>'+tableRows(fc)+'</table>';
+  h+='<h2>Forecast ('+ndate+') – '+fc.length+'</h2><table class="small"><tr><th>S.No</th><th>PS</th><th>Place of Agitation/Forecast</th><th>Date & Timing</th><th>Organizer Name</th><th>No of Person Attending (Approx)</th><th>Type of Agitation</th><th>Bandobust Arrangement</th></tr>'+tableRows(fc.length?fc:[["","","","","","",""]])+'</table>';
   $("report").innerHTML=h;
 }
 
 function snapshot(){
- const ids=["ps","reportDate","offenceHead","offenceCount","nbwCount","prcCount","forecastCount","hsCount","crsec","dosoc","complainant","io","accused","property","gist","complPrev","complToday","csrDisposed","csrPending","firPrev","firToday","lastFir"];
- const data={};ids.forEach(id=>data[id]=$(id).value);data.nbw=getRows("nbwBody");data.prc=getRows("prcBody");data.hs=getRows("hsBody");data.forecast=getRows("forecastBody");return data
+ const ids=["ps","reportDate","complPrev","complToday","csrDisposed","csrPending","firPrev","firToday","lastFir"];
+ const data={};ids.forEach(id=>data[id]=$(id).value);
+ data.cases=getCases().map(c=>({...c,imageData:""}));
+ data.nbw=getRows("nbwBody");data.prc=getRows("prcBody");data.hs=getRows("hsBody");data.forecast=getRows("forecastBody");
+ return data
 }
-function saveDraft(){localStorage.setItem("stationDSR",JSON.stringify(snapshot()));alert("Draft saved on this device.")}
-function loadDraft(){const raw=localStorage.getItem("stationDSR");if(!raw)return alert("No saved draft.");const d=JSON.parse(raw);Object.keys(d).forEach(k=>{if($(k)&&typeof d[k]!=="object")$(k).value=d[k]});["nbw","prc","hs","forecast"].forEach(k=>{const id=k+"Body";$(id).innerHTML="";(d[k]||[]).forEach(v=>({nbw:addNBW,prc:addPRC,hs:addHS,forecast:addForecast}[k](v)))});renderReport()}
+function saveDraft(){localStorage.setItem("stationDSR",JSON.stringify(snapshot()));alert("Draft saved on this device. Property images are not stored in the draft.")}
+function loadDraft(){
+ const raw=localStorage.getItem("stationDSR");if(!raw)return alert("No saved draft.");
+ const d=JSON.parse(raw);["ps","reportDate","complPrev","complToday","csrDisposed","csrPending","firPrev","firToday","lastFir"].forEach(k=>{if(d[k]!=null)$(k).value=d[k]});
+ $("caseList").innerHTML="";(d.cases&&d.cases.length?d.cases:[{}]).forEach(addCase);
+ ["nbw","prc","hs","forecast"].forEach(k=>{const id=k+"Body";$(id).innerHTML="";(d[k]||[]).forEach(v=>({nbw:addNBW,prc:addPRC,hs:addHS,forecast:addForecast}[k](v))});
+ renderReport()
+}
 function clearDraft(){if(!confirm("Clear all entered DSR data?"))return;localStorage.removeItem("stationDSR");location.reload()}
-function downloadWord(){renderReport();const blob=new Blob(['<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:"Times New Roman"}table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:5px;vertical-align:top}h1{text-align:center;font-size:15pt}h2{font-size:12pt;text-decoration:underline}</style></head><body>'+$("report").innerHTML+'</body></html>'],{type:"application/msword"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Daily_Situation_Report_"+($("reportDate").value||"").replaceAll("-","_")+".doc";a.click();URL.revokeObjectURL(a.href)}
-document.querySelectorAll("input,textarea").forEach(x=>x.addEventListener("input",()=>{clearTimeout(window.__r);window.__r=setTimeout(renderReport,250)}));
+function downloadWord(){
+ renderReport();
+ const blob=new Blob(['<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:"Times New Roman"}table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:5px;vertical-align:top}h1{text-align:center;font-size:15pt}h2{font-size:12pt;text-decoration:underline}img{max-width:100%;max-height:170px}</style></head><body>'+$("report").innerHTML+'</body></html>'],{type:"application/msword"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Daily_Situation_Report_"+($("reportDate").value||"").replaceAll("-","_")+".doc";a.click();URL.revokeObjectURL(a.href)
+}
+document.querySelectorAll("#basic input,#abstract input").forEach(x=>x.addEventListener("input",debouncedRender));
 renderReport();
 </script>
 </body>
