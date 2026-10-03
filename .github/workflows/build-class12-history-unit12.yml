@@ -1,0 +1,92 @@
+name: Build Class 12 History Unit 12
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/textbook/class-12/history/unit-12-parts/part-*.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Unit 12
+        shell: python
+        run: |
+          import glob, json, re
+          from pathlib import Path
+
+          parts = sorted(
+              glob.glob("data/textbook/class-12/history/unit-12-parts/part-*.json"),
+              key=lambda p: int(re.search(r"part-(\d+)\.json$", p).group(1))
+          )
+          if len(parts) < 5:
+              print(f"Waiting for all 5 parts; found {len(parts)}")
+              raise SystemExit(0)
+
+          questions = []
+          for path in parts:
+              with open(path, encoding="utf-8") as f:
+                  questions.extend(json.load(f)["questions"])
+
+          quiz_sets = [
+              {
+                  "id": i,
+                  "title_en": f"Quiz {i} · Competitive Review",
+                  "title_ta": f"வினாடி வினா {i} · போட்டித் தேர்வு மீள்பார்வை"
+              }
+              for i in range(1, (len(questions) + 19) // 20 + 1)
+          ]
+
+          positions = [0, 0, 0, 0]
+          for q in questions:
+              positions[q["correct"]] += 1
+
+          meta = {
+              "board": "Tamil Nadu State Board",
+              "class": 12,
+              "subject": "History",
+              "edition": 2025,
+              "unit": 12,
+              "unit_en": "Europe in Turmoil",
+              "unit_ta": "ஐரோப்பாவில் அமைதியின்மை",
+              "source": "Government of Tamil Nadu Higher Secondary Second Year History, Revised Edition 2025, English and Tamil editions supplied by the user",
+              "total_questions": len(questions),
+              "quiz_sets": quiz_sets,
+              "question_style": "Maximum useful source-grounded bilingual competitive-exam coverage from Unit 12: post-Napoleonic Europe, socialism and communism, Chartism, the 1830 and 1848 revolutions, Italian and German unification, the Paris Commune, the Long Depression and labour struggles.",
+              "quality_policy": "Four-option bilingual MCQs grounded in the supplied 2025 textbook. Activity, project, comparison and classroom-procedure prompts are excluded.",
+              "page_reference_note": "page_en refers to the printed English textbook page; Tamil page numbering differs and is not inferred.",
+              "qa_all_four_options": all(len(q["opts_en"]) == 4 and len(q["opts_ta"]) == 4 for q in questions),
+              "qa_valid_correct_indexes": all(isinstance(q["correct"], int) and 0 <= q["correct"] < 4 for q in questions),
+              "qa_exact_duplicate_question_options": len(questions) - len({q["q_en"] + "|" + json.dumps(q["opts_en"], ensure_ascii=False) for q in questions}),
+              "qa_duplicate_question_stems": len(questions) - len({q["q_en"] for q in questions}),
+              "qa_duplicate_ids": len(questions) - len({q["id"] for q in questions}),
+              "qa_low_value_activity_hits": sum(bool(re.search(r"activity|students may|collect information|explore how|ict corner|qr code", q["q_en"], re.I)) for q in questions),
+              "qa_answer_position_counts": {
+                  "A": positions[0],
+                  "B": positions[1],
+                  "C": positions[2],
+                  "D": positions[3]
+              }
+          }
+
+          out = Path("data/textbook/class-12/history/unit-12.json")
+          out.write_text(json.dumps({"meta": meta, "questions": questions}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print(f"Built {len(questions)} questions into {out}")
+
+      - name: Commit built Unit 12
+        run: |
+          if [ ! -f data/textbook/class-12/history/unit-12.json ]; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/textbook/class-12/history/unit-12.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Build Class 12 History Unit 12 question bank"
+          git push
