@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CM Programme - 108 Ambulance Request</title>
+<meta name="description" content="Editable police request letter generator to 108 Ambulance District Manager for ambulance deployment during VIP/CM programmes.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--navy:#0b2545;--blue:#1463ff;--bg:#eef3f8;--line:#d7e0ea;--muted:#617187;--green:#18794e;--danger:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#172033;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.topbar a{color:var(--blue);font-weight:800;text-decoration:none}.status{margin-left:auto;font-size:.78rem;color:var(--green);background:#e9f8ef;border:1px solid #bfe7cc;padding:5px 9px;border-radius:999px}
+.shell{max-width:1450px;margin:18px auto;padding:0 14px;display:grid;grid-template-columns:minmax(340px,520px) minmax(0,1fr);gap:18px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(13,38,76,.08)}
+.form-panel{padding:18px}.form-panel h1{font-size:1.3rem;margin:0 0 4px;color:var(--navy)}.sub{color:var(--muted);font-size:.9rem;line-height:1.45;margin:0 0 16px}
+fieldset{border:1px solid var(--line);border-radius:10px;padding:12px;margin:0 0 14px}legend{font-weight:850;color:var(--navy);padding:0 6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
+label{display:block;font-size:.78rem;font-weight:750;color:#34455b;margin-bottom:4px}
+input,textarea{width:100%;border:1px solid #bdc9d7;border-radius:8px;padding:9px 10px;font:inherit;color:#172033;background:#fff}
+textarea{min-height:82px;resize:vertical}input:focus,textarea:focus{outline:2px solid rgba(20,99,255,.18);border-color:var(--blue)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer}.primary{background:var(--navy);color:#fff}.pdf{background:var(--green);color:#fff}.secondary{background:#eaf1fb;color:#15375d}.danger{background:#fff0ee;color:var(--danger)}
+.note{margin-top:12px;font-size:.78rem;color:var(--muted);line-height:1.45}
+.preview-panel{padding:14px;overflow:auto}.preview-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;color:var(--navy)}
+.paper{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#000;padding:16mm 16mm 18mm;font-family:Bamini,"Noto Sans Tamil","Latha",Arial,sans-serif;box-shadow:0 5px 24px rgba(0,0,0,.16)}
+.block{font-size:13pt;line-height:1.55;margin-bottom:8mm}.date{font-size:13pt;margin:5mm 0}.para{font-size:13pt;line-height:1.7;text-align:justify;margin:0 0 7mm;white-space:pre-wrap}.signature{text-align:right;font-size:13pt;line-height:1.5;margin-top:22mm;font-weight:700;white-space:pre-line}
+.english{font-family:"Times New Roman",Times,serif}
+@media(max-width:980px){.shell{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}.paper{width:100%;min-height:auto;padding:24px 20px}.status{margin-left:0}}
+@media print{body{background:#fff}.topbar,.form-panel,.preview-head{display:none!important}.shell{display:block;margin:0;padding:0}.preview-panel,.panel{border:0;box-shadow:none;padding:0}.paper{box-shadow:none;width:210mm;min-height:297mm;margin:0;padding:16mm 16mm 18mm}@page{size:A4;margin:0}}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="/policedocuments/">← Police Documents</a><strong>CM Programme Request Letter 9 — 108 Ambulance</strong><span class="status">Editable • Local-only</span></div>
+<main class="shell">
+<section class="panel form-panel">
+<h1>108 Ambulance Deployment Request</h1>
+<p class="sub">Based on pages 10–11 of the uploaded CM programme request-letter set. The source uses legacy Tamil/Bamini text; the original wording is preserved as editable text.</p>
+
+<fieldset><legend>From</legend><div class="grid">
+<div class="full"><label for="fromText">From block</label><textarea id="fromText">nrd;id fhty ;
+mDg;Geu;
+fhty; Ma;thsu;>
+[p7 Nrj;Jg;gl;L fhty; epiyak;>
+rl;lk; kw;Wk; xOq;F gpupT>
+Nrj;Jg;gl;L > nrd;id 600 031.</textarea></div>
+</div></fieldset>
+
+<fieldset><legend>To</legend><div class="grid">
+<div class="full"><label for="toOfficer">Officer</label><input id="toOfficer" value="cau;jpU khtl;l Nkyhsu;; mtu;fs;>"></div>
+<div class="full"><label for="toDepartment">Service</label><input id="toDepartment" value="108 Mk;Gyd;];>"></div>
+<div class="full"><label for="toAddress">Address</label><textarea id="toAddress">DMS mYtyfk;>
+nrd;id.</textarea></div>
+</div></fieldset>
+
+<fieldset><legend>Programme details</legend><div class="grid">
+<div><label for="visitDate">Visit date</label><input id="visitDate" type="date" value="2026-07-20"></div>
+<div><label for="visitTime">Visit time</label><input id="visitTime" value="14.00"></div>
+<div class="full"><label for="venue">Venue</label><input id="venue" value="Bio CNG Plant"></div>
+<div><label for="ambulanceCount">Number of ambulances</label><input id="ambulanceCount" value="2"></div>
+<div><label for="reportTime">Reporting time</label><input id="reportTime" value="14.00"></div>
+</div></fieldset>
+
+<fieldset><legend>Original Tamil/Bamini wording</legend><div class="grid">
+<div class="full"><label for="bodyText">Body</label><textarea id="bodyText">ma;ah.
+[p7 Nrj;Jg;gl;L fhty; epiya vy;iyf;Fl;gl;l “Bio CNG Plant” - y; 20.06.2026 Njjp md;W khiy 14.00 kzp mstpy khz;GkpF jkpo;ehL Kjyikr;rh; jpU. N[hrg; tp[a; mtu;fs; tUif je;J ghHitapl cs;s epfo;r;rp; eilngwTs;sJ. me;epfo;r;rpf;F khz;GkpF jkpo;ehL Kjyikr;ru; kw;Wk; Kf;fpa gpuKfu;fs; tUif juTs;sJ. vdNt nghJkf;fspd; eyd; fUjp 108 Mk;Gyd;];
+Njitg;gLtjhy;; “Bio CNG Plant” Nrj;Jg;gl;L – y; nkhj;jk; 2 thfdq;fs; 20.07.2026 md;W khiy 14.00 kzpf;F epWj;jp itf;f Mtz nra;AkhW jq;fis gzpTld; Nfl;Lf;nfhs;fpNwd;.</textarea></div>
+<div class="full"><label for="signatureText">Signature block</label><textarea id="signatureText">fhty; Ma;thsu;>
+[p7 Nrj;Jg;gl;L fhty; epiyak;>
+Nrj;Jg;gl;L> nrd;id-31.</textarea></div>
+</div></fieldset>
+
+<div class="actions">
+<button class="btn primary" id="printBtn" type="button">🖨️ Print</button>
+<button class="btn pdf" id="pdfBtn" type="button">⬇️ Save PDF</button>
+<button class="btn secondary" id="syncBtn" type="button">↻ Update date / venue / ambulance count</button>
+<button class="btn danger" id="resetBtn" type="button">Reset sample</button>
+</div>
+<p class="note">The source contains inconsistent dates (20.06.2026 in one line and 20.07.2026 later). This generator preserves the source wording and lets you edit/update it rather than silently correcting it.</p>
+</section>
+
+<section class="panel preview-panel">
+<div class="preview-head"><strong>A4 Preview</strong><span id="statusText"></span></div>
+<article class="paper" id="paper">
+<div class="block" id="pFromText"></div>
+<div class="block"><div>ngWeu;</div><div id="pToOfficer"></div><div id="pToDepartment"></div><div id="pToAddress"></div></div>
+<div class="para" id="pBody"></div>
+<div class="signature" id="pSignature"></div>
+</article>
+</section>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const ids=["fromText","toOfficer","toDepartment","toAddress","visitDate","visitTime","venue","ambulanceCount","reportTime","bodyText","signatureText"];
+function fmtDate(v){if(!v)return "";const [y,m,d]=v.split("-");return d+"."+m+"."+y}
+function nl(s){return String(s||"").replace(/\n/g,"<br>")}
+function render(){
+ $("pFromText").innerHTML=nl($("fromText").value);
+ $("pToOfficer").textContent=$("toOfficer").value;
+ $("pToDepartment").textContent=$("toDepartment").value;
+ $("pToAddress").innerHTML=nl($("toAddress").value);
+ $("pBody").textContent=$("bodyText").value;
+ $("pSignature").textContent=$("signatureText").value;
+}
+function updateFields(){
+ const vd=fmtDate($("visitDate").value), venue=$("venue").value.trim(), vt=$("visitTime").value.trim(), rt=$("reportTime").value.trim(), count=$("ambulanceCount").value.trim();
+ let t=$("bodyText").value;
+ t=t.replace(/“Bio CNG Plant”/g,"“"+venue+"”")
+    .replace(/20\.07\.2026/g,vd)
+    .replace(/14\.00/g,vt);
+ t=t.replace(/nkhj;jk;\s*2\s*thfdq;fs;/g,"nkhj;jk; "+count+" thfdq;fs;");
+ if(rt!==vt){ t=t.replace(new RegExp(vt.replace(".","\\.")+" kzpf;F"),rt+" kzpf;F"); }
+ $("bodyText").value=t;
+ render();
+}
+ids.forEach(id=>$(id).addEventListener("input",render));
+$("syncBtn").addEventListener("click",updateFields);
+$("printBtn").addEventListener("click",()=>{render();window.print()});
+$("resetBtn").addEventListener("click",()=>location.reload());
+$("pdfBtn").addEventListener("click",async function(){
+ render();const b=this,old=b.textContent;b.disabled=true;b.textContent="Creating PDF…";
+ try{
+  const paper=$("paper"),canvas=await html2canvas(paper,{scale:2,useCORS:true,backgroundColor:"#fff"});
+  const img=canvas.toDataURL("image/jpeg",0.96),pdf=new window.jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+  const w=210,h=canvas.height*w/canvas.width;
+  if(h<=297){pdf.addImage(img,"JPEG",0,0,w,h)}
+  else{let left=h,pos=0;pdf.addImage(img,"JPEG",0,pos,w,h);left-=297;while(left>0){pos=left-h;pdf.addPage();pdf.addImage(img,"JPEG",0,pos,w,h);left-=297}}
+  pdf.save("108_ambulance_request_letter.pdf");
+ }catch(e){alert("PDF creation failed. Please use Print.");}
+ finally{b.disabled=false;b.textContent=old;}
+});
+render();
+})();
+</script>
+</body>
+</html>
