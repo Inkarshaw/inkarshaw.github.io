@@ -3,7 +3,7 @@
   window.CDRMovementFactory = function(ctx){
     const {$,state,localDateKey,haversineKm,fmtInt,fmtDur,dtFmt,dateFmt,escapeHtml,escAttr,mapLink,incidentDateTime,contactLabel,showStatus,timeMins,withinNight}=ctx;
     let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null;
-    let movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null;
+    let movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null, movementBounds=null;
     let movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null;
 
   function movementDateRange(){
@@ -109,44 +109,62 @@
     const latlngs=routePts.map(p=>[p.x.lat,p.x.lng]);
     if(latlngs.length>1)L.polyline(latlngs,{pane:'movementRoutePane',weight:4,opacity:.95,dashArray:'9,6',color:'#18d9ff',lineCap:'round',lineJoin:'round'}).addTo(movementLayer);
 
-    // Small datasets retain chronological numbered markers. Large datasets use one Canvas marker per distinct tower.
+    // Group repeated visits at the same tower so markers remain readable.
+    const towerGroups=new Map();
+    pts.forEach(({x,i},j)=>{
+      const k=x.key||x.cellId||x.address||`${Number(x.lat).toFixed(5)},${Number(x.lng).toFixed(5)}`;
+      let t=towerGroups.get(k);
+      if(!t)t={key:k,lat:x.lat,lng:x.lng,cellId:x.cellId,address:x.address,segments:0,events:0,first:x.start,last:x.end,contacts:new Set(),visits:[]};
+      const visit={x,i,j,seq:j+1};
+      t.visits.push(visit);t.segments++;t.events+=x.events||0;
+      if(x.start<t.first)t.first=x.start;if(x.end>t.last)t.last=x.end;
+      for(const n of x.contacts||[])t.contacts.add(n);
+      towerGroups.set(k,t);
+    });
+    const repeatVisits=Math.max(0,pts.length-towerGroups.size);
+
     if(pts.length<=500){
-      pts.forEach(({x,i},j)=>{
-        const icon=L.divIcon({className:'sequence-marker',html:`<span>${i+1}</span>`,iconSize:[30,30],iconAnchor:[15,15]});
-        const marker=L.marker([x.lat,x.lng],{pane:'movementAnchorPane',icon,title:`#${i+1} ${x.cellId||x.address||'Tower'}`}).addTo(movementLayer);
-        movementPlaybackMarkers[j]=marker;
-        const next=x.nextDistance==null?'—':x.nextDistance.toFixed(1)+' km',gap=x.nextMinutes==null?'—':Math.round(x.nextMinutes)+' min';
-        const contacts=[...x.contacts].slice(0,12).map(n=>escapeHtml(contactLabel(n))).join(', ');
-        marker.bindPopup(`<div style="min-width:230px"><b>Stop #${i+1}</b><br><b>Time:</b> ${escapeHtml(dtFmt(x.start))}${x.end&&+x.end!==+x.start?' – '+escapeHtml(dtFmt(x.end)):''}<br><b>Cell ID:</b> ${escapeHtml(x.cellId||'—')}<br><b>Tower:</b> ${escapeHtml(x.address||'—')}<br><b>Events:</b> ${fmtInt(x.events)}<br><b>Contacts:</b> ${contacts||'—'}<br><b>Next tower:</b> ${escapeHtml(next)} • <b>Gap:</b> ${escapeHtml(gap)}</div>`);
-      });
+      for(const t of towerGroups.values()){
+        const first=t.visits[0],repeat=t.visits.length>1;
+        const icon=L.divIcon({
+          className:`sequence-marker${repeat?' repeat':''}`,
+          html:`<span>${first.seq}</span>${repeat?`<b>×${t.visits.length}</b>`:''}`,
+          iconSize:[repeat?38:30,repeat?38:30],iconAnchor:[repeat?19:15,repeat?19:15]
+        });
+        const marker=L.marker([t.lat,t.lng],{pane:'movementAnchorPane',icon,title:`Visit #${first.seq} ${t.cellId||t.address||'Tower'}`}).addTo(movementLayer);
+        for(const v of t.visits)movementPlaybackMarkers[v.j]=marker;
+        const contacts=[...t.contacts].slice(0,12).map(n=>escapeHtml(contactLabel(n))).join(', ');
+        const visits=t.visits.slice(0,10).map(v=>`<div class="movement-popup-visit"><b>#${v.seq}</b> ${escapeHtml(dtFmt(v.x.start))}${v.x.end&&+v.x.end!==+v.x.start?' – '+escapeHtml(dtFmt(v.x.end)):''}</div>`).join('');
+        const more=t.visits.length>10?`<div class="tiny">+${fmtInt(t.visits.length-10)} more visits</div>`:'';
+        marker.bindPopup(`<div class="movement-popup"><div class="movement-popup-title">${escapeHtml(t.cellId||'Tower')}${repeat?` • ${fmtInt(t.visits.length)} visits`:''}</div><div><b>Tower:</b> ${escapeHtml(t.address||'—')}</div><div><b>Events:</b> ${fmtInt(t.events)} • <b>Contacts:</b> ${contacts||'—'}</div><div><b>Coordinates:</b> ${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}</div><div class="movement-popup-visits">${visits}${more}</div></div>`);
+      }
     }else{
-      const towers=new Map();
-      for(const {x} of pts){
-        const k=x.key||x.cellId||x.address||`${x.lat.toFixed(5)},${x.lng.toFixed(5)}`;
-        let t=towers.get(k);
-        if(!t)t={lat:x.lat,lng:x.lng,cellId:x.cellId,address:x.address,segments:0,events:0,first:x.start,last:x.end,contacts:new Set()};
-        t.segments++;t.events+=x.events||0;if(x.start<t.first)t.first=x.start;if(x.end>t.last)t.last=x.end;
-        for(const n of x.contacts||[])t.contacts.add(n);
-        towers.set(k,t);
+      for(const t of towerGroups.values()){
+        const radius=Math.max(4,Math.min(11,4+Math.log2(1+t.segments)));
+        const marker=L.circleMarker([t.lat,t.lng],{pane:'movementTowerPane',renderer:movementCanvasRenderer,radius,color:'#d9fbff',weight:1.5,fillColor:'#17c9e8',fillOpacity:.88}).addTo(movementLayer);
+        for(const v of t.visits)movementPlaybackMarkers[v.j]=marker;
+        const visits=t.visits.slice(0,6).map(v=>`#${v.seq} ${escapeHtml(dtFmt(v.x.start))}`).join('<br>');
+        marker.bindPopup(`<div class="movement-popup"><div class="movement-popup-title">${escapeHtml(t.cellId||'Tower')} • ${fmtInt(t.visits.length)} visits</div><div><b>Address:</b> ${escapeHtml(t.address||'—')}</div><div><b>Events:</b> ${fmtInt(t.events)} • <b>First:</b> ${escapeHtml(dtFmt(t.first))} • <b>Last:</b> ${escapeHtml(dtFmt(t.last))}</div><div><b>Coordinates:</b> ${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}</div><div class="movement-popup-visits">${visits}${t.visits.length>6?'<br>+ '+fmtInt(t.visits.length-6)+' more visits':''}</div></div>`);
       }
-      for(const t of towers.values()){
-        const radius=Math.max(4,Math.min(10,4+Math.log2(1+t.segments)));
-        const marker=L.circleMarker([t.lat,t.lng],{pane:'movementTowerPane',radius,color:'#d9fbff',weight:1.5,fillColor:'#17c9e8',fillOpacity:.88}).addTo(movementLayer);
-        marker.bindPopup(`<div style="min-width:230px"><b>${escapeHtml(t.cellId||'Tower')}</b><br><b>Address:</b> ${escapeHtml(t.address||'—')}<br><b>Movement segments:</b> ${fmtInt(t.segments)}<br><b>Events:</b> ${fmtInt(t.events)}<br><b>First:</b> ${escapeHtml(dtFmt(t.first))}<br><b>Last:</b> ${escapeHtml(dtFmt(t.last))}<br><b>Contacts:</b> ${[...t.contacts].slice(0,10).map(n=>escapeHtml(contactLabel(n))).join(', ')||'—'}</div>`);
-      }
-      if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">High-volume mode: ${fmtInt(towers.size)} tower markers</span>`;
+      if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">High-volume mode: ${fmtInt(towerGroups.size)} tower markers</span>`;
     }
 
     const firstPt=pts[0]?.x,lastPt=pts[pts.length-1]?.x;
-    if(firstPt){
-      movementStartMarker=L.circleMarker([firstPt.lat,firstPt.lng],{pane:'movementAnchorPane',radius:10,color:'#ffffff',weight:3,fillColor:'#31f7a8',fillOpacity:1}).addTo(movementLayer);
-      movementStartMarker.bindTooltip('START',{permanent:false,direction:'top'});
+    const sameEndpoint=firstPt&&lastPt&&Math.abs(firstPt.lat-lastPt.lat)<1e-7&&Math.abs(firstPt.lng-lastPt.lng)<1e-7;
+    if(firstPt&&sameEndpoint){
+      movementStartMarker=movementEndMarker=L.circleMarker([firstPt.lat,firstPt.lng],{pane:'movementAnchorPane',radius:11,color:'#ffffff',weight:3,fillColor:'#9b7bff',fillOpacity:1}).addTo(movementLayer);
+      movementStartMarker.bindTooltip('START / END',{permanent:true,direction:'top',className:'movement-endpoint-label'});
+    }else{
+      if(firstPt){
+        movementStartMarker=L.circleMarker([firstPt.lat,firstPt.lng],{pane:'movementAnchorPane',radius:10,color:'#ffffff',weight:3,fillColor:'#31f7a8',fillOpacity:1}).addTo(movementLayer);
+        movementStartMarker.bindTooltip('START',{permanent:true,direction:'top',className:'movement-endpoint-label'});
+      }
+      if(lastPt){
+        movementEndMarker=L.circleMarker([lastPt.lat,lastPt.lng],{pane:'movementAnchorPane',radius:10,color:'#ffffff',weight:3,fillColor:'#ff5d78',fillOpacity:1}).addTo(movementLayer);
+        movementEndMarker.bindTooltip('END',{permanent:true,direction:'top',className:'movement-endpoint-label'});
+      }
     }
-    if(lastPt){
-      movementEndMarker=L.circleMarker([lastPt.lat,lastPt.lng],{pane:'movementAnchorPane',radius:10,color:'#ffffff',weight:3,fillColor:'#ff5d78',fillOpacity:1}).addTo(movementLayer);
-      movementEndMarker.bindTooltip('END',{permanent:false,direction:'top'});
-    }
-    if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip goodtext">Overlay: route + ${pts.length<=500?fmtInt(pts.length):'tower'} markers</span>`;
+    if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip goodtext">${fmtInt(towerGroups.size)} distinct mapped tower${towerGroups.size===1?'':'s'}</span>${repeatVisits?`<span class="metric-chip">${fmtInt(repeatVisits)} repeat visit${repeatVisits===1?'':'s'} grouped</span>`:''}`;
 
     const slider=$('movementSlider');if(slider){slider.max=Math.max(0,movementPlaybackRows.length-1);if(+slider.value>+slider.max)slider.value=0;updateMovementPlayback(+slider.value||0,false);}
     const smsFocus=state.smsMovementFocus;
@@ -157,11 +175,24 @@
       updateMovementPlayback(best,true,true);
       if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip goodtext">SMS focus: ${escapeHtml(dtFmt(new Date(target)))} • nearest segment gap ${Math.round(bestGap/60000)} min</span>`;
     }
-    const fullBounds=L.latLngBounds(pts.map(p=>[p.x.lat,p.x.lng]));
+    const fullBounds=L.latLngBounds(pts.map(p=>[p.x.lat,p.x.lng]));movementBounds=fullBounds;
     movementMap.invalidateSize({pan:false});
-    if(pts.length===1)movementMap.setView([pts[0].x.lat,pts[0].x.lng],15);else movementMap.fitBounds(fullBounds.pad(.08),{maxZoom:16});
+    if(pts.length===1)movementMap.setView([pts[0].x.lat,pts[0].x.lng],15);else movementMap.fitBounds(fullBounds.pad(.08),{maxZoom:16,padding:[18,18]});
     requestAnimationFrame(()=>movementMap?.invalidateSize({pan:false}));
     setTimeout(()=>{movementMap?.invalidateSize({pan:false});if(pts.length>1)movementMap?.fitBounds(fullBounds.pad(.08),{maxZoom:16});const f=state.smsMovementFocus;if(f&&f.at&&movementPlaybackRows.length&&(!f.subject||f.subject===($('movementCdr')?.value||''))){const target=+f.at;let best=0,gapBest=Infinity;movementPlaybackRows.forEach((x,i)=>{const a=+(x.start||0),b=+(x.end||x.start||0),g=target>=a&&target<=b?0:Math.min(Math.abs(target-a),Math.abs(target-b));if(g<gapBest){gapBest=g;best=i;}});updateMovementPlayback(best,true,true);}},220);
+  }
+
+  function fitMovementMap(){
+    if(!movementMap||!movementBounds)return;
+    movementMap.invalidateSize({pan:false});
+    const ne=movementBounds.getNorthEast(),sw=movementBounds.getSouthWest();
+    if(ne.equals(sw))movementMap.setView(ne,15);else movementMap.fitBounds(movementBounds.pad(.08),{maxZoom:16,padding:[18,18]});
+  }
+  function focusMovementEndpoint(which){
+    const marker=which==='end'?movementEndMarker:movementStartMarker;
+    if(!movementMap||!marker)return;
+    const ll=marker.getLatLng();movementMap.setView(ll,Math.max(15,movementMap.getZoom()),{animate:true});
+    marker.openTooltip?.();
   }
 
   function updateMovementPlayback(i,openPopup=true,pan=true){
@@ -171,15 +202,8 @@
     $('movementSlider').value=movementPlaybackIndex;
     $('movementPlaybackLabel').textContent=`#${movementPlaybackIndex+1} / ${movementPlaybackRows.length} • ${dtFmt(r.start)} • ${r.address||r.cellId||'Tower'}`;
 
-    const m=movementPlaybackMarkers[movementPlaybackIndex];
-    if(m&&movementMap){
-      if(pan)movementMap.panTo(m.getLatLng(),{animate:true,duration:.25});
-      if(openPopup)m.openPopup();
-      return;
-    }
-
     if(movementMap){
-      const ll=[r.lat,r.lng];
+      const grouped=movementPlaybackMarkers[movementPlaybackIndex],ll=grouped?.getLatLng?.()||L.latLng(r.lat,r.lng);
       if(!movementPlaybackMarker){
         movementPlaybackMarker=L.circleMarker(ll,{
           pane:'movementAnchorPane',radius:11,color:'#ffffff',weight:3,
@@ -187,8 +211,8 @@
         }).addTo(movementMap);
         const el=movementPlaybackMarker.getElement?.();if(el)el.classList.add('movement-playback-pulse');
       }else movementPlaybackMarker.setLatLng(ll);
-
-      movementPlaybackMarker.bindPopup(`<b>Playback #${movementPlaybackIndex+1}</b><br>${escapeHtml(dtFmt(r.start))}<br>${escapeHtml(r.address||r.cellId||'Tower')}`);
+      const next=r.nextDistance==null?'—':r.nextDistance.toFixed(1)+' km',gap=r.nextMinutes==null?'—':Math.round(r.nextMinutes)+' min';
+      movementPlaybackMarker.bindPopup(`<div class="movement-popup"><div class="movement-popup-title">Visit #${movementPlaybackIndex+1}</div><div><b>Time:</b> ${escapeHtml(dtFmt(r.start))}${r.end&&+r.end!==+r.start?' – '+escapeHtml(dtFmt(r.end)):''}</div><div><b>Cell ID:</b> ${escapeHtml(r.cellId||'—')}</div><div><b>Tower:</b> ${escapeHtml(r.address||'—')}</div><div><b>Events:</b> ${fmtInt(r.events||0)} • <b>Next:</b> ${escapeHtml(next)} • <b>Gap:</b> ${escapeHtml(gap)}</div></div>`);
       if(pan)movementMap.panTo(ll,{animate:true,duration:.22});
       if(openPopup)movementPlaybackMarker.openPopup();
     }
@@ -317,6 +341,9 @@
       $('movementNextBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex+1,true,true);};
       $('movementSlider').oninput=e=>{stopMovementPlayback();updateMovementPlayback(+e.target.value,true,true);};
       $('movementSpeed').onchange=()=>{if(movementPlaybackTimer){clearTimeout(movementPlaybackTimer);movementPlaybackTimer=-1;scheduleMovementPlayback();}};
+      if($('movementFitBtn'))$('movementFitBtn').onclick=fitMovementMap;
+      if($('movementStartBtn'))$('movementStartBtn').onclick=()=>focusMovementEndpoint('start');
+      if($('movementEndBtn'))$('movementEndBtn').onclick=()=>focusMovementEndpoint('end');
     }
 
     function invalidateMap(){
@@ -324,7 +351,7 @@
     }
 
     return {
-      movementDateRange,movementDateMatch,movementRows,renderMovementMap,updateMovementPlayback,
+      movementDateRange,movementDateMatch,movementRows,renderMovementMap,fitMovementMap,focusMovementEndpoint,updateMovementPlayback,
       stopMovementPlayback,scheduleMovementPlayback,toggleMovementPlayback,shiftLocalDateKey,
       displayLocalDateKey,nightStayAnalysis,renderMovement,bind,invalidateMap
     };
