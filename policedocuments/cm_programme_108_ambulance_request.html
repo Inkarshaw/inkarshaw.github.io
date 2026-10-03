@@ -72,7 +72,7 @@ Nrj;Jg;gl;L> nrd;id-31.</textarea></div>
 
 <div class="actions">
 <button class="btn primary" id="printBtn" type="button">🖨️ Print</button>
-<button class="btn pdf" id="pdfBtn" type="button">⬇️ Save PDF</button>
+<button class="btn pdf" id="pdfBtn" type="button">⬇️ Save PDF</button>\n<button class="btn secondary" id="wordBtn" type="button">📝 Download Word</button>
 <button class="btn secondary" id="syncBtn" type="button">↻ Update date / venue / ambulance count</button>
 <button class="btn danger" id="resetBtn" type="button">Reset sample</button>
 </div>
@@ -131,8 +131,23 @@ $("pdfBtn").addEventListener("click",async function(){
  }catch(e){alert("PDF creation failed. Please use Print.");}
  finally{b.disabled=false;b.textContent=old;}
 });
-render();
-})();
-</script>
+
+function downloadWordDocument(){
+ render();
+ const paper=$("paper");
+ const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+document.title+'</title>'+
+ '<style>@page{size:A4;margin:14mm;}body{font-family:"Times New Roman",Times,serif;color:#000;background:#fff;}'+
+ '.paper{width:auto!important;min-height:auto!important;margin:0!important;padding:0!important;box-shadow:none!important;}'+
+ '.emblem{margin:0 auto 5mm;text-align:center}.dept{text-align:center;font-weight:700;text-decoration:underline}.fromto{display:table;width:100%}.fromto>div{display:table-cell;width:50%;vertical-align:top}.toBlock{text-align:center}.rule{border-top:1px dashed #333}.date{text-align:right}.subject{text-align:center}.stars{text-align:center}.para{text-align:justify}.signature{text-align:right;font-weight:700}.urgent{text-align:center;text-transform:uppercase}</style>'+
+ '</head><body><div class="paper">'+paper.innerHTML+'</div></body></html>';
+ const blob=new Blob(['\ufeff',html],{type:'application/msword'});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;a.download='108_ambulance_request_letter.doc';
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$("wordBtn").addEventListener("click",downloadWordDocument);
+render();\n})();\n</script>
 </body>
 </html>
