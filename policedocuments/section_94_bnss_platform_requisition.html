@@ -50,7 +50,8 @@ Chennai.</textarea></div>
 </div></fieldset>
 
 <fieldset><legend>Case details</legend><div class="grid">
-<div><label for="ps">Police Station</label><input id="ps" value="G1 Police Station"></div>
+<div><label for="districtSelect">District</label><select id="districtSelect"><option value="chennai" selected>Chennai City</option><option value="other">Other District</option></select></div>
+<div><label for="policeStationDropdown">Police Station</label><div id="chennaiPoliceStationContainer"><select id="policeStationDropdown"><option value="">-- Select Police Station --</option></select></div><div id="otherPoliceStationContainer" style="display:none"><input id="policeStationText" placeholder="Enter full Police Station name"></div></div>
 <div><label for="crimeNo">Crime No.</label><input id="crimeNo" value="182/2026"></div>
 <div class="full"><label for="sections">Sections</label><input id="sections" value="8(c) r/w 22(b), 22(c), 25 & 29(1) of the NDPS Act, 1985"></div>
 <div><label for="mobile">Mobile No.</label><input id="mobile" value="7026519552"></div>
@@ -110,15 +111,15 @@ Any other relevant transaction and location-related electronic records available
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const ids=["officerName","rank","unit","toOfficer","platform","hq","ps","crimeNo","sections","mobile","count","records","formatText","closing"];
+const ids=["officerName","rank","unit","toOfficer","platform","hq","districtSelect","policeStationDropdown","policeStationText","crimeNo","sections","mobile","count","records","formatText","closing"];
 function nl(v){return String(v||"").replace(/\n/g,"<br>")}
 function render(){
  const mob=$("mobile").value.trim(), platform=$("platform").value.trim(), count=$("count").value.trim();
  $("pFrom").innerHTML=nl($("officerName").value+",\n"+$("rank").value+",\n"+$("unit").value);
  $("pTo").innerHTML=nl($("toOfficer").value+",\n"+$("hq").value+",\n"+platform+".");
  $("pSubject").textContent="Requisition under Section 94 of the Bharatiya Nagarik Suraksha Sanhita, 2023 – Request for details of the last "+count+" transactions, delivery addresses and latitude/longitude pertaining to Mobile No. "+mob+" – Regarding.";
- $("pReference").textContent=$("ps").value+" Cr.No."+$("crimeNo").value+" U/s "+$("sections").value+".";
- $("pPara1").textContent="It is submitted that a case in "+$("ps").value+" Cr.No."+$("crimeNo").value+", under "+$("sections").value+", is under investigation.";
+ $("pReference").textContent=getPoliceStation()+" Cr.No."+$("crimeNo").value+" U/s "+$("sections").value+".";
+ $("pPara1").textContent="It is submitted that a case in "+getPoliceStation()+" Cr.No."+$("crimeNo").value+", under "+$("sections").value+", is under investigation.";
  $("pPara2").textContent="During the course of investigation, it has become necessary to obtain the details of transactions/orders made through your platform using the mobile number "+mob+", as the same is relevant and necessary for the investigation of the above case.";
  $("pPara3").textContent="Hence, in exercise of the powers conferred under Section 94 of the Bharatiya Nagarik Suraksha Sanhita, 2023, you are hereby requested to furnish the following details pertaining to the last "+count+" transactions/orders associated with the above-mentioned mobile number:";
  const items=$("records").value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
@@ -127,7 +128,7 @@ function render(){
  $("pClosing").textContent=$("closing").value;
  $("pSign").innerHTML=nl($("officerName").value.toUpperCase()+"\n"+$("rank").value+"\n"+$("unit").value);
 }
-ids.forEach(id=>{$(id).addEventListener("input",render);$(id).addEventListener("change",render);});
+ids.forEach(id=>{const el=$(id);if(el){el.addEventListener("input",render);el.addEventListener("change",render);}}); $("districtSelect").addEventListener("change",toggleDistrict);
 $("refreshBtn").addEventListener("click",render);
 $("printBtn").addEventListener("click",()=>{render();window.print()});
 $("wordBtn").addEventListener("click",()=>{
@@ -136,7 +137,7 @@ $("wordBtn").addEventListener("click",()=>{
  const blob=new Blob(['\ufeff',doc],{type:'application/msword'}),url=URL.createObjectURL(blob),a=document.createElement("a");
  a.href=url;a.download="Section_94_BNSS_Platform_Records_Requisition.doc";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
-render();
+populateStations();toggleDistrict();render();
 })();
 </script>
 </body>
