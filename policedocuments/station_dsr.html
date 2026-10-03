@@ -256,13 +256,21 @@ function render(){
     }
     out+='</table>';
   }
-  out+='<h2>NBW Received & Recall – '+nbw.length+'</h2><table><tr><th>S.No</th><th>PS, Cr.No & Sec</th><th>Court & CC/SC/PRC No</th><th>Accused</th><th>Received Date</th><th>Execute Details</th></tr>'+tableRows(nbw)+'</table>';
-  out+='<h2>PRC.No Received :'+("0"+prc.length).slice(-2)+'</h2><table><tr><th>S.No</th><th>Cr.No. Sec</th><th>D/O,D/R-SOC</th><th>Accused</th><th>PRC.No Received</th></tr>'+tableRows(prc)+'</table>';
-  out+='<h2>HS Checked Details – '+hs.length+'</h2><table><tr><th>S.No</th><th>PS</th><th>HS Name</th><th>Present/OV/Jail</th><th>Category</th><th>Checking Officer</th><th>Action Taken</th></tr>'+tableRows(hs)+'</table>';
+  if(nbw.length>0){
+    out+='<h2>NBW Received & Recall – '+nbw.length+'</h2><table><tr><th>S.No</th><th>PS, Cr.No & Sec</th><th>Court & CC/SC/PRC No</th><th>Accused</th><th>Received Date</th><th>Execute Details</th></tr>'+tableRows(nbw)+'</table>';
+  }
+  if(prc.length>0){
+    out+='<h2>PRC.No Received :'+("0"+prc.length).slice(-2)+'</h2><table><tr><th>S.No</th><th>Cr.No. Sec</th><th>D/O,D/R-SOC</th><th>Accused</th><th>PRC.No Received</th></tr>'+tableRows(prc)+'</table>';
+  }
+  if(hs.length>0){
+    out+='<h2>HS Checked Details – '+hs.length+'</h2><table><tr><th>S.No</th><th>PS</th><th>HS Name</th><th>Present/OV/Jail</th><th>Category</th><th>Checking Officer</th><th>Action Taken</th></tr>'+tableRows(hs)+'</table>';
+  }
   var totalCompl=(parseInt(byId("complPrev").value||0,10)+parseInt(byId("complToday").value||0,10));
   out+='<h2>CSR & FIR Abstract:</h2><table><tr><th>PS</th><th>Complaints up to '+prev+'</th><th>Complaints today '+date+'</th><th>Total</th><th>CSR disposed today</th><th>Total pending CSR</th><th>Cases registered up to '+prev+'</th><th>Cases today</th><th>Last FIR Cr.No.</th></tr>'+
        '<tr><td>'+esc(ps.replace(" L&O",""))+'</td><td>'+esc(byId("complPrev").value)+'</td><td>'+esc(byId("complToday").value)+'</td><td>'+totalCompl+'</td><td>'+esc(byId("csrDisposed").value)+'</td><td>'+esc(byId("csrPending").value)+'</td><td>'+esc(byId("firPrev").value)+'</td><td>'+esc(byId("firToday").value)+'</td><td>'+esc(byId("lastFir").value)+'</td></tr></table>';
-  out+='<h2>Forecast ('+next+') – '+fc.length+'</h2><table><tr><th>S.No</th><th>PS</th><th>Place</th><th>Date & Timing</th><th>Organizer</th><th>Approx Persons</th><th>Type</th><th>Bandobust</th></tr>'+tableRows(fc)+'</table>';
+  if(fc.length>0){
+    out+='<h2>Forecast ('+next+') – '+fc.length+'</h2><table><tr><th>S.No</th><th>PS</th><th>Place</th><th>Date & Timing</th><th>Organizer</th><th>Approx Persons</th><th>Type</th><th>Bandobust</th></tr>'+tableRows(fc)+'</table>';
+  }
   byId("report").innerHTML=out;
 }
 function snapshot(){
