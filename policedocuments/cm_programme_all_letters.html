@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CM Programme - All Request Letters</title>
+<meta name="description" content="Create all CM/VIP programme request letters from one page using shared programme details.">
+<style>
+:root{--navy:#0b2545;--blue:#1463ff;--bg:#eef3f8;--line:#d7e0ea;--muted:#617187;--green:#18794e;--danger:#b42318}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#172033;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.topbar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.topbar a{color:var(--blue);font-weight:800;text-decoration:none}.status{margin-left:auto;font-size:.78rem;color:var(--green);background:#e9f8ef;border:1px solid #bfe7cc;padding:5px 9px;border-radius:999px}
+.wrap{max-width:1500px;margin:18px auto;padding:0 14px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(13,38,76,.08)}
+.form{padding:18px;margin-bottom:18px}.form h1{margin:0 0 4px;color:var(--navy);font-size:1.45rem}.sub{margin:0 0 16px;color:var(--muted);font-size:.9rem}
+fieldset{border:1px solid var(--line);border-radius:10px;padding:12px;margin:0 0 14px}legend{font-weight:850;color:var(--navy);padding:0 6px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.full{grid-column:1/-1}.span2{grid-column:span 2}
+label{display:block;font-size:.78rem;font-weight:750;color:#34455b;margin-bottom:4px}
+input,textarea{width:100%;border:1px solid #bdc9d7;border-radius:8px;padding:9px 10px;font:inherit;background:#fff;color:#172033}
+textarea{min-height:65px;resize:vertical}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.primary{background:var(--navy);color:#fff}.word{background:#185abd;color:#fff}.secondary{background:#eaf1fb;color:#15375d}.green{background:var(--green);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.card h3{margin:0 0 5px;color:var(--navy);font-size:1rem}.card p{margin:0 0 10px;color:var(--muted);font-size:.82rem;line-height:1.4}.card-actions{display:flex;gap:7px;flex-wrap:wrap}
+.preview-set{display:grid;gap:18px}.letter-wrap{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;overflow:auto}.letter-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.letter-head strong{color:var(--navy)}
+.paper{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#000;padding:14mm 14mm 18mm;font-family:"Times New Roman",Times,serif;box-shadow:0 5px 24px rgba(0,0,0,.14)}
+.dept{text-align:center;font-weight:700;text-decoration:underline;font-size:14pt;margin-bottom:13mm}.fromto{display:grid;grid-template-columns:1fr 1fr;gap:22mm;font-size:13pt;line-height:1.45}.fthead{font-weight:700;margin-bottom:7mm}.toBlock{text-align:center}.rule{border-top:1px dashed #333;margin:8mm 0 3mm}.date{text-align:right;font-size:13pt;margin-bottom:3mm}.sir{font-size:13pt;margin-bottom:8mm}.subject{font-size:13pt;line-height:1.55;text-align:center;margin:0 8mm 9mm}.stars{text-align:center;font-size:14pt;margin:7mm 0}.para{font-size:13pt;line-height:1.65;text-align:justify;text-indent:14mm;margin:0 0 7mm}.urgent{text-align:center;font-size:12.5pt;margin:14mm 0 0}.signature{text-align:right;font-size:13pt;line-height:1.4;margin-top:25mm;font-weight:700}
+.tamil{font-family:Bamini,"Noto Sans Tamil","Latha",Arial,sans-serif}.tamil .para{text-indent:0;white-space:pre-wrap}.tamil .signature{white-space:pre-line}
+@media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr 1fr}.paper{width:100%;min-height:auto;padding:24px 20px}.fromto{gap:18px}}
+@media(max-width:650px){.grid,.cards{grid-template-columns:1fr}.span2,.full{grid-column:auto}.status{margin-left:0}}
+@media print{body{background:#fff}.topbar,.form,.cards,.letter-head{display:none!important}.wrap{max-width:none;margin:0;padding:0}.letter-wrap{border:0;padding:0;page-break-after:always}.paper{box-shadow:none;width:210mm;min-height:297mm;margin:0;padding:14mm 14mm 18mm}@page{size:A4;margin:0}}
+</style>
+</head>
+<body>
+<div class="topbar">
+<a href="/policedocuments/">← Police Documents</a>
+<strong>CM Programme — All Request Letters</strong>
+<span class="status">Fill once • Generate all 9 letters</span>
+</div>
+
+<div class="wrap">
+<section class="panel form">
+<h1>Create all CM Programme letters from one page</h1>
+<p class="sub">Enter the common programme details once. All nine letters below update automatically. You can print all, download all as one Word file, or open an individual letter.</p>
+
+<fieldset><legend>Common police office details</legend><div class="grid">
+<div><label>From Rank</label><input id="fromRank" value="Inspector of Police"></div>
+<div><label>Police Station</label><input id="station" value="G7 Chetpet Police Station"></div>
+<div class="span2"><label>Station Address</label><input id="fromAddress" value="Chetpet, Chennai-600 031."></div>
+<div><label>Letter Date</label><input id="letterDate" type="date" value="2026-07-19"></div>
+<div><label>Visit Date</label><input id="visitDate" type="date" value="2026-07-20"></div>
+<div><label>Visit Time</label><input id="visitTime" value="14.00"></div>
+<div><label>Venue</label><input id="venue" value="Bio CNG Plant"></div>
+<div class="span2"><label>Place / Locality</label><input id="place" value="Chetpet, Chennai"></div>
+<div><label>General reporting time</label><input id="reportTime" value="12.00"></div>
+<div><label>Armed Guard deployment</label><input id="guardTime" value="19.07.2026 at 20.00 Hrs."></div>
+</div></fieldset>
+
+<fieldset><legend>Letter-specific editable details</legend><div class="grid">
+<div><label>Fire Tender</label><input id="fireTender" value="one Fire Tender"></div>
+<div><label>Fire Extinguishers</label><input id="extinguishers" value="4 fire extinguishers"></div>
+<div><label>Armed Guard strength</label><input id="guardStrength" value="2 + 8 Armed Guard"></div>
+<div><label>108 Ambulance count</label><input id="ambulanceCount" value="2"></div>
+<div class="span2"><label>Temporary structures</label><input id="structures" value="stage, dais, wooden gallery and other temporary structures"></div>
+<div class="span2"><label>Motor Transport vehicle</label><input id="vehicle" value="Thar Jeep"></div>
+</div></fieldset>
+
+<div class="actions">
+<button class="btn primary" type="button" id="printAll">🖨️ Print All 9 Letters</button>
+<button class="btn word" type="button" id="wordAll">📝 Download All as Word</button>
+<button class="btn secondary" type="button" id="refreshBtn">↻ Refresh All Letters</button>
+</div>
+</section>
+
+<section class="cards">
+<div class="card"><h3>1. Fire & Rescue</h3><p>Fire Tender and extinguishers.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_fire_rescue_request.html" target="_blank">Open individual</a></div></div>
+<div class="card"><h3>2. Medical Team & Ambulance</h3><p>KMC Medical Team, ambulance and Medical Room.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_medical_ambulance_request.html" target="_blank">Open individual</a></div></div>
+<div class="card"><h3>3. Structural Stability</h3><p>PWD inspection of temporary structures.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_structural_stability_request.html" target="_blank">Open individual</a></div></div>
+<div class="card"><h3>4. Electrical Soundness</h3><p>Electrical Inspector venue inspection.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_electrical_soundness_request.html" target="_blank">Open individual</a></div></div>
+<div class="card"><h3>5. PA System / Electrical Stability</h3><p>PWD Electrical Engineer inspection.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_pa_electrical_stability_request.html" target="_blank">Open individual</a></div></div>
+<div class="card"><h3>6. Armed Guard</h3><p>Armed Reserve deployment request.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_armed_guard_request.html" target="_blank">Open individual</a></div></div>
+<div class="card"><h3>7. Food Safety</h3><p>Designated Officer food-quality inspection.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_food_safety_request.html" target="_blank">Open individual</a></div></div>
+<div class="card"><h3>8. Motor Transport</h3><p>Vehicle inspection and fitness certificate.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_motor_transport_fitness_request.html" target="_blank">Open individual</a></div></div>
+<div class="card"><h3>9. 108 Ambulance</h3><p>108 Ambulance deployment request.</p><div class="card-actions"><a class="btn secondary" href="/policedocuments/cm_programme_108_ambulance_request.html" target="_blank">Open individual</a></div></div>
+</section>
+
+<section class="preview-set" id="letters"></section>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const v=id=>($(id).value||"").trim();
+const esc=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+function fd(id){const x=v(id);if(!x)return "";if(/^\d{4}-\d{2}-\d{2}$/.test(x)){const [y,m,d]=x.split("-");return d+"."+m+"."+y}return x}
+function commonSubject(){
+ return 'The Hon’ble Chief Minister of Tamil Nadu will Visit the “'+v("venue")+'” at, '+v("place")+' on '+fd("visitDate")+'. – Security Arrangements – Regarding.';
+}
+function commonIntro(){
+ return 'Hon’ble Chief Minister of Tamil Nadu will Visit the “'+v("venue")+'” at, '+v("place")+' on '+fd("visitDate")+' In this function VIPs, Important dignitaries will participate.';
+}
+function englishLetter(n,title,toLines,body,urgent){
+ return '<div class="letter-wrap"><div class="letter-head"><strong>'+n+'. '+esc(title)+'</strong></div><article class="paper">'+
+ '<div class="dept">POLICE DEPARTMENT</div>'+
+ '<div class="fromto"><div><div class="fthead">From</div><div>'+esc(v("fromRank"))+',</div><div>'+esc(v("station"))+',</div><div>'+esc(v("fromAddress"))+'</div></div>'+
+ '<div><div class="fthead">To</div><div class="toBlock">'+toLines.map(x=>'<div>'+esc(x)+'</div>').join('')+'</div></div></div>'+
+ '<div class="rule"></div><div class="date">Date :'+esc(fd("letterDate"))+'</div><div class="sir">Sir,</div>'+
+ '<div class="subject"><b>Sub: -</b> '+esc(commonSubject())+'</div><div class="stars">*****</div>'+
+ '<p class="para">'+esc(commonIntro())+'</p><p class="para">'+esc(body)+'</p>'+
+ (urgent?'<div class="urgent">'+esc(urgent)+'</div>':'')+
+ '<div class="signature">Inspector Of Police<br>'+esc(v("station"))+'<br>Chetpet, Chennai-31.</div>'+
+ '</article></div>';
+}
+function tamilLetter(n,title,toHtml,body){
+ return '<div class="letter-wrap"><div class="letter-head"><strong>'+n+'. '+esc(title)+'</strong></div><article class="paper tamil">'+
+ '<div class="para">fhty; Jiw\nmDg;Geh;\nfhty; Ma;thsh;\n[p7 Nrj;Jg;gl;L fhty; epiyak;>\nrl;lk; kw;Wk; xOq;F gpupT>\nNrj;Jg;gl;L> nrd;id-31.</div>'+
+ '<div class="para">'+toHtml+'</div><div class="para">'+esc(body)+'</div>'+
+ '<div class="signature">fhty; Ma;thsh;\n[p7 Nrj;Jg;gl;L fhty; epiyak;>\nNrj;Jg;gl;L> nrd;id-31.</div>'+
+ '</article></div>';
+}
+function render(){
+ const venue=v("venue"),place=v("place"),vd=fd("visitDate"),report=v("reportTime"),visitTime=v("visitTime");
+ const out=[];
+ out.push(englishLetter(1,"Fire & Rescue Service",["The Director,","Fire & Rescue Service,","Egmore, Chennai-600 008."],
+ 'In this connection, I request that a '+v("fireTender")+' with '+v("extinguishers")+' may kindly be directed to stationed near “'+venue+'” at, '+place+' on '+vd+' at '+report+' Hrs., till the function is over.'));
+ out.push(englishLetter(2,"Medical Team & Ambulance",["The Dean,","KMC Medical Collage Hospital","Chennai-03."],
+ 'In this connection, I request that a Medical team with Ambulance van may be directed to be available at the “'+venue+'” at, '+place+' and arrange the Medical Team and Medical Room for emergency treatment on '+vd+' at '+report+' hrs., till the function is over.'));
+ out.push(englishLetter(3,"Structural Stability Certificate",["The Executive Engineer,","P.W.D.","Building Maintenance Division,","Chepauk, Chennai-600 005."],
+ 'In this connection, temporary structures with '+v("structures")+' at the “'+venue+'” at, '+place+', may kindly be inspected and necessary Structural Stability Certificate may be issued, well in advance.'));
+ out.push(englishLetter(4,"Electrical Soundness Certificate",["The Electrical Inspector to","Chennai South Division,","Thiru-vi-ka Industrial Estate,","Guindy, Chennai-600 032."],
+ 'In connection with the Chief Minister programmed, I request that the Electrical installation at the “'+venue+'” at, '+place+' may kindly be inspected and Electrical Soundness certificate issued, well in advance.','THIS MAY KINDLY BE TREATED AS URGENT.'));
+ out.push(englishLetter(5,"PA System & Electrical Stability",["The Electrical Engineer,","Public Work Department,","Electrical Division-1, Chennai."],
+ 'In this connection, I request that the Public Address System at the function place may kindly be inspected, other electrical works at the venue and the connected electrical installations may be inspected thoroughly and Electrical Stability certificate may be issued, well in advance.','THIS MAY KINDLY BE TREATED AS URGENT.'));
+ out.push(englishLetter(6,"Armed Guard Deployment",["The Dy. Commr. of Police,","Armed Reserve,","Pudupet, Chennai-600 002."],
+ 'In this connection, I request that '+v("guardStrength")+' from Chennai City Armed Reserve may kindly be ordered to be posted at the venue of “'+venue+'”, '+place+' on '+v("guardTime")+', Till the function is over.'));
+ const foodBody='nghUs; :- [p7 Nrj;Jg;gl;L fhty; epiya vy;iyf;Fl;gl;l “'+venue+'” - y; '+vd+' Njjp tUif je;J ghHitapl cs;s epfo;r;rp - rk;ke;jkhf.\n*******\n[p7 Nrj;Jg;gl;L fhty; epiya vy;iyf;Fl;gl;l “'+venue+'” - y; '+vd+' Njjp md;W khiy '+visitTime+' kzp mstpy khz;GkpF jkpo;ehL Kjyikr;rh; jpU. N[hrg; tp[a; mtu;fs; tUif je;J ghHitapl cs;s epfo;r;rp; eilngwTs;sJ. epfo;r;rpapd; NghJ gupkhwg;gLk; czTfspd; juj;jpid gupNrhjpj;J jFe;j eltbf;if vLf;f Nfl;Lf;nfhs;sg;gLfpwJ.';
+ out.push(tamilLetter(7,"Food Safety / Designated Officer",'ngWeh;\nThe Designated officer,\nNO. 33, West Jones Road,\nSaidapet , Chennai-15.\nehs;: '+fd("letterDate"),foodBody));
+ out.push(englishLetter(8,"Motor Transport Fitness Certificate",["The Deputy Commissioner of Police,","Motor Transport,","Pudupet,","Chennai-600 002."],
+ 'In connection with the Chief Minister programmed, I request that the '+v("vehicle")+' to be used for inspecting the Guard of Honor at Jawaharlal Nehru Indoor Stadium, Chetpet, Chennai, may kindly be inspected and fitness certificate issued, well in advance.'));
+ const ambBody='ma;ah.\n[p7 Nrj;Jg;gl;L fhty; epiya vy;iyf;Fl;gl;l “'+venue+'” - y; '+vd+' Njjp md;W khiy '+visitTime+' kzp mstpy khz;GkpF jkpo;ehL Kjyikr;rh; jpU. N[hrg; tp[a; mtu;fs; tUif je;J ghHitapl cs;s epfo;r;rp; eilngwTs;sJ. me;epfo;r;rpf;F khz;GkpF jkpo;ehL Kjyikr;ru; kw;Wk; Kf;fpa gpuKfu;fs; tUif juTs;sJ. vdNt nghJkf;fspd; eyd; fUjp 108 Mk;Gyd;]; Njitg;gLtjhy;; “'+venue+'” Nrj;Jg;gl;L – y; nkhj;jk; '+v("ambulanceCount")+' thfdq;fs; '+vd+' md;W khiy '+visitTime+' kzpf;F epWj;jp itf;f Mtz nra;AkhW jq;fis gzpTld; Nfl;Lf;nfhs;fpNwd;.';
+ out.push(tamilLetter(9,"108 Ambulance Deployment",'ngWeu;\ncau;jpU khtl;l Nkyhsu;; mtu;fs;>\n108 Mk;Gyd;];>\nDMS mYtyfk;>\nnrd;id.',ambBody));
+ $("letters").innerHTML=out.join("");
+}
+document.querySelectorAll("input,textarea").forEach(el=>el.addEventListener("input",render));
+$("refreshBtn").addEventListener("click",render);
+$("printAll").addEventListener("click",()=>{render();window.print()});
+$("wordAll").addEventListener("click",()=>{
+ render();
+ const content=$("letters").innerHTML;
+ const doc='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CM Programme All Request Letters</title><style>@page{size:A4;margin:14mm;}body{font-family:"Times New Roman",Times,serif;color:#000}.letter-wrap{page-break-after:always}.letter-head{display:none}.paper{width:auto;min-height:auto;padding:0;box-shadow:none}.dept{text-align:center;font-weight:700;text-decoration:underline}.fromto{display:table;width:100%}.fromto>div{display:table-cell;width:50%;vertical-align:top}.toBlock{text-align:center}.rule{border-top:1px dashed #333}.date{text-align:right}.subject{text-align:center}.stars{text-align:center}.para{text-align:justify;line-height:1.6}.signature{text-align:right;font-weight:700}.urgent{text-align:center}.tamil{font-family:Bamini,"Noto Sans Tamil","Latha",Arial,sans-serif}</style></head><body>'+content+'</body></html>';
+ const blob=new Blob(['\ufeff',doc],{type:'application/msword'});
+ const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="CM_Programme_All_Request_Letters.doc";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+render();
+})();
+</script>
+</body>
+</html>
