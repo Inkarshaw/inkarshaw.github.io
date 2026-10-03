@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CDR & CAF Certified Copy</title>
+<style>
+:root{--bg:#eef2f7;--ink:#111827;--muted:#667085;--brand:#143d73;--blue:#0b66c3;--danger:#b42318}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.app{display:grid;grid-template-columns:minmax(330px,430px) 1fr;min-height:100vh}
+.editor{background:#fff;border-right:1px solid #d8dee8;padding:18px;overflow:auto;height:100vh}
+h1{font-size:20px;margin:0 0 4px;color:var(--brand)}.sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.section{border:1px solid #e0e5ec;border-radius:10px;margin:0 0 12px;overflow:hidden}
+.section h2{font-size:13px;margin:0;padding:10px 12px;background:#f8fafc;border-bottom:1px solid #e4e7ec}
+.fields{padding:10px 12px}label{display:block;font-size:11px;font-weight:700;color:#475467;margin:9px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid #cfd6df;border-radius:7px;font:inherit;font-size:13px;background:#fff}
+textarea{min-height:70px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.numrow{display:grid;grid-template-columns:1.2fr 1fr 1fr 38px;gap:6px;align-items:end;margin:8px 0}
+button{border:0;border-radius:8px;padding:10px 12px;font-weight:700;cursor:pointer}.btn{background:var(--blue);color:#fff}
+.secondary{background:#eef4fb;color:#174a7e}.dark{background:#1d2939;color:#fff}.danger{background:#fee4e2;color:var(--danger)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.preview{padding:22px;overflow:auto}
+.paper{width:210mm;min-height:297mm;margin:auto;background:#fff;box-shadow:0 5px 25px rgba(16,24,40,.12);padding:18mm;font-family:"Times New Roman",serif;font-size:14.5pt;line-height:1.45;color:#111}
+.lettergrid{display:grid;grid-template-columns:55px 1fr;gap:0 12px;margin-bottom:22px}.addr{white-space:pre-line}.salute{margin:18px 0}
+.meta{margin:10px 0 18px 28px}.metarow{display:grid;grid-template-columns:58px 1fr;gap:8px;margin:8px 0}.stars{text-align:center;letter-spacing:4px;margin:20px 0 12px}
+.body{text-align:justify;text-indent:36px;margin:0 0 14px}table{border-collapse:collapse;width:100%;font-size:13.5pt}td{border:1px solid #333;padding:7px 8px;vertical-align:top}.sno{width:42px;text-align:center}
+.signature{margin-top:42px;text-align:right;padding-right:18px;min-height:70px}.mobilebar{display:none;position:sticky;top:0;z-index:5;background:#fff;padding:8px;border-bottom:1px solid #ddd}
+.mobilebar button{width:49%}.back{display:inline-block;margin-bottom:10px;text-decoration:none;color:#174a7e;font-weight:700;font-size:13px}
+@media(max-width:900px){.app{display:block}.mobilebar{display:flex;gap:2%}.editor{height:auto;border-right:0}.preview{padding:8px}.paper{transform-origin:top left;width:210mm}body.showpreview .editor{display:none}body:not(.showpreview) .preview{display:none}}
+@media print{body{background:#fff}.editor,.mobilebar{display:none!important}.app{display:block}.preview{padding:0}.paper{box-shadow:none;margin:0;width:auto;min-height:auto;padding:16mm 17mm}@page{size:A4;margin:0}}
+</style>
+</head>
+<body>
+<div class="mobilebar"><button onclick="document.body.classList.remove('showpreview')">Edit</button><button onclick="document.body.classList.add('showpreview')">Preview</button></div>
+<div class="app">
+<aside class="editor">
+<a class="back" href="/policedocuments/">← Police Documents</a>
+<h1>CDR & CAF Certified Copy</h1>
+<div class="sub">Editable certified-copy requisition for CDR, CAF, name and address.</div>
+
+<div class="section"><h2>FROM</h2><div class="fields">
+<label>Rank</label><select id="fromRank" oninput="render()"><option>Inspector of Police</option><option>Sub-Inspector of Police</option></select>
+<label>Police Station</label><input id="ps" value="G7 Chetpet Police Station" oninput="render()">
+<label>Station Address</label><textarea id="psAddress" oninput="render()">Chetpet, Chennai-31.</textarea>
+</div></div>
+
+<div class="section"><h2>TO / TELECOM PROVIDER</h2><div class="fields">
+<label>Provider</label><select id="provider" onchange="setProvider(this.value)"><option value="jio">Reliance Jio</option><option value="airtel">Airtel</option><option value="vi">Vi</option><option value="bsnl">BSNL</option><option value="custom">Custom</option></select>
+<label>Recipient</label><input id="recipient" value="The State Nodal Officer," oninput="render()">
+<label>Company</label><input id="company" value="Reliance Jio Infocom Ltd.," oninput="render()">
+<label>Address</label><textarea id="companyAddress" oninput="render()">New No. 147,149,151 & 153
+Shanti Center (CLS Building)
+Ramakrishna Mutt Road,
+Mandaiveli, Chennai-600028.</textarea>
+</div></div>
+
+<div class="section"><h2>CASE DETAILS</h2><div class="fields">
+<div class="row"><div><label>Crime No.</label><input id="crimeNo" value="209/2025" oninput="render()"></div><div><label>Sections</label><input id="sections" value="103(1) BNS Act" oninput="render()"></div></div>
+<div class="row"><div><label>Registered Date</label><input id="regDate" type="date" value="2025-09-27" oninput="render()"></div><div><label>Registered Time</label><input id="regTime" type="time" value="09:00" oninput="render()"></div></div>
+<label>Reference Police Station</label><input id="refPs" value="G7 Chetpet PS" oninput="render()">
+<label>Subject</label><textarea id="subject" oninput="render()">Requested for a certified copy (Form – 63(4)(c)) of CDR & Name and Address (CAF)</textarea>
+</div></div>
+
+<div class="section"><h2>MOBILE NUMBERS / CDR PERIOD</h2><div class="fields"><div id="numbers"></div><button class="btn secondary" type="button" onclick="addNumber()">+ Add Mobile Number</button></div></div>
+
+<div class="section"><h2>OPTIONS</h2><div class="fields">
+<label><input id="includeCaf" type="checkbox" checked onchange="render()" style="width:auto;margin-right:6px">Include CAF Details</label>
+<label><input id="includeName" type="checkbox" checked onchange="render()" style="width:auto;margin-right:6px">Include Name and Address</label>
+<label>Signature Rank</label><input id="signRank" value="Inspector of Police" oninput="render()">
+<label>Signature Station</label><input id="signStation" value="G7 Chetpet Police Station" oninput="render()">
+</div></div>
+
+<div class="actions">
+<button class="btn dark" onclick="window.print()">Print / Save PDF</button>
+<button class="btn secondary" onclick="saveDraft()">Save Draft</button>
+<button class="btn secondary" onclick="loadDraft()">Load Draft</button>
+<button class="btn danger" onclick="resetForm()">Reset</button>
+</div>
+</aside>
+
+<main class="preview"><article class="paper">
+<div class="lettergrid"><div>From</div><div class="addr" id="pFrom"></div></div>
+<div class="lettergrid"><div>To</div><div class="addr" id="pTo"></div></div>
+<div class="salute">Sir,</div>
+<div class="meta"><div class="metarow"><b>Ref:</b><div id="pRef"></div></div><div class="metarow"><b>Sub:</b><div id="pSub"></div></div></div>
+<div class="stars">*****</div><p class="body" id="pBody"></p>
+<table><tbody id="pTable"></tbody></table>
+<div class="signature"><div id="pSignRank" style="font-weight:bold"></div><div id="pSignStation"></div></div>
+</article></main>
+</div>
+
+<script>
+function el(id){return document.getElementById(id)}
+var rows=[
+ {number:"6374453321",from:"2025-06-01",to:""},
+ {number:"9345851415",from:"2025-06-01",to:""},
+ {number:"8778196487",from:"2025-06-01",to:""}
+];
+var providers={
+ jio:{recipient:"The State Nodal Officer,",company:"Reliance Jio Infocom Ltd.,",address:"New No. 147,149,151 & 153\nShanti Center (CLS Building)\nRamakrishna Mutt Road,\nMandaiveli, Chennai-600028."},
+ airtel:{recipient:"The Nodal Officer,",company:"Bharti Airtel Limited,",address:"Chennai, Tamil Nadu."},
+ vi:{recipient:"The Nodal Officer,",company:"Vodafone Idea Limited,",address:"Chennai, Tamil Nadu."},
+ bsnl:{recipient:"The Nodal Officer,",company:"Bharat Sanchar Nigam Limited,",address:"Chennai, Tamil Nadu."}
+};
+function esc(s){return String(s||"").replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]})}
+function fmtDate(v){if(!v)return "";var p=v.split("-");return p[2]+"."+p[1]+"."+p[0]}
+function fmtTime(v){return v?v.replace(":","."):""}
+function setProvider(v){if(v==="custom")return;var p=providers[v];el("recipient").value=p.recipient;el("company").value=p.company;el("companyAddress").value=p.address;render()}
+function addNumber(){rows.push({number:"",from:"",to:""});drawRows();render()}
+function removeNumber(i){if(rows.length===1)return;rows.splice(i,1);drawRows();render()}
+function updateRow(i,k,v){rows[i][k]=v;render()}
+function drawRows(){
+ var w=el("numbers");w.innerHTML="";
+ rows.forEach(function(r,i){
+  var d=document.createElement("div");d.className="numrow";
+  d.innerHTML='<div><label>Mobile Number</label><input inputmode="numeric" value="'+esc(r.number)+'" oninput="updateRow('+i+',\'number\',this.value)"></div>'+
+  '<div><label>From</label><input type="date" value="'+esc(r.from)+'" oninput="updateRow('+i+',\'from\',this.value)"></div>'+
+  '<div><label>To</label><input type="date" value="'+esc(r.to)+'" oninput="updateRow('+i+',\'to\',this.value)"></div>'+
+  '<button class="btn danger" title="Remove" onclick="removeNumber('+i+')">×</button>';
+  w.appendChild(d);
+ });
+}
+function render(){
+ el("pFrom").innerHTML=esc(el("fromRank").value)+",<br>"+esc(el("ps").value)+",<br>"+esc(el("psAddress").value).replace(/\n/g,"<br>");
+ el("pTo").innerHTML=esc(el("recipient").value)+"<br>"+esc(el("company").value)+"<br>"+esc(el("companyAddress").value).replace(/\n/g,"<br>");
+ el("pRef").textContent=el("refPs").value+" Cr. No. "+el("crimeNo").value+", U/s "+el("sections").value;
+ el("pSub").textContent=el("subject").value;
+ el("pBody").textContent="On "+fmtDate(el("regDate").value)+" at "+fmtTime(el("regTime").value)+" Hrs the above cited reference case was registered in "+el("ps").value+" and the case is under investigation. Hence, I request you to provide the certified copy (Form – 63(4)(c)) of the CDR for Court purpose.";
+ var caf=el("includeCaf").checked,name=el("includeName").checked;
+ el("pTable").innerHTML=rows.map(function(r,i){
+  var period=r.to?"from "+fmtDate(r.from)+" to "+fmtDate(r.to):"from "+fmtDate(r.from)+" till date";
+  var lines='<div>1. '+esc(r.number||"—")+' – CDR '+esc(period)+'</div>';var n=2;
+  if(caf)lines+='<div>'+(n++)+'. CAF Details</div>';
+  if(name)lines+='<div>'+(n++)+'. Name and Address</div>';
+  return '<tr><td class="sno">'+(i+1)+'.</td><td>'+lines+'</td></tr>';
+ }).join("");
+ el("pSignRank").textContent=el("signRank").value;el("pSignStation").textContent=el("signStation").value;
+}
+function collect(){var ids=["fromRank","ps","psAddress","provider","recipient","company","companyAddress","crimeNo","sections","regDate","regTime","refPs","subject","signRank","signStation"],d={};ids.forEach(function(id){d[id]=el(id).value});d.includeCaf=el("includeCaf").checked;d.includeName=el("includeName").checked;d.rows=rows;return d}
+function saveDraft(){localStorage.setItem("cdrCafCertifiedCopyV1",JSON.stringify(collect()));alert("Draft saved on this device.")}
+function loadDraft(){var raw=localStorage.getItem("cdrCafCertifiedCopyV1");if(!raw){alert("No saved draft found.");return}var d=JSON.parse(raw);Object.keys(d).forEach(function(k){if(el(k)&&k!=="includeCaf"&&k!=="includeName")el(k).value=d[k]});el("includeCaf").checked=d.includeCaf!==false;el("includeName").checked=d.includeName!==false;if(Array.isArray(d.rows)&&d.rows.length)rows=d.rows;drawRows();render()}
+function resetForm(){if(confirm("Reset all fields to the sample letter?")){localStorage.removeItem("cdrCafCertifiedCopyV1");location.reload()}}
+drawRows();render();
+</script>
+</body>
+</html>
