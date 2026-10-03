@@ -17,7 +17,7 @@ body{margin:0;background:var(--bg);color:#172033;font-family:system-ui,-apple-sy
 fieldset{border:1px solid var(--line);border-radius:10px;padding:12px;margin:0 0 14px}legend{font-weight:850;color:var(--navy);padding:0 6px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
 label{display:block;font-size:.78rem;font-weight:750;color:#34455b;margin-bottom:4px}
-input,textarea{width:100%;border:1px solid #bdc9d7;border-radius:8px;padding:9px 10px;font:inherit;color:#172033;background:#fff}
+input,textarea,select{width:100%;border:1px solid #bdc9d7;border-radius:8px;padding:9px 10px;font:inherit;color:#172033;background:#fff}
 textarea{min-height:72px;resize:vertical}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer}
 .primary{background:var(--navy);color:#fff}.word{background:#185abd;color:#fff}.secondary{background:#eaf1fb;color:#15375d}
@@ -38,7 +38,7 @@ textarea{min-height:72px;resize:vertical}
 
 <fieldset><legend>From</legend><div class="grid">
 <div><label for="officerName">Officer Name</label><input id="officerName" value="A. Karthikeyan"></div>
-<div><label for="rank">Rank</label><input id="rank" value="Sub-Inspector of Police"></div>
+<div><label for="rank">Rank</label><select id="rank"><option value="Sub-Inspector of Police" selected>Sub-Inspector of Police</option><option value="Inspector of Police">Inspector of Police</option></select></div>
 <div class="full"><label for="unit">Unit / Office</label><textarea id="unit">Anti-Narcotics Task Force,
 Chennai.</textarea></div>
 </div></fieldset>
@@ -127,7 +127,7 @@ function render(){
  $("pClosing").textContent=$("closing").value;
  $("pSign").innerHTML=nl($("officerName").value.toUpperCase()+"\n"+$("rank").value+"\n"+$("unit").value);
 }
-ids.forEach(id=>$(id).addEventListener("input",render));
+ids.forEach(id=>{$(id).addEventListener("input",render);$(id).addEventListener("change",render);});
 $("refreshBtn").addEventListener("click",render);
 $("printBtn").addEventListener("click",()=>{render();window.print()});
 $("wordBtn").addEventListener("click",()=>{
