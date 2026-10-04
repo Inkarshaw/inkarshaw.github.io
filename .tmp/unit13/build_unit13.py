@@ -298,6 +298,18 @@ for i,f in enumerate(facts):
     exta=["கூற்று I மற்றும் II இரண்டும் சரி.","கூற்று I சரி; கூற்று II தவறு.","கூற்று I தவறு; கூற்று II சரி.","கூற்று I மற்றும் II இரண்டும் தவறு."][mode]
     add(max(f["page_en"],g["page_en"]),qen,qta,comb_en,comb_ta,mode,exen,exta,"statement-analysis")
 
+# Remove any accidental exact duplicate question+option combinations, then renumber.
+unique=[]; seen_q=set()
+for q in questions:
+    s=(q["q_en"],tuple(q["opts_en"]))
+    if s in seen_q: continue
+    seen_q.add(s)
+    unique.append(q)
+questions=unique
+for i,q in enumerate(questions,1):
+    q["id"]=f"C11H13-Q{i:03d}"
+    q["quiz"]=(i-1)//20+1
+
 quiz_count=(len(questions)+19)//20
 sets=[{"id":i,"title_en":f"Quiz {i} · Competitive Review","title_ta":f"வினாடி வினா {i} · போட்டித் தேர்வு மீள்பார்வை"} for i in range(1,quiz_count+1)]
 counts=Counter("ABCD"[q["correct"]] for q in questions)
