@@ -46,9 +46,60 @@
     return {byMsisdn,byImsi,byImei,events,msisdnNewImsi,imsiNewImei,imeiMultiImsi,imsiCrossCdr,repeatedSwaps};
   }
 
+  function buildSubjectDeviceUsage(data){
+    const subjects=new Map();
+    for(const r of data){
+      const subject=String(r.cdrNo||'').trim();if(!subject)continue;
+      let x=subjects.get(subject);
+      if(!x){x={subject,devices:new Map(),sims:new Map()};subjects.set(subject,x);}
+      const imei=String(r.imei||'').trim(),imsi=String(r.imsi||'').trim();
+      if(imei){
+        let d=x.devices.get(imei);if(!d)d={imei,first:null,last:null,records:0};
+        d.records++;
+        if(r.dt&&(!d.first||r.dt<d.first))d.first=r.dt;
+        if(r.dt&&(!d.last||r.dt>d.last))d.last=r.dt;
+        x.devices.set(imei,d);
+      }
+      if(imsi){
+        let s=x.sims.get(imsi);if(!s)s={imsi,first:null,last:null,records:0};
+        s.records++;
+        if(r.dt&&(!s.first||r.dt<s.first))s.first=r.dt;
+        if(r.dt&&(!s.last||r.dt>s.last))s.last=r.dt;
+        x.sims.set(imsi,s);
+      }
+    }
+    return [...subjects.values()].map(x=>({
+      subject:x.subject,
+      devices:[...x.devices.values()].sort((a,b)=>(a.first?.getTime?.()||0)-(b.first?.getTime?.()||0)||a.imei.localeCompare(b.imei)),
+      sims:[...x.sims.values()].sort((a,b)=>(a.first?.getTime?.()||0)-(b.first?.getTime?.()||0)||a.imsi.localeCompare(b.imsi))
+    })).sort((a,b)=>a.subject.localeCompare(b.subject,undefined,{numeric:true}));
+  }
+
+  function renderDeviceUsageSummary(data){
+    const box=$('deviceUsageSummary');if(!box)return;
+    const subjects=buildSubjectDeviceUsage(data);
+    if(!subjects.length){box.innerHTML='<div class="empty">No IMEI / IMSI usage is available in the current filters.</div>';return;}
+    box.innerHTML=subjects.map(x=>{
+      const deviceLines=x.devices.length?x.devices.map(d=>{
+        const info=resolveDevice(d.imei),model=[info.manufacturer,info.model].filter(Boolean).join(' ')||'Unknown model';
+        return `<div class="device-usage-row"><div class="device-usage-id"><b>IMEI</b> ${escapeHtml(d.imei)} <span class="device-model">(${escapeHtml(model)})</span></div><div class="device-usage-range"><span><b>From</b> ${escapeHtml(dtFmt(d.first)||'—')}</span><span><b>To</b> ${escapeHtml(dtFmt(d.last)||'—')}</span></div></div>`;
+      }).join(''):'<div class="tiny">No IMEI recorded.</div>';
+      const simLines=x.sims.length?x.sims.map((s,i)=>`<div class="device-usage-row"><div class="device-usage-id"><b>IMSI</b> ${escapeHtml(s.imsi)} <span class="device-model">(SIM ${i+1})</span></div><div class="device-usage-range"><span><b>From</b> ${escapeHtml(dtFmt(s.first)||'—')}</span><span><b>To</b> ${escapeHtml(dtFmt(s.last)||'—')}</span></div></div>`).join(''):'<div class="tiny">No IMSI recorded.</div>';
+      return `<div class="device-usage-card">
+        <div class="device-usage-head">
+          <div><b>${escapeHtml(x.subject)}</b><div class="tiny">Subject / MSISDN</div></div>
+          <div class="metric-row"><span class="metric-chip"><b>${fmtInt(x.devices.length)}</b> device${x.devices.length===1?'':'s'} used</span><span class="metric-chip"><b>${fmtInt(x.sims.length)}</b> SIM${x.sims.length===1?'':'s'} used</span></div>
+        </div>
+        <div class="device-usage-section"><div class="device-usage-label">Devices</div>${deviceLines}</div>
+        <div class="device-usage-section"><div class="device-usage-label">SIMs</div>${simLines}</div>
+      </div>`;
+    }).join('');
+  }
+
   function renderDevices(){
     learnTacFromRecords(state.records);updateTacStatus();
     const data=state.filtered,A=analyzeIdentifiers(data),rows=aggregateDevices(data);
+    renderDeviceUsageSummary(data);
     const uniqueSubjects=new Set(data.map(r=>r.cdrNo).filter(Boolean)).size,uniqueImsi=A.byImsi.size,uniqueImei=A.byImei.size;
     $('identifierSummary').innerHTML=`<div class="kpis"><div class="kpi"><div class="v">${fmtInt(uniqueSubjects)}</div><div class="l">MSISDN / subjects</div></div><div class="kpi"><div class="v">${fmtInt(uniqueImsi)}</div><div class="l">Unique IMSI</div></div><div class="kpi"><div class="v">${fmtInt(uniqueImei)}</div><div class="l">Unique IMEI</div></div><div class="kpi"><div class="v">${fmtInt(A.msisdnNewImsi.length)}</div><div class="l">MSISDN with multiple IMSIs</div></div><div class="kpi"><div class="v">${fmtInt(A.imsiNewImei.length)}</div><div class="l">IMSI with multiple IMEIs</div></div><div class="kpi"><div class="v">${fmtInt(A.imeiMultiImsi.length)}</div><div class="l">IMEI with multiple IMSIs</div></div></div>`;
     $('resolvedDeviceTable').innerHTML=`<thead><tr><th>IMEI</th><th>TAC</th><th>Manufacturer</th><th>Model</th><th>IMSI</th><th>Lookup status</th><th>Records</th><th>First</th><th>Last</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${escapeHtml(x.imei||'—')}</td><td>${escapeHtml(x.tac||'—')}</td><td>${escapeHtml(x.manufacturer||'—')}</td><td class="details">${escapeHtml(x.model||'—')}</td><td>${escapeHtml(x.imsi||'—')}</td><td>${escapeHtml(x.lookupStatus||'Unknown TAC')}</td><td class="num">${fmtInt(x.records)}</td><td>${dtFmt(x.first)}</td><td>${dtFmt(x.last)}</td></tr>`).join('')}</tbody>`;
