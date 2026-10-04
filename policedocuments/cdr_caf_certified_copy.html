@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CDR & CAF Certified Copy Request Request</title>
+<title>CDR & CAF Certified Copy Request</title>
 <style>
 :root{--bg:#eef2f7;--ink:#111827;--muted:#667085;--brand:#143d73;--blue:#0b66c3;--danger:#b42318}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
@@ -34,13 +34,25 @@ button{border:0;border-radius:8px;padding:10px 12px;font-weight:700;cursor:point
 <div class="app">
 <aside class="editor">
 <a class="back" href="/policedocuments/">← Police Documents</a>
-<h1>CDR & CAF Certified Copy Request Request</h1>
+<h1>CDR & CAF Certified Copy Request</h1>
 <div class="sub">Editable certified-copy requisition for CDR, CAF, name and address.</div>
 
 <div class="section"><h2>FROM</h2><div class="fields">
 <label>Rank</label><select id="fromRank" oninput="render()"><option>Inspector of Police</option><option>Sub-Inspector of Police</option></select>
-<label>Police Station</label><input id="ps" value="G7 Chetpet Police Station" oninput="render()">
+<label>Station Selection</label>
+<select id="stationMode" onchange="toggleStationMode()">
+<option value="chennai" selected>Chennai – Select Police Station</option>
+<option value="other">Other Station – Manual Entry</option>
+</select>
+<div id="chennaiStationWrap">
+<label>Chennai Police Station</label>
+<select id="chennaiStation" onchange="selectChennaiStation(this.value)"></select>
+</div>
+<div id="otherStationWrap" style="display:none">
+<label>Police Station Name</label><input id="otherPs" placeholder="Enter full police station name" oninput="render()">
+</div>
 <label>Station Address</label><textarea id="psAddress" oninput="render()">Chetpet, Chennai-31.</textarea>
+<div style="font-size:11px;color:#667085;margin-top:6px">For “Other Station”, enter the station name and address manually. The entire TO section remains editable.</div>
 </div></div>
 
 <div class="section"><h2>TO / TELECOM PROVIDER</h2><div class="fields">
@@ -90,6 +102,81 @@ Mandaiveli, Chennai-600028.</textarea>
 
 <script>
 function el(id){return document.getElementById(id)}
+var chennaiPoliceStations=[
+ "AWPS Peravallur",
+ "B1 North Beach Police Station",
+ "B2 Esplanade Police Station",
+ "B3 Fort St. George Police Station",
+ "B4 High Court Police Station",
+ "C1 Flower Bazaar Police Station",
+ "C2 Elephant Gate Police Station",
+ "C3 Seven Wells Police Station",
+ "C4 Government General Hospital Outpost",
+ "C5 Kothawal Chavadi Police Station",
+ "D1 Triplicane Police Station",
+ "D2 Anna Salai Police Station",
+ "D3 Ice House Police Station",
+ "D4 Jam Bazaar Police Station",
+ "D5 Marina Police Station",
+ "D6 Anna Square Police Station",
+ "D7 Government Estate Police Station",
+ "D8 Kasturba Gandhi Hospital Police Station",
+ "E1 Mylapore Police Station",
+ "E2 Royapettah Police Station",
+ "E3 Teynampet Police Station",
+ "E4 Abiramapuram Police Station",
+ "F1 Chintadripet Police Station",
+ "F2 Egmore Police Station",
+ "F3 Nungambakkam Police Station",
+ "F4 Thousand Lights Police Station",
+ "F5 Chetpet Police Station",
+ "G1 Vepery Police Station",
+ "G2 Periamet Police Station",
+ "G3 Kilpauk Police Station",
+ "G5 Secretariat Colony Police Station",
+ "G7 Chetpet Police Station",
+ "H1 Old Washermenpet Police Station",
+ "H3 Tondiarpet Police Station",
+ "J1 Saidapet Police Station",
+ "J2 Adyar Police Station",
+ "J3 Guindy Police Station",
+ "J5 Sastri Nagar Police Station",
+ "J6 Thiruvanmiyur Police Station",
+ "J7 Velachery Police Station",
+ "K1 Sembium Police Station",
+ "K2 Ayanavaram Police Station",
+ "K4 Anna Nagar Police Station",
+ "K6 TP Chatram Police Station",
+ "K8 Arumbakkam Police Station",
+ "M1 Harbour Police Station",
+ "N1 Royapuram Police Station",
+ "P1 Pulianthope Police Station",
+ "R1 Mambalam Police Station",
+ "R2 Kodambakkam Police Station",
+ "R3 Ashok Nagar Police Station",
+ "V1 Villivakkam Police Station",
+ "V2 Virugambakkam Police Station",
+ "W1 All Women Police Station, Thousand Lights"
+];
+function populateChennaiStations(){
+ var s=el("chennaiStation");
+ s.innerHTML='<option value="">-- Select Chennai Police Station --</option>'+chennaiPoliceStations.map(function(x){return '<option value="'+esc(x)+'">'+esc(x)+'</option>'}).join("");
+ s.value="G7 Chetpet Police Station";
+}
+function getPoliceStation(){
+ return el("stationMode").value==="other"?(el("otherPs").value.trim()||"Police Station"):(el("chennaiStation").value||"Police Station");
+}
+function selectChennaiStation(v){
+ if(v==="G7 Chetpet Police Station")el("psAddress").value="Chetpet, Chennai-31.";
+ render();
+}
+function toggleStationMode(){
+ var other=el("stationMode").value==="other";
+ el("chennaiStationWrap").style.display=other?"none":"block";
+ el("otherStationWrap").style.display=other?"block":"none";
+ render();
+}
+
 var rows=[
  {number:"6374453321",from:"2025-06-01",to:""},
  {number:"9345851415",from:"2025-06-01",to:""},
@@ -120,11 +207,12 @@ function drawRows(){
  });
 }
 function render(){
- el("pFrom").innerHTML=esc(el("fromRank").value)+",<br>"+esc(el("ps").value)+",<br>"+esc(el("psAddress").value).replace(/\n/g,"<br>");
+ var selectedPs=getPoliceStation();
+ el("pFrom").innerHTML=esc(el("fromRank").value)+",<br>"+esc(selectedPs)+",<br>"+esc(el("psAddress").value).replace(/\n/g,"<br>");
  el("pTo").innerHTML=esc(el("recipient").value)+"<br>"+esc(el("company").value)+"<br>"+esc(el("companyAddress").value).replace(/\n/g,"<br>");
  el("pRef").textContent=el("refPs").value+" Cr. No. "+el("crimeNo").value+", U/s "+el("sections").value;
  el("pSub").textContent=el("subject").value;
- el("pBody").textContent="On "+fmtDate(el("regDate").value)+" at "+fmtTime(el("regTime").value)+" Hrs the above cited reference case was registered in "+el("ps").value+" and the case is under investigation. Hence, I request you to provide the certified copy (Form – 63(4)(c)) of the CDR for Court purpose.";
+ el("pBody").textContent="On "+fmtDate(el("regDate").value)+" at "+fmtTime(el("regTime").value)+" Hrs the above cited reference case was registered in "+selectedPs+" and the case is under investigation. Hence, I request you to provide the certified copy (Form – 63(4)(c)) of the CDR for Court purpose.";
  var caf=el("includeCaf").checked,name=el("includeName").checked;
  el("pTable").innerHTML=rows.map(function(r,i){
   var period=r.to?"from "+fmtDate(r.from)+" to "+fmtDate(r.to):"from "+fmtDate(r.from)+" till date";
@@ -135,11 +223,11 @@ function render(){
  }).join("");
  el("pSignRank").textContent=el("signRank").value;el("pSignStation").textContent=el("signStation").value;
 }
-function collect(){var ids=["fromRank","ps","psAddress","provider","recipient","company","companyAddress","crimeNo","sections","regDate","regTime","refPs","subject","signRank","signStation"],d={};ids.forEach(function(id){d[id]=el(id).value});d.includeCaf=el("includeCaf").checked;d.includeName=el("includeName").checked;d.rows=rows;return d}
+function collect(){var ids=["fromRank","stationMode","chennaiStation","otherPs","psAddress","provider","recipient","company","companyAddress","crimeNo","sections","regDate","regTime","refPs","subject","signRank","signStation"],d={};ids.forEach(function(id){d[id]=el(id).value});d.ps=getPoliceStation();d.includeCaf=el("includeCaf").checked;d.includeName=el("includeName").checked;d.rows=rows;return d}
 function saveDraft(){localStorage.setItem("cdrCafCertifiedCopyV1",JSON.stringify(collect()));alert("Draft saved on this device.")}
-function loadDraft(){var raw=localStorage.getItem("cdrCafCertifiedCopyV1");if(!raw){alert("No saved draft found.");return}var d=JSON.parse(raw);Object.keys(d).forEach(function(k){if(el(k)&&k!=="includeCaf"&&k!=="includeName")el(k).value=d[k]});el("includeCaf").checked=d.includeCaf!==false;el("includeName").checked=d.includeName!==false;if(Array.isArray(d.rows)&&d.rows.length)rows=d.rows;drawRows();render()}
+function loadDraft(){var raw=localStorage.getItem("cdrCafCertifiedCopyV1");if(!raw){alert("No saved draft found.");return}var d=JSON.parse(raw);Object.keys(d).forEach(function(k){if(el(k)&&k!=="includeCaf"&&k!=="includeName")el(k).value=d[k]});if(d.ps&&!d.stationMode){var match=chennaiPoliceStations.indexOf(d.ps)!==-1;el("stationMode").value=match?"chennai":"other";if(match)el("chennaiStation").value=d.ps;else el("otherPs").value=d.ps}el("includeCaf").checked=d.includeCaf!==false;el("includeName").checked=d.includeName!==false;if(Array.isArray(d.rows)&&d.rows.length)rows=d.rows;toggleStationMode();drawRows();render()}
 function resetForm(){if(confirm("Reset all fields to the sample letter?")){localStorage.removeItem("cdrCafCertifiedCopyV1");location.reload()}}
-drawRows();render();
+populateChennaiStations();toggleStationMode();drawRows();render();
 </script>
 </body>
 </html>
