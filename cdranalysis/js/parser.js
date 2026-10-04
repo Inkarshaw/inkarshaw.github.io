@@ -87,20 +87,54 @@
         return {sheetName,headerRow,rows:XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,range:headerRow})};
       });
     }
-    function workerCall(file,action,sheetNames=[],headerRows={}){
+    function inspectParseCdrBuffer(buffer){
+      const wb=XLSX.read(buffer,{type:'array',cellDates:true});
+      const sheets=wb.SheetNames.map(name=>{
+        const ws=wb.Sheets[name],ref=ws&&ws['!ref'];let rowCount=0;
+        if(ref){const r=XLSX.utils.decode_range(ref);rowCount=r.e.r-r.s.r+1;}
+        const headerRow=detectHeaderRow(ws);
+        const rr=ref?XLSX.utils.decode_range(ref):null;
+        const preview=rr?XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,range:{s:{r:headerRow,c:rr.s.c},e:{r:Math.min(rr.e.r,headerRow+8),c:rr.e.c}}}).slice(0,8):[];
+        const headers=preview[0]?Object.keys(preview[0]):[];
+        return {name,rowCount,headerRow,headers,preview};
+      });
+      let compatible=sheets.filter(likelySheet);
+      if(!compatible.length){const mapping=sheets.find(x=>normalize(x.name)==='mapping');if(mapping)compatible=[mapping];}
+      const headerRows=Object.fromEntries(compatible.map(x=>[x.name,x.headerRow]));
+      return {sheets,parsedSheets:parseBufferSheetsFromWorkbook(wb,compatible.map(x=>x.name),headerRows)};
+    }
+    function parseBufferSheetsFromWorkbook(wb,sheetNames,headerRows={}){
+      return sheetNames.filter(n=>wb.Sheets[n]).map(sheetName=>{
+        const ws=wb.Sheets[sheetName],headerRow=Number.isInteger(headerRows?.[sheetName])?headerRows[sheetName]:detectHeaderRow(ws);
+        return {sheetName,headerRow,rows:XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,range:headerRow})};
+      });
+    }
+    function workerCall(file,action,sheetNames=[],headerRows={},providedBuffer=null){
       return new Promise(async(resolve,reject)=>{
-        const buffer=await file.arrayBuffer();
-        if(typeof Worker==='undefined'){
-          try{return resolve(action==='inspect'?{sheets:inspectBuffer(buffer)}:{sheets:parseBufferSheets(buffer,sheetNames,headerRows)});}catch(e){return reject(e);}
-        }
-        const worker=new Worker('/cdranalysis/cdr-parser-worker.js'),id=++parserWorkerSeq,cleanup=()=>{try{worker.terminate()}catch{}};
+        const buffer=providedBuffer||await file.arrayBuffer();
+        const fallback=()=>{
+          try{
+            if(action==='inspect')return resolve({sheets:inspectBuffer(buffer)});
+            if(action==='inspectParseCdr')return resolve(inspectParseCdrBuffer(buffer));
+            return resolve({sheets:parseBufferSheets(buffer,sheetNames,headerRows)});
+          }catch(e){return reject(e);}
+        };
+        if(typeof Worker==='undefined')return fallback();
+        const worker=new Worker('/cdranalysis/cdr-parser-worker.js?v=66'),id=++parserWorkerSeq,cleanup=()=>{try{worker.terminate()}catch{}};
         worker.onmessage=e=>{const m=e.data||{};if(m.id!==id)return;cleanup();m.ok?resolve(m):reject(new Error(m.error||'Worker parsing failed'));};
-        worker.onerror=()=>{cleanup();file.arrayBuffer().then(b=>resolve(action==='inspect'?{sheets:inspectBuffer(b)}:{sheets:parseBufferSheets(b,sheetNames,headerRows)})).catch(reject);};
+        worker.onerror=()=>{cleanup();file.arrayBuffer().then(b=>{
+          try{
+            if(action==='inspect')resolve({sheets:inspectBuffer(b)});
+            else if(action==='inspectParseCdr')resolve(inspectParseCdrBuffer(b));
+            else resolve({sheets:parseBufferSheets(b,sheetNames,headerRows)});
+          }catch(err){reject(err);}
+        }).catch(reject);};
         worker.postMessage({id,buffer,name:file.name,action,sheetNames,headerRows},[buffer]);
       });
     }
 
-    async function hashFile(file){try{if(!crypto?.subtle)return 'Unavailable';const buf=await file.arrayBuffer(),hash=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');}catch{return 'Unavailable';}}
+    async function hashBuffer(buf){try{if(!crypto?.subtle)return 'Unavailable';const hash=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');}catch{return 'Unavailable';}}
+    async function hashFile(file){try{return hashBuffer(await file.arrayBuffer());}catch{return 'Unavailable';}}
     function mappingSignature(headers){let h=2166136261;for(const c of headers.map(normalize).sort().join('|')){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return (h>>>0).toString(16);}
     function savedMapping(headers){try{return JSON.parse(localStorage.getItem('cdrAnalyzer:mapping:'+mappingSignature(headers))||'null');}catch{return null;}}
     function saveMapping(headers,map){if(state.privateSession)return;try{localStorage.setItem('cdrAnalyzer:mapping:'+mappingSignature(headers),JSON.stringify(map));}catch{}}
@@ -159,31 +193,35 @@
 
     async function inspectNext(){
       if(state.pendingImport||!importQueue.length)return;
-      const file=importQueue.shift();showImportLoading(file);showStatus('Inspecting '+file.name+'…','');
+      const file=importQueue.shift();showImportLoading(file);showStatus('Reading '+file.name+' once and detecting CDR tabs…','');
       try{
-        const [ins,sha256]=await Promise.all([workerCall(file,'inspect'),hashFile(file)]);
-        const sheets=ins.sheets||[];if(!sheets.length)throw new Error('No worksheets found');
-        const selected=new Set(chooseInitialSheets(sheets)),mappings={};for(const s of sheets)mappings[s.name]=savedMapping(s.headers)||mapHeaders(s.headers);
-        state.pendingImport={file,sha256,sheets,selected:new Set(sheets.map(s=>s.name)),mappings,inspectedAt:new Date().toISOString(),autoAll:true};
+        const buffer=await file.arrayBuffer(),hashCopy=buffer.slice(0);
+        const [fast,sha256]=await Promise.all([workerCall(file,'inspectParseCdr',[],{},buffer),hashBuffer(hashCopy)]);
+        const sheets=fast.sheets||[],parsedSheets=fast.parsedSheets||[];
+        if(!sheets.length)throw new Error('No worksheets found');
+        if(!parsedSheets.length)throw new Error('No CDR-compatible worksheet found');
+        const mappings={};for(const s of sheets)mappings[s.name]=savedMapping(s.headers)||mapHeaders(s.headers);
+        state.pendingImport={file,sha256,sheets,parsedSheets,selected:new Set(parsedSheets.map(s=>s.sheetName)),mappings,inspectedAt:new Date().toISOString(),autoAll:true,fastPath:true};
         hideSheetPicker();
-        showStatus('Importing all '+sheets.length+' worksheet tab(s) from '+file.name+'…','');
+        const skipped=Math.max(0,sheets.length-parsedSheets.length);
+        showStatus('Detected '+parsedSheets.length+' CDR tab(s)'+(skipped?' • skipped '+skipped+' non-CDR/report tab(s)':'')+'. Importing…','');
         await confirmImport();
-      }catch(err){console.error(err);showStatus('Could not inspect '+file.name+': '+err.message,'error');finishImportStep();inspectNext();}
+      }catch(err){console.error(err);state.pendingImport=null;showStatus('Could not import '+file.name+': '+err.message,'error');finishImportStep();inspectNext();}
     }
 
     async function confirmImport(){
       const p=state.pendingImport;if(!p)return;
       const picked=p.autoAll?'__ALL__':($('sheetSelect')?.value||'');
-      let selected=picked==='__ALL__'?(p.sheets||[]).map(s=>s.name):(picked?[picked]:[...p.selected]);
-      if(!selected.length){showStatus('Select at least one worksheet to import.','error');return;}
+      let selected=p.fastPath?(p.parsedSheets||[]).map(s=>s.sheetName):(picked==='__ALL__'?(p.sheets||[]).map(s=>s.name):(picked?[picked]:[...p.selected]));
+      if(!selected.length){showStatus('No CDR-compatible worksheet found.','error');return;}
       p.selected=new Set(selected);
       for(const name of selected){const sheet=p.sheets.find(x=>x.name===name);p.mappings[name]=p.mappings[name]||savedMapping(sheet?.headers||[])||mapHeaders(sheet?.headers||[]);if(sheet)saveMapping(sheet.headers,p.mappings[name]);}
       hideSheetPicker();
       showImportLoading(p.file);
-      showStatus('Importing '+selected.length+' worksheet(s) from '+p.file.name+'…','');
+      showStatus('Importing '+selected.length+' CDR worksheet(s) from '+p.file.name+'…','');
       try{
         const headerRows=Object.fromEntries((p.sheets||[]).map(x=>[x.name,Number.isInteger(x.headerRow)?x.headerRow:0]));
-        const parsed=await workerCall(p.file,'parse',selected,headerRows),timezone=$('sourceTimezone')?.value||state.sourceTimezone||'Asia/Kolkata';state.sourceTimezone=timezone;
+        const parsed=p.fastPath?{sheets:p.parsedSheets}:await workerCall(p.file,'parse',selected,headerRows),timezone=$('sourceTimezone')?.value||state.sourceTimezone||'Asia/Kolkata';state.sourceTimezone=timezone;
         for(const sh of parsed.sheets||[]){
           const rows=sh.rows||[],map=p.mappings[sh.sheetName]||{};if(!rows.length)continue;
           if(!map.bparty&&!map.cdrNo&&!map.date){
@@ -234,9 +272,6 @@
       syncLoadedUi();
       window.addEventListener('cdr:updated',syncLoadedUi);
       const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput')?.click();
-      ensureSheetPicker();
-      if($('importSelectedSheetBtn'))$('importSelectedSheetBtn').onclick=()=>confirmImport();
-      if($('cancelSheetImportBtn'))$('cancelSheetImportBtn').onclick=()=>cancelImport();
       const input=$('fileInput');if(input)input.onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
       const dz=$('dropZone');if(!dz)return;
       ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
@@ -250,6 +285,6 @@
       });
     }
 
-    return {parseDuration,inferCdrFromFilename,parseDateTime,parseTime,timeMins,mapHeaders,parseLatLong,detectSheet,parseFileOnMain,parseFileInWorker,hashFile,loadFiles,confirmImport,cancelImport,bind};
+    return {parseDuration,inferCdrFromFilename,parseDateTime,parseTime,timeMins,mapHeaders,parseLatLong,detectSheet,parseFileOnMain,parseFileInWorker,hashFile,hashBuffer,loadFiles,confirmImport,cancelImport,bind};
   };
 })();
