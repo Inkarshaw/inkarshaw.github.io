@@ -323,14 +323,30 @@
                     <input type="date" id="fromDate" required>
                 </div>
                 <div class="form-group">
-                    <label for="policeStation">Select Police Station:</label>
-                    <select id="policeStation" class="police-station-select" required>
-                        <option value="">Select Police Station</option>
-                        <option value="G7 Chetpet PS(L&O)">G7 Chetpet PS(L&O)</option>
-                        <option value="G5 Secretariat Colony PS">G5 Secretariat Colony PS</option>
-                        <option value="G3 Kilpauk PS(L&O)">G3 Kilpauk PS(L&O)</option>
-                        <option value="Other">Other Police Station</option>
+                    <label for="stationMode">Station Selection:</label>
+                    <select id="stationMode" class="police-station-select">
+                        <option value="chennai" selected>Chennai – Select Police Station</option>
+                        <option value="other">Other Station – Manual Entry</option>
                     </select>
+                </div>
+                <div class="form-group" id="chennaiPoliceStationGroup">
+                    <label for="policeStation">Chennai Police Station:</label>
+                    <select id="policeStation" class="police-station-select" required></select>
+                </div>
+                <div class="form-group" id="customPoliceStationGroup" style="display: none;">
+                    <label for="customPoliceStation">Police Station Name:</label>
+                    <input type="text" id="customPoliceStation" placeholder="Enter full police station name">
+                </div>
+                <div class="form-group" id="customAddressGroup" style="display: none;">
+                    <label for="senderAddress">From Address:</label>
+                    <textarea id="senderAddress" class="address-field" placeholder="Enter complete From address"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="receiverAddress">To Address (Editable):</label>
+                    <textarea id="receiverAddress" class="address-field">The Deputy Commissioner of Police,
+Kilpauk District,
+Chennai – 600010.</textarea>
+                    <div class="input-hint">When “Other Station” is selected, enter the required receiving officer/address here.</div>
                 </div>
                 <div class="form-group">
                     <label>Address Preview:</label>
@@ -338,16 +354,10 @@
                         <h4>From Address:</h4>
                         <p id="fromAddressPreview">Select a police station to preview address</p>
                         <h4>To Address:</h4>
-                        <p id="toAddressPreview">Select a police station to preview address</p>
+                        <p id="toAddressPreview">The Deputy Commissioner of Police,
+Kilpauk District,
+Chennai – 600010.</p>
                     </div>
-                </div>
-                <div class="form-group" id="customPoliceStationGroup" style="display: none;">
-                    <label for="customPoliceStation">Custom Police Station Name:</label>
-                    <input type="text" id="customPoliceStation" placeholder="Enter police station name">
-                </div>
-                <div class="form-group" id="customAddressGroup" style="display: none;">
-                    <label for="senderAddress">Full Address:</label>
-                    <textarea id="senderAddress" class="address-field" placeholder="Enter complete address with city, state, and PIN code"></textarea>
                 </div>
             </div>
             
@@ -458,31 +468,78 @@
             const mobileNumbersContainer = document.getElementById('mobileNumbersContainer');
             const generatePdfBtn = document.getElementById('generatePdfBtn');
             const loadingMessage = document.getElementById('loadingMessage');
+            const stationModeSelect = document.getElementById('stationMode');
             const policeStationSelect = document.getElementById('policeStation');
+            const chennaiPoliceStationGroup = document.getElementById('chennaiPoliceStationGroup');
             const customPoliceStationGroup = document.getElementById('customPoliceStationGroup');
             const customAddressGroup = document.getElementById('customAddressGroup');
+            const receiverAddressInput = document.getElementById('receiverAddress');
             const fromAddressPreview = document.getElementById('fromAddressPreview');
             const toAddressPreview = document.getElementById('toAddressPreview');
             
-            // Police station data
-            const policeStations = {
-                'G7 Chetpet PS(L&O)': {
-                    fromAddress: 'Inspector of Police,\nG7 Chetpet PS (L&O),\nChetpet, Chennai – 31.',
-                    toAddress: 'The Deputy Commissioner of Police,\nKilpauk District,\nChennai – 600010.'
-                },
-                'G5 Secretariat Colony PS': {
-                    fromAddress: 'Inspector of Police,\nG5 Secretariat Colony PS,\nKilpauk, Chennai.',
-                    toAddress: 'The Deputy Commissioner of Police,\nKilpauk District,\nChennai – 600010.'
-                },
-                'G3 Kilpauk PS(L&O)': {
-                    fromAddress: 'Inspector of Police,\nG3 Kilpauk PS(L&O),\nKilpauk, Chennai-10.',
-                    toAddress: 'The Deputy Commissioner of Police,\nKilpauk District,\nChennai – 600010.'
-                },
-                'Other': {
-                    fromAddress: 'Custom address will be entered below',
-                    toAddress: 'The Deputy Commissioner of Police,\nKilpauk District,\nChennai – 600010.'
-                }
+            // Chennai station list mirrors the Tahsildar-letter selector.
+            const chennaiPoliceStations = [
+                'AWPS Peravallur',
+                'B1 North Beach Police Station','B2 Esplanade Police Station','B3 Fort St. George Police Station','B4 High Court Police Station',
+                'C1 Flower Bazaar Police Station','C2 Elephant Gate Police Station','C3 Seven Wells Police Station','C4 Government General Hospital Outpost','C5 Kothawal Chavadi Police Station',
+                'D1 Triplicane Police Station','D2 Anna Salai Police Station','D3 Ice House Police Station','D4 Jam Bazaar Police Station','D5 Marina Police Station','D6 Anna Square Police Station','D7 Government Estate Police Station','D8 Kasturba Gandhi Hospital Police Station',
+                'E1 Mylapore Police Station','E2 Royapettah Police Station','E3 Teynampet Police Station','E4 Abiramapuram Police Station',
+                'F1 Chintadripet Police Station','F2 Egmore Police Station','F3 Nungambakkam Police Station','F4 Thousand Lights Police Station','F5 Chetpet Police Station',
+                'G1 Vepery Police Station','G2 Periamet Police Station','G3 Kilpauk Police Station','G5 Secretariat Colony Police Station','G7 Chetpet Police Station',
+                'H1 Old Washermenpet Police Station','H3 Tondiarpet Police Station',
+                'J1 Saidapet Police Station','J2 Adyar Police Station','J3 Guindy Police Station','J5 Sastri Nagar Police Station','J6 Thiruvanmiyur Police Station','J7 Velachery Police Station',
+                'K1 Sembium Police Station','K2 Ayanavaram Police Station','K4 Anna Nagar Police Station','K6 TP Chatram Police Station','K8 Arumbakkam Police Station',
+                'M1 Harbour Police Station','N1 Royapuram Police Station','P1 Pulianthope Police Station',
+                'R1 Mambalam Police Station','R2 Kodambakkam Police Station','R3 Ashok Nagar Police Station',
+                'V1 Villivakkam Police Station','V2 Virugambakkam Police Station',
+                'W1 All Women Police Station, Thousand Lights'
+            ];
+
+            const specialFromAddresses = {
+                'G7 Chetpet Police Station': 'Inspector of Police,\nG7 Chetpet Police Station,\nChetpet, Chennai – 31.',
+                'G5 Secretariat Colony Police Station': 'Inspector of Police,\nG5 Secretariat Colony Police Station,\nKilpauk, Chennai.',
+                'G3 Kilpauk Police Station': 'Inspector of Police,\nG3 Kilpauk Police Station,\nKilpauk, Chennai – 10.'
             };
+
+            function getChennaiFromAddress(station) {
+                return specialFromAddresses[station] || ('Inspector of Police,\n' + station + ',\nChennai.');
+            }
+
+            function normalizeStationName(value) {
+                return String(value || '').toLowerCase()
+                    .replace(/\(l&o\)/g, '')
+                    .replace(/police station/g, '')
+                    .replace(/\bps\b/g, '')
+                    .replace(/[^a-z0-9]/g, '');
+            }
+
+            function populateChennaiStations() {
+                policeStationSelect.innerHTML = '<option value="">Select Police Station</option>' +
+                    chennaiPoliceStations.map(station => '<option value="' + station.replace(/"/g, '&quot;') + '">' + station + '</option>').join('');
+                policeStationSelect.value = 'G7 Chetpet Police Station';
+            }
+
+            function updateStationUI() {
+                const isOther = stationModeSelect.value === 'other';
+                chennaiPoliceStationGroup.style.display = isOther ? 'none' : 'block';
+                customPoliceStationGroup.style.display = isOther ? 'block' : 'none';
+                customAddressGroup.style.display = isOther ? 'block' : 'none';
+
+                document.getElementById('customPoliceStation').required = isOther;
+                document.getElementById('senderAddress').required = isOther;
+                policeStationSelect.required = !isOther;
+
+                if (isOther) {
+                    const customAddress = document.getElementById('senderAddress').value.trim();
+                    fromAddressPreview.textContent = customAddress || 'Enter the From address above';
+                } else {
+                    const selectedStation = policeStationSelect.value;
+                    fromAddressPreview.textContent = selectedStation ? getChennaiFromAddress(selectedStation) : 'Select a police station to preview address';
+                }
+                toAddressPreview.textContent = receiverAddressInput.value || 'Enter the To address above';
+            }
+
+            populateChennaiStations();
             
             // Set default date values
             const today = new Date().toISOString().split('T')[0];
@@ -499,15 +556,19 @@
                     if (currentCase.sections) document.getElementById('crimeSection').value = currentCase.sections;
 
                     if (currentCase.policeStation) {
-                        const wanted = currentCase.policeStation.trim().toLowerCase();
+                        const wanted = normalizeStationName(currentCase.policeStation);
                         const matchingOption = Array.from(policeStationSelect.options).find(option => {
-                            const value = (option.value || '').trim().toLowerCase();
-                            return value && value !== 'other' && (value === wanted || wanted.includes(value) || value.includes(wanted));
+                            const value = normalizeStationName(option.value);
+                            return value && (value === wanted || value.includes(wanted) || wanted.includes(value));
                         });
                         if (matchingOption) {
+                            stationModeSelect.value = 'chennai';
                             policeStationSelect.value = matchingOption.value;
-                            policeStationSelect.dispatchEvent(new Event('change'));
+                        } else {
+                            stationModeSelect.value = 'other';
+                            document.getElementById('customPoliceStation').value = currentCase.policeStation;
                         }
+                        updateStationUI();
                     }
 
                     const banner = document.getElementById('caseLoadBanner');
@@ -528,38 +589,13 @@
                 input.value = today;
             });
             
-            // Police station selection handler
-            policeStationSelect.addEventListener('change', function() {
-                const selectedStation = this.value;
-                
-                if (selectedStation && policeStations[selectedStation]) {
-                    const stationData = policeStations[selectedStation];
-                    
-                    // Update address preview
-                    fromAddressPreview.textContent = stationData.fromAddress;
-                    toAddressPreview.textContent = stationData.toAddress;
-                    
-                    // Show/hide custom input fields
-                    if (selectedStation === 'Other') {
-                        customPoliceStationGroup.style.display = 'block';
-                        customAddressGroup.style.display = 'block';
-                        // Make custom fields required
-                        document.getElementById('customPoliceStation').required = true;
-                        document.getElementById('senderAddress').required = true;
-                    } else {
-                        customPoliceStationGroup.style.display = 'none';
-                        customAddressGroup.style.display = 'none';
-                        // Remove required from custom fields
-                        document.getElementById('customPoliceStation').required = false;
-                        document.getElementById('senderAddress').required = false;
-                    }
-                } else {
-                    fromAddressPreview.textContent = 'Select a police station to preview address';
-                    toAddressPreview.textContent = 'Select a police station to preview address';
-                    customPoliceStationGroup.style.display = 'none';
-                    customAddressGroup.style.display = 'none';
-                }
-            });
+            // Station selection and editable address handlers
+            stationModeSelect.addEventListener('change', updateStationUI);
+            policeStationSelect.addEventListener('change', updateStationUI);
+            document.getElementById('customPoliceStation').addEventListener('input', updateStationUI);
+            document.getElementById('senderAddress').addEventListener('input', updateStationUI);
+            receiverAddressInput.addEventListener('input', updateStationUI);
+            updateStationUI();
             
             // Auto-advance crime number sections
             const crimeInputs = ['crimeCrNo', 'crimeYear', 'crimeSection'];
@@ -881,25 +917,30 @@
                             return;
                         }
                         
+                        const isOtherStation = stationModeSelect.value === 'other';
                         const selectedStation = policeStationSelect.value;
-                        let policeStationName, senderAddress, receiverAddress;
-                        
-                        if (selectedStation === 'Other') {
-                            policeStationName = document.getElementById('customPoliceStation').value;
-                            senderAddress = document.getElementById('senderAddress').value;
-                            receiverAddress = policeStations['Other'].toAddress;
-                            
-                            // Validate custom fields
-                            if (!policeStationName || !senderAddress) {
-                                alert('Please fill in all custom police station fields.');
+                        let policeStationName, senderAddress;
+                        const receiverAddress = receiverAddressInput.value.trim();
+
+                        if (isOtherStation) {
+                            policeStationName = document.getElementById('customPoliceStation').value.trim();
+                            senderAddress = document.getElementById('senderAddress').value.trim();
+
+                            if (!policeStationName || !senderAddress || !receiverAddress) {
+                                alert('Please fill in the Police Station, From Address and To Address.');
                                 loadingMessage.style.display = 'none';
                                 generatePdfBtn.disabled = false;
                                 return;
                             }
                         } else {
                             policeStationName = selectedStation;
-                            senderAddress = policeStations[selectedStation].fromAddress;
-                            receiverAddress = policeStations[selectedStation].toAddress;
+                            senderAddress = getChennaiFromAddress(selectedStation);
+                            if (!selectedStation || !receiverAddress) {
+                                alert('Please select a Chennai Police Station and fill in the To Address.');
+                                loadingMessage.style.display = 'none';
+                                generatePdfBtn.disabled = false;
+                                return;
+                            }
                         }
                         
                         // Collect form data
@@ -1178,7 +1219,21 @@
                 
                 setIfPresent('crimeNumber', [currentCase.crimeNo, currentCase.crimeYear].filter(Boolean).join('/'));
                 setIfPresent('sections', currentCase.sections);
-                setIfPresent('policeStation', currentCase.policeStation);
+                if (currentCase.policeStation) {
+                    const wanted = normalizeStationName(currentCase.policeStation);
+                    const option = Array.from(policeStationSelect.options).find(o => {
+                        const value = normalizeStationName(o.value);
+                        return value && (value === wanted || value.includes(wanted) || wanted.includes(value));
+                    });
+                    if (option) {
+                        stationModeSelect.value = 'chennai';
+                        policeStationSelect.value = option.value;
+                    } else {
+                        stationModeSelect.value = 'other';
+                        setIfPresent('customPoliceStation', currentCase.policeStation);
+                    }
+                    updateStationUI();
+                }
                 setIfPresent('caseType', currentCase.caseType);
 
             }
