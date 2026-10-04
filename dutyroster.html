@@ -2226,7 +2226,7 @@
   <button class="orange" onclick="nextDayRotate(1)">Next Day + Rotate</button>
   <button onclick="rotateShifts(1)">Apply Shift Rotation</button>
   <button onclick="rotateShifts(-1)">Reverse Rotation</button>
-  <button onclick="openNominalRoll()">Nominal Roll</button>
+  <button id="nominalRollButton" onclick="openNominalRoll()" hidden>Nominal Roll</button>
   <button class="green" onclick="saveRoster()">Save</button>
   <button onclick="openCloudRosters()">Cloud Rosters</button>
   <button id="pdfActionButton" onclick="printDutyRoster()">Print / PDF</button>
@@ -2869,6 +2869,29 @@ function rosterCloudToken(){
   return sessionStorage.getItem(ROSTER_CLOUD_TOKEN_KEY) || "";
 }
 
+function setNominalRollLoginVisibility(isLoggedIn){
+  const btn=document.getElementById("nominalRollButton");
+  if(btn) btn.hidden=!isLoggedIn;
+}
+
+async function refreshNominalRollLoginVisibility(){
+  // Hidden by default. Only reveal after the existing cloud session is verified.
+  setNominalRollLoginVisibility(false);
+  if(!rosterCloudToken()) return false;
+
+  try{
+    const session=await rosterCloudFetch("/api/session");
+    const authenticated=Boolean(session?.authenticated);
+    setNominalRollLoginVisibility(authenticated);
+    if(!authenticated) sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+    return authenticated;
+  }catch(e){
+    sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+    setNominalRollLoginVisibility(false);
+    return false;
+  }
+}
+
 async function rosterCloudFetch(path,options={}){
   const headers={...(options.headers || {})};
   if(options.body && !headers["Content-Type"]) headers["Content-Type"]="application/json";
@@ -2889,9 +2912,13 @@ async function ensureRosterCloudLogin(){
   if(rosterCloudToken()){
     try{
       const session=await rosterCloudFetch("/api/session");
-      if(session.authenticated) return true;
+      if(session.authenticated){
+        setNominalRollLoginVisibility(true);
+        return true;
+      }
     }catch(e){}
     sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+    setNominalRollLoginVisibility(false);
   }
 
   const password=prompt("Enter cloud password to access saved Duty Rosters:");
@@ -2909,7 +2936,9 @@ async function ensureRosterCloudLogin(){
   }
 
   sessionStorage.setItem(ROSTER_CLOUD_TOKEN_KEY,data.token || "");
-  return Boolean(data.token);
+  const loggedIn=Boolean(data.token);
+  setNominalRollLoginVisibility(loggedIn);
+  return loggedIn;
 }
 
 function rosterCloudPersonLabel(row){
@@ -2966,7 +2995,10 @@ async function saveRosterToCloud(data){
     return true;
   }catch(err){
     console.error(err);
-    if(err?.status===401) sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+    if(err?.status===401){
+      sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+      setNominalRollLoginVisibility(false);
+    }
     setStatus("Saved in browser · cloud pending");
     return false;
   }
@@ -3054,7 +3086,10 @@ async function openCloudRosters(){
     }
   }catch(err){
     console.error(err);
-    if(err?.status===401) sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+    if(err?.status===401){
+      sessionStorage.removeItem(ROSTER_CLOUD_TOKEN_KEY);
+      setNominalRollLoginVisibility(false);
+    }
     closeCloudRosters();
     alert(err.message || "Cloud rosters could not be loaded.");
   }
@@ -3500,6 +3535,7 @@ window.addEventListener("DOMContentLoaded",()=>{
   }
 
   syncHeader();
+  refreshNominalRollLoginVisibility();
   setTimeout(()=>{
     if(typeof refreshNominalDependentUI==="function") refreshNominalDependentUI(false);
   },0);
@@ -5015,7 +5051,10 @@ function saveNominalStaffEdit(){
 }
 
 
-function openNominalRoll(){
+async function openNominalRoll(){
+  const loggedIn=await refreshNominalRollLoginVisibility();
+  if(!loggedIn) return;
+
   const modal=document.getElementById("nominalRollModal");
   if(!modal) return;
   renderNominalRollTable();
