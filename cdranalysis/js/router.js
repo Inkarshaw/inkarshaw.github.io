@@ -4,12 +4,13 @@
     const {
       $,applyFilters,renderDashboard,renderRecords,renderExcelView,renderContacts,renderLocations,renderDevices,
       renderSmsIntelligence,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,
-      renderMovement,invalidateMovementMap,renderLeads,renderNetwork,renderCompare,
+      renderMovement,invalidateMovementMap,renderLeads,renderNetwork,renderLinkAnalysis,renderCompare,
       renderChronology,renderFlags
     }=ctx;
 
     function renderView(id){
       if(id==='dashboard'){renderDashboard();renderLeads();}
+      else if(id==='linkanalysis'){requestAnimationFrame(()=>renderLinkAnalysis());}
       else if(id==='records')renderRecords();
       else if(id==='excelview')renderExcelView();
       else if(id==='contacts')renderContacts();
