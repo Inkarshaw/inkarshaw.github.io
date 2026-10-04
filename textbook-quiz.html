@@ -91,7 +91,9 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
 
 <script>
 (function(){
-  const cls=Number(new URLSearchParams(location.search).get('class')||6);
+  const params=new URLSearchParams(location.search);
+  const cls=Number(params.get('class')||6);
+  const subject=(cls===12 && params.get('subject')==='geography')?'geography':'history';
   if(cls!==11 && cls!==12) return;
 
   document.querySelectorAll('.class').forEach(el=>{
@@ -123,35 +125,45 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
 
   const main=document.querySelector('main.wrap');
   async function render(){
-    let units;
+    let units,edition=2025;
     if(cls===11){
-      units=units11.map(x=>({id:x[0],unit_en:x[1],unit_ta:x[2],total:x[3]}));
+      units=units11.map(x=>({id:x[0],unit_en:x[1],unit_ta:x[2],total:x[3],ready:true}));
     }else{
-      const r=await fetch('data/textbook/class-12/history/index.json',{cache:'no-store'});
-      if(!r.ok) throw new Error('Class 12 index unavailable');
+      edition=subject==='geography'?2024:2025;
+      const r=await fetch('data/textbook/class-12/'+subject+'/index.json',{cache:'no-store'});
+      if(!r.ok) throw new Error('Class 12 '+subject+' index unavailable');
       const d=await r.json();
-      units=d.units.map(x=>({...x,total:null}));
+      units=d.units.map(x=>({...x,total:x.total??null,ready:x.ready!==false}));
     }
 
-    const totalKnown=units.reduce((n,u)=>n+(u.total||0),0);
+    const subjEn=subject==='geography'?'Geography':'History';
+    const subjTa=subject==='geography'?'புவியியல்':'வரலாறு';
+    const totalKnown=units.reduce((n,u)=>n+(u.ready&&u.total?u.total:0),0);
+    const switcher=cls===12?
+      '<div class="sets" style="margin:0 0 16px"><a class="btn '+(subject==='history'?'primary':'')+'" href="textbook-quiz.html?class=12&subject=history">History / வரலாறு</a><a class="btn '+(subject==='geography'?'primary':'')+'" href="textbook-quiz.html?class=12&subject=geography">Geography / புவியியல்</a></div>':'';
+
     main.innerHTML=
       '<section class="section panel">'+
-      '<div class="crumb">'+cls+'th Standard → History → 2025 Edition</div>'+
-      '<div class="head" style="margin-top:7px"><div><h2>'+cls+'th History / '+cls+'ஆம் வகுப்பு வரலாறு</h2>'+
+      '<div class="crumb">'+cls+'th Standard → '+subjEn+' → '+edition+' Edition</div>'+
+      '<div class="head" style="margin-top:7px"><div><h2>'+cls+'th '+subjEn+' / '+cls+'ஆம் வகுப்பு '+subjTa+'</h2>'+
       '<p>Competitive-exam-focused bilingual textbook quizzes. Choose a unit to start.</p></div>'+
       (totalKnown?'<span class="tag">'+totalKnown.toLocaleString('en-IN')+' questions live</span>':'')+'</div>'+
+      switcher+
       '<div class="unitgrid">'+units.map(u=>{
-        const fileUnit=cls===11?String(u.id).padStart(2,'0'):u.id;
-        const full='textbook-play.html?class='+cls+'&subject=history&unit='+u.id+'&quiz=all';
-        const q1='textbook-play.html?class='+cls+'&subject=history&unit='+u.id+'&quiz=1';
+        if(!u.ready){
+          return '<article class="unit locked"><h3>'+u.id+'. '+u.unit_en+' / '+u.unit_ta+'</h3><p>Quiz bank is being prepared from the supplied textbook.</p><div class="sets"><span class="btn">Coming next</span></div></article>';
+        }
+        const full='textbook-play.html?class='+cls+'&subject='+subject+'&unit='+u.id+'&quiz=all';
+        const q1='textbook-play.html?class='+cls+'&subject='+subject+'&unit='+u.id+'&quiz=1';
         return '<article class="unit ready"><h3>'+u.id+'. '+u.unit_en+' / '+u.unit_ta+'</h3>'+
-          '<p>'+(u.total?u.total.toLocaleString('en-IN')+' source-grounded questions available.':'2025 textbook unit quiz bank.')+'</p>'+
+          '<p>'+(u.total?u.total.toLocaleString('en-IN')+' source-grounded questions available.':edition+' textbook unit quiz bank.')+'</p>'+
           '<div class="sets"><a class="btn primary" href="'+q1+'">Quiz 1</a><a class="btn" href="'+full+'">Full Unit'+(u.total?' · '+u.total.toLocaleString('en-IN'):'')+'</a></div></article>';
       }).join('')+'</div></section>'+
-      '<div class="note"><strong>Source-first design:</strong> questions are grounded in the supplied Tamil Nadu State Board 2025 English and Tamil History textbooks and filtered for competitive-exam relevance.</div>';
+      '<div class="note"><strong>Source-first design:</strong> questions are grounded in the supplied Tamil Nadu State Board '+edition+' English and Tamil '+subjEn+' textbooks and filtered for competitive-exam relevance.</div>';
   }
   render().catch(err=>{
-    main.innerHTML='<section class="section panel"><h2>'+cls+'th History</h2><p>Could not load the class quiz index. Please refresh once.</p></section>';
+    const subj=subject==='geography'?'Geography':'History';
+    main.innerHTML='<section class="section panel"><h2>'+cls+'th '+subj+'</h2><p>Could not load the class quiz index. Please refresh once.</p></section>';
     console.error(err);
   });
 })();
