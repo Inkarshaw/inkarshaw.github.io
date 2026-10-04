@@ -1,0 +1,36 @@
+name: Build Class 12 Geography Unit 1
+
+on:
+  push:
+    paths:
+      - '.tmp/geography12/unit1/builder.zlib'
+      - '.github/workflows/build-class12-geography-unit1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-unit-1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate and publish Geography Unit 1
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib, zlib
+          src = pathlib.Path('.tmp/geography12/unit1/builder.zlib').read_bytes()
+          pathlib.Path('/tmp/build_geo12_u1.py').write_bytes(zlib.decompress(src))
+          PY
+          python /tmp/build_geo12_u1.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/textbook/class-12/geography/unit-1.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Add Class 12 Geography Unit 1 bilingual competitive question bank"
+          git push
