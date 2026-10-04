@@ -125,13 +125,28 @@
       return chosen;
     }
 
+    function ensureSheetPicker(){
+      let picker=$('sheetPicker');
+      if(picker&&$('sheetSelect'))return picker;
+      const status=$('loadStatus'),drop=$('dropZone');
+      if(!status&&!drop)return null;
+      picker=document.createElement('div');
+      picker.id='sheetPicker';picker.className='panel';
+      picker.style.cssText='display:none;padding:10px;margin:8px 0';
+      picker.innerHTML='<div class="field"><label>Worksheet / tab</label><select id="sheetSelect"><option value="">Select worksheet</option></select></div><div class="tiny" id="sheetPickerInfo" style="margin:6px 0">Select one worksheet or All tabs.</div><div class="upload-actions"><button type="button" class="btn small" id="importSelectedSheetBtn">Import</button><button type="button" class="btn secondary small" id="cancelSheetImportBtn">Cancel</button></div>';
+      if(status?.parentNode)status.parentNode.insertBefore(picker,status.nextSibling);
+      else drop?.parentNode?.insertBefore(picker,drop.nextSibling);
+      $('importSelectedSheetBtn')?.addEventListener('click',()=>confirmImport());
+      $('cancelSheetImportBtn')?.addEventListener('click',()=>cancelImport());
+      return picker;
+    }
     function hideSheetPicker(){
       const picker=$('sheetPicker');if(picker)picker.style.display='none';
       const select=$('sheetSelect');if(select)select.innerHTML='<option value="">Select worksheet</option>';
     }
     function showSheetPicker(p){
-      const picker=$('sheetPicker'),select=$('sheetSelect'),info=$('sheetPickerInfo');
-      if(!picker||!select)return;
+      const picker=ensureSheetPicker(),select=$('sheetSelect'),info=$('sheetPickerInfo');
+      if(!picker||!select)return false;
       const recommended=chooseInitialSheets(p.sheets||[])[0]||'';
       select.innerHTML='<option value="__ALL__">All tabs</option>'+(p.sheets||[]).map(s=>{
         const compatible=likelySheet(s),label=s.name+' ('+fmtInt(s.rowCount||0)+' rows'+(compatible?' • CDR':' • report/other')+')';
@@ -141,6 +156,7 @@
       if(info)info.textContent=(p.sheets||[]).length+' worksheet tab(s) found. Choose one tab or All tabs. Non-CDR report tabs are skipped safely.';
       picker.style.display='block';
       const overlay=$('importLoadingOverlay');if(overlay)overlay.hidden=true;
+      return true;
     }
 
     async function inspectNext(){
@@ -151,8 +167,12 @@
         const sheets=ins.sheets||[];if(!sheets.length)throw new Error('No worksheets found');
         const selected=new Set(chooseInitialSheets(sheets)),mappings={};for(const s of sheets)mappings[s.name]=savedMapping(s.headers)||mapHeaders(s.headers);
         state.pendingImport={file,sha256,sheets,selected,mappings,inspectedAt:new Date().toISOString()};
-        showSheetPicker(state.pendingImport);
-        showStatus('Select a worksheet tab to import from '+file.name+'.','ok');
+        const pickerShown=showSheetPicker(state.pendingImport);
+        if(pickerShown)showStatus('Select a worksheet tab to import from '+file.name+'.','ok');
+        else{
+          showStatus('Worksheet selector unavailable; importing the recommended CDR worksheet automatically…','');
+          await confirmImport();
+        }
       }catch(err){console.error(err);showStatus('Could not inspect '+file.name+': '+err.message,'error');finishImportStep();inspectNext();}
     }
 
@@ -218,11 +238,12 @@
     function bind(){
       syncLoadedUi();
       window.addEventListener('cdr:updated',syncLoadedUi);
-      const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput').click();
+      const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput')?.click();
+      ensureSheetPicker();
       $('importSelectedSheetBtn')?.addEventListener('click',()=>confirmImport());
       $('cancelSheetImportBtn')?.addEventListener('click',()=>cancelImport());
-      $('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
-      const dz=$('dropZone');
+      const input=$('fileInput');if(input)input.onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
+      const dz=$('dropZone');if(!dz)return;
       ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
       ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
       dz.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files]));
