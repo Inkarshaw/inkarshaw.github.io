@@ -125,6 +125,23 @@
       return chosen;
     }
 
+    function hideSheetPicker(){
+      const picker=$('sheetPicker');if(picker)picker.style.display='none';
+      const select=$('sheetSelect');if(select)select.innerHTML='<option value="">Select worksheet</option>';
+    }
+    function showSheetPicker(p){
+      const picker=$('sheetPicker'),select=$('sheetSelect'),info=$('sheetPickerInfo');
+      if(!picker||!select)return;
+      const recommended=chooseInitialSheets(p.sheets||[])[0]||'';
+      select.innerHTML='<option value="__ALL__">All tabs</option>'+(p.sheets||[]).map(s=>{
+        const compatible=likelySheet(s),label=s.name+' ('+fmtInt(s.rowCount||0)+' rows'+(compatible?' • CDR':' • report/other')+')';
+        return '<option value="'+String(s.name).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'">'+label.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</option>';
+      }).join('');
+      select.value=recommended||'__ALL__';
+      if(info)info.textContent=(p.sheets||[]).length+' worksheet tab(s) found. Choose one tab or All tabs. Non-CDR report tabs are skipped safely.';
+      picker.style.display='block';
+      const overlay=$('importLoadingOverlay');if(overlay)overlay.hidden=true;
+    }
 
     async function inspectNext(){
       if(state.pendingImport||!importQueue.length)return;
@@ -134,22 +151,30 @@
         const sheets=ins.sheets||[];if(!sheets.length)throw new Error('No worksheets found');
         const selected=new Set(chooseInitialSheets(sheets)),mappings={};for(const s of sheets)mappings[s.name]=savedMapping(s.headers)||mapHeaders(s.headers);
         state.pendingImport={file,sha256,sheets,selected,mappings,inspectedAt:new Date().toISOString()};
-        showStatus('Importing '+file.name+' using automatic worksheet and column mapping…','');
-        await confirmImport();
+        showSheetPicker(state.pendingImport);
+        showStatus('Select a worksheet tab to import from '+file.name+'.','ok');
       }catch(err){console.error(err);showStatus('Could not inspect '+file.name+': '+err.message,'error');finishImportStep();inspectNext();}
     }
 
     async function confirmImport(){
       const p=state.pendingImport;if(!p)return;
-      const selected=[...p.selected];if(!selected.length){showStatus('Select at least one worksheet to import.','error');return;}
+      const picked=$('sheetSelect')?.value||'';
+      let selected=picked==='__ALL__'?(p.sheets||[]).map(s=>s.name):(picked?[picked]:[...p.selected]);
+      if(!selected.length){showStatus('Select at least one worksheet to import.','error');return;}
+      p.selected=new Set(selected);
       for(const name of selected){const sheet=p.sheets.find(x=>x.name===name);p.mappings[name]=p.mappings[name]||savedMapping(sheet?.headers||[])||mapHeaders(sheet?.headers||[]);if(sheet)saveMapping(sheet.headers,p.mappings[name]);}
+      hideSheetPicker();
+      showImportLoading(p.file);
       showStatus('Importing '+selected.length+' worksheet(s) from '+p.file.name+'…','');
       try{
         const headerRows=Object.fromEntries((p.sheets||[]).map(x=>[x.name,Number.isInteger(x.headerRow)?x.headerRow:0]));
         const parsed=await workerCall(p.file,'parse',selected,headerRows),timezone=$('sourceTimezone')?.value||state.sourceTimezone||'Asia/Kolkata';state.sourceTimezone=timezone;
         for(const sh of parsed.sheets||[]){
           const rows=sh.rows||[],map=p.mappings[sh.sheetName]||{};if(!rows.length)continue;
-          if(!map.bparty&&!map.cdrNo&&!map.date)throw new Error('No standard CDR columns mapped for '+sh.sheetName);
+          if(!map.bparty&&!map.cdrNo&&!map.date){
+            audit('Worksheet skipped',p.file.name+' / '+sh.sheetName+' • no standard CDR columns');
+            continue;
+          }
           const fileId=++state.fileSeq,inferredCdr=inferCdrFromFilename(p.file.name);let added=0;
           rows.forEach((r,idx)=>{
             const sourceRow=idx+(Number.isInteger(sh.headerRow)?sh.headerRow:0)+2;
@@ -165,7 +190,7 @@
       }catch(err){console.error(err);showStatus('Import failed: '+err.message,'error');state.pendingImport=null;finishImportStep();inspectNext();}
     }
 
-    function cancelImport(){if(state.pendingImport)audit('CDR import cancelled',state.pendingImport.file?.name||'');state.pendingImport=null;finishImportStep();inspectNext();}
+    function cancelImport(){if(state.pendingImport)audit('CDR import cancelled',state.pendingImport.file?.name||'');hideSheetPicker();state.pendingImport=null;finishImportStep();inspectNext();}
     function loadFiles(files){if(!files?.length)return;if(importBatchTotal===0){importBatchDone=0;importBatchTotal=files.length;}else importBatchTotal+=files.length;importQueue.push(...files);inspectNext();}
     function detectSheet(wb){if(wb.Sheets.Mapping)return 'Mapping';let best=wb.SheetNames[0],max=0;wb.SheetNames.forEach(n=>{const ref=wb.Sheets[n]?.['!ref'];if(ref){const r=XLSX.utils.decode_range(ref),rows=r.e.r-r.s.r+1;if(rows>max){max=rows;best=n;}}});return best;}
     function parseFileOnMain(buffer){const sheets=inspectBuffer(buffer),name=chooseInitialSheets(sheets)[0]||sheets[0]?.name,headerRows=Object.fromEntries(sheets.map(x=>[x.name,x.headerRow||0]));return {sheetName:name,rows:parseBufferSheets(buffer,[name],headerRows)[0]?.rows||[]};}
@@ -194,6 +219,8 @@
       syncLoadedUi();
       window.addEventListener('cdr:updated',syncLoadedUi);
       const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput').click();
+      $('importSelectedSheetBtn')?.addEventListener('click',()=>confirmImport());
+      $('cancelSheetImportBtn')?.addEventListener('click',()=>cancelImport());
       $('fileInput').onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
       const dz=$('dropZone');
       ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
