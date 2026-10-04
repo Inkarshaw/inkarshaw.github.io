@@ -24,7 +24,7 @@
 <div class="app">
   <header class="topbar">
     <div class="toprow">
-      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v68</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
+      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v69</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
       <div class="toolbar">
         <button class="btn ghost" id="printBtn">Print / Save PDF</button>
       </div>
@@ -255,72 +255,111 @@
       <section id="devices" class="view hidden"><div class="panel"><div class="panel-title"><h2>SIM / Subscriber / Device Identity</h2><span class="muted">MSISDN = subject number • IMSI = SIM/subscription identity • IMEI = handset identity</span></div><div class="notice">Identifier relationships are investigative indicators only. SIM replacement, handset repair/replacement, dual-SIM use, data quality issues and provider practices can also explain changes; corroborate before drawing conclusions.</div><div class="subtoolbar no-print" style="margin-top:10px"><button class="btn secondary small" id="importTacBtn">Import TAC Database</button><button class="btn secondary small" id="exportTacBtn">Export TAC Cache</button><input id="tacInput" type="file" accept=".csv,.json,.xlsx,.xls,text/csv,application/json" hidden><span class="tiny" id="tacCacheStatus">TAC cache: 0 entries</span></div><div class="tiny" style="margin:6px 0 6px"><b>Automatic device source:</b> <a href="https://github.com/MoazEb/tac-database" target="_blank" rel="noopener">MoazEb/tac-database</a> • MIT licensed • 254,997 documented TAC entries. The public CSV is downloaded as a static database and matching is performed locally; IMEI/TAC values are not sent as lookup queries.</div><div class="tiny" style="margin:6px 0 10px">Phone model resolution uses the first 8 IMEI digits (TAC). Only matched device entries are added to the local TAC cache. Manual TAC import remains available as a fallback. Unknown TACs are not guessed. TAC prefixes such as 35 or 86 are <b>not</b> used to infer a manufacturer because the first two digits identify a Reporting Body and are shared across many device makers.</div><div id="identifierSummary" style="margin-top:10px"></div><h3>Resolved device models</h3><div class="tablewrap"><table class="table" id="resolvedDeviceTable"></table></div><h3>TAC / IMEI structure</h3><div class="tiny" style="margin-bottom:6px">Practical IMEI check: TAC identifies the device allocation, the serial distinguishes individual handsets, and the check digit helps validate a standard 15-digit IMEI. A 16-digit IMEISV shows a software-version number instead of an IMEI check digit.</div><div class="tablewrap"><table class="table" id="imeiStructureTable"></table></div><h3>MSISDN ↔ IMSI ↔ IMEI relationships</h3><div class="tablewrap"><table class="table" id="identifierRelationshipTable"></table></div><h3>Identifier change timeline</h3><div class="tablewrap" style="max-height:420px"><table class="table" id="deviceChangeTable"></table></div><div class="split" style="margin-top:14px"><div><h3>IMSI cross-CDR linkage</h3><div class="tablewrap"><table class="table" id="imsiCrossCdrTable"></table></div></div><div><h3>IMEI with multiple IMSIs</h3><div class="tablewrap"><table class="table" id="imeiMultiImsiTable"></table></div></div></div><h3>IMEI ↔ IMSI relationship matrix</h3><div id="imeiImsiMatrix" class="tablewrap"></div></div></section>
       <section id="smsintel" class="view hidden">
         <div class="panel">
-          <div class="panel-title"><h2>SMS Sender Intelligence</h2><span class="muted">Brand-like sender IDs and timing metadata</span></div>
-          <div class="notice"><b>SMS metadata inference only.</b> A sender ID such as VM-SWIGGY, AD-AMAZON or VK-ZOMATO can indicate that an SMS associated with that sender label was recorded. It does not prove that an order, delivery, payment, login, booking or other underlying action actually occurred. Rows with an explicit SMS event are labelled accordingly; recognizable sender-ID rows without a usable event label are included as <b>Sender-ID inference</b>. This tab uses the loaded raw CDR records and its own filters, so the global “Exclude service / OTP-like senders” filter does not hide these rows.</div>
-          <div class="subtoolbar no-print">
-            <div class="field"><label>Subject / MSISDN</label><select id="smsIntelCdr"><option value="">All subjects</option></select></div>
-            <div class="field"><label>From date</label><input type="date" id="smsIntelFrom"></div>
-            <div class="field"><label>To date</label><input type="date" id="smsIntelTo"></div>
-            <div class="field"><label>Unusual time from</label><input type="time" id="smsIntelNightFrom" value="22:00"></div>
-            <div class="field"><label>Unusual time to</label><input type="time" id="smsIntelNightTo" value="06:00"></div>
-            <div class="field"><label>Call proximity ± min</label><input type="number" id="smsIntelCallMins" min="1" max="240" value="10"></div>
-            <div class="field"><label>ID-change proximity ± min</label><input type="number" id="smsIntelIdMins" min="1" max="1440" value="60"></div>
-            <div class="field"><label>Event context ± min</label><input type="number" id="smsIntelContextMins" min="1" max="360" value="30"></div>
-            <div class="field"><label>SMS burst gap (min)</label><input type="number" id="smsIntelBurstMins" min="1" max="240" value="15"></div>
-            <div class="field"><label>Burst minimum events</label><input type="number" id="smsIntelBurstMinCount" min="2" max="50" value="3"></div>
-            <div class="field"><label>Burst mode</label><select id="smsIntelBurstMode"><option value="any">Any senders</option><option value="same">Same sender/brand</option><option value="multi">Multiple senders/brands</option></select></div>
-            <div class="field"><label>Incident proximity ± min</label><input type="number" id="smsIntelIncidentMins" min="1" max="1440" value="60"></div>
-            <button class="btn secondary small" id="smsIntelRefreshBtn">Refresh</button>
-            <button class="btn secondary small" id="smsIntelExportBtn">Export SMS Review CSV</button>
+          <div class="panel-title">
+            <div><h2>SMS Intelligence</h2><span class="muted">Quick review of sender IDs and SMS timing</span></div>
+            <button class="btn secondary small no-print" id="smsIntelExportBtn">Export CSV</button>
           </div>
-          <div class="subtoolbar no-print" style="margin:10px 0">
-            <div class="field" style="min-width:220px"><label>Search sender / brand</label><input id="smsIntelSearch" placeholder="e.g. SWIGGY, AMAZON"></div>
-            <div class="field"><label>Category</label><select id="smsIntelFilterCategory"><option value="">All categories</option></select></div>
-            <div class="field"><label>Recognition</label><select id="smsIntelFilterRecognition"><option value="">All recognition</option><option>Recognized</option><option>Probable</option><option>Manual</option><option>Unclassified</option></select></div>
-            <label class="check"><input type="checkbox" id="smsIntelFirstOnly"> First observed only</label>
-            <label class="check"><input type="checkbox" id="smsIntelIncidentOnly"> Incident-near only</label>
-            <label class="check"><input type="checkbox" id="smsIntelUnusualOnly"> Unusual-time only</label>
-            <button class="btn secondary small" id="smsIntelClearReviewFilters">Clear review filters</button>
+          <div class="notice"><b>Use this as a review aid.</b> Sender IDs and timing show metadata only; they do not prove the content or purpose of an SMS.</div>
+
+          <div class="subtoolbar no-print sms-simple-toolbar">
+            <div class="field" style="min-width:220px"><label>Subject</label><select id="smsIntelCdr"><option value="">All subjects</option></select></div>
+            <div class="field"><label>From</label><input type="date" id="smsIntelFrom"></div>
+            <div class="field"><label>To</label><input type="date" id="smsIntelTo"></div>
+            <div class="field" style="min-width:220px"><label>Search sender / brand</label><input id="smsIntelSearch" placeholder="Swiggy, bank, sender ID…"></div>
+            <button class="btn small" id="smsIntelRefreshBtn">Refresh</button>
+            <button class="btn secondary small" id="smsIntelClearReviewFilters">Clear</button>
           </div>
-          <details class="panel no-print" style="padding:10px 12px;margin:10px 0">
-            <summary style="cursor:pointer;font-weight:800">Sender Dictionary / Manual Correction</summary>
-            <div class="subtoolbar" style="margin-top:10px">
-              <div class="field"><label>Raw sender ID</label><input id="smsSenderRaw" placeholder="VM-SWIGGY"></div>
-              <div class="field"><label>Display label</label><input id="smsSenderLabel" placeholder="Swiggy"></div>
-              <div class="field"><label>Category</label><select id="smsSenderCategory"><option>Banking</option><option>Payments / Wallet</option><option>Food Delivery</option><option>Ride-hailing / Transport</option><option>SIM / Telecom</option><option>E-commerce</option><option>Logistics / Courier</option><option>Travel / Booking</option><option>Healthcare</option><option>Insurance</option><option>Education</option><option>Utilities</option><option>Internet / Social</option><option>Government / Public Service</option><option>Other / Unclassified</option></select></div>
-              <label class="check"><input type="checkbox" id="smsSenderApplyAliases" checked> Apply to loaded aliases with same brand token</label>
-              <button class="btn small" id="smsSenderSaveBtn">Save sender mapping</button>
-              <button class="btn secondary small" id="smsSenderClearBtn">Remove manual mapping</button>
-              <button class="btn secondary small" id="smsSenderExportBtn">Export dictionary</button>
-              <button class="btn secondary small" id="smsSenderImportBtn">Import dictionary</button><input type="file" id="smsSenderImportInput" accept=".json,application/json" hidden>
-              <span class="tiny" id="smsSenderMappingStatus">Click “Edit sender” in a table row to load a sender here.</span>
+
+          <div id="smsIntelSummary"></div>
+
+          <div class="split sms-simple-grid">
+            <div>
+              <h3>Important SMS leads</h3>
+              <div id="smsIntelInsights"></div>
+            </div>
+            <div>
+              <h3>Sender summary</h3>
+              <div class="tablewrap"><table class="table" id="smsIntelBrandTable"></table></div>
+            </div>
+          </div>
+
+          <h3 style="margin-top:18px">SMS timeline</h3>
+          <div class="tiny" style="margin-bottom:8px">Chronological SMS/sender metadata for the current subject and date filter. Use “Show context” on a row when you need nearby calls, towers or identifier changes.</div>
+          <div class="tablewrap" style="max-height:620px"><table class="table" id="smsIntelTimelineTable"></table></div>
+
+          <h3 style="margin-top:18px">Selected SMS context</h3>
+          <div id="smsIntelContextPanel" class="empty">Use “Show context” on an SMS row to inspect nearby CDR activity.</div>
+
+          <details class="sms-advanced panel no-print" style="padding:10px 12px;margin-top:16px">
+            <summary style="cursor:pointer;font-weight:800">Advanced SMS review</summary>
+            <div class="tiny" style="margin:6px 0 12px">Open only when you need unusual-time review, incident comparison, burst analysis, sender classification or matrices.</div>
+
+            <div class="subtoolbar">
+              <div class="field"><label>Unusual time from</label><input type="time" id="smsIntelNightFrom" value="22:00"></div>
+              <div class="field"><label>Unusual time to</label><input type="time" id="smsIntelNightTo" value="06:00"></div>
+              <div class="field"><label>Call proximity ± min</label><input type="number" id="smsIntelCallMins" min="1" max="240" value="10"></div>
+              <div class="field"><label>ID-change proximity ± min</label><input type="number" id="smsIntelIdMins" min="1" max="1440" value="60"></div>
+              <div class="field"><label>Context ± min</label><input type="number" id="smsIntelContextMins" min="1" max="360" value="30"></div>
+              <div class="field"><label>Incident proximity ± min</label><input type="number" id="smsIntelIncidentMins" min="1" max="1440" value="60"></div>
+              <div class="field"><label>Burst gap (min)</label><input type="number" id="smsIntelBurstMins" min="1" max="240" value="15"></div>
+              <div class="field"><label>Burst minimum</label><input type="number" id="smsIntelBurstMinCount" min="2" max="50" value="3"></div>
+              <div class="field"><label>Burst mode</label><select id="smsIntelBurstMode"><option value="any">Any senders</option><option value="same">Same sender/brand</option><option value="multi">Multiple senders/brands</option></select></div>
+            </div>
+
+            <div class="subtoolbar">
+              <div class="field"><label>Category</label><select id="smsIntelFilterCategory"><option value="">All categories</option></select></div>
+              <div class="field"><label>Recognition</label><select id="smsIntelFilterRecognition"><option value="">All recognition</option><option>Recognized</option><option>Probable</option><option>Manual</option><option>Unclassified</option></select></div>
+              <label class="check"><input type="checkbox" id="smsIntelFirstOnly"> First observed only</label>
+              <label class="check"><input type="checkbox" id="smsIntelIncidentOnly"> Incident-near only</label>
+              <label class="check"><input type="checkbox" id="smsIntelUnusualOnly"> Unusual-time only</label>
+            </div>
+
+            <details class="panel" style="padding:10px 12px;margin:10px 0">
+              <summary style="cursor:pointer;font-weight:800">Sender dictionary / manual correction</summary>
+              <div class="subtoolbar" style="margin-top:10px">
+                <div class="field"><label>Raw sender ID</label><input id="smsSenderRaw" placeholder="VM-SWIGGY"></div>
+                <div class="field"><label>Display label</label><input id="smsSenderLabel" placeholder="Swiggy"></div>
+                <div class="field"><label>Category</label><select id="smsSenderCategory"><option>Banking</option><option>Payments / Wallet</option><option>Food Delivery</option><option>Ride-hailing / Transport</option><option>SIM / Telecom</option><option>E-commerce</option><option>Logistics / Courier</option><option>Travel / Booking</option><option>Healthcare</option><option>Insurance</option><option>Education</option><option>Utilities</option><option>Internet / Social</option><option>Government / Public Service</option><option>Other / Unclassified</option></select></div>
+                <label class="check"><input type="checkbox" id="smsSenderApplyAliases" checked> Apply to matching aliases</label>
+                <button class="btn small" id="smsSenderSaveBtn">Save mapping</button>
+                <button class="btn secondary small" id="smsSenderClearBtn">Remove mapping</button>
+                <button class="btn secondary small" id="smsSenderExportBtn">Export dictionary</button>
+                <button class="btn secondary small" id="smsSenderImportBtn">Import dictionary</button>
+                <input type="file" id="smsSenderImportInput" accept=".json,application/json" hidden>
+                <span class="tiny" id="smsSenderMappingStatus">Click “Edit sender” in a table row to load a sender here.</span>
+              </div>
+            </details>
+
+            <h3>Unclassified senders</h3>
+            <div class="tablewrap"><table class="table" id="smsIntelUnknownTable"></table></div>
+
+            <h3>Incident comparison</h3>
+            <div class="subtoolbar" style="margin-bottom:6px"><button class="btn small" id="smsIncidentContextBtn">Build Incident Context</button></div>
+            <div class="tablewrap"><table class="table" id="smsIntelBaselineTable"></table></div>
+            <div id="smsIncidentContextPanel" style="margin-top:10px"></div>
+
+            <h3>SMS bursts</h3>
+            <div class="tablewrap"><table class="table" id="smsIntelBurstsTable"></table></div>
+
+            <h3>Service category summary</h3>
+            <div class="tablewrap"><table class="table" id="smsIntelCategoryTable"></table></div>
+
+            <h3>Sender × subject matrix</h3>
+            <div class="tablewrap" id="smsIntelSubjectMatrix"></div>
+
+            <h3>Sender × day matrix</h3>
+            <div class="tablewrap" id="smsIntelDayMatrix"></div>
+
+            <div class="subtoolbar" style="margin-top:12px">
+              <button class="btn secondary small" id="smsSelectDisplayedBtn">Select displayed</button>
+              <button class="btn secondary small" id="smsClearSelectedBtn">Clear selection</button>
+              <span class="tiny">Context preset:</span>
+              <button class="btn secondary small sms-context-preset" data-mins="5">±5m</button>
+              <button class="btn secondary small sms-context-preset" data-mins="15">±15m</button>
+              <button class="btn secondary small sms-context-preset" data-mins="30">±30m</button>
+              <button class="btn secondary small sms-context-preset" data-mins="60">±1h</button>
             </div>
           </details>
-          <div id="smsIntelSummary"></div>
-          <h3>Unknown / unclassified sender review</h3>
-          <div class="tablewrap"><table class="table" id="smsIntelUnknownTable"></table></div>
-          <h3 style="margin-top:16px">Incident baseline comparison</h3>
-          <div class="subtoolbar no-print" style="margin-bottom:6px"><span class="tiny">Compares sender activity near the entered incident time with the preceding 7-day and 30-day windows.</span><button class="btn small" id="smsIncidentContextBtn">Build Incident Context</button></div>
-          <div class="tablewrap"><table class="table" id="smsIntelBaselineTable"></table></div>
-          <div id="smsIncidentContextPanel" style="margin-top:10px"></div>
-          <h3 style="margin-top:16px">Sender × subject matrix</h3>
-          <div class="tablewrap" id="smsIntelSubjectMatrix"></div>
-          <h3 style="margin-top:16px">Sender × day matrix</h3>
-          <div class="tablewrap" id="smsIntelDayMatrix"></div>
-          <h3>Service category summary</h3>
-          <div class="tablewrap"><table class="table" id="smsIntelCategoryTable"></table></div>
-          <h3>Brand / sender summary</h3>
-          <div class="tablewrap"><table class="table" id="smsIntelBrandTable"></table></div>
-          <h3 style="margin-top:16px">SMS review leads</h3>
-          <div id="smsIntelInsights"></div>
-          <h3 style="margin-top:16px">SMS bursts</h3>
-          <div class="tablewrap"><table class="table" id="smsIntelBurstsTable"></table></div>
-          <h3 style="margin-top:16px">Chronological SMS metadata</h3>
-          <div class="subtoolbar no-print" style="margin-bottom:8px"><button class="btn secondary small" id="smsSelectDisplayedBtn">Select displayed</button><button class="btn secondary small" id="smsClearSelectedBtn">Clear selection</button></div>
-          <div class="tablewrap" style="max-height:620px"><table class="table" id="smsIntelTimelineTable"></table></div>
-          <h3 style="margin-top:16px">Selected SMS event context</h3>
-          <div class="subtoolbar no-print"><span class="tiny">Context preset:</span><button class="btn secondary small sms-context-preset" data-mins="5">±5m</button><button class="btn secondary small sms-context-preset" data-mins="15">±15m</button><button class="btn secondary small sms-context-preset" data-mins="30">±30m</button><button class="btn secondary small sms-context-preset" data-mins="60">±1h</button><button class="btn secondary small sms-context-preset" data-mins="360">±6h</button></div>
-          <div id="smsIntelContextPanel" class="empty">Use “Show context” on an SMS row to inspect nearby calls, SMS records, towers and identifier metadata.</div>
         </div>
       </section>
       <section id="incident" class="view hidden">
@@ -441,7 +480,7 @@
 <script src="/cdranalysis/js/movement.js"></script>
 <script src="/cdranalysis/js/network.js"></script>
 <script src="/cdranalysis/js/linkanalysis.js?v=65"></script>
-<script src="/cdranalysis/js/analysis.js"></script>
+<script src="/cdranalysis/js/analysis.js?v=69"></script>
 <script src="/cdranalysis/js/reports.js"></script>
 <script src="/cdranalysis/js/workspace.js"></script>
 <script src="/cdranalysis/js/case.js"></script>
