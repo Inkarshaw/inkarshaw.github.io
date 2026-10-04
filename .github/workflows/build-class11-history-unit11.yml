@@ -19,6 +19,8 @@ jobs:
         run: |
           set -euo pipefail
           cat .tmp/unit11/chunk*.txt | base64 -d | gzip -d > /tmp/build_unit11.py
+          sudo mkdir -p /mnt/data
+          sudo chown "$USER":"$USER" /mnt/data
           python /tmp/build_unit11.py
           mkdir -p data/textbook/class-11/history
           cp /mnt/data/unit-11.json data/textbook/class-11/history/unit-11.json
