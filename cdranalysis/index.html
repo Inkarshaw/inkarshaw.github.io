@@ -24,7 +24,7 @@
 <div class="app">
   <header class="topbar">
     <div class="toprow">
-      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v62</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
+      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v63</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
       <div class="toolbar">
         <button class="btn ghost" id="printBtn">Print / Save PDF</button>
       </div>
@@ -133,6 +133,7 @@
       <div class="mobile-filter-bar no-print"><button class="btn secondary" id="mobileFiltersBtn" aria-controls="filterSidebar" aria-expanded="false">☰ Filters <span class="badge" id="activeFilterCount">0</span></button></div><div class="filter-backdrop no-print" id="filterBackdrop"></div>
       <div class="tabs no-print" id="tabs" role="tablist" aria-label="CDR analysis views">
         <button class="tab active" role="tab" aria-selected="true" data-tab="dashboard">Dashboard</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="linkanalysis">Link Analysis</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="records">Records</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="excelview">Excel View</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="contacts">Contacts</button>
@@ -178,6 +179,39 @@
             <input type="hidden" id="leadCoordinationMins" value="10" />
           </div>
           <div id="leadsContent"></div>
+        </div>
+      </section>
+
+      <section id="linkanalysis" class="view hidden">
+        <div class="panel">
+          <div class="panel-title"><div><h2>Link Analysis</h2><span class="muted">Communication relationships between loaded subjects and connected numbers</span></div><span class="badge" id="linkAnalysisCount">0 links</span></div>
+          <div class="notice">Link analysis shows relationships recorded in the CDR dataset. A connection indicates communication metadata, not proof of identity, association, intent, or physical presence.</div>
+          <div class="subtoolbar no-print">
+            <div class="field" style="min-width:220px"><label>Focus subject</label><select id="linkSubject"><option value="">All loaded subjects</option></select></div>
+            <div class="field"><label>From date</label><input type="date" id="linkFrom"></div>
+            <div class="field"><label>To date</label><input type="date" id="linkTo"></div>
+            <div class="field" style="min-width:170px"><label>Event type</label><select id="linkEventType"><option value="">All event types</option></select></div>
+            <div class="field"><label>Top contacts</label><select id="linkTop"><option>20</option><option selected>40</option><option>75</option><option>120</option></select></div>
+            <div class="field"><label>Minimum events</label><input type="number" id="linkMinEvents" min="1" value="1"></div>
+            <label class="check"><input type="checkbox" id="linkMutualOnly"> Shared / mutual contacts only</label>
+            <button class="btn small" id="linkRefreshBtn">Apply</button>
+            <button class="btn secondary small" id="linkResetBtn">Reset</button>
+          </div>
+          <div id="linkAnalysisSummary" class="metric-row" style="margin-bottom:10px"></div>
+          <div class="link-analysis-layout">
+            <div>
+              <div class="network-wrap link-network-wrap"><canvas id="linkAnalysisCanvas"></canvas></div>
+              <div class="tiny" style="margin-top:8px">Node size = event volume • edge thickness = communication frequency • loaded subjects are emphasized • shared contacts connect to more than one loaded subject.</div>
+            </div>
+            <div class="link-side-panel">
+              <div class="panel" style="margin:0 0 10px"><div class="panel-title"><h2>Selected node</h2></div><div id="linkSelectedNode" class="empty" style="padding:24px 12px">Click a node in the graph.</div></div>
+              <div class="panel" style="margin:0"><div class="panel-title"><h2>Top hubs</h2></div><div class="tablewrap" style="max-height:300px"><table class="table" id="linkHubTable"></table></div></div>
+            </div>
+          </div>
+          <div class="split" style="margin-top:14px">
+            <div><h3>Strongest links</h3><div class="tablewrap"><table class="table" id="linkEdgesTable"></table></div></div>
+            <div><h3>Mutual / common contacts</h3><div class="tablewrap"><table class="table" id="linkMutualTable"></table></div></div>
+          </div>
         </div>
       </section>
 
@@ -417,6 +451,7 @@
 <script src="/cdranalysis/js/devices.js"></script>
 <script src="/cdranalysis/js/movement.js"></script>
 <script src="/cdranalysis/js/network.js"></script>
+<script src="/cdranalysis/js/linkanalysis.js"></script>
 <script src="/cdranalysis/js/analysis.js"></script>
 <script src="/cdranalysis/js/reports.js"></script>
 <script src="/cdranalysis/js/workspace.js"></script>
