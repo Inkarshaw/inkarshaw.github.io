@@ -11,7 +11,7 @@
 header{position:sticky;top:0;z-index:20;background:#fffffff2;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}nav{min-height:64px;display:flex;align-items:center;gap:16px}.brand{font-size:1.15rem;font-weight:900}.links{margin-left:auto;display:flex;gap:14px;font-weight:800;color:#38516c}
 .hero{background:linear-gradient(135deg,#071c33,#0d3b67);color:#fff}.hero .wrap{padding:42px 0}.hero h1{margin:0;font-size:clamp(2.2rem,6vw,4rem);line-height:1.02}.hero p{max-width:720px;margin:12px 0 0;color:#c8d8e8}
 main{padding:24px 0 64px}.section{margin-top:24px}.head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:12px}.head h2{margin:0;font-size:1.45rem}.head p{margin:3px 0 0;color:var(--muted)}
-.classgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}.class{padding:16px 8px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:center;font-weight:900}.class.active{border-color:#9fc2ff;background:#eef5ff;color:#1357c4}.class.locked{color:#9aa8b7}
+.classgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}.class{padding:16px 8px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:center;font-weight:900;text-decoration:none;color:inherit;cursor:pointer}.class.active{border-color:#9fc2ff;background:#eef5ff;color:#1357c4}.class.locked{color:#9aa8b7}
 .panel{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}.crumb{font-size:.8rem;color:var(--muted);font-weight:800}.unitgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}.unit{padding:16px;border:1px solid var(--line);border-radius:15px;background:#fff}.unit.ready{border-color:#b9d6c9}.unit h3{margin:0 0 5px}.unit p{margin:0;color:var(--muted);font-size:.86rem}.sets{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btn{display:inline-flex;min-height:40px;padding:0 12px;align-items:center;justify-content:center;border:1px solid #cbd7e5;border-radius:9px;background:#fff;font-weight:850;color:#29445f}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.tag{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eaf8f1;color:var(--green);font-size:.72rem;font-weight:900}
 .note{margin-top:16px;padding:13px 14px;border:1px solid #d8e2ed;border-radius:12px;background:#f9fbfd;color:#53677c;font-size:.85rem}
 footer{padding:28px 0;background:#061629;color:#cbd8e5}
@@ -24,7 +24,7 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
 <main class="wrap">
 <section class="section"><div class="head"><div><h2>Choose class</h2><p>The structure is ready for Standards 6–12.</p></div></div>
 <div class="classgrid">
-<div class="class active">6th</div><div class="class locked">7th</div><div class="class locked">8th</div><div class="class locked">9th</div><div class="class locked">10th</div><div class="class locked">11th</div><div class="class locked">12th</div>
+<a class="class active" href="textbook-quiz.html">6th</a><div class="class locked">7th</div><div class="class locked">8th</div><div class="class locked">9th</div><div class="class locked">10th</div><a class="class" href="textbook-quiz.html?class=11">11th</a><a class="class" href="textbook-quiz.html?class=12">12th</a>
 </div></section>
 <section class="section panel">
 <div class="crumb">6th Standard → Science → Term I → 2025 Edition</div>
@@ -88,4 +88,64 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
 
 </main>
 <footer><div class="wrap">© 2026 ClearExams.ink · Tamil Nadu Textbook Practice</div></footer>
+
+<script>
+(function(){
+  const cls=Number(new URLSearchParams(location.search).get('class')||6);
+  if(cls!==11 && cls!==12) return;
+
+  document.querySelectorAll('.class').forEach(el=>{
+    el.classList.remove('active');
+    if(el.textContent.trim()===cls+'th') el.classList.add('active');
+  });
+
+  const units11=[
+    [1,'Early India: From the Beginnings to the Indus Civilisation','பண்டைய இந்தியா: தொடக்கம் முதல் சிந்து நாகரிகம் வரை',804],
+    [2,'Early India: The Chalcolithic, Megalithic, Iron Age and Vedic Cultures','பண்டைய இந்தியா: செம்புக்கற்கால, பெருங்கற்கால, இரும்புக்கால, வேதகாலப் பண்பாடுகள்',996],
+    [3,'Rise of Territorial Kingdoms and New Religious Sects','பிரதேச முடியரசுகளின் தோற்றமும் புதிய மதப்பிரிவுகள் உருவாக்கமும்',1116],
+    [4,'Emergence of State and Empire','அரசும் பேரரசும் தோற்றம்',1188],
+    [5,'Evolution of Society in South India','தென்னிந்தியாவில் சமுதாய உருவாக்கம்',1044],
+    [6,'Polity and Society in Post-Mauryan Period','மௌரியருக்குப் பிந்தைய அரசியல் அமைப்பும் சமூகமும்',828],
+    [7,'The Guptas','குப்தர்',1476],
+    [8,'Harsha and Rise of Regional Kingdoms','ஹர்ஷர் மற்றும் பிரதேச முடியரசுகளின் எழுச்சி',1404],
+    [9,'Cultural Development in South India','தென்னிந்தியாவில் பண்பாட்டு வளர்ச்சி',2052],
+    [10,'Advent of Arabs and Turks','அரபியர், துருக்கியரின் வருகை',2196]
+  ];
+
+  const main=document.querySelector('main.wrap');
+  async function render(){
+    let units;
+    if(cls===11){
+      units=units11.map(x=>({id:x[0],unit_en:x[1],unit_ta:x[2],total:x[3]}));
+    }else{
+      const r=await fetch('data/textbook/class-12/history/index.json',{cache:'no-store'});
+      if(!r.ok) throw new Error('Class 12 index unavailable');
+      const d=await r.json();
+      units=d.units.map(x=>({...x,total:null}));
+    }
+
+    const totalKnown=units.reduce((n,u)=>n+(u.total||0),0);
+    main.innerHTML=
+      '<section class="section panel">'+
+      '<div class="crumb">'+cls+'th Standard → History → 2025 Edition</div>'+
+      '<div class="head" style="margin-top:7px"><div><h2>'+cls+'th History / '+cls+'ஆம் வகுப்பு வரலாறு</h2>'+
+      '<p>Competitive-exam-focused bilingual textbook quizzes. Choose a unit to start.</p></div>'+
+      (totalKnown?'<span class="tag">'+totalKnown.toLocaleString('en-IN')+' questions live</span>':'')+'</div>'+
+      '<div class="unitgrid">'+units.map(u=>{
+        const fileUnit=cls===11?String(u.id).padStart(2,'0'):u.id;
+        const full='textbook-play.html?class='+cls+'&subject=history&unit='+u.id+'&quiz=all';
+        const q1='textbook-play.html?class='+cls+'&subject=history&unit='+u.id+'&quiz=1';
+        return '<article class="unit ready"><h3>'+u.id+'. '+u.unit_en+' / '+u.unit_ta+'</h3>'+
+          '<p>'+(u.total?u.total.toLocaleString('en-IN')+' source-grounded questions available.':'2025 textbook unit quiz bank.')+'</p>'+
+          '<div class="sets"><a class="btn primary" href="'+q1+'">Quiz 1</a><a class="btn" href="'+full+'">Full Unit'+(u.total?' · '+u.total.toLocaleString('en-IN'):'')+'</a></div></article>';
+      }).join('')+'</div></section>'+
+      '<div class="note"><strong>Source-first design:</strong> questions are grounded in the supplied Tamil Nadu State Board 2025 English and Tamil History textbooks and filtered for competitive-exam relevance.</div>';
+  }
+  render().catch(err=>{
+    main.innerHTML='<section class="section panel"><h2>'+cls+'th History</h2><p>Could not load the class quiz index. Please refresh once.</p></section>';
+    console.error(err);
+  });
+})();
+</script>
+
 </body></html>
