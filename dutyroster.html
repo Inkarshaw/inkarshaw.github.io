@@ -2651,6 +2651,14 @@ function persistRemovedNominalIds(){
   );
 }
 
+function applyPersistedNominalRemovals(){
+  for(let i=NOMINAL_STAFF.length-1;i>=0;i--){
+    if(REMOVED_NOMINAL_IDS.has(String(NOMINAL_STAFF[i]?.id || ""))){
+      NOMINAL_STAFF.splice(i,1);
+    }
+  }
+}
+
 function collectData(){
   const data={
     stationName:document.getElementById("stationName").value,
@@ -3548,6 +3556,7 @@ function runConflictChecks(){
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
+  applyPersistedNominalRemovals();
   buildTargets();
   fillStaffSelect();
 
@@ -5044,6 +5053,9 @@ function removeStaffFromAssignmentText(value,staff){
 
 function removeNominalStaffFromCurrentRoster(staff){
   if(!staff) return;
+
+  const shoCell=document.getElementById("shoCell");
+  if(shoCell && entryMatchesStaff(staff,shoCell.value || "")) shoCell.value="";
 
   const dutyCell=document.getElementById("dutySICell");
   if(dutyCell && entryMatchesStaff(staff,dutyCell.value || "")){
