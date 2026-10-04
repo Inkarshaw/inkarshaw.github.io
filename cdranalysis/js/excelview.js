@@ -58,14 +58,14 @@
       const sourceLabel=selectedSource()?($('excelViewSource')?.selectedOptions?.[0]?.textContent||'Selected worksheet'):'All source worksheets';
       scope.textContent=`${subject} • ${sourceLabel} • ${fmtInt(withRaw.length)} original row(s) • ${fmtInt(headers.length)} source column(s)`;
 
-      table.innerHTML=`<thead><tr><th>Source Row</th>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr><td><b>${fmtInt(r.rowNumber)}</b><div class="tiny">${escapeHtml(r.sourceFile||'')}<br>${escapeHtml(r.sourceSheet||'')}</div></td>${headers.map(h=>`<td class="details">${escapeHtml(r.rawRow?.[h]??'')}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      table.innerHTML=`<thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td class="details">${escapeHtml(r.rawRow?.[h]??'')}</td>`).join('')}</tr>`).join('')}</tbody>`;
       pager.innerHTML=`<span class="tiny">Rows ${fmtInt((page-1)*size+1)}–${fmtInt(Math.min(page*size,withRaw.length))} of ${fmtInt(withRaw.length)}</span><button class="btn secondary small" id="excelViewPrev" ${page<=1?'disabled':''}>Previous</button><span class="badge">Page ${fmtInt(page)} / ${fmtInt(pages)}</span><button class="btn secondary small" id="excelViewNext" ${page>=pages?'disabled':''}>Next</button>`;
     }
     function csvCell(v){const s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
     function exportCsv(){
       const rows=scopedRows().filter(r=>r.rawRow&&Object.keys(r.rawRow).length);if(!rows.length){showStatus?.('No original Excel rows available to export.','error');return;}
-      const headers=headersFor(rows),lines=[['Source File','Source Sheet','Source Row',...headers].map(csvCell).join(',')];
-      for(const r of rows)lines.push([r.sourceFile,r.sourceSheet,r.rowNumber,...headers.map(h=>r.rawRow?.[h]??'')].map(csvCell).join(','));
+      const headers=headersFor(rows),lines=[['Source File','Source Sheet',...headers].map(csvCell).join(',')];
+      for(const r of rows)lines.push([r.sourceFile,r.sourceSheet,...headers.map(h=>r.rawRow?.[h]??'')].map(csvCell).join(','));
       const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
       a.href=url;a.download='excel_view_'+String(selectedSubject()).replace(/[^0-9A-Za-z_-]+/g,'_')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
     }
