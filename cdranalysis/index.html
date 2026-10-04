@@ -24,7 +24,7 @@
 <div class="app">
   <header class="topbar">
     <div class="toprow">
-      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v61</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
+      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v62</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
       <div class="toolbar">
         <button class="btn ghost" id="printBtn">Print / Save PDF</button>
       </div>
@@ -55,13 +55,24 @@
       <div class="mobile-filter-head"><b>Filters</b><button class="btn secondary small" id="closeFiltersBtn">Close ✕</button></div>
       <div class="uploadbox" id="dropZone">
         <strong>Upload CDR file(s)</strong>
-        <div class="tiny">Choose one or more .xlsx, .xls or .csv files. The analyzer automatically selects likely CDR worksheets and maps recognized columns.</div>
+        <div class="tiny">Choose one or more .xlsx, .xls or .csv files. After inspection, select any worksheet tab or choose All tabs.</div>
         <div class="upload-actions">
           <label class="btn upload-file-label" for="fileInput">Choose Files</label>
         </div>
         <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" />
       </div>
       <div id="loadStatus" class="status"></div>
+      <div id="sheetPicker" class="panel" style="display:none;padding:10px;margin:8px 0">
+        <div class="field">
+          <label>Worksheet / tab</label>
+          <select id="sheetSelect"><option value="">Select worksheet</option></select>
+        </div>
+        <div class="tiny" id="sheetPickerInfo" style="margin:6px 0">Select one worksheet or All tabs.</div>
+        <div class="upload-actions">
+          <button type="button" class="btn small" id="importSelectedSheetBtn">Import</button>
+          <button type="button" class="btn secondary small" id="cancelSheetImportBtn">Cancel</button>
+        </div>
+      </div>
       <div id="importHealthStatus" class="tiny" style="margin:6px 0 8px">No CDR rows loaded.</div>
       <div class="file-list" id="fileList"></div>
       <div style="margin-top:8px"><button class="btn secondary small" id="clearFilesBtn">Clear Loaded CDRs</button></div>
