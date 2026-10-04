@@ -196,6 +196,18 @@ function refreshIODropdowns(){
   }
   render();
 }
+function getHeadOptions(selected){
+  var opts=["Murder","Attempt to Murder","Simple Hurt","Grievous Hurt","NDPS Act","Theft","Robbery","Dacoity","Burglary / House Breaking","Cheating / Fraud","Women Harassment","POCSO Act","SC/ST Act","Arms Act","Gambling Act","Prohibition Act","Road Accident","Missing Person","Unnatural Death / 194 BNSS","Other"];
+  var out="",i,known=false;
+  for(i=0;i<opts.length;i++){
+    if(selected===opts[i]){known=true;}
+    out+='<option value="'+esc(opts[i])+'"'+(selected===opts[i]?' selected':'')+'>'+esc(opts[i])+'</option>';
+  }
+  if(selected && !known){
+    out=out.replace('<option value="Other">Other</option>','<option value="Other" selected>Other</option>');
+  }
+  return out;
+}
 function createCase(data){
   data=data||{};
   var box=document.createElement("div");
@@ -203,7 +215,7 @@ function createCase(data){
   box.innerHTML=
     '<div class="casehead"><b class="caseTitle">Case</b><div class="actions"><button type="button" class="gray dup">Duplicate</button><button type="button" class="red rem">Remove</button></div></div>'+
     '<div class="grid">'+
-    '<div><label>Head of Offence</label><input class="head" value="'+esc(data.head||"NDPS Act")+'"></div>'+
+    '<div><label>Head of Offence</label><select class="head">'+getHeadOptions(data.head||"NDPS Act")+'</select><input class="headOther" placeholder="Enter other head" value="'+esc((data.head && ["Murder","Attempt to Murder","Simple Hurt","Grievous Hurt","NDPS Act","Theft","Robbery","Dacoity","Burglary / House Breaking","Cheating / Fraud","Women Harassment","POCSO Act","SC/ST Act","Arms Act","Gambling Act","Prohibition Act","Road Accident","Missing Person","Unnatural Death / 194 BNSS","Other"].indexOf(data.head)===-1)?data.head:"")+'" style="margin-top:6px;display:'+((data.head==="Other" || (data.head && ["Murder","Attempt to Murder","Simple Hurt","Grievous Hurt","NDPS Act","Theft","Robbery","Dacoity","Burglary / House Breaking","Cheating / Fraud","Women Harassment","POCSO Act","SC/ST Act","Arms Act","Gambling Act","Prohibition Act","Road Accident","Missing Person","Unnatural Death / 194 BNSS","Other"].indexOf(data.head)===-1))?"block":"none")+'"></div>'+
     '<div><label>Cr.No. & Sections</label><textarea class="crsec">'+esc(data.crsec||"")+'</textarea></div>'+
     '<div><label>D/O, D/R & SOC</label><textarea class="dosoc">'+esc(data.dosoc||"")+'</textarea></div>'+
     '<div><label>Complainant</label><textarea class="complainant">'+esc(data.complainant||"")+'</textarea></div>'+
@@ -229,6 +241,13 @@ function createCase(data){
   var fields=box.querySelectorAll("input,textarea,select");
   var i;
   for(i=0;i<fields.length;i++){fields[i].oninput=render;fields[i].onchange=render;}
+  var headSel=box.querySelector(".head"),headOther=box.querySelector(".headOther");
+  headSel.onchange=function(){
+    headOther.style.display=(headSel.value==="Other")?"block":"none";
+    if(headSel.value!=="Other"){headOther.value="";}
+    render();
+  };
+  headOther.oninput=render;
   numberCases();
 }
 function numberCases(){
@@ -236,8 +255,10 @@ function numberCases(){
   for(i=0;i<boxes.length;i++){boxes[i].querySelector(".caseTitle").innerHTML="Case "+(i+1);}
 }
 function readCase(box){
+  var headSel=box.querySelector(".head").value;
+  var head=(headSel==="Other" ? (box.querySelector(".headOther").value||"Other") : headSel);
   return {
-    head:box.querySelector(".head").value||"Other",
+    head:head||"Other",
     crsec:box.querySelector(".crsec").value,
     dosoc:box.querySelector(".dosoc").value,
     complainant:box.querySelector(".complainant").value,
