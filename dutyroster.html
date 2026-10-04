@@ -1928,10 +1928,11 @@
     color:#64748b;
   }
   .nominal-actions-col{
-    width:64px;
+    width:126px;
     text-align:center !important;
   }
-  .nominal-edit-row-btn{
+  .nominal-edit-row-btn,
+  .nominal-remove-row-btn{
     border:1px solid #94a3b8;
     border-radius:5px;
     background:#fff;
@@ -1939,6 +1940,12 @@
     font-size:10px;
     font-weight:800;
     cursor:pointer;
+  }
+  .nominal-remove-row-btn{
+    margin-left:4px;
+    border-color:#dc2626;
+    background:#dc2626;
+    color:#fff;
   }
   .nominal-roll-table td.nominal-action-cell{
     text-align:center;
@@ -2629,6 +2636,21 @@ function duplicateToday(){
   saveRoster(false);
   setStatus("Current roster duplicated in browser");
 }
+const REMOVED_NOMINAL_STORAGE_KEY="dutyRosterRemovedNominalIdsV1";
+let REMOVED_NOMINAL_IDS=new Set();
+
+try{
+  const savedRemoved=JSON.parse(localStorage.getItem(REMOVED_NOMINAL_STORAGE_KEY) || "[]");
+  if(Array.isArray(savedRemoved)) REMOVED_NOMINAL_IDS=new Set(savedRemoved.map(String));
+}catch(e){}
+
+function persistRemovedNominalIds(){
+  localStorage.setItem(
+    REMOVED_NOMINAL_STORAGE_KEY,
+    JSON.stringify([...REMOVED_NOMINAL_IDS])
+  );
+}
+
 function collectData(){
   const data={
     stationName:document.getElementById("stationName").value,
@@ -2638,6 +2660,7 @@ function collectData(){
     rosterDate:document.getElementById("rosterDate").value,
     shiftRows:[],
     fields:{},
+    removedNominalIds:[...REMOVED_NOMINAL_IDS],
     nominalStaff:NOMINAL_STAFF.map(s=>({
       id:s.id,
       group:s.group,
@@ -2730,6 +2753,12 @@ function loadData(data){
   data=migrateOldDriverLayout(data);
   if(!data) return;
 
+  // Merge persistent Nominal Roll removals from browser/cloud roster data.
+  if(Array.isArray(data.removedNominalIds)){
+    data.removedNominalIds.map(String).forEach(id=>REMOVED_NOMINAL_IDS.add(id));
+    persistRemovedNominalIds();
+  }
+
   // Remove personnel deleted from the current master roster from old browser,
   // backup and cloud data before it is applied to the page.
   const removedPersonLine=/\b(?:HC\s*11790\b[^\n,;]*Ajith\s*Kumar)\b/gi;
@@ -2787,6 +2816,8 @@ function loadData(data){
   ];
 
   requiredNominalStaff.forEach(required=>{
+    if(REMOVED_NOMINAL_IDS.has(String(required.id || ""))) return;
+
     const requiredNo=String(required.rank || "").match(/\b\d{2,6}\b/)?.[0] || "";
     const requiredRank=String(required.rank || "").trim().split(/\s+/)[0].toLowerCase();
     const requiredName=String(required.name || "").replace(/\s+/g,"").toLowerCase();
@@ -2806,9 +2837,13 @@ function loadData(data){
     if(!exists) NOMINAL_STAFF.push({...required});
   });
 
-  // Permanently remove personnel deleted from the master Nominal Roll,
-  // including from older browser-saved roster backups.
+  // Apply user removals as well as older hard-coded removals.
   for(let i=NOMINAL_STAFF.length-1;i>=0;i--){
+    if(REMOVED_NOMINAL_IDS.has(String(NOMINAL_STAFF[i]?.id || ""))){
+      NOMINAL_STAFF.splice(i,1);
+      continue;
+    }
+
     const s=NOMINAL_STAFF[i];
     const service=String(s.rank || "");
     const phone=String(s.phone || "").replace(/\D/g,"");
@@ -5002,6 +5037,100 @@ function syncEditedStaffInCurrentRoster(oldStaff,newStaff){
   syncTopInputsFromCells();
 }
 
+function removeStaffFromAssignmentText(value,staff){
+  const parts=String(value || "").split(/\s*(?:\n|,)\s*/).filter(Boolean);
+  return parts.filter(part=>!entryMatchesStaff(staff,part)).join(", ");
+}
+
+function removeNominalStaffFromCurrentRoster(staff){
+  if(!staff) return;
+
+  const dutyCell=document.getElementById("dutySICell");
+  if(dutyCell && entryMatchesStaff(staff,dutyCell.value || "")){
+    dutyCell.value="";
+    const dutySelect=document.getElementById("dutySI");
+    if(dutySelect) dutySelect.value="";
+  }
+
+  const otherCell=document.getElementById("otherSICell");
+  if(otherCell){
+    const remaining=findStaffInCell(otherCell.value || "").filter(s=>s.id!==staff.id);
+    otherCell.value=remaining.map(formatHeaderSI).join(", ");
+    const hiddenOther=document.getElementById("otherSI");
+    if(hiddenOther) hiddenOther.value=otherCell.value;
+  }
+
+  document.querySelectorAll("#shiftBody [data-shift]").forEach(el=>{
+    const current=findStaffInCell(el.value || "");
+    if(!current.some(s=>s.id===staff.id)) return;
+    const remaining=current.filter(s=>s.id!==staff.id);
+    el.value=remaining.map(s=>s.rank+" "+s.name+(s.phone ? "\n"+s.phone : "")).join("\n");
+  });
+
+  ["misc","inOD","outOD","casualties"].forEach(key=>{
+    const rows=parseSerialStore(key);
+    const kept=rows.filter(r=>!entryMatchesStaff(staff,(r.rank || "")+" "+(r.name || "")));
+    if(kept.length!==rows.length) writeSerialStore(key,kept,false);
+  });
+
+  const extraRows=readExtraWarrantRows();
+  let extraChanged=false;
+  extraRows.forEach(row=>{
+    const next=removeStaffFromAssignmentText(row.persons || "",staff);
+    if(next!==String(row.persons || "")){
+      row.persons=next;
+      extraChanged=true;
+    }
+  });
+  if(extraChanged) writeExtraWarrantRows(extraRows,true);
+
+  const structural=new Set([
+    "extraWarrantRows","misc","inOD","outOD","casualties",
+    "miscSummary","inODSummary","outODSummary","casualtiesSummary",
+    "sanctionedStrength","actualStrength"
+  ]);
+
+  document.querySelectorAll("[data-field]").forEach(el=>{
+    const key=el.dataset.field || "";
+    if(structural.has(key)) return;
+    if(!staffMentionedInCell(staff,String(el.value || ""))) return;
+    el.value=removeStaffFromAssignmentText(el.value,staff);
+  });
+
+  renderSerialRosterBody();
+  renderExtraWarrantRows();
+  syncTopInputsFromCells();
+}
+
+async function removeNominalStaff(id){
+  const loggedIn=await refreshNominalRollLoginVisibility();
+  if(!loggedIn) return;
+
+  const staff=NOMINAL_STAFF.find(s=>s.id===id);
+  if(!staff) return;
+
+  const label=(staff.rank+" "+staff.name).replace(/\s+/g," ").trim();
+  if(!confirm("Remove "+label+" from the Nominal Roll?\n\nAny current roster assignments for this person will also be cleared.")){
+    return;
+  }
+
+  removeNominalStaffFromCurrentRoster(staff);
+
+  const index=NOMINAL_STAFF.findIndex(s=>s.id===id);
+  if(index>=0) NOMINAL_STAFF.splice(index,1);
+
+  REMOVED_NOMINAL_IDS.add(String(id));
+  persistRemovedNominalIds();
+
+  if(NOMINAL_EDIT_ID===id) cancelNominalStaffEdit();
+
+  refreshNominalDependentUI(true);
+  renderNominalRollTable();
+  runConflictChecks();
+  saveRoster(true);
+  setStatus(staff.name+" removed from Nominal Roll");
+}
+
 function saveNominalStaffEdit(){
   const group=document.getElementById("nominalEditGroup").value.trim();
   const rank=document.getElementById("nominalEditRank").value.trim();
@@ -5112,6 +5241,8 @@ function renderNominalRollTable(){
       <td class="nominal-action-cell">
         <button type="button" class="nominal-edit-row-btn"
                 onclick="startNominalStaffEdit('${escapeHtml(s.id)}')">Edit</button>
+        <button type="button" class="nominal-remove-row-btn"
+                onclick="removeNominalStaff('${escapeHtml(s.id)}')">Remove</button>
       </td>`;
     body.appendChild(tr);
   });
