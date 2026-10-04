@@ -164,19 +164,16 @@
         const [ins,sha256]=await Promise.all([workerCall(file,'inspect'),hashFile(file)]);
         const sheets=ins.sheets||[];if(!sheets.length)throw new Error('No worksheets found');
         const selected=new Set(chooseInitialSheets(sheets)),mappings={};for(const s of sheets)mappings[s.name]=savedMapping(s.headers)||mapHeaders(s.headers);
-        state.pendingImport={file,sha256,sheets,selected,mappings,inspectedAt:new Date().toISOString()};
-        const pickerShown=showSheetPicker(state.pendingImport);
-        if(pickerShown)showStatus('Select a worksheet tab to import from '+file.name+'.','ok');
-        else{
-          showStatus('Worksheet selector unavailable; importing the recommended CDR worksheet automatically…','');
-          await confirmImport();
-        }
+        state.pendingImport={file,sha256,sheets,selected:new Set(sheets.map(s=>s.name)),mappings,inspectedAt:new Date().toISOString(),autoAll:true};
+        hideSheetPicker();
+        showStatus('Importing all '+sheets.length+' worksheet tab(s) from '+file.name+'…','');
+        await confirmImport();
       }catch(err){console.error(err);showStatus('Could not inspect '+file.name+': '+err.message,'error');finishImportStep();inspectNext();}
     }
 
     async function confirmImport(){
       const p=state.pendingImport;if(!p)return;
-      const picked=$('sheetSelect')?.value||'';
+      const picked=p.autoAll?'__ALL__':($('sheetSelect')?.value||'');
       let selected=picked==='__ALL__'?(p.sheets||[]).map(s=>s.name):(picked?[picked]:[...p.selected]);
       if(!selected.length){showStatus('Select at least one worksheet to import.','error');return;}
       p.selected=new Set(selected);
