@@ -3,7 +3,7 @@ name: Build Class 12 Geography Unit 1
 on:
   push:
     paths:
-      - '.tmp/geography12/unit1/builder.zlib'
+      - '.tmp/geography12/unit1/builder.b64.*'
       - '.github/workflows/build-class12-geography-unit1.yml'
   workflow_dispatch:
 
@@ -19,10 +19,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          cat .tmp/geography12/unit1/builder.b64.1 .tmp/geography12/unit1/builder.b64.2 .tmp/geography12/unit1/builder.b64.3 .tmp/geography12/unit1/builder.b64.4 > /tmp/builder.b64
           python - <<'PY'
-          import pathlib, zlib
-          src = pathlib.Path('.tmp/geography12/unit1/builder.zlib').read_bytes()
-          pathlib.Path('/tmp/build_geo12_u1.py').write_bytes(zlib.decompress(src))
+          import base64, pathlib, zlib
+          raw = base64.b64decode(pathlib.Path('/tmp/builder.b64').read_text().strip())
+          pathlib.Path('/tmp/build_geo12_u1.py').write_bytes(zlib.decompress(raw))
           PY
           python /tmp/build_geo12_u1.py
           git config user.name "github-actions[bot]"
