@@ -45,7 +45,7 @@
     const topContacts=contacts.slice(0,10);
     if($('dashTopContacts'))$('dashTopContacts').innerHTML=topContacts.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Contact</th><th>Records</th><th>Calls</th><th>SMS</th><th>Duration</th></tr></thead><tbody>${topContacts.map(x=>`<tr><td>${escapeHtml(contactLabel(x.bparty))}</td><td>${fmtInt(x.records)}</td><td>${fmtInt(x.calls)}</td><td>${fmtInt(x.sms)}</td><td>${fmtDur(x.duration)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No matching data</div>';
     const hours=Array(24).fill(0);d.forEach(r=>{if(r.dt)hours[window.CDRCore.sourceHour(r.dt)]++;else{const t=parseTime(r.time);if(t)hours[t.h]++;}});
-    if($('dashHourValues'))$('dashHourValues').innerHTML=`<div class="tablewrap"><table class="table"><thead><tr><th>Hour</th><th>Records</th></tr></thead><tbody>${hours.map((n,h)=>n?`<tr><td>${String(h).padStart(2,'0')}:00–${String(h).padStart(2,'0')}:59</td><td>${fmtInt(n)}</td></tr>`:'').join('')}</tbody></table></div>`;
+    if($('dashHourValues'))$('dashHourValues').innerHTML=`<div class="tablewrap"><table class="table"><thead><tr><th>Hour</th><th>Records</th></tr></thead><tbody>${hours.map((n,h)=>n?`<tr class="dashboard-hour-row" data-hour="${h}" tabindex="0" role="button" title="Show records from ${String(h).padStart(2,'0')}:00 to ${String(h).padStart(2,'0')}:59"><td><span class="link">${String(h).padStart(2,'0')}:00–${String(h).padStart(2,'0')}:59</span></td><td><b>${fmtInt(n)}</b></td></tr>`:'').join('')}</tbody></table></div>`;
     const tm={};d.forEach(r=>{const key=r.callType||'Unknown';tm[key]=(tm[key]||0)+1;});
     const typeEntries=Object.entries(tm).sort((a,b)=>b[1]-a[1]);
     if($('dashEventTypes'))$('dashEventTypes').innerHTML=typeEntries.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Event type</th><th>Records</th></tr></thead><tbody>${typeEntries.map(([name,count])=>`<tr><td>${escapeHtml(name)}</td><td>${fmtInt(count)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No matching data</div>';
@@ -83,8 +83,24 @@
 
 
 
+    function openHourRecords(hour){
+      const h=Math.max(0,Math.min(23,Number(hour)||0)),hh=String(h).padStart(2,'0');
+      if($('timeFrom'))$('timeFrom').value=hh+':00';
+      if($('timeTo'))$('timeTo').value=hh+':59';
+      applyFilters();
+      switchTab('records');
+    }
+
     function bind(){
       $('saveCaseSnapshotBtn').onclick=()=>{if(window.CDRApp?.openCaseSaveDialog)window.CDRApp.openCaseSaveDialog('snapshot');else saveCaseSnapshot();};
+      document.addEventListener('click',e=>{
+        const row=e.target.closest('.dashboard-hour-row');if(row){e.preventDefault();openHourRecords(row.dataset.hour);return;}
+      });
+      document.addEventListener('keydown',e=>{
+        if((e.key==='Enter'||e.key===' ')&&e.target.closest('.dashboard-hour-row')){
+          e.preventDefault();openHourRecords(e.target.closest('.dashboard-hour-row').dataset.hour);
+        }
+      });
     }
 
     return {
