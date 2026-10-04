@@ -15,7 +15,7 @@ button.gray{background:#58636d}button.red{background:#a33}button.green{backgroun
 .panel{display:none;background:#fff;padding:14px;border:1px solid #c9d2da;border-radius:10px}.panel.active{display:block}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
-input,textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid #b9c5cf;border-radius:6px;font:14px Arial}
+input,textarea,select{width:100%;box-sizing:border-box;padding:8px;border:1px solid #b9c5cf;border-radius:6px;font:14px Arial}
 textarea{min-height:78px;resize:vertical}
 .case{border:1px solid #aab6c0;border-radius:10px;padding:12px;margin-bottom:12px;background:#f9fbfc}
 .casehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -60,6 +60,17 @@ th,td{border:1px solid #999;padding:5px;vertical-align:top}th{background:#e9eef2
 <div class="grid">
 <div><label>Police Station</label><input id="ps" value="G7 L&O PS"></div>
 <div><label>Report Date</label><input id="reportDate" type="date"></div>
+<div style="grid-column:1/-1"><label>Nominal Roll – Inspector & SI only (one officer per line)</label><textarea id="ioNominalRoll">Ins.Tr.N. Thirumal
+SI.Tr.Shanmugam
+SI.Tmt.Mahalakshmi
+SI.Tr.Inkarshaw Bell Abraham
+SI.Tr.Saravanan
+SI.Tr.Sureshkumar
+SI.Tr.Subramani
+SI.Tr.Thirunavukarasu
+SI.Tr.Karthikeyan
+SI.Tr.Sivakumar
+WSI.Tmt.Muthulakshmi</textarea></div>
 </div>
 </div>
 
@@ -157,6 +168,31 @@ function addRow(bodyId,values){
   tr.querySelector(".delrow").onclick=function(){tr.parentNode.removeChild(tr);renumber(bodyId);render();};
   renumber(bodyId);
 }
+function getIOOptions(selected){
+  var raw=byId("ioNominalRoll")?byId("ioNominalRoll").value:"";
+  var lines=raw.split(/\r?\n/), seen={}, out='<option value="">-- Select I.O. --</option>',i,name;
+  for(i=0;i<lines.length;i++){
+    name=lines[i].replace(/^\s+|\s+$/g,"");
+    if(name && !seen[name]){
+      seen[name]=true;
+      out+='<option value="'+esc(name)+'"'+(selected===name?' selected':'')+'>'+esc(name)+'</option>';
+    }
+  }
+  if(selected && !seen[selected]){
+    out+='<option value="'+esc(selected)+'" selected>'+esc(selected)+'</option>';
+  }
+  return out;
+}
+function refreshIODropdowns(){
+  var boxes=byId("caseList").children,i,sel,current;
+  for(i=0;i<boxes.length;i++){
+    sel=boxes[i].querySelector(".io");
+    if(!sel){continue;}
+    current=sel.value;
+    sel.innerHTML=getIOOptions(current);
+  }
+  render();
+}
 function createCase(data){
   data=data||{};
   var box=document.createElement("div");
@@ -170,7 +206,7 @@ function createCase(data){
     '<div><label>Complainant</label><textarea class="complainant">'+esc(data.complainant||"")+'</textarea></div>'+
     '<div><label>Accused</label><textarea class="accused">'+esc(data.accused||"")+'</textarea></div>'+
     '<div><label>Property</label><textarea class="property">'+esc(data.property||"")+'</textarea></div>'+
-    '<div><label>I.O.</label><textarea class="io">'+esc(data.io||"")+'</textarea></div>'+
+    '<div><label>I.O.</label><select class="io">'+getIOOptions(data.io||"")+'</select></div>'+
     '<div><label>Gist of Case</label><textarea class="gist">'+esc(data.gist||"")+'</textarea></div>'+
     '<div><label>Property Image</label><input class="img" type="file" accept="image/*"></div>'+
     '</div>';
@@ -187,9 +223,9 @@ function createCase(data){
     r.onload=function(){box.setAttribute("data-image",r.result);render();};
     r.readAsDataURL(file);
   };
-  var fields=box.querySelectorAll("input,textarea");
+  var fields=box.querySelectorAll("input,textarea,select");
   var i;
-  for(i=0;i<fields.length;i++){fields[i].oninput=render;}
+  for(i=0;i<fields.length;i++){fields[i].oninput=render;fields[i].onchange=render;}
   numberCases();
 }
 function numberCases(){
@@ -275,7 +311,7 @@ function render(){
 }
 function snapshot(){
   return {
-    ps:byId("ps").value,reportDate:byId("reportDate").value,
+    ps:byId("ps").value,reportDate:byId("reportDate").value,ioNominalRoll:byId("ioNominalRoll").value,
     complPrev:byId("complPrev").value,complToday:byId("complToday").value,csrDisposed:byId("csrDisposed").value,csrPending:byId("csrPending").value,
     firPrev:byId("firPrev").value,firToday:byId("firToday").value,lastFir:byId("lastFir").value,
     cases:getCases(),nbw:rowValues("nbwBody"),prc:rowValues("prcBody"),hs:rowValues("hsBody"),forecast:rowValues("forecastBody")
@@ -285,7 +321,7 @@ function saveDraft(){localStorage.setItem("stationDSR_v2",JSON.stringify(snapsho
 function loadDraft(){
   var raw=localStorage.getItem("stationDSR_v2");
   if(!raw){alert("No saved draft.");return;}
-  var d=JSON.parse(raw),ids=["ps","reportDate","complPrev","complToday","csrDisposed","csrPending","firPrev","firToday","lastFir"],i;
+  var d=JSON.parse(raw),ids=["ps","reportDate","ioNominalRoll","complPrev","complToday","csrDisposed","csrPending","firPrev","firToday","lastFir"],i;
   for(i=0;i<ids.length;i++){if(d[ids[i]]!==undefined){byId(ids[i]).value=d[ids[i]];}}
   byId("caseList").innerHTML="";
   for(i=0;i<d.cases.length;i++){createCase(d.cases[i]);}
@@ -324,8 +360,9 @@ byId("wordBtn").onclick=downloadWord;
 byId("saveBtn").onclick=saveDraft;
 byId("loadBtn").onclick=loadDraft;
 byId("clearBtn").onclick=clearAll;
-var fields=document.querySelectorAll("input,textarea");
-for(i=0;i<fields.length;i++){fields[i].oninput=render;}
+var fields=document.querySelectorAll("input,textarea,select");
+for(i=0;i<fields.length;i++){fields[i].oninput=render;fields[i].onchange=render;}
+byId("ioNominalRoll").oninput=refreshIODropdowns;
 var today=new Date(),y=today.getFullYear(),m=("0"+(today.getMonth()+1)).slice(-2),day=("0"+today.getDate()).slice(-2);
 byId("reportDate").value=y+"-"+m+"-"+day;
 createCase({head:"NDPS Act"});
