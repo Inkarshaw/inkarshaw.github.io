@@ -2,24 +2,33 @@ importScripts('/cdranalysis/vendor/xlsx.full.min.js');
 
 function norm(v){return String(v??'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'');}
 const HEADER_GROUPS=[
-  ['cdrno','cdrnumber','aparty','apartymsisdn','msisdn'],
-  ['bparty','bpartynumber','connectednumber','callednumber','callingnumber'],
+  ['cdrno','cdrnumber','aparty','apartymsisdn','msisdn','subscribernumber','mobilenumber'],
+  ['bparty','bpartynumber','otherparty','connectednumber','callednumber','callingnumber'],
   ['date','calldate','eventdate'],
   ['time','calltime','eventtime'],
-  ['duration','callduration'],
-  ['calltype','eventtype','type'],
-  ['firstcellid','cellid'],
-  ['firstcellidaddress','toweraddress','celladdress'],
+  ['duration','callduration','durationsec','durationseconds'],
+  ['calltype','eventtype','direction','type'],
+  ['firstcellid','cellid','firstcell'],
+  ['firstcellidaddress','firsttoweraddress','toweraddress','celladdress'],
   ['imei'],
   ['imsi']
 ];
+const CORE_GROUP_INDEXES=[0,1,2,3,5];
+
+function groupHit(vals,group){
+  return vals.some(v=>group.some(a=>v===a||v.includes(a)||a.includes(v)));
+}
 function headerScore(row){
   const vals=(row||[]).map(norm).filter(Boolean);
   let score=0;
-  for(const group of HEADER_GROUPS){
-    if(vals.some(v=>group.some(a=>v===a||v.includes(a)||a.includes(v))))score++;
-  }
+  for(const group of HEADER_GROUPS)if(groupHit(vals,group))score++;
   return score;
+}
+function compatibleHeaders(headers){
+  const vals=(headers||[]).map(norm).filter(Boolean);
+  let hits=0;
+  for(const i of CORE_GROUP_INDEXES)if(groupHit(vals,HEADER_GROUPS[i]))hits++;
+  return hits>=2;
 }
 function detectHeaderRow(ws){
   const ref=ws&&ws['!ref'];if(!ref)return 0;
@@ -35,12 +44,30 @@ function rowsFromSheet(ws,headerRow){
 }
 function sheetInfo(wb,name){
   const ws=wb.Sheets[name],ref=ws&&ws['!ref'];
-  let rowCount=0;
-  if(ref){const r=XLSX.utils.decode_range(ref);rowCount=r.e.r-r.s.r+1;}
+  let rowCount=0,rr=null;
+  if(ref){rr=XLSX.utils.decode_range(ref);rowCount=rr.e.r-rr.s.r+1;}
   const headerRow=detectHeaderRow(ws);
-  const preview=rowsFromSheet(ws,headerRow).slice(0,8);
+  let preview=[];
+  if(rr){
+    const endRow=Math.min(rr.e.r,headerRow+8);
+    preview=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,range:{s:{r:headerRow,c:rr.s.c},e:{r:endRow,c:rr.e.c}}}).slice(0,8);
+  }
   const headers=preview.length?Object.keys(preview[0]):[];
-  return {name,rowCount,headerRow,headers,preview};
+  return {name,rowCount,headerRow,headers,preview,compatible:compatibleHeaders(headers),score:headerScore(headers)};
+}
+function inspectAndParseCdr(wb){
+  const sheets=wb.SheetNames.map(n=>sheetInfo(wb,n));
+  let compatible=sheets.filter(s=>s.compatible);
+  if(!compatible.length){
+    const mapping=sheets.find(s=>norm(s.name)==='mapping');
+    if(mapping)compatible=[mapping];
+  }
+  const parsedSheets=compatible.map(info=>({
+    sheetName:info.name,
+    headerRow:info.headerRow,
+    rows:rowsFromSheet(wb.Sheets[info.name],info.headerRow)
+  }));
+  return {sheets,parsedSheets};
 }
 
 self.onmessage=e=>{
@@ -50,6 +77,11 @@ self.onmessage=e=>{
     if(action==='inspect'){
       const sheets=wb.SheetNames.map(n=>sheetInfo(wb,n));
       self.postMessage({id,ok:true,name,sheets});
+      return;
+    }
+    if(action==='inspectParseCdr'){
+      const out=inspectAndParseCdr(wb);
+      self.postMessage({id,ok:true,name,...out});
       return;
     }
     const wanted=(sheetNames&&sheetNames.length?sheetNames:wb.SheetNames).filter(n=>wb.Sheets[n]);
