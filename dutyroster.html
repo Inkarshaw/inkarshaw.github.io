@@ -2418,10 +2418,10 @@ Gr1 43478 Tr.Sirajudeen
 <textarea data-field="insDriverRest" onclick="handleRosterPersonnelTap(event,function(){openFieldPersonPicker('insDriverRest')})" readonly="" title="Click to select personnel from Nominal Roll">PC 624974 Tr.P.Marimuthu</textarea>
 </td>
 <td class="personcell" colspan="14">
-<textarea data-field="patrolDriverRest" onclick="handleRosterPersonnelTap(event,function(){openFieldPersonPicker('patrolDriverRest')})" placeholder="" readonly="" title="Click to select personnel from Nominal Roll"></textarea><span class="allot-help"></span>
+<textarea data-field="patrolDriverRest" onclick="handleRosterPersonnelTap(event,function(){openFieldPersonPicker('patrolDriverRest')})" placeholder="" readonly="" title="Click to select personnel from Nominal Roll">GrI 65004 Tr.Anand</textarea><span class="allot-help"></span>
 </td>
 <td class="personcell" colspan="14">
-<textarea data-field="gypsyDriverRest" onclick="handleRosterPersonnelTap(event,function(){openFieldPersonPicker('gypsyDriverRest')})" readonly="" style="font-weight:800;text-align:center;background:#f8fafc;" title="Click to select personnel from Nominal Roll">VACANT</textarea>
+<textarea data-field="gypsyDriverRest" onclick="handleRosterPersonnelTap(event,function(){openFieldPersonPicker('gypsyDriverRest')})" readonly="" style="font-weight:800;text-align:center;background:#f8fafc;" title="Click to select personnel from Nominal Roll"></textarea>
 </td>
 </tr>
 <tr><td class="place" colspan="8">Receptionist</td><td colspan="42"><textarea data-field="receptionist" onclick="handleRosterPersonnelTap(event,function(){openFieldPersonPicker('receptionist')})" readonly="" title="Click to add or remove personnel">DEO Tmt.Banumathi (10.00 hrs to 17.00 hrs)</textarea></td></tr>
@@ -2565,6 +2565,48 @@ function rotateShifts(direction=1){
   runConflictChecks();
   setStatus(direction===1 ? "Daily shift rotation applied" : "Reverse rotation applied");
 }
+function rotateDriversForNextDay(){
+  const patrolPresent=document.querySelector('[data-field="patrolDriver"]');
+  const patrolRest=document.querySelector('[data-field="patrolDriverRest"]');
+  const gypsyPresent=document.querySelector('[data-field="gypsyDriver"]');
+  const gypsyRest=document.querySelector('[data-field="gypsyDriverRest"]');
+
+  // Patrol has two drivers: Vasanthakumar and Anand.
+  // Keep them alternating between Present and Rest every next-day rotation.
+  if(patrolPresent && patrolRest){
+    let present=String(patrolPresent.value || "").trim();
+    let rest=String(patrolRest.value || "").trim();
+
+    // Older saved rosters may have Anand's rest slot blank.
+    if(/Vasanthakumar/i.test(present) && !rest){
+      rest="GrI 65004 Tr.Anand";
+    }else if(/Anand/i.test(present) && !rest){
+      rest="GrI 61150 Tr.Vasanthakumar (MCR)";
+    }
+
+    patrolPresent.value=rest;
+    patrolRest.value=present;
+  }
+
+  // Only one Gypsy driver (Murugan): alternate duty day and rest day.
+  // The unused slot must remain blank; never display VACANT.
+  if(gypsyPresent && gypsyRest){
+    const present=String(gypsyPresent.value || "").replace(/^VACANT$/i,"").trim();
+    const rest=String(gypsyRest.value || "").replace(/^VACANT$/i,"").trim();
+
+    if(present){
+      gypsyPresent.value="";
+      gypsyRest.value=present;
+    }else if(rest){
+      gypsyPresent.value=rest;
+      gypsyRest.value="";
+    }else{
+      gypsyPresent.value="";
+      gypsyRest.value="";
+    }
+  }
+}
+
 function nextDayRotate(direction=1){
   let v=document.getElementById("rosterDate").value;
   let dt;
@@ -2578,8 +2620,10 @@ function nextDayRotate(direction=1){
   document.getElementById("rosterDate").value=isoDate(dt);
   document.getElementById("dateLabel").textContent=niceDate(dt);
   rotateShifts(direction);
+  rotateDriversForNextDay();
+  runConflictChecks();
   saveRoster(false);
-  setStatus("Tomorrow created + shifts rotated");
+  setStatus("Tomorrow created + shifts and drivers rotated");
 }
 function duplicateToday(){
   saveRoster(false);
@@ -2666,11 +2710,15 @@ function migrateOldDriverLayout(data){
 
 
   if(!Object.prototype.hasOwnProperty.call(data.fields,"patrolDriverRest")){
-    data.fields.patrolDriverRest="";
+    data.fields.patrolDriverRest="GrI 65004 Tr.Anand";
   }
 
   if(!Object.prototype.hasOwnProperty.call(data.fields,"gypsyDriverRest")){
-    data.fields.gypsyDriverRest="VACANT";
+    data.fields.gypsyDriverRest="";
+  }
+
+  if(/^VACANT$/i.test(String(data.fields.gypsyDriverRest || "").trim())){
+    data.fields.gypsyDriverRest="";
   }
 
   delete data.fields.gypsyDriverVacant;
