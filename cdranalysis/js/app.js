@@ -5,7 +5,7 @@
     haversineKm,percentile,incidentDateTime,escAttr,showStatus,renderFileList,uniq,fillSelect,
     sortData,typePill,safeName,duplicateSignature,uniqueRecords,analysisRecords,rebuildIndexes,getIndex,audit,dateFromSourceParts
   }=window.CDRCore;
-  let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, excelViewModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null, routerModule=null, uiModule=null;
+  let identityModule=null, parserModule=null, filtersModule=null, dashboardModule=null, recordsModule=null, excelViewModule=null, contactsModule=null, locationsModule=null, devicesModule=null, movementModule=null, networkModule=null, linkAnalysisModule=null, analysisModule=null, reportsModule=null, workspaceModule=null, caseModule=null, routerModule=null, uiModule=null;
   function contactName(num){return identityModule?.contactName(num)||'';}
   function contactTag(num){return identityModule?.contactTag(num)||'';}
   function contactLabel(num){return identityModule?.contactLabel(num)||String(num??'');}
@@ -92,6 +92,7 @@
   function renderLeads(){return analysisModule?.renderLeads();}
 
   function renderNetwork(){return networkModule?.renderNetwork();}
+  function renderLinkAnalysis(){return linkAnalysisModule?.render();}
   function colocationEpisodes(data=state.filtered,windowMin=30,episodeGapMin=60){return networkModule?.colocationEpisodes(data,windowMin,episodeGapMin)||[];}
   function renderCompare(){return networkModule?.renderCompare();}
 
@@ -171,6 +172,11 @@
   })||null;
   networkModule?.bind();
 
+  linkAnalysisModule=window.CDRLinkAnalysisFactory?.({
+    $,state,phoneKey,contactLabel,contactTitle,escapeHtml,escAttr,fmtInt,fmtDur,dtFmt,switchTab
+  })||null;
+  linkAnalysisModule?.bind();
+
   analysisModule=window.CDRAnalysisFactory?.({
     $,state,smsIntelRows,smsSenderIntelligence,senderBrandInfo,getSmsSenderOverride,setSmsSenderOverride,clearSmsSenderOverride,fmtInt,escapeHtml,dtFmt,
     incidentDateTime,subjectEventScopedRecords,localDateKey,aggregateContacts,simpleTable,
@@ -199,7 +205,7 @@
     $,applyFilters,renderDashboard,renderRecords,renderExcelView,renderContacts,renderLocations,renderDevices,
     renderSmsIntelligence,renderIncident,renderDaySummary,renderPatterns,renderDataQuality,
     renderMovement,invalidateMovementMap:()=>movementModule?.invalidateMap(),renderLeads,
-    renderNetwork,renderCompare,renderChronology,renderFlags
+    renderNetwork,renderLinkAnalysis,renderCompare,renderChronology,renderFlags
   })||null;
 
   uiModule=window.CDRUIFactory?.({
