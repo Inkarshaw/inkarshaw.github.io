@@ -136,12 +136,10 @@
       picker.innerHTML='<div class="field"><label>Worksheet / tab</label><select id="sheetSelect"><option value="">Select worksheet</option></select></div><div class="tiny" id="sheetPickerInfo" style="margin:6px 0">Select one worksheet or All tabs.</div><div class="upload-actions"><button type="button" class="btn small" id="importSelectedSheetBtn">Import</button><button type="button" class="btn secondary small" id="cancelSheetImportBtn">Cancel</button></div>';
       if(status?.parentNode)status.parentNode.insertBefore(picker,status.nextSibling);
       else drop?.parentNode?.insertBefore(picker,drop.nextSibling);
-      $('importSelectedSheetBtn')?.addEventListener('click',()=>confirmImport());
-      $('cancelSheetImportBtn')?.addEventListener('click',()=>cancelImport());
       return picker;
     }
     function hideSheetPicker(){
-      const picker=$('sheetPicker');if(picker)picker.style.display='none';
+      const picker=$('sheetPicker');if(picker)picker.style.setProperty('display','none','important');
       const select=$('sheetSelect');if(select)select.innerHTML='<option value="">Select worksheet</option>';
     }
     function showSheetPicker(p){
@@ -154,9 +152,9 @@
       }).join('');
       select.value=recommended||'__ALL__';
       if(info)info.textContent=(p.sheets||[]).length+' worksheet tab(s) found. Choose one tab or All tabs. Non-CDR report tabs are skipped safely.';
-      picker.style.display='block';
+      picker.style.setProperty('display','block','important');
       const overlay=$('importLoadingOverlay');if(overlay)overlay.hidden=true;
-      return true;
+      return getComputedStyle(picker).display!=='none';
     }
 
     async function inspectNext(){
@@ -240,8 +238,8 @@
       window.addEventListener('cdr:updated',syncLoadedUi);
       const choose=$('chooseBtn');if(choose)choose.onclick=()=>$('fileInput')?.click();
       ensureSheetPicker();
-      $('importSelectedSheetBtn')?.addEventListener('click',()=>confirmImport());
-      $('cancelSheetImportBtn')?.addEventListener('click',()=>cancelImport());
+      if($('importSelectedSheetBtn'))$('importSelectedSheetBtn').onclick=()=>confirmImport();
+      if($('cancelSheetImportBtn'))$('cancelSheetImportBtn').onclick=()=>cancelImport();
       const input=$('fileInput');if(input)input.onchange=e=>{loadFiles([...e.target.files]);e.target.value='';};
       const dz=$('dropZone');if(!dz)return;
       ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
