@@ -98,7 +98,7 @@
         const headers=preview[0]?Object.keys(preview[0]):[];
         return {name,rowCount,headerRow,headers,preview};
       });
-      let compatible=sheets.filter(likelySheet);
+      let compatible=sheets.filter(x=>likelySheet(x)&&!isDerivedReportSheet(x.name));
       if(!compatible.length){const mapping=sheets.find(x=>normalize(x.name)==='mapping');if(mapping)compatible=[mapping];}
       const headerRows=Object.fromEntries(compatible.map(x=>[x.name,x.headerRow]));
       return {sheets,parsedSheets:parseBufferSheetsFromWorkbook(wb,compatible.map(x=>x.name),headerRows)};
@@ -204,8 +204,9 @@
         for(const s of sheets)if(parsedNames.has(s.name))mappings[s.name]=savedMapping(s.headers)||mapHeaders(s.headers);
         state.pendingImport={file,sha256,sheets,parsedSheets,selected:parsedNames,mappings,inspectedAt:new Date().toISOString(),autoAll:true,fastPath:true};
         hideSheetPicker();
-        const skipped=Math.max(0,sheets.length-parsedSheets.length);
-        showStatus('Detected '+parsedSheets.length+' CDR tab(s)'+(skipped?' • skipped '+skipped+' non-CDR/report tab(s)':'')+'. Importing…','');
+        const skipped=Math.max(0,sheets.length-parsedSheets.length),derivedSkipped=sheets.filter(s=>isDerivedReportSheet(s.name)).length;
+        showStatus('Detected '+parsedSheets.length+' raw CDR tab(s)'+(skipped?' • skipped '+skipped+' report/derived tab(s)':'')+'. Importing…','');
+        if(derivedSkipped)audit('Derived worksheets skipped',sheets.filter(s=>isDerivedReportSheet(s.name)).map(s=>s.name).join(', '));
         await confirmImport();
       }catch(err){console.error(err);state.pendingImport=null;showStatus('Could not import '+file.name+': '+err.message,'error');finishImportStep();inspectNext();}
     }
