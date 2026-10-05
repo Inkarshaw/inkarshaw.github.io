@@ -120,7 +120,7 @@
           }catch(e){return reject(e);}
         };
         if(typeof Worker==='undefined')return fallback();
-        const worker=new Worker('/cdranalysis/cdr-parser-worker.js?v=66'),id=++parserWorkerSeq,cleanup=()=>{try{worker.terminate()}catch{}};
+        const worker=new Worker('/cdranalysis/cdr-parser-worker.js?v=73'),id=++parserWorkerSeq,cleanup=()=>{try{worker.terminate()}catch{}};
         worker.onmessage=e=>{const m=e.data||{};if(m.id!==id)return;cleanup();m.ok?resolve(m):reject(new Error(m.error||'Worker parsing failed'));};
         worker.onerror=()=>{cleanup();file.arrayBuffer().then(b=>{
           try{
@@ -224,6 +224,7 @@
       try{
         const headerRows=Object.fromEntries((p.sheets||[]).map(x=>[x.name,Number.isInteger(x.headerRow)?x.headerRow:0]));
         const parsed=p.fastPath?{sheets:p.parsedSheets}:await workerCall(p.file,'parse',selected,headerRows),timezone=$('sourceTimezone')?.value||state.sourceTimezone||'Asia/Kolkata';state.sourceTimezone=timezone;
+        const crossSheetSeen=new Map();let crossSheetDuplicates=0;
         for(const sh of parsed.sheets||[]){
           const rows=sh.rows||[],map=p.mappings[sh.sheetName]||{};if(!rows.length)continue;
           if(!map.bparty&&!map.cdrNo&&!map.date){
@@ -234,14 +235,20 @@
           rows.forEach((r,idx)=>{
             const sourceRow=idx+(Number.isInteger(sh.headerRow)?sh.headerRow:0)+2;
             const rawDate=val(r,map,'date'),rawTime=val(r,map,'time'),dt=parseDateTime(rawDate,rawTime,timezone),loc=parseLatLong(val(r,map,'latlong'),val(r,map,'location')),deviceMeta=parseCdrDeviceMetadata(val(r,map,'manufacturer'),val(r,map,'deviceType'));
-            const rec={id:`${fileId}:${sourceRow}`,fileId,sourceFile:p.file.name,sourceSheet:sh.sheetName,rowNumber:sourceRow,sourceHash:p.sha256,sourceTimezone:timezone,rawRow:r,rawDate,rawTime,cdrNo:String(val(r,map,'cdrNo')??'').trim()||inferredCdr,bparty:String(val(r,map,'bparty')??'').trim(),date:rawDate,time:rawTime,dt,duration:parseDuration(val(r,map,'duration')),callType:String(val(r,map,'callType')??'').trim(),firstCellId:String(val(r,map,'firstCellId')??'').trim(),firstAddress:String(val(r,map,'firstAddress')??'').trim(),lastCellId:String(val(r,map,'lastCellId')??'').trim(),lastAddress:String(val(r,map,'lastAddress')??'').trim(),imei:String(val(r,map,'imei')??'').trim(),manufacturer:deviceMeta.manufacturer,model:deviceMeta.model,deviceType:deviceMeta.deviceType,os:deviceMeta.os,imsi:String(val(r,map,'imsi')??'').trim(),roaming:String(val(r,map,'roaming')??'').trim(),provider:String(val(r,map,'provider')??'').trim(),mainCity:String(val(r,map,'mainCity')??'').trim(),subCity:String(val(r,map,'subCity')??'').trim(),latlong:String(val(r,map,'latlong')??'').trim(),lat:loc?.lat??null,lng:loc?.lng??null,azimuth:loc?.az??'',caseName:String(val(r,map,'caseName')??'').trim(),circle:String(val(r,map,'circle')??'').trim(),operator:String(val(r,map,'operator')??'').trim(),lrn:String(val(r,map,'lrn')??'').trim(),callForward:String(val(r,map,'callForward')??'').trim(),location:String(val(r,map,'location')??'').trim()};
+            const sigSubject=String(val(r,map,'cdrNo')??'').trim()||inferredCdr,sigParty=String(val(r,map,'bparty')??'').trim(),sigType=String(val(r,map,'callType')??'').trim(),sigCell=String(val(r,map,'firstCellId')??'').trim(),sigDuration=parseDuration(val(r,map,'duration'));
+            const sig=[sigSubject,sigParty,dt instanceof Date&&!isNaN(dt)?dt.getTime():String(rawDate)+'|'+String(rawTime),sigDuration,sigType,sigCell].join('|');
+            const seenSheet=crossSheetSeen.get(sig);
+            if(seenSheet&&seenSheet!==sh.sheetName){crossSheetDuplicates++;return;}
+            if(!seenSheet)crossSheetSeen.set(sig,sh.sheetName);
+            const rec={id:`${fileId}:${sourceRow}`,fileId,sourceFile:p.file.name,sourceSheet:sh.sheetName,rowNumber:sourceRow,sourceHash:p.sha256,sourceTimezone:timezone,rawRow:r,rawDate,rawTime,cdrNo:sigSubject,bparty:sigParty,date:rawDate,time:rawTime,dt,duration:sigDuration,callType:sigType,firstCellId:sigCell,firstAddress:String(val(r,map,'firstAddress')??'').trim(),lastCellId:String(val(r,map,'lastCellId')??'').trim(),lastAddress:String(val(r,map,'lastAddress')??'').trim(),imei:String(val(r,map,'imei')??'').trim(),manufacturer:deviceMeta.manufacturer,model:deviceMeta.model,deviceType:deviceMeta.deviceType,os:deviceMeta.os,imsi:String(val(r,map,'imsi')??'').trim(),roaming:String(val(r,map,'roaming')??'').trim(),provider:String(val(r,map,'provider')??'').trim(),mainCity:String(val(r,map,'mainCity')??'').trim(),subCity:String(val(r,map,'subCity')??'').trim(),latlong:String(val(r,map,'latlong')??'').trim(),lat:loc?.lat??null,lng:loc?.lng??null,azimuth:loc?.az??'',caseName:String(val(r,map,'caseName')??'').trim(),circle:String(val(r,map,'circle')??'').trim(),operator:String(val(r,map,'operator')??'').trim(),lrn:String(val(r,map,'lrn')??'').trim(),callForward:String(val(r,map,'callForward')??'').trim(),location:String(val(r,map,'location')??'').trim()};
             rec.cdrKey=phoneKey(rec.cdrNo);rec.bpartyKey=phoneKey(rec.bparty);rec.search=normalize([rec.cdrNo,rec.bparty,rec.callType,rec.firstCellId,rec.firstAddress,rec.lastCellId,rec.lastAddress,rec.imei,rec.imsi,rec.manufacturer,rec.model,rec.deviceType,rec.os,rec.roaming,rec.provider,rec.mainCity,rec.subCity,rec.operator,rec.sourceFile].join(' | '));state.records.push(rec);added++;
           });
           const info=p.sheets.find(x=>x.name===sh.sheetName)||{};
           state.files.push({id:fileId,name:p.file.name,sheet:sh.sheetName,rows:added,map,headers:info.headers||[],headerRow:Number.isInteger(info.headerRow)?info.headerRow:0,inferredCdr,sha256:p.sha256,size:p.file.size,lastModified:p.file.lastModified?new Date(p.file.lastModified).toISOString():'',importedAt:new Date().toISOString(),sourceTimezone:timezone});
           audit('CDR worksheet imported',p.file.name+' / '+sh.sheetName+' • '+added+' rows • SHA-256 '+p.sha256);
         }
-        state.pendingImport=null;rebuildIndexes();refreshSelectors();renderFileList();restorePendingWorkspace();applyFilters();showStatus('Loaded '+fmtInt(state.records.length)+' raw records from '+state.files.length+' worksheet import(s).','ok');finishImportStep();inspectNext();
+        if(crossSheetDuplicates)audit('Cross-sheet duplicate rows skipped',p.file.name+' • '+crossSheetDuplicates+' duplicate row(s)');
+        state.pendingImport=null;rebuildIndexes();refreshSelectors();renderFileList();restorePendingWorkspace();applyFilters();showStatus('Loaded '+fmtInt(state.records.length)+' records from '+state.files.length+' worksheet import(s)'+(crossSheetDuplicates?' • skipped '+fmtInt(crossSheetDuplicates)+' cross-tab duplicate(s)':'')+'.','ok');finishImportStep();inspectNext();
       }catch(err){console.error(err);showStatus('Import failed: '+err.message,'error');state.pendingImport=null;finishImportStep();inspectNext();}
     }
 
