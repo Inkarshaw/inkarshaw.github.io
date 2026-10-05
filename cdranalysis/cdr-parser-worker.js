@@ -55,9 +55,14 @@ function sheetInfo(wb,name){
   const headers=preview.length?Object.keys(preview[0]):[];
   return {name,rowCount,headerRow,headers,preview,compatible:compatibleHeaders(headers),score:headerScore(headers)};
 }
+function isDerivedReportSheet(name){
+  const n=norm(name);
+  return /^(summary|maxcalls|maxduration|maxstay|otherstatecontactsummary|roamingperiod|imeiperiod|imsiperiod|nightmapping|nightmaxstay|daymapping|daymaxstay|workhomelocation|homelocationbasedondayfirstand|isdcalls)$/.test(n);
+}
+
 function inspectAndParseCdr(wb){
   const sheets=wb.SheetNames.map(n=>sheetInfo(wb,n));
-  let compatible=sheets.filter(s=>s.compatible);
+  let compatible=sheets.filter(s=>s.compatible&&!isDerivedReportSheet(s.name));
   if(!compatible.length){
     const mapping=sheets.find(s=>norm(s.name)==='mapping');
     if(mapping)compatible=[mapping];
