@@ -23133,6 +23133,475 @@ let state={mode:'report',values:{...DEFAULTS},bodies:{report:null,lab:null,frien
 const labels={};
 const D=(key,label,placeholder='',type='text',wide=false,options=null)=>{labels[key]=label.split(' / ')[0];return{key,label,placeholder,type,wide,options}};
 const RANKS=['காவல் ஆய்வாளர்','காவல் உதவி ஆய்வாளர்'];
+// Station labels follow the existing Tamil and CDR selectors. F5 and harbour/M1
+// code-name pairs checked against Greater Chennai Corporation and TN tender records.
+// https://chennaicorporation.gov.in/gcc/about-GCC/about-chennai/police-station/
+const POLICE_STATIONS = [
+  {
+    "id": "B1",
+    "value": "B1 வடக்குக் கடற்கரை காவல் நிலையம்",
+    "english": "B1 North Beach Police Station",
+    "aliases": [],
+    "address": "வடக்குக் கடற்கரை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "B2",
+    "value": "B2 எஸ்பிளனேட் காவல் நிலையம்",
+    "english": "B2 Esplanade Police Station",
+    "aliases": [],
+    "address": "எஸ்பிளனேட், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "B3",
+    "value": "B3 கோட்டை செயின்ட் ஜார்ஜ் காவல் நிலையம்",
+    "english": "B3 Fort St. George Police Station",
+    "aliases": [],
+    "address": "கோட்டை செயின்ட் ஜார்ஜ், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "B4",
+    "value": "B4 உயர்நீதிமன்ற காவல் நிலையம்",
+    "english": "B4 High Court Police Station",
+    "aliases": [],
+    "address": "உயர்நீதிமன்ற, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "B5",
+    "value": "B5 துறைமுகம் காவல் நிலையம்",
+    "english": "B5 Harbour Police Station",
+    "aliases": [],
+    "address": "துறைமுகம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "C1",
+    "value": "C1 பூக்கடை காவல் நிலையம்",
+    "english": "C1 Flower Bazaar Police Station",
+    "aliases": [],
+    "address": "பூக்கடை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "C2",
+    "value": "C2 எலிபெண்ட் கேட் காவல் நிலையம்",
+    "english": "C2 Elephant Gate Police Station",
+    "aliases": [],
+    "address": "எலிபெண்ட் கேட், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "C3",
+    "value": "C3 செவன் வெல்ஸ் காவல் நிலையம்",
+    "english": "C3 Seven Wells Police Station",
+    "aliases": [],
+    "address": "செவன் வெல்ஸ், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "C4",
+    "value": "C4 அரசு பொது மருத்துவமனை அவுட்போஸ்ட்",
+    "english": "C4 Government General Hospital Outpost",
+    "aliases": [],
+    "address": "அரசு பொது மருத்துவமனை அவுட்போஸ்ட், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "C5",
+    "value": "C5 கொத்தவால் சாவடி காவல் நிலையம்",
+    "english": "C5 Kothawal Chavadi Police Station",
+    "aliases": [],
+    "address": "கொத்தவால் சாவடி, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "D1",
+    "value": "D1 திருப்பள்ளிக்கேணி காவல் நிலையம்",
+    "english": "D1 Triplicane Police Station",
+    "aliases": [],
+    "address": "திருப்பள்ளிக்கேணி, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "D2",
+    "value": "D2 அண்ணா சாலை காவல் நிலையம்",
+    "english": "D2 Anna Salai Police Station",
+    "aliases": [],
+    "address": "அண்ணா சாலை, சென்னை - 02",
+    "city": "சென்னை - 02"
+  },
+  {
+    "id": "D3",
+    "value": "D3 ஐஸ் ஹவுஸ் காவல் நிலையம்",
+    "english": "D3 Ice House Police Station",
+    "aliases": [],
+    "address": "ஐஸ் ஹவுஸ், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "D4",
+    "value": "D4 ஜாம் பஜார் காவல் நிலையம்",
+    "english": "D4 Jam Bazaar Police Station",
+    "aliases": [],
+    "address": "ஜாம் பஜார், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "D5",
+    "value": "D5 மெரினா காவல் நிலையம்",
+    "english": "D5 Marina Police Station",
+    "aliases": [],
+    "address": "மெரினா, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "D6",
+    "value": "D6 அண்ணா சதுக்கம் காவல் நிலையம்",
+    "english": "D6 Anna Square Police Station",
+    "aliases": [],
+    "address": "அண்ணா சதுக்கம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "D7",
+    "value": "D7 அரசு எஸ்டேட் காவல் நிலையம்",
+    "english": "D7 Government Estate Police Station",
+    "aliases": [],
+    "address": "அரசு எஸ்டேட், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "D8",
+    "value": "D8 கஸ்தூரிபாய் காந்தி மருத்துவமனை காவல் நிலையம்",
+    "english": "D8 Kasturba Gandhi Hospital Police Station",
+    "aliases": [],
+    "address": "கஸ்தூரிபாய் காந்தி மருத்துவமனை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "E1",
+    "value": "E1 மயிலாப்பூர் காவல் நிலையம்",
+    "english": "E1 Mylapore Police Station",
+    "aliases": [],
+    "address": "மயிலாப்பூர், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "E2",
+    "value": "E2 ராயப்பேட்டை காவல் நிலையம்",
+    "english": "E2 Royapettah Police Station",
+    "aliases": [],
+    "address": "ராயப்பேட்டை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "E3",
+    "value": "E3 தேனாம்பேட்டை காவல் நிலையம்",
+    "english": "E3 Teynampet Police Station",
+    "aliases": [],
+    "address": "தேனாம்பேட்டை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "E4",
+    "value": "E4 அபிராமபுரம் காவல் நிலையம்",
+    "english": "E4 Abiramapuram Police Station",
+    "aliases": [],
+    "address": "அபிராமபுரம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "F1",
+    "value": "F1 சிந்தாதிரிப்பேட்டை காவல் நிலையம்",
+    "english": "F1 Chintadripet Police Station",
+    "aliases": [],
+    "address": "சிந்தாதிரிப்பேட்டை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "F2",
+    "value": "F2 எழும்பூர் காவல் நிலையம்",
+    "english": "F2 Egmore Police Station",
+    "aliases": [],
+    "address": "எழும்பூர், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "F3",
+    "value": "F3 நுங்கம்பாக்கம் காவல் நிலையம்",
+    "english": "F3 Nungambakkam Police Station",
+    "aliases": [],
+    "address": "நுங்கம்பாக்கம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "F4",
+    "value": "F4 தௌசண்ட் லைட்ஸ் காவல் நிலையம்",
+    "english": "F4 Thousand Lights Police Station",
+    "aliases": [],
+    "address": "தௌசண்ட் லைட்ஸ், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "F5",
+    "value": "F5 சூளைமேடு காவல் நிலையம்",
+    "english": "F5 Choolaimedu Police Station",
+    "aliases": [],
+    "address": "சூளைமேடு, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "G1",
+    "value": "G1 வேப்பேரி காவல் நிலையம்",
+    "english": "G1 Vepery Police Station",
+    "aliases": [],
+    "address": "வேப்பேரி, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "G2",
+    "value": "G2 பெரியமேடு காவல் நிலையம்",
+    "english": "G2 Periamet Police Station",
+    "aliases": [],
+    "address": "பெரியமேடு, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "G3",
+    "value": "G3 கீழ்ப்பாக்கம் காவல் நிலையம்",
+    "english": "G3 Kilpauk Police Station",
+    "aliases": [
+      "G3 கிளிப்பாக் காவல் நிலையம்"
+    ],
+    "address": "கீழ்ப்பாக்கம், சென்னை - 10",
+    "city": "சென்னை - 10"
+  },
+  {
+    "id": "G5",
+    "value": "G5 செயலக காலனி காவல் நிலையம்",
+    "english": "G5 Secretariat Colony Police Station",
+    "aliases": [],
+    "address": "செயலக காலனி, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "G7",
+    "value": "G7 சேத்துப்பட்டு காவல் நிலையம்",
+    "english": "G7 Chetpet Police Station",
+    "aliases": [
+      "G7 சேத்துபட்டு காவல் நிலையம்"
+    ],
+    "address": "சேத்துப்பட்டு, சென்னை - 31",
+    "city": "சென்னை - 31"
+  },
+  {
+    "id": "H1",
+    "value": "H1 பழைய வண்ணாரப்பேட்டை காவல் நிலையம்",
+    "english": "H1 Old Washermenpet Police Station",
+    "aliases": [],
+    "address": "பழைய வண்ணாரப்பேட்டை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "H3",
+    "value": "H3 தொண்டையார்பேட்டை காவல் நிலையம்",
+    "english": "H3 Tondiarpet Police Station",
+    "aliases": [],
+    "address": "தொண்டையார்பேட்டை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "J1",
+    "value": "J1 சைதாப்பேட்டை காவல் நிலையம்",
+    "english": "J1 Saidapet Police Station",
+    "aliases": [],
+    "address": "சைதாப்பேட்டை, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "J2",
+    "value": "J2 அடையாறு காவல் நிலையம்",
+    "english": "J2 Adyar Police Station",
+    "aliases": [],
+    "address": "அடையாறு, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "J3",
+    "value": "J3 கிண்டி காவல் நிலையம்",
+    "english": "J3 Guindy Police Station",
+    "aliases": [],
+    "address": "கிண்டி, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "J5",
+    "value": "J5 சாஸ்திரி நகர் காவல் நிலையம்",
+    "english": "J5 Sastri Nagar Police Station",
+    "aliases": [],
+    "address": "சாஸ்திரி நகர், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "J6",
+    "value": "J6 திருவான்மியூர் காவல் நிலையம்",
+    "english": "J6 Thiruvanmiyur Police Station",
+    "aliases": [],
+    "address": "திருவான்மியூர், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "J7",
+    "value": "J7 வேளச்சேரி காவல் நிலையம்",
+    "english": "J7 Velachery Police Station",
+    "aliases": [],
+    "address": "வேளச்சேரி, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "K1",
+    "value": "K1 செம்பியம் காவல் நிலையம்",
+    "english": "K1 Sembium Police Station",
+    "aliases": [],
+    "address": "செம்பியம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "K2",
+    "value": "K2 அயனாவரம் காவல் நிலையம்",
+    "english": "K2 Ayanavaram Police Station",
+    "aliases": [],
+    "address": "அயனாவரம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "K4",
+    "value": "K4 அண்ணா நகர் காவல் நிலையம்",
+    "english": "K4 Anna Nagar Police Station",
+    "aliases": [],
+    "address": "அண்ணா நகர், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "K6",
+    "value": "K6 டிபி சத்திரம் காவல் நிலையம்",
+    "english": "K6 TP Chatram Police Station",
+    "aliases": [],
+    "address": "டிபி சத்திரம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "K8",
+    "value": "K8 அரும்பாக்கம் காவல் நிலையம்",
+    "english": "K8 Arumbakkam Police Station",
+    "aliases": [],
+    "address": "அரும்பாக்கம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "M1",
+    "value": "M1 மாதவரம் காவல் நிலையம்",
+    "english": "M1 Madhavaram Police Station",
+    "aliases": [],
+    "address": "மாதவரம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "N1",
+    "value": "N1 ராயபுரம் காவல் நிலையம்",
+    "english": "N1 Royapuram Police Station",
+    "aliases": [],
+    "address": "ராயபுரம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "P1",
+    "value": "P1 புளியந்தோப்பு காவல் நிலையம்",
+    "english": "P1 Pulianthope Police Station",
+    "aliases": [],
+    "address": "புளியந்தோப்பு, சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "R1",
+    "value": "R1 மாம்பலம் காவல் நிலையம்",
+    "english": "R1 Mambalam Police Station",
+    "aliases": [],
+    "address": "மாம்பலம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "R2",
+    "value": "R2 கோடம்பாக்கம் காவல் நிலையம்",
+    "english": "R2 Kodambakkam Police Station",
+    "aliases": [],
+    "address": "கோடம்பாக்கம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "R3",
+    "value": "R3 அசோக் நகர் காவல் நிலையம்",
+    "english": "R3 Ashok Nagar Police Station",
+    "aliases": [],
+    "address": "அசோக் நகர், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "V1",
+    "value": "V1 வில்லிவாக்கம் காவல் நிலையம்",
+    "english": "V1 Villivakkam Police Station",
+    "aliases": [],
+    "address": "வில்லிவாக்கம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "V2",
+    "value": "V2 விருகம்பாக்கம் காவல் நிலையம்",
+    "english": "V2 Virugambakkam Police Station",
+    "aliases": [],
+    "address": "விருகம்பாக்கம், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "W1",
+    "value": "W1 அனைத்து மகளிர் காவல் நிலையம் தௌசண்ட் லைட்ஸ்",
+    "english": "W1 All Women Police Station, Thousand Lights",
+    "aliases": [],
+    "address": "அனைத்து மகளிர் காவல் நிலையம் தௌசண்ட் லைட்ஸ், சென்னை",
+    "city": "சென்னை"
+  },
+  {
+    "id": "AWPS_PERAVALLUR",
+    "value": "AWPS பேரவள்ளூர்",
+    "english": "AWPS Peravallur",
+    "aliases": [],
+    "address": "பேரவள்ளூர், சென்னை",
+    "city": "சென்னை"
+  }
+];
+function stationKey(text){return String(text||'').toLowerCase().replace(/[\s.,–—-]+/g,'')}
+function stationForName(name){const key=stationKey(name);return POLICE_STATIONS.find(s=>[s.value,s.english,...s.aliases].some(v=>stationKey(v)===key))}
+function stationFieldHTML(f){
+ const name=String(state.values.station||'');const match=stationForName(name);const custom=!match;
+ const options=POLICE_STATIONS.map(s=>`<option value="${esc(s.id)}" ${match?.id===s.id?'selected':''}>${esc(s.value)} / ${esc(s.english.replace(/^[A-Z0-9]+\s*/,'').replace(/ Police Station$/,''))}</option>`).join('');
+ return `<div class="field wide" data-field="station"><label for="f_station">${esc(f.label)}</label><select id="f_station" aria-describedby="stationHelp"><optgroup label="சென்னை காவல் நிலையங்கள் / Chennai stations">${options}</optgroup><option value="__other__" ${custom?'selected':''}>பிற காவல் நிலையம் / பிரிவு — Other station / unit</option></select><small id="stationHelp">Select a station, or choose Other station / unit to enter it manually.</small></div><div class="field wide" data-field="stationCustom" ${custom?'':'hidden'}><label for="f_stationCustom">பிற காவல் நிலையம் / பிரிவு பெயர் / Custom station or unit</label><input id="f_stationCustom" data-key="station" value="${custom?esc(name):''}" placeholder="காவல் நிலையம் / பிரிவின் முழுப் பெயர்"></div>`;
+}
+function chooseStation(id){
+ const selected=POLICE_STATIONS.find(s=>s.id===id);
+ if(!selected&&id!=='__other__')return;
+ state.values.station=selected?selected.value:'';
+ state.values.stationAddress=selected?selected.address:'';
+ state.values.city=selected?selected.city:'';
+ const custom=$('f_stationCustom');if(custom)custom.value='';
+ if($('f_stationAddress'))$('f_stationAddress').value=state.values.stationAddress;
+ if($('f_city'))$('f_city').value=state.values.city;
+ updateVisibility();refresh();
+ if(!selected&&custom)custom.focus();
+}
+
 const GROUPS=[
  {id:'shared',title:'01 · Police station & officer',modes:['report','lab','friend'],open:true,fields:[D('station','காவல் நிலையம் / Police station','D2 அண்ணாசாலை காவல் நிலையம்','text',true),D('branch','பிரிவு / Branch','சட்டம் மற்றும் ஒழுங்கு பிரிவு','text',true),D('stationAddress','நிலைய முகவரி / Station address','','textarea',true),D('city','நகரம் மற்றும் அஞ்சல் குறியீடு / City & PIN','','text',true),D('rank','கையொப்பமிடும் அலுவலர் பதவி / Officer rank','','list',true,RANKS),D('rankSuffix','பிரிவு சுருக்கம் / Rank suffix','(ச&ஒ)'),D('officerName','அலுவலர் பெயர் / Officer name'),D('docDate','ஆவண தேதி / Document date','','date'),D('section','வாக்குமூலம் பிரிவு / Statement provision','180(3) BNSS')]},
  {id:'case',title:'02 · Case references',modes:['report','lab','friend'],open:true,fields:[D('crimeNo','குற்ற எண் / Crime number'),D('crimeYear','ஆண்டு / Year','','year'),D('sections','சட்டப் பிரிவுகள் / Sections','','textarea',true),D('hasSecond','இரண்டாவது வழக்கு சேர்க்க / Include second case','','checkbox',true),D('secondNo','இரண்டாம் குற்ற எண் / Second crime number'),D('secondYear','இரண்டாம் ஆண்டு / Second year','','year'),D('secondSections','இரண்டாம் வழக்கின் பிரிவுகள் / Second case sections','','textarea',true)]},
@@ -23192,6 +23661,7 @@ function htmlModel(m){return `<article class="paper paper-${m.mode}" lang="ta" a
  return `<p class="${b.type==='body'?'narrative':'salutation'}">${esc(b.text)}</p>`;
  }).join('')+'</article>'}
 function fieldHTML(f){let v=state.values[f.key]??'';const id='f_'+f.key;let control='';
+ if(f.key==='station')return stationFieldHTML(f);
  if(f.type==='checkbox')return `<div class="field wide check-field"><input type="checkbox" id="${id}" data-key="${f.key}" ${v?'checked':''}><label for="${id}">${esc(f.label)}</label></div>`;
  if(f.type==='textarea')control=`<textarea id="${id}" data-key="${f.key}" placeholder="${esc(f.placeholder)}" rows="2">${esc(v)}</textarea>`;
  else if(f.type==='year'||f.type==='select'){
@@ -23201,11 +23671,12 @@ function fieldHTML(f){let v=state.values[f.key]??'';const id='f_'+f.key;let cont
  return `<div class="field ${f.wide?'wide':''}" data-field="${f.key}"><label for="${id}">${esc(f.label)}</label>${control}</div>`;
 }
 function renderFields(){const visible=GROUPS.filter(g=>g.modes.includes(state.mode));$('fieldGroups').innerHTML=visible.map(g=>`<details ${g.open?'open':''} data-group="${g.id}"><summary>${esc(g.title)}</summary><div class="field-grid">${g.fields.map(fieldHTML).join('')}</div></details>`).join('');updateVisibility();}
-function updateVisibility(){const hidden=[];if(!state.values.hasSecond)hidden.push('secondNo','secondYear','secondSections');if(!state.values.hasExtension)hidden.push('extensionDate');if(!state.values.bailClause&&state.mode==='report')hidden.push('witnessName');if(state.mode==='report')hidden.push('section');if(state.mode==='lab')hidden.push('hasSecond','secondNo','secondYear','secondSections');
+function updateVisibility(){const hidden=[];if($('f_station')?.value!=='__other__')hidden.push('stationCustom');if(!state.values.hasSecond)hidden.push('secondNo','secondYear','secondSections');if(!state.values.hasExtension)hidden.push('extensionDate');if(!state.values.bailClause&&state.mode==='report')hidden.push('witnessName');if(state.mode==='report')hidden.push('section');if(state.mode==='lab')hidden.push('hasSecond','secondNo','secondYear','secondSections');
  document.querySelectorAll('[data-field]').forEach(el=>el.hidden=hidden.includes(el.dataset.field));if(state.mode==='lab'){const c=$('f_hasSecond');if(c)c.closest('.field').hidden=true}}
 function refresh(updateEditor=true){document.documentElement.style.setProperty('--font-size',String(state.values.fontSize)+'pt');document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===state.mode)));const m=model(state.mode);$('preview').innerHTML=htmlModel(m);if(updateEditor)$('bodyEditor').value=state.bodies[state.mode]??autoBody(state.mode);const custom=state.bodies[state.mode]!==null;$('editStatus').textContent=custom?'Custom body text · preserved until you choose Update from fields.':'Body text updates automatically as you fill the fields.';const unresolved=m.blocks.reduce((n,b)=>n+(b.text.match(/\[[^\]]+\]/g)||[]).length,0);$('previewInfo').textContent='A4 portrait'+(unresolved?' · '+unresolved+' blank detail'+(unresolved===1?'':'s'):' · Ready to export');}
 function switchMode(mode){state.mode=mode;renderFields();refresh()}
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
+$('fieldGroups').addEventListener('change',e=>{if(e.target.id==='f_station')chooseStation(e.target.value)});
 $('fieldGroups').addEventListener('input',e=>{const k=e.target.dataset.key;if(!k)return;state.values[k]=e.target.type==='checkbox'?e.target.checked:e.target.value;updateVisibility();refresh()});
 $('bodyEditor').addEventListener('input',e=>{state.bodies[state.mode]=e.target.value;refresh(false)});
 $('rebuildBtn').addEventListener('click',()=>{if(state.bodies[state.mode]!==null&&!confirm('Replace the custom body text for this format with wording built from the current fields?'))return;state.bodies[state.mode]=null;refresh();toast('Body updated from the input fields.')});
