@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Police Documentation Tools | Forms, Generators & References</title>\n    <meta name="description" content="Police documentation tools, official-form references, document generators and workflow resources.">\n    <link rel="canonical" href="https://clearexams.ink/policedocuments/">
+    <title>Police Documentation Tools | Forms, Generators & References</title>
+    <meta name="description" content="Police documentation tools, official-form references, document generators and workflow resources.">
+    <link rel="canonical" href="https://clearexams.ink/policedocuments/">
 
     <!-- Google tag (gtag.js) - Google Analytics 4 -->
     <!-- Stream: Police Documents | Stream URL: https://clearexams.ink/policedocuments -->
@@ -3133,47 +3135,27 @@
 
         function setupGlobalLinkHandlers() {
             document.querySelectorAll('.doc-actions a').forEach(link => {
-                if (link.getAttribute('href') === '#' || link.getAttribute('href') === 'javascript:void(0)' || link
-                    .style.cursor === 'default') {
-                    link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href') || '';
+                if (href === '#' || href === 'javascript:void(0)' || link.style.cursor === 'default') {
+                    link.addEventListener('click', e => {
                         e.preventDefault();
-                        const docTitle = link.closest('.document-item')?.getAttribute('data-title') ||
-                            'Unknown';
                         showNotification('This document is coming soon.');
-                        if (typeof gtag !== 'undefined') {
-                            gtag('event', 'coming_soon_click', {
-                                'event_category': 'document',
-                                'event_label': docTitle
-                            });
-                        }
                     });
                     return;
                 }
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const docItem = this.closest('.document-item');
-                    let docTitle = docItem ? docItem.getAttribute('data-title') : 'Document';
-                    if (!docTitle) docTitle = 'Document';
-                    const isGenerate = this.classList.contains('btn-generate') || this.classList.contains(
-                        'btn-crb') || this.classList.contains('btn-election') || this.classList.contains(
-                        'btn-remand') || this.classList.contains('btn-bnss') || this.classList.contains(
-                        'btn-court');
-                    const actionMsg = isGenerate ? `Opening ${docTitle} generator...` :
-                        `Opening ${docTitle} document...`;
-                    showNotification(actionMsg);
-
-                    if (typeof gtag !== 'undefined') {
+                // Keep native anchor navigation (including keyboard, new-tab, and browser popup handling).
+                // Track non-sensitive metadata only; never include case details in analytics.
+                link.addEventListener('click', function () {
+                    const item = this.closest('.document-item');
+                    const title = item?.getAttribute('data-title') || 'Document';
+                    if (typeof gtag === 'function') {
                         gtag('event', 'document_access', {
-                            'event_category': isGenerate ? 'generator' : 'download',
-                            'event_label': docTitle,
-                            'document_type': this.classList.contains('btn-word') ? 'word' : (this
-                                .classList.contains('btn-pdf') ? 'pdf' : 'html')
+                            event_category: 'document',
+                            event_label: title,
+                            document_type: this.classList.contains('btn-word') ? 'word' :
+                                (this.classList.contains('btn-pdf') ? 'pdf' : 'html')
                         });
                     }
-
-                    setTimeout(() => {
-                        window.open(this.href, '_blank');
-                    }, 200);
                 });
             });
         }
