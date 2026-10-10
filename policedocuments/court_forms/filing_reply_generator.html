@@ -36,6 +36,7 @@
 <div class="field"><label for="respondent">Respondent police designation</label><select id="respondent"></select></div>
 <div class="field hidden" id="respondentOtherField"><label for="respondentOther">Other respondent designation</label><input id="respondentOther"></div>
 <div class="field"><label for="station">Police station / Unit</label><select id="station"></select></div>
+<div class="field"><button type="button" id="importMyCase" style="padding:9px;border-radius:8px">Import selected case from My Cases</button><small id="caseImportNote" role="status"></small></div>
 <div class="field hidden" id="stationOtherField"><label for="stationOther">Other police station / Unit</label><textarea id="stationOther" rows="2" placeholder="Enter the police station or unit"></textarea></div>
 <div class="field"><label for="district">District</label><select id="district"></select></div>
 <div class="field hidden" id="districtOtherField"><label for="districtOther">Other district</label><input id="districtOther"></div>
@@ -390,6 +391,39 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 
  -->
+<script>
+window.addEventListener('DOMContentLoaded',function(){
+ var btn=document.getElementById('importMyCase');
+ if(!btn)return;
+ btn.addEventListener('click',function(){
+  var c=null;
+  try{c=JSON.parse(localStorage.getItem('clearexamsCurrentCaseV2')||'null')}catch(e){}
+  var note=document.getElementById('caseImportNote');
+  if(!c||!c.id||c.deletedAt){note.textContent='Select an active case in My Cases first.';return}
+  if(!confirm('Import crime number, year and station from the selected case? Review all court reply details before export.'))return;
+  function setValue(id,value){
+   var input=document.getElementById(id);
+   if(!input||value===undefined||value===null||String(value).trim()==='')return;
+   input.value=String(value);
+   input.dispatchEvent(new Event('input',{bubbles:true}));
+   input.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+  setValue('crimeNumber',c.crimeNo);
+  setValue('crimeYear',c.crimeYear);
+  var station=document.getElementById('station'),name=String(c.policeStation||'').trim();
+  if(station&&name){
+   function normalize(x){return String(x||'').toLowerCase().replace(/police station|\\bps\\b/g,'').replace(/[^a-z0-9]/g,'')}
+   var option=Array.from(station.options).find(function(o){return normalize(o.textContent)===normalize(name)||normalize(o.value)===normalize(name)});
+   if(option)setValue('station',option.value);
+   else{
+    var other=Array.from(station.options).find(function(o){return /other/i.test(o.textContent)});
+    if(other){setValue('station',other.value);setValue('stationOther',name)}
+   }
+  }
+  note.textContent='Case data imported. Verify legal and court particulars.';
+ });
+});
+</script>
 </body>
 </html>
 
