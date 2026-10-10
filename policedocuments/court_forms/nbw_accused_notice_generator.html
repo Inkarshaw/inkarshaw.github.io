@@ -18,15 +18,15 @@ input,textarea,select{width:100%;font:inherit;padding:9px;border:1px solid #9bb0
 .previewhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.previewhead h2{margin:0}.zoom{font-size:12px;color:#526375}
 .paper-frame{overflow:auto;background:#e3e9ef;border-radius:7px;padding:16px}.paper{background:white;margin:auto;width:210mm;min-height:297mm;padding:19mm 17mm 20mm 29mm;box-shadow:0 4px 16px #65768744}
 .doc{font-family:"Noto Serif Tamil","Nirmala UI","Latha",serif;font-size:11.4pt;line-height:1.76;color:#000;overflow-wrap:break-word}
-.doc .court-heading{text-align:center;font-size:12pt;font-weight:700;white-space:pre-line;line-height:1.6}
-.doc .judge{text-align:center;margin:10px 0 17px}
-.doc .court-info{text-align:center;white-space:pre-line;margin:0 0 13px}
-.doc .case-line{font-size:11pt;margin:10px 0;font-weight:700}
-.doc .accused-line{display:flex;justify-content:space-between;gap:12px;margin:8px 0 14px}
-.doc .accused-address{white-space:pre-line;flex:1;min-width:0}.doc .accused-label{align-self:flex-end;white-space:nowrap}
-.doc h2.notice-title{text-align:center;font-size:13pt;text-decoration:underline;margin:20px 0 12px;font-weight:700}
-.doc .notice-body{text-align:justify;text-indent:20px;line-height:1.95;white-space:pre-line}
-.doc .signature{text-align:right;white-space:pre-line;margin-top:36px;font-weight:700}
+.doc .court-heading{text-align:center;font-size:12pt;font-weight:700;text-decoration:underline;text-underline-offset:3px;white-space:pre-line;line-height:1.6;margin-bottom:16px}
+.doc .judge{text-align:center;margin:8px 0 17px;font-weight:700}
+.doc .court-info{text-align:center;white-space:pre-line;margin:12px 0 17px;font-weight:700}
+.doc .case-line{font-size:11pt;margin:9px 0 16px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.doc .accused-line{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:12px;margin:8px 0 20px;font-weight:700;break-inside:avoid}
+.doc .accused-address{white-space:pre-line;flex:1;min-width:0}.doc .accused-label{align-self:end;white-space:nowrap}
+.doc h2.notice-title{text-align:center;font-size:13pt;margin:25px 0 12px;font-weight:700}
+.doc .notice-body{text-align:justify;text-indent:20px;line-height:1.85;white-space:pre-line}
+.doc .signature{text-align:right;white-space:pre-line;margin-top:62px;font-weight:400}
 .doc .blank{border-bottom:1px dotted #999;min-width:18px;display:inline-block;color:#555}
 @media(max-width:1150px){.layout{grid-template-columns:1fr}.paper-frame{padding:10px}.paper{box-shadow:none}}
 @media(max-width:650px){header{padding:14px}.layout{padding:9px}.panel{padding:13px}.grid{grid-template-columns:1fr}.paper-frame{padding:0}.paper{width:100%;min-height:0;padding:16px}.doc{font-size:10pt}}
@@ -41,14 +41,14 @@ input,textarea,select{width:100%;font:inherit;padding:9px;border:1px solid #9bb0
 <main class="layout">
 <section class="panel editor">
 <h2>Editable particulars</h2>
-<p class="helper">Based on the two pages of the uploaded <strong>NBW - Accused.docx</strong>. Choose a source case preset or start blank. Verify all judicial facts and wording before use. No data is sent to a server.</p>
-<div class="field"><label for="preset">Sample / blank form</label><select id="preset"><option value="blank">Blank new notice</option><option value="one">Uploaded notice – CC 2059/2018, Crime 1140/2017</option><option value="two">Uploaded notice – CC 6499/2018, Crime 1141/2017</option></select></div>
+<p class="helper">Based on the uploaded <strong>NBW - Accused.docx</strong>. Each source case loads separately. The source wording and its unverified blanks are retained. Verify dates and wording before filing. Form data stays in this browser.</p>
+<div class="field"><label for="preset">Sample / blank form</label><select id="preset"><option value="blank">Blank new notice</option><option value="one">Uploaded notice – CC 2059-2018, Crime 1140/2017</option><option value="two">Uploaded notice – CC 6499-2018, Crime 1141/2017</option></select></div>
 <form id="noticeForm" autocomplete="off"><div id="fields"></div></form>
 <div class="actions">
 <button type="button" id="word">Download Word (.docx)</button><button type="button" id="pdf">Save PDF / Print</button><button type="button" id="reset" class="light">Clear case fields</button>
 </div>
-<p class="helper">Word creates an editable .docx when the document library is available; otherwise an editable .doc is offered. For PDF choose <strong>Save as PDF</strong> in your browser's print dialog. Tamil uses Unicode fonts, not legacy Bamini/MCL Mangai encoding.</p>
-<div id="status" role="status" aria-live="polite"></div>
+<p class="helper">Word creates an editable .docx when the document library is available; otherwise an editable .doc is offered. For PDF choose <strong>Save as PDF</strong> in your browser's print dialog. Tamil is converted to Unicode so it remains readable without the original MCL Mangai font.</p>
+<div id="sourceWarning" role="note" aria-live="polite" style="display:none;border-left:4px solid #bb7a17;padding:10px 12px;background:#fff6df;color:#613e0e;margin-top:8px;font-size:13px"></div><div id="status" role="status" aria-live="polite"></div>
 </section>
 <section class="panel preview"><div class="previewhead"><h2>A4 live notice preview</h2><span class="zoom">Print layout · Tamil</span></div><div class="paper-frame"><article class="paper" id="paper"><div class="doc" id="document" lang="ta"></div></article></div></section>
 </main>
@@ -58,45 +58,48 @@ input,textarea,select{width:100%;font:inherit;padding:9px;border:1px solid #9bb0
 var $=function(id){return document.getElementById(id)};
 var groups=[
 ["Court details",[
-["courtHeading","Court heading / நீதிமன்றத் தலைப்பு","textarea","கனம் 2-வது பெருநகர் குற்றவியல் நடுவர் நீதிமன்ற நீதிபதி அவர்கள்\nமுன்பாக எழும்பூர், சென்னை - 08"],
+["courtHeading","Court heading / நீதிமன்றத் தலைப்பு","textarea","கனம் 2-வது பெரு நகர குற்றவியல் நடுவர் நீதிமன்ற நீதிபதி அவர்கள்\nமுன்பாக எழும்பூர், சென்னை - 08"],
 ["magistrate","Presiding Magistrate / முன்னிலை","text",""],
-["court","Court name / நீதிமன்றம்","text","2-வது பெருநகர் குற்றவியல் நடுவர் நீதிமன்றம், எழும்பூர்"],
+["court","Court name appearing in notice / நீதிமன்றம்","text","2-வது பெரு நகர குற்றவியல் நடுவர் நீதிமன்றம்"],
+["courtListing","Hearing line / நீதிமன்ற வரி","textarea","2-வது பெரு நகர குற்றவியல் நடுவர் நீதிமன்றம், இரண்டாவது பெருநகர் குற்றவியல் நடுவர்"],
 ["noticeDate","Notice date / அறிவிப்பு தேதி","date",""],
-["footerCourt","Signature designation / கையொப்பம்","textarea","2-வது பெருநகர் குற்றவியல் நடுவர்\nஎழும்பூர், சென்னை - 08"]
+["weekdaySource","Printed weekday (optional override) / வார நாள்","text",""],
+["footerCourt","Signature designation / கையொப்பம்","textarea","2-வது பெருநகர குற்றவியல் நடுவர்\nஎழும்பூர், சென்னை - 08"]
 ]],
 ["Case details",[
-["cc","C.C. No. / Year","text",""],["crime","Crime No. / Year","text",""],
-["sections","Sections of law / சட்டப் பிரிவுகள்","textarea",""],
+["cc","C.C. No. / Year (retain hyphen if in source)","text",""],
+["crime","Crime No. / Year","text",""],
+["sections","Sections of law (including IPC / BNS)","textarea",""],
 ["station","Police station / காவல் நிலையம்","text","G7 Chetpet Police Station"],
-["stationTamil","Police station in Tamil / தமிழில்","text","ஜி 7 சேத்துப்பட்டு காவல் நிலையம்"]
+["stationTamil","Police station in Tamil / தமிழில்","text","ஜி 7 சேத்துப்பட்டு"]
 ]],
 ["Accused details",[
 ["accused","Accused name / எதிரி பெயர்","text",""],
-["alias","Alias / என்ற பெயரும் (optional)","text",""],
+["alias","Alias / (எ)","text",""],
 ["age","Age / வயது","text",""],
 ["parentRelation","Relationship / உறவு","select","த/பெ",["த/பெ","க/பெ","ம/பெ","Other"]],
-["parent","Parent / spouse name / தந்தை அல்லது துணை பெயர்","text",""],
+["parent","Parent / spouse / தந்தை அல்லது துணை பெயர்","text",""],
 ["address","Accused address / முகவரி","textarea",""]
 ]],
 ["Arrest, bail and NBW particulars",[
 ["arrestDate","Original arrest date / கைது தேதி","date",""],
 ["cmp","Bail Crl.M.P. No. / Year","text",""],
 ["bailDate","Bail order date / ஜாமீன் உத்தரவு தேதி","date",""],
-["warrantDate","NBW issued from / பிடியாணை தேதி","date",""],
-["executionDate","NBW execution / arrest date","date",""],
-["productionDate","Produced before court date","date",""],
-["arrestingOfficer","Officer designation / கைது செய்த அதிகாரி","text","காவல் ஆய்வாளரால்"]
+["warrantDate","Warrant issue date / பிடியாணை தேதி","date",""],
+["executionDate","Warrant execution / arrest date","date",""],
+["productionDate","Court production date (blank = இன்று)","date",""],
+["arrestingOfficer","Arresting officer designation / கைது செய்த அதிகாரி","text","காவல் ஆய்வாளரால்"]
 ]],
 ["Notice text",[
 ["title","Heading / அறிவிப்பு தலைப்பு","text","விளக்கம் கேட்கும் அறிவிப்பு"],
-["additional","Additional remarks (optional; shown below body)","textarea",""]
+["additional","Further details (only if required)","textarea",""]
 ]]
 ];
 var defaults={},fields=$("fields");
 groups.forEach(function(g){var title=document.createElement("h3");title.textContent=g[0];fields.appendChild(title);var grid=document.createElement("div");grid.className="grid";g[1].forEach(function(f){var id=f[0],lab=f[1],type=f[2],def=f[3];defaults[id]=def;var wrap=document.createElement("div");wrap.className="field"+((type==="textarea"||id==="courtHeading"||id==="footerCourt")?" full":"");var label=document.createElement("label");label.htmlFor=id;label.textContent=lab;wrap.appendChild(label);var input;if(type==="textarea"){input=document.createElement("textarea");input.rows=(id==="address"?3:2);}else if(type==="select"){input=document.createElement("select");f[4].forEach(function(option){var opt=document.createElement("option");opt.value=option;opt.textContent=option;input.appendChild(opt)});}else{input=document.createElement("input");input.type=type;}input.id=id;input.name=id;input.value=def;wrap.appendChild(input);grid.appendChild(wrap);});fields.appendChild(grid)});
 var samples={
-one:{magistrate:"திருமதி இந்துலதா, B.A., B.L.",cc:"2059/2018",crime:"1140/2017",sections:"341, 294(b), 324, 506(ii) r/w 34 IPC",accused:"செட்டியார்",alias:"நாகராஜ்",age:"36",parent:"பெருமாள்",address:"எண். 1-5, ஜோதியம்மாள் நகர்,\nசெனாய் நகர், சென்னை - 30"},
-two:{magistrate:"திருமதி இந்துலதா, B.A., B.L.",cc:"6499/2018",crime:"1141/2017",sections:"341, 323, 336, 392, 384, 427, 506(ii) IPC",accused:"செட்டியார்",alias:"நாகராஜ்",age:"36",parent:"பெருமாள்",address:"எண். 9A, ஜோதியம்மாள் நகர்,\nசெனாய் நகர், சென்னை - 30"}
+one:{magistrate:"திருமதி இந்துலதா B.A.BL",noticeDate:"2026-09-09",weekdaySource:"வெள்ளிக்கிழமை",cc:"2059-2018",crime:"1140/2017",sections:"341, 294(b), 324, 506(ii) r/w 34 IPC",accused:"செட்டியார்",alias:"நாகராஜ்",age:"36",parent:"பெருமாள்",address:"எண். 1-5, ஜோதியம்மாள் நகர்,\nசெனாய் நகர், சென்னை - 30"},
+two:{magistrate:"திருமதி இந்துலதா B.A.BL",noticeDate:"2026-09-09",weekdaySource:"வெள்ளிக்கிழமை",cc:"6499-2018",crime:"1141/2017",sections:"341, 323, 336, 392, 384, 427, 506(ii) IPC",accused:"செட்டியார்",alias:"நாகராஜ்",age:"36",parent:"பெருமாள்",address:"எண். 9A, ஜோதியம்மாள் நகர்,\nசெனாய் நகர், சென்னை - 30"}
 };
 var stationList=document.createElement("datalist");stationList.id="stationOptions";document.body.appendChild(stationList);$("station").setAttribute("list","stationOptions");if(window.PoliceDocumentShared){window.PoliceDocumentShared.stations.forEach(function(s){var option=document.createElement("option");option.value=s;stationList.appendChild(option)})}
 function val(id){return String($(id).value||"").trim()}
