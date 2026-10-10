@@ -106,36 +106,74 @@ function val(id){return String($(id).value||"").trim()}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function display(id){return val(id)||"________________"}
 function when(id){var v=val(id);if(!v)return "________________";var parts=v.split("-");return parts.length===3?parts[2]+"."+parts[1]+"."+parts[0]:v}
-function noticeDate(){var d=val("noticeDate");if(!d)return "________ ஆம் ஆண்டு __________ மாதம் ____ ஆம் நாள்";var parts=d.split("-"),months=["ஜனவரி","பிப்ரவரி","மார்ச்","ஏப்ரல்","மே","ஜூன்","ஜூலை","ஆகஸ்ட்","செப்டம்பர்","அக்டோபர்","நவம்பர்","டிசம்பர்"];if(parts.length!==3)return d;var weekday=new Intl.DateTimeFormat("ta-IN",{weekday:"long",timeZone:"UTC"}).format(new Date(d+"T12:00:00Z"));return parts[0]+" ஆம் ஆண்டு "+months[Number(parts[1])-1]+" மாதம் "+Number(parts[2])+" ஆம் நாள் "+weekday}
+function noticeDate(){
+var d=val("noticeDate");if(!d)return "________ ஆம் ஆண்டு __________ மாதம் ____ ஆம் நாள் __________";
+var p=d.split("-"),months=["ஜனவரி","பிப்ரவரி","மார்ச்","ஏப்ரல்","மே","ஜூன்","ஜூலை","ஆகஸ்ட்","செப்டம்பர்","அக்டோபர்","நவம்பர்","டிசம்பர்"];
+if(p.length!==3)return d;
+var computed=new Intl.DateTimeFormat("ta-IN",{weekday:"long",timeZone:"UTC"}).format(new Date(d+"T12:00:00Z"));
+return p[0]+" ஆம் ஆண்டு "+months[Number(p[1])-1]+" மாதம் "+Number(p[2])+" ஆம் நாள் "+(val("weekdaySource")||computed);
+}
 function parts(){
-var name=display("accused");if(val("alias"))name+=" (எ) "+val("alias");if(val("age"))name+=" வயது/"+val("age");
+var name=display("accused");if(val("alias"))name+=" (எ) "+val("alias");if(val("age"))name+=" ஆ-வ/"+val("age");
 var person=name+"\n"+(val("parentRelation")||"த/பெ")+" "+display("parent")+"\n"+display("address");
-var para=display("stationTamil")+" குற்ற எண் : "+display("crime")+" U/s "+display("sections")+" வழக்கில் "+when("arrestDate")+" ஆம் தேதி கைது செய்யப்பட்டு எதிரியான நீர் கனம் "+display("court")+" நீதிமன்றத்தில் Crl.M.P.No: "+display("cmp")+"-ன் உத்தரவு "+when("bailDate")+" ஆம் தேதி அன்று பிறப்பிக்கப்பட்ட உத்தரவின் பேரில் நிபந்தனை ஜாமீனில் விடுவிக்கப்பட்டுள்ளீர். இந்த வழக்கில் நீதிமன்றத்தில் வழக்கிற்காக ஆஜராகாத காரணத்தால் கடந்த "+when("warrantDate")+" ஆம் தேதி முதல் உன் மீது பிடியாணை பிறப்பிக்கப்பட்டு, இன்று "+when("executionDate")+" ஆம் தேதி பிடியாணையின் பேரில் சம்பந்தப்பட்ட காவல் நிலைய "+display("arrestingOfficer")+" கைது செய்யப்பட்டு, நீர் "+when("productionDate")+" ஆம் தேதி நீதிமன்றத்தில் ஆஜர்படுத்தப்பட்டுள்ளீர். எனவே உமக்கு இந்த வழக்கில் வழங்கப்பட்டுள்ள பிணை உத்தரவினை ஏன் ரத்து செய்யக்கூடாது என்ற விளக்கத்தினை தெரிவிக்குமாறு அறிவுறுத்தப்படுகிறது.";
+var arrest=when("arrestDate"),bail=when("bailDate"),warrant=when("warrantDate"),execution=when("executionDate");
+var produced=val("productionDate")?when("productionDate")+" ஆம் தேதி":"இன்று";
+var para=display("stationTamil")+" காவல் நிலைய குற்ற எண் : "+display("crime")+" U/s "+display("sections")+" வழக்கில் "+arrest+" ஆம் தேதி கைது செய்யப்பட்டு எதிரியான நீர் கனம் "+display("court")+" நீதிமன்றத்தில் Crl.M.P.No: "+display("cmp")+"-ன் உத்தரவு "+bail+" ஆம் தேதி அன்று பிறப்பிக்கப்பட்டு உத்தரவின் பேரில் நிபந்தனை ஜாமினில் விடுவிக்கப்பட்டுள்ளீர். இந்த வழக்கில் நீதிமன்றத்தில் வழக்கிற்காக ஆஜராகாத காரணத்தால் கடந்த "+warrant+" ஆம் தேதி முதல் உன் மீது பிடியாணை பிறப்பிக்கப்பட்டு இன்று "+execution+" ஆம் தேதி பிடியாணையின் பேரில் சம்பந்தப்பட்ட காவல் நிலைய "+display("arrestingOfficer")+" கைது செய்யப்பட்டு நீர் "+produced+" நீதிமன்றத்தில் ஆஜர் படுத்தப்பட்டுள்ளீர். எனவே உமக்கு இந்த வழக்கில் வழங்கப்பட்டுள்ள பிணை உத்தரவினை ஏன் ரத்து செய்யக்கூடாது என்ற விளக்கத்தினை தெரிவிக்குமாறு அறிவுறுத்தப்படுகிறது.";
 if(val("additional"))para+="\n\n"+val("additional");
 return [
-{text:display("courtHeading"),align:"center",bold:true,role:"heading"},
-{text:"முன்னிலை: "+display("magistrate"),align:"center"},
-{text:display("court")+"\n"+noticeDate(),align:"center"},
-{text:"C.C.No: "+display("cc")+"       வழக்கு எண்: "+display("crime"),bold:true},
-{text:person+"\n— எதிரி",align:"left",role:"accused"},
+{text:display("courtHeading"),align:"center",bold:true,underline:true,role:"heading"},
+{text:"முன்னிலை "+display("magistrate"),align:"center",bold:true,role:"judge"},
+{text:display("courtListing")+" "+noticeDate(),align:"center",bold:true,role:"court"},
+{text:"CC.No: "+display("cc")+"   வழக்கு எண் : "+display("crime"),align:"left",bold:true,underline:true,role:"case"},
+{text:person,align:"left",bold:true,role:"accused"},
 {text:display("title"),align:"center",bold:true,role:"title"},
 {text:para,align:"justify",role:"body"},
-{text:display("footerCourt"),align:"right",bold:true,role:"signature"}
-]}
-function render(){var p=parts(),out="";p.forEach(function(line){var cl=line.role==="heading"?"court-heading":line.role==="title"?"notice-title":line.role==="body"?"notice-body":line.role==="signature"?"signature":line.role==="accused"?"accused-address":line.align==="center"?"court-info":line.bold?"case-line":"judge";var tag=line.role==="title"?"h2":"div";out+="<"+tag+" class="+JSON.stringify(cl)+">"+esc(line.text)+"</"+tag+">"});$("document").innerHTML=out;}
-function setPreset(id){Object.keys(defaults).forEach(function(k){$(k).value=defaults[k]});if(samples[id])Object.keys(samples[id]).forEach(function(k){$(k).value=samples[id][k]});render();$("status").textContent=id==="blank"?"Blank notice loaded; complete and verify fields.":"Uploaded example loaded. Other dates and order details remain blank because they were not supplied."}
+{text:display("footerCourt"),align:"right",role:"signature"}
+];
+}
+function render(){
+var blocks=parts(),out="";
+blocks.forEach(function(line){
+if(line.role==="accused"){out+='<div class="accused-line"><div class="accused-address">'+esc(line.text)+'</div><span class="accused-label">எதிரி</span></div>';return}
+var classes={heading:"court-heading",judge:"judge",court:"court-info",case:"case-line",title:"notice-title",body:"notice-body",signature:"signature"};
+var cls=classes[line.role]||"court-info",tag=line.role==="title"?"h2":"div";
+out+="<"+tag+' class="'+cls+'">'+esc(line.text)+"</"+tag+">";
+});
+$("document").innerHTML=out;
+}
+function checkWeekday(){
+var warning=$("sourceWarning"),d=val("noticeDate"),label=val("weekdaySource");
+if(d==="2026-09-09"&&label==="வெள்ளிக்கிழமை"){
+warning.style.display="block";warning.textContent="Original date discrepancy: the uploaded notice states 09.09.2026 (வெள்ளிக்கிழமை / Friday), but 09.09.2026 was Wednesday (புதன்கிழமை). Source wording is retained; verify before issuing this court notice.";
+}else{warning.style.display="none";warning.textContent="";}
+}
+function setPreset(id){
+Object.keys(defaults).forEach(function(k){$(k).value=defaults[k]});
+if(samples[id])Object.keys(samples[id]).forEach(function(k){$(k).value=samples[id][k]});
+render();checkWeekday();
+$("status").textContent=id==="blank"?"Blank notice loaded; complete and verify all case details.":"Uploaded source loaded: 09.09.2026, original CC number format, case details and original notice wording. Unverified bail/NBW particulars remain blank.";
+}
 $("preset").addEventListener("change",function(){if($("preset").value!=="blank"||confirm("Clear all entered case particulars?"))setPreset($("preset").value);else $("preset").value="blank"});
-$("noticeForm").addEventListener("input",render);$("noticeForm").addEventListener("change",render);
+$("noticeForm").addEventListener("input",function(){render();checkWeekday()});$("noticeForm").addEventListener("change",function(){render();checkWeekday()});$("noticeDate").addEventListener("change",function(){if(val("noticeDate")!=="2026-09-09"&&val("weekdaySource")==="வெள்ளிக்கிழமை"){$("weekdaySource").value="";render();checkWeekday()}});
 $("reset").addEventListener("click",function(){if(confirm("Clear case details and restore the blank notice?")){$("preset").value="blank";setPreset("blank")}});
 function name(){return "NBW_Accused_Show_Cause_"+(val("cc")||val("crime")||"Blank").replace(/[^a-zA-Z0-9_-]/g,"_")}
 function save(blob,filename){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},30000)}
-function exportDoc(){render();var css=document.querySelector("style").textContent;var body="<!doctype html><html><head><meta charset=utf-8><style>"+css+"body{background:white}.paper{box-shadow:none}@page{size:A4;margin:15mm}</style></head><body><article class=paper><div class=doc>"+$("document").innerHTML+"</div></article></body></html>";save(new Blob(["\ufeff",body],{type:"application/msword;charset=utf-8"}),name()+".doc");$("status").textContent="Editable Word (.doc) downloaded. DOCX library was unavailable."}
+function exportDoc(){render();var css=document.querySelector("style").textContent;var body="<!doctype html><html><head><meta charset=utf-8><style>"+css+"body{background:white}.paper{box-shadow:none}@page{size:A4;margin:0}</style></head><body><article class=paper><div class=doc>"+$("document").innerHTML+"</div></article></body></html>";save(new Blob(["\ufeff",body],{type:"application/msword;charset=utf-8"}),name()+".doc");$("status").textContent="Editable Word (.doc) downloaded. DOCX library was unavailable."}
 $("word").addEventListener("click",async function(){render();if(!window.docx||!window.docx.Packer){exportDoc();return}try{
 var d=window.docx;
-var paragraphs=parts().map(function(block){var fontSize=block.role==="heading"||block.role==="title"?24:22;var align=block.align==="center"?d.AlignmentType.CENTER:block.align==="right"?d.AlignmentType.RIGHT:block.align==="justify"?d.AlignmentType.JUSTIFIED:d.AlignmentType.LEFT;
-var lines=block.text.split("\n"),runs=[];lines.forEach(function(t,i){runs.push(new d.TextRun({text:t,break:i>0?1:0,bold:!!block.bold,font:"Nirmala UI",size:fontSize}))});
-return new d.Paragraph({children:runs,alignment:align,spacing:{after:block.role==="signature"?100:220,line:380},indent:block.role==="body"?{firstLine:360}:undefined})});
-var doc=new d.Document({creator:"Police Documents",title:"NBW Accused - Show Cause Notice",sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1200,bottom:1100,left:1640,right:950}}},children:paragraphs}]});var blob=await d.Packer.toBlob(doc);save(blob,name()+".docx");$("status").textContent="Editable Word (.docx) downloaded.";
+var paragraphs=parts().map(function(block){
+if(block.role==="accused"){
+var cellNoBorder={top:{style:d.BorderStyle.NONE},bottom:{style:d.BorderStyle.NONE},left:{style:d.BorderStyle.NONE},right:{style:d.BorderStyle.NONE}};
+var left=new d.TableCell({children:[new d.Paragraph({children:block.text.split("\n").map(function(t,i){return new d.TextRun({text:t,break:i>0?1:0,bold:true,font:"Nirmala UI",size:22})})})],borders:cellNoBorder});
+var right=new d.TableCell({children:[new d.Paragraph({children:[new d.TextRun({text:"எதிரி",bold:true,font:"Nirmala UI",size:22})],alignment:d.AlignmentType.RIGHT})],verticalAlign:d.VerticalAlign.BOTTOM,borders:cellNoBorder});
+return new d.Table({rows:[new d.TableRow({children:[left,right]})],width:{size:100,type:d.WidthType.PERCENTAGE},columnWidths:[6200,2300]});
+}
+var size=block.role==="heading"||block.role==="title"?24:22;
+var align=block.align==="center"?d.AlignmentType.CENTER:block.align==="right"?d.AlignmentType.RIGHT:block.align==="justify"?d.AlignmentType.JUSTIFIED:d.AlignmentType.LEFT;
+var runs=block.text.split("\n").map(function(t,i){return new d.TextRun({text:t,break:i>0?1:0,bold:!!block.bold,underline:!!block.underline,font:"Nirmala UI",size:size})});
+return new d.Paragraph({children:runs,alignment:align,spacing:{before:block.role==="title"?350:0,after:block.role==="signature"?100:240,line:390},indent:block.role==="body"?{firstLine:360}:undefined});
+});
+var doc=new d.Document({creator:"Police Documents",title:"NBW Accused - Show Cause Notice",sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1078,bottom:1134,left:1644,right:964}}},children:paragraphs}]});var blob=await d.Packer.toBlob(doc);save(blob,name()+".docx");$("status").textContent="Editable Word (.docx) downloaded.";
 }catch(err){console.error(err);exportDoc();}});
 $("pdf").addEventListener("click",function(){render();$("status").textContent="Select Save as PDF in the print dialog.";window.print()});
 setPreset("blank");
