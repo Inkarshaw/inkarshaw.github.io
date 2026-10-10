@@ -30,7 +30,7 @@ input,textarea,select{width:100%;font:inherit;padding:9px;border:1px solid #9bb0
 .doc .blank{border-bottom:1px dotted #999;min-width:18px;display:inline-block;color:#555}
 @media(max-width:1150px){.layout{grid-template-columns:1fr}.paper-frame{padding:10px}.paper{box-shadow:none}}
 @media(max-width:650px){header{padding:14px}.layout{padding:9px}.panel{padding:13px}.grid{grid-template-columns:1fr}.paper-frame{padding:0}.paper{width:100%;min-height:0;padding:16px}.doc{font-size:10pt}}
-@page{size:A4;margin:0}
+.paper.two-page-first{break-after:page;page-break-after:always}.paper.two-page-second{display:block!important}@page{size:A4;margin:0}
 @media print{header,.editor,.previewhead,.helper,.actions{display:none!important}body,.layout,.preview,.paper-frame{display:block!important;background:white!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;max-width:none!important;width:100%!important}.paper{box-shadow:none;width:210mm;min-height:297mm;padding:19mm 17mm 20mm 29mm;page-break-after:avoid}.doc{font-size:11.4pt}button{display:none}}
 </style>
 <script src="/policedocuments/shared-stations.js?v=1"></script>
@@ -45,12 +45,12 @@ input,textarea,select{width:100%;font:inherit;padding:9px;border:1px solid #9bb0
 <div class="field"><label for="preset">Sample / blank form</label><select id="preset"><option value="blank">Blank new notice</option><option value="one">Uploaded notice – CC 2059-2018, Crime 1140/2017</option><option value="two">Uploaded notice – CC 6499-2018, Crime 1141/2017</option></select></div>
 <form id="noticeForm" autocomplete="off"><div id="fields"></div></form>
 <div class="actions">
-<button type="button" id="word">Download Word (.docx)</button><button type="button" id="pdf">Save PDF / Print</button><button type="button" id="reset" class="light">Clear case fields</button>
+<button type="button" id="word">Download Word (.docx)</button><button type="button" id="pdf">Save PDF / Print</button><button type="button" id="twoPage" class="secondary">Original 2-page Word (.docx)</button><button type="button" id="twoPagePdf" class="secondary">Original 2-page PDF / Print</button><button type="button" id="reset" class="light">Clear case fields</button>
 </div>
 <p class="helper">Word creates an editable .docx when the document library is available; otherwise an editable .doc is offered. For PDF choose <strong>Save as PDF</strong> in your browser's print dialog. Tamil is converted to Unicode so it remains readable without the original MCL Mangai font.</p>
 <div id="sourceWarning" role="note" aria-live="polite" style="display:none;border-left:4px solid #bb7a17;padding:10px 12px;background:#fff6df;color:#613e0e;margin-top:8px;font-size:13px"></div><div id="status" role="status" aria-live="polite"></div>
 </section>
-<section class="panel preview"><div class="previewhead"><h2>A4 live notice preview</h2><span class="zoom">Print layout · Tamil</span></div><div class="paper-frame"><article class="paper" id="paper"><div class="doc" id="document" lang="ta"></div></article></div></section>
+<section class="panel preview"><div class="previewhead"><h2>A4 live notice preview</h2><span class="zoom">Print layout · Tamil</span></div><div class="paper-frame"><article class="paper" id="paper"><div class="doc" id="document" lang="ta"></div></article><article class="paper" id="paperTwo" style="display:none"><div class="doc" id="documentTwo" lang="ta"></div></article></div></section>
 </main>
 <script>
 (function(){
@@ -131,16 +131,20 @@ return [
 {text:display("footerCourt"),align:"right",role:"signature"}
 ];
 }
-function render(){
-var blocks=parts(),out="";
+function renderToHtml(blocks){
+var out="";
 blocks.forEach(function(line){
 if(line.role==="accused"){out+='<div class="accused-line"><div class="accused-address">'+esc(line.text)+'</div><span class="accused-label">எதிரி</span></div>';return}
 var classes={heading:"court-heading",judge:"judge",court:"court-info",case:"case-line",title:"notice-title",body:"notice-body",signature:"signature"};
 var cls=classes[line.role]||"court-info",tag=line.role==="title"?"h2":"div";
 out+="<"+tag+' class="'+cls+'">'+esc(line.text)+"</"+tag+">";
 });
-$("document").innerHTML=out;
+return out;
 }
+function render(){$("document").innerHTML=renderToHtml(parts());}
+function sampleParts(which){var old={};Object.keys(defaults).forEach(function(k){old[k]=$(k).value;$(k).value=defaults[k]});Object.keys(samples[which]).forEach(function(k){$(k).value=samples[which][k]});var result=parts();Object.keys(old).forEach(function(k){$(k).value=old[k]});return result;}
+function twoPagePreview(on){var first=sampleParts("one"),second=sampleParts("two");$("document").innerHTML=renderToHtml(first);$("documentTwo").innerHTML=renderToHtml(second);$("paper").classList.toggle("two-page-first",on);$("paperTwo").classList.toggle("two-page-second",on);$("paperTwo").style.display=on?"block":"none";return [first,second];}
+function returnSinglePreview(){ $("paper").classList.remove("two-page-first");$("paperTwo").classList.remove("two-page-second");$("paperTwo").style.display="none";render(); }
 function checkWeekday(){
 var warning=$("sourceWarning"),d=val("noticeDate"),label=val("weekdaySource");
 if(d==="2026-09-09"&&label==="வெள்ளிக்கிழமை"){
@@ -175,6 +179,28 @@ return new d.Paragraph({children:runs,alignment:align,spacing:{before:block.role
 });
 var doc=new d.Document({creator:"Police Documents",title:"NBW Accused - Show Cause Notice",sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1078,bottom:1134,left:1644,right:964}}},children:paragraphs}]});var blob=await d.Packer.toBlob(doc);save(blob,name()+".docx");$("status").textContent="Editable Word (.docx) downloaded.";
 }catch(err){console.error(err);exportDoc();}});
+$("twoPage").addEventListener("click",async function(){
+var documents=twoPagePreview(true);try{
+ if(!window.docx||!window.docx.Packer)throw new Error("DOCX library not loaded");
+ var d=window.docx,children=[];
+ documents.forEach(function(blocks,index){
+  blocks.forEach(function(b,j){
+   var alignment=b.align==="center"?d.AlignmentType.CENTER:b.align==="right"?d.AlignmentType.RIGHT:b.align==="justify"?d.AlignmentType.JUSTIFIED:d.AlignmentType.LEFT;
+   if(b.role==="accused"){
+    var lines=b.text.split("\\n").map(function(t,i){return new d.TextRun({text:t,break:i>0?1:0,font:"Nirmala UI",size:22,bold:true})});
+    children.push(new d.Paragraph({children:lines,spacing:{after:160}}));
+    children.push(new d.Paragraph({children:[new d.TextRun({text:"எதிரி",font:"Nirmala UI",size:22,bold:true})],alignment:d.AlignmentType.RIGHT}));return;
+   }
+   children.push(new d.Paragraph({children:b.text.split("\\n").map(function(t,i){return new d.TextRun({text:t,break:i>0?1:0,bold:!!b.bold,underline:!!b.underline,font:"Nirmala UI",size:b.role==="heading"||b.role==="title"?24:22})}),alignment:alignment,pageBreakBefore:index===1&&j===0,spacing:{before:b.role==="title"?260:0,after:b.role==="signature"?80:150,line:330},indent:b.role==="body"?{firstLine:360}:undefined}));
+  });
+ });
+ var doc=new d.Document({creator:"Police Documents",title:"NBW accused original two notices",sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1078,bottom:1134,left:1644,right:964}}},children:children}]});
+ save(await d.Packer.toBlob(doc),"NBW_Accused_Original_Two_Pages.docx");
+ $("status").textContent="Original two notices exported as editable Word; page 1 CC 2059-2018, page 2 CC 6499-2018.";
+}catch(e){console.error(e);$("status").textContent="Two-page DOCX could not be created; check connection to the Word export library."}
+finally{returnSinglePreview();}
+});
+$("twoPagePdf").addEventListener("click",function(){twoPagePreview(true);$("status").textContent="Printing original notices: page 1 CC 2059-2018; page 2 CC 6499-2018. Select Save as PDF.";window.print();setTimeout(returnSinglePreview,1200);});
 $("pdf").addEventListener("click",function(){render();$("status").textContent="Select Save as PDF in the print dialog.";window.print()});
 setPreset("blank");
 })();
