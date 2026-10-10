@@ -232,8 +232,8 @@ function validateRequest(){
  if(!el("recipient").value.trim()||!el("company").value.trim())problems.push("Enter the recipient and provider.");
  if(!rows.length)problems.push("Add at least one mobile number.");
  rows.forEach(function(r,i){
-  var n=String(r.number||"").replace(/[\\s+-]/g,"");
-  if(!/^\\d{10}$/.test(n))problems.push("Row "+(i+1)+": enter a valid 10-digit mobile number.");
+  var n=String(r.number||"").replace(/[\s+-]/g,"");
+  if(!/^\d{10}$/.test(n))problems.push("Row "+(i+1)+": enter a valid 10-digit mobile number.");
   if(!r.from)problems.push("Row "+(i+1)+": enter the start date.");
   if(r.from&&r.to&&r.to<r.from)problems.push("Row "+(i+1)+": end date is before start date.");
  });
