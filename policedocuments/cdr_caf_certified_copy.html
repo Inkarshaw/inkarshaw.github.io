@@ -81,8 +81,8 @@ Mandaiveli, Chennai-600028.</textarea>
 <label>Signature Station</label><input id="signStation" value="G7 Chetpet Police Station" oninput="render()">
 </div></div>
 
-<div class="actions">
-<button class="btn dark" onclick="window.print()">Print / Save PDF</button>
+<p id="formValidation" role="alert" style="font-size:12px;color:#b42318;line-height:1.5" aria-live="polite"></p><div class="actions">
+<button class="btn dark" onclick="printValidated()">Print / Save PDF</button>
 <button class="btn secondary" onclick="saveDraft()">Save Draft</button>
 <button class="btn secondary" onclick="loadDraft()">Load Draft</button>
 <button class="btn danger" onclick="resetForm()">Reset</button>
@@ -223,8 +223,34 @@ function render(){
  }).join("");
  el("pSignRank").textContent=el("signRank").value;el("pSignStation").textContent=el("signStation").value;
 }
+function validateRequest(){
+ var problems=[];
+ if(!el("crimeNo").value.trim())problems.push("Enter Crime No.");
+ if(!el("sections").value.trim())problems.push("Enter sections of law.");
+ if(!el("regDate").value)problems.push("Enter registered date.");
+ if(el("stationMode").value==="other"&&!el("otherPs").value.trim())problems.push("Enter Police Station.");
+ if(!el("recipient").value.trim()||!el("company").value.trim())problems.push("Enter the recipient and provider.");
+ if(!rows.length)problems.push("Add at least one mobile number.");
+ rows.forEach(function(r,i){
+  var n=String(r.number||"").replace(/[\\s+-]/g,"");
+  if(!/^\\d{10}$/.test(n))problems.push("Row "+(i+1)+": enter a valid 10-digit mobile number.");
+  if(!r.from)problems.push("Row "+(i+1)+": enter the start date.");
+  if(r.from&&r.to&&r.to<r.from)problems.push("Row "+(i+1)+": end date is before start date.");
+ });
+ return problems;
+}
+function printValidated(){
+ var errors=validateRequest();
+ el("formValidation").textContent=errors.join(" ");
+ if(errors.length){el("formValidation").scrollIntoView({behavior:"smooth",block:"center"});return}
+ render();window.print();
+}
 function collect(){var ids=["fromRank","stationMode","chennaiStation","otherPs","psAddress","provider","recipient","company","companyAddress","crimeNo","sections","regDate","regTime","refPs","subject","signRank","signStation"],d={};ids.forEach(function(id){d[id]=el(id).value});d.ps=getPoliceStation();d.includeCaf=el("includeCaf").checked;d.includeName=el("includeName").checked;d.rows=rows;return d}
-function saveDraft(){localStorage.setItem("cdrCafCertifiedCopyV1",JSON.stringify(collect()));alert("Draft saved on this device.")}
+function saveDraft(){
+ if(!confirm("This draft contains investigation details and will be stored in this browser's local storage. Save only on an authorised, protected device. Continue?"))return;
+ try{localStorage.setItem("cdrCafCertifiedCopyV1",JSON.stringify(collect()));alert("Draft saved in this browser. Clear it after use.")}
+ catch(e){alert("Unable to save draft in browser storage.")}
+}
 function loadDraft(){var raw=localStorage.getItem("cdrCafCertifiedCopyV1");if(!raw){alert("No saved draft found.");return}var d=JSON.parse(raw);Object.keys(d).forEach(function(k){if(el(k)&&k!=="includeCaf"&&k!=="includeName")el(k).value=d[k]});if(d.ps&&!d.stationMode){var match=chennaiPoliceStations.indexOf(d.ps)!==-1;el("stationMode").value=match?"chennai":"other";if(match)el("chennaiStation").value=d.ps;else el("otherPs").value=d.ps}el("includeCaf").checked=d.includeCaf!==false;el("includeName").checked=d.includeName!==false;if(Array.isArray(d.rows)&&d.rows.length)rows=d.rows;toggleStationMode();drawRows();render()}
 function resetForm(){if(confirm("Reset all fields to the sample letter?")){localStorage.removeItem("cdrCafCertifiedCopyV1");location.reload()}}
 populateChennaiStations();toggleStationMode();drawRows();render();
