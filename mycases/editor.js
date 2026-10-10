@@ -63,11 +63,63 @@
     try{sessionStorage.setItem('myCasesEditorTab',name)}catch(e){}
   }
 
+  const ANNEXURE_HEADS={
+    'Murder':'murder','Attempt to Murder':'hurt','Simple Hurt':'hurt','Grievous Hurt':'hurt',
+    'Rioting':'hurt','Robbery':'robbery','Dacoity':'robbery','Chain Snatching':'robbery',
+    'Rape / Sexual Offence':'rape','POCSO':'pocso','Missing Person':'missing',
+    'SC/ST Act':'scst','Bomb Blast':'blast','TNPPDL Act':'tnppdl',
+    'Cyber Crime':'cyber','Fake Currency':'ficn'
+  };
+  const annexure=()=>window.InvestigationAnnexure?.categories||[];
+  const annexureMeta=()=>state.investigationChecklist.find(x=>x.id==='annexure-selected-template');
+  function selectedAnnexure(){
+    const meta=annexureMeta();
+    return meta?String(meta.value||''):(ANNEXURE_HEADS[state.caseType]||'');
+  }
+  function setAnnexureTemplate(templateId){
+    const existing=annexureMeta();
+    if(existing)existing.value=templateId;
+    else state.investigationChecklist.push({id:'annexure-selected-template',label:'',hidden:true,value:templateId});
+  }
+  function ensureAnnexure(){
+    const template=annexure().find(t=>t.id===selectedAnnexure());
+    if(!template)return null;
+    template.items.forEach((label,i)=>{
+      const id='annexure-'+template.id+'-'+(i+1);
+      if(!state.investigationChecklist.some(x=>x.id===id))
+        state.investigationChecklist.push({id,label,sourceTemplate:template.id,sourceNumber:i+1,status:'Pending',done:false,date:'',remarks:'',reference:''});
+    });
+    return template;
+  }
+  function renderAnnexure(){
+    const sel=$('#annexureTemplate'),list=$('#annexureChecklist'),progress=$('#annexureProgress'),notice=$('#annexureNotice');
+    if(!sel||!list)return;
+    const active=selectedAnnexure();
+    sel.innerHTML='<option value="">Choose a category</option>'+annexure().map(t=>'<option value="'+esc(t.id)+'" '+(t.id===active?'selected':'')+'>'+esc(t.title)+' ('+t.items.length+')</option>').join('');
+    const template=ensureAnnexure();
+    if(!template){progress.textContent='Select a template';list.innerHTML='';notice.textContent='Choose the relevant annexure for this case. Existing quick checklist remains available.';return}
+    const items=state.investigationChecklist.filter(x=>x.sourceTemplate===template.id);
+    const done=items.filter(x=>x.status==='Completed'||x.done).length;
+    const na=items.filter(x=>x.status==='Not Applicable').length;
+    progress.textContent=done+'/'+items.length+' complete · '+na+' N/A · '+(items.length-done-na)+' open';
+    notice.textContent=(window.InvestigationAnnexure?.referenceNote||'')+' · Annexure pages '+template.pages+'.';
+    list.innerHTML=items.map((x,i)=>{
+      const status=x.status||(x.done?'Completed':'Pending');
+      return '<article class="annexure-card '+(status==='Completed'?'done':'')+'">'+
+       '<h3>'+(i+1)+'. '+esc(x.label)+'</h3>'+
+       '<div class="annexure-fields">'+
+       '<select data-ann-status="'+esc(x.id)+'">'+['Pending','In Progress','Completed','Not Applicable'].map(v=>'<option '+(status===v?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
+       '<input type="date" title="Completion date" data-ann-date="'+esc(x.id)+'" value="'+esc(x.date||'')+'">'+
+       '<input title="Document reference / page no." placeholder="File / CD / page reference" data-ann-field="reference" data-ann-id="'+esc(x.id)+'" value="'+esc(x.reference||'')+'">'+
+       '<input class="remarks" placeholder="Remarks / document location / responsible officer" data-ann-field="remarks" data-ann-id="'+esc(x.id)+'" value="'+esc(x.remarks||'')+'">'+
+       '</div><div class="actions"><span class="muted">Source entry '+(i+1)+' of '+items.length+'</span><button type="button" data-ann-task="'+esc(x.id)+'">+ Follow-up task</button></div></article>';
+    }).join('');
+  }
   function renderChecklist(){
     ensureChecklist();
-    const done=state.investigationChecklist.filter(x=>x.done).length,total=state.investigationChecklist.length;
+    const basic=state.investigationChecklist.filter(x=>!x.sourceTemplate&&!x.hidden);const done=basic.filter(x=>x.done).length,total=basic.length;
     $('#investigationProgress').textContent=done+'/'+total+' completed';
-    $('#checklist').innerHTML=state.investigationChecklist.map(x=>'<div class="check-row '+(x.done?'done':'')+'"><input type="checkbox" data-check="'+esc(x.id)+'" '+(x.done?'checked':'')+'><div>'+esc(x.label)+'</div><input type="date" data-check-date="'+esc(x.id)+'" value="'+esc(x.date||'')+'"></div>').join('');
+    $('#checklist').innerHTML=state.investigationChecklist.filter(x=>!x.sourceTemplate&&!x.hidden).map(x=>'<div class="check-row '+(x.done?'done':'')+'"><input type="checkbox" data-check="'+esc(x.id)+'" '+(x.done?'checked':'')+'><div>'+esc(x.label)+'</div><input type="date" data-check-date="'+esc(x.id)+'" value="'+esc(x.date||'')+'"></div>').join('');
   }
   function propertySeized(){
     const step=(state.investigationChecklist||[]).find(x=>String(x.label||'').toLowerCase()==='property seized');
@@ -157,7 +209,7 @@
     box.innerHTML=state.attachments.map(a=>'<article class="list-card"><div><strong>'+esc(a.name||a.type||'Document')+'</strong><p>'+esc(a.type||'')+(a.sizeLabel?' · '+esc(a.sizeLabel):'')+'</p></div><div class="row-btns">'+((a.url||a.data)?'<button type="button" data-attachment-open="'+esc(a.id)+'">Open</button>':'')+'<button type="button" class="danger" data-attachment-delete="'+esc(a.id)+'">Delete</button></div></article>').join('');
   }
   function renderAll(){
-    bindFields();renderChecklist();renderProperties();renderAccused();renderHearings();renderTasks();renderTimeline();renderAttachments();status();
+    bindFields();renderChecklist();renderAnnexure();renderProperties();renderAccused();renderHearings();renderTasks();renderTimeline();renderAttachments();status();
   }
   function addAudit(before,after){
     if(!before){
@@ -230,6 +282,7 @@
 
   document.addEventListener('input',e=>{
     if(e.target.matches('[data-field]'))scheduleAutosave();
+    if(e.target.dataset.annField){const x=state.investigationChecklist.find(v=>v.id===e.target.dataset.annId);if(x){x[e.target.dataset.annField]=e.target.value;scheduleAutosave()}}
     const i=Number(e.target.dataset.i),key=e.target.dataset.personField;
     if(key&&state.accusedPersons[i]){state.accusedPersons[i][key]=e.target.value;scheduleAutosave()}
     const pi=Number(e.target.dataset.pi),pkey=e.target.dataset.propertyField;
@@ -237,7 +290,7 @@
   });
   document.addEventListener('change',e=>{
     if(e.target.matches('[data-field]')){
-      if(e.target.dataset.field==='caseType'){collectFields();ensureChecklist();renderChecklist()}
+      if(e.target.dataset.field==='caseType'){collectFields();setAnnexureTemplate(ANNEXURE_HEADS[state.caseType]||'');ensureChecklist();renderChecklist();renderAnnexure()}
       if(e.target.dataset.field==='finalResult'&&e.target.value){
         const map={'Committed to Higher Court':'Case Disposed','Other Disposal':'Case Disposed'};
         state.stage=map[e.target.value]||e.target.value;$('[data-field="stage"]').value=state.stage;
@@ -246,6 +299,11 @@
     }
     const i=Number(e.target.dataset.i),key=e.target.dataset.personField;
     if(key&&state.accusedPersons[i]){state.accusedPersons[i][key]=e.target.value;scheduleAutosave()}
+    if(e.target.dataset.annStatus){
+      const x=state.investigationChecklist.find(v=>v.id===e.target.dataset.annStatus);
+      if(x){x.status=e.target.value;x.done=x.status==='Completed';if(x.done&&!x.date)x.date=new Date().toISOString().slice(0,10);renderAnnexure();scheduleAutosave()}
+    }
+    if(e.target.dataset.annDate){const x=state.investigationChecklist.find(v=>v.id===e.target.dataset.annDate);if(x){x.date=e.target.value;scheduleAutosave()}}
     if(e.target.dataset.check){
       const x=state.investigationChecklist.find(v=>v.id===e.target.dataset.check);if(x){x.done=e.target.checked;if(x.done&&!x.date)x.date=new Date().toISOString().slice(0,10);renderChecklist();renderProperties();scheduleAutosave()}
     }
@@ -270,6 +328,12 @@
   document.addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b)return;
     if(b.dataset.tab){setTab(b.dataset.tab);return}
+    if(b.dataset.annTask){
+      const x=state.investigationChecklist.find(v=>v.id===b.dataset.annTask);if(!x)return;
+      if(state.tasks.some(t=>!t.done&&t.annexureId===x.id)){toast('A pending follow-up already exists.');return}
+      state.tasks.push({id:Core.uid(),text:'Annexure: '+x.label,due:'',done:false,annexureId:x.id,createdAt:Core.now()});
+      renderTasks();scheduleAutosave();toast('Follow-up added to Tasks tab.');return;
+    }
     if(b.dataset.propertyDelete!==undefined){state.propertyItems.splice(Number(b.dataset.propertyDelete),1);renderProperties();scheduleAutosave()}
     else if(b.dataset.propertyPhoto!==undefined){
       const input=document.createElement('input');input.type='file';input.accept='image/*';input.capture='environment';input.onchange=()=>setPropertyPhoto(Number(b.dataset.propertyPhoto),input.files[0]);input.click();
@@ -298,6 +362,13 @@
       if(!state){toast('Case not found.');setTimeout(leave,700);return}
     }
     ensureChecklist();baseline=isNew?null:clone(state);renderAll();
+    $('#annexureTemplate').addEventListener('change',e=>{setAnnexureTemplate(e.target.value);renderAnnexure();scheduleAutosave()});
+    $('#annexureGenerate').addEventListener('click',async()=>{
+      if(!selectedAnnexure()){toast('Select an annexure first.');return}
+      if(!await explicitSave(false))return;
+      Core.setHandoff(state);
+      location.href='/policedocuments/investigation_checklist_generator.html?case='+encodeURIComponent(state.id);
+    });
     $('#editorTitle').textContent=isNew?'New Case':'Edit Case';
     $('#saveBtn').textContent=isNew?'Create Case':'Save Changes';
 
