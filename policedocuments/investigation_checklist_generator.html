@@ -35,7 +35,7 @@ h1{font-size:1.45rem;margin:0 0 4px}h2{font-size:1.1rem}.sub{font-size:.82rem;op
 <div class="field"><label for="reportDate">Checklist Date</label><input id="reportDate" type="date"></div>
 <div class="field full"><label for="category">Annexure category</label><select id="category"><option value="">Select checklist</option></select></div>
 </div><div class="alert" id="legalNote">The uploaded annexure contains pre-2024 IPC / Cr.P.C. / Evidence Act references. Verify which current provisions, deadlines and court directions apply. A completed checklist does not certify legal compliance.</div>
-<div class="note" id="importNote">No case has been imported. Enter particulars manually or open this tool through My Cases → Investigation.</div></section>
+<div class="controls" style="margin:10px 0"><button class="btn" id="loadCaseBtn" type="button">↻ Load current My Cases case</button></div><div class="note" id="importNote">No case has been imported. Enter particulars manually or open this tool through My Cases → Investigation.</div></section>
 <section class="panel"><div class="controls"><button class="btn primary" id="wordBtn" type="button">⬇ Download Word (.docx)</button><button class="btn primary" id="pdfBtn" type="button">⬇ Download PDF</button><button class="btn" id="printBtn" type="button">🖨 Print / Save PDF</button><button class="btn" id="addBtn" type="button">＋ Custom item</button><button class="btn" id="saveCaseBtn" type="button" hidden>✓ Save changes to My Cases</button></div><div id="message" role="status" aria-live="polite"></div><div class="stats" id="stats"></div></section>
 <section class="panel"><h2 id="checkTitle">Select an offence-wise annexure</h2><p class="note">Mark each requirement Pending, In Progress, Completed or Not Applicable. Add the document reference, date and remarks. You can edit the wording and add your own items.</p><div id="items"></div></section>
 <section class="panel"><div class="controls"><button class="btn primary" id="wordBottom" type="button">Download Word</button><button class="btn primary" id="pdfBottom" type="button">Download PDF</button><a class="btn" href="/mycases/">Return to My Cases</a></div></section>
@@ -141,6 +141,13 @@ async function downloadWord(){
 function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),5000)}
 $('pdfBtn').addEventListener('click',downloadPDF);$('pdfBottom').addEventListener('click',downloadPDF);
 $('wordBtn').addEventListener('click',downloadWord);$('wordBottom').addEventListener('click',downloadWord);
+$('loadCaseBtn').addEventListener('click',()=>{
+ const Core=window.MyCasesCore;
+ const h=Core?.getHandoff?.();
+ if(!h?.id||h.deletedAt){msg('No active case selected. Open My Cases, select a case, then return here.');return}
+ if(rows.length&&rows.some(r=>r.status!=='Pending'||r.reference||r.remarks||r.date)&&!confirm('Replace unsaved checklist entries with the selected My Cases record?'))return;
+ const url=new URL(location.href);url.searchParams.set('case',String(h.id));location.assign(url.pathname+url.search);
+});
 const params=new URLSearchParams(location.search),requested=params.get('case');
 try{
  const Core=window.MyCasesCore,h=Core?.getHandoff?.();
@@ -165,15 +172,20 @@ $('saveCaseBtn').addEventListener('click',async()=>{
  try{
  const Core=window.MyCasesCore;Core.init();
  const c=Core.getCase(imported.id);if(!c){msg('Case no longer available on this device.');return}
- const currentIds=new Set(rows.map(r=>r.id));
- const kept=(c.investigationChecklist||[]).filter(x=>x.sourceTemplate!==$('category').value);
+ if(!$('category').value||!rows.length){msg('Choose a checklist category before saving.');return}
+ const kept=(c.investigationChecklist||[]).filter(x=>x.sourceTemplate!==$('category').value && x.id!=='annexure-selected-template');
  c.investigationChecklist=kept.concat(rows.map((r,i)=>({...r,sourceTemplate:$('category').value,sourceNumber:i+1,done:r.status==='Completed'})));
  const marker=c.investigationChecklist.find(x=>x.id==='annexure-selected-template');
  if(marker)marker.value=$('category').value;
  else c.investigationChecklist.push({id:'annexure-selected-template',label:'',hidden:true,value:$('category').value});
  Core.saveCase(c,{queue:true,touch:true});
- if(Core.token())await Core.processQueue();
- msg('Checklist saved to My Cases (cloud sync if connected).');imported=c;
+ let feedback='Saved locally to My Cases. Cloud sync pending.';
+ if(Core.token()){
+   const synced=await Core.processQueue();
+   if(synced===true)feedback='Saved to My Cases and cloud sync completed.';
+   else if(synced===false)feedback='Saved locally; cloud sync is pending.';
+ }
+ msg(feedback);imported=c;
  }catch(err){console.error(err);msg('Save failed: '+err.message)}
 });
 render();
