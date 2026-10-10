@@ -133,7 +133,7 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
       const indexUrl='data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json';
       const r=await fetch(indexUrl,{cache:'no-store'});
       if(!r.ok){
-        if(cls===7) throw new Error('Class 7 '+subject+' Term '+term+' index unavailable');
+        if(cls===7&&term===1) throw new Error('Class 7 '+subject+' Term '+term+' index unavailable');
         units=[];
         upcoming=true;
       }else{
@@ -158,10 +158,10 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
     const switcher=cls>=7&&cls<=10?
       '<div class="sets" style="margin:0 0 16px">'+
       '<a class="btn '+(subject==='science'?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject=science'+(cls<=8?'&term='+term:'')+'">Science / அறிவியல்</a>'+
-      '<a class="btn '+(subject==='social-science'?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject=social-science'+(cls<=8?'&term=1':'')+'">Social Science / சமூக அறிவியல்</a>'+
+      '<a class="btn '+(subject==='social-science'?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject=social-science'+(cls<=8?'&term='+term:'')+'">Social Science / சமூக அறிவியல்</a>'+
       (cls<=8?'<a class="btn '+(term===1?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject='+subject+'&term=1">Term I</a>'+
-      '<a class="btn '+(term===2?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject='+(cls===7?'science':subject)+'&term=2">Term II</a>'+
-      '<a class="btn '+(term===3?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject='+(cls===7?'science':subject)+'&term=3">Term III</a>':'')+'</div>':
+      '<a class="btn '+(term===2?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject='+subject+'&term=2">Term II</a>'+
+      '<a class="btn '+(term===3?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject='+subject+'&term=3">Term III</a>':'')+'</div>':
       cls===12?
       '<div class="sets" style="margin:0 0 16px"><a class="btn '+(subject==='history'?'primary':'')+'" href="textbook-quiz.html?class=12&subject=history">History / வரலாறு</a><a class="btn '+(subject==='geography'?'primary':'')+'" href="textbook-quiz.html?class=12&subject=geography">Geography / புவியியல்</a></div>':'';
 
