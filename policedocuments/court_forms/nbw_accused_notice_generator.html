@@ -59,7 +59,7 @@ var $=function(id){return document.getElementById(id)};
 var groups=[
 ["Court details",[
 ["courtHeading","Court heading / நீதிமன்றத் தலைப்பு","textarea","கனம் 2-வது பெருநகர் குற்றவியல் நடுவர் நீதிமன்ற நீதிபதி அவர்கள்\nமுன்பாக எழும்பூர், சென்னை - 08"],
-["magistrate","Presiding Magistrate / முன்னிலை","text","திருமதி இந்துலதா, B.A., B.L."],
+["magistrate","Presiding Magistrate / முன்னிலை","text",""],
 ["court","Court name / நீதிமன்றம்","text","2-வது பெருநகர் குற்றவியல் நடுவர் நீதிமன்றம், எழும்பூர்"],
 ["noticeDate","Notice date / அறிவிப்பு தேதி","date",""],
 ["footerCourt","Signature designation / கையொப்பம்","textarea","2-வது பெருநகர் குற்றவியல் நடுவர்\nஎழும்பூர், சென்னை - 08"]
@@ -95,8 +95,8 @@ var groups=[
 var defaults={},fields=$("fields");
 groups.forEach(function(g){var title=document.createElement("h3");title.textContent=g[0];fields.appendChild(title);var grid=document.createElement("div");grid.className="grid";g[1].forEach(function(f){var id=f[0],lab=f[1],type=f[2],def=f[3];defaults[id]=def;var wrap=document.createElement("div");wrap.className="field"+((type==="textarea"||id==="courtHeading"||id==="footerCourt")?" full":"");var label=document.createElement("label");label.htmlFor=id;label.textContent=lab;wrap.appendChild(label);var input;if(type==="textarea"){input=document.createElement("textarea");input.rows=(id==="address"?3:2);}else if(type==="select"){input=document.createElement("select");f[4].forEach(function(option){var opt=document.createElement("option");opt.value=option;opt.textContent=option;input.appendChild(opt)});}else{input=document.createElement("input");input.type=type;}input.id=id;input.name=id;input.value=def;wrap.appendChild(input);grid.appendChild(wrap);});fields.appendChild(grid)});
 var samples={
-one:{cc:"2059/2018",crime:"1140/2017",sections:"341, 294(b), 324, 506(ii) r/w 34 IPC",accused:"செட்டியார்",alias:"நாகராஜ்",age:"36",parent:"பெருமாள்",address:"எண். 1-5, ஜோதியம்மாள் நகர்,\nசெனாய் நகர், சென்னை - 30"},
-two:{cc:"6499/2018",crime:"1141/2017",sections:"341, 323, 336, 392, 384, 427, 506(ii) IPC",accused:"செட்டியார்",alias:"நாகராஜ்",age:"36",parent:"பெருமாள்",address:"எண். 9A, ஜோதியம்மாள் நகர்,\nசெனாய் நகர், சென்னை - 30"}
+one:{magistrate:"திருமதி இந்துலதா, B.A., B.L.",cc:"2059/2018",crime:"1140/2017",sections:"341, 294(b), 324, 506(ii) r/w 34 IPC",accused:"செட்டியார்",alias:"நாகராஜ்",age:"36",parent:"பெருமாள்",address:"எண். 1-5, ஜோதியம்மாள் நகர்,\nசெனாய் நகர், சென்னை - 30"},
+two:{magistrate:"திருமதி இந்துலதா, B.A., B.L.",cc:"6499/2018",crime:"1141/2017",sections:"341, 323, 336, 392, 384, 427, 506(ii) IPC",accused:"செட்டியார்",alias:"நாகராஜ்",age:"36",parent:"பெருமாள்",address:"எண். 9A, ஜோதியம்மாள் நகர்,\nசெனாய் நகர், சென்னை - 30"}
 };
 var stationList=document.createElement("datalist");stationList.id="stationOptions";document.body.appendChild(stationList);$("station").setAttribute("list","stationOptions");if(window.PoliceDocumentShared){window.PoliceDocumentShared.stations.forEach(function(s){var option=document.createElement("option");option.value=s;stationList.appendChild(option)})}
 function val(id){return String($(id).value||"").trim()}
