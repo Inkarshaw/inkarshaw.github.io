@@ -508,6 +508,7 @@
             }
         }
     </style>
+<script defer src="/policedocuments/shared-stations.js?v=1"></script>
 </head>
 <body>
     <div class="container">
@@ -566,7 +567,7 @@
                 
                 <div class="form-group">
                     <label for="policeStation">Police Station:</label>
-                    <input type="text" id="policeStation" value="G7 Chetpet PS" placeholder="Enter police station">
+                    <input type="text" id="policeStation" list="sharedPoliceStations" value="G7 Chetpet PS" placeholder="Enter or select police station"><datalist id="sharedPoliceStations"></datalist>
                     <div class="error-message" id="policeStationError">Please enter a police station</div>
                 </div>
                 
@@ -1072,10 +1073,19 @@ Hence I request you to furnish the details of below mentioned ${accountRequestWo
             updateDocument();
         }
     
+        // Shared Chennai station suggestions, while allowing other stations.
+        const stationList = document.getElementById('sharedPoliceStations');
+        if (stationList && window.PoliceDocumentShared) {
+            window.PoliceDocumentShared.stations.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                stationList.appendChild(option);
+            });
+        }
         // Prefill from ClearExams My Cases when opened from a selected case.
         try {
-            const currentCase = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
-            if (currentCase) {
+            const currentCase = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV2') || 'null');
+            if (currentCase && currentCase.id && !currentCase.deletedAt) {
                 const setIfPresent = (id, value) => {
                     const el = document.getElementById(id);
                     if (el && value !== undefined && value !== null && String(value).trim() !== '') {
