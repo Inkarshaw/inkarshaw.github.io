@@ -11,7 +11,7 @@
 header{position:sticky;top:0;z-index:20;background:#fffffff2;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}nav{min-height:64px;display:flex;align-items:center;gap:16px}.brand{font-size:1.15rem;font-weight:900}.links{margin-left:auto;display:flex;gap:14px;font-weight:800;color:#38516c}
 .hero{background:linear-gradient(135deg,#071c33,#0d3b67);color:#fff}.hero .wrap{padding:42px 0}.hero h1{margin:0;font-size:clamp(2.2rem,6vw,4rem);line-height:1.02}.hero p{max-width:720px;margin:12px 0 0;color:#c8d8e8}
 main{padding:24px 0 64px}.section{margin-top:24px}.head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:12px}.head h2{margin:0;font-size:1.45rem}.head p{margin:3px 0 0;color:var(--muted)}
-.classgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}.class{padding:16px 8px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:center;font-weight:900;text-decoration:none;color:inherit;cursor:pointer}.class.active{border-color:#9fc2ff;background:#eef5ff;color:#1357c4}.class.locked{color:#9aa8b7}
+.classgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}.class{padding:16px 8px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:center;font-weight:900;text-decoration:none;color:inherit;cursor:pointer}.class.active{border-color:#9fc2ff;background:#eef5ff;color:#1357c4}.class.locked{color:#9aa8b7}.class:hover{border-color:#9fc2ff;background:#f4f8ff}.class:focus-visible{outline:3px solid #1463ff;outline-offset:2px}
 .panel{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}.crumb{font-size:.8rem;color:var(--muted);font-weight:800}.unitgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}.unit{padding:16px;border:1px solid var(--line);border-radius:15px;background:#fff}.unit.ready{border-color:#b9d6c9}.unit h3{margin:0 0 5px}.unit p{margin:0;color:var(--muted);font-size:.86rem}.sets{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.quizsets{max-height:190px;overflow:auto;padding:2px 4px 4px 0;scrollbar-width:thin}.quizsets .btn{flex:0 0 auto}.quizset-count{width:100%;font-size:.75rem;color:var(--muted);font-weight:800;margin-bottom:1px}.btn{display:inline-flex;min-height:40px;padding:0 12px;align-items:center;justify-content:center;border:1px solid #cbd7e5;border-radius:9px;background:#fff;font-weight:850;color:#29445f}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.tag{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eaf8f1;color:var(--green);font-size:.72rem;font-weight:900}
 .note{margin-top:16px;padding:13px 14px;border:1px solid #d8e2ed;border-radius:12px;background:#f9fbfd;color:#53677c;font-size:.85rem}
 footer{padding:28px 0;background:#061629;color:#cbd8e5}
@@ -24,7 +24,7 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
 <main class="wrap">
 <section class="section"><div class="head"><div><h2>Choose class</h2><p>The structure is ready for Standards 6–12.</p></div></div>
 <div class="classgrid">
-<a class="class active" href="textbook-quiz.html">6th</a><div class="class locked">7th</div><div class="class locked">8th</div><div class="class locked">9th</div><div class="class locked">10th</div><a class="class" href="textbook-quiz.html?class=11">11th</a><a class="class" href="textbook-quiz.html?class=12">12th</a>
+<a class="class active" href="textbook-quiz.html">6th</a><a class="class" href="textbook-quiz.html?class=7&subject=science&term=1">7th</a><a class="class" href="textbook-quiz.html?class=8&subject=science&term=1">8th</a><a class="class" href="textbook-quiz.html?class=9&subject=science">9th</a><a class="class" href="textbook-quiz.html?class=10&subject=science">10th</a><a class="class" href="textbook-quiz.html?class=11">11th</a><a class="class" href="textbook-quiz.html?class=12">12th</a>
 </div></section>
 <section class="section panel">
 <div class="crumb">6th Standard → Science → Term I → 2025 Edition</div>
@@ -96,7 +96,7 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
   const requestedSubject=params.get('subject')||'science';
   const subject=cls>=11?((cls===12&&requestedSubject==='geography')?'geography':'history'):(requestedSubject==='social-science'?'social-science':'science');
   const term=Number(params.get('term')||1);
-  if(cls!==7 && cls!==11 && cls!==12) return;
+  if(![7,8,9,10,11,12].includes(cls)) return;
 
   document.querySelectorAll('.class').forEach(el=>{
     el.classList.remove('active');
@@ -127,13 +127,21 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
 
   const main=document.querySelector('main.wrap');
   async function render(){
-    let units,edition=2025;
-    if(cls===7){
-      const r=await fetch('data/textbook/class-7/'+subject+'/term-'+term+'/index.json',{cache:'no-store'});
-      if(!r.ok) throw new Error('Class 7 '+subject+' Term '+term+' index unavailable');
-      const d=await r.json();
-      edition=d.meta?.edition||2025;
-      units=d.units.map(x=>({...x,total:x.total??null,ready:x.ready!==false}));
+    let units,edition=2025,upcoming=false;
+    if(cls>=7&&cls<=10){
+      const termSegment=cls<=8?'/term-'+term:'';
+      const indexUrl='data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json';
+      const r=await fetch(indexUrl,{cache:'no-store'});
+      if(!r.ok){
+        if(cls===7) throw new Error('Class 7 '+subject+' Term '+term+' index unavailable');
+        units=[];
+        upcoming=true;
+      }else{
+        const d=await r.json();
+        edition=d.meta?.edition||2025;
+        units=(d.units||[]).map(x=>({...x,total:x.total??null,ready:x.ready!==false}));
+        if(!units.length)upcoming=true;
+      }
     }else if(cls===11){
       units=units11.map(x=>({id:x[0],unit_en:x[1],unit_ta:x[2],total:x[3],quiz_count:x[4],ready:true}));
     }else{
@@ -147,8 +155,13 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
     const subjEn=subject==='geography'?'Geography':subject==='social-science'?'Social Science':subject==='science'?'Science':'History';
     const subjTa=subject==='geography'?'புவியியல்':subject==='social-science'?'சமூக அறிவியல்':subject==='science'?'அறிவியல்':'வரலாறு';
     const totalKnown=units.reduce((n,u)=>n+(u.ready&&u.total?u.total:0),0);
-    const switcher=cls===7?
-      '<div class="sets" style="margin:0 0 16px"><a class="btn '+(subject==='science'?'primary':'')+'" href="textbook-quiz.html?class=7&subject=science&term='+term+'">Science / அறிவியல்</a><a class="btn '+(subject==='social-science'?'primary':'')+'" href="textbook-quiz.html?class=7&subject=social-science&term=1">Social Science / சமூக அறிவியல்</a><a class="btn '+(term===1?'primary':'')+'" href="textbook-quiz.html?class=7&subject='+subject+'&term=1">Term I</a><a class="btn '+(term===2?'primary':'')+'" href="textbook-quiz.html?class=7&subject=science&term=2">Term II</a><a class="btn '+(term===3?'primary':'')+'" href="textbook-quiz.html?class=7&subject=science&term=3">Term III</a></div>':
+    const switcher=cls>=7&&cls<=10?
+      '<div class="sets" style="margin:0 0 16px">'+
+      '<a class="btn '+(subject==='science'?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject=science'+(cls<=8?'&term='+term:'')+'">Science / அறிவியல்</a>'+
+      '<a class="btn '+(subject==='social-science'?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject=social-science'+(cls<=8?'&term=1':'')+'">Social Science / சமூக அறிவியல்</a>'+
+      (cls<=8?'<a class="btn '+(term===1?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject='+subject+'&term=1">Term I</a>'+
+      '<a class="btn '+(term===2?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject='+(cls===7?'science':subject)+'&term=2">Term II</a>'+
+      '<a class="btn '+(term===3?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject='+(cls===7?'science':subject)+'&term=3">Term III</a>':'')+'</div>':
       cls===12?
       '<div class="sets" style="margin:0 0 16px"><a class="btn '+(subject==='history'?'primary':'')+'" href="textbook-quiz.html?class=12&subject=history">History / வரலாறு</a><a class="btn '+(subject==='geography'?'primary':'')+'" href="textbook-quiz.html?class=12&subject=geography">Geography / புவியியல்</a></div>':'';
 
@@ -156,15 +169,29 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
       '<section class="section"><div class="head"><div><h2>Choose class</h2><p>Select the standard you want to practise.</p></div></div>'+
       '<div class="classgrid">'+
       '<a class="class'+(cls===6?' active':'')+'" href="textbook-quiz.html">6th</a>'+
-      '<a class="class'+(cls===7?' active':'')+'" href="textbook-quiz.html?class=7&subject=science&term=1">7th</a><div class="class locked">8th</div><div class="class locked">9th</div><div class="class locked">10th</div>'+
+      '<a class="class'+(cls===7?' active':'')+'" href="textbook-quiz.html?class=7&subject=science&term=1">7th</a>'+
+      '<a class="class'+(cls===8?' active':'')+'" href="textbook-quiz.html?class=8&subject=science&term=1">8th</a>'+
+      '<a class="class'+(cls===9?' active':'')+'" href="textbook-quiz.html?class=9&subject=science">9th</a>'+
+      '<a class="class'+(cls===10?' active':'')+'" href="textbook-quiz.html?class=10&subject=science">10th</a>'+
       '<a class="class'+(cls===11?' active':'')+'" href="textbook-quiz.html?class=11">11th</a>'+
       '<a class="class'+(cls===12?' active':'')+'" href="textbook-quiz.html?class=12&subject=history">12th</a>'+
       '</div></section>';
 
+    if(upcoming){
+      main.innerHTML=classPicker+
+        '<section class="section panel">'+
+        '<div class="crumb">'+cls+'th Standard → '+subjEn+(cls<=8?' → Term '+(term===3?'III':term===2?'II':'I'):'')+'</div>'+
+        '<div class="head" style="margin-top:7px"><div><h2>'+cls+'th '+subjEn+' / '+cls+'ஆம் வகுப்பு '+subjTa+'</h2><p>Select a subject'+(cls<=8?' and term':'')+' to check available quizzes.</p></div></div>'+
+        switcher+
+        '<div class="note" role="status"><strong>Coming soon / விரைவில்:</strong> The quiz bank for this class and subject has not been published yet. The class buttons are ready, and quizzes will appear here after publication. / இந்த வகுப்பு, பாடத்திற்கான வினாடி வினாக்கள் இன்னும் வெளியிடப்படவில்லை.</div>'+
+        '</section>';
+      return;
+    }
+
     main.innerHTML=
       classPicker+
       '<section class="section panel">'+
-      '<div class="crumb">'+cls+'th Standard → '+subjEn+(cls===7?' → Term '+(term===3?'III':term===2?'II':'I'):'')+' → '+edition+' Edition</div>'+
+      '<div class="crumb">'+cls+'th Standard → '+subjEn+(cls<=8?' → Term '+(term===3?'III':term===2?'II':'I'):'')+' → '+edition+' Edition</div>'+
       '<div class="head" style="margin-top:7px"><div><h2>'+cls+'th '+subjEn+' / '+cls+'ஆம் வகுப்பு '+subjTa+'</h2>'+
       '<p>Competitive-exam-focused bilingual textbook quizzes. Choose a unit to start.</p></div>'+
       (totalKnown?'<span class="tag">'+totalKnown.toLocaleString('en-IN')+' questions live</span>':'')+'</div>'+
@@ -173,7 +200,7 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
         if(!u.ready){
           return '<article class="unit locked"><h3>'+u.id+'. '+u.unit_en+' / '+u.unit_ta+'</h3><p>Quiz bank is being prepared from the supplied textbook.</p><div class="sets"><span class="btn">Coming next</span></div></article>';
         }
-        const termArg=cls===7?'&term='+term:'';
+        const termArg=cls<=8?'&term='+term:'';
         const full='textbook-play.html?class='+cls+'&subject='+subject+termArg+'&unit='+u.id+'&quiz=all';
         const quizCount=Number(u.quiz_count||(u.quiz_sets&&u.quiz_sets.length)||(u.total?Math.ceil(u.total/20):1));
         const quizButtons=Array.from({length:Math.max(1,quizCount)},(_,i)=>{
@@ -189,8 +216,8 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
       '<div class="note"><strong>Source-first design:</strong> questions are grounded in the supplied Tamil Nadu State Board '+edition+' English and Tamil '+subjEn+' textbooks and filtered for competitive-exam relevance.</div>';
   }
   render().catch(err=>{
-    const subj=subject==='geography'?'Geography':'History';
-    main.innerHTML='<section class="section panel"><h2>'+cls+'th '+subj+'</h2><p>Could not load the class quiz index. Please refresh once.</p></section>';
+    const subj=subject==='geography'?'Geography':subject==='social-science'?'Social Science':subject==='science'?'Science':'History';
+    main.innerHTML='<section class="section panel"><h2>'+cls+'th '+subj+'</h2><p>Could not load the class quiz index. Please refresh once.</p><p><a class="btn" href="textbook-quiz.html">Return to textbook classes</a></p></section>';
     console.error(err);
   });
 })();
