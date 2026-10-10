@@ -2839,8 +2839,8 @@
             if (!banner || !details) return;
 
             try {
-                const currentCase = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
-                if (!currentCase) return;
+                const currentCase = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV2') || 'null');
+                if (!currentCase || !currentCase.id || currentCase.deletedAt) return;
 
                 const caseNo = [currentCase.crimeNo, currentCase.crimeYear].filter(Boolean).join('/') || 'No case number';
                 const station = currentCase.policeStation || 'Police station not set';
