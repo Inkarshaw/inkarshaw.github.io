@@ -412,7 +412,7 @@ window.addEventListener('DOMContentLoaded',function(){
   setValue('crimeYear',c.crimeYear);
   var station=document.getElementById('station'),name=String(c.policeStation||'').trim();
   if(station&&name){
-   function normalize(x){return String(x||'').toLowerCase().replace(/police station|\\bps\\b/g,'').replace(/[^a-z0-9]/g,'')}
+   function normalize(x){return String(x||'').toLowerCase().replace(/police station|\bps\b/g,'').replace(/[^a-z0-9]/g,'')}
    var option=Array.from(station.options).find(function(o){return normalize(o.textContent)===normalize(name)||normalize(o.value)===normalize(name)});
    if(option)setValue('station',option.value);
    else{
