@@ -67,6 +67,7 @@ Mandaiveli, Chennai-600028.</textarea>
 </div></div>
 
 <div class="section"><h2>CASE DETAILS</h2><div class="fields">
+<button class="secondary" type="button" onclick="importCurrentCase()" style="margin-bottom:8px">Import selected case from My Cases</button><div id="caseImportStatus" role="status" style="font-size:12px;color:#475467"></div>
 <div class="row"><div><label>Crime No.</label><input id="crimeNo" value="209/2025" oninput="render()"></div><div><label>Sections</label><input id="sections" value="103(1) BNS Act" oninput="render()"></div></div>
 <div class="row"><div><label>Registered Date</label><input id="regDate" type="date" value="2025-09-27" oninput="render()"></div><div><label>Registered Time</label><input id="regTime" type="time" value="09:00" oninput="render()"></div></div>
 <label>Reference Police Station</label><input id="refPs" value="G7 Chetpet PS" oninput="render()">
@@ -190,6 +191,26 @@ function printValidated(){
  el("formValidation").textContent=errors.join(" ");
  if(errors.length){el("formValidation").scrollIntoView({behavior:"smooth",block:"center"});return}
  render();window.print();
+}
+function importCurrentCase(){
+ var current=null;
+ try{current=JSON.parse(localStorage.getItem("clearexamsCurrentCaseV2")||"null")}catch(e){}
+ if(!current||!current.id||current.deletedAt){el("caseImportStatus").textContent="No current case selected. Open My Cases and select a case first.";return}
+ if(!confirm("Replace the case particulars in this request with the selected My Cases record? Mobile number rows and provider settings will remain unchanged."))return;
+ var cr=String(current.crimeNo||"").trim(),yr=String(current.crimeYear||"").trim();
+ if(cr)el("crimeNo").value=cr+(yr?"/"+yr:"");
+ if(current.sections)el("sections").value=current.sections;
+ if(current.dateRegistration&&/^\\d{4}-\\d{2}-\\d{2}/.test(current.dateRegistration))el("regDate").value=current.dateRegistration.slice(0,10);
+ if(current.policeStation){
+  var wanted=window.PoliceDocumentShared.normalizeStation(current.policeStation);
+  var match=chennaiPoliceStations.find(function(s){return window.PoliceDocumentShared.normalizeStation(s)===wanted});
+  if(match){el("stationMode").value="chennai";el("chennaiStation").value=match}
+  else{el("stationMode").value="other";el("otherPs").value=current.policeStation}
+  el("refPs").value=current.policeStation;
+  el("signStation").value=current.policeStation;
+ }
+ toggleStationMode();render();
+ el("caseImportStatus").textContent="Case information loaded locally. Review all fields before printing.";
 }
 function collect(){var ids=["fromRank","stationMode","chennaiStation","otherPs","psAddress","provider","recipient","company","companyAddress","crimeNo","sections","regDate","regTime","refPs","subject","signRank","signStation"],d={};ids.forEach(function(id){d[id]=el(id).value});d.ps=getPoliceStation();d.includeCaf=el("includeCaf").checked;d.includeName=el("includeName").checked;d.rows=rows;return d}
 function saveDraft(){
