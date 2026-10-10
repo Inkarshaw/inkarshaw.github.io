@@ -48,7 +48,7 @@
     const ref=(state.caseType||'Case')+' '+(state.crimeNo||'New')+(state.crimeYear?'/'+state.crimeYear:'');
     $('#caseRef').textContent=ref;
     $('#caseMeta').textContent=(state.policeStation||'Police station not set')+' · '+(state.stage||'Investigation')+(state.nextHearing?' · Next '+fmt(state.nextHearing):'');
-    const done=(state.investigationChecklist||[]).filter(x=>x.done).length,total=(state.investigationChecklist||[]).length;
+    const visible=(state.investigationChecklist||[]).filter(x=>!x.hidden&&(!x.sourceTemplate||x.sourceTemplate===selectedAnnexure()));const done=visible.filter(x=>x.done).length,total=visible.length;
     $('#casePills').innerHTML='<span>Investigation '+(total?Math.round(done*100/total):0)+'%</span><span>'+((state.tasks||[]).filter(x=>!x.done).length)+' pending tasks</span><span>'+((state.accusedPersons||[]).length)+' accused</span><span>'+((state.propertyItems||[]).length)+' properties</span>';
   }
   function setSave(text,kind='local'){
