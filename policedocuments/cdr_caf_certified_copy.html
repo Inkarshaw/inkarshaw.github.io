@@ -28,6 +28,7 @@ button{border:0;border-radius:8px;padding:10px 12px;font-weight:700;cursor:point
 @media(max-width:900px){.app{display:block}.mobilebar{display:flex;gap:2%}.editor{height:auto;border-right:0}.preview{padding:8px}.paper{transform-origin:top left;width:210mm}body.showpreview .editor{display:none}body:not(.showpreview) .preview{display:none}}
 @media print{body{background:#fff}.editor,.mobilebar{display:none!important}.app{display:block}.preview{padding:0}.paper{box-shadow:none;margin:0;width:auto;min-height:auto;padding:16mm 17mm}@page{size:A4;margin:0}}
 </style>
+<script defer src="/policedocuments/shared-stations.js?v=1"></script>
 </head>
 <body>
 <div class="mobilebar"><button onclick="document.body.classList.remove('showpreview')">Edit</button><button onclick="document.body.classList.add('showpreview')">Preview</button></div>
@@ -102,62 +103,7 @@ Mandaiveli, Chennai-600028.</textarea>
 
 <script>
 function el(id){return document.getElementById(id)}
-var chennaiPoliceStations=[
- "AWPS Peravallur",
- "B1 North Beach Police Station",
- "B2 Esplanade Police Station",
- "B3 Fort St. George Police Station",
- "B4 High Court Police Station",
- "C1 Flower Bazaar Police Station",
- "C2 Elephant Gate Police Station",
- "C3 Seven Wells Police Station",
- "C4 Government General Hospital Outpost",
- "C5 Kothawal Chavadi Police Station",
- "D1 Triplicane Police Station",
- "D2 Anna Salai Police Station",
- "D3 Ice House Police Station",
- "D4 Jam Bazaar Police Station",
- "D5 Marina Police Station",
- "D6 Anna Square Police Station",
- "D7 Government Estate Police Station",
- "D8 Kasturba Gandhi Hospital Police Station",
- "E1 Mylapore Police Station",
- "E2 Royapettah Police Station",
- "E3 Teynampet Police Station",
- "E4 Abiramapuram Police Station",
- "F1 Chintadripet Police Station",
- "F2 Egmore Police Station",
- "F3 Nungambakkam Police Station",
- "F4 Thousand Lights Police Station",
- "F5 Chetpet Police Station",
- "G1 Vepery Police Station",
- "G2 Periamet Police Station",
- "G3 Kilpauk Police Station",
- "G5 Secretariat Colony Police Station",
- "G7 Chetpet Police Station",
- "H1 Old Washermenpet Police Station",
- "H3 Tondiarpet Police Station",
- "J1 Saidapet Police Station",
- "J2 Adyar Police Station",
- "J3 Guindy Police Station",
- "J5 Sastri Nagar Police Station",
- "J6 Thiruvanmiyur Police Station",
- "J7 Velachery Police Station",
- "K1 Sembium Police Station",
- "K2 Ayanavaram Police Station",
- "K4 Anna Nagar Police Station",
- "K6 TP Chatram Police Station",
- "K8 Arumbakkam Police Station",
- "M1 Harbour Police Station",
- "N1 Royapuram Police Station",
- "P1 Pulianthope Police Station",
- "R1 Mambalam Police Station",
- "R2 Kodambakkam Police Station",
- "R3 Ashok Nagar Police Station",
- "V1 Villivakkam Police Station",
- "V2 Virugambakkam Police Station",
- "W1 All Women Police Station, Thousand Lights"
-];
+var chennaiPoliceStations=window.PoliceDocumentShared.stations;
 function populateChennaiStations(){
  var s=el("chennaiStation");
  s.innerHTML='<option value="">-- Select Chennai Police Station --</option>'+chennaiPoliceStations.map(function(x){return '<option value="'+esc(x)+'">'+esc(x)+'</option>'}).join("");
