@@ -37,7 +37,7 @@
       questions.some(q => q.type === 'direct');
   }
   function rewriteEnglish(raw) {
-    const stem = unwrapped(raw).replace(/[?\s]+$/, '').trim();
+    const stem = unwrapped(raw).replace(/[?\\s]+$/, '').trim();
     if (!stem) return raw;
     let m;
     if ((m = /^(Early|Later) Medieval period in Indian history is classified as$/i.exec(stem)))
@@ -51,10 +51,20 @@
       return 'How many types of ' + m[1].toLowerCase() + ' are identified in the textbook?';
     if ((m = /^(.*?) are classified into how many types$/i.exec(stem)))
       return 'Into how many types are ' + m[1].toLowerCase() + ' classified?';
-    if (/^(Who|What|Which|Where|When|How|Why)\b/i.test(stem)) return stem + '?';
-    if (/^(Number|Year|Date|Period|Capital|Core area|Place|Founder|Author|Ruler|Courtier|Visitor|Portuguese traveller|Italian visitor|Dynasty|Name|Meaning|Definition|Collective name|Prominent rallying point)\b/i.test(stem))
+    if ((m = /^SI (fundamental )?unit of (.+)$/i.exec(stem)))
+      return 'What is the SI ' + (m[1]||'') + 'unit of ' + m[2] + '?';
+    if ((m = /^Formula for (.+)$/i.exec(stem)))
+      return 'Which formula is used for ' + m[1] + '?';
+    if ((m = /^(Two|Three|Four) (.+) of (.+)$/i.exec(stem)))
+      return 'Which are the ' + m[1].toLowerCase() + ' ' + m[2] + ' of ' + m[3] + '?';
+    if ((m = /^(One|Another) (.+)$/i.exec(stem)))
+      return 'Which of the following is ' + m[1].toLowerCase() + ' ' + m[2] + '?';
+    if (/^(Who|What|Which|Where|When|How|Why)\\b/i.test(stem)) return stem + '?';
+    if (/\\b(is|are|was|were|on|in|at|from|by|as|to|for|of|called|means)$/i.test(stem))
+      return 'Complete the textbook statement: ' + stem + ' _____.';
+    if (/^(Number|Year|Date|Period|Capital|Core area|Place|Founder|Author|Ruler|Courtier|Visitor|Portuguese traveller|Italian visitor|Dynasty|Name|Meaning|Definition|Collective name|Prominent rallying point)\\b/i.test(stem))
       return 'Identify the ' + stem.charAt(0).toLowerCase() + stem.slice(1) + '.';
-    return 'Which option correctly completes this textbook fact: ' + stem + '?';
+    return 'Which of the following identifies the ' + stem.charAt(0).toLowerCase() + stem.slice(1) + '?';
   }
   function rewriteTamil(raw) {
     return unwrapped(String(raw || '')).replace(/[?\s]+$/, '').trim() + '?';
@@ -76,14 +86,23 @@
     const candidates = expanded
       ? arr.filter(q => q.type === 'direct')
       : arr;
+    // A repeated stem paired with different answers is ambiguous:
+    // for example, "One primary source?" with coins AND inscriptions.
+    // Exclude the entire conflicting group rather than accepting multiple answers.
+    const groups = new Map();
+    for (const q of candidates) {
+      if (!valid(q)) continue;
+      const stem = signature(q.q_en);
+      if (!groups.has(stem)) groups.set(stem, new Set());
+      groups.get(stem).add(String(q.opts_en[q.correct]).toLowerCase().trim());
+    }
+    const conflicting = new Set([...groups.entries()]
+      .filter(([, answers]) => answers.size > 1).map(([stem]) => stem));
     const seen = new Set(), kept = [];
     for (const q of candidates) {
       if (!valid(q)) continue;
-      const answer = String(q.opts_en[q.correct]).toLowerCase().trim();
-      const key = expanded
-        ? signature(q.q_en) + '|' + answer
-        : signature(q.q_en) + '|' + answer;
-      if (seen.has(key)) continue;
+      const key = signature(q.q_en);
+      if (conflicting.has(key) || seen.has(key)) continue;
       seen.add(key);
       const next = { ...q };
       if (isBoilerplate(q.q_en)) {
