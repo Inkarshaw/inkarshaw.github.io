@@ -9,7 +9,8 @@
     /^What is the correct textbook answer for:\s*/i,
     /^Which option is correctly associated with:\s*/i,
     /^Identify the correct (?:historical source, work, author, place or term|ruler, dynasty, date, place or cultural fact|ruler, institution, administrative term, place or trade fact|textbook association for this fact|[^:]{1,160}) for:\s*/i,
-    /^According to the textbook, which option correctly answers the following:\s*/i
+    /^According to the textbook, which option correctly answers the following:\s*/i,
+    /^இதற்கான சரியான பாடநூல் விடை எது[:：]\s*/i
   ];
   function unwrapped(q) {
     let value = String(q || '').trim();
