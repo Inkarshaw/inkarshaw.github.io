@@ -66,6 +66,16 @@
       return 'Identify the ' + stem.charAt(0).toLowerCase() + stem.slice(1) + '.';
     return 'Which of the following identifies the ' + stem.charAt(0).toLowerCase() + stem.slice(1) + '?';
   }
+  function polishQuestion(q) {
+    // Convert a fragmentary fact ("X is called?") into a valid completion prompt.
+    const match = /^Which of the following identifies the (.+)\?$/i.exec(q);
+    if (!match) return q;
+    const fragment = match[1].trim();
+    if (!/\b(?:is|are|was|were|as|on|in|at|from|by|for|to|about|called|means|a|an)$/i.test(fragment))
+      return q;
+    return 'Complete the textbook statement: ' +
+      fragment.charAt(0).toUpperCase() + fragment.slice(1) + ' _____.';
+  }
   function rewriteTamil(raw) {
     return unwrapped(String(raw || '')).replace(/[?\s]+$/, '').trim() + '?';
   }
@@ -109,6 +119,7 @@
         next.q_en = rewriteEnglish(q.q_en);
         next.q_ta = rewriteTamil(q.q_ta);
       }
+      next.q_en = polishQuestion(next.q_en);
       kept.push(next);
     }
     return {
