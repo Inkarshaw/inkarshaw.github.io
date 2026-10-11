@@ -37,7 +37,7 @@
       questions.some(q => q.type === 'direct');
   }
   function rewriteEnglish(raw) {
-    const stem = unwrapped(raw).replace(/[?\\s]+$/, '').trim();
+    const stem = unwrapped(raw).replace(/[?\s]+$/, '').trim();
     if (!stem) return raw;
     let m;
     if ((m = /^(Early|Later) Medieval period in Indian history is classified as$/i.exec(stem)))
@@ -59,10 +59,10 @@
       return 'Which are the ' + m[1].toLowerCase() + ' ' + m[2] + ' of ' + m[3] + '?';
     if ((m = /^(One|Another) (.+)$/i.exec(stem)))
       return 'Which of the following is ' + m[1].toLowerCase() + ' ' + m[2] + '?';
-    if (/^(Who|What|Which|Where|When|How|Why)\\b/i.test(stem)) return stem + '?';
-    if (/\\b(is|are|was|were|on|in|at|from|by|as|to|for|of|called|means)$/i.test(stem))
+    if (/^(Who|What|Which|Where|When|How|Why)\b/i.test(stem)) return stem + '?';
+    if (/\b(is|are|was|were|on|in|at|from|by|as|to|for|of|called|means)$/i.test(stem))
       return 'Complete the textbook statement: ' + stem + ' _____.';
-    if (/^(Number|Year|Date|Period|Capital|Core area|Place|Founder|Author|Ruler|Courtier|Visitor|Portuguese traveller|Italian visitor|Dynasty|Name|Meaning|Definition|Collective name|Prominent rallying point)\\b/i.test(stem))
+    if (/^(Number|Year|Date|Period|Capital|Core area|Place|Founder|Author|Ruler|Courtier|Visitor|Portuguese traveller|Italian visitor|Dynasty|Name|Meaning|Definition|Collective name|Prominent rallying point)\b/i.test(stem))
       return 'Identify the ' + stem.charAt(0).toLowerCase() + stem.slice(1) + '.';
     return 'Which of the following identifies the ' + stem.charAt(0).toLowerCase() + stem.slice(1) + '?';
   }
