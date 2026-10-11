@@ -64,7 +64,7 @@ async function loadQuizData(){
     }
   };
   const loadSupplement=async n=>{
-    const base=DATA.replace(/\\.json$/,'-quiz-'+n+'.json'),er=await fetch(base,{cache:'no-store'});
+    const base=DATA.replace(/\.json$/,'-quiz-'+n+'.json'),er=await fetch(base,{cache:'no-store'});
     if(!er.ok)return null;
     const e=await er.json();
     const arr=Array.isArray(e.questions)?[...e.questions]:[];
@@ -72,7 +72,7 @@ async function loadQuizData(){
     for(let part=2;arr.length<target&&part<=9;part++){
       let pe=null;
       for(const tag of ['part','more']){
-        const pr=await fetch(DATA.replace(/\\.json$/,'-quiz-'+n+'-'+tag+'-'+part+'.json'),{cache:'no-store'});
+        const pr=await fetch(DATA.replace(/\.json$/,'-quiz-'+n+'-'+tag+'-'+part+'.json'),{cache:'no-store'});
         if(pr.ok){pe=await pr.json();break}
       }
       if(!pe)break;
