@@ -5,6 +5,8 @@
     let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null;
     let movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null, movementBounds=null;
     let movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null;
+    const validCoords=p=>Number.isFinite(Number(p?.lat))&&Number.isFinite(Number(p?.lng))&&Math.abs(Number(p.lat))<=90&&Math.abs(Number(p.lng))<=180&&!(Number(p.lat)===0&&Number(p.lng)===0);
+    const linkTowers=(a,b)=>{const gap=+b.start-+a.end,km=haversineKm(a,b);return validCoords(a)&&validCoords(b)&&Number.isFinite(gap)&&gap>=0&&gap<=12*3600000&&Number.isFinite(km)&&(km<.05||(gap>0&&km/(gap/3600000)<=250));};
 
   function movementDateRange(){
     const from=$('movementDateFrom')?.value||'',to=$('movementDateTo')?.value||'';
@@ -23,7 +25,7 @@
     const range=movementDateRange();if(!range.valid)return [];data=data.filter(movementDateMatch);
     data=[...data].sort((a,b)=>a.dt-b.dt); const gap=(+$('movementMergeMins')?.value||30)*60000; const out=[];
     for(const r of data){
-      const key=r.firstCellId||r.firstAddress,last=out[out.length-1],lat=r.lat==null||r.lat===''?null:Number(r.lat),lng=r.lng==null||r.lng===''?null:Number(r.lng),hasCoords=Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180;
+      const key=r.firstCellId||r.firstAddress,last=out[out.length-1],lat=r.lat==null||r.lat===''?null:Number(r.lat),lng=r.lng==null||r.lng===''?null:Number(r.lng),hasCoords=Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180&&!(lat===0&&lng===0);
       if(last&&last.key===key&&r.dt-last.end<=gap){last.end=r.dt;last.events++;last.duration+=r.duration;if(r.bparty)last.contacts.add(r.bparty);if(hasCoords){last.lat=lat;last.lng=lng;}continue;}
       out.push({key,cellId:r.firstCellId,address:r.firstAddress,start:r.dt,end:r.dt,events:1,duration:r.duration,contacts:new Set(r.bparty?[r.bparty]:[]),lat:hasCoords?lat:null,lng:hasCoords?lng:null,cdrs:new Set(r.cdrNo?[r.cdrNo]:[])});
     }
@@ -46,9 +48,11 @@
     const el=$('movementMap');if(!el)return;
     const rect=el.getBoundingClientRect();
     if((rect.width<80||rect.height<80)&&attempt<5){setTimeout(()=>renderMovementMap(rows,attempt+1),80);return;}
-    movementPlaybackMarkers=[];movementPlaybackMarker=null;
+    stopMovementPlayback();
+    if(movementPlaybackMarker&&movementMap){try{movementMap.removeLayer(movementPlaybackMarker)}catch{}}
+    movementPlaybackMarkers=[];movementPlaybackMarker=null;movementPlaybackIndex=0;
     state.mapPrivacyMode=!!$('mapPrivacyMode')?.checked;
-    const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180);
+    const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180&&!(p.x.lat===0&&p.x.lng===0));
     movementPlaybackRows=pts.map(p=>p.x);
     if($('movementMapStatus'))$('movementMapStatus').innerHTML=`<span class="metric-chip">Segments: ${fmtInt(rows.length)}</span><span class="metric-chip">Mapped: ${fmtInt(pts.length)}</span><span class="metric-chip">Without coordinates: ${fmtInt(rows.length-pts.length)}</span><span class="metric-chip" id="tileStatusChip">${state.mapPrivacyMode?'Privacy mode: external map tiles disabled':'Loading map tiles…'}</span>`;
     if(typeof L==='undefined'){el.innerHTML='<div class="map-empty">Map library is unavailable. The movement table remains usable, but the route/tower map cannot be drawn.</div>';return;}
@@ -103,16 +107,23 @@
       return;
     }
 
-    // Keep route drawing lightweight on very large CDRs.
-    const maxRoutePoints=2500,step=Math.max(1,Math.ceil(pts.length/maxRoutePoints));
-    const routePts=pts.filter((_,i)=>i%step===0||i===pts.length-1);
-    const latlngs=routePts.map(p=>[p.x.lat,p.x.lng]);
-    if(latlngs.length>1)L.polyline(latlngs,{pane:'movementRoutePane',weight:4,opacity:.95,dashArray:'9,6',color:'#18d9ff',lineCap:'round',lineJoin:'round'}).addTo(movementLayer);
+    // Straight lines represent tower coordinate associations, never a road route.
+    // Do not connect missing coordinates, gaps over 12h, or implausible jumps.
+    let track=[],breaks=0;
+    const flushTrack=()=>{if(track.length>1)L.polyline(track,{pane:'movementRoutePane',weight:2.5,opacity:.7,dashArray:'5,7',color:'#18d9ff',interactive:false}).addTo(movementLayer);track=[];};
+    for(let i=0;i<rows.length;i++){
+      const current=rows[i];
+      if(!validCoords(current)){flushTrack();continue;}
+      if(i>0&&!linkTowers(rows[i-1],current)){flushTrack();breaks++;}
+      track.push([Number(current.lat),Number(current.lng)]);
+    }
+    flushTrack();
+    if(breaks&&$('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip warntext">${fmtInt(breaks)} uncertain connections hidden</span>`;
 
     // Group repeated visits at the same tower so markers remain readable.
     const towerGroups=new Map();
     pts.forEach(({x,i},j)=>{
-      const k=x.key||x.cellId||x.address||`${Number(x.lat).toFixed(5)},${Number(x.lng).toFixed(5)}`;
+      const k=`${Number(x.lat).toFixed(4)},${Number(x.lng).toFixed(4)}`; // group co-located towers
       let t=towerGroups.get(k);
       if(!t)t={key:k,lat:x.lat,lng:x.lng,cellId:x.cellId,address:x.address,segments:0,events:0,first:x.start,last:x.end,contacts:new Set(),visits:[]};
       const visit={x,i,j,seq:j+1};
@@ -123,32 +134,13 @@
     });
     const repeatVisits=Math.max(0,pts.length-towerGroups.size);
 
-    if(pts.length<=500){
-      for(const t of towerGroups.values()){
-        const first=t.visits[0],repeat=t.visits.length>1;
-        const icon=L.divIcon({
-          className:`sequence-marker${repeat?' repeat':''}`,
-          html:`<span>${first.seq}</span>${repeat?`<b>×${t.visits.length}</b>`:''}`,
-          iconSize:[repeat?38:30,repeat?38:30],iconAnchor:[repeat?19:15,repeat?19:15]
-        });
-        const marker=L.marker([t.lat,t.lng],{pane:'movementAnchorPane',icon,title:`Visit #${first.seq} ${t.cellId||t.address||'Tower'}`}).addTo(movementLayer);
-        for(const v of t.visits)movementPlaybackMarkers[v.j]=marker;
-        const contacts=[...t.contacts].slice(0,12).map(n=>escapeHtml(contactLabel(n))).join(', ');
-        const visits=t.visits.slice(0,10).map(v=>`<div class="movement-popup-visit"><b>#${v.seq}</b> ${escapeHtml(dtFmt(v.x.start))}${v.x.end&&+v.x.end!==+v.x.start?' – '+escapeHtml(dtFmt(v.x.end)):''}</div>`).join('');
-        const more=t.visits.length>10?`<div class="tiny">+${fmtInt(t.visits.length-10)} more visits</div>`:'';
-        marker.bindPopup(`<div class="movement-popup"><div class="movement-popup-title">${escapeHtml(t.cellId||'Tower')}${repeat?` • ${fmtInt(t.visits.length)} visits`:''}</div><div><b>Tower:</b> ${escapeHtml(t.address||'—')}</div><div><b>Events:</b> ${fmtInt(t.events)} • <b>Contacts:</b> ${contacts||'—'}</div><div><b>Coordinates:</b> ${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}</div><div class="movement-popup-visits">${visits}${more}</div></div>`);
-      }
-    }else{
-      for(const t of towerGroups.values()){
-        const radius=Math.max(4,Math.min(11,4+Math.log2(1+t.segments)));
-        const marker=L.circleMarker([t.lat,t.lng],{pane:'movementTowerPane',renderer:movementCanvasRenderer,radius,color:'#d9fbff',weight:1.5,fillColor:'#17c9e8',fillOpacity:.88}).addTo(movementLayer);
-        for(const v of t.visits)movementPlaybackMarkers[v.j]=marker;
-        const visits=t.visits.slice(0,6).map(v=>`#${v.seq} ${escapeHtml(dtFmt(v.x.start))}`).join('<br>');
-        marker.bindPopup(`<div class="movement-popup"><div class="movement-popup-title">${escapeHtml(t.cellId||'Tower')} • ${fmtInt(t.visits.length)} visits</div><div><b>Address:</b> ${escapeHtml(t.address||'—')}</div><div><b>Events:</b> ${fmtInt(t.events)} • <b>First:</b> ${escapeHtml(dtFmt(t.first))} • <b>Last:</b> ${escapeHtml(dtFmt(t.last))}</div><div><b>Coordinates:</b> ${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}</div><div class="movement-popup-visits">${visits}${t.visits.length>6?'<br>+ '+fmtInt(t.visits.length-6)+' more visits':''}</div></div>`);
-      }
-      if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip">High-volume mode: ${fmtInt(towerGroups.size)} tower markers</span>`;
+    // Small radius circle markers remain readable when tower coordinates are close.
+    for(const t of towerGroups.values()){
+      const marker=L.circleMarker([t.lat,t.lng],{pane:'movementTowerPane',renderer:movementCanvasRenderer,radius:Math.min(7,4+Math.log2(1+t.segments)*.6),color:'#d9fbff',weight:1.2,fillColor:'#17c9e8',fillOpacity:.85}).addTo(movementLayer);
+      for(const v of t.visits)movementPlaybackMarkers[v.j]=marker;
+      const visits=t.visits.slice(0,15).map(v=>`#${v.seq} ${escapeHtml(dtFmt(v.x.start))}`).join('<br>');
+      marker.bindPopup(`<div class="movement-popup"><div class="movement-popup-title">${escapeHtml(t.cellId||'Tower')} • ${fmtInt(t.visits.length)} visits</div><div><b>Address:</b> ${escapeHtml(t.address||'—')}</div><div><b>Events:</b> ${fmtInt(t.events)} • <b>First:</b> ${escapeHtml(dtFmt(t.first))} • <b>Last:</b> ${escapeHtml(dtFmt(t.last))}</div><div><b>Coordinates:</b> ${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}</div><div class="movement-popup-visits">${visits}${t.visits.length>15?'<br>+ '+fmtInt(t.visits.length-15)+' more visits':''}</div></div>`);
     }
-
     const firstPt=pts[0]?.x,lastPt=pts[pts.length-1]?.x;
     const sameEndpoint=firstPt&&lastPt&&Math.abs(firstPt.lat-lastPt.lat)<1e-7&&Math.abs(firstPt.lng-lastPt.lng)<1e-7;
     if(firstPt&&sameEndpoint){
@@ -166,7 +158,7 @@
     }
     if($('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip goodtext">${fmtInt(towerGroups.size)} distinct mapped tower${towerGroups.size===1?'':'s'}</span>${repeatVisits?`<span class="metric-chip">${fmtInt(repeatVisits)} repeat visit${repeatVisits===1?'':'s'} grouped</span>`:''}`;
 
-    const slider=$('movementSlider');if(slider){slider.max=Math.max(0,movementPlaybackRows.length-1);if(+slider.value>+slider.max)slider.value=0;updateMovementPlayback(+slider.value||0,false);}
+    const slider=$('movementSlider');if(slider){slider.max=Math.max(0,movementPlaybackRows.length-1);slider.value=0;updateMovementPlayback(0,false,false);}
     const smsFocus=state.smsMovementFocus;
     if(smsFocus&&smsFocus.at&&movementPlaybackRows.length&&(!smsFocus.subject||smsFocus.subject===($('movementCdr')?.value||''))){
       const target=+smsFocus.at;
@@ -218,25 +210,18 @@
     }
   }
 
-  function playbackStepSize(){
-    const n=movementPlaybackRows.length;
-    if(n>10000)return Math.ceil(n/500);
-    if(n>5000)return Math.ceil(n/650);
-    if(n>2000)return Math.ceil(n/800);
-    if(n>1000)return 2;
-    return 1;
-  }
+  function playbackStepSize(){return 1;} // Never skip associations during playback.
 
   function stopMovementPlayback(){
-    if(movementPlaybackTimer){clearTimeout(movementPlaybackTimer);movementPlaybackTimer=null;}
+    if(movementPlaybackTimer!==null){clearTimeout(movementPlaybackTimer);movementPlaybackTimer=null;}
     if($('movementPlayBtn'))$('movementPlayBtn').textContent='▶ Play';
   }
 
   function scheduleMovementPlayback(){
-    if(!movementPlaybackTimer)return;
+    if(movementPlaybackTimer===null)return;
     const delay=+$('movementSpeed')?.value||350;
     movementPlaybackTimer=setTimeout(()=>{
-      if(!movementPlaybackTimer)return;
+      if(movementPlaybackTimer===null)return;
       const step=playbackStepSize();
       let next=movementPlaybackIndex+step;
       if(next>=movementPlaybackRows.length){
@@ -250,7 +235,7 @@
   }
 
   function toggleMovementPlayback(){
-    if(movementPlaybackTimer){stopMovementPlayback();return;}
+    if(movementPlaybackTimer!==null){stopMovementPlayback();return;}
     if(!movementPlaybackRows.length){
       const rows=movementRows();
       // Rebuild synchronously from the current subject/date/filter state so Play never depends on a stale RAF callback.
@@ -340,7 +325,7 @@
       $('movementPrevBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex-1,true,true);};
       $('movementNextBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex+1,true,true);};
       $('movementSlider').oninput=e=>{stopMovementPlayback();updateMovementPlayback(+e.target.value,true,true);};
-      $('movementSpeed').onchange=()=>{if(movementPlaybackTimer){clearTimeout(movementPlaybackTimer);movementPlaybackTimer=-1;scheduleMovementPlayback();}};
+      $('movementSpeed').onchange=()=>{if(movementPlaybackTimer!==null){clearTimeout(movementPlaybackTimer);movementPlaybackTimer=-1;scheduleMovementPlayback();}};
       if($('movementFitBtn'))$('movementFitBtn').onclick=fitMovementMap;
       if($('movementStartBtn'))$('movementStartBtn').onclick=()=>focusMovementEndpoint('start');
       if($('movementEndBtn'))$('movementEndBtn').onclick=()=>focusMovementEndpoint('end');
