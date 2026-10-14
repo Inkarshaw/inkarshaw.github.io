@@ -1,4 +1,15 @@
-# Uploading Daily Current Affairs PDFs
+# Current Affairs: TEXT-ONLY publication
+
+**Effective 14 October 2026:** New ClearExams current affairs are published only as searchable text articles and MCQs at [`/current-affairs/text/`](text/). The root [`/current-affairs/`](index.html) opens the text archive.
+
+The PDFs already in this folder are **historical archives**. Existing PDF downloads are preserved at [`pdf-archive.html`](pdf-archive.html), but no new PDFs, covers, or compiled PDF digests should be generated, uploaded or published. The former PDF GitHub Actions jobs have been disabled, and the Website Queue rejects new current-affairs PDF jobs.
+
+**For future editions:** use [`text/EDITORIAL-FORMAT.md`](text/EDITORIAL-FORMAT.md), publish verified `text/data/YYYY-MM-DD.json`, and let `text/build_text_editions.py` generate the public article and archive. See [`website-automation/current-affairs-runbook.md`](../website-automation/current-affairs-runbook.md) for workflow details.
+
+---
+
+## Historical PDF workflow — discontinued (reference only)
+
 
 1. Name the PDF using the **edition date printed on its cover**, as **`YYYY-MM-DD.pdf`** (for example, `2026-09-05.pdf`). A delayed upload or workflow run must keep the original edition date.
 2. Upload or delete the file in this `current-affairs` folder and commit the change to `main`.
