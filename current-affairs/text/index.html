@@ -26,5 +26,34 @@ main{padding:30px 0 70px}.search{display:flex;gap:12px;align-items:center;flex-w
 </div><p class="note" id="empty" hidden>No matching text edition found. Try another date or subject.</p>
 <p class="note">Only editions with verified text are listed. Existing infographic PDFs remain accessible in the separate PDF archive.</p>
 </main><footer>© 2026 ClearExams · Text Current Affairs</footer>
-<script>const f=document.querySelector('#filter');const entries=[...document.querySelectorAll('.entry')];f.addEventListener('input',()=>{const q=f.value.toLowerCase().trim();let n=0;entries.forEach(e=>{const ok=e.dataset.search.includes(q);e.hidden=!ok;if(ok)n++});document.querySelector('#empty').hidden=!!n;});</script>
+<script>
+const filter=document.querySelector('#filter');
+const holder=document.querySelector('#editions');
+const empty=document.querySelector('#empty');
+let list=[...document.querySelectorAll('.entry')];
+const defaultLink=document.querySelector('.hero .actions .btn.primary');
+function search(){
+const q=filter.value.toLocaleLowerCase().trim();let count=0;
+list.forEach(entry=>{const match=entry.textContent.toLocaleLowerCase().includes(q);entry.hidden=!match;if(match)count++});
+empty.hidden=count!==0;
+}
+filter.addEventListener('input',search);
+fetch('editions.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('No text index');return r.json()}).then(items=>{
+if(!Array.isArray(items)||!items.length)return;
+items.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+holder.textContent='';list=[];
+for(const item of items){
+if(!/^\d{4}-\d{2}-\d{2}\.html$/.test(item.file)||!/^\d{4}-\d{2}-\d{2}$/.test(item.date))continue;
+const card=document.createElement('article');card.className='entry';
+const tag=document.createElement('div');tag.className='tag';tag.textContent=item.date+(item.status==='partial'?' · Initial / partial edition':' · Verified edition');
+const heading=document.createElement('h2');heading.textContent=item.title;
+const summary=document.createElement('p');summary.textContent=item.description;
+const links=document.createElement('div');links.className='links';
+const open=document.createElement('a');open.href=item.file;open.textContent='Read Full Text';
+const pdf=document.createElement('a');pdf.href='../';pdf.textContent='PDF Archive';
+links.append(open,pdf);card.append(tag,heading,summary,links);holder.append(card);list.push(card);
+}
+if(list.length){defaultLink.href=items[0].file;search()}
+}).catch(()=>{ /* Keep the existing initial edition as the offline fallback. */ });
+</script>
 </body></html>
