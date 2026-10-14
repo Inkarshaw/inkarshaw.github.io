@@ -92,7 +92,7 @@ def main():
 
     if action in {"PUBLISH_URL","PUBLISH_FILE"}:
         target = safe_target(args.target)
-        if target.parent == ROOT / "current-affairs" and target.suffix.lower() == ".pdf":
+        if target.suffix.lower() == ".pdf" and (ROOT / "current-affairs" in target.parents):
             # Text-only publishing policy: preserve existing PDF archive, reject new submissions.
             raise ValueError("Current affairs PDF publishing is disabled; publish verified text JSON instead")
         if re.fullmatch(r"current-affairs/text/data/\d{4}-\d{2}-\d{2}\.json",
