@@ -105,7 +105,7 @@ def main():
                         raise ValueError("Drive PDF no longer matches the queued edition; refusing to publish it under this date")
                 publish_pdf(source_pdf, target.stem, target.parent)
             rebuild_ca_index()
-        elif re.fullmatch(r"current-affairs/text/data/\\d{4}-\\d{2}-\\d{2}\\.json",
+        elif re.fullmatch(r"current-affairs/text/data/\d{4}-\d{2}-\d{2}\.json",
                               target.relative_to(ROOT).as_posix()):
             # Editorial input is immutable for this queue attempt: check checksum
             # and filename date before replacing any published edition.
