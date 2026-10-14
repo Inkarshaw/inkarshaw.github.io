@@ -135,9 +135,6 @@ def render(payload):
         "inLanguage": "en", "url": canonical,
         "publisher": {"@type": "Organization", "name": "ClearExams"},
     }, ensure_ascii=False).replace("<", "\\u003c")
-    pdf_link = ""
-    if (SECTION.parent / f"{edition}.pdf").is_file():
-        pdf_link = f'<a class="button secondary" href="../{edition}.pdf" target="_blank" rel="noopener">View infographic PDF</a>'
     label = "Initial / partial edition" if status == "partial" else "Verified daily edition"
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -161,12 +158,12 @@ details{{padding:12px 15px;border:1px solid #dae4ef;border-radius:11px;backgroun
 .button{{display:inline-block;background:#1765dd;color:white;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:800;margin:7px 7px 3px 0}}.button.secondary{{background:#fff;color:#123658;border:1px solid #9fb3c8}}
 footer{{background:#071c33;color:#e1ebf4;text-align:center;padding:25px}}@media(max-width:550px){{.story,.quiz,.intro{{padding:16px}}}}
 </style></head><body>
-<nav><div class="wrap"><a href="../../index.html">ClearExams.</a><a href="./">All text editions</a><a href="../">PDF Archive</a></div></nav>
+<nav><div class="wrap"><a href="../../index.html">ClearExams.</a><a href="./">All text editions</a><a href="../../index.html">Home</a></div></nav>
 <header class="hero"><div class="wrap"><div class="eyebrow">{text(label)} · {text(edition)}</div>
 <h1>{text(heading)}</h1><p>{text(description)}</p></div></header>
 <main class="wrap"><section class="intro"><strong>{len(payload['stories'])} sourced news briefs · {len(payload['mcqs'])} practice MCQs</strong>
 <p>This study edition contains original summaries of sources linked below. Updates described as proposals, plans or announcements are not presented as completed outcomes.</p>
-<a class="button" href="#practice">Practice MCQs ↓</a>{pdf_link}</section>
+<a class="button" href="#practice">Practice MCQs ↓</a></section>
 {''.join(stories_html)}
 <section class="quiz" id="practice"><h2>Practice MCQs</h2>{''.join(questions)}</section>
 <p><a href="./">← Back to all text editions</a></p></main>
