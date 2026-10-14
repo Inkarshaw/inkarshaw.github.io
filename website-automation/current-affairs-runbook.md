@@ -93,3 +93,53 @@ The existing bridge retries failed attempts up to its configured limit (default
 three attempts) and recovers stale processing jobs. Preserve its retry history;
 do not repeatedly reset the count. Missing sources, upload failures or exhausted
 retries must produce a clear notification rather than a false success.
+
+## Companion searchable text edition (new workflow support)
+
+In addition to the PDF, ClearExams can now publish an original, source-linked
+text article for the **same fixed edition date**. The text publisher does not
+extract text from image-only PDFs or invent stories. Provide an **editorially
+reviewed** JSON input matching
+[`current-affairs/text/EDITORIAL-FORMAT.md`](../current-affairs/text/EDITORIAL-FORMAT.md)
+and validate it using:
+
+```bash
+python3 current-affairs/text/build_text_editions.py --validate /path/to/edition.json --date YYYY-MM-DD
+```
+
+Ensure the `date` in the JSON and its public source filename are the edition
+date, with at least two source-linked original news summaries and two distinct
+four-option MCQs. Cover a representative selection of relevant national,
+Tamil Nadu and global developments when verified news is available. Do not
+convert old PDFs into new-dated articles, invent facts, invent citations or
+translate unverified content.
+
+Host the *actual verified JSON bytes* at a stable HTTPS/Google Drive URL and
+calculate their SHA-256. In the existing Website Queue, create a **separate**
+row (never overwrite the PDF job):
+
+| Column | Value |
+| --- | --- |
+| A Job ID | `CATEXT-YYYY-MM-DD` |
+| B Page / Section | Daily Current Affairs Text, YYYY-MM-DD |
+| C Action | `PUBLISH_URL` |
+| D Source | HTTPS or Google Drive URL to the verified JSON |
+| E Target Path | `current-affairs/text/data/YYYY-MM-DD.json` |
+| F Scheduled Date | Fixed edition date |
+| G Status | `READY` |
+| L Notes | `sha256=<SHA-256 of exact JSON bytes>; edition=YYYY-MM-DD` |
+
+Preserve normal row bookkeeping, trigger via `.github/website-queue-trigger`
+or the five-minute fallback and check the published state. Existing queue
+processing compares the JSON checksum, validates date, source URLs and MCQs,
+generates `current-affairs/text/YYYY-MM-DD.html`, refreshes
+`current-affairs/text/editions.json` and `sitemap.xml`, and verifies the
+live HTML, published editorial JSON checksum and archive before acknowledging
+publication. The PDF and text jobs are independent: either can fail without
+claiming the other succeeded.
+
+The site deployment also runs the text renderer whenever JSON edition files
+are already checked into `current-affairs/text/data/`. The text-first
+workflow is only automated **after verified editorial JSON is supplied**;
+there is no unattended, fact-checking news collector in this repository.
+
