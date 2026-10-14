@@ -13,3 +13,28 @@ Text edition archive: `/current-affairs/text/`. PDFs remain available at `/curre
 7. If a PDF exists for that edition, cross-link it. Do not publish an old edition under a new date or present a draft as a completed daily digest.
 
 **Important:** The current text edition is a verified *initial afternoon digest*, not a promise of automatic daily publication. The separate PDF workflows do not currently create or populate text articles. A source-aware daily publisher needs editorial validation and a real content feed before scheduling unattended website updates.
+
+## Structured publication (now connected to Website Queue)
+
+A verified editorial source can be published by naming it
+`current-affairs/text/data/YYYY-MM-DD.json`. Refer to
+[`EDITORIAL-FORMAT.md`](EDITORIAL-FORMAT.md) for the required data fields.
+
+Validate locally:
+
+```bash
+python3 current-affairs/text/build_text_editions.py --validate edition.json --date YYYY-MM-DD
+python3 -m unittest discover -s tests -p 'test_current_affairs_text.py'
+python3 current-affairs/text/build_text_editions.py
+```
+
+Use the existing Website Queue action `PUBLISH_URL`, target
+`current-affairs/text/data/YYYY-MM-DD.json`, with the actual source URL and
+`sha256=<64-hexadecimal-digest>` in Notes. The queue checks the checksum and
+date, then generates the text article, `editions.json`, and sitemap, and
+verifies publication after deploying GitHub Pages.
+
+**No fabricated news:** Pages generation is automated; sourcing and
+independent editorial fact checking are not. An infographic image-only PDF
+is not a verified text article. The existing manual 2026-10-14 pilot stays
+in the archive without needing conversion.
