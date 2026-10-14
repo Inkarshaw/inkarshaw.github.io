@@ -2,20 +2,22 @@
 
 Private-sheet bridge used by GitHub Actions.
 
-## Daily current affairs
+## Daily current affairs: text only
 
-The enabled ChatGPT tasks check news every two hours, create the cover at
-21:05 IST, and assemble/upload/publish the daily PDF at 21:30 IST. See
-[the current-affairs runbook](current-affairs-runbook.md) for the complete handoff.
-The old 20:10 repository-assets builder is manual-only.
+As of 14 October 2026, ClearExams publishes new daily current affairs as
+source-linked text HTML pages and MCQs. The 21:30 IST **Daily CA Text Publish**
+automation is enabled; the PDF cover automation is disabled.
+New PDFs and PDF compilations are not published. Historical PDFs are preserved
+at `current-affairs/pdf-archive.html`.
 
-Each current-affairs queue entry uses `CA-YYYY-MM-DD`, action `PUBLISH_URL`,
-the public Drive PDF link, target `current-affairs/YYYY-MM-DD.pdf`, and a
-`sha256=<64-character checksum>` marker in Notes. The publisher checks the
-download against that checksum before replacing a PDF, then checks both the
-live PDF bytes and the dated website index before marking the row `PUBLISHED`.
-This prevents a delayed request from publishing a changed `current-affairs-latest.pdf`
-under an older edition date. Non-PDF website jobs keep their existing behavior.
+Preferred route: commit a verified, date-matched editorial JSON file at
+`current-affairs/text/data/YYYY-MM-DD.json`. GitHub Pages generates the text
+article, archive index and sitemap. The alternate Website Queue accepts
+`CATEXT-YYYY-MM-DD` as `PUBLISH_URL` with that JSON path and its SHA-256,
+validates the input, and verifies the output. New PDF jobs are rejected.
+
+See [the text-only current affairs runbook](current-affairs-runbook.md).
+
 
 Flow:
 
