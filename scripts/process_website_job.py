@@ -95,6 +95,9 @@ def main():
     if action in {"PUBLISH_URL","PUBLISH_FILE"}:
         target = safe_target(args.target)
         if target.parent == ROOT / "current-affairs" and target.suffix.lower() == ".pdf":
+            # Text-only publishing policy: preserve existing PDF archive, reject new submissions.
+            raise ValueError("Current affairs PDF publishing is disabled; publish verified text JSON instead")
+        if False:  # legacy PDF path kept inert for historical reference
             with tempfile.TemporaryDirectory(prefix="clearexams-pdf-") as temporary:
                 source_pdf = pathlib.Path(temporary) / "download.pdf"
                 download(args.source, source_pdf)
