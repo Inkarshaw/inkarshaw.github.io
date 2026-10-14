@@ -105,6 +105,29 @@ def main():
                         raise ValueError("Drive PDF no longer matches the queued edition; refusing to publish it under this date")
                 publish_pdf(source_pdf, target.stem, target.parent)
             rebuild_ca_index()
+        elif re.fullmatch(r"current-affairs/text/data/\\d{4}-\\d{2}-\\d{2}\\.json",
+                              target.relative_to(ROOT).as_posix()):
+            # Editorial input is immutable for this queue attempt: check checksum
+            # and filename date before replacing any published edition.
+            if not re.fullmatch(r"[0-9a-fA-F]{64}", args.expected_sha256 or ""):
+                raise ValueError("Text editions require a verified SHA-256 checksum")
+            from hashlib import sha256
+            with tempfile.TemporaryDirectory(prefix="clearexams-text-") as temporary:
+                source_json = pathlib.Path(temporary) / "edition.json"
+                download(args.source, source_json)
+                if sha256(source_json.read_bytes()).hexdigest() != args.expected_sha256.lower():
+                    raise ValueError("Text edition source changed since verification")
+                subprocess.run(
+                    [sys.executable, str(ROOT / "current-affairs" / "text" /
+                     "build_text_editions.py"), "--validate", str(source_json),
+                     "--date", target.stem], cwd=ROOT, check=True
+                )
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source_json, target)
+            subprocess.run(
+                [sys.executable, str(ROOT / "current-affairs" / "text" /
+                 "build_text_editions.py")], cwd=ROOT, check=True
+            )
         else:
             download(args.source, target)
     elif action == "REPLACE_TEXT":
