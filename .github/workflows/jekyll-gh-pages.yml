@@ -30,6 +30,8 @@ jobs:
         uses: actions/checkout@v5
       - name: Generate current affairs PDF list
         run: python3 current-affairs/generate-pdf-list.py
+      - name: Test current affairs text input validation
+        run: python3 -m unittest discover -s tests -p 'test_current_affairs_text.py'
       - name: Build vetted current affairs text pages and archive
         run: python3 current-affairs/text/build_text_editions.py
       - name: Check text edition catalog
