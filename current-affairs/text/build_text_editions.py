@@ -41,7 +41,7 @@ def validate(payload, filename_date):
         edition_day = date.fromisoformat(actual_date)
     except ValueError as exc:
         raise ValueError("Invalid edition date") from exc
-    if edition_day > date.today(ZoneInfo("Asia/Kolkata")):
+    if edition_day > datetime.now(ZoneInfo("Asia/Kolkata")).date():
         raise ValueError("Future edition dates are not permitted")
     status = payload.get("status", "complete")
     if status not in ("partial", "complete"):
