@@ -10,8 +10,6 @@ import tempfile
 import urllib.parse
 import urllib.request
 
-from current_affairs_pdf import pdf_digest, publish_pdf
-
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 BLOCKED_PREFIXES = (
     ".git/",
@@ -97,18 +95,7 @@ def main():
         if target.parent == ROOT / "current-affairs" and target.suffix.lower() == ".pdf":
             # Text-only publishing policy: preserve existing PDF archive, reject new submissions.
             raise ValueError("Current affairs PDF publishing is disabled; publish verified text JSON instead")
-        if False:  # legacy PDF path kept inert for historical reference
-            with tempfile.TemporaryDirectory(prefix="clearexams-pdf-") as temporary:
-                source_pdf = pathlib.Path(temporary) / "download.pdf"
-                download(args.source, source_pdf)
-                if args.expected_sha256:
-                    if not re.fullmatch(r"[0-9a-fA-F]{64}", args.expected_sha256):
-                        raise ValueError("Expected SHA-256 must contain 64 hexadecimal characters")
-                    if pdf_digest(source_pdf) != args.expected_sha256.lower():
-                        raise ValueError("Drive PDF no longer matches the queued edition; refusing to publish it under this date")
-                publish_pdf(source_pdf, target.stem, target.parent)
-            rebuild_ca_index()
-        elif re.fullmatch(r"current-affairs/text/data/\d{4}-\d{2}-\d{2}\.json",
+        if re.fullmatch(r"current-affairs/text/data/\d{4}-\d{2}-\d{2}\.json",
                               target.relative_to(ROOT).as_posix()):
             # Editorial input is immutable for this queue attempt: check checksum
             # and filename date before replacing any published edition.
