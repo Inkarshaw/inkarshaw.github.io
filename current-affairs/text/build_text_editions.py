@@ -24,7 +24,6 @@ SITEMAP = ROOT / "sitemap.xml"
 SITE = "https://clearexams.ink"
 DATED = re.compile(r"\d{4}-\d{2}-\d{2}")
 PAGE = re.compile(r"(\d{4}-\d{2}-\d{2})\.html")
-DEFAULT_DATE = date.today(ZoneInfo("Asia/Kolkata"))
 
 def require_text(item, field, minimum=1, maximum=2500):
     value = item.get(field)
