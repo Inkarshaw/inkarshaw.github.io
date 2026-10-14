@@ -38,6 +38,9 @@ def derive_url(job):
     action = (job.get("action") or "").upper()
     if action == "REBUILD_CA_INDEX":
         return SITE + "/current-affairs/"
+    text_match = re.fullmatch(r"current-affairs/text/data/(\d{4}-\d{2}-\d{2})\.json", target)
+    if text_match and action in {"PUBLISH_URL", "PUBLISH_FILE"}:
+        return SITE + "/current-affairs/text/" + text_match.group(1) + ".html"
     if action in {"FIX_OLD_DOMAIN","DEPLOY_ONLY"} or not target:
         return SITE + "/"
     if target.endswith("/index.html"):
@@ -48,13 +51,16 @@ def derive_url(job):
 
 def ca_publication_details(job):
     target = (job.get("targetPath") or "").strip().replace("\\", "/")
-    match = re.fullmatch(r"current-affairs/(\d{4}-\d{2}-\d{2})\.pdf", target)
-    if job.get("action", "").upper() not in {"PUBLISH_URL", "PUBLISH_FILE"} or not match:
+    pdf_match = re.fullmatch(r"current-affairs/(\d{4}-\d{2}-\d{2})\.pdf", target)
+    text_match = re.fullmatch(r"current-affairs/text/data/(\d{4}-\d{2}-\d{2})\.json", target)
+    if job.get("action", "").upper() not in {"PUBLISH_URL", "PUBLISH_FILE"} or not (pdf_match or text_match):
         return {}
     digest = re.search(r"(?:^|[\s;])sha256=([0-9a-fA-F]{64})(?=$|[\s;])", job.get("notes") or "")
     if not digest:
-        raise ValueError("Current-affairs jobs require sha256=<verified PDF checksum> in Notes")
-    return {"expectedSha256": digest.group(1).lower(), "editionDate": match.group(1)}
+        raise ValueError("Current-affairs jobs require sha256=<verified file checksum> in Notes")
+    return {"expectedSha256": digest.group(1).lower(),
+            "editionDate": (pdf_match or text_match).group(1),
+            "textEdition": bool(text_match)}
 
 def verify_url(url, attempts=12, delay=5, expected_sha256=None, expected_edition=None):
     last = None
@@ -83,6 +89,36 @@ def verify_url(url, attempts=12, delay=5, expected_sha256=None, expected_edition
         print(f"Post-deploy verification ({i+1}/{attempts}): {last}")
         time.sleep(delay)
     raise RuntimeError(f"Published URL is not healthy: {url} ({last})")
+
+def verify_live_text(url, edition, checksum):
+    raw_url = SITE + f"/current-affairs/text/data/{edition}.json"
+    index_url = SITE + "/current-affairs/text/editions.json"
+    with urllib.request.urlopen(
+        urllib.request.Request(url, headers={"Cache-Control": "no-cache"}),
+        timeout=30
+    ) as response:
+        html = response.read().decode("utf-8")
+    if "<!doctype html>" not in html.lower() or edition not in html:
+        raise RuntimeError("Published text edition HTML does not match expected date")
+    with urllib.request.urlopen(
+        urllib.request.Request(raw_url, headers={"Cache-Control": "no-cache"}),
+        timeout=30
+    ) as response:
+        raw = response.read()
+    if hashlib.sha256(raw).hexdigest() != checksum:
+        raise RuntimeError("Published editorial JSON does not match verified source")
+    with urllib.request.urlopen(
+        urllib.request.Request(index_url, headers={"Cache-Control": "no-cache"}),
+        timeout=30
+    ) as response:
+        entries = json.loads(response.read())
+    if not isinstance(entries, list) or not any(
+        isinstance(item, dict) and item.get("date") == edition
+        and item.get("file") == f"{edition}.html" for item in entries
+    ):
+        raise RuntimeError("Text edition missing from the published archive")
+    print(f"Verified text article, JSON checksum and archive for {edition}")
+
 
 def git_commit(job):
     run(["git","add","-A"])
@@ -163,9 +199,23 @@ def finalize(manifest_path):
     unacknowledged = []
     for item in pending:
         try:
-            verify_url(item["url"], expected_sha256=item.get("expectedSha256"))
-            if item.get("editionDate"):
-                verify_url(SITE + "/current-affairs/pdfs.json", expected_edition=item["editionDate"])
+            if item.get("textEdition"):
+                last = None
+                for attempt in range(12):
+                    try:
+                        verify_live_text(item["url"], item["editionDate"], item["expectedSha256"])
+                        last = None
+                        break
+                    except Exception as exc:
+                        last = exc
+                        print(f"Text deployment verification ({attempt+1}/12): {exc}")
+                        time.sleep(5)
+                if last:
+                    raise last
+            else:
+                verify_url(item["url"], expected_sha256=item.get("expectedSha256"))
+                if item.get("editionDate"):
+                    verify_url(SITE + "/current-affairs/pdfs.json", expected_edition=item["editionDate"])
             request("/complete","POST",{
                 "token":item["token"],
                 "githubRun":RUN_URL,
