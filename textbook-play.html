@@ -12,16 +12,24 @@ main{padding:18px 0 56px}.crumb{font-size:.78rem;color:var(--muted);font-weight:
 h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9px}.option{width:100%;text-align:left;border:1px solid #d5e0eb;background:#fff;border-radius:11px;padding:12px;cursor:pointer;color:var(--ink)}.option:hover{border-color:#9bbdff}.option.selected{border-color:#1463ff;background:#eef5ff}.option.correct{border-color:#8ac8ab;background:#eef9f3}.option.wrong{border-color:#e5a7b4;background:#fff2f5}.feedback{display:none;margin-top:14px;padding:13px;border-radius:11px;background:#f7f9fc;color:#405970}.feedback.show{display:block}.feedback strong{color:var(--ink)}
 .actions{display:flex;justify-content:space-between;gap:9px;margin-top:16px}.btn{min-height:44px;padding:0 14px;border:1px solid #cbd7e5;border-radius:10px;background:#fff;color:#29445f;font-weight:850;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn:disabled{opacity:.45}.result{display:none;text-align:center}.result.show{display:block}.score{font-size:3rem;font-weight:950;line-height:1;margin:10px 0}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:16px 0}.stat{padding:12px;border:1px solid var(--line);border-radius:12px}.stat strong{display:block;font-size:1.25rem}.stat span{font-size:.75rem;color:var(--muted)}
 .review{margin-top:18px;text-align:left}.review-item{padding:12px 0;border-top:1px solid var(--line)}.review-item strong{display:block}.review-item small{color:var(--muted)}.review-item .bad{color:var(--red)}.review-item .good{color:var(--green)}
+.quiztools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.quiztools .btn{min-height:38px;font-size:.86rem}.quiztools .active{border-color:#1463ff;background:#eef5ff;color:#1357c4}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px;margin:8px 0 14px}
+.palette button{min-height:40px;border:1px solid #cbd7e5;border-radius:8px;background:#fff;color:#29445f;cursor:pointer}
+.palette button.answered{background:#e9f6ef;border-color:#84c6a5}.palette button.current{outline:2px solid #1463ff;outline-offset:1px}.palette button.flagged{border:2px solid #b47b1b}
+.quiznotice{font-size:.78rem;color:var(--muted);margin:7px 0}.source a{text-decoration:underline;color:#1357c4}.report-status{font-size:.82rem;color:#315d49;min-height:1em}
 @media(max-width:560px){.card{padding:14px}.actions{display:grid;grid-template-columns:1fr 1fr}.btn{width:100%}.stats{grid-template-columns:1fr 1fr 1fr}}
 </style>
 </head>
 <body>
-<header><nav class="wrap"><a class="brand" href="textbook-quiz.html">← Textbook Quiz</a><div class="spacer"></div><div class="lang"><button id="enBtn" class="active">English</button><button id="taBtn">தமிழ்</button></div></nav></header>
+<header><nav class="wrap"><a class="brand" id="backLink" href="textbook-quiz.html">← Textbook Quiz</a><div class="spacer"></div><div class="lang"><button id="enBtn" class="active">English</button><button id="taBtn">தமிழ்</button></div></nav></header>
 <main class="wrap">
 <div class="crumb" id="crumb">Loading textbook quiz…</div>
 <section class="card" id="quizCard">
-<div class="top"><span class="badge" id="setBadge">Quiz</span><span class="source" id="source"></span></div>
+<div class="top"><span class="badge" id="setBadge">Quiz</span><span class="source"><span id="source"></span> <a id="sourceLink" hidden target="_blank" rel="noopener noreferrer"></a></span></div>
+<div class="quiztools"><button class="btn" id="bookmark" type="button">☆ Bookmark</button><button class="btn" id="mark" type="button">⚑ Mark for review</button><button class="btn" id="report" type="button">Report question</button><span id="timer" class="badge" hidden></span></div>
+<div class="report-status" id="reportStatus" role="status"></div>
 <div class="progress"><i id="bar"></i></div>
+<div class="quiznotice" id="paletteLabel">Question palette</div><nav class="palette" id="palette" aria-label="Question palette"></nav>
 <h1 id="question"></h1>
 <div class="options" id="options"></div>
 <div class="feedback" id="feedback"></div>
@@ -29,26 +37,98 @@ h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9
 </section>
 <section class="card result" id="result">
 <div class="badge" id="resultBadge">Completed</div><div class="score" id="score"></div><h2 id="resultTitle"></h2>
-<div class="stats"><div class="stat"><strong id="correctN">0</strong><span>Correct</span></div><div class="stat"><strong id="wrongN">0</strong><span>Wrong</span></div><div class="stat"><strong id="accuracy">0%</strong><span>Accuracy</span></div></div>
-<div class="actions"><a class="btn" href="textbook-quiz.html">All textbook quizzes</a><button class="btn primary" id="retry">Retry quiz</button></div>
+<div class="stats"><div class="stat"><strong id="correctN">0</strong><span id="correctLabel">Correct</span></div><div class="stat"><strong id="wrongN">0</strong><span id="wrongLabel">Wrong</span></div><div class="stat"><strong id="accuracy">0%</strong><span id="accuracyLabel">Accuracy</span></div></div>
+<div class="actions"><a class="btn" id="resultBack" href="textbook-quiz.html">All textbook quizzes</a><button class="btn primary" id="retry">Retry quiz</button></div>
 <div class="review" id="review"></div>
 </section>
 </main>
 <script src="assets/js/textbook-quality.js"></script>
 <script>
-const p=new URLSearchParams(location.search),classNo=Number(p.get('class')||6),subjectSlug=p.get('subject')||(classNo>=11?'history':'science'),subject=(classNo===12&&subjectSlug==='geography')?'geography':classNo>=11?'history':(subjectSlug==='social-science'?'social-science':'science'),term=Number(p.get('term')||1),unit=Number(p.get('unit')||1),quizRaw=p.get('quiz')||'1',quizNo=quizRaw==='all'?'all':Number(quizRaw),DATA=classNo===11?'data/textbook/class-11/history/unit-'+String(unit).padStart(2,'0')+'.json':classNo===12?'data/textbook/class-12/'+subject+'/unit-'+unit+'.json':(classNo===6||classNo===7||classNo===8)?'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json':'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json',KEY='clearexamsTextbookProgressV2';
-let lang=localStorage.getItem('clearexamsTextbookLang')||'en',meta=null,qs=[],idx=0,answers=[],checked=[];
+const p=new URLSearchParams(location.search),mode=['practice','timed'].includes(p.get('mode'))?p.get('mode'):'standard',classNo=Number(p.get('class')||6),subjectSlug=p.get('subject')||(classNo>=11?'history':'science'),subject=(classNo===12&&subjectSlug==='geography')?'geography':classNo>=11?'history':(subjectSlug==='social-science'?'social-science':'science'),term=Number(p.get('term')||1),unit=Number(p.get('unit')||1),quizRaw=p.get('quiz')||'1',quizNo=quizRaw==='all'?'all':Number(quizRaw),DATA=classNo===11?'data/textbook/class-11/history/unit-'+String(unit).padStart(2,'0')+'.json':classNo===12?'data/textbook/class-12/'+subject+'/unit-'+unit+'.json':(classNo===6||classNo===7||classNo===8)?'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json':'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json',KEY='clearexamsTextbookProgressV2';
+let lang=localStorage.getItem('clearexamsTextbookLang')||'en',meta=null,qs=[],idx=0,answers=[],checked=[],marked=[],deadline=0,completed=false;
+const catalogParams=new URLSearchParams({class:String(classNo),subject,unit:String(unit)});if(classNo<=8)catalogParams.set('term',String(term));const catalogUrl='textbook-quiz.html?'+catalogParams.toString();
+$('backLink').href=catalogUrl;$('resultBack').href=catalogUrl;
+const bookmarkKey='clearexamsTextbookBookmarksV1';let bookmarks=new Set();try{bookmarks=new Set(JSON.parse(localStorage.getItem(bookmarkKey)||'[]'))}catch{}
+const questionKey=q=>String(q.id||classNo+'-'+subject+'-'+term+'-'+unit+'-'+q.q_en);
+const storageId='c'+classNo+'-'+subject+'-t'+term+'-u'+unit+'-q'+quizNo+(mode==='standard'?'':'-'+mode);
 const $=id=>document.getElementById(id);
 function txt(en,ta){return lang==='ta'?ta:en}
-function setLang(v){lang=v;localStorage.setItem('clearexamsTextbookLang',v);$('enBtn').classList.toggle('active',v==='en');$('taBtn').classList.toggle('active',v==='ta');render()}
+function setLang(v){lang=v;localStorage.setItem('clearexamsTextbookLang',v);$('enBtn').classList.toggle('active',v==='en');$('taBtn').classList.toggle('active',v==='ta');if(completed){finish(true)}else render()}
 $('enBtn').onclick=()=>setLang('en');$('taBtn').onclick=()=>setLang('ta');
-function save(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}'),id='c'+classNo+'-'+subject+'-t'+term+'-u'+unit+'-q'+quizNo;all[id]={idx,answers,checked,ts:Date.now()};localStorage.setItem(KEY,JSON.stringify(all))}catch{}}
-function loadSaved(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}'),s=all['c'+classNo+'-'+subject+'-t'+term+'-u'+unit+'-q'+quizNo];if(s&&Array.isArray(s.answers)&&s.answers.length===qs.length){idx=Math.min(Number(s.idx)||0,qs.length-1);answers=s.answers;checked=s.checked||Array(qs.length).fill(false)}}catch{}}
+
+function save(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}');all[storageId]={idx,answers,checked,marked,deadline,ts:Date.now()};localStorage.setItem(KEY,JSON.stringify(all))}catch{}}
+function loadSaved(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}'),v=all[storageId];if(v&&Array.isArray(v.answers)&&v.answers.length===qs.length){idx=Math.max(0,Math.min(Number(v.idx)||0,qs.length-1));answers=v.answers;checked=v.checked||Array(qs.length).fill(false);marked=v.marked||Array(qs.length).fill(false);deadline=Number(v.deadline)||0}}catch{}}
+function renderPalette(){
+ const box=$('palette');box.replaceChildren();
+ qs.forEach((q,i)=>{const b=document.createElement('button');b.type='button';b.textContent=i+1;b.className=(i===idx?'current ':'')+(checked[i]?'answered ':'')+(marked[i]?'flagged':'');b.setAttribute('aria-label',txt('Question ','வினா ')+(i+1)+(marked[i]?' ⚑':''));if(i===idx)b.setAttribute('aria-current','step');b.onclick=()=>{idx=i;render()};box.appendChild(b)});
+}
+function safeSourceUrl(q){
+ const link=q.source_url||meta.source_url||meta.textbook_url||'';
+ try{const parsed=new URL(link,location.href);return /^https?:$/.test(parsed.protocol)?parsed.href:null}catch{return null}
+}
+function render(){
+ if(!qs.length||completed)return;
+ const q=qs[idx],set=quizNo==='all'?{title_en:'Full Unit · All Questions',title_ta:'முழு அலகு · அனைத்து வினாக்கள்'}:(meta.quiz_sets.find(x=>Number(x.id)===quizNo)||{title_en:'Quiz '+quizNo,title_ta:'வினாடி வினா '+quizNo});
+ document.documentElement.lang=lang==='ta'?'ta':'en';
+ const subjEn=subject==='history'?'History':subject==='geography'?'Geography':subject==='social-science'?'Social Science':'Science',subjTa=subject==='history'?'வரலாறு':subject==='geography'?'புவியியல்':subject==='social-science'?'சமூக அறிவியல்':'அறிவியல்',sectionEn=meta.section_en?' → '+meta.section_en:'',sectionTa=meta.section_ta?' → '+meta.section_ta:'',displayUnit=meta.display_unit??meta.unit,termEn=classNo<=8?' → Term '+(term===3?'III':term===2?'II':'I'):'',termTa=classNo<=8?' → '+(term===3?'மூன்றாம் பருவம்':term===2?'இரண்டாம் பருவம்':'முதல் பருவம்'):'';
+ $('crumb').textContent=lang==='ta'?classNo+'ஆம் வகுப்பு → '+subjTa+termTa+sectionTa+' → அலகு '+displayUnit+' · '+(meta.unit_ta||''):classNo+'th Standard → '+subjEn+termEn+sectionEn+' → Unit '+displayUnit+' · '+(meta.unit_en||'');
+ $('backLink').textContent=txt('← Back to selected unit','← தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
+ $('resultBack').textContent=txt('Back to selected unit','தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
+ $('setBadge').textContent=txt(set.title_en,set.title_ta)+' · '+(idx+1)+' / '+qs.length;
+ const pageRef=lang==='ta'?(q.page_ta??q.page_en??q.page):(q.page_en??q.page_ta??q.page);
+ $('source').textContent=txt('Textbook page ','பாடநூல் பக்கம் ')+(pageRef??'—');
+ const src=safeSourceUrl(q),a=$('sourceLink');a.hidden=!src;if(src)a.href=src;a.textContent=txt('Open source ↗','மூல நூலைத் திற ↗');
+ $('bar').style.width=((idx+1)/qs.length*100)+'%';
+ $('question').textContent=txt(q.q_en,q.q_ta)||q.q_en;
+ const box=$('options');box.replaceChildren();const opts=lang==='ta'&&Array.isArray(q.opts_ta)&&q.opts_ta.length===4?q.opts_ta:q.opts_en;
+ opts.forEach((o,i)=>{const b=document.createElement('button');b.className='option';b.type='button';b.textContent=String.fromCharCode(65+i)+'. '+o;if(answers[idx]===i)b.classList.add('selected');if(checked[idx]){if(i===q.correct)b.classList.add('correct');else if(i===answers[idx])b.classList.add('wrong');b.disabled=true}else b.onclick=()=>{answers[idx]=i;render()};box.appendChild(b)});
+ const fb=$('feedback');fb.replaceChildren();if(checked[idx]){fb.classList.add('show');const strong=document.createElement('strong');strong.textContent=txt('Explanation','விளக்கம்')+': ';fb.append(strong,document.createTextNode(txt(q.exp_en||'',q.exp_ta||q.exp_en||'')))}else fb.classList.remove('show');
+ $('prev').disabled=idx===0;
+ $('prev').textContent=txt('Previous','முந்தையது');
+ $('next').textContent=checked[idx]?(idx===qs.length-1?txt('Finish','முடிக்கவும்'):txt('Next','அடுத்து')):txt('Check answer','விடையைச் சரிபார்க்கவும்');
+ $('bookmark').textContent=bookmarks.has(questionKey(q))?txt('★ Bookmarked','★ சேமிக்கப்பட்டது'):txt('☆ Bookmark','☆ சேமி');
+ $('bookmark').classList.toggle('active',bookmarks.has(questionKey(q)));
+ $('mark').textContent=marked[idx]?txt('⚑ Marked for review','⚑ மீளாய்வுக்கு குறிக்கப்பட்டது'):txt('⚐ Mark for review','⚐ மீளாய்வுக்குக் குறி');
+ $('mark').classList.toggle('active',!!marked[idx]);
+ $('report').textContent=txt('Report question','வினாவில் பிழை தெரிவி');
+ $('paletteLabel').textContent=txt('Question palette · Blue: current · Green: checked · Gold: marked','வினா எண்கள் · நீலம்: தற்போது · பச்சை: சரிபார்த்தது · தங்கம்: மீளாய்வு');
+ $('resultBadge').textContent=txt('Completed','முடிக்கப்பட்டது');
+ $('correctLabel').textContent=txt('Correct','சரி');$('wrongLabel').textContent=txt('Wrong','தவறு');$('accuracyLabel').textContent=txt('Accuracy','துல்லியம்');$('retry').textContent=txt('Retry quiz','மீண்டும் முயற்சி');
+ renderPalette();save();
+}
+$('bookmark').onclick=()=>{const k=questionKey(qs[idx]);if(bookmarks.has(k))bookmarks.delete(k);else bookmarks.add(k);localStorage.setItem(bookmarkKey,JSON.stringify([...bookmarks]));render()};
+$('mark').onclick=()=>{marked[idx]=!marked[idx];render()};
+$('report').onclick=async()=>{
+ const q=qs[idx],report=['ClearExams textbook question report','Class: '+classNo,'Subject: '+subject,'Term: '+term,'Unit: '+unit,'Quiz: '+quizNo,'Question: '+(idx+1),'ID: '+(q.id||'Not set'),'Textbook page: '+(q.page||'Unverified'),'Question (English): '+q.q_en,'Suggested correction: '].join('\n');
+ try{await navigator.clipboard.writeText(report);$('reportStatus').textContent=txt('Report details copied. Paste them into your message to ClearExams.','புகார் விவரங்கள் நகலெடுக்கப்பட்டன. ClearExams-க்கு அனுப்பும் செய்தியில் ஒட்டவும்.')}
+ catch{window.prompt(txt('Copy this report and send it to ClearExams:','இந்த விவரங்களை நகலெடுத்து ClearExams-க்கு அனுப்பவும்:'),report)}
+};
+function tickClock(){
+ if(mode!=='timed'||!qs.length||completed)return;
+ const left=Math.max(0,Math.ceil((deadline-Date.now())/1000)),min=Math.floor(left/60),sec=String(left%60).padStart(2,'0');
+ $('timer').hidden=false;$('timer').textContent=txt('Time left ','மீதமுள்ள நேரம் ')+min+':'+sec;
+ if(!left)finish();
+}
+setInterval(tickClock,1000);
 function render(){if(!qs.length)return;const q=qs[idx],set=quizNo==='all'?{title_en:'Full Unit · All Questions',title_ta:'முழு அலகு · அனைத்து வினாக்கள்'}:meta.quiz_sets.find(x=>x.id===quizNo);document.documentElement.lang=lang==='ta'?'ta':'en';const subjEn=subject==='history'?'History':subject==='geography'?'Geography':subject==='social-science'?'Social Science':'Science',subjTa=subject==='history'?'வரலாறு':subject==='geography'?'புவியியல்':subject==='social-science'?'சமூக அறிவியல்':'அறிவியல்',sectionEn=meta.section_en?' → '+meta.section_en:'',sectionTa=meta.section_ta?' → '+meta.section_ta:'',displayUnit=meta.display_unit??meta.unit,classEn=classNo+'th Standard',classTa=classNo+'ஆம் வகுப்பு',termEn=(classNo===6||classNo===7||classNo===8)?' → Term '+(term===3?'III':term===2?'II':'I'):'',termTa=(classNo===6||classNo===7||classNo===8)?' → '+(term===3?'மூன்றாம் பருவம்':term===2?'இரண்டாம் பருவம்':'முதல் பருவம்'):'';$('crumb').textContent=lang==='ta'?classTa+' → '+subjTa+termTa+sectionTa+' → அலகு '+displayUnit+' · '+meta.unit_ta:classEn+' → '+subjEn+termEn+sectionEn+' → Unit '+displayUnit+' · '+meta.unit_en;$('setBadge').textContent=txt(set.title_en,set.title_ta)+' · '+(idx+1)+' / '+qs.length;const pageRef=lang==='ta'?(q.page_ta??q.page_en??q.page):(q.page_en??q.page_ta??q.page);$('source').textContent=(lang==='ta'?'பாடநூல் பக்கம் ':'Textbook page ')+pageRef;$('bar').style.width=((idx+1)/qs.length*100)+'%';$('question').textContent=txt(q.q_en,q.q_ta);const box=$('options');box.innerHTML='';const opts=lang==='ta'?q.opts_ta:q.opts_en;opts.forEach((o,i)=>{const b=document.createElement('button');b.className='option';b.textContent=String.fromCharCode(65+i)+'. '+o;if(answers[idx]===i)b.classList.add('selected');if(checked[idx]){if(i===q.correct)b.classList.add('correct');else if(i===answers[idx])b.classList.add('wrong');b.disabled=true}else b.onclick=()=>{answers[idx]=i;render()};box.appendChild(b)});const fb=$('feedback');if(checked[idx]){fb.classList.add('show');fb.innerHTML='<strong>'+txt('Explanation','விளக்கம்')+':</strong> '+txt(q.exp_en,q.exp_ta)}else{fb.classList.remove('show');fb.textContent=''}$('prev').disabled=idx===0;$('next').textContent=checked[idx]?(idx===qs.length-1?txt('Finish','முடி'):txt('Next','அடுத்து')):txt('Check answer','விடையை சரிபார்');save()}
 $('prev').onclick=()=>{if(idx>0){idx--;render()}};
 $('next').onclick=()=>{if(!checked[idx]){if(answers[idx]==null){alert(txt('Choose an answer first.','முதலில் ஒரு விடையைத் தேர்ந்தெடுக்கவும்.'));return}checked[idx]=true;render();return}if(idx<qs.length-1){idx++;render()}else finish()};
-function finish(){const correct=qs.reduce((n,q,i)=>n+(answers[i]===q.correct?1:0),0),wrong=qs.length-correct,pct=Math.round(correct/qs.length*100);$('quizCard').style.display='none';$('result').classList.add('show');$('score').textContent=correct+' / '+qs.length;$('correctN').textContent=correct;$('wrongN').textContent=wrong;$('accuracy').textContent=pct+'%';$('resultTitle').textContent=lang==='ta'?(pct>=80?'சிறப்பு!':'மீண்டும் பயிற்சி செய்க'):(pct>=80?'Excellent work!':'Review and practise again');const r=$('review');r.innerHTML='<h3>'+txt('Review','மீளாய்வு')+'</h3>';qs.forEach((q,i)=>{const d=document.createElement('div');d.className='review-item';d.innerHTML='<strong>'+(i+1)+'. '+txt(q.q_en,q.q_ta)+'</strong><small class="'+(answers[i]===q.correct?'good':'bad')+'">'+txt(answers[i]===q.correct?'Correct':'Wrong',''+(answers[i]===q.correct?'சரி':'தவறு'))+' · '+txt('Page ','பக்கம் ')+q.page+'</small>';r.appendChild(d)});window.scrollTo({top:0,behavior:'smooth'})}
-$('retry').onclick=()=>{idx=0;answers=Array(qs.length).fill(null);checked=Array(qs.length).fill(false);$('quizCard').style.display='block';$('result').classList.remove('show');render()};
+function finish(retranslate=false){
+ if(completed&&!retranslate)return;completed=true;
+ const correct=qs.reduce((n,q,i)=>n+(checked[i]&&answers[i]===q.correct?1:0),0),wrong=qs.length-correct,pct=Math.round(correct/qs.length*100);
+ $('quizCard').style.display='none';$('result').classList.add('show');$('score').textContent=correct+' / '+qs.length;
+ $('correctN').textContent=correct;$('wrongN').textContent=wrong;$('accuracy').textContent=pct+'%';
+ $('resultBadge').textContent=txt('Completed','முடிக்கப்பட்டது');
+ $('correctLabel').textContent=txt('Correct','சரி');$('wrongLabel').textContent=txt('Wrong','தவறு');$('accuracyLabel').textContent=txt('Accuracy','துல்லியம்');
+ $('resultBack').textContent=txt('Back to selected unit','தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
+ $('retry').textContent=txt('Retry quiz','மீண்டும் முயற்சி');
+ $('resultTitle').textContent=txt(pct>=80?'Excellent work!':'Review and practise again',pct>=80?'சிறப்பு!':'மீண்டும் பயிற்சி செய்க');
+ const r=$('review');r.replaceChildren();const h=document.createElement('h3');h.textContent=txt('Review','மீளாய்வு');r.appendChild(h);
+ qs.forEach((q,i)=>{const d=document.createElement('div');d.className='review-item';const strong=document.createElement('strong');strong.textContent=(i+1)+'. '+txt(q.q_en,q.q_ta);const small=document.createElement('small');small.className=checked[i]&&answers[i]===q.correct?'good':'bad';small.textContent=txt(checked[i]&&answers[i]===q.correct?'Correct':'Wrong',checked[i]&&answers[i]===q.correct?'சரி':'தவறு')+' · '+txt('Page ','பக்கம் ')+(q.page??'—');d.append(strong,small);r.appendChild(d)});
+ if(!retranslate)window.scrollTo({top:0,behavior:'smooth'});
+}
+
+$('retry').onclick=()=>{idx=0;answers=Array(qs.length).fill(null);checked=Array(qs.length).fill(false);marked=Array(qs.length).fill(false);completed=false;if(mode==='timed')deadline=Date.now()+20*60*1000;$('quizCard').style.display='block';$('result').classList.remove('show');render()};
 async function loadQuizData(){
   const r=await fetch(DATA,{cache:'no-store'});
   if(!r.ok)throw Error('Question bank unavailable');
@@ -122,13 +202,16 @@ async function loadQuizData(){
   if(!qs.length){
     $('quizCard').innerHTML='<h2>'+txt('This quiz was consolidated','இந்த வினாடி வினா ஒருங்கிணைக்கப்பட்டது')+'</h2>'+
       '<p>'+txt('Repeated or invalid questions have been removed. Please choose one of the updated quiz sets.','மீண்டும் வந்த அல்லது பிழையான வினாக்கள் நீக்கப்பட்டுள்ளன. புதுப்பிக்கப்பட்ட வினாடி வினாவைத் தேர்ந்தெடுக்கவும்.')+'</p>'+
-      '<a class="btn primary" href="textbook-quiz.html?class='+classNo+'&subject='+subject+'&term='+term+'">View updated quizzes</a>';
+      '<a class="btn primary" href="'+catalogUrl+'">'+txt('View updated quizzes','புதுப்பிக்கப்பட்ட வினாடி வினாக்கள்')+'</a>';
     return;
   }
   qs=qs.map(q=>({...q,page:q.page??q.page_en??q.page_ta??'—'}));
+  if(mode==='practice'||mode==='timed')qs=qs.slice(0,20);
   answers=Array(qs.length).fill(null);
   checked=Array(qs.length).fill(false);
+  marked=Array(qs.length).fill(false);
   loadSaved();
+  if(mode==='timed'){if(!deadline)deadline=Date.now()+20*60*1000;tickClock()}
   setLang(lang);
 }
 loadQuizData().catch(e=>{$('quizCard').innerHTML='<p>Could not load this textbook quiz.</p>'});
