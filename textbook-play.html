@@ -47,11 +47,11 @@ h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9
 const p=new URLSearchParams(location.search),mode=['practice','timed'].includes(p.get('mode'))?p.get('mode'):'standard',classNo=Number(p.get('class')||6),subjectSlug=p.get('subject')||(classNo>=11?'history':'science'),subject=(classNo===12&&subjectSlug==='geography')?'geography':classNo>=11?'history':(subjectSlug==='social-science'?'social-science':'science'),term=Number(p.get('term')||1),unit=Number(p.get('unit')||1),quizRaw=p.get('quiz')||'1',quizNo=quizRaw==='all'?'all':Number(quizRaw),DATA=classNo===11?'data/textbook/class-11/history/unit-'+String(unit).padStart(2,'0')+'.json':classNo===12?'data/textbook/class-12/'+subject+'/unit-'+unit+'.json':(classNo===6||classNo===7||classNo===8)?'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json':'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json',KEY='clearexamsTextbookProgressV2';
 let lang=localStorage.getItem('clearexamsTextbookLang')||'en',meta=null,qs=[],idx=0,answers=[],checked=[],marked=[],deadline=0,completed=false;
 const catalogParams=new URLSearchParams({class:String(classNo),subject,unit:String(unit)});if(classNo<=8)catalogParams.set('term',String(term));const catalogUrl='textbook-quiz.html?'+catalogParams.toString();
-$('backLink').href=catalogUrl;$('resultBack').href=catalogUrl;
 const bookmarkKey='clearexamsTextbookBookmarksV1';let bookmarks=new Set();try{bookmarks=new Set(JSON.parse(localStorage.getItem(bookmarkKey)||'[]'))}catch{}
 const questionKey=q=>String(q.id||classNo+'-'+subject+'-'+term+'-'+unit+'-'+q.q_en);
 const storageId='c'+classNo+'-'+subject+'-t'+term+'-u'+unit+'-q'+quizNo+(mode==='standard'?'':'-'+mode);
 const $=id=>document.getElementById(id);
+$('backLink').href=catalogUrl;$('resultBack').href=catalogUrl;
 function txt(en,ta){return lang==='ta'?ta:en}
 function setLang(v){lang=v;localStorage.setItem('clearexamsTextbookLang',v);$('enBtn').classList.toggle('active',v==='en');$('taBtn').classList.toggle('active',v==='ta');if(completed){finish(true)}else render()}
 $('enBtn').onclick=()=>setLang('en');$('taBtn').onclick=()=>setLang('ta');
