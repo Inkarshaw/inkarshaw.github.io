@@ -52,7 +52,7 @@
     div.appendChild(makeSelect('Subject / பாடம்',allowed,allowed.some(a=>a[0]===subject)?subject:allowed[0][0],v=>location.href=urlFor(cls,v,term)));
     if(cls<=8)div.appendChild(makeSelect('Term / பருவம்',[[1,'Term I / பருவம் 1'],[2,'Term II / பருவம் 2'],[3,'Term III / பருவம் 3']],term,v=>location.href=urlFor(cls,subject,Number(v))));
     const lab=document.createElement('label');lab.textContent='Search unit / அலகைத் தேடு';const inp=document.createElement('input');inp.type='search';inp.placeholder='Chapter name / அலகின் பெயர்';inp.autocomplete='off';inp.oninput=()=>{searchText=inp.value.trim().toLocaleLowerCase();filterUnits()};lab.appendChild(inp);div.appendChild(lab);
-    const hint=document.createElement('div');hint.className='catalog-hint';hint.textContent='Choose a unit, then 20-question practice, timed practice, or its individual quiz sets. / அலகைத் தேர்ந்தெடுத்து பயிற்சியைத் தொடங்குங்கள்.';div.appendChild(hint);
+    const hint=document.createElement('div');hint.className='catalog-hint';hint.textContent='Choose a unit to practise. Question totals reflect indexed records; textbook-level quality verification is ongoing. / அலகைத் தேர்ந்தெடுத்து பயிற்சி செய்யவும். வினாக்களின் தரச் சரிபார்ப்பு நடைபெறுகிறது.';div.appendChild(hint);
     panel.before(div);
   }
   function enhanceUnits(){
