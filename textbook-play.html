@@ -59,8 +59,14 @@ $('enBtn').onclick=()=>setLang('en');$('taBtn').onclick=()=>setLang('ta');
 function save(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}');all[storageId]={idx,answers,checked,marked,deadline,ts:Date.now()};localStorage.setItem(KEY,JSON.stringify(all))}catch{}}
 function loadSaved(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}'),v=all[storageId];if(v&&Array.isArray(v.answers)&&v.answers.length===qs.length){idx=Math.max(0,Math.min(Number(v.idx)||0,qs.length-1));answers=v.answers;checked=v.checked||Array(qs.length).fill(false);marked=v.marked||Array(qs.length).fill(false);deadline=Number(v.deadline)||0}}catch{}}
 function renderPalette(){
- const box=$('palette');box.replaceChildren();
- qs.forEach((q,i)=>{const b=document.createElement('button');b.type='button';b.textContent=i+1;b.className=(i===idx?'current ':'')+(checked[i]?'answered ':'')+(marked[i]?'flagged':'');b.setAttribute('aria-label',txt('Question ','வினா ')+(i+1)+(marked[i]?' ⚑':''));if(i===idx)b.setAttribute('aria-current','step');b.onclick=()=>{idx=i;render()};box.appendChild(b)});
+ const box=$('palette');box.replaceChildren();const n=qs.length;
+ const indices=n<=45?Array.from({length:n},(_,i)=>i):[0,...Array.from({length:Math.min(n,31)},(_,j)=>Math.min(Math.max(idx-15,1),Math.max(n-31,1))+j).filter(i=>i>0&&i<n-1),n-1];
+ let last=-1;
+ for(const i of [...new Set(indices)]){
+  if(i>last+1){const dots=document.createElement('span');dots.textContent='…';dots.setAttribute('aria-hidden','true');box.appendChild(dots)}
+  const b=document.createElement('button');b.type='button';b.textContent=i+1;b.className=(i===idx?'current ':'')+(checked[i]?'answered ':'')+(marked[i]?'flagged':'');
+  b.setAttribute('aria-label',txt('Question ','வினா ')+(i+1)+(marked[i]?' ⚑':''));if(i===idx)b.setAttribute('aria-current','step');b.onclick=()=>{idx=i;render()};box.appendChild(b);last=i;
+ }
 }
 function safeSourceUrl(q){
  const link=q.source_url||meta.source_url||meta.textbook_url||'';
