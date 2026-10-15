@@ -52,7 +52,7 @@ const questionKey=q=>String(q.id||classNo+'-'+subject+'-'+term+'-'+unit+'-'+q.q_
 const storageId='c'+classNo+'-'+subject+'-t'+term+'-u'+unit+'-q'+quizNo+(mode==='standard'?'':'-'+mode);
 const $=id=>document.getElementById(id);
 $('backLink').href=catalogUrl;$('resultBack').href=catalogUrl;
-function txt(en,ta){return lang==='ta'?ta:en}
+function txt(en,ta){return lang==='ta'?(ta??en):en}
 function setLang(v){lang=v;localStorage.setItem('clearexamsTextbookLang',v);$('enBtn').classList.toggle('active',v==='en');$('taBtn').classList.toggle('active',v==='ta');if(completed){finish(true)}else render()}
 $('enBtn').onclick=()=>setLang('en');$('taBtn').onclick=()=>setLang('ta');
 
