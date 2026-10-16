@@ -19,7 +19,7 @@ main{padding:30px 0 70px}.search{display:flex;gap:12px;align-items:center;flex-w
 @media(max-width:500px){.hero{padding:36px 0}.entry{padding:18px}.links{display:grid}.links a{text-align:center}}
 </style></head><body>
 <header><nav class="wrap"><a href="../../index.html">ClearExams.</a><a href="../../daily-quiz.html">Daily Quiz</a><a href="../../index.html">Home</a></nav></header>
-<section class="hero"><div class="wrap"><div class="eyebrow">Read · Revise · Practice</div><h1>Daily Current Affairs<br>in Text</h1><p>Mobile-friendly competitive-exam notes, important facts, primary sources and daily MCQs. Read online without downloading PDFs.</p><div class="actions"><a class="btn primary" href="2026-10-15.html">Read Latest Text Edition</a></div></div></section>
+<section class="hero"><div class="wrap"><div class="eyebrow">Read · Revise · Practice</div><h1>Daily Current Affairs<br>in Text</h1><p>Mobile-friendly competitive-exam notes, important facts, primary sources and daily MCQs. Read online without downloading PDFs.</p><div class="actions"><a class="btn primary" id="latestTextEdition" href="2026-10-15.html">Read Latest Text Edition</a></div></div></section>
 <main class="wrap"><h2>Text editions</h2><div class="search"><label for="filter">Find an edition</label><input id="filter" type="search" placeholder="Search date or subject…" autocomplete="off"></div>
 <div id="editions">
 <article class="entry" data-search="15 october 2026 economy defence governance tamil nadu science ecology"><div class="tag">15 October 2026 · Source-linked edition</div><h2>Economy · Defence · Governance · Tamil Nadu · Environment</h2><p>Ten source-linked current-affairs updates and fifteen revision MCQs.</p><div class="links"><a href="2026-10-15.html">Read Full Text</a></div></article>
@@ -42,6 +42,9 @@ filter.addEventListener('input',search);
 fetch('editions.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('No text index');return r.json()}).then(items=>{
 if(!Array.isArray(items)||!items.length)return;
 items.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+const latest=items.find(x=>/^\d{4}-\d{2}-\d{2}\.html$/.test(x.file||'')&&x.file===x.date+'.html');
+if(latest){const link=document.querySelector('#latestTextEdition');link.href=latest.file;link.textContent='Read Latest Text Edition · '+latest.date;}
+
 holder.textContent='';list=[];
 for(const item of items){
 if(!/^\d{4}-\d{2}-\d{2}\.html$/.test(item.file)||!/^\d{4}-\d{2}-\d{2}$/.test(item.date))continue;
