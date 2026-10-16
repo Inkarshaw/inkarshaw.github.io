@@ -271,6 +271,39 @@ class ClearExamsRegressionTests(unittest.TestCase):
         self.assertEqual(indexed["C11H04-Q421"]["opts_en"][indexed["C11H04-Q421"]["correct"]], "305–303 BCE")
         self.assertEqual(indexed["C11H04-Q406"]["opts_en"][indexed["C11H04-Q406"]["correct"]], "It connects Indian dynastic history with dated Hellenistic events")
 
+    def test_history_unit_four_quiz_eight_bilingual_and_source_criticism(self):
+        data = json.loads(source("data/textbook/class-11/history/unit-04.json"))
+        self.assertEqual(len(data["questions"]), 394)
+        self.assertEqual(len(data["meta"]["quiz_sets"]), 20)
+        eighth = data["questions"][140:160]
+        self.assertEqual(len(eighth), 20)
+        self.assertEqual(eighth[0]["id"], "C11H04-Q427")
+        self.assertEqual(eighth[-1]["id"], "C11H04-Q484")
+        indexed = {q["id"]: q for q in eighth}
+        for q in eighth:
+            self.assertTrue(q["q_en"].endswith("?"), q["id"])
+            self.assertTrue(q["q_ta"].endswith("?"), q["id"])
+            self.assertNotIn("What is the correct textbook answer for", q["q_en"])
+            self.assertEqual(len(q["opts_en"]), 4)
+            self.assertEqual(len(q["opts_ta"]), 4)
+            self.assertEqual(len(set(q["opts_en"])), 4)
+            self.assertEqual(len(set(q["opts_ta"])), 4)
+            self.assertIn(q["correct"], range(4))
+            self.assertGreaterEqual(len(q["exp_en"]), 85)
+            self.assertGreaterEqual(len(q["exp_ta"]), 55)
+        for key, expected in {
+            "C11H04-Q427": "500",
+            "C11H04-Q430": "Megasthenes",
+            "C11H04-Q439": "Strabo, Arrian and Diodorus",
+            "C11H04-Q463": "Bindusara's succession is accepted, but details of the handover are not securely documented",
+            "C11H04-Q469": "Chandragiri",
+            "C11H04-Q484": "272 BCE",
+        }.items():
+            self.assertEqual(indexed[key]["opts_en"][indexed[key]["correct"]], expected)
+        self.assertIn("complex editorial history", indexed["C11H04-Q445"]["exp_en"])
+        self.assertIn("not fully verified", indexed["C11H04-Q466"]["exp_en"])
+        self.assertIn("273 BCE", indexed["C11H04-Q484"]["exp_en"])
+
     def test_text_archive_latest_button_follows_edition_index(self):
         html = source("current-affairs/text/index.html")
         self.assertIn('id="latestTextEdition"', html)
