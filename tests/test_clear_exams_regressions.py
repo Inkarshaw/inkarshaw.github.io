@@ -59,7 +59,7 @@ class ClearExamsRegressionTests(unittest.TestCase):
     def test_syllabus_uses_verified_chapter_route_mapping(self):
         js = source("assets/js/syllabus-reader.js")
         self.assertIn("mappedChapters(part,index,tamil)", js)
-        match = re.search(r"const generalStudyLinks=(\\[.*?\\]);", js)
+        match = re.search(r"const generalStudyLinks=(\[.*?\]);", js)
         self.assertIsNotNone(match, "Syllabus study map is missing")
         groups = json.loads(match.group(1))
         self.assertEqual(len(groups), 6)
