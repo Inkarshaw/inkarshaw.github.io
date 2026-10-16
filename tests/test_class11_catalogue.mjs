@@ -125,6 +125,42 @@ for(const row of rows){
     assert.match(traditions.exp_en,/Jain versions/,'Contested historical accounts must be qualified');
     assert.match(third.find(q=>q.id==='C11H04-Q157').exp_en,/narrower claim/,'Avoid categorical Kosala annexation claim');
   }
+  if(row.unit===4){
+    const fourth=result.questions.slice(60,80);
+    assert.equal(fourth.length,20,'History Unit 4 Quiz 4 must have 20 playable questions');
+    assert.equal(fourth[0].id,'C11H04-Q187','Quiz 4 starts at the wrong source concept');
+    assert.equal(fourth.at(-1).id,'C11H04-Q244','Quiz 4 must end at the Gandara inscription fact');
+    const expectedAnswers={
+      'C11H04-Q187':'362 BCE',
+      'C11H04-Q190':'Dhana Nanda',
+      'C11H04-Q202':'Hathigumpha inscription',
+      'C11H04-Q223':'Cyrus II',
+      'C11H04-Q232':'Herodotus',
+      'C11H04-Q235':'Seventh',
+      'C11H04-Q238':'The Indians of the twentieth district',
+      'C11H04-Q241':'Darius I',
+      'C11H04-Q244':'Gadāra'
+    };
+    const stems=new Set();
+    for(const q of fourth){
+      assert.ok(q.q_en?.endsWith('?')&&q.q_ta?.endsWith('?'),q.id+' lacks complete bilingual stems');
+      assert.ok(!/^What is the correct textbook answer for:/i.test(q.q_en),q.id+' has mechanical wording');
+      assert.equal(q.opts_en.length,4,q.id+' lacks four English options');
+      assert.equal(q.opts_ta.length,4,q.id+' lacks four Tamil options');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' repeats English options');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' repeats Tamil options');
+      assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<=3,q.id+' answer index invalid');
+      assert.ok(q.opts_ta[q.correct]?.trim(),q.id+' Tamil correct answer missing');
+      assert.ok(q.exp_en.length>=85&&q.exp_ta.length>=50,q.id+' has thin explanations');
+      assert.ok(!stems.has(q.q_en),q.id+' duplicates a quiz stem');
+      stems.add(q.q_en);
+      if(expectedAnswers[q.id])assert.equal(q.opts_en[q.correct],expectedAnswers[q.id],q.id+' historical key changed');
+    }
+    assert.match(fourth.find(q=>q.id==='C11H04-Q235').exp_en,/twentieth district.*Indians/i,
+      'Gandarans seventh vs Indians twentieth distinction must survive');
+    assert.match(fourth.find(q=>q.id==='C11H04-Q226').exp_en,/debated/i,
+      'Cyrus campaign date should not be represented as indisputable');
+  }
   if(row.unit===1){
     assert.equal(data.meta.duplicated_or_ambiguous_direct_records_removed,3);
     const second=result.questions.slice(20,40);
