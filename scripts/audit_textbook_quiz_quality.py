@@ -41,8 +41,11 @@ def audit(records: list[dict], start: int, count: int) -> dict:
     stop = start + count
     if start < 0 or count < 1 or stop > len(records):
         raise ValueError("Reviewed window must lie inside the question bank")
-    if start % 20 or count % 20:
-        raise ValueError("Use complete 20-question quiz boundaries")
+    # Quizzes have 20 items except a legitimate trailing partial quiz.
+    # A non-multiple-of-20 window is valid only if it consumes the entire
+    # remaining tail, beginning at a real 20-item quiz boundary.
+    if start % 20 or (count % 20 and stop != len(records)):
+        raise ValueError("Use complete 20-question quiz boundaries, except for the final bank tail")
 
     ids = [q.get("id", "") for q in records]
     if len(ids) != len(set(ids)):
@@ -109,7 +112,7 @@ def audit(records: list[dict], start: int, count: int) -> dict:
     return {
         "reviewed_start": start,
         "reviewed_count": count,
-        "reviewed_quizzes": f"{start // 20 + 1}–{stop // 20}",
+        "reviewed_quizzes": f"{start // 20 + 1}–{(stop + 19) // 20}",
         "answer_positions": dict(sorted(answer_positions.items())),
         "warnings": warnings,
         "errors": problems,

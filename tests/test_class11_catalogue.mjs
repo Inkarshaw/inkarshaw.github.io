@@ -338,8 +338,8 @@ for(const row of rows){
       'Distinguish textbook chronology from modern alternative chronology');
   }
   if(row.unit===4){
-    assert.equal(data.meta.qa_reviewed_prefix,360,'Unit 4 reviewed source prefix changed');
-    assert.equal(data.meta.qa_reviewed_quizzes,18,'Unit 4 editorial quiz marker changed');
+    assert.equal(data.meta.qa_reviewed_prefix,394,'Unit 4 reviewed source prefix changed');
+    assert.equal(data.meta.qa_reviewed_quizzes,20,'Unit 4 editorial quiz marker changed');
     const hundred=result.questions.slice(160,260);
     assert.equal(hundred.length,100,'History Unit 4 batch must contain 100 playable questions');
     assert.equal(hundred[0].id,'C11H04-Q487');
