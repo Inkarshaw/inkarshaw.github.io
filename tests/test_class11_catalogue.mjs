@@ -26,13 +26,35 @@ for(const row of rows){
   const result=quality.curate(data.questions);
   // 'expanded' signals that at least 18% of the bank still uses mechanical
   // prompts. A cleaned, direct-only bank need not keep triggering that flag.
-  if(row.unit!==4){
+  if(![4,5].includes(row.unit)){
     assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
   }else{
-    assert.equal(result.expanded,false,'Reviewed Unit 4 should no longer trigger mechanical expansion');
+    assert.equal(result.expanded,false,'Reviewed Units 4–5 should no longer trigger mechanical expansion');
   }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
+  if(row.unit===5){
+    assert.equal(data.questions.length,348,'Unit 5 must retain exactly 348 direct playable questions');
+    assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 5 generated variants resurfaced');
+    assert.equal(data.meta.source_records_before_editorial_curation,1044);
+    assert.equal(data.meta.generated_variants_removed,696);
+    assert.equal(data.meta.qa_reviewed_prefix,100);
+    assert.equal(data.meta.qa_reviewed_quizzes,5);
+    assert.equal(data.meta.total_questions,348);
+    assert.equal(data.meta.quiz_sets.length,18);
+    assert.equal(result.questions.length,348);
+    assert.equal(result.questions[0].id,'C11H05-Q001');
+    assert.equal(result.questions[99].id,'C11H05-Q298');
+    const firstFive=result.questions.slice(0,100);
+    assert.equal(firstFive.length,100);
+    for(const q of firstFive){
+      assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' weak bilingual question');
+      assert.ok(!/What is the correct textbook answer for:/i.test(q.q_en),q.id+' mechanical stem');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' repeated English option');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' repeated Tamil option');
+      assert.ok(q.exp_en.length>=75&&q.exp_ta.length>=50,q.id+' weak bilingual explanation');
+    }
+  }
   total+=result.questions.length;
   if(row.unit===1){
     assert.equal(data.questions.length,265,'Unit 1 should retain 265 quality-filtered direct source records');
