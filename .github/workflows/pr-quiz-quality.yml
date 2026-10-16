@@ -14,6 +14,7 @@ on:
       - "data/textbook/class-11/history/**"
       - "current-affairs/text/**"
       - "tests/**"
+      - "scripts/audit_textbook_quiz_quality.py"
       - ".github/workflows/pr-quiz-quality.yml"
   workflow_dispatch:
 
@@ -31,6 +32,10 @@ jobs:
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
       - name: Verify all 19 Class 11 History catalogue counts and the opening question
         run: node tests/test_class11_catalogue.mjs
+      - name: Audit 100-question English-Tamil History batch
+        run: |
+          python3 scripts/audit_textbook_quiz_quality.py data/textbook/class-11/history/unit-04.json --start 160 --count 100
+          python3 -m unittest discover -s tests -p "test_textbook_batch_audit.py" -v
       - name: Run current affairs text validation tests
         run: python3 -m unittest discover -s tests -p "test_current_affairs_text.py" -v
       - name: Validate the 15 October text source and index
