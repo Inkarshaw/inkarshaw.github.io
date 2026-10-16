@@ -161,6 +161,43 @@ for(const row of rows){
     assert.match(fourth.find(q=>q.id==='C11H04-Q226').exp_en,/debated/i,
       'Cyrus campaign date should not be represented as indisputable');
   }
+  if(row.unit===4){
+    const fifth=result.questions.slice(80,100);
+    assert.equal(fifth.length,20,'History Unit 4 Quiz 5 must contain 20 questions');
+    assert.equal(fifth[0].id,'C11H04-Q247','Quiz 5 start source changed');
+    assert.equal(fifth.at(-1).id,'C11H04-Q304','Quiz 5 end source changed');
+    const expectedAnswers={
+      'C11H04-Q247':'Harauvatiš',
+      'C11H04-Q250':'Maka',
+      'C11H04-Q262':'Sir Mortimer Wheeler',
+      'C11H04-Q265':'Panini',
+      'C11H04-Q268':'Eight',
+      'C11H04-Q274':'Kharosthi',
+      'C11H04-Q280':'Right to left',
+      'C11H04-Q283':'Silver siglos (sigloi)',
+      'C11H04-Q286':'Twenty',
+      'C11H04-Q292':'Lipi',
+      'C11H04-Q295':'Dipi',
+      'C11H04-Q301':'Lion capital of Sarnath'
+    };
+    for(const q of fifth){
+      assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' question phrasing is incomplete');
+      assert.ok(!/^What is the correct textbook answer for:/i.test(q.q_en),q.id+' has boilerplate wording');
+      assert.equal(q.opts_en.length,4,q.id+' missing English distractors');
+      assert.equal(q.opts_ta.length,4,q.id+' missing Tamil distractors');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' duplicate English distractors');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' duplicate Tamil distractors');
+      assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<4,q.id+' invalid key');
+      assert.ok(q.opts_ta[q.correct]?.trim(),q.id+' missing Tamil answer');
+      assert.ok(q.exp_en.length>=95 && q.exp_ta.length>=55,q.id+' explanation is insufficient');
+      if(expectedAnswers[q.id])assert.equal(q.opts_en[q.correct],expectedAnswers[q.id],
+        q.id+' historical answer drift');
+    }
+    assert.match(fifth.find(q=>q.id==='C11H04-Q262').exp_en,/1913 and 1934/,
+      'John Marshall versus Mortimer Wheeler excavation chronology needs retaining');
+    assert.match(fifth.find(q=>q.id==='C11H04-Q286').exp_en,/twenty silver sigloi/,
+      'Achaemenid daric/siglos conversion needs retaining');
+  }
   if(row.unit===1){
     assert.equal(data.meta.duplicated_or_ambiguous_direct_records_removed,3);
     const second=result.questions.slice(20,40);
