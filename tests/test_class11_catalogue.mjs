@@ -243,6 +243,46 @@ for(const row of rows){
     assert.match(sixth.find(q=>q.id==='C11H04-Q352').exp_en,/more accurate.*Indu/i,'Sindhu to Greek etymology caution disappeared');
     assert.match(sixth.find(q=>q.id==='C11H04-Q343').exp_en,/not the sole verified cause/,'Hyphasis reasons must be nuanced');
   }
+  if(row.unit===4){
+    const seventh=result.questions.slice(120,140);
+    assert.equal(seventh.length,20,'Unit 4 Quiz 7 must have 20 playable questions');
+    assert.equal(seventh[0].id,'C11H04-Q367','Quiz 7 opening ID changed');
+    assert.equal(seventh.at(-1).id,'C11H04-Q424','Quiz 7 final ID changed');
+    const expected={
+      'C11H04-Q370':'Babylon',
+      'C11H04-Q379':'Alexandria on the Caucasus',
+      'C11H04-Q382':'Boukephala (Bucephala)',
+      'C11H04-Q385':'The lower Indus and Sindh region',
+      'C11H04-Q394':'Chandragupta Maurya',
+      'C11H04-Q403':'Sandrokottos (Sandrocottus)',
+      'C11H04-Q406':'It connects Indian dynastic history with dated Hellenistic events',
+      'C11H04-Q409':'321 BCE',
+      'C11H04-Q418':'Seleucus I Nicator',
+      'C11H04-Q421':'305–303 BCE',
+      'C11H04-Q424':'An agreement involved eastern territories and the transfer of war elephants to Seleucus'
+    };
+    const stems=new Set();
+    for(const q of seventh){
+      assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' needs complete bilingual stems');
+      assert.ok(!/^(What is the correct textbook answer for:|According to Unit 4, what is the correct textbook answer for:)/i.test(q.q_en),q.id+' has mechanical boilerplate');
+      assert.equal(q.opts_en.length,4,q.id+' lacks English options');
+      assert.equal(q.opts_ta.length,4,q.id+' lacks Tamil options');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' has repeated English distractors');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' has repeated Tamil distractors');
+      assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<=3,q.id+' has invalid answer index');
+      assert.ok(q.opts_ta[q.correct],q.id+' has no Tamil keyed answer');
+      assert.ok(q.exp_en.length>=95&&q.exp_ta.length>=65,q.id+' needs more informative explanations');
+      assert.ok(!stems.has(q.q_en),q.id+' duplicates a question stem');
+      stems.add(q.q_en);
+      if(expected[q.id])assert.equal(q.opts_en[q.correct],expected[q.id],q.id+' key drifted');
+    }
+    assert.match(seventh.find(q=>q.id==='C11H04-Q382').exp_en,/not near Peshawar/i,
+      'Corrected Boukephala geography disappeared');
+    assert.match(seventh.find(q=>q.id==='C11H04-Q421').exp_en,/about 305–303 BCE/,
+      'Seleucid chronological precision disappeared');
+    assert.match(seventh.find(q=>q.id==='C11H04-Q400').exp_en,/not independently verified/i,
+      'Chandragupta residence should not be asserted as certain');
+  }
   if(row.unit===1){
     assert.equal(data.meta.duplicated_or_ambiguous_direct_records_removed,3);
     const second=result.questions.slice(20,40);
