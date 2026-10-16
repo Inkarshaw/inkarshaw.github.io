@@ -72,7 +72,7 @@ for(const row of rows){
     }
   }
   if(row.unit===4){
-    assert.equal(data.meta.duplicated_or_low_value_direct_records_removed,1);
+    assert.equal(data.meta.duplicated_or_low_value_direct_records_removed,2);
     const second=result.questions.slice(20,40);
     assert.equal(second.length,20,'History Unit 4 Quiz 2 must contain 20 questions');
     assert.ok(!data.questions.some(q=>q.id==='C11H04-Q118'),
