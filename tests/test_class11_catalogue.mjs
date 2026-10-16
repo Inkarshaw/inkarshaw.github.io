@@ -331,6 +331,53 @@ for(const row of rows){
     assert.match(eighth.find(q=>q.id==='C11H04-Q484').exp_en,/273 BCE/,
       'Distinguish textbook chronology from modern alternative chronology');
   }
+  if(row.unit===4){
+    assert.equal(data.meta.qa_reviewed_prefix,260,'Unit 4 reviewed source prefix changed');
+    assert.equal(data.meta.qa_reviewed_quizzes,13,'Unit 4 editorial quiz marker changed');
+    const hundred=result.questions.slice(160,260);
+    assert.equal(hundred.length,100,'History Unit 4 batch must contain 100 playable questions');
+    assert.equal(hundred[0].id,'C11H04-Q487');
+    assert.equal(hundred.at(-1).id,'C11H04-Q784');
+    const keyed={
+      'C11H04-Q487':'268 BCE',
+      'C11H04-Q511':'The Kalinga campaign',
+      'C11H04-Q526':'Categories and repeated copies are counted differently',
+      'C11H04-Q529':'14',
+      'C11H04-Q532':'2',
+      'C11H04-Q535':'7',
+      'C11H04-Q565':'Brahmi',
+      'C11H04-Q574':'Kharosthi',
+      'C11H04-Q601':'250 BCE',
+      'C11H04-Q616':'Mahinda',
+      'C11H04-Q619':'Sanghamitta',
+      'C11H04-Q631':'It controlled much of the subcontinent, but not every southern kingdom',
+      'C11H04-Q652':'48,000 panas',
+      'C11H04-Q661':'Prescriptive text',
+      'C11H04-Q682':'Suvarnagiri',
+      'C11H04-Q697':'Samaharta',
+      'C11H04-Q703':'Sannidhata (treasurer)',
+      'C11H04-Q724':'One-sixth',
+      'C11H04-Q727':'About one-fourth',
+      'C11H04-Q763':'Dharmasthiya',
+      'C11H04-Q766':'Kantakasodhana',
+      'C11H04-Q772':'Amatyas'
+    };
+    for(const q of hundred){
+      assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' incomplete bilingual stem');
+      assert.ok(!/What is the correct textbook answer for:/i.test(q.q_en),q.id+' boilerplate stem');
+      assert.equal(q.opts_en.length,4,q.id+' missing options');
+      assert.equal(q.opts_ta.length,4,q.id+' missing Tamil alternatives');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' duplicate options');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' duplicate Tamil options');
+      assert.ok(q.exp_en.length>=75&&q.exp_ta.length>=50,q.id+' explanation too short');
+      assert.ok(q.opts_ta[q.correct],q.id+' missing keyed Tamil answer');
+      if(keyed[q.id])assert.equal(q.opts_en[q.correct],keyed[q.id],q.id+' keyed historical concept changed');
+    }
+    assert.match(hundred.find(q=>q.id==='C11H04-Q520').exp_en,/not established/,
+      'Do not imply an independently established date of Ashoka conversion');
+    assert.match(hundred.find(q=>q.id==='C11H04-Q601').exp_en,/later Buddhist chronicles/,
+      'Third Buddhist Council must be attributed to Buddhist tradition');
+  }
   if(row.unit===1){
     assert.equal(data.meta.duplicated_or_ambiguous_direct_records_removed,3);
     const second=result.questions.slice(20,40);
