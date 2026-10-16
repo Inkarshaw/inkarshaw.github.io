@@ -76,7 +76,7 @@ class UnitFiveQuizzesSixToTen(unittest.TestCase):
         }.items():
             with self.subTest(question=n):
                 self.assertEqual(keyed(n),expected)
-        self.assertIn("not a contemporary",qs[150]["exp_en"].lower())
+        self.assertIn("not as a contemporary",qs[150]["exp_en"].lower())
         self.assertIn("not",qs[151]["exp_en"].lower())
 
     def test_pandya_sites_and_source_dates(self):
