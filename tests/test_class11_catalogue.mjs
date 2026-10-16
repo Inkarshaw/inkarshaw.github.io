@@ -29,9 +29,13 @@ for(const row of rows){
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
   total+=result.questions.length;
   if(row.unit===1){
+    assert.equal(data.questions.length,268,'Unit 1 should retain 268 direct source records');
+    assert.ok(data.questions.every(x=>x.type==='direct'),'Generated associations or statement variants resurfaced');
+    assert.equal(data.meta.duplicated_association_and_generated_statement_variants_removed,536);
+
     const first=result.questions[0];
-    assert.match(first.q_en,/Which type of evidence/,'History opening question is still boilerplate');
-    assert.equal(first.opts_en[first.correct],'Archaeological remains');
+    assert.match(first.q_en,/Which archaeological finds most directly indicate stone-tool manufacture/,'Opening question needs specific archaeological focus');
+    assert.equal(first.opts_en[first.correct],'Chipped stone flakes and cores');
     assert.ok(!first.opts_en.some(x=>/Not yet deciphered|Stone Age|Pre-historic period/.test(x)),
       'Opening question mixes unrelated option types');
     assert.ok(first.q_ta&&first.opts_ta?.length===4&&first.exp_ta,'Tamil opening question is incomplete');
