@@ -61,7 +61,7 @@ class HistoryUnit5FirstFiveTests(unittest.TestCase):
             with self.subTest(n=n):
                 self.assertEqual(QUESTIONS[n-1]["opts_en"][QUESTIONS[n-1]["correct"]],v)
         self.assertIn("independent",QUESTIONS[71]["exp_en"].lower())
-        self.assertIn("both",QUESTIONS[69]["exp_en"].lower())
+        self.assertIn("humans and animals",QUESTIONS[69]["exp_en"].lower())
 
     def test_sangam_women_and_poetic_sources(self):
         q=QUESTIONS[40]
