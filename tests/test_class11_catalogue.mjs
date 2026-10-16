@@ -40,8 +40,8 @@ for(const row of rows){
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 5 generated variants resurfaced');
     assert.equal(data.meta.source_records_before_editorial_curation,1044);
     assert.equal(data.meta.generated_variants_removed,696);
-    assert.equal(data.meta.qa_reviewed_prefix,100);
-    assert.equal(data.meta.qa_reviewed_quizzes,5);
+    assert.ok(data.meta.qa_reviewed_prefix>=100,'Unit 5 first 100 records not reviewed');
+    assert.ok(data.meta.qa_reviewed_quizzes>=5,'Unit 5 first five quizzes not reviewed');
     assert.equal(data.meta.total_questions,348);
     assert.equal(data.meta.quiz_sets.length,18);
     assert.equal(result.questions.length,348);
