@@ -1,0 +1,64 @@
+name: ClearExams PR quiz and text quality
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "daily-quiz.html"
+      - "textbook-*.html"
+      - "index.html"
+      - "dashboard.html"
+      - "search.html"
+      - "assets/js/textbook-*.js"
+      - "assets/js/syllabus-reader.js"
+      - "current-affairs/text/**"
+      - "tests/**"
+      - ".github/workflows/pr-quiz-quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    name: Quizzes, navigation, and text edition checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pull request code
+        uses: actions/checkout@v4
+      - name: Run ClearExams regression tests
+        run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
+      - name: Verify all 19 Class 11 History catalogue counts and the opening question
+        run: node tests/test_class11_catalogue.mjs
+      - name: Run current affairs text validation tests
+        run: python3 -m unittest discover -s tests -p "test_current_affairs_text.py" -v
+      - name: Validate the 15 October text source and index
+        run: |
+          python3 current-affairs/text/build_text_editions.py --validate current-affairs/text/data/2026-10-15.json --date 2026-10-15
+          python3 -m json.tool current-affairs/text/editions.json >/dev/null
+      - name: Check JavaScript syntax in edited scripts and HTML pages
+        run: |
+          node --check assets/js/textbook-quality.js
+          node --check assets/js/textbook-catalog-controls.js
+          node --check assets/js/syllabus-reader.js
+          python3 - <<'PY'
+          import pathlib, re, subprocess
+          files = [
+              "daily-quiz.html", "textbook-play.html", "textbook-quiz.html",
+              "index.html", "dashboard.html", "search.html",
+              "current-affairs/text/index.html", "current-affairs/text/2026-10-15.html",
+          ]
+          script_pattern = re.compile(r"<script\\b([^>]*)>(.*?)</script>", re.I | re.S)
+          total = 0
+          for name in files:
+              html = pathlib.Path(name).read_text(encoding="utf-8")
+              for match in script_pattern.finditer(html):
+                  attrs, code = match.groups()
+                  if not code.strip() or re.search(r"application/ld\\+json", attrs, re.I):
+                      continue
+                  result = subprocess.run(["node", "--check"], input=code, text=True, capture_output=True)
+                  if result.returncode:
+                      raise SystemExit(f"{name}: invalid JavaScript\\n{result.stderr}")
+                  total += 1
+          print(f"Validated {total} inline scripts across {len(files)} HTML pages.")
+          PY
