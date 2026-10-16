@@ -283,6 +283,54 @@ for(const row of rows){
     assert.match(seventh.find(q=>q.id==='C11H04-Q400').exp_en,/not independently verified/i,
       'Chandragupta residence should not be asserted as certain');
   }
+  if(row.unit===4){
+    const eighth=result.questions.slice(140,160);
+    assert.equal(eighth.length,20,'History Unit 4 Quiz 8 must have 20 playable questions');
+    assert.equal(eighth[0].id,'C11H04-Q427','Quiz 8 opening ID changed');
+    assert.equal(eighth.at(-1).id,'C11H04-Q484','Quiz 8 final ID changed');
+    const correctKeys={
+      'C11H04-Q427':'500',
+      'C11H04-Q430':'Megasthenes',
+      'C11H04-Q433':'Indica',
+      'C11H04-Q436':'The complete original text is lost',
+      'C11H04-Q439':'Strabo, Arrian and Diodorus',
+      'C11H04-Q445':'Kautilya',
+      'C11H04-Q448':'Vishnugupta',
+      'C11H04-Q451':'Arthashastra',
+      'C11H04-Q454':"Winning the former Nanda minister Rakshasa to Chandragupta's side",
+      'C11H04-Q457':'Bindusara',
+      'C11H04-Q460':'297 BCE',
+      'C11H04-Q463':"Bindusara's succession is accepted, but details of the handover are not securely documented",
+      'C11H04-Q469':'Chandragiri',
+      'C11H04-Q472':'Karnataka',
+      'C11H04-Q475':'Diplomatic contacts with Hellenistic rulers in western Asia',
+      'C11H04-Q481':'25 years',
+      'C11H04-Q484':'272 BCE'
+    };
+    const seen=new Set();
+    for(const q of eighth){
+      assert.ok(q.q_en?.endsWith('?')&&q.q_ta?.endsWith('?'),q.id+' incomplete bilingual question');
+      assert.ok(!/^(What is the correct textbook answer for:|According to Unit 4, what is the correct textbook answer for:)/i.test(q.q_en),q.id+' still uses generated boilerplate');
+      assert.equal(q.opts_en.length,4,q.id+' English options missing');
+      assert.equal(q.opts_ta.length,4,q.id+' Tamil options missing');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' repeated English alternatives');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' repeated Tamil alternatives');
+      assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<4,q.id+' invalid answer index');
+      assert.ok(q.opts_ta[q.correct],q.id+' missing Tamil keyed option');
+      assert.ok(q.exp_en.length>=85&&q.exp_ta.length>=55,q.id+' weak bilingual explanations');
+      assert.ok(!seen.has(q.q_en),q.id+' duplicated stem');
+      seen.add(q.q_en);
+      if(correctKeys[q.id])assert.equal(q.opts_en[q.correct],correctKeys[q.id],q.id+' answer drift');
+    }
+    assert.match(eighth.find(q=>q.id==='C11H04-Q463').exp_en,/peaceful and natural/,
+      'Bindusara succession must not be described as proven peaceful');
+    assert.match(eighth.find(q=>q.id==='C11H04-Q445').exp_en,/complex editorial history/,
+      'Arthashastra single-author certainty must be qualified');
+    assert.match(eighth.find(q=>q.id==='C11H04-Q466').exp_en,/not fully verified/,
+      'Chandragupta Jain renunciation must be presented as later tradition');
+    assert.match(eighth.find(q=>q.id==='C11H04-Q484').exp_en,/273 BCE/,
+      'Distinguish textbook chronology from modern alternative chronology');
+  }
   if(row.unit===1){
     assert.equal(data.meta.duplicated_or_ambiguous_direct_records_removed,3);
     const second=result.questions.slice(20,40);
