@@ -24,7 +24,13 @@ for(const row of rows){
   const filename=`data/textbook/class-11/history/unit-${String(row.unit).padStart(2,'0')}.json`;
   const data=JSON.parse(fs.readFileSync(path.join(root,filename),'utf8'));
   const result=quality.curate(data.questions);
-  assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
+  // 'expanded' signals that at least 18% of the bank still uses mechanical
+  // prompts. A cleaned, direct-only bank need not keep triggering that flag.
+  if(row.unit!==4){
+    assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
+  }else{
+    assert.equal(result.expanded,false,'Reviewed Unit 4 should no longer trigger mechanical expansion');
+  }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
   total+=result.questions.length;
