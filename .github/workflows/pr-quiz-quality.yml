@@ -28,6 +28,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Run ClearExams regression tests
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
+      - name: Verify all 19 Class 11 History catalogue counts and the opening question
+        run: node tests/test_class11_catalogue.mjs
       - name: Run current affairs text validation tests
         run: python3 -m unittest discover -s tests -p "test_current_affairs_text.py" -v
       - name: Validate the 15 October text source and index
