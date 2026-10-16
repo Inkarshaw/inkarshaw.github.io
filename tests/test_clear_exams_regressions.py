@@ -98,7 +98,7 @@ class ClearExamsRegressionTests(unittest.TestCase):
 
     def test_history_unit_four_removes_generated_variants(self):
         data = json.loads(source("data/textbook/class-11/history/unit-04.json"))
-        self.assertEqual(len(data["questions"]), 396)
+        self.assertEqual(len(data["questions"]), 395)
         self.assertEqual(data["meta"]["duplicated_association_and_generated_statement_variants_removed"], 792)
         self.assertTrue(all(q["type"] == "direct" for q in data["questions"]))
         for q in data["questions"][:20]:
@@ -107,6 +107,27 @@ class ClearExamsRegressionTests(unittest.TestCase):
             self.assertEqual(len(q["opts_ta"]), 4)
             self.assertGreater(len(q["exp_en"]), 95)
             self.assertGreater(len(q["exp_ta"]), 65)
+
+    def test_shared_bank_supports_separate_tnpsc_and_upsc_exam_views(self):
+        import csv
+        with (ROOT / "data/quizzes/daily-quiz.csv").open(encoding="utf-8", newline="") as stream:
+            rows = list(csv.DictReader(stream))
+        shared = [
+            row for row in rows
+            if row["Exam"] == "UPSC/TNPSC"
+            and row["Active"].strip().lower() != "false"
+            and row["Topic"] and row["Subtopic"] and row["Question"]
+            and row["CorrectAnswer"].upper() in "ABCD"
+            and all(row["Option" + option] and row["Explanation" + option] for option in "ABCD")
+        ]
+        self.assertGreaterEqual(len(shared), 10, "Shared TNPSC fallback questions must be available")
+        workflow = source(".github/workflows/site-health.yml")
+        self.assertIn('if family in {"tnpsc", "upsc"}:', workflow)
+        self.assertIn('available += coverage.get("UPSC/TNPSC", 0)', workflow)
+        html = source("daily-quiz.html")
+        self.assertIn('if(hasShared&&!hasExactTnpsc)exams.push("TNPSC Group IV")', html)
+        self.assertIn('if(hasShared&&!hasExactUpsc)exams.push("UPSC")', html)
+        self.assertIn('if(selected==="UPSC"||selected==="TNPSC Group IV")', html)
 
     def test_text_archive_latest_button_follows_edition_index(self):
         html = source("current-affairs/text/index.html")
