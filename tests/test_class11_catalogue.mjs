@@ -60,7 +60,7 @@ for(const row of rows){
     for(const q of opening){
       assert.ok(!/^(What is the correct textbook answer for:|Which option is correctly associated with:)/i.test(q.q_en),
         `History Unit 2 still contains a mechanical stem: ${q.id}`);
-      assert.ok(/\\?$/.test(q.q_en.trim()),`Question needs clear interrogative wording: ${q.id}`);
+      assert.ok(q.q_en.trim().endsWith('?'),`Question needs clear interrogative wording: ${q.id}`);
       assert.ok(q.exp_en?.length>65&&q.exp_ta?.length>35,
         `Explanation needs bilingual editorial review: ${q.id}`);
       assert.ok(q.opts_ta?.length===4&&new Set(q.opts_ta).size===4,
