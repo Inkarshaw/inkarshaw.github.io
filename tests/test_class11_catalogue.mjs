@@ -78,5 +78,57 @@ for(const row of rows){
       opening.find(q=>q.id==='C11H02-Q025').correct
     ],'Rig Veda');
   }
+  if(row.unit===3){
+    const opening=result.questions.slice(0,20);
+    assert.equal(opening.length,20,'History Unit 3 must provide 20 playable questions');
+    const expected=[
+      ['C11H03-Q001','About 1000 BCE',33],
+      ['C11H03-Q004','Iron technology',33],
+      ['C11H03-Q007','Iron ploughshares',33],
+      ['C11H03-Q010','Urbanisation',33],
+      ['C11H03-Q013','Buddhism',33],
+      ['C11H03-Q016','Jainism',33],
+      ['C11H03-Q019','Mahabharata',33],
+      ['C11H03-Q022','Ramayana',33],
+      ['C11H03-Q025','Tripitakas',33],
+      ['C11H03-Q028','Jatakas',33],
+      ['C11H03-Q031','Arrian',33],
+      ['C11H03-Q034','D. D. Kosambi',33],
+      ['C11H03-Q037','R. S. Sharma',33],
+      ['C11H03-Q040','Makkhan Lal',33],
+      ['C11H03-Q043','A. Ghosh and Niharranjan Ray',33],
+      ['C11H03-Q046','Wet rice cultivation',34],
+      ['C11H03-Q049','Agrarian surplus',34],
+      ['C11H03-Q052','Growth of crafts',34],
+      ['C11H03-Q055','Vibrant trade',34],
+      ['C11H03-Q058','Second urbanisation',34],
+    ];
+    const stems=new Set();
+    for(const [i,q] of opening.entries()){
+      const [id,answer,page]=expected[i];
+      assert.equal(q.id,id,`History Unit 3 question order changed at ${i+1}`);
+      assert.equal(q.opts_en[q.correct],answer,`Unit 3 answer key drift: ${id}`);
+      assert.equal(q.page_en,page,`Unit 3 source page changed: ${id}`);
+      assert.ok(q.q_en?.trim().endsWith('?')&&q.q_ta?.trim().endsWith('?'),
+        `Unit 3 bilingual question stem incomplete: ${id}`);
+      assert.ok(!/^(What is the correct textbook answer for:|Which option is correctly associated with:)/i.test(q.q_en),
+        `Unit 3 boilerplate returned: ${id}`);
+      assert.ok(q.exp_en?.length>85&&q.exp_ta?.length>65,
+        `Unit 3 English/Tamil explanation too weak: ${id}`);
+      assert.ok(q.opts_en.length===4&&q.opts_ta?.length===4,
+        `Unit 3 bilingual options missing: ${id}`);
+      assert.equal(new Set(q.opts_en).size,4,`Unit 3 repeated English option: ${id}`);
+      assert.equal(new Set(q.opts_ta).size,4,`Unit 3 repeated Tamil option: ${id}`);
+      assert.ok(q.opts_ta[q.correct]?.trim(),`Unit 3 Tamil answer missing: ${id}`);
+      assert.ok(!stems.has(q.q_en),`Unit 3 duplicate stem: ${id}`);
+      stems.add(q.q_en);
+    }
+    const ironViews=opening.filter(q=>['C11H03-Q034','C11H03-Q037','C11H03-Q040','C11H03-Q043'].includes(q.id));
+    assert.equal(ironViews.length,4,'Unit 3 historian comparisons incomplete');
+    assert.ok(ironViews.every(q=>q.opts_en.every(x=>!/^[0-9]|technology|century/i.test(x))),
+      'Unit 3 historian questions contain a date or unrelated technical option');
+    const first=opening[0];
+    assert.ok(first.opts_en.every(x=>/BCE/.test(x)),'Unit 3 opening chronology options are mixed types');
+  }
 }
 console.log(`Class 11 catalogue verified: ${rows.length} units and ${total} playable curated questions.`);
