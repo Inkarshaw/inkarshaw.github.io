@@ -24,7 +24,13 @@ for(const row of rows){
   const filename=`data/textbook/class-11/history/unit-${String(row.unit).padStart(2,'0')}.json`;
   const data=JSON.parse(fs.readFileSync(path.join(root,filename),'utf8'));
   const result=quality.curate(data.questions);
-  assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
+  // 'expanded' signals that at least 18% of the bank still uses mechanical
+  // prompts. A cleaned, direct-only bank need not keep triggering that flag.
+  if(row.unit!==4){
+    assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
+  }else{
+    assert.equal(result.expanded,false,'Reviewed Unit 4 should no longer trigger mechanical expansion');
+  }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
   total+=result.questions.length;
@@ -332,8 +338,8 @@ for(const row of rows){
       'Distinguish textbook chronology from modern alternative chronology');
   }
   if(row.unit===4){
-    assert.equal(data.meta.qa_reviewed_prefix,260,'Unit 4 reviewed source prefix changed');
-    assert.equal(data.meta.qa_reviewed_quizzes,13,'Unit 4 editorial quiz marker changed');
+    assert.equal(data.meta.qa_reviewed_prefix,360,'Unit 4 reviewed source prefix changed');
+    assert.equal(data.meta.qa_reviewed_quizzes,18,'Unit 4 editorial quiz marker changed');
     const hundred=result.questions.slice(160,260);
     assert.equal(hundred.length,100,'History Unit 4 batch must contain 100 playable questions');
     assert.equal(hundred[0].id,'C11H04-Q487');
