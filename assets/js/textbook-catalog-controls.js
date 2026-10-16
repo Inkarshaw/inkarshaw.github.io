@@ -79,18 +79,19 @@
       details.appendChild(summary);list.before(details);details.appendChild(list);
       card.dataset.detailOpen='0';
       if(selectedUnit===unit&&!didJump){
-        const visible=cls!==6||card.closest('section.panel')?.querySelector('.crumb')?.textContent.includes('→ '+labels[subject]+' → Term '+termRoman[term]);
-        if(visible){details.open=true;card.classList.add('unit-selected')}
+        if(panelMatches(card.closest('section.panel'))){details.open=true;card.classList.add('unit-selected')}
       }
     }
   }
+  function panelMatches(panel){
+    if(cls!==6)return true;
+    if(!panel)return false;
+    const parts=(panel.querySelector('.crumb')?.textContent||'').split('→').map(s=>s.trim());
+    return parts[0]==='6th Standard'&&parts[1]===labels[subject]&&parts[2]==='Term '+termRoman[term];
+  }
   function filterUnits(){
     for(const panel of main.querySelectorAll('section.panel')){
-      const crumb=panel.querySelector('.crumb')?.textContent||'';
-      if(cls===6){
-        const wanted='→ '+labels[subject]+' → Term '+termRoman[term];
-        panel.hidden=!crumb.includes(wanted);
-      }else panel.hidden=false;
+      panel.hidden=!panelMatches(panel);
     }
     for(const article of main.querySelectorAll('article.unit')){
       const heading=article.querySelector('h3')?.textContent||'';
