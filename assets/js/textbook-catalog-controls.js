@@ -84,10 +84,21 @@
     }
   }
   function panelMatches(panel){
-    if(cls!==6)return true;
     if(!panel)return false;
+    // Match the URL fields as complete values; never use partial text matching
+    // (Term II must not match Term III, and Science must not match Social Science).
+    const first=panel.querySelector('article.unit a[href*="textbook-play.html"]');
+    if(first){
+      const params=new URL(first.href,location.href).searchParams;
+      return Number(params.get('class'))===cls &&
+        params.get('subject')===subject &&
+        (cls>8 || Number(params.get('term'))===term);
+    }
+    // Empty/upcoming panels have no quiz link; use exact breadcrumb segments.
     const parts=(panel.querySelector('.crumb')?.textContent||'').split('→').map(s=>s.trim());
-    return parts[0]==='6th Standard'&&parts[1]===labels[subject]&&parts[2]==='Term '+termRoman[term];
+    return parts[0]===cls+'th Standard' &&
+      parts[1]===labels[subject] &&
+      (cls>8 || parts[2]==='Term '+termRoman[term]);
   }
   function filterUnits(){
     for(const panel of main.querySelectorAll('section.panel')){
