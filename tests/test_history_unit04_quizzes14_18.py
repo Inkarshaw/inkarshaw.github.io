@@ -75,6 +75,9 @@ class HistoryUnit04Quiz14To18Tests(unittest.TestCase):
         self.assertIn("predating", QUESTIONS[333]["exp_en"])
 
     def test_urbanisation_dates_and_name_collision(self):
+        self.assertIn("post-Mauryan", QUESTIONS[346]["q_en"])
+        self.assertIn("UNESCO", QUESTIONS[346]["exp_en"])
+        self.assertIn("மௌரியருக்குப் பிந்தைய", QUESTIONS[346]["exp_ta"])
         self.assertEqual(QUESTIONS[347]["opts_en"][QUESTIONS[347]["correct"]], "6th century BCE")
         self.assertEqual(QUESTIONS[353]["opts_en"][QUESTIONS[353]["correct"]], "Rajagriha")
         self.assertNotIn("Rajgriha", QUESTIONS[353]["opts_en"])
