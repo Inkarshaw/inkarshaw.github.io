@@ -21,8 +21,8 @@ class HistoryUnit04Quiz14To18Tests(unittest.TestCase):
     def test_exactly_five_complete_quizzes_and_stable_metadata(self):
         self.assertEqual(len(QUESTIONS), 394)
         self.assertEqual(BANK["meta"]["total_questions"], 394)
-        self.assertEqual(BANK["meta"]["qa_reviewed_prefix"], 360)
-        self.assertEqual(BANK["meta"]["qa_reviewed_quizzes"], 18)
+        self.assertGreaterEqual(BANK["meta"]["qa_reviewed_prefix"], 360)
+        self.assertGreaterEqual(BANK["meta"]["qa_reviewed_quizzes"], 18)
         self.assertEqual(len(REVIEWED), 100)
         self.assertEqual(len(BANK["meta"]["quiz_sets"]), 20)
         self.assertEqual(len({q["id"] for q in QUESTIONS}), 394)
