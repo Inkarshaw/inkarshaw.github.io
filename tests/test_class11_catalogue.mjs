@@ -26,10 +26,12 @@ for(const row of rows){
   const result=quality.curate(data.questions);
   // 'expanded' signals that at least 18% of the bank still uses mechanical
   // prompts. A cleaned, direct-only bank need not keep triggering that flag.
-  if(![4,5].includes(row.unit)){
+  // Unit 5 is only partially rewritten: untouched direct items still use
+  // textbook-answer boilerplate, so the browser's mechanical guard remains on.
+  if(row.unit!==4){
     assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
   }else{
-    assert.equal(result.expanded,false,'Reviewed Units 4–5 should no longer trigger mechanical expansion');
+    assert.equal(result.expanded,false,'Reviewed Unit 4 should no longer trigger mechanical expansion');
   }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
