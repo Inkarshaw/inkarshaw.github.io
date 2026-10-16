@@ -150,6 +150,36 @@ class ClearExamsRegressionTests(unittest.TestCase):
             self.assertGreaterEqual(len(q["exp_en"]), 80)
             self.assertGreaterEqual(len(q["exp_ta"]), 45)
 
+    def test_history_unit_four_quiz_four_historical_sources_and_tamil(self):
+        data = json.loads(source("data/textbook/class-11/history/unit-04.json"))
+        self.assertEqual(len(data["questions"]), 394)
+        self.assertEqual(len(data["meta"]["quiz_sets"]), 20)
+        fourth = data["questions"][60:80]
+        self.assertEqual(len(fourth), 20)
+        self.assertEqual(fourth[0]["id"], "C11H04-Q187")
+        self.assertEqual(fourth[-1]["id"], "C11H04-Q244")
+        indexed = {q["id"]: q for q in fourth}
+        for q in fourth:
+            self.assertTrue(q["q_en"].endswith("?"))
+            self.assertTrue(q["q_ta"].endswith("?"))
+            self.assertNotIn("What is the correct textbook answer for", q["q_en"])
+            self.assertEqual(len(q["opts_en"]), 4)
+            self.assertEqual(len(q["opts_ta"]), 4)
+            self.assertEqual(len(set(q["opts_en"])), 4)
+            self.assertEqual(len(set(q["opts_ta"])), 4)
+            self.assertIn(q["correct"], range(4))
+            self.assertGreaterEqual(len(q["exp_en"]), 85)
+            self.assertGreaterEqual(len(q["exp_ta"]), 50)
+        for key, expected in {
+            "C11H04-Q190": "Dhana Nanda",
+            "C11H04-Q235": "Seventh",
+            "C11H04-Q238": "The Indians of the twentieth district",
+            "C11H04-Q244": "Gadāra",
+        }.items():
+            q = indexed[key]
+            self.assertEqual(q["opts_en"][q["correct"]], expected)
+        self.assertIn("uncertain", indexed["C11H04-Q223"]["exp_en"])
+        self.assertIn("Herodotus 3.91", indexed["C11H04-Q235"]["exp_en"])
     def test_text_archive_latest_button_follows_edition_index(self):
         html = source("current-affairs/text/index.html")
         self.assertIn('id="latestTextEdition"', html)
