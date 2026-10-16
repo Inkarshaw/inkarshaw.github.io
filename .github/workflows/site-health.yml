@@ -72,8 +72,13 @@ jobs:
               coverage[row["Exam"]] += 1
           for family, route in routes.items():
               quiz_exam = route.get("quizExam")
-              if coverage.get(quiz_exam, 0) < 10:
-                  raise SystemExit(f"{family}.quizExam has only {coverage.get(quiz_exam,0)} valid fallback questions: {quiz_exam}")
+              # The daily quiz deliberately shares UPSC/TNPSC questions with both
+              # dedicated exam views; don't count only exact CSV exam labels.
+              available = coverage.get(quiz_exam, 0)
+              if family in {"tnpsc", "upsc"}:
+                  available += coverage.get("UPSC/TNPSC", 0)
+              if available < 10:
+                  raise SystemExit(f"{family}.quizExam has only {available} valid fallback questions (including shared): {quiz_exam}")
 
           subject_requirements = {
               ("TNUSRB","General Knowledge"): 10,
