@@ -168,6 +168,14 @@ jobs:
           PY
           echo "Repository metadata checks passed." >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Audit reviewed textbook quiz batches
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/audit_textbook_quiz_quality.py data/textbook/class-11/history/unit-04.json --start 160 --count 100
+          python3 -m unittest discover -s tests -p "test_textbook_batch_audit.py" -v
+          echo "Reviewed 100-question English-Tamil quiz batch passed." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Validate JavaScript syntax
         shell: bash
         run: |
