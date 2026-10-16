@@ -55,7 +55,7 @@ for(const row of rows){
       'C11H02-Q031','C11H02-Q034','C11H02-Q037','C11H02-Q040','C11H02-Q043',
       'C11H02-Q046','C11H02-Q049','C11H02-Q052','C11H02-Q055','C11H02-Q058'
     ];
-    assert.deepEqual(opening.map(q=>q.id),ids,'Reviewed Unit 2 quiz order unexpectedly changed');
+    assert.deepEqual(Array.from(opening,q=>q.id),ids,'Reviewed Unit 2 quiz order unexpectedly changed');
     const stems=new Set();
     for(const q of opening){
       assert.ok(!/^(What is the correct textbook answer for:|Which option is correctly associated with:)/i.test(q.q_en),
