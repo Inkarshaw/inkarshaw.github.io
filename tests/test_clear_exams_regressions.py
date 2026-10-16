@@ -212,6 +212,40 @@ class ClearExamsRegressionTests(unittest.TestCase):
         self.assertIn("1913 and 1934", indexed["C11H04-Q262"]["exp_en"])
         self.assertIn("twenty silver sigloi", indexed["C11H04-Q286"]["exp_en"])
 
+    def test_history_unit_four_quiz_six_sources_geography_and_tamil(self):
+        data = json.loads(source("data/textbook/class-11/history/unit-04.json"))
+        self.assertEqual(len(data["questions"]), 394)
+        self.assertEqual(len(data["meta"]["quiz_sets"]), 20)
+        sixth = data["questions"][100:120]
+        self.assertEqual(len(sixth), 20)
+        self.assertEqual(sixth[0]["id"], "C11H04-Q307")
+        self.assertEqual(sixth[-1]["id"], "C11H04-Q364")
+        keys = {q["id"]: q for q in sixth}
+        for q in sixth:
+            self.assertTrue(q["q_en"].endswith("?"))
+            self.assertTrue(q["q_ta"].endswith("?"))
+            self.assertNotIn("What is the correct textbook answer for", q["q_en"])
+            self.assertEqual(len(q["opts_en"]), 4)
+            self.assertEqual(len(q["opts_ta"]), 4)
+            self.assertEqual(len(set(q["opts_en"])), 4)
+            self.assertEqual(len(set(q["opts_ta"])), 4)
+            self.assertIn(q["correct"], range(4))
+            self.assertGreaterEqual(len(q["exp_en"]), 95)
+            self.assertGreaterEqual(len(q["exp_ta"]), 65)
+        expected = {
+            "C11H04-Q310": "Avesta",
+            "C11H04-Q319": "14th century BCE (about 1380 BCE)",
+            "C11H04-Q346": "Darius I",
+            "C11H04-Q352": "Indos (Indus)",
+            "C11H04-Q355": "326 BCE",
+            "C11H04-Q361": "Porus",
+        }
+        for key, answer in expected.items():
+            q = keys[key]
+            self.assertEqual(q["opts_en"][q["correct"]], answer)
+        self.assertIn("Jhelum and Chenab", keys["C11H04-Q361"]["exp_en"])
+        self.assertIn("DPe", keys["C11H04-Q346"]["exp_en"])
+
     def test_text_archive_latest_button_follows_edition_index(self):
         html = source("current-affairs/text/index.html")
         self.assertIn('id="latestTextEdition"', html)

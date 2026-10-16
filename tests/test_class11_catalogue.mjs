@@ -198,6 +198,51 @@ for(const row of rows){
     assert.match(fifth.find(q=>q.id==='C11H04-Q286').exp_en,/twenty silver sigloi/,
       'Achaemenid daric/siglos conversion needs retaining');
   }
+  if(row.unit===4){
+    const sixth=result.questions.slice(100,120);
+    assert.equal(sixth.length,20,'Unit 4 Quiz 6 must have 20 questions');
+    assert.equal(sixth[0].id,'C11H04-Q307','Quiz 6 opening source changed');
+    assert.equal(sixth.at(-1).id,'C11H04-Q364','Quiz 6 final source changed');
+    const answers={
+      'C11H04-Q307':'Pillared hall remains at Kumrahar',
+      'C11H04-Q310':'Avesta',
+      'C11H04-Q313':'Thomas Burrow',
+      'C11H04-Q316':'Bogazkoy Hittite–Mitanni treaty',
+      'C11H04-Q319':'14th century BCE (about 1380 BCE)',
+      'C11H04-Q322':'It invokes names resembling Vedic deities outside South Asia',
+      'C11H04-Q325':'Varuna',
+      'C11H04-Q328':'Mitra',
+      'C11H04-Q331':'The Ashvins (Nasatyas)',
+      'C11H04-Q334':'327–325 BCE',
+      'C11H04-Q337':'Dhana Nanda',
+      'C11H04-Q343':'Long campaigning, exhaustion and concern about further major resistance',
+      'C11H04-Q346':'Darius I',
+      'C11H04-Q349':'Hinduš',
+      'C11H04-Q352':'Indos (Indus)',
+      'C11H04-Q355':'326 BCE',
+      'C11H04-Q358':'Ambhi',
+      'C11H04-Q361':'Porus',
+      'C11H04-Q364':'Battle of the Hydaspes'
+    };
+    const seen=new Set();
+    for(const q of sixth){
+      assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' requires bilingual interrogative stem');
+      assert.ok(!/^(What is the correct textbook answer for:|According to Unit 4, what is the correct textbook answer for:)/i.test(q.q_en),q.id+' still has boilerplate');
+      assert.equal(q.opts_en.length,4,q.id+' missing English distractors');
+      assert.equal(q.opts_ta.length,4,q.id+' missing Tamil distractors');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' duplicate English distractors');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' duplicate Tamil distractors');
+      assert.ok(q.exp_en?.length>=95&&q.exp_ta?.length>=65,q.id+' needs explanatory bilingual feedback');
+      assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<=3,q.id+' invalid answer key');
+      assert.ok(q.opts_ta[q.correct],q.id+' lacks correct Tamil answer');
+      assert.ok(!seen.has(q.q_en),q.id+' duplicates another quiz stem');
+      seen.add(q.q_en);
+      if(answers[q.id])assert.equal(q.opts_en[q.correct],answers[q.id],q.id+' answer key has changed');
+    }
+    assert.match(sixth.find(q=>q.id==='C11H04-Q361').exp_en,/Jhelum and Chenab/,'Porus geography correction disappeared');
+    assert.match(sixth.find(q=>q.id==='C11H04-Q352').exp_en,/more accurate.*Indu/i,'Sindhu to Greek etymology caution disappeared');
+    assert.match(sixth.find(q=>q.id==='C11H04-Q343').exp_en,/not the sole verified cause/,'Hyphasis reasons must be nuanced');
+  }
   if(row.unit===1){
     assert.equal(data.meta.duplicated_or_ambiguous_direct_records_removed,3);
     const second=result.questions.slice(20,40);
