@@ -35,6 +35,16 @@ for(const row of rows){
     assert.ok(!first.opts_en.some(x=>/Not yet deciphered|Stone Age|Pre-historic period/.test(x)),
       'Opening question mixes unrelated option types');
     assert.ok(first.q_ta&&first.opts_ta?.length===4&&first.exp_ta,'Tamil opening question is incomplete');
+    const opening=result.questions.slice(0,20);
+    assert.equal(opening.length,20,'Opening competitive-review quiz must have 20 questions');
+    for(const q of opening){
+      assert.ok(!/^What is the correct textbook answer for:/i.test(q.q_en),
+        `History first quiz still contains a mechanical stem: ${q.id}`);
+      assert.equal(q.opts_en.length,4,`Missing English alternatives: ${q.id}`);
+      assert.equal(q.opts_ta?.length,4,`Missing Tamil alternatives: ${q.id}`);
+      assert.ok(q.exp_en?.length>40&&q.exp_ta?.length>20,
+        `Explanation too weak or missing: ${q.id}`);
+    }
   }
 }
 console.log(`Class 11 catalogue verified: ${rows.length} units and ${total} playable curated questions.`);
