@@ -112,7 +112,7 @@ def audit(records: list[dict], start: int, count: int) -> dict:
     return {
         "reviewed_start": start,
         "reviewed_count": count,
-        "reviewed_quizzes": f"{start // 20 + 1}–{stop // 20}",
+        "reviewed_quizzes": f"{start // 20 + 1}–{(stop + 19) // 20}",
         "answer_positions": dict(sorted(answer_positions.items())),
         "warnings": warnings,
         "errors": problems,
