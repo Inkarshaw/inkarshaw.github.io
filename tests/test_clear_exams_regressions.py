@@ -88,13 +88,25 @@ class ClearExamsRegressionTests(unittest.TestCase):
 
     def test_history_unit_one_drops_generated_variants(self):
         data = json.loads(source("data/textbook/class-11/history/unit-01.json"))
-        self.assertEqual(len(data["questions"]), 268)
+        self.assertEqual(len(data["questions"]), 265)
         self.assertTrue(all(q["type"] == "direct" for q in data["questions"]))
         first = data["questions"][0]
         self.assertEqual(first["id"], "C11H01-Q001")
         self.assertEqual(first["opts_en"][first["correct"]], "Chipped stone flakes and cores")
         self.assertEqual(len(first["opts_ta"]), 4)
         self.assertTrue(first["exp_en"] and first["exp_ta"])
+
+    def test_history_unit_four_removes_generated_variants(self):
+        data = json.loads(source("data/textbook/class-11/history/unit-04.json"))
+        self.assertEqual(len(data["questions"]), 396)
+        self.assertEqual(data["meta"]["duplicated_association_and_generated_statement_variants_removed"], 792)
+        self.assertTrue(all(q["type"] == "direct" for q in data["questions"]))
+        for q in data["questions"][:20]:
+            self.assertNotIn("What is the correct textbook answer for", q["q_en"])
+            self.assertEqual(len(q["opts_en"]), 4)
+            self.assertEqual(len(q["opts_ta"]), 4)
+            self.assertGreater(len(q["exp_en"]), 95)
+            self.assertGreater(len(q["exp_ta"]), 65)
 
     def test_text_archive_latest_button_follows_edition_index(self):
         html = source("current-affairs/text/index.html")
