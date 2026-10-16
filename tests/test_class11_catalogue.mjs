@@ -46,5 +46,37 @@ for(const row of rows){
         `Explanation too weak or missing: ${q.id}`);
     }
   }
+  if(row.unit===2){
+    const opening=result.questions.slice(0,20);
+    assert.equal(opening.length,20,'Class 11 History Unit 2 must offer a full first quiz');
+    const ids=[
+      'C11H02-Q001','C11H02-Q004','C11H02-Q007','C11H02-Q010','C11H02-Q013',
+      'C11H02-Q016','C11H02-Q019','C11H02-Q022','C11H02-Q025','C11H02-Q028',
+      'C11H02-Q031','C11H02-Q034','C11H02-Q037','C11H02-Q040','C11H02-Q043',
+      'C11H02-Q046','C11H02-Q049','C11H02-Q052','C11H02-Q055','C11H02-Q058'
+    ];
+    assert.deepEqual(opening.map(q=>q.id),ids,'Reviewed Unit 2 quiz order unexpectedly changed');
+    const stems=new Set();
+    for(const q of opening){
+      assert.ok(!/^(What is the correct textbook answer for:|Which option is correctly associated with:)/i.test(q.q_en),
+        `History Unit 2 still contains a mechanical stem: ${q.id}`);
+      assert.ok(/\\?$/.test(q.q_en.trim()),`Question needs clear interrogative wording: ${q.id}`);
+      assert.ok(q.exp_en?.length>65&&q.exp_ta?.length>35,
+        `Explanation needs bilingual editorial review: ${q.id}`);
+      assert.ok(q.opts_ta?.length===4&&new Set(q.opts_ta).size===4,
+        `Tamil distractors are missing or repeated: ${q.id}`);
+      assert.equal(new Set(q.opts_en).size,4,`English distractors repeat: ${q.id}`);
+      assert.ok(q.opts_en[q.correct]&&q.opts_ta[q.correct],
+        `Correct option is not aligned across languages: ${q.id}`);
+      assert.ok(!stems.has(q.q_en),`Duplicated stem in opening quiz: ${q.id}`);
+      stems.add(q.q_en);
+    }
+    assert.ok(opening[0].opts_en.every(x=>/BCE|CE/.test(x)),
+      'Unit 2 date question mixes a period with unrelated facts');
+    assert.equal(opening[0].opts_en[opening[0].correct],'c. 2000–600 BCE');
+    assert.equal(opening.find(q=>q.id==='C11H02-Q025').opts_en[
+      opening.find(q=>q.id==='C11H02-Q025').correct
+    ],'Rig Veda');
+  }
 }
 console.log(`Class 11 catalogue verified: ${rows.length} units and ${total} playable curated questions.`);
