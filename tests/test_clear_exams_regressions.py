@@ -18,12 +18,12 @@ class ClearExamsRegressionTests(unittest.TestCase):
     def test_daily_quiz_preserves_native_history(self):
         html = source("daily-quiz.html")
         self.assertIn("function getQuizHistory()", html)
-        self.assertNotRegex(html, r"function\\s+history\\s*\\(")
+        self.assertNotRegex(html, r"function\s+history\s*\(")
         self.assertIn("window.history.replaceState", html)
 
     def test_textbook_has_one_bilingual_renderer(self):
         html = source("textbook-play.html")
-        self.assertEqual(len(re.findall(r"function\\s+render\\s*\\(", html)), 1)
+        self.assertEqual(len(re.findall(r"function\s+render\s*\(", html)), 1)
         for marker in ("renderPalette();save();", "txt('Previous','முந்தையது')",
                        "txt('☆ Bookmark','☆ சேமி')", "txt('Report question','வினாவில் பிழை தெரிவி')"):
             self.assertIn(marker, html)
