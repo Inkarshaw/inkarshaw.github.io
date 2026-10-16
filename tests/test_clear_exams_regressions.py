@@ -98,7 +98,7 @@ class ClearExamsRegressionTests(unittest.TestCase):
 
     def test_history_unit_four_removes_generated_variants(self):
         data = json.loads(source("data/textbook/class-11/history/unit-04.json"))
-        self.assertEqual(len(data["questions"]), 395)
+        self.assertEqual(len(data["questions"]), 394)
         self.assertEqual(data["meta"]["duplicated_association_and_generated_statement_variants_removed"], 792)
         self.assertTrue(all(q["type"] == "direct" for q in data["questions"]))
         for q in data["questions"][:20]:
@@ -128,6 +128,27 @@ class ClearExamsRegressionTests(unittest.TestCase):
         self.assertIn('if(hasShared&&!hasExactTnpsc)exams.push("TNPSC Group IV")', html)
         self.assertIn('if(hasShared&&!hasExactUpsc)exams.push("UPSC")', html)
         self.assertIn('if(selected==="UPSC"||selected==="TNPSC Group IV")', html)
+
+    def test_history_unit_four_quiz_three_is_bilingual_and_distinct(self):
+        data = json.loads(source("data/textbook/class-11/history/unit-04.json"))
+        self.assertEqual(len(data["questions"]), 394)
+        self.assertEqual(data["meta"]["duplicated_or_low_value_direct_records_removed"], 2)
+        third = data["questions"][40:60]
+        self.assertEqual(len(third), 20)
+        self.assertEqual(third[0]["id"], "C11H04-Q124")
+        self.assertEqual(third[-1]["id"], "C11H04-Q184")
+        self.assertNotIn("C11H04-Q145", [q["id"] for q in data["questions"]])
+        for q in third:
+            self.assertTrue(q["q_en"].endswith("?"))
+            self.assertTrue(q["q_ta"].endswith("?"))
+            self.assertNotIn("What is the correct textbook answer for", q["q_en"])
+            self.assertEqual(len(q["opts_en"]), 4)
+            self.assertEqual(len(q["opts_ta"]), 4)
+            self.assertEqual(len(set(q["opts_en"])), 4)
+            self.assertEqual(len(set(q["opts_ta"])), 4)
+            self.assertIn(q["correct"], range(4))
+            self.assertGreaterEqual(len(q["exp_en"]), 80)
+            self.assertGreaterEqual(len(q["exp_ta"]), 45)
 
     def test_text_archive_latest_button_follows_edition_index(self):
         html = source("current-affairs/text/index.html")
