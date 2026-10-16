@@ -246,6 +246,31 @@ class ClearExamsRegressionTests(unittest.TestCase):
         self.assertIn("Jhelum and Chenab", keys["C11H04-Q361"]["exp_en"])
         self.assertIn("DPe", keys["C11H04-Q346"]["exp_en"])
 
+    def test_history_unit_four_quiz_seven_geography_sources_and_tamil(self):
+        data = json.loads(source("data/textbook/class-11/history/unit-04.json"))
+        self.assertEqual(len(data["questions"]), 394)
+        self.assertEqual(len(data["meta"]["quiz_sets"]), 20)
+        seventh = data["questions"][120:140]
+        self.assertEqual(len(seventh), 20)
+        self.assertEqual(seventh[0]["id"], "C11H04-Q367")
+        self.assertEqual(seventh[-1]["id"], "C11H04-Q424")
+        indexed = {q["id"]: q for q in seventh}
+        for q in seventh:
+            self.assertTrue(q["q_en"].endswith("?"))
+            self.assertTrue(q["q_ta"].endswith("?"))
+            self.assertNotIn("What is the correct textbook answer for", q["q_en"])
+            self.assertEqual(len(q["opts_en"]), 4)
+            self.assertEqual(len(q["opts_ta"]), 4)
+            self.assertEqual(len(set(q["opts_en"])), 4)
+            self.assertEqual(len(set(q["opts_ta"])), 4)
+            self.assertIn(q["correct"], range(4))
+            self.assertGreaterEqual(len(q["exp_en"]), 95)
+            self.assertGreaterEqual(len(q["exp_ta"]), 65)
+        self.assertEqual(indexed["C11H04-Q382"]["opts_en"][indexed["C11H04-Q382"]["correct"]], "Boukephala (Bucephala)")
+        self.assertIn("Jhelum river region", indexed["C11H04-Q382"]["exp_en"])
+        self.assertEqual(indexed["C11H04-Q421"]["opts_en"][indexed["C11H04-Q421"]["correct"]], "305–303 BCE")
+        self.assertEqual(indexed["C11H04-Q406"]["opts_en"][indexed["C11H04-Q406"]["correct"]], "It connects Indian dynastic history with dated Hellenistic events")
+
     def test_text_archive_latest_button_follows_edition_index(self):
         html = source("current-affairs/text/index.html")
         self.assertIn('id="latestTextEdition"', html)
