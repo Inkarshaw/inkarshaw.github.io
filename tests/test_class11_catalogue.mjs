@@ -53,8 +53,12 @@ for(const row of rows){
     assert.equal(new Set(allIds).size,result.questions.length,`Unit ${row.unit}: duplicated quiz records`);
     assert.equal(quality.selectReviewedQuiz(data.meta,data.questions,result.questions,row.sets+1).length,0,
       `Unit ${row.unit}: invalid quiz link must be empty`);
-    assert.equal(quality.selectReviewedQuiz({...data.meta,qa_reviewed_prefix:0},data.questions,result.questions,1),null,
-      'Incomplete reviews must keep their previous routing behavior');
+    const markedIncomplete=quality.selectReviewedQuiz({...data.meta,qa_reviewed_prefix:0},data.questions,result.questions,1);
+    if(row.unit===6){
+      assert.equal(markedIncomplete.length,20,'Explicit positional Unit 6 routing must persist across editorial batches');
+    }else{
+      assert.equal(markedIncomplete,null,'Fully reviewed banks without positional opt-in require complete markers');
+    }
   }
   if(row.unit===6){
     assert.equal(data.questions.length,276,'Unit 6 must preserve 276 distinct source questions');
