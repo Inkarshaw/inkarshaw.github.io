@@ -36,8 +36,8 @@ for(const row of rows){
   }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
-  if([4,5].includes(row.unit)){
-    // These fully reviewed banks retain old source q.quiz labels (6/7 records).
+  if([4,5,6].includes(row.unit)){
+    // Curated direct-only banks retain old source q.quiz labels (6/7 records).
     // The live player MUST route all catalogue links by 20-question position.
     const allIds=[];
     for(let n=1;n<=row.sets;n++){
@@ -55,6 +55,25 @@ for(const row of rows){
       `Unit ${row.unit}: invalid quiz link must be empty`);
     assert.equal(quality.selectReviewedQuiz({...data.meta,qa_reviewed_prefix:0},data.questions,result.questions,1),null,
       'Incomplete reviews must keep their previous routing behavior');
+  }
+  if(row.unit===6){
+    assert.equal(data.questions.length,276,'Unit 6 must preserve 276 distinct source questions');
+    assert.equal(data.meta.total_questions,276,'Unit 6 catalogue count differs');
+    assert.equal(data.meta.quiz_sets.length,14,'Unit 6 must have 14 playable links');
+    assert.equal(data.meta.source_records_before_editorial_curation,828);
+    assert.equal(data.meta.mechanically_generated_variants_removed,552);
+    assert.equal(data.meta.qa_reviewed_prefix,100,'Unit 6 first 100 review progress drift');
+    assert.equal(data.meta.qa_reviewed_quizzes,5);
+    assert.equal(data.meta.positional_quiz_sets,true,'Unit 6 must keep curated quiz routing');
+    assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 6 generated variants resurfaced');
+    assert.equal(result.questions[0].id,'C11H06-Q001');
+    assert.equal(result.questions[99].id,'C11H06-Q298');
+    for(const q of result.questions.slice(0,100)){
+      assert.equal(q.opts_en.length,4,q.id+' missing choices');
+      assert.equal(q.opts_ta.length,4,q.id+' missing Tamil choices');
+      assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' incomplete question');
+      assert.ok(q.exp_en.length>=75&&q.exp_ta.length>=50,q.id+' weak explanation');
+    }
   }
   if(row.unit===5){
     assert.equal(data.questions.length,348,'Unit 5 must retain exactly 348 direct playable questions');
