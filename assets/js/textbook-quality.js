@@ -135,13 +135,16 @@
     if (!meta || !Array.isArray(sourceQuestions) || !Array.isArray(curatedQuestions)) return null;
     const sets = Array.isArray(meta.quiz_sets) ? meta.quiz_sets : [];
     const expectedSets = Math.ceil(sourceQuestions.length / 20);
-    const fullyReviewed = sourceQuestions.length > 0 &&
-      Number(meta.qa_reviewed_prefix) === sourceQuestions.length &&
-      Number(meta.qa_reviewed_quizzes) === expectedSets &&
+    const positionalBank = sourceQuestions.length > 0 &&
       sets.length === expectedSets &&
       curatedQuestions.length === sourceQuestions.length &&
       sourceQuestions.every(q => q.type === 'direct');
-    if (!fullyReviewed) return null; // Keep the legacy/supplemental routes unchanged.
+    const fullyReviewed = positionalBank &&
+      Number(meta.qa_reviewed_prefix) === sourceQuestions.length &&
+      Number(meta.qa_reviewed_quizzes) === expectedSets;
+    // A partially reviewed direct-only bank may explicitly use the same
+    // stable 20-question catalogue slots without misusing old q.quiz labels.
+    if (!positionalBank || (!fullyReviewed && meta.positional_quiz_sets !== true)) return null;
     if (!Number.isInteger(quizNumber) || quizNumber < 1 || quizNumber > expectedSets) return [];
     return curatedQuestions.slice((quizNumber - 1) * 20, quizNumber * 20);
   }
