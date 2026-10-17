@@ -27,9 +27,8 @@ for(const row of rows){
   // 'expanded' signals that at least 18% of the bank still uses mechanical
   // prompts. A cleaned, direct-only bank need not keep triggering that flag.
   // 'expanded' is true only if the mechanical-stem share exceeds the
-  // browser threshold. Unit 5 now has 300 revised direct questions of 348;
-  // its 48 unfinished questions fall below that threshold, so 'expanded'
-  // is correctly false even though further editorial review remains.
+  // browser threshold. Both Units 4 and 5 now have fully reviewed banks,
+  // so neither should continue to trigger mechanical expansion.
   if(![4,5].includes(row.unit)){
     assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
   }else{
@@ -42,8 +41,8 @@ for(const row of rows){
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 5 generated variants resurfaced');
     assert.equal(data.meta.source_records_before_editorial_curation,1044);
     assert.equal(data.meta.generated_variants_removed,696);
-    assert.ok(data.meta.qa_reviewed_prefix>=300,'Unit 5 Quizzes 1–15 have not all been reviewed');
-    assert.ok(data.meta.qa_reviewed_quizzes>=15,'Unit 5 Quizzes 1–15 reviewed status unexpectedly regressed');
+    assert.equal(data.meta.qa_reviewed_prefix,348,'Unit 5 final editorial status regressed');
+    assert.equal(data.meta.qa_reviewed_quizzes,18,'Unit 5 must mark all 18 quizzes reviewed');
     assert.equal(data.meta.total_questions,348);
     assert.equal(data.meta.quiz_sets.length,18);
     assert.equal(result.questions.length,348);
