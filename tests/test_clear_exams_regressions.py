@@ -22,6 +22,13 @@ class ClearExamsRegressionTests(unittest.TestCase):
         self.assertNotRegex(html, r"function\s+history\s*\(")
         self.assertIn("window.history.replaceState", html)
 
+    def test_reviewed_history_quizzes_use_positional_routing(self):
+        html = source("textbook-play.html")
+        quality = source("assets/js/textbook-quality.js")
+        self.assertIn("quality.selectReviewedQuiz(meta,d.questions||[],curatedBase.questions,quizNo)", html)
+        self.assertIn("qs=reviewedQuiz;", html)
+        self.assertIn("function selectReviewedQuiz(meta, sourceQuestions, curatedQuestions, quizNumber)", quality)
+
     def test_textbook_has_one_bilingual_renderer(self):
         html = source("textbook-play.html")
         self.assertEqual(len(re.findall(r"function\s+render\s*\(", html)), 1)

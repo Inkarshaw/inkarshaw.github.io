@@ -36,6 +36,26 @@ for(const row of rows){
   }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
+  if([4,5].includes(row.unit)){
+    // These fully reviewed banks retain old source q.quiz labels (6/7 records).
+    // The live player MUST route all catalogue links by 20-question position.
+    const allIds=[];
+    for(let n=1;n<=row.sets;n++){
+      const expected=result.questions.slice((n-1)*20,n*20);
+      const selected=quality.selectReviewedQuiz(data.meta,data.questions,result.questions,n);
+      assert.ok(selected!==null,`Unit ${row.unit} quiz ${n}: reviewed routing not enabled`);
+      assert.equal(selected.length,expected.length,`Unit ${row.unit} quiz ${n}: incorrect question count`);
+      assert.deepEqual(Array.from(selected,q=>q.id),Array.from(expected,q=>q.id),
+        `Unit ${row.unit} quiz ${n}: wrong question order or links`);
+      allIds.push(...selected.map(q=>q.id));
+    }
+    assert.equal(allIds.length,result.questions.length,`Unit ${row.unit}: inaccessible questions`);
+    assert.equal(new Set(allIds).size,result.questions.length,`Unit ${row.unit}: duplicated quiz records`);
+    assert.equal(quality.selectReviewedQuiz(data.meta,data.questions,result.questions,row.sets+1).length,0,
+      `Unit ${row.unit}: invalid quiz link must be empty`);
+    assert.equal(quality.selectReviewedQuiz({...data.meta,qa_reviewed_prefix:0},data.questions,result.questions,1),null,
+      'Incomplete reviews must keep their previous routing behavior');
+  }
   if(row.unit===5){
     assert.equal(data.questions.length,348,'Unit 5 must retain exactly 348 direct playable questions');
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 5 generated variants resurfaced');

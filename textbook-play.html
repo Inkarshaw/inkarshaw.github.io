@@ -143,6 +143,7 @@ async function loadQuizData(){
   const quality=window.TextbookQuality;
   if(!quality)throw Error('Textbook quality guard failed to load');
   const curatedBase=quality.curate(d.questions||[]);
+  const reviewedQuiz=quality.selectReviewedQuiz(meta,d.questions||[],curatedBase.questions,quizNo);
   const mergeSet=e=>{
     if(e&&e.meta&&Array.isArray(e.meta.quiz_sets)){
       e.meta.quiz_sets.forEach(x=>{if(!meta.quiz_sets.some(y=>y.id===x.id))meta.quiz_sets.push(x)});
@@ -186,6 +187,9 @@ async function loadQuizData(){
       }catch(err){console.warn('Some supplemental quiz files were unavailable',err)}
     }
     qs=quality.curate(all).questions;
+  }else if(reviewedQuiz!==null){
+    // Match the catalogue's 20-question windows, not legacy 6/7-item source labels.
+    qs=reviewedQuiz;
   }else if(curatedBase.expanded){
     // Old automatically varied sets are rebuilt from distinct source facts.
     const freshCount=Math.ceil(curatedBase.questions.length/20);

@@ -128,5 +128,22 @@
       removed: arr.length - kept.length
     };
   }
-  root.TextbookQuality = { curate, valid, isBoilerplate, mechanicallyExpanded, unwrapped };
+  // Fully reviewed direct-question banks retain legacy q.quiz source-group labels
+  // (6-7 records each), whereas the published catalogue groups 20 by position.
+  // Never use the old labels to route these stable editorial quiz sets.
+  function selectReviewedQuiz(meta, sourceQuestions, curatedQuestions, quizNumber) {
+    if (!meta || !Array.isArray(sourceQuestions) || !Array.isArray(curatedQuestions)) return null;
+    const sets = Array.isArray(meta.quiz_sets) ? meta.quiz_sets : [];
+    const expectedSets = Math.ceil(sourceQuestions.length / 20);
+    const fullyReviewed = sourceQuestions.length > 0 &&
+      Number(meta.qa_reviewed_prefix) === sourceQuestions.length &&
+      Number(meta.qa_reviewed_quizzes) === expectedSets &&
+      sets.length === expectedSets &&
+      curatedQuestions.length === sourceQuestions.length &&
+      sourceQuestions.every(q => q.type === 'direct');
+    if (!fullyReviewed) return null; // Keep the legacy/supplemental routes unchanged.
+    if (!Number.isInteger(quizNumber) || quizNumber < 1 || quizNumber > expectedSets) return [];
+    return curatedQuestions.slice((quizNumber - 1) * 20, quizNumber * 20);
+  }
+  root.TextbookQuality = { curate, valid, isBoilerplate, mechanicallyExpanded, unwrapped, selectReviewedQuiz };
 })(window);
