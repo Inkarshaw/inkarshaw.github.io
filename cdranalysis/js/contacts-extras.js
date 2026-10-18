@@ -8,21 +8,24 @@
     const history=()=>recordsIgnoringDateTimeFilters();
     const global=()=>core&&analysisRecords?core.build(analysisRecords(),phoneKey||String):new Map();
     const scoped=()=>core?core.build(history(),phoneKey||String):new Map();
+    let cachedGlobal=null;
+    function sharedIndex(){return cachedGlobal||(cachedGlobal=global());}
     function visibleRows(){
+      cachedGlobal=null;
       const data=$('contactsDataScope')?.value==='history'?history():state.filtered;
       const q=String($('contactsSearch')?.value||'').trim().toLowerCase();
       const tag=$('contactsTagFilter')?.value||'';
       const min=Math.max(0,Number($('contactsMinCalls')?.value)||0);
       const shared=!!$('contactsSharedOnly')?.checked;
       const shortlisted=!!$('contactsShortlistOnly')?.checked;
-      const globalMap=shared?global():null;
+      const globalMap=shared?sharedIndex():null;
       return aggregateContacts(data).filter(x=>{
         const label=[x.bparty,contactLabel(x.bparty),contactName(x.bparty),contactTag(x.bparty),...(x.aliases||[])].join(' ').toLowerCase();
         return (!q||label.includes(q))&&(!tag||contactTag(x.bparty)===tag)&&x.calls>=min&&(!shared||(globalMap.get(x.key)?.subjects.size||0)>=2)&&(!shortlisted||state.contactShortlist.has(requestIdentifier(x.bparty)));
       });
     }
     function details(){return scoped();}
-    function commonCount(key){return global().get(key)?.subjects.size||0;}
+    function commonCount(key){return sharedIndex().get(key)?.subjects.size||0;}
     function compareButton(key){
       const n=commonCount(key);
       return '<button class="btn secondary small contact-compare-subjects" type="button" data-key="'+escAttr(key)+'">Compare subjects'+(n>1?' ('+n+')':'')+'</button>';
