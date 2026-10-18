@@ -37,7 +37,7 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:11px 9px
   document.getElementById('qa').textContent=qa.reviewedQuestions.toLocaleString('en-IN')+' / '+qa.directQuestionCandidates.toLocaleString('en-IN');
   const subjectName={science:'Science / அறிவியல்','social-science':'Social Science / சமூக அறிவியல்',history:'History / வரலாறு',geography:'Geography / புவியியல்'};
   const classRows=rows.map(r=>{
-   const link='textbook-quiz.html?class='+r.class+'&subject='+encodeURIComponent(r.subject)+(r.term?'&term='+r.term:'');
+   const link=r.class===6?'textbook-quiz.html':'textbook-quiz.html?class='+r.class+'&subject='+encodeURIComponent(r.subject)+(r.term?'&term='+r.term:'');
    const term=r.term?' · Term '+['','I','II','III'][r.term]:'';
    return '<tr><td><strong>'+r.class+'th</strong></td><td>'+escapeHtml(subjectName[r.subject]||r.subject)+escapeHtml(term)+'</td><td>'+r.publishedFiles+'</td><td>'+r.publishedUnits+'</td><td><span class="badge '+(r.publishedUnits?'live':'')+'">'+(r.publishedUnits?'Files available':'Not published')+'</span></td><td><a href="'+link+'">View →</a></td></tr>';
   }).join('');
