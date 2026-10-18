@@ -89,7 +89,7 @@ class Unit6FinalReviewTests(unittest.TestCase):
         self.assertEqual(record["opts_en"][record["correct"]],"Hard-eyed")
         self.assertIn("literary",record["exp_en"])
         self.assertIn("modern",record["exp_en"])
-        self.assertIn("இக்கால",record["exp_ta"])
+        self.assertIn("இன்றைய",record["exp_ta"])
         self.assertIn("not solely ethnic Greeks",Q[249]["exp_en"])
 
     def test_salt_barter_versus_monetisation(self):
@@ -113,7 +113,7 @@ class Unit6FinalReviewTests(unittest.TestCase):
             with self.subTest(idx=idx):
                 item=Q[idx]
                 self.assertEqual(item["opts_en"][item["correct"]],answer)
-        self.assertIn("commercial",Q[268]["exp_en"].lower() if "commercial" in Q[268]["exp_en"].lower() else "commercial") # structural confirmation
+        self.assertIn("northern and southern India", Q[268]["exp_en"])
         self.assertTrue(Q[-1]["exp_ta"])
 
 if __name__=="__main__":
