@@ -115,8 +115,9 @@ class GuptaUnit7QuizzesSixToTen(unittest.TestCase):
         self.assertEqual(QUESTIONS[197]["opts_en"][QUESTIONS[197]["correct"]], "Klipta")
         self.assertEqual(QUESTIONS[198]["opts_en"][QUESTIONS[198]["correct"]], "Bali")
         self.assertEqual(QUESTIONS[199]["opts_en"][QUESTIONS[199]["correct"]], "Udranga")
-        for idx in [197, 198, 199]:
-            self.assertIn("context", QUESTIONS[idx]["exp_en"])
+        self.assertIn("inscriptional", QUESTIONS[197]["exp_en"])
+        self.assertIn("context", QUESTIONS[198]["exp_en"])
+        self.assertIn("contexts", QUESTIONS[199]["exp_en"])
 
 
 if __name__ == "__main__":
