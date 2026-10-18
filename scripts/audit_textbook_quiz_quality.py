@@ -15,6 +15,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -32,7 +33,19 @@ RE_EN_DATE = re.compile(r"\b(?:bce|ce|bc|ad)\b", re.IGNORECASE)
 
 
 def normalize(text: str) -> str:
-    return " ".join(re.sub(r"[^\w\s]", " ", text.casefold()).split())
+    """Normalize labels without erasing Tamil and other combining vowel marks.
+
+    Python's \\w does not include all Unicode mark categories. Stripping marks
+    would conflate distinct Tamil words such as பாகா and போகா, wrongly
+    flagging legitimate bilingual distractors as duplicates.
+    """
+    normalized = unicodedata.normalize("NFC", text.casefold())
+    safe = "".join(
+        char if (char.isspace() or unicodedata.category(char)[0] in "LNM")
+        else " "
+        for char in normalized
+    )
+    return " ".join(safe.split())
 
 
 def audit(records: list[dict], start: int, count: int) -> dict:
