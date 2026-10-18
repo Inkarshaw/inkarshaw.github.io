@@ -34,7 +34,7 @@
     function onRender(rows){
       if($('contactsShowingCount'))$('contactsShowingCount').textContent=rows.length+' shown • '+state.requestSelected.size+' checked • '+state.contactShortlist.size+' shortlisted';
     }
-    const selected=()=>[...state.requestSelected].filter(x=>/^(?:\\d{10}|\\d{15})$/.test(x));
+    const selected=()=>[...state.requestSelected].filter(x=>/^(?:\d{10}|\d{15})$/.test(x));
     function selectedAliases(){
       const ids=new Set(selected()),aliases=new Set(ids);
       if(analysisRecords)for(const r of analysisRecords())if(ids.has(requestIdentifier(r.bparty)))aliases.add(r.bparty);
@@ -64,7 +64,7 @@
       const value=x=>dtFmt(core?.date(x))||'';
       const rows=nums.map(id=>{const raw=lookup.get(id)||id,summary=all.get(phoneKey?phoneKey(raw):raw);return [id,contactName(raw),contactTag(raw),state.contactShortlist.has(id)?'Yes':'No',value(summary?.firstCall),value(summary?.firstIncoming),value(summary?.firstOutgoing),value(summary?.lastCall),value(summary?.lastEvent),[...(summary?.subjects.keys()||[])].join('; ')];});
       if(!core){showStatus('CSV tools not loaded. Refresh the page.','error');return;}
-      download('cdr_selected_contacts.csv','\\uFEFF'+core.csv(headers,rows),'text/csv;charset=utf-8');
+      download('cdr_selected_contacts.csv','\uFEFF'+core.csv(headers,rows),'text/csv;charset=utf-8');
       showStatus(nums.length+' selected contacts exported to a local CSV file.','ok');
     }
     function comparison(key){
