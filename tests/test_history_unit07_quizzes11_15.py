@@ -101,7 +101,7 @@ class GuptaUnit7Quizzes11To15(unittest.TestCase):
         for n, val in expected.items():
             with self.subTest(number=n):
                 self.assertEqual(self.answer(n), val)
-        self.assertIn("debated", QUESTIONS[240]["exp_en"])
+        self.assertIn("disputed", QUESTIONS[240]["exp_en"])
         self.assertIn("cash payment", QUESTIONS[241]["exp_en"])
         self.assertIn("income", QUESTIONS[252]["exp_en"])
         self.assertIn("first cultivation", QUESTIONS[253]["exp_en"])
