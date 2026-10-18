@@ -28,15 +28,15 @@ for(const row of rows){
   // prompts. A cleaned, direct-only bank need not keep triggering that flag.
   // 'expanded' is true only if the mechanical-stem share exceeds the
   // browser threshold. Units 4, 5 and 6 now have fully reviewed banks,
-  // so neither should continue to trigger mechanical expansion.
-  if(![4,5,6].includes(row.unit)){
+  // and Unit 7's completed 420/492 now falls below the expansion threshold.
+  if(![4,5,6,7].includes(row.unit)){
     assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
   }else{
     assert.equal(result.expanded,false,`Reviewed Class 11 Unit ${row.unit} unexpectedly crossed the mechanical threshold`);
   }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
-  if([4,5,6].includes(row.unit)){
+  if([4,5,6,7].includes(row.unit)){
     // Curated direct-only banks retain old source q.quiz labels (6/7 records).
     // The live player MUST route all catalogue links by 20-question position.
     const allIds=[];
@@ -93,7 +93,7 @@ for(const row of rows){
       assert.ok(!/correct textbook answer for/i.test(q.q_en),q.id+' mechanical stem');
     }
   }
-  if(row.unit===6){
+  if([6,7].includes(row.unit)){
       assert.equal(markedIncomplete.length,20,'Explicit positional Unit 6 routing must persist across editorial batches');
     }else{
       assert.equal(markedIncomplete,null,'Fully reviewed banks without positional opt-in require complete markers');
