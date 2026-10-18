@@ -54,7 +54,39 @@ for(const row of rows){
     assert.equal(quality.selectReviewedQuiz(data.meta,data.questions,result.questions,row.sets+1).length,0,
       `Unit ${row.unit}: invalid quiz link must be empty`);
     const markedIncomplete=quality.selectReviewedQuiz({...data.meta,qa_reviewed_prefix:0},data.questions,result.questions,1);
-    if(row.unit===6){
+    if(row.unit===7){
+    assert.equal(data.questions.length,492,'Unit 7 must retain all 492 unique source records');
+    assert.equal(data.meta.total_questions,492);
+    assert.equal(data.meta.quiz_sets.length,25);
+    assert.equal(data.meta.source_records_before_editorial_curation,1476);
+    assert.equal(data.meta.mechanically_generated_variants_removed,984);
+    assert.equal(data.meta.qa_reviewed_prefix,100);
+    assert.equal(data.meta.qa_reviewed_quizzes,5);
+    assert.equal(data.meta.positional_quiz_sets,true);
+    assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 7 generated variants resurfaced');
+    assert.equal(result.questions[0].id,'C11H07-Q001');
+    assert.equal(result.questions[99].id,'C11H07-Q298');
+    assert.equal(result.questions.slice(480).length,12,'Unit 7 final quiz should have 12 records');
+    const allIds=[];
+    for(let n=1;n<=row.sets;n++){
+      const expected=result.questions.slice((n-1)*20,n*20);
+      const selected=quality.selectReviewedQuiz(data.meta,data.questions,result.questions,n);
+      assert.ok(selected!==null,'Unit 7 positional direct routing missing');
+      assert.deepEqual(Array.from(selected,q=>q.id),Array.from(expected,q=>q.id),
+        `Unit 7 quiz ${n}: broken positional catalogue link`);
+      allIds.push(...selected.map(q=>q.id));
+    }
+    assert.equal(new Set(allIds).size,492,'Unit 7 unique links or records missing');
+    assert.equal(allIds.length,492,'Unit 7 some questions unreachable');
+    for(const q of result.questions.slice(0,100)){
+      assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' bilingual question mark');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' English options');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' Tamil options');
+      assert.ok(q.exp_en.length>=75&&q.exp_ta.length>=50,q.id+' explanation');
+      assert.ok(!/correct textbook answer for/i.test(q.q_en),q.id+' mechanical stem');
+    }
+  }
+  if(row.unit===6){
       assert.equal(markedIncomplete.length,20,'Explicit positional Unit 6 routing must persist across editorial batches');
     }else{
       assert.equal(markedIncomplete,null,'Fully reviewed banks without positional opt-in require complete markers');
