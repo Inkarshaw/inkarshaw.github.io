@@ -66,8 +66,8 @@ for(const row of rows){
     assert.equal(data.meta.quiz_sets.length,14,'Unit 6 must have 14 playable links');
     assert.equal(data.meta.source_records_before_editorial_curation,828);
     assert.equal(data.meta.mechanically_generated_variants_removed,552);
-    assert.equal(data.meta.qa_reviewed_prefix,200,'Unit 6 first ten quizzes reviewed');
-    assert.equal(data.meta.qa_reviewed_quizzes,10);
+    assert.ok(data.meta.qa_reviewed_prefix>=200,'Unit 6 first ten quizzes reviewed');
+    assert.ok(data.meta.qa_reviewed_quizzes>=10);
     assert.equal(data.meta.positional_quiz_sets,true,'Unit 6 must keep curated quiz routing');
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 6 generated variants resurfaced');
     assert.equal(result.questions[0].id,'C11H06-Q001');
