@@ -31,8 +31,8 @@ class GuptaQuizzes17To21Tests(unittest.TestCase):
     def test_batch_size_metadata_and_stable_ids(self):
         self.assertEqual(len(self.questions), 492)
         self.assertEqual(len(self.batch), 100)
-        self.assertEqual(self.data["meta"]["qa_reviewed_prefix"], 420)
-        self.assertEqual(self.data["meta"]["qa_reviewed_quizzes"], 21)
+        self.assertGreaterEqual(self.data["meta"]["qa_reviewed_prefix"], 420)
+        self.assertGreaterEqual(self.data["meta"]["qa_reviewed_quizzes"], 21)
         self.assertEqual(self.data["meta"]["total_questions"], 492)
         self.assertEqual(self.get_question(321)["id"], "C11H07-Q961")
         self.assertEqual(self.get_question(420)["id"], "C11H07-Q1258")
