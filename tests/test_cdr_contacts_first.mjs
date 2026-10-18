@@ -104,6 +104,6 @@ test('First displays a dash for a contact with no call, rather than mislabeling 
   h.state.filtered=[h.state.records[0]];
   h.contact.render();
   const html=h.inputs.contactsTable.innerHTML;
-  assert.match(html,/<th title="Earliest voice call/);
+  assert.match(html,/<th[^>]*title="Earliest voice call/);
   assert.match(html,/<td>—<\/td><td>2026-10-10T17:30:00.000Z<\/td>/);
 });
