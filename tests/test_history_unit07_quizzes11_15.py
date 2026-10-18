@@ -92,12 +92,13 @@ class GuptaUnit7Quizzes11To15(unittest.TestCase):
 
     def test_gupta_taxes_and_grant_conditions(self):
         expected = {236:"King's customary one-sixth share of produce",
-                    237:"Periodic supply of fruits, firewood, flowers etc.",
-                    238:"Periodic tax on villagers, separate from annual land tax",
-                    239:"Voluntary offering that later became compulsory and oppressive",
-                    241:"An extra tax of uncertain purpose",
-                    247:"Perpetual, hereditary, tax-free grant to Brahmins",
-                    250:"Land endowment under trusteeship"}
+                    237:"Bhoga", 238:"Kara", 239:"Bali",
+                    240:"Udranga / Udianga", 241:"Uparikara",
+                    242:"Hiranya", 243:"Vata-Bhuta cess",
+                    244:"Halivakara", 246:"Klipta and Upakilpta",
+                    247:"Agrahara grant", 248:"Devagrahara grant",
+                    250:"Nivi dharma", 252:"Nivi dharma aksayana",
+                    253:"Aprada dharma", 254:"Bhumichchidra-nyaya"}
         for n, val in expected.items():
             with self.subTest(number=n):
                 self.assertEqual(self.answer(n), val)
@@ -106,12 +107,29 @@ class GuptaUnit7Quizzes11To15(unittest.TestCase):
         self.assertIn("income", QUESTIONS[252]["exp_en"])
         self.assertIn("first cultivation", QUESTIONS[253]["exp_en"])
 
+    def test_named_tax_and_tenure_questions_do_not_key_definitions(self):
+        names = {237:"Bhoga",238:"Kara",239:"Bali",
+                 240:"Udranga / Udianga",241:"Uparikara",242:"Hiranya",
+                 243:"Vata-Bhuta cess",244:"Halivakara",
+                 246:"Klipta and Upakilpta",247:"Agrahara grant",
+                 248:"Devagrahara grant",250:"Nivi dharma",
+                 252:"Nivi dharma aksayana",253:"Aprada dharma",
+                 254:"Bhumichchidra-nyaya"}
+        for number, name in names.items():
+            with self.subTest(number=number):
+                q = QUESTIONS[number-1]
+                self.assertEqual(q["opts_en"][q["correct"]],name)
+                self.assertEqual(len(set(q["opts_en"])),4)
+                self.assertEqual(len(set(q["opts_ta"])),4)
+                self.assertIn(name,q["exp_en"])
+                self.assertTrue(q["q_en"].endswith("?"))
+
     def test_mehrauli_corrosion_and_industrial_history(self):
         self.assertEqual(self.answer(260), "Mehrauli Iron Pillar")
         self.assertEqual(self.answer(261), "Qutb Minar Complex, Delhi")
-        self.assertEqual(self.answer(262), "Survived centuries without rusting")
-        self.assertIn("not literally free", QUESTIONS[261]["exp_en"])
-        self.assertIn("protective film", QUESTIONS[261]["exp_en"])
+        self.assertEqual(self.answer(262), "Exceptional resistance to corrosion over centuries")
+        self.assertIn("completely rust-free", QUESTIONS[261]["exp_en"])
+        self.assertIn("protective surface film", QUESTIONS[261]["exp_en"])
         self.assertEqual(self.answer(270), "Sresti")
         self.assertEqual(self.answer(271), "Sarthavaha")
 
