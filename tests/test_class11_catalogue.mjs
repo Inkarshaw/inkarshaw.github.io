@@ -36,7 +36,7 @@ for(const row of rows){
   }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
-  if([4,5,6,7].includes(row.unit)){
+  if([4,5,6,7,8].includes(row.unit)){
     // Curated direct-only banks retain old source q.quiz labels (6/7 records).
     // The live player MUST route all catalogue links by 20-question position.
     const allIds=[];
@@ -54,6 +54,27 @@ for(const row of rows){
     assert.equal(quality.selectReviewedQuiz(data.meta,data.questions,result.questions,row.sets+1).length,0,
       `Unit ${row.unit}: invalid quiz link must be empty`);
     const markedIncomplete=quality.selectReviewedQuiz({...data.meta,qa_reviewed_prefix:0},data.questions,result.questions,1);
+    if(row.unit===8){
+      assert.equal(data.questions.length,468,'Unit 8 distinct source count changed');
+      assert.equal(data.meta.total_questions,468);
+      assert.equal(data.meta.quiz_sets.length,24);
+      assert.equal(data.meta.qa_reviewed_prefix,100);
+      assert.equal(data.meta.qa_reviewed_quizzes,5);
+      assert.equal(data.meta.source_records_before_editorial_curation,1404);
+      assert.equal(data.meta.mechanically_generated_variants_removed,936);
+      assert.equal(data.meta.positional_quiz_sets,true);
+      assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 8 generated variants resurfaced');
+      assert.equal(result.questions[0].id,'C11H08-Q001');
+      assert.equal(result.questions[99].id,'C11H08-Q298');
+      assert.equal(result.questions.slice(460).length,8,'Unit 8 final quiz should hold eight records');
+      for(const q of result.questions.slice(0,100)){
+        assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' bilingual question');
+        assert.equal(new Set(q.opts_en).size,4,q.id+' English choices');
+        assert.equal(new Set(q.opts_ta).size,4,q.id+' Tamil choices');
+        assert.ok(q.exp_en.length>=75&&q.exp_ta.length>=50,q.id+' explanations');
+        assert.ok(!/correct textbook answer for/i.test(q.q_en),q.id+' template stem');
+      }
+    }
     if(row.unit===7){
     assert.equal(data.questions.length,492,'Unit 7 must retain all 492 unique source records');
     assert.equal(data.meta.total_questions,492);
@@ -93,7 +114,7 @@ for(const row of rows){
       assert.ok(!/correct textbook answer for/i.test(q.q_en),q.id+' mechanical stem');
     }
   }
-  if([6,7].includes(row.unit)){
+  if([6,7,8].includes(row.unit)){
       assert.equal(markedIncomplete.length,20,'Explicit positional Unit 6 routing must persist across editorial batches');
     }else{
       assert.equal(markedIncomplete,null,'Fully reviewed banks without positional opt-in require complete markers');
