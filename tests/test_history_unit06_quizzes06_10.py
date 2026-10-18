@@ -86,7 +86,7 @@ class HistoryUnit06QuizSixToTen(unittest.TestCase):
                                154: "Asvaghosha", 157: "Nagarjuna",
                                159: "Sariputraprakarana"}.items():
             self.assertEqual(keyed(number), answer)
-        self.assertIn("not", QUESTIONS[156]["q_en"])
+        self.assertIn("rather than", QUESTIONS[156]["q_en"])
         self.assertIn("later", QUESTIONS[150]["exp_en"])
 
     def test_satavahana_cross_unit_chronology_correction(self):
