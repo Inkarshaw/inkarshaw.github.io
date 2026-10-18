@@ -151,7 +151,7 @@
   contactsModule=window.CDRContactsFactory?.({
     $,state,aggregateContacts,aggregateLocations,identityStore,defaultCdrRequestDates,updateCdrRequestCount,requestIdentifier,
     escAttr,escapeHtml,contactTitle,contactLabel,contactTag,contactName,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable,
-    showStatus,localDateKey,analysisRecords,recordsIgnoringDateTimeFilters
+    showStatus,localDateKey,analysisRecords,recordsIgnoringDateTimeFilters,phoneKey,download,persistLocal,audit
   })||null;
   contactsModule?.bind();
 

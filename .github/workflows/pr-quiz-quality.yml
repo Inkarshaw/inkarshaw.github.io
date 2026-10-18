@@ -35,10 +35,13 @@ jobs:
       - name: Check CDR Contacts copy selection
         run: |
           node --check cdranalysis/js/filters.js
+          node --check cdranalysis/js/contacts-insights.js
+          node --check cdranalysis/js/contacts-extras.js
+          node --check cdranalysis/js/workspace.js
           node --check cdranalysis/js/contacts.js
           node --check cdranalysis/js/app.js
           node --check cdranalysis/js/ui.js
-          node --test tests/test_cdr_contacts_copy.mjs tests/test_cdr_contacts_first.mjs tests/test_cdr_contacts_sort.mjs
+          node --test tests/test_cdr_contacts_copy.mjs tests/test_cdr_contacts_first.mjs tests/test_cdr_contacts_sort.mjs tests/test_cdr_contacts_extras.mjs tests/test_cdr_contacts_integration.mjs
       - name: Audit 100-question English-Tamil History batch
         run: |
           python3 scripts/audit_textbook_quiz_quality.py data/textbook/class-11/history/unit-04.json --start 160 --count 100
