@@ -27,9 +27,9 @@ for(const row of rows){
   // 'expanded' signals that at least 18% of the bank still uses mechanical
   // prompts. A cleaned, direct-only bank need not keep triggering that flag.
   // 'expanded' is true only if the mechanical-stem share exceeds the
-  // browser threshold. Both Units 4 and 5 now have fully reviewed banks,
+  // browser threshold. Units 4, 5 and 6 now have fully reviewed banks,
   // so neither should continue to trigger mechanical expansion.
-  if(![4,5].includes(row.unit)){
+  if(![4,5,6].includes(row.unit)){
     assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
   }else{
     assert.equal(result.expanded,false,`Reviewed Class 11 Unit ${row.unit} unexpectedly crossed the mechanical threshold`);
