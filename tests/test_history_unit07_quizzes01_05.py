@@ -63,7 +63,7 @@ class Unit7FirstHundredTests(unittest.TestCase):
         self.assertEqual(item["id"],"C11H07-Q052")
         self.assertEqual(item["opts_en"][item["correct"]],"Chandragupta II")
         self.assertEqual(item["opts_ta"][item["correct"]],"இரண்டாம் சந்திரகுப்தர்")
-        self.assertIn("misattribution",item["exp_en"])
+        self.assertIn("incorrectly labels",item["exp_en"])
         self.assertIn("பிழையாக",item["exp_ta"])
         self.assertIn("Chandragupta II",Q[16]["exp_en"])
 
