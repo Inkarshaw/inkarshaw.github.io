@@ -126,7 +126,7 @@ class Unit8QuizzesOneToFive(unittest.TestCase):
         self.assertEqual(answer(63)[0], "King of Kamarupa")
         self.assertEqual(answer(64)[0], "Assam")
         self.assertEqual(answer(65)[0], "Few details of direct battles survive")
-        self.assertIn("hardly", get(65)["q_en"] + get(65)["exp_en"].replace("almost no","hardly")) if False else None
+        self.assertIn("step-by-step", get(65)["exp_en"])
         self.assertIn("seems", get(66)["exp_en"])
         self.assertIn("Gauda", get(66)["q_en"])
 
