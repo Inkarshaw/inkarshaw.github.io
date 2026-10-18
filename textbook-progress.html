@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="ClearExams Tamil Nadu textbook quiz availability and editorial quality review by standard and subject.">
+<link rel="canonical" href="https://clearexams.ink/textbook-progress.html">
+<title>TN Textbook Quiz Progress | ClearExams</title>
+<style>
+:root{color-scheme:light;--navy:#071c33;--ink:#122d48;--blue:#145ef5;--muted:#526a80;--line:#d9e5f0;--green:#087a52;--orange:#915b13}
+*{box-sizing:border-box}body{margin:0;font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;background:#f3f7fc;color:var(--ink)}a{color:var(--blue)}.wrap{width:min(1060px,calc(100% - 24px));margin:auto}
+header{background:white;border-bottom:1px solid var(--line)}nav{display:flex;align-items:center;gap:16px;min-height:62px}nav .brand{font-weight:900;font-size:1.15rem;color:var(--navy);text-decoration:none}nav a:last-child{margin-left:auto;font-weight:700}
+.hero{background:linear-gradient(115deg,#061729,#114f8d);color:#fff;padding:35px 0}.hero h1{font-size:clamp(2rem,5vw,2.9rem);margin:0}.hero p{color:#d3e5f9;max-width:800px;margin:9px 0}.subtitle{font-weight:600}.content{padding:26px 0 60px}.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:18px;margin:16px 0}.card h2{margin:0 0 9px;font-size:1.4rem}.muted{color:var(--muted);margin:5px 0 12px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:#fff;padding:17px;border-radius:14px;border:1px solid var(--line)}.stat strong{display:block;font-size:1.9rem}.stat span{font-size:.83rem;color:var(--muted)}
+table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:.8rem;color:var(--muted);background:#f7faff}td small{display:block;color:var(--muted)}.scroller{overflow-x:auto}.badge{display:inline-block;border-radius:999px;padding:4px 9px;font-weight:800;font-size:.76rem;background:#edf1f7;color:#526377}.badge.live{background:#e7f6ef;color:var(--green)}.badge.partial{background:#fff4e5;color:var(--orange)}.bar{height:9px;background:#e5edf7;border-radius:15px;overflow:hidden}.bar i{display:block;height:100%;background:#1b7bd1;border-radius:15px}.quick{display:flex;gap:10px;flex-wrap:wrap}.quick a{padding:9px 13px;border:1px solid #b5d2ff;border-radius:9px;text-decoration:none;font-weight:750;background:#f5f9ff}
+.foot{font-size:.9rem;color:var(--muted)}#status{color:var(--muted)}:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+@media(max-width:680px){.stats{grid-template-columns:1fr}.stat strong{font-size:1.5rem}th,td{padding:8px 6px;font-size:.85rem}}
+</style>
+</head><body>
+<header><nav class="wrap"><a class="brand" href="index.html">ClearExams.</a><a href="textbook-quiz.html">Open textbook quizzes →</a></nav></header>
+<div class="hero"><div class="wrap"><h1>Textbook Quiz Progress</h1><p class="subtitle">தமிழ்நாடு பாடநூல் வினாடி வினா முன்னேற்றம்</p><p>Published question files, missing subject/term combinations, and editorial review status are shown separately. A live bank is <strong>not</strong> automatically a fact-checked bank.</p></div></div>
+<main class="wrap content"><p id="status" role="status">Loading repository coverage snapshot…</p><div id="main" hidden>
+<div class="stats"><div class="stat"><strong id="pub">—</strong><span>Subject / term combinations with published unit files</span></div><div class="stat"><strong id="missing">—</strong><span>Tracked combinations without unit files</span></div><div class="stat"><strong id="qa">—</strong><span>Class 11 History direct questions editorially reviewed</span></div></div>
+<section class="card"><h2>Class-wise availability / வகுப்பு வாரியான நிலை</h2><p class="muted">Unit numbers are counted once even if a unit has many separate quiz files. “Not published” means no unit JSON exists in that tracked combination, not that the textbook has no such subject.</p><div class="scroller"><table><thead><tr><th>Class</th><th>Subject &amp; term</th><th>Unit files</th><th>Distinct units</th><th>Availability</th><th>Open</th></tr></thead><tbody id="classes"></tbody></table></div></section>
+<section class="card"><h2>Class 11 History — editorial review / வரலாறு தர ஆய்வு</h2><p class="muted">Only question records with documented editorial review are marked reviewed. Unreviewed questions may still be publicly available for practice, but need fact, bilingual and distractor checking.</p><div class="bar" role="img" id="bar" aria-label="Review progress"><i id="barfill"></i></div><p id="reviewText" class="muted"></p><div class="scroller"><table><thead><tr><th>Unit</th><th>Distinct direct MCQs</th><th>Editorially reviewed</th><th>Status</th><th>Practice</th></tr></thead><tbody id="history"></tbody></table></div></section>
+<section class="card"><h2>What remains / இன்னும் செய்ய வேண்டியது</h2><p id="next"></p><p class="muted">Next steps: publish genuinely textbook-grounded questions for unavailable subjects and terms; replace repeated/generated stems in existing banks; verify both English and Tamil editions; test navigation and publish each reviewed batch.</p><div class="quick"><a href="textbook-quiz.html?class=11&subject=history&unit=8">Continue Class 11 History</a><a href="textbook-quiz.html">Browse all quizzes</a></div></section>
+<p class="foot" id="footer"></p></div></main>
+<script>
+(async function(){
+ const status=document.getElementById('status'), main=document.getElementById('main');
+ const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ try{
+  const res=await fetch('data/textbook/coverage.json',{cache:'no-store'});
+  if(!res.ok)throw new Error('Coverage snapshot unavailable');
+  const data=await res.json(); const rows=data.classes, present=rows.filter(x=>x.publishedUnits>0);
+  document.getElementById('pub').textContent=present.length;
+  document.getElementById('missing').textContent=rows.length-present.length;
+  const qa=data.class11History;
+  document.getElementById('qa').textContent=qa.reviewedQuestions.toLocaleString('en-IN')+' / '+qa.directQuestionCandidates.toLocaleString('en-IN');
+  const subjectName={science:'Science / அறிவியல்','social-science':'Social Science / சமூக அறிவியல்',history:'History / வரலாறு',geography:'Geography / புவியியல்'};
+  const classRows=rows.map(r=>{
+   const link='textbook-quiz.html?class='+r.class+'&subject='+encodeURIComponent(r.subject)+(r.term?'&term='+r.term:'');
+   const term=r.term?' · Term '+['','I','II','III'][r.term]:'';
+   return '<tr><td><strong>'+r.class+'th</strong></td><td>'+escapeHtml(subjectName[r.subject]||r.subject)+escapeHtml(term)+'</td><td>'+r.publishedFiles+'</td><td>'+r.publishedUnits+'</td><td><span class="badge '+(r.publishedUnits?'live':'')+'">'+(r.publishedUnits?'Files available':'Not published')+'</span></td><td><a href="'+link+'">View →</a></td></tr>';
+  }).join('');
+  document.getElementById('classes').innerHTML=classRows;
+  const percent=qa.directQuestionCandidates?Math.round(qa.reviewedQuestions/qa.directQuestionCandidates*100):0;
+  document.getElementById('barfill').style.width=percent+'%';
+  document.getElementById('bar').setAttribute('aria-label','Class 11 History '+percent+' percent editorially reviewed');
+  document.getElementById('reviewText').textContent=percent+'% documented editorial review. Reviewed '+qa.reviewedQuestions.toLocaleString('en-IN')+' of '+qa.directQuestionCandidates.toLocaleString('en-IN')+' distinct direct-question candidates.';
+  document.getElementById('history').innerHTML=qa.units.map(x=>{
+   const done=x.editoriallyReviewed===x.directQuestions,started=x.editoriallyReviewed>0;
+   const link='textbook-quiz.html?class=11&subject=history&unit='+x.unit;
+   return '<tr><td>Unit '+x.unit+'</td><td>'+x.directQuestions+'</td><td>'+x.editoriallyReviewed+'</td><td><span class="badge '+(done?'live':started?'partial':'')+'">'+(done?'Reviewed':started?'In progress':'Review pending')+'</span></td><td><a href="'+link+'">Open →</a></td></tr>';
+  }).join('');
+  document.getElementById('next').textContent=data.nextEditorialBatch;
+  document.getElementById('footer').textContent='Snapshot: '+data.generatedDate+'. Source: '+data.scope+'. This inventory is not a claim that the full TN textbook syllabus is complete, or that all English/Tamil questions have independently verified answers.';
+  status.textContent='';main.hidden=false;
+ }catch(e){status.textContent='Could not load the coverage snapshot. You can still use the textbook quiz catalogue.';}
+})();
+</script>
+</body></html>
