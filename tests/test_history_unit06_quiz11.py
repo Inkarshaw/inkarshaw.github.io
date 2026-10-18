@@ -13,8 +13,8 @@ class Unit6Quiz11Tests(unittest.TestCase):
     def test_count_and_metadata(self):
         self.assertEqual(len(Q),276)
         self.assertEqual(DATA["meta"]["total_questions"],276)
-        self.assertEqual(DATA["meta"]["qa_reviewed_prefix"],220)
-        self.assertEqual(DATA["meta"]["qa_reviewed_quizzes"],11)
+        self.assertGreaterEqual(DATA["meta"]["qa_reviewed_prefix"],220)
+        self.assertGreaterEqual(DATA["meta"]["qa_reviewed_quizzes"],11)
         self.assertEqual(len(DATA["meta"]["quiz_sets"]),14)
         self.assertEqual(len(Q[200:220]),20)
     def test_quality_gate(self):

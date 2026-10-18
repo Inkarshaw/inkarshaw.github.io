@@ -27,9 +27,9 @@ for(const row of rows){
   // 'expanded' signals that at least 18% of the bank still uses mechanical
   // prompts. A cleaned, direct-only bank need not keep triggering that flag.
   // 'expanded' is true only if the mechanical-stem share exceeds the
-  // browser threshold. Both Units 4 and 5 now have fully reviewed banks,
+  // browser threshold. Units 4, 5 and 6 now have fully reviewed banks,
   // so neither should continue to trigger mechanical expansion.
-  if(![4,5].includes(row.unit)){
+  if(![4,5,6].includes(row.unit)){
     assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
   }else{
     assert.equal(result.expanded,false,`Reviewed Class 11 Unit ${row.unit} unexpectedly crossed the mechanical threshold`);
@@ -66,8 +66,9 @@ for(const row of rows){
     assert.equal(data.meta.quiz_sets.length,14,'Unit 6 must have 14 playable links');
     assert.equal(data.meta.source_records_before_editorial_curation,828);
     assert.equal(data.meta.mechanically_generated_variants_removed,552);
-    assert.ok(data.meta.qa_reviewed_prefix>=200,'Unit 6 first ten quizzes reviewed');
-    assert.ok(data.meta.qa_reviewed_quizzes>=10);
+    assert.equal(data.meta.qa_reviewed_prefix,276,'Unit 6 full editorial review marker');
+    assert.equal(data.meta.qa_reviewed_quizzes,14,'Unit 6 complete quiz review marker');
+    assert.equal(result.questions.slice(260).length,16,'Unit 6 Quiz 14 must have sixteen questions');
     assert.equal(data.meta.positional_quiz_sets,true,'Unit 6 must keep curated quiz routing');
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 6 generated variants resurfaced');
     assert.equal(result.questions[0].id,'C11H06-Q001');
