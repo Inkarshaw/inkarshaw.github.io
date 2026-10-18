@@ -1,4 +1,4 @@
-const CACHE='cdr-analyzer-v74';
+const CACHE='cdr-analyzer-v75';
 const CORE=[
   '/cdranalysis/',
   '/cdranalysis/index.html',
