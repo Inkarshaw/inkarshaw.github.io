@@ -46,6 +46,19 @@ class BilingualBatchAuditTests(unittest.TestCase):
         result = MODULE.audit(records, start=160, count=100)
         self.assertTrue(any("numerical answer differs" in item for item in result["errors"]))
 
+    def test_tamil_vowel_marks_are_semantically_significant(self):
+        self.assertNotEqual(MODULE.normalize("பாகா"), MODULE.normalize("போகா"))
+        self.assertNotEqual(MODULE.normalize("கரா"), MODULE.normalize("காரா"))
+        self.assertNotEqual(MODULE.normalize("உபரிகரா"), MODULE.normalize("உபரிகாரா"))
+        self.assertEqual(MODULE.normalize("  போகா! "), MODULE.normalize("போகா"))
+
+    def test_gupta_valid_tax_terms_do_not_trigger_tamil_duplicate_error(self):
+        records = json.loads(
+            (ROOT / "data/textbook/class-11/history/unit-07.json").read_text(encoding="utf-8")
+        )["questions"]
+        outcome = MODULE.audit(records, start=200, count=100)
+        self.assertFalse(any("duplicate ta distractors" in x for x in outcome["errors"]))
+
     def test_rejects_partial_quiz_windows(self):
         with self.assertRaisesRegex(ValueError, "20-question"):
             MODULE.audit(BANK["questions"], start=160, count=99)
