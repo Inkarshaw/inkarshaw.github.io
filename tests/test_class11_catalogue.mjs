@@ -28,15 +28,15 @@ for(const row of rows){
   // prompts. A cleaned, direct-only bank need not keep triggering that flag.
   // 'expanded' is true only if the mechanical-stem share exceeds the
   // browser threshold. Units 4, 5 and 6 now have fully reviewed banks,
-  // so neither should continue to trigger mechanical expansion.
-  if(![4,5,6].includes(row.unit)){
+  // and Unit 7's completed 420/492 now falls below the expansion threshold.
+  if(![4,5,6,7].includes(row.unit)){
     assert.ok(result.expanded,`Class 11 History Unit ${row.unit}: mechanical variants unexpectedly changed`);
   }else{
     assert.equal(result.expanded,false,`Reviewed Class 11 Unit ${row.unit} unexpectedly crossed the mechanical threshold`);
   }
   assert.equal(row.questions,result.questions.length,`Unit ${row.unit}: catalogue question total differs from playable count`);
   assert.equal(row.sets,Math.ceil(result.questions.length/20),`Unit ${row.unit}: catalogue contains broken quiz links`);
-  if([4,5,6].includes(row.unit)){
+  if([4,5,6,7].includes(row.unit)){
     // Curated direct-only banks retain old source q.quiz labels (6/7 records).
     // The live player MUST route all catalogue links by 20-question position.
     const allIds=[];
@@ -60,8 +60,8 @@ for(const row of rows){
     assert.equal(data.meta.quiz_sets.length,25);
     assert.equal(data.meta.source_records_before_editorial_curation,1476);
     assert.equal(data.meta.mechanically_generated_variants_removed,984);
-    assert.equal(data.meta.qa_reviewed_prefix,320);
-    assert.equal(data.meta.qa_reviewed_quizzes,16);
+    assert.equal(data.meta.qa_reviewed_prefix,420);
+    assert.equal(data.meta.qa_reviewed_quizzes,21);
     assert.equal(data.meta.positional_quiz_sets,true);
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 7 generated variants resurfaced');
     assert.equal(result.questions[0].id,'C11H07-Q001');
@@ -93,7 +93,7 @@ for(const row of rows){
       assert.ok(!/correct textbook answer for/i.test(q.q_en),q.id+' mechanical stem');
     }
   }
-  if(row.unit===6){
+  if([6,7].includes(row.unit)){
       assert.equal(markedIncomplete.length,20,'Explicit positional Unit 6 routing must persist across editorial batches');
     }else{
       assert.equal(markedIncomplete,null,'Fully reviewed banks without positional opt-in require complete markers');

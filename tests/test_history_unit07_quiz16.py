@@ -14,8 +14,8 @@ PART=QUESTIONS[300:320]
 class GuptaQuiz16Tests(unittest.TestCase):
     def test_review_progress_and_source_count(self):
         self.assertEqual(len(QUESTIONS),492)
-        self.assertEqual(DATA["meta"]["qa_reviewed_prefix"],320)
-        self.assertEqual(DATA["meta"]["qa_reviewed_quizzes"],16)
+        self.assertGreaterEqual(DATA["meta"]["qa_reviewed_prefix"],320)
+        self.assertGreaterEqual(DATA["meta"]["qa_reviewed_quizzes"],16)
         self.assertEqual(DATA["meta"]["source_records_before_editorial_curation"],1476)
         self.assertEqual(DATA["meta"]["mechanically_generated_variants_removed"],984)
         self.assertEqual(len(PART),20)
