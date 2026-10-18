@@ -5,6 +5,7 @@
 
     function isVoiceCall(r){
       const type=String(r.callType||'').trim().toLowerCase().replace(/[\s_-]+/g,'');
+      if(/sms|data|gprs|internet/.test(type))return false;
       return /(call|voice|moc|mtc)/.test(type)||/^(incoming|outgoing|in|out|mo|mt|og|ic)$/.test(type);
     }
 
