@@ -153,6 +153,7 @@
     escAttr,escapeHtml,contactTitle,contactLabel,contactTag,contactName,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable,
     showStatus,localDateKey,analysisRecords,recordsIgnoringDateTimeFilters
   })||null;
+  contactsModule?.bind();
 
   locationsModule=window.CDRLocationsFactory?.({
     $,state,uniq,escAttr,escapeHtml,localDateKey,locationTowerKey,fmtInt,dtFmt,aggregateLocations,fmtDur,analysisRecords
