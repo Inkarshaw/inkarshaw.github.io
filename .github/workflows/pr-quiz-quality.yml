@@ -32,6 +32,12 @@ jobs:
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
       - name: Verify all 19 Class 11 History catalogue counts and the opening question
         run: node tests/test_class11_catalogue.mjs
+      - name: Check CDR Contacts copy selection
+        run: |
+          node --check cdranalysis/js/contacts.js
+          node --check cdranalysis/js/app.js
+          node --check cdranalysis/js/ui.js
+          node --test tests/test_cdr_contacts_copy.mjs
       - name: Audit 100-question English-Tamil History batch
         run: |
           python3 scripts/audit_textbook_quiz_quality.py data/textbook/class-11/history/unit-04.json --start 160 --count 100
