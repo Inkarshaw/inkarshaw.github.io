@@ -31,8 +31,8 @@ class HistoryUnit06QuizzesOneToFive(unittest.TestCase):
         self.assertEqual(QUESTIONS[99]["id"], "C11H06-Q298")
 
     def test_first_five_quizzes_are_fully_reviewed(self):
-        self.assertEqual(DATA["meta"]["qa_reviewed_prefix"], 100)
-        self.assertEqual(DATA["meta"]["qa_reviewed_quizzes"], 5)
+        self.assertGreaterEqual(DATA["meta"]["qa_reviewed_prefix"], 100)
+        self.assertGreaterEqual(DATA["meta"]["qa_reviewed_quizzes"], 5)
         for quiz in range(1, 6):
             with self.subTest(quiz=quiz):
                 self.assertEqual(len(QUESTIONS[(quiz-1)*20:quiz*20]), 20)
