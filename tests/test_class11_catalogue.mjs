@@ -60,8 +60,8 @@ for(const row of rows){
     assert.equal(data.meta.quiz_sets.length,25);
     assert.equal(data.meta.source_records_before_editorial_curation,1476);
     assert.equal(data.meta.mechanically_generated_variants_removed,984);
-    assert.equal(data.meta.qa_reviewed_prefix,320);
-    assert.equal(data.meta.qa_reviewed_quizzes,16);
+    assert.equal(data.meta.qa_reviewed_prefix,420);
+    assert.equal(data.meta.qa_reviewed_quizzes,21);
     assert.equal(data.meta.positional_quiz_sets,true);
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 7 generated variants resurfaced');
     assert.equal(result.questions[0].id,'C11H07-Q001');
