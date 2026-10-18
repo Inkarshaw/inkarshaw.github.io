@@ -20,7 +20,7 @@
       const shortlisted=!!$('contactsShortlistOnly')?.checked;
       const globalMap=shared?sharedIndex():null;
       return aggregateContacts(data).filter(x=>{
-        const label=[x.bparty,contactLabel(x.bparty),contactName(x.bparty),contactTag(x.bparty),...(x.aliases||[])].join(' ').toLowerCase();
+        const label=[x.bparty,contactLabel(x.bparty),contactName(x.bparty),contactTag(x.bparty),...(x.aliases||[]),...(x.cdrs||[])].join(' ').toLowerCase();
         return (!q||label.includes(q))&&(!tag||contactTag(x.bparty)===tag)&&x.calls>=min&&(!shared||(globalMap.get(x.key)?.subjects.size||0)>=2)&&(!shortlisted||state.contactShortlist.has(requestIdentifier(x.bparty)));
       });
     }
