@@ -68,6 +68,7 @@
   function renderExcelView(){return excelViewModule?.render();}
   function renderContacts(){return contactsModule?.render();}
   function selectRequestContacts(){return contactsModule?.selectRequestContacts();}
+  function copySelectedContacts(){return contactsModule?.copySelectedContacts();}
   function openCdrRequestGenerator(){return contactsModule?.openCdrRequestGenerator();}
 
   function mapLink(x){return locationsModule?.mapLink(x)||'';}
@@ -215,7 +216,7 @@
     exportWorkbook,download,switchTab,applyFilters,refreshSelectors,renderFileList,renderRecords,
     renderFlags,renderContactProfile:num=>contactsModule?.renderProfile(num),jumpToRecord,samePhone,contactFilter,caseSnapshots,persistLocal,
     renderIncident,contactLabel,timeMins,shiftLocalDateKey,fmtDur,renderChronology,
-    selectRequestContacts,renderContacts,openCdrRequestGenerator,updateCdrRequestCount,
+    selectRequestContacts,copySelectedContacts,renderContacts,openCdrRequestGenerator,updateCdrRequestCount,
     identityStore,renderNetwork,seedBuiltinTacMappings,audit
   })||null;
   uiModule?.bind();
