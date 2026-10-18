@@ -49,6 +49,7 @@
   function withinNight(mins,from,to){return filtersModule?.withinNight(mins,from,to)??true;}
   function updateFilterCount(){return filtersModule?.updateFilterCount();}
   function applyFilters(){return filtersModule?.applyFilters();}
+  function recordsIgnoringDateTimeFilters(){return filtersModule?.recordsIgnoringDateTimeFilters()||[];}
 
   function aggregateContacts(data=state.filtered){return dashboardModule?.aggregateContacts(data)||[];}
   function locationTowerKey(r){return dashboardModule?.locationTowerKey(r)||'';}
@@ -150,7 +151,7 @@
   contactsModule=window.CDRContactsFactory?.({
     $,state,aggregateContacts,aggregateLocations,identityStore,defaultCdrRequestDates,updateCdrRequestCount,requestIdentifier,
     escAttr,escapeHtml,contactTitle,contactLabel,contactTag,contactName,serviceSenderType,fmtInt,fmtDur,dtFmt,simpleTable,
-    showStatus,localDateKey,analysisRecords
+    showStatus,localDateKey,analysisRecords,recordsIgnoringDateTimeFilters
   })||null;
 
   locationsModule=window.CDRLocationsFactory?.({
