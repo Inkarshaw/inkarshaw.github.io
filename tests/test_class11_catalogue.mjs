@@ -60,8 +60,8 @@ for(const row of rows){
     assert.equal(data.meta.quiz_sets.length,25);
     assert.equal(data.meta.source_records_before_editorial_curation,1476);
     assert.equal(data.meta.mechanically_generated_variants_removed,984);
-    assert.equal(data.meta.qa_reviewed_prefix,200);
-    assert.equal(data.meta.qa_reviewed_quizzes,10);
+    assert.equal(data.meta.qa_reviewed_prefix,300);
+    assert.equal(data.meta.qa_reviewed_quizzes,15);
     assert.equal(data.meta.positional_quiz_sets,true);
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 7 generated variants resurfaced');
     assert.equal(result.questions[0].id,'C11H07-Q001');
@@ -78,6 +78,13 @@ for(const row of rows){
     }
     assert.equal(new Set(allIds).size,492,'Unit 7 unique links or records missing');
     assert.equal(allIds.length,492,'Unit 7 some questions unreachable');
+    for(const q of result.questions.slice(200,300)){
+      assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' bilingual question mark');
+      assert.equal(new Set(q.opts_en).size,4,q.id+' English options');
+      assert.equal(new Set(q.opts_ta).size,4,q.id+' Tamil options');
+      assert.ok(q.exp_en.length>=75&&q.exp_ta.length>=50,q.id+' explanation');
+      assert.ok(!/correct textbook answer for/i.test(q.q_en),q.id+' boilerplate question');
+    }
     for(const q of result.questions.slice(0,100)){
       assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' bilingual question mark');
       assert.equal(new Set(q.opts_en).size,4,q.id+' English options');
