@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""Tests for the repository-wide structural quiz validator."""
+import importlib.util
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SPEC = importlib.util.spec_from_file_location(
+    "textbook_repository_audit", ROOT / "scripts/audit_textbook_repository.py"
+)
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+
+
+def question(**changes):
+    record = {
+        "id": "TEST-Q1",
+        "q_en": "Which option correctly identifies the force that attracts objects toward Earth?",
+        "q_ta": "பொருள்களைப் பூமியை நோக்கி ஈர்க்கும் விசை எது?",
+        "opts_en": ["Gravity", "Friction", "Magnetism", "Buoyancy"],
+        "opts_ta": ["ஈர்ப்பு விசை", "உராய்வு விசை", "காந்த விசை", "மிதப்பு விசை"],
+        "correct": 0,
+        "exp_en": "Gravity attracts objects with mass toward one another; near Earth, it pulls objects toward Earth's centre.",
+        "exp_ta": "நிறையுள்ள பொருள்கள் ஒன்றையொன்று ஈர்ப்பது ஈர்ப்பு விசையாகும்; பூமிக்கு அருகில் அது பொருள்களை மையத்தை நோக்கி இழுக்கிறது.",
+    }
+    record.update(changes)
+    return record
+
+
+class RepositoryQuizAuditTests(unittest.TestCase):
+    def test_accepts_complete_bilingual_mcq(self):
+        result = MODULE.audit_bank(Path("fixture.json"), {"questions": [question()]})
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["warnings"], [])
+
+    def test_rejects_bad_answer_index_and_repeated_options(self):
+        record = question(correct=True)
+        record["opts_en"][3] = record["opts_en"][2]
+        result = MODULE.audit_bank(Path("fixture.json"), {"questions": [record]})
+        self.assertTrue(any("duplicate English options" in item for item in result["errors"]))
+        self.assertTrue(any("correct must be an integer" in item for item in result["errors"]))
+
+    def test_flags_untranslated_or_repeated_stems_for_editorial_review(self):
+        first = question(q_ta="Which option describes gravity?")
+        second = question(id="TEST-Q2", q_en=first["q_en"])
+        result = MODULE.audit_bank(Path("fixture.json"), {"questions": [first, second]})
+        self.assertTrue(any("no Tamil script" in item for item in result["warnings"]))
+        self.assertTrue(any("repeated English stem" in item for item in result["warnings"]))
+        self.assertEqual(result["errors"], [])
+
+    def test_rejects_wrong_shape(self):
+        result = MODULE.audit_bank(Path("fixture.json"), {"meta": {}})
+        self.assertTrue(any("questions array" in item for item in result["errors"]))
+
+
+if __name__ == "__main__":
+    unittest.main()
