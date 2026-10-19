@@ -4,7 +4,7 @@
   const area = document.getElementById('notices');
   try {
     const [catalog,data] = await Promise.all([json('data/exams/exam-catalog.json'),json('data/exams/exam-notifications.json')]);
-    document.getElementById('checkedOn').textContent = 'Checked on ' + formatDate(data.checkedOn) + '. Manually maintained reference; this is not a live vacancy feed. Tentative plans are labelled, and 2026 updates for other exams are coming soon.';
+    document.getElementById('checkedOn').textContent = 'TNPSC official records updated ' + formatDate(data.tnpscUpdatedOn || data.checkedOn) + '. Other exam boards last manually reviewed ' + formatDate(data.checkedOn) + '. Always confirm any subsequent amendments on the official site.';
     const filter = document.getElementById('categoryFilter');
     Object.entries(catalog).forEach(([key,body])=> {const option=document.createElement('option');option.value=key;option.textContent=body.name;filter.appendChild(option);});
     const initial = new URLSearchParams(location.search).get('category');
