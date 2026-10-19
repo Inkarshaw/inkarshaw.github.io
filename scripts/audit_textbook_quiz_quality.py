@@ -27,7 +27,7 @@ BAD_FRAGMENTS = (
     "identify the correct historical source, work, author",
 )
 RE_NUM = re.compile(r"\d[\d,]*(?:[–-]\d+)?")
-RE_START_NUMBER = re.compile(r"^\s*[0-9]")
+RE_START_NUMBER = re.compile(r"^\s*[+\-−]?(?:\d|\.\d)")
 RE_EN_DATE = re.compile(r"\b(?:bce|ce|bc|ad)\b", re.IGNORECASE)
 
 
