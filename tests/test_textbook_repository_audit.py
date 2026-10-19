@@ -66,6 +66,27 @@ class RepositoryQuizAuditTests(unittest.TestCase):
         result = MODULE.audit_bank(Path("fixture.json"), {"questions": [record]})
         self.assertFalse(any("does not name the keyed option" in item for item in result["warnings"]))
 
+    def test_scientific_case_differences_are_not_duplicate_answers(self):
+        symbol = question(
+            q_en="Which SI unit symbol is written correctly for the kilogram?",
+            opts_en=["kg", "Kg", "KG", "kG"],
+            opts_ta=["kg", "Kg", "KG", "kG"],
+            exp_en="The kilogram symbol is kg; capital letters change the SI symbol.",
+            exp_ta="கிலோகிராமின் சரியான SI குறியீடு kg ஆகும்; பெரிய எழுத்துகள் வேறு குறியீடுகளாகும்.",
+        )
+        result = MODULE.audit_bank(Path("fixture.json"), {"questions": [symbol]})
+        self.assertEqual(result["errors"], [])
+        self.assertTrue(any("case-sensitive" in x for x in result["warnings"]))
+
+    def test_case_only_words_and_exactly_repeated_symbols_still_fail(self):
+        for record in (
+            question(opts_en=["Gravity", "gravity", "Magnetism", "Friction"]),
+            question(q_en="Which SI symbol is written correctly?", opts_en=["kg", "kg", "Kg", "KG"]),
+        ):
+            with self.subTest(record=record["opts_en"]):
+                result = MODULE.audit_bank(Path("fixture.json"), {"questions": [record]})
+                self.assertTrue(any("duplicate English options" in x for x in result["errors"]))
+
     def test_cli_rejects_valid_json_bank_missing_questions_array(self):
         with tempfile.TemporaryDirectory() as directory:
             bank = Path(directory) / "unit-1.json"
