@@ -22,6 +22,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 TAMIL = re.compile(r"[\u0B80-\u0BFF]")
+WORD = re.compile(r"[A-Za-z\u0B80-\u0BFF]{4,}")
 
 
 def normalize(value: str) -> str:
@@ -96,9 +97,9 @@ def audit_bank(path: Path, data: Any) -> dict[str, Any]:
         exp_ta = question.get("exp_ta") if isinstance(question.get("exp_ta"), str) else ""
         if len(exp_en.strip()) < 40 or len(exp_ta.strip()) < 25:
             warnings.append(f"{label} ({ident or 'no id'}): one or both explanations are very short; review usefulness")
-        if isinstance(options_en[correct], str) and options_en[correct] not in exp_en:
+        if isinstance(options_en[correct], str) and WORD.search(options_en[correct]) and options_en[correct] not in exp_en:
             warnings.append(f"{label} ({ident or 'no id'}): English explanation does not name the keyed option; verify answer/explanation")
-        if isinstance(options_ta[correct], str) and options_ta[correct] not in exp_ta:
+        if isinstance(options_ta[correct], str) and WORD.search(options_ta[correct]) and options_ta[correct] not in exp_ta:
             warnings.append(f"{label} ({ident or 'no id'}): Tamil explanation does not name the keyed option; verify answer/explanation")
 
     return {"path": str(path), "questions": len(questions), "errors": errors, "warnings": warnings}
@@ -119,12 +120,14 @@ def bank_paths(args: argparse.Namespace) -> list[Path]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group()
     group.add_argument("--all", action="store_true", help="audit every Class 6–12 textbook JSON file")
     group.add_argument("--changed-from", metavar="REF", help="audit textbook JSON files changed since REF")
-    group.add_argument("paths", nargs="*", help="one or more textbook JSON files")
+    parser.add_argument("paths", nargs="*", help="one or more textbook JSON files")
     parser.add_argument("--json", action="store_true", help="print a machine-readable report")
     args = parser.parse_args()
+    if sum((bool(args.all), bool(args.changed_from), bool(args.paths))) != 1:
+        parser.error("choose exactly one of --all, --changed-from REF, or one or more file paths")
     paths = bank_paths(args)
     report: list[dict[str, Any]] = []
     invalid_json = 0

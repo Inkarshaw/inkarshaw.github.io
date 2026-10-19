@@ -52,6 +52,16 @@ class RepositoryQuizAuditTests(unittest.TestCase):
         result = MODULE.audit_bank(Path("fixture.json"), {"meta": {}})
         self.assertTrue(any("questions array" in item for item in result["errors"]))
 
+    def test_shared_formula_choices_do_not_trigger_missing_answer_echo(self):
+        record = question(
+            opts_en=["H₂O", "H₂O₂", "HO₂", "H₃O"],
+            opts_ta=["H₂O", "H₂O₂", "HO₂", "H₃O"],
+            exp_en="One molecule contains two hydrogen atoms and one oxygen atom.",
+            exp_ta="ஒரு மூலக்கூறில் இரண்டு ஹைட்ரஜன் அணுக்களும் ஓர் ஆக்சிஜன் அணுவும் உள்ளன.",
+        )
+        result = MODULE.audit_bank(Path("fixture.json"), {"questions": [record]})
+        self.assertFalse(any("does not name the keyed option" in item for item in result["warnings"]))
+
 
 if __name__ == "__main__":
     unittest.main()
