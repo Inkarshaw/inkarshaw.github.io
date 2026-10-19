@@ -69,7 +69,8 @@ function renderPalette(){
  }
 }
 function safeSourceUrl(q){
- const link=q.source_url||meta.source_url||meta.textbook_url||'';
+ const editionUrl=lang==='ta'?meta.source_ta_url:meta.source_en_url;
+ const link=q.source_url||editionUrl||meta.source_url||meta.textbook_url||'';
  try{const parsed=new URL(link,location.href);return /^https?:$/.test(parsed.protocol)?parsed.href:null}catch{return null}
 }
 function render(){
