@@ -21,13 +21,22 @@
     return unwrapped(q).toLowerCase().normalize('NFKC').replace(/[^\p{L}\p{N}]+/gu, '');
   }
   function isBoilerplate(q) { return unwrapped(q) !== String(q || '').trim(); }
+  // In scientific notation, changing a letter's case may change the answer:
+  // kg and Kg, N and n, or chemical element symbols are distinct distractors.
+  // Ordinary prose options must still be unique case-insensitively.
+  const notationStem = /\b(?:symbols?|notation|capitali[sz](?:ed|ation)|uppercase|lowercase|letter[-\s]+case|SI[-\s]+style|SI[-\s]+unit)\b/i;
+  function distinctOptions(opts, stem) {
+    const normalized = opts.map(x => x.normalize('NFC').trim().replace(/\s+/g, ' '));
+    if (new Set(normalized.map(x => x.toLowerCase())).size === 4) return true;
+    return notationStem.test(stem) && new Set(normalized).size === 4;
+  }
   function valid(q) {
     if (!q || typeof q.q_en !== 'string' || !q.q_en.trim()) return false;
     const opts = q.opts_en;
     if (!Array.isArray(opts) || opts.length !== 4) return false;
     if (!Number.isInteger(q.correct) || q.correct < 0 || q.correct > 3) return false;
     return opts.every(x => typeof x === 'string' && x.trim()) &&
-      new Set(opts.map(x => x.trim().toLowerCase())).size === 4;
+      distinctOptions(opts, q.q_en);
   }
   function mechanicallyExpanded(questions) {
     if (!Array.isArray(questions) || questions.length < 30) return false;
