@@ -23,7 +23,7 @@
     if (item.kind === 'archive') return {label:'Archived · applications closed', className:'closed'};
     if (item.kind === 'planned') return {label: now > new Date(item.notificationDate + 'T23:59:59+05:30') ? 'Planner date passed · check official notice' : 'Tentative annual plan', className:'planned'};
     if (!item.applicationStart || !item.applicationEnd) return {label:'Check official notice',className:'planned'};
-    const deadline = new Date(item.applicationEnd);
+    const deadline = new Date(item.applicationEnd.length === 10 ? item.applicationEnd + 'T23:59:59+05:30' : item.applicationEnd);
     if (now > deadline) return {label:'Applications closed',className:'closed'};
     if (now < new Date(item.applicationStart + 'T00:00:00+05:30')) return {label:'Applications upcoming',className:'planned'};
     if (deadline - now <= 3 * 24 * 60 * 60 * 1000) return {label:'Closing soon · verify deadline',className:'open'};
@@ -31,7 +31,7 @@
   }
   function notificationHTML(item) {
     const state = notificationStatus(item);
-    return `<article class="notification-card"><span class="status-tag ${state.className}">${escape(state.label)}</span><h3>${escape(item.title)}</h3><dl class="dates"><div><dt>${item.kind === 'planned' ? 'Planned notification' : 'Notification'}</dt><dd>${formatDate(item.notificationDate)}</dd></div><div><dt>${item.kind === 'planned' ? 'Tentative examination' : 'Examination'}</dt><dd>${formatDate(item.examDate)}</dd></div><div><dt>Applications start</dt><dd>${formatDate(item.applicationStart)}</dd></div><div><dt>Application deadline</dt><dd>${formatDate(item.applicationEnd, true)}</dd></div></dl><p class="muted">${escape(item.note)}</p><div class="actions">${link(item.sourceLabel, item.source)}${link('Official updates ↗', item.official)}</div></article>`;
+    return `<article class="notification-card"><span class="status-tag ${state.className}">${escape(state.label)}</span><h3>${escape(item.title)}</h3><dl class="dates"><div><dt>${item.kind === 'planned' ? 'Planned notification' : 'Notification'}</dt><dd>${formatDate(item.notificationDate)}</dd></div><div><dt>${item.kind === 'planned' ? 'Tentative examination' : 'Examination'}</dt><dd>${formatDate(item.examDate)}</dd></div><div><dt>Applications start</dt><dd>${formatDate(item.applicationStart)}</dd></div><div><dt>Application deadline</dt><dd>${formatDate(item.applicationEnd, Boolean(item.applicationEnd && item.applicationEnd.length > 10))}</dd></div></dl><p class="muted">${escape(item.note)}</p><div class="actions">${link(item.sourceLabel, item.source)}${link('Official updates ↗', item.official)}</div></article>`;
   }
   function notificationPlaceholderHTML(title) {
     return `<article class="notification-card"><span class="status-tag planned">2026 updates coming soon</span><h3>${escape(title)}</h3><p class="muted">Verified 2026 notification details will be added here. Check the official recruitment links below for published notices and the latest application dates.</p></article>`;
