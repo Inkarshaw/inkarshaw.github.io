@@ -44,15 +44,16 @@ code{color:#daf7ff;word-break:break-word}.fineprint{font-size:.83rem;color:var(-
 <main class="wrap">
 <section class="panel" aria-labelledby="searchTitle">
 <h2 id="searchTitle">1. Enter cell details</h2>
-<p class="sub">For OpenCellID lookup, provide MCC, MNC, LAC/TAC and Cell ID. If searching a local CSV, Cell ID alone can return multiple possible matches.</p>
+<p class="sub">Paste a Cell ID or a combined 5G NCGI (6-digit MCC/MNC followed by 9 hexadecimal NCI digits). The combined code fills MCC, MNC and NCI; you still need a separate TAC for online lookup. A local CSV may contain multiple matches.</p>
 <form id="locatorForm" novalidate>
 <div class="grid">
-<div class="field"><label for="cellId">Cell ID / ECI / NCI *</label><input id="cellId" name="cellId" type="text" inputmode="text" autocomplete="off" placeholder="e.g. 12345678 or 0xBC614E" required></div>
+<div class="field"><label for="cellId">Cell ID / 5G NCGI *</label><input id="cellId" name="cellId" type="text" inputmode="text" autocomplete="off" placeholder="e.g. 405869105B7C010" required></div>
 <div class="field"><label for="mcc">MCC (country code)</label><input id="mcc" name="mcc" inputmode="numeric" placeholder="India: 404 or 405" maxlength="3"></div>
 <div class="field"><label for="mnc">MNC (operator code)</label><input id="mnc" name="mnc" inputmode="numeric" placeholder="e.g. 10" maxlength="3"></div>
 <div class="field"><label for="lac">LAC / TAC / area</label><input id="lac" name="lac" inputmode="numeric" placeholder="e.g. 12001"></div>
 <div class="field"><label for="radio">Radio technology</label><select id="radio" name="radio"><option value="">Any / unknown</option><option value="GSM">2G (GSM)</option><option value="UMTS">3G (UMTS)</option><option value="LTE">4G (LTE)</option><option value="NR">5G (NR)</option><option value="NBIOT">NB-IoT</option><option value="CDMA">CDMA</option></select></div>
 </div>
+<p id="decodedNcgi" class="note" role="status" aria-live="polite">For 5G combined codes, paste the whole identifier; MCC/MNC and NCI will be decoded automatically.</p>
 <details><summary>Online database lookup (OpenCellID)</summary>
 <div class="grid" style="margin-top:13px"><div class="field wide"><label for="apiKey">Your OpenCellID API key</label><input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste key; never saved by this site"></div></div>
 <p class="note">Get a key from <a href="https://opencellid.org/" target="_blank" rel="noopener noreferrer">OpenCellID</a>. The request sends these network identifiers and your key directly from this browser to OpenCellID. Some browsers may block cross-origin API requests; the offline CSV method below works without an API key.</p>
@@ -107,18 +108,49 @@ function numberId(raw) {
   if (/^[0-9a-f]*[a-f][0-9a-f]*$/i.test(value)) return parseInt(value,16);
   return NaN;
 }
+function decodeNcgi(raw) {
+  // NCGI human-readable form: three decimal MCC digits, three decimal MNC digits, nine hexadecimal NCI digits.
+  // This is not the BCD-encoded PLMN octet representation used in telecom signaling.
+  const input = String(raw || '').trim().replace(/[-\s]/g,'');
+  const m = /^([0-9]{3})([0-9]{3})([0-9A-Fa-f]{9})$/.exec(input);
+  if (!m) return null;
+  const mcc = Number(m[1]), mnc = Number(m[2]), cid = parseInt(m[3],16);
+  if(mcc < 100 || mcc > 999 || !Number.isSafeInteger(cid) || cid < 1 || cid >= 2**36)return null;
+  return {mcc,mnc,cid,nciHex:m[3].toUpperCase()};
+}
+function syncCombinedCode(){
+  const parsed=decodeNcgi($('cellId').value);
+  const el=$('decodedNcgi');
+  if(!parsed){
+    el.textContent='For 5G combined codes, paste the whole identifier; MCC/MNC and NCI will be decoded automatically.';
+    return;
+  }
+  $('mcc').value=String(parsed.mcc);
+  $('mnc').value=String(parsed.mnc);
+  $('radio').value='NR';
+  el.textContent='5G NCGI detected · MCC '+parsed.mcc+' · MNC '+parsed.mnc+' · NCI 0x'+parsed.nciHex+' ('+parsed.cid+'). TAC is not included in this combined code; enter it separately for online lookup.';
+}
+$('cellId').addEventListener('input',syncCombinedCode);
+const initialNcgi=new URLSearchParams(window.location.search).get('ncgi');
+if(initialNcgi && decodeNcgi(initialNcgi)){
+  $('cellId').value=initialNcgi;
+  syncCombinedCode();
+}
 function integerField(id) {
   const v = $(id).value.trim();
   return v === '' ? null : (/^\d+$/.test(v) && Number.isSafeInteger(Number(v)) ? Number(v) : NaN);
 }
 function query() {
-  const raw = $('cellId').value.trim(), cid = numberId(raw);
-  if (!raw || !Number.isSafeInteger(cid) || cid < 0) throw Error('Enter a valid decimal Cell ID or hexadecimal ID (0x...).');
-  const mcc = integerField('mcc'), mnc = integerField('mnc'), lac = integerField('lac');
+  const raw = $('cellId').value.trim(), composite = decodeNcgi(raw);
+  const cid = composite ? composite.cid : numberId(raw);
+  if (!raw || !Number.isSafeInteger(cid) || cid < 0) throw Error('Enter a decimal Cell ID, hexadecimal ID (0x...), or a combined 5G NCGI.');
+  const mcc = composite ? composite.mcc : integerField('mcc');
+  const mnc = composite ? composite.mnc : integerField('mnc');
+  const lac = integerField('lac');
   if ([mcc,mnc,lac].some(x => Number.isNaN(x))) throw Error('MCC, MNC and LAC/TAC must contain decimal digits only.');
   if (mcc !== null && (mcc < 1 || mcc > 999)) throw Error('MCC must be between 1 and 999.');
   if (mnc !== null && mnc > 999) throw Error('MNC must be between 0 and 999.');
-  return {cid,mcc,mnc,lac,radio:$('radio').value};
+  return {cid,mcc,mnc,lac,radio:composite ? 'NR' : $('radio').value};
 }
 function validCoord(lat,lon) {
   return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && !(lat === 0 && lon === 0);
@@ -212,7 +244,7 @@ $('locatorForm').addEventListener('submit',async e=>{
   const key=$('apiKey').value.trim();
   if(!key){status('apiStatus','Enter your OpenCellID API key under Online database lookup.','error');return;}
   if([q.mcc,q.mnc,q.lac].some(x=>x===null)){
-    status('apiStatus','Online lookup needs MCC, MNC and LAC/TAC as well as Cell ID.','error');return;
+    status('apiStatus','Online lookup requires MCC, MNC and TAC/LAC. A 5G NCGI contains MCC, MNC and NCI, but not the TAC; obtain TAC separately.','error');return;
   }
   if(q.lac<0||q.lac>16777215){status('apiStatus','Check the LAC/TAC area code. It must be a non-negative decimal value.','error');return;}
   $('apiSearch').disabled=true;status('apiStatus','Looking up the cell in OpenCellID…');
