@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Tests for the repository-wide structural quiz validator."""
 import importlib.util
+import json
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -61,6 +65,17 @@ class RepositoryQuizAuditTests(unittest.TestCase):
         )
         result = MODULE.audit_bank(Path("fixture.json"), {"questions": [record]})
         self.assertFalse(any("does not name the keyed option" in item for item in result["warnings"]))
+
+    def test_cli_rejects_valid_json_bank_missing_questions_array(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bank = Path(directory) / "unit-1.json"
+            bank.write_text(json.dumps({"meta": {"class": 8}}), encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts/audit_textbook_repository.py"), str(bank)],
+                text=True, capture_output=True, check=False,
+            )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("bank must be an object with a questions array", result.stdout)
 
 
 if __name__ == "__main__":

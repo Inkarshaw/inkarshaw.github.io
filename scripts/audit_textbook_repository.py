@@ -16,7 +16,6 @@ import json
 import re
 import sys
 import unicodedata
-from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -107,14 +106,20 @@ def audit_bank(path: Path, data: Any) -> dict[str, Any]:
 
 def bank_paths(args: argparse.Namespace) -> list[Path]:
     if args.all:
-        return sorted((ROOT / "data/textbook").glob("class-*/**/*.json"))
+        return sorted(
+            path for path in (ROOT / "data/textbook").glob("class-*/**/*.json")
+            if not path.name.startswith("index")
+        )
     if args.changed_from:
         import subprocess
         result = subprocess.run(
             ["git", "diff", "--name-only", f"{args.changed_from}...HEAD", "--", "data/textbook/"],
             cwd=ROOT, text=True, capture_output=True, check=True,
         )
-        return [ROOT / line for line in result.stdout.splitlines() if line.endswith(".json")]
+        return [
+            ROOT / line for line in result.stdout.splitlines()
+            if line.endswith(".json") and not Path(line).name.startswith("index")
+        ]
     return [Path(value).resolve() for value in args.paths]
 
 
@@ -140,8 +145,9 @@ def main() -> int:
             invalid_json += 1
             report.append({"path": str(path), "questions": 0, "errors": [f"invalid or unreadable JSON: {error}"], "warnings": []})
             continue
-        if isinstance(data, dict) and isinstance(data.get("questions"), list):
-            report.append(audit_bank(path, data))
+        if path.name.startswith("index"):
+            continue
+        report.append(audit_bank(path, data))
 
     errors = sum(len(item["errors"]) for item in report)
     warnings = sum(len(item["warnings"]) for item in report)
