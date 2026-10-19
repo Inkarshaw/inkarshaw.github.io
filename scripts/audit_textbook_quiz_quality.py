@@ -47,6 +47,27 @@ def normalize(text: str) -> str:
     return " ".join(safe.split())
 
 
+# Scientific notation often relies on case distinctions (N versus n).
+NOTATION_STEM = re.compile(
+    r"\b(?:symbols?|notation|capitali[sz](?:ed|ation)|uppercase|lowercase|"
+    r"letter[-\s]+case|SI[-\s]+style|SI[-\s]+unit)\b", re.IGNORECASE
+)
+
+
+def distinct_options(options: list[str], stem: str) -> bool:
+    if len({normalize(x) for x in options}) == len(options):
+        return True
+    if not NOTATION_STEM.search(stem):
+        return False
+    # Retain letters' case but normalize punctuation and Unicode marks.
+    def case_sensitive(value: str) -> str:
+        value = unicodedata.normalize("NFC", value)
+        chars = (ch if ch.isspace() or unicodedata.category(ch)[0] in "LNM"
+                 or ch in "+-−√≠=<>/×÷·^²³°%:" else " " for ch in value)
+        return " ".join("".join(chars).split())
+    return len({case_sensitive(x) for x in options}) == len(options)
+
+
 def audit(records: list[dict], start: int, count: int) -> dict:
     problems: list[str] = []
     warnings: list[str] = []
@@ -99,8 +120,10 @@ def audit(records: list[dict], start: int, count: int) -> dict:
             if not all(isinstance(v, str) and v.strip() for v in items):
                 problems.append(f"{ident}: empty {lang} option")
                 continue
-            if len({normalize(x) for x in items}) != 4:
+            if not distinct_options(items, en):
                 problems.append(f"{ident}: duplicate {lang} distractors")
+            elif len({normalize(x) for x in items}) != 4:
+                warnings.append(f"{ident}: case-sensitive {lang} options; verify notation")
             if any(any(f in x.casefold() for f in BAD_FRAGMENTS[2:]) for x in items):
                 problems.append(f"{ident}: unrelated boilerplate distractor in {lang}")
         index = q.get("correct")

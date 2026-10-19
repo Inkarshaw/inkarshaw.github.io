@@ -59,6 +59,25 @@ class BilingualBatchAuditTests(unittest.TestCase):
         outcome = MODULE.audit(records, start=200, count=100)
         self.assertFalse(any("duplicate ta distractors" in x for x in outcome["errors"]))
 
+    def test_case_sensitive_scientific_symbols_preserve_distinct_options(self):
+        records = copy.deepcopy(BANK["questions"])
+        item = records[160]
+        item["q_en"] = "Which SI unit symbol is correctly written for a kilogram?"
+        item["q_ta"] = "கிலோகிராமுக்கான சரியான SI அலகுக் குறியீடு எது?"
+        item["opts_en"] = ["kg", "Kg", "KG", "kG"]
+        item["opts_ta"] = ["kg", "Kg", "KG", "kG"]
+        item["correct"] = 0
+        item["exp_en"] = "The correct kilogram unit symbol is kg with lowercase k and lowercase g in SI notation."
+        item["exp_ta"] = "கிலோகிராமுக்கு SI குறியீடாக kg என்பதே சரி; இரு எழுத்துகளும் சிறிய எழுத்துகளாக எழுதப்படும்."
+        result = MODULE.audit(records, start=160, count=20)
+        self.assertFalse(any("duplicate en distractors" in x for x in result["errors"]))
+        self.assertFalse(any("duplicate ta distractors" in x for x in result["errors"]))
+        item["opts_en"][1] = "kg"
+        item["opts_ta"][1] = "kg"
+        result = MODULE.audit(records, start=160, count=20)
+        self.assertTrue(any("duplicate en distractors" in x for x in result["errors"]))
+        self.assertTrue(any("duplicate ta distractors" in x for x in result["errors"]))
+
     def test_rejects_partial_quiz_windows(self):
         with self.assertRaisesRegex(ValueError, "20-question"):
             MODULE.audit(BANK["questions"], start=160, count=99)

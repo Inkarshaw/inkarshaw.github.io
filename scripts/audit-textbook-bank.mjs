@@ -19,6 +19,10 @@ function walk(folder){
  });
 }
 const norm=s=>String(s??'').toLocaleLowerCase('en').normalize('NFKC').replace(/[^\p{L}\p{N}]+/gu,' ').replace(/\s+/g,' ').trim();
+
+const normCase=s=>String(s??'').normalize('NFKC').replace(/[^\p{L}\p{N}]+/gu,' ').replace(/\s+/g,' ').trim();
+const notationStem=s=>/\b(?:symbols?|notation|capitali[sz](?:ed|ation)|uppercase|lowercase|letter[-\s]+case|SI[-\s]+style|SI[-\s]+unit)\b/i.test(s);
+const optionsDistinct=(items,stem)=>new Set(items.map(norm)).size===4||(notationStem(stem)&&new Set(items.map(normCase)).size===4);
 const fact=s=>String(s||'').toLowerCase().replace(/divided\s+by|÷/g,'/').replace(/\s+/g,' ').match(/\b(speed|distance|time)\s*=\s*(speed|distance|time)\s*\/\s*(speed|distance|time)\b/)?.[0].replace(/\s/g,'')||'';
 const bucket=s=>{
  const x=norm(s);if(/^(none|all|both|neither|not yet|unknown|undeciphered|cannot|not known)/i.test(x))return 'meta-answer';
@@ -42,7 +46,7 @@ for(const f of walk(root)){
     Array.isArray(en)&&en.length===4&&Array.isArray(ta)&&ta.length===4&&
     Number.isInteger(q.correct)&&q.correct>=0&&q.correct<=3&&
     [...en,...ta].every(x=>typeof x==='string'&&x.trim())&&
-    new Set(en?.map(norm)).size===4&&new Set(ta?.map(norm)).size===4;
+    optionsDistinct(en,q.q_en)&&optionsDistinct(ta,q.q_en);
   if(!structurallyValid){stats.invalid++;emit('high','invalid-structure',rec,'Missing bilingual stem, non-distinct options or invalid correct index');continue}
   if(!q.exp_en?.trim()||!q.exp_ta?.trim())emit('high','missing-explanation',rec,'Missing English or Tamil explanation');
   if(!Number.isInteger(Number(rec.page))||Number(rec.page)<1)emit('medium','unverified-page',rec,'No usable textbook page reference');

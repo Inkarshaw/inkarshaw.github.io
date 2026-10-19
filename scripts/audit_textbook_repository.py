@@ -28,6 +28,24 @@ def normalize(value: str) -> str:
     return " ".join(unicodedata.normalize("NFC", value).casefold().split())
 
 
+# Case-sensitive SI symbols must not be conflated with ordinary repeated words.
+NOTATION_STEM = re.compile(
+    r"\b(?:symbols?|notation|capitali[sz](?:ed|ation)|uppercase|lowercase|"
+    r"letter[-\s]+case|SI[-\s]+style|SI[-\s]+unit)\b", re.IGNORECASE
+)
+
+
+def distinct_options(options: list[str], stem: str) -> bool:
+    if len({normalize(option) for option in options}) == len(options):
+        return True
+    if not NOTATION_STEM.search(stem):
+        return False
+    # Letter case may distinguish symbols such as kg and Kg; do not allow
+    # options differing by whitespace alone or exact repeats.
+    exact = [" ".join(unicodedata.normalize("NFC", x).split()) for x in options]
+    return len(set(exact)) == len(options)
+
+
 def stem_signature(value: str) -> str:
     value = unicodedata.normalize("NFC", value).casefold()
     return " ".join(re.sub(r"[^\w\u0B80-\u0BFF ]", " ", value).split())
@@ -81,9 +99,10 @@ def audit_bank(path: Path, data: Any) -> dict[str, Any]:
             if any(not isinstance(option, str) or not option.strip() for option in options):
                 errors.append(f"{label} ({ident or 'no id'}): empty or non-string {lang} option")
             else:
-                normalized = [normalize(option) for option in options]
-                if len(set(normalized)) != 4:
+                if not distinct_options(options, q_en):
                     errors.append(f"{label} ({ident or 'no id'}): duplicate {lang} options")
+                elif len({normalize(option) for option in options}) != 4:
+                    warnings.append(f"{label} ({ident or 'no id'}): case-sensitive {lang} options; verify symbol notation")
             # Shared notation, formulae, numbers and units may be identical in
             # both languages; Tamil script in the stem is a more reliable
             # translation-presence signal than requiring script in every choice.
