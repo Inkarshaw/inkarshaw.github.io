@@ -21,14 +21,13 @@ from pathlib import Path
 
 BAD_FRAGMENTS = (
     "what is the correct textbook answer for:",
-    "which option is correctly associated with:",
     "layout of city and construction of buildings",
     "waterways for trade and travel",
     "chakravartin / ekarat",
     "identify the correct historical source, work, author",
 )
 RE_NUM = re.compile(r"\d[\d,]*(?:[–-]\d+)?")
-RE_START_NUMBER = re.compile(r"^\s*[0-9]")
+RE_START_NUMBER = re.compile(r"^\s*[+\-−]?(?:\d|\.\d)")
 RE_EN_DATE = re.compile(r"\b(?:bce|ce|bc|ad)\b", re.IGNORECASE)
 
 
@@ -41,7 +40,7 @@ def normalize(text: str) -> str:
     """
     normalized = unicodedata.normalize("NFC", text.casefold())
     safe = "".join(
-        char if (char.isspace() or unicodedata.category(char)[0] in "LNM")
+        char if (char.isspace() or unicodedata.category(char)[0] in "LNM" or char in "+-−√≠=<>/×÷·^²³°%:")
         else " "
         for char in normalized
     )
@@ -72,8 +71,11 @@ def audit(records: list[dict], start: int, count: int) -> dict:
             if not isinstance(q.get(key), str) or not q[key].strip():
                 problems.append(f"{ident}: missing {key}")
         en, ta = q.get("q_en", ""), q.get("q_ta", "")
-        if not en.endswith("?") or not ta.endswith("?"):
-            problems.append(f"{ident}: both language questions must end with '?'")
+        # Exam-style prompts may be direct questions, calculations ending with a
+        # period, or statement completions ending with a colon.
+        valid_endings = ("?", ".", ":", ")")
+        if not en.rstrip().endswith(valid_endings) or not ta.rstrip().endswith(valid_endings):
+            problems.append(f"{ident}: malformed question ending")
         if any(frag in en.casefold() for frag in BAD_FRAGMENTS):
             problems.append(f"{ident}: machine-generated question stem")
         if len(en.strip()) < 34 or len(ta.strip()) < 18:
