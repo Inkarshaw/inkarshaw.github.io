@@ -2,6 +2,12 @@ name: Sync official exam calendar
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/sync-exam-calendar.yml'
+      - 'scripts/sync_exam_calendar.py'
+      - 'tests/test_exam_calendar_sync.py'
+      - 'data/exams/exam-notifications.json'
   schedule:
     - cron: "23 0 * * *" # Daily at 05:53 IST, subject to GitHub scheduling delays.
 
@@ -31,12 +37,14 @@ jobs:
         run: python3 -m unittest discover -s tests -p 'test_exam_calendar_sync.py' -v
 
       - name: Read official TNPSC notifications
+        if: github.event_name != 'pull_request'
         run: python3 scripts/sync_exam_calendar.py
 
       - name: Validate resulting JSON
         run: python3 -m json.tool data/exams/exam-notifications.json > /dev/null
 
       - name: Publish only approved calendar data changes
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
