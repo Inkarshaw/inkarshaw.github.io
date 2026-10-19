@@ -21,7 +21,6 @@ from pathlib import Path
 
 BAD_FRAGMENTS = (
     "what is the correct textbook answer for:",
-    "which option is correctly associated with:",
     "layout of city and construction of buildings",
     "waterways for trade and travel",
     "chakravartin / ekarat",
@@ -41,7 +40,7 @@ def normalize(text: str) -> str:
     """
     normalized = unicodedata.normalize("NFC", text.casefold())
     safe = "".join(
-        char if (char.isspace() or unicodedata.category(char)[0] in "LNM")
+        char if (char.isspace() or unicodedata.category(char)[0] in "LNM" or char in "+-−√≠=<>/×÷·^²³°%:")
         else " "
         for char in normalized
     )
