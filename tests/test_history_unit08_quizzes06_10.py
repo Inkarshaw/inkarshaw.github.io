@@ -82,13 +82,13 @@ class Unit8QuizzesSixToTen(unittest.TestCase):
 
     def test_three_tax_terms_and_bali_contradiction_repaired(self):
         self.assertEqual(key(108)[0], "Bhaga, Hiranya and Bali")
-        self.assertIn("no specific reference", get(108)["exp_en"])
+        self.assertIn("Bali lacks a further reference", get(108)["exp_en"])
         self.assertEqual(key(109)[0], "Land tax paid in kind")
         self.assertEqual(key(110)[0], "One-sixth of produce")
         self.assertEqual(key(111)[0], "Cash tax paid by farmers and merchants")
         self.assertEqual(key(112)[0], "No specific reference to the levy of Bali is provided")
-        self.assertIn("internally inconsistent", get(112)["exp_en"])
-        self.assertIn("முரண்பாட்டை", get(112)["exp_ta"])
+        self.assertIn("After initially including Bali", get(112)["exp_en"])
+        self.assertIn("தனி விவரம்", get(112)["exp_ta"])
 
     def test_royal_revenue_allocation_distinct_uses(self):
         self.assertEqual([key(i)[0] for i in range(113,117)], [
@@ -120,7 +120,7 @@ class Unit8QuizzesSixToTen(unittest.TestCase):
                          ["Bhukti", "Vishaya", "Pathaka", "Villages"])
         self.assertEqual([key(i)[0] for i in range(137,140)],
                          ["Bhogapathi", "Ayuktha", "Pratpalaka-purusha"])
-        self.assertIn("precise duties", get(140)["q_en"])
+        self.assertIn("duties of local officers", get(140)["q_en"])
 
     def test_xuanzang_source_attributions_and_caution(self):
         self.assertEqual(key(141)[0], "Xuanzang (Hieun Tsang)")
@@ -130,13 +130,13 @@ class Unit8QuizzesSixToTen(unittest.TestCase):
         self.assertIn("not a crime-statistics", get(146)["exp_en"])
         self.assertEqual(key(147)[0], "Pataliputra")
         self.assertEqual(key(148)[0], "Kanauj")
-        self.assertEqual(key(158)[0], "612 CE")
-        self.assertIn("other scholarly chronologies vary", get(158)["exp_en"])
+        self.assertEqual(key(158)[0], "602 CE")
+        self.assertIn("text gives 612 CE", get(158)["exp_en"])
         self.assertEqual(key(160)[0], "Five years")
 
     def test_welfare_does_not_claim_modern_hospital_standard(self):
         self.assertEqual(key(153)[0], "Cow dung")
-        self.assertIn("not a modern public-health", get(153)["exp_en"])
+        self.assertIn("modern hygienic", get(153)["exp_en"])
         self.assertEqual(key(154)[0], "Kiln-fired bricks, red sandstone and marble")
         self.assertEqual(key(155)[0], "Viharas, monasteries and stupas")
         self.assertEqual(key(156)[0], "Rest houses or dharmasalas")
