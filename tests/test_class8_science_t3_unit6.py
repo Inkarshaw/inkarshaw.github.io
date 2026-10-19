@@ -30,6 +30,12 @@ class Class8ScienceTerm3Unit6Tests(unittest.TestCase):
         self.assertTrue(BANK["meta"].get("source_en_url"))
         self.assertTrue(BANK["meta"].get("source_ta_url"))
 
+    def test_quiz_source_link_uses_the_matching_textbook_edition(self):
+        page = (ROOT / "textbook-play.html").read_text(encoding="utf-8")
+        helper = page.split("function safeSourceUrl(q){", 1)[1].split("\n}", 1)[0]
+        self.assertIn("meta.source_en_url", helper)
+        self.assertIn("meta.source_ta_url", helper)
+
     def test_twenty_questions_pass_structural_review_with_balanced_keys(self):
         questions = BANK["questions"]
         self.assertEqual(len(questions), 20)
