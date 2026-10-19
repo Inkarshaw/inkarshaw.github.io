@@ -71,8 +71,11 @@ def audit(records: list[dict], start: int, count: int) -> dict:
             if not isinstance(q.get(key), str) or not q[key].strip():
                 problems.append(f"{ident}: missing {key}")
         en, ta = q.get("q_en", ""), q.get("q_ta", "")
-        if not en.endswith("?") or not ta.endswith("?"):
-            problems.append(f"{ident}: both language questions must end with '?'")
+        # Exam-style prompts may be direct questions, calculations ending with a
+        # period, or statement completions ending with a colon.
+        valid_endings = ("?", ".", ":", ")")
+        if not en.rstrip().endswith(valid_endings) or not ta.rstrip().endswith(valid_endings):
+            problems.append(f"{ident}: malformed question ending")
         if any(frag in en.casefold() for frag in BAD_FRAGMENTS):
             problems.append(f"{ident}: machine-generated question stem")
         if len(en.strip()) < 34 or len(ta.strip()) < 18:
