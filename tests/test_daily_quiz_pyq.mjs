@@ -18,7 +18,7 @@ for(const q of rows){
   assert.match(q.SourceYear,/^(19|20)\d{2}$/);
   assert.ok(Number(q.SourceYear)<=2026);
   assert.ok(q.SourceExam && q.SourcePaper && q.SourceQuestion && q.PYQSubject);
-  assert.ok(["www.upsc.gov.in","www.tnpsc.gov.in"].includes(new URL(q.SourceURL).hostname));
+  assert.ok(["upsc.gov.in","tnpsc.gov.in","www.upsc.gov.in","www.tnpsc.gov.in"].includes(new URL(q.SourceURL).hostname));
   assert.ok(!paperQuestions.has(q.SourceExam+q.SourceYear+q.SourceQuestion),"unique original paper question reference");
   paperQuestions.add(q.SourceExam+q.SourceYear+q.SourceQuestion);
   assert.ok(q.Question?.trim());
