@@ -32,6 +32,7 @@ for(const q of rows){
 }
 assert.ok(counts["TNPSC Group IV"]>=10);
 assert.ok(counts["UPSC Civil Services Prelims"]>=10);
+assert.ok(counts["TNPSC Group II/IIA"]>=10);
 
 function fn(prefix){
   const line=html.split("\n").find(x=>x.startsWith(prefix));
@@ -61,8 +62,9 @@ assert.equal(ten.length,10,"Default daily PYQ mix is ten");
 assert.equal(new Set(ten.map(x=>x.ID)).size,10);
 const nTn=ten.filter(q=>q.SourceExam==="TNPSC Group IV").length;
 const nUp=ten.filter(q=>q.SourceExam==="UPSC Civil Services Prelims").length;
-assert.equal(nTn,5,"PYQ mix includes five TNPSC questions");
-assert.equal(nUp,5,"PYQ mix includes five UPSC questions");
+assert.ok(nTn>=3&&nTn<=4,"Mixed PYQ includes balanced TNPSC Group IV questions");
+assert.ok(nUp>=3&&nUp<=4,"Mixed PYQ includes balanced UPSC questions");
+assert.ok(ten.filter(q=>q.SourceExam==="TNPSC Group II/IIA").length>=3,"Mixed PYQ includes Group II/IIA questions");
 assert.equal(ctx.dailySet(rows,"Previous Year Questions",date,"all").map(q=>q.ID).join(),ten.map(q=>q.ID).join(),"Fixed date/context selects deterministic questions");
 assert.equal(ctx.dailySet(rows.filter(q=>q.SourceExam==="TNPSC Group IV"),"Previous Year Questions",date,"tnpsc").length,10);
 

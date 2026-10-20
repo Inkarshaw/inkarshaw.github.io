@@ -21,7 +21,8 @@ for(const record of catalog.entries){
  if(record.quiz){
   const year=new URL(record.quiz,"https://clearexams.ink").searchParams.get("pyqYear");
   assert.equal(Number(year),record.year,"Quiz year matches source year");
-  const source=record.category==="TNPSC"?"TNPSC Group IV":"UPSC Civil Services Prelims";
+  const source=record.category==="TNPSC"?(record.exam==="Group IV"?"TNPSC Group IV":record.exam==="Group II / IIA"?"TNPSC Group II/IIA":""):"UPSC Civil Services Prelims";
+  assert.ok(source,"Quiz source mapping is known");
   assert.ok(qs.filter(q=>q.SourceExam===source&&Number(q.SourceYear)===record.year).length>=10,"Practice link only where 10 reviewed questions exist");
  }
 }
