@@ -69,8 +69,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Major Harappan settlements show planned streets, brick structures and sophisticated drainage.",
       "The Great Bath is associated with Mohenjo-daro; Lothal is known for maritime trade.",
-      "The Indus script has not been conclusively deciphered; avoid treating speculative readings as established facts."
-    ]
+      "The Indus script has not been conclusively deciphered; avoid treating speculative readings as established facts.",
+      "The mature Harappan phase is commonly dated to about 2600–1900 BCE.",
+      "Harappa lies in present-day Pakistan near the Ravi river; Mohenjo-daro is associated with the Indus river system.",
+      "Standardised weights, seals and crafts point to organised production and exchange.",
+      "The Harappan script remains undeciphered, so the precise language or meanings of inscriptions cannot be asserted as settled."
+    ],
+    "points_ta": [
+      "முக்கிய ஹரப்பா குடியிருப்புகளில் திட்டமிட்ட வீதிகள், செங்கல் கட்டிடங்கள், மேம்பட்ட கழிவுநீர் வடிகால் அமைப்புகள் காணப்படுகின்றன.",
+      "பெருங்குளியல் குளம் மொகஞ்சதாரோவுடன் தொடர்புடையது; லோத்தல் கடல்சார் வணிகத்திற்குப் பெயர் பெற்றது.",
+      "சிந்துவெளி எழுத்துமுறை இன்னும் உறுதியாகப் பொருள் கண்டறியப்படவில்லை; ஊக அடிப்படையிலான வாசிப்புகளை நிறுவப்பட்ட உண்மைகளாகக் கருதக்கூடாது.",
+      "முதிர்ந்த ஹரப்பா நாகரிகக் காலம் பொதுவாக கி.மு. 2600 முதல் 1900 வரை எனக் கணிக்கப்படுகிறது.",
+      "ஹரப்பா இன்றைய பாகிஸ்தானில் ராவி ஆற்றருகே அமைந்துள்ளது; மொகஞ்சதாரோ சிந்து ஆற்று அமைப்புடன் தொடர்புடையது.",
+      "ஒரே மாதிரியான எடைக்கற்கள், முத்திரைகள், கைவினைப் பொருட்கள் ஒழுங்கமைந்த உற்பத்தி மற்றும் பரிமாற்றத்தைக் காட்டுகின்றன.",
+      "ஹரப்பா எழுத்து இன்னும் வாசித்தறியப்படவில்லை; எனவே கல்வெட்டுகளின் மொழியையும் முழுப் பொருளையும் உறுதியானதாகக் கூற முடியாது."
+    ],
+    "exam_focus": "Mohenjo-daro—Great Bath; Lothal—coastal trade; Harappan script—undeciphered.",
+    "exam_focus_ta": "மொகஞ்சதாரோ—பெருங்குளியல் குளம்; லோத்தல்—கடலோர வணிகம்; ஹரப்பா எழுத்து—இன்னும் வாசித்தறியப்படாதது.",
+    "worked_example": "A multiple-choice claim that the Harappan script is conclusively deciphered is incorrect.",
+    "worked_example_ta": "ஹரப்பா எழுத்துமுறை முழுமையாக வாசிக்கப்பட்டுவிட்டது என்ற பல்தேர்வு கூற்று தவறானது.",
+    "quick_check": {
+      "question": "Where is the Great Bath of the Indus Civilisation located?",
+      "answer": "Mohenjo-daro.",
+      "question_ta": "சிந்துவெளி நாகரிகத்தின் பெருங்குளியல் குளம் அமைந்த இடம் எது?",
+      "answer_ta": "மொகஞ்சதாரோ."
+    }
   },
   {
     "id": "ancient-tamil-towns",
@@ -93,8 +116,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Rajaraja I consolidated Chola power and patronised the Brihadisvara Temple at Thanjavur.",
       "Rajendra I expanded Chola influence and is associated with Gangaikonda Cholapuram.",
-      "Medieval Tamil dynasties are studied through inscriptions, temples, trade and administrative records."
-    ]
+      "Medieval Tamil dynasties are studied through inscriptions, temples, trade and administrative records.",
+      "Rajaraja I commissioned the great Brihadisvara Temple at Thanjavur in the early eleventh century.",
+      "Rajendra I established Gangaikonda Cholapuram as an important imperial capital.",
+      "Chola inscriptions document royal orders, land grants, temple resources and local institutions.",
+      "The medieval Tamil region also witnessed Pandya power, overseas commerce and religious-cultural patronage."
+    ],
+    "points_ta": [
+      "முதலாம் இராஜராஜ சோழன் சோழர் ஆட்சியை வலுப்படுத்தித் தஞ்சாவூர் பெருவுடையார் கோயிலுக்கு ஆதரவளித்தார்.",
+      "முதலாம் இராஜேந்திர சோழன் சோழர்களின் செல்வாக்கை விரிவுபடுத்தினார்; கங்கைகொண்ட சோழபுரம் அவருடன் தொடர்புடையது.",
+      "இடைக்காலத் தமிழக அரசவம்சங்களை அறிய கல்வெட்டுகள், கோயில்கள், வணிகம், நிர்வாகப் பதிவுகள் ஆகியவை முக்கிய ஆதாரங்கள்.",
+      "முதலாம் இராஜராஜன் பதினொன்றாம் நூற்றாண்டின் தொடக்கத்தில் தஞ்சாவூர்ப் பெருவுடையார் கோயிலைக் கட்டுவித்தார்.",
+      "முதலாம் இராஜேந்திரன் கங்கைகொண்ட சோழபுரத்தை முக்கியப் பேரரசுத் தலைநகரமாக நிறுவினார்.",
+      "சோழர் கல்வெட்டுகள் அரசாணைகள், நிலக்கொடைகள், கோயில் வளங்கள், உள்ளாட்சி அமைப்புகள் குறித்த தகவல்களைத் தருகின்றன.",
+      "இடைக்காலத் தமிழகத்தில் பாண்டியர் ஆட்சி, கடல்கடந்த வணிகம், சமய மற்றும் பண்பாட்டு ஆதரவு ஆகியவையும் இடம்பெற்றன."
+    ],
+    "exam_focus": "Rajaraja I—Thanjavur Brihadisvara; Rajendra I—Gangaikonda Cholapuram; distinguish ruler and site.",
+    "exam_focus_ta": "முதலாம் இராஜராஜன்—தஞ்சைப் பெருவுடையார்; முதலாம் இராஜேந்திரன்—கங்கைகொண்ட சோழபுரம். அரசரையும் இடத்தையும் சரியாக இணைக்கவும்.",
+    "worked_example": "If the question asks who founded Gangaikonda Cholapuram, identify Rajendra I rather than Rajaraja I.",
+    "worked_example_ta": "கங்கைகொண்ட சோழபுரத்தை நிறுவியவர் யார் என்ற வினாவுக்கு முதலாம் இராஜேந்திரன்; முதலாம் இராஜராஜன் அல்ல.",
+    "quick_check": {
+      "question": "Which Chola ruler is associated with the Brihadisvara Temple at Thanjavur?",
+      "answer": "Rajaraja I.",
+      "question_ta": "தஞ்சாவூர் பெருவுடையார் கோயிலுடன் தொடர்புடைய சோழ மன்னர் யார்?",
+      "answer_ta": "முதலாம் இராஜராஜ சோழன்."
+    }
   },
   {
     "id": "equality",
@@ -223,8 +269,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Indian National Congress was founded in 1885 as a forum for political discussion and representation.",
       "Early nationalists used petitions, resolutions and public meetings to press for administrative reforms.",
-      "Economic criticism of colonial rule included the drain of wealth and the impact of British policies on Indian industries."
-    ]
+      "Economic criticism of colonial rule included the drain of wealth and the impact of British policies on Indian industries.",
+      "The Indian National Congress held its first session in Bombay in December 1885, presided over by W. C. Bonnerjee.",
+      "Dadabhai Naoroji is especially associated with the economic 'drain of wealth' critique of colonial rule.",
+      "The early moderate nationalists pressed for representative institutions, civil liberties and Indian participation in services.",
+      "Nationalism developed through political organisations, newspapers, public meetings and economic criticism."
+    ],
+    "points_ta": [
+      "இந்திய தேசிய காங்கிரஸ் 1885ஆம் ஆண்டு அரசியல் விவாதத்திற்கும் பிரதிநிதித்துவக் கோரிக்கைகளுக்கும் ஒரு மேடையாகத் தொடங்கப்பட்டது.",
+      "தொடக்ககால தேசியவாதிகள் மனுக்கள், தீர்மானங்கள், பொதுக்கூட்டங்கள் மூலம் நிர்வாகச் சீர்திருத்தங்களைக் கோரினர்.",
+      "காலனிய ஆட்சியின் செல்வச் சுரண்டலும் இந்தியத் தொழில்களுக்கு பிரிட்டிஷ் கொள்கைகளால் ஏற்பட்ட பாதிப்புகளும் பொருளாதார விமர்சனங்களில் இடம்பெற்றன.",
+      "இந்திய தேசிய காங்கிரஸின் முதல் மாநாடு 1885 டிசம்பரில் பம்பாயில் நடைபெற்றது; அதன் தலைவராக டபிள்யூ. சி. பானர்ஜி இருந்தார்.",
+      "காலனிய ஆட்சியின் 'செல்வச் சுரண்டல்' என்ற பொருளாதார விமர்சனத்துடன் தாதாபாய் நௌரோஜி குறிப்பிடத்தக்க வகையில் தொடர்புடையவர்.",
+      "ஆரம்பகால மிதவாத தேசியவாதிகள் பிரதிநிதித்துவ அமைப்புகள், குடிமைச் சுதந்திரங்கள், அரசுப் பணிகளில் இந்தியர்களுக்கான பங்கு ஆகியவற்றைக் கோரினர்.",
+      "அரசியல் அமைப்புகள், செய்தித்தாள்கள், பொதுக்கூட்டங்கள் மற்றும் பொருளாதார விமர்சனங்கள் வழியாக தேசிய உணர்வு வளர்ந்தது."
+    ],
+    "exam_focus": "1885—first INC session and W. C. Bonnerjee; Dadabhai Naoroji—drain theory. Do not confuse first president with later INC leaders.",
+    "exam_focus_ta": "1885—காங்கிரஸ் முதல் மாநாடு, டபிள்யூ. சி. பானர்ஜி; தாதாபாய் நௌரோஜி—செல்வச் சுரண்டல் கோட்பாடு. முதல் தலைவரையும் பிற்காலத் தலைவர்களையும் குழப்ப வேண்டாம்.",
+    "worked_example": "A question about the drain theory concerns colonial economic exploitation, while a question about INC's foundation concerns the organisation of political representation.",
+    "worked_example_ta": "செல்வச் சுரண்டல் கோட்பாடு பற்றிய வினா காலனியப் பொருளாதாரச் சுரண்டலைக் குறிக்கும்; காங்கிரஸ் தோற்றம் பற்றிய வினா அரசியல் பிரதிநிதித்துவ அமைப்பைக் குறிக்கும்.",
+    "quick_check": {
+      "question": "Who presided over the first Indian National Congress session?",
+      "answer": "W. C. Bonnerjee (1885, Bombay).",
+      "question_ta": "இந்திய தேசிய காங்கிரஸின் முதல் மாநாட்டிற்குத் தலைமை வகித்தவர் யார்?",
+      "answer_ta": "டபிள்யூ. சி. பானர்ஜி (1885, பம்பாய்)."
+    }
   },
   {
     "id": "swadeshi",
@@ -235,8 +304,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The partition of Bengal in 1905 gave powerful momentum to the Swadeshi and boycott movements.",
       "Swadeshi promoted the use of Indian-made goods; boycott challenged imported products and colonial institutions.",
-      "Bal Gangadhar Tilak, Bipin Chandra Pal and Lala Lajpat Rai were prominent assertive nationalist leaders."
-    ]
+      "Bal Gangadhar Tilak, Bipin Chandra Pal and Lala Lajpat Rai were prominent assertive nationalist leaders.",
+      "Lord Curzon's partition of Bengal took effect in October 1905 and stimulated public protests.",
+      "Swadeshi and boycott were connected but distinct methods: promote domestic production, and refuse selected foreign goods.",
+      "The Surat split of the Indian National Congress occurred in 1907 amid differences between moderates and extremists.",
+      "The 1905 partition of Bengal was annulled in 1911; this did not end the wider Indian nationalist movement."
+    ],
+    "points_ta": [
+      "1905ஆம் ஆண்டின் வங்காளப் பிரிவினை சுதேசி மற்றும் புறக்கணிப்பு இயக்கங்களுக்கு வலுவான தூண்டுதலாக அமைந்தது.",
+      "சுதேசி இயக்கம் உள்நாட்டுப் பொருட்களைப் பயன்படுத்த வலியுறுத்தியது; புறக்கணிப்பு இயக்கம் இறக்குமதிப் பொருட்களையும் காலனிய நிறுவனங்களையும் எதிர்த்தது.",
+      "பால கங்காதர திலகர், பிபின் சந்திர பால், லாலா லஜபத் ராய் ஆகியோர் தீவிர தேசியவாதத் தலைவர்களாக விளங்கினர்.",
+      "கர்சன் பிரபுவின் வங்காளப் பிரிவினை 1905 அக்டோபரில் அமலுக்கு வந்து மக்களின் எதிர்ப்புப் போராட்டங்களைத் தூண்டியது.",
+      "சுதேசியும் புறக்கணிப்பும் தொடர்புடையன; ஆனால் வேறுபட்ட முறைகள்: உள்நாட்டு உற்பத்தியை ஊக்குவித்தல், வெளிநாட்டுப் பொருட்களில் குறிப்பிட்டவற்றைப் புறக்கணித்தல்.",
+      "மிதவாதிகளுக்கும் தீவிரவாதிகளுக்கும் இடையிலான கருத்து வேறுபாடுகளின் பின்னணியில் 1907ஆம் ஆண்டு காங்கிரஸின் சூரத் பிளவு ஏற்பட்டது.",
+      "1905ஆம் ஆண்டின் வங்காளப் பிரிவினை 1911ஆம் ஆண்டு ரத்து செய்யப்பட்டது; அதனால் இந்திய தேசிய இயக்கம் முழுமையாக முடிவடையவில்லை."
+    ],
+    "exam_focus": "1905 Bengal partition; 1907 Surat split; 1911 annulment of Bengal partition. Learn the three events separately.",
+    "exam_focus_ta": "1905 வங்காளப் பிரிவினை; 1907 சூரத் பிளவு; 1911 வங்காளப் பிரிவினை ரத்து—மூன்று நிகழ்வுகளையும் தனித்தனியாகக் கற்கவும்.",
+    "worked_example": "Buying Indian cloth supports Swadeshi; refusing imported cloth is boycott. An action can express both ideas.",
+    "worked_example_ta": "இந்தியத் துணி வாங்குவது சுதேசியை ஆதரிக்கிறது; இறக்குமதித் துணியை வாங்க மறுப்பது புறக்கணிப்பாகும். ஒரு செயல் இரு நோக்கங்களையும் பிரதிபலிக்கலாம்.",
+    "quick_check": {
+      "question": "Which 1905 event became a major trigger for the Swadeshi Movement?",
+      "answer": "The partition of Bengal.",
+      "question_ta": "1905ஆம் ஆண்டில் சுதேசி இயக்கத்திற்கு முக்கியத் தூண்டுதலான நிகழ்வு எது?",
+      "answer_ta": "வங்காளப் பிரிவினை."
+    }
   },
   {
     "id": "home-rule",
@@ -259,8 +351,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Gandhi led the Champaran satyagraha in 1917 and the Kheda struggle in 1918.",
       "The Non-Cooperation Movement began in 1920 and was withdrawn after the Chauri Chaura incident in 1922.",
-      "The Salt March of 1930 initiated the Civil Disobedience Movement, challenging the colonial salt laws."
-    ]
+      "The Salt March of 1930 initiated the Civil Disobedience Movement, challenging the colonial salt laws.",
+      "Champaran (1917) in Bihar concerned indigo cultivators and became an early major Gandhian satyagraha in India.",
+      "The Kheda struggle of 1918 in Gujarat concerned relief from land revenue after agricultural distress.",
+      "The 1919 Rowlatt Act and Jallianwala Bagh massacre were major developments in the escalation of anti-colonial agitation.",
+      "The Salt March began at Sabarmati on 12 March 1930 and culminated in Gandhi's breaking the salt law at Dandi in April."
+    ],
+    "points_ta": [
+      "1917ஆம் ஆண்டு காந்தியடிகள் சம்பாரண் சத்தியாகிரகத்தையும் 1918ஆம் ஆண்டு கேடா போராட்டத்தையும் முன்னின்று நடத்தினார்.",
+      "ஒத்துழையாமை இயக்கம் 1920ஆம் ஆண்டு தொடங்கப்பட்டது; 1922ஆம் ஆண்டு சௌரி சௌரா நிகழ்வுக்குப் பிறகு அது திரும்பப் பெறப்பட்டது.",
+      "1930ஆம் ஆண்டின் உப்புச் சத்தியாகிரகப் பயணம் காலனிய உப்புச் சட்டங்களை எதிர்த்து சட்டமறுப்பு இயக்கத்தைத் தொடங்கி வைத்தது.",
+      "பீகாரின் சம்பாரண் போராட்டம் (1917) அவுரிச் சாகுபடி விவசாயிகளைக் குறித்தது; இந்தியாவில் காந்தியடிகளின் தொடக்ககால முக்கிய சத்தியாகிரகமாக அமைந்தது.",
+      "குஜராத்தின் கேடா போராட்டம் (1918) வேளாண் பாதிப்பைத் தொடர்ந்து நிலவரித் தளர்வு கோரிய போராட்டமாகும்.",
+      "1919ஆம் ஆண்டின் ரௌலட் சட்டமும் ஜாலியன்வாலா பாக் படுகொலையும் காலனிய எதிர்ப்புப் போராட்டம் தீவிரமடைய முக்கிய காரணங்களாயின.",
+      "உப்புச் சத்தியாகிரகப் பயணம் 1930 மார்ச் 12ஆம் தேதி சபர்மதியில் தொடங்கியது; ஏப்ரலில் தண்டியில் காந்தியடிகள் உப்புச் சட்டத்தை மீறினார்."
+    ],
+    "exam_focus": "Champaran 1917—indigo; Kheda 1918—land revenue; Non-Cooperation 1920–22; Dandi Salt March 1930.",
+    "exam_focus_ta": "சம்பாரண் 1917—அவுரி; கேடா 1918—நிலவரி; ஒத்துழையாமை 1920–22; தண்டி உப்புப் பயணம் 1930.",
+    "worked_example": "A demand for relief for indigo cultivators points to Champaran; a question about salt-tax defiance points to Dandi.",
+    "worked_example_ta": "அவுரி விவசாயிகளின் கோரிக்கை சம்பாரணைக் குறிக்கும்; உப்புவரிக்கு எதிரான சட்டமீறல் தண்டியைக் குறிக்கும்.",
+    "quick_check": {
+      "question": "Which event prompted Gandhi to withdraw the Non-Cooperation Movement in 1922?",
+      "answer": "The Chauri Chaura incident.",
+      "question_ta": "1922ஆம் ஆண்டு ஒத்துழையாமை இயக்கத்தை காந்தியடிகள் திரும்பப் பெறக் காரணமான நிகழ்வு எது?",
+      "answer_ta": "சௌரி சௌரா நிகழ்வு."
+    }
   },
   {
     "id": "anti-imperial",
@@ -402,8 +517,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Sangam corpus is an important literary source for studying early Tamilagam.",
       "The five tinai landscapes link ecological settings with livelihoods, social life and poetic conventions.",
-      "Literary, archaeological and inscriptional evidence must be read together when reconstructing the Sangam period."
-    ]
+      "Literary, archaeological and inscriptional evidence must be read together when reconstructing the Sangam period.",
+      "Kurinji refers to mountain landscapes; Mullai to pastoral and forest settings.",
+      "Marutam concerns cultivated plains, while Neital is associated with the coast and maritime livelihoods.",
+      "Palai is associated with dry, arid conditions in Tamil literary landscape conventions.",
+      "Ports, trade, occupations and political life are studied from texts together with archaeological and inscriptional evidence."
+    ],
+    "points_ta": [
+      "சங்க இலக்கியங்கள் பண்டைய தமிழக வரலாற்றை அறிய முக்கியமான இலக்கிய ஆதாரங்களாக விளங்குகின்றன.",
+      "ஐந்திணை நிலங்கள் சுற்றுச்சூழல், வாழ்வாதாரம், சமூக வாழ்க்கை, பாடல் மரபுகள் ஆகியவற்றோடு தொடர்புடையவை.",
+      "சங்ககால வரலாற்றை மீட்டுருவாக்கும்போது இலக்கியம், தொல்லியல், கல்வெட்டு ஆதாரங்கள் ஆகியவற்றை ஒன்றிணைத்து ஆராய வேண்டும்.",
+      "குறிஞ்சி என்பது மலைநிலத்தையும் முல்லை என்பது காடு மற்றும் மேய்ச்சல் சார்ந்த நிலத்தையும் குறிக்கும்.",
+      "மருதம் வயல்வெளி மற்றும் வேளாண்மை சார்ந்த நிலம்; நெய்தல் கடற்கரை மற்றும் கடல்சார் வாழ்வாதாரங்களுடன் தொடர்புடையது.",
+      "பாலை என்பது தமிழிலக்கிய நிலப்பாகுபாட்டில் வறண்ட சூழலைக் குறிக்கிறது.",
+      "துறைமுகங்கள், வணிகம், தொழில்கள், அரசியல் வாழ்க்கை ஆகியவற்றை இலக்கியங்கள் மட்டுமின்றித் தொல்லியல் மற்றும் கல்வெட்டுச் சான்றுகளோடும் இணைத்து ஆராய்கிறோம்."
+    ],
+    "exam_focus": "Five tinai: Kurinji—mountain; Mullai—forest/pastoral; Marutam—agriculture; Neital—coast; Palai—arid.",
+    "exam_focus_ta": "ஐந்திணை: குறிஞ்சி—மலை; முல்லை—காடு/மேய்ச்சல்; மருதம்—வேளாண்மை; நெய்தல்—கடல்; பாலை—வறண்ட நிலம்.",
+    "worked_example": "A Sangam poem describing fishermen and coastal trade is usually associated with Neital.",
+    "worked_example_ta": "மீனவர்கள் மற்றும் கடலோர வணிகம் பற்றிய சங்கப் பாடல் பொதுவாக நெய்தல் திணையைச் சார்ந்தது.",
+    "quick_check": {
+      "question": "Which tinai is linked with agriculture and cultivated plains?",
+      "answer": "Marutam (மருதம்).",
+      "question_ta": "வேளாண்மை மற்றும் வயல்வெளிகளோடு தொடர்புடைய திணை எது?",
+      "answer_ta": "மருதம்."
+    }
   },
   {
     "id": "post-mauryan",
@@ -855,8 +993,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The South Indian Liberal Federation, known as the Justice Party, was founded in November 1916.",
       "C. Natesanar, Pitti Theagarayar and T. M. Nair were prominent in the non-Brahmin movement.",
-      "It sought broader educational, public employment and political opportunities."
-    ]
+      "It sought broader educational, public employment and political opportunities.",
+      "The South Indian Liberal Federation became widely known as the Justice Party after its political newspaper Justice.",
+      "The Non-Brahmin Manifesto of December 1916 articulated demands for fairer political representation.",
+      "The Justice Party formed a government in Madras Presidency following the 1920 elections under dyarchy.",
+      "Its governments pursued reforms relating to access to public service and communal representation."
+    ],
+    "points_ta": [
+      "தென்னிந்திய நல உரிமைச் சங்கம் எனப்படும் நீதிக்கட்சி 1916 நவம்பரில் தொடங்கப்பட்டது.",
+      "சி. நடேசனார், பிட்டி தியாகராயர், டி. எம். நாயர் ஆகியோர் பிராமணரல்லாதோர் இயக்கத்தின் முக்கிய ஆளுமைகள்.",
+      "கல்வி, அரசுப் பணி, அரசியல் வாய்ப்புகள் ஆகியவற்றில் விரிவான பிரதிநிதித்துவத்தை இவ்வியக்கம் கோரியது.",
+      "தென்னிந்திய நல உரிமைச் சங்கம் தனது 'ஜஸ்டிஸ்' என்ற பத்திரிகை பெயரால் நீதிக்கட்சி என பரவலாக அழைக்கப்பட்டது.",
+      "1916 டிசம்பரில் வெளியிடப்பட்ட பிராமணரல்லாதோர் அறிக்கை நியாயமான அரசியல் பிரதிநிதித்துவத்தை வலியுறுத்தியது.",
+      "இரட்டையாட்சி முறையின் கீழ் 1920 தேர்தலைத் தொடர்ந்து சென்னை மாகாணத்தில் நீதிக்கட்சி ஆட்சி அமைத்தது.",
+      "அதன் அரசுகள் அரசுப் பணியில் வாய்ப்புகள் மற்றும் வகுப்புவாரிப் பிரதிநிதித்துவம் சார்ந்த சீர்திருத்தங்களை முன்னெடுத்தன."
+    ],
+    "exam_focus": "1916 Justice Party, 1925 Self-Respect Movement and 1944 Dravidar Kazhagam are distinct stages.",
+    "exam_focus_ta": "1916 நீதிக்கட்சி, 1925 சுயமரியாதை இயக்கம், 1944 திராவிடர் கழகம்—இவை வேறுபட்ட வரலாற்று நிலைகள்.",
+    "worked_example": "A question naming T. M. Nair and Pitti Theagarayar points to the Justice Party, not to the founding of the Indian National Congress.",
+    "worked_example_ta": "டி. எம். நாயர், பிட்டி தியாகராயர் பெயர்கள் இடம்பெறும் வினா நீதிக்கட்சியைக் குறிக்கிறது; இந்திய தேசிய காங்கிரஸ் தோற்றத்தை அல்ல.",
+    "quick_check": {
+      "question": "In which year was the South Indian Liberal Federation formed?",
+      "answer": "1916.",
+      "question_ta": "தென்னிந்திய நல உரிமைச் சங்கம் எந்த ஆண்டு தொடங்கப்பட்டது?",
+      "answer_ta": "1916."
+    }
   },
   {
     "id": "non-brahmin-manifesto",
@@ -915,8 +1076,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "E. V. Ramasamy, known as Periyar, founded the Self-Respect Movement in 1925.",
       "The movement opposed caste hierarchy and promoted rationalist inquiry.",
-      "Women's equality and self-respect marriages became important themes."
-    ]
+      "Women's equality and self-respect marriages became important themes.",
+      "Periyar used the journal Kudi Arasu, begun in 1925, to communicate social criticism and reformist ideas.",
+      "The movement criticised caste inequality, untouchability, ritual authority and social hierarchy.",
+      "Self-respect marriages emphasised consent, dignity and a challenge to caste-based marriage restrictions.",
+      "Periyar advocated women's rights in education, property and freedom of personal choice."
+    ],
+    "points_ta": [
+      "பெரியார் என அறியப்படும் ஈ. வெ. இராமசாமி 1925ஆம் ஆண்டு சுயமரியாதை இயக்கத்தைத் தொடங்கினார்.",
+      "இவ்வியக்கம் சாதிப் படிநிலைகளை எதிர்த்துப் பகுத்தறிவுச் சிந்தனையை ஊக்குவித்தது.",
+      "பெண் சமத்துவமும் சுயமரியாதைத் திருமணங்களும் இவ்வியக்கத்தின் முக்கியக் கருத்துகளாக விளங்கின.",
+      "1925இல் தொடங்கிய குடி அரசு இதழைப் பெரியார் சமூக விமர்சனங்களையும் சீர்திருத்தக் கருத்துகளையும் பரப்பப் பயன்படுத்தினார்.",
+      "இவ்வியக்கம் சாதி ஏற்றத்தாழ்வு, தீண்டாமை, சடங்கு ஆதிக்கம், சமூகப் படிநிலை ஆகியவற்றை விமர்சித்தது.",
+      "சுயமரியாதைத் திருமணங்கள் இருதரப்புச் சம்மதம், கண்ணியம், சாதிசார் திருமணக் கட்டுப்பாடுகளை எதிர்த்தல் ஆகியவற்றை வலியுறுத்தின.",
+      "கல்வி, சொத்து, தனிப்பட்ட விருப்பத் தேர்வு ஆகியவற்றில் பெண்களின் உரிமைகளுக்குப் பெரியார் ஆதரவளித்தார்."
+    ],
+    "exam_focus": "Founder—Periyar E. V. Ramasamy; start—1925; associated journal—Kudi Arasu.",
+    "exam_focus_ta": "தொடங்கியவர்—பெரியார் ஈ. வெ. இராமசாமி; தொடக்கம்—1925; தொடர்புடைய இதழ்—குடி அரசு.",
+    "worked_example": "A question on self-respect marriage belongs to the social reform movement, not simply to the formation of a political party.",
+    "worked_example_ta": "சுயமரியாதைத் திருமணம் பற்றிய வினா ஒரு சமூகச் சீர்திருத்த இயக்கத்தைச் சார்ந்தது; அரசியல் கட்சி தோற்றத்தை மட்டும் சார்ந்ததல்ல.",
+    "quick_check": {
+      "question": "Who founded the Self-Respect Movement in 1925?",
+      "answer": "Periyar E. V. Ramasamy.",
+      "question_ta": "1925ஆம் ஆண்டு சுயமரியாதை இயக்கத்தைத் தொடங்கியவர் யார்?",
+      "answer_ta": "பெரியார் ஈ. வெ. இராமசாமி."
+    }
   },
   {
     "id": "periyar-journals",
