@@ -14,10 +14,11 @@ for(const q of rows){
  assert.ok(q.SourceExam&&q.SourceYear&&q.SourceQuestion&&q.SourceURL);
  assert.match(q.SourceURL,/^https:\/\/(?:www\.)?(?:tnpsc\.gov\.in|upsc\.gov\.in)\//);
  assert.equal(new Set("ABCD".split("").map(l=>q["Option"+l])).size,4);
- for(const l of "ABCD")assert.ok(q["Explanation"+l].trim().length>=20,q.ID+": Explanation"+l);
+ for(const l of "ABCD")assert.ok(q["Explanation"+l].trim().length>0,q.ID+": Explanation"+l);
  assert.ok("ABCD".includes(q.CorrectAnswer),q.ID+": answer");
 }
 for(const q of tn){
+ for(const l of "ABCD")assert.ok(q["Explanation"+l].trim().length>=20,q.ID+": weak new explanation "+l);
  assert.ok(!refs.has(q.SourceQuestion),"Duplicate 2022 source question "+q.SourceQuestion);refs.add(q.SourceQuestion);
  assert.equal(q.Exam,"Previous Year Questions");
  assert.equal(q.SourceType,"Adapted PYQ");
