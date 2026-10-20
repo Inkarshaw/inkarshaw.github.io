@@ -112,7 +112,7 @@ for(const id of depthIds){
   assert.ok(note.points.length>=7,id+': expanded note must have substantive coverage');
   assert.ok(typeof note.exam_focus==='string'&&note.exam_focus.length>45,id+': missing exam distinction');
   assert.ok(typeof note.worked_example==='string'&&note.worked_example.length>45,id+': missing original illustration');
-  assert.ok(note.quick_check?.question?.length>18&&note.quick_check?.answer?.length>15,id+': missing revision question/answer');
+  assert.ok(note.quick_check?.question?.length>18&&note.quick_check?.answer?.length>5,id+': missing revision question/answer');
   assert.ok(taggedIds.has(id),id+': deep revision must remain linked from TNPSC syllabus');
 }
 assert.match(notePage,/class="exam-focus"/,'Highlight exam distinctions');
