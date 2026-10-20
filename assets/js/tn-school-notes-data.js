@@ -1076,13 +1076,13 @@ window.ClearExamsTNSchoolNotes=[
     "id": "tn-bdo-roles",
     "title": "Block Development Officer and Panchayat Union",
     "ta": "வட்டார வளர்ச்சி அலுவலரும் ஊராட்சி ஒன்றியமும்",
-    "chapter": "Tamil Nadu Rural Development & Panchayat Raj · District administration contacts",
+    "chapter": "Tamil Nadu RD&PR Policy Note 2018–19 · Panchayat Union and BDO responsibilities (historical policy note)",
     "source_kind": "government",
-    "source_url": "https://www.tnrd.tn.gov.in/contacts/rd_pt_ramnad.html",
+    "source_url": "https://tnrd.tn.gov.in/policynotes/rd_e_pn_2018_19.pdf",
     "source_label": "Official Tamil Nadu government reference",
     "points": [
-      "The Block Development Officer carries out administrative responsibilities at the Panchayat Union (block) level.",
-      "Block-level development administration supports rural works, implementation and monitoring of applicable schemes.",
+      "The Block Development Officer (Block Panchayat) is the executive authority of the Panchayat Union, assisted by administrative and technical staff.",
+      "Under the Panchayats Act framework, Panchayat Unions have functions covering selected roads, school facilities and minor irrigation assets.",
       "Do not confuse the BDO and Panchayat Union offices with the Tahsildar-led taluk revenue administration."
     ]
   },
