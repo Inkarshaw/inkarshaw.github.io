@@ -875,5 +875,103 @@ window.ClearExamsTNSchoolNotes=[
       "The movement encouraged replacing many Sanskrit-derived terms with Tamil vocabulary.",
       "It reflected debates about language, identity and the Tamil literary tradition."
     ]
+  },
+  {
+    "id": "local-bodies-structure",
+    "title": "Rural and urban local bodies",
+    "ta": "ஊரக மற்றும் நகர்ப்புற உள்ளாட்சி அமைப்புகள்",
+    "chapter": "Class 6 Social Science · Term III · Civics: Local Bodies – Rural and Urban (2024 textbook)",
+    "source_url": "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tamil-and-english-versions/blob/main/6th-standard/English/Class_6_Social_Science_English_Social_Science_-_Term_3_-_2024_Edition.md",
+    "points": [
+      "Rural local bodies include Village Panchayats, Panchayat Unions and District Panchayats.",
+      "Urban local bodies include Town Panchayats, Municipalities and Municipal Corporations.",
+      "Local government provides civic services and democratic representation close to residents."
+    ]
+  },
+  {
+    "id": "gram-sabha",
+    "title": "Gram Sabha: members and meetings",
+    "ta": "கிராம சபை: உறுப்பினர்களும் கூட்டங்களும்",
+    "chapter": "Class 6 Social Science · Term III · Civics: Local Bodies – Rural and Urban (2024 textbook)",
+    "source_url": "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tamil-and-english-versions/blob/main/6th-standard/English/Class_6_Social_Science_English_Social_Science_-_Term_3_-_2024_Edition.md",
+    "update_url": "https://www.tnrd.tn.gov.in/dyn_json_schemes_name_details.php?go_type=MQ%3D%3D&sch_id=Mg%3D%3D&scheme_type=MQ%3D%3D&y=MjAyMg%3D%3D",
+    "update_label": "TN Rural Development GO No. 65 (25 May 2022): six Gram Sabha meetings",
+    "points": [
+      "A Gram Sabha comprises people registered on the electoral roll of the relevant village panchayat.",
+      "It enables citizens to discuss local development, monitor work and raise public grievances.",
+      "Older Class 6 textbooks state four annual meetings, but a May 2022 Tamil Nadu government order increased the schedule to six per year."
+    ]
+  },
+  {
+    "id": "village-panchayat",
+    "title": "Village Panchayat: public services",
+    "ta": "கிராம ஊராட்சி: பொது சேவைகள்",
+    "chapter": "Class 6 Social Science · Term III · Civics: Local Bodies – Rural and Urban (2024 textbook)",
+    "source_url": "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tamil-and-english-versions/blob/main/6th-standard/English/Class_6_Social_Science_English_Social_Science_-_Term_3_-_2024_Edition.md",
+    "points": [
+      "Village Panchayats are responsible for important local functions such as drinking-water supply and street lighting.",
+      "Other duties include roads, cleaning and basic sanitation.",
+      "Distinguish obligatory services from discretionary facilities such as parks and libraries."
+    ]
+  },
+  {
+    "id": "panchayat-union",
+    "title": "Panchayat Union and Block Development Officer",
+    "ta": "ஊராட்சி ஒன்றியமும் வட்டார வளர்ச்சி அலுவலரும்",
+    "chapter": "Class 6 Social Science · Term III · Civics: Local Bodies – Rural and Urban (2024 textbook)",
+    "source_url": "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tamil-and-english-versions/blob/main/6th-standard/English/Class_6_Social_Science_English_Social_Science_-_Term_3_-_2024_Edition.md",
+    "points": [
+      "A Panchayat Union joins several Village Panchayats at the block level.",
+      "The Block Development Officer is a principal administrative officer associated with the Panchayat Union.",
+      "The elected Panchayat Union chairperson and administrative officials have different roles."
+    ]
+  },
+  {
+    "id": "district-panchayat",
+    "title": "District Panchayat and development planning",
+    "ta": "மாவட்ட ஊராட்சியும் வளர்ச்சித் திட்டமிடலும்",
+    "chapter": "Class 6 Social Science · Term III · Civics: Local Bodies – Rural and Urban (2024 textbook)",
+    "source_url": "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tamil-and-english-versions/blob/main/6th-standard/English/Class_6_Social_Science_English_Social_Science_-_Term_3_-_2024_Edition.md",
+    "points": [
+      "A District Panchayat is a district-level rural local-government institution.",
+      "It participates in planning and coordinating rural development.",
+      "The elected District Panchayat is distinct from the district revenue administration headed by the District Collector."
+    ]
+  },
+  {
+    "id": "urban-local-government",
+    "title": "Town Panchayat, Municipality and Corporation",
+    "ta": "பேரூராட்சி, நகராட்சி மற்றும் மாநகராட்சி",
+    "chapter": "Class 6 Social Science · Term III · Civics: Local Bodies – Rural and Urban (2024 textbook)",
+    "source_url": "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tamil-and-english-versions/blob/main/6th-standard/English/Class_6_Social_Science_English_Social_Science_-_Term_3_-_2024_Edition.md",
+    "points": [
+      "Town Panchayats, Municipalities and Corporations are types of urban local government.",
+      "Their functions include roads, waste management, water supply, street lighting and public facilities.",
+      "A Mayor is an elected civic leader of a Municipal Corporation, whereas the Commissioner heads its administration."
+    ]
+  },
+  {
+    "id": "local-body-finance",
+    "title": "Local-body revenue and spending",
+    "ta": "உள்ளாட்சி நிதி வருவாயும் செலவுகளும்",
+    "chapter": "Class 6 Social Science · Term III · Civics: Local Bodies – Rural and Urban (2024 textbook)",
+    "source_url": "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tamil-and-english-versions/blob/main/6th-standard/English/Class_6_Social_Science_English_Social_Science_-_Term_3_-_2024_Edition.md",
+    "points": [
+      "Local bodies may raise funds from authorised local taxes, user charges and fees.",
+      "They also receive funds through grants and government transfers.",
+      "Local revenue and grants finance water supply, sanitation, roads and related services."
+    ]
+  },
+  {
+    "id": "local-elections",
+    "title": "Local elections and democratic representation",
+    "ta": "உள்ளாட்சித் தேர்தல்களும் மக்களாட்சி பிரதிநிதித்துவமும்",
+    "chapter": "Class 6 Social Science · Term III · Civics: Local Bodies – Rural and Urban (2024 textbook)",
+    "source_url": "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tamil-and-english-versions/blob/main/6th-standard/English/Class_6_Social_Science_English_Social_Science_-_Term_3_-_2024_Edition.md",
+    "points": [
+      "Residents elect local representatives from wards and other prescribed constituencies.",
+      "The normal term of a local body is five years, subject to applicable constitutional provisions.",
+      "The State Election Commission is responsible for supervising local-body elections."
+    ]
   }
 ];
