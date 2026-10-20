@@ -22,7 +22,7 @@ const notesContext={window:{}};vm.runInNewContext(notesSrc,notesContext);
 const notes=notesContext.window.ClearExamsTNSchoolNotes;
 const ids=new Set(notes.map(n=>n.id));
 assert.equal(ids.size,notes.length,'Unique note IDs');
-assert.ok(notes.length>=81,'Class 10 social transformation and Class 6 local government notes');
+assert.ok(notes.length>=98,'Class 10 social history, local bodies and official administration notes');
 for(const n of notes){
   assert.ok(n.title&&n.chapter&&Array.isArray(n.points)&&n.points.length>=3);
   assert.ok(n.href||n.source_url,n.id+': needs a published quiz or actual textbook source');
@@ -50,7 +50,7 @@ let links=0;
 for(const b of blocks)for(const u of b.units)for(const t of u.topics){
   if(Array.isArray(t)&&t[1]){assert.ok(ids.has(t[1]),'Unresolved school-book note: '+t[1]);links++;}
 }
-assert.ok(links>=154,'Social justice and local self-government chapter links');
+assert.ok(links>=187,'Add direct government-source links to the development-administration units');
 assert.ok(notes.some(n=>n.id==='sangam')&&notes.some(n=>n.id==='gandhi-mass')&&notes.some(n=>n.id==='state-government')&&notes.some(n=>n.id==='biotech'),'History, polity and science chapter links present');
 const socialReforms=['brahmo-samaj','arya-samaj','ramakrishna-mission','theosophical-society','prarthana-samaj','satyashodhak','narayana-guru','pandita-ramabai','aligarh-movement','vaikunda-swami','vallalar','iyothee-thass','christian-missions'];
 for(const id of socialReforms){const note=notes.find(n=>n.id===id);assert.ok(note,'Missing social reform note: '+id);assert.match(note.chapter,/Class 11 History · Unit 19: Towards Modernity/);assert.equal(new URL(note.href,'https://clearexams.ink/').searchParams.get('unit'),'19');assert.ok(links>0);}
@@ -67,6 +67,23 @@ for(const id of localIds)assert.match(notes.find(n=>n.id===id).chapter,/Class 6 
 const gram=notes.find(n=>n.id==='gram-sabha');assert.ok(gram.update_url&&gram.points.join(' ').includes('six per year'),'Current Tamil Nadu Gram Sabha meeting frequency must be shown');
 assert.match(notePage,/data-quiz-pending/,'Unpublished chapter must be explicitly labelled');
 assert.match(notePage,/Read source textbook/,'Notes must offer source chapters');
+
+const adminIds=['tn-district-collector','tn-dro','tn-rdo','tn-tahsildar','tn-revenue-inspector','tn-vao','tn-revenue-structure','tn-bdo-roles','tn-district-rural-development','tn-tnega','tn-esevai-certificates','tn-pension-delivery','tn-land-records','tn-2026-integrated-land','tn-patta-transfer-history','tn-cm-helpline','tn-disaster-revenue'];
+for(const id of adminIds){
+ const note=notes.find(n=>n.id===id);
+ assert.ok(note,'Missing official administration note: '+id);
+ assert.equal(note.source_kind,'government',id+': incorrect source category');
+ assert.ok(!note.href,id+': official-reference notes cannot pretend to have a textbook quiz');
+ assert.ok(note.source_url&&note.source_url.startsWith('https://'),id+': missing primary reference');
+ const host=new URL(note.source_url).hostname;
+ assert.ok(host.endsWith('.tn.gov.in')||host.endsWith('.nic.in')||host==='tn.nic.in'||host==='cmhelpline.tnega.org',id+': not a primary government reference: '+host);
+ assert.ok(note.chapter&&note.points.length>=3&&note.ta,id+': incomplete bilingual title or revision summary');
+ assert.ok(taggedIds.has(id),id+': missing direct syllabus topic-to-note link');
+}
+assert.match(notePage,/note.source_kind==='government'/,'Render official sources separately from school-books');
+assert.match(notePage,/Read official government source/,'Show a real official source link');
+assert.match(notePage,/Official government reference:/,'Identify the source category');
+assert.match(notePage,/note.source_kind==='government'\?'':/,'Official notes must not display missing-quiz placeholders');
 
 assert.match(notePage,/id="noteSearch"/,'Notes have topic search');
 assert.match(notePage,/id="noteMatches"/,'Topic search has accessible results');
