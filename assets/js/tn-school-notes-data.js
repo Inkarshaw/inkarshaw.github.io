@@ -1,4 +1,4 @@
-/* Curated original short revision notes aligned to published Tamil Nadu school-book chapters. */
+/* Original concise TNPSC revision notes linked to published Tamil Nadu State Board chapters. */
 window.ClearExamsTNSchoolNotes=[
   {
     "id": "measurements",
@@ -514,6 +514,198 @@ window.ClearExamsTNSchoolNotes=[
       "Information technology uses computers and communication systems to store, process and share information.",
       "Hardware refers to physical computer components; software refers to programs and instructions.",
       "Digital communication is useful but requires care with personal information, passwords and reliable sources."
+    ]
+  },
+  {
+    "id": "brahmo-samaj",
+    "title": "Brahmo Samaj and Raja Rammohan Roy",
+    "ta": "பிரம்ம சமாஜமும் இராஜா ராம்மோகன் ராயும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Raja Rammohan Roy founded Brahmo Sabha in 1828; it developed into the Brahmo Samaj.",
+      "The movement challenged practices such as sati and pressed for social and religious reform.",
+      "Roy supported women's rights, education and reasoned debate about Indian society."
+    ]
+  },
+  {
+    "id": "arya-samaj",
+    "title": "Arya Samaj and Dayananda Saraswati",
+    "ta": "ஆரிய சமாஜமும் தயானந்த சரஸ்வதியும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Dayananda Saraswati founded the Arya Samaj in 1875.",
+      "Its reform programme emphasised Vedic authority, education and criticism of certain ritual practices.",
+      "The movement promoted social reform while drawing on a revivalist interpretation of the Vedas."
+    ]
+  },
+  {
+    "id": "ramakrishna-mission",
+    "title": "Swami Vivekananda and the Ramakrishna Mission",
+    "ta": "சுவாமி விவேகானந்தரும் இராமகிருஷ்ண மிஷனும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Swami Vivekananda founded the Ramakrishna Mission in 1897.",
+      "He addressed the World's Parliament of Religions in Chicago in 1893.",
+      "The Mission became known for work in education, healthcare and social service."
+    ]
+  },
+  {
+    "id": "theosophical-society",
+    "title": "Theosophical Society and the Adyar centre",
+    "ta": "பிரம்மஞான சபையும் அடையாறு மையமும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "H. P. Blavatsky and H. S. Olcott founded the Theosophical Society in the United States in 1875.",
+      "Its international headquarters was established at Adyar, Madras, in the nineteenth century.",
+      "Annie Besant later became associated with the movement and educational and nationalist activities in India."
+    ]
+  },
+  {
+    "id": "prarthana-samaj",
+    "title": "Prarthana Samaj and social reform",
+    "ta": "பிரார்த்தனை சமாஜமும் சமூகச் சீர்திருத்தமும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Atmaram Pandurang founded the Prarthana Samaj in Bombay in 1867.",
+      "M. G. Ranade was an influential reformer associated with the movement.",
+      "It advocated social reforms such as women's education and the improvement of women's status."
+    ]
+  },
+  {
+    "id": "satyashodhak",
+    "title": "Jyotirao Phule and Satyashodhak Samaj",
+    "ta": "ஜோதிராவ் புலேயும் சத்தியசோதக் சமாஜமும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Jyotirao Phule founded the Satyashodhak Samaj in 1873.",
+      "Jyotirao and Savitribai Phule worked to expand education for girls and oppressed communities.",
+      "The movement questioned caste inequality and inherited social privileges."
+    ]
+  },
+  {
+    "id": "narayana-guru",
+    "title": "Sri Narayana Guru and social equality",
+    "ta": "ஸ்ரீ நாராயண குருவும் சமூகச் சமத்துவமும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Sri Narayana Guru challenged caste exclusion and promoted dignity and social equality.",
+      "The Sri Narayana Dharma Paripalana (SNDP) Yogam was established in 1903, associated with his reform efforts.",
+      "Reformers connected with the movement worked for access to education, public roads and religious spaces."
+    ]
+  },
+  {
+    "id": "pandita-ramabai",
+    "title": "Pandita Ramabai and women's education",
+    "ta": "பண்டித ரமாபாயும் பெண்கல்வியும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Pandita Ramabai promoted education and support for widowed and disadvantaged women.",
+      "She established institutions for women including Sharada Sadan and Mukti Sadan.",
+      "Her work illustrates the role of women reformers in debates over education, social customs and autonomy."
+    ]
+  },
+  {
+    "id": "aligarh-movement",
+    "title": "Sir Syed Ahmad Khan and the Aligarh Movement",
+    "ta": "சர் சையத் அகமது கானும் அலிகார் இயக்கமும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Sir Syed Ahmad Khan promoted modern scientific and English education among Indian Muslims.",
+      "The Muhammadan Anglo-Oriental College at Aligarh was founded in 1875.",
+      "His reform activities connected educational advancement with wider social change."
+    ]
+  },
+  {
+    "id": "vaikunda-swami",
+    "title": "Vaikunda Swamigal and Samathuva Sangam",
+    "ta": "வைகுண்ட சுவாமிகளும் சமத்துவ சங்கமும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Vaikunda Swamigal challenged caste restrictions in the south Travancore region of present-day southern Tamil Nadu.",
+      "He promoted inter-dining through Samathuva Sangam and inclusive feeding centres known as Nizhal Thangals.",
+      "His movement linked spiritual practice with social equality."
+    ]
+  },
+  {
+    "id": "vallalar",
+    "title": "Vallalar Ramalinga Adigal and compassion",
+    "ta": "வள்ளலார் இராமலிங்க அடிகளும் ஜீவகாருண்யமும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Vallalar Ramalinga Adigal taught compassion toward all living beings, often expressed as jeevakarunyam.",
+      "He established a charitable feeding centre at Vadalur, associated with serving food without caste discrimination.",
+      "His teachings stressed humaneness and the rejection of social exclusion."
+    ]
+  },
+  {
+    "id": "iyothee-thass",
+    "title": "Iyothee Thass Pandithar and anti-caste ideas",
+    "ta": "அயோத்திதாச பண்டிதரும் சாதி எதிர்ப்புச் சிந்தனையும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Iyothee Thass Pandithar criticised caste oppression and advocated the dignity of oppressed communities.",
+      "He promoted a reinterpretation of Tamil and Buddhist history in anti-caste discourse.",
+      "He published the Tamil journal Oru Paisa Tamilan, later called Tamilan."
+    ]
+  },
+  {
+    "id": "christian-missions",
+    "title": "Christian missionaries and educational change",
+    "ta": "கிறித்தவ மறைப்பணியாளர்களும் கல்வி மாற்றங்களும்",
+    "chapter": "Class 11 History · Unit 19: Towards Modernity",
+    "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
+    "points": [
+      "Christian missionary organisations contributed to schools, printing, medical activity and social services in colonial India.",
+      "Women and marginalised groups gained access to some new educational institutions, although opportunities differed by place.",
+      "Missionary activity also formed part of religious debates and colonial-era social transformations."
+    ]
+  },
+  {
+    "id": "governor",
+    "title": "Office and constitutional role of a State Governor",
+    "ta": "மாநில ஆளுநரின் பதவியும் அரசியலமைப்புப் பங்கும்",
+    "chapter": "Class 7 Social Science · Term II · Civics: State Government",
+    "href": "textbook-play.html?class=7&subject=social-science&term=2&unit=6&quiz=1",
+    "points": [
+      "The Governor is the constitutional head of a state and is appointed by the President of India.",
+      "Executive action of a state is formally expressed in the name of its Governor, subject to constitutional provisions.",
+      "Ordinarily the Governor acts on the aid and advice of the Council of Ministers, except where the Constitution permits discretion."
+    ]
+  },
+  {
+    "id": "chief-minister",
+    "title": "Chief Minister and Council of Ministers",
+    "ta": "முதலமைச்சரும் அமைச்சரவையும்",
+    "chapter": "Class 7 Social Science · Term II · Civics: State Government",
+    "href": "textbook-play.html?class=7&subject=social-science&term=2&unit=6&quiz=1",
+    "points": [
+      "The Chief Minister leads the elected State government and heads the Council of Ministers.",
+      "The Governor appoints the Chief Minister; other ministers are appointed on the Chief Minister's advice.",
+      "The Council of Ministers is collectively responsible to the State Legislative Assembly."
+    ]
+  },
+  {
+    "id": "legislative-assembly",
+    "title": "State Legislative Assembly and lawmaking",
+    "ta": "மாநிலச் சட்டப்பேரவையும் சட்டமியற்றுதலும்",
+    "chapter": "Class 7 Social Science · Term II · Civics: State Government",
+    "href": "textbook-play.html?class=7&subject=social-science&term=2&unit=6&quiz=1",
+    "points": [
+      "Members of the Legislative Assembly are elected from territorial constituencies.",
+      "The State Legislative Assembly debates bills, passes laws within the state legislative sphere and examines the government.",
+      "The Assembly scrutinises expenditure and can hold the Council of Ministers politically accountable."
     ]
   }
 ];
