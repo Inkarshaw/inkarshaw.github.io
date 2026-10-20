@@ -1,4 +1,4 @@
-/* Group IIA notes: TN State Board chapters and separately tagged official Tamil Nadu government references. */
+/* TNPSC Group IIA revision notes, with short summaries and selectively expanded exam-preparation depth. */
 window.ClearExamsTNSchoolNotes=[
   {
     "id": "measurements",
@@ -1223,8 +1223,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The State Secretariat consists of government departments supporting ministers in policy development, rules, interdepartmental coordination and administrative decisions.",
       "Government departments are headed administratively by their respective Secretaries or Principal Secretaries; field directorates are distinct implementation bodies.",
-      "For example, the Rural Development and Panchayat Raj Secretariat department and Directorate of Rural Development are separately listed on the official department website."
-    ]
+      "For example, the Rural Development and Panchayat Raj Secretariat department and Directorate of Rural Development are separately listed on the official department website.",
+      "Ministers provide the elected policy leadership, while government Secretaries manage Secretariat administration and advise on policy execution.",
+      "The Secretariat typically handles cabinet/ministerial decisions, business rules, government orders, finance proposals and coordination among departments.",
+      "Directorates and subordinate offices perform sector-specific technical or field work outside the Secretariat.",
+      "At district level, field administration may be headed by Collectors and department-specific officers depending on statutory powers.",
+      "The location of a government office does not by itself determine its authority: jurisdiction and rules of business are decisive."
+    ],
+    "exam_focus": "Secretariat (policy, rules and coordination) versus Directorate (departmental execution and supervision) versus District office (local implementation).",
+    "worked_example": "A policy proposal may be processed by a Secretariat department, operationalised through a Directorate, and administered by district and taluk staff.",
+    "quick_check": {
+      "question": "Which is primarily the policy-coordination institution: Secretariat or Village Panchayat?",
+      "answer": "The State Secretariat."
+    }
   },
   {
     "id": "tn-business-rules",
@@ -1237,8 +1248,18 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Article 166 of the Constitution provides for conduct of state government business in the Governor's name and rules for transaction and allocation of government business.",
       "The Tamil Nadu Government Business Rules, 1978, allocate subjects among Secretariat departments.",
-      "An official 2008 amendment transferred Tamil Nadu Corporation for Development of Women and Mahalir Thittam from the Social Welfare portfolio to Rural Development and Panchayat Raj."
-    ]
+      "An official 2008 amendment transferred Tamil Nadu Corporation for Development of Women and Mahalir Thittam from the Social Welfare portfolio to Rural Development and Panchayat Raj.",
+      "Article 166 addresses executive action in a State, authentication of orders and rules for allocation and transaction of Government business.",
+      "Business Rules determine which Secretariat department handles a subject, not the public eligibility conditions of a welfare scheme.",
+      "When subjects are reallocated, the controlling administrative department can change even though programme beneficiaries are unchanged.",
+      "Check the latest amendment or government order before naming a department as the currently responsible department."
+    ],
+    "exam_focus": "A change in the Secretariat's allocation of business is an administrative reallocation, not necessarily a repeal of a welfare programme.",
+    "worked_example": "A programme moved from one Secretariat portfolio to another can retain its name and objectives while its administering department changes.",
+    "quick_check": {
+      "question": "Which Constitution article provides for rules governing the transaction of State government business?",
+      "answer": "Article 166."
+    }
   },
   {
     "id": "tn-hrm",
@@ -1265,8 +1286,18 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Secretariat departments must consult the Finance Department on proposals with specified financial implications under the Government Business Rules.",
       "New government schemes and significant expansion of existing services require financial scrutiny before budget provision.",
-      "Distinguish a policy announcement, administrative sanction and the legislative appropriation needed before government expenditure."
-    ]
+      "Distinguish a policy announcement, administrative sanction and the legislative appropriation needed before government expenditure.",
+      "Departments submit budget and new-expenditure proposals subject to government procedures, Finance Department review and appropriate sanction.",
+      "A policy proposal, administrative approval, budget allocation and actual expenditure are different steps in the public-finance chain.",
+      "A charged expenditure item is not voted in the same manner as voted expenditure; both still appear in government accounts.",
+      "Legislative grants and the Appropriation Act provide authority to draw funds for specified services under the constitutional budget process."
+    ],
+    "exam_focus": "An announced welfare policy does not itself prove that money was appropriated, released or actually paid.",
+    "worked_example": "Illustrative administration sequence: proposal → Finance scrutiny → government sanction → budget provision/authorised release → implementation → audited expenditure.",
+    "quick_check": {
+      "question": "Does a government press announcement alone constitute an Appropriation Act?",
+      "answer": "No. Expenditure must follow the constitutionally required budget and financial-control processes."
+    }
   },
   {
     "id": "tn-budget-process",
@@ -1279,8 +1310,18 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Budget Estimates (BE) are planned receipts and spending for the coming financial year.",
       "Revised Estimates (RE) update earlier projections during the financial year; actual accounts record outcomes.",
-      "Revenue receipts and capital receipts differ, as do recurring revenue expenditure and capital spending on assets."
-    ]
+      "Revenue receipts and capital receipts differ, as do recurring revenue expenditure and capital spending on assets.",
+      "Revenue receipts are generally non-debt receipts, including tax revenue, non-tax revenue and revenue grants; they do not create a repayment obligation.",
+      "Capital receipts include borrowings, loan recoveries and proceeds from asset disposals; not every capital receipt is a debt.",
+      "Revenue expenditure commonly includes salaries, pensions, interest and current subsidies; capital expenditure generally creates assets or reduces liabilities.",
+      "The annual budget authorises planned expenditure, but a budget allocation is not evidence that the whole amount has actually been spent."
+    ],
+    "exam_focus": "Distinguish BE (initial plan), RE (revised in-year forecast) and Actuals (recorded expenditure). Revenue versus capital is a classification, not simply 'small versus large' spending.",
+    "worked_example": "Illustrative only: A department shows BE ₹100 crore, RE ₹115 crore and Actuals ₹108 crore. Actual spending exceeded BE by ₹8 crore but was ₹7 crore below RE.",
+    "quick_check": {
+      "question": "Which figure records what the department spent, rather than what it proposed?",
+      "answer": "Actuals. Budget Estimates and Revised Estimates are planning or forecast figures."
+    }
   },
   {
     "id": "tn-budget-deficits",
@@ -1293,8 +1334,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "A revenue deficit occurs when revenue expenditure exceeds revenue receipts.",
       "Fiscal deficit measures the government's overall borrowing requirement, excluding borrowings from total receipts.",
-      "Budget figures must be interpreted with the stated financial year and whether they are Budget, Revised or Actual values."
-    ]
+      "Budget figures must be interpreted with the stated financial year and whether they are Budget, Revised or Actual values.",
+      "Revenue deficit = revenue expenditure − revenue receipts; a positive result means current revenue is insufficient to meet revenue expenditure.",
+      "Fiscal deficit = total expenditure − (revenue receipts + non-debt capital receipts). It is the broad borrowing requirement for the year.",
+      "Primary deficit = fiscal deficit − interest payments; it excludes the interest burden of past borrowing.",
+      "All deficits are flows over a financial year; outstanding government debt is a stock measured at a particular date.",
+      "Compare fiscal-deficit ratios only against the appropriate year's GSDP, and distinguish BE, RE and actual values."
+    ],
+    "exam_focus": "Fiscal deficit is NOT simply expenditure minus all receipts: borrowings must be excluded from receipts when deriving the financing gap.",
+    "worked_example": "Illustrative only: Expenditure ₹150, revenue receipts ₹90, non-debt capital receipts ₹10 and interest ₹15 (all in crore). Fiscal deficit = ₹50 crore; primary deficit = ₹35 crore.",
+    "quick_check": {
+      "question": "If fiscal deficit is ₹50 crore and interest payments are ₹15 crore, what is the primary deficit?",
+      "answer": "₹35 crore, because primary deficit = fiscal deficit − interest payments."
+    }
   },
   {
     "id": "tn-gsdp",
@@ -1307,7 +1359,21 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Gross State Domestic Product (GSDP) measures the value of goods and services produced within a state's economic territory.",
       "Net State Domestic Product (NSDP) equals GSDP less consumption of fixed capital.",
-      "State-income estimates are released at current and constant prices; comparisons over time should distinguish nominal and real growth."
+      "State-income estimates are released at current and constant prices; comparisons over time should distinguish nominal and real growth.",
+      "At market prices, GSDP is the sum of sectoral Gross Value Added plus taxes on products less subsidies on products.",
+      "NSDP = GSDP − consumption of fixed capital (depreciation). The 'net' figure accounts for wear and use of fixed assets.",
+      "Current-price GSDP reflects both output and price changes; constant-price measures are used to estimate real output growth.",
+      "Per-capita state income is usually calculated using NSDP divided by the relevant population estimate.",
+      "The Tamil Nadu DES page cited here contains an older 2011–12-base series; MoSPI's February 2026 GDP FAQ describes a national-series revision to the 2022–23 base. Always identify the series and release before comparing values."
+    ],
+    "exam_focus": "GSDP versus GVA, gross versus net, and current versus constant prices are three separate distinctions.",
+    "worked_example": "Illustrative only: sectoral GVA totals ₹900 crore; product taxes ₹130 crore and product subsidies ₹30 crore. GSDP at market prices = ₹1,000 crore. If fixed-capital consumption is ₹70 crore, NSDP = ₹930 crore.",
+    "quick_check": {
+      "question": "Sectoral GVA ₹900 crore, product taxes ₹130 crore and product subsidies ₹30 crore. What is GSDP?",
+      "answer": "₹1,000 crore: ₹900 + ₹130 − ₹30."
+    },
+    "additional_sources": [
+      "https://www.mospi.gov.in/uploads/announcements/announcements_1772117257791_84ae898f-7be2-4b7d-a135-565e1a809513_FAQ_GDP_26022026_1902.pdf"
     ]
   },
   {
@@ -1321,8 +1387,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Gross Value Added (GVA) can be classified into primary, secondary and service sectors.",
       "Agriculture and allied activities belong primarily to the primary sector, manufacturing to the secondary sector and trade, transport and finance to services.",
-      "Sectoral GVA at current and constant prices helps analyse structural change in the state economy."
-    ]
+      "Sectoral GVA at current and constant prices helps analyse structural change in the state economy.",
+      "Gross Value Added is the value of output minus intermediate consumption such as purchased raw materials and services used in production.",
+      "Primary activities include agriculture, forestry, fishing and mining; secondary activities include manufacturing, construction and utility production.",
+      "Tertiary or services activities include trade, transport, communications, banking, education and many public services.",
+      "GVA is not the same as turnover; subtracting intermediate inputs prevents counting the value of the same material at successive production stages.",
+      "At market prices, GDP/GSDP includes product taxes minus product subsidies in addition to GVA."
+    ],
+    "exam_focus": "A shop's sale value or a factory's turnover is not automatically its GVA; intermediate consumption must be deducted.",
+    "worked_example": "Illustrative only: A factory produces output worth ₹200 lakh and uses purchased inputs of ₹140 lakh. Its GVA is ₹60 lakh, not ₹200 lakh.",
+    "quick_check": {
+      "question": "Why are raw materials subtracted when estimating GVA?",
+      "answer": "They are intermediate inputs whose value was created in another production stage; subtraction avoids double counting."
+    }
   },
   {
     "id": "tn-state-income-estimates",
@@ -1335,8 +1412,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Department of Economics and Statistics prepares Tamil Nadu State Domestic Product estimates following national statistical methodology.",
       "Published stages include provisional advance, advance, quick and revised estimates.",
-      "Changes across successive estimates reflect revised or additional source data; never mix estimates from different releases without noting their status."
-    ]
+      "Changes across successive estimates reflect revised or additional source data; never mix estimates from different releases without noting their status.",
+      "Tamil Nadu's Department of Economics and Statistics prepares state-income estimates using National Statistical Office guidelines.",
+      "Release stages include Advance Estimates (Provisional), Advance Estimates, Quick Estimates and Revised Estimates.",
+      "Early releases depend on incomplete indicators; later releases incorporate more actual administrative, survey and sectoral data.",
+      "The DES page refers explicitly to the old 2011–12 base series. A change in the national base year means series comparison must be checked separately.",
+      "Do not treat a revised statistical estimate as a Revised Estimate of budget spending; both use the word 'revised' but describe different processes."
+    ],
+    "exam_focus": "State-income RE is a later statistical output estimate; Budget RE is a revision to the government's income and expenditure forecast.",
+    "worked_example": "A published GSDP growth rate at current prices can exceed its constant-price growth rate because price changes affect nominal values. This example is conceptual, not a claim about a particular year.",
+    "quick_check": {
+      "question": "Can an Advance Estimate and a Revised Estimate for the same year differ legitimately?",
+      "answer": "Yes. The Revised Estimate can use more complete or updated statistical evidence."
+    }
   },
   {
     "id": "tn-agri-statistics",
@@ -1349,8 +1437,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Agriculture and allied work remains important for employment and livelihoods in Tamil Nadu.",
       "The state agricultural statistical system collects information on cropping area, production, irrigation, land holdings and agricultural wages.",
-      "Government uses these statistics to design agricultural policies and monitor outcomes."
-    ]
+      "Government uses these statistics to design agricultural policies and monitor outcomes.",
+      "Area sown, harvested area, crop yield and production are separate indicators; yield is output per unit of area.",
+      "Crop productivity can be compared only after specifying crop, season, unit and method of measurement.",
+      "Gross cropped area can count land sown more than once during a year, while net sown area counts a parcel only once.",
+      "Cropping intensity (%) = gross cropped area ÷ net sown area × 100.",
+      "Official agricultural statistics support planning for irrigation, crop insurance, storage and marketing."
+    ],
+    "exam_focus": "Net area sown versus gross cropped area: the difference captures multiple cropping, not a change in total physical farmland.",
+    "worked_example": "Illustrative only: A district has 100,000 hectares net sown and 150,000 hectares gross cropped. Cropping intensity = 150%.",
+    "quick_check": {
+      "question": "A field is cultivated with two crops in a year. How is it counted in gross cropped area?",
+      "answer": "Twice, because gross cropped area sums crop-season area, while net sown area counts the land once."
+    }
   },
   {
     "id": "tn-industry-sipcot",
@@ -1363,8 +1462,18 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "SIPCOT is the State Industries Promotion Corporation of Tamil Nadu, a government-owned industrial-development organisation.",
       "It develops industrial parks, sector-focused clusters and associated land and infrastructure to support investment.",
-      "Industrial infrastructure development is distinct from regulating firms or granting every statutory clearance."
-    ]
+      "Industrial infrastructure development is distinct from regulating firms or granting every statutory clearance.",
+      "SIPCOT focuses on industrial land, estates and shared infrastructure to support the establishment and expansion of industries.",
+      "Industrial parks are not equivalent to all forms of enterprise assistance; district-level MSME facilitation falls under other institutional arrangements.",
+      "Large, medium, small and micro enterprises may face different regulatory and infrastructure requirements.",
+      "Examination questions may test the expansion of SIPCOT and its development function, not current park counts which can change."
+    ],
+    "exam_focus": "SIPCOT = State Industries Promotion Corporation of Tamil Nadu; DIC = District Industries Centre. Their functions overlap in economic development but are not identical.",
+    "worked_example": "An investor seeking developed industrial-park land may approach SIPCOT; a district entrepreneur seeking facilitation for a government MSME scheme may approach a DIC.",
+    "quick_check": {
+      "question": "Does SIPCOT chiefly exist to conduct local elections or develop industrial infrastructure?",
+      "answer": "Develop industrial infrastructure and investment-ready industrial areas."
+    }
   },
   {
     "id": "tn-msme-dic",
@@ -1377,8 +1486,18 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "District Industries Centres provide district-level industrial and entrepreneur facilitation.",
       "Departmental responsibilities include self-employment schemes, enterprise support and access to administrative guidance.",
-      "Examples of programme families described in official departmental responsibilities include NEEDS, UYEGP and PMEGP; consult current scheme guidelines for eligibility."
-    ]
+      "Examples of programme families described in official departmental responsibilities include NEEDS, UYEGP and PMEGP; consult current scheme guidelines for eligibility.",
+      "DICs provide district-level facilitation for industry-related permissions and self-employment support programmes as applicable.",
+      "PMEGP is a centrally linked employment-generation programme, whereas NEEDS and UYEGP are Tamil Nadu scheme frameworks mentioned in state departmental material.",
+      "A scheme announcement should not be confused with approval of an individual applicant's subsidy, bank credit or licence.",
+      "MSME classification and incentive rules can change. Consult the relevant current scheme notification before memorising financial thresholds."
+    ],
+    "exam_focus": "DIC is a district industrial facilitation office; it does not itself guarantee a loan or replace the lending bank's appraisal.",
+    "worked_example": "An applicant intending to start a microenterprise can ask the DIC about scheme eligibility and documentation, while a lending bank still evaluates the loan application.",
+    "quick_check": {
+      "question": "Which district-level institution is associated with enterprise facilitation: DIC or Gram Sabha?",
+      "answer": "District Industries Centre (DIC)."
+    }
   },
   {
     "id": "tn-startup-ecosystem",
@@ -1405,7 +1524,21 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Naan Mudhalvan is a Tamil Nadu skill-development initiative linked with the Tamil Nadu Skill Development Corporation.",
       "It provides upskilling opportunities for learners from colleges, polytechnics, ITIs and other eligible groups.",
-      "Activities include training, internships, apprenticeships and preparation support for selected competitive examinations."
+      "Activities include training, internships, apprenticeships and preparation support for selected competitive examinations.",
+      "The Tamil Nadu Skill Development Corporation (TNSDC) operates the scheme under the State's Special Programme Implementation Department.",
+      "The official platform lists skill tracks for engineering, arts and science, polytechnic, ITI and other eligible disciplines.",
+      "Programmes can cover employability skills, internships, apprenticeships, career preparation and sector-specific learning.",
+      "Naan Mudhalvan was launched on 1 March 2022 according to the TNSDC's official 2026–27 programme document.",
+      "Training provision and beneficiary eligibility vary by institution and programme stream."
+    ],
+    "exam_focus": "Naan Mudhalvan is a skills and employability initiative, not a blanket unconditional cash-benefit scheme.",
+    "worked_example": "A polytechnic student joining an industry-linked short course is participating in skill development; this is different from a student receiving a higher-education DBT scholarship.",
+    "quick_check": {
+      "question": "Which body is directly associated with Naan Mudhalvan: TNSDC or the State Election Commission?",
+      "answer": "TNSDC — Tamil Nadu Skill Development Corporation."
+    },
+    "additional_sources": [
+      "https://portal.naanmudhalvan.tn.gov.in/pdfs/EOI/2026-27_odd_iti.pdf"
     ]
   },
   {
@@ -1419,8 +1552,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Moovalur Ramamirtham Ammaiyar Ninaivu Pudhumai Penn Thittam provides financial assistance to eligible girls pursuing higher education.",
       "Schooling history and institutional enrolment matter to eligibility; the official scheme uses digital beneficiary verification and direct benefit transfer.",
-      "Check current eligibility rules on the scheme or institute website before assuming a student qualifies."
-    ]
+      "Check current eligibility rules on the scheme or institute website before assuming a student qualifies.",
+      "The scheme's full name commemorates Moovalur Ramamirtham Ammaiyar; it is associated with assisting girls to continue higher education.",
+      "The Government institute's published description specifies eligible school-study history, including prescribed government and Tamil-medium aided schools.",
+      "UMIS is used for online student application, enrolment validation and institutional verification.",
+      "Under the published institute guidance, students may be asked for school-study, identity, bank and admission documents.",
+      "The scheme should not be confused with the Tamil Nadu marriage-assistance schemes bearing related historical names."
+    ],
+    "exam_focus": "Remember both intended beneficiary (eligible girl higher-education student) and method of delivery (application and institution-linked DBT validation).",
+    "worked_example": "A college verifies an applicant's school-study certificate and admission details through UMIS before forwarding a scheme claim; verification is not the same as automatic eligibility.",
+    "quick_check": {
+      "question": "Is Pudhumai Penn principally a school-breakfast programme or higher-education assistance scheme?",
+      "answer": "Higher-education assistance for eligible girl students."
+    }
   },
   {
     "id": "tn-tamil-pudhalvan",
@@ -1433,8 +1577,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Tamil Pudhalvan is a Tamil Nadu higher-education assistance scheme directed at eligible male students.",
       "The official institution's scheme page lists qualifying school background and online application through UMIS.",
-      "Pudhumai Penn and Tamil Pudhalvan are separate programmes and must not be confused in exam questions."
-    ]
+      "Pudhumai Penn and Tamil Pudhalvan are separate programmes and must not be confused in exam questions.",
+      "The Tamil Pudhalvan programme supports eligible male students in higher education, under criteria published by the responsible department.",
+      "The institute's scheme guidance specifies prior school-study requirements and online application using the UMIS portal.",
+      "Assistance is delivered through direct bank transfer after validation under the scheme rules.",
+      "Do not combine Pudhumai Penn and Tamil Pudhalvan student counts or programme eligibility as if they were a single scheme.",
+      "Enrolment rules and beneficiary scope may be revised by later orders; current operational guidance takes precedence over earlier notes."
+    ],
+    "exam_focus": "Pudhumai Penn: eligible girl students. Tamil Pudhalvan: eligible boy students. Both support transition into higher education, not general unemployment benefits.",
+    "worked_example": "A candidate asked which scheme corresponds to eligible male higher-education students should choose Tamil Pudhalvan, not Naan Mudhalvan.",
+    "quick_check": {
+      "question": "Which scheme is directed to eligible boys pursuing higher education?",
+      "answer": "Tamil Pudhalvan."
+    }
   },
   {
     "id": "tn-magalir-urimai",
@@ -1447,7 +1602,22 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Kalaignar Magalir Urimai Thittam is a Tamil Nadu programme intended to support eligible women heads of families.",
       "The scheme began in September 2023, and status-checking has an official e-Sevai service entry.",
-      "Benefit amounts, qualifying conditions and coverage must be checked against current government instructions rather than historic statements."
+      "Benefit amounts, qualifying conditions and coverage must be checked against current government instructions rather than historic statements.",
+      "Kalaignar Magalir Urimai Thittam (KMUT) is a household-focused welfare scheme for eligible women heads of families.",
+      "The state's e-Sevai list identifies the KMU-103 service for checking KMUT application status.",
+      "Government IT policy documentation discusses data validation and bank-account verification used in KMUT payment workflows.",
+      "Direct Benefit Transfer (DBT) directs approved assistance to beneficiary bank accounts following prescribed verification and approvals.",
+      "An application, an approved beneficiary, a payment file and a successful bank credit are distinct stages.",
+      "Scheme expansion and payment conditions must be checked from the current order rather than treated as permanent numerical facts."
+    ],
+    "exam_focus": "KMUT is a family/women's income-support programme, distinct from Pudhumai Penn or Tamil Pudhalvan higher-education assistance.",
+    "worked_example": "The administrative path is: application → eligibility verification → approval → bank-account validation → benefit disbursement → status/grievance follow-up.",
+    "quick_check": {
+      "question": "What does the e-Sevai KMU-103 entry permit the citizen to check?",
+      "answer": "The status of a Kalaignar Magalir Urimai Thittam application."
+    },
+    "additional_sources": [
+      "https://tnega.tn.gov.in/assets/pdf/it_e_pn_2025_26.pdf"
     ]
   },
   {
@@ -1461,8 +1631,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Chief Minister's Breakfast Scheme started in September 2022 to serve breakfast to government primary-school children.",
       "Its objective is to support children's nutrition and school participation.",
-      "Coverage has been expanded over time; use the applicable dated government order to determine which institutions are currently included."
-    ]
+      "Coverage has been expanded over time; use the applicable dated government order to determine which institutions are currently included.",
+      "The Chief Minister's Breakfast Scheme is a school-nutrition intervention, not a college scholarship or a direct household cash transfer.",
+      "Breakfast provision is intended to support school attendance, concentration and access to food during the school day.",
+      "The scheme was introduced in September 2022 and expanded in later phases; historical descriptions may cover only an earlier set of schools.",
+      "Actual delivery involves procuring or preparing meals, quality and hygiene supervision, and monitoring at the institution or local level.",
+      "For exam questions, distinguish nutritional outcomes from spending figures: budget allocation does not itself measure meals served or health effects."
+    ],
+    "exam_focus": "Breakfast Scheme: school meal in kind. KMUT: eligible household cash benefit. Pudhumai Penn: eligible higher-education cash assistance.",
+    "worked_example": "A primary-school pupil receiving breakfast before classes receives a nutrition service; a college student receiving Pudhumai Penn receives financial assistance.",
+    "quick_check": {
+      "question": "What is the main policy instrument of the Chief Minister's Breakfast Scheme?",
+      "answer": "Providing breakfast meals to eligible schoolchildren."
+    }
   },
   {
     "id": "tn-shg-mahalir",
@@ -1475,8 +1656,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Tamil Nadu Corporation for Development of Women (TNCDW) was established in 1983.",
       "The corporation coordinates support for Self-Help Groups and women's socio-economic empowerment.",
-      "Mahalir Thittam and associated SHG activities connect savings, credit linkages, training and microenterprise development."
-    ]
+      "Mahalir Thittam and associated SHG activities connect savings, credit linkages, training and microenterprise development.",
+      "Tamil Nadu Corporation for Development of Women (TNCDW) was established in 1983 and later moved under the Rural Development and Panchayat Raj portfolio.",
+      "Self-Help Groups typically organise regular savings, group decisions and internal lending before broader bank linkages and livelihood activities.",
+      "Mahalir Thittam historically expanded women's SHG organisation and capacity building in Tamil Nadu.",
+      "SHG federations and financial linkages can improve access to credit, marketing and livelihood support.",
+      "Historical policy notes give dated membership or group-size targets; these should not be assumed to describe current scheme rules."
+    ],
+    "exam_focus": "A Self-Help Group is a membership-based collective for savings and empowerment, not an individual government pension.",
+    "worked_example": "Women pooling small regular savings and lending within their group illustrate SHG financial inclusion; a bank loan later obtained by the SHG is a separate formal-credit step.",
+    "quick_check": {
+      "question": "Which corporation is associated with implementing Mahalir Thittam and SHG development?",
+      "answer": "Tamil Nadu Corporation for Development of Women (TNCDW)."
+    }
   },
   {
     "id": "tn-rural-welfare",
@@ -1489,8 +1681,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The department implements central, state and externally supported rural development programmes.",
       "Its remit includes poverty reduction, employment, sanitation, capacity building and women's economic empowerment.",
-      "Administrative delivery through departments must be distinguished from elected Panchayat Raj institutions."
-    ]
+      "Administrative delivery through departments must be distinguished from elected Panchayat Raj institutions.",
+      "The Rural Development and Panchayat Raj Department supports programmes across poverty reduction, housing, rural assets, sanitation and livelihoods.",
+      "An administrative department or directorate executes policy, while elected Panchayat bodies represent local residents and discharge statutory functions.",
+      "MGNREGS provides a statutory framework for rural wage employment; the rules and permitted works derive from the central legislation and state implementation guidance.",
+      "Beneficiary targeting, identification, sanction, work completion, measurement and audit are separate administrative stages.",
+      "Social audits and Gram Sabha participation help local people review the implementation of appropriate rural programmes."
+    ],
+    "exam_focus": "Differentiate the three tiers of elected Panchayats, the BDO's field administration and district-level scheme coordination.",
+    "worked_example": "In a rural infrastructure programme, a local body may identify a need, departmental staff may monitor execution, and the programme accounts must still show sanctioned and completed works.",
+    "quick_check": {
+      "question": "Is the BDO an elected Village Panchayat president?",
+      "answer": "No. The Block Development Officer is an administrative official."
+    }
   },
   {
     "id": "tn-social-pensions",
@@ -1503,8 +1706,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Tamil Nadu's social-security pensions cover categories such as older people, eligible widows, people with disabilities and specified vulnerable groups.",
       "Different pension categories may use state funding, national funding or a combination.",
-      "Amounts, age criteria and asset thresholds can change; check the currently operative official scheme rules."
-    ]
+      "Amounts, age criteria and asset thresholds can change; check the currently operative official scheme rules.",
+      "Social-security pension categories address different circumstances, including old age, widowhood and qualifying disability or vulnerability.",
+      "Some schemes operate with a central-government contribution and a state-government component; funding structure must be verified for the named category.",
+      "An application commonly passes through prescribed eligibility and identity checks before administrative sanction and payment.",
+      "A pension is a recurrent social-protection transfer; it is not the same as compensation for loss of property or a student education incentive.",
+      "Exam preparation should distinguish scheme objective, nodal department, eligibility and type of assistance rather than memorising potentially outdated payment amounts."
+    ],
+    "exam_focus": "State social-security pensions are not a single eligibility-free pension for every resident; multiple categories have distinct conditions.",
+    "worked_example": "A widow pension and an old-age pension may share a payment channel but have separate qualifying requirements.",
+    "quick_check": {
+      "question": "Does inclusion in a list of pension categories automatically establish eligibility?",
+      "answer": "No. Eligibility is decided under the applicable scheme-specific rules."
+    }
   },
   {
     "id": "tn-women-commission",

@@ -94,7 +94,7 @@ for(const id of nextIds){
   assert.match(note.source_url,/^https:\/\/\S+/,id+': no government link');
   const host=new URL(note.source_url).hostname;
   assert.ok(host.endsWith('.tn.gov.in')||host.endsWith('.nic.in')||host==='tn.nic.in',id+': not Tamil Nadu official source: '+host);
-  assert.equal(note.points.length,3,id+': needs three useful facts');
+  assert.ok(note.points.length>=3,id+': needs at least three useful facts');
   assert.ok(taggedIds.has(id),id+': not linked from the Group IIA syllabus');
 }
 assert.match(notePage,/id="noteCategory"/,'Filter textbook vs government notes');
@@ -102,6 +102,34 @@ assert.match(notePage,/value="government"/,'Government notes filter choice');
 assert.match(notePage,/value="textbook"/,'School-book notes filter choice');
 assert.match(notePage,/setOptions\(/,'Source filter updates the note selector');
 assert.match(notePage,/inCategory\(n\)/,'Search respects selected source category');
+
+const depthIds=['tn-budget-process','tn-budget-deficits','tn-gsdp','tn-gva-sectors','tn-state-income-estimates','tn-finance-consultation','tn-agri-statistics','tn-industry-sipcot','tn-msme-dic','tn-naan-mudhalvan','tn-pudhumai-penn','tn-tamil-pudhalvan','tn-magalir-urimai','tn-breakfast-scheme','tn-shg-mahalir','tn-rural-welfare','tn-social-pensions','tn-secretariat','tn-business-rules'];
+assert.equal(depthIds.length,19,'Focused syllabus revision batch');
+for(const id of depthIds){
+  const note=notes.find(n=>n.id===id);
+  assert.ok(note,'Missing expanded note: '+id);
+  assert.equal(note.source_kind,'government',id+': expansion must remain an official-reference note');
+  assert.ok(note.points.length>=7,id+': expanded note must have substantive coverage');
+  assert.ok(typeof note.exam_focus==='string'&&note.exam_focus.length>45,id+': missing exam distinction');
+  assert.ok(typeof note.worked_example==='string'&&note.worked_example.length>45,id+': missing original illustration');
+  assert.ok(note.quick_check?.question?.length>18&&note.quick_check?.answer?.length>5,id+': missing revision question/answer');
+  assert.ok(taggedIds.has(id),id+': deep revision must remain linked from TNPSC syllabus');
+}
+assert.match(notePage,/class="exam-focus"/,'Highlight exam distinctions');
+assert.match(notePage,/class="worked-example"/,'Render practical worked examples');
+assert.match(notePage,/<details class="quick-check">/,'Quick-check answer should be revealable');
+assert.match(notePage,/class="additional-sources"/,'Render independently verified additional references');
+const gdp=notes.find(n=>n.id==='tn-gsdp');
+assert.ok(gdp.additional_sources.some(url=>url.includes('mospi.gov.in')),'2026 MoSPI national-base-year source missing');
+assert.match(gdp.exam_focus,/GSDP versus GVA/,'Differentiate state product and value-added');
+assert.match(gdp.points.join(' '),/2011–12-base series/,'Label historical DES base-year series');
+const fisc=notes.find(n=>n.id==='tn-budget-deficits');
+assert.match(fisc.points.join(' '),/fiscal deficit.*non-debt capital receipts/is,'Fiscal deficit must exclude borrowings');
+assert.match(fisc.quick_check.answer,/35 crore/,'Numerical primary deficit example must be internally consistent');
+const pPenn=notes.find(n=>n.id==='tn-pudhumai-penn');
+const pBoy=notes.find(n=>n.id==='tn-tamil-pudhalvan');
+assert.match(pPenn.exam_focus,/girl/i,'Pudhumai Penn intended beneficiary');
+assert.match(pBoy.exam_focus,/boy/i,'Tamil Pudhalvan intended beneficiary');
 
 assert.match(notePage,/id="noteSearch"/,'Notes have topic search');
 assert.match(notePage,/id="noteMatches"/,'Topic search has accessible results');
