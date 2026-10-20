@@ -1,4 +1,4 @@
-/* TNPSC Group IIA revision notes, with short summaries and selectively expanded exam-preparation depth. */
+/* TNPSC Group IIA revision notes: textbook references, official government references and bilingual study expansions. */
 window.ClearExamsTNSchoolNotes=[
   {
     "id": "measurements",
@@ -69,8 +69,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Major Harappan settlements show planned streets, brick structures and sophisticated drainage.",
       "The Great Bath is associated with Mohenjo-daro; Lothal is known for maritime trade.",
-      "The Indus script has not been conclusively deciphered; avoid treating speculative readings as established facts."
-    ]
+      "The Indus script has not been conclusively deciphered; avoid treating speculative readings as established facts.",
+      "The mature Harappan phase is commonly dated to about 2600–1900 BCE.",
+      "Harappa lies in present-day Pakistan near the Ravi river; Mohenjo-daro is associated with the Indus river system.",
+      "Standardised weights, seals and crafts point to organised production and exchange.",
+      "The Harappan script remains undeciphered, so the precise language or meanings of inscriptions cannot be asserted as settled."
+    ],
+    "points_ta": [
+      "முக்கிய ஹரப்பா குடியிருப்புகளில் திட்டமிட்ட வீதிகள், செங்கல் கட்டிடங்கள், மேம்பட்ட கழிவுநீர் வடிகால் அமைப்புகள் காணப்படுகின்றன.",
+      "பெருங்குளியல் குளம் மொகஞ்சதாரோவுடன் தொடர்புடையது; லோத்தல் கடல்சார் வணிகத்திற்குப் பெயர் பெற்றது.",
+      "சிந்துவெளி எழுத்துமுறை இன்னும் உறுதியாகப் பொருள் கண்டறியப்படவில்லை; ஊக அடிப்படையிலான வாசிப்புகளை நிறுவப்பட்ட உண்மைகளாகக் கருதக்கூடாது.",
+      "முதிர்ந்த ஹரப்பா நாகரிகக் காலம் பொதுவாக கி.மு. 2600 முதல் 1900 வரை எனக் கணிக்கப்படுகிறது.",
+      "ஹரப்பா இன்றைய பாகிஸ்தானில் ராவி ஆற்றருகே அமைந்துள்ளது; மொகஞ்சதாரோ சிந்து ஆற்று அமைப்புடன் தொடர்புடையது.",
+      "ஒரே மாதிரியான எடைக்கற்கள், முத்திரைகள், கைவினைப் பொருட்கள் ஒழுங்கமைந்த உற்பத்தி மற்றும் பரிமாற்றத்தைக் காட்டுகின்றன.",
+      "ஹரப்பா எழுத்து இன்னும் வாசித்தறியப்படவில்லை; எனவே கல்வெட்டுகளின் மொழியையும் முழுப் பொருளையும் உறுதியானதாகக் கூற முடியாது."
+    ],
+    "exam_focus": "Mohenjo-daro—Great Bath; Lothal—coastal trade; Harappan script—undeciphered.",
+    "exam_focus_ta": "மொகஞ்சதாரோ—பெருங்குளியல் குளம்; லோத்தல்—கடலோர வணிகம்; ஹரப்பா எழுத்து—இன்னும் வாசித்தறியப்படாதது.",
+    "worked_example": "A multiple-choice claim that the Harappan script is conclusively deciphered is incorrect.",
+    "worked_example_ta": "ஹரப்பா எழுத்துமுறை முழுமையாக வாசிக்கப்பட்டுவிட்டது என்ற பல்தேர்வு கூற்று தவறானது.",
+    "quick_check": {
+      "question": "Where is the Great Bath of the Indus Civilisation located?",
+      "answer": "Mohenjo-daro.",
+      "question_ta": "சிந்துவெளி நாகரிகத்தின் பெருங்குளியல் குளம் அமைந்த இடம் எது?",
+      "answer_ta": "மொகஞ்சதாரோ."
+    }
   },
   {
     "id": "ancient-tamil-towns",
@@ -93,8 +116,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Rajaraja I consolidated Chola power and patronised the Brihadisvara Temple at Thanjavur.",
       "Rajendra I expanded Chola influence and is associated with Gangaikonda Cholapuram.",
-      "Medieval Tamil dynasties are studied through inscriptions, temples, trade and administrative records."
-    ]
+      "Medieval Tamil dynasties are studied through inscriptions, temples, trade and administrative records.",
+      "Rajaraja I commissioned the great Brihadisvara Temple at Thanjavur in the early eleventh century.",
+      "Rajendra I established Gangaikonda Cholapuram as an important imperial capital.",
+      "Chola inscriptions document royal orders, land grants, temple resources and local institutions.",
+      "The medieval Tamil region also witnessed Pandya power, overseas commerce and religious-cultural patronage."
+    ],
+    "points_ta": [
+      "முதலாம் இராஜராஜ சோழன் சோழர் ஆட்சியை வலுப்படுத்தித் தஞ்சாவூர் பெருவுடையார் கோயிலுக்கு ஆதரவளித்தார்.",
+      "முதலாம் இராஜேந்திர சோழன் சோழர்களின் செல்வாக்கை விரிவுபடுத்தினார்; கங்கைகொண்ட சோழபுரம் அவருடன் தொடர்புடையது.",
+      "இடைக்காலத் தமிழக அரசவம்சங்களை அறிய கல்வெட்டுகள், கோயில்கள், வணிகம், நிர்வாகப் பதிவுகள் ஆகியவை முக்கிய ஆதாரங்கள்.",
+      "முதலாம் இராஜராஜன் பதினொன்றாம் நூற்றாண்டின் தொடக்கத்தில் தஞ்சாவூர்ப் பெருவுடையார் கோயிலைக் கட்டுவித்தார்.",
+      "முதலாம் இராஜேந்திரன் கங்கைகொண்ட சோழபுரத்தை முக்கியப் பேரரசுத் தலைநகரமாக நிறுவினார்.",
+      "சோழர் கல்வெட்டுகள் அரசாணைகள், நிலக்கொடைகள், கோயில் வளங்கள், உள்ளாட்சி அமைப்புகள் குறித்த தகவல்களைத் தருகின்றன.",
+      "இடைக்காலத் தமிழகத்தில் பாண்டியர் ஆட்சி, கடல்கடந்த வணிகம், சமய மற்றும் பண்பாட்டு ஆதரவு ஆகியவையும் இடம்பெற்றன."
+    ],
+    "exam_focus": "Rajaraja I—Thanjavur Brihadisvara; Rajendra I—Gangaikonda Cholapuram; distinguish ruler and site.",
+    "exam_focus_ta": "முதலாம் இராஜராஜன்—தஞ்சைப் பெருவுடையார்; முதலாம் இராஜேந்திரன்—கங்கைகொண்ட சோழபுரம். அரசரையும் இடத்தையும் சரியாக இணைக்கவும்.",
+    "worked_example": "If the question asks who founded Gangaikonda Cholapuram, identify Rajendra I rather than Rajaraja I.",
+    "worked_example_ta": "கங்கைகொண்ட சோழபுரத்தை நிறுவியவர் யார் என்ற வினாவுக்கு முதலாம் இராஜேந்திரன்; முதலாம் இராஜராஜன் அல்ல.",
+    "quick_check": {
+      "question": "Which Chola ruler is associated with the Brihadisvara Temple at Thanjavur?",
+      "answer": "Rajaraja I.",
+      "question_ta": "தஞ்சாவூர் பெருவுடையார் கோயிலுடன் தொடர்புடைய சோழ மன்னர் யார்?",
+      "answer_ta": "முதலாம் இராஜராஜ சோழன்."
+    }
   },
   {
     "id": "equality",
@@ -105,8 +151,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Equality rejects unfair discrimination and seeks fair opportunities; it does not require identical abilities or outcomes.",
       "Articles 14–18 of the Constitution of India contain the Right to Equality provisions.",
-      "Article 17 abolishes untouchability and forbids its practice in any form."
-    ]
+      "Article 17 abolishes untouchability and forbids its practice in any form.",
+      "Article 14 guarantees equality before the law and equal protection of the laws.",
+      "Article 15 prohibits specified discrimination by the State on grounds including religion, race, caste, sex and place of birth, subject to constitutional exceptions.",
+      "Article 16 concerns equality of opportunity in public employment.",
+      "Article 18 abolishes titles, with specified exceptions for military and academic distinctions."
+    ],
+    "points_ta": [
+      "சமத்துவம் நியாயமற்ற பாகுபாட்டை எதிர்த்து அனைவருக்கும் நியாயமான வாய்ப்புகளை வலியுறுத்துகிறது; எல்லோரின் திறன்களும் முடிவுகளும் ஒரே மாதிரியாக இருக்க வேண்டும் என்பதல்ல.",
+      "இந்திய அரசியலமைப்பின் 14 முதல் 18 வரையிலான உறுப்புரைகள் சமத்துவ உரிமையைப் பற்றியவை.",
+      "உறுப்புரை 17 தீண்டாமையை ஒழித்து, எந்த வடிவிலும் அதைப் பின்பற்றுவதைத் தடை செய்கிறது.",
+      "உறுப்புரை 14 சட்டத்தின் முன் சமத்துவத்தையும் சட்டங்களின் சமமான பாதுகாப்பையும் உறுதி செய்கிறது.",
+      "உறுப்புரை 15 மதம், இனம், சாதி, பாலினம், பிறந்த இடம் ஆகிய அடிப்படைகளில் அரசின் குறிப்பிட்ட பாகுபாட்டைத் தடை செய்கிறது; அரசியலமைப்புச் சிறப்பு விதிகள் பொருந்தும்.",
+      "உறுப்புரை 16 அரசு வேலைவாய்ப்பில் சம வாய்ப்பைப் பற்றியது.",
+      "உறுப்புரை 18 பட்டங்களை ஒழிக்கிறது; இராணுவ மற்றும் கல்விசார் சிறப்புகளுக்கு குறிப்பிட்ட விதிவிலக்குகள் உள்ளன."
+    ],
+    "exam_focus": "Equality articles: 14—law; 15—prohibited discrimination; 16—public employment; 17—untouchability; 18—titles.",
+    "exam_focus_ta": "சமத்துவ உறுப்புரைகள்: 14—சட்டம்; 15—பாகுபாட்டுத் தடை; 16—அரசு வேலைவாய்ப்பு; 17—தீண்டாமை ஒழிப்பு; 18—பட்டங்கள்.",
+    "worked_example": "A question about discrimination in government recruitment primarily tests Article 16, whereas a question about untouchability tests Article 17.",
+    "worked_example_ta": "அரசுப் பணியில் பாகுபாடு பற்றிய வினாவுக்கு முக்கியமாக உறுப்புரை 16; தீண்டாமை பற்றிய வினாவுக்கு உறுப்புரை 17 பொருந்தும்.",
+    "quick_check": {
+      "question": "Which Article abolishes untouchability?",
+      "answer": "Article 17.",
+      "question_ta": "தீண்டாமையை ஒழிக்கும் அரசியலமைப்பு உறுப்புரை எது?",
+      "answer_ta": "உறுப்புரை 17."
+    }
   },
   {
     "id": "political-parties",
@@ -117,8 +186,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Political parties bring together people with shared political objectives and present candidates at elections.",
       "In representative democracy, the ruling party or coalition forms the government while opposition parties scrutinise its actions.",
-      "Party symbols help voters identify candidates; recognition of parties is governed by Election Commission rules."
-    ]
+      "Party symbols help voters identify candidates; recognition of parties is governed by Election Commission rules.",
+      "In India, the Election Commission registers political parties under Section 29A of the Representation of the People Act, 1951.",
+      "Registration and recognition are different: national or state party recognition depends on prescribed electoral performance criteria.",
+      "The Election Symbols (Reservation and Allotment) Order, 1968 governs reservation and allotment of election symbols.",
+      "A coalition government is formed when multiple parties agree to support a government."
+    ],
+    "points_ta": [
+      "அரசியல் கட்சிகள் ஒரே மாதிரியான அரசியல் நோக்கங்களைக் கொண்டவர்களை ஒருங்கிணைத்து தேர்தலில் வேட்பாளர்களை நிறுத்துகின்றன.",
+      "பிரதிநிதித்துவ மக்களாட்சியில் ஆளும் கட்சி அல்லது கூட்டணி அரசை அமைக்கிறது; எதிர்க்கட்சிகள் அதன் செயல்பாட்டைக் கண்காணிக்கின்றன.",
+      "கட்சிச் சின்னங்கள் வாக்காளர்கள் வேட்பாளர்களை அடையாளம் காண உதவுகின்றன; கட்சி அங்கீகாரம் தேர்தல் ஆணைய விதிகளால் நிர்ணயிக்கப்படுகிறது.",
+      "இந்தியாவில் மக்கள் பிரதிநிதித்துவச் சட்டம், 1951-இன் பிரிவு 29A-ன்படி அரசியல் கட்சிகளைத் தேர்தல் ஆணையம் பதிவு செய்கிறது.",
+      "கட்சிப் பதிவு மற்றும் அங்கீகாரம் வெவ்வேறு; தேசிய அல்லது மாநிலக் கட்சி அங்கீகாரம் நிர்ணயிக்கப்பட்ட தேர்தல் செயல்திறன் அளவுகோல்களைப் பொறுத்தது.",
+      "தேர்தல் சின்னங்கள் (ஒதுக்கீடு மற்றும் வழங்கல்) ஆணை, 1968 தேர்தல் சின்னங்களை ஒதுக்குவதையும் வழங்குவதையும் ஒழுங்குபடுத்துகிறது.",
+      "பல கட்சிகள் இணைந்து ஒரு அரசை ஆதரிக்க ஒப்புக்கொள்ளும்போது கூட்டணி அரசு உருவாகிறது."
+    ],
+    "exam_focus": "Do not confuse party registration, party recognition, symbol allotment and government formation.",
+    "exam_focus_ta": "கட்சிப் பதிவு, கட்சி அங்கீகாரம், சின்ன ஒதுக்கீடு, அரசு அமைத்தல் ஆகிய நான்கையும் வேறுபடுத்திக் கற்கவும்.",
+    "worked_example": "A newly registered party does not automatically become a recognised national party.",
+    "worked_example_ta": "புதிதாகப் பதிவுசெய்யப்பட்ட கட்சி தானாகவே அங்கீகரிக்கப்பட்ட தேசியக் கட்சியாகிவிடாது.",
+    "quick_check": {
+      "question": "Does registration alone make a party a recognised national party?",
+      "answer": "No. National-party recognition follows specified Election Commission criteria.",
+      "question_ta": "கட்சிப் பதிவு மட்டும் ஒரு கட்சியை அங்கீகரிக்கப்பட்ட தேசியக் கட்சியாக மாற்றுமா?",
+      "answer_ta": "இல்லை. தேர்தல் ஆணையத்தின் குறிப்பிட்ட அளவுகோல்கள் நிறைவேற்றப்பட வேண்டும்."
+    }
   },
   {
     "id": "production",
@@ -177,8 +269,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Indian National Congress was founded in 1885 as a forum for political discussion and representation.",
       "Early nationalists used petitions, resolutions and public meetings to press for administrative reforms.",
-      "Economic criticism of colonial rule included the drain of wealth and the impact of British policies on Indian industries."
-    ]
+      "Economic criticism of colonial rule included the drain of wealth and the impact of British policies on Indian industries.",
+      "The Indian National Congress held its first session in Bombay in December 1885, presided over by W. C. Bonnerjee.",
+      "Dadabhai Naoroji is especially associated with the economic 'drain of wealth' critique of colonial rule.",
+      "The early moderate nationalists pressed for representative institutions, civil liberties and Indian participation in services.",
+      "Nationalism developed through political organisations, newspapers, public meetings and economic criticism."
+    ],
+    "points_ta": [
+      "இந்திய தேசிய காங்கிரஸ் 1885ஆம் ஆண்டு அரசியல் விவாதத்திற்கும் பிரதிநிதித்துவக் கோரிக்கைகளுக்கும் ஒரு மேடையாகத் தொடங்கப்பட்டது.",
+      "தொடக்ககால தேசியவாதிகள் மனுக்கள், தீர்மானங்கள், பொதுக்கூட்டங்கள் மூலம் நிர்வாகச் சீர்திருத்தங்களைக் கோரினர்.",
+      "காலனிய ஆட்சியின் செல்வச் சுரண்டலும் இந்தியத் தொழில்களுக்கு பிரிட்டிஷ் கொள்கைகளால் ஏற்பட்ட பாதிப்புகளும் பொருளாதார விமர்சனங்களில் இடம்பெற்றன.",
+      "இந்திய தேசிய காங்கிரஸின் முதல் மாநாடு 1885 டிசம்பரில் பம்பாயில் நடைபெற்றது; அதன் தலைவராக டபிள்யூ. சி. பானர்ஜி இருந்தார்.",
+      "காலனிய ஆட்சியின் 'செல்வச் சுரண்டல்' என்ற பொருளாதார விமர்சனத்துடன் தாதாபாய் நௌரோஜி குறிப்பிடத்தக்க வகையில் தொடர்புடையவர்.",
+      "ஆரம்பகால மிதவாத தேசியவாதிகள் பிரதிநிதித்துவ அமைப்புகள், குடிமைச் சுதந்திரங்கள், அரசுப் பணிகளில் இந்தியர்களுக்கான பங்கு ஆகியவற்றைக் கோரினர்.",
+      "அரசியல் அமைப்புகள், செய்தித்தாள்கள், பொதுக்கூட்டங்கள் மற்றும் பொருளாதார விமர்சனங்கள் வழியாக தேசிய உணர்வு வளர்ந்தது."
+    ],
+    "exam_focus": "1885—first INC session and W. C. Bonnerjee; Dadabhai Naoroji—drain theory. Do not confuse first president with later INC leaders.",
+    "exam_focus_ta": "1885—காங்கிரஸ் முதல் மாநாடு, டபிள்யூ. சி. பானர்ஜி; தாதாபாய் நௌரோஜி—செல்வச் சுரண்டல் கோட்பாடு. முதல் தலைவரையும் பிற்காலத் தலைவர்களையும் குழப்ப வேண்டாம்.",
+    "worked_example": "A question about the drain theory concerns colonial economic exploitation, while a question about INC's foundation concerns the organisation of political representation.",
+    "worked_example_ta": "செல்வச் சுரண்டல் கோட்பாடு பற்றிய வினா காலனியப் பொருளாதாரச் சுரண்டலைக் குறிக்கும்; காங்கிரஸ் தோற்றம் பற்றிய வினா அரசியல் பிரதிநிதித்துவ அமைப்பைக் குறிக்கும்.",
+    "quick_check": {
+      "question": "Who presided over the first Indian National Congress session?",
+      "answer": "W. C. Bonnerjee (1885, Bombay).",
+      "question_ta": "இந்திய தேசிய காங்கிரஸின் முதல் மாநாட்டிற்குத் தலைமை வகித்தவர் யார்?",
+      "answer_ta": "டபிள்யூ. சி. பானர்ஜி (1885, பம்பாய்)."
+    }
   },
   {
     "id": "swadeshi",
@@ -189,8 +304,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The partition of Bengal in 1905 gave powerful momentum to the Swadeshi and boycott movements.",
       "Swadeshi promoted the use of Indian-made goods; boycott challenged imported products and colonial institutions.",
-      "Bal Gangadhar Tilak, Bipin Chandra Pal and Lala Lajpat Rai were prominent assertive nationalist leaders."
-    ]
+      "Bal Gangadhar Tilak, Bipin Chandra Pal and Lala Lajpat Rai were prominent assertive nationalist leaders.",
+      "Lord Curzon's partition of Bengal took effect in October 1905 and stimulated public protests.",
+      "Swadeshi and boycott were connected but distinct methods: promote domestic production, and refuse selected foreign goods.",
+      "The Surat split of the Indian National Congress occurred in 1907 amid differences between moderates and extremists.",
+      "The 1905 partition of Bengal was annulled in 1911; this did not end the wider Indian nationalist movement."
+    ],
+    "points_ta": [
+      "1905ஆம் ஆண்டின் வங்காளப் பிரிவினை சுதேசி மற்றும் புறக்கணிப்பு இயக்கங்களுக்கு வலுவான தூண்டுதலாக அமைந்தது.",
+      "சுதேசி இயக்கம் உள்நாட்டுப் பொருட்களைப் பயன்படுத்த வலியுறுத்தியது; புறக்கணிப்பு இயக்கம் இறக்குமதிப் பொருட்களையும் காலனிய நிறுவனங்களையும் எதிர்த்தது.",
+      "பால கங்காதர திலகர், பிபின் சந்திர பால், லாலா லஜபத் ராய் ஆகியோர் தீவிர தேசியவாதத் தலைவர்களாக விளங்கினர்.",
+      "கர்சன் பிரபுவின் வங்காளப் பிரிவினை 1905 அக்டோபரில் அமலுக்கு வந்து மக்களின் எதிர்ப்புப் போராட்டங்களைத் தூண்டியது.",
+      "சுதேசியும் புறக்கணிப்பும் தொடர்புடையன; ஆனால் வேறுபட்ட முறைகள்: உள்நாட்டு உற்பத்தியை ஊக்குவித்தல், வெளிநாட்டுப் பொருட்களில் குறிப்பிட்டவற்றைப் புறக்கணித்தல்.",
+      "மிதவாதிகளுக்கும் தீவிரவாதிகளுக்கும் இடையிலான கருத்து வேறுபாடுகளின் பின்னணியில் 1907ஆம் ஆண்டு காங்கிரஸின் சூரத் பிளவு ஏற்பட்டது.",
+      "1905ஆம் ஆண்டின் வங்காளப் பிரிவினை 1911ஆம் ஆண்டு ரத்து செய்யப்பட்டது; அதனால் இந்திய தேசிய இயக்கம் முழுமையாக முடிவடையவில்லை."
+    ],
+    "exam_focus": "1905 Bengal partition; 1907 Surat split; 1911 annulment of Bengal partition. Learn the three events separately.",
+    "exam_focus_ta": "1905 வங்காளப் பிரிவினை; 1907 சூரத் பிளவு; 1911 வங்காளப் பிரிவினை ரத்து—மூன்று நிகழ்வுகளையும் தனித்தனியாகக் கற்கவும்.",
+    "worked_example": "Buying Indian cloth supports Swadeshi; refusing imported cloth is boycott. An action can express both ideas.",
+    "worked_example_ta": "இந்தியத் துணி வாங்குவது சுதேசியை ஆதரிக்கிறது; இறக்குமதித் துணியை வாங்க மறுப்பது புறக்கணிப்பாகும். ஒரு செயல் இரு நோக்கங்களையும் பிரதிபலிக்கலாம்.",
+    "quick_check": {
+      "question": "Which 1905 event became a major trigger for the Swadeshi Movement?",
+      "answer": "The partition of Bengal.",
+      "question_ta": "1905ஆம் ஆண்டில் சுதேசி இயக்கத்திற்கு முக்கியத் தூண்டுதலான நிகழ்வு எது?",
+      "answer_ta": "வங்காளப் பிரிவினை."
+    }
   },
   {
     "id": "home-rule",
@@ -213,8 +351,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Gandhi led the Champaran satyagraha in 1917 and the Kheda struggle in 1918.",
       "The Non-Cooperation Movement began in 1920 and was withdrawn after the Chauri Chaura incident in 1922.",
-      "The Salt March of 1930 initiated the Civil Disobedience Movement, challenging the colonial salt laws."
-    ]
+      "The Salt March of 1930 initiated the Civil Disobedience Movement, challenging the colonial salt laws.",
+      "Champaran (1917) in Bihar concerned indigo cultivators and became an early major Gandhian satyagraha in India.",
+      "The Kheda struggle of 1918 in Gujarat concerned relief from land revenue after agricultural distress.",
+      "The 1919 Rowlatt Act and Jallianwala Bagh massacre were major developments in the escalation of anti-colonial agitation.",
+      "The Salt March began at Sabarmati on 12 March 1930 and culminated in Gandhi's breaking the salt law at Dandi in April."
+    ],
+    "points_ta": [
+      "1917ஆம் ஆண்டு காந்தியடிகள் சம்பாரண் சத்தியாகிரகத்தையும் 1918ஆம் ஆண்டு கேடா போராட்டத்தையும் முன்னின்று நடத்தினார்.",
+      "ஒத்துழையாமை இயக்கம் 1920ஆம் ஆண்டு தொடங்கப்பட்டது; 1922ஆம் ஆண்டு சௌரி சௌரா நிகழ்வுக்குப் பிறகு அது திரும்பப் பெறப்பட்டது.",
+      "1930ஆம் ஆண்டின் உப்புச் சத்தியாகிரகப் பயணம் காலனிய உப்புச் சட்டங்களை எதிர்த்து சட்டமறுப்பு இயக்கத்தைத் தொடங்கி வைத்தது.",
+      "பீகாரின் சம்பாரண் போராட்டம் (1917) அவுரிச் சாகுபடி விவசாயிகளைக் குறித்தது; இந்தியாவில் காந்தியடிகளின் தொடக்ககால முக்கிய சத்தியாகிரகமாக அமைந்தது.",
+      "குஜராத்தின் கேடா போராட்டம் (1918) வேளாண் பாதிப்பைத் தொடர்ந்து நிலவரித் தளர்வு கோரிய போராட்டமாகும்.",
+      "1919ஆம் ஆண்டின் ரௌலட் சட்டமும் ஜாலியன்வாலா பாக் படுகொலையும் காலனிய எதிர்ப்புப் போராட்டம் தீவிரமடைய முக்கிய காரணங்களாயின.",
+      "உப்புச் சத்தியாகிரகப் பயணம் 1930 மார்ச் 12ஆம் தேதி சபர்மதியில் தொடங்கியது; ஏப்ரலில் தண்டியில் காந்தியடிகள் உப்புச் சட்டத்தை மீறினார்."
+    ],
+    "exam_focus": "Champaran 1917—indigo; Kheda 1918—land revenue; Non-Cooperation 1920–22; Dandi Salt March 1930.",
+    "exam_focus_ta": "சம்பாரண் 1917—அவுரி; கேடா 1918—நிலவரி; ஒத்துழையாமை 1920–22; தண்டி உப்புப் பயணம் 1930.",
+    "worked_example": "A demand for relief for indigo cultivators points to Champaran; a question about salt-tax defiance points to Dandi.",
+    "worked_example_ta": "அவுரி விவசாயிகளின் கோரிக்கை சம்பாரணைக் குறிக்கும்; உப்புவரிக்கு எதிரான சட்டமீறல் தண்டியைக் குறிக்கும்.",
+    "quick_check": {
+      "question": "Which event prompted Gandhi to withdraw the Non-Cooperation Movement in 1922?",
+      "answer": "The Chauri Chaura incident.",
+      "question_ta": "1922ஆம் ஆண்டு ஒத்துழையாமை இயக்கத்தை காந்தியடிகள் திரும்பப் பெறக் காரணமான நிகழ்வு எது?",
+      "answer_ta": "சௌரி சௌரா நிகழ்வு."
+    }
   },
   {
     "id": "anti-imperial",
@@ -309,8 +470,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Governor is the constitutional head of a state, while the Chief Minister heads the elected Council of Ministers.",
       "A state's Legislative Assembly makes laws on matters within its constitutional competence.",
-      "Ministers are collectively responsible to the Legislative Assembly."
-    ]
+      "Ministers are collectively responsible to the Legislative Assembly.",
+      "State government has an elected political executive and a permanent administrative machinery.",
+      "Article 163 provides for a Council of Ministers with the Chief Minister at its head to aid and advise the Governor, subject to constitutional exceptions.",
+      "Article 164 concerns the appointment of the Chief Minister and other ministers and collective responsibility.",
+      "The Secretariat develops and coordinates policy; departments and field offices help implement government decisions."
+    ],
+    "points_ta": [
+      "மாநிலத்தின் அரசியலமைப்புத் தலைவர் ஆளுநர்; தேர்ந்தெடுக்கப்பட்ட அமைச்சரவையின் தலைவர் முதலமைச்சர்.",
+      "மாநிலச் சட்டப்பேரவை, அரசியலமைப்பால் வழங்கப்பட்ட அதிகார வரம்பிற்குள் சட்டங்களை இயற்றுகிறது.",
+      "அமைச்சர்கள் அனைவரும் சட்டப்பேரவைக்கு கூட்டாகப் பொறுப்புடையவர்கள்.",
+      "மாநில அரசில் தேர்ந்தெடுக்கப்பட்ட அரசியல் நிர்வாகமும் நிரந்தர அரசுப் பணியாளர் நிர்வாக அமைப்பும் உள்ளன.",
+      "உறுப்புரை 163-ன்படி அரசியலமைப்புச் சிறப்பு விதிகளுக்கு உட்பட்டு ஆளுநருக்கு உதவியும் ஆலோசனையும் வழங்க முதலமைச்சர் தலைமையில் அமைச்சரவை உள்ளது.",
+      "உறுப்புரை 164 முதலமைச்சர் மற்றும் பிற அமைச்சர்களின் நியமனத்தையும் கூட்டுப் பொறுப்பையும் குறிக்கிறது.",
+      "தலைமைச் செயலகம் கொள்கை வடிவமைப்பு மற்றும் ஒருங்கிணைப்பை மேற்கொள்கிறது; துறைகளும் கள அலுவலகங்களும் அரசு முடிவுகளைச் செயல்படுத்த உதவுகின்றன."
+    ],
+    "exam_focus": "Governor ≠ Chief Minister; Secretariat ≠ Legislative Assembly; administrative and legislative functions are distinct.",
+    "exam_focus_ta": "ஆளுநர் ≠ முதலமைச்சர்; தலைமைச் செயலகம் ≠ சட்டப்பேரவை; நிர்வாகப் பணிகளும் சட்டமன்றப் பணிகளும் வெவ்வேறு.",
+    "worked_example": "A ministry proposes a welfare policy; the State Legislature exercises the applicable lawmaking and budgetary roles.",
+    "worked_example_ta": "ஓர் அமைச்சகம் நலத்திட்டக் கொள்கையை முன்மொழிகிறது; சட்டமன்றம் பொருந்தக்கூடிய சட்டமியற்றல் மற்றும் நிதி ஒப்புதல் பணிகளை மேற்கொள்கிறது.",
+    "quick_check": {
+      "question": "To which house is the State Council of Ministers collectively responsible?",
+      "answer": "The State Legislative Assembly (Article 164(2)).",
+      "question_ta": "மாநில அமைச்சரவை எந்த அவைக்குக் கூட்டாகப் பொறுப்புடையது?",
+      "answer_ta": "மாநிலச் சட்டப்பேரவை (உறுப்புரை 164(2))."
+    }
   },
   {
     "id": "media-democracy",
@@ -333,8 +517,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Sangam corpus is an important literary source for studying early Tamilagam.",
       "The five tinai landscapes link ecological settings with livelihoods, social life and poetic conventions.",
-      "Literary, archaeological and inscriptional evidence must be read together when reconstructing the Sangam period."
-    ]
+      "Literary, archaeological and inscriptional evidence must be read together when reconstructing the Sangam period.",
+      "Kurinji refers to mountain landscapes; Mullai to pastoral and forest settings.",
+      "Marutam concerns cultivated plains, while Neital is associated with the coast and maritime livelihoods.",
+      "Palai is associated with dry, arid conditions in Tamil literary landscape conventions.",
+      "Ports, trade, occupations and political life are studied from texts together with archaeological and inscriptional evidence."
+    ],
+    "points_ta": [
+      "சங்க இலக்கியங்கள் பண்டைய தமிழக வரலாற்றை அறிய முக்கியமான இலக்கிய ஆதாரங்களாக விளங்குகின்றன.",
+      "ஐந்திணை நிலங்கள் சுற்றுச்சூழல், வாழ்வாதாரம், சமூக வாழ்க்கை, பாடல் மரபுகள் ஆகியவற்றோடு தொடர்புடையவை.",
+      "சங்ககால வரலாற்றை மீட்டுருவாக்கும்போது இலக்கியம், தொல்லியல், கல்வெட்டு ஆதாரங்கள் ஆகியவற்றை ஒன்றிணைத்து ஆராய வேண்டும்.",
+      "குறிஞ்சி என்பது மலைநிலத்தையும் முல்லை என்பது காடு மற்றும் மேய்ச்சல் சார்ந்த நிலத்தையும் குறிக்கும்.",
+      "மருதம் வயல்வெளி மற்றும் வேளாண்மை சார்ந்த நிலம்; நெய்தல் கடற்கரை மற்றும் கடல்சார் வாழ்வாதாரங்களுடன் தொடர்புடையது.",
+      "பாலை என்பது தமிழிலக்கிய நிலப்பாகுபாட்டில் வறண்ட சூழலைக் குறிக்கிறது.",
+      "துறைமுகங்கள், வணிகம், தொழில்கள், அரசியல் வாழ்க்கை ஆகியவற்றை இலக்கியங்கள் மட்டுமின்றித் தொல்லியல் மற்றும் கல்வெட்டுச் சான்றுகளோடும் இணைத்து ஆராய்கிறோம்."
+    ],
+    "exam_focus": "Five tinai: Kurinji—mountain; Mullai—forest/pastoral; Marutam—agriculture; Neital—coast; Palai—arid.",
+    "exam_focus_ta": "ஐந்திணை: குறிஞ்சி—மலை; முல்லை—காடு/மேய்ச்சல்; மருதம்—வேளாண்மை; நெய்தல்—கடல்; பாலை—வறண்ட நிலம்.",
+    "worked_example": "A Sangam poem describing fishermen and coastal trade is usually associated with Neital.",
+    "worked_example_ta": "மீனவர்கள் மற்றும் கடலோர வணிகம் பற்றிய சங்கப் பாடல் பொதுவாக நெய்தல் திணையைச் சார்ந்தது.",
+    "quick_check": {
+      "question": "Which tinai is linked with agriculture and cultivated plains?",
+      "answer": "Marutam (மருதம்).",
+      "question_ta": "வேளாண்மை மற்றும் வயல்வெளிகளோடு தொடர்புடைய திணை எது?",
+      "answer_ta": "மருதம்."
+    }
   },
   {
     "id": "post-mauryan",
@@ -681,8 +888,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Governor is the constitutional head of a state and is appointed by the President of India.",
       "Executive action of a state is formally expressed in the name of its Governor, subject to constitutional provisions.",
-      "Ordinarily the Governor acts on the aid and advice of the Council of Ministers, except where the Constitution permits discretion."
-    ]
+      "Ordinarily the Governor acts on the aid and advice of the Council of Ministers, except where the Constitution permits discretion.",
+      "Article 155 governs the appointment of a Governor by the President.",
+      "Article 156 provides that the Governor holds office during the President's pleasure; the normal stated term is five years.",
+      "Article 163 describes the Council of Ministers' aid and advice to the Governor.",
+      "Article 200 deals with the Governor's action on Bills passed by the State Legislature; constitutional limitations and judicial rulings also matter."
+    ],
+    "points_ta": [
+      "மாநிலத்தின் அரசியலமைப்புத் தலைவரான ஆளுநரை இந்தியக் குடியரசுத் தலைவர் நியமிக்கிறார்.",
+      "மாநிலத்தின் ஆட்சிச் செயல்கள் அரசியலமைப்புச் சட்ட விதிகளுக்கு உட்பட்டு ஆளுநரின் பெயரில் வெளியிடப்படுகின்றன.",
+      "அரசியலமைப்பில் விருப்புரிமை வழங்கப்பட்ட நிலைகளைத் தவிர பொதுவாக அமைச்சரவையின் உதவி மற்றும் ஆலோசனைப்படி ஆளுநர் செயல்படுகிறார்.",
+      "உறுப்புரை 155-ன்படி குடியரசுத் தலைவர் ஆளுநரை நியமிக்கிறார்.",
+      "உறுப்புரை 156-ன்படி ஆளுநர் குடியரசுத் தலைவரின் விருப்பம் இருக்கும் வரை பதவியில் இருப்பார்; வழக்கமான குறிப்பிடப்பட்ட பதவிக்காலம் ஐந்து ஆண்டுகள்.",
+      "உறுப்புரை 163 ஆளுநருக்கான அமைச்சரவையின் உதவி மற்றும் ஆலோசனை பற்றி குறிப்பிடுகிறது.",
+      "உறுப்புரை 200 மாநிலச் சட்டமன்றம் நிறைவேற்றிய மசோதாக்கள் தொடர்பாக ஆளுநரின் நடவடிக்கையைப் பற்றியது; அரசியலமைப்பு வரம்புகளும் நீதிமன்றத் தீர்ப்புகளும் முக்கியம்."
+    ],
+    "exam_focus": "Remember Articles 155 (appointment), 156 (term), 163 (aid and advice), and 200 (Bills).",
+    "exam_focus_ta": "உறுப்புரைகள் 155 (நியமனம்), 156 (பதவிக்காலம்), 163 (உதவி மற்றும் ஆலோசனை), 200 (மசோதாக்கள்) ஆகியவற்றை நினைவில் கொள்ளவும்.",
+    "worked_example": "The Governor is appointed, not directly elected by the voters of the State.",
+    "worked_example_ta": "மாநில வாக்காளர்கள் ஆளுநரை நேரடியாகத் தேர்ந்தெடுப்பதில்லை; அவர் நியமிக்கப்படுகிறார்.",
+    "quick_check": {
+      "question": "Who appoints a State Governor?",
+      "answer": "The President of India, under Article 155.",
+      "question_ta": "மாநில ஆளுநரை நியமிப்பவர் யார்?",
+      "answer_ta": "இந்தியக் குடியரசுத் தலைவர்; உறுப்புரை 155."
+    }
   },
   {
     "id": "chief-minister",
@@ -693,8 +923,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Chief Minister leads the elected State government and heads the Council of Ministers.",
       "The Governor appoints the Chief Minister; other ministers are appointed on the Chief Minister's advice.",
-      "The Council of Ministers is collectively responsible to the State Legislative Assembly."
-    ]
+      "The Council of Ministers is collectively responsible to the State Legislative Assembly.",
+      "Article 164 provides for the Governor's appointment of the Chief Minister and appointment of other ministers on the Chief Minister's advice.",
+      "A minister who is not a member of the State Legislature for six consecutive months must cease to be a minister, subject to constitutional rules.",
+      "The Chief Minister coordinates departmental priorities and communicates Cabinet decisions.",
+      "Collective responsibility means the ministry must retain the confidence of the Legislative Assembly."
+    ],
+    "points_ta": [
+      "மாநிலத்தின் தேர்ந்தெடுக்கப்பட்ட அரசின் தலைமையிலும் அமைச்சரவையின் தலைமையிலும் முதலமைச்சர் உள்ளார்.",
+      "ஆளுநர் முதலமைச்சரை நியமிக்கிறார்; மற்ற அமைச்சர்கள் முதலமைச்சரின் ஆலோசனைப்படி நியமிக்கப்படுகிறார்கள்.",
+      "அமைச்சரவை மாநிலச் சட்டப்பேரவைக்குக் கூட்டாகப் பொறுப்புடையது.",
+      "உறுப்புரை 164-ன்படி ஆளுநர் முதலமைச்சரை நியமிக்கிறார்; அவருடைய ஆலோசனையின் பேரில் பிற அமைச்சர்களை நியமிக்கிறார்.",
+      "தொடர்ச்சியாக ஆறு மாதங்கள் மாநிலச் சட்டமன்ற உறுப்பினராக இல்லாத அமைச்சர் அரசியலமைப்புச் சட்ட விதிகளின்படி பதவியை விட்டு விலக வேண்டும்.",
+      "முதலமைச்சர் துறைகளின் முன்னுரிமைகளை ஒருங்கிணைத்து அமைச்சரவையின் முடிவுகளைத் தெரிவிக்கிறார்.",
+      "கூட்டுப் பொறுப்பு என்பதன் பொருள் அமைச்சரவை சட்டப்பேரவையின் நம்பிக்கையைத் தக்கவைத்திருக்க வேண்டும் என்பதாகும்."
+    ],
+    "exam_focus": "Appointment by Governor ≠ direct popular election as Chief Minister; majority support in the Assembly is crucial.",
+    "exam_focus_ta": "ஆளுநரின் நியமனம் ≠ முதலமைச்சர் பதவிக்கான நேரடி மக்கள் தேர்தல்; சட்டப்பேரவை பெரும்பான்மை ஆதரவு முக்கியம்.",
+    "worked_example": "MLAs are elected to constituencies; the Chief Minister is appointed through the constitutional process, normally based on majority support.",
+    "worked_example_ta": "தொகுதி வாக்காளர்கள் சட்டமன்ற உறுப்பினர்களைத் தேர்ந்தெடுக்கிறார்கள்; பொதுவாக பெரும்பான்மை ஆதரவின் அடிப்படையில் அரசியலமைப்பு முறையில் முதலமைச்சர் நியமிக்கப்படுகிறார்.",
+    "quick_check": {
+      "question": "Under which Article are the Chief Minister and other State Ministers appointed?",
+      "answer": "Article 164.",
+      "question_ta": "முதலமைச்சரும் மற்ற மாநில அமைச்சர்களும் எந்த உறுப்புரையின்படி நியமிக்கப்படுகிறார்கள்?",
+      "answer_ta": "உறுப்புரை 164."
+    }
   },
   {
     "id": "legislative-assembly",
@@ -705,8 +958,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Members of the Legislative Assembly are elected from territorial constituencies.",
       "The State Legislative Assembly debates bills, passes laws within the state legislative sphere and examines the government.",
-      "The Assembly scrutinises expenditure and can hold the Council of Ministers politically accountable."
-    ]
+      "The Assembly scrutinises expenditure and can hold the Council of Ministers politically accountable.",
+      "Article 170 concerns the composition of State Legislative Assemblies.",
+      "Article 172 provides a normal five-year Assembly duration unless sooner dissolved, subject to constitutional exceptions.",
+      "Members question ministers, discuss public policy and scrutinise government spending through legislative procedures.",
+      "In a bicameral State Legislature, the Legislative Council and Assembly have different powers, particularly regarding money bills."
+    ],
+    "points_ta": [
+      "சட்டப்பேரவை உறுப்பினர்கள் நிலப்பரப்பு அடிப்படையிலான தேர்தல் தொகுதிகளிலிருந்து தேர்ந்தெடுக்கப்படுகின்றனர்.",
+      "மாநிலச் சட்டப்பேரவை மசோதாக்களை விவாதித்து, மாநிலச் சட்டமியற்றும் அதிகார வரம்பிற்குள் சட்டங்களை இயற்றி, அரசைக் கண்காணிக்கிறது.",
+      "சட்டப்பேரவை அரசுச் செலவினங்களை ஆய்வு செய்து அமைச்சரவையை அரசியல் ரீதியாகப் பொறுப்பேற்கச் செய்கிறது.",
+      "உறுப்புரை 170 மாநிலச் சட்டப்பேரவையின் அமைப்பைப் பற்றியது.",
+      "உறுப்புரை 172-ன்படி முன்கூட்டியே கலைக்கப்படாவிட்டால் சட்டப்பேரவையின் இயல்பான பதவிக்காலம் ஐந்து ஆண்டுகள்; அரசியலமைப்புச் சிறப்பு விதிகள் பொருந்தும்.",
+      "உறுப்பினர்கள் அமைச்சர்களிடம் கேள்வி கேட்டு, பொதுக் கொள்கைகளை விவாதித்து, சட்டமன்ற நடைமுறைகள் வழியாக அரசுச் செலவினங்களை ஆய்வு செய்கிறார்கள்.",
+      "ஈரவை மாநிலச் சட்டமன்றத்தில் சட்ட மேலவைக்கும் சட்டப்பேரவைக்கும் வேறுபட்ட அதிகாரங்கள் உள்ளன; குறிப்பாக நிதி மசோதாக்களில்."
+    ],
+    "exam_focus": "Assembly duration (Article 172) is distinct from the term of Governor (Article 156).",
+    "exam_focus_ta": "சட்டப்பேரவையின் பதவிக்காலம் (உறுப்புரை 172) ஆளுநரின் பதவிக்காலத்திலிருந்து (உறுப்புரை 156) வேறுபட்டது.",
+    "worked_example": "A no-confidence motion tests political support for the Council of Ministers in the Assembly, not the Governor's personal popularity.",
+    "worked_example_ta": "நம்பிக்கையில்லாத் தீர்மானம் சட்டப்பேரவையில் அமைச்சரவைக்கான ஆதரவைச் சோதிக்கிறது; ஆளுநரின் தனிப்பட்ட செல்வாக்கை அல்ல.",
+    "quick_check": {
+      "question": "What is the normal term of a State Legislative Assembly?",
+      "answer": "Five years, unless dissolved earlier or affected by a constitutional exception.",
+      "question_ta": "மாநிலச் சட்டப்பேரவையின் இயல்பான பதவிக்காலம் எத்தனை ஆண்டுகள்?",
+      "answer_ta": "ஐந்து ஆண்டுகள்; முன்கூட்டியே கலைத்தல் அல்லது அரசியலமைப்புச் சிறப்பு விதிகள் பொருந்தலாம்."
+    }
   },
   {
     "id": "justice-party",
@@ -717,8 +993,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The South Indian Liberal Federation, known as the Justice Party, was founded in November 1916.",
       "C. Natesanar, Pitti Theagarayar and T. M. Nair were prominent in the non-Brahmin movement.",
-      "It sought broader educational, public employment and political opportunities."
-    ]
+      "It sought broader educational, public employment and political opportunities.",
+      "The South Indian Liberal Federation became widely known as the Justice Party after its political newspaper Justice.",
+      "The Non-Brahmin Manifesto of December 1916 articulated demands for fairer political representation.",
+      "The Justice Party formed a government in Madras Presidency following the 1920 elections under dyarchy.",
+      "Its governments pursued reforms relating to access to public service and communal representation."
+    ],
+    "points_ta": [
+      "தென்னிந்திய நல உரிமைச் சங்கம் எனப்படும் நீதிக்கட்சி 1916 நவம்பரில் தொடங்கப்பட்டது.",
+      "சி. நடேசனார், பிட்டி தியாகராயர், டி. எம். நாயர் ஆகியோர் பிராமணரல்லாதோர் இயக்கத்தின் முக்கிய ஆளுமைகள்.",
+      "கல்வி, அரசுப் பணி, அரசியல் வாய்ப்புகள் ஆகியவற்றில் விரிவான பிரதிநிதித்துவத்தை இவ்வியக்கம் கோரியது.",
+      "தென்னிந்திய நல உரிமைச் சங்கம் தனது 'ஜஸ்டிஸ்' என்ற பத்திரிகை பெயரால் நீதிக்கட்சி என பரவலாக அழைக்கப்பட்டது.",
+      "1916 டிசம்பரில் வெளியிடப்பட்ட பிராமணரல்லாதோர் அறிக்கை நியாயமான அரசியல் பிரதிநிதித்துவத்தை வலியுறுத்தியது.",
+      "இரட்டையாட்சி முறையின் கீழ் 1920 தேர்தலைத் தொடர்ந்து சென்னை மாகாணத்தில் நீதிக்கட்சி ஆட்சி அமைத்தது.",
+      "அதன் அரசுகள் அரசுப் பணியில் வாய்ப்புகள் மற்றும் வகுப்புவாரிப் பிரதிநிதித்துவம் சார்ந்த சீர்திருத்தங்களை முன்னெடுத்தன."
+    ],
+    "exam_focus": "1916 Justice Party, 1925 Self-Respect Movement and 1944 Dravidar Kazhagam are distinct stages.",
+    "exam_focus_ta": "1916 நீதிக்கட்சி, 1925 சுயமரியாதை இயக்கம், 1944 திராவிடர் கழகம்—இவை வேறுபட்ட வரலாற்று நிலைகள்.",
+    "worked_example": "A question naming T. M. Nair and Pitti Theagarayar points to the Justice Party, not to the founding of the Indian National Congress.",
+    "worked_example_ta": "டி. எம். நாயர், பிட்டி தியாகராயர் பெயர்கள் இடம்பெறும் வினா நீதிக்கட்சியைக் குறிக்கிறது; இந்திய தேசிய காங்கிரஸ் தோற்றத்தை அல்ல.",
+    "quick_check": {
+      "question": "In which year was the South Indian Liberal Federation formed?",
+      "answer": "1916.",
+      "question_ta": "தென்னிந்திய நல உரிமைச் சங்கம் எந்த ஆண்டு தொடங்கப்பட்டது?",
+      "answer_ta": "1916."
+    }
   },
   {
     "id": "non-brahmin-manifesto",
@@ -777,8 +1076,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "E. V. Ramasamy, known as Periyar, founded the Self-Respect Movement in 1925.",
       "The movement opposed caste hierarchy and promoted rationalist inquiry.",
-      "Women's equality and self-respect marriages became important themes."
-    ]
+      "Women's equality and self-respect marriages became important themes.",
+      "Periyar used the journal Kudi Arasu, begun in 1925, to communicate social criticism and reformist ideas.",
+      "The movement criticised caste inequality, untouchability, ritual authority and social hierarchy.",
+      "Self-respect marriages emphasised consent, dignity and a challenge to caste-based marriage restrictions.",
+      "Periyar advocated women's rights in education, property and freedom of personal choice."
+    ],
+    "points_ta": [
+      "பெரியார் என அறியப்படும் ஈ. வெ. இராமசாமி 1925ஆம் ஆண்டு சுயமரியாதை இயக்கத்தைத் தொடங்கினார்.",
+      "இவ்வியக்கம் சாதிப் படிநிலைகளை எதிர்த்துப் பகுத்தறிவுச் சிந்தனையை ஊக்குவித்தது.",
+      "பெண் சமத்துவமும் சுயமரியாதைத் திருமணங்களும் இவ்வியக்கத்தின் முக்கியக் கருத்துகளாக விளங்கின.",
+      "1925இல் தொடங்கிய குடி அரசு இதழைப் பெரியார் சமூக விமர்சனங்களையும் சீர்திருத்தக் கருத்துகளையும் பரப்பப் பயன்படுத்தினார்.",
+      "இவ்வியக்கம் சாதி ஏற்றத்தாழ்வு, தீண்டாமை, சடங்கு ஆதிக்கம், சமூகப் படிநிலை ஆகியவற்றை விமர்சித்தது.",
+      "சுயமரியாதைத் திருமணங்கள் இருதரப்புச் சம்மதம், கண்ணியம், சாதிசார் திருமணக் கட்டுப்பாடுகளை எதிர்த்தல் ஆகியவற்றை வலியுறுத்தின.",
+      "கல்வி, சொத்து, தனிப்பட்ட விருப்பத் தேர்வு ஆகியவற்றில் பெண்களின் உரிமைகளுக்குப் பெரியார் ஆதரவளித்தார்."
+    ],
+    "exam_focus": "Founder—Periyar E. V. Ramasamy; start—1925; associated journal—Kudi Arasu.",
+    "exam_focus_ta": "தொடங்கியவர்—பெரியார் ஈ. வெ. இராமசாமி; தொடக்கம்—1925; தொடர்புடைய இதழ்—குடி அரசு.",
+    "worked_example": "A question on self-respect marriage belongs to the social reform movement, not simply to the formation of a political party.",
+    "worked_example_ta": "சுயமரியாதைத் திருமணம் பற்றிய வினா ஒரு சமூகச் சீர்திருத்த இயக்கத்தைச் சார்ந்தது; அரசியல் கட்சி தோற்றத்தை மட்டும் சார்ந்ததல்ல.",
+    "quick_check": {
+      "question": "Who founded the Self-Respect Movement in 1925?",
+      "answer": "Periyar E. V. Ramasamy.",
+      "question_ta": "1925ஆம் ஆண்டு சுயமரியாதை இயக்கத்தைத் தொடங்கியவர் யார்?",
+      "answer_ta": "பெரியார் ஈ. வெ. இராமசாமி."
+    }
   },
   {
     "id": "periyar-journals",
@@ -885,8 +1207,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Rural local bodies include Village Panchayats, Panchayat Unions and District Panchayats.",
       "Urban local bodies include Town Panchayats, Municipalities and Municipal Corporations.",
-      "Local government provides civic services and democratic representation close to residents."
-    ]
+      "Local government provides civic services and democratic representation close to residents.",
+      "The 73rd Constitutional Amendment strengthened the constitutional framework for Panchayats (Part IX).",
+      "The 74th Constitutional Amendment addressed urban municipalities (Part IXA).",
+      "Article 243A describes the Gram Sabha; Article 243Q concerns the constitution of municipalities.",
+      "Elected local bodies and field-level revenue offices have different functions and reporting structures."
+    ],
+    "points_ta": [
+      "ஊரக உள்ளாட்சி அமைப்புகளில் கிராம ஊராட்சிகள், ஊராட்சி ஒன்றியங்கள் மற்றும் மாவட்ட ஊராட்சிகள் அடங்கும்.",
+      "நகர்ப்புற உள்ளாட்சி அமைப்புகளில் பேரூராட்சிகள், நகராட்சிகள் மற்றும் மாநகராட்சிகள் அடங்கும்.",
+      "உள்ளாட்சி அமைப்புகள் மக்களுக்கு அருகிலேயே பொதுச் சேவைகளையும் ஜனநாயகப் பிரதிநிதித்துவத்தையும் வழங்குகின்றன.",
+      "73வது அரசியலமைப்புத் திருத்தம் ஊராட்சிகளுக்கான அரசியலமைப்புக் கட்டமைப்பை (பகுதி IX) வலுப்படுத்தியது.",
+      "74வது அரசியலமைப்புத் திருத்தம் நகர்ப்புற நகராட்சி அமைப்புகளை (பகுதி IXA) பற்றியது.",
+      "உறுப்புரை 243A கிராம சபையைப் பற்றியது; உறுப்புரை 243Q நகராட்சி அமைப்புகள் உருவாக்கத்தைப் பற்றியது.",
+      "தேர்ந்தெடுக்கப்பட்ட உள்ளாட்சி அமைப்புகளுக்கும் களநிலை வருவாய்த் துறை அலுவலகங்களுக்கும் வேறுபட்ட பணிகளும் நிர்வாக வழிகளும் உள்ளன."
+    ],
+    "exam_focus": "73rd = rural Panchayats; 74th = urban municipalities; Gram Sabha ≠ Village Panchayat.",
+    "exam_focus_ta": "73வது = ஊரக ஊராட்சிகள்; 74வது = நகர்ப்புற நகராட்சிகள்; கிராம சபை ≠ கிராம ஊராட்சி.",
+    "worked_example": "A Gram Sabha comprises eligible voters; the Village Panchayat is an elected local institution responsible for specified village services.",
+    "worked_example_ta": "கிராம சபையில் உரிய வாக்காளர்கள் இடம்பெறுகிறார்கள்; கிராம ஊராட்சி குறிப்பிட்ட கிராம சேவைகளுக்குப் பொறுப்பான தேர்ந்தெடுக்கப்பட்ட அமைப்பாகும்.",
+    "quick_check": {
+      "question": "Which constitutional amendment relates chiefly to municipalities?",
+      "answer": "The 74th Constitutional Amendment.",
+      "question_ta": "நகராட்சிகளை முக்கியமாகக் குறிக்கும் அரசியலமைப்புத் திருத்தம் எது?",
+      "answer_ta": "74வது அரசியலமைப்புத் திருத்தம்."
+    }
   },
   {
     "id": "gram-sabha",
@@ -899,8 +1244,31 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "A Gram Sabha comprises people registered on the electoral roll of the relevant village panchayat.",
       "It enables citizens to discuss local development, monitor work and raise public grievances.",
-      "Older Class 6 textbooks state four annual meetings, but a May 2022 Tamil Nadu government order increased the schedule to six per year."
-    ]
+      "Older Class 6 textbooks state four annual meetings, but a May 2022 Tamil Nadu government order increased the schedule to six per year.",
+      "A Gram Sabha is a body of voters of a village, not the elected executive committee of a Panchayat.",
+      "Its responsibilities may include community discussion of local works, development priorities and oversight of appropriate schemes.",
+      "The Tamil Nadu Rural Development department lists G.O. (Ms.) No. 65, dated 25 May 2022, increasing the annual schedule from four meetings to six.",
+      "A Gram Sabha can be convened beyond its minimum prescribed meetings according to applicable law and procedure."
+    ],
+    "points_ta": [
+      "சம்பந்தப்பட்ட கிராம ஊராட்சியின் வாக்காளர் பட்டியலில் இடம்பெற்றவர்கள் கிராம சபை உறுப்பினர்களாவர்.",
+      "உள்ளூர் வளர்ச்சியைப் பற்றி விவாதிக்கவும் பணிகளைக் கண்காணிக்கவும் பொதுமக்கள் குறைகளை எழுப்பவும் கிராம சபை வாய்ப்பு வழங்குகிறது.",
+      "பழைய 6ஆம் வகுப்புப் பாடநூல் ஆண்டுக்கு நான்கு கூட்டங்கள் எனக் கூறினாலும், 2022 மே மாதத் தமிழக அரசு ஆணை கூட்டங்களை ஆண்டுக்கு ஆறாக உயர்த்தியது.",
+      "கிராம சபை கிராம வாக்காளர்களைக் கொண்ட அமைப்பு; அது ஊராட்சியின் தேர்ந்தெடுக்கப்பட்ட நிர்வாகக் குழு அல்ல.",
+      "உள்ளூர் பணிகள், வளர்ச்சி முன்னுரிமைகள், திட்டக் கண்காணிப்பு ஆகியவற்றைப் பற்றி மக்கள் விவாதிப்பதும் இதன் பணிகளில் அடங்கும்.",
+      "தமிழ்நாடு ஊரக வளர்ச்சித் துறை பட்டியலின்படி 25 மே 2022 தேதியிட்ட அரசாணை (நிலை) எண் 65, ஆண்டு கூட்ட எண்ணிக்கையை நான்கிலிருந்து ஆறாக உயர்த்தியது.",
+      "பொருந்தும் சட்டம் மற்றும் நடைமுறைகளுக்கு உட்பட்டு குறைந்தபட்ச கூட்ட எண்ணிக்கையைவிட கூடுதல் கிராம சபைக் கூட்டங்கள் நடத்தப்படலாம்."
+    ],
+    "exam_focus": "Use the updated Tamil Nadu order, not only an older textbook's four-meetings figure.",
+    "exam_focus_ta": "பழைய பாடநூலில் உள்ள நான்கு கூட்டங்கள் என்ற எண்ணை மட்டும் பயன்படுத்தாமல், புதிய தமிழக அரசு ஆணையைப் பின்பற்றவும்.",
+    "worked_example": "Six scheduled meetings a year is an administrative requirement; it does not mean there are only six possible Gram Sabha meetings.",
+    "worked_example_ta": "ஆண்டுக்கு ஆறு கூட்டங்கள் என்ற திட்டமிடப்பட்ட எண்ணிக்கை, அதற்கு மேல் கிராம சபைக் கூட்டங்கள் நடத்தவே முடியாது என்பதல்ல.",
+    "quick_check": {
+      "question": "Under the 2022 Tamil Nadu government order, how many Gram Sabha meetings are scheduled annually?",
+      "answer": "Six, under G.O. (Ms.) No. 65 of 25 May 2022.",
+      "question_ta": "2022 தமிழக அரசாணைப்படி ஆண்டுதோறும் திட்டமிடப்படும் கிராம சபைக் கூட்டங்கள் எத்தனை?",
+      "answer_ta": "ஆறு; 25 மே 2022 தேதியிட்ட அரசாணை (நிலை) எண் 65."
+    }
   },
   {
     "id": "village-panchayat",

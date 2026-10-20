@@ -131,6 +131,33 @@ const pBoy=notes.find(n=>n.id==='tn-tamil-pudhalvan');
 assert.match(pPenn.exam_focus,/girl/i,'Pudhumai Penn intended beneficiary');
 assert.match(pBoy.exam_focus,/boy/i,'Tamil Pudhalvan intended beneficiary');
 
+const bilingualIds=['equality','political-parties','state-government','governor','chief-minister','legislative-assembly','local-bodies-structure','gram-sabha','nationalism','swadeshi','gandhi-mass','sangam','justice-party','self-respect-movement','indus','cholas-pandyas'];
+assert.equal(bilingualIds.length,16);
+for(const id of bilingualIds){
+  const note=notes.find(n=>n.id===id);
+  assert.ok(note,'Missing bilingual study note: '+id);
+  assert.ok(Array.isArray(note.points_ta),id+': Tamil facts missing');
+  assert.equal(note.points.length,7,id+': English facts should be expanded to seven');
+  assert.equal(note.points_ta.length,note.points.length,id+': every English fact must have Tamil equivalent');
+  assert.ok(note.points_ta.every(x=>typeof x==='string'&&/[\u0B80-\u0BFF]/u.test(x)),id+': Tamil fact not translated');
+  assert.ok(note.exam_focus?.length>45&&/[\u0B80-\u0BFF]/u.test(note.exam_focus_ta),id+': bilingual exam focus missing');
+  assert.ok(note.worked_example?.length>45&&/[\u0B80-\u0BFF]/u.test(note.worked_example_ta),id+': bilingual practical example missing');
+  assert.ok(note.quick_check?.question?.length>15&&note.quick_check?.answer?.length>3,id+': English answer check missing');
+  assert.ok(/[\u0B80-\u0BFF]/u.test(note.quick_check.question_ta)&&( /[\u0B80-\u0BFF]/u.test(note.quick_check.answer_ta)||/^[\d\s.,–-]+$/.test(note.quick_check.answer_ta)),id+': Tamil answer check missing');
+  assert.ok(taggedIds.has(id),id+': bilingual note is not linked from syllabus');
+}
+assert.equal(notes.filter(n=>n.points_ta?.length===n.points?.length).length,16,'Only complete translations should be counted');
+for(const id of ['tn-budget-process','tn-naan-mudhalvan'])assert.ok(!notes.find(n=>n.id===id).points_ta,'Do not claim existing English-only notes are fully bilingual');
+assert.match(notePage,/id="noteLanguage"/,'Reader must offer a study-language selector');
+assert.match(notePage,/<option value="ta">தமிழ்<\/option>/,'Tamil-only reading mode missing');
+assert.match(notePage,/<option value="both">English \+ தமிழ்<\/option>/,'Side-by-side reading mode missing');
+assert.match(notePage,/language.addEventListener\('change',render\)/,'Language controls must change the note display');
+assert.match(notePage,/mode=bilingual\?language.value:'en'/,'Untranslated topics must remain clearly in English');
+assert.match(notePage,/Full Tamil explanations for this topic are not published yet/,'Partial coverage must be disclosed');
+assert.match(notePage,/note.points_ta\[i\]/,'Fact-by-fact Tamil display not wired');
+assert.match(notePage,/quick_check.question_ta/,'Tamil revision questions not displayed');
+assert.match(notePage,/quick_check.answer_ta/,'Tamil revision answers not displayed');
+
 assert.match(notePage,/id="noteSearch"/,'Notes have topic search');
 assert.match(notePage,/id="noteMatches"/,'Topic search has accessible results');
 const scripts=[...notePage.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(s=>s.trim());
