@@ -15,7 +15,7 @@
 </head>
 <body>
 <header><nav><a href="index.html">ClearExams</a><a href="syllabus.html#tnpsc-group-2-2a">← Group II & IIA syllabus</a><a href="textbook-quiz.html">Textbook quizzes</a></nav></header>
-<main><h1>TN School-Book Revision Notes</h1><p class="lede">Concise topic summaries linked to published Tamil Nadu State Board chapter quizzes. Select a note to read its key ideas and practice questions.</p>
+<main><h1>TN School-Book Revision Notes</h1><p class="lede">Concise topic summaries linked to published Tamil Nadu State Board chapter quizzes. Select a note to review key facts and open its source textbook. Practice quizzes are available only for chapters already published on ClearExams.</p>
 <div class="toolbar"><label for="noteSelect">Choose a school-book topic<select id="noteSelect"></select></label><label for="noteSearch">Search topics in English or Tamil<input id="noteSearch" type="search" placeholder="Try Swadeshi, genetics, சங்கம்…" autocomplete="off"></label></div><div id="noteMatches" class="search-results" role="status" aria-live="polite" hidden></div>
 <div id="noteContent" role="region" aria-live="polite"></div>
 <p class="disclaimer">These are original, shortened revision notes aligned with the named school-book chapters, not copied textbook pages or a replacement for the official TNPSC syllabus. Review the full chapter and the official notification for examination preparation.</p>
@@ -29,7 +29,15 @@ search.addEventListener('input',updateSearch);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 if(!notes.length){content.textContent='Notes could not load. Please refresh this page.';return;}
 notes.forEach(n=>{const o=document.createElement('option');o.value=n.id;o.textContent=n.title;select.appendChild(o)});
-function render(){const requested=new URLSearchParams(location.search).get('topic');const note=notes.find(n=>n.id===requested)||notes[0];select.value=note.id;content.innerHTML='<article><h2>'+esc(note.title)+'</h2><p class="tamil" lang="ta">'+esc(note.ta)+'</p><p class="chapter">Textbook reference: '+esc(note.chapter)+'</p><h3>Important exam-ready points</h3><ol class="facts">'+note.points.map(point=>'<li>'+esc(point)+'</li>').join('')+'</ol><div class="actions"><a class="btn primary" href="'+esc(note.href)+'">Practise this textbook chapter →</a><a class="btn" href="syllabus.html#tnpsc-group-2-2a">Back to Group II & IIA syllabus</a></div></article>';}
+function render(){
+const requested=new URLSearchParams(location.search).get('topic');
+const note=notes.find(n=>n.id===requested)||notes[0];
+select.value=note.id;
+const practice=note.href?'<a class="btn primary" href="'+esc(note.href)+'">Practise this textbook chapter →</a>':'<span class="chapter" data-quiz-pending>Chapter quiz not yet published</span>';
+const source=note.source_url?'<a class="btn" href="'+esc(note.source_url)+'" target="_blank" rel="noopener noreferrer">Read source textbook ↗</a>':'';
+const update=note.update_url?'<p class="chapter"><strong>Important update:</strong> <a href="'+esc(note.update_url)+'" target="_blank" rel="noopener noreferrer">'+esc(note.update_label||'Government update')+' ↗</a></p>':'';
+content.innerHTML='<article><h2>'+esc(note.title)+'</h2><p class="tamil" lang="ta">'+esc(note.ta)+'</p><p class="chapter">Textbook reference: '+esc(note.chapter)+'</p><h3>Important exam-ready points</h3><ol class="facts">'+note.points.map(point=>'<li>'+esc(point)+'</li>').join('')+'</ol>'+update+'<div class="actions">'+practice+source+'<a class="btn" href="syllabus.html#tnpsc-group-2-2a">Back to Group II & IIA syllabus</a></div></article>';
+}
 select.addEventListener('change',()=>{history.replaceState(null,'','?topic='+encodeURIComponent(select.value));render()});window.addEventListener('popstate',render);render();
 });
 </script>
