@@ -104,8 +104,8 @@ class Class8CropProductionQuizTests(unittest.TestCase):
         self.assertTrue(entry["ready"])
         self.assertEqual((entry["total"], entry["quiz_count"], entry["path"]),
                          (20, 1, "unit-7.json"))
-        self.assertEqual(INDEX["meta"]["total_questions"], 140)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 7)
+        self.assertEqual(INDEX["meta"]["total_questions"], 180)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 9)
         self.assertEqual(BANK["meta"]["total_questions"], 20)
         self.assertTrue(BANK["meta"]["source_en_url"].startswith("https://"))
         self.assertTrue(BANK["meta"]["source_ta_url"].startswith("https://"))
