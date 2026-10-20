@@ -1,4 +1,4 @@
-/* Original concise TNPSC revision notes linked to published Tamil Nadu State Board chapters. */
+/* TN State Board textbook-grounded short revision notes; unpublished quiz banks use textbook sources. */
 window.ClearExamsTNSchoolNotes=[
   {
     "id": "measurements",
@@ -706,6 +706,174 @@ window.ClearExamsTNSchoolNotes=[
       "Members of the Legislative Assembly are elected from territorial constituencies.",
       "The State Legislative Assembly debates bills, passes laws within the state legislative sphere and examines the government.",
       "The Assembly scrutinises expenditure and can hold the Council of Ministers politically accountable."
+    ]
+  },
+  {
+    "id": "justice-party",
+    "title": "Justice Party: formation and aims",
+    "ta": "நீதிக்கட்சி: தோற்றமும் நோக்கமும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "The South Indian Liberal Federation, known as the Justice Party, was founded in November 1916.",
+      "C. Natesanar, Pitti Theagarayar and T. M. Nair were prominent in the non-Brahmin movement.",
+      "It sought broader educational, public employment and political opportunities."
+    ]
+  },
+  {
+    "id": "non-brahmin-manifesto",
+    "title": "The Non-Brahmin Manifesto",
+    "ta": "பிராமணரல்லாதோர் அறிக்கை",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "The Non-Brahmin Manifesto was published in December 1916 in the Madras Presidency.",
+      "It articulated demands for more inclusive political and administrative representation.",
+      "The manifesto was a milestone in organised non-Brahmin politics."
+    ]
+  },
+  {
+    "id": "justice-party-reforms",
+    "title": "Justice Party reforms in education and administration",
+    "ta": "நீதிக்கட்சியின் கல்வி மற்றும் நிர்வாகச் சீர்திருத்தங்கள்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "Justice Party ministries promoted wider educational and employment access.",
+      "The government established a Staff Selection Board in 1924 for recruiting officials.",
+      "Institutional reforms aimed at broadening participation in administration."
+    ]
+  },
+  {
+    "id": "communal-representation",
+    "title": "Early communal representation",
+    "ta": "ஆரம்பகால வகுப்புவாரிப் பிரதிநிதித்துவம்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "The Madras Presidency introduced communal representation orders in the early 1920s.",
+      "These measures sought more equitable access to public employment for under-represented communities.",
+      "Do not confuse early provincial government orders with later constitutional reservation rules."
+    ]
+  },
+  {
+    "id": "hindu-endowment-1926",
+    "title": "Justice Party and temple administration reform",
+    "ta": "நீதிக்கட்சியும் கோயில் நிர்வாகச் சீர்திருத்தங்களும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "The Hindu Religious Endowment Act was introduced in 1926 during Justice Party rule.",
+      "It sought to regulate aspects of the management of religious endowments.",
+      "Distinguish this historical law from later Tamil Nadu HR&CE legislation."
+    ]
+  },
+  {
+    "id": "self-respect-movement",
+    "title": "Periyar and the Self-Respect Movement",
+    "ta": "பெரியாரும் சுயமரியாதை இயக்கமும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "E. V. Ramasamy, known as Periyar, founded the Self-Respect Movement in 1925.",
+      "The movement opposed caste hierarchy and promoted rationalist inquiry.",
+      "Women's equality and self-respect marriages became important themes."
+    ]
+  },
+  {
+    "id": "periyar-journals",
+    "title": "Periyar's publications and rationalism",
+    "ta": "பெரியாரின் இதழ்களும் பகுத்தறிவும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "Periyar launched the journal Kudi Arasu in 1925 to communicate Self-Respect ideas.",
+      "He also used publications including Revolt and Paguththarivu.",
+      "Periodicals are important sources for the movement's social and political views."
+    ]
+  },
+  {
+    "id": "self-respect-marriages",
+    "title": "Self-respect marriages and women's rights",
+    "ta": "சுயமரியாதைத் திருமணங்களும் பெண்களின் உரிமைகளும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "Self-respect marriages emphasised the partners' consent and dignity without dependence on caste rituals.",
+      "Periyar criticised child marriage and the devadasi system.",
+      "He argued for women's property rights, independence and equality."
+    ]
+  },
+  {
+    "id": "dravidar-kazhagam",
+    "title": "Formation of Dravidar Kazhagam",
+    "ta": "திராவிடர் கழகத்தின் தோற்றம்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "The Justice Party was transformed into Dravidar Kazhagam in 1944 under Periyar's leadership.",
+      "Dravidar Kazhagam promoted social equality, rationalism and anti-caste thought.",
+      "Keep the dates distinct: Justice Party 1916, Self-Respect Movement 1925 and Dravidar Kazhagam 1944."
+    ]
+  },
+  {
+    "id": "anti-hindi-agitation",
+    "title": "Anti-Hindi agitation in Tamil Nadu",
+    "ta": "தமிழக இந்தி எதிர்ப்புப் போராட்டம்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "The introduction of compulsory Hindi in the Madras Presidency's schools in the late 1930s triggered protests.",
+      "Periyar and other Tamil activists were associated with resistance to compulsory Hindi.",
+      "Language rights became a lasting issue in Tamil Nadu politics."
+    ]
+  },
+  {
+    "id": "rettamalai-srinivasan",
+    "title": "Rettaimalai Srinivasan and civil rights",
+    "ta": "இரட்டைமலை சீனிவாசனும் குடியுரிமைப் போராட்டமும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "Rettaimalai Srinivasan founded the Adi Dravida Mahajana Sabha in 1893.",
+      "He represented marginalised communities at the Round Table Conferences.",
+      "He was a signatory to the Poona Pact of 1932."
+    ]
+  },
+  {
+    "id": "mc-rajah",
+    "title": "M. C. Rajah and representation",
+    "ta": "எம்.சி. ராஜாவும் பிரதிநிதித்துவமும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "M. C. Rajah was an advocate of political representation for oppressed communities.",
+      "He became an early elected representative of the Depressed Classes in the Madras legislature.",
+      "His work contributed to debates about social justice and education."
+    ]
+  },
+  {
+    "id": "tamil-renaissance",
+    "title": "Tamil Renaissance and classical texts",
+    "ta": "தமிழ் மறுமலர்ச்சியும் செவ்வியல் நூல்களும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "Scholars helped retrieve and publish literary texts preserved on palm-leaf manuscripts.",
+      "U. V. Swaminatha Iyer contributed greatly to publishing early Tamil works.",
+      "Print culture helped renew interest in Tamil history and literature."
+    ]
+  },
+  {
+    "id": "tani-tamil",
+    "title": "Maraimalai Adigal and Pure Tamil",
+    "ta": "மறைமலையடிகளும் தனித்தமிழ் இயக்கமும்",
+    "chapter": "Class 10 Social Science · History Unit 10: Social Transformation in Tamil Nadu (2022 English textbook)",
+    "source_url": "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-SSLC-Class-10-Social-Science-Textbook-English.pdf",
+    "points": [
+      "Maraimalai Adigal was an important figure in the Pure Tamil Movement.",
+      "The movement encouraged replacing many Sanskrit-derived terms with Tamil vocabulary.",
+      "It reflected debates about language, identity and the Tamil literary tradition."
     ]
   }
 ];
