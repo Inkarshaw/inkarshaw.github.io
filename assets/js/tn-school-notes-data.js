@@ -1,4 +1,4 @@
-/* TN State Board textbook-grounded short revision notes; unpublished quiz banks use textbook sources. */
+/* TNPSC revision notes: textbook-grounded entries plus explicitly tagged official-government entries. */
 window.ClearExamsTNSchoolNotes=[
   {
     "id": "measurements",
@@ -972,6 +972,244 @@ window.ClearExamsTNSchoolNotes=[
       "Residents elect local representatives from wards and other prescribed constituencies.",
       "The normal term of a local body is five years, subject to applicable constitutional provisions.",
       "The State Election Commission is responsible for supervising local-body elections."
+    ]
+  },
+  {
+    "id": "tn-district-collector",
+    "title": "District Collector and district administration",
+    "ta": "மாவட்ட ஆட்சியரும் மாவட்ட நிர்வாகமும்",
+    "chapter": "Chennai District Administration · Collectorate",
+    "source_kind": "government",
+    "source_url": "https://chennai.nic.in/district-administration/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "The District Collector is the head of district administration and acts as District Magistrate under applicable laws.",
+      "The Collectorate handles revenue, public grievances, social security, land matters and coordination of district-level government work.",
+      "The District Revenue Officer and other district officers assist the Collector; their assigned statutory functions differ."
+    ]
+  },
+  {
+    "id": "tn-dro",
+    "title": "District Revenue Officer (DRO)",
+    "ta": "மாவட்ட வருவாய் அலுவலர்",
+    "chapter": "Chennai District Administration · District Revenue Officer",
+    "source_kind": "government",
+    "source_url": "https://chennai.nic.in/district-administration/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "The District Revenue Officer assists the Collector and supervises the routine functioning of the Collectorate.",
+      "District revenue administration covers land-related matters, civil supplies and other entrusted subjects.",
+      "The DRO is designated Additional District Magistrate; do not confuse this position with the district Collector."
+    ]
+  },
+  {
+    "id": "tn-rdo",
+    "title": "Revenue Divisional Officer (RDO)",
+    "ta": "வருவாய் கோட்டாட்சியர்",
+    "chapter": "Cuddalore District · Revenue administrative structure",
+    "source_kind": "government",
+    "source_url": "https://cuddalore.nic.in/revenue/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "A revenue division comprises a number of taluks and is ordinarily headed by a Revenue Divisional Officer or Sub-Collector.",
+      "The Revenue Division stands administratively between district and taluk levels.",
+      "RDO functions may include land-revenue administration and responsibilities assigned under revenue and executive-magisterial law."
+    ]
+  },
+  {
+    "id": "tn-tahsildar",
+    "title": "Tahsildar and taluk administration",
+    "ta": "வட்டாட்சியரும் வருவாய் வட்ட நிர்வாகமும்",
+    "chapter": "Commissionerate of Revenue Administration · Taluk Administration",
+    "source_kind": "government",
+    "source_url": "https://www.cra.tn.gov.in/taluk_level.php",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "The Tahsildar heads revenue administration at taluk level.",
+      "Deputy Tahsildars, Revenue Inspectors and Village Administrative Officers assist taluk-level functions.",
+      "Patta, Chitta, Adangal, land-revenue collection and prescribed revenue certificates are major areas of taluk service delivery."
+    ]
+  },
+  {
+    "id": "tn-revenue-inspector",
+    "title": "Revenue Inspector and the firka",
+    "ta": "வருவாய் ஆய்வாளரும் குறுவட்டமும்",
+    "chapter": "Commissionerate of Revenue Administration · Firka Administration",
+    "source_kind": "government",
+    "source_url": "https://www.cra.tn.gov.in/firka_adm.php",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "A taluk is divided into firkas, each consisting of a group of revenue villages.",
+      "The Revenue Inspector heads firka-level administration and supports revenue supervision.",
+      "Revenue inspection is a revenue function, not an elected Panchayat position."
+    ]
+  },
+  {
+    "id": "tn-vao",
+    "title": "Village Administrative Officer (VAO)",
+    "ta": "கிராம நிர்வாக அலுவலர்",
+    "chapter": "Commissionerate of Revenue Administration · Revenue Village Administration",
+    "source_kind": "government",
+    "source_url": "https://www.cra.tn.gov.in/village_admn.php",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "A Village Administrative Officer heads administration of a revenue village.",
+      "Village accounts, land-revenue collection and protection of government land are key VAO functions.",
+      "The VAO also communicates disaster information and reports important local incidents to higher revenue officers."
+    ]
+  },
+  {
+    "id": "tn-revenue-structure",
+    "title": "Revenue administration hierarchy",
+    "ta": "வருவாய் நிர்வாகப் படிநிலைகள்",
+    "chapter": "Cuddalore District · Revenue divisions, taluks and firkas",
+    "source_kind": "government",
+    "source_url": "https://cuddalore.nic.in/revenue/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "At district level, the Collector heads overall administration and district revenue officers support the work.",
+      "Revenue divisions are headed by RDOs; taluks by Tahsildars; firkas by Revenue Inspectors; revenue villages by VAOs.",
+      "This revenue hierarchy is different from the elected rural local-government structure of District Panchayats, Panchayat Unions and Village Panchayats."
+    ]
+  },
+  {
+    "id": "tn-bdo-roles",
+    "title": "Block Development Officer and Panchayat Union",
+    "ta": "வட்டார வளர்ச்சி அலுவலரும் ஊராட்சி ஒன்றியமும்",
+    "chapter": "Tamil Nadu RD&PR Policy Note 2018–19 · Panchayat Union and BDO responsibilities (historical policy note)",
+    "source_kind": "government",
+    "source_url": "https://tnrd.tn.gov.in/policynotes/rd_e_pn_2018_19.pdf",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "The Block Development Officer (Block Panchayat) is the executive authority of the Panchayat Union, assisted by administrative and technical staff.",
+      "Under the Panchayats Act framework, Panchayat Unions have functions covering selected roads, school facilities and minor irrigation assets.",
+      "Do not confuse the BDO and Panchayat Union offices with the Tahsildar-led taluk revenue administration."
+    ]
+  },
+  {
+    "id": "tn-district-rural-development",
+    "title": "District Rural Development Agency (DRDA)",
+    "ta": "மாவட்ட ஊரக வளர்ச்சி முகமை",
+    "chapter": "Tamil Nadu Rural Development & Panchayat Raj · District-level officers",
+    "source_kind": "government",
+    "source_url": "https://www.tnrd.tn.gov.in/contacts/rd_pt_coimbatore.html",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "The district administration includes district-level Rural Development and Panchayat Raj officers and a DRDA Project Director.",
+      "District Collector and DRDA office have distinct coordinating and programme implementation responsibilities.",
+      "Rural development programmes operate through district and block-level administrative arrangements, alongside elected Panchayats."
+    ]
+  },
+  {
+    "id": "tn-tnega",
+    "title": "Tamil Nadu e-Governance Agency (TNeGA)",
+    "ta": "தமிழ்நாடு மின் ஆளுமை முகமை",
+    "chapter": "TNeGA · Official citizen e-Sevai Portal",
+    "source_kind": "government",
+    "source_url": "https://www.tnesevai.tn.gov.in/citizen/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "TNeGA supports digital delivery of Tamil Nadu government citizen services.",
+      "e-Sevai offers an online citizen portal as well as services via Common Service Centres.",
+      "Digital application, acknowledgement, status tracking and back-end workflow improve service accessibility and transparency."
+    ]
+  },
+  {
+    "id": "tn-esevai-certificates",
+    "title": "e-Sevai revenue and other certificates",
+    "ta": "இ-சேவை வருவாய்ச் சான்றிதழ்கள்",
+    "chapter": "TNeGA · Official list of citizen-facing services",
+    "source_kind": "government",
+    "source_url": "https://www.tnesevai.tn.gov.in/citizen/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "Citizen e-Sevai lists community, nativity, income, first-graduate and legal-heir certificates among its revenue services.",
+      "Services are classified by department and codes, for example REV-101 for community certificate and REV-103 for income certificate.",
+      "Eligibility, supporting documents and fees can change; always use the official portal for current application requirements."
+    ]
+  },
+  {
+    "id": "tn-pension-delivery",
+    "title": "Social security pensions and service delivery",
+    "ta": "சமூகப் பாதுகாப்பு ஓய்வூதியங்களும் சேவை வழங்கலும்",
+    "chapter": "TNeGA · Listed revenue social-security services",
+    "source_kind": "government",
+    "source_url": "https://www.tnesevai.tn.gov.in/citizen/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "e-Sevai lists access to social-security pension services administered through the relevant government departments.",
+      "Illustrative categories include old-age, widow and differently abled pension services.",
+      "Do not memorise a pension amount or eligibility threshold without checking the current government order or current official service guidance."
+    ]
+  },
+  {
+    "id": "tn-land-records",
+    "title": "Patta, Chitta, FMB and A-Register",
+    "ta": "பட்டா, சிட்டா, புல அளவுப் புத்தகம் மற்றும் அ-பதிவேடு",
+    "chapter": "Chennai District · Official land record e-Services",
+    "source_kind": "government",
+    "source_url": "https://chennai.nic.in/service/eservices-anytime-anywhere-land/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "Patta, Chitta or TSLR and Field Measurement Book extracts are distinct land records accessible through government e-services.",
+      "The A-Register records survey and classification information, while FMB sketches show field measurements and boundaries.",
+      "Official e-services allow citizens to view and verify land records; a digital extract should not by itself be mistaken for a conclusive court determination of title."
+    ]
+  },
+  {
+    "id": "tn-2026-integrated-land",
+    "title": "Integrated Land Record (ILR) — 2026 update",
+    "ta": "ஒருங்கிணைந்த நிலப் பதிவேடு — 2026 புதுப்பிப்பு",
+    "chapter": "National Informatics Centre Tamil Nadu · Launch note dated 4 March 2026",
+    "source_kind": "government",
+    "source_url": "https://tn.nic.in/news/additional-land-records-services-launch-by-honourable-minister-for-revenue-and-disaster-management-tamil-nadu/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "On 4 March 2026, Tamil Nadu announced the Integrated Land Record service.",
+      "The ILR combines Record of Rights information, FMB map or measurements and Chitta information into one digitised document.",
+      "It is a service-delivery update; retain the difference between land-record entries and legal ownership disputes."
+    ]
+  },
+  {
+    "id": "tn-patta-transfer-history",
+    "title": "Patta transfer history — online service",
+    "ta": "பட்டா பெயர் மாற்ற வரலாறு இணையவழிச் சேவை",
+    "chapter": "National Informatics Centre Tamil Nadu · 2026 land services launch",
+    "source_kind": "government",
+    "source_url": "https://tn.nic.in/news/additional-land-records-services-launch-by-honourable-minister-for-revenue-and-disaster-management-tamil-nadu/",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "Patta Transfer History was announced on 4 March 2026 as an additional land-record service.",
+      "The stated scope covers private land patta transfer information recorded online from 2016 onward for a specified survey number.",
+      "Use the Tamil Nilam government citizen service for current availability and the record details, rather than treating historical coverage as universal."
+    ]
+  },
+  {
+    "id": "tn-cm-helpline",
+    "title": "Mudhalvarin Mugavari / CM Helpline grievances",
+    "ta": "முதல்வரின் முகவரி: பொதுமக்கள் குறைதீர்ப்பு",
+    "chapter": "Tamil Nadu CM Helpline · Official FAQ",
+    "source_kind": "government",
+    "source_url": "https://cmhelpline.tnega.org/portal/en/kb/articles/tamil-nadu-cm-helpline-faqs",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "Mudhalvarin Mugavari is an integrated platform for registering and tracking grievances concerning public services and other civic issues.",
+      "Citizens can lodge grievances through the portal or helpline 1100 and receive acknowledgements and status updates.",
+      "Grievances are routed to the responsible government office; tracking and follow-up support accountability."
+    ]
+  },
+  {
+    "id": "tn-disaster-revenue",
+    "title": "Revenue administration and disaster management",
+    "ta": "வருவாய் நிர்வாகமும் பேரிடர் மேலாண்மையும்",
+    "chapter": "Commissionerate of Revenue Administration and Disaster Management · Official functions",
+    "source_kind": "government",
+    "source_url": "https://www.cra.tn.gov.in/rev_admn.php",
+    "source_label": "Official Tamil Nadu government reference",
+    "points": [
+      "The Commissionerate of Revenue Administration supervises district revenue administration.",
+      "The Revenue Administration Commissioner is also designated State Relief Commissioner, with disaster-management duties.",
+      "Core revenue-department work includes social security schemes, e-certificates, grievance redressal, regulatory functions and disaster response."
     ]
   }
 ];
