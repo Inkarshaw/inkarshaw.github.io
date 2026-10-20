@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "daily-quiz.html"
+      - "data/quizzes/verified-pyqs.json"
       - "textbook-*.html"
       - "index.html"
       - "dashboard.html"
@@ -33,6 +34,8 @@ jobs:
           fetch-depth: 0
       - name: Run ClearExams regression tests
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
+      - name: Validate attributed previous-year questions and Daily Quiz loading
+        run: node tests/test_daily_quiz_pyq.mjs
       - name: Test live SI-symbol quiz curation
         run: node --test tests/test_textbook_scientific_symbols.mjs
       - name: Test repository-wide textbook validator
