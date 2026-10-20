@@ -22,9 +22,12 @@ const notesContext={window:{}};vm.runInNewContext(notesSrc,notesContext);
 const notes=notesContext.window.ClearExamsTNSchoolNotes;
 const ids=new Set(notes.map(n=>n.id));
 assert.equal(ids.size,notes.length,'Unique note IDs');
-assert.ok(notes.length>=59,'Social-reform and state-government school-book coverage');
+assert.ok(notes.length>=81,'Class 10 social transformation and Class 6 local government notes');
 for(const n of notes){
   assert.ok(n.title&&n.chapter&&Array.isArray(n.points)&&n.points.length>=3);
+  assert.ok(n.href||n.source_url,n.id+': needs a published quiz or actual textbook source');
+  if(n.source_url)assert.match(n.source_url,/^https:\/\//,n.id+': secure textbook source required');
+  if(!n.href)continue; // The chapter itself exists, but a ClearExams chapter quiz has not been published.
   const params=new URL(n.href,'https://clearexams.ink/').searchParams;
   assert.equal(new URL(n.href,'https://clearexams.ink/').pathname,'/textbook-play.html');
   assert.equal(params.get('quiz'),'1');
@@ -47,7 +50,7 @@ let links=0;
 for(const b of blocks)for(const u of b.units)for(const t of u.topics){
   if(Array.isArray(t)&&t[1]){assert.ok(ids.has(t[1]),'Unresolved school-book note: '+t[1]);links++;}
 }
-assert.ok(links>=108,'Additional reform and polity topic links');
+assert.ok(links>=154,'Social justice and local self-government chapter links');
 assert.ok(notes.some(n=>n.id==='sangam')&&notes.some(n=>n.id==='gandhi-mass')&&notes.some(n=>n.id==='state-government')&&notes.some(n=>n.id==='biotech'),'History, polity and science chapter links present');
 const socialReforms=['brahmo-samaj','arya-samaj','ramakrishna-mission','theosophical-society','prarthana-samaj','satyashodhak','narayana-guru','pandita-ramabai','aligarh-movement','vaikunda-swami','vallalar','iyothee-thass','christian-missions'];
 for(const id of socialReforms){const note=notes.find(n=>n.id===id);assert.ok(note,'Missing social reform note: '+id);assert.match(note.chapter,/Class 11 History · Unit 19: Towards Modernity/);assert.equal(new URL(note.href,'https://clearexams.ink/').searchParams.get('unit'),'19');assert.ok(links>0);}
@@ -55,6 +58,15 @@ for(const id of ['governor','chief-minister','legislative-assembly']){const note
 const taggedIds=new Set(blocks.flatMap(b=>b.units.flatMap(u=>u.topics.filter(t=>Array.isArray(t)&&t[1]).map(t=>t[1]))));
 for(const id of [...socialReforms,'governor','chief-minister','legislative-assembly'])assert.ok(taggedIds.has(id),'Note not linked from syllabus: '+id);
 assert.equal(find('main-gs').units.reduce((n,u)=>n+u.count,0),150,'Question distribution was not altered');
+
+const newSocialIds=['justice-party','non-brahmin-manifesto','justice-party-reforms','communal-representation','hindu-endowment-1926','self-respect-movement','periyar-journals','self-respect-marriages','dravidar-kazhagam','anti-hindi-agitation','rettamalai-srinivasan','mc-rajah','tamil-renaissance','tani-tamil'];
+const localIds=['local-bodies-structure','gram-sabha','village-panchayat','panchayat-union','district-panchayat','urban-local-government','local-body-finance','local-elections'];
+for(const id of [...newSocialIds,...localIds]){const note=notes.find(n=>n.id===id);assert.ok(note,'Missing new textbook note: '+id);assert.ok(!note.href,'Do not invent a quiz route for '+id);assert.match(note.source_url,/^https:\/\//);assert.ok(taggedIds.has(id),'New note not linked in the syllabus: '+id);}
+for(const id of newSocialIds)assert.match(notes.find(n=>n.id===id).chapter,/Class 10 Social Science/);
+for(const id of localIds)assert.match(notes.find(n=>n.id===id).chapter,/Class 6 Social Science/);
+const gram=notes.find(n=>n.id==='gram-sabha');assert.ok(gram.update_url&&gram.points.join(' ').includes('six per year'),'Current Tamil Nadu Gram Sabha meeting frequency must be shown');
+assert.match(notePage,/data-quiz-pending/,'Unpublished chapter must be explicitly labelled');
+assert.match(notePage,/Read source textbook/,'Notes must offer source chapters');
 
 assert.match(notePage,/id="noteSearch"/,'Notes have topic search');
 assert.match(notePage,/id="noteMatches"/,'Topic search has accessible results');
