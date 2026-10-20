@@ -22,7 +22,7 @@ const notesContext={window:{}};vm.runInNewContext(notesSrc,notesContext);
 const notes=notesContext.window.ClearExamsTNSchoolNotes;
 const ids=new Set(notes.map(n=>n.id));
 assert.equal(ids.size,notes.length,'Unique note IDs');
-assert.ok(notes.length>=40,'Broad coverage of verified Tamil Nadu textbook chapters');
+assert.ok(notes.length>=59,'Social-reform and state-government school-book coverage');
 for(const n of notes){
   assert.ok(n.title&&n.chapter&&Array.isArray(n.points)&&n.points.length>=3);
   const params=new URL(n.href,'https://clearexams.ink/').searchParams;
@@ -47,8 +47,15 @@ let links=0;
 for(const b of blocks)for(const u of b.units)for(const t of u.topics){
   if(Array.isArray(t)&&t[1]){assert.ok(ids.has(t[1]),'Unresolved school-book note: '+t[1]);links++;}
 }
-assert.ok(links>=75,'Expanded direct syllabus-to-note coverage');
+assert.ok(links>=108,'Additional reform and polity topic links');
 assert.ok(notes.some(n=>n.id==='sangam')&&notes.some(n=>n.id==='gandhi-mass')&&notes.some(n=>n.id==='state-government')&&notes.some(n=>n.id==='biotech'),'History, polity and science chapter links present');
+const socialReforms=['brahmo-samaj','arya-samaj','ramakrishna-mission','theosophical-society','prarthana-samaj','satyashodhak','narayana-guru','pandita-ramabai','aligarh-movement','vaikunda-swami','vallalar','iyothee-thass','christian-missions'];
+for(const id of socialReforms){const note=notes.find(n=>n.id===id);assert.ok(note,'Missing social reform note: '+id);assert.match(note.chapter,/Class 11 History · Unit 19: Towards Modernity/);assert.equal(new URL(note.href,'https://clearexams.ink/').searchParams.get('unit'),'19');assert.ok(links>0);}
+for(const id of ['governor','chief-minister','legislative-assembly']){const note=notes.find(n=>n.id===id);assert.ok(note,'Missing state polity note: '+id);assert.match(note.chapter,/Class 7 Social Science · Term II · Civics: State Government/);const u=new URL(note.href,'https://clearexams.ink/').searchParams;assert.equal(u.get('class'),'7');assert.equal(u.get('term'),'2');assert.equal(u.get('unit'),'6');}
+const taggedIds=new Set(blocks.flatMap(b=>b.units.flatMap(u=>u.topics.filter(t=>Array.isArray(t)&&t[1]).map(t=>t[1]))));
+for(const id of [...socialReforms,'governor','chief-minister','legislative-assembly'])assert.ok(taggedIds.has(id),'Note not linked from syllabus: '+id);
+assert.equal(find('main-gs').units.reduce((n,u)=>n+u.count,0),150,'Question distribution was not altered');
+
 assert.match(notePage,/id="noteSearch"/,'Notes have topic search');
 assert.match(notePage,/id="noteMatches"/,'Topic search has accessible results');
 const scripts=[...notePage.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(s=>s.trim());
