@@ -1,4 +1,4 @@
-/* Curated short revision notes aligned to published Tamil Nadu school-book chapters. */
+/* Curated original short revision notes aligned to published Tamil Nadu school-book chapters. */
 window.ClearExamsTNSchoolNotes=[
   {
     "id": "measurements",
@@ -166,6 +166,354 @@ window.ClearExamsTNSchoolNotes=[
       "The three major layers of the Earth are crust, mantle and core.",
       "Igneous, sedimentary and metamorphic rocks are distinguished by their formation.",
       "Movements within the Earth can produce earthquakes, volcanoes and changes in relief."
+    ]
+  },
+  {
+    "id": "nationalism",
+    "title": "Rise of nationalism in India",
+    "ta": "இந்தியாவில் தேசியத்தின் எழுச்சி",
+    "chapter": "Class 12 History · Rise of Nationalism in India",
+    "href": "textbook-play.html?class=12&subject=history&unit=1&quiz=1",
+    "points": [
+      "The Indian National Congress was founded in 1885 as a forum for political discussion and representation.",
+      "Early nationalists used petitions, resolutions and public meetings to press for administrative reforms.",
+      "Economic criticism of colonial rule included the drain of wealth and the impact of British policies on Indian industries."
+    ]
+  },
+  {
+    "id": "swadeshi",
+    "title": "Swadeshi and the growth of militant nationalism",
+    "ta": "சுதேசி இயக்கமும் தீவிர தேசியவாத வளர்ச்சியும்",
+    "chapter": "Class 12 History · Rise of Extremism and Swadeshi Movement",
+    "href": "textbook-play.html?class=12&subject=history&unit=2&quiz=1",
+    "points": [
+      "The partition of Bengal in 1905 gave powerful momentum to the Swadeshi and boycott movements.",
+      "Swadeshi promoted the use of Indian-made goods; boycott challenged imported products and colonial institutions.",
+      "Bal Gangadhar Tilak, Bipin Chandra Pal and Lala Lajpat Rai were prominent assertive nationalist leaders."
+    ]
+  },
+  {
+    "id": "home-rule",
+    "title": "Home Rule movement and the First World War",
+    "ta": "தன்னாட்சி இயக்கமும் முதல் உலகப்போரும்",
+    "chapter": "Class 12 History · Impact of World War I on Indian Freedom Movement",
+    "href": "textbook-play.html?class=12&subject=history&unit=3&quiz=1",
+    "points": [
+      "The First World War increased India's economic and political strains under colonial rule.",
+      "Annie Besant and Bal Gangadhar Tilak organised Home Rule Leagues in 1916.",
+      "The Lucknow Pact of 1916 was an agreement between the Indian National Congress and the Muslim League."
+    ]
+  },
+  {
+    "id": "gandhi-mass",
+    "title": "Gandhi and mass nationalist movements",
+    "ta": "காந்தியடிகளும் மக்கள் இயக்கங்களும்",
+    "chapter": "Class 12 History · Advent of Gandhi and Mass Mobilisation",
+    "href": "textbook-play.html?class=12&subject=history&unit=4&quiz=1",
+    "points": [
+      "Gandhi led the Champaran satyagraha in 1917 and the Kheda struggle in 1918.",
+      "The Non-Cooperation Movement began in 1920 and was withdrawn after the Chauri Chaura incident in 1922.",
+      "The Salt March of 1930 initiated the Civil Disobedience Movement, challenging the colonial salt laws."
+    ]
+  },
+  {
+    "id": "anti-imperial",
+    "title": "Revolutionary anti-imperialist struggles",
+    "ta": "ஏகாதிபத்திய எதிர்ப்புப் புரட்சிகரப் போராட்டங்கள்",
+    "chapter": "Class 12 History · Period of Radicalism in Anti-imperialist Struggles",
+    "href": "textbook-play.html?class=12&subject=history&unit=5&quiz=1",
+    "points": [
+      "Revolutionary groups used clandestine organisation and direct actions against colonial rule.",
+      "The Hindustan Socialist Republican Association was associated with Bhagat Singh and his fellow revolutionaries.",
+      "Study revolutionary movements alongside mass civil disobedience, recognising their different strategies."
+    ]
+  },
+  {
+    "id": "freedom-final",
+    "title": "Last phase of the Indian freedom movement",
+    "ta": "இந்திய விடுதலை இயக்கத்தின் இறுதிக்கட்டம்",
+    "chapter": "Class 12 History · Last Phase of Indian National Movement",
+    "href": "textbook-play.html?class=12&subject=history&unit=7&quiz=1",
+    "points": [
+      "The Quit India resolution was adopted by the Congress in August 1942.",
+      "Subhas Chandra Bose became associated with the Indian National Army in the struggle against British colonial rule.",
+      "India attained independence in August 1947 amid Partition and severe human displacement."
+    ]
+  },
+  {
+    "id": "postcolonial",
+    "title": "Reconstruction of independent India",
+    "ta": "விடுதலைக்குப் பிந்தைய இந்திய மறுகட்டமைப்பு",
+    "chapter": "Class 12 History · Reconstruction of Post-colonial India",
+    "href": "textbook-play.html?class=12&subject=history&unit=8&quiz=1",
+    "points": [
+      "Post-independence India faced the integration of princely states and the resettlement of displaced people.",
+      "The Constitution came into force on 26 January 1950, establishing a republic.",
+      "Linguistic reorganisation and planning were major parts of the early decades of nation building."
+    ]
+  },
+  {
+    "id": "socioeconomic",
+    "title": "Economic planning and social development",
+    "ta": "பொருளாதாரத் திட்டமிடலும் சமூக வளர்ச்சியும்",
+    "chapter": "Class 12 History · Envisioning a New Socio-Economic Order",
+    "href": "textbook-play.html?class=12&subject=history&unit=9&quiz=1",
+    "points": [
+      "Independent India adopted a mixed-economy approach with public and private sectors.",
+      "Five-Year Plans set priorities for industrialisation, agriculture and infrastructure.",
+      "Development measures must be assessed alongside distribution, education, health and social equity."
+    ]
+  },
+  {
+    "id": "vijayanagar",
+    "title": "Vijayanagara and Bahmani kingdoms",
+    "ta": "விஜயநகரமும் பாமினி அரசுகளும்",
+    "chapter": "Class 7 Social Science · Term II · Vijayanagar and Bahmani Kingdoms",
+    "href": "textbook-play.html?class=7&subject=social-science&term=2&unit=1&quiz=1",
+    "points": [
+      "The Vijayanagara Empire was established in the fourteenth century and developed Hampi as a major centre.",
+      "Krishnadevaraya was a prominent Vijayanagara ruler known for military and cultural achievements.",
+      "The Bahmani kingdom emerged in the Deccan in the fourteenth century and later split into successor sultanates."
+    ]
+  },
+  {
+    "id": "mughals",
+    "title": "The Mughal Empire",
+    "ta": "முகலாயப் பேரரசு",
+    "chapter": "Class 7 Social Science · Term II · The Mughal Empire",
+    "href": "textbook-play.html?class=7&subject=social-science&term=2&unit=2&quiz=1",
+    "points": [
+      "Babur's victory at the First Battle of Panipat in 1526 established Mughal power in north India.",
+      "Akbar expanded the empire and developed administrative and revenue arrangements.",
+      "Mansabdari involved ranking nobles and officers and assigning obligations under imperial service."
+    ]
+  },
+  {
+    "id": "marathas",
+    "title": "Rise of Marathas and the Peshwas",
+    "ta": "மராத்தியர்களும் பேஷ்வாக்களும்",
+    "chapter": "Class 7 Social Science · Term II · Rise of Marathas and Peshwas",
+    "href": "textbook-play.html?class=7&subject=social-science&term=2&unit=3&quiz=1",
+    "points": [
+      "Shivaji built a Maratha kingdom and was crowned at Raigad in 1674.",
+      "The Ashtapradhan was an eight-member council of ministers associated with Shivaji's administration.",
+      "The Peshwas later assumed a leading political role in the Maratha confederacy."
+    ]
+  },
+  {
+    "id": "state-government",
+    "title": "Tamil Nadu state government structure",
+    "ta": "தமிழ்நாடு மாநில அரசின் அமைப்பு",
+    "chapter": "Class 7 Social Science · Term II · State Government",
+    "href": "textbook-play.html?class=7&subject=social-science&term=2&unit=6&quiz=1",
+    "points": [
+      "The Governor is the constitutional head of a state, while the Chief Minister heads the elected Council of Ministers.",
+      "A state's Legislative Assembly makes laws on matters within its constitutional competence.",
+      "Ministers are collectively responsible to the Legislative Assembly."
+    ]
+  },
+  {
+    "id": "media-democracy",
+    "title": "Media, democracy and public accountability",
+    "ta": "ஊடகம், மக்களாட்சி மற்றும் பொறுப்புடைமை",
+    "chapter": "Class 7 Social Science · Term II · Media and Democracy",
+    "href": "textbook-play.html?class=7&subject=social-science&term=2&unit=7&quiz=1",
+    "points": [
+      "The media informs the public and can scrutinise decisions made by those in power.",
+      "Freedom of expression supports democratic debate, subject to constitutional restrictions.",
+      "News reports should be checked for accuracy, sourcing and bias before being accepted or shared."
+    ]
+  },
+  {
+    "id": "sangam",
+    "title": "Sangam-age Tamil society and culture",
+    "ta": "சங்ககாலத் தமிழ்ச் சமூகமும் பண்பாடும்",
+    "chapter": "Class 6 Social Science · Term III · Society and Culture in Ancient Tamizhagam: The Sangam Age",
+    "href": "textbook-play.html?class=6&subject=social-science&term=3&unit=1&quiz=1",
+    "points": [
+      "The Sangam corpus is an important literary source for studying early Tamilagam.",
+      "The five tinai landscapes link ecological settings with livelihoods, social life and poetic conventions.",
+      "Literary, archaeological and inscriptional evidence must be read together when reconstructing the Sangam period."
+    ]
+  },
+  {
+    "id": "post-mauryan",
+    "title": "Post-Mauryan dynasties and cultural change",
+    "ta": "மௌரியருக்குப் பிந்தைய இந்திய அரசுகளும் பண்பாடும்",
+    "chapter": "Class 6 Social Science · Term III · The Post-Mauryan India",
+    "href": "textbook-play.html?class=6&subject=social-science&term=3&unit=2&quiz=1",
+    "points": [
+      "The Sungas and Kanvas ruled in parts of northern India after the Mauryas.",
+      "Indo-Greek, Saka, Kushana and Satavahana rulers were important in post-Mauryan political history.",
+      "Cross-regional trade, religious patronage and coinage are key sources for this period."
+    ]
+  },
+  {
+    "id": "guptas",
+    "title": "Guptas and Vardhanas",
+    "ta": "குப்தர்களும் வர்த்தனர்களும்",
+    "chapter": "Class 6 Social Science · Term III · The Age of Empires: Guptas and Vardhanas",
+    "href": "textbook-play.html?class=6&subject=social-science&term=3&unit=3&quiz=1",
+    "points": [
+      "The Gupta age saw developments in Sanskrit literature, science and the arts.",
+      "Samudragupta's achievements are described in the Allahabad Pillar inscription.",
+      "Harshavardhana was associated with the Pushyabhuti (Vardhana) dynasty and the north Indian political landscape."
+    ]
+  },
+  {
+    "id": "population-settlement",
+    "title": "Population distribution and settlements",
+    "ta": "மக்கள்தொகைப் பரவலும் குடியிருப்புகளும்",
+    "chapter": "Class 7 Social Science · Term I · Population and Settlement",
+    "href": "textbook-play.html?class=7&subject=social-science&term=1&unit=7&quiz=1",
+    "points": [
+      "Population density relates the number of people to the area they occupy.",
+      "Physical factors such as relief, water and climate influence settlement patterns.",
+      "Settlements may be classified as rural or urban based on characteristics including economic activity and services."
+    ]
+  },
+  {
+    "id": "optics",
+    "title": "Light and optical phenomena",
+    "ta": "ஒளி மற்றும் ஒளியியல் நிகழ்வுகள்",
+    "chapter": "Class 10 Science · Optics",
+    "href": "textbook-play.html?class=10&subject=science&unit=2&quiz=1",
+    "points": [
+      "Reflection obeys the law that the angle of incidence equals the angle of reflection.",
+      "Refraction is the change in direction of light as it passes between media with different refractive indices.",
+      "Convex lenses can form real or virtual images depending on the object's position."
+    ]
+  },
+  {
+    "id": "thermal",
+    "title": "Heat and thermal physics",
+    "ta": "வெப்பமும் வெப்ப இயற்பியலும்",
+    "chapter": "Class 10 Science · Thermal Physics",
+    "href": "textbook-play.html?class=10&subject=science&unit=3&quiz=1",
+    "points": [
+      "Temperature indicates the thermal state of a body, while heat is energy transferred due to a temperature difference.",
+      "Heat transfer occurs by conduction, convection and radiation.",
+      "The thermal expansion of substances can affect engineering structures and measuring devices."
+    ]
+  },
+  {
+    "id": "electric-current",
+    "title": "Electric current and Ohm's law",
+    "ta": "மின்னோட்டமும் ஓம் விதியும்",
+    "chapter": "Class 10 Science · Electricity",
+    "href": "textbook-play.html?class=10&subject=science&unit=4&quiz=1",
+    "points": [
+      "Electric current is the rate of flow of electric charge: I = Q/t.",
+      "Ohm's law states that V = IR for an ohmic conductor at constant physical conditions.",
+      "Resistance in series adds, while reciprocal resistances add for parallel connections."
+    ]
+  },
+  {
+    "id": "nuclear",
+    "title": "Radioactivity and nuclear physics",
+    "ta": "கதிரியக்கமும் அணுக்கரு இயற்பியலும்",
+    "chapter": "Class 10 Science · Nuclear Physics",
+    "href": "textbook-play.html?class=10&subject=science&unit=6&quiz=1",
+    "points": [
+      "Alpha, beta and gamma radiation differ in charge, penetrating ability and interaction with matter.",
+      "The half-life of a radioactive isotope is the time required for half of its radioactive nuclei to decay.",
+      "Nuclear fission splits heavy nuclei; fusion combines light nuclei under suitable conditions."
+    ]
+  },
+  {
+    "id": "genetics",
+    "title": "Heredity and Mendelian genetics",
+    "ta": "மரபுவழிப் பண்புகளும் மெண்டலிய மரபியலும்",
+    "chapter": "Class 10 Science · Genetics",
+    "href": "textbook-play.html?class=10&subject=science&unit=18&quiz=1",
+    "points": [
+      "Genes are functional units of heredity carried on chromosomes.",
+      "Mendel's pea-plant experiments revealed patterns of dominance and segregation.",
+      "Genotype describes an organism's genetic constitution; phenotype denotes observable traits."
+    ]
+  },
+  {
+    "id": "biotech",
+    "title": "Biotechnology and selective breeding",
+    "ta": "உயிரித்தொழில்நுட்பமும் தேர்ந்தெடுத்த இனப்பெருக்கமும்",
+    "chapter": "Class 10 Science · Breeding and Biotechnology",
+    "href": "textbook-play.html?class=10&subject=science&unit=20&quiz=1",
+    "points": [
+      "Selective breeding combines desirable traits through planned mating or crossing.",
+      "Biotechnology uses living organisms, cells or biological components to develop useful products and processes.",
+      "DNA-based techniques have applications in medicine, agriculture and identifying biological material."
+    ]
+  },
+  {
+    "id": "health-diseases",
+    "title": "Human health, disease and prevention",
+    "ta": "மனித உடல்நலம், நோய்கள் மற்றும் தடுப்பு",
+    "chapter": "Class 10 Science · Health and Diseases",
+    "href": "textbook-play.html?class=10&subject=science&unit=21&quiz=1",
+    "points": [
+      "Communicable diseases spread through infectious agents; noncommunicable diseases do not spread by infection.",
+      "Vaccination helps the immune system develop protection against specific pathogens.",
+      "Public-health measures include sanitation, safe water, nutrition, screening and disease surveillance."
+    ]
+  },
+  {
+    "id": "environment-management",
+    "title": "Environmental management and conservation",
+    "ta": "சுற்றுச்சூழல் மேலாண்மையும் பாதுகாப்பும்",
+    "chapter": "Class 10 Science · Environmental Management",
+    "href": "textbook-play.html?class=10&subject=science&unit=22&quiz=1",
+    "points": [
+      "Sustainable resource use seeks to meet present needs without undermining future generations.",
+      "Afforestation, water conservation and responsible waste management reduce environmental pressure.",
+      "Renewable sources such as solar and wind energy can reduce dependence on finite fossil fuels."
+    ]
+  },
+  {
+    "id": "acids-bases",
+    "title": "Acids, bases and indicators",
+    "ta": "அமிலங்கள், காரங்கள் மற்றும் நிறங்காட்டிகள்",
+    "chapter": "Class 8 Science · Term III · Acids and Bases",
+    "href": "textbook-play.html?class=8&subject=science&term=3&unit=5&quiz=1",
+    "points": [
+      "Acids generally turn blue litmus red, while bases generally turn red litmus blue.",
+      "The pH scale describes how acidic or basic an aqueous solution is.",
+      "Acids and bases can react in neutralisation reactions to form salt and water."
+    ]
+  },
+  {
+    "id": "crop-production",
+    "title": "Agriculture and crop management",
+    "ta": "வேளாண்மையும் பயிர் மேலாண்மையும்",
+    "chapter": "Class 8 Science · Term III · Crop Production and Management",
+    "href": "textbook-play.html?class=8&subject=science&term=3&unit=7&quiz=1",
+    "points": [
+      "Crop production involves soil preparation, sowing, irrigation, nutrition, protection and harvesting.",
+      "Weeds compete with crops for water, nutrients, light and space.",
+      "Soil and water conservation, seed quality and careful fertilizer use improve sustainability."
+    ]
+  },
+  {
+    "id": "biodiversity",
+    "title": "Conservation of plants and animals",
+    "ta": "தாவர விலங்குப் பல்லுயிர் பாதுகாப்பு",
+    "chapter": "Class 8 Science · Term III · Conservation of Plants and Animals",
+    "href": "textbook-play.html?class=8&subject=science&term=3&unit=8&quiz=1",
+    "points": [
+      "Biodiversity includes variation among genes, species and ecosystems.",
+      "National parks, wildlife sanctuaries and biosphere reserves support habitat and species protection.",
+      "Deforestation can damage habitats, reduce biodiversity and increase soil erosion."
+    ]
+  },
+  {
+    "id": "information-age",
+    "title": "Computer basics and the information age",
+    "ta": "கணினி அடிப்படைகளும் தகவல் யுகமும்",
+    "chapter": "Class 8 Science · Term I · Introduction to the Information Age",
+    "href": "textbook-play.html?class=8&subject=science&term=1&unit=9&quiz=1",
+    "points": [
+      "Information technology uses computers and communication systems to store, process and share information.",
+      "Hardware refers to physical computer components; software refers to programs and instructions.",
+      "Digital communication is useful but requires care with personal information, passwords and reliable sources."
     ]
   }
 ];
