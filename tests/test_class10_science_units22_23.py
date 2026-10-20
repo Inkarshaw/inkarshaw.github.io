@@ -167,7 +167,7 @@ EXPECTED={
       "அது தற்போதைய திசையில் முன்னே நகரும்"
     ],
     [
-      "Go to x:0 y:0, then move steps",
+      "Go to x:0 y:0 then move steps",
       "முதலில் x:0 y:0 செல், பின்னர் படிகள் நகரு"
     ],
     [
