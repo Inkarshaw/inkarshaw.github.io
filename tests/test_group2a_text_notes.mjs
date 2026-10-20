@@ -22,7 +22,7 @@ const notesContext={window:{}};vm.runInNewContext(notesSrc,notesContext);
 const notes=notesContext.window.ClearExamsTNSchoolNotes;
 const ids=new Set(notes.map(n=>n.id));
 assert.equal(ids.size,notes.length,'Unique note IDs');
-assert.ok(notes.length>=14,'Published revision notes');
+assert.ok(notes.length>=40,'Broad coverage of verified Tamil Nadu textbook chapters');
 for(const n of notes){
   assert.ok(n.title&&n.chapter&&Array.isArray(n.points)&&n.points.length>=3);
   const params=new URL(n.href,'https://clearexams.ink/').searchParams;
@@ -47,5 +47,10 @@ let links=0;
 for(const b of blocks)for(const u of b.units)for(const t of u.topics){
   if(Array.isArray(t)&&t[1]){assert.ok(ids.has(t[1]),'Unresolved school-book note: '+t[1]);links++;}
 }
-assert.ok(links>=15);
+assert.ok(links>=75,'Expanded direct syllabus-to-note coverage');
+assert.ok(notes.some(n=>n.id==='sangam')&&notes.some(n=>n.id==='gandhi-mass')&&notes.some(n=>n.id==='state-government')&&notes.some(n=>n.id==='biotech'),'History, polity and science chapter links present');
+assert.match(notePage,/id="noteSearch"/,'Notes have topic search');
+assert.match(notePage,/id="noteMatches"/,'Topic search has accessible results');
+const scripts=[...notePage.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g)].map(m=>m[1]).filter(s=>s.trim());
+assert.ok(scripts.length);for(const script of scripts)new vm.Script(script,{filename:'tn-school-notes.html'});
 console.log('Group IIA syllabus valid: '+blocks.length+' subjects, '+notes.length+' notes, '+links+' note-linked topics.');
