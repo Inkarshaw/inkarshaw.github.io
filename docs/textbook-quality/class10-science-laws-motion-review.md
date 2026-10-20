@@ -6,7 +6,7 @@
 
 ## Inventory and first review batch
 
-The chapter has **580 MCQs in 29 sets of 20**. Four consecutive quality batches now review **Quiz sets 1–20 (questions 1–400)** and preserve all 580 question IDs, the existing 29 quiz sets, and the answer concepts while clarifying equivalent numerical display options.
+The chapter has **580 MCQs in 29 sets of 20**. Five consecutive quality batches now review **Quiz sets 1–25 (questions 1–500)** and preserve all 580 question IDs, the existing 29 quiz sets, and the answer concepts while clarifying equivalent numerical display options.
 
 Review improvements:
 - Make both English and Tamil explanations identify their actual keyed answer, then explain the physical principle or calculation.
@@ -15,7 +15,7 @@ Review improvements:
 - Remove metatextual stems asking for the answer *in the textbook*: question 77 (gravitational constant), 122 (parallel forces), 130 (Newton's second law), and 138 (Earth's mass). These questions now test physics directly.
 - Confirm the chapter concepts against the printed government textbook, especially inertia, forces, torque, impulse, gravitation and the value of G.
 
-The first 400 questions now meet the targeted basic criteria: four distinguishable options in both languages, explicitly keyed bilingual explanation, adequate rationale length and consistent numerical answer format. The new focused regression and repository quality workflow must pass before merging.
+The first 500 questions now meet the targeted basic criteria: four distinguishable options in both languages, explicitly keyed bilingual explanation, adequate rationale length and consistent numerical answer format. The new focused regression and repository quality workflow must pass before merging.
 
 ## Second review batch: quizzes 6–10
 
@@ -35,24 +35,30 @@ Questions **301–400** received updated keyed bilingual explanations and more s
 
 The newly added `tests/test_class10_science_unit1_review16_20.py` locks the 100 keyed English and Tamil answers and checks the 580-question structure, explanatory sufficiency, choice uniqueness, and no errors or warnings from the existing audit at offset 300. All four earlier and current review windows are separately regression-tested.
 
+## Fifth review batch: quizzes 21–25
+
+Questions **401–500** received more explicit English–Tamil keyed explanations, targeted expansion of short derivations, and consistent units and terminology. **19 mixed numerical-option sets** were reformatted with meaningful physical-quantity labels (forces, moments, energy, speed and collision outcomes). English and Tamil number order was synchronised for zero-field Q437 and three-fragment momentum Q452. The physical answers and all question IDs remain unchanged.
+
+The `tests/test_class10_science_unit1_review21_25.py` suite locks the exact 100 bilingual answer keys and runs the existing structural auditor over the reviewed window. All first 500 items now meet the focus checks, leaving 80 items for the final chapter audit batch.
+
 ## Outstanding editorial backlog
 
-**Questions 401–580 remain unreviewed in the first four passes**. A provisional scan after these revisions identified the following *overlapping* categories among these 180 questions; these are triage counts, not independently validated factual errors:
+**Questions 501–580 remain unreviewed in the first five passes**. A provisional scan after these revisions identified the following *overlapping* categories among these 80 questions; these are triage counts, not independently validated factual errors:
 
 | Signal in remaining questions | Count |
 | --- | ---: |
-| English or Tamil explanation shorter than structural minimum | 7 |
-| Correct answer wording not repeated literally in one or both explanations | 114 |
-| Numerical and nonnumerical English option formats mixed | 24 |
-| Keyed answer's Arabic numerals differ across English and Tamil | 3 |
+| English or Tamil explanation shorter than structural minimum | 1 |
+| Correct answer wording not repeated literally in one or both explanations | 46 |
+| Numerical and nonnumerical English option formats mixed | 6 |
+| Keyed answer's Arabic numerals differ across English and Tamil | 1 |
 
 The last signal needs especially careful editorial inspection: it can represent either a translation mismatch or inconsistent formatting of an otherwise equal value. Merely copying option text into an explanation does not establish factually correct answers or good Tamil.
 
 ## Planned follow-up
 
-1. Review **Quizzes 21–25 (questions 401–500)** against the chapter and correct actual distractor, formula, numerical and Tamil-alignment issues.
-2. Finish Quizzes 26–29 (questions 501–580) and review the entire 580-question bank.
+1. Finish **Quizzes 26–29 (questions 501–580)** against the chapter, including numerical and Tamil alignment issues.
+2. Run a whole-bank audit and perform additional independent Tamil editorial spot checks.
 3. Run the whole-bank structural audit after every completed review series and carry out an independent textbook/Tamil-native editorial sampling.
 4. Check the live website after GitHub Pages publishes the merge; green GitHub tests alone do not confirm browser publication.
 
-**Do not describe the entire Laws of Motion bank as editorially complete on the basis of the first twenty quizzes.**
+**Do not describe the entire Laws of Motion bank as editorially complete on the basis of the first twenty-five quizzes.**
