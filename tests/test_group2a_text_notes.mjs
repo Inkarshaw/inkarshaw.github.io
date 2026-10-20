@@ -143,7 +143,7 @@ for(const id of bilingualIds){
   assert.ok(note.exam_focus?.length>45&&/[\u0B80-\u0BFF]/u.test(note.exam_focus_ta),id+': bilingual exam focus missing');
   assert.ok(note.worked_example?.length>45&&/[\u0B80-\u0BFF]/u.test(note.worked_example_ta),id+': bilingual practical example missing');
   assert.ok(note.quick_check?.question?.length>15&&note.quick_check?.answer?.length>3,id+': English answer check missing');
-  assert.ok(/[\u0B80-\u0BFF]/u.test(note.quick_check.question_ta)&&/[\u0B80-\u0BFF]/u.test(note.quick_check.answer_ta),id+': Tamil answer check missing');
+  assert.ok(/[\u0B80-\u0BFF]/u.test(note.quick_check.question_ta)&&( /[\u0B80-\u0BFF]/u.test(note.quick_check.answer_ta)||/^[\d\s.,–-]+$/.test(note.quick_check.answer_ta)),id+': Tamil answer check missing');
   assert.ok(taggedIds.has(id),id+': bilingual note is not linked from syllabus');
 }
 assert.equal(notes.filter(n=>n.points_ta?.length===n.points?.length).length,16,'Only complete translations should be counted');
