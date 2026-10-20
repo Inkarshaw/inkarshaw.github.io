@@ -596,7 +596,7 @@ window.ClearExamsTNSchoolNotes=[
     "href": "textbook-play.html?class=11&subject=history&unit=19&quiz=1",
     "points": [
       "Sri Narayana Guru challenged caste exclusion and promoted dignity and social equality.",
-      "The Sri Narayana Dharma Paripalana (SNDP) Yogam was established in 1903, associated with his reform efforts.",
+      "The Sri Narayana Dharma Paripalana (SNDP) Yogam advanced reform efforts in the early twentieth century.",
       "Reformers connected with the movement worked for access to education, public roads and religious spaces."
     ]
   },
