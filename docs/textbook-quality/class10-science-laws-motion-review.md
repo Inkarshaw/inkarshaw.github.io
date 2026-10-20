@@ -4,9 +4,9 @@
 **Bank:** `data/textbook/class-10/science/unit-1.json`  
 **Textbook:** [Tamil Nadu State Board Class 10 Science, Unit 1 (2019 English chapter PDF)](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-10-Science-Textbook-Chapter-1.pdf)
 
-## Inventory and first review batch
+## Inventory and completed review batches
 
-The chapter has **580 MCQs in 29 sets of 20**. Five consecutive quality batches now review **Quiz sets 1–25 (questions 1–500)** and preserve all 580 question IDs, the existing 29 quiz sets, and the answer concepts while clarifying equivalent numerical display options.
+The chapter has **580 MCQs in 29 sets of 20**. Six consecutive quality batches now review **all 29 quiz sets (questions 1–580)** and preserve all 580 question IDs, the existing 29 quiz sets, and the answer concepts while clarifying equivalent numerical display options.
 
 Review improvements:
 - Make both English and Tamil explanations identify their actual keyed answer, then explain the physical principle or calculation.
@@ -15,13 +15,13 @@ Review improvements:
 - Remove metatextual stems asking for the answer *in the textbook*: question 77 (gravitational constant), 122 (parallel forces), 130 (Newton's second law), and 138 (Earth's mass). These questions now test physics directly.
 - Confirm the chapter concepts against the printed government textbook, especially inertia, forces, torque, impulse, gravitation and the value of G.
 
-The first 500 questions now meet the targeted basic criteria: four distinguishable options in both languages, explicitly keyed bilingual explanation, adequate rationale length and consistent numerical answer format. The new focused regression and repository quality workflow must pass before merging.
+All 580 questions now meet the targeted basic criteria: four distinguishable options in both languages, explicitly keyed bilingual explanation, adequate rationale length and consistent numerical answer format. Separate frozen-answer tests cover all six batches; the full-bank audit is required to pass CI before merge.
 
 ## Second review batch: quizzes 6–10
 
 Questions 101–200 received additional EN/Tamil explanation alignment and worked calculations. Eleven MCQs also received clearer, consistent answer-option presentation for gravitation, vectors, circular motion, impulse and torque (Q115, Q116, Q120, Q124, Q142, Q148, Q169, Q178, Q188, Q191, Q196). Q124 and Q196 specifically align the order of numerical values across the languages; these had represented formatting mismatches rather than different mathematical answers.
 
-A dedicated `tests/test_class10_science_unit1_review6_10.py` freezes the 100 bilingual keyed answers and requires the unchanged 580-question bank plus a zero-error and zero-warning audit of that window. It does not waive editorial review for Quizzes 11–29.
+A dedicated `tests/test_class10_science_unit1_review6_10.py` freezes the 100 bilingual keyed answers and requires the unchanged 580-question bank plus a zero-error and zero-warning audit of that window. The additional review batches are documented below.
 
 ## Third review batch: quizzes 11–15
 
@@ -39,26 +39,23 @@ The newly added `tests/test_class10_science_unit1_review16_20.py` locks the 100 
 
 Questions **401–500** received more explicit English–Tamil keyed explanations, targeted expansion of short derivations, and consistent units and terminology. **19 mixed numerical-option sets** were reformatted with meaningful physical-quantity labels (forces, moments, energy, speed and collision outcomes). English and Tamil number order was synchronised for zero-field Q437 and three-fragment momentum Q452. The physical answers and all question IDs remain unchanged.
 
-The `tests/test_class10_science_unit1_review21_25.py` suite locks the exact 100 bilingual answer keys and runs the existing structural auditor over the reviewed window. All first 500 items now meet the focus checks, leaving 80 items for the final chapter audit batch.
+The `tests/test_class10_science_unit1_review21_25.py` suite locks the exact 100 bilingual answer keys and runs the existing structural auditor over the reviewed window. This batch's tests passed the focused checks; the last 80 items are documented below.
 
-## Outstanding editorial backlog
+## Sixth review batch: quizzes 26–29
 
-**Questions 501–580 remain unreviewed in the first five passes**. A provisional scan after these revisions identified the following *overlapping* categories among these 80 questions; these are triage counts, not independently validated factual errors:
+Questions **501–580** received bilingual keyed-answer explanation alignment. Six answer-option sets were clarified for consistent numerical presentation: **Q511, Q515, Q529, Q547, Q568, Q574**. The correct English answer's numerical order for three-fragment momentum **Q514** now matches Tamil without altering the underlying result. The short planetary-density explanation at **Q517** was extended with the relevant physical relationship. All original keys, IDs, and the 29 quiz sets are preserved.
 
-| Signal in remaining questions | Count |
-| --- | ---: |
-| English or Tamil explanation shorter than structural minimum | 1 |
-| Correct answer wording not repeated literally in one or both explanations | 46 |
-| Numerical and nonnumerical English option formats mixed | 6 |
-| Keyed answer's Arabic numerals differ across English and Tamil | 1 |
+The new `tests/test_class10_science_unit1_review26_29.py` freezes **80 bilingual answer pairs** and checks the final review window. It also runs the standard quality auditor across **all 580 questions**, requiring zero errors and zero warnings. Prior review tests freeze the other 500 bilingual answer pairs.
 
-The last signal needs especially careful editorial inspection: it can represent either a translation mismatch or inconsistent formatting of an otherwise equal value. Merely copying option text into an explanation does not establish factually correct answers or good Tamil.
+## Review coverage and independent editorial follow-up
 
-## Planned follow-up
+**All 580 MCQs (29 quiz sets) have now passed the targeted structural and explanation-alignment preflight.** The six regression tests cover all 580 bilingual correct answers. Preliminary numeric-format checks found zero remaining mixed-format options or English–Tamil numeric-order mismatches.
 
-1. Finish **Quizzes 26–29 (questions 501–580)** against the chapter, including numerical and Tamil alignment issues.
-2. Run a whole-bank audit and perform additional independent Tamil editorial spot checks.
-3. Run the whole-bank structural audit after every completed review series and carry out an independent textbook/Tamil-native editorial sampling.
-4. Check the live website after GitHub Pages publishes the merge; green GitHub tests alone do not confirm browser publication.
+**Important limitation:** Explicitly including a keyed choice in an explanation does not independently prove the physics or Tamil translation is correct. No automated checker can fully certify the factual accuracy, authenticity of distractors or native-speaker Tamil style. Do not label this an independent, fact-by-fact SCERT editorial certification.
 
-**Do not describe the entire Laws of Motion bank as editorially complete on the basis of the first twenty-five quizzes.**
+Recommended next actions:
+1. Carry out independent Tamil-medium subject-teacher sampling across all 29 quizzes and verify the most complex calculation choices against SCERT examples.
+2. Review **Class 10 Science Unit 2** and other previously published textbook banks using the same chapter-by-chapter methodology.
+3. Check the live website after GitHub Pages deploys and test answering, explanation feedback and language switching. GitHub merges and green CI do not alone establish live-browser publication.
+
+**Overall Class 10 Science catalogue:** 23 units, 1,040 questions, 52 quiz sets; this QA work changes question text and supporting tests, not counts.
