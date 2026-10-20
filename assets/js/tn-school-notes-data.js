@@ -1,4 +1,4 @@
-/* TNPSC revision notes: textbook-grounded entries plus explicitly tagged official-government entries. */
+/* Group IIA notes: TN State Board chapters and separately tagged official Tamil Nadu government references. */
 window.ClearExamsTNSchoolNotes=[
   {
     "id": "measurements",
@@ -1210,6 +1210,314 @@ window.ClearExamsTNSchoolNotes=[
       "The Commissionerate of Revenue Administration supervises district revenue administration.",
       "The Revenue Administration Commissioner is also designated State Relief Commissioner, with disaster-management duties.",
       "Core revenue-department work includes social security schemes, e-certificates, grievance redressal, regulatory functions and disaster response."
+    ]
+  },
+  {
+    "id": "tn-secretariat",
+    "title": "Tamil Nadu Secretariat and policy administration",
+    "ta": "தமிழ்நாடு தலைமைச் செயலகமும் கொள்கை நிர்வாகமும்",
+    "chapter": "Tamil Nadu Rural Development & Panchayat Raj: Secretariat and field directorate",
+    "source_kind": "government",
+    "source_url": "https://www.tnrd.tn.gov.in/rd_pt_state_contacts.html",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "The State Secretariat consists of government departments supporting ministers in policy development, rules, interdepartmental coordination and administrative decisions.",
+      "Government departments are headed administratively by their respective Secretaries or Principal Secretaries; field directorates are distinct implementation bodies.",
+      "For example, the Rural Development and Panchayat Raj Secretariat department and Directorate of Rural Development are separately listed on the official department website."
+    ]
+  },
+  {
+    "id": "tn-business-rules",
+    "title": "Rules of Business and administrative allocation",
+    "ta": "அரசுப் பணிப் பகிர்வு விதிகளும் நிர்வாக ஒதுக்கீடும்",
+    "chapter": "Rural Development & Panchayat Raj: 2008 amendment to TN Government Business Rules",
+    "source_kind": "government",
+    "source_url": "https://tnrd.tn.gov.in/State_Schemes/linkfiles/go_144_110808_par.pdf",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Article 166 of the Constitution provides for conduct of state government business in the Governor's name and rules for transaction and allocation of government business.",
+      "The Tamil Nadu Government Business Rules, 1978, allocate subjects among Secretariat departments.",
+      "An official 2008 amendment transferred Tamil Nadu Corporation for Development of Women and Mahalir Thittam from the Social Welfare portfolio to Rural Development and Panchayat Raj."
+    ]
+  },
+  {
+    "id": "tn-hrm",
+    "title": "Human Resources Management Department functions",
+    "ta": "மனிதவள மேலாண்மைத் துறை: பணிகள்",
+    "chapter": "Tamil Nadu government HRM Department · About Us",
+    "source_kind": "government",
+    "source_url": "https://www.karuvoolam.tn.gov.in/web/tnta/about-us-hrm",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "The Human Resources Management Department advises Secretariat departments on conditions of service, staffing rules, seniority and regularisation.",
+      "It handles policy questions under relevant service rules, including disciplinary matters and establishment issues.",
+      "Government-servant training includes foundation programmes and refresher topics such as the Right to Information Act, e-governance and cyber security."
+    ]
+  },
+  {
+    "id": "tn-finance-consultation",
+    "title": "Finance Department and expenditure proposals",
+    "ta": "நிதித்துறையும் புதிய செலவினத் திட்டங்களும்",
+    "chapter": "Tamil Nadu Finance Department · Budget Manual Volume I",
+    "source_kind": "government",
+    "source_url": "https://tnbudget.tn.gov.in/tnweb_files/TN_Budget_Manual_Vol_I_Book.pdf",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Secretariat departments must consult the Finance Department on proposals with specified financial implications under the Government Business Rules.",
+      "New government schemes and significant expansion of existing services require financial scrutiny before budget provision.",
+      "Distinguish a policy announcement, administrative sanction and the legislative appropriation needed before government expenditure."
+    ]
+  },
+  {
+    "id": "tn-budget-process",
+    "title": "Budget Estimates, Revised Estimates and actuals",
+    "ta": "வரவு–செலவுத் திட்ட மதிப்பீடுகள், திருத்திய மதிப்பீடுகள் மற்றும் உண்மை கணக்குகள்",
+    "chapter": "Tamil Nadu Finance Department · Citizen's Guide to Budget 2025–26",
+    "source_kind": "government",
+    "source_url": "https://www.tnbudget.tn.gov.in/tnweb_files/CB%202025_2026_English.pdf",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Budget Estimates (BE) are planned receipts and spending for the coming financial year.",
+      "Revised Estimates (RE) update earlier projections during the financial year; actual accounts record outcomes.",
+      "Revenue receipts and capital receipts differ, as do recurring revenue expenditure and capital spending on assets."
+    ]
+  },
+  {
+    "id": "tn-budget-deficits",
+    "title": "Fiscal deficit, revenue deficit and public debt",
+    "ta": "நிதிப் பற்றாக்குறை, வருவாய்ப் பற்றாக்குறை மற்றும் பொதுக் கடன்",
+    "chapter": "Tamil Nadu Finance Department · Citizen's Guide to Budget 2025–26",
+    "source_kind": "government",
+    "source_url": "https://www.tnbudget.tn.gov.in/tnweb_files/CB%202025_2026_English.pdf",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "A revenue deficit occurs when revenue expenditure exceeds revenue receipts.",
+      "Fiscal deficit measures the government's overall borrowing requirement, excluding borrowings from total receipts.",
+      "Budget figures must be interpreted with the stated financial year and whether they are Budget, Revised or Actual values."
+    ]
+  },
+  {
+    "id": "tn-gsdp",
+    "title": "Tamil Nadu GSDP and NSDP concepts",
+    "ta": "தமிழ்நாடு மாநில மொத்த உற்பத்தி மற்றும் நிகர உற்பத்தி",
+    "chapter": "Tamil Nadu Department of Economics and Statistics · Estimation of State Income",
+    "source_kind": "government",
+    "source_url": "https://des.tn.gov.in/index.php/en/node/20",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Gross State Domestic Product (GSDP) measures the value of goods and services produced within a state's economic territory.",
+      "Net State Domestic Product (NSDP) equals GSDP less consumption of fixed capital.",
+      "State-income estimates are released at current and constant prices; comparisons over time should distinguish nominal and real growth."
+    ]
+  },
+  {
+    "id": "tn-gva-sectors",
+    "title": "Primary, secondary and tertiary-sector GVA",
+    "ta": "முதன்மை, இரண்டாம் மற்றும் சேவைத் துறை மதிப்புக் கூட்டல்",
+    "chapter": "Tamil Nadu Department of Economics and Statistics · State Income methodology",
+    "source_kind": "government",
+    "source_url": "https://des.tn.gov.in/index.php/en/node/20",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Gross Value Added (GVA) can be classified into primary, secondary and service sectors.",
+      "Agriculture and allied activities belong primarily to the primary sector, manufacturing to the secondary sector and trade, transport and finance to services.",
+      "Sectoral GVA at current and constant prices helps analyse structural change in the state economy."
+    ]
+  },
+  {
+    "id": "tn-state-income-estimates",
+    "title": "Advance, quick and revised state-income estimates",
+    "ta": "முன்கூட்டிய, விரைவு மற்றும் திருத்திய மாநில வருவாய் மதிப்பீடுகள்",
+    "chapter": "Tamil Nadu Department of Economics and Statistics · State Income Estimates",
+    "source_kind": "government",
+    "source_url": "https://des.tn.gov.in/index.php/en/node/20",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "The Department of Economics and Statistics prepares Tamil Nadu State Domestic Product estimates following national statistical methodology.",
+      "Published stages include provisional advance, advance, quick and revised estimates.",
+      "Changes across successive estimates reflect revised or additional source data; never mix estimates from different releases without noting their status."
+    ]
+  },
+  {
+    "id": "tn-agri-statistics",
+    "title": "Tamil Nadu agriculture and statistical administration",
+    "ta": "தமிழ்நாட்டின் வேளாண்மையும் புள்ளிவிவர நிர்வாகமும்",
+    "chapter": "Tamil Nadu Department of Economics and Statistics · Agricultural Division",
+    "source_kind": "government",
+    "source_url": "https://des.tn.gov.in/en/node/339",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Agriculture and allied work remains important for employment and livelihoods in Tamil Nadu.",
+      "The state agricultural statistical system collects information on cropping area, production, irrigation, land holdings and agricultural wages.",
+      "Government uses these statistics to design agricultural policies and monitor outcomes."
+    ]
+  },
+  {
+    "id": "tn-industry-sipcot",
+    "title": "SIPCOT and industrial infrastructure",
+    "ta": "சிப்காட் மற்றும் தொழில்துறை உள்கட்டமைப்பு",
+    "chapter": "State Industries Promotion Corporation of Tamil Nadu · Official FAQ",
+    "source_kind": "government",
+    "source_url": "https://sipcotweb.tn.gov.in/FAQ",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "SIPCOT is the State Industries Promotion Corporation of Tamil Nadu, a government-owned industrial-development organisation.",
+      "It develops industrial parks, sector-focused clusters and associated land and infrastructure to support investment.",
+      "Industrial infrastructure development is distinct from regulating firms or granting every statutory clearance."
+    ]
+  },
+  {
+    "id": "tn-msme-dic",
+    "title": "District Industries Centres and MSME facilitation",
+    "ta": "மாவட்டத் தொழில் மையங்களும் குறு, சிறு, நடுத்தரத் தொழில் உதவியும்",
+    "chapter": "Commissionerate of Industries and Commerce · RTI responsibilities and DIC scheme administration",
+    "source_kind": "government",
+    "source_url": "https://msmeonline.tn.gov.in/pdf/RTI_ENGLISH_%20UPDATION_PDF_REG.pdf",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "District Industries Centres provide district-level industrial and entrepreneur facilitation.",
+      "Departmental responsibilities include self-employment schemes, enterprise support and access to administrative guidance.",
+      "Examples of programme families described in official departmental responsibilities include NEEDS, UYEGP and PMEGP; consult current scheme guidelines for eligibility."
+    ]
+  },
+  {
+    "id": "tn-startup-ecosystem",
+    "title": "StartupTN and innovation support",
+    "ta": "ஸ்டார்ட்அப் தமிழ்நாடும் புத்தாக்க உதவிகளும்",
+    "chapter": "iTNT Hub · Official Tamil Nadu funding directory",
+    "source_kind": "government",
+    "source_url": "https://itnthub.tn.gov.in/funding-directory.html",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "StartupTN supports an ecosystem of new enterprises through mentorship, networks and startup-focused support programmes.",
+      "The state's innovation landscape includes sector-focused startup grants and programmes supporting marginalised entrepreneurs.",
+      "Funding limits and application windows vary; the official programme page takes precedence over static exam notes."
+    ]
+  },
+  {
+    "id": "tn-naan-mudhalvan",
+    "title": "Naan Mudhalvan skill development",
+    "ta": "நான் முதல்வன் திறன் மேம்பாட்டுத் திட்டம்",
+    "chapter": "Tamil Nadu Skill Development Corporation · Naan Mudhalvan portal",
+    "source_kind": "government",
+    "source_url": "https://naanmudhalvan.tn.gov.in/",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Naan Mudhalvan is a Tamil Nadu skill-development initiative linked with the Tamil Nadu Skill Development Corporation.",
+      "It provides upskilling opportunities for learners from colleges, polytechnics, ITIs and other eligible groups.",
+      "Activities include training, internships, apprenticeships and preparation support for selected competitive examinations."
+    ]
+  },
+  {
+    "id": "tn-pudhumai-penn",
+    "title": "Pudhumai Penn support for higher education",
+    "ta": "புதுமைப் பெண் உயர்கல்வி உதவித் திட்டம்",
+    "chapter": "Tamil Nadu Institute of Labour Studies · Government schemes",
+    "source_kind": "government",
+    "source_url": "https://tils.tn.gov.in/schemes",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Moovalur Ramamirtham Ammaiyar Ninaivu Pudhumai Penn Thittam provides financial assistance to eligible girls pursuing higher education.",
+      "Schooling history and institutional enrolment matter to eligibility; the official scheme uses digital beneficiary verification and direct benefit transfer.",
+      "Check current eligibility rules on the scheme or institute website before assuming a student qualifies."
+    ]
+  },
+  {
+    "id": "tn-tamil-pudhalvan",
+    "title": "Tamil Pudhalvan higher-education assistance",
+    "ta": "தமிழ் புதல்வன் உயர்கல்வி உதவித் திட்டம்",
+    "chapter": "Tamil Nadu Institute of Labour Studies · Government schemes",
+    "source_kind": "government",
+    "source_url": "https://tils.tn.gov.in/schemes",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Tamil Pudhalvan is a Tamil Nadu higher-education assistance scheme directed at eligible male students.",
+      "The official institution's scheme page lists qualifying school background and online application through UMIS.",
+      "Pudhumai Penn and Tamil Pudhalvan are separate programmes and must not be confused in exam questions."
+    ]
+  },
+  {
+    "id": "tn-magalir-urimai",
+    "title": "Kalaignar Magalir Urimai Thittam",
+    "ta": "கலைஞர் மகளிர் உரிமைத் திட்டம்",
+    "chapter": "Tamil Nadu e-Sevai · Official citizen service list (KMUT check status)",
+    "source_kind": "government",
+    "source_url": "https://www.tnesevai.tn.gov.in/Pages/ServiceList.aspx",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Kalaignar Magalir Urimai Thittam is a Tamil Nadu programme intended to support eligible women heads of families.",
+      "The scheme began in September 2023, and status-checking has an official e-Sevai service entry.",
+      "Benefit amounts, qualifying conditions and coverage must be checked against current government instructions rather than historic statements."
+    ]
+  },
+  {
+    "id": "tn-breakfast-scheme",
+    "title": "Chief Minister's Breakfast Scheme",
+    "ta": "முதலமைச்சரின் காலை உணவுத் திட்டம்",
+    "chapter": "Tamil Nadu Cooperation Department · Policy Note 2023–24, scheme overview",
+    "source_kind": "government",
+    "source_url": "https://tncu.tn.gov.in/doc/2023_2024.pdf",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "The Chief Minister's Breakfast Scheme started in September 2022 to serve breakfast to government primary-school children.",
+      "Its objective is to support children's nutrition and school participation.",
+      "Coverage has been expanded over time; use the applicable dated government order to determine which institutions are currently included."
+    ]
+  },
+  {
+    "id": "tn-shg-mahalir",
+    "title": "Tamil Nadu Corporation for Development of Women and SHGs",
+    "ta": "தமிழ்நாடு மகளிர் மேம்பாட்டுக் கழகமும் சுயஉதவிக் குழுக்களும்",
+    "chapter": "Tamil Nadu Rural Development & Panchayat Raj · About Us",
+    "source_kind": "government",
+    "source_url": "https://www.tnrd.tn.gov.in/aboutus.html",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Tamil Nadu Corporation for Development of Women (TNCDW) was established in 1983.",
+      "The corporation coordinates support for Self-Help Groups and women's socio-economic empowerment.",
+      "Mahalir Thittam and associated SHG activities connect savings, credit linkages, training and microenterprise development."
+    ]
+  },
+  {
+    "id": "tn-rural-welfare",
+    "title": "Rural development and antipoverty programme delivery",
+    "ta": "ஊரக வளர்ச்சியும் வறுமை ஒழிப்பு திட்டச் செயலாக்கமும்",
+    "chapter": "Tamil Nadu Rural Development & Panchayat Raj Department · About Us",
+    "source_kind": "government",
+    "source_url": "https://www.tnrd.tn.gov.in/aboutus.html",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "The department implements central, state and externally supported rural development programmes.",
+      "Its remit includes poverty reduction, employment, sanitation, capacity building and women's economic empowerment.",
+      "Administrative delivery through departments must be distinguished from elected Panchayat Raj institutions."
+    ]
+  },
+  {
+    "id": "tn-social-pensions",
+    "title": "Categories of Tamil Nadu social-security pensions",
+    "ta": "தமிழ்நாடு சமூகப் பாதுகாப்பு ஓய்வூதியப் பிரிவுகள்",
+    "chapter": "Commissionerate of Revenue Administration · Social Security Schemes",
+    "source_kind": "government",
+    "source_url": "https://www.cra.tn.gov.in/about_schemes.php",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "Tamil Nadu's social-security pensions cover categories such as older people, eligible widows, people with disabilities and specified vulnerable groups.",
+      "Different pension categories may use state funding, national funding or a combination.",
+      "Amounts, age criteria and asset thresholds can change; check the currently operative official scheme rules."
+    ]
+  },
+  {
+    "id": "tn-women-commission",
+    "title": "State Commission for Women and women's protection",
+    "ta": "மாநில மகளிர் ஆணையமும் பெண்கள் பாதுகாப்பும்",
+    "chapter": "Tamil Nadu State Commission for Women · Acts and Rules",
+    "source_kind": "government",
+    "source_url": "https://www.tnscw.tn.gov.in/",
+    "source_label": "Official Tamil Nadu Government reference",
+    "points": [
+      "The Tamil Nadu State Commission for Women is a state-level institution concerned with women's rights and welfare.",
+      "Its official website links to legal frameworks including the Dowry Prohibition Act and the Protection of Women from Domestic Violence Act.",
+      "Distinguish the commission's institutional role from police powers, courts and welfare scheme implementation."
     ]
   }
 ];
