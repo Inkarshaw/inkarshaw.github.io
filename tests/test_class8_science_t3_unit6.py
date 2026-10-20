@@ -25,8 +25,8 @@ class Class8ScienceTerm3Unit6Tests(unittest.TestCase):
         self.assertTrue(entry["ready"])
         self.assertEqual(entry["path"], "unit-6.json")
         self.assertEqual(entry["total"], 20)
-        self.assertEqual(INDEX["meta"]["total_questions"], 120)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 6)
+        self.assertEqual(INDEX["meta"]["total_questions"], 180)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 9)
         self.assertTrue(BANK["meta"].get("source_en_url"))
         self.assertTrue(BANK["meta"].get("source_ta_url"))
 
