@@ -1223,8 +1223,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The State Secretariat consists of government departments supporting ministers in policy development, rules, interdepartmental coordination and administrative decisions.",
       "Government departments are headed administratively by their respective Secretaries or Principal Secretaries; field directorates are distinct implementation bodies.",
-      "For example, the Rural Development and Panchayat Raj Secretariat department and Directorate of Rural Development are separately listed on the official department website."
-    ]
+      "For example, the Rural Development and Panchayat Raj Secretariat department and Directorate of Rural Development are separately listed on the official department website.",
+      "Ministers provide the elected policy leadership, while government Secretaries manage Secretariat administration and advise on policy execution.",
+      "The Secretariat typically handles cabinet/ministerial decisions, business rules, government orders, finance proposals and coordination among departments.",
+      "Directorates and subordinate offices perform sector-specific technical or field work outside the Secretariat.",
+      "At district level, field administration may be headed by Collectors and department-specific officers depending on statutory powers.",
+      "The location of a government office does not by itself determine its authority: jurisdiction and rules of business are decisive."
+    ],
+    "exam_focus": "Secretariat (policy, rules and coordination) versus Directorate (departmental execution and supervision) versus District office (local implementation).",
+    "worked_example": "A policy proposal may be processed by a Secretariat department, operationalised through a Directorate, and administered by district and taluk staff.",
+    "quick_check": {
+      "question": "Which is primarily the policy-coordination institution: Secretariat or Village Panchayat?",
+      "answer": "The State Secretariat."
+    }
   },
   {
     "id": "tn-business-rules",
@@ -1237,8 +1248,18 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Article 166 of the Constitution provides for conduct of state government business in the Governor's name and rules for transaction and allocation of government business.",
       "The Tamil Nadu Government Business Rules, 1978, allocate subjects among Secretariat departments.",
-      "An official 2008 amendment transferred Tamil Nadu Corporation for Development of Women and Mahalir Thittam from the Social Welfare portfolio to Rural Development and Panchayat Raj."
-    ]
+      "An official 2008 amendment transferred Tamil Nadu Corporation for Development of Women and Mahalir Thittam from the Social Welfare portfolio to Rural Development and Panchayat Raj.",
+      "Article 166 addresses executive action in a State, authentication of orders and rules for allocation and transaction of Government business.",
+      "Business Rules determine which Secretariat department handles a subject, not the public eligibility conditions of a welfare scheme.",
+      "When subjects are reallocated, the controlling administrative department can change even though programme beneficiaries are unchanged.",
+      "Check the latest amendment or government order before naming a department as the currently responsible department."
+    ],
+    "exam_focus": "A change in the Secretariat's allocation of business is an administrative reallocation, not necessarily a repeal of a welfare programme.",
+    "worked_example": "A programme moved from one Secretariat portfolio to another can retain its name and objectives while its administering department changes.",
+    "quick_check": {
+      "question": "Which Constitution article provides for rules governing the transaction of State government business?",
+      "answer": "Article 166."
+    }
   },
   {
     "id": "tn-hrm",
@@ -1503,7 +1524,21 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Naan Mudhalvan is a Tamil Nadu skill-development initiative linked with the Tamil Nadu Skill Development Corporation.",
       "It provides upskilling opportunities for learners from colleges, polytechnics, ITIs and other eligible groups.",
-      "Activities include training, internships, apprenticeships and preparation support for selected competitive examinations."
+      "Activities include training, internships, apprenticeships and preparation support for selected competitive examinations.",
+      "The Tamil Nadu Skill Development Corporation (TNSDC) operates the scheme under the State's Special Programme Implementation Department.",
+      "The official platform lists skill tracks for engineering, arts and science, polytechnic, ITI and other eligible disciplines.",
+      "Programmes can cover employability skills, internships, apprenticeships, career preparation and sector-specific learning.",
+      "Naan Mudhalvan was launched on 1 March 2022 according to the TNSDC's official 2026–27 programme document.",
+      "Training provision and beneficiary eligibility vary by institution and programme stream."
+    ],
+    "exam_focus": "Naan Mudhalvan is a skills and employability initiative, not a blanket unconditional cash-benefit scheme.",
+    "worked_example": "A polytechnic student joining an industry-linked short course is participating in skill development; this is different from a student receiving a higher-education DBT scholarship.",
+    "quick_check": {
+      "question": "Which body is directly associated with Naan Mudhalvan: TNSDC or the State Election Commission?",
+      "answer": "TNSDC — Tamil Nadu Skill Development Corporation."
+    },
+    "additional_sources": [
+      "https://portal.naanmudhalvan.tn.gov.in/pdfs/EOI/2026-27_odd_iti.pdf"
     ]
   },
   {
@@ -1517,8 +1552,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Moovalur Ramamirtham Ammaiyar Ninaivu Pudhumai Penn Thittam provides financial assistance to eligible girls pursuing higher education.",
       "Schooling history and institutional enrolment matter to eligibility; the official scheme uses digital beneficiary verification and direct benefit transfer.",
-      "Check current eligibility rules on the scheme or institute website before assuming a student qualifies."
-    ]
+      "Check current eligibility rules on the scheme or institute website before assuming a student qualifies.",
+      "The scheme's full name commemorates Moovalur Ramamirtham Ammaiyar; it is associated with assisting girls to continue higher education.",
+      "The Government institute's published description specifies eligible school-study history, including prescribed government and Tamil-medium aided schools.",
+      "UMIS is used for online student application, enrolment validation and institutional verification.",
+      "Under the published institute guidance, students may be asked for school-study, identity, bank and admission documents.",
+      "The scheme should not be confused with the Tamil Nadu marriage-assistance schemes bearing related historical names."
+    ],
+    "exam_focus": "Remember both intended beneficiary (eligible girl higher-education student) and method of delivery (application and institution-linked DBT validation).",
+    "worked_example": "A college verifies an applicant's school-study certificate and admission details through UMIS before forwarding a scheme claim; verification is not the same as automatic eligibility.",
+    "quick_check": {
+      "question": "Is Pudhumai Penn principally a school-breakfast programme or higher-education assistance scheme?",
+      "answer": "Higher-education assistance for eligible girl students."
+    }
   },
   {
     "id": "tn-tamil-pudhalvan",
@@ -1531,8 +1577,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Tamil Pudhalvan is a Tamil Nadu higher-education assistance scheme directed at eligible male students.",
       "The official institution's scheme page lists qualifying school background and online application through UMIS.",
-      "Pudhumai Penn and Tamil Pudhalvan are separate programmes and must not be confused in exam questions."
-    ]
+      "Pudhumai Penn and Tamil Pudhalvan are separate programmes and must not be confused in exam questions.",
+      "The Tamil Pudhalvan programme supports eligible male students in higher education, under criteria published by the responsible department.",
+      "The institute's scheme guidance specifies prior school-study requirements and online application using the UMIS portal.",
+      "Assistance is delivered through direct bank transfer after validation under the scheme rules.",
+      "Do not combine Pudhumai Penn and Tamil Pudhalvan student counts or programme eligibility as if they were a single scheme.",
+      "Enrolment rules and beneficiary scope may be revised by later orders; current operational guidance takes precedence over earlier notes."
+    ],
+    "exam_focus": "Pudhumai Penn: eligible girl students. Tamil Pudhalvan: eligible boy students. Both support transition into higher education, not general unemployment benefits.",
+    "worked_example": "A candidate asked which scheme corresponds to eligible male higher-education students should choose Tamil Pudhalvan, not Naan Mudhalvan.",
+    "quick_check": {
+      "question": "Which scheme is directed to eligible boys pursuing higher education?",
+      "answer": "Tamil Pudhalvan."
+    }
   },
   {
     "id": "tn-magalir-urimai",
@@ -1545,7 +1602,22 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Kalaignar Magalir Urimai Thittam is a Tamil Nadu programme intended to support eligible women heads of families.",
       "The scheme began in September 2023, and status-checking has an official e-Sevai service entry.",
-      "Benefit amounts, qualifying conditions and coverage must be checked against current government instructions rather than historic statements."
+      "Benefit amounts, qualifying conditions and coverage must be checked against current government instructions rather than historic statements.",
+      "Kalaignar Magalir Urimai Thittam (KMUT) is a household-focused welfare scheme for eligible women heads of families.",
+      "The state's e-Sevai list identifies the KMU-103 service for checking KMUT application status.",
+      "Government IT policy documentation discusses data validation and bank-account verification used in KMUT payment workflows.",
+      "Direct Benefit Transfer (DBT) directs approved assistance to beneficiary bank accounts following prescribed verification and approvals.",
+      "An application, an approved beneficiary, a payment file and a successful bank credit are distinct stages.",
+      "Scheme expansion and payment conditions must be checked from the current order rather than treated as permanent numerical facts."
+    ],
+    "exam_focus": "KMUT is a family/women's income-support programme, distinct from Pudhumai Penn or Tamil Pudhalvan higher-education assistance.",
+    "worked_example": "The administrative path is: application → eligibility verification → approval → bank-account validation → benefit disbursement → status/grievance follow-up.",
+    "quick_check": {
+      "question": "What does the e-Sevai KMU-103 entry permit the citizen to check?",
+      "answer": "The status of a Kalaignar Magalir Urimai Thittam application."
+    },
+    "additional_sources": [
+      "https://tnega.tn.gov.in/assets/pdf/it_e_pn_2025_26.pdf"
     ]
   },
   {
@@ -1559,8 +1631,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The Chief Minister's Breakfast Scheme started in September 2022 to serve breakfast to government primary-school children.",
       "Its objective is to support children's nutrition and school participation.",
-      "Coverage has been expanded over time; use the applicable dated government order to determine which institutions are currently included."
-    ]
+      "Coverage has been expanded over time; use the applicable dated government order to determine which institutions are currently included.",
+      "The Chief Minister's Breakfast Scheme is a school-nutrition intervention, not a college scholarship or a direct household cash transfer.",
+      "Breakfast provision is intended to support school attendance, concentration and access to food during the school day.",
+      "The scheme was introduced in September 2022 and expanded in later phases; historical descriptions may cover only an earlier set of schools.",
+      "Actual delivery involves procuring or preparing meals, quality and hygiene supervision, and monitoring at the institution or local level.",
+      "For exam questions, distinguish nutritional outcomes from spending figures: budget allocation does not itself measure meals served or health effects."
+    ],
+    "exam_focus": "Breakfast Scheme: school meal in kind. KMUT: eligible household cash benefit. Pudhumai Penn: eligible higher-education cash assistance.",
+    "worked_example": "A primary-school pupil receiving breakfast before classes receives a nutrition service; a college student receiving Pudhumai Penn receives financial assistance.",
+    "quick_check": {
+      "question": "What is the main policy instrument of the Chief Minister's Breakfast Scheme?",
+      "answer": "Providing breakfast meals to eligible schoolchildren."
+    }
   },
   {
     "id": "tn-shg-mahalir",
@@ -1573,8 +1656,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Tamil Nadu Corporation for Development of Women (TNCDW) was established in 1983.",
       "The corporation coordinates support for Self-Help Groups and women's socio-economic empowerment.",
-      "Mahalir Thittam and associated SHG activities connect savings, credit linkages, training and microenterprise development."
-    ]
+      "Mahalir Thittam and associated SHG activities connect savings, credit linkages, training and microenterprise development.",
+      "Tamil Nadu Corporation for Development of Women (TNCDW) was established in 1983 and later moved under the Rural Development and Panchayat Raj portfolio.",
+      "Self-Help Groups typically organise regular savings, group decisions and internal lending before broader bank linkages and livelihood activities.",
+      "Mahalir Thittam historically expanded women's SHG organisation and capacity building in Tamil Nadu.",
+      "SHG federations and financial linkages can improve access to credit, marketing and livelihood support.",
+      "Historical policy notes give dated membership or group-size targets; these should not be assumed to describe current scheme rules."
+    ],
+    "exam_focus": "A Self-Help Group is a membership-based collective for savings and empowerment, not an individual government pension.",
+    "worked_example": "Women pooling small regular savings and lending within their group illustrate SHG financial inclusion; a bank loan later obtained by the SHG is a separate formal-credit step.",
+    "quick_check": {
+      "question": "Which corporation is associated with implementing Mahalir Thittam and SHG development?",
+      "answer": "Tamil Nadu Corporation for Development of Women (TNCDW)."
+    }
   },
   {
     "id": "tn-rural-welfare",
@@ -1587,8 +1681,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "The department implements central, state and externally supported rural development programmes.",
       "Its remit includes poverty reduction, employment, sanitation, capacity building and women's economic empowerment.",
-      "Administrative delivery through departments must be distinguished from elected Panchayat Raj institutions."
-    ]
+      "Administrative delivery through departments must be distinguished from elected Panchayat Raj institutions.",
+      "The Rural Development and Panchayat Raj Department supports programmes across poverty reduction, housing, rural assets, sanitation and livelihoods.",
+      "An administrative department or directorate executes policy, while elected Panchayat bodies represent local residents and discharge statutory functions.",
+      "MGNREGS provides a statutory framework for rural wage employment; the rules and permitted works derive from the central legislation and state implementation guidance.",
+      "Beneficiary targeting, identification, sanction, work completion, measurement and audit are separate administrative stages.",
+      "Social audits and Gram Sabha participation help local people review the implementation of appropriate rural programmes."
+    ],
+    "exam_focus": "Differentiate the three tiers of elected Panchayats, the BDO's field administration and district-level scheme coordination.",
+    "worked_example": "In a rural infrastructure programme, a local body may identify a need, departmental staff may monitor execution, and the programme accounts must still show sanctioned and completed works.",
+    "quick_check": {
+      "question": "Is the BDO an elected Village Panchayat president?",
+      "answer": "No. The Block Development Officer is an administrative official."
+    }
   },
   {
     "id": "tn-social-pensions",
@@ -1601,8 +1706,19 @@ window.ClearExamsTNSchoolNotes=[
     "points": [
       "Tamil Nadu's social-security pensions cover categories such as older people, eligible widows, people with disabilities and specified vulnerable groups.",
       "Different pension categories may use state funding, national funding or a combination.",
-      "Amounts, age criteria and asset thresholds can change; check the currently operative official scheme rules."
-    ]
+      "Amounts, age criteria and asset thresholds can change; check the currently operative official scheme rules.",
+      "Social-security pension categories address different circumstances, including old age, widowhood and qualifying disability or vulnerability.",
+      "Some schemes operate with a central-government contribution and a state-government component; funding structure must be verified for the named category.",
+      "An application commonly passes through prescribed eligibility and identity checks before administrative sanction and payment.",
+      "A pension is a recurrent social-protection transfer; it is not the same as compensation for loss of property or a student education incentive.",
+      "Exam preparation should distinguish scheme objective, nodal department, eligibility and type of assistance rather than memorising potentially outdated payment amounts."
+    ],
+    "exam_focus": "State social-security pensions are not a single eligibility-free pension for every resident; multiple categories have distinct conditions.",
+    "worked_example": "A widow pension and an old-age pension may share a payment channel but have separate qualifying requirements.",
+    "quick_check": {
+      "question": "Does inclusion in a list of pension categories automatically establish eligibility?",
+      "answer": "No. Eligibility is decided under the applicable scheme-specific rules."
+    }
   },
   {
     "id": "tn-women-commission",
