@@ -354,14 +354,14 @@ SPEC.loader.exec_module(AUDIT)
 
 class Class10ScienceUnits10To13Tests(unittest.TestCase):
     def test_catalogue_and_previous_units(self):
-        self.assertEqual(INDEX["meta"]["unit_count"], 13)
-        self.assertEqual(INDEX["meta"]["total_questions"], 840)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 42)
-        self.assertEqual([u["id"] for u in INDEX["units"]],
+        self.assertEqual(INDEX["meta"]["unit_count"], 17)
+        self.assertEqual(INDEX["meta"]["total_questions"], 920)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 46)
+        self.assertEqual([u["id"] for u in INDEX["units"][:13]],
                          list(range(1, 14)))
         self.assertEqual([u["total"] for u in INDEX["units"][:9]],
                          [580, 40, 20, 20, 20, 20, 20, 20, 20])
-        for u in INDEX["units"][9:]:
+        for u in INDEX["units"][9:13]:
             self.assertTrue(u["ready"])
             self.assertEqual(u["total"], 20)
             self.assertEqual(u["quiz_count"], 1)
