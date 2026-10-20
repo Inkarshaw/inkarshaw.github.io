@@ -59,8 +59,8 @@ EXPECTED_ANSWERS = {
       "வெப்பங்கொள் வினை"
     ],
     [
-      "⇌",
-      "⇌"
+      "Reversible arrow (⇌)",
+      "மீள்வினை அம்பு (⇌)"
     ],
     [
       "They are equal",
@@ -79,7 +79,7 @@ EXPECTED_ANSWERS = {
       "குறைந்த கிளர்வுறு ஆற்றல் பாதையை வழங்குகிறது"
     ],
     [
-      "pH 3, by 100 times",
+      "pH 3 by 100 times",
       "pH 3 இல், 100 மடங்கு"
     ],
     [
@@ -121,8 +121,8 @@ EXPECTED_ANSWERS = {
       "ஈத்தைன் (C₂H₂)"
     ],
     [
-      "CₙH₂ₙ",
-      "CₙH₂ₙ"
+      "Alkene: CₙH₂ₙ",
+      "ஆல்கீன்: CₙH₂ₙ"
     ],
     [
       "Heterocyclic compound",
