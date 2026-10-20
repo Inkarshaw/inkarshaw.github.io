@@ -352,14 +352,14 @@ SPEC.loader.exec_module(AUDIT)
 
 class Class10ScienceUnits6To9Tests(unittest.TestCase):
     def test_catalogue_is_complete_through_unit_nine(self):
-        self.assertEqual(INDEX["meta"]["unit_count"], 9)
-        self.assertEqual(INDEX["meta"]["total_questions"], 760)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 38)
-        self.assertEqual([u["id"] for u in INDEX["units"]], list(range(1, 10)))
+        self.assertEqual(INDEX["meta"]["unit_count"], 13)
+        self.assertEqual(INDEX["meta"]["total_questions"], 840)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 42)
+        self.assertEqual([u["id"] for u in INDEX["units"][:9]], list(range(1, 10)))
         self.assertEqual([u["total"] for u in INDEX["units"][:5]],
                          [580, 40, 20, 20, 20])
         self.assertTrue(all(u["ready"] and u["total"] == 20 and u["quiz_count"] == 1
-                            for u in INDEX["units"][5:]))
+                            for u in INDEX["units"][5:9]))
 
     def test_each_batch_has_exact_bilingual_answers_and_good_structure(self):
         for unit in range(6, 10):
