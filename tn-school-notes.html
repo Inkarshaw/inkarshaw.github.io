@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Concise TNPSC revision notes aligned to Tamil Nadu State Board school-book chapters with practice-quiz links.">
+<meta name="description" content="TNPSC Group IIA revision notes with Tamil Nadu school-book chapter links and primary government administration references.">
 <link rel="canonical" href="https://clearexams.ink/tn-school-notes.html">
-<title>Tamil Nadu School-Book Notes | ClearExams</title>
+<title>TNPSC Notes: School Books & Government Sources | ClearExams</title>
 <style>
 :root{--navy:#173b75;--blue:#1559c8;--ink:#1a2940;--muted:#55677f;--line:#d8e2ee}
 *{box-sizing:border-box}body{font:17px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);margin:0;background:#f4f7fc}a{color:var(--blue)}header{background:var(--navy);color:#fff;padding:14px 20px}header nav{max-width:900px;margin:auto;display:flex;gap:18px;align-items:center}header a{color:#fff;text-decoration:none;font-weight:700}header a:first-child{font-size:1.2rem}main{max-width:900px;margin:auto;padding:28px 18px 70px}h1{color:var(--navy);margin:0 0 9px;font-size:clamp(1.65rem,4vw,2.6rem)}.lede{color:var(--muted);margin:5px 0 20px}.toolbar{border:1px solid var(--line);padding:14px 16px;background:#fff;border-radius:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:end}.toolbar label{font-weight:800;flex:1 1 230px}.toolbar input{display:block;margin-top:5px;width:100%;padding:11px;border:1px solid #aec3db;border-radius:9px;font:inherit}.search-results{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-top:9px}.search-results[hidden]{display:none}.search-results a{display:block;padding:7px 2px}.search-results p{margin:5px 0;color:var(--muted)}.toolbar select{display:block;margin-top:5px;width:100%;padding:11px;border:1px solid #aec3db;border-radius:9px;font:inherit}article{background:#fff;border:1px solid var(--line);border-radius:17px;padding:25px;margin:18px 0}.chapter{color:var(--muted);font-size:.93rem;margin:4px 0 18px}.tamil{color:#45607e;font-weight:700}.facts{padding-left:23px}.facts li{margin:13px 0}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.btn{display:inline-flex;padding:10px 16px;border-radius:10px;border:1px solid var(--blue);text-decoration:none;font-weight:750}.btn.primary{background:var(--blue);color:#fff}.disclaimer{font-size:.87rem;color:var(--muted)}footer{padding:25px;text-align:center;color:var(--muted)}@media(max-width:550px){article{padding:17px}}@media print{header,.toolbar,.actions{display:none}body{background:#fff}article{border:0;padding:0}}
@@ -15,16 +15,16 @@
 </head>
 <body>
 <header><nav><a href="index.html">ClearExams</a><a href="syllabus.html#tnpsc-group-2-2a">← Group II & IIA syllabus</a><a href="textbook-quiz.html">Textbook quizzes</a></nav></header>
-<main><h1>TN School-Book Revision Notes</h1><p class="lede">Concise topic summaries linked to published Tamil Nadu State Board chapter quizzes. Select a note to review key facts and open its source textbook. Practice quizzes are available only for chapters already published on ClearExams.</p>
+<main><h1>TNPSC Revision Notes</h1><p class="lede">Read topic summaries drawn from Tamil Nadu State Board textbooks and official government references. School-book quizzes are available only where the chapter is published on ClearExams.</p>
 <div class="toolbar"><label for="noteSelect">Choose a school-book topic<select id="noteSelect"></select></label><label for="noteSearch">Search topics in English or Tamil<input id="noteSearch" type="search" placeholder="Try Swadeshi, genetics, சங்கம்…" autocomplete="off"></label></div><div id="noteMatches" class="search-results" role="status" aria-live="polite" hidden></div>
 <div id="noteContent" role="region" aria-live="polite"></div>
-<p class="disclaimer">These are original, shortened revision notes aligned with the named school-book chapters, not copied textbook pages or a replacement for the official TNPSC syllabus. Review the full chapter and the official notification for examination preparation.</p>
+<p class="disclaimer">These are original summaries: some are based on Tamil Nadu State Board textbooks; development-administration notes are based on linked government references. Official information and administrative schemes may change. Read the primary source and TNPSC notification for the current rules.</p>
 </main><footer>© 2026 ClearExams</footer>
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
 const notes=window.ClearExamsTNSchoolNotes||[],p=new URLSearchParams(location.search),select=document.getElementById('noteSelect'),content=document.getElementById('noteContent');
 const search=document.getElementById('noteSearch'),matches=document.getElementById('noteMatches');
-function updateSearch(){const term=search.value.trim().toLocaleLowerCase();if(!term){matches.hidden=true;matches.replaceChildren();return;}const found=notes.filter(n=>(n.title+' '+n.ta+' '+n.chapter+' '+n.points.join(' ')).toLocaleLowerCase().includes(term));matches.hidden=false;matches.innerHTML=found.length?'<p>'+found.length+' matching textbook notes</p>'+found.slice(0,15).map(n=>'<a href="?topic='+encodeURIComponent(n.id)+'">'+esc(n.title)+' · '+esc(n.ta)+'</a>').join('')+(found.length>15?'<p>Refine your search to see additional notes.</p>':''):'<p>No matching notes. Try another subject or chapter name.</p>';}
+function updateSearch(){const term=search.value.trim().toLocaleLowerCase();if(!term){matches.hidden=true;matches.replaceChildren();return;}const found=notes.filter(n=>(n.title+' '+n.ta+' '+n.chapter+' '+(n.source_kind||'textbook')+' '+n.points.join(' ')).toLocaleLowerCase().includes(term));matches.hidden=false;matches.innerHTML=found.length?'<p>'+found.length+' matching textbook notes</p>'+found.slice(0,15).map(n=>'<a href="?topic='+encodeURIComponent(n.id)+'">'+esc(n.title)+' · '+esc(n.ta)+'</a>').join('')+(found.length>15?'<p>Refine your search to see additional notes.</p>':''):'<p>No matching notes. Try another subject or chapter name.</p>';}
 search.addEventListener('input',updateSearch);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 if(!notes.length){content.textContent='Notes could not load. Please refresh this page.';return;}
@@ -33,10 +33,10 @@ function render(){
 const requested=new URLSearchParams(location.search).get('topic');
 const note=notes.find(n=>n.id===requested)||notes[0];
 select.value=note.id;
-const practice=note.href?'<a class="btn primary" href="'+esc(note.href)+'">Practise this textbook chapter →</a>':'<span class="chapter" data-quiz-pending>Chapter quiz not yet published</span>';
-const source=note.source_url?'<a class="btn" href="'+esc(note.source_url)+'" target="_blank" rel="noopener noreferrer">Read source textbook ↗</a>':'';
+const practice=note.href?'<a class="btn primary" href="'+esc(note.href)+'">Practise this textbook chapter →</a>':note.source_kind==='government'?'':'<span class="chapter" data-quiz-pending>Chapter quiz not yet published</span>';
+const source=note.source_url?'<a class="btn" href="'+esc(note.source_url)+'" target="_blank" rel="noopener noreferrer">'+(note.source_kind==='government'?'Read official government source ↗':'Read source textbook ↗')+'</a>':'';
 const update=note.update_url?'<p class="chapter"><strong>Important update:</strong> <a href="'+esc(note.update_url)+'" target="_blank" rel="noopener noreferrer">'+esc(note.update_label||'Government update')+' ↗</a></p>':'';
-content.innerHTML='<article><h2>'+esc(note.title)+'</h2><p class="tamil" lang="ta">'+esc(note.ta)+'</p><p class="chapter">Textbook reference: '+esc(note.chapter)+'</p><h3>Important exam-ready points</h3><ol class="facts">'+note.points.map(point=>'<li>'+esc(point)+'</li>').join('')+'</ol>'+update+'<div class="actions">'+practice+source+'<a class="btn" href="syllabus.html#tnpsc-group-2-2a">Back to Group II & IIA syllabus</a></div></article>';
+content.innerHTML='<article><h2>'+esc(note.title)+'</h2><p class="tamil" lang="ta">'+esc(note.ta)+'</p><p class="chapter">'+(note.source_kind==='government'?'Official government reference: ':'Textbook reference: ')+esc(note.chapter)+'</p><h3>Important exam-ready points</h3><ol class="facts">'+note.points.map(point=>'<li>'+esc(point)+'</li>').join('')+'</ol>'+update+'<div class="actions">'+practice+source+'<a class="btn" href="syllabus.html#tnpsc-group-2-2a">Back to Group II & IIA syllabus</a></div></article>';
 }
 select.addEventListener('change',()=>{history.replaceState(null,'','?topic='+encodeURIComponent(select.value));render()});window.addEventListener('popstate',render);render();
 });
