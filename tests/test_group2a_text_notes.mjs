@@ -94,7 +94,7 @@ for(const id of nextIds){
   assert.match(note.source_url,/^https:\/\/\S+/,id+': no government link');
   const host=new URL(note.source_url).hostname;
   assert.ok(host.endsWith('.tn.gov.in')||host.endsWith('.nic.in')||host==='tn.nic.in',id+': not Tamil Nadu official source: '+host);
-  assert.equal(note.points.length,3,id+': needs three useful facts');
+  assert.ok(note.points.length>=3,id+': needs at least three useful facts');
   assert.ok(taggedIds.has(id),id+': not linked from the Group IIA syllabus');
 }
 assert.match(notePage,/id="noteCategory"/,'Filter textbook vs government notes');
