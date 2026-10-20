@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - "daily-quiz.html"
+      - "pyq-hub.html"
+      - "data/quizzes/pyq-yearwise-catalog.json"
       - "data/quizzes/verified-pyqs.json"
       - "textbook-*.html"
       - "index.html"
@@ -36,6 +38,8 @@ jobs:
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
       - name: Validate attributed previous-year questions and Daily Quiz loading
         run: node tests/test_daily_quiz_pyq.mjs
+      - name: Validate year-wise paper catalog and PYQ year routing
+        run: node tests/test_pyq_yearwise.mjs
       - name: Test live SI-symbol quiz curation
         run: node --test tests/test_textbook_scientific_symbols.mjs
       - name: Test repository-wide textbook validator
