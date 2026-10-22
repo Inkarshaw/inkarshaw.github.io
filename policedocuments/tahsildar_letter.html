@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ஆளில்லா சான்று PDF ஜெனரேட்டர் | Tamil Police Certificate</title>
+    <title>வட்டாட்சியர் சாட்சி முகவரி விசாரணை கடிதம் | Police Documents</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -248,6 +248,8 @@
             margin-top: 8px;
         }
         
+        .document-content { overflow-wrap: anywhere; }
+        @media (max-width: 767px) { .input-panel { max-height: none; } .a4-scroll-container { justify-content: flex-start; } }
         /* Removed underline from section headers */
         .section-header {
             font-weight: bold;
@@ -261,7 +263,7 @@
 <div class="app-container">
     <div class="header">
         <h1 class="tamil-title">📄 ஆளில்லா சான்று PDF ஜெனரேட்டர்</h1>
-        <p class="text-muted mt-2 mb-0">தமிழ் காவல் சான்றிதழ் | G7 சேத்துப்பட்டு → "சென்னை-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "சென்னை-31" (பெறுநர்)</p>
+        <p class="text-muted mt-2 mb-0">காவல்துறை சாட்சி முகவரி சரிபார்ப்பு கோரிக்கை · பெறுநர் முகவரியை சரிபார்த்து நிரப்பவும்</p>
     </div>
 
     <div class="dashboard">
@@ -300,7 +302,7 @@
                     <option value="other_district">பிற மாவட்டம்</option>
                 </select>
                 <div id="chennaiReceiverHint" class="district-hint" style="display: block;">
-                    <i class="bi bi-geo-alt-fill"></i> சென்னை மாவட்டம் தேர்வு செய்யப்பட்டால் பெறுநர் முகவரியின் இறுதியில் "சென்னை-31" சேர்க்கப்படும்
+                    <i class="bi bi-geo-alt-fill"></i> வட்டாட்சியர் அலுவலகத்தின் முழு முகவரியைக் கீழே நிரப்பவும். அஞ்சல் குறியீடு தானாகச் சேர்க்கப்படாது.
                 </div>
             </div>
 
@@ -317,8 +319,16 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label" for="tahsildarAddress">📮 வட்டாட்சியர் அலுவலக முகவரி *</label>
+                <textarea class="form-control" id="tahsildarAddress" rows="3" placeholder="தெரு, பகுதி, ஊர், மாவட்டம், அஞ்சல் குறியீடு — சரிபார்த்து நிரப்பவும்"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="letterReference">📋 கடித குறிப்பு எண் (விருப்பம்)</label>
+                <input type="text" class="form-control" id="letterReference" placeholder="ந.க.எண் / தேதி">
+            </div>
+            <div class="mb-3">
                 <label class="form-label">🔢 சாட்சி எண்</label>
-                <input type="text" class="form-control" id="witnessNumber" value="PW 1">
+                <input type="text" class="form-control" id="witnessNumber" placeholder="PW 1">
             </div>
 
             <div class="mb-3">
@@ -326,16 +336,16 @@
                 <div class="title-section">
                     <select class="form-select title-select" id="witnessTitle">
                         <option value="திரு.">திரு.</option>
-                        <option value="திருமதி." selected>திருமதி.</option>
+                        <option value="திருமதி.">திருமதி.</option>
                         <option value="செல்வி.">செல்வி.</option>
-                        <option value="">(இல்லை)</option>
+                        <option value="" selected>(இல்லை)</option>
                     </select>
-                    <input type="text" class="form-control" id="witnessName" value="மாலதி" placeholder="முழுப்பெயர்">
+                    <input type="text" class="form-control" id="witnessName" placeholder="முழுப்பெயர்">
                 </div>
                 <div class="row g-2 mt-1">
                     <div class="col-6">
                         <label class="small-label">வயது</label>
-                        <input type="text" class="form-control" id="witnessAge" value="31">
+                        <input type="text" class="form-control" id="witnessAge" inputmode="numeric">
                     </div>
                     <div class="col-6">
                         <label class="small-label">தொடர்பு</label>
@@ -343,7 +353,7 @@
                             <div class="relationship-btn active" id="fatherBtn">தந்தை பெயர்</div>
                             <div class="relationship-btn" id="husbandBtn">கணவர் பெயர்</div>
                         </div>
-                        <input type="text" class="form-control" id="witnessRelationship" value="டி. சந்திரன்">
+                        <input type="text" class="form-control" id="witnessRelationship">
                         <input type="hidden" id="relationshipType" value="father">
                     </div>
                 </div>
@@ -351,24 +361,37 @@
 
             <div class="mb-3">
                 <label class="form-label">🏠 முகவரி</label>
-                <textarea class="form-control" id="witnessAddress" rows="2">எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031</textarea>
+                <textarea class="form-control" id="witnessAddress" rows="2" placeholder="சாட்சியின் கடைசியாக அறியப்பட்ட முழு முகவரி"></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">📅 தேதி</label>
-                <input type="date" class="form-control" id="documentDate" value="2025-12-22">
+                <input type="date" class="form-control" id="documentDate">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">⚖️ குற்ற எண்</label>
-                <input type="text" class="form-control" id="caseNumber" value="1249/2012">
+                <input type="text" class="form-control" id="caseNumber" placeholder="உதா: 1249/2012">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">📜 குற்ற விதிகள்</label>
-                <input type="text" class="form-control" id="caseSections" value="452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC">
+                <input type="text" class="form-control" id="caseSections" placeholder="வழக்கிற்குப் பொருந்தும் சட்டப் பிரிவுகள்">
             </div>
 
+            <div class="mb-3">
+                <label class="form-label" for="searchDetails">🔍 சாட்சியைத் தேடிய விவரம் (விருப்பம்)</label>
+                <textarea class="form-control" id="searchDetails" rows="3" placeholder="உண்மையாக மேற்கொண்ட விசாரணை அல்லது தேடுதல் நடவடிக்கைகளை மட்டும் குறிப்பிடவும்"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="senderDesignation">✍️ கடிதம் அனுப்புபவரின் பதவி</label>
+                <select class="form-select" id="senderDesignation">
+                    <option value="காவல் ஆய்வாளர்" selected>காவல் ஆய்வாளர்</option>
+                    <option value="காவல் உதவி ஆய்வாளர்">காவல் உதவி ஆய்வாளர்</option>
+                    <option value="காவல் நிலைய பொறுப்பு அதிகாரி">காவல் நிலைய பொறுப்பு அதிகாரி</option>
+                </select>
+                <input type="text" class="form-control mt-2" id="senderName" placeholder="அதிகாரியின் பெயர் (விருப்பம்)">
+            </div>
             <div class="controls mt-3">
                 <button class="btn btn-primary btn-action" onclick="generatePDF()"><i class="bi bi-file-pdf-fill"></i> PDF உருவாக்கு & பதிவிறக்கம்</button>
                 <button class="btn btn-success btn-action" onclick="printDocument()"><i class="bi bi-printer-fill"></i> அச்சிடுக</button>
@@ -390,7 +413,7 @@
                 </div>
             </div>
             <div class="text-center mt-3 no-print">
-                <small class="text-secondary">📄 A4 210mm × 297mm | G7 சேத்துப்பட்டு → "சென்னை-31" (அனுப்புநர்) | சென்னை மாவட்டம் → "சென்னை-31" (பெறுநர்)</small>
+                <small class="text-secondary">📄 A4 210mm × 297mm | அச்சிடுவதற்கு முன் முகவரி மற்றும் வழக்கு விவரங்களைச் சரிபார்க்கவும்</small>
             </div>
         </div>
     </div>
@@ -488,49 +511,30 @@
         }
     }
     
-    // Build FROM address with சென்னை-31 for G7 Chetpet
-    function getFormattedFromAddress(policeStationFullName, stationLocation) {
-        const displayStationName = policeStationFullName || "காவல் நிலையம்";
-        let locationPart = stationLocation || extractStationName(policeStationFullName);
-        
-        let baseAddress = `காவல் ஆய்வாளர்<br>${displayStationName}<br>${locationPart}`;
-        
-        if (isG7ChetpetStation(policeStationFullName)) {
-            if (!locationPart.includes("சென்னை-31") && !locationPart.includes("சென்னை-31")) {
-                baseAddress = `காவல் ஆய்வாளர்<br>${displayStationName}<br>${locationPart}, சென்னை-31`;
-            }
-        }
-        return baseAddress;
+    function escapeHTML(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     }
-    
-    // Build RECEIVER address with சென்னை-31 if Taluk District is Chennai
-    function getFormattedReceiverAddress(collectorSelection, receiverLocation) {
-        const receiverFirstLine = "வட்டாட்சியர் அவர்கள்";
-        const tahsildarOffice = getTahsildarOffice(collectorSelection);
-        let locationPart = receiverLocation;
-        
-        const talukDistrict = document.getElementById('talukDistrictSelect').value;
-        
-        let address = `${receiverFirstLine}<br>${tahsildarOffice}<br>${locationPart}`;
-        
-        if (talukDistrict === 'chennai') {
-            if (!locationPart.includes("சென்னை-31") && !locationPart.includes("சென்னை-31")) {
-                address = `${receiverFirstLine}<br>${tahsildarOffice}<br>${locationPart}, சென்னை-31`;
-            }
-        }
-        return address;
+    function multilineHTML(value) { return escapeHTML(value).replace(/\r?\n/g, '<br>'); }
+    function localDateString() {
+        const d = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
     }
-    
+    function getFormattedFromAddress(station, location) {
+        const designation = document.getElementById('senderDesignation').value;
+        let area = location || extractStationName(station);
+        if (isG7ChetpetStation(station) && !area.includes('சென்னை-31')) area += ', சென்னை-31';
+        return [designation, station || '[காவல் நிலையம்]', area].map(escapeHTML).join('<br>');
+    }
+    function getFormattedReceiverAddress(collector) {
+        const office = collector && collector !== 'வட்டாட்சியர் அவர்கள்' ? getTahsildarOffice(collector) : '[வட்டாட்சியர் அலுவலகத்தைத் தேர்வு செய்க]';
+        const address = document.getElementById('tahsildarAddress').value.trim();
+        return ['வட்டாட்சியர் அவர்கள்', office, address || '[அலுவலக முகவரியை நிரப்பவும்]'].map(multilineHTML).join('<br>');
+    }
+
     function getTahsildarOffice(collectorVal) {
         if (!collectorVal || collectorVal === "வட்டாட்சியர் அவர்கள்") return "வட்டாட்சியர் அவர்கள்";
         return collectorVal.replace("வட்டாட்சியர்", "வட்டாட்சியர் அலுவலகம்");
-    }
-    
-    function getLocationForCollector(collectorVal) {
-        if (collectorVal === "திருவொற்றியூர் வட்டாட்சியர்") return "திருவொற்றியூர்";
-        const match = collectorVal.match(/^(.*?)\s+வட்டாட்சியர்$/);
-        if (match && match[1]) return match[1];
-        return "சேத்துப்பட்டு";
     }
     
     function getRelationshipPrefix() {
@@ -538,104 +542,91 @@
     }
 
     function updatePreview() {
-        const district = document.getElementById('districtSelect').value;
-        let policeStationFull = "", collectorSelection = "";
-        if (district === 'chennai') {
-            policeStationFull = document.getElementById('policeStationDropdown').value || "";
-            collectorSelection = document.getElementById('collectorNameDropdown').value || "வட்டாட்சியர் அவர்கள்";
-        } else {
-            policeStationFull = document.getElementById('policeStationText').value.trim();
-            collectorSelection = document.getElementById('collectorNameText').value.trim();
-            if (!collectorSelection) collectorSelection = "வட்டாட்சியர் அவர்கள்";
-        }
-        if (!policeStationFull) policeStationFull = "காவல் நிலையம்";
-        
-        const stationNameForBody = getStationNameForBody(policeStationFull);
-        const stationLocation = extractStationName(policeStationFull);
-        
-        const fromAddressHTML = getFormattedFromAddress(policeStationFull, stationLocation);
-        
-        const receiverLocation = getLocationForCollector(collectorSelection);
-        const receiverAddressHTML = getFormattedReceiverAddress(collectorSelection, receiverLocation);
-        
-        const witnessNumber = document.getElementById('witnessNumber').value || 'PW 1';
-        const witnessTitle = document.getElementById('witnessTitle').value;
-        const witnessName = document.getElementById('witnessName').value || 'சாட்சி';
-        const fullWitnessName = (witnessTitle ? witnessTitle + " " : "") + witnessName;
-        const witnessAge = document.getElementById('witnessAge').value || 'வயது';
-        const witnessRelationship = document.getElementById('witnessRelationship').value || 'தந்தை/கணவர் பெயர்';
-        const relationshipPrefix = getRelationshipPrefix();
-        const witnessAddress = document.getElementById('witnessAddress').value || 'முகவரி';
-        const documentDateRaw = document.getElementById('documentDate').value;
-        let formattedDate = "தேதி";
-        if (documentDateRaw) {
-            const d = new Date(documentDateRaw);
-            formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth()+1).toString().padStart(2, '0')}.${d.getFullYear()}`;
-        }
-        const caseNumber = document.getElementById('caseNumber').value || 'குற்ற எண்';
-        const caseSections = document.getElementById('caseSections').value || 'குற்ற விதிகள்';
-        
-        const additionalInfo = `பார்வையில் கண்ட ${stationNameForBody} காவல் நிலைய குற்ற வழக்கில் அரசு தரப்பு சாட்சி எண் ${fullWitnessName}, வயது ${witnessAge}, ${relationshipPrefix} ${witnessRelationship}, ${witnessAddress} என்பவரை நீதிமன்ற விசாரணைக்கு ஆஜர் படுத்த பலமுறை முயற்சித்தும் அவர் மேற்படி விலாசத்தில் இல்லாததால் நீதிமன்ற விசாரணைக்கு அழைக்க இயலவில்லை. மேற்படி நபரை பற்றி எந்த தகவலும் இல்லை.`;
-        
-        const previewHTML = `
-            <div style="text-align: center; margin-bottom: 28px;">
-                <div style="font-size: 24pt; font-weight: bold; letter-spacing: 1px;">காவல்துறை</div>
-                <div style="height: 2px; background: #000; width: 80px; margin: 8px auto 0;"></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 38px;">
-                <div style="width: 48%;">
-                    <div style="font-weight: bold; margin-bottom: 8px;">அனுப்புநர்</div>
-                    <div style="line-height: 1.7; margin-top: 8px;">${fromAddressHTML}</div>
-                </div>
-                <div style="width: 48%;">
-                    <div style="font-weight: bold; margin-bottom: 8px;">பெறுநர்</div>
-                    <div style="line-height: 1.7; margin-top: 8px;">${receiverAddressHTML}</div>
-                </div>
-            </div>
-            <div style="text-align: right; margin-bottom: 32px;">
-                <div><strong>நாள்:</strong> ${formattedDate}</div>
-            </div>
-            <div style="margin-bottom: 28px;">
-                <div><strong>ஐயா,</strong></div>
-                <div style="margin-top: 12px; padding-left: 30px;"><strong>பார்வை:</strong> காவல் நிலை குற்ற எண் ${caseNumber} U/s ${caseSections}</div>
-            </div>
-            <div style="margin-bottom: 24px;">
-                <div style="padding-left: 30px;"><strong>பொருள்:</strong> பார்வையில் கண்ட வழக்கில் சாட்சியாக உள்ளவரின் விலாசம் மற்றும் விபரம் பற்றி விசாரித்து சான்றிதழ் அளிக்க வேண்டுகிறது.</div>
-            </div>
-            <div style="text-align: justify; line-height: 1.75; text-indent: 40px; margin-bottom: 20px;">
-                சாட்சி எண் ${witnessNumber} ${additionalInfo}
-            </div>
-            <div style="text-align: justify; line-height: 1.75; text-indent: 40px; margin-bottom: 30px;">
-                எனவே பார்வையில் கண்ட வழக்கு தொடர்பாக நீதிமன்ற நடவடிக்கைக்கு மேற்படி நபரின் தற்போதைய விலாசம் பற்றி விசாரணை செய்து சான்றிதழ் வழங்குமாறு கேட்டுக்கொள்ளப்படுகிறது.
-            </div>
-            <div style="margin-top: 110px; text-align: right;">
-                <!-- கையெழுத்து இடம் -->
-            </div>
-        `;
-        document.getElementById('previewContent').innerHTML = previewHTML;
-        
+        const stationChennai = document.getElementById('districtSelect').value === 'chennai';
+        const talukChennai = document.getElementById('talukDistrictSelect').value === 'chennai';
+        const station = (stationChennai ? document.getElementById('policeStationDropdown').value : document.getElementById('policeStationText').value.trim()) || '';
+        const collector = (talukChennai ? document.getElementById('collectorNameDropdown').value : document.getElementById('collectorNameText').value.trim()) || '';
+        const fromAddress = getFormattedFromAddress(station, extractStationName(station));
+        const receiverAddress = getFormattedReceiverAddress(collector);
+        const stationBody = escapeHTML(getStationNameForBody(station));
+        const witnessNumber = escapeHTML(document.getElementById('witnessNumber').value.trim() || '[சாட்சி எண்]');
+        const title = document.getElementById('witnessTitle').value;
+        const witnessName = document.getElementById('witnessName').value.trim();
+        const fullName = escapeHTML((title ? title + ' ' : '') + (witnessName || '[பெயர்]'));
+        const age = escapeHTML(document.getElementById('witnessAge').value.trim() || '[வயது]');
+        const relation = escapeHTML(document.getElementById('witnessRelationship').value.trim() || '[தந்தை/கணவர் பெயர்]');
+        const prefix = escapeHTML(getRelationshipPrefix());
+        const address = multilineHTML(document.getElementById('witnessAddress').value.trim() || '[சாட்சி முகவரி]');
+        const date = document.getElementById('documentDate').value;
+        const readableDate = /^\d{4}-\d{2}-\d{2}$/.test(date) ? date.slice(8,10) + '.' + date.slice(5,7) + '.' + date.slice(0,4) : '[தேதி]';
+        const crimeNo = escapeHTML(document.getElementById('caseNumber').value.trim() || '[குற்ற எண்]');
+        const sections = escapeHTML(document.getElementById('caseSections').value.trim() || '[சட்டப் பிரிவுகள்]');
+        const reference = escapeHTML(document.getElementById('letterReference').value.trim());
+        const searchDetails = document.getElementById('searchDetails').value.trim();
+        const designation = escapeHTML(document.getElementById('senderDesignation').value);
+        const senderName = escapeHTML(document.getElementById('senderName').value.trim());
+        document.getElementById('previewContent').innerHTML = [
+            '<div style="text-align:center;margin-bottom:24px"><div style="font-size:24pt;font-weight:bold">காவல்துறை</div><div style="height:2px;background:#000;width:80px;margin:8px auto"></div></div>',
+            '<div style="display:flex;justify-content:space-between;gap:18px;margin-bottom:30px">',
+            '<div style="width:49%"><strong>அனுப்புநர்</strong><div style="margin-top:8px;line-height:1.7">', fromAddress, '</div></div>',
+            '<div style="width:49%"><strong>பெறுநர்</strong><div style="margin-top:8px;line-height:1.7">', receiverAddress, '</div></div></div>',
+            '<div style="text-align:right;margin-bottom:24px"><strong>நாள்:</strong> ', readableDate, '</div>',
+            reference ? '<div style="margin-bottom:12px"><strong>குறிப்பு எண்:</strong> ' + reference + '</div>' : '',
+            '<div style="margin-bottom:20px"><strong>ஐயா,</strong><div style="margin-top:12px"><strong>பார்வை:</strong> ',
+            stationBody, ' காவல் நிலைய குற்ற எண் ', crimeNo, ' U/s ', sections, '</div></div>',
+            '<div style="margin-bottom:20px"><strong>பொருள்:</strong> பார்வையில் கண்ட வழக்கின் அரசு தரப்பு சாட்சியின் தற்போதைய முகவரி மற்றும் விவரங்களை விசாரித்து அறிக்கை / சான்றிதழ் வழங்கக் கோருதல்.</div>',
+            '<div style="text-align:justify;line-height:1.75;margin-bottom:20px">பார்வையில் கண்ட வழக்கில் அரசு தரப்பு சாட்சி எண் ',
+            witnessNumber, ', ', fullName, ', வயது ', age, ', ', prefix, ' ', relation, ', ', address,
+            ' என்ற முகவரியுடையவரின் தற்போதைய இருப்பிடம் குறித்து நீதிமன்ற நடவடிக்கைக்காக சரிபார்ப்பு தேவைப்படுகிறது.</div>',
+            searchDetails ? '<div style="text-align:justify;line-height:1.75;margin-bottom:20px"><strong>இதுவரை மேற்கொண்ட நடவடிக்கைகள்:</strong> ' + multilineHTML(searchDetails) + '</div>' : '',
+            '<div style="text-align:justify;line-height:1.75;margin-bottom:30px">எனவே மேற்படி சாட்சியின் தற்போதைய முகவரி மற்றும் நிலை குறித்து வருவாய்த் துறை மூலம் விசாரித்து உரிய சான்றிதழ் / அறிக்கை வழங்குமாறு கேட்டுக்கொள்ளப்படுகிறது.</div>',
+            '<div style="text-align:right;margin-top:42px;break-inside:avoid"><div style="min-height:38px"></div><strong>',
+            designation, '</strong>', senderName ? '<div>' + senderName + '</div>' : '', '</div>'
+        ].join('');
         updateChennai31Hint();
     }
-    
     function toggleDistrictFields() {
-        const district = document.getElementById('districtSelect').value;
-        const isChennai = district === 'chennai';
+        const isChennai = document.getElementById('districtSelect').value === 'chennai';
         document.getElementById('chennaiPoliceStationContainer').style.display = isChennai ? 'block' : 'none';
         document.getElementById('otherPoliceStationContainer').style.display = isChennai ? 'none' : 'block';
-        document.getElementById('chennaiCollectorContainer').style.display = isChennai ? 'block' : 'none';
-        document.getElementById('otherCollectorContainer').style.display = isChennai ? 'none' : 'block';
-        if (!isChennai) {
-            document.getElementById('policeStationDropdown').value = "";
-            document.getElementById('collectorNameDropdown').value = "வட்டாட்சியர் அவர்கள்";
-            document.getElementById('chennai31Hint').style.display = 'none';
-        } else {
-            document.getElementById('policeStationText').value = "";
-            document.getElementById('collectorNameText').value = "";
-            updateChennai31Hint();
-        }
         updatePreview();
     }
-    
+    function toggleTalukFields() {
+        const isChennai = document.getElementById('talukDistrictSelect').value === 'chennai';
+        document.getElementById('chennaiCollectorContainer').style.display = isChennai ? 'block' : 'none';
+        document.getElementById('otherCollectorContainer').style.display = isChennai ? 'none' : 'block';
+        document.getElementById('chennaiReceiverHint').style.display = isChennai ? 'block' : 'none';
+        updatePreview();
+    }
+    function validateForm() {
+        const stationChennai = document.getElementById('districtSelect').value === 'chennai';
+        const talukChennai = document.getElementById('talukDistrictSelect').value === 'chennai';
+        const fields = [
+            [stationChennai ? 'policeStationDropdown' : 'policeStationText', 'காவல் நிலையத்தை'],
+            [talukChennai ? 'collectorNameDropdown' : 'collectorNameText', 'வட்டாட்சியர் அலுவலகத்தை'],
+            ['tahsildarAddress', 'வட்டாட்சியர் அலுவலக முகவரியை'],
+            ['witnessNumber', 'சாட்சி எண்ணை'], ['witnessName', 'சாட்சியின் பெயரை'],
+            ['witnessAge', 'சாட்சியின் வயதை'], ['witnessRelationship', 'சாட்சியின் உறவினர் பெயரை'],
+            ['witnessAddress', 'சாட்சியின் முகவரியை'], ['documentDate', 'கடிதத் தேதியை'],
+            ['caseNumber', 'குற்ற எண்ணை'], ['caseSections', 'குற்றச் சட்டப் பிரிவுகளை']
+        ];
+        for (const [id,label] of fields) {
+            const el = document.getElementById(id);
+            if (!el.value.trim() || (id === 'collectorNameDropdown' && el.value === 'வட்டாட்சியர் அவர்கள்')) {
+                showNotification('⚠️ ' + label + ' நிரப்பவும்.', 'danger');
+                el.focus();
+                return false;
+            }
+        }
+        const age = document.getElementById('witnessAge').value.trim();
+        if (!/^\d{1,3}$/.test(age) || Number(age) > 120) {
+            showNotification('⚠️ சரியான சாட்சி வயதை உள்ளிடவும்.', 'danger');
+            document.getElementById('witnessAge').focus();
+            return false;
+        }
+        return true;
+    }
+
     function selectRelationship(type) {
         const fatherBtn = document.getElementById('fatherBtn');
         const husbandBtn = document.getElementById('husbandBtn');
@@ -654,103 +645,73 @@
     }
     
     function resetForm() {
+        ['policeStationText','collectorNameText','tahsildarAddress','letterReference','witnessNumber',
+         'witnessName','witnessAge','witnessRelationship','witnessAddress','caseNumber','caseSections',
+         'searchDetails','senderName'].forEach(id => { document.getElementById(id).value = ''; });
         document.getElementById('districtSelect').value = 'chennai';
         document.getElementById('talukDistrictSelect').value = 'chennai';
-        toggleDistrictFields();
-        document.getElementById('policeStationDropdown').value = "";
-        document.getElementById('collectorNameDropdown').value = "வட்டாட்சியர் அவர்கள்";
-        document.getElementById('witnessNumber').value = "PW 1";
-        document.getElementById('witnessTitle').value = "திருமதி.";
-        document.getElementById('witnessName').value = "மாலதி";
-        document.getElementById('witnessAge').value = "31";
+        document.getElementById('policeStationDropdown').value = '';
+        document.getElementById('collectorNameDropdown').value = 'வட்டாட்சியர் அவர்கள்';
+        document.getElementById('witnessTitle').value = '';
+        document.getElementById('senderDesignation').value = 'காவல் ஆய்வாளர்';
+        document.getElementById('documentDate').value = localDateString();
         selectRelationship('father');
-        document.getElementById('witnessRelationship').value = "டி. சந்திரன்";
-        document.getElementById('witnessAddress').value = "எண் 7, வள்ளுவர் சாலை, செத்துப்பட்டு, சென்னை 600031";
-        document.getElementById('documentDate').value = "2025-12-22";
-        document.getElementById('caseNumber').value = "1249/2012";
-        document.getElementById('caseSections').value = "452, 326, 427, 506(i) IPC மற்றும் 109 CrPC 34 IPC";
-        document.getElementById('policeStationText').value = "";
-        document.getElementById('collectorNameText').value = "";
-        document.getElementById('chennai31Hint').style.display = 'none';
-        updatePreview();
+        toggleDistrictFields();
+        toggleTalukFields();
     }
-    
+
     async function generatePDF() {
+        if (!validateForm()) return;
         updatePreview();
-        const originalPage = document.getElementById('a4Page');
-        const clone = originalPage.cloneNode(true);
+        if (!window.jspdf || !window.html2canvas) {
+            showNotification('❌ PDF கருவிகள் ஏற்றப்படவில்லை. இணைய இணைப்பைச் சரிபார்க்கவும்.', 'danger');
+            return;
+        }
+        const clone = document.getElementById('a4Page').cloneNode(true);
         clone.style.position = 'absolute';
         clone.style.left = '-9999px';
         clone.style.top = '0';
         clone.style.boxShadow = 'none';
         document.body.appendChild(clone);
         try {
-            const canvas = await html2canvas(clone, {
-                scale: 2.8,
-                backgroundColor: '#ffffff',
-                useCORS: true,
-                logging: false
-            });
-            document.body.removeChild(clone);
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-            pdf.save(`police_certificate_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
-            showNotification('✅ PDF வெற்றிகரமாக உருவாக்கப்பட்டது!', 'success');
+            if (document.fonts && document.fonts.ready) await document.fonts.ready;
+            const canvas = await html2canvas(clone, {scale:2,backgroundColor:'#fff',useCORS:true,logging:false});
+            const pdf = new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+            const pageWidth = pdf.internal.pageSize.getWidth(), pageHeight = pdf.internal.pageSize.getHeight();
+            const imageHeight = canvas.height * pageWidth / canvas.width, image = canvas.toDataURL('image/png');
+            for (let offset = 0; offset < imageHeight; offset += pageHeight) {
+                if (offset) pdf.addPage();
+                pdf.addImage(image, 'PNG', 0, -offset, pageWidth, imageHeight, undefined, 'FAST');
+            }
+            pdf.save('tahsildar_witness_address_' + document.getElementById('documentDate').value + '.pdf');
+            showNotification('✅ PDF உருவாக்கப்பட்டது', 'success');
         } catch (err) {
             console.error(err);
-            if(document.body.contains(clone)) document.body.removeChild(clone);
-            showNotification('❌ பிழை: PDF உருவாக்க முடியவில்லை', 'danger');
-        }
+            showNotification('❌ PDF உருவாக்க முடியவில்லை', 'danger');
+        } finally { clone.remove(); }
     }
-    
+
     function printDocument() {
+        if (!validateForm()) return;
         updatePreview();
-        const content = document.getElementById('previewContent').innerHTML;
         const printWin = window.open('', '_blank');
-        printWin.document.write(`
-            <html><head><title>காவல்துறை ஆவணம்</title>
-            <style>
-                body { font-family: 'Latha', 'Noto Sans Tamil', serif; margin: 20mm; padding:0; width: 210mm; }
-                @media print { @page { size: A4; margin: 20mm; } }
-            </style></head><body>${content}<script>
-/* clearExamsCaseAutofillV1 */
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    const c = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
-    if (!c) return;
-    const set = (id, value) => {
-      const el = document.getElementById(id);
-      if (!el || value === undefined || value === null || String(value).trim() === '') return;
-      el.value = String(value);
-      el.dispatchEvent(new Event('input', {bubbles:true}));
-      el.dispatchEvent(new Event('change', {bubbles:true}));
-    };
-    set('caseNumber', [c.crimeNo, c.crimeYear].filter(Boolean).join('/'));
-    set('caseSections', c.sections);
-    const station = c.policeStation || '';
-    const dropdown = document.getElementById('policeStationDropdown');
-    if (dropdown && station) {
-      const option = Array.from(dropdown.options).find(o => o.text.trim().toLowerCase() === station.trim().toLowerCase() || o.value.trim().toLowerCase() === station.trim().toLowerCase());
-      if (option) {
-        dropdown.value = option.value;
-        dropdown.dispatchEvent(new Event('change', {bubbles:true}));
-      }
-    }
-    set('policeStationText', station);
-  } catch (_) {}
-});
-</script>
-</body></html>
-        `);
+        if (!printWin) {
+            showNotification('⚠️ Pop-ups அனுமதித்துப் பிறகு மீண்டும் முயலவும்.', 'danger');
+            return;
+        }
+        const css = '<style>@page{size:A4;margin:18mm}html,body{margin:0;padding:0;width:auto}' +
+            'body{font-family:"Noto Sans Tamil","Latha",serif;font-size:11pt;line-height:1.55;color:#000}' +
+            '.document-content{width:auto;overflow-wrap:anywhere}div{box-sizing:border-box}</style>';
+        printWin.document.open();
+        printWin.document.write('<!doctype html><html lang="ta"><head><meta charset="utf-8"><title>வட்டாட்சியர் கடிதம்</title>' +
+            css + '</head><body><div class="document-content">' +
+            document.getElementById('previewContent').innerHTML + '</div></body></html>');
         printWin.document.close();
         printWin.focus();
-        setTimeout(() => { printWin.print(); printWin.close(); }, 400);
-        showNotification('🖨️ அச்சிடல் துவங்கியது', 'info');
+        printWin.print();
+        showNotification('🖨️ அச்சு முன்னோட்டம் திறக்கப்பட்டது', 'info');
     }
-    
+
     function showNotification(msg, type) {
         const notif = document.createElement('div');
         notif.className = `alert alert-${type} position-fixed top-0 end-0 m-3 shadow-lg`;
@@ -761,32 +722,43 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => notif.remove(), 2800);
     }
     
+    function applyCaseAutofill() {
+        try {
+            const data = JSON.parse(localStorage.getItem('clearexamsCurrentCaseV1') || 'null');
+            if (!data) return;
+            if (data.crimeNo || data.crimeYear) document.getElementById('caseNumber').value = [data.crimeNo,data.crimeYear].filter(Boolean).join('/');
+            if (data.sections) document.getElementById('caseSections').value = data.sections;
+            if (data.policeStation) {
+                const dropdown = document.getElementById('policeStationDropdown');
+                const station = String(data.policeStation).trim().toLowerCase();
+                const option = Array.from(dropdown.options).find(item => item.text.trim().toLowerCase() === station || item.value.trim().toLowerCase() === station);
+                if (option) { document.getElementById('districtSelect').value = 'chennai'; dropdown.value = option.value; }
+                else { document.getElementById('districtSelect').value = 'other'; document.getElementById('policeStationText').value = data.policeStation; }
+            }
+        } catch (_) { /* No selected case. */ }
+    }
     document.addEventListener('DOMContentLoaded', () => {
         populateChennaiStations();
         populateCollectorDropdown();
+        document.getElementById('documentDate').value = localDateString();
+        applyCaseAutofill();
         document.getElementById('districtSelect').addEventListener('change', toggleDistrictFields);
-        document.getElementById('talukDistrictSelect').addEventListener('change', updatePreview);
-        document.getElementById('policeStationDropdown').addEventListener('change', () => {
-            updatePreview();
-            updateChennai31Hint();
-        });
+        document.getElementById('talukDistrictSelect').addEventListener('change', toggleTalukFields);
+        document.getElementById('policeStationDropdown').addEventListener('change', updatePreview);
         document.getElementById('policeStationText').addEventListener('input', updatePreview);
         document.getElementById('collectorNameDropdown').addEventListener('change', updatePreview);
         document.getElementById('collectorNameText').addEventListener('input', updatePreview);
-        document.getElementById('witnessNumber').addEventListener('input', updatePreview);
+        ['tahsildarAddress','letterReference','witnessNumber','witnessName','witnessAge',
+         'witnessRelationship','witnessAddress','documentDate','caseNumber','caseSections',
+         'searchDetails','senderName'].forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
         document.getElementById('witnessTitle').addEventListener('change', updatePreview);
-        document.getElementById('witnessName').addEventListener('input', updatePreview);
-        document.getElementById('witnessAge').addEventListener('input', updatePreview);
-        document.getElementById('witnessRelationship').addEventListener('input', updatePreview);
-        document.getElementById('witnessAddress').addEventListener('input', updatePreview);
-        document.getElementById('documentDate').addEventListener('input', updatePreview);
-        document.getElementById('caseNumber').addEventListener('input', updatePreview);
-        document.getElementById('caseSections').addEventListener('input', updatePreview);
+        document.getElementById('senderDesignation').addEventListener('change', updatePreview);
         document.getElementById('fatherBtn').addEventListener('click', () => selectRelationship('father'));
         document.getElementById('husbandBtn').addEventListener('click', () => selectRelationship('husband'));
         toggleDistrictFields();
-        updatePreview();
+        toggleTalukFields();
     });
+
 </script>
 </body>
 </html>
