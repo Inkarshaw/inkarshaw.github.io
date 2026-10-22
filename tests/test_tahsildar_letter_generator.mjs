@@ -51,10 +51,11 @@ assert.match(element('previewContent').innerHTML, /எழும்பூர், 
 assert.doesNotMatch(element('previewContent').innerHTML, /600008, சென்னை-31/);
 
 element('talukDistrictSelect').value = 'other_district';
-element('collectorNameText').value = 'காஞ்சிபுரம் வட்டாட்சியர்';
+element('collectorNameText').value = 'காஞ்சிபுரம் வட்டாட்சியர் அலுவலகம்';
 element('tahsildarAddress').value = 'காஞ்சிபுரம் 631501';
 app.toggleTalukFields();
 assert.match(element('previewContent').innerHTML, /காஞ்சிபுரம் வட்டாட்சியர் அலுவலகம்/);
+assert.doesNotMatch(element('previewContent').innerHTML, /வட்டாட்சியர் அலுவலகம் அலுவலகம்/);
 assert.match(element('previewContent').innerHTML, /G7 சேத்துபட்டு/);
 
 element('witnessName').value = '<img src=x onerror=alert(1)>';
