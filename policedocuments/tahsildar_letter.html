@@ -532,7 +532,8 @@
 
     function getTahsildarOffice(collectorVal) {
         if (!collectorVal || collectorVal === "வட்டாட்சியர் அவர்கள்") return "வட்டாட்சியர் அவர்கள்";
-        return collectorVal.replace("வட்டாட்சியர்", "வட்டாட்சியர் அலுவலகம்");
+        if (collectorVal.includes('வட்டாட்சியர் அலுவலகம்')) return collectorVal;
+        return collectorVal.replace(/வட்டாட்சியர்$/, 'வட்டாட்சியர் அலுவலகம்');
     }
     
     function getRelationshipPrefix() {
