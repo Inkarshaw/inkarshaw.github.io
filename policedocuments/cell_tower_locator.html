@@ -44,16 +44,16 @@ code{color:#daf7ff;word-break:break-word}.fineprint{font-size:.83rem;color:var(-
 <main class="wrap">
 <section class="panel" aria-labelledby="searchTitle">
 <h2 id="searchTitle">1. Enter cell details</h2>
-<p class="sub">Paste a Cell ID or a combined 5G NCGI (6-digit MCC/MNC followed by 9 hexadecimal NCI digits). The combined code fills MCC, MNC and NCI; you still need a separate TAC for online lookup. A local CSV may contain multiple matches.</p>
+<p class="sub">Paste a Cell ID or a combined identifier (3-digit MCC + 3-digit MNC + 9-character cell suffix). Numeric combined identifiers are ambiguous: select 4G LTE (decimal ECI) or 5G NR (hex NCI). A suffix containing A–F is unambiguously 5G. Online lookup also requires LAC/TAC; local CSV can be searched without it.</p>
 <form id="locatorForm" novalidate>
 <div class="grid">
-<div class="field"><label for="cellId">Cell ID / 5G NCGI *</label><input id="cellId" name="cellId" type="text" inputmode="text" autocomplete="off" placeholder="e.g. 405869105B7C010" required></div>
+<div class="field"><label for="cellId">Cell ID / 5G NCGI *</label><input id="cellId" name="cellId" type="text" inputmode="text" autocomplete="off" placeholder="e.g. 405869105200011" required></div>
 <div class="field"><label for="mcc">MCC (country code)</label><input id="mcc" name="mcc" inputmode="numeric" placeholder="India: 404 or 405" maxlength="3"></div>
 <div class="field"><label for="mnc">MNC (operator code)</label><input id="mnc" name="mnc" inputmode="numeric" placeholder="e.g. 10" maxlength="3"></div>
 <div class="field"><label for="lac">LAC / TAC / area</label><input id="lac" name="lac" inputmode="numeric" placeholder="e.g. 12001"></div>
-<div class="field"><label for="radio">Radio technology</label><select id="radio" name="radio"><option value="">Any / unknown</option><option value="GSM">2G (GSM)</option><option value="UMTS">3G (UMTS)</option><option value="LTE">4G (LTE)</option><option value="NR">5G (NR)</option><option value="NBIOT">NB-IoT</option><option value="CDMA">CDMA</option></select></div>
+<div class="field"><label for="radio">Radio technology</label><select id="radio" name="radio"><option value="">Any / unknown (choose for combined numeric IDs)</option><option value="GSM">2G (GSM)</option><option value="UMTS">3G (UMTS)</option><option value="LTE">4G (LTE)</option><option value="NR">5G (NR)</option><option value="NBIOT">NB-IoT</option><option value="CDMA">CDMA</option></select></div>
 </div>
-<p id="decodedNcgi" class="note" role="status" aria-live="polite">For 5G combined codes, paste the whole identifier; MCC/MNC and NCI will be decoded automatically.</p>
+<p id="decodedNcgi" class="note" role="status" aria-live="polite">For combined codes, paste the full identifier. Select LTE or NR when the code contains only digits.</p>
 <details><summary>Online database lookup (OpenCellID)</summary>
 <div class="grid" style="margin-top:13px"><div class="field wide"><label for="apiKey">Your OpenCellID API key</label><input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste key; never saved by this site"></div></div>
 <p class="note">Get a key from <a href="https://opencellid.org/" target="_blank" rel="noopener noreferrer">OpenCellID</a>. The request sends these network identifiers and your key directly from this browser to OpenCellID. Some browsers may block cross-origin API requests; the offline CSV method below works without an API key.</p>
@@ -108,32 +108,58 @@ function numberId(raw) {
   if (/^[0-9a-f]*[a-f][0-9a-f]*$/i.test(value)) return parseInt(value,16);
   return NaN;
 }
-function decodeNcgi(raw) {
-  // NCGI human-readable form: three decimal MCC digits, three decimal MNC digits, nine hexadecimal NCI digits.
-  // This is not the BCD-encoded PLMN octet representation used in telecom signaling.
-  const input = String(raw || '').trim().replace(/[-\s]/g,'');
-  const m = /^([0-9]{3})([0-9]{3})([0-9A-Fa-f]{9})$/.exec(input);
-  if (!m) return null;
-  const mcc = Number(m[1]), mnc = Number(m[2]), cid = parseInt(m[3],16);
-  if(mcc < 100 || mcc > 999 || !Number.isSafeInteger(cid) || cid < 1 || cid >= 2**36)return null;
-  return {mcc,mnc,cid,nciHex:m[3].toUpperCase()};
+function decodeCombinedId(raw, selectedRadio) {
+  // Human-readable combined format: MCC(3) + MNC(3) + 9-character cell suffix.
+  // LTE ECI uses decimal notation (28 bits); 5G NCI uses hex notation (36 bits).
+  // Numeric-only suffixes can mean EITHER: never silently choose a technology.
+  const input=String(raw||'').trim().replace(/[-\s]/g,'');
+  const m=/^([0-9]{3})([0-9]{3})([0-9A-Fa-f]{9})$/.exec(input);
+  if(!m)return null;
+  const mcc=Number(m[1]),mnc=Number(m[2]);
+  if(mcc<100||mcc>999)return null;
+  const suffix=m[3].toUpperCase(),hasHexLetters=/[A-F]/.test(suffix);
+  if(selectedRadio&&!['LTE','NR'].includes(selectedRadio))
+    return {error:'Combined cell codes require 4G (LTE) or 5G (NR). Select the matching technology.'};
+  if(selectedRadio==='LTE'){
+    if(hasHexLetters)return {error:'An LTE ECI must be decimal; this suffix contains hex letters. Select 5G (NR) if this is a 5G NCGI.'};
+    const cid=Number(suffix);
+    if(!Number.isSafeInteger(cid)||cid<0||cid>=2**28)
+      return {error:'LTE ECI must be less than 268435456 (28 bits). Verify the Cell ID or select 5G (NR).'};
+    return {mcc,mnc,cid,radio:'LTE',eci:suffix};
+  }
+  if(selectedRadio==='NR'||hasHexLetters){
+    const cid=parseInt(suffix,16);
+    if(!Number.isSafeInteger(cid)||cid<1||cid>=2**36)return {error:'The 5G NCI is outside the 36-bit range.'};
+    return {mcc,mnc,cid,radio:'NR',nciHex:suffix};
+  }
+  return {mcc,mnc,ambiguous:true};
 }
 function syncCombinedCode(){
-  const parsed=decodeNcgi($('cellId').value);
+  const parsed=decodeCombinedId($('cellId').value,$('radio').value);
   const el=$('decodedNcgi');
   if(!parsed){
-    el.textContent='For 5G combined codes, paste the whole identifier; MCC/MNC and NCI will be decoded automatically.';
+    el.textContent='For combined codes, paste the full identifier. Select LTE or NR when the code contains only digits.';
     return;
   }
+  if(parsed.error){el.textContent=parsed.error;return;}
   $('mcc').value=String(parsed.mcc);
   $('mnc').value=String(parsed.mnc);
-  $('radio').value='NR';
-  el.textContent='5G NCGI detected · MCC '+parsed.mcc+' · MNC '+parsed.mnc+' · NCI 0x'+parsed.nciHex+' ('+parsed.cid+'). TAC is not included in this combined code; enter it separately for online lookup.';
+  if(parsed.ambiguous){
+    el.textContent='Ambiguous combined numeric ID: it could be an LTE decimal ECI or a 5G hexadecimal NCI. Select 4G (LTE) or 5G (NR); lookup is blocked until then.';
+  }else if(parsed.radio==='LTE'){
+    el.textContent='4G LTE combined code · MCC '+parsed.mcc+' · MNC '+parsed.mnc+' · decimal ECI '+parsed.cid+' · eNodeB '+Math.floor(parsed.cid/256)+' · sector '+(parsed.cid%256)+'. LAC/TAC is required for online lookup.';
+  }else{
+    el.textContent='5G NR combined code · MCC '+parsed.mcc+' · MNC '+parsed.mnc+' · hex NCI 0x'+parsed.nciHex+' (decimal '+parsed.cid+'). TAC is required for online lookup.';
+  }
 }
 $('cellId').addEventListener('input',syncCombinedCode);
-const initialNcgi=new URLSearchParams(window.location.search).get('ncgi');
-if(initialNcgi && decodeNcgi(initialNcgi)){
-  $('cellId').value=initialNcgi;
+$('radio').addEventListener('change',syncCombinedCode);
+const initialParams=new URLSearchParams(window.location.search);
+const initialCell=initialParams.get('cellid')||initialParams.get('ncgi');
+const initialRadio=String(initialParams.get('radio')||'').toUpperCase();
+if(initialCell&&initialCell.length<=32&&/^[0-9A-Fa-fxX-]+$/.test(initialCell)){
+  $('cellId').value=initialCell;
+  if(['LTE','NR','GSM','UMTS','NBIOT','CDMA'].includes(initialRadio))$('radio').value=initialRadio;
   syncCombinedCode();
 }
 function integerField(id) {
@@ -141,16 +167,21 @@ function integerField(id) {
   return v === '' ? null : (/^\d+$/.test(v) && Number.isSafeInteger(Number(v)) ? Number(v) : NaN);
 }
 function query() {
-  const raw = $('cellId').value.trim(), composite = decodeNcgi(raw);
-  const cid = composite ? composite.cid : numberId(raw);
-  if (!raw || !Number.isSafeInteger(cid) || cid < 0) throw Error('Enter a decimal Cell ID, hexadecimal ID (0x...), or a combined 5G NCGI.');
-  const mcc = composite ? composite.mcc : integerField('mcc');
-  const mnc = composite ? composite.mnc : integerField('mnc');
-  const lac = integerField('lac');
-  if ([mcc,mnc,lac].some(x => Number.isNaN(x))) throw Error('MCC, MNC and LAC/TAC must contain decimal digits only.');
-  if (mcc !== null && (mcc < 1 || mcc > 999)) throw Error('MCC must be between 1 and 999.');
-  if (mnc !== null && mnc > 999) throw Error('MNC must be between 0 and 999.');
-  return {cid,mcc,mnc,lac,radio:composite ? 'NR' : $('radio').value};
+  const raw=$('cellId').value.trim(),selectedRadio=$('radio').value;
+  const composite=decodeCombinedId(raw,selectedRadio);
+  if(composite&&composite.error)throw Error(composite.error);
+  if(composite&&composite.ambiguous)throw Error('Ambiguous numeric combined ID. Choose LTE for decimal ECI or NR for hexadecimal NCI before lookup.');
+  const cid=composite?composite.cid:numberId(raw);
+  if(!raw||!Number.isSafeInteger(cid)||cid<0)throw Error('Enter a decimal Cell ID, hexadecimal ID (0x...), or combined LTE/5G identifier.');
+  if(!composite&&selectedRadio==='LTE'&&cid>=2**28)throw Error('LTE ECI must fit in 28 bits (less than 268435456).');
+  if(!composite&&selectedRadio==='NR'&&cid>=2**36)throw Error('5G NCI must fit in 36 bits.');
+  const mcc=composite?composite.mcc:integerField('mcc');
+  const mnc=composite?composite.mnc:integerField('mnc');
+  const lac=integerField('lac');
+  if([mcc,mnc,lac].some(x=>Number.isNaN(x)))throw Error('MCC, MNC and LAC/TAC must contain decimal digits only.');
+  if(mcc!==null&&(mcc<1||mcc>999))throw Error('MCC must be between 1 and 999.');
+  if(mnc!==null&&mnc>999)throw Error('MNC must be between 0 and 999.');
+  return {cid,mcc,mnc,lac,radio:composite?composite.radio:selectedRadio};
 }
 function validCoord(lat,lon) {
   return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && !(lat === 0 && lon === 0);
@@ -283,7 +314,14 @@ $('csvSearch').addEventListener('click',async()=>{
     for(let i=1;i<lines.length;i++){
       if(!lines[i].trim())continue;
       const r=csvRecord(parseCsvLine(lines[i]),names);
-      if(numericCsv(r.cellid)!==q.cid)continue;
+      const recordedCid=numericCsv(r.cellid);
+      if(recordedCid!==q.cid){
+        // Some operator CSVs contain the full PLMN+ECI/NCI in the cell column.
+        // Match only if operator codes AND explicit network type agree.
+        const combined=decodeCombinedId(r.cellid,q.radio);
+        if(!combined||combined.error||combined.ambiguous||combined.cid!==q.cid||
+           q.mcc===null||q.mnc===null||combined.mcc!==q.mcc||combined.mnc!==q.mnc)continue;
+      }
       if(q.mcc!==null && numericCsv(r.mcc)!==q.mcc)continue;
       if(q.mnc!==null && numericCsv(r.mnc)!==q.mnc)continue;
       if(q.lac!==null && numericCsv(r.lac)!==q.lac)continue;
