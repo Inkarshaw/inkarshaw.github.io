@@ -86,6 +86,13 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
 <div class="note"><strong>Term I Social Science source:</strong> English and Tamil Class 6 Social Science Term I 2025 textbooks supplied by the user. English/Tamil printed page references are preserved separately where the editions differ.</div>
 </section>
 
+<section class="section panel" id="class6-term3-social-science" hidden>
+<div class="crumb">6th Standard → Social Science → Term III → 2024 Edition</div>
+<div class="head" style="margin-top:7px"><div><h2>Social Science · Term III</h2><p>Quiz sets are published from the Tamil Nadu English and Tamil source books, with page references and bilingual explanations.</p></div><span class="tag" id="class6-term3-count">20 questions live</span></div>
+<div class="unitgrid" id="class6-term3-units"></div>
+<div class="note"><strong>Term III Social Science source:</strong> English and Tamil Class 6 Social Science textbooks linked from TN Textbooks. Unit 4 Quiz 1 has been checked against the English chapter; Tamil questions and explanations are editorial translations.</div>
+</section>
+
 </main>
 <footer><div class="wrap">© 2026 ClearExams.ink · Tamil Nadu Textbook Practice</div></footer>
 
@@ -93,10 +100,29 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
 (function(){
   const params=new URLSearchParams(location.search);
   const cls=Number(params.get('class')||6);
+  if(cls===6&&params.get('subject')==='social-science'&&params.get('term')==='3'){
+    const panel=document.getElementById('class6-term3-social-science');
+    document.querySelectorAll('main.wrap > section.panel').forEach(x=>x.hidden=true);
+    panel.hidden=false;
+    document.querySelectorAll('.class').forEach(el=>{el.classList.remove('active');if(el.textContent.trim()==='6th')el.classList.add('active')});
+    fetch('data/textbook/class-6/social-science/term-3/index.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+      const units=d.units||[],ready=units.filter(u=>u.ready);
+      document.getElementById('class6-term3-count').textContent=ready.reduce((n,u)=>n+(u.total||0),0).toLocaleString('en-IN')+' questions live';
+      document.getElementById('class6-term3-units').innerHTML=units.map(u=>{
+        const card=document.createElement('article');card.className='unit '+(u.ready?'ready':'locked');
+        const title=document.createElement('h3');title.textContent=u.id+'. '+u.unit_en+' / '+u.unit_ta;
+        const desc=document.createElement('p');desc.textContent=u.ready?'Bilingual textbook quiz set with explanations and printed page references.':'Quiz bank is being prepared from the TN Textbooks source book.';
+        const sets=document.createElement('div');sets.className='sets';
+        if(u.ready){for(let n=1;n<=Number(u.quiz_count||1);n++){const a=document.createElement('a');a.className='btn primary';a.href='textbook-play.html?class=6&subject=social-science&term=3&unit='+u.id+'&quiz='+n;a.textContent='Quiz '+n;sets.append(a)}const full=document.createElement('a');full.className='btn';full.href='textbook-play.html?class=6&subject=social-science&term=3&unit='+u.id+'&quiz=all';full.textContent='Full Unit · '+Number(u.total||0).toLocaleString('en-IN');sets.append(full)}
+        else{const badge=document.createElement('span');badge.className='btn';badge.textContent='Coming next';sets.append(badge)}
+        card.append(title,desc,sets);return card.outerHTML;
+      }).join('');
+    }).catch(err=>{document.getElementById('class6-term3-units').textContent='Could not load the unit list. Refresh to try again.';console.error(err)});
+  }
   const requestedSubject=params.get('subject')||'science';
   const subject=cls>=11?((cls===12&&requestedSubject==='geography')?'geography':'history'):(requestedSubject==='social-science'?'social-science':'science');
   const term=Number(params.get('term')||1);
-  if(![7,8,9,10,11,12].includes(cls)) return;
+  if(![6,7,8,9,10,11,12].includes(cls)) return;
 
   document.querySelectorAll('.class').forEach(el=>{
     el.classList.remove('active');
@@ -128,7 +154,15 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
   const main=document.querySelector('main.wrap');
   async function render(){
     let units,edition=2025,upcoming=false;
-    if(cls>=7&&cls<=10){
+    if(cls===6){
+      const indexUrl='data/textbook/class-6/'+subject+'/term-'+term+'/index.json';
+      const r=await fetch(indexUrl,{cache:'no-store'});
+      if(!r.ok){units=[];upcoming=true;}else{
+        const d=await r.json();edition=d.meta?.edition||2024;
+        units=(d.units||[]).map(x=>({...x,total:x.total??null,ready:x.ready!==false}));
+        if(!units.length)upcoming=true;
+      }
+    }else if(cls>=7&&cls<=10){
       const termSegment=cls<=8?'/term-'+term:'';
       const indexUrl='data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json';
       const r=await fetch(indexUrl,{cache:'no-store'});
@@ -155,7 +189,7 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
     const subjEn=subject==='geography'?'Geography':subject==='social-science'?'Social Science':subject==='science'?'Science':'History';
     const subjTa=subject==='geography'?'புவியியல்':subject==='social-science'?'சமூக அறிவியல்':subject==='science'?'அறிவியல்':'வரலாறு';
     const totalKnown=units.reduce((n,u)=>n+(u.ready&&u.total?u.total:0),0);
-    const switcher=cls>=7&&cls<=10?
+    const switcher=cls>=6&&cls<=10?
       '<div class="sets" style="margin:0 0 16px">'+
       '<a class="btn '+(subject==='science'?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject=science'+(cls<=8?'&term='+term:'')+'">Science / அறிவியல்</a>'+
       '<a class="btn '+(subject==='social-science'?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject=social-science'+(cls<=8?'&term='+term:'')+'">Social Science / சமூக அறிவியல்</a>'+
