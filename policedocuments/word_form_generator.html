@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fill & Generate Police Document</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.8/pizzip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.4.1/dist/docx-preview.min.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Tahoma,sans-serif;background:#0d1b2a;color:#eef5fb}
+.top{background:#132a3f;padding:16px 20px;position:sticky;top:0;z-index:20;border-bottom:1px solid #294b67;display:flex;gap:12px;align-items:center;justify-content:space-between}
+.top a{color:#bfe3ff;text-decoration:none;font-weight:700}.top h1{font-size:20px;margin:0}.wrap{max-width:1250px;margin:auto;padding:18px;display:grid;grid-template-columns:minmax(320px,520px) 1fr;gap:18px}
+.panel{background:#14283b;border:1px solid #2d506b;border-radius:14px;padding:18px;box-shadow:0 8px 28px #0003}
+h2{margin:0 0 14px;color:#bfe3ff}.note{font-size:13px;color:#b8cad8;background:#102131;border:1px solid #294b67;padding:10px;border-radius:8px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:5px;color:#d7e7f2}
+input,textarea,select{width:100%;border:1px solid #456b87;background:#f9fbfd;color:#13202b;border-radius:8px;padding:11px;font:inherit}
+textarea{min-height:92px;resize:vertical}.section{margin:18px 0 8px;padding-top:12px;border-top:1px solid #36566d;font-weight:800;color:#9ed2f5}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:8px;padding:11px 14px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.primary{background:#3f8f62;color:white}.word{background:#245a9a;color:white}.pdf{background:#9a4b24;color:white}.ghost{background:#263f52;color:#eef5fb;border:1px solid #456b87}
+.previewWrap{background:#d8e0e7;border-radius:12px;padding:18px;overflow:auto;min-height:70vh}
+.paper{background:white;color:#111;width:210mm;min-height:297mm;margin:auto;padding:20mm 18mm;box-shadow:0 3px 16px #0003;font-family:"Times New Roman",serif;font-size:14pt;line-height:1.55}
+.paper h1{text-align:center;font-size:16pt;text-transform:uppercase;margin:0 0 20px}.paper .meta{margin-bottom:14px}.paper .row{display:flex;gap:8px;margin:4px 0}.paper .k{font-weight:bold;min-width:145px}.paper .body{white-space:pre-wrap;text-align:justify;margin-top:16px}.signature{text-align:right;margin-top:42px}.muted{color:#666;font-size:10pt}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.previewWrap{min-height:auto}.paper{width:100%;min-height:auto;padding:22px 18px}.top{position:static}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+#exactRenderHost{position:fixed;left:-100000px;top:0;background:#fff;z-index:-1}
+#exactRenderHost .docx-wrapper{background:#fff!important;padding:0!important}
+#exactRenderHost section.docx{box-shadow:none!important;margin:0!important}
+@media print{body{background:white}.top,.panel:first-child{display:none!important}.wrap{display:block;padding:0}.panel{border:0;box-shadow:none;padding:0}.previewWrap{padding:0;background:white}.paper{box-shadow:none;width:210mm;min-height:297mm;margin:0}}
+</style>
+</head>
+<body>
+<div class="top"><a href="/policedocuments/">← Police Documents</a><h1>Fill & Generate Word / PDF</h1><span></span></div>
+<div class="wrap">
+<section class="panel">
+<h2 id="formTitle">Document Generator</h2>
+<div class="note">Fill the required details. <b>Exact Word</b> fills the existing .docx while preserving its original formatting, tables and page setup. <b>Quick Word/PDF</b> uses the preview layout. Your saved officer/station defaults stay only in this browser.</div>
+<div class="note" id="exactStatus" style="display:none"></div>
+<div class="grid">
+<div class="full"><label>Document / Form</label><input id="docTitle"></div>
+<div><label>Police Station</label><input id="station" placeholder="e.g. G7 Chetpet PS"></div>
+<div><label>District / City</label><input id="district" placeholder="Chennai"></div>
+<div><label>Crime / CSR No.</label><input id="crimeNo" placeholder="123/2026"></div>
+<div><label>Sections</label><input id="sections"></div>
+<div><label>Court</label><input id="court"></div>
+<div><label>CC / PRC / Case No.</label><input id="caseNo"></div>
+<div class="full"><label>Accused / Person concerned</label><input id="accused"></div>
+<div><label>Date</label><input id="date" type="date"></div>
+<div><label>Time</label><input id="time" type="time"></div>
+<div class="full"><label>Place / Location</label><input id="place"></div>
+</div>
+<div id="dynamicFields"></div>
+<div class="section">Officer & document details</div>
+<div class="grid">
+<div><label>Officer Name</label><input id="officer"></div>
+<div><label>Rank</label><input id="rank" placeholder="Sub-Inspector of Police"></div>
+<div><label>Reference / Rc. No.</label><input id="reference"></div>
+<div><label>Subject</label><input id="subject"></div>
+<div class="full"><label>Document Body / Proceedings</label><textarea id="bodyText" rows="10"></textarea></div>
+<div class="full"><label>Remarks / Enclosures</label><textarea id="remarks" rows="3"></textarea></div>
+</div>
+<div class="actions">
+<button class="btn primary" id="previewBtn">↻ Update Preview</button>
+<button class="btn word" id="exactWordBtn">🧩 Exact Word — Original Layout</button>
+<button class="btn pdf" id="exactPdfBtn">🧩 Exact PDF — Original Layout</button>
+<button class="btn word" id="wordBtn">📝 Quick Word</button>
+<button class="btn pdf" id="pdfBtn">📄 Quick PDF</button>
+<button class="btn ghost" id="saveBtn">💾 Save Defaults</button>
+<a class="btn ghost" id="originalBtn" href="#" target="_blank">⬇ Original Word</a>
+</div>
+</section>
+<section class="panel"><div class="previewWrap"><article class="paper" id="paper"></article></div></section>
+</div>
+<div id="exactRenderHost" aria-hidden="true"></div>
+<script>
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+const template=params.get('template')||'';
+const passedTitle=params.get('title')||'';
+const file=(template.split('/').pop()||'').toLowerCase();
+
+const presets={
+'panchanama_ii.docx':{
+ title:'Panchanama II — A Property / CCD Deposit',
+ fields:[
+  ['serialNo','S.No.'],
+  ['aNo','A.No.'],
+  ['ccdAmount','Amount (Rs.)'],
+  ['amountWords','Amount in words'],
+  ['depositRemarks','Deposit / order remarks','textarea']
+ ],
+ body:'Request to deposit the A Property cash amount in the Criminal Court Deposit (C.C.D.) account.'
+},
+'panchanama_judicial_form_82.docx':{
+ title:'Judicial Panchanama Form 82',
+ fields:[
+  ['seizedOn','Seized on','date'],
+  ['receivedOn','Received on','date'],
+  ['propertyItemNo','Property Register Item No.'],
+  ['propertyYear','Property Register Year'],
+  ['articles','Articles / Properties — one item per line','textarea'],
+  ['otherRemarks','Other remarks','textarea'],
+  ['witness1','Witness 1 — name & address','textarea'],
+  ['witness2','Witness 2 — name & address','textarea'],
+  ['formDate','Panchanama date','date']
+ ],
+ body:'The articles / properties produced by police are checked, received and entered in the Property Register.'
+},
+'mm_pt_warrant.docx':{
+ title:'MM PT Warrant',
+ fields:[
+  ['remandedIn','Remanded in / Case reference'],
+  ['prison','Prison / Block / custody description'],
+  ['productionDate','Date required for production','date'],
+  ['warrantDate','Warrant date','date']
+ ],
+ body:'Production warrant for appearance of the accused before the Chief Metropolitan Magistrate Court.'
+},
+'withdrawal_report.docx':{
+ title:'Withdrawal Report',
+ fields:[
+  ['offenceDate','Date of Offence','date'],
+  ['complainant','Defacto Complainant / Victim'],
+  ['finalReportDate','Final Report Filed On','date'],
+  ['reason','Reason for Withdrawal','textarea'],
+  ['inspectorRecommendation','Recommendation by Inspector of Police','textarea'],
+  ['acRecommendation','Recommendation by Assistant Commissioner of Police','textarea'],
+  ['dcRecommendation','Recommendation by Deputy Commissioner of Police','textarea'],
+  ['appOpinion','Opinion / Approval from APP','textarea']
+ ],
+ body:'Withdrawal report submitted with the particulars and recommendations entered below.'
+},
+'warrant_form.docx':{
+ title:'Warrant Form',
+ fields:[['personAddress','Address of person concerned','textarea'],['purpose','Purpose / direction','textarea']],
+ body:'The warrant is prepared in respect of the above matter with the following particulars and directions:\n\n'
+},
+'parent_intimation_form.docx':{
+ title:'Parent Intimation Form',
+ fields:[['juvenile','Child / Juvenile name'],['parent','Parent / Guardian name'],['parentAddress','Parent / Guardian address','textarea']],
+ body:'Intimation is hereby given to the parent/guardian regarding the apprehension and proceedings concerning the child named above.'
+},
+'form_ii_(home).docx':{
+ title:'Form II (Home)',
+ fields:[['juvenile','Child / Juvenile name'],['home','Children Home / Institution'],['guardian','Parent / Guardian']],
+ body:'Form II particulars are submitted with the details entered above for the placement/production of the child before the competent authority.'
+}
+};
+
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function prettyFile(){return (passedTitle||file.replace(/\.(docx?|DOCX?)$/,'').replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase())||'Police Document')}
+function addFields(def){
+ const host=$('dynamicFields'); host.innerHTML='';
+ if(!def?.fields?.length)return;
+ const sec=document.createElement('div');sec.className='section';sec.textContent='Form-specific details';host.appendChild(sec);
+ const grid=document.createElement('div');grid.className='grid';host.appendChild(grid);
+ def.fields.forEach(([id,label,type='text'])=>{
+   const d=document.createElement('div'); if(type==='textarea')d.className='full';
+   d.innerHTML='<label>'+esc(label)+'</label>'+(type==='textarea'?'<textarea id="'+id+'"></textarea>':'<input id="'+id+'" type="'+type+'">');
+   grid.appendChild(d);
+ });
+}
+function val(id){return $(id)?.value?.trim()||''}
+function labelRows(){
+ const rows=[['Police Station',val('station')],['District / City',val('district')],['Crime / CSR No.',val('crimeNo')],['Sections',val('sections')],['Court',val('court')],['Case No.',val('caseNo')],['Accused / Person',val('accused')],['Date',val('date')],['Time',val('time')],['Place',val('place')],['Reference',val('reference')],['Subject',val('subject')]];
+ const def=presets[file]; (def?.fields||[]).forEach(([id,label])=>rows.push([label,val(id)]));
+ return rows.filter(x=>x[1]);
+}
+function updatePreview(){
+ const rows=labelRows().map(([k,v])=>'<div class="row"><span class="k">'+esc(k)+'</span><span>: '+esc(v)+'</span></div>').join('');
+ const remarks=val('remarks');
+ $('paper').innerHTML='<h1>'+esc(val('docTitle'))+'</h1><div class="meta">'+rows+'</div><div class="body">'+esc(val('bodyText'))+'</div>'+(remarks?'<div class="body"><b>Remarks / Enclosures:</b> '+esc(remarks)+'</div>':'')+'<div class="signature"><div>'+esc(val('officer'))+'</div><b>'+esc(val('rank'))+'</b><div>'+esc(val('station'))+'</div></div><div class="muted">Generated using ClearExams Police Documents</div>';
+}
+function fileBase(){return (val('docTitle')||'police_document').replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,'')}
+function downloadWord(){
+ updatePreview();
+ const html='<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:"Times New Roman";font-size:14pt;line-height:1.5;margin:1in}h1{text-align:center;font-size:16pt}.row{margin:4px 0}.k{font-weight:bold;display:inline-block;width:160px}.body{white-space:pre-wrap;text-align:justify;margin-top:18px}.signature{text-align:right;margin-top:45px}</style></head><body>'+$('paper').innerHTML+'</body></html>';
+ const blob=new Blob(['\ufeff',html],{type:'application/msword'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileBase()+'.doc';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function downloadPdf(){
+ updatePreview();
+ const opt={margin:0,filename:fileBase()+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}};
+ await html2pdf().set(opt).from($('paper')).save();
+}
+
+const WORD_NS='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+
+function exactFieldMap(){
+ const map={
+  station:{value:val('station'),aliases:['Police Station','P.S.','P.S','PS Name','Station']},
+  district:{value:val('district'),aliases:['District','City','Commissionerate']},
+  crimeNo:{value:val('crimeNo'),aliases:['Crime No','Crime No.','Cr.No','Cr. No','Cr No','Crime Number']},
+  sections:{value:val('sections'),aliases:['Sections','Section','U/s','U/S','Under Section']},
+  court:{value:val('court'),aliases:['Court','Name of Court','Honble Court',"Hon'ble Court"]},
+  caseNo:{value:val('caseNo'),aliases:['Case No','C.C.No','C.C. No','CC No','P.R.C.No','P.R.C. No','PRC No']},
+  accused:{value:val('accused'),aliases:['Accused','Name of Accused','Accused Name','Name of the Accused']},
+  date:{value:val('date'),aliases:['Date','Dated']},
+  time:{value:val('time'),aliases:['Time']},
+  place:{value:val('place'),aliases:['Place','Location','Place of Occurrence','Place of occurrence']},
+  officer:{value:val('officer'),aliases:['Officer Name','Name of Officer','Investigating Officer','Investigation Officer']},
+  rank:{value:val('rank'),aliases:['Rank','Designation']},
+  reference:{value:val('reference'),aliases:['Reference','Ref.No','Ref. No','Rc.No','Rc. No']},
+  subject:{value:val('subject'),aliases:['Subject','Sub']},
+  bodyText:{value:val('bodyText'),aliases:['Proceedings','Narration','Brief Facts','Facts','Details']},
+  remarks:{value:val('remarks'),aliases:['Remarks','Enclosures']}
+ };
+ const def=presets[file];
+ (def?.fields||[]).forEach(([id,label])=>{
+   const aliases=[label];
+   if(id==='witness1') aliases.push('Witness 1','Witness No.1','Witness No. 1','Panchayatdar 1','Panch Witness 1');
+   if(id==='witness2') aliases.push('Witness 2','Witness No.2','Witness No. 2','Panchayatdar 2','Panch Witness 2');
+   if(id==='property') aliases.push('Property','Articles','Material Objects','Property Details');
+   if(id==='proceedings') aliases.push('Proceedings','Observations','Judicial Proceedings');
+   if(id==='prison') aliases.push('Prison','Place of Custody','Jail');
+   if(id==='productionDate') aliases.push('Production Date','Date of Production','Produce On');
+   if(id==='prisonerNo') aliases.push('Prisoner No','Remand No','Prisoner Number');
+   if(id==='complainant') aliases.push('Complainant','Petitioner');
+   if(id==='reason') aliases.push('Reason','Grounds','Reason for Withdrawal');
+   if(id==='personAddress') aliases.push('Address','Address of Person');
+   if(id==='purpose') aliases.push('Purpose','Direction');
+   if(id==='juvenile') aliases.push('Child Name','Juvenile Name','Name of Child');
+   if(id==='parent') aliases.push('Parent','Guardian','Parent / Guardian');
+   if(id==='parentAddress') aliases.push('Parent Address','Guardian Address');
+   if(id==='home') aliases.push('Home','Institution','Children Home');
+   if(id==='guardian') aliases.push('Guardian','Parent / Guardian');
+   map[id]={value:val(id),aliases};
+ });
+ return map;
+}
+
+function nodeText(node){
+ return Array.from(node.getElementsByTagName('w:t')).map(n=>n.textContent||'').join('');
+}
+function normalizeText(s){return String(s||'').replace(/\s+/g,' ').trim().toLowerCase()}
+function looksBlank(s){
+ const x=String(s||'').replace(/\s+/g,'').trim();
+ return !x || /^[_\.\-:()\/]*$/.test(x);
+}
+function appendValueToCell(doc,cell,value){
+ let p=cell.getElementsByTagName('w:p')[0];
+ if(!p){p=doc.createElementNS(WORD_NS,'w:p');cell.appendChild(p)}
+ const r=doc.createElementNS(WORD_NS,'w:r');
+ const t=doc.createElementNS(WORD_NS,'w:t');
+ t.setAttribute('xml:space','preserve');
+ t.textContent=value;
+ r.appendChild(t);p.appendChild(r);
+}
+function replaceBlankRuns(node,value){
+ const texts=Array.from(node.getElementsByTagName('w:t'));
+ for(const t of texts){
+   const original=t.textContent||'';
+   if(/_{2,}|\.{4,}|…{2,}/.test(original)){
+     t.textContent=original.replace(/_{2,}|\.{4,}|…{2,}/,value);
+     return true;
+   }
+ }
+ return false;
+}
+function fillAdjacentTableCell(doc,cell,value){
+ const row=cell.parentNode;
+ const cells=Array.from(row.childNodes).filter(n=>n.nodeType===1 && (n.localName==='tc'||n.nodeName==='w:tc'));
+ const idx=cells.indexOf(cell);
+ if(idx<0 || idx>=cells.length-1) return false;
+ for(let i=idx+1;i<Math.min(cells.length,idx+3);i++){
+   const candidate=cells[i];
+   const txt=nodeText(candidate);
+   if(looksBlank(txt)){appendValueToCell(doc,candidate,value);return true}
+   if(replaceBlankRuns(candidate,value)) return true;
+ }
+ return false;
+}
+function escapeRegExp(s){return s.replace(/[\\^$.*+?()[\]{}|]/g,'\\$&')}
+function replacePlaceholders(xml,id,value){
+ const safe=value.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[m]));
+ const tokens=['{{'+id+'}}','[['+id+']]','<<'+id+'>>','__'+id.toUpperCase()+'__','{{'+id.toUpperCase()+'}}','[['+id.toUpperCase()+']]'];
+ let n=0;
+ for(const token of tokens){
+   const re=new RegExp(escapeRegExp(token),'g');
+   const matches=xml.match(re);
+   if(matches){n+=matches.length;xml=xml.replace(re,safe)}
+ }
+ return {xml,count:n};
+}
+function aliasMatch(node,aliases){
+ const txt=normalizeText(nodeText(node));
+ return aliases.some(a=>{
+   const n=normalizeText(a);
+   return n && (txt===n || txt.startsWith(n+':') || txt.startsWith(n+' :') || txt.includes(n));
+ });
+}
+
+function directChildren(node,local){
+ return Array.from(node.childNodes||[]).filter(n=>n.nodeType===1 && (n.localName===local || n.nodeName==='w:'+local));
+}
+function getTable(doc,tableIndex){
+ return Array.from(doc.getElementsByTagName('w:tbl'))[tableIndex]||null;
+}
+function getTableCell(doc,tableIndex,rowIndex,cellIndex){
+ const table=getTable(doc,tableIndex); if(!table)return null;
+ const rows=directChildren(table,'tr'); const row=rows[rowIndex]; if(!row)return null;
+ return directChildren(row,'tc')[cellIndex]||null;
+}
+function setCellValue(doc,tableIndex,rowIndex,cellIndex,value){
+ if(!value)return false;
+ const cell=getTableCell(doc,tableIndex,rowIndex,cellIndex); if(!cell)return false;
+ const texts=Array.from(cell.getElementsByTagName('w:t'));
+ if(texts.length){
+   texts[0].textContent=value; texts[0].setAttribute('xml:space','preserve');
+   for(let i=1;i<texts.length;i++)texts[i].textContent='';
+ }else{
+   appendValueToCell(doc,cell,value);
+ }
+ return true;
+}
+function setParagraphValue(p,value){
+ if(!p||value===undefined||value===null)return false;
+ const texts=Array.from(p.getElementsByTagName('w:t'));
+ if(texts.length){
+   texts[0].textContent=String(value); texts[0].setAttribute('xml:space','preserve');
+   for(let i=1;i<texts.length;i++)texts[i].textContent='';
+ }else{
+   const r=p.ownerDocument.createElementNS(WORD_NS,'w:r');
+   const t=p.ownerDocument.createElementNS(WORD_NS,'w:t');
+   t.setAttribute('xml:space','preserve');t.textContent=String(value);r.appendChild(t);p.appendChild(r);
+ }
+ return true;
+}
+function findParagraph(doc,needle){
+ const n=normalizeText(needle);
+ return Array.from(doc.getElementsByTagName('w:p')).find(p=>normalizeText(nodeText(p)).includes(n))||null;
+}
+function formatDateDisplay(value){
+ if(!value)return '';
+ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+ return m?m[3]+'.'+m[2]+'.'+m[1]:value;
+}
+function formatDateWords(value){
+ if(!value)return '';
+ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(value); if(!m)return value;
+ const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+ return String(Number(m[3]))+' day of '+months[Number(m[2])-1]+' '+m[1];
+}
+function fieldValue(fields,id){return fields[id]?.value||''}
+function markIf(used,id,value){if(value)used.add(id)}
+function setNumberedArticleRows(doc,items){
+ const lines=String(items||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,8);
+ for(let i=0;i<lines.length;i++){
+   setCellValue(doc,1,i+1,0,String(i+1));
+   setCellValue(doc,1,i+1,1,lines[i]);
+ }
+ return lines.length;
+}
+function applyPreciseTemplate(doc,fields){
+ const used=new Set(); let count=0;
+ const put=(ok,id,value)=>{if(ok){count++;markIf(used,id,value)}};
+
+ if(file==='panchanama_ii.docx'){
+   const serial=fieldValue(fields,'serialNo')||'1';
+   put(setCellValue(doc,0,1,0,serial),'serialNo',serial);
+   put(setCellValue(doc,0,1,1,fieldValue(fields,'aNo')),'aNo',fieldValue(fields,'aNo'));
+   put(setCellValue(doc,0,1,2,fieldValue(fields,'crimeNo')),'crimeNo',fieldValue(fields,'crimeNo'));
+   put(setCellValue(doc,0,1,3,fieldValue(fields,'caseNo')),'caseNo',fieldValue(fields,'caseNo'));
+   put(setCellValue(doc,0,1,4,fieldValue(fields,'ccdAmount')),'ccdAmount',fieldValue(fields,'ccdAmount'));
+
+   const amount=fieldValue(fields,'ccdAmount');
+   if(amount){
+     const p=findParagraph(doc,'cash amount of Rs.');
+     put(setParagraphValue(p,'The above mentioned “A” Property cash amount of Rs. '+amount),'ccdAmount',amount);
+   }
+   const words=fieldValue(fields,'amountWords');
+   if(words){
+     const p=findParagraph(doc,'Rupees');
+     put(setParagraphValue(p,'(Rupees '+words+' only)'),'amountWords',words);
+   }
+   const remarks=fieldValue(fields,'depositRemarks');
+   if(remarks){
+     const p=findParagraph(doc,'For orders');
+     put(setParagraphValue(p,'For orders — '+remarks),'depositRemarks',remarks);
+   }
+ }
+
+ if(file==='mm_pt_warrant.docx'){
+   const cc=fieldValue(fields,'caseNo');
+   if(cc){
+     const p=findParagraph(doc,'CC.No:');
+     put(setParagraphValue(p,'CC.No: '+cc),'caseNo',cc);
+   }
+   const station=fieldValue(fields,'station');
+   if(station){
+     const p=findParagraph(doc,'POLICE STATION:');
+     put(setParagraphValue(p,'POLICE STATION: '+station),'station',station);
+   }
+   const accused=fieldValue(fields,'accused');
+   const remanded=fieldValue(fields,'remandedIn')||cc;
+   const prison=fieldValue(fields,'prison');
+   const crime=fieldValue(fields,'crimeNo');
+   const sections=fieldValue(fields,'sections');
+   const production=formatDateDisplay(fieldValue(fields,'productionDate'));
+   const body=findParagraph(doc,'WHEREAS one');
+   if(body && (accused||remanded||prison||crime||sections||production)){
+     const bodyText='WHEREAS one '+(accused||'____________________')+
+       ' who had been remanded in '+(remanded||'____________________')+
+       '. Now the prisoner contained in the '+(prison||'____________________')+
+       ' Puzhal Central Jail at Chennai aforesaid, is required personally to appear at the Chief Metropolitan Magistrate’s Court, Egmore, Chennai-08, aforesaid to be examined in connection with Police Station Cr. No. '+
+       (crime||'____________________')+' U/s '+(sections||'____________________')+
+       '. You are hereby required to bring the said accused to the Court aforesaid at 10.30 am, in the forenoon of the '+
+       (production||'____________________')+
+       ' and there to be so examined as aforesaid and to be further dealt with according to law.';
+     setParagraphValue(body,bodyText);count++;
+     ['accused','remandedIn','prison','crimeNo','sections','productionDate'].forEach(id=>markIf(used,id,fieldValue(fields,id)));
+     if(!fieldValue(fields,'remandedIn')&&cc)used.add('caseNo');
+   }
+   const warrantDate=formatDateDisplay(fieldValue(fields,'warrantDate')||fieldValue(fields,'date'));
+   if(warrantDate){
+     const p=findParagraph(doc,'Dated this');
+     if(setParagraphValue(p,'Dated this '+warrantDate)){count++; if(fieldValue(fields,'warrantDate'))used.add('warrantDate');else used.add('date')}
+   }
+ }
+
+ if(file==='panchanama_judicial_form_82.docx'){
+   const caseNo=fieldValue(fields,'caseNo');
+   if(caseNo){
+     const p=findParagraph(doc,'Case No.');
+     put(setParagraphValue(p,'Case No. '+caseNo),'caseNo',caseNo);
+   }
+   put(setCellValue(doc,0,0,1,fieldValue(fields,'station')),'station',fieldValue(fields,'station'));
+   put(setCellValue(doc,0,1,1,fieldValue(fields,'crimeNo')),'crimeNo',fieldValue(fields,'crimeNo'));
+   put(setCellValue(doc,0,2,1,fieldValue(fields,'sections')),'sections',fieldValue(fields,'sections'));
+   put(setCellValue(doc,0,3,1,fieldValue(fields,'accused')),'accused',fieldValue(fields,'accused'));
+   put(setCellValue(doc,0,4,1,formatDateDisplay(fieldValue(fields,'seizedOn'))),'seizedOn',fieldValue(fields,'seizedOn'));
+   put(setCellValue(doc,0,5,1,formatDateDisplay(fieldValue(fields,'receivedOn'))),'receivedOn',fieldValue(fields,'receivedOn'));
+
+   const item=fieldValue(fields,'propertyItemNo');
+   const year=fieldValue(fields,'propertyYear')||(fieldValue(fields,'formDate')||fieldValue(fields,'date')||'').slice(0,4)||String(new Date().getFullYear());
+   if(item||year){
+     const p=findParagraph(doc,'as Item No.');
+     if(p){
+       const text='The undermentioned Articles / Properties which are produced by the police, are checked, received and entered in the Property Register in Administrative Form No. 19 (C.R. No. 19) (in case of Judicial Magistrate court) or in Judicial Form No. 70 (in case of Metropolitan Magistrate Court) as Item No. '+(item||'........................')+' of '+year+' and they have been photographed.';
+       setParagraphValue(p,text);count++;markIf(used,'propertyItemNo',item);markIf(used,'propertyYear',fieldValue(fields,'propertyYear'));
+     }
+   }
+   const articles=fieldValue(fields,'articles');
+   if(articles){const n=setNumberedArticleRows(doc,articles);if(n){count+=n;used.add('articles')}}
+   const remarks=fieldValue(fields,'otherRemarks');
+   if(remarks){
+     const p=findParagraph(doc,'Other remarks');
+     put(setParagraphValue(p,'Other remarks: '+remarks),'otherRemarks',remarks);
+   }
+   const w1=fieldValue(fields,'witness1'),w2=fieldValue(fields,'witness2');
+   if(w1){
+     const p=Array.from(doc.getElementsByTagName('w:p')).find(x=>normalizeText(nodeText(x))==='1.');
+     put(setParagraphValue(p,'1. '+w1),'witness1',w1);
+   }
+   if(w2){
+     const p=Array.from(doc.getElementsByTagName('w:p')).find(x=>normalizeText(nodeText(x))==='2.');
+     put(setParagraphValue(p,'2. '+w2),'witness2',w2);
+   }
+   const fd=fieldValue(fields,'formDate')||fieldValue(fields,'date');
+   if(fd){
+     const p=findParagraph(doc,'Date this');
+     if(setParagraphValue(p,'Date this '+formatDateWords(fd)+'.')){count++;if(fieldValue(fields,'formDate'))used.add('formDate');else used.add('date')}
+   }
+ }
+
+ if(file==='withdrawal_report.docx'){
+   const crimeSection=[fieldValue(fields,'crimeNo'),fieldValue(fields,'sections')?('U/s '+fieldValue(fields,'sections')):''].filter(Boolean).join(' — ');
+   const finalReport=[fieldValue(fields,'finalReportDate')?formatDateDisplay(fieldValue(fields,'finalReportDate')):'',fieldValue(fields,'caseNo')?('C.C. No. '+fieldValue(fields,'caseNo')):''].filter(Boolean).join(' — ');
+   const rows=[
+    ['station',fieldValue(fields,'station')],
+    ['crimeNo',crimeSection],
+    ['offenceDate',formatDateDisplay(fieldValue(fields,'offenceDate'))],
+    ['complainant',fieldValue(fields,'complainant')],
+    ['accused',fieldValue(fields,'accused')],
+    ['finalReportDate',finalReport],
+    ['reason',fieldValue(fields,'reason')],
+    ['inspectorRecommendation',fieldValue(fields,'inspectorRecommendation')],
+    ['acRecommendation',fieldValue(fields,'acRecommendation')],
+    ['dcRecommendation',fieldValue(fields,'dcRecommendation')],
+    ['appOpinion',fieldValue(fields,'appOpinion')]
+   ];
+   rows.forEach(([id,value],row)=>{
+     if(value && setCellValue(doc,0,row,2,value)){count++;used.add(id)}
+   });
+   if(crimeSection){markIf(used,'sections',fieldValue(fields,'sections'))}
+   if(finalReport){markIf(used,'caseNo',fieldValue(fields,'caseNo'))}
+ }
+
+ return {used,count};
+}
+
+
+async function buildExactDocx(){
+ if(!template || !/\.docx$/i.test(template)) throw new Error('Exact-layout generation is available for .docx templates only.');
+ if(typeof PizZip==='undefined') throw new Error('Word template engine did not load.');
+ const response=await fetch(template,{cache:'no-store'});
+ if(!response.ok) throw new Error('Could not load the original Word file.');
+ const zip=new PizZip(await response.arrayBuffer());
+ const part=zip.file('word/document.xml');
+ if(!part) throw new Error('This file does not contain a standard Word document body.');
+
+ let xml=part.asText();
+ const fields=exactFieldMap();
+ let placeholderCount=0;
+ Object.entries(fields).forEach(([id,spec])=>{
+   if(!spec.value)return;
+   const result=replacePlaceholders(xml,id,spec.value);
+   xml=result.xml;placeholderCount+=result.count;
+ });
+
+ const doc=new DOMParser().parseFromString(xml,'application/xml');
+ if(doc.getElementsByTagName('parsererror').length) throw new Error('Could not read the Word template XML.');
+
+ const precise=applyPreciseTemplate(doc,fields);
+ let labelCount=precise.count;
+ const used=precise.used;
+ const cells=Array.from(doc.getElementsByTagName('w:tc'));
+
+ for(const [id,spec] of Object.entries(fields)){
+   if(!spec.value || used.has(id)) continue;
+   for(const cell of cells){
+     if(!aliasMatch(cell,spec.aliases)) continue;
+     if(replaceBlankRuns(cell,spec.value) || fillAdjacentTableCell(doc,cell,spec.value)){
+       labelCount++;used.add(id);break;
+     }
+   }
+ }
+
+ const paragraphs=Array.from(doc.getElementsByTagName('w:p'));
+ for(const [id,spec] of Object.entries(fields)){
+   if(!spec.value || used.has(id)) continue;
+   for(const p of paragraphs){
+     if(!aliasMatch(p,spec.aliases)) continue;
+     if(replaceBlankRuns(p,spec.value)){labelCount++;used.add(id);break}
+   }
+ }
+
+ zip.file('word/document.xml',new XMLSerializer().serializeToString(doc));
+ const blob=zip.generate({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+ return {blob,total:placeholderCount+labelCount};
+}
+
+async function downloadExactWord(){
+ const status=$('exactStatus');status.style.display='block';status.textContent='Preparing original Word template…';
+ try{
+   const built=await buildExactDocx();
+   const a=document.createElement('a');
+   a.href=URL.createObjectURL(built.blob);
+   a.download=fileBase()+'_filled_exact.docx';
+   a.click();
+   setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+   status.innerHTML='✅ Exact Word generated from the original template. <b>'+built.total+'</b> field location'+(built.total===1?'':'s')+' filled automatically.';
+ }catch(err){
+   console.error(err);
+   status.textContent='⚠️ Exact Word could not be generated: '+err.message+' Use Quick Word/PDF instead.';
+ }
+}
+
+async function downloadExactPdf(){
+ const status=$('exactStatus');status.style.display='block';status.textContent='Rendering filled original Word layout to PDF…';
+ const host=$('exactRenderHost');
+ try{
+   if(!window.docx || typeof window.docx.renderAsync!=='function') throw new Error('DOCX preview renderer did not load.');
+   const built=await buildExactDocx();
+   host.innerHTML='';
+   await window.docx.renderAsync(
+     await built.blob.arrayBuffer(),
+     host,
+     host,
+     {
+       inWrapper:true,
+       breakPages:true,
+       ignoreWidth:false,
+       ignoreHeight:false,
+       ignoreFonts:false,
+       ignoreLastRenderedPageBreak:false
+     }
+   );
+   const rendered=host.querySelector('.docx-wrapper')||host;
+   const option={
+     margin:0,
+     filename:fileBase()+'_filled_exact.pdf',
+     image:{type:'jpeg',quality:.99},
+     html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
+     jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+     pagebreak:{mode:['css','legacy'],before:'.docx-page-break'}
+   };
+   await html2pdf().set(option).from(rendered).save();
+   status.innerHTML='✅ Exact PDF generated from the filled original DOCX layout. <b>'+built.total+'</b> field location'+(built.total===1?'':'s')+' filled.';
+   host.innerHTML='';
+ }catch(err){
+   console.error(err);
+   status.textContent='⚠️ Exact PDF could not be generated: '+err.message+' Use Quick PDF instead.';
+   host.innerHTML='';
+ }
+}
+
+function saveDefaults(){
+ const d={station:val('station'),district:val('district'),court:val('court'),officer:val('officer'),rank:val('rank')};
+ localStorage.setItem('policeDocDefaults',JSON.stringify(d)); alert('Defaults saved on this device.');
+}
+function loadDefaults(){
+ try{const d=JSON.parse(localStorage.getItem('policeDocDefaults')||'{}');Object.entries(d).forEach(([k,v])=>{if($(k))$(k).value=v||''})}catch(e){}
+}
+const def=presets[file];
+$('docTitle').value=def?.title||prettyFile(); $('formTitle').textContent='Fill '+$('docTitle').value;
+$('bodyText').value=def?.body||'Enter the document contents / proceedings here.\n\n';
+$('date').value=new Date().toISOString().slice(0,10);
+if(template){$('originalBtn').href=template}else{$('originalBtn').style.display='none'}
+addFields(def); loadDefaults(); updatePreview();
+document.addEventListener('input',e=>{if(e.target.matches('input,textarea,select'))updatePreview()});
+$('previewBtn').onclick=updatePreview;$('exactWordBtn').onclick=downloadExactWord;$('exactPdfBtn').onclick=downloadExactPdf;$('wordBtn').onclick=downloadWord;$('pdfBtn').onclick=downloadPdf;$('saveBtn').onclick=saveDefaults;
+</script>
+</body>
+</html>

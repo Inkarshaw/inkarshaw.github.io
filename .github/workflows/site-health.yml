@@ -1,0 +1,361 @@
+name: ClearExams site health
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clearexams-site-health
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Validate repository health
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(tr -d '\r\n' < CNAME)" = "clearexams.ink"
+          python3 -m json.tool current-affairs/pdfs.json >/dev/null
+          python3 - <<'PY'
+          import csv, json, pathlib, re, urllib.parse, xml.etree.ElementTree as ET
+          from collections import Counter
+          tree = ET.parse("sitemap.xml")
+          root = tree.getroot()
+          if len(root) < 10:
+              raise SystemExit("sitemap.xml contains too few URLs")
+          urls = [x.text for x in root.iter() if x.tag.endswith('loc') and x.text]
+          required_urls = {
+              'https://clearexams.ink/',
+              'https://clearexams.ink/start.html',
+              'https://clearexams.ink/daily-quiz.html',
+              'https://clearexams.ink/pyq-hub.html',
+              'https://clearexams.ink/dashboard.html',
+              'https://clearexams.ink/syllabus.html',
+              'https://clearexams.ink/tnpsc.html',
+              'https://clearexams.ink/tnusrb.html',
+              'https://clearexams.ink/upsc.html',
+          }
+          missing = sorted(required_urls - set(urls))
+          if missing:
+              raise SystemExit('Required sitemap URLs missing: ' + ', '.join(missing))
+          p = pathlib.Path("data/quizzes/daily-quiz.csv")
+          with p.open(encoding="utf-8", newline="") as f:
+              rows = list(csv.DictReader(f))
+          if len(rows) < 10:
+              raise SystemExit("daily-quiz.csv has fewer than 10 question rows")
+          required = {"ID","Active","Exam","Topic","Subtopic","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer","ExplanationA","ExplanationB","ExplanationC","ExplanationD"}
+          if not rows or not required.issubset(rows[0].keys()):
+              raise SystemExit("daily-quiz.csv is missing required columns")
+
+          routes = json.loads(pathlib.Path("data/exams/exam-routes.json").read_text(encoding="utf-8"))
+          coverage = Counter()
+          for row in rows:
+              if str(row.get("Active","")).lower() == "false":
+                  continue
+              if not row.get("Exam") or not row.get("Topic") or not row.get("Subtopic") or not row.get("Question"):
+                  continue
+              if str(row.get("CorrectAnswer","")).upper() not in {"A","B","C","D"}:
+                  continue
+              if not all(row.get("Option"+x) and row.get("Explanation"+x) for x in "ABCD"):
+                  continue
+              coverage[row["Exam"]] += 1
+          for family, route in routes.items():
+              quiz_exam = route.get("quizExam")
+              # The daily quiz deliberately shares UPSC/TNPSC questions with both
+              # dedicated exam views; don't count only exact CSV exam labels.
+              available = coverage.get(quiz_exam, 0)
+              if family in {"tnpsc", "upsc"}:
+                  available += coverage.get("UPSC/TNPSC", 0)
+              if available < 10:
+                  raise SystemExit(f"{family}.quizExam has only {available} valid fallback questions (including shared): {quiz_exam}")
+
+          subject_requirements = {
+              ("TNUSRB","General Knowledge"): 10,
+              ("TNUSRB","Psychology & Aptitude"): 10,
+              ("SSC","General Awareness"): 10,
+              ("SSC","Quantitative Aptitude"): 10,
+              ("SSC","English"): 10,
+              ("Banking","Banking Awareness"): 10,
+              ("Banking","Quantitative Aptitude"): 10,
+              ("Banking","Reasoning"): 10,
+              ("Railways","Mathematics"): 10,
+              ("Railways","General Science"): 10,
+          }
+          subject_coverage = Counter()
+          for row in rows:
+              if str(row.get("Active","")).lower() == "false":
+                  continue
+              if row.get("Exam") and row.get("Subtopic") and row.get("Question"):
+                  subject_coverage[(row["Exam"], row["Subtopic"])] += 1
+          for key, minimum in subject_requirements.items():
+              if subject_coverage.get(key, 0) < minimum:
+                  raise SystemExit(f"Quiz subject bank {key[0]} → {key[1]} has only {subject_coverage.get(key,0)} rows; need {minimum}")
+
+          shared_topic_requirements = {
+              "Indian Polity": 10,
+              "History": 10,
+              "Geography": 10,
+              "Indian Economy": 10,
+              "Science & Technology": 10,
+              "Environment": 10,
+              "Current Affairs": 10,
+              "Tamil Nadu GK": 10,
+              "Aptitude": 10,
+              "English": 10,
+              "Tamil": 10,
+          }
+          shared_topic_coverage = Counter()
+          for row in rows:
+              if row.get("Exam") == "UPSC/TNPSC" and row.get("Topic") and row.get("Question"):
+                  shared_topic_coverage[row["Topic"]] += 1
+          for topic, minimum in shared_topic_requirements.items():
+              if shared_topic_coverage.get(topic, 0) < minimum:
+                  raise SystemExit(f"Shared UPSC/TNPSC topic bank {topic} has only {shared_topic_coverage.get(topic,0)} rows; need {minimum}")
+
+          for family, route in routes.items():
+              subjects = route.get("quizSubjects") or []
+              if not subjects:
+                  raise SystemExit(f"{family}.quizSubjects is missing or empty")
+              if len(subjects) != len(set(subjects)):
+                  raise SystemExit(f"{family}.quizSubjects contains duplicates")
+              quiz_exam = route.get("quizExam","")
+              for subject in subjects:
+                  if family in {"tnpsc","upsc"}:
+                      count = shared_topic_coverage.get(subject,0) + subject_coverage.get((quiz_exam,subject),0)
+                  else:
+                      count = subject_coverage.get((quiz_exam,subject),0)
+                  if count < 10:
+                      raise SystemExit(f"{family}.quizSubjects entry {subject} has only {count} valid questions; need 10")
+          catalog = json.loads(pathlib.Path("data/exams/exam-catalog.json").read_text(encoding="utf-8"))
+          catalog_ids = {item["id"] for body in catalog.values() for item in body.get("items", [])}
+          syllabus_text = pathlib.Path("syllabus.html").read_text(encoding="utf-8")
+          syllabus_ids = set(re.findall(r"""\bid\s*:\s*['"]([^'"]+)['"]""", syllabus_text))
+
+          if set(routes) - set(catalog):
+              raise SystemExit("exam-routes.json contains unknown exam families: " + ", ".join(sorted(set(routes) - set(catalog))))
+
+          route_fields = ("hubRoute","syllabusRoute","pyqRoute","preparationRoute","currentAffairsRoute")
+          for family, route in routes.items():
+              for field in route_fields:
+                  value = route.get(field)
+                  if not value:
+                      raise SystemExit(f"{family}.{field} is missing")
+                  parsed = urllib.parse.urlsplit(value)
+                  path = pathlib.Path(urllib.parse.unquote(parsed.path))
+                  candidates = [path]
+                  if str(path).endswith("/") or not path.suffix:
+                      candidates += [path / "index.html", path.with_suffix(".html")]
+                  if not any(candidate.exists() for candidate in candidates):
+                      raise SystemExit(f"{family}.{field} points to missing path: {value}")
+              prep = urllib.parse.urlsplit(route["preparationRoute"])
+              prep_exam = urllib.parse.parse_qs(prep.query).get("exam", [""])[0]
+              if prep_exam not in catalog_ids:
+                  raise SystemExit(f"{family}.preparationRoute uses unknown exam id: {prep_exam}")
+              syllabus = urllib.parse.urlsplit(route["syllabusRoute"])
+              if syllabus.fragment and syllabus.fragment not in syllabus_ids:
+                  raise SystemExit(f"{family}.syllabusRoute uses unknown syllabus fragment: {syllabus.fragment}")
+          PY
+          echo "Repository metadata checks passed." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Audit reviewed textbook quiz batches
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/audit_textbook_quiz_quality.py data/textbook/class-11/history/unit-04.json --start 160 --count 100
+          python3 -m unittest discover -s tests -p "test_textbook_batch_audit.py" -v
+          echo "Reviewed 100-question English-Tamil quiz batch passed." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check assets/js/exam-common.js
+          node --check assets/js/exam-preparation.js
+          node --check assets/js/exam-posts.js
+          node --check assets/js/pwa.js
+          python3 - <<'PY'
+          import pathlib, re, subprocess, tempfile
+          pages = [
+              "daily-quiz.html",
+              "dashboard.html",
+              "index.html",
+              "start.html",
+              "current-affairs/index.html",
+              "current-affairs/daily.html",
+          ]
+          checked = 0
+          for page in pages:
+              text = pathlib.Path(page).read_text(encoding="utf-8")
+              for i, match in enumerate(re.finditer(r"<script([^>]*)>(.*?)</script>", text, re.I | re.S), 1):
+                  attrs, body = match.groups()
+                  if re.search(r"\bsrc\s*=", attrs, re.I):
+                      continue
+                  if "application/ld+json" in attrs.lower():
+                      continue
+                  if not body.strip():
+                      continue
+                  path = pathlib.Path(tempfile.gettempdir()) / f"clearexams-{pathlib.Path(page).stem}-{i}.js"
+                  path.write_text(body, encoding="utf-8")
+                  subprocess.run(["node","--check",str(path)], check=True)
+                  checked += 1
+          print(f"Validated {checked} inline JavaScript block(s).")
+          PY
+          echo "JavaScript syntax checks passed." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate core exam-site internal links
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit, unquote
+
+          root = Path('.').resolve()
+          skip_dirs = {'.git','node_modules','vendor','website-automation','instagram-publisher','policedocuments','cdranalysis','exam'}
+          download_ext = {'.pdf','.doc','.docx','.xls','.xlsx','.ppt','.pptx','.zip','.rar'}
+          broken=[]; checked=0
+
+          class Links(HTMLParser):
+              def __init__(self): super().__init__(); self.hrefs=[]
+              def handle_starttag(self, tag, attrs):
+                  if tag not in {'a','link','script','img','source'}: return
+                  d=dict(attrs); value=d.get('href') or d.get('src')
+                  if value: self.hrefs.append(value)
+
+          files=[p for p in root.rglob('*.html') if not any(part in skip_dirs for part in p.relative_to(root).parts)]
+          for p in files:
+              try: text=p.read_text(encoding='utf-8')
+              except UnicodeDecodeError: continue
+              parser=Links(); parser.feed(text)
+              for raw in parser.hrefs:
+                  raw=raw.strip()
+                  if not raw or raw.startswith(('#','mailto:','tel:','javascript:','data:','blob:')): continue
+                  u=urlsplit(raw)
+                  if u.scheme in {'http','https'} or raw.startswith('//'): continue
+                  path=unquote(u.path)
+                  if not path or Path(path).suffix.lower() in download_ext: continue
+                  target=(root/path.lstrip('/')) if path.startswith('/') else (p.parent/path)
+                  candidates=[target]
+                  if path.endswith('/') or not target.suffix:
+                      candidates.extend([target/'index.html',target.with_suffix('.html')])
+                  checked+=1
+                  if not any(x.resolve().exists() for x in candidates): broken.append(f'{p.relative_to(root)} -> {raw}')
+          print(f'Checked {checked} core exam-site links across {len(files)} HTML files.')
+          if broken:
+              print('Broken core exam-site links:')
+              print('\n'.join(' - '+x for x in broken[:100]))
+              if len(broken)>100: print(f' ... and {len(broken)-100} more')
+              raise SystemExit(1)
+          PY
+          echo "Core exam-site internal links passed." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Audit legacy and download links
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit, unquote
+          root=Path('.').resolve(); areas={'policedocuments','cdranalysis','exam'}; missing=[]; checked=0
+          class Links(HTMLParser):
+              def __init__(self): super().__init__(); self.hrefs=[]
+              def handle_starttag(self,tag,attrs):
+                  if tag not in {'a','link','script','img','source'}: return
+                  d=dict(attrs); v=d.get('href') or d.get('src')
+                  if v:self.hrefs.append(v)
+          for area in areas:
+              base=root/area
+              if not base.exists(): continue
+              for p in base.rglob('*.html'):
+                  try:text=p.read_text(encoding='utf-8')
+                  except UnicodeDecodeError:continue
+                  parser=Links();parser.feed(text)
+                  for raw in parser.hrefs:
+                      raw=raw.strip();u=urlsplit(raw)
+                      if not raw or raw.startswith(('#','mailto:','tel:','javascript:','data:','blob:','//')) or u.scheme in {'http','https'}:continue
+                      path=unquote(u.path)
+                      if not path:continue
+                      target=(root/path.lstrip('/')) if path.startswith('/') else (p.parent/path)
+                      candidates=[target]
+                      if path.endswith('/') or not target.suffix:candidates.extend([target/'index.html',target.with_suffix('.html')])
+                      checked+=1
+                      if not any(x.resolve().exists() for x in candidates):missing.append(f'{p.relative_to(root)} -> {raw}')
+          print(f'Audited {checked} legacy/download-area links; {len(missing)} unresolved.')
+          summary=Path(__import__('os').environ['GITHUB_STEP_SUMMARY'])
+          with summary.open('a',encoding='utf-8') as f:
+              f.write('## Legacy/download link audit\n')
+              f.write(f'- Unresolved links: {len(missing)}\n')
+              for x in missing[:25]: f.write(f'  - {x}\n')
+              if len(missing)>25:f.write(f'  - … and {len(missing)-25} more\n')
+          PY
+
+      - name: Check production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          urls=(
+            "https://clearexams.ink/"
+            "https://clearexams.ink/start.html"
+            "https://clearexams.ink/current-affairs/"
+            "https://clearexams.ink/daily-quiz.html"
+            "https://clearexams.ink/exam-notifications.html"
+            "https://clearexams.ink/exam-calendar.html"
+            "https://clearexams.ink/pyq-hub.html"
+            "https://clearexams.ink/dashboard.html"
+            "https://clearexams.ink/search.html"
+            "https://clearexams.ink/study-plan-30.html"
+            "https://clearexams.ink/answer-writing.html"
+            "https://clearexams.ink/current-affairs/compilations.html"
+            "https://clearexams.ink/current-affairs/daily.html"
+            "https://clearexams.ink/exam-preparation.html"
+            "https://clearexams.ink/syllabus.html"
+            "https://clearexams.ink/tnpsc.html"
+            "https://clearexams.ink/tnusrb.html"
+            "https://clearexams.ink/upsc.html"
+            "https://clearexams.ink/policedocuments/"
+            "https://clearexams.ink/sitemap.xml"
+            "https://clearexams.ink/robots.txt"
+          )
+          echo "## ClearExams production checks" >> "$GITHUB_STEP_SUMMARY"
+          failed=0
+          for url in "${urls[@]}"; do
+            code="000"
+            for attempt in 1 2 3 4 5 6; do
+              code=$(curl --location --silent --show-error --connect-timeout 15 --max-time 45 --output /dev/null --write-out "%{http_code}" "$url" || true)
+              if [[ "$code" =~ ^[23] ]]; then break; fi
+              if [ "$attempt" -lt 6 ]; then sleep 10; fi
+            done
+            if [[ "$code" =~ ^[23] ]]; then
+              echo "- ✅ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "- ❌ $url — HTTP $code" >> "$GITHUB_STEP_SUMMARY"; failed=1
+            fi
+          done
+          exit "$failed"
+
+      - name: Enforce current domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "## Legacy-domain scan" >> "$GITHUB_STEP_SUMMARY"
+          matches=$(grep -RIl --exclude-dir=.git --exclude-dir=.github --exclude-dir=website-automation --exclude-dir=instagram-publisher --exclude='*.pdf' --exclude='*.png' --exclude='*.jpg' --exclude='*.jpeg' --exclude='*.webp' "clearexams.online" . || true)
+          if [ -z "$matches" ]; then
+            echo "- ✅ No clearexams.online references found." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- ❌ Old-domain references remain in:" >> "$GITHUB_STEP_SUMMARY"
+            while IFS= read -r file; do echo "  - ${file#./}" >> "$GITHUB_STEP_SUMMARY"; done <<< "$matches"
+            exit 1
+          fi

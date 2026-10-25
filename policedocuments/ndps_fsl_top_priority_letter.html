@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NDPS FSL Top Priority Letter</title>
+<style>
+body{font-family:Arial,sans-serif;background:#eef3f8;margin:0;color:#172033}
+header{background:#fff;padding:14px 18px;border-bottom:1px solid #d7e0ea}
+main{max-width:1200px;margin:20px auto;padding:0 14px;display:grid;grid-template-columns:420px 1fr;gap:18px}
+.panel{background:#fff;border:1px solid #d7e0ea;border-radius:12px;padding:16px}
+label{display:block;font-size:12px;font-weight:700;margin:10px 0 4px}
+input,textarea{width:100%;box-sizing:border-box;padding:9px;border:1px solid #bdc9d7;border-radius:7px;font:inherit}
+textarea{min-height:74px;resize:vertical}
+button{margin:12px 6px 0 0;border:0;border-radius:8px;padding:10px 13px;font-weight:700;cursor:pointer}
+.primary{background:#0b2545;color:#fff}.secondary{background:#185abd;color:#fff}
+.paper{width:210mm;min-height:297mm;margin:auto;background:#fff;color:#000;padding:15mm;box-sizing:border-box;font-family:"Times New Roman",serif;box-shadow:0 4px 20px #bbb}
+.title{text-align:center;font-weight:700;font-size:18pt;margin-bottom:18px}.row{display:grid;grid-template-columns:1fr 1fr;gap:20px}.date{text-align:right;margin:12px 0}.block{font-size:13pt;line-height:1.6;margin-top:12px;white-space:pre-wrap}.sig{text-align:right;margin-top:30px;font-weight:700}
+@media(max-width:900px){main{grid-template-columns:1fr}.paper{width:100%;min-height:auto}}
+@media print{header,.form{display:none!important}main{display:block;margin:0;padding:0}.panel{border:0;padding:0}.paper{box-shadow:none;width:210mm;min-height:297mm}@page{size:A4;margin:0}}
+</style>
+</head>
+<body>
+<header><b>NDPS – FSL Top Priority Letter</b></header>
+<main>
+<section class="panel form">
+<h2>AC to FSL – TOP PRIORITY</h2>
+<label>Letter Date</label><input id="letterDate" type="date" value="2026-09-27">
+<label>Police Station</label><input id="ps" value="G7 Chetpet Police Station">
+<label>Crime No.</label><input id="crimeNo" value="159/2026">
+<label>Sections</label><input id="sections" value="8(c), 22(b) NDPS Act">
+<label>NAR No.</label><input id="narNo" value="2582/2026">
+<label>NAR Date</label><input id="narDate" type="date" value="2026-09-23">
+<label>Sample</label><input id="sample" value="S1">
+<label>From</label><textarea id="fromText">Assistant Commissioner of Police,
+Kilpauk Range,
+Greater Chennai Police,
+Chennai-10.</textarea>
+<label>To</label><textarea id="toText">The Director,
+Forensic Sciences Department,
+Narcotics Analysis Division,
+Kamarajar Salai,
+Chennai-04.</textarea>
+<label>Subject</label><textarea id="subject">Request to examine the S1 sample in TOP PRIORITY and issue the analysis report early – Regarding.</textarea>
+<label>Accused Details</label><textarea id="accused">Name / age / parent name / address</textarea>
+<label>Body</label><textarea id="body">The sample connected with the above case was submitted to the Forensic Sciences Department under the above NAR reference. Since the analysis report is required for further legal proceedings in the case, it is requested that the S1 sample may kindly be examined on TOP PRIORITY and the analysis report issued at the earliest.</textarea>
+<button class="primary" onclick="window.print()">Print</button>
+<button class="secondary" onclick="downloadWord()">Download Word</button>
+</section>
+<section class="panel">
+<article class="paper" id="paper">
+<div class="title">GREATER CHENNAI POLICE</div>
+<div class="row"><div class="block" id="pFrom"></div><div class="block" id="pTo"></div></div>
+<div class="date">Date: <span id="pDate"></span></div>
+<div class="block"><b>Ref:</b><br><span id="pRef"></span></div>
+<div class="block"><b>Sub:</b> <span id="pSubject"></span></div>
+<div class="block"><b>Accused:</b><br><span id="pAccused"></span></div>
+<div class="block" id="pBody"></div>
+<div class="sig">Assistant Commissioner of Police<br>Kilpauk Range</div>
+</article>
+</section>
+</main>
+<script>
+const byId=id=>document.getElementById(id);
+function fd(v){if(!v)return "";const p=v.split("-");return p[2]+"."+p[1]+"."+p[0]}
+function nl(v){return (v||"").replace(/\n/g,"<br>")}
+function render(){
+ byId("pFrom").innerHTML=nl(byId("fromText").value);
+ byId("pTo").innerHTML=nl(byId("toText").value);
+ byId("pDate").textContent=fd(byId("letterDate").value);
+ byId("pRef").innerHTML=byId("ps").value+" Crime No. "+byId("crimeNo").value+" U/s "+byId("sections").value+"<br>NAR No. "+byId("narNo").value+", Dt: "+fd(byId("narDate").value);
+ byId("pSubject").textContent=byId("subject").value;
+ byId("pAccused").innerHTML=nl(byId("accused").value);
+ byId("pBody").textContent=byId("body").value;
+}
+document.querySelectorAll("input,textarea").forEach(el=>el.addEventListener("input",render));
+function downloadWord(){
+ render();
+ const doc='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Times New Roman,serif}.row{display:table;width:100%}.row>div{display:table-cell;width:50%;vertical-align:top}.block{white-space:pre-wrap;line-height:1.5}.date{text-align:right}.sig{text-align:right;font-weight:bold}.title{text-align:center;font-weight:bold}</style></head><body>'+byId("paper").outerHTML+'</body></html>';
+ const blob=new Blob(['\ufeff',doc],{type:'application/msword'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='NDPS_FSL_Top_Priority_Letter.doc';a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+render();
+</script>
+</body>
+</html>

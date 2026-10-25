@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""Regression tests for the reusable bilingual 100-question editorial gate."""
+import copy
+import importlib.util
+import json
+from pathlib import Path
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+SPEC = importlib.util.spec_from_file_location(
+    "textbook_batch_audit", ROOT / "scripts/audit_textbook_quiz_quality.py"
+)
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+BANK = json.loads(
+    (ROOT / "data/textbook/class-11/history/unit-04.json").read_text(encoding="utf-8")
+)
+
+
+class BilingualBatchAuditTests(unittest.TestCase):
+    def test_quizzes_nine_through_thirteen_pass_quality_gate(self):
+        result = MODULE.audit(BANK["questions"], start=160, count=100)
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["reviewed_quizzes"], "9–13")
+        self.assertEqual(sum(result["answer_positions"].values()), 100)
+
+    def test_flags_repeated_distractors_and_incomplete_tamil(self):
+        records = copy.deepcopy(BANK["questions"])
+        records[160]["opts_ta"][1] = records[160]["opts_ta"][0]
+        records[161]["q_ta"] = ""
+        result = MODULE.audit(records, start=160, count=100)
+        self.assertTrue(any("duplicate ta distractors" in item for item in result["errors"]))
+        self.assertTrue(any("missing q_ta" in item for item in result["errors"]))
+
+    def test_flags_mixed_type_answers_and_mechanical_stems(self):
+        records = copy.deepcopy(BANK["questions"])
+        records[160]["opts_en"][0] = "Not yet deciphered"
+        records[161]["q_en"] = "What is the correct textbook answer for: a ruler?"
+        result = MODULE.audit(records, start=160, count=100)
+        self.assertTrue(any("mixed chronology" in item for item in result["errors"]))
+        self.assertTrue(any("machine-generated question stem" in item for item in result["errors"]))
+
+    def test_flags_numerical_tamil_answer_mismatch(self):
+        records = copy.deepcopy(BANK["questions"])
+        records[160]["opts_ta"][records[160]["correct"]] = "பொ.ஆ.மு. 999"
+        result = MODULE.audit(records, start=160, count=100)
+        self.assertTrue(any("numerical answer differs" in item for item in result["errors"]))
+
+    def test_tamil_vowel_marks_are_semantically_significant(self):
+        self.assertNotEqual(MODULE.normalize("பாகா"), MODULE.normalize("போகா"))
+        self.assertNotEqual(MODULE.normalize("கரா"), MODULE.normalize("காரா"))
+        self.assertNotEqual(MODULE.normalize("உபரிகரா"), MODULE.normalize("உபரிகாரா"))
+        self.assertEqual(MODULE.normalize("  போகா! "), MODULE.normalize("போகா"))
+
+    def test_gupta_valid_tax_terms_do_not_trigger_tamil_duplicate_error(self):
+        records = json.loads(
+            (ROOT / "data/textbook/class-11/history/unit-07.json").read_text(encoding="utf-8")
+        )["questions"]
+        outcome = MODULE.audit(records, start=200, count=100)
+        self.assertFalse(any("duplicate ta distractors" in x for x in outcome["errors"]))
+
+    def test_case_sensitive_scientific_symbols_preserve_distinct_options(self):
+        records = copy.deepcopy(BANK["questions"])
+        item = records[160]
+        item["q_en"] = "Which SI unit symbol is correctly written for a kilogram?"
+        item["q_ta"] = "கிலோகிராமுக்கான சரியான SI அலகுக் குறியீடு எது?"
+        item["opts_en"] = ["kg", "Kg", "KG", "kG"]
+        item["opts_ta"] = ["kg", "Kg", "KG", "kG"]
+        item["correct"] = 0
+        item["exp_en"] = "The correct kilogram unit symbol is kg with lowercase k and lowercase g in SI notation."
+        item["exp_ta"] = "கிலோகிராமுக்கு SI குறியீடாக kg என்பதே சரி; இரு எழுத்துகளும் சிறிய எழுத்துகளாக எழுதப்படும்."
+        result = MODULE.audit(records, start=160, count=20)
+        self.assertFalse(any("duplicate en distractors" in x for x in result["errors"]))
+        self.assertFalse(any("duplicate ta distractors" in x for x in result["errors"]))
+        item["opts_en"][1] = "kg"
+        item["opts_ta"][1] = "kg"
+        result = MODULE.audit(records, start=160, count=20)
+        self.assertTrue(any("duplicate en distractors" in x for x in result["errors"]))
+        self.assertTrue(any("duplicate ta distractors" in x for x in result["errors"]))
+
+    def test_rejects_partial_quiz_windows(self):
+        with self.assertRaisesRegex(ValueError, "20-question"):
+            MODULE.audit(BANK["questions"], start=160, count=99)
+
+
+if __name__ == "__main__":
+    unittest.main()

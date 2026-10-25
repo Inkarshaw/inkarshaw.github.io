@@ -1,0 +1,31 @@
+name: Build Class 11 History Unit 14
+
+on:
+  push:
+    paths:
+      - '.tmp/unit14/build_unit14.py'
+      - '.github/workflows/build-class11-history-unit14.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-unit-14:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate and publish Unit 14 question bank
+        shell: bash
+        run: |
+          set -euo pipefail
+          python .tmp/unit14/build_unit14.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/textbook/class-11/history/unit-14.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Add Class 11 History Unit 14 bilingual competitive question bank"
+          git push

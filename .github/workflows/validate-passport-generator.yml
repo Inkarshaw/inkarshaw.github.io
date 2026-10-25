@@ -1,0 +1,31 @@
+name: Validate Police Passport Generator
+
+on:
+  push:
+    paths:
+      - 'policepassportgenerator/**'
+      - 'policedocuments/police_passport.html'
+      - 'scripts/validate-passport-generator.mjs'
+      - '.github/workflows/validate-passport-generator.yml'
+  pull_request:
+    paths:
+      - 'policepassportgenerator/**'
+      - 'policedocuments/police_passport.html'
+      - 'scripts/validate-passport-generator.mjs'
+      - '.github/workflows/validate-passport-generator.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate passport generator
+        run: node scripts/validate-passport-generator.mjs

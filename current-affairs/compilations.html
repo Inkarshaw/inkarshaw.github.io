@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#09233e">
+<meta name="description" content="Download weekly and monthly ClearExams current affairs compilation PDFs for revision.">
+<link rel="canonical" href="https://clearexams.ink/current-affairs/compilations.html"><title>Weekly & Monthly Current Affairs Compilations | ClearExams</title>
+<link rel="stylesheet" href="../assets/css/exam-pages.css"><link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../assets/clearexams-icon.svg" type="image/svg+xml"><script src="../assets/js/pwa.js" defer></script>
+<style>
+.comp-tools{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.comp-tools button{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-weight:800}.comp-tools button.active{background:#1463ff;color:#fff;border-color:#1463ff}.comp-list{display:grid;gap:14px}.comp-card{padding:20px;border:1px solid var(--line);border-radius:14px;background:#fff}.comp-card h3{margin:8px 0}.meta-row{display:flex;gap:9px;flex-wrap:wrap;color:var(--muted);font-size:.84rem}.kind{display:inline-block;padding:4px 9px;border-radius:999px;background:#eef5ff;color:#174b96;font-size:.75rem;font-weight:850;text-transform:uppercase}.empty{padding:30px;border:1px dashed #c6d4e3;border-radius:12px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-nav"><a class="brand" href="../index.html">ClearExams</a><nav><a href="./">Daily Current Affairs</a><a href="../daily-quiz.html">Daily Quiz</a><a href="../dashboard.html">Dashboard</a><a href="../index.html">Home</a></nav></div></header>
+<section class="hero"><div class="wrap"><p class="eyebrow">Revision packs</p><h1>Weekly & monthly current affairs</h1><p>Revise multiple daily editions in one PDF. These compilation files are rebuilt automatically as new daily Current Affairs PDFs are published.</p></div></section>
+<main class="wrap">
+<section class="panel"><h2>Compilation archive</h2><p class="source">Use weekly packs for fast revision and monthly packs for broader exam preparation.</p><div class="comp-tools"><button class="active" data-kind="all">All</button><button data-kind="weekly">Weekly</button><button data-kind="monthly">Monthly</button></div><div id="list" class="comp-list" aria-live="polite"><div class="empty">Loading compilations…</div></div></section>
+<section class="panel"><h2>Revision routine</h2><div class="grid"><article class="resource"><h3>Daily</h3><p>Read the latest issue and take the Daily Quiz.</p></article><article class="resource"><h3>Weekly</h3><p>Use the weekly compilation to identify topics you forgot.</p></article><article class="resource"><h3>Monthly</h3><p>Revise the full month before mocks and major examinations.</p></article><article class="resource"><h3>Wrong answers</h3><p>Open your dashboard and retry recurring weak areas.</p></article></div></section>
+</main>
+<footer class="footer">© 2026 ClearExams.ink · Current Affairs compilations</footer>
+<script>
+let data=[],kind='all';const box=document.getElementById('list'),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=v=>new Date(v+'T00:00:00+05:30').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kolkata'});
+function render(){const shown=kind==='all'?data:data.filter(x=>x.kind===kind);box.innerHTML=shown.length?shown.map(x=>'<article class="comp-card"><span class="kind">'+esc(x.kind)+'</span><h3>'+esc(x.title)+'</h3><div class="meta-row"><span>'+fmt(x.startDate)+' – '+fmt(x.endDate)+'</span><span>•</span><span>'+Number(x.editionCount||0)+' daily editions</span></div><div class="actions"><a class="button" href="'+esc(x.file)+'" target="_blank" rel="noopener">View PDF</a><a class="button secondary" href="'+esc(x.file)+'" download>Download</a></div></article>').join(''):'<div class="empty">No '+(kind==='all'?'':' '+kind)+' compilations are available yet.</div>'}
+document.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{kind=b.dataset.kind;document.querySelectorAll('[data-kind]').forEach(x=>x.classList.toggle('active',x===b));render()});
+fetch('compilations/compilations.json',{cache:'no-store'}).then(r=>r.json()).then(x=>{data=Array.isArray(x)?x:[];render()}).catch(()=>{box.innerHTML='<div class="empty">Compilation list could not be loaded.</div>'});
+</script>
+</body></html>

@@ -1,0 +1,76 @@
+# DEPRECATED: PDF publishing disabled on 2026-10-14. Historical PDF files are retained.
+name: Pull current affairs PDF from Google Drive
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Edition date printed on the PDF (YYYY-MM-DD), not the upload or run date"
+        required: true
+        type: string
+      file_id:
+        description: "Public Google Drive file ID for the PDF"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: current-affairs-drive-publish
+  cancel-in-progress: false
+
+jobs:
+  pull-and-publish:
+    # PDF publication paused: ClearExams now publishes text editions only.
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    env:
+      EDITION_DATE: ${{ inputs.date }}
+      DRIVE_FILE_ID: ${{ inputs.file_id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Validate explicit edition date and Drive file ID
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, sys
+          sys.path.insert(0, "scripts")
+          from current_affairs_pdf import edition_date
+          edition_date(os.environ["EDITION_DATE"])
+          if not re.fullmatch(r"[A-Za-z0-9_-]+", os.environ["DRIVE_FILE_ID"]):
+              raise SystemExit("Invalid Google Drive file ID")
+          PY
+
+      - name: Download public PDF from Google Drive
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/current-affairs-download.pdf"
+          curl --fail --location --retry 3 \
+            "https://drive.usercontent.google.com/download?id=${DRIVE_FILE_ID}&export=download&confirm=t" \
+            --output "$OUT"
+          python3 scripts/current_affairs_pdf.py --source "$OUT" --date "$EDITION_DATE"
+
+      - name: Rebuild current affairs PDF list
+        run: python3 current-affairs/generate-pdf-list.py
+
+      - name: Commit PDF and updated list
+        shell: bash
+        run: |
+          DATE="$EDITION_DATE"
+          FILE="current-affairs/$DATE.pdf"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$FILE" current-affairs/pdfs.json
+          if git diff --cached --quiet; then
+            echo "PDF and list are already up to date."
+            exit 0
+          fi
+          git commit -m "Publish current affairs PDF and update list for $DATE"
+          git pull --rebase origin main
+          git push origin main

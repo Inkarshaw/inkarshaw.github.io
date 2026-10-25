@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDR Case Analyzer</title>
+  <meta name="description" content="Local browser-based Call Detail Record analysis workspace for case investigation." />
+  <!-- Google Analytics 4: police-tools stream. Privacy-safe page view only; no CDR/case data is sent. -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0CC7V559PM"></script>
+  <script>
+    window.dataLayer=window.dataLayer||[];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js',new Date());
+    gtag('config','G-0CC7V559PM',{
+      send_page_view:false,
+      allow_google_signals:false,
+      allow_ad_personalization_signals:false
+    });
+    gtag('event','page_view',{
+      page_title:'CDR Analyzer',
+      page_location:location.origin+'/cdranalysis/',
+      page_path:'/cdranalysis/'
+    });
+  </script>
+  <script src="/cdranalysis/vendor/xlsx.full.min.js"></script>
+  <script src="/cdranalysis/vendor/chart.umd.js"></script>
+  <link rel="stylesheet" href="/cdranalysis/vendor/leaflet.css" />
+  <script src="/cdranalysis/vendor/leaflet.js"></script>
+  <script src="/cdranalysis/vendor/leaflet-heat.js"></script>
+  <link rel="stylesheet" href="/cdranalysis/css/cdr-components.css?v=70" />
+  <link rel="stylesheet" href="/cdranalysis/css/nexus-ui.css" />
+</head>
+<body>
+<div id="importLoadingOverlay" class="import-loading-overlay" hidden aria-live="polite" aria-busy="true">
+  <div class="import-loading-card">
+    <div class="import-spinner" aria-hidden="true"></div>
+    <div class="import-loading-count" id="importLoadingCount">Loading 1 of 1</div>
+    <div class="import-loading-file" id="importLoadingFile">Preparing CDR…</div>
+  </div>
+</div>
+<div class="app">
+  <header class="topbar">
+    <div class="toprow">
+      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v73</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
+      <div class="toolbar">
+        <button class="btn ghost" id="printBtn">Print / Save PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <dialog id="caseSaveDialog" class="case-save-dialog">
+    <form id="caseSaveForm">
+      <div class="panel-title"><h2 id="caseSaveDialogTitle">Save Case Snapshot</h2><span class="muted">Case details are requested only when saving.</span></div>
+      <div class="case-save-grid">
+        <div class="field"><label>Case title / subject</label><input id="caseTitle" placeholder="Case title / subject" /></div>
+        <div class="field"><label>Crime / CSR / Case No.</label><input id="caseNo" placeholder="Crime / CSR / Case No." /></div>
+        <div class="field"><label>Police station / unit</label><input id="station" placeholder="Police station / unit" /></div>
+        <div class="field"><label>Investigating officer / analyst</label><input id="analyst" placeholder="Name / rank" /></div>
+        <div class="field"><label>Incident date</label><input type="date" id="incidentDate" /></div>
+        <div class="field"><label>Incident time</label><input type="time" id="incidentTime" /></div>
+      </div>
+      <div class="tiny" style="margin-top:8px">These details are used for the saved case snapshot and report metadata.</div>
+      <div class="subtoolbar" style="justify-content:flex-end;margin-top:14px">
+        <button type="button" class="btn secondary" id="caseSaveCancelBtn">Cancel</button>
+        <button type="submit" class="btn" id="caseSaveConfirmBtn">Save Snapshot</button>
+      </div>
+    </form>
+  </dialog>
+  
+  <div class="layout">
+    <aside class="sidebar no-print" id="filterSidebar" aria-label="CDR filters" aria-hidden="false">
+      <div class="mobile-filter-head"><b>Filters</b><button class="btn secondary small" id="closeFiltersBtn">Close ✕</button></div>
+      <div class="uploadbox" id="dropZone">
+        <strong>Upload CDR file(s)</strong>
+        <div class="tiny">Choose one or more .xlsx, .xls or .csv files. All worksheet tabs are imported automatically.</div>
+        <div class="upload-actions">
+          <label class="btn upload-file-label" for="fileInput">Choose Files</label>
+        </div>
+        <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" />
+      </div>
+      <div id="loadStatus" class="status"></div>
+      <div id="importHealthStatus" class="tiny" style="margin:6px 0 8px">No CDR rows loaded.</div>
+      <div class="file-list" id="fileList"></div>
+      <div style="margin-top:8px"><button class="btn secondary small" id="clearFilesBtn">Clear Loaded CDRs</button></div>
+
+      <h3>Quick filters</h3>
+      <div class="field"><label>Any text</label><input id="q" placeholder="Number, tower, IMEI, name…" /></div>
+      <div class="field"><label>CDR / A Party</label><select id="cdrNo"><option value="">All CDR numbers</option></select></div>
+      <div class="field"><label>B Party / connected number</label><input id="bparty" placeholder="Number or sender ID" /></div>
+      <div class="row2">
+        <div class="field"><label>Date from</label><input type="date" id="dateFrom" /></div>
+        <div class="field"><label>Date to</label><input type="date" id="dateTo" /></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Time from</label><input type="time" id="timeFrom" /></div>
+        <div class="field"><label>Time to</label><input type="time" id="timeTo" /></div>
+      </div>
+      <div class="field"><label>Event type</label><select id="callType"><option value="">All event types</option></select></div>
+      <div class="field"><label>IMEI</label><input id="imei" /></div>
+      <div class="field"><label>IMSI</label><input id="imsi" /></div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="callsOnly"> Calls only</label>
+        <label class="check"><input type="checkbox" id="smsOnly"> SMS only</label>
+        <label class="check"><input type="checkbox" id="nightOnly"> Night</label>
+        <label class="check"><input type="checkbox" id="weekendOnly"> Weekend</label>
+        <label class="check"><input type="checkbox" id="excludeServiceSenders"> Exclude service senders</label>
+      </div>
+
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:800">Advanced Filters</summary>
+        <div class="row2" style="margin-top:8px">
+          <div class="field"><label>Min duration (sec)</label><input type="number" min="0" id="durMin" /></div>
+          <div class="field"><label>Max duration (sec)</label><input type="number" min="0" id="durMax" /></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Night from</label><input type="time" id="nightFrom" value="20:00" /></div>
+          <div class="field"><label>Night to</label><input type="time" id="nightTo" value="06:00" /></div>
+        </div>
+        <h3>Location</h3>
+        <div class="field"><label>Cell ID</label><input id="cellId" placeholder="First / last cell ID" /></div>
+        <div class="field"><label>Tower address</label><input id="tower" placeholder="Address contains…" /></div>
+        <div class="row2">
+          <div class="field"><label>Main city</label><input id="city" /></div>
+          <div class="field"><label>Sub city</label><input id="subcity" /></div>
+        </div>
+        <div class="field"><label>Roaming</label><input id="roaming" /></div>
+        <h3>Network / source</h3>
+        <div class="row2">
+          <div class="field"><label>Provider</label><input id="provider" /></div>
+          <div class="field"><label>Operator</label><input id="operator" /></div>
+        </div>
+        <div class="field"><label>Source file</label><select id="sourceFile"><option value="">All files</option></select></div>
+      </details>
+
+      <div class="filter-actions"><button class="btn" id="applyBtn">Apply</button><button class="btn secondary" id="resetBtn">Reset</button></div>
+    </aside>
+
+    <main class="main">
+      <div class="mobile-filter-bar no-print"><button class="btn secondary" id="mobileFiltersBtn" aria-controls="filterSidebar" aria-expanded="false">☰ Filters <span class="badge" id="activeFilterCount">0</span></button></div><div class="filter-backdrop no-print" id="filterBackdrop"></div>
+      <div class="tabs no-print" id="tabs" role="tablist" aria-label="CDR analysis views">
+        <button class="tab active" role="tab" aria-selected="true" data-tab="dashboard">Dashboard</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="linkanalysis">Link Analysis</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="records">Records</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="excelview">Excel View</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="contacts">Contacts</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="locations">Locations</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="devices">Devices</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="smsintel">SMS Intelligence</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="incident">Incident Timeline</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="patterns">Patterns</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="movement">Movement</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="multinumber">Multi-number</button>
+      </div>
+
+      <section id="dashboard" class="view">
+        <div class="panel no-print" style="padding:10px 12px">
+          <div class="subtoolbar" style="margin:0">
+            <div class="field" style="min-width:260px"><label>Subject / MSISDN</label><select id="dashboardCdr"><option value="">All subjects</option></select></div>
+            <div class="field" style="min-width:220px"><label>Event type</label><select id="dashboardEventType"><option value="">All event types</option></select></div>
+            <div class="tiny" id="dashboardScopeText">Showing all subjects and event types within the current filters.</div>
+          </div>
+        </div>
+        <div class="kpis" id="kpis"></div>
+        <div class="panel no-print"><div class="panel-title"><h2>Case dashboard</h2><button class="btn secondary small" id="saveCaseSnapshotBtn">Save case snapshot</button></div><div id="caseSnapshots" class="tiny"></div></div>
+        <div class="split">
+          <div class="panel"><div class="panel-title"><h2>Top contacts</h2><span class="badge" id="topContactBadge">0</span></div><div id="dashTopContacts"></div></div>
+          <div class="panel"><div class="panel-title"><h2>Activity by hour</h2></div><div id="dashHourValues"></div></div>
+        </div>
+        <div class="panel"><div class="panel-title"><h2>Event types</h2></div><div id="dashEventTypes"></div></div>
+        <div class="split">
+          <div class="panel"><div class="panel-title"><h2>Top locations / towers</h2><button class="btn secondary small" data-jump="locations">View all</button></div><div id="dashLocations"></div></div>
+          <div class="panel"><div class="panel-title"><h2>Device / SIM usage</h2><button class="btn secondary small" data-jump="devices">View all</button></div><div id="dashDevices"></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><h2>Investigation Leads</h2><span class="muted">Only useful leads for quick review</span></div>
+          <div class="subtoolbar no-print" style="align-items:flex-end">
+            <div class="tiny" style="flex:1">Uses the current filters and the incident date/time saved in the case.</div>
+            <button class="btn secondary small" id="leadsRefreshBtn">Refresh</button>
+            <input type="hidden" id="burstMins" value="10" />
+            <input type="hidden" id="burstCount" value="3" />
+            <input type="hidden" id="longCallSec" value="600" />
+            <input type="hidden" id="leadIncidentMins" value="60" />
+            <input type="hidden" id="leadInactivityHours" value="4" />
+            <input type="hidden" id="leadColocationMins" value="15" />
+            <input type="hidden" id="leadCoordinationMins" value="10" />
+          </div>
+          <div id="leadsContent"></div>
+        </div>
+      </section>
+
+      <section id="linkanalysis" class="view hidden">
+        <div class="panel">
+          <div class="panel-title"><div><h2>Link Analysis</h2><span class="muted">Communication relationships between loaded subjects and connected numbers</span></div><span class="badge" id="linkAnalysisCount">0 links</span></div>
+          <div class="notice">Link analysis shows relationships recorded in the CDR dataset. A connection indicates communication metadata, not proof of identity, association, intent, or physical presence.</div>
+          <div class="subtoolbar no-print">
+            <div class="field" style="min-width:220px"><label>Focus subject</label><select id="linkSubject"><option value="">All loaded subjects</option></select></div>
+            <div class="field"><label>From date</label><input type="date" id="linkFrom"></div>
+            <div class="field"><label>To date</label><input type="date" id="linkTo"></div>
+            <div class="field" style="min-width:170px"><label>Event type</label><select id="linkEventType"><option value="">All event types</option></select></div>
+            <div class="field"><label>Top contacts</label><select id="linkTop"><option>20</option><option selected>40</option><option>75</option><option>120</option></select></div>
+            <div class="field"><label>Minimum events</label><input type="number" id="linkMinEvents" min="1" value="1"></div>
+            <label class="check"><input type="checkbox" id="linkMutualOnly"> Shared / mutual contacts only</label>
+            <button class="btn small" id="linkRefreshBtn">Apply</button>
+            <button class="btn secondary small" id="linkResetBtn">Reset</button>
+          </div>
+          <div id="linkAnalysisSummary" class="metric-row" style="margin-bottom:10px"></div>
+          <div class="link-analysis-layout">
+            <div>
+              <div class="network-wrap link-network-wrap"><canvas id="linkAnalysisCanvas"></canvas></div>
+              <div class="tiny" style="margin-top:8px">Node size = event volume • edge thickness = communication frequency • loaded subjects are emphasized • shared contacts connect to more than one loaded subject.</div>
+            </div>
+            <div class="link-side-panel">
+              <div class="panel" style="margin:0 0 10px"><div class="panel-title"><h2>Selected node</h2></div><div id="linkSelectedNode" class="empty" style="padding:24px 12px">Click a node in the graph.</div></div>
+              <div class="panel" style="margin:0"><div class="panel-title"><h2>Top hubs</h2></div><div class="tablewrap" style="max-height:300px"><table class="table" id="linkHubTable"></table></div></div>
+            </div>
+          </div>
+          <div class="split" style="margin-top:14px">
+            <div><h3>Strongest links</h3><div class="tablewrap"><table class="table" id="linkEdgesTable"></table></div></div>
+            <div><h3>Mutual / common contacts</h3><div class="tablewrap"><table class="table" id="linkMutualTable"></table></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="records" class="view hidden">
+        <div class="panel">
+          <div class="panel-title"><div><h2>Records</h2><span class="tiny">Quick review view • open Excel View for all original worksheet columns.</span></div><span class="muted" id="recordCount"></span></div>
+          <div class="tablewrap"><table class="table" id="recordsTable"></table></div>
+          <div class="pager"><div class="group"><button class="btn secondary small" id="prevPage">Previous</button><span id="pageInfo" class="tiny"></span><button class="btn secondary small" id="nextPage">Next</button></div><div class="group tiny">Rows/page <select id="pageSize"><option>50</option><option selected>100</option><option>250</option><option>500</option></select></div></div>
+        </div>
+      </section>
+
+      <section id="excelview" class="view hidden">
+        <div class="panel">
+          <div class="panel-title"><h2>Excel View</h2><span class="muted" id="excelViewScope">Select one loaded CDR / A-party number.</span></div>
+          <div class="notice">Displays the original column names and cell values retained from the uploaded Excel worksheet for the selected number. This view uses raw imported rows and is not affected by duplicate-safe analysis mode.</div>
+          <div class="subtoolbar no-print">
+            <div class="field" style="min-width:220px"><label>CDR / A-party number</label><select id="excelViewSubject"><option value="">Select number</option></select></div>
+            <div class="field" style="min-width:260px"><label>Source worksheet</label><select id="excelViewSource"><option value="">All source worksheets</option></select></div>
+            <div class="field" style="min-width:220px"><label>Search source rows</label><input id="excelViewSearch" placeholder="Search any original Excel value"></div>
+            <div class="field"><label>Rows per page</label><select id="excelViewPageSize"><option>50</option><option selected>100</option><option>250</option><option>500</option></select></div>
+            <button class="btn secondary small" id="excelViewExport">Export selected rows CSV</button>
+          </div>
+          <div class="tablewrap" style="max-height:68vh"><table class="table" id="excelViewTable"></table></div>
+          <div class="subtoolbar no-print" id="excelViewPager" style="justify-content:flex-end;margin-top:10px"></div>
+        </div>
+      </section>
+
+      <section id="contacts" class="view hidden"><div class="panel"><div class="panel-title"><h2>Contact analysis</h2><div class="group"><select id="identityScope" title="Choose where name/tag edits are saved"><option value="case" selected>Case identity</option><option value="global">Global directory</option></select><button class="btn secondary small" id="exportDirectoryBtn">Export Global Directory</button><button class="btn secondary small" id="importDirectoryBtn">Import Global Directory</button><input id="directoryInput" type="file" accept=".json,application/json" hidden></div></div><div class="tiny" style="margin-bottom:8px"><b>Case identity</b> overrides the reusable Global Directory only inside this workspace. Click a number to filter the record view.</div><div class="subtoolbar no-print" style="margin-bottom:10px"><div class="field"><label>CDR request from</label><input type="date" id="cdrRequestFrom"></div><div class="field"><label>CDR request to</label><input type="date" id="cdrRequestTo"></div><button class="btn secondary small" id="selectRequestContactsBtn">Select numeric contacts</button><button class="btn secondary small" id="clearRequestContactsBtn">Clear selection</button><button class="btn secondary small" type="button" id="copySelectedContactsBtn" title="Copy checked numbers, one per line">Copy selected numbers</button><button class="btn small" id="openCdrRequestBtn">Create CDR Request <span class="badge" id="cdrRequestCount">0</span></button></div><div class="tiny" style="margin-bottom:8px">Select mobile/IMEI-like numeric identifiers below, then copy the checked numbers to your clipboard (one per line) or open the CDR Request Generator with the numbers prefilled. <b>First</b> shows the earliest call across all loaded dates and times, regardless of date/time filters; other filters still apply. <b>Last</b> follows the current filters.</div><div class="subtoolbar no-print" style="margin-bottom:10px"><div class="field"><label for="contactsSort">Sort contacts</label><select id="contactsSort" title="Sort Contacts by first call or last record date"><option value="records_desc" selected>Most records (default)</option><option value="first_asc">First call — oldest first</option><option value="first_desc">First call — newest first</option><option value="last_asc">Last record — oldest first</option><option value="last_desc">Last record — newest first</option></select></div><span class="tiny">You can also click the First or Last column heading to change date order.</span></div><div class="subtoolbar no-print" style="margin-bottom:10px"><div class="field"><label for="contactsDataScope">Contact date scope</label><select id="contactsDataScope"><option value="filtered">Current filtered period</option><option value="history">All loaded dates/times (retain other filters)</option></select></div><div class="field"><label for="contactsSearch">Find contact</label><input id="contactsSearch" type="search" placeholder="Number, name, tag" autocomplete="off"></div><div class="field"><label for="contactsTagFilter">Tag</label><select id="contactsTagFilter"><option value="">All tags</option><option>Suspect</option><option>Victim</option><option>Witness</option><option>Associate</option><option>Service</option><option>Other</option></select></div><div class="field"><label for="contactsMinCalls">Minimum calls</label><input id="contactsMinCalls" type="number" min="0" step="1" value="0" style="max-width:100px"></div><label class="tiny"><input id="contactsSharedOnly" type="checkbox"> Common to 2+ CDR subjects</label><label class="tiny"><input id="contactsShortlistOnly" type="checkbox"> Shortlisted only</label></div><div class="subtoolbar no-print" style="margin-bottom:10px"><span id="contactsShowingCount" class="tiny" role="status" aria-live="polite"></span><button type="button" id="contactsSelectVisible" class="btn secondary small">Select visible contacts</button><div class="field"><label for="contactsBulkTag">Bulk tag checked numbers</label><select id="contactsBulkTag"><option value="">Choose tag</option><option>Suspect</option><option>Victim</option><option>Witness</option><option>Associate</option><option>Service</option><option>Other</option><option>Unclassified</option></select></div><button type="button" class="btn secondary small" id="contactsBulkTagApply">Apply tag</button><button type="button" class="btn secondary small" id="contactsShortlistAdd">Add to shortlist</button><button type="button" class="btn secondary small" id="contactsShortlistRemove">Remove from shortlist</button><button type="button" class="btn secondary small" id="contactsExportSelected">Export selected CSV</button></div><p class="tiny">The First/Last Call and All Event columns use the historical date scope; the existing Last column follows the displayed rows. Historical mode ignores only date/time constraints. The subject comparison uses all loaded CDR subjects, even when a subject filter is active. Shortlist is saved with the case workspace, not transmitted online.</p><div class="tablewrap"><table class="table" id="contactsTable"></table></div><div id="contactsComparisonPanel" aria-live="polite"></div><div id="contactProfilePanel" style="margin-top:14px"></div></div></section>
+      <section id="locations" class="view hidden"><div class="panel"><div class="panel-title"><h2>Location / tower analysis</h2><span class="muted">Based on first cell ID / first tower address</span></div>
+        <div id="locationKpis"></div>
+        <h3>Multi-number location match</h3>
+        <div class="notice">Select one or more loaded subject numbers. With two or more subjects, a match means records share the same tower identity within the selected time window. Where operator metadata is available, <b>Operator + Cell ID</b> is used to reduce accidental Cell-ID collisions. This remains a network-metadata lead, not proof of exact physical co-presence.</div>
+        <div class="subtoolbar no-print">
+          <div class="field"><label>Match mode</label><select id="locationMatchMode"><option value="all">All selected numbers</option><option value="pair">Any pair among selected</option></select></div>
+          <div class="field"><label>Time window (min)</label><input type="number" id="locationMatchMins" min="0" max="360" value="15"></div>
+          <div class="field"><label>Episode break gap (min)</label><input type="number" id="locationEpisodeGapMins" min="1" max="1440" value="60"></div>
+          <div class="field"><label>From date</label><input type="date" id="locationMatchFrom"></div>
+          <div class="field"><label>To date</label><input type="date" id="locationMatchTo"></div>
+          <button class="btn secondary small" id="locationMatchSelectAllBtn">Select all</button>
+          <button class="btn secondary small" id="locationMatchClearBtn">Clear</button>
+          <button class="btn small" id="locationMatchRunBtn">Find matching locations</button>
+        </div>
+        <div class="tiny" style="margin:6px 0">The shared Event Type selector is respected. The multi-number selector below is independent of the shared single-Subject selector so several subjects can be compared together.</div>
+        <div id="locationMatchSubjects" class="checks" style="max-height:180px;overflow:auto;padding:8px 0"></div>
+        <div id="locationMatchSummary" style="margin-top:10px"></div>
+        <div class="tablewrap" style="max-height:520px"><table class="table" id="locationMatchTable"></table></div>
+        <h3 style="margin-top:18px">Repeated shared towers</h3>
+        <div class="tablewrap"><table class="table" id="locationSharedTowerSummary"></table></div>
+        <h3 style="margin-top:18px">Tower summary</h3>
+        <div class="tablewrap"><table class="table" id="locationsTable"></table></div>
+      </div></section>
+      <section id="devices" class="view hidden"><div class="panel"><div class="panel-title"><h2>SIM / Subscriber / Device Identity</h2><span class="muted">MSISDN = subject number • IMSI = SIM/subscription identity • IMEI = handset identity</span></div><div class="notice">Identifier relationships are investigative indicators only. SIM replacement, handset repair/replacement, dual-SIM use, data quality issues and provider practices can also explain changes; corroborate before drawing conclusions.</div><div class="subtoolbar no-print" style="margin-top:10px"><button class="btn secondary small" id="importTacBtn">Import TAC Database</button><button class="btn secondary small" id="exportTacBtn">Export TAC Cache</button><input id="tacInput" type="file" accept=".csv,.json,.xlsx,.xls,text/csv,application/json" hidden><span class="tiny" id="tacCacheStatus">TAC cache: 0 entries</span></div><div class="tiny" style="margin:6px 0 6px"><b>Automatic device source:</b> <a href="https://github.com/MoazEb/tac-database" target="_blank" rel="noopener">MoazEb/tac-database</a> • MIT licensed • 254,997 documented TAC entries. The public CSV is downloaded as a static database and matching is performed locally; IMEI/TAC values are not sent as lookup queries.</div><div class="tiny" style="margin:6px 0 10px">Phone model resolution uses the first 8 IMEI digits (TAC). Only matched device entries are added to the local TAC cache. Manual TAC import remains available as a fallback. Unknown TACs are not guessed. TAC prefixes such as 35 or 86 are <b>not</b> used to infer a manufacturer because the first two digits identify a Reporting Body and are shared across many device makers.</div><h3 style="margin-top:14px">Device & SIM usage summary</h3><div id="deviceUsageSummary"></div><div id="identifierSummary" style="margin-top:14px"></div><h3>Resolved device models</h3><div class="tablewrap"><table class="table" id="resolvedDeviceTable"></table></div><h3>TAC / IMEI structure</h3><div class="tiny" style="margin-bottom:6px">Practical IMEI check: TAC identifies the device allocation, the serial distinguishes individual handsets, and the check digit helps validate a standard 15-digit IMEI. A 16-digit IMEISV shows a software-version number instead of an IMEI check digit.</div><div class="tablewrap"><table class="table" id="imeiStructureTable"></table></div><h3>MSISDN ↔ IMSI ↔ IMEI relationships</h3><div class="tablewrap"><table class="table" id="identifierRelationshipTable"></table></div><h3>Identifier change timeline</h3><div class="tablewrap" style="max-height:420px"><table class="table" id="deviceChangeTable"></table></div><div class="split" style="margin-top:14px"><div><h3>IMSI cross-CDR linkage</h3><div class="tablewrap"><table class="table" id="imsiCrossCdrTable"></table></div></div><div><h3>IMEI with multiple IMSIs</h3><div class="tablewrap"><table class="table" id="imeiMultiImsiTable"></table></div></div></div><h3>IMEI ↔ IMSI relationship matrix</h3><div id="imeiImsiMatrix" class="tablewrap"></div></div></section>
+      <section id="smsintel" class="view hidden">
+        <div class="panel">
+          <div class="panel-title">
+            <div><h2>SMS Intelligence</h2><span class="muted">Quick review of sender IDs and SMS timing</span></div>
+            <button class="btn secondary small no-print" id="smsIntelExportBtn">Export CSV</button>
+          </div>
+          <div class="notice"><b>Use this as a review aid.</b> Sender IDs and timing show metadata only; they do not prove the content or purpose of an SMS.</div>
+
+          <div class="subtoolbar no-print sms-simple-toolbar">
+            <div class="field" style="min-width:220px"><label>Subject</label><select id="smsIntelCdr"><option value="">All subjects</option></select></div>
+            <div class="field"><label>From</label><input type="date" id="smsIntelFrom"></div>
+            <div class="field"><label>To</label><input type="date" id="smsIntelTo"></div>
+            <div class="field" style="min-width:220px"><label>Search sender / brand</label><input id="smsIntelSearch" placeholder="Swiggy, bank, sender ID…"></div>
+            <button class="btn small" id="smsIntelRefreshBtn">Refresh</button>
+            <button class="btn secondary small" id="smsIntelClearReviewFilters">Clear</button>
+          </div>
+
+          <div id="smsIntelSummary"></div>
+
+          <div class="split sms-simple-grid">
+            <div>
+              <h3>Important SMS leads</h3>
+              <div id="smsIntelInsights"></div>
+            </div>
+            <div>
+              <h3>Sender summary</h3>
+              <div class="tablewrap"><table class="table" id="smsIntelBrandTable"></table></div>
+            </div>
+          </div>
+
+          <h3 style="margin-top:18px">SMS timeline</h3>
+          <div class="tiny" style="margin-bottom:8px">Chronological SMS/sender metadata for the current subject and date filter. Use “Show context” on a row when you need nearby calls, towers or identifier changes.</div>
+          <div class="tablewrap" style="max-height:620px"><table class="table" id="smsIntelTimelineTable"></table></div>
+
+          <h3 style="margin-top:18px">Selected SMS context</h3>
+          <div id="smsIntelContextPanel" class="empty">Use “Show context” on an SMS row to inspect nearby CDR activity.</div>
+
+          <details class="sms-advanced panel no-print" style="padding:10px 12px;margin-top:16px">
+            <summary style="cursor:pointer;font-weight:800">Advanced SMS review</summary>
+            <div class="tiny" style="margin:6px 0 12px">Open only when you need unusual-time review, incident comparison, burst analysis, sender classification or matrices.</div>
+
+            <div class="subtoolbar">
+              <div class="field"><label>Unusual time from</label><input type="time" id="smsIntelNightFrom" value="22:00"></div>
+              <div class="field"><label>Unusual time to</label><input type="time" id="smsIntelNightTo" value="06:00"></div>
+              <div class="field"><label>Call proximity ± min</label><input type="number" id="smsIntelCallMins" min="1" max="240" value="10"></div>
+              <div class="field"><label>ID-change proximity ± min</label><input type="number" id="smsIntelIdMins" min="1" max="1440" value="60"></div>
+              <div class="field"><label>Context ± min</label><input type="number" id="smsIntelContextMins" min="1" max="360" value="30"></div>
+              <div class="field"><label>Incident proximity ± min</label><input type="number" id="smsIntelIncidentMins" min="1" max="1440" value="60"></div>
+              <div class="field"><label>Burst gap (min)</label><input type="number" id="smsIntelBurstMins" min="1" max="240" value="15"></div>
+              <div class="field"><label>Burst minimum</label><input type="number" id="smsIntelBurstMinCount" min="2" max="50" value="3"></div>
+              <div class="field"><label>Burst mode</label><select id="smsIntelBurstMode"><option value="any">Any senders</option><option value="same">Same sender/brand</option><option value="multi">Multiple senders/brands</option></select></div>
+            </div>
+
+            <div class="subtoolbar">
+              <div class="field"><label>Category</label><select id="smsIntelFilterCategory"><option value="">All categories</option></select></div>
+              <div class="field"><label>Recognition</label><select id="smsIntelFilterRecognition"><option value="">All recognition</option><option>Recognized</option><option>Probable</option><option>Manual</option><option>Unclassified</option></select></div>
+              <label class="check"><input type="checkbox" id="smsIntelFirstOnly"> First observed only</label>
+              <label class="check"><input type="checkbox" id="smsIntelIncidentOnly"> Incident-near only</label>
+              <label class="check"><input type="checkbox" id="smsIntelUnusualOnly"> Unusual-time only</label>
+            </div>
+
+            <details class="panel" style="padding:10px 12px;margin:10px 0">
+              <summary style="cursor:pointer;font-weight:800">Sender dictionary / manual correction</summary>
+              <div class="subtoolbar" style="margin-top:10px">
+                <div class="field"><label>Raw sender ID</label><input id="smsSenderRaw" placeholder="VM-SWIGGY"></div>
+                <div class="field"><label>Display label</label><input id="smsSenderLabel" placeholder="Swiggy"></div>
+                <div class="field"><label>Category</label><select id="smsSenderCategory"><option>Banking</option><option>Payments / Wallet</option><option>Food Delivery</option><option>Ride-hailing / Transport</option><option>SIM / Telecom</option><option>E-commerce</option><option>Logistics / Courier</option><option>Travel / Booking</option><option>Healthcare</option><option>Insurance</option><option>Education</option><option>Utilities</option><option>Internet / Social</option><option>Government / Public Service</option><option>Other / Unclassified</option></select></div>
+                <label class="check"><input type="checkbox" id="smsSenderApplyAliases" checked> Apply to matching aliases</label>
+                <button class="btn small" id="smsSenderSaveBtn">Save mapping</button>
+                <button class="btn secondary small" id="smsSenderClearBtn">Remove mapping</button>
+                <button class="btn secondary small" id="smsSenderExportBtn">Export dictionary</button>
+                <button class="btn secondary small" id="smsSenderImportBtn">Import dictionary</button>
+                <input type="file" id="smsSenderImportInput" accept=".json,application/json" hidden>
+                <span class="tiny" id="smsSenderMappingStatus">Click “Edit sender” in a table row to load a sender here.</span>
+              </div>
+            </details>
+
+            <h3>Unclassified senders</h3>
+            <div class="tablewrap"><table class="table" id="smsIntelUnknownTable"></table></div>
+
+            <h3>Incident comparison</h3>
+            <div class="subtoolbar" style="margin-bottom:6px"><button class="btn small" id="smsIncidentContextBtn">Build Incident Context</button></div>
+            <div class="tablewrap"><table class="table" id="smsIntelBaselineTable"></table></div>
+            <div id="smsIncidentContextPanel" style="margin-top:10px"></div>
+
+            <h3>SMS bursts</h3>
+            <div class="tablewrap"><table class="table" id="smsIntelBurstsTable"></table></div>
+
+            <h3>Service category summary</h3>
+            <div class="tablewrap"><table class="table" id="smsIntelCategoryTable"></table></div>
+
+            <h3>Sender × subject matrix</h3>
+            <div class="tablewrap" id="smsIntelSubjectMatrix"></div>
+
+            <h3>Sender × day matrix</h3>
+            <div class="tablewrap" id="smsIntelDayMatrix"></div>
+
+            <div class="subtoolbar" style="margin-top:12px">
+              <button class="btn secondary small" id="smsSelectDisplayedBtn">Select displayed</button>
+              <button class="btn secondary small" id="smsClearSelectedBtn">Clear selection</button>
+              <span class="tiny">Context preset:</span>
+              <button class="btn secondary small sms-context-preset" data-mins="5">±5m</button>
+              <button class="btn secondary small sms-context-preset" data-mins="15">±15m</button>
+              <button class="btn secondary small sms-context-preset" data-mins="30">±30m</button>
+              <button class="btn secondary small sms-context-preset" data-mins="60">±1h</button>
+            </div>
+          </details>
+        </div>
+      </section>
+      <section id="incident" class="view hidden">
+        <div class="panel">
+          <div class="panel-title"><h2>Before / During / After Incident</h2><span class="muted">Chronological CDR events around the incident time</span></div>
+          <div class="subtoolbar">
+            <div class="field"><label>Before (hours)</label><input type="number" id="incidentBeforeHours" min="1" max="72" value="6"></div>
+            <div class="field"><label>During (± minutes)</label><input type="number" id="incidentDuringMins" min="1" max="360" value="30"></div>
+            <div class="field"><label>After (hours)</label><input type="number" id="incidentAfterHours" min="1" max="72" value="6"></div>
+            <button class="btn secondary small" id="incidentRefreshBtn">Refresh</button>
+          </div>
+          <div id="incidentSummary"></div>
+          <div class="split"><div><h3>Baseline vs incident</h3><div id="baselineCompare"></div></div><div><h3>New / disappearing contacts</h3><div id="contactChanges"></div></div></div>
+          <div class="tablewrap" style="margin-top:12px"><table class="table" id="incidentTable"></table></div>
+        </div>
+      </section>
+
+      <section id="patterns" class="view hidden"><div class="panel">
+        <div class="panel-title"><h2>Activity patterns</h2><span class="muted">Time, weekday, event-type and recurring-contact patterns from the current filters</span></div>
+        <div class="notice">Pattern summaries are descriptive CDR metadata. “Lower-frequency hours” means hours used much less often than the subject's own peak activity hour within the current filtered period; it is not an assessment of intent or significance.</div>
+        <h3 style="margin-top:16px">Day-wise summary</h3>
+        <div class="tiny" style="margin-bottom:6px">One row per day from the current filters. Click a date to open its records.</div>
+        <div class="tablewrap"><table class="table" id="daySummaryTable"></table></div>
+        <div id="patternSummary" style="margin-top:10px"></div>
+        <div id="patternNarrative" class="notice" style="margin-top:10px"></div>
+        <div class="split" style="margin-top:14px">
+          <div><h3>Weekday pattern</h3><div class="tablewrap"><table class="table" id="patternWeekdayTable"></table></div></div>
+          <div><h3>Event-type pattern</h3><div class="tablewrap"><table class="table" id="patternEventTypeTable"></table></div></div>
+        </div>
+        <div class="split" style="margin-top:14px">
+          <div><h3>Recurring contacts</h3><div class="tiny" style="margin-bottom:6px">Contacts ranked by the number of separate active dates on which they appear.</div><div class="tablewrap"><table class="table" id="patternRegularContactsTable"></table></div></div>
+          <div><h3>Lower-frequency-hour activity</h3><div class="tiny" style="margin-bottom:6px">Hours with activity at or below 20% of the peak-hour count, shown for review.</div><div class="tablewrap"><table class="table" id="patternUnusualHoursTable"></table></div></div>
+        </div>
+        <div class="split" style="margin-top:14px">
+          <div><h3>Time-band pattern</h3><div class="tiny" style="margin-bottom:6px">Activity grouped into four six-hour bands for a simpler daily routine view.</div><div class="tablewrap"><table class="table" id="patternTimeBandTable"></table></div></div>
+          <div><h3>Statistical high-activity dates</h3><div class="tiny" style="margin-bottom:6px">Dates above the current filtered period's mean + 2 standard deviations. This is a review flag, not a conclusion.</div><div class="tablewrap"><table class="table" id="patternHighDatesTable"></table></div></div>
+        </div>
+        <h3 style="margin-top:18px">Recurring contact + hour patterns</h3>
+        <div class="tiny" style="margin-bottom:6px">Same contact recurring within the same one-hour band across multiple separate dates. Ranked by date recurrence, then event count. Use as a review lead only.</div>
+        <div class="tablewrap"><table class="table" id="patternContactHourTable"></table></div>
+        <h3 style="margin-top:18px">Recurring weekday + contact + hour patterns</h3>
+        <div class="tiny" style="margin-bottom:6px">Looks for the same contact recurring on the same weekday and within the same one-hour band across separate dates. Coverage is measured against active dates for that weekday, not against all dates.</div>
+        <div class="tablewrap"><table class="table" id="patternWeekdayContactHourTable"></table></div>
+        <h3 style="margin-top:18px">Date × hour activity matrix</h3>
+        <div class="tiny" style="margin-bottom:6px">Latest 31 filtered dates. Darker cells indicate more CDR events in that hour. Click a populated cell to open the matching records.</div>
+        <div id="hourMatrix" class="tablewrap"></div>
+        <div id="contactDayMatrix" style="margin-top:18px"></div>
+      </div></section>
+      <section id="movement" class="view hidden">
+        <div class="panel">
+          <div class="panel-title"><h2>Movement / tower timeline</h2><span class="muted">Chronological tower associations from CDR events</span></div>
+          <div class="notice">Tower association is an investigative lead, not proof of exact physical location. Distance and rate calculations are between recorded tower coordinates and should be corroborated independently.</div>
+          <div class="subtoolbar">
+            <div class="field"><label>CDR / subject</label><select id="movementCdr"><option value="">Select subject</option></select></div>
+            <div class="field"><label>From date</label><input type="date" id="movementDateFrom" /></div>
+            <div class="field"><label>To date</label><input type="date" id="movementDateTo" /></div>
+            <div class="field"><label>Merge same tower within (min)</label><input type="number" id="movementMergeMins" min="0" max="1440" value="30" /></div>
+            <div class="field"><label>Density overlay</label><select id="movementHeatMode"><option value="off">Off</option><option value="all">All</option><option value="day">Day</option><option value="night">Night</option><option value="incident">Incident window</option></select></div>
+            <label class="check"><input type="checkbox" id="mapPrivacyMode"> Map Privacy Mode (no external tiles)</label>
+            <button class="btn secondary small" id="movementRefreshBtn">Refresh</button>
+          </div>
+          <div id="movementSummary"></div>
+          <div class="playbar no-print" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0">
+            <button class="btn secondary small" id="movementPlayBtn">▶ Play</button>
+            <button class="btn secondary small" id="movementPrevBtn">◀ Previous</button>
+            <button class="btn secondary small" id="movementNextBtn">Next ▶</button>
+            <select id="movementSpeed" title="Playback speed" style="padding:6px 8px;border-radius:7px"><option value="700">0.5×</option><option value="350" selected>1×</option><option value="180">2×</option><option value="90">4×</option></select>
+            <input type="range" id="movementSlider" min="0" max="0" value="0" style="flex:1;min-width:180px">
+            <span class="tiny" id="movementPlaybackLabel">No movement selected</span>
+          </div>
+          <div class="panel" style="margin-top:12px"><div class="panel-title"><div><h2>Movement map</h2><span class="tiny">Chronological tower associations • repeated visits grouped at the same tower</span></div><div class="movement-map-actions no-print"><button class="btn secondary small" id="movementFitBtn">Fit route</button><button class="btn secondary small" id="movementStartBtn">Start</button><button class="btn secondary small" id="movementEndBtn">End</button></div></div><div id="movementMap"><div class="map-empty">Select a subject/date range with tower coordinates to display movement.</div></div><div id="movementMapStatus" class="metric-row" style="margin-top:8px"></div><div class="movement-map-legend"><span><i class="movement-map-line"></i>Tower sequence</span><span><i class="movement-map-dot tower"></i>Tower / visit</span><span><i class="movement-map-dot start"></i>Start</span><span><i class="movement-map-dot end"></i>End</span></div><div class="tiny" style="margin-top:8px">Lines connect recorded tower coordinates in time order. Repeated visits to the same tower are grouped into one marker. These are tower associations, not the actual road travelled or precise handset location.</div></div>
+          <h3>Tower stay analysis</h3><div class="tablewrap" style="margin-top:8px"><table class="table" id="towerStayTable"></table></div>
+          <h3>Night stay analysis</h3>
+          <div class="notice">Groups nighttime CDR events into overnight windows using the current <b>Night from / Night to</b> settings. “Main recorded night tower” means the tower with the most recorded events for that subject-night; it does not prove continuous presence or an overnight stay.</div>
+          <div id="nightStaySummary"></div>
+          <div class="tablewrap" style="margin-top:8px"><table class="table" id="nightStayTable"></table></div>
+          <div class="tablewrap" style="margin-top:12px"><table class="table" id="movementTable"></table></div>
+        </div>
+      </section>
+
+      <section id="multinumber" class="view hidden">
+        <div class="panel" style="margin-bottom:14px">
+          <div class="panel-title"><h2>Multi-number Analysis</h2><span class="muted">Shared contacts, locations, identifiers, network structure and direct pair relationships</span></div>
+          <div class="notice">Use this view when two or more subject CDRs are loaded. Shared contacts, same-tower timing, identifiers and network links are correlation leads that require independent verification.</div>
+        </div>
+        <div class="multi-number-stack">
+          <div class="panel"><div class="panel-title"><h2>Cross-CDR comparison</h2><span class="muted">Common contacts, towers, identifiers and possible same-cell time overlaps</span></div><div class="subtoolbar"><div class="field"><label>Same-cell time window (min)</label><input type="number" id="colocationMins" min="1" max="360" value="30" /></div><div class="field"><label>Episode break gap (min)</label><input type="number" id="episodeGapMins" min="1" max="1440" value="60" /></div><button class="btn secondary small" id="compareRefreshBtn">Refresh</button></div><div class="notice">A same-cell overlap means two loaded CDR subjects used the same recorded Cell ID within the selected time window. It is not proof that the devices or people were physically together.</div><div id="compareContent" class="empty">Load at least two different CDR / A Party numbers to compare them.</div></div>
+          <div class="panel">
+          <div class="panel-title"><h2>Communication network</h2><span class="muted">Loaded A-party numbers connected to frequent B-party contacts</span></div>
+          <div class="subtoolbar">
+            <div class="field"><label>Top contacts</label><select id="networkTop"><option>15</option><option selected>30</option><option>50</option><option>75</option></select></div><div class="field"><label>Minimum events</label><input type="number" id="networkMinEvents" min="1" value="1"></div><label class="check"><input type="checkbox" id="networkSharedOnly"> Shared contacts only</label>
+            <button class="btn secondary small" id="networkRefreshBtn">Redraw</button>
+            <span class="tiny">Larger nodes/edges mean more CDR records. Shared contacts connect to multiple subject numbers.</span>
+          </div>
+          <div class="network-wrap"><canvas id="networkCanvas"></canvas></div>
+          <div id="networkLegend" class="metric-row" style="margin-top:10px"></div>
+        </div>
+          <div class="panel"><div class="panel-title"><h2>Number Relationship Analysis</h2><span class="muted" id="relationshipScope">Select a pair to analyse.</span></div><div class="notice">This module summarizes communication metadata between two numbers and, when both are loaded CDR subjects, compares shared towers and identifiers. Treat these as review leads rather than proof of identity, exact location, association, or intent.</div><div class="subtoolbar no-print"><div class="field" style="min-width:220px"><label>Person A / Subject</label><select id="relationshipA"><option value="">Select subject</option></select></div><div class="field" style="min-width:220px"><label>Person B / Contact</label><input id="relationshipB" list="relationshipBOptions" placeholder="Enter or select number"><datalist id="relationshipBOptions"></datalist></div><div class="field"><label>From date</label><input type="date" id="relationshipFrom"></div><div class="field"><label>To date</label><input type="date" id="relationshipTo"></div><div class="field" style="min-width:190px"><label>Event type</label><select id="relationshipEvent"><option value="">All event types</option></select></div><label class="check"><input type="checkbox" id="relationshipNightOnly"> Night only</label><button class="btn secondary small" id="relationshipSwap">⇄ Swap</button><button class="btn small" id="relationshipAnalyse">Analyse</button><button class="btn secondary small" id="relationshipClear">Clear</button><button class="btn secondary small" id="relationshipExport">Export pair CSV</button><button class="btn secondary small" id="relationshipOpenARecords">Open A-side records</button><button class="btn secondary small" id="relationshipOpenBRecords">Open B-side records</button></div><div class="tiny" style="margin:6px 0 10px">Relationship date/event filters apply only inside this tab and do not change the analyzer-wide filters.</div><div id="relationshipSummary" class="empty">Enter Person B to find which loaded subjects contacted that number, or select a pair to analyse.</div><h3>Loaded subjects connected to Person B</h3><div class="tablewrap"><table class="table" id="relationshipSubjects"></table></div><h3 style="margin-top:18px">Communication timeline</h3><div class="tablewrap"><table class="table" id="relationshipTimeline"></table></div><h3 style="margin-top:18px">Common towers</h3><div class="tablewrap"><table class="table" id="relationshipTowers"></table></div><h3 style="margin-top:18px">Shared IMEI / IMSI</h3><div class="tablewrap"><table class="table" id="relationshipDevices"></table></div></div>
+        </div>
+      </section>
+
+      <textarea id="generalNote" hidden></textarea>
+    
+    </main>
+  </div>
+</div>
+
+<script src="/cdranalysis/js/core.js"></script>
+<script src="/cdranalysis/js/identity.js"></script>
+<script src="/cdranalysis/js/parser.js?v=73"></script>
+<script src="/cdranalysis/js/filters.js?v=75"></script>
+<script src="/cdranalysis/js/dashboard.js?v=71"></script>
+<script src="/cdranalysis/js/records.js"></script>
+<script src="/cdranalysis/js/excelview.js?v=68"></script>
+<script src="/cdranalysis/js/contacts-insights.js?v=77"></script>
+<script src="/cdranalysis/js/contacts-extras.js?v=77"></script>
+<script src="/cdranalysis/js/contacts.js?v=77"></script>
+<script src="/cdranalysis/js/locations.js"></script>
+<script src="/cdranalysis/js/devices.js?v=70"></script>
+<script src="/cdranalysis/js/movement.js?v=74"></script>
+<script src="/cdranalysis/js/network.js"></script>
+<script src="/cdranalysis/js/linkanalysis.js?v=65"></script>
+<script src="/cdranalysis/js/analysis.js?v=69"></script>
+<script src="/cdranalysis/js/reports.js"></script>
+<script src="/cdranalysis/js/workspace.js"></script>
+<script src="/cdranalysis/js/case.js"></script>
+<script src="/cdranalysis/js/router.js?v=65"></script>
+<script src="/cdranalysis/js/ui.js?v=74"></script>
+<script src="/cdranalysis/js/app.js?v=77"></script>
+<script src="/cdranalysis/js/relationship.js"></script>
+<script src="/cdranalysis/js/diagnostics.js"></script>
+<script src="/cdranalysis/js/investigation-leads.js"></script>
+</body>
+</html>

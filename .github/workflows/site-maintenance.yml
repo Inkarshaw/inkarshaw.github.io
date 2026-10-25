@@ -1,0 +1,62 @@
+name: ClearExams automatic maintenance
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "10 21 * * *"  # 02:40 IST
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clearexams-maintenance
+  cancel-in-progress: false
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Repair legacy ClearExams domain links
+        run: python3 scripts/process_website_job.py --action FIX_OLD_DOMAIN
+
+      - name: Rebuild current-affairs index
+        run: python3 current-affairs/generate-pdf-list.py
+
+      - name: Validate generated data
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool current-affairs/pdfs.json >/dev/null
+          test "$(tr -d '\r\n' < CNAME)" = "clearexams.ink"
+          python3 - <<'PY'
+          import csv, pathlib, xml.etree.ElementTree as ET
+          ET.parse("sitemap.xml")
+          p = pathlib.Path("data/quizzes/daily-quiz.csv")
+          with p.open(encoding="utf-8", newline="") as f:
+              rows = list(csv.DictReader(f))
+          if len(rows) < 10:
+              raise SystemExit("daily-quiz.csv has fewer than 10 questions")
+          required = {"ID","Question","OptionA","OptionB","OptionC","OptionD","CorrectAnswer"}
+          if not required.issubset(rows[0].keys()):
+              raise SystemExit("daily-quiz.csv header is incomplete")
+          PY
+
+      - name: Commit maintenance changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No maintenance changes required." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git commit -m "Automated ClearExams site maintenance"
+          git pull --rebase origin main
+          git push origin main

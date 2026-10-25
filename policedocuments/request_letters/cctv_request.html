@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CRB கடிதம் - தமிழ் யுனிகோடு | PDF பதிவிறக்கம்</title>
+    <!-- html2canvas + jsPDF for reliable PDF rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+            font-family: 'Segoe UI', 'Noto Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            background: transparent;
+        }
+
+        /* Input Controls Panel */
+        .input-panel {
+            background: #ffffff;
+            border: 1px solid #2c3e4e;
+            padding: 22px 28px;
+            margin-bottom: 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 6px;
+        }
+        .input-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .input-field-group label {
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.4px;
+            color: #1e2f3a;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', monospace;
+        }
+        .input-field-group input, .input-field-group textarea, .input-field-group select {
+            padding: 9px 12px;
+            border: 1px solid #a0b8c5;
+            background: #fffef7;
+            font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+            transition: 0.1s linear;
+            border-radius: 2px;
+        }
+        .input-field-group select {
+            cursor: pointer;
+        }
+        .input-field-group textarea {
+            resize: vertical;
+            min-height: 68px;
+        }
+        .input-field-group input:focus, .input-field-group textarea:focus, .input-field-group select:focus {
+            border-color: #000000;
+            background: #fffae6;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+        }
+        
+        /* FIXED Time row with period dropdown + time input - no overlapping */
+        .time-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+        .time-row select {
+            flex: 1;
+            min-width: 85px;
+            width: auto;
+            max-width: 110px;
+        }
+        .time-row input {
+            flex: 2;
+            min-width: 80px;
+            width: auto;
+        }
+        
+        .datetime-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .datetime-row .input-field-group {
+            flex: 1;
+            min-width: 0; /* prevent overflow */
+        }
+        
+        /* Row for SOC with location and proximity side by side */
+        .soc-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .soc-row .input-field-group:first-child {
+            flex: 2;
+        }
+        .soc-row .input-field-group:last-child {
+            flex: 1;
+        }
+        
+        .apply-btn {
+            grid-column: span 2;
+            background: #f3f6f8;
+            color: #000;
+            border: 1px solid #2c3e4e;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.6px;
+            transition: 0.1s;
+            margin-top: 8px;
+            border-radius: 4px;
+        }
+        .apply-btn:hover {
+            background: #e2e9ef;
+            border-color: black;
+        }
+
+        /* Document Card - Legal Style with MAXIMUM MARGINS */
+        .document-card {
+            width: 100%;
+            background: white;
+            border: 1px solid #1e2f3a;
+            box-shadow: 0 16px 32px -14px rgba(0,0,0,0.18);
+            border-radius: 3px;
+        }
+
+        /* INCREASED MARGINS - formal legal document */
+        .legal-paper {
+            padding: 6rem 5rem !important;
+            background: white;
+            color: #000000;
+            line-height: 1.85;
+            font-size: 14px;
+        }
+
+        /* Tamil Unicode Font Support */
+        .tamil-text, .legal-paper, p, div, span, table, td, .info-label, .info-value, .signature-box,
+        .header-left, .copy-section, .iah-section, .content-paragraph {
+            font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', 'Segoe UI Emoji', sans-serif;
+            font-weight: normal;
+        }
+
+        /* Enhanced spacing for sender/receiver blocks */
+        .header-left {
+            text-align: left;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            font-size: 13px;
+        }
+        .sender-label {
+            padding-left: 0;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .sender-address {
+            padding-left: 48px !important;
+            margin-bottom: 0.1rem;
+        }
+        
+        .copy-section {
+            text-align: left;
+            margin-bottom: 1.8rem;
+            margin-top: 1.4rem;
+            line-height: 1.65;
+            font-size: 13px;
+        }
+        .receiver-label {
+            padding-left: 0;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+        .receiver-address {
+            padding-left: 48px !important;
+        }
+        
+        .iah-section {
+            text-align: left;
+            margin-bottom: 2rem;
+            margin-top: 1rem;
+            font-size: 13px;
+            font-weight: 500;
+            padding-left: 0;
+        }
+
+        /* MERGED TABLE: single outer table with two rows (பார்வை and பொருள்) */
+        .merged-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.8rem 0;
+            border: 1.2px solid #000000;
+            background: white;
+        }
+        .merged-info-table td {
+            border: none;
+            vertical-align: top;
+            padding: 0;
+        }
+        .merged-info-table .label-cell {
+            width: 18%;
+            background: white;
+            border-right: 1.2px solid black;
+            font-weight: 700;
+            padding: 16px 22px;
+            letter-spacing: 0.3px;
+            font-size: 13.5px;
+        }
+        .merged-info-table .value-cell {
+            width: 82%;
+            background: white;
+            padding: 16px 22px;
+            font-size: 13.5px;
+            line-height: 1.65;
+        }
+        /* subtle border only between rows: first row gets bottom border for visual separation */
+        .merged-info-table tr:first-child td {
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .merged-info-table tr:first-child .label-cell,
+        .merged-info-table tr:first-child .value-cell {
+            border-bottom: 1px solid #e0e0e0;
+        }
+        /* ensure no double border on last row */
+        .merged-info-table tr:last-child .label-cell,
+        .merged-info-table tr:last-child .value-cell {
+            border-bottom: none;
+        }
+
+        .content-paragraph {
+            margin: 32px 0;
+            text-align: justify;
+            line-height: 1.85;
+            font-size: 14px;
+        }
+        
+        .indent-first-line {
+            text-indent: 72px;
+        }
+
+        .signature-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 4.2rem;
+            margin-bottom: 1rem;
+        }
+        .signature-box {
+            text-align: center;
+            line-height: 2.1;
+        }
+        .signature-box div {
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .action-bar {
+            background: #f8fafc;
+            padding: 16px 2.5rem;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #2c3e4e;
+            gap: 18px;
+        }
+        button {
+            background: white;
+            color: black;
+            border: 1px solid #1e2f3a;
+            padding: 8px 28px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12.5px;
+            transition: 0.1s;
+            font-family: inherit;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #e2e8ed;
+            border-color: black;
+            transform: translateY(-1px);
+        }
+
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.88);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.1s, opacity 0.2s;
+        }
+        .loader-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .loader-content {
+            background: white;
+            padding: 32px 52px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 17px;
+            text-align: center;
+            border: 1px solid black;
+            font-family: 'Segoe UI', 'Noto Sans', monospace;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #ccc;
+            border-top: 4px solid #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive fixes - prevent time field overlap on small screens */
+        @media (max-width: 780px) {
+            .legal-paper {
+                padding: 3rem 2rem !important;
+            }
+            .merged-info-table .label-cell, 
+            .merged-info-table .value-cell {
+                display: block;
+                width: 100%;
+            }
+            .merged-info-table .label-cell {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            .merged-info-table tr:first-child .label-cell,
+            .merged-info-table tr:first-child .value-cell {
+                border-bottom: 1px solid #ddd;
+            }
+            .merged-info-table {
+                border: 1.2px solid black;
+            }
+            .input-panel {
+                padding: 18px;
+            }
+            .apply-btn {
+                grid-column: span 1;
+            }
+            .indent-first-line {
+                text-indent: 40px;
+            }
+            .sender-address {
+                padding-left: 28px !important;
+            }
+            .receiver-address {
+                padding-left: 28px !important;
+            }
+            .datetime-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .time-row {
+                flex-wrap: nowrap;
+            }
+            .time-row select {
+                min-width: 70px;
+            }
+            .time-row input {
+                min-width: 70px;
+            }
+            .soc-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 550px) {
+            .time-row {
+                flex-wrap: wrap;
+            }
+            .time-row select {
+                min-width: 100%;
+            }
+            .time-row input {
+                min-width: 100%;
+            }
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .input-panel, .action-bar {
+                display: none;
+            }
+            .legal-paper {
+                padding: 1.8cm !important;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-content">
+        <div class="spinner"></div>
+        <div class="loader-text">PDF தயாராகிறது...<br>தயவுசெய்து காத்திருக்கவும்</div>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- Input Panel with Station Selection Dropdown -->
+    <div class="input-panel">
+        <div class="input-field-group">
+            <label>🏢 காவல் நிலையம் (Police Station)</label>
+            <select id="inputStationSelect">
+                <option value="ஜி7 சேத்துப்பட்டு காவல்நிலையம்">ஜி7 சேத்துப்பட்டு காவல்நிலையம்</option>
+                <option value="ஜி4 அண்ணா சாலை காவல்நிலையம்">ஜி4 அண்ணா சாலை காவல்நிலையம்</option>
+                <option value="ஜி2 தேனாம்பேட்டை காவல்நிலையம்">ஜி2 தேனாம்பேட்டை காவல்நிலையம்</option>
+                <option value="ஜி6 தியாகராய நகர் காவல்நிலையம்">ஜி6 தியாகராய நகர் காவல்நிலையம்</option>
+                <option value="ஜி8 நுங்கம்பாக்கம் காவல்நிலையம்">ஜி8 நுங்கம்பாக்கம் காவல்நிலையம்</option>
+                <option value="ஜி3 எழும்பூர் காவல்நிலையம்">ஜி3 எழும்பூர் காவல்நிலையம்</option>
+                <option value="கே-2 கீழ்ப்பாக்கம் காவல்நிலையம்">கே-2 கீழ்ப்பாக்கம் காவல்நிலையம்</option>
+            </select>
+        </div>
+        
+        <div class="input-field-group">
+            <label>⚖️ வழக்கு எண் (CRB)</label>
+            <input type="text" id="inputCaseNumber" value="88/2026">
+        </div>
+        <div class="input-field-group">
+            <label>📜 BNSS பிரிவு</label>
+            <input type="text" id="inputBnss" value="194 BNSS">
+        </div>
+        
+        <div class="soc-row">
+            <div class="input-field-group">
+                <label>📍 SOC - இடம் (Scene of Crime)</label>
+                <input type="text" id="inputSocLocation" value="மேயர் ராமநாதன் பூங்கா">
+            </div>
+            <div class="input-field-group">
+                <label>📍 அருகில் / உள்ளே / எதிரே</label>
+                <select id="inputSocProximity">
+                    <option value="அருகில்">அருகில்</option>
+                    <option value="உள்ளே">உள்ளே</option>
+                    <option value="எதிரே">எதிரே</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="datetime-row">
+            <div class="input-field-group">
+                <label>📅 சம்பவ தேதி</label>
+                <input type="text" id="inputIncidentDate" value="11.04.2026" placeholder="DD.MM.YYYY">
+            </div>
+            <div class="input-field-group">
+                <label>⏱️ சம்பவ நேரம் (காலை/மாலை)</label>
+                <div class="time-row">
+                    <select id="inputIncidentPeriod">
+                        <option value="காலை">காலை</option>
+                        <option value="மதியம்">மதியம்</option>
+                        <option value="மாலை">மாலை</option>
+                        <option value="இரவு">இரவு</option>
+                    </select>
+                    <input type="text" id="inputIncidentTime" value="07:45" placeholder="HH:MM">
+                </div>
+            </div>
+        </div>
+        
+        <div class="datetime-row">
+            <div class="input-field-group">
+                <label>📆 புகார் தேதி</label>
+                <input type="text" id="inputComplaintDate" value="11.04.2025" placeholder="DD.MM.YYYY">
+            </div>
+            <div class="input-field-group">
+                <label>⏱️ புகார் நேரம் (காலை/மாலை)</label>
+                <div class="time-row">
+                    <select id="inputComplaintPeriod">
+                        <option value="காலை">காலை</option>
+                        <option value="மதியம்">மதியம்</option>
+                        <option value="மாலை">மாலை</option>
+                        <option value="இரவு">இரவு</option>
+                    </select>
+                    <input type="text" id="inputComplaintTime" value="07:30" placeholder="HH:MM">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-field-group">
+            <label>🧓 இறந்தவரின் பாலினம்</label>
+            <select id="inputDeceasedGender">
+                <option value="ஆண்">ஆண் (Male)</option>
+                <option value="பெண்">பெண் (Female)</option>
+                <option value="தெரியாது">தெரியாது (Unknown)</option>
+            </select>
+        </div>
+        <div class="input-field-group">
+            <label>🧓 இறந்தவரின் வயது</label>
+            <input type="text" id="inputAgeValue" value="55">
+        </div>
+        <div class="input-field-group">
+            <label>✅ உறுதிபடுத்திய விதம்</label>
+            <input type="text" id="inputConfirmationMethod" value="108 ஆம்புலன்ஸ் மூலம்">
+        </div>
+        
+        <div class="input-field-group">
+            <label>🏥 பிரேதம் வைக்கப்பட்ட இடம் (Mortuary)</label>
+            <select id="inputBodyKeptSelect">
+                <option value="கீழ்ப்பாக்கம் அரசு மருத்துவமனை சவக்கிடங்கு">கீழ்ப்பாக்கம் அரசு மருத்துவமனை சவக்கிடங்கு</option>
+                <option value="ராஜீவ் காந்தி அரசு பொது மருத்துவமனை சவக்கிடங்கு, சென்னை">ராஜீவ் காந்தி அரசு பொது மருத்துவமனை சவக்கிடங்கு, சென்னை</option>
+            </select>
+        </div>
+
+        <div class="input-field-group">
+            <label>👨 புகார்தாரர் பெயர்</label>
+            <input type="text" id="inputComplainantName" value="ஏழுமலை">
+        </div>
+        <div class="input-field-group">
+            <label>📅 புகார்தாரர் வயது</label>
+            <input type="text" id="inputComplainantAge" value="55">
+        </div>
+        <div class="input-field-group">
+            <label>👨‍👦 புகார்தாரரின் தந்தை பெயர்</label>
+            <input type="text" id="inputFatherName" value="அண்ணாமலை">
+        </div>
+        <div class="input-field-group">
+            <label>🏠 புகார்தாரரின் முகவரி</label>
+            <textarea id="inputAddress" rows="2">எண்.12, இளங்கோ செட்டி தெரு, கிழக்கு மேடு, இராமநாதபுரம்</textarea>
+        </div>
+        <button class="apply-btn" id="applyBtn">⟳ புதுப்பிக்கவும் / மாற்றங்களைப் பயன்படுத்தவும்</button>
+    </div>
+
+    <!-- Official CRB Letter Content in Tamil Unicode - MERGED TABLE with TWO ROWS (பார்வை and பொருள்) -->
+    <div class="document-card">
+        <div class="legal-paper tamil-text" id="pdfContent">
+            <div class="header-left">
+                <div class="sender-label">அனுப்புநர்</div>
+                <div class="sender-address">காவல் ஆய்வாளர் (L&O)</div>
+                <div class="sender-address" id="stationAddressLine"><span id="stationNameDisplay">ஜி7 சேத்துப்பட்டு காவல்நிலையம்</span>,</div>
+                <div class="sender-address" id="stationAreaLine">சென்னை-31.</div>
+            </div>
+
+            <div class="copy-section">
+                <div class="receiver-label">பெறுநர்</div>
+                <div class="receiver-address">உதவி ஆணையாளர் அவர்கள்,</div>
+                <div class="receiver-address">குற்ற ஆவண காப்பகம் (C.R.B),</div>
+                <div class="receiver-address">வேப்பேரி, சென்னை-07.</div>
+            </div>
+
+            <div class="iah-section">
+                <div>ஐயா,</div>
+            </div>
+
+            <!-- MERGED TABLE WITH TWO ROWS: பார்வை (first row) and பொருள் (second row) -->
+            <table class="merged-info-table">
+                <tr>
+                    <td class="label-cell">பார்வை:</td>
+                    <td class="value-cell" id="visionValue">
+                        <span id="stationShortDisplay">ஜி7 சேத்துப்பட்டு கா.நி</span> குற்ற எண்: <span id="caseNumberSpan">88/2026</span> பிரிவு <span id="bnssSpan">194 BNSS</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-cell">பொருள்:</td>
+                    <td class="value-cell" id="subjectTextDisplay">
+                        இறந்த நபரின் பெயர் தெரியாத <span id="deceasedGenderSpanSubject">ஆண்</span> <span id="subjectAgeSpan">55</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Main narrative: includes station jurisdiction, SOC location with proximity -->
+            <p class="content-paragraph indent-first-line" id="mainNarrative">
+                பார்வையில் கண்ட வழக்கில் <span id="complainantNameSpan">ஏழுமலை</span> <span id="genderTitleSpan">ஆ</span>/<span id="complainantAgeSpan">55</span> த/பெ <span id="fatherNameSpan">அண்ணாமலை</span> 
+                <span id="addressSpan">எண்.12, இளங்கோ செட்டி தெரு, கிழக்கு மேடு, இராமநாதபுரம்</span> என்பவர் அளித்த புகாரில்
+                <span id="incidentDateSpan">11.04.2026</span> ஆம் நாள் <strong><span id="incidentPeriodSpan">காலை</span> <span id="incidentTimeSpan">07:45</span> மணி</strong> அளவில் <strong id="jurisdictionSpan">ஜி7 சேத்துப்பட்டு காவல்நிலைய எல்லைக்குட்பட்ட</strong> <strong id="socLocationSpan">மேயர் ராமநாதன் பூங்கா</strong> <strong id="socProximitySpan">அருகில்</strong> உள்ள இடத்தில் மயங்கிய நிலையில் இருந்த சுமார் 
+                <span id="ageValueSpan">55</span> வயது மதிக்கத்தக்க பெயர் விலாசம் தெரியாத <span id="deceasedGenderTextSpan">ஆண்</span> நபரை
+                <span id="confirmationMethodSpan">108 ஆம்புலன்ஸ் மூலம்</span> உறுதிபடுத்தப்பட்டதாகவும் இறந்துபோனவரின் பிரேதத்தின் மீது விசாரணை செய்து சட்டப்படி நடவடிக்கை எடுக்குமாறு கொடுத்த புகாரைப் பெற்று  
+                <span id="complaintDateSpan">11.04.2025</span> ஆம் நாள் <strong><span id="complaintPeriodSpan">காலை</span> <span id="complaintTimeSpan">07:30</span> மணி</strong>க்கு <strong id="stationNarrativeSpan">ஜி7 சேத்துப்பட்டு காவல்நிலைய</strong> குற்ற எண்.
+                <span id="crbCaseAgainSpan">88/2026</span> பிரிவு <span id="bnssAgainSpan">194 BNSS</span> 
+                -இல் வழக்குப் பதிவு செய்து விசாரணைக்கு எடுத்துக் கொள்ளப்பட்டது. வழக்கு புலன் விசாரணையில் உள்ளது. 
+                மேற்படி நபரின் பிரேதம் <strong id="bodyKeptSpan">கீழ்ப்பாக்கம் அரசு மருத்துவமனை சவக்கிடங்கு</strong> இல் வைக்கப்பட்டுள்ளது.
+            </p>
+
+            <p class="content-paragraph indent-first-line">
+                மேற்படி நபரின் விபரம் அறிய அவரது புகைப்படத்துடன் செய்திதாளில் இலவசமாக இச்செய்தி விளம்பரப்படுத்துமாறு கேட்டுக் கொள்கிறேன். 
+                இது தொடர்பான மேலதிக விசாரணை நடவடிக்கைகள் மேற்கொள்ளப்பட்டு வருகின்றன.
+            </p>
+
+            <div class="signature-container">
+                <div class="signature-box">
+                    <div>காவல் ஆய்வாளர்,</div>
+                    <div id="signatureStationSpan">ஜி7 சேத்துப்பட்டு காவல் நிலையம்</div>
+                    <div id="signatureAreaSpan">சென்னை-31</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="reset-btn" id="resetBtn">⟳ அனைத்தையும் மீட்டமை</button>
+            <button class="download-btn" id="downloadPdfBtn">📄 PDF ஆவணமாக பதிவிறக்கவும்</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Default values including station selection and proximity
+    const defaultValues = {
+        station: "ஜி7 சேத்துப்பட்டு காவல்நிலையம்",
+        stationShort: "ஜி7 சேத்துப்பட்டு கா.நி",
+        stationArea: "சென்னை-31",
+        caseNumber: "88/2026",
+        bnss: "194 BNSS",
+        socLocation: "மேயர் ராமநாதன் பூங்கா",
+        socProximity: "அருகில்",
+        incidentDate: "11.04.2026",
+        incidentPeriod: "காலை",
+        incidentTime: "07:45",
+        complaintDate: "11.04.2025",
+        complaintPeriod: "காலை",
+        complaintTime: "07:30",
+        deceasedGender: "ஆண்",
+        ageValue: "55",
+        confirmationMethod: "108 ஆம்புலன்ஸ் மூலம்",
+        bodyKept: "கீழ்ப்பாக்கம் அரசு மருத்துவமனை சவக்கிடங்கு",
+        complainantName: "ஏழுமலை",
+        complainantAge: "55",
+        fatherName: "அண்ணாமலை",
+        address: "எண்.12, இளங்கோ செட்டி தெரு, கிழக்கு மேடு, இராமநாதபுரம்"
+    };
+
+    // Station data mapping
+    const stationData = {
+        "ஜி7 சேத்துப்பட்டு காவல்நிலையம்": { short: "ஜி7 சேத்துப்பட்டு கா.நி", narrative: "ஜி7 சேத்துப்பட்டு காவல்நிலைய", area: "சென்னை-31", jurisdiction: "ஜி7 சேத்துப்பட்டு காவல்நிலைய எல்லைக்குட்பட்ட" },
+        "ஜி4 அண்ணா சாலை காவல்நிலையம்": { short: "ஜி4 அண்ணா சாலை கா.நி", narrative: "ஜி4 அண்ணா சாலை காவல்நிலைய", area: "சென்னை-02", jurisdiction: "ஜி4 அண்ணா சாலை காவல்நிலைய எல்லைக்குட்பட்ட" },
+        "ஜி2 தேனாம்பேட்டை காவல்நிலையம்": { short: "ஜி2 தேனாம்பேட்டை கா.நி", narrative: "ஜி2 தேனாம்பேட்டை காவல்நிலைய", area: "சென்னை-08", jurisdiction: "ஜி2 தேனாம்பேட்டை காவல்நிலைய எல்லைக்குட்பட்ட" },
+        "ஜி6 தியாகராய நகர் காவல்நிலையம்": { short: "ஜி6 தியாகராய நகர் கா.நி", narrative: "ஜி6 தியாகராய நகர் காவல்நிலைய", area: "சென்னை-17", jurisdiction: "ஜி6 தியாகராய நகர் காவல்நிலைய எல்லைக்குட்பட்ட" },
+        "ஜி8 நுங்கம்பாக்கம் காவல்நிலையம்": { short: "ஜி8 நுங்கம்பாக்கம் கா.நி", narrative: "ஜி8 நுங்கம்பாக்கம் காவல்நிலைய", area: "சென்னை-34", jurisdiction: "ஜி8 நுங்கம்பாக்கம் காவல்நிலைய எல்லைக்குட்பட்ட" },
+        "ஜி3 எழும்பூர் காவல்நிலையம்": { short: "ஜி3 எழும்பூர் கா.நி", narrative: "ஜி3 எழும்பூர் காவல்நிலைய", area: "சென்னை-08", jurisdiction: "ஜி3 எழும்பூர் காவல்நிலைய எல்லைக்குட்பட்ட" },
+        "கே-2 கீழ்ப்பாக்கம் காவல்நிலையம்": { short: "கே-2 கீழ்ப்பாக்கம் கா.நி", narrative: "கே-2 கீழ்ப்பாக்கம் காவல்நிலைய", area: "சென்னை-10", jurisdiction: "கே-2 கீழ்ப்பாக்கம் காவல்நிலைய எல்லைக்குட்பட்ட" }
+    };
+
+    function getGenderTitle(deceasedGender) {
+        if (deceasedGender === "ஆண்") return "ஆ";
+        else if (deceasedGender === "பெண்") return "பெ";
+        else return "தெ";
+    }
+
+    function updatePreview() {
+        const station = document.getElementById('inputStationSelect').value;
+        const stationInfo = stationData[station] || stationData["ஜி7 சேத்துப்பட்டு காவல்நிலையம்"];
+        
+        const caseNumber = document.getElementById('inputCaseNumber').value.trim() || defaultValues.caseNumber;
+        const bnss = document.getElementById('inputBnss').value.trim() || defaultValues.bnss;
+        const socLocation = document.getElementById('inputSocLocation').value.trim() || defaultValues.socLocation;
+        const socProximity = document.getElementById('inputSocProximity').value;
+        const incidentDate = document.getElementById('inputIncidentDate').value.trim() || defaultValues.incidentDate;
+        const incidentPeriod = document.getElementById('inputIncidentPeriod').value;
+        const incidentTime = document.getElementById('inputIncidentTime').value.trim() || defaultValues.incidentTime;
+        const complaintDate = document.getElementById('inputComplaintDate').value.trim() || defaultValues.complaintDate;
+        const complaintPeriod = document.getElementById('inputComplaintPeriod').value;
+        const complaintTime = document.getElementById('inputComplaintTime').value.trim() || defaultValues.complaintTime;
+        const deceasedGender = document.getElementById('inputDeceasedGender').value;
+        const ageValue = document.getElementById('inputAgeValue').value.trim() || defaultValues.ageValue;
+        const confirmationMethod = document.getElementById('inputConfirmationMethod').value.trim() || defaultValues.confirmationMethod;
+        const bodyKeptSelected = document.getElementById('inputBodyKeptSelect').value;
+        const complainantName = document.getElementById('inputComplainantName').value.trim() || defaultValues.complainantName;
+        const complainantAge = document.getElementById('inputComplainantAge').value.trim() || defaultValues.complainantAge;
+        const fatherName = document.getElementById('inputFatherName').value.trim() || defaultValues.fatherName;
+        const address = document.getElementById('inputAddress').value.trim() || defaultValues.address;
+        
+        const genderTitle = getGenderTitle(deceasedGender);
+        
+        // Update station related spans
+        document.getElementById('stationAddressLine').innerHTML = `<span id="stationNameDisplay">${station}</span>,`;
+        document.getElementById('stationAreaLine').innerHTML = stationInfo.area;
+        document.getElementById('stationShortDisplay').innerText = stationInfo.short;
+        document.getElementById('stationNarrativeSpan').innerHTML = stationInfo.narrative;
+        document.getElementById('jurisdictionSpan').innerText = stationInfo.jurisdiction;
+        document.getElementById('signatureStationSpan').innerText = station;
+        document.getElementById('signatureAreaSpan').innerText = stationInfo.area;
+        
+        // SOC & proximity
+        document.getElementById('socLocationSpan').innerText = socLocation;
+        document.getElementById('socProximitySpan').innerText = socProximity;
+        
+        // Case, BNSS
+        document.getElementById('caseNumberSpan').innerText = caseNumber;
+        document.getElementById('bnssSpan').innerText = bnss;
+        document.getElementById('crbCaseAgainSpan').innerText = caseNumber;
+        document.getElementById('bnssAgainSpan').innerText = bnss;
+        
+        // Incident & complaint details
+        document.getElementById('incidentDateSpan').innerText = incidentDate;
+        document.getElementById('incidentPeriodSpan').innerText = incidentPeriod;
+        document.getElementById('incidentTimeSpan').innerText = incidentTime;
+        document.getElementById('complaintDateSpan').innerText = complaintDate;
+        document.getElementById('complaintPeriodSpan').innerText = complaintPeriod;
+        document.getElementById('complaintTimeSpan').innerText = complaintTime;
+        
+        // Deceased and other fields
+        document.getElementById('ageValueSpan').innerText = ageValue;
+        document.getElementById('confirmationMethodSpan').innerText = confirmationMethod;
+        document.getElementById('bodyKeptSpan').innerHTML = bodyKeptSelected;
+        document.getElementById('deceasedGenderTextSpan').innerText = deceasedGender;
+        document.getElementById('deceasedGenderSpanSubject').innerText = deceasedGender;
+        document.getElementById('subjectAgeSpan').innerText = ageValue;
+        
+        // Complainant details
+        document.getElementById('genderTitleSpan').innerText = genderTitle;
+        document.getElementById('complainantNameSpan').innerText = complainantName;
+        document.getElementById('complainantAgeSpan').innerText = complainantAge;
+        document.getElementById('fatherNameSpan').innerText = fatherName;
+        document.getElementById('addressSpan').innerText = address;
+        
+        // Update the subject text (second row in merged table)
+        const subjectDiv = document.getElementById('subjectTextDisplay');
+        if (subjectDiv) {
+            subjectDiv.innerHTML = `இறந்த நபரின் பெயர் தெரியாத <span id="deceasedGenderSpanSubject">${deceasedGender}</span> <span id="subjectAgeSpan">${ageValue}</span> வயதுடைய மர்ம நபர் - காணாமல் போனது குறித்த தகவல்களை தக்க முறையில் விசாரணை செய்ய வேண்டும் - தொடர்பாக.`;
+        }
+    }
+    
+    function resetToDefault() {
+        document.getElementById('inputStationSelect').value = defaultValues.station;
+        document.getElementById('inputCaseNumber').value = defaultValues.caseNumber;
+        document.getElementById('inputBnss').value = defaultValues.bnss;
+        document.getElementById('inputSocLocation').value = defaultValues.socLocation;
+        document.getElementById('inputSocProximity').value = defaultValues.socProximity;
+        document.getElementById('inputIncidentDate').value = defaultValues.incidentDate;
+        document.getElementById('inputIncidentPeriod').value = defaultValues.incidentPeriod;
+        document.getElementById('inputIncidentTime').value = defaultValues.incidentTime;
+        document.getElementById('inputComplaintDate').value = defaultValues.complaintDate;
+        document.getElementById('inputComplaintPeriod').value = defaultValues.complaintPeriod;
+        document.getElementById('inputComplaintTime').value = defaultValues.complaintTime;
+        document.getElementById('inputDeceasedGender').value = defaultValues.deceasedGender;
+        document.getElementById('inputAgeValue').value = defaultValues.ageValue;
+        document.getElementById('inputConfirmationMethod').value = defaultValues.confirmationMethod;
+        document.getElementById('inputBodyKeptSelect').value = defaultValues.bodyKept;
+        document.getElementById('inputComplainantName').value = defaultValues.complainantName;
+        document.getElementById('inputComplainantAge').value = defaultValues.complainantAge;
+        document.getElementById('inputFatherName').value = defaultValues.fatherName;
+        document.getElementById('inputAddress').value = defaultValues.address;
+        updatePreview();
+    }
+    
+    async function downloadPDF() {
+        const element = document.getElementById('pdfContent');
+        const loader = document.getElementById('loaderOverlay');
+        if (!element) return;
+        loader.classList.add('active');
+        try {
+            await new Promise(resolve => setTimeout(resolve, 120));
+            const caseNumRaw = document.getElementById('inputCaseNumber').value.trim() || "CRB_Letter";
+            const safeCaseNum = caseNumRaw.replace(/[\/\\:*?"<>|]/g, '_');
+            const station = document.getElementById('inputStationSelect').value;
+            const shortStation = station.substring(0, 18).replace(/[\/\\:*?"<>|]/g, '_');
+            const filename = `CRB_Letter_${shortStation}_${safeCaseNum}.pdf`;
+            const canvas = await html2canvas(element, {
+                scale: 3.2,
+                backgroundColor: '#ffffff',
+                logging: false,
+                useCORS: false,
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight,
+                letterRendering: true,
+                onclone: (clonedDoc, elementClone) => {
+                    const style = clonedDoc.createElement('style');
+                    style.textContent = `
+                        * { font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', 'Segoe UI Emoji', 'FreeSerif', sans-serif !important; }
+                        .legal-paper, .tamil-text, p, div, span, .merged-info-table, .merged-info-table td { font-family: 'Noto Sans Tamil', 'Latha', 'Tamil MN', 'Arial Unicode MS', sans-serif !important; }
+                        body { background: white; margin: 0; padding: 0; }
+                        .legal-paper { padding: 6rem 5rem !important; }
+                        .merged-info-table { border: 1.2px solid black !important; margin: 1.8rem 0 !important; }
+                        .merged-info-table .label-cell { border-right: 1.2px solid black !important; background: white !important; }
+                        .indent-first-line { text-indent: 72px !important; }
+                        .sender-address { padding-left: 48px !important; }
+                        .receiver-address { padding-left: 48px !important; }
+                    `;
+                    clonedDoc.head.appendChild(style);
+                }
+            });
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pdfWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            if (imgHeight <= pdfHeight + 6) {
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            } else {
+                const fitScale = pdfHeight / imgHeight;
+                const scaledWidth = imgWidth * fitScale;
+                const scaledHeight = imgHeight * fitScale;
+                const xOffset = (pdfWidth - scaledWidth) / 2;
+                pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight);
+            }
+            pdf.save(filename);
+        } catch (error) {
+            console.error(error);
+            alert('PDF உருவாக்கத்தில் பிழை: ' + (error.message || 'Unknown'));
+        } finally {
+            loader.classList.remove('active');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const applyBtn = document.getElementById('applyBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const downloadBtn = document.getElementById('downloadPdfBtn');
+        if (applyBtn) applyBtn.addEventListener('click', (e) => { e.preventDefault(); updatePreview(); });
+        if (resetBtn) resetBtn.addEventListener('click', (e) => { e.preventDefault(); resetToDefault(); });
+        if (downloadBtn) downloadBtn.addEventListener('click', (e) => { e.preventDefault(); downloadPDF(); });
+        updatePreview();
+        const allInputs = document.querySelectorAll('.input-field-group input, .input-field-group textarea, .input-field-group select');
+        allInputs.forEach(input => {
+            input.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); updatePreview(); } });
+            input.addEventListener('blur', () => updatePreview());
+            if (input.tagName === 'SELECT') input.addEventListener('change', () => updatePreview());
+        });
+    });
+</script>
+</body>
+</html>

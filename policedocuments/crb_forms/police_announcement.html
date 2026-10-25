@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>காவல் அறிவிப்பு | ஜி7 சேத்துப்பட்டு | BNSS 194 | உடை விவரம் + புகைப்படம்</title>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Google Fonts Tamil Unicode -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body, .tamil-unicode, input, textarea, select, button, .pdf-content, .narrative-text, table, td, th, li, div, span, p {
+            font-family: 'Noto Sans Tamil', 'Latha', 'Nirmala UI', 'Segoe UI', 'Bamini', system-ui, sans-serif;
+        }
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            .pdf-card { box-shadow: none; margin: 0; padding: 0.3in; }
+        }
+        .legal-header {
+            border-bottom: 2px solid #1e3a8a;
+            margin-bottom: 0.75rem;
+        }
+        .evidence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+        }
+        .evidence-table td, .evidence-table th {
+            border: 1px solid #2c3e4e;
+            padding: 0.5rem;
+            vertical-align: top;
+        }
+        .evidence-table td:first-child {
+            background-color: #f8fafc;
+            font-weight: 600;
+            width: 30%;
+        }
+        .officer-contact-block {
+            background: #f1f5f9;
+            padding: 0.75rem;
+            border-left: 5px solid #b91c1c;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+        }
+        .person-photo-container {
+            border: 2px solid #d1d5db;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 0.7rem;
+            color: #4b5563;
+            transition: all 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .person-photo-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        .footer-disclaimer {
+            font-size: 0.65rem;
+            text-align: center;
+            border-top: 1px dashed #cbd5e1;
+            margin-top: 1.5rem;
+            padding-top: 0.75rem;
+            color: #334155;
+        }
+        .input-group {
+            transition: all 0.2s ease;
+        }
+        .input-group:focus-within {
+            transform: translateY(-1px);
+        }
+        .clothing-item-row {
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .remove-clothing-btn {
+            background: #ef4444;
+            color: white;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .remove-clothing-btn:hover {
+            background: #dc2626;
+        }
+        .add-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .add-btn:hover {
+            background: #2563eb;
+        }
+        .upload-btn {
+            background: #8b5cf6;
+            transition: all 0.2s;
+        }
+        .upload-btn:hover {
+            background: #7c3aed;
+        }
+        .remove-photo-btn {
+            background: #ef4444;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-gray-200 p-4 md:p-6">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- ACTION BAR -->
+        <div class="no-print bg-white rounded-2xl shadow-lg p-5 mb-6 flex flex-wrap justify-between items-center border border-gray-200">
+            <div>
+                <h1 class="text-2xl font-bold text-red-800 flex items-center gap-2">📄 காவல் அறிவிப்பு (BNSS 194) - ஜி7 சேத்துப்பட்டு</h1>
+                <p class="text-gray-600 text-sm mt-1">தமிழ் யூனிகோட் | உடை விவரங்கள் + நபர் புகைப்படம் (காவல் முத்திரை நீக்கப்பட்டது)</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="downloadPdfBtn" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition flex items-center gap-2">
+                    ⬇️ PDF பதிவிறக்கவும்
+                </button>
+                <button id="resetFormBtn" class="bg-gray-600 hover:bg-gray-700 text-white py-2.5 px-5 rounded-xl shadow transition">மீட்டமை</button>
+            </div>
+        </div>
+
+        <!-- INPUT FIELDS SECTION with DYNAMIC CLOTHING + PHOTO UPLOAD -->
+        <div class="no-print bg-white rounded-2xl shadow-xl p-6 mb-8">
+            <div class="border-b border-gray-200 pb-3 mb-5 flex items-center gap-2">
+                <span class="text-2xl">✏️</span>
+                <h2 class="text-2xl font-bold text-gray-800">தரவு உள்ளீட்டு புலங்கள்</h2>
+                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full ml-3">PDF-ல் உடனடியாக பிரதிபலிக்கும்</span>
+            </div>
+            
+            <!-- Photo Upload Section -->
+            <div class="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
+                <label class="block text-md font-bold text-gray-800 mb-2">🖼️ நபரின் புகைப்படம் (Person's Photo) - PDF-ல் இடம்பெறும்</label>
+                <div class="flex flex-wrap items-center gap-4">
+                    <button id="uploadPhotoBtn" class="upload-btn text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">📷 புகைப்படம் பதிவேற்றம்</button>
+                    <input type="file" id="photoFileInput" accept="image/jpeg,image/png,image/jpg" class="hidden">
+                    <button id="removePhotoBtn" class="remove-photo-btn text-white px-3 py-1.5 rounded-lg hidden">✕ அகற்று</button>
+                    <span id="photoStatus" class="text-sm text-gray-500"> எந்த புகைப்படமும் இல்லை</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">💡 JPG, PNG படங்களைப் பதிவேற்றலாம். PDF தயாரிக்கும் போது புகைப்படம் தானாக சேர்க்கப்படும்.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">📌 குற்ற எண் (FIR/BNSS)</label>
+                    <input type="text" id="caseNumberInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="88/2026">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">👤 முறையீட்டாளர் (Complainant)</label>
+                    <input type="text" id="complainantInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="M/55 j/ng mNrhfd; vz;. 42, ngUkhs; gps;is njU">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">❓ சந்தேக நபர் (Accused)</label>
+                    <input type="text" id="accusedNameInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="தெரியாத நபர்">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">📅 வயது (Age)</label>
+                    <input type="text" id="ageInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="55">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">📆 சம்பவ தேதி</label>
+                    <input type="date" id="incidentDateInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="2026-04-11">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">📑 பதிவு தேதி</label>
+                    <input type="date" id="filingDateInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="2025-04-11">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">🕊️ இறந்தவர் பெயர்</label>
+                    <input type="text" id="victimNameInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="அடையாளம் தெரியாத 55 வயது முதியவர்">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">📏 உயரம்</label>
+                    <input type="text" id="heightInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="5 1/2 அடி">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">💪 உடலமைப்பு</label>
+                    <input type="text" id="buildInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="இயல்பான உருவாக்கம்">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">💇 முடி</label>
+                    <input type="text" id="hairInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="கருப்பு முடி">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">🔍 அங்க மச்சம் / பிற அடையாளம் 1</label>
+                    <input type="text" id="evidence1Input" class="w-full border border-gray-300 rounded-lg p-2.5" value="இடது கையில் தழும்பு">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">🔎 அங்க மச்சம் / பிற அடையாளம் 2</label>
+                    <input type="text" id="evidence2Input" class="w-full border border-gray-300 rounded-lg p-2.5" value="வலது கன்னத்தில் மச்சம்">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">📞 காவல் நிலைய தொடர்பு</label>
+                    <input type="text" id="policeContactInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="28555069, 23452359">
+                </div>
+                <div class="input-group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">📱 அதிகாரி கைபேசி</label>
+                    <input type="text" id="officerMobileInput" class="w-full border border-gray-300 rounded-lg p-2.5" value="9498100026">
+                </div>
+            </div>
+
+            <!-- DYNAMIC CLOTHING SECTION -->
+            <div class="mt-6 border-t border-gray-200 pt-5">
+                <div class="flex items-center justify-between mb-3">
+                    <label class="block text-md font-bold text-gray-800">👕 உடை விவரங்கள் (Clothing Details) - பலவற்றை சேர்க்கலாம்</label>
+                    <button type="button" id="addClothingBtn" class="add-btn">+ புதிய உடை சேர்</button>
+                </div>
+                <div id="clothingItemsContainer" class="space-y-3">
+                    <div class="clothing-item-row" data-index="0">
+                        <input type="text" class="clothing-input flex-1 border border-gray-300 rounded-lg p-2.5" placeholder="உடை விவரம் 1" value="வெள்ளை நிற சட்டை">
+                        <button type="button" class="remove-clothing-btn hidden">✕</button>
+                    </div>
+                    <div class="clothing-item-row" data-index="1">
+                        <input type="text" class="clothing-input flex-1 border border-gray-300 rounded-lg p-2.5" placeholder="உடை விவரம் 2" value="கருப்பு நிற கால்சட்டை">
+                        <button type="button" class="remove-clothing-btn hidden">✕</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF PREVIEW SECTION - POLICE SEAL REMOVED, only person photo remains -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden pdf-card border border-gray-200" id="pdfContainer">
+            <div class="p-6 md:p-8 pdf-content tamil-unicode" id="reportContent">
+                <!-- HEADER -->
+                <div class="text-center mb-3">
+                    <div class="text-xl font-bold tracking-wide text-red-900 border-b-2 border-red-600 inline-block pb-1 px-4">ஜி7 சேத்துப்பட்டு காவல் நிலையம்</div>
+                    <div class="text-md font-medium mt-3">
+                        <span class="font-semibold">குற்ற எண்:</span> 
+                        <span id="dynamicFirRef" class="font-bold bg-gray-50 px-2 py-0.5 rounded">ஜி7 சேத்துப்பட்டு காவல் நிலைய குற்ற எண். 88/2026 ச/பி 194 BNSS</span>
+                    </div>
+                    <div class="legal-header mt-2"></div>
+                </div>
+
+                <!-- ONLY PERSON PHOTO (காவல் முத்திரை completely removed) -->
+                <div class="flex justify-center my-3">
+                    <div id="personPhotoContainer" class="person-photo-container w-40 h-40 rounded-md shadow-md flex items-center justify-center overflow-hidden bg-gray-50 border-2 border-gray-300">
+                        <div id="photoPlaceholder" class="text-center text-gray-400 text-xs p-2 flex flex-col items-center">
+                            <span class="text-4xl">📷</span>
+                            <span class="mt-1">நபர் புகைப்படம்</span>
+                        </div>
+                        <img id="personPhotoImg" src="" class="hidden w-full h-full object-cover" alt="Person Photo">
+                    </div>
+                </div>
+
+                <!-- Narrative -->
+                <div class="text-sm leading-relaxed space-y-2 mt-2 narrative-text">
+                    <p><span class="font-semibold">மனுதாரர் / முறையீட்டாளர்:</span> 
+                    <span id="dynamicComplainant" class="font-medium">M/55 j/ng mNrhfd; vz;. 42, ngUkhs; gps;is njU</span> 
+                    அவர்களின் புகாரின் பேரில், <span id="dynamicIncidentDate" class="underline font-medium">11.04.2026</span> அன்று 
+                    ஜி7 சேத்துப்பட்டு காவல் நிலைய எல்லைக்குட்பட்ட பகுதியில், சுமார் 
+                    <span id="dynamicAge" class="font-bold">55</span> வயதுடைய, பெயர் <span id="dynamicAccusedName" class="italic">தெரியாத நபர்</span> 
+                    என்பவர் 108 அவசர சேவை எண் மூலம் இறந்து கிடந்ததாக தெரிவிக்கப்பட்டது. இறந்தவரின் உடலின் மீது விசாரணை மேற்கொண்டு, சட்டப்படியான நடவடிக்கை எடுக்குமாறு கோரிக்கை விடுக்கப்பட்டது. 
+                    பின்னர் <span id="dynamicFilingDate" class="underline">11.04.2025</span> அன்று காலை 07.30 மணிக்கு, ஜி7 சேத்துப்பட்டு காவல் நிலைய குற்ற எண் <span id="dynamicCaseNumber" class="font-mono font-bold">88/2026</span> 
+                    பிரிவு 194 BNSS-யின் கீழ் வழக்கு பதிவு செய்யப்பட்டு விசாரணைக்கு எடுத்துக்கொள்ளப்பட்டது. தற்போது வழக்கு விசாரணையில் உள்ளது.</p>
+                </div>
+
+                <!-- Deceased Table -->
+                <div class="mt-5">
+                    <div class="font-bold text-base border-b border-gray-400 inline-block pr-2 mb-2">இறந்தவரின் விவரங்கள் (Deceased details)</div>
+                    <table class="evidence-table">
+                        <tbody>
+                            <tr><td class="w-1/3">பெயர் (ngah;)</td><td id="victimNameDisplay">அடையாளம் தெரியாத 55 வயது முதியவர்</td></tr>
+                            <tr><td>உயரம் (cauk;)</td><td id="victimHeightDisplay">5 1/2 அடி</td></tr>
+                            <tr><td>உடலமைப்பு (jpNufk;)</td><td id="victimBuildDisplay">இயல்பான உருவாக்கம்</td></tr>
+                            <tr><td>முடி (jiy Kb)</td><td id="victimHairDisplay">கருப்பு முடி</td></tr>
+                            <tr><td>உடை (cil)</td><td id="victimClothingDisplay">1. வெள்ளை நிற சட்டை<br>2. கருப்பு நிற கால்சட்டை</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Body marks -->
+                <div class="mt-4">
+                    <div class="font-bold underline text-md">அங்க மச்ச அடையாளங்கள் (Body marks / Identification marks)</div>
+                    <ul class="list-disc list-inside text-sm mt-1 space-y-1 ml-2">
+                        <li id="evidenceItem1">இடது கையில் தழும்பு</li>
+                        <li id="evidenceItem2">வலது கன்னத்தில் மச்சம்</li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div class="mt-5">
+                    <div class="font-bold underline">இது குறித்து தகவல் தெரிந்தால், கீழ்கண்ட எண்களில் தொடர்பு கொள்ளவும்:</div>
+                    <div class="officer-contact-block flex flex-wrap justify-between items-center">
+                        <div><span class="font-semibold">காவல் நிலைய கட்டுப்பாட்டறை :</span> <span id="policeStationContactSpan">28555069, 23452359</span></div>
+                        <div><span class="font-semibold">விசாரணை அதிகாரி (ஜி7) :</span> <span id="officerMobileSpan">9498100026</span></div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-xs text-gray-600 italic mt-4 pt-1 border-t border-gray-200">
+                    <span>தொடர்பு கொள்ளும் அனைவரும் தகவல் வழங்கலாம். — BNSS பிரிவு 194-ன் கீழ் பிறப்பிக்கப்பட்ட உத்தரவு.</span>
+                </div>
+                <div class="footer-disclaimer">
+                    * மேற்கண்ட சம்பவம் குறித்து ஏதேனும் தகவல் தெரிந்தால் உடனடியாக காவல் நிலையத்தை அணுகவும்.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM bindings
+        const dynamicFirRef = document.getElementById('dynamicFirRef');
+        const dynamicComplainant = document.getElementById('dynamicComplainant');
+        const dynamicIncidentDateSpan = document.getElementById('dynamicIncidentDate');
+        const dynamicAgeSpan = document.getElementById('dynamicAge');
+        const dynamicAccusedSpan = document.getElementById('dynamicAccusedName');
+        const dynamicFilingDateSpan = document.getElementById('dynamicFilingDate');
+        const dynamicCaseNumberSpan = document.getElementById('dynamicCaseNumber');
+        
+        const victimNameDisplay = document.getElementById('victimNameDisplay');
+        const victimHeightDisplay = document.getElementById('victimHeightDisplay');
+        const victimBuildDisplay = document.getElementById('victimBuildDisplay');
+        const victimHairDisplay = document.getElementById('victimHairDisplay');
+        const victimClothingDisplay = document.getElementById('victimClothingDisplay');
+        
+        const evidenceItem1 = document.getElementById('evidenceItem1');
+        const evidenceItem2 = document.getElementById('evidenceItem2');
+        const policeStationContactSpan = document.getElementById('policeStationContactSpan');
+        const officerMobileSpan = document.getElementById('officerMobileSpan');
+        
+        // Input elements
+        const caseNumberInput = document.getElementById('caseNumberInput');
+        const complainantInput = document.getElementById('complainantInput');
+        const incidentDateInput = document.getElementById('incidentDateInput');
+        const ageInput = document.getElementById('ageInput');
+        const accusedNameInput = document.getElementById('accusedNameInput');
+        const filingDateInput = document.getElementById('filingDateInput');
+        const victimNameInput = document.getElementById('victimNameInput');
+        const heightInput = document.getElementById('heightInput');
+        const buildInput = document.getElementById('buildInput');
+        const hairInput = document.getElementById('hairInput');
+        const evidence1Input = document.getElementById('evidence1Input');
+        const evidence2Input = document.getElementById('evidence2Input');
+        const policeContactInput = document.getElementById('policeContactInput');
+        const officerMobileInput = document.getElementById('officerMobileInput');
+        
+        // Photo elements
+        const photoFileInput = document.getElementById('photoFileInput');
+        const uploadBtn = document.getElementById('uploadPhotoBtn');
+        const removePhotoBtn = document.getElementById('removePhotoBtn');
+        const photoStatus = document.getElementById('photoStatus');
+        const personPhotoImg = document.getElementById('personPhotoImg');
+        const photoPlaceholder = document.getElementById('photoPlaceholder');
+        let currentPhotoDataUrl = null;
+        
+        // Clothing dynamic
+        const clothingContainer = document.getElementById('clothingItemsContainer');
+        let clothingItemCount = 2;
+        
+        // Helper functions
+        function getClothingList() {
+            const inputs = document.querySelectorAll('#clothingItemsContainer .clothing-input');
+            const items = [];
+            inputs.forEach(input => {
+                let val = input.value.trim();
+                if (val !== "") items.push(val);
+            });
+            return items;
+        }
+        
+        function updateClothingDisplay() {
+            const clothingArray = getClothingList();
+            if (clothingArray.length === 0) {
+                victimClothingDisplay.innerHTML = "எதுவும் இல்லை (None)";
+                return;
+            }
+            let html = "";
+            clothingArray.forEach((item, idx) => {
+                html += `${idx+1}. ${item}<br>`;
+            });
+            victimClothingDisplay.innerHTML = html;
+        }
+        
+        function updateRemoveButtons() {
+            const rows = document.querySelectorAll('#clothingItemsContainer .clothing-item-row');
+            rows.forEach(row => {
+                const removeBtn = row.querySelector('.remove-clothing-btn');
+                if (rows.length <= 1) {
+                    removeBtn.classList.add('hidden');
+                } else {
+                    removeBtn.classList.remove('hidden');
+                }
+            });
+        }
+        
+        function addClothingItem(initialValue = "") {
+            const newIndex = clothingItemCount++;
+            const newRow = document.createElement('div');
+            newRow.className = 'clothing-item-row';
+            newRow.setAttribute('data-index', newIndex);
+            newRow.innerHTML = `
+                <input type="text" class="clothing-input flex-1 border border-gray-300 rounded-lg p-2.5" placeholder="உடை விவரம் ${clothingItemCount}" value="${escapeHtml(initialValue)}">
+                <button type="button" class="remove-clothing-btn">✕</button>
+            `;
+            clothingContainer.appendChild(newRow);
+            const removeBtn = newRow.querySelector('.remove-clothing-btn');
+            removeBtn.addEventListener('click', function() {
+                newRow.remove();
+                updateRemoveButtons();
+                updateClothingDisplay();
+                updateAllFields();
+            });
+            const inputField = newRow.querySelector('.clothing-input');
+            inputField.addEventListener('input', () => {
+                updateClothingDisplay();
+                updateAllFields();
+            });
+            updateRemoveButtons();
+            updateClothingDisplay();
+            updateAllFields();
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        function initClothingRows() {
+            const rows = document.querySelectorAll('#clothingItemsContainer .clothing-item-row');
+            rows.forEach(row => {
+                const inputField = row.querySelector('.clothing-input');
+                const removeBtn = row.querySelector('.remove-clothing-btn');
+                if (inputField) {
+                    inputField.addEventListener('input', () => {
+                        updateClothingDisplay();
+                        updateAllFields();
+                    });
+                }
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function() {
+                        row.remove();
+                        updateRemoveButtons();
+                        updateClothingDisplay();
+                        updateAllFields();
+                    });
+                }
+            });
+            updateRemoveButtons();
+            updateClothingDisplay();
+        }
+        
+        // Update photo preview in PDF container
+        function updatePhotoInPdf() {
+            if (currentPhotoDataUrl) {
+                personPhotoImg.src = currentPhotoDataUrl;
+                personPhotoImg.classList.remove('hidden');
+                photoPlaceholder.classList.add('hidden');
+                removePhotoBtn.classList.remove('hidden');
+                photoStatus.innerText = "✅ புகைப்படம் பதிவேற்றப்பட்டது";
+            } else {
+                personPhotoImg.src = "";
+                personPhotoImg.classList.add('hidden');
+                photoPlaceholder.classList.remove('hidden');
+                removePhotoBtn.classList.add('hidden');
+                photoStatus.innerText = " எந்த புகைப்படமும் இல்லை";
+            }
+        }
+        
+        // Handle photo upload
+        uploadBtn.addEventListener('click', () => {
+            photoFileInput.click();
+        });
+        
+        photoFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    currentPhotoDataUrl = ev.target.result;
+                    updatePhotoInPdf();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("தயவுசெய்து JPG அல்லது PNG கோப்பைத் தேர்ந்தெடுக்கவும்.");
+            }
+            photoFileInput.value = '';
+        });
+        
+        removePhotoBtn.addEventListener('click', () => {
+            currentPhotoDataUrl = null;
+            updatePhotoInPdf();
+        });
+        
+        function updateAllFields() {
+            let caseNum = caseNumberInput.value.trim() || "88/2026";
+            dynamicCaseNumberSpan.innerText = caseNum;
+            dynamicFirRef.innerText = `ஜி7 சேத்துப்பட்டு காவல் நிலைய குற்ற எண். ${caseNum} ச/பி 194 BNSS`;
+            dynamicComplainant.innerText = complainantInput.value.trim() || "M/55 j/ng mNrhfd; vz;. 42, ngUkhs; gps;is njU";
+            let incDateRaw = incidentDateInput.value;
+            dynamicIncidentDateSpan.innerText = incDateRaw ? formatDateToDoc(incDateRaw) : "11.04.2026";
+            dynamicAgeSpan.innerText = ageInput.value.trim() || "55";
+            dynamicAccusedSpan.innerText = accusedNameInput.value.trim() || "தெரியாத நபர்";
+            let filingRaw = filingDateInput.value;
+            dynamicFilingDateSpan.innerText = filingRaw ? formatDateToDoc(filingRaw) : "11.04.2025";
+            victimNameDisplay.innerText = victimNameInput.value.trim() || "அடையாளம் தெரியாத நபர்";
+            victimHeightDisplay.innerText = heightInput.value.trim() || "5 1/2 அடி";
+            victimBuildDisplay.innerText = buildInput.value.trim() || "இயல்பான உருவாக்கம்";
+            victimHairDisplay.innerText = hairInput.value.trim() || "கருப்பு முடி";
+            evidenceItem1.innerText = evidence1Input.value.trim() || "இடது கையில் தழும்பு";
+            evidenceItem2.innerText = evidence2Input.value.trim() || "வலது கன்னத்தில் மச்சம்";
+            policeStationContactSpan.innerText = policeContactInput.value.trim() || "28555069, 23452359";
+            officerMobileSpan.innerText = officerMobileInput.value.trim() || "9498100026";
+            updateClothingDisplay();
+        }
+        
+        function formatDateToDoc(dateStr) {
+            if (!dateStr) return "11.04.2026";
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[2]}.${parts[1]}.${parts[0]}`;
+        }
+        
+        const staticInputs = [
+            caseNumberInput, complainantInput, incidentDateInput, ageInput, accusedNameInput, filingDateInput,
+            victimNameInput, heightInput, buildInput, hairInput, evidence1Input, evidence2Input,
+            policeContactInput, officerMobileInput
+        ];
+        staticInputs.forEach(input => {
+            input.addEventListener('input', updateAllFields);
+            input.addEventListener('change', updateAllFields);
+        });
+        
+        document.getElementById('addClothingBtn').addEventListener('click', () => addClothingItem(""));
+        
+        function resetToOriginal() {
+            caseNumberInput.value = "88/2026";
+            complainantInput.value = "M/55 j/ng mNrhfd; vz;. 42, ngUkhs; gps;is njU";
+            incidentDateInput.value = "2026-04-11";
+            ageInput.value = "55";
+            accusedNameInput.value = "தெரியாத நபர்";
+            filingDateInput.value = "2025-04-11";
+            victimNameInput.value = "அடையாளம் தெரியாத 55 வயது முதியவர்";
+            heightInput.value = "5 1/2 அடி";
+            buildInput.value = "இயல்பான உருவாக்கம்";
+            hairInput.value = "கருப்பு முடி";
+            evidence1Input.value = "இடது கையில் தழும்பு";
+            evidence2Input.value = "வலது கன்னத்தில் மச்சம்";
+            policeContactInput.value = "28555069, 23452359";
+            officerMobileInput.value = "9498100026";
+            // Reset clothing
+            clothingContainer.innerHTML = `
+                <div class="clothing-item-row" data-index="0">
+                    <input type="text" class="clothing-input flex-1 border border-gray-300 rounded-lg p-2.5" placeholder="உடை விவரம் 1" value="வெள்ளை நிற சட்டை">
+                    <button type="button" class="remove-clothing-btn hidden">✕</button>
+                </div>
+                <div class="clothing-item-row" data-index="1">
+                    <input type="text" class="clothing-input flex-1 border border-gray-300 rounded-lg p-2.5" placeholder="உடை விவரம் 2" value="கருப்பு நிற கால்சட்டை">
+                    <button type="button" class="remove-clothing-btn hidden">✕</button>
+                </div>
+            `;
+            clothingItemCount = 2;
+            initClothingRows();
+            // Reset photo
+            currentPhotoDataUrl = null;
+            updatePhotoInPdf();
+            updateAllFields();
+        }
+        
+        document.getElementById('resetFormBtn').addEventListener('click', resetToOriginal);
+        
+        function downloadPDF() {
+            const element = document.getElementById('pdfContainer');
+            const opt = {
+                margin: [0.4, 0.4, 0.4, 0.4],
+                filename: `G7_Chetpet_Photo_${caseNumberInput.value.trim() || "88-2026"}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2.8, 
+                    letterRendering: true, 
+                    useCORS: true,
+                    onclone: (clonedDoc) => {
+                        const style = clonedDoc.createElement('style');
+                        style.textContent = `* { font-family: 'Noto Sans Tamil', 'Latha', 'Nirmala UI', 'Segoe UI', sans-serif !important; }`;
+                        clonedDoc.head.appendChild(style);
+                    }
+                },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+        
+        document.getElementById('downloadPdfBtn').addEventListener('click', downloadPDF);
+        
+        initClothingRows();
+        updateAllFields();
+    </script>
+</body>
+</html>

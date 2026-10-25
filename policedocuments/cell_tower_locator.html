@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cell Tower Locator | Police Documents</title>
+<meta name="description" content="Look up an estimated mobile cell location by Cell ID and network identifiers, or search a local tower CSV, then view results on a map.">
+<link rel="canonical" href="https://clearexams.ink/policedocuments/cell_tower_locator.html">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoT5V+g2+xFj4=" crossorigin="">
+<style>
+:root{color-scheme:dark;--bg:#081a2b;--surface:#102a40;--surface2:#17364e;--border:#355770;--text:#ecf5ff;--muted:#b5cce0;--blue:#66c6ff;--accent:#38d0b0;--warn:#ffe2a4}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(125deg,#071523,#0c2940);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:#8bd7ff}button,input,select{font:inherit}button{cursor:pointer}header,.wrap{max-width:1300px;margin:auto;padding:0 20px}
+header{padding-top:28px;padding-bottom:16px}.back{text-decoration:none;font-size:.9rem;color:var(--muted)}h1{margin:13px 0 5px;font-size:clamp(1.65rem,3vw,2.5rem)}header p{color:var(--muted);margin:0;max-width:850px}
+.wrap{padding-bottom:52px}.panel{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:21px;margin:16px 0;box-shadow:0 10px 30px #0003}
+.panel h2{font-size:1.17rem;margin:0 0 8px}.sub{font-size:.92rem;color:var(--muted);margin:4px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:.89rem;font-weight:650}.field input,.field select{width:100%;min-height:44px;padding:10px 11px;border:1px solid #62819a;border-radius:8px;background:#071c2d;color:var(--text)}
+.field input:focus,.field select:focus{outline:3px solid #258cb06b;outline-offset:1px}
+.field input::placeholder{color:#a0b4c8}.wide{grid-column:span 2}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px;align-items:center}
+.btn{background:#167ea3;border:1px solid #58b4d6;color:white;border-radius:9px;padding:10px 17px;min-height:44px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.secondary{background:#24425b;border-color:#587b95}.btn:disabled{opacity:.5;cursor:not-allowed}
+.hint,.note{color:var(--muted);font-size:.9rem}.note{margin-top:10px}
+.alert{background:#493515;border:1px solid #b78b4d;color:#ffe5b9;border-radius:10px;padding:12px 15px;margin:12px 0}
+.status{min-height:24px;color:#d5eaff;margin:12px 0 0;overflow-wrap:anywhere}
+.status.error{color:#ffc7bd}.status.success{color:#baf0d9}
+#map{height:440px;width:100%;border-radius:12px;background:#224258}#mapFallback{padding:22px;background:#18354d;border-radius:9px}
+.results-heading{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:11px;margin-top:15px}
+.result{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px;min-width:0;overflow-wrap:anywhere}
+.result strong{color:#bfe8ff}.result p{margin:5px 0;font-size:.88rem}.result button{margin-top:9px}
+details{margin-top:14px}summary{cursor:pointer;color:#bde7ff;font-weight:650}
+code{color:#daf7ff;word-break:break-word}.fineprint{font-size:.83rem;color:var(--muted)}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wide{grid-column:span 2}#map{height:380px}}
+@media(max-width:490px){.panel{padding:15px}.grid{grid-template-columns:1fr}.wide{grid-column:span 1}.actions .btn{flex:1}#map{height:330px}}
+</style>
+</head>
+<body>
+<header>
+<a class="back" href="/policedocuments/">← Police Documents</a>
+<h1>📡 Cell Tower Locator</h1>
+<p>Find a <strong>mapped cell-location estimate</strong> from network identifiers or your own tower-coordinate records. One Cell ID is not globally unique, and a mapped cell is not necessarily the physical mast.</p>
+</header>
+<main class="wrap">
+<section class="panel" aria-labelledby="searchTitle">
+<h2 id="searchTitle">1. Enter cell details</h2>
+<p class="sub">Paste a Cell ID or a combined identifier (3-digit MCC + 3-digit MNC + 9-character cell suffix). Numeric combined identifiers are ambiguous: select 4G LTE (decimal ECI) or 5G NR (hex NCI). A suffix containing A–F is unambiguously 5G. Online lookup also requires LAC/TAC; local CSV can be searched without it.</p>
+<form id="locatorForm" novalidate>
+<div class="grid">
+<div class="field"><label for="cellId">Cell ID / 5G NCGI *</label><input id="cellId" name="cellId" type="text" inputmode="text" autocomplete="off" placeholder="e.g. 405869105200011" required></div>
+<div class="field"><label for="mcc">MCC (country code)</label><input id="mcc" name="mcc" inputmode="numeric" placeholder="India: 404 or 405" maxlength="3"></div>
+<div class="field"><label for="mnc">MNC (operator code)</label><input id="mnc" name="mnc" inputmode="numeric" placeholder="e.g. 10" maxlength="3"></div>
+<div class="field"><label for="lac">LAC / TAC / area</label><input id="lac" name="lac" inputmode="numeric" placeholder="e.g. 12001"></div>
+<div class="field"><label for="radio">Radio technology</label><select id="radio" name="radio"><option value="">Any / unknown (choose for combined numeric IDs)</option><option value="GSM">2G (GSM)</option><option value="UMTS">3G (UMTS)</option><option value="LTE">4G (LTE)</option><option value="NR">5G (NR)</option><option value="NBIOT">NB-IoT</option><option value="CDMA">CDMA</option></select></div>
+</div>
+<p id="decodedNcgi" class="note" role="status" aria-live="polite">For combined codes, paste the full identifier. Select LTE or NR when the code contains only digits.</p>
+<details><summary>Online database lookup (OpenCellID)</summary>
+<div class="grid" style="margin-top:13px"><div class="field wide"><label for="apiKey">Your OpenCellID API key</label><input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste key; never saved by this site"></div></div>
+<p class="note">Get a key from <a href="https://opencellid.org/" target="_blank" rel="noopener noreferrer">OpenCellID</a>. The request sends these network identifiers and your key directly from this browser to OpenCellID. Some browsers may block cross-origin API requests; the offline CSV method below works without an API key.</p>
+</details>
+<div class="actions"><button id="apiSearch" class="btn" type="submit">🔎 Look up online</button><button class="btn secondary" type="button" id="clear">Clear results</button></div>
+</form>
+<p id="apiStatus" class="status" role="status" aria-live="polite"></p>
+</section>
+<section class="panel" aria-labelledby="localTitle">
+<h2 id="localTitle">2. Search local tower records (no upload)</h2>
+<p class="sub">Select an OpenCellID CSV export or your own CSV with <code>cellid,latitude,longitude</code> columns. OpenCellID exports also support <code>radio,mcc,net,area,cell,lon,lat</code>. File contents are processed in this browser and are not uploaded to this website.</p>
+<div class="grid"><div class="field wide"><label for="csvFile">Tower location CSV</label><input id="csvFile" type="file" accept=".csv,text/csv,text/plain"></div></div>
+<div class="actions"><button id="csvSearch" type="button" class="btn secondary">📂 Find Cell ID in CSV</button><span class="hint">Maximum file size: 30 MB</span></div>
+<p id="csvStatus" class="status" role="status" aria-live="polite"></p>
+</section>
+<section class="panel" aria-labelledby="mapTitle">
+<div class="results-heading"><h2 id="mapTitle">3. Location map &amp; results</h2><span id="resultCount" class="hint">No lookup performed</span></div>
+<p class="sub">Markers represent the dataset's estimated cell coordinates. They do <strong>not</strong> prove where a phone was located or confirm tower ownership.</p>
+<div id="map" role="region" aria-label="Map of estimated cell locations"></div>
+<div id="mapFallback" hidden>Interactive map unavailable. Matching coordinates and OpenStreetMap links will still appear below.</div>
+<div class="results" id="results" aria-live="polite"></div>
+</section>
+<section class="panel">
+<h2>Using results for investigation</h2>
+<p class="note">For reliable identification, obtain the relevant operator's Cell ID–site list, date-specific tower details, sector/azimuth details and certified records. Network identifiers are reused, reconfigured and can refer to sectors rather than a unique physical tower. Public coordinates may be inaccurate or outdated; do not treat this lookup as conclusive legal evidence.</p>
+<p class="fineprint">OpenCellID data: <a href="https://opencellid.org/" target="_blank" rel="noopener noreferrer">OpenCelliD</a>, licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> (community-generated estimates). Basemap: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>. Only entered network identifiers are sent to OpenCellID when you explicitly choose online lookup; map tiles are requested from OpenStreetMap. No uploaded CSV or API key is stored by this page.</p>
+</section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+let map = null, layer = null, matches = [], markers = [];
+if (typeof L !== 'undefined') {
+  map = L.map('map').setView([20.5937,78.9629],5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+  }).addTo(map);
+  layer = L.featureGroup().addTo(map);
+} else {
+  $('map').hidden = true;
+  $('mapFallback').hidden = false;
+}
+function status(id,message,kind) {
+  const el = $(id); el.textContent = message; el.className = 'status' + (kind ? ' ' + kind : '');
+}
+function numberId(raw) {
+  const value = String(raw == null ? '' : raw).trim();
+  if (/^0x[0-9a-f]+$/i.test(value)) return parseInt(value.slice(2),16);
+  if (/^[0-9]+$/.test(value)) return Number(value);
+  if (/^[0-9a-f]*[a-f][0-9a-f]*$/i.test(value)) return parseInt(value,16);
+  return NaN;
+}
+function decodeCombinedId(raw, selectedRadio) {
+  // Human-readable combined format: MCC(3) + MNC(3) + 9-character cell suffix.
+  // LTE ECI uses decimal notation (28 bits); 5G NCI uses hex notation (36 bits).
+  // Numeric-only suffixes can mean EITHER: never silently choose a technology.
+  const input=String(raw||'').trim().replace(/[-\s]/g,'');
+  const m=/^([0-9]{3})([0-9]{3})([0-9A-Fa-f]{9})$/.exec(input);
+  if(!m)return null;
+  const mcc=Number(m[1]),mnc=Number(m[2]);
+  if(mcc<100||mcc>999)return null;
+  const suffix=m[3].toUpperCase(),hasHexLetters=/[A-F]/.test(suffix);
+  if(selectedRadio&&!['LTE','NR'].includes(selectedRadio))
+    return {error:'Combined cell codes require 4G (LTE) or 5G (NR). Select the matching technology.'};
+  if(selectedRadio==='LTE'){
+    if(hasHexLetters)return {error:'An LTE ECI must be decimal; this suffix contains hex letters. Select 5G (NR) if this is a 5G NCGI.'};
+    const cid=Number(suffix);
+    if(!Number.isSafeInteger(cid)||cid<0||cid>=2**28)
+      return {error:'LTE ECI must be less than 268435456 (28 bits). Verify the Cell ID or select 5G (NR).'};
+    return {mcc,mnc,cid,radio:'LTE',eci:suffix};
+  }
+  if(selectedRadio==='NR'||hasHexLetters){
+    const cid=parseInt(suffix,16);
+    if(!Number.isSafeInteger(cid)||cid<1||cid>=2**36)return {error:'The 5G NCI is outside the 36-bit range.'};
+    return {mcc,mnc,cid,radio:'NR',nciHex:suffix};
+  }
+  return {mcc,mnc,ambiguous:true};
+}
+function syncCombinedCode(){
+  const parsed=decodeCombinedId($('cellId').value,$('radio').value);
+  const el=$('decodedNcgi');
+  if(!parsed){
+    el.textContent='For combined codes, paste the full identifier. Select LTE or NR when the code contains only digits.';
+    return;
+  }
+  if(parsed.error){el.textContent=parsed.error;return;}
+  $('mcc').value=String(parsed.mcc);
+  $('mnc').value=String(parsed.mnc);
+  if(parsed.ambiguous){
+    el.textContent='Ambiguous combined numeric ID: it could be an LTE decimal ECI or a 5G hexadecimal NCI. Select 4G (LTE) or 5G (NR); lookup is blocked until then.';
+  }else if(parsed.radio==='LTE'){
+    el.textContent='4G LTE combined code · MCC '+parsed.mcc+' · MNC '+parsed.mnc+' · decimal ECI '+parsed.cid+' · eNodeB '+Math.floor(parsed.cid/256)+' · sector '+(parsed.cid%256)+'. LAC/TAC is required for online lookup.';
+  }else{
+    el.textContent='5G NR combined code · MCC '+parsed.mcc+' · MNC '+parsed.mnc+' · hex NCI 0x'+parsed.nciHex+' (decimal '+parsed.cid+'). TAC is required for online lookup.';
+  }
+}
+$('cellId').addEventListener('input',syncCombinedCode);
+$('radio').addEventListener('change',syncCombinedCode);
+const initialParams=new URLSearchParams(window.location.search);
+const initialCell=initialParams.get('cellid')||initialParams.get('ncgi');
+const initialRadio=String(initialParams.get('radio')||'').toUpperCase();
+if(initialCell&&initialCell.length<=32&&/^[0-9A-Fa-fxX-]+$/.test(initialCell)){
+  $('cellId').value=initialCell;
+  if(['LTE','NR','GSM','UMTS','NBIOT','CDMA'].includes(initialRadio))$('radio').value=initialRadio;
+  syncCombinedCode();
+}
+function integerField(id) {
+  const v = $(id).value.trim();
+  return v === '' ? null : (/^\d+$/.test(v) && Number.isSafeInteger(Number(v)) ? Number(v) : NaN);
+}
+function query() {
+  const raw=$('cellId').value.trim(),selectedRadio=$('radio').value;
+  const composite=decodeCombinedId(raw,selectedRadio);
+  if(composite&&composite.error)throw Error(composite.error);
+  if(composite&&composite.ambiguous)throw Error('Ambiguous numeric combined ID. Choose LTE for decimal ECI or NR for hexadecimal NCI before lookup.');
+  const cid=composite?composite.cid:numberId(raw);
+  if(!raw||!Number.isSafeInteger(cid)||cid<0)throw Error('Enter a decimal Cell ID, hexadecimal ID (0x...), or combined LTE/5G identifier.');
+  if(!composite&&selectedRadio==='LTE'&&cid>=2**28)throw Error('LTE ECI must fit in 28 bits (less than 268435456).');
+  if(!composite&&selectedRadio==='NR'&&cid>=2**36)throw Error('5G NCI must fit in 36 bits.');
+  const mcc=composite?composite.mcc:integerField('mcc');
+  const mnc=composite?composite.mnc:integerField('mnc');
+  const lac=integerField('lac');
+  if([mcc,mnc,lac].some(x=>Number.isNaN(x)))throw Error('MCC, MNC and LAC/TAC must contain decimal digits only.');
+  if(mcc!==null&&(mcc<1||mcc>999))throw Error('MCC must be between 1 and 999.');
+  if(mnc!==null&&mnc>999)throw Error('MNC must be between 0 and 999.');
+  return {cid,mcc,mnc,lac,radio:composite?composite.radio:selectedRadio};
+}
+function validCoord(lat,lon) {
+  return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && !(lat === 0 && lon === 0);
+}
+function cleanResult(r,source) {
+  const lat = Number(r.lat ?? r.latitude), lon = Number(r.lon ?? r.lng ?? r.longitude);
+  if (!validCoord(lat,lon)) return null;
+  return {
+    lat,lon,source,
+    cell:String(r.cellid ?? r.cell ?? r.cid ?? ''),
+    mcc:String(r.mcc ?? ''),mnc:String(r.mnc ?? r.net ?? ''),
+    lac:String(r.lac ?? r.area ?? r.tac ?? ''),
+    radio:String(r.radio ?? ''),range:r.range == null ? '' : String(r.range),
+    samples:r.samples == null ? '' : String(r.samples),
+    address:String(r.address ?? r.siteaddress ?? '')
+  };
+}
+function addText(parent,tag,value) {
+  const el = document.createElement(tag); el.textContent = value; parent.appendChild(el); return el;
+}
+function showResults(rows,source,count) {
+  matches=rows.slice(0,200);markers=[];
+  if (layer) layer.clearLayers();
+  $('results').replaceChildren();
+  $('resultCount').textContent = count + ' matching location' + (count === 1 ? '' : 's') + (count > 200 ? ' (first 200 shown)' : '') + ' · ' + source;
+  if (!rows.length) {
+    addText($('results'),'p','No matching cell coordinate found. Check the network identifiers, radio technology and source coverage.');
+    return;
+  }
+  const bounds=[];
+  matches.forEach((r,i) => {
+    const coords=[r.lat,r.lon], label='Cell '+(r.cell || 'unknown');
+    const url='https://www.openstreetmap.org/?mlat='+encodeURIComponent(r.lat)+'&mlon='+encodeURIComponent(r.lon)+'#map=16/'+encodeURIComponent(r.lat)+'/'+encodeURIComponent(r.lon);
+    if (layer) {
+      const marker=L.marker(coords).bindPopup(document.createTextNode(label+' — estimated cell position'));
+      marker.addTo(layer); markers.push(marker); bounds.push(coords);
+    }
+    const card=document.createElement('div');card.className='result';
+    addText(card,'strong',label);
+    addText(card,'p','Latitude: '+r.lat+' · Longitude: '+r.lon);
+    addText(card,'p','MCC / MNC: '+(r.mcc||'—')+' / '+(r.mnc||'—')+' · LAC/TAC: '+(r.lac||'—'));
+    addText(card,'p','Radio: '+(r.radio||'Unknown')+' · Source: '+r.source);
+    if(r.address) addText(card,'p','Site/address label: '+r.address);
+    if(r.range) addText(card,'p','Dataset range: '+r.range+' m (not positional accuracy)');
+    if(r.samples) addText(card,'p','Reported samples: '+r.samples);
+    const action=document.createElement('div');action.className='actions';
+    const focus=document.createElement('button');focus.className='btn secondary';focus.type='button';focus.textContent='Show on map';
+    focus.addEventListener('click',()=>{
+      if(map){map.setView(coords,Math.max(14,map.getZoom()));if(markers[i])markers[i].openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});}
+      else window.open(url,'_blank','noopener,noreferrer');
+    });action.appendChild(focus);
+    const anchor=document.createElement('a');anchor.href=url;anchor.target='_blank';anchor.rel='noopener noreferrer';anchor.className='btn secondary';anchor.textContent='Open in OSM';action.appendChild(anchor);
+    card.appendChild(action);$('results').appendChild(card);
+  });
+  if(map&&bounds.length){map.fitBounds(bounds,{padding:[30,30],maxZoom:15});setTimeout(()=>map.invalidateSize(),50);}
+}
+function parseCsvLine(line) {
+  const fields=[];let field='',quoted=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(quoted&&line[i+1]==='"'){field+='"';i++;}else quoted=!quoted;}
+    else if(c===','&&!quoted){fields.push(field.trim());field='';}
+    else field+=c;
+  }
+  fields.push(field.trim());return fields;
+}
+function headerIndex(headers,...options){
+  for(const name of options){const at=headers.indexOf(name);if(at>=0)return at;}return -1;
+}
+function csvRecord(row,idx){
+  const value=(...keys)=>{const n=headerIndex(idx,...keys);return n>=0 ? row[n] : '';};
+  return {
+    cellid:value('cellid','cell','cid','eci','nci'),
+    lat:value('lat','latitude'),lon:value('lon','lng','longitude','long'),
+    mcc:value('mcc'),mnc:value('mnc','net'),lac:value('lac','tac','area'),
+    radio:value('radio','networktype','technology'),
+    range:value('range'),samples:value('samples'),address:value('address','siteaddress','toweraddress')
+  };
+}
+function numericCsv(value) {
+  return numberId(value);
+}
+$('clear').addEventListener('click',()=>{
+  matches=[];markers=[];if(layer)layer.clearLayers();
+  $('results').replaceChildren();$('resultCount').textContent='Results cleared';
+  status('apiStatus','');status('csvStatus','');
+});
+$('locatorForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  let q;try{q=query();}catch(err){status('apiStatus',err.message,'error');return;}
+  const key=$('apiKey').value.trim();
+  if(!key){status('apiStatus','Enter your OpenCellID API key under Online database lookup.','error');return;}
+  if([q.mcc,q.mnc,q.lac].some(x=>x===null)){
+    status('apiStatus','Online lookup requires MCC, MNC and TAC/LAC. A 5G NCGI contains MCC, MNC and NCI, but not the TAC; obtain TAC separately.','error');return;
+  }
+  if(q.lac<0||q.lac>16777215){status('apiStatus','Check the LAC/TAC area code. It must be a non-negative decimal value.','error');return;}
+  $('apiSearch').disabled=true;status('apiStatus','Looking up the cell in OpenCellID…');
+  try{
+    const params=new URLSearchParams({key,mcc:String(q.mcc),mnc:String(q.mnc),lac:String(q.lac),cellid:String(q.cid),format:'json'});
+    if(q.radio)params.set('radio',q.radio);
+    const res=await fetch('https://opencellid.org/cell/get?'+params.toString(),{method:'GET',mode:'cors',credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer'});
+    if(!res.ok)throw Error('OpenCellID returned HTTP '+res.status+'. Check your key, quota or identifiers.');
+    let data;try{data=await res.json();}catch(_){throw Error('The provider did not return JSON data.');}
+    if(data.error||data.err||data.stat==='fail'||data.status==='error')throw Error('OpenCellID could not match this cell or rejected the request. Check identifiers, key and quota.');
+    const result=cleanResult(data,'OpenCellID');
+    if(!result){showResults([],'OpenCellID',0);status('apiStatus','No valid estimated coordinates returned. Coverage can be incomplete.','error');return;}
+    showResults([result],'OpenCellID',1);
+    status('apiStatus','One estimated cell location found. Verify independently with operator records.','success');
+  }catch(err){
+    status('apiStatus',err instanceof TypeError ?
+      'Could not reach OpenCellID from this browser (network or cross-origin/CORS restriction). Use a local CSV export instead; no location was fabricated.' :
+      (err.message||'Lookup failed.'),'error');
+  }finally{$('apiSearch').disabled=false;}
+});
+$('csvSearch').addEventListener('click',async()=>{
+  let q;try{q=query();}catch(err){status('csvStatus',err.message,'error');return;}
+  const file=$('csvFile').files[0];
+  if(!file){status('csvStatus','Select a CSV file containing cell ID and coordinates.','error');return;}
+  if(file.size>30*1024*1024){status('csvStatus','This file exceeds 30 MB. Select a smaller area/operator export.','error');return;}
+  $('csvSearch').disabled=true;status('csvStatus','Reading selected CSV locally…');
+  try {
+    const lines=(await file.text()).replace(/^\uFEFF/,'').split(/\r?\n/);
+    if(!lines.length){throw Error('The CSV is empty.');}
+    const names=parseCsvLine(lines[0]).map(s=>s.toLowerCase().replace(/[^a-z0-9]/g,''));
+    if(headerIndex(names,'cellid','cell','cid','eci','nci')<0 ||
+      headerIndex(names,'lat','latitude')<0 || headerIndex(names,'lon','lng','longitude','long')<0){
+      throw Error('Expected CSV headers: cell/cellid, lat/latitude, lon/longitude.');
+    }
+    const out=[];let count=0,invalid=0;
+    for(let i=1;i<lines.length;i++){
+      if(!lines[i].trim())continue;
+      const r=csvRecord(parseCsvLine(lines[i]),names);
+      const recordedCid=numericCsv(r.cellid);
+      if(recordedCid!==q.cid){
+        // Some operator CSVs contain the full PLMN+ECI/NCI in the cell column.
+        // Match only if operator codes AND explicit network type agree.
+        const combined=decodeCombinedId(r.cellid,q.radio);
+        if(!combined||combined.error||combined.ambiguous||combined.cid!==q.cid||
+           q.mcc===null||q.mnc===null||combined.mcc!==q.mcc||combined.mnc!==q.mnc)continue;
+      }
+      if(q.mcc!==null && numericCsv(r.mcc)!==q.mcc)continue;
+      if(q.mnc!==null && numericCsv(r.mnc)!==q.mnc)continue;
+      if(q.lac!==null && numericCsv(r.lac)!==q.lac)continue;
+      if(q.radio && String(r.radio).toUpperCase()!==q.radio)continue;
+      const clean=cleanResult(r,'Local CSV');
+      if(!clean){invalid++;continue;}
+      count++;if(out.length<200)out.push(clean);
+    }
+    showResults(out,'local CSV',count);
+    status('csvStatus',count+' mapped match(es) found in '+file.name+(invalid?' · '+invalid+' matching row(s) had invalid coordinates.':'')+'. No file data was uploaded.',count?'success':'');
+  }catch(err){status('csvStatus',err.message||'CSV search failed.','error');}
+  finally{$('csvSearch').disabled=false;}
+});
+})();
+</script>
+</body>
+</html>
