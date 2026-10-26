@@ -35,7 +35,7 @@ assert.ok(entry?.quiz?.includes("pyqYear=2024")&&entry.quiz.includes("exam=TNPSC
 assert.ok(entry.documents.some(d=>d.type==="paper"&&d.url.endsWith("08_2024_CCSEII_IIA_GS_GE.pdf")));
 assert.ok(entry.documents.some(d=>d.type==="key"&&d.url.endsWith("08_2024_PE_14092024_FAK.pdf")));
 assert.match(entry.notes,/final-key.*pending/i,"Year card is transparent");
-assert.ok(hub.includes("final-key check pending"),"Year-wise quiz CTA shows provisional final-key status");
+assert.ok(hub.includes("Official final-key check incomplete or not documented"),"Year-wise quiz CTA transparently labels incomplete final-key audit");
 const fn=name=>{const line=daily.split("\n").find(x=>x.startsWith("function "+name+"("));assert.ok(line,name+" missing");return line};
 const ctx={PRACTICE_COUNT:10,bank:rows,examSelect:{value:"TNPSC Group II/IIA"},pyqYearSelect:{value:"2024"}};
 vm.createContext(ctx);

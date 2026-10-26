@@ -44,7 +44,7 @@ assert.ok(officialPdfs.every(d=>new URL(d.url).hostname==="www.tnusrb.tn.gov.in"
 for(const [year,min] of [[2019,1],[2022,3],[2023,4],[2025,2]]){
  const r=siRecords.find(q=>q.year===year);assert.ok(r.documents.length>=min);assert.ok(!r.quiz,"Do not advertise an untranscribed paper as a PYQ quiz");
 }
-assert.ok(hub.includes("original booklet-number / key audit pending"),"Year-wise quiz card discloses incomplete verification");
+assert.ok(hub.includes("Original paper question-number check pending"),"Year-wise quiz card discloses incomplete booklet verification");
 assert.ok(quiz.includes('Transcript GS #'),"Source label distinguishes transcript index from official question number");
 const fn=name=>{const line=quiz.split("\n").find(l=>l.startsWith("function "+name+"("));assert.ok(line);return line};
 const ctx={bank:rows,examSelect:{value:"TNPSC Group II/IIA"},pyqYearSelect:{value:"2025"},PRACTICE_COUNT:10};
