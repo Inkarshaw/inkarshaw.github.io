@@ -83,11 +83,11 @@ function safeSourceUrl(q){
   if(typeof candidate!=='string'||!candidate.trim())continue;
   try{
    const parsed=new URL(candidate,location.href),host=parsed.hostname.toLowerCase(),path=parsed.pathname.toLowerCase();
-   if(parsed.protocol!=='https:'||host===location.hostname||host==='clearexams.ink'||host.endsWith('.github.io'))continue;
+   if(parsed.protocol!=='https:'||host===location.hostname||host==='clearexams.ink'||host==='inkarshaw.github.io')continue;
    if(/(?:textbook-play|textbook-quiz|daily-quiz|quiz-play)\.html$/.test(path))continue;
    const directPdf=path.endsWith('.pdf');
    const googleBook=host==='drive.google.com'&&(/^\/file\/d\/[A-Za-z0-9_-]+\/(?:view|preview)?$/.test(parsed.pathname)||path==='/open'&&parsed.searchParams.has('id'));
-   const chapterPage=/(?:chapter|lesson)[-/\w]*\.html?$/.test(path);
+   const chapterPage=/(?:chapter|lesson)[-/\w]*\.html?$/.test(path)||(host==='tnebooks.github.io'&&/\/docs\/[^/]+\/?$/.test(path));
    if(directPdf||googleBook||chapterPage)return parsed.href;
   }catch{}
  }
