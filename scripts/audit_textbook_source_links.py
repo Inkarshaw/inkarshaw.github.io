@@ -85,7 +85,10 @@ def audit():
             continue
         questions = doc["questions"]
         meta = {**base_document(path), **(doc.get("meta") or {})}
-        registered = registry.get(path.parent.relative_to(DATA).as_posix(), {})
+        parent_key = path.parent.relative_to(DATA).as_posix()
+        keys = parent_key.split("/")
+        registered = next((registry[prefix] for size in range(len(keys), 0, -1)
+                           if (prefix := "/".join(keys[:size])) in registry), {})
         counts["question_files"] += 1
         counts["question_entries"] += len(questions)
         files.append(relative)
