@@ -78,8 +78,11 @@ function safeSourceUrl(q){
  const registeredAlternate=lang==='ta'?registered.source_en_url:registered.source_ta_url;
  const perQuestion=lang==='ta'?q.source_ta_url:q.source_en_url;
  const perQuestionAlternate=lang==='ta'?q.source_en_url:q.source_ta_url;
- const candidates=[perQuestion,editionUrl,registeredEdition,q.source_url,meta.source_url,meta.textbook_url,perQuestionAlternate,alternateUrl,registeredAlternate];
- for(const candidate of candidates){
+ const alternateLanguage=lang==='ta'?'en':'ta';
+ const candidates=[[perQuestion,lang],[editionUrl,lang],[registeredEdition,lang],
+  [q.source_url,null],[meta.source_url,null],[meta.textbook_url,null],
+  [perQuestionAlternate,alternateLanguage],[alternateUrl,alternateLanguage],[registeredAlternate,alternateLanguage]];
+ for(const [candidate,sourceLanguage] of candidates){
   if(typeof candidate!=='string'||!candidate.trim())continue;
   try{
    const parsed=new URL(candidate,location.href),host=parsed.hostname.toLowerCase(),path=parsed.pathname.toLowerCase();
@@ -88,7 +91,7 @@ function safeSourceUrl(q){
    const directPdf=path.endsWith('.pdf');
    const googleBook=host==='drive.google.com'&&(/^\/file\/d\/[A-Za-z0-9_-]+\/(?:view|preview)?$/.test(parsed.pathname)||path==='/open'&&parsed.searchParams.has('id'));
    const chapterPage=/(?:chapter|lesson)[-/\w]*\.html?$/.test(path)||(host==='tnebooks.github.io'&&/\/docs\/[^/]+\/?$/.test(path));
-   if(directPdf||googleBook||chapterPage)return parsed.href;
+   if(directPdf||googleBook||chapterPage)return {href:parsed.href,language:sourceLanguage};
   }catch{}
  }
  return null;
@@ -105,8 +108,10 @@ function render(){
  const pageRef=lang==='ta'?(q.page_ta??q.page_en??q.page):(q.page_en??q.page_ta??q.page);
  const src=safeSourceUrl(q),a=$('sourceLink');
  $('source').textContent=txt('Textbook page ','பாடநூல் பக்கம் ')+(pageRef??'—')+(src?'':txt(' · Source PDF pending verification',' · மூல பாடநூல் PDF சரிபார்ப்பு நிலுவையில் உள்ளது'));
- a.hidden=!src;if(src)a.href=src;else a.removeAttribute('href');
- a.textContent=txt('View textbook ↗','பாடநூலைத் திற ↗');
+ a.hidden=!src;if(src)a.href=src.href;else a.removeAttribute('href');
+ a.textContent=src&&src.language&&src.language!==lang
+  ?(src.language==='ta'?txt('View Tamil textbook ↗','தமிழ் பாடநூலைத் திற ↗'):txt('View English textbook ↗','ஆங்கிலப் பாடநூலைத் திற ↗'))
+  :txt('View textbook ↗','பாடநூலைத் திற ↗');
  $('bar').style.width=((idx+1)/qs.length*100)+'%';
  $('question').textContent=txt(q.q_en,q.q_ta)||q.q_en;
  const box=$('options');box.replaceChildren();const opts=lang==='ta'&&Array.isArray(q.opts_ta)&&q.opts_ta.length===4?q.opts_ta:q.opts_en;
