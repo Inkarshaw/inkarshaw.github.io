@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Police Quarters Report Letter Generator</title>
+<style>
+:root{--navy:#16324f;--blue:#245d84;--line:#d5deea;--bg:#f3f6fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:16px/1.65 "Noto Sans Tamil","Latha","Arial",sans-serif;color:#1c2833}
+header{background:linear-gradient(120deg,#10283f,#245d84);color:#fff;padding:24px max(20px,calc((100vw - 1180px)/2))}
+header h1{margin:0;font-size:1.6rem}header p{margin:6px 0 0;color:#d7e7f4}
+.wrap{max-width:1180px;margin:22px auto;padding:0 16px;display:grid;grid-template-columns:minmax(280px,390px) 1fr;gap:18px}
+.panel,.preview-shell{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 20px #1c375414}
+.panel{padding:20px;height:max-content}.panel h2{font-size:1.08rem;color:var(--navy);margin:0 0 14px}
+label{display:block;font-size:.9rem;font-weight:700;margin:12px 0 5px;color:#34495e}
+input,textarea{width:100%;font:inherit;padding:9px 10px;border:1px solid #c8d2df;border-radius:7px;background:#fff;color:#1c2833}
+textarea{min-height:94px;resize:vertical}.hint{font-size:.82rem;color:#68798a;margin:12px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+button{border:0;border-radius:7px;padding:10px 13px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff}
+button.secondary{background:#496170}button.light{background:#e8eef4;color:#19364c}
+.preview-shell{padding:18px;overflow:auto}.preview-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 auto 12px;max-width:794px;color:#617487;font-size:.9rem}
+.paper{background:#fff;color:#111;max-width:794px;min-height:1123px;margin:auto;padding:78px 68px;box-shadow:0 2px 12px #172c401a;font-family:"Noto Serif Tamil","Latha","Tamil MN",serif;font-size:16px;line-height:1.8}
+.address{white-space:pre-line;margin-bottom:22px}.sender{margin-left:110px}.subject{border:1px solid #444;display:grid;grid-template-columns:85px 1fr;margin:20px -20px;padding:7px 10px;line-height:1.6}
+.subject strong{border-right:1px solid #777;padding-right:9px}.subject span{padding-left:12px}.bodypara{text-align:justify;text-indent:48px;margin:12px 0}
+.signature{margin:36px 0 0 50px}
+[contenteditable=true]:focus{outline:2px dashed #4c91bd;outline-offset:3px}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}.paper{padding:38px 25px;min-height:0;font-size:15px}.subject{margin:18px 0}.sender{margin-left:50px}}
+@media print{body{background:#fff}.no-print,header,.panel,.preview-tools{display:none!important}.wrap{display:block;margin:0;padding:0}.preview-shell{padding:0;border:0;box-shadow:none}.paper{max-width:none;min-height:0;padding:18mm 17mm;box-shadow:none;font-size:12pt}}
+</style>
+</head>
+<body>
+<header><h1>காவல் குடியிருப்பு அறிக்கை கடிதம்</h1><p>Editable quarters report letter · Preview, PDF and Word</p></header>
+<main class="wrap">
+<section class="panel no-print">
+<h2>கடித விவரங்கள்</h2>
+<label for="officerName">அனுப்புநர் பெயர் / பதவி</label><input id="officerName" value="காவல் உதவி ஆணையாளர் அவர்கள்">
+<label for="senderOffice">அனுப்புநர் அலுவலகம்</label><textarea id="senderOffice">குடியிருப்பு மற்றும் நலன்,
+சென்னை பெருநகர காவல்,
+வேப்பேரி, சென்னை - 7.</textarea>
+<label for="recipient">பெறுநர் / பதவி</label><input id="recipient" value="காவல் ஆணையாளர் அவர்கள்">
+<label for="recipientOffice">பெறுநர் அலுவலக முகவரி</label><textarea id="recipientOffice">ஜி3 கீழ்ப்பாக்கம் காவல் நிலையம்,
+சட்டம் மற்றும் ஒழுங்கு,
+கீழ்ப்பாக்கம், சென்னை - 10.</textarea>
+<label for="subject">பொருள்</label><textarea id="subject">ஜி3 கீழ்ப்பாக்கம் பழைய காவலர் குடியிருப்பு K-5 பற்றிய விவரம் தெரிவிப்பது தொடர்பாக</textarea>
+<label for="residentName">காவலர் பெயர் <span style="color:#a33">(மாற்றவும்)</span></label><input id="residentName" value="திருமதி. பிரியகுமாரி WSSI">
+<label for="doorNo">கதவு / குடியிருப்பு எண் <span style="color:#a33">(மாற்றவும்)</span></label><input id="doorNo" value="K-5">
+<label for="station">காவல் நிலையம் / பிரிவு</label><input id="station" value="ஜி3 கீழ்ப்பாக்கம் காவல் நிலையம்">
+<label for="allotmentDate">ஒதுக்கீட்டு தேதி</label><input id="allotmentDate" value="07.10.2025">
+<label for="reportBody">அறிக்கை உரை (தேவையான இடங்களில் பெயர்/கதவு எண்ணை மாற்றவும்)</label><textarea id="reportBody" style="min-height:250px">மேற்படி காவல் நிலைய எல்லைக்குட்பட்ட காவலர் குடியிருப்பு பழைய காவலர் குடியிருப்பு எனப்படும் குடியிருப்பில் தற்போது வசித்து வருகிறார். இவருக்கு {{allotmentDate}} அன்று ஒதுக்கீடு செய்யப்பட்டுள்ளதுடன், தற்போது சிறுவர் நலக்காவலர் பிரிவில் பணிபுரிந்து வருகிறார். தற்போது அவர் குடியிருக்கும் குடியிருப்பில் ஜன்னல் கதவு கணணாடி உடைந்திருப்பதாகவும் மேலும் குடியிருப்பில் சில இடங்களில் சிறிய விரிசல்கள் மற்றும் வாசலின் தூணின் கீழ்ப்பகுதியிலும் சின்ன விரிசலும் உள்ளதாகவும் தெரிவித்துள்ளார். இதனை சரிசெய்து கொள்ளவும், குடியிருப்பை பார்வையிடவும் கேட்டுக் கொண்டுள்ளார்.
+
+குடியிருப்பை பார்வையிட்டதில் சில இடங்களில் சிறிய விரிசல்கள் மற்றும் ஜன்னல் இடதுபுறம் ஓரத்தில் சிறிய விரிசல் காணப்பட்டது. குடியிருப்பில் பெரிய பாதிப்பு ஏதுமில்லை. தேவையான பராமரிப்பு பணிகளை மேற்கொள்ள நடவடிக்கை எடுக்குமாறும், சம்பந்தப்பட்ட குடியிருப்பு குறித்த பதிவுகளை சரிபார்த்து நடவடிக்கை மேற்கொள்ளவும் பணிவுடன் தெரிவிக்கப்படுகிறது.</textarea>
+<label for="date">தேதி</label><input type="date" id="date">
+<div class="hint">Name, door number and date fields are inserted into the letter. Click the report text in the preview to make final wording edits before export.</div>
+<div class="actions"><button type="button" id="previewBtn">Preview</button><button type="button" id="pdfBtn">Download PDF</button><button type="button" id="wordBtn">Download Word</button><button type="button" class="light" id="resetBtn">Reset</button></div>
+</section>
+<section class="preview-shell">
+<div class="preview-tools no-print"><span>Live letter preview</span><button type="button" class="secondary" onclick="window.print()">Print / Save PDF</button></div>
+<article class="paper" id="letter" lang="ta">
+<div class="address">அனுப்புநர்,
+  <span id="vOfficer"></span>,
+  <span id="vRecipientOffice"></span></div>
+<div class="address">பெறுநர்,
+  <span id="vRecipient"></span>,
+  <span id="vSenderOffice"></span></div>
+<div class="subject"><strong>பொருள்</strong><span id="vSubject"></span></div>
+<p>அய்யா,</p>
+<div class="bodypara" id="vBody" contenteditable="true"></div>
+<p class="signature">தங்கள் உண்மையுள்ள,<br><br><span id="vOfficerSign"></span><br><span id="vStation"></span></p>
+<p style="text-align:right;margin-top:28px">நாள்: <span id="vDate"></span></p>
+</article>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function update(){
+ const v=id=>$(id).value.trim();
+ $('vOfficer').textContent=v('officerName'); $('vRecipientOffice').textContent=v('recipientOffice');
+ $('vRecipient').textContent=v('recipient'); $('vSenderOffice').textContent=v('senderOffice');
+ $('vSubject').textContent=v('subject');
+ let body=v('reportBody').replaceAll('{{name}}',v('residentName')).replaceAll('{{doorNo}}',v('doorNo')).replaceAll('{{station}}',v('station')).replaceAll('{{allotmentDate}}',v('allotmentDate'));
+ body=body.replaceAll('திருமதி. பிரியகுமாரி WSSI',v('residentName')).replaceAll('குடியிருப்பு K-5', 'குடியிருப்பு '+v('doorNo')).replaceAll('குடியிருப்பு '+v('doorNo')+' என்ற','குடியிருப்பு '+v('doorNo')+' என்ற');
+ $('vBody').innerHTML=body.split(/\n\s*\n/).map(p=>'<p>'+esc(p).replaceAll('\n','<br>')+'</p>').join('');
+ $('vOfficerSign').textContent=v('officerName'); $('vStation').textContent=v('station');
+ $('vDate').textContent=v('date')?new Date(v('date')+'T00:00:00').toLocaleDateString('en-GB'):'';
+}
+document.querySelectorAll('input,textarea').forEach(x=>x.addEventListener('input',update));
+$('previewBtn').onclick=()=>{update();$('letter').scrollIntoView({behavior:'smooth',block:'start'})};
+function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$('wordBtn').onclick=()=>{update();const content='<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Latha,Arial,sans-serif;font-size:12pt;line-height:1.8;margin:2cm}.subject{border:1px solid #444;padding:8px}.bodypara{text-align:justify;text-indent:40px}</style></head><body>'+ $('letter').innerHTML+'</body></html>';download('Police_Quarters_Report_Letter.doc',new Blob(['\ufeff',content],{type:'application/msword'}))};
+$('pdfBtn').onclick=()=>{update();window.print()};
+$('resetBtn').onclick=()=>{document.querySelectorAll('input,textarea').forEach(x=>{if(x.id==='date')x.value='';else x.value=x.defaultValue});update()};
+$('date').value=new Date().toISOString().slice(0,10); update();
+</script>
+</body></html>
