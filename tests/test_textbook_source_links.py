@@ -38,6 +38,7 @@ class TextbookSourceTests(unittest.TestCase):
         )
         for candidate in bad:
             self.assertFalse(MODULE.is_direct_book_url(candidate), candidate)
+        self.assertTrue(MODULE.is_direct_book_url("https://tnebooks.github.io/10th-science/ta/docs/environmental-management/"))
 
     def test_player_enforces_real_external_textbook_links(self):
         html = (ROOT / "textbook-play.html").read_text(encoding="utf-8")
