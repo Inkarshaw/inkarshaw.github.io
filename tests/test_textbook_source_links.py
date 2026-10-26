@@ -32,7 +32,7 @@ class TextbookSourceTests(unittest.TestCase):
             "https://clearexams.ink/textbook-play.html?class=10&subject=science",
             "https://inkarshaw.github.io/textbook-play.html?class=6",
             "https://www.tntextbooks.in/p/10th-books.html",
-            "https://example.org/chapter-2.pdf".replace(".pdf", "-quiz.html"),
+            "https://example.org/quiz-play.html",
             "javascript:alert(1)",
             "textbook-play.html?class=10",
         )
