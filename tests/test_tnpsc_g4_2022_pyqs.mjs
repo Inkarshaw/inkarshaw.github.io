@@ -53,7 +53,7 @@ const ctx={pyqYearSelect:{value:"2022"}};vm.createContext(ctx);vm.runInContext(l
 const selected=ctx.yearFiltered(rows);
 assert.equal(selected.filter(q=>q.SourceExam==="TNPSC Group IV").length,20);
 assert.equal(selected.filter(q=>q.SourceExam==="TNPSC Group II/IIA").length,20);
-ctx.pyqYearSelect.value="2024";assert.equal(ctx.yearFiltered(rows).length,30);
+ctx.pyqYearSelect.value="2024";assert.equal(ctx.yearFiltered(rows).length,40);
 ctx.pyqYearSelect.value="2023";assert.equal(ctx.yearFiltered(rows).length,10);
 ctx.pyqYearSelect.value="";assert.equal(ctx.yearFiltered(rows).length,rows.length);
 for(const h of [page,quiz])for(const s of h.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g))if(!/src=|application\/ld\+json/i.test(s[1]))new vm.Script(s[2]);

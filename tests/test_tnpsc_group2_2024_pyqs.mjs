@@ -51,7 +51,7 @@ assert.equal(filtered.length,20);
 assert.ok(filtered.every(q=>q.SourceYear==="2022"&&q.SourceExam==="TNPSC Group II/IIA"));
 ctx.examSelect.value="TNPSC Group IV";ctx.pyqYearSelect.value="2024";
 filtered=ctx.yearFiltered(ctx.examRows());
-assert.equal(filtered.length,10);
+assert.equal(filtered.length,20);
 assert.ok(filtered.every(q=>q.SourceExam==="TNPSC Group IV"));
 for(const html of [hub,daily])for(const script of html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)){
  if(/src\s*=|application\/ld\+json/i.test(script[1]))continue;

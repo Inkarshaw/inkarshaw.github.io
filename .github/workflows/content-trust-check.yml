@@ -15,6 +15,8 @@ on:
       - "data/exams/review-schedule.json"
       - "data/quizzes/verified-pyqs.json"
       - "tests/test_content_trust.mjs"
+      - "tests/test_tnpsc_g4_2024_final_key.mjs"
+      - "assets/js/tn-school-notes-data.js"
       - "scripts/audit_pyq_year_coverage.py"
   push:
     branches: [main]
@@ -29,6 +31,7 @@ on:
       - "data/exams/review-schedule.json"
       - "data/quizzes/verified-pyqs.json"
       - "tests/test_content_trust.mjs"
+      - "tests/test_tnpsc_g4_2024_final_key.mjs"
   workflow_dispatch:
 
 permissions:
@@ -44,6 +47,12 @@ jobs:
           node-version: "22"
       - name: Test content quality and user interactions
         run: node tests/test_content_trust.mjs
+      - name: Reconcile new 2024 Group IV questions with official final key
+        run: node tests/test_tnpsc_g4_2024_final_key.mjs
+      - name: Validate full bilingual Group IIA notes
+        run: node tests/test_group2a_text_notes.mjs
+      - name: Validate year-wise PYQ routing
+        run: node tests/test_pyq_yearwise.mjs
       - name: Audit source-attributed PYQ coverage
         run: python3 scripts/audit_pyq_year_coverage.py
       - name: Check scheduled board review policy
