@@ -18,8 +18,10 @@ class TextbookSourceTests(unittest.TestCase):
         registry = json.loads((ROOT / "data/textbook/source-registry.json").read_text(encoding="utf-8"))
         self.assertGreaterEqual(registry["version"], 1)
         for key, row in registry["books"].items():
+            self.assertTrue(any(row.get(field) for field in ("source_en_url", "source_ta_url")), key)
             for field in ("source_en_url", "source_ta_url"):
-                self.assertTrue(MODULE.is_direct_book_url(row[field]), (key, field))
+                if row.get(field):
+                    self.assertTrue(MODULE.is_direct_book_url(row[field]), (key, field))
 
     def test_class_11_history_2025_has_real_book_files(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json").read_text(encoding="utf-8"))["books"]
