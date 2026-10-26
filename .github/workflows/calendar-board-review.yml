@@ -1,0 +1,56 @@
+name: Board-by-board exam calendar review reminder
+
+on:
+  schedule:
+    - cron: "12 2 * * *" # Daily 07:42 IST, subject to GitHub schedule delays.
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'data/exams/review-schedule.json'
+      - 'scripts/audit_calendar_freshness.py'
+      - '.github/workflows/calendar-board-review.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Audit board-specific review dates
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/audit_calendar_freshness.py --output "$RUNNER_TEMP/exam-review-report.json"
+      - name: Publish scheduled editorial reminder if stale
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          python3 - "$RUNNER_TEMP/exam-review-report.json" "$RUNNER_TEMP/review-issue.md" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding='utf-8'))
+          with open(sys.argv[2],'w',encoding='utf-8') as f:
+              f.write('## Exam board freshness review · '+d['asOf']+'\n\n')
+              for row in d['overdue']:
+                  f.write(f"- [ ] **{row['name']}**: last reviewed {row['lastReviewed']}; "
+                          f"{row['daysSinceReview']} days ago, target every {row['cadenceDays']} days. "
+                          f"[Official notices]({row['source']}). Check closing date and time, amendments, "
+                          "and source PDF before updating the review schedule.\n")
+              f.write('\nThis is an editorial task, not an automated official notice verification.\n')
+          print('Overdue boards:',len(d['overdue']))
+          PY
+          if ! python3 -c 'import json,sys;sys.exit(0 if json.load(open(sys.argv[1]))["overdue"] else 1)' "$RUNNER_TEMP/exam-review-report.json"; then exit 0; fi
+          title="Review overdue exam deadlines and board notices"
+          issue=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number,title --jq '.[] | select(.title=="Review overdue exam deadlines and board notices") | .number' | head -n1)
+          if [ -n "$issue" ]; then
+            gh issue edit "$issue" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/review-issue.md"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file "$RUNNER_TEMP/review-issue.md"
+          fi
