@@ -1,0 +1,50 @@
+name: ClearExams content trust and user experience checks
+
+on:
+  pull_request:
+    paths:
+      - "pyq-hub.html"
+      - "daily-quiz.html"
+      - "textbook-play.html"
+      - "tn-school-notes.html"
+      - "dashboard.html"
+      - "exam-calendar.html"
+      - "assets/js/notes-quality.js"
+      - "assets/js/calendar-freshness.js"
+      - "assets/js/progress-transfer.js"
+      - "data/exams/review-schedule.json"
+      - "data/quizzes/verified-pyqs.json"
+      - "tests/test_content_trust.mjs"
+      - "scripts/audit_pyq_year_coverage.py"
+  push:
+    branches: [main]
+    paths:
+      - "pyq-hub.html"
+      - "daily-quiz.html"
+      - "textbook-play.html"
+      - "tn-school-notes.html"
+      - "dashboard.html"
+      - "exam-calendar.html"
+      - "assets/js/**"
+      - "data/exams/review-schedule.json"
+      - "data/quizzes/verified-pyqs.json"
+      - "tests/test_content_trust.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trust-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test content quality and user interactions
+        run: node tests/test_content_trust.mjs
+      - name: Audit source-attributed PYQ coverage
+        run: python3 scripts/audit_pyq_year_coverage.py
+      - name: Check scheduled board review policy
+        run: python3 scripts/audit_calendar_freshness.py
