@@ -4,7 +4,8 @@
   const area = document.getElementById('notices');
   try {
     const [catalog,data] = await Promise.all([json('data/exams/exam-catalog.json'),json('data/exams/exam-notifications.json')]);
-    document.getElementById('checkedOn').textContent = 'TNPSC official records updated ' + formatDate(data.tnpscUpdatedOn || data.checkedOn) + '. Other exam boards last manually reviewed ' + formatDate(data.checkedOn) + '. Always confirm any subsequent amendments on the official site.';
+    document.getElementById('checkedOn').textContent = 'TNPSC official records updated ' + formatDate(data.tnpscUpdatedOn || data.checkedOn) + '. Other exam boards last manually reviewed ' + formatDate(data.checkedOn) + '. Reviews are not automatic confirmations of deadlines; always check official notices.';
+    try{const policy=await json('data/exams/review-schedule.json');const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());const asDate=s=>Date.parse(s+'T00:00:00Z'),due=Object.entries(policy.boards||{}).filter(([key,v])=>Number.isFinite(asDate(v.lastReviewed))&&Math.floor((Date.parse(today+'T00:00:00Z')-asDate(v.lastReviewed))/86400000)>Number(policy.cadenceDays?.[key]||7)).map(([,v])=>v.name);if(due.length)document.getElementById('checkedOn').textContent+=' REVIEW OVERDUE: '+due.join(', ')+'.';}catch{document.getElementById('checkedOn').textContent+=' Review schedule unavailable.';}
     const filter = document.getElementById('categoryFilter');
     Object.entries(catalog).forEach(([key,body])=> {const option=document.createElement('option');option.value=key;option.textContent=body.name;filter.appendChild(option);});
     const initial = new URLSearchParams(location.search).get('category');
