@@ -14,6 +14,10 @@ assert.equal(noteQuality.evaluate(simple).level,'outline');
 const deep=notes.find(n=>n.id==='equality');
 assert.ok(deep);
 assert.notEqual(noteQuality.evaluate(deep).level,'reviewed-bilingual','Do not claim editorial review without a recorded approver');
+for(const id of ['tn-budget-process','tn-budget-deficits','tn-finance-consultation']){
+ const item=notes.find(n=>n.id===id);
+ assert.equal(noteQuality.evaluate(item).level,'bilingual-review-pending',id+': structural bilingual draft must await human approval');
+}
 assert.ok(noteQuality.evaluate(deep).reasons.length);
 const notePage=read('tn-school-notes.html');
 assert.match(notePage,/notes-quality\.js/);
@@ -53,7 +57,10 @@ assert.match(daily,/ALLOWED_COUNTS=\[10,20,25,50,100\]/);
 assert.match(hub,/Practise all 20 adapted PYQs/);
 assert.match(hub,/Official final-key check incomplete or not documented/);
 const bank=JSON.parse(read('data/quizzes/verified-pyqs.json'));
-assert.equal(bank.length,140,'Do not fabricate count increases without original paper verification');
+assert.equal(bank.length,150,'Only ten documented 2024 Group IV additions permitted');
+const group42024=bank.filter(q=>q.SourceExam==='TNPSC Group IV'&&q.SourceYear==='2024');
+assert.equal(group42024.length,20);
+assert.ok(group42024.every(q=>q.AnswerKeyURL?.includes('01_2024_Final%20_Answer_Key_GT_GE.pdf')));
 
 for(const name of ['exam-calendar.html','textbook-play.html','pyq-hub.html','dashboard.html','tn-school-notes.html']){
  const html=read(name);
