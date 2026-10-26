@@ -45,7 +45,7 @@ h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9
 <script src="assets/js/textbook-quality.js"></script>
 <script>
 const p=new URLSearchParams(location.search),mode=['practice','timed'].includes(p.get('mode'))?p.get('mode'):'standard',classNo=Number(p.get('class')||6),subjectSlug=p.get('subject')||(classNo>=11?'history':'science'),subject=(classNo===12&&subjectSlug==='geography')?'geography':classNo>=11?'history':(subjectSlug==='social-science'?'social-science':'science'),term=Number(p.get('term')||1),unit=Number(p.get('unit')||1),quizRaw=p.get('quiz')||'1',quizNo=quizRaw==='all'?'all':Number(quizRaw),DATA=classNo===11?'data/textbook/class-11/history/unit-'+String(unit).padStart(2,'0')+'.json':classNo===12?'data/textbook/class-12/'+subject+'/unit-'+unit+'.json':(classNo===6||classNo===7||classNo===8)?'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json':'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json',KEY='clearexamsTextbookProgressV2';
-let lang=localStorage.getItem('clearexamsTextbookLang')||'en',meta=null,qs=[],idx=0,answers=[],checked=[],marked=[],deadline=0,completed=false;
+let sourceRegistry={},lang=localStorage.getItem('clearexamsTextbookLang')||'en',meta=null,qs=[],idx=0,answers=[],checked=[],marked=[],deadline=0,completed=false;
 const catalogParams=new URLSearchParams({class:String(classNo),subject,unit:String(unit)});if(classNo<=8)catalogParams.set('term',String(term));const catalogUrl='textbook-quiz.html?'+catalogParams.toString();
 const bookmarkKey='clearexamsTextbookBookmarksV1';let bookmarks=new Set();try{bookmarks=new Set(JSON.parse(localStorage.getItem(bookmarkKey)||'[]'))}catch{}
 const questionKey=q=>String(q.id||classNo+'-'+subject+'-'+term+'-'+unit+'-'+q.q_en);
@@ -69,9 +69,29 @@ function renderPalette(){
  }
 }
 function safeSourceUrl(q){
+ // Never treat the quiz page, a generic catalogue, or an unverified landing page as a cited textbook.
+ const key=classNo<=8?'class-'+classNo+'/'+subject+'/term-'+term:'class-'+classNo+'/'+subject;
+ const registered=sourceRegistry[key]||{};
  const editionUrl=lang==='ta'?meta.source_ta_url:meta.source_en_url;
- const link=q.source_url||editionUrl||meta.source_url||meta.textbook_url||'';
- try{const parsed=new URL(link,location.href);return /^https?:$/.test(parsed.protocol)?parsed.href:null}catch{return null}
+ const alternateUrl=lang==='ta'?meta.source_en_url:meta.source_ta_url;
+ const registeredEdition=lang==='ta'?registered.source_ta_url:registered.source_en_url;
+ const registeredAlternate=lang==='ta'?registered.source_en_url:registered.source_ta_url;
+ const perQuestion=lang==='ta'?q.source_ta_url:q.source_en_url;
+ const perQuestionAlternate=lang==='ta'?q.source_en_url:q.source_ta_url;
+ const candidates=[perQuestion,editionUrl,registeredEdition,q.source_url,meta.source_url,meta.textbook_url,perQuestionAlternate,alternateUrl,registeredAlternate];
+ for(const candidate of candidates){
+  if(typeof candidate!=='string'||!candidate.trim())continue;
+  try{
+   const parsed=new URL(candidate,location.href),host=parsed.hostname.toLowerCase(),path=parsed.pathname.toLowerCase();
+   if(parsed.protocol!=='https:'||host===location.hostname||host==='clearexams.ink'||host.endsWith('.github.io'))continue;
+   if(/(?:textbook-play|textbook-quiz|daily-quiz|quiz-play)\.html$/.test(path))continue;
+   const directPdf=path.endsWith('.pdf');
+   const googleBook=host==='drive.google.com'&&(/^\/file\/d\/[A-Za-z0-9_-]+\/(?:view|preview)?$/.test(parsed.pathname)||path==='/open'&&parsed.searchParams.has('id'));
+   const chapterPage=/(?:chapter|lesson)[-/\w]*\.html?$/.test(path);
+   if(directPdf||googleBook||chapterPage)return parsed.href;
+  }catch{}
+ }
+ return null;
 }
 function render(){
  if(!qs.length||completed)return;
@@ -83,8 +103,10 @@ function render(){
  $('resultBack').textContent=txt('Back to selected unit','தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
  $('setBadge').textContent=txt(set.title_en,set.title_ta)+' · '+(idx+1)+' / '+qs.length;
  const pageRef=lang==='ta'?(q.page_ta??q.page_en??q.page):(q.page_en??q.page_ta??q.page);
- $('source').textContent=txt('Textbook page ','பாடநூல் பக்கம் ')+(pageRef??'—');
- const src=safeSourceUrl(q),a=$('sourceLink');a.hidden=!src;if(src)a.href=src;a.textContent=txt('Open source ↗','மூல நூலைத் திற ↗');
+ const src=safeSourceUrl(q),a=$('sourceLink');
+ $('source').textContent=txt('Textbook page ','பாடநூல் பக்கம் ')+(pageRef??'—')+(src?'':txt(' · Source PDF pending verification',' · மூல பாடநூல் PDF சரிபார்ப்பு நிலுவையில் உள்ளது'));
+ a.hidden=!src;if(src)a.href=src;else a.removeAttribute('href');
+ a.textContent=txt('View textbook ↗','பாடநூலைத் திற ↗');
  $('bar').style.width=((idx+1)/qs.length*100)+'%';
  $('question').textContent=txt(q.q_en,q.q_ta)||q.q_en;
  const box=$('options');box.replaceChildren();const opts=lang==='ta'&&Array.isArray(q.opts_ta)&&q.opts_ta.length===4?q.opts_ta:q.opts_en;
@@ -140,6 +162,10 @@ async function loadQuizData(){
   if(!r.ok)throw Error('Question bank unavailable');
   const d=await r.json();
   meta=d.meta||{};
+  try{
+    const sources=await fetch('data/textbook/source-registry.json',{cache:'no-store'});
+    if(sources.ok){const registry=await sources.json();sourceRegistry=registry.books||{}}
+  }catch(err){console.warn('Book source registry unavailable; using verified unit metadata only',err)}
   meta.quiz_sets=meta.quiz_sets||[];
   const quality=window.TextbookQuality;
   if(!quality)throw Error('Textbook quality guard failed to load');
