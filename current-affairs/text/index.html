@@ -52,22 +52,25 @@ empty.hidden=count!==0;
 filter.addEventListener('input',search);
 fetch('editions.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('No text index');return r.json()}).then(items=>{
 if(!Array.isArray(items)||!items.length)return;
-items.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-const latest=items.find(x=>/^\d{4}-\d{2}-\d{2}\.html$/.test(x.file||'')&&x.file===x.date+'.html');
-if(latest){const link=document.querySelector('#latestTextEdition');link.href=latest.file;link.textContent='Read Latest Text Edition · '+latest.date;}
-
+const valid=items.filter(x=>x&&/^\d{4}-\d{2}-\d{2}$/.test(x.date||'')&&x.file===x.date+'.html');
+valid.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+if(!valid.length)return;
+// A cached/stale JSON response must never replace newer editions already in the HTML.
+const staticLatest=holder.querySelector('[data-edition-date]')?.dataset.editionDate||'';
+if(staticLatest&&valid[0].date<staticLatest)return;
+const latest=valid[0],link=document.querySelector('#latestTextEdition');
+link.href=latest.file;link.textContent='Read Latest Text Edition · '+latest.date;
 holder.textContent='';list=[];
-for(const item of items){
-if(!/^\d{4}-\d{2}-\d{2}\.html$/.test(item.file)||!/^\d{4}-\d{2}-\d{2}$/.test(item.date))continue;
-const card=document.createElement('article');card.className='entry';
-const tag=document.createElement('div');tag.className='tag';tag.textContent=item.date+(item.status==='partial'?' · Initial / partial edition':' · Verified edition');
-const heading=document.createElement('h2');heading.textContent=item.title;
-const summary=document.createElement('p');summary.textContent=item.description;
+for(const item of valid){
+const card=document.createElement('article');card.className='entry';card.dataset.editionDate=item.date;
+const tag=document.createElement('div');tag.className='tag';tag.textContent=item.date+(item.status==='partial'?' · Initial / partial edition':' · Source-linked edition');
+const heading=document.createElement('h2');heading.textContent=item.title||'Daily Current Affairs · '+item.date;
+const summary=document.createElement('p');summary.textContent=item.description||'Source-linked daily exam notes and revision questions.';
 const links=document.createElement('div');links.className='links';
 const open=document.createElement('a');open.href=item.file;open.textContent='Read Full Text';
 links.append(open);card.append(tag,heading,summary,links);holder.append(card);list.push(card);
 }
-if(list.length){defaultLink.href=items[0].file;search()}
-}).catch(()=>{ /* Keep the existing initial edition as the offline fallback. */ });
+search();
+}).catch(()=>{ /* The generated static HTML contains the latest edition and complete archive. */ });
 </script>
 </body></html>
