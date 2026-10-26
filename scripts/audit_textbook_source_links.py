@@ -23,7 +23,7 @@ def is_direct_book_url(value):
     url = urlparse(value.strip())
     host = (url.hostname or "").lower()
     path = url.path.lower()
-    if url.scheme != "https" or not host or host == "clearexams.ink" or host.endswith(".github.io"):
+    if url.scheme != "https" or not host or host == "clearexams.ink" or host == "inkarshaw.github.io":
         return False
     if re.search(r"(?:textbook-play|textbook-quiz|daily-quiz|quiz-play)\.html$", path):
         return False
@@ -32,7 +32,8 @@ def is_direct_book_url(value):
     if host == "drive.google.com":
         return bool(re.match(r"^/file/d/[A-Za-z0-9_-]+/(?:view|preview)?$", url.path)
                     or path == "/open" and parse_qs(url.query).get("id"))
-    return bool(re.search(r"(?:chapter|lesson)[-/\w]*\.html?$", path))
+    return bool(re.search(r"(?:chapter|lesson)[-/\w]*\.html?$", path)
+                or host == "tnebooks.github.io" and re.search(r"/docs/[^/]+/?$", path))
 
 
 def base_document(file):
