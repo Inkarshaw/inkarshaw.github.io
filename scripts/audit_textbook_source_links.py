@@ -68,6 +68,7 @@ def source_choices(question, meta, registered, language):
 def audit():
     registry = json.loads((DATA / "source-registry.json").read_text(encoding="utf-8"))["books"]
     counts = Counter()
+    missing_by_book = Counter()
     missing_examples, invalid_examples, files = [], [], []
     for path in sorted(DATA.rglob("*.json")):
         if path.name in ("index.json", "source-registry.json"):
@@ -107,6 +108,8 @@ def audit():
             for language in ("en", "ta"):
                 valid = any(is_direct_book_url(v) for v in source_choices(q, meta, registered, language))
                 counts[language + "_linked" if valid else language + "_missing"] += 1
+                if not valid:
+                    missing_by_book[path.parent.relative_to(DATA).as_posix()] += 1
                 exact = any(is_direct_book_url(v) for v in
                             (q.get("source_" + language + "_url"),
                              meta.get("source_" + language + "_url"),
@@ -115,7 +118,7 @@ def audit():
                     counts[language + "_fallback_to_other_or_unspecified"] += 1
                 if not valid and len(missing_examples) < 35:
                     missing_examples.append({"file": relative, "question": q.get("id", n), "language": language})
-    return {"counts": dict(sorted(counts.items())), "files_scanned": files,
+    return {"counts": dict(sorted(counts.items())), "missing_by_book": dict(missing_by_book.most_common()), "files_scanned": files,
             "missing_examples": missing_examples, "invalid_examples": invalid_examples}
 
 
@@ -132,6 +135,7 @@ def main():
     print("Textbook source-link audit:")
     for key, value in report["counts"].items():
         print(f"  {key}: {value}")
+    print("Missing by textbook:", json.dumps(dict(list(report["missing_by_book"].items())[:30]), ensure_ascii=False))
     print("Missing examples:", json.dumps(report["missing_examples"][:12], ensure_ascii=False))
     print("Invalid examples:", json.dumps(report["invalid_examples"][:12], ensure_ascii=False))
     counts = report["counts"]
