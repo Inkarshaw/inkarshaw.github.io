@@ -44,7 +44,9 @@ for(const year of expectedYears){
 assert.ok(directPapers>=6);
 assert.ok(officialKeys>=3);
 assert.match(page,/for\(const doc of x\.documents\|\|\[\]\)/);
-assert.match(page,/Practice 10 questions/);
+assert.match(page,/Practise 10 adapted PYQs/);
+assert.match(page,/Practise all 20 adapted PYQs/);
+assert.match(page,/Official final answer key reconciled/);
 const line=quiz.split("\n").find(s=>s.startsWith("function yearFiltered("));
 assert.ok(line);
 const ctx={pyqYearSelect:{value:"2022"}};vm.createContext(ctx);vm.runInContext(line,ctx,{timeout:500});
