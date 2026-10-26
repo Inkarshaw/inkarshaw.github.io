@@ -1,0 +1,55 @@
+name: Textbook source-link audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'textbook-play.html'
+      - 'data/textbook/**'
+      - 'scripts/audit_textbook_source_links.py'
+      - 'tests/test_textbook_source_links.py'
+  pull_request:
+    paths:
+      - 'textbook-play.html'
+      - 'data/textbook/**'
+      - 'scripts/audit_textbook_source_links.py'
+      - 'tests/test_textbook_source_links.py'
+  workflow_dispatch:
+
+jobs:
+  textbook-source-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Regression tests for safe textbook links
+        run: python -m unittest discover -s tests -p test_textbook_source_links.py -v
+      - name: Audit every textbook source (including supplemental quizzes)
+        run: python scripts/audit_textbook_source_links.py --json-out textbook-source-audit.json
+      - name: Publish audit summary and pending coverage counts
+        run: |
+          python - <<'PY'
+          import json, os
+          r=json.load(open('textbook-source-audit.json', encoding='utf-8'))
+          c=r['counts']
+          lines=['### Textbook source-link audit',
+                 f"- Question entries checked: {c.get('question_entries',0)}",
+                 f"- English link missing: {c.get('en_missing',0)}",
+                 f"- Tamil link missing: {c.get('ta_missing',0)}",
+                 f"- Invalid explicit question URLs: {c.get('invalid_question_urls',0)}",
+                 f"- Invalid explicit unit URLs: {c.get('invalid_metadata_urls',0)}",
+                 '',
+                 'Only real PDF / Drive-book / specific chapter destinations are displayed. Missing links are clearly labelled pending verification.',
+                 'The report is a structural audit, not a live HTTP or edition/page correspondence check.']
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as f:f.write('\n'.join(lines)+'\n')
+          if any(c.get(k,0) for k in ('en_missing','ta_missing','invalid_question_urls','invalid_metadata_urls')):
+              print('::warning::Textbook sources still require editorial verification; see the audit artifact.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: textbook-source-audit
+          path: textbook-source-audit.json
+          if-no-files-found: ignore
