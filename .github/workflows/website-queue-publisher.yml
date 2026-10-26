@@ -49,6 +49,7 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_current_affairs_text.py'
           python3 current-affairs/text/build_text_editions.py
           python3 -m json.tool current-affairs/text/editions.json >/dev/null
+          python3 -m unittest discover -s tests -p 'test_current_affairs_archive.py' -v
           test "$(tr -d '\r\n' < CNAME)" = "clearexams.ink"
 
       - name: Setup Pages

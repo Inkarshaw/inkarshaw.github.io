@@ -40,6 +40,8 @@ jobs:
         run: python3 current-affairs/text/build_text_editions.py
       - name: Check text edition catalog
         run: python3 -m json.tool current-affairs/text/editions.json > /dev/null
+      - name: Verify latest edition and complete static archive
+        run: python3 -m unittest discover -s tests -p 'test_current_affairs_archive.py' -v
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll

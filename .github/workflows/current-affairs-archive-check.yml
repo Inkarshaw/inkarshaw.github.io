@@ -1,0 +1,47 @@
+name: Current affairs archive consistency
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "current-affairs/text/**"
+      - "tests/test_current_affairs_archive.py"
+      - ".github/workflows/current-affairs-archive-check.yml"
+  pull_request:
+    paths:
+      - "current-affairs/text/**"
+      - "tests/test_current_affairs_archive.py"
+      - ".github/workflows/current-affairs-archive-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate article data and rebuild all text editions
+        run: python3 current-affairs/text/build_text_editions.py
+      - name: Test archive and source schemas
+        run: |
+          python3 -m unittest discover -s tests -p 'test_current_affairs_text.py' -v
+          python3 -m unittest discover -s tests -p 'test_current_affairs_archive.py' -v
+      - name: Check link targets and latest edition consistency
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, re
+          root = pathlib.Path("current-affairs/text")
+          catalog = json.loads((root / "editions.json").read_text(encoding="utf-8"))
+          latest = catalog[0]["date"]
+          archive = (root / "index.html").read_text(encoding="utf-8")
+          assert catalog and latest == max(e["date"] for e in catalog)
+          assert all((root / e["file"]).is_file() for e in catalog)
+          assert 'id="latestTextEdition" href="'+latest+'.html"' in archive
+          assert [e["date"] for e in catalog] == re.findall(r'data-edition-date="(\d{4}-\d{2}-\d{2})"',archive)
+          print(f"Verified {len(catalog)} editions, latest {latest}, with all destination pages present.")
+          PY
