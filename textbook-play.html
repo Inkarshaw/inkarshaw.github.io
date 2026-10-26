@@ -27,7 +27,7 @@ h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9
 <section class="card" id="quizCard">
 <div class="top"><span class="badge" id="setBadge">Quiz</span><span class="source"><span id="source"></span> <a id="sourceLink" hidden target="_blank" rel="noopener noreferrer"></a></span></div>
 <div class="quiztools"><button class="btn" id="bookmark" type="button">☆ Bookmark</button><button class="btn" id="mark" type="button">⚑ Mark for review</button><button class="btn" id="report" type="button">Report question</button><span id="timer" class="badge" hidden></span></div>
-<div class="report-status" id="reportStatus" role="status"></div>
+<div class="report-status" id="reportStatus" role="status"></div><a id="reportSubmitLink" href="https://github.com/Inkarshaw/inkarshaw.github.io/issues/new?template=textbook-question.yml" target="_blank" rel="noopener noreferrer" hidden>Submit correction on GitHub ↗</a><p class="source" id="reportHelp" hidden>Opening the report form requires a GitHub account. Paste the copied question details into the form; no report is submitted by copying alone.</p>
 <div class="progress"><i id="bar"></i></div>
 <div class="quiznotice" id="paletteLabel">Question palette</div><nav class="palette" id="palette" aria-label="Question palette"></nav>
 <h1 id="question"></h1>
@@ -125,6 +125,7 @@ function render(){
  $('mark').textContent=marked[idx]?txt('⚑ Marked for review','⚑ மீளாய்வுக்கு குறிக்கப்பட்டது'):txt('⚐ Mark for review','⚐ மீளாய்வுக்குக் குறி');
  $('mark').classList.toggle('active',!!marked[idx]);
  $('report').textContent=txt('Report question','வினாவில் பிழை தெரிவி');
+ $('reportSubmitLink').hidden=true;$('reportHelp').hidden=true;$('reportStatus').textContent='';
  $('paletteLabel').textContent=txt('Question palette · Blue: current · Green: checked · Gold: marked','வினா எண்கள் · நீலம்: தற்போது · பச்சை: சரிபார்த்தது · தங்கம்: மீளாய்வு');
  $('resultBadge').textContent=txt('Completed','முடிக்கப்பட்டது');
  $('correctLabel').textContent=txt('Correct','சரி');$('wrongLabel').textContent=txt('Wrong','தவறு');$('accuracyLabel').textContent=txt('Accuracy','துல்லியம்');$('retry').textContent=txt('Retry quiz','மீண்டும் முயற்சி');
@@ -133,9 +134,15 @@ function render(){
 $('bookmark').onclick=()=>{const k=questionKey(qs[idx]);if(bookmarks.has(k))bookmarks.delete(k);else bookmarks.add(k);localStorage.setItem(bookmarkKey,JSON.stringify([...bookmarks]));render()};
 $('mark').onclick=()=>{marked[idx]=!marked[idx];render()};
 $('report').onclick=async()=>{
- const q=qs[idx],report=['ClearExams textbook question report','Class: '+classNo,'Subject: '+subject,'Term: '+term,'Unit: '+unit,'Quiz: '+quizNo,'Question: '+(idx+1),'ID: '+(q.id||'Not set'),'Textbook page: '+(q.page||'Unverified'),'Question (English): '+q.q_en,'Suggested correction: '].join('\n');
- try{await navigator.clipboard.writeText(report);$('reportStatus').textContent=txt('Report details copied. Paste them into your message to ClearExams.','புகார் விவரங்கள் நகலெடுக்கப்பட்டன. ClearExams-க்கு அனுப்பும் செய்தியில் ஒட்டவும்.')}
- catch{window.prompt(txt('Copy this report and send it to ClearExams:','இந்த விவரங்களை நகலெடுத்து ClearExams-க்கு அனுப்பவும்:'),report)}
+ const q=qs[idx],report=['ClearExams textbook question report','Class: '+classNo,'Subject: '+subject,'Term: '+term,'Unit: '+unit,'Quiz: '+quizNo,'Question: '+(idx+1),'ID: '+(q.id||'Not set'),'Textbook page: '+(q.page||q.page_en||'Unverified'),'Question (English): '+q.q_en,'Suggested correction: '].join('\n');
+ const url=new URL('https://github.com/Inkarshaw/inkarshaw.github.io/issues/new');
+ url.searchParams.set('template','textbook-question.yml');
+ url.searchParams.set('title','[Textbook question] '+String(q.id||classNo+'-'+subject+'-'+unit+'-'+(idx+1)));
+ $('reportSubmitLink').href=url.href;
+ $('reportSubmitLink').hidden=false;$('reportHelp').hidden=false;
+ $('reportSubmitLink').textContent=txt('Submit correction on GitHub ↗','GitHub-இல் பிழையைச் சமர்ப்பிக்கவும் ↗');
+ try{await navigator.clipboard.writeText(report);$('reportStatus').textContent=txt('Question details copied. Open the report form below and paste them; copying is not submission.','வினா விவரங்கள் நகலெடுக்கப்பட்டன. கீழுள்ள படிவத்தில் ஒட்டிச் சமர்ப்பிக்கவும்.')}
+ catch{$('reportStatus').textContent=txt('Open the report form below. Copy the question ID and textbook page.','கீழுள்ள புகார் படிவத்தைத் திறக்கவும். வினா எண்ணையும் பாடநூல் பக்கத்தையும் குறிப்பிடவும்.')}
 };
 function tickClock(){
  if(mode!=='timed'||!qs.length||completed)return;
