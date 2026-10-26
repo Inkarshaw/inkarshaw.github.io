@@ -58,8 +58,8 @@ for(const row of rows){
       assert.equal(data.questions.length,468,'Unit 8 distinct source count changed');
       assert.equal(data.meta.total_questions,468);
       assert.equal(data.meta.quiz_sets.length,24);
-      assert.equal(data.meta.qa_reviewed_prefix,320);
-      assert.equal(data.meta.qa_reviewed_quizzes,16);
+      assert.equal(data.meta.qa_reviewed_prefix,340);
+      assert.equal(data.meta.qa_reviewed_quizzes,17);
       assert.equal(data.meta.source_records_before_editorial_curation,1404);
       assert.equal(data.meta.mechanically_generated_variants_removed,936);
       assert.equal(data.meta.positional_quiz_sets,true);
