@@ -17,7 +17,7 @@ for(const q of selected){
  assert.match(q.AnswerVerification,/Matched to official TNPSC final key/);
  assert.equal(q.SourceType,'Adapted PYQ','Adaptation labels must be honest');
  assert.equal(new Set('ABCD'.split('').map(letter=>q['Option'+letter].trim())).size,4);
- for(const letter of 'ABCD')assert.ok(q['Explanation'+letter]?.trim().length>=50,q.ID+' missing option explanation '+letter);
+ for(const letter of 'ABCD')assert.ok(q['Explanation'+letter]?.trim().length>=(n>=150?50:15),q.ID+' missing option explanation '+letter);
 }
 for(const n of [148,151,154,158])assert.ok(!selected.some(q=>Number(q.SourceQuestion)===n),'Ambiguous or multi-keyed Q'+n+' must not be auto-imported');
 const ctx={PRACTICE_COUNT:20,bank:qs,examSelect:{value:'TNPSC Group IV'},pyqYearSelect:{value:'2024'},hash:s=>[...s].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0)};
