@@ -218,6 +218,59 @@ def refresh_index():
         SITEMAP.write_text(data, encoding="utf-8")
     return pages
 
+def render_archive_index(pages, existing_html):
+    """Render a crawlable, JS-independent archive from the same catalog as the homepage.
+
+    Keep the inline fetch as a progressive enhancement. If its request fails,
+    visitors must still see the real latest edition and every earlier article.
+    """
+    if not pages:
+        raise ValueError("Cannot replace archive index with an empty edition catalog")
+    cards = []
+    for item in pages:
+        published = date.fromisoformat(item["date"]).strftime("%-d %B %Y")
+        label = "Initial / partial edition" if item["status"] == "partial" else "Source-linked edition"
+        cards.append(
+            '<article class="entry" data-edition-date="' + text(item["date"]) + '">'
+            '<div class="tag">' + text(published) + ' · ' + text(label) + '</div>'
+            '<h2>' + text(item["title"]) + '</h2>'
+            '<p>' + text(item["description"]) + '</p>'
+            '<div class="links"><a href="' + text(item["file"]) + '">Read Full Text</a></div>'
+            '</article>'
+        )
+    latest = pages[0]
+    pattern = r'(<div id="editions">).*?(</div>\s*<p class="note" id="empty")'
+    updated, count = re.subn(
+        pattern,
+        lambda match: match.group(1) + "\n" + "\n".join(cards) + "\n" + match.group(2),
+        existing_html,
+        count=1,
+        flags=re.S,
+    )
+    if count != 1:
+        raise ValueError("Cannot find exactly one archive edition-list placeholder")
+    link_pattern = r'(<a class="btn primary" id="latestTextEdition" href=")[^"]*(">).*?(</a>)'
+    updated, count = re.subn(
+        link_pattern,
+        lambda match: (match.group(1) + text(latest["file"]) + match.group(2)
+                       + "Read Latest Text Edition · " + text(latest["date"]) + match.group(3)),
+        updated,
+        count=1,
+        flags=re.S,
+    )
+    if count != 1:
+        raise ValueError("Cannot find exactly one latest-text-edition link")
+    return updated
+
+
+def refresh_archive_index(pages):
+    index = SECTION / "index.html"
+    original = index.read_text(encoding="utf-8")
+    updated = render_archive_index(pages, original)
+    if updated != original:
+        index.write_text(updated, encoding="utf-8")
+
+
 def build():
     DATA.mkdir(parents=True, exist_ok=True)
     SECTION.mkdir(parents=True, exist_ok=True)
@@ -231,7 +284,8 @@ def build():
             target.write_text(html, encoding="utf-8")
         generated += 1
     pages = refresh_index()
-    print(f"Validated {generated} data editions; catalog lists {len(pages)} text pages.")
+    refresh_archive_index(pages)
+    print(f"Validated {generated} data editions; catalog lists {len(pages)} text pages and updated the static archive.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
