@@ -146,7 +146,14 @@ for(const id of bilingualIds){
   assert.ok(/[\u0B80-\u0BFF]/u.test(note.quick_check.question_ta)&&( /[\u0B80-\u0BFF]/u.test(note.quick_check.answer_ta)||/^[\d\s.,–-]+$/.test(note.quick_check.answer_ta)),id+': Tamil answer check missing');
   assert.ok(taggedIds.has(id),id+': bilingual note is not linked from syllabus');
 }
-assert.equal(notes.filter(n=>n.points_ta?.length===n.points?.length).length,19,'Three further aligned Tamil drafts plus the original sixteen');
+assert.equal(notes.filter(n=>n.points_ta?.length===n.points?.length).length,22,'Three science and three finance drafts plus the original sixteen');
+for(const id of ['measurements','force-motion','matter']){
+ const n=notes.find(note=>note.id===id);
+ assert.equal(n.points.length,7,id+': seven substantive English points required');
+ assert.equal(n.points_ta.length,n.points.length,id+': matching Tamil explanations required');
+ assert.ok(n.exam_focus_ta&&n.worked_example_ta&&n.quick_check?.question_ta&&n.quick_check?.answer_ta,id+': bilingual revision aids required');
+ assert.notEqual(n.editorial_review,'approved',id+': draft must not claim editorial approval');
+}
 for(const id of ['tn-naan-mudhalvan'])assert.ok(!notes.find(n=>n.id===id).points_ta,'Do not claim existing English-only notes are fully bilingual');
 for(const id of ['tn-budget-process','tn-budget-deficits','tn-finance-consultation']){const n=notes.find(x=>x.id===id);assert.equal(n.points_ta.length,n.points.length,id+': Tamil point-by-point alignment');assert.ok(n.quick_check.question_ta&&n.quick_check.answer_ta,id+': bilingual check missing');assert.match(n.translation_status,/awaiting independent/i,id+': editorial review must not be asserted');}
 assert.match(notePage,/id="noteLanguage"/,'Reader must offer a study-language selector');
