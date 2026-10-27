@@ -83,11 +83,20 @@ jobs:
               if valid(row):
                   source_by_exam[row.get("Exam","")].append(row)
           for row in fallback_rows:
-              fallback_by_exam[row.get("Exam","")].append(row)
+              if valid(row):
+                  fallback_by_exam[row.get("Exam","")].append(row)
 
           merged = []
           print("## Daily quiz sync coverage")
           for exam in expected:
+              # Group IV uses the shared UPSC/TNPSC bank on the live quiz.
+              # Do not duplicate shared questions under a synthetic exam name.
+              if exam == "TNPSC Group IV" and (
+                  len(source_by_exam["UPSC/TNPSC"]) >= 10
+                  or len(fallback_by_exam["UPSC/TNPSC"]) >= 10
+              ):
+                  print("- ✅ TNPSC Group IV: covered by shared UPSC/TNPSC bank")
+                  continue
               if coverage.get(exam,0) >= 10:
                   merged.extend(source_by_exam[exam])
                   print(f"- ✅ {exam}: Sheet bank used ({coverage[exam]} valid rows)")
@@ -101,7 +110,12 @@ jobs:
           handled = set(expected)
           extra_exams = sorted((set(source_by_exam) | set(fallback_by_exam)) - handled - {""})
           for exam in extra_exams:
-              chosen = source_by_exam.get(exam) or fallback_by_exam.get(exam,[])
+              chosen = source_by_exam.get(exam,[])
+              if exam == "UPSC/TNPSC" and len(chosen) < 10:
+                  # Never replace a healthy shared fallback with a sparse sheet.
+                  chosen = fallback_by_exam.get(exam,[])
+              elif not chosen:
+                  chosen = fallback_by_exam.get(exam,[])
               merged.extend(chosen)
               print(f"- ➕ {exam}: {len(chosen)} rows retained")
 
