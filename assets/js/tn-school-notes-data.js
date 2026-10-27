@@ -199,10 +199,33 @@ window.ClearExamsTNSchoolNotes=[
     "chapter": "Class 6 Social Science · Term I · History: Ancient Cities of Tamilagam",
     "href": "textbook-play.html?class=6&subject=social-science&term=1&unit=4&quiz=1",
     "points": [
-      "Poompuhar (Kaveripoompattinam) was an important coastal trading centre of ancient Tamilagam.",
-      "Madurai was an important Pandya political and cultural centre.",
-      "Kanchipuram is noted for its long history as a centre of learning, religion and administration."
-    ]
+      "Poompuhar, Madurai and Kanchi were major ancient Tamil towns known through literature, travellers' reports and archaeological evidence.",
+      "Poompuhar, also called Puhar or Kaveripoompattinam, was an early Chola port at the Cauvery mouth on the Bay of Bengal.",
+      "Pattinappaalai, Silappathikaram and Manimekalai refer to Poompuhar and its maritime trading activity.",
+      "Madurai was associated with Pandya rule and Tamil Sangams; excavations at Keezhadi near Madurai illuminate early urban life.",
+      "Madurai had a daytime market called Naalangadi and an evening market called Allangadi.",
+      "Kanchi was known as a learning centre with Jain educational institutions and Buddhist viharas, and was associated with Pallava rule.",
+      "Kanchi's Kailasanathar temple was built under Pallava king Rajasimha; lakes and connecting canals reflect the area's historic water management."
+    ],
+    "points_ta": [
+      "பூம்புகார், மதுரை, காஞ்சி ஆகியவை இலக்கியங்கள், பயணிகளின் குறிப்புகள், தொல்லியல் சான்றுகள் மூலம் அறியப்படும் முக்கிய பண்டைய தமிழக நகரங்களாகும்.",
+      "புகார் அல்லது காவிரிப்பூம்பட்டினம் என்றும் அழைக்கப்படும் பூம்புகார், வங்கக்கடலில் காவிரி ஆற்றுமுகத்தில் இருந்த தொடக்ககாலச் சோழர் துறைமுகமாகும்.",
+      "பட்டினப்பாலை, சிலப்பதிகாரம், மணிமேகலை ஆகிய இலக்கியங்கள் பூம்புகாரையும் அதன் கடல்வழி வணிகத்தையும் குறிப்பிடுகின்றன.",
+      "மதுரை பாண்டியர் ஆட்சியுடனும் தமிழ்ச் சங்கங்களுடனும் தொடர்புடையது; மதுரைக்கு அருகிலுள்ள கீழடி அகழாய்வுகள் பண்டைய நகர வாழ்க்கையை விளக்குகின்றன.",
+      "மதுரையில் பகல் சந்தையான நாளங்காடியும் மாலைச் சந்தையான அல்லங்காடியும் இருந்தன.",
+      "காஞ்சி சமணக் கல்வி நிலையங்களும் பௌத்த விகாரைகளும் கொண்ட கல்வி மையமாக விளங்கியது; பல்லவர் ஆட்சியுடனும் தொடர்புடையது.",
+      "காஞ்சியின் கைலாசநாதர் கோயில் பல்லவ மன்னர் இராஜசிம்மன் காலத்தில் கட்டப்பட்டது; அப்பகுதியின் ஏரிகளும் இணைப்புக் கால்வாய்களும் பழங்கால நீர் மேலாண்மையை எடுத்துக்காட்டுகின்றன."
+    ],
+    "exam_focus": "Associate Poompuhar with maritime Chola trade, Madurai with Sangams and Pandya markets, and Kanchi with learning, Pallava temples and water management.",
+    "exam_focus_ta": "பூம்புகாரைச் சோழர் கடல்வணிகத்துடனும், மதுரையைத் தமிழ்ச் சங்கங்கள் மற்றும் பாண்டியர் சந்தைகளுடனும், காஞ்சியைக் கல்வி, பல்லவர் கோயில்கள் மற்றும் நீர் மேலாண்மையுடனும் பொருத்தவும்.",
+    "worked_example": "The clue 'Cauvery river mouth, Puhar and early Chola port' identifies Poompuhar; the clue 'Naalangadi and Allangadi' identifies Madurai.",
+    "worked_example_ta": "'காவிரி ஆற்றுமுகம், புகார், தொடக்ககாலச் சோழர் துறைமுகம்' என்ற குறிப்பு பூம்புகாரைக் குறிக்கும்; 'நாளங்காடி, அல்லங்காடி' என்ற குறிப்பு மதுரையைக் குறிக்கும்.",
+    "quick_check": {
+      "question": "Which ancient Tamil town was also called Kaveripoompattinam?",
+      "question_ta": "காவிரிப்பூம்பட்டினம் என்றும் அழைக்கப்பட்ட பண்டைய தமிழக நகரம் எது?",
+      "answer": "Poompuhar (Puhar).",
+      "answer_ta": "பூம்புகார் (புகார்)."
+    }
   },
   {
     "id": "cholas-pandyas",
@@ -316,10 +339,33 @@ window.ClearExamsTNSchoolNotes=[
     "chapter": "Class 7 Social Science · Term I · Economics: Production",
     "href": "textbook-play.html?class=7&subject=social-science&term=1&unit=10&quiz=1",
     "points": [
-      "Production creates goods or services that provide utility.",
-      "The main factors of production are land, labour, capital and entrepreneurship.",
-      "Primary activities obtain natural resources; secondary activities transform materials; tertiary activities provide services."
-    ]
+      "Production creates useful goods and services; utility refers to their capacity to satisfy human wants.",
+      "Form utility arises when a material changes form, as when cotton is made into cloth.",
+      "Place utility arises when goods reach the place where they are needed, while time utility arises through storage until needed.",
+      "Primary-sector activities directly use natural resources; examples include farming, fishing, forestry and mining.",
+      "Secondary-sector activities transform raw materials into manufactured goods, such as sugar and textiles.",
+      "Tertiary-sector activities provide services, including transport, banking, education, insurance and health care.",
+      "The four factors of production are land, labour, capital and organisation or entrepreneurship; an entrepreneur coordinates these inputs."
+    ],
+    "points_ta": [
+      "உற்பத்தி பயன்பாடுள்ள பொருட்களையும் சேவைகளையும் உருவாக்குகிறது; மனிதத் தேவையை நிறைவேற்றும் ஆற்றலே பயன்பாடு எனப்படுகிறது.",
+      "பருத்தியைத் துணியாக மாற்றுவது போல ஒரு பொருளின் வடிவத்தை மாற்றுவதால் வடிவப் பயன்பாடு உருவாகிறது.",
+      "தேவையான இடத்திற்கு பொருட்களைக் கொண்டு செல்வதால் இடப் பயன்பாடும், தேவைப்படும் காலம் வரை சேமிப்பதால் காலப் பயன்பாடும் உருவாகின்றன.",
+      "விவசாயம், மீன்பிடித்தல், வனவளம், சுரங்கத் தொழில் போன்ற இயற்கை வளங்களை நேரடியாகப் பயன்படுத்தும் செயல்கள் முதன்மைத் துறையாகும்.",
+      "மூலப்பொருட்களைச் சர்க்கரை, துணி போன்ற உற்பத்திப் பொருட்களாக மாற்றும் செயல்கள் இரண்டாம் நிலைத் துறையாகும்.",
+      "போக்குவரத்து, வங்கிச் சேவை, கல்வி, காப்பீடு, மருத்துவம் போன்ற சேவைகள் மூன்றாம் நிலைத் துறையைச் சேர்ந்தவை.",
+      "நிலம், உழைப்பு, மூலதனம், அமைப்பு அல்லது தொழில்முனைவு ஆகியன உற்பத்திக் காரணிகள்; தொழில்முனைவோர் இவற்றை ஒருங்கிணைக்கிறார்."
+    ],
+    "exam_focus": "Distinguish primary, secondary and tertiary activities from the four factors of production, and classify form, place and time utility.",
+    "exam_focus_ta": "முதன்மை, இரண்டாம் நிலை, மூன்றாம் நிலைத் துறைகளை நான்கு உற்பத்திக் காரணிகளிலிருந்து வேறுபடுத்தவும்; வடிவ, இட, காலப் பயன்பாடுகளை வகைப்படுத்தவும்.",
+    "worked_example": "Sugarcane cultivation is primary production; producing sugar in a factory is secondary production; delivering the sugar to shops is a tertiary service.",
+    "worked_example_ta": "கரும்பு சாகுபடி முதன்மைத் துறை; தொழிற்சாலையில் சர்க்கரை தயாரித்தல் இரண்டாம் நிலைத் துறை; கடைகளுக்கு சர்க்கரையை எடுத்துச் செல்வது மூன்றாம் நிலைச் சேவை.",
+    "quick_check": {
+      "question": "Which utility increases when harvested grain is stored for a later season?",
+      "question_ta": "அறுவடை செய்த தானியத்தைப் பின்னர் பயன்படுத்தச் சேமிக்கும்போது எந்தப் பயன்பாடு அதிகரிக்கிறது?",
+      "answer": "Time utility.",
+      "answer_ta": "காலப் பயன்பாடு."
+    }
   },
   {
     "id": "landforms",
@@ -328,10 +374,33 @@ window.ClearExamsTNSchoolNotes=[
     "chapter": "Class 7 Social Science · Term I · Geography: Landforms",
     "href": "textbook-play.html?class=7&subject=social-science&term=1&unit=6&quiz=1",
     "points": [
-      "Mountains, plateaus and plains are major landform categories.",
-      "Internal processes such as tectonic uplift and external processes such as weathering and erosion shape landforms.",
-      "River erosion and deposition can form valleys, floodplains and deltas."
-    ]
+      "Mountains, plateaus, plains and valleys are major landforms shaped by internal and external forces.",
+      "Endogenic processes may uplift or lower Earth's surface; exogenic processes reshape it through erosion and deposition.",
+      "Weathering breaks down rocks in place, whereas erosion removes and transports rock and soil.",
+      "River erosion forms features such as V-shaped valleys and waterfalls; river deposition creates alluvial fans and floodplains.",
+      "Large river bends are called meanders; a meander cut off from the main channel may become an ox-bow lake.",
+      "River deposition near the mouth may create a fertile delta, such as the Cauvery delta.",
+      "Glaciers carve cirques and U-shaped valleys; winds create sand dunes, and sea waves can form cliffs and beaches."
+    ],
+    "points_ta": [
+      "மலைகள், பீடபூமிகள், சமவெளிகள், பள்ளத்தாக்குகள் ஆகிய முக்கிய நிலத்தோற்றங்களை உள் மற்றும் வெளி விசைகள் வடிவமைக்கின்றன.",
+      "அகச்செயல்பாடுகள் புவிப்பரப்பை உயர்த்தவோ தாழ்த்தவோ செய்யலாம்; புறச்செயல்பாடுகள் அரிப்பு மற்றும் படிவு மூலம் அதை மாற்றுகின்றன.",
+      "பாறைகள் இருந்த இடத்திலேயே உடைவது சிதைவு; பாறைத் துண்டுகள் மற்றும் மண் அகற்றப்பட்டுக் கடத்தப்படுவது அரிப்பு ஆகும்.",
+      "ஆற்றின் அரிப்பால் V வடிவப் பள்ளத்தாக்குகளும் நீர்வீழ்ச்சிகளும் உருவாகின்றன; படிவால் வண்டல் விசிறிகளும் வெள்ளச் சமவெளிகளும் உருவாகின்றன.",
+      "ஆற்றின் பெரிய வளைவுகள் நெளிவுகள் எனப்படும்; முதன்மைப் பாதையிலிருந்து துண்டிக்கப்படும் நெளிவு குதிரைக்குளம்பு வடிவ ஏரியாக மாறலாம்.",
+      "ஆற்றுமுகத்துக்கு அருகிலுள்ள வண்டல் படிவு காவிரி கழிமுகம் போன்ற வளமான கழிமுக நிலத்தோற்றத்தை உருவாக்கலாம்.",
+      "பனியாறுகள் சர்க்கஸ் பள்ளங்கள், U வடிவப் பள்ளத்தாக்குகள் ஆகியவற்றை உருவாக்குகின்றன; காற்று மணற்குன்றுகளையும் கடல் அலைகள் கடற்கரைச் செங்குத்துப் பாறைகளையும் மணற்கரைகளையும் உருவாக்கலாம்."
+    ],
+    "exam_focus": "Match landforms to rivers, glaciers, wind or sea waves, and distinguish weathering, erosion and deposition.",
+    "exam_focus_ta": "நிலத்தோற்றங்களை ஆறுகள், பனியாறுகள், காற்று, கடல் அலைகள் ஆகியவற்றுடன் பொருத்தவும்; சிதைவு, அரிப்பு, படிவு ஆகியவற்றை வேறுபடுத்தவும்.",
+    "worked_example": "When a river cuts across the neck of a meander during a flood, the abandoned curved channel can become an ox-bow lake.",
+    "worked_example_ta": "வெள்ளத்தின்போது ஆறு ஒரு நெளிவின் குறுகிய பகுதியைத் துண்டித்துச் சென்றால், கைவிடப்பட்ட வளைந்த பாதை குதிரைக்குளம்பு வடிவ ஏரியாக மாறலாம்.",
+    "quick_check": {
+      "question": "Which river landform results from a cut-off meander?",
+      "question_ta": "ஆற்றின் நெளிவு துண்டிக்கப்பட்டால் உருவாகும் நிலத்தோற்றம் எது?",
+      "answer": "Ox-bow lake.",
+      "answer_ta": "குதிரைக்குளம்பு வடிவ ஏரி."
+    }
   },
   {
     "id": "solar-system",
@@ -375,10 +444,33 @@ window.ClearExamsTNSchoolNotes=[
     "chapter": "Class 7 Social Science · Term I · Geography: Interior of the Earth",
     "href": "textbook-play.html?class=7&subject=social-science&term=1&unit=5&quiz=1",
     "points": [
-      "The three major layers of the Earth are crust, mantle and core.",
-      "Igneous, sedimentary and metamorphic rocks are distinguished by their formation.",
-      "Movements within the Earth can produce earthquakes, volcanoes and changes in relief."
-    ]
+      "Earth has three principal internal layers—crust, mantle and core—identified in part using seismic evidence.",
+      "The outermost crust is generally thicker but less dense beneath continents than beneath oceans.",
+      "The mantle lies below the Mohorovičić discontinuity and extends to about 2,900 kilometres depth.",
+      "The iron- and nickel-rich core has a liquid outer part and a solid inner part under very high pressure.",
+      "The lithosphere is divided into slowly moving tectonic plates over the more deformable asthenosphere.",
+      "An earthquake begins at the focus inside Earth; the epicentre lies on the surface directly above it, and a seismograph records earthquake waves.",
+      "Molten rock below Earth's surface is called magma; material erupted onto the surface is called lava."
+    ],
+    "points_ta": [
+      "புவியின் உள்ளமைப்பில் மேலோடு, கவசம், கருவம் என மூன்று முதன்மை அடுக்குகள் உள்ளன; நிலநடுக்க அலைகள் இவற்றை அறிய உதவுகின்றன.",
+      "வெளிப்புற மேலோடு பொதுவாகக் கண்டங்களின் அடியில் அதிகத் தடிமனாகவும், கடலடியில் இருப்பதைவிடக் குறைந்த அடர்த்தியுடனும் உள்ளது.",
+      "மோஹோரோவிசிக் எல்லைக்குக் கீழே கவசம் அமைந்துள்ளது; அது சுமார் 2,900 கிலோமீட்டர் ஆழம் வரை நீள்கிறது.",
+      "இரும்பும் நிக்கலும் நிறைந்த புவிக்கருவத்தின் வெளிப்பகுதி திரவமாகவும், அதிக அழுத்தத்திலுள்ள உட்பகுதி திண்மமாகவும் உள்ளது.",
+      "பாறைக்கோளம் பல மெதுவாக நகரும் புவித்தட்டுகளாகப் பிரிந்துள்ளது; இவை ஒப்பீட்டளவில் நெகிழ்வான அஸ்தெனோஸ்பியரின் மீது நகர்கின்றன.",
+      "நிலநடுக்கம் புவிக்குள் உள்ள தோற்றுமிடத்தில் தொடங்குகிறது; அதன் நேர்மேல் புவிப்பரப்பிலுள்ள இடம் நிலநடுக்க மையம்; நிலநடுக்கப் பதிவுக் கருவி அதிர்வலைகளைப் பதிவு செய்கிறது.",
+      "புவிக்கடியில் உள்ள உருகிய பாறை மாக்மா எனப்படும்; புவிப்பரப்பில் வெடித்து வெளிவரும் உருகிய பாறை லாவா எனப்படும்."
+    ],
+    "exam_focus": "Know crust, mantle, core, Moho, tectonic plates, earthquake focus versus epicentre and magma versus lava.",
+    "exam_focus_ta": "மேலோடு, கவசம், கருவம், மோஹோ எல்லை, புவித்தட்டுகள், தோற்றுமிடம்–நிலநடுக்க மையம், மாக்மா–லாவா வேறுபாடுகளை அறியவும்.",
+    "worked_example": "For an earthquake starting 15 km underground, the focus is 15 km below the surface and its epicentre is directly above that point on the ground.",
+    "worked_example_ta": "புவிக்கடியில் 15 கி.மீ. ஆழத்தில் நிலநடுக்கம் தொடங்கினால் அதன் தோற்றுமிடம் அங்கு இருக்கும்; அதற்கு நேர் மேலே தரைப்பரப்பில் உள்ள இடமே நிலநடுக்க மையம்.",
+    "quick_check": {
+      "question": "What boundary separates Earth's crust and mantle?",
+      "question_ta": "புவியின் மேலோட்டையும் கவசத்தையும் பிரிக்கும் எல்லை எது?",
+      "answer": "Mohorovičić discontinuity (Moho).",
+      "answer_ta": "மோஹோரோவிசிக் எல்லை (Moho)."
+    }
   },
   {
     "id": "nationalism",
