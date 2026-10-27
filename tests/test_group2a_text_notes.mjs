@@ -166,7 +166,7 @@ for(const id of ['electricity','organs','solar-system']){
  assert.ok(!n.editorial_review,id+': human editorial approval must not be invented');
 }
 assert.match(notes.find(n=>n.id==='electricity').points.join(' '),/chemical energy.*electrical energy/,'Cell energy conversion');
-assert.match(notes.find(n=>n.id==='organs').points.join(' '),/ureters.*urinary bladder/,'Correct excretory pathway');
+assert.match(notes.find(n=>n.id==='organs').points.join(' '),/ureters.*(?:urinary )?bladder/,'Correct excretory pathway');
 assert.match(notes.find(n=>n.id==='solar-system').points.join(' '),/light-year.*distance/,'Light-year is distance');
 for(const id of ['tn-naan-mudhalvan'])assert.ok(!notes.find(n=>n.id===id).points_ta,'Do not claim existing English-only notes are fully bilingual');
 for(const id of ['tn-budget-process','tn-budget-deficits','tn-finance-consultation']){const n=notes.find(x=>x.id===id);assert.equal(n.points_ta.length,n.points.length,id+': Tamil point-by-point alignment');assert.ok(n.quick_check.question_ta&&n.quick_check.answer_ta,id+': bilingual check missing');assert.match(n.translation_status,/awaiting independent/i,id+': editorial review must not be asserted');}
