@@ -146,7 +146,7 @@ for(const id of bilingualIds){
   assert.ok(/[\u0B80-\u0BFF]/u.test(note.quick_check.question_ta)&&( /[\u0B80-\u0BFF]/u.test(note.quick_check.answer_ta)||/^[\d\s.,–-]+$/.test(note.quick_check.answer_ta)),id+': Tamil answer check missing');
   assert.ok(taggedIds.has(id),id+': bilingual note is not linked from syllabus');
 }
-assert.equal(notes.filter(n=>n.points_ta?.length===n.points?.length).length,25,'Expanded science, finance, geography drafts plus the original sixteen');
+assert.ok(notes.filter(n=>n.points_ta?.length===n.points?.length).length>=29,'At least 29 structurally bilingual notes, including the next four expansion drafts');
 for(const id of ['measurements','force-motion','matter']){
  const n=notes.find(note=>note.id===id);
  assert.equal(n.points.length,7,id+': seven substantive English points required');
@@ -168,6 +168,24 @@ for(const id of ['electricity','organs','solar-system']){
 assert.match(notes.find(n=>n.id==='electricity').points.join(' '),/chemical energy.*electrical energy/,'Cell energy conversion');
 assert.match(notes.find(n=>n.id==='organs').points.join(' '),/ureters.*(?:urinary )?bladder/,'Correct excretory pathway');
 assert.match(notes.find(n=>n.id==='solar-system').points.join(' '),/light-year.*distance/,'Light-year is distance');
+const latestDraftIds=['production','landforms','earth-interior','ancient-tamil-towns'];
+for(const id of latestDraftIds){
+ const n=notes.find(x=>x.id===id);
+ assert.ok(n,id+': syllabus-linked note missing');
+ assert.equal(n.points.length,7,id+': seven specific study points');
+ assert.equal(n.points_ta.length,7,id+': each English point needs Tamil');
+ assert.ok(n.points.every(x=>x.length>=25),id+': avoid superficial bullet points');
+ assert.ok(n.points_ta.every(x=>/[\u0B80-\u0BFF]/.test(x)&&x.length>=15),id+': Tamil details required');
+ assert.ok(n.exam_focus?.length>45&&/[\u0B80-\u0BFF]/.test(n.exam_focus_ta),id+': bilingual exam focus');
+ assert.ok(n.worked_example?.length>45&&/[\u0B80-\u0BFF]/.test(n.worked_example_ta),id+': bilingual example');
+ assert.ok(n.quick_check?.question&&n.quick_check?.answer&&n.quick_check?.question_ta&&n.quick_check?.answer_ta,id+': bilingual answer check');
+ assert.ok(!n.editorial_review,id+': no fabricated human approval');
+ assert.ok(taggedIds.has(id),id+': retain Group IIA syllabus link');
+}
+assert.match(notes.find(n=>n.id==='production').points.join(' '),/Primary-sector.*Secondary-sector.*Tertiary-sector/is);
+assert.match(notes.find(n=>n.id==='landforms').points.join(' '),/meanders.*ox-bow lake/is);
+assert.match(notes.find(n=>n.id==='earth-interior').points.join(' '),/focus.*epicentre/is);
+assert.match(notes.find(n=>n.id==='ancient-tamil-towns').points.join(' '),/Poompuhar.*Kaveripoompattinam/is);
 for(const id of ['tn-naan-mudhalvan'])assert.ok(!notes.find(n=>n.id===id).points_ta,'Do not claim existing English-only notes are fully bilingual');
 for(const id of ['tn-budget-process','tn-budget-deficits','tn-finance-consultation']){const n=notes.find(x=>x.id===id);assert.equal(n.points_ta.length,n.points.length,id+': Tamil point-by-point alignment');assert.ok(n.quick_check.question_ta&&n.quick_check.answer_ta,id+': bilingual check missing');assert.match(n.translation_status,/awaiting independent/i,id+': editorial review must not be asserted');}
 assert.match(notePage,/id="noteLanguage"/,'Reader must offer a study-language selector');
