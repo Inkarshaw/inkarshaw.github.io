@@ -353,15 +353,15 @@ SPEC.loader.exec_module(AUDIT)
 class Class10ScienceUnits18To21Tests(unittest.TestCase):
     def test_index_counts_and_previous_units(self):
         self.assertEqual(INDEX["meta"]["unit_count"], 23)
-        self.assertEqual(INDEX["meta"]["total_questions"], 1040)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 52)
+        self.assertEqual(INDEX["meta"]["total_questions"], 1460)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 73)
         self.assertEqual([u["id"] for u in INDEX["units"][:21]], list(range(1,22)))
         self.assertEqual([u["total"] for u in INDEX["units"][:17]],
-                         [580,40] + [20]*15)
+                         [580, 40] + [40] * 15)
         for u in INDEX["units"][17:21]:
             self.assertTrue(u["ready"])
-            self.assertEqual(u["total"], 20)
-            self.assertEqual(u["quiz_count"], 1)
+            self.assertEqual(u["total"], 40)
+            self.assertEqual(u["quiz_count"], 2)
             self.assertEqual(u["path"], f'unit-{u["id"]}.json')
 
     def test_80_exact_bilingual_keys_and_quality(self):
@@ -370,8 +370,11 @@ class Class10ScienceUnits18To21Tests(unittest.TestCase):
             with self.subTest(unit=unit):
                 bank=json.loads((BASE/f"unit-{unit}.json").read_text(encoding="utf-8"))
                 qs=bank["questions"]
+                self.assertEqual(len(qs), 40)
+                self.assertEqual(len({q["id"] for q in qs}), 40)
+                qs = qs[:20]
                 answers=EXPECTED[str(unit)]
-                self.assertEqual(bank["meta"]["total_questions"],20)
+                self.assertEqual(bank["meta"]["total_questions"],40)
                 self.assertTrue(bank["meta"]["source_en_url"])
                 self.assertTrue(bank["meta"]["source_ta_url"])
                 self.assertEqual(len(qs),20)
