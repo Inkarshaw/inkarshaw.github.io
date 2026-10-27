@@ -188,14 +188,14 @@ SPEC.loader.exec_module(AUDIT)
 class Class10ScienceCompleteChapterTests(unittest.TestCase):
     def test_complete_catalogue(self):
         self.assertEqual(INDEX["meta"]["unit_count"],23)
-        self.assertEqual(INDEX["meta"]["total_questions"],1040)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"],52)
+        self.assertEqual(INDEX["meta"]["total_questions"],1460)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"],73)
         self.assertEqual([u["id"] for u in INDEX["units"]],list(range(1,24)))
         self.assertEqual([u["total"] for u in INDEX["units"]],
-                         [580,40]+[20]*21)
+                         [580, 40] + [40] * 21)
         self.assertTrue(all(u["ready"] for u in INDEX["units"]))
         for unit in INDEX["units"][-2:]:
-            self.assertEqual(unit["quiz_count"],1)
+            self.assertEqual(unit["quiz_count"],2)
             self.assertEqual(unit["path"],f'unit-{unit["id"]}.json')
 
     def test_last_two_chapters_40_bilingual_keys_and_audit(self):
@@ -203,7 +203,10 @@ class Class10ScienceCompleteChapterTests(unittest.TestCase):
             with self.subTest(unit=unit):
                 d=json.loads((DATA/f"unit-{unit}.json").read_text(encoding="utf-8"))
                 qs=d["questions"]
-                self.assertEqual(d["meta"]["total_questions"],20)
+                self.assertEqual(len(qs), 40)
+                self.assertEqual(len({q["id"] for q in qs}), 40)
+                qs = qs[:20]
+                self.assertEqual(d["meta"]["total_questions"],40)
                 self.assertTrue(d["meta"]["source_en_url"])
                 self.assertTrue(d["meta"]["source_ta_url"])
                 self.assertEqual(len(qs),20)
