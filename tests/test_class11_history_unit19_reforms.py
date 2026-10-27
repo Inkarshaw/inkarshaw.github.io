@@ -94,6 +94,28 @@ class ModernityUnit19Tests(unittest.TestCase):
             self.assertIn("1878", item["exp_en"])
             self.assertTrue(item["fact_check_url"].startswith("https://"))
 
+    def test_fourth_and_fifth_quizzes_have_answerable_bilingual_choices(self):
+        questions = self.bank["questions"][60:100]
+        self.assertEqual(len(questions), 40)
+        for item in questions:
+            with self.subTest(id=item["id"]):
+                self.assertNotIn("textbook answer for", item["q_en"].lower())
+                self.assertNotIn("சரியான பாடநூல் விடை", item["q_ta"])
+                self.assertTrue(item["q_en"].endswith("?"))
+                self.assertTrue(item["q_ta"].endswith("?"))
+                self.assertEqual(len(set(item["opts_en"])), 4)
+                self.assertEqual(len(set(item["opts_ta"])), 4)
+                self.assertTrue(item["exp_en"] and item["exp_ta"])
+
+        by_id = {item["id"]: item for item in questions}
+        priesthood = by_id["C11H19-Q0331"]
+        self.assertEqual(priesthood["opts_en"][priesthood["correct"]],
+                         "The authority of Brahmin priests")
+        self.assertIn("Widow remarriage", priesthood["opts_en"])
+        dav = by_id["C11H19-Q0340"]
+        self.assertEqual(dav["opts_en"][dav["correct"]],
+                         "Dayanand Anglo Vedic schools and colleges")
+
 
 if __name__ == "__main__":
     unittest.main()
