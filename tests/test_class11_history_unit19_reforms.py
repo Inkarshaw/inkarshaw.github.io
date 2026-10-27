@@ -116,6 +116,34 @@ class ModernityUnit19Tests(unittest.TestCase):
         self.assertEqual(dav["opts_en"][dav["correct"]],
                          "Dayanand Anglo Vedic schools and colleges")
 
+    def test_sixth_and_seventh_quizzes_have_unique_grounded_answers(self):
+        questions = self.bank["questions"][100:140]
+        self.assertEqual(len(questions), 40)
+        for item in questions:
+            with self.subTest(id=item["id"]):
+                self.assertNotIn("textbook answer for", item["q_en"].lower())
+                self.assertNotIn("சரியான பாடநூல் விடை", item["q_ta"])
+                self.assertTrue(item["q_en"].endswith("?"))
+                self.assertTrue(item["q_ta"].endswith("?"))
+                self.assertEqual(len(set(item["opts_en"])), 4)
+                self.assertEqual(len(set(item["opts_ta"])), 4)
+                self.assertIn(item["opts_en"][item["correct"]], item["exp_en"])
+                self.assertIn(item["opts_ta"][item["correct"]], item["exp_ta"])
+
+        by_id = {item["id"]: item for item in questions}
+        expected = {
+            "C11H19-Q0385": "No formal education",
+            "C11H19-Q0454": "1882",
+            "C11H19-Q0460": "1893",
+            "C11H19-Q0478": "Satya Shodhak Samaj",
+        }
+        for ident, answer in expected.items():
+            self.assertEqual(by_id[ident]["opts_en"][by_id[ident]["correct"]], answer)
+        self.assertIn("1886", by_id["C11H19-Q0454"]["exp_en"])
+        self.assertIn("1875", by_id["C11H19-Q0478"]["exp_en"])
+        for ident in ("C11H19-Q0454", "C11H19-Q0478"):
+            self.assertTrue(by_id[ident]["fact_check_url"].startswith("https://"))
+
 
 if __name__ == "__main__":
     unittest.main()
