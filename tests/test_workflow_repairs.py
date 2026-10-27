@@ -32,6 +32,18 @@ class WorkflowRepairTests(unittest.TestCase):
         self.assertLess(generation, check)
         self.assertIn("python3 current-affairs/text/build_text_editions.py", workflow[generation:check])
 
+    def test_metadata_only_change_does_not_trigger_unrelated_question_errors(self):
+        import importlib.util
+        module_path = ROOT / "scripts/audit_textbook_repository.py"
+        spec = importlib.util.spec_from_file_location("textbook_audit", module_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        bank = {"meta": {"source_en_url": "https://old.example/"}, "questions": [{"q_en": "sample"}]}
+        fixed = {"meta": {"source_en_url": "https://new.example/"}, "questions": [{"q_en": "sample"}]}
+        changed = {"meta": fixed["meta"], "questions": [{"q_en": "different"}]}
+        self.assertTrue(module.questions_unchanged(bank, fixed))
+        self.assertFalse(module.questions_unchanged(bank, changed))
+
     def test_daily_sync_preserves_shared_bank_when_sheet_is_empty(self):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "sheet.csv"
