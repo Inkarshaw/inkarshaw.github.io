@@ -353,15 +353,15 @@ SPEC.loader.exec_module(AUDIT)
 class Class10ScienceUnits14To17Tests(unittest.TestCase):
     def test_catalogue_integrity(self):
         self.assertEqual(INDEX["meta"]["unit_count"], 23)
-        self.assertEqual(INDEX["meta"]["total_questions"], 1040)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 52)
+        self.assertEqual(INDEX["meta"]["total_questions"], 1460)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 73)
         self.assertEqual([u["id"] for u in INDEX["units"][:17]], list(range(1, 18)))
         self.assertEqual([u["total"] for u in INDEX["units"][:13]],
-                         [580, 40] + [20] * 11)
+                         [580, 40] + [40] * 11)
         for unit in INDEX["units"][13:17]:
             self.assertTrue(unit["ready"])
-            self.assertEqual(unit["total"], 20)
-            self.assertEqual(unit["quiz_count"], 1)
+            self.assertEqual(unit["total"], 40)
+            self.assertEqual(unit["quiz_count"], 2)
             self.assertEqual(unit["path"], f'unit-{unit["id"]}.json')
 
     def test_bilingual_answer_keys_and_structural_quality(self):
@@ -370,7 +370,10 @@ class Class10ScienceUnits14To17Tests(unittest.TestCase):
             with self.subTest(unit=unit):
                 d = json.loads((DATA / f"unit-{unit}.json").read_text(encoding="utf-8"))
                 questions = d["questions"]
-                self.assertEqual(d["meta"]["total_questions"], 20)
+                self.assertEqual(len(questions), 40)
+                self.assertEqual(len({q["id"] for q in questions}), 40)
+                questions = questions[:20]
+                self.assertEqual(d["meta"]["total_questions"], 40)
                 self.assertTrue(d["meta"]["source_en_url"])
                 self.assertTrue(d["meta"]["source_ta_url"])
                 self.assertEqual(len(questions), 20)

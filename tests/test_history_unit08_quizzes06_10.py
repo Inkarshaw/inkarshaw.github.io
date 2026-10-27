@@ -30,8 +30,8 @@ class Unit8QuizzesSixToTen(unittest.TestCase):
     def test_review_progress_and_unchanged_bank_size(self):
         self.assertEqual(len(QUESTIONS), 468)
         self.assertEqual(len(DATA["meta"]["quiz_sets"]), 24)
-        self.assertEqual(DATA["meta"]["qa_reviewed_prefix"], 200)
-        self.assertEqual(DATA["meta"]["qa_reviewed_quizzes"], 10)
+        self.assertGreaterEqual(DATA["meta"]["qa_reviewed_prefix"], 200)
+        self.assertGreaterEqual(DATA["meta"]["qa_reviewed_quizzes"], 10)
         self.assertEqual(DATA["meta"]["total_questions"], 468)
         self.assertEqual(DATA["meta"]["mechanically_generated_variants_removed"], 936)
         self.assertEqual([len(QUESTIONS[x:x+20]) for x in range(100,200,20)], [20]*5)

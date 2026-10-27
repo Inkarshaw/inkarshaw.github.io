@@ -24,9 +24,9 @@ class Class8ScienceTerm3Unit6Tests(unittest.TestCase):
         entry = next(unit for unit in INDEX["units"] if unit["id"] == 6)
         self.assertTrue(entry["ready"])
         self.assertEqual(entry["path"], "unit-6.json")
-        self.assertEqual(entry["total"], 20)
-        self.assertEqual(INDEX["meta"]["total_questions"], 180)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 9)
+        self.assertEqual(entry["total"], 40)
+        self.assertEqual(INDEX["meta"]["total_questions"], 360)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 18)
         self.assertTrue(BANK["meta"].get("source_en_url"))
         self.assertTrue(BANK["meta"].get("source_ta_url"))
 
@@ -38,6 +38,9 @@ class Class8ScienceTerm3Unit6Tests(unittest.TestCase):
 
     def test_twenty_questions_pass_structural_review_with_balanced_keys(self):
         questions = BANK["questions"]
+        self.assertEqual(len(questions), 40)
+        self.assertEqual(len({q["id"] for q in questions}), 40)
+        questions = questions[:20]
         self.assertEqual(len(questions), 20)
         result = MODULE.audit(questions, start=0, count=20)
         self.assertEqual(result["errors"], [])

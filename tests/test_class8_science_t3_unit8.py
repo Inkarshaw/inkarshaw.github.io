@@ -104,17 +104,20 @@ class Class8Term3Unit8Tests(unittest.TestCase):
         entry = next(u for u in INDEX["units"] if u["id"] == 8)
         self.assertTrue(entry["ready"])
         self.assertEqual((entry["path"], entry["total"], entry["quiz_count"]),
-                         ("unit-8.json", 20, 1))
+                         ("unit-8.json", 40, 2))
         self.assertEqual(len(INDEX["units"]), 9)
         self.assertTrue(all(u["ready"] for u in INDEX["units"]))
-        self.assertEqual(INDEX["meta"]["total_questions"], 180)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 9)
-        self.assertEqual(BANK["meta"]["total_questions"], 20)
+        self.assertEqual(INDEX["meta"]["total_questions"], 360)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 18)
+        self.assertEqual(BANK["meta"]["total_questions"], 40)
         self.assertTrue(BANK["meta"]["source_en_url"])
         self.assertTrue(BANK["meta"]["source_ta_url"])
 
     def test_bilingual_keys_options_and_explanations(self):
         records = BANK["questions"]
+        self.assertEqual(len(records), 40)
+        self.assertEqual(len({q["id"] for q in records}), 40)
+        records = records[:20]
         self.assertEqual(len(records), len(EXPECTED))
         self.assertEqual(len(records), 20)
         self.assertEqual(Counter(q["correct"] for q in records),

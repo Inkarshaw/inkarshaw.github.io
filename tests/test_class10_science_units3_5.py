@@ -270,20 +270,23 @@ SPEC.loader.exec_module(AUDIT)
 class Class10PhysicsUnitsThreeToFiveTests(unittest.TestCase):
     def test_catalogue(self):
         self.assertEqual(INDEX["meta"]["unit_count"], 23)
-        self.assertEqual(INDEX["meta"]["total_questions"], 1040)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 52)
+        self.assertEqual(INDEX["meta"]["total_questions"], 1460)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 73)
         self.assertEqual([u["id"] for u in INDEX["units"][:5]], [1, 2, 3, 4, 5])
-        self.assertEqual([u["total"] for u in INDEX["units"][:5]], [580, 40, 20, 20, 20])
+        self.assertEqual([u["total"] for u in INDEX["units"][:5]], [580, 40, 40, 40, 40])
         for unit in INDEX["units"][2:5]:
             self.assertTrue(unit["ready"])
-            self.assertEqual(unit["quiz_count"], 1)
+            self.assertEqual(unit["quiz_count"], 2)
 
     def test_bilingual_maths_and_answers(self):
         for unit_number in (3, 4, 5):
             with self.subTest(unit=unit_number):
                 d = json.loads((DIR / f"unit-{unit_number}.json").read_text(encoding="utf-8"))
                 records = d["questions"]
-                self.assertEqual(d["meta"]["total_questions"], 20)
+                self.assertEqual(len(records), 40)
+                self.assertEqual(len({q["id"] for q in records}), 40)
+                records = records[:20]
+                self.assertEqual(d["meta"]["total_questions"], 40)
                 self.assertTrue(d["meta"].get("source_en_url"))
                 self.assertTrue(d["meta"].get("source_ta_url"))
                 self.assertEqual(len(records), 20)
