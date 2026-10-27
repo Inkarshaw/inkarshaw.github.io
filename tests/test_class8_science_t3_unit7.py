@@ -103,16 +103,19 @@ class Class8CropProductionQuizTests(unittest.TestCase):
         entry = next(unit for unit in INDEX["units"] if unit["id"] == 7)
         self.assertTrue(entry["ready"])
         self.assertEqual((entry["total"], entry["quiz_count"], entry["path"]),
-                         (20, 1, "unit-7.json"))
-        self.assertEqual(INDEX["meta"]["total_questions"], 180)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 9)
-        self.assertEqual(BANK["meta"]["total_questions"], 20)
+                         (40, 2, "unit-7.json"))
+        self.assertEqual(INDEX["meta"]["total_questions"], 360)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 18)
+        self.assertEqual(BANK["meta"]["total_questions"], 40)
         self.assertTrue(BANK["meta"]["source_en_url"].startswith("https://"))
         self.assertTrue(BANK["meta"]["source_ta_url"].startswith("https://"))
-        self.assertEqual(len(BANK["meta"]["quiz_sets"]), 1)
+        self.assertEqual(len(BANK["meta"]["quiz_sets"]), 2)
 
     def test_source_grounded_bilingual_questions(self):
         records = BANK["questions"]
+        self.assertEqual(len(records), 40)
+        self.assertEqual(len({q["id"] for q in records}), 40)
+        records = records[:20]
         self.assertEqual(len(records), 20)
         self.assertEqual(len(EXPECTED), 20)
         self.assertEqual(len(set(q["id"] for q in records)), 20)
