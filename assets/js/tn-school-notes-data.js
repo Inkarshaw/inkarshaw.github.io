@@ -94,10 +94,33 @@ window.ClearExamsTNSchoolNotes=[
     "chapter": "Class 6 Science · Term II · Unit 2: Electricity",
     "href": "textbook-play.html?class=6&subject=science&term=2&unit=2&quiz=1",
     "points": [
-      "An electric circuit is a complete conducting path through which current can flow.",
-      "Conductors permit current more readily than insulators; copper is a common conductor and rubber an insulator.",
-      "An open switch breaks a circuit; a closed switch completes it."
-    ]
+      "An electric cell converts chemical energy into electrical energy and has positive and negative terminals.",
+      "A battery is a combination of two or more electric cells connected to supply electrical energy.",
+      "A simple working circuit contains an energy source, conducting wires and a device such as a bulb in a closed path.",
+      "A switch controls the circuit: closing it completes the path; opening it interrupts current through that path.",
+      "Metals such as copper and aluminium conduct electricity, while rubber and dry plastic generally act as insulators.",
+      "Common sources of generated electricity include thermal, hydroelectric, wind and solar power.",
+      "Circuit diagrams use conventional symbols to represent cells, batteries, lamps, switches and connecting wires."
+    ],
+    "points_ta": [
+      "மின்கலம் வேதி ஆற்றலை மின் ஆற்றலாக மாற்றுகிறது; அதற்கு நேர்மின் முனையும் எதிர்மின் முனையும் உள்ளன.",
+      "இரண்டு அல்லது அதற்கு மேற்பட்ட மின்கலங்களை இணைத்துத் தேவையான மின் ஆற்றலை வழங்கும் அமைப்பு மின்கல அடுக்கு ஆகும்.",
+      "ஒரு எளிய மின்சுற்றில் ஆற்றல் மூலம், மின்கடத்திக் கம்பிகள், மின்விளக்கு போன்ற சாதனம் ஆகியவை மூடிய பாதையில் இணைக்கப்பட்டிருக்கும்.",
+      "மின்சுற்றைச் சாவி கட்டுப்படுத்துகிறது; சாவியை மூடினால் பாதை முழுமை பெறும், திறந்தால் அந்தப் பாதையில் மின்னோட்டம் தடைப்படும்.",
+      "செம்பு, அலுமினியம் போன்ற உலோகங்கள் மின்கடத்திகள்; ரப்பர், உலர்ந்த நெகிழி போன்றவை பொதுவாக மின்காப்பான்கள்.",
+      "அனல் மின் நிலையம், நீர்மின் நிலையம், காற்றாலை, சூரிய மின் நிலையம் ஆகியவை மின்சாரம் உற்பத்தி செய்யும் வழிமுறைகளாகும்.",
+      "மின்சுற்றுப் படங்களில் மின்கலம், மின்கல அடுக்கு, விளக்கு, சாவி, இணைப்புக் கம்பி ஆகியவற்றைக் குறிக்க மரபுக் குறியீடுகள் பயன்படுத்தப்படுகின்றன."
+    ],
+    "exam_focus": "Identify a cell versus a battery, distinguish conductors from insulators, and infer whether a lamp lights when a circuit switch is open or closed.",
+    "exam_focus_ta": "மின்கலத்தையும் மின்கல அடுக்கையும் வேறுபடுத்துதல், கடத்தி–காப்பான்களை அறிதல், சாவி திறந்த அல்லது மூடிய நிலையில் விளக்கு எரியுமா எனத் தீர்மானித்தல் ஆகியவை தேர்வுக்கு முக்கியம்.",
+    "worked_example": "Connect a cell, two wires, a switch and a small bulb in one loop. The bulb can glow when the switch is closed; opening the switch breaks the loop.",
+    "worked_example_ta": "ஒரு மின்கலம், இரண்டு கம்பிகள், சாவி, சிறிய மின்விளக்கு ஆகியவற்றை ஒரே சுற்றாக இணைக்கவும். சாவியை மூடினால் விளக்கு எரியலாம்; சாவியைத் திறந்தால் சுற்று துண்டிக்கப்படும்.",
+    "quick_check": {
+      "question": "Which device converts chemical energy into electrical energy in a simple torch circuit?",
+      "question_ta": "எளிய கைவிளக்கின் மின்சுற்றில் வேதி ஆற்றலை மின் ஆற்றலாக மாற்றும் சாதனம் எது?",
+      "answer": "An electric cell (or the cells that form the battery).",
+      "answer_ta": "மின்கலம் (அல்லது மின்கல அடுக்கிலுள்ள மின்கலங்கள்)."
+    }
   },
   {
     "id": "organs",
@@ -106,10 +129,33 @@ window.ClearExamsTNSchoolNotes=[
     "chapter": "Class 6 Science · Term II · Unit 6: Human Organ Systems",
     "href": "textbook-play.html?class=6&subject=science&term=2&unit=6&quiz=1",
     "points": [
-      "The digestive system breaks food into absorbable nutrients.",
-      "The respiratory system enables gas exchange, taking in oxygen and releasing carbon dioxide.",
-      "The circulatory system transports oxygen, nutrients and wastes through the body."
-    ]
+      "An organ system is a group of organs working together; the textbook identifies skeletal, muscular, digestive, respiratory, circulatory, nervous, endocrine and excretory systems.",
+      "The skeletal system supports the body and protects internal organs; the adult human skeleton has about 206 bones.",
+      "Muscles bring about movement; skeletal muscles are generally voluntary, while smooth and cardiac muscles act involuntarily.",
+      "Digestion breaks complex food into simpler absorbable substances; much nutrient absorption occurs in the small intestine.",
+      "The lungs exchange gases during breathing, taking oxygen into the body and removing carbon dioxide; the diaphragm helps breathing movements.",
+      "The circulatory system consists of the heart, blood and blood vessels and carries oxygen, nutrients and other substances around the body.",
+      "The kidneys filter blood to form urine; the ureters carry urine to the bladder, and the urethra carries it out of the body."
+    ],
+    "points_ta": [
+      "ஒரு குறிப்பிட்ட பணியைச் சேர்ந்து செய்யும் உறுப்புகளின் கூட்டமே உறுப்பு மண்டலம்; எலும்பு, தசை, செரிமான, சுவாச, இரத்த ஓட்ட, நரம்பு, நாளமில்லாச் சுரப்பி, கழிவு நீக்க மண்டலங்களைப் பாடநூல் குறிப்பிடுகிறது.",
+      "எலும்பு மண்டலம் உடலுக்குத் தாங்குதலை அளித்து உள்ளுறுப்புகளைப் பாதுகாக்கிறது; வளர்ந்த மனிதரின் எலும்புக்கூட்டில் சுமார் 206 எலும்புகள் உள்ளன.",
+      "தசைகள் இயக்கத்துக்கு உதவுகின்றன; எலும்புத் தசைகள் பொதுவாக நம் விருப்பத்தால் இயங்குகின்றன, மென்தசை மற்றும் இதயத் தசை விருப்பமின்றி இயங்குகின்றன.",
+      "செரிமானம் சிக்கலான உணவை உறிஞ்சத்தக்க எளிய பொருட்களாக மாற்றுகிறது; பெரும்பாலான ஊட்டச்சத்துக்கள் சிறுகுடலில் உறிஞ்சப்படுகின்றன.",
+      "நுரையீரல்கள் வாயுப் பரிமாற்றத்தில் ஆக்சிஜனை உடலுக்குள் எடுத்துக்கொண்டு கார்பன் டை ஆக்சைடை வெளியேற்றுகின்றன; உதரவிதானம் சுவாச இயக்கத்துக்கு உதவுகிறது.",
+      "இதயம், இரத்தம், இரத்த நாளங்கள் ஆகியவற்றைக் கொண்ட இரத்த ஓட்ட மண்டலம் ஆக்சிஜன், ஊட்டச்சத்துக்கள் மற்றும் பிற பொருட்களை உடல் முழுவதும் கொண்டு செல்கிறது.",
+      "சிறுநீரகங்கள் இரத்தத்தை வடிகட்டிச் சிறுநீரை உருவாக்குகின்றன; சிறுநீர்க்குழாய்கள் அதை சிறுநீர்ப்பைக்குக் கொண்டு செல்கின்றன; சிறுநீர்ப் புறவழி மூலம் வெளியேறுகிறது."
+    ],
+    "exam_focus": "Distinguish the eight major organ systems and their core functions, especially digestion versus absorption and ureter versus urethra.",
+    "exam_focus_ta": "எட்டு முக்கிய உறுப்பு மண்டலங்களையும் அவற்றின் பணிகளையும் வேறுபடுத்த வேண்டும்; குறிப்பாக செரிமானம்–உறிஞ்சுதல், சிறுநீர்க்குழாய்–சிறுநீர்ப் புறவழி வேறுபாடுகள் முக்கியம்.",
+    "worked_example": "Trace the urinary pathway: the kidneys form urine, the ureters transport it to the urinary bladder, and the urethra carries it outside.",
+    "worked_example_ta": "சிறுநீரின் பாதை: சிறுநீரகங்கள் சிறுநீரை உருவாக்கும்; சிறுநீர்க்குழாய்கள் சிறுநீர்ப்பைக்குக் கொண்டு செல்லும்; சிறுநீர்ப் புறவழி அதை உடலுக்கு வெளியேற்றும்.",
+    "quick_check": {
+      "question": "Which tubes carry urine from the kidneys to the urinary bladder?",
+      "question_ta": "சிறுநீரகங்களிலிருந்து சிறுநீர்ப்பைக்குச் சிறுநீரைக் கொண்டு செல்லும் குழாய்கள் எவை?",
+      "answer": "The ureters.",
+      "answer_ta": "சிறுநீர்க்குழாய்கள் (Ureters)."
+    }
   },
   {
     "id": "indus",
@@ -294,10 +340,33 @@ window.ClearExamsTNSchoolNotes=[
     "chapter": "Class 6 Social Science · Term I · Geography: The Universe and Solar System",
     "href": "textbook-play.html?class=6&subject=social-science&term=1&unit=5&quiz=1",
     "points": [
-      "The Earth rotates on its axis, producing the day-night cycle.",
-      "The Earth revolves around the Sun; its axial tilt is important in the seasonal cycle.",
-      "The Sun is a star and the eight major planets orbit it."
-    ]
+      "The Sun is a self-luminous star at the centre of the Solar System and provides light and heat to Earth.",
+      "The eight planets in order from the Sun are Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.",
+      "Earth is the third planet from the Sun and has one natural satellite, the Moon.",
+      "The Solar System is part of the Milky Way galaxy; a galaxy is a large gravitationally bound collection of stars.",
+      "Earth rotates around its axis approximately once every 24 hours, causing the cycle of day and night.",
+      "Earth revolves around the Sun in approximately one year; its tilted axis, together with revolution, produces the seasons.",
+      "A light-year is a unit of distance travelled by light in one year, not a unit of time."
+    ],
+    "points_ta": [
+      "சூரியன் சூரியக் குடும்பத்தின் மையத்தில் உள்ள தானாக ஒளி வீசும் விண்மீன்; அது பூமிக்கு ஒளியையும் வெப்பத்தையும் அளிக்கிறது.",
+      "சூரியனிலிருந்து வரிசையாக உள்ள எட்டு கோள்கள்: புதன், வெள்ளி, பூமி, செவ்வாய், வியாழன், சனி, யுரேனஸ், நெப்டியூன்.",
+      "பூமி சூரியனிலிருந்து மூன்றாவது கோள்; நிலா அதன் ஒரே இயற்கைத் துணைக்கோள் ஆகும்.",
+      "சூரியக் குடும்பம் பால்வெளி விண்மீன் மண்டலத்தின் ஒரு பகுதியாகும்; ஈர்ப்பு விசையால் பிணைந்த பல விண்மீன்களைக் கொண்ட பெரிய தொகுதியே விண்மீன் மண்டலம்.",
+      "பூமி தன் அச்சில் சுமார் 24 மணிநேரத்திற்கு ஒருமுறை சுழல்வதால் பகலும் இரவும் மாறிமாறி ஏற்படுகின்றன.",
+      "பூமி சுமார் ஓராண்டில் சூரியனைச் சுற்றி வருகிறது; அதன் அச்சுச் சாய்வும் சுற்றிவருதலும் இணைந்து பருவகால மாற்றங்களை ஏற்படுத்துகின்றன.",
+      "ஒளியாண்டு என்பது ஓராண்டில் ஒளி பயணிக்கும் தொலைவைக் குறிக்கும் அலகு; அது காலத்தைக் குறிக்கும் அலகு அல்ல."
+    ],
+    "exam_focus": "Know the planet order, Earth's two movements and their distinct effects, the Milky Way relationship and the meaning of a light-year.",
+    "exam_focus_ta": "கோள்களின் வரிசை, பூமியின் சுழற்சி–சுற்றிவருதல் மற்றும் அவற்றின் விளைவுகள், பால்வெளித் தொடர்பு, ஒளியாண்டின் பொருள் ஆகியவை தேர்வுக்கு முக்கியம்.",
+    "worked_example": "When your location faces the Sun during Earth's rotation, it is daytime there; when it rotates away from the Sun, it is night.",
+    "worked_example_ta": "பூமி சுழலும்போது ஓர் இடம் சூரியனை நோக்கி இருந்தால் அங்கே பகல்; சூரியனை விட்டு மறுபுறம் திரும்பியதும் அங்கே இரவு.",
+    "quick_check": {
+      "question": "Which motion of Earth directly causes the day-and-night cycle?",
+      "question_ta": "பூமியின் எந்த இயக்கம் நேரடியாகப் பகல்–இரவு மாற்றத்தை ஏற்படுத்துகிறது?",
+      "answer": "Rotation of Earth on its axis.",
+      "answer_ta": "பூமி தன் அச்சில் சுழல்வது."
+    }
   },
   {
     "id": "earth-interior",
