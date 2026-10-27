@@ -14,6 +14,11 @@ for(const id of ['measurements','force-motion','matter']){
  assert.ok(draft,id+': bilingual draft missing');
  assert.equal(noteQuality.evaluate(draft).level,'bilingual-review-pending',id+': expanded draft must await editorial review');
 }
+for(const id of ['electricity','organs','solar-system']){
+ const draft=notes.find(n=>n.id===id);
+ assert.ok(draft,id+': expanded bilingual draft not found');
+ assert.equal(noteQuality.evaluate(draft).level,'bilingual-review-pending',id+': an unreviewed draft must never be called complete');
+}
 const deep=notes.find(n=>n.id==='equality');
 assert.ok(deep);
 assert.notEqual(noteQuality.evaluate(deep).level,'reviewed-bilingual','Do not claim editorial review without a recorded approver');
