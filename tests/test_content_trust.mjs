@@ -9,8 +9,11 @@ const noteQuality=load('assets/js/notes-quality.js').ClearExamsNoteQuality;
 const notesContext={window:{}};vm.runInNewContext(read('assets/js/tn-school-notes-data.js'),notesContext);
 const notes=notesContext.window.ClearExamsTNSchoolNotes;
 assert.ok(notes.length>=120);
-const simple=notes.find(n=>n.id==='measurements');
-assert.equal(noteQuality.evaluate(simple).level,'outline');
+for(const id of ['measurements','force-motion','matter']){
+ const draft=notes.find(n=>n.id===id);
+ assert.ok(draft,id+': bilingual draft missing');
+ assert.equal(noteQuality.evaluate(draft).level,'bilingual-review-pending',id+': expanded draft must await editorial review');
+}
 const deep=notes.find(n=>n.id==='equality');
 assert.ok(deep);
 assert.notEqual(noteQuality.evaluate(deep).level,'reviewed-bilingual','Do not claim editorial review without a recorded approver');
