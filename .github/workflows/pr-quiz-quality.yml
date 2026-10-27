@@ -178,7 +178,9 @@ jobs:
       - name: Run current affairs text validation tests
         run: python3 -m unittest discover -s tests -p "test_current_affairs_text.py" -v
       - name: Ensure all dated current-affairs sources appear in archive
-        run: python3 -m unittest discover -s tests -p "test_current_affairs_archive.py" -v
+        run: |
+          python3 current-affairs/text/build_text_editions.py
+          python3 -m unittest discover -s tests -p "test_current_affairs_archive.py" -v
       - name: Validate the 15 October text source and index
         run: |
           python3 current-affairs/text/build_text_editions.py --validate current-affairs/text/data/2026-10-15.json --date 2026-10-15
