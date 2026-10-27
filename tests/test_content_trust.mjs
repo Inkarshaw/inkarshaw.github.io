@@ -19,6 +19,11 @@ for(const id of ['electricity','organs','solar-system']){
  assert.ok(draft,id+': expanded bilingual draft not found');
  assert.equal(noteQuality.evaluate(draft).level,'bilingual-review-pending',id+': an unreviewed draft must never be called complete');
 }
+for(const id of ['production','landforms','earth-interior','ancient-tamil-towns']){
+ const draft=notes.find(n=>n.id===id);
+ assert.ok(draft,id+': expanded note missing');
+ assert.equal(noteQuality.evaluate(draft).level,'bilingual-review-pending',id+': explicit human review remains necessary');
+}
 const deep=notes.find(n=>n.id==='equality');
 assert.ok(deep);
 assert.notEqual(noteQuality.evaluate(deep).level,'reviewed-bilingual','Do not claim editorial review without a recorded approver');
