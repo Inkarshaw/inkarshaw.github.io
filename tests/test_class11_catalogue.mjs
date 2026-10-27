@@ -140,6 +140,23 @@ for(const row of rows){
       assert.ok(q.exp_en.length>=75&&q.exp_ta.length>=50,q.id+' weak explanation');
     }
   }
+  if(row.unit===19){
+    assert.equal(data.questions.length,319,'Unit 19 must contain only playable distinct questions');
+    assert.equal(data.meta.source_records_before_editorial_curation,1507);
+    assert.equal(data.meta.mechanically_generated_variants_removed,1188);
+    assert.equal(data.meta.qa_reviewed_prefix,0,'Unit 19 must not claim complete editorial review');
+    assert.equal(data.meta.positional_quiz_sets,true,'Unit 19 quiz routing must use published positions');
+    assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 19 generated variants resurfaced');
+    const allIds=[];
+    for(let n=1;n<=row.sets;n++){
+      const selected=quality.selectReviewedQuiz(data.meta,data.questions,result.questions,n);
+      assert.ok(selected!==null,`Unit 19 quiz ${n}: positional routing missing`);
+      assert.deepEqual(Array.from(selected,q=>q.id),Array.from(result.questions.slice((n-1)*20,n*20),q=>q.id));
+      allIds.push(...selected.map(q=>q.id));
+    }
+    assert.equal(allIds.length,319,'Unit 19 has inaccessible questions');
+    assert.equal(new Set(allIds).size,319,'Unit 19 has repeated questions');
+  }
   if(row.unit===5){
     assert.equal(data.questions.length,348,'Unit 5 must retain exactly 348 direct playable questions');
     assert.ok(data.questions.every(q=>q.type==='direct'),'Unit 5 generated variants resurfaced');
