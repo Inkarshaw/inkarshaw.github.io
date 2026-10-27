@@ -72,6 +72,28 @@ class ModernityUnit19Tests(unittest.TestCase):
         report = AUDIT.audit_bank(BANK, self.bank)
         self.assertEqual(report["errors"], [])
 
+    def test_second_and_third_quizzes_are_direct_and_bilingual(self):
+        questions = self.bank["questions"][20:60]
+        self.assertEqual(len(questions), 40)
+        for item in questions:
+            with self.subTest(id=item["id"]):
+                self.assertNotIn("textbook answer for", item["q_en"].lower())
+                self.assertTrue(item["q_en"].endswith("?"))
+                self.assertTrue(item["q_ta"].endswith("?"))
+                self.assertEqual(len(set(item["opts_en"])), 4)
+                self.assertEqual(len(set(item["opts_ta"])), 4)
+                self.assertTrue(item["exp_en"] and item["exp_ta"])
+
+    def test_brahmo_split_is_corrected_even_when_textbook_reverses_labels(self):
+        questions = {item["id"]: item for item in self.bank["questions"]}
+        adi = questions["C11H19-Q0208"]
+        keshab = questions["C11H19-Q0211"]
+        self.assertEqual(adi["opts_en"][adi["correct"]], "Adi Brahmo Samaj")
+        self.assertEqual(keshab["opts_en"][keshab["correct"]], "Brahmo Samaj of India")
+        for item in (adi, keshab):
+            self.assertIn("1878", item["exp_en"])
+            self.assertTrue(item["fact_check_url"].startswith("https://"))
+
 
 if __name__ == "__main__":
     unittest.main()
