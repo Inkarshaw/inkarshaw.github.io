@@ -40,10 +40,18 @@ assert.match(notePage,/editorial verification pending/);
 const review=JSON.parse(read('data/exams/review-schedule.json'));
 assert.deepEqual(Object.keys(review.boards).sort(),['banking','railways','ssc','tnpsc','tnusrb','upsc'].sort());
 const fresh=load('assets/js/calendar-freshness.js').ClearExamsCalendarFreshness;
-const evaluation=fresh.all(review,'2026-10-26');
+// Verify freshness relative to each board's actual review date, not a fixed stale date.
+const latestReview=review.boards.upsc.lastReviewed;
+const evaluation=fresh.all(review,latestReview);
 assert.equal(evaluation.length,6);
-assert.ok(evaluation.find(x=>x.board==='upsc').due);
-assert.ok(evaluation.find(x=>x.board==='tnpsc').due);
+assert.equal(evaluation.find(x=>x.board==='upsc').due,false);
+const afterCadence=new Date(Date.parse(latestReview+'T00:00:00Z')+
+  (review.cadenceDays.upsc+1)*86400000).toISOString().slice(0,10);
+assert.ok(fresh.all(review,afterCadence).find(x=>x.board==='upsc').due);
+const tnpscReview=review.boards.tnpsc.lastReviewed;
+const tnpscExpiry=new Date(Date.parse(tnpscReview+'T00:00:00Z')+
+  (review.cadenceDays.tnpsc+1)*86400000).toISOString().slice(0,10);
+assert.ok(fresh.all(review,tnpscExpiry).find(x=>x.board==='tnpsc').due);
 assert.match(read('exam-calendar.html'),/id="freshnessAlert"/);
 assert.match(read('.github/workflows/calendar-board-review.yml'),/schedule:/);
 

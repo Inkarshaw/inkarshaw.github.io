@@ -142,17 +142,60 @@ def bank_paths(args: argparse.Namespace) -> list[Path]:
     return [Path(value).resolve() for value in args.paths]
 
 
+def questions_unchanged(base: Any, current: Any) -> bool:
+    """Source-only metadata revisions should not re-gate unchanged question bodies."""
+    return (
+        isinstance(base, dict) and isinstance(current, dict)
+        and isinstance(base.get("questions"), list)
+        and isinstance(current.get("questions"), list)
+        and base["questions"] == current["questions"]
+    )
+
+
+def exclude_metadata_only_paths(paths: list[Path], ref: str) -> list[Path]:
+    """Compare original question arrays with the merge-base revision."""
+    import subprocess
+    result = []
+    for path in paths:
+        if not path.is_file():
+            result.append(path)
+            continue
+        relative = path.relative_to(ROOT).as_posix()
+        base = subprocess.run(
+            ["git", "show", f"{ref}:{relative}"],
+            cwd=ROOT, text=True, capture_output=True,
+        )
+        if base.returncode:
+            result.append(path)  # New question banks must be fully audited.
+            continue
+        try:
+            old_data = json.loads(base.stdout)
+            new_data = json.loads(path.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeError, OSError):
+            result.append(path)  # Bad JSON must still be rejected.
+            continue
+        if not questions_unchanged(old_data, new_data):
+            result.append(path)
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--all", action="store_true", help="audit every Class 6–12 textbook JSON file")
     group.add_argument("--changed-from", metavar="REF", help="audit textbook JSON files changed since REF")
     parser.add_argument("paths", nargs="*", help="one or more textbook JSON files")
+    parser.add_argument("--changed-questions-only", action="store_true",
+                        help="with --changed-from, skip banks where only metadata changed")
     parser.add_argument("--json", action="store_true", help="print a machine-readable report")
     args = parser.parse_args()
     if sum((bool(args.all), bool(args.changed_from), bool(args.paths))) != 1:
         parser.error("choose exactly one of --all, --changed-from REF, or one or more file paths")
+    if args.changed_questions_only and not args.changed_from:
+        parser.error("--changed-questions-only requires --changed-from")
     paths = bank_paths(args)
+    if args.changed_questions_only:
+        paths = exclude_metadata_only_paths(paths, args.changed_from)
     report: list[dict[str, Any]] = []
     invalid_json = 0
     for path in paths:

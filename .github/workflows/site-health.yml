@@ -213,6 +213,16 @@ jobs:
           PY
           echo "JavaScript syntax checks passed." >> "$GITHUB_STEP_SUMMARY"
 
+      # Article pages are generated at Pages build time, not checked in to main.
+      # Materialise the same pages before testing whether local archive links exist.
+      - name: Generate current-affairs HTML before link validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 current-affairs/text/build_text_editions.py
+          python3 -m unittest discover -s tests -p 'test_current_affairs_archive.py' -v
+          echo "Generated current-affairs pages validated." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Validate core exam-site internal links
         shell: bash
         run: |

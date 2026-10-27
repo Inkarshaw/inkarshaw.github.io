@@ -38,6 +38,9 @@ jobs:
         run: node tests/test_group2a_text_notes.mjs
       - name: Run ClearExams regression tests
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
+      - name: Regression checks for generated archive links and shared daily-quiz banks
+        run: python3 -m unittest discover -s tests -p "test_workflow_repairs.py" -v
+
       - name: Validate Police Documents LTE and 5G cell identifiers
         run: python3 -m unittest discover -s tests -p "test_police_cell_tower_locator.py" -v
       - name: Validate attributed previous-year questions and Daily Quiz loading
@@ -119,7 +122,7 @@ jobs:
       - name: Test Class 10 Optics 40 bilingual review
         run: python3 -m unittest discover -s tests -p "test_class10_science_optics_40_review.py" -v
       - name: Audit changed textbook question banks across Classes 6–12
-        run: python3 scripts/audit_textbook_repository.py --changed-from "origin/${GITHUB_BASE_REF}"
+        run: python3 scripts/audit_textbook_repository.py --changed-from "origin/${GITHUB_BASE_REF}" --changed-questions-only
       - name: Verify all 19 Class 11 History catalogue counts and the opening question
         run: node tests/test_class11_catalogue.mjs
       - name: Check CDR Contacts copy selection
@@ -175,7 +178,9 @@ jobs:
       - name: Run current affairs text validation tests
         run: python3 -m unittest discover -s tests -p "test_current_affairs_text.py" -v
       - name: Ensure all dated current-affairs sources appear in archive
-        run: python3 -m unittest discover -s tests -p "test_current_affairs_archive.py" -v
+        run: |
+          python3 current-affairs/text/build_text_editions.py
+          python3 -m unittest discover -s tests -p "test_current_affairs_archive.py" -v
       - name: Validate the 15 October text source and index
         run: |
           python3 current-affairs/text/build_text_editions.py --validate current-affairs/text/data/2026-10-15.json --date 2026-10-15
