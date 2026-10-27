@@ -38,6 +38,9 @@ jobs:
         run: node tests/test_group2a_text_notes.mjs
       - name: Run ClearExams regression tests
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
+      - name: Regression checks for generated archive links and shared daily-quiz banks
+        run: python3 -m unittest discover -s tests -p "test_workflow_repairs.py" -v
+
       - name: Validate Police Documents LTE and 5G cell identifiers
         run: python3 -m unittest discover -s tests -p "test_police_cell_tower_locator.py" -v
       - name: Validate attributed previous-year questions and Daily Quiz loading
