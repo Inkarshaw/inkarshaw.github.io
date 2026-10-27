@@ -44,11 +44,16 @@ class ModernityUnit19Tests(unittest.TestCase):
 
     def test_revised_mcqs_are_distinct_and_bilingual(self):
         records = self.bank["questions"]
-        self.assertEqual(len(records), 1507)
+        self.assertEqual(len(records), 319)
+        self.assertEqual(len({item["id"] for item in records}), 319)
+        self.assertTrue(all(item["type"] == "direct" for item in records))
+        self.assertEqual(self.bank["meta"]["source_records_before_editorial_curation"], 1507)
+        self.assertEqual(self.bank["meta"]["mechanically_generated_variants_removed"], 1188)
+        by_id = {item["id"]: item for item in records}
         stems = set()
         for n, (answer, printed_page) in KEYS.items():
             with self.subTest(question=n):
-                item = records[n - 1]
+                item = by_id[f"C11H19-Q{n:04d}"]
                 self.assertEqual(item["id"], f"C11H19-Q{n:04d}")
                 self.assertEqual(item["type"], "direct")
                 self.assertEqual(item["page_en"], printed_page)

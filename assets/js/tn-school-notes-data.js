@@ -11,7 +11,7 @@ window.ClearExamsTNSchoolNotes=[
       "One kilometre equals 1,000 metres, and one centimetre equals one-hundredth of a metre.",
       "The SI unit of area is square metre (m²), whereas the SI unit of volume is cubic metre (m³).",
       "A ruler or measuring tape measures length; a balance measures mass and a clock or stopwatch measures time.",
-      "Parallax error occurs when the eye is not directly in line with a scale marking; read at eye level.",
+      "Parallax error occurs when a scale mark is viewed from an angle; place the eye directly above the mark before reading.",
       "For an irregular curved line, a thread can be laid along the curve and then measured against a straight ruler."
 ],
     "points_ta": [
@@ -20,7 +20,7 @@ window.ClearExamsTNSchoolNotes=[
       "ஒரு கிலோமீட்டர் என்பது 1,000 மீட்டர்; ஒரு சென்டிமீட்டர் என்பது ஒரு மீட்டரின் நூறில் ஒரு பங்கு.",
       "பரப்பளவின் SI அலகு சதுர மீட்டர் (m²); கனஅளவின் SI அலகு கன மீட்டர் (m³) ஆகும்.",
       "அளவுகோல் அல்லது அளவை நாடா நீளத்தையும், தராசு நிறையையும், கடிகாரம் அல்லது நிறுத்துக்கடிகாரம் காலத்தையும் அளவிட உதவுகின்றன.",
-      "அளவுகோலின் குறியீட்டை நேராகப் பார்க்காமல் சாய்வாகப் பார்ப்பதால் இடமாறுபாட்டுப் பிழை ஏற்படுகிறது; கண்மட்டத்தில் வாசிக்க வேண்டும்.",
+      "அளவுகோலின் குறியீட்டைச் சாய்வாகப் பார்ப்பதால் இடமாறு தோற்றப் பிழை ஏற்படுகிறது; குறியீட்டின் நேர் மேலிருந்து பார்த்து அளவை வாசிக்க வேண்டும்.",
       "வளைந்த கோட்டின் நீளத்தை அளவிட நூலை அந்தக் கோட்டின் மீது வைத்து, பின்னர் நேரான அளவுகோலில் அதன் நீளத்தை அளக்கலாம்."
 ],
     "exam_focus": "Competitive exams often test the difference between base units and derived units, unit conversions and reading errors.",
@@ -36,7 +36,7 @@ window.ClearExamsTNSchoolNotes=[
     "href": "textbook-play.html?class=6&subject=science&term=1&unit=2&quiz=1",
     "points": [
       "Force is a push or pull that may change an object's speed, direction or shape.",
-      "Speed equals distance travelled divided by time taken, with SI unit metre per second (m/s).",
+      "Average speed equals total distance travelled divided by total time taken; its SI unit is metre per second (m/s).",
       "An object in uniform motion covers equal distances in equal intervals of time.",
       "Balanced forces produce no change in an object's state of motion; unbalanced forces can change it.",
       "Friction opposes relative motion between contacting surfaces and may also help us walk without slipping.",
@@ -45,7 +45,7 @@ window.ClearExamsTNSchoolNotes=[
 ],
     "points_ta": [
       "விசை என்பது தள்ளுதல் அல்லது இழுத்தல்; அது பொருளின் வேகம், திசை அல்லது வடிவத்தை மாற்றக்கூடும்.",
-      "வேகம் = கடந்த தொலைவு / எடுத்துக்கொண்ட காலம்; இதன் SI அலகு மீட்டர்/வினாடி (m/s) ஆகும்.",
+      "சராசரி வேகம் = கடந்த மொத்தத் தொலைவு / எடுத்துக்கொண்ட மொத்தக் காலம்; இதன் SI அலகு மீட்டர்/வினாடி (m/s) ஆகும்.",
       "சீரான இயக்கத்தில் ஒரு பொருள் சம கால இடைவெளிகளில் சம தொலைவுகளைக் கடக்கிறது.",
       "சமநிலை விசைகள் பொருளின் இயக்கநிலையை மாற்றாது; சமநிலையற்ற விசைகள் இயக்கநிலையை மாற்றக்கூடும்.",
       "உராய்வு தொடும் பரப்புகளுக்கிடையிலான சார்பு இயக்கத்தை எதிர்க்கிறது; வழுக்காமல் நடக்கவும் உதவுகிறது.",
@@ -77,15 +77,15 @@ window.ClearExamsTNSchoolNotes=[
       "திண்மத்துக்கு நிலையான வடிவமும் கனஅளவும் உண்டு; திரவத்துக்கு நிலையான கனஅளவு உண்டு, ஆனால் கொள்கலனின் வடிவத்தை ஏற்கும்.",
       "வாயுவுக்கு நிலையான வடிவமோ கனஅளவோ இல்லை; கிடைக்கும் இடம் முழுவதும் பரவுகிறது.",
       "தூய பொருளுக்கு குறிப்பிட்ட இயைபு உண்டு; கலவையில் இரண்டு அல்லது அதற்கு மேற்பட்ட பொருட்கள் இயற்பியல் முறையில் சேர்ந்திருக்கும்.",
-      "படிதல் முறையில் கரையாத கனமான துகள்கள் அடியில் தங்கும்; தெளியவார்த்தல் மூலம் மேலுள்ள திரவத்தைப் பிரிக்கலாம்.",
+      "படிய வைத்தல் முறையில் கரையாத கனமான துகள்கள் அடியில் வண்டலாகத் தங்கும்; தெளிய வைத்து இறுத்தல் மூலம் மேலுள்ள திரவத்தைப் பிரிக்கலாம்.",
       "வடிகட்டுதல் முறையில் பொருத்தமான வடிகட்டியின் உதவியுடன் திரவத்திலிருந்து கரையாத திண்மத் துகள்களைப் பிரிக்கலாம்.",
-      "உப்பு நீரிலிருந்து கரைந்த உப்பைப் பெற ஆவியாதல் முறையைப் பயன்படுத்தலாம்."
+      "உப்பு நீரிலிருந்து கரைந்த உப்பைப் பெற ஆவியாக்குதல் முறையைப் பயன்படுத்தலாம்."
 ],
     "exam_focus": "Match the separation technique to the physical property of the mixture, especially solubility and particle size.",
     "exam_focus_ta": "கலவையின் கரைதிறன், துகள் அளவு போன்ற இயற்பியல் பண்புகளுக்கேற்ப பிரித்தல் முறையைப் பொருத்திக் காண வேண்டும்.",
     "worked_example": "To separate sand from salt water, filter out the sand and then evaporate the filtrate to recover salt.",
     "worked_example_ta": "மணல் கலந்த உப்பு நீரை வடிகட்டினால் மணல் பிரியும்; பின்னர் வடிநீரை ஆவியாக்கினால் உப்பைப் பெறலாம்.",
-    "quick_check": {"question":"Which method recovers salt from a salt-water solution?","question_ta":"உப்புநீரிலிருந்து உப்பை மீட்கப் பயன்படும் முறை எது?","answer":"Evaporation.","answer_ta":"ஆவியாதல்."}
+    "quick_check": {"question":"Which method recovers salt from a salt-water solution?","question_ta":"உப்புநீரிலிருந்து உப்பை மீட்கப் பயன்படும் முறை எது?","answer":"Evaporation.","answer_ta":"ஆவியாக்குதல்."}
   },
   {
     "id": "electricity",
