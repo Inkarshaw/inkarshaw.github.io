@@ -92,6 +92,7 @@
         index:0,timed:$('timedCheck').checked,deadline:$('timedCheck').checked?Date.now()+qs.length*60000:null,finished:false};
       save();
     }
+    endTimer();timingHandle=setInterval(tick,1000);
     $('quizTitle').textContent=(qs[0].SourceExam===qs[qs.length-1].SourceExam&&$('examSelect').value?$('examSelect').value:'Mixed exams')+
       ' · '+($('yearSelect').value||'All years')+' · '+qs.length+' adapted PYQs';
     show('quiz');renderQuestion();tick();
@@ -212,7 +213,6 @@
     if(!confirm('Start a new attempt? Your completed score remains in local history.'))return;
     storageWrite(activeKey,null);session=null;show('setup');start();
   });
-  timingHandle=setInterval(tick,1000);
   fetch(FEED,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('PYQ question bank unavailable');return r.json()})
     .then(data=>{
       if(!Array.isArray(data))throw Error('Invalid PYQ bank');
