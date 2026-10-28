@@ -1,4 +1,4 @@
-"""Validate the first Class 7 Term III Social Science bilingual quiz and catalogue."""
+"""Validate published Class 7 Term III Social Science bilingual quizzes and catalogue."""
 import json
 from pathlib import Path
 import unittest
@@ -16,8 +16,8 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
         self.assertEqual(index["meta"]["unit_count"], 10)
         self.assertEqual(len(index["units"]), 10)
         self.assertEqual([u["id"] for u in index["units"]], list(range(1, 11)))
-        self.assertEqual(sum(u["total"] for u in index["units"]), 20)
-        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 1)
+        self.assertEqual(sum(u["total"] for u in index["units"]), 40)
+        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 2)
         for unit in index["units"]:
             if unit["ready"]:
                 self.assertGreater(unit["total"], 0)
@@ -52,6 +52,32 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
                 self.assertIn(q["correct"], range(4))
                 self.assertGreaterEqual(len(q["exp_en"]), 78)
                 self.assertGreaterEqual(len(q["exp_ta"]), 55)
+
+    def test_second_history_quiz_is_complete_and_bilingual(self):
+        bank = json.loads((TERM / "unit-2.json").read_text(encoding="utf-8"))
+        qs = bank["questions"]
+        self.assertEqual(bank["meta"]["edition"], 2024)
+        self.assertEqual(bank["meta"]["total_questions"], 20)
+        self.assertEqual(bank["meta"]["unit"], 2)
+        self.assertEqual(len(qs), 20)
+        self.assertEqual(len(bank["meta"]["quiz_sets"]), 1)
+        self.assertEqual([q["id"] for q in qs],
+                         [f"C7SS3U2-Q{i:03d}" for i in range(1, 21)])
+        self.assertEqual([sum(q["correct"] == c for q in qs) for c in range(4)],
+                         [5, 5, 5, 5])
+        for q in qs:
+            with self.subTest(question=q["id"]):
+                self.assertEqual(q["quiz"], 1)
+                self.assertTrue(q["q_en"].endswith("?"))
+                self.assertTrue(q["q_ta"].endswith("?"))
+                self.assertNotIn("according to the textbook", q["q_en"].lower())
+                self.assertEqual(len(q["opts_en"]), 4)
+                self.assertEqual(len(q["opts_ta"]), 4)
+                self.assertEqual(len(set(o.casefold() for o in q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn(q["correct"], range(4))
+                self.assertGreaterEqual(len(q["exp_en"]), 70)
+                self.assertGreaterEqual(len(q["exp_ta"]), 50)
 
     def test_source_registry_has_separate_english_and_tamil_links(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
