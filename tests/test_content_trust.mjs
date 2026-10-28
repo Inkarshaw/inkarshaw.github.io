@@ -125,4 +125,16 @@ assert.ok(stationMaster.source.includes('pib.gov.in'));
 assert.ok(stationMaster.verifiedOn);
 assert.ok(review.boards.tnusrb.lastReviewed!=='2026-10-28','Do not mark TNUSRB verified without an official check');
 
+const tnusrbHub=read('tnusrb.html');
+assert.match(tnusrbHub,/id="tentative-2026-27-planner"/);
+assert.match(tnusrbHub,/Current verification status:/);
+assert.match(tnusrbHub,/could not complete a live official-site review/);
+assert.match(tnusrbHub,/not application deadlines, exam dates/);
+assert.match(tnusrbHub,/exam-calendar.html\?category=tnusrb/);
+for(const month of ['December 2026','February 2027','March 2027','June 2027']){
+ assert.match(tnusrbHub,new RegExp(month));
+}
+const tnusrbPolicy=JSON.parse(read('data/exams/review-schedule.json'));
+assert.notEqual(tnusrbPolicy.boards.tnusrb.lastReviewed,'2026-10-28','Do not falsify an official TNUSRB review');
+
 console.log('Content trust tests passed: notes, PYQ practice, calendar review, report form and progress transfer.');
