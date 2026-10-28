@@ -37,7 +37,7 @@ assert.match(hub,/Original 200-question paper/);
 assert.match(hub,/pyq-original-paper\.html/);
 assert.match(hub,/pyq-full-quiz\.html/);
 assert.match(adapted,/All Available Adapted PYQs/);
-assert.match(adapted,/not the complete official examination paper/);
+assert.match(adapted,/Not a complete original paper/);
 assert.match(read('sitemap.xml'),/pyq-original-paper\.html/);
 new vm.Script(js,{filename:'assets/js/pyq-original-paper.js'});
 new vm.Script(adaptedJs,{filename:'assets/js/pyq-full-quiz.js'});
