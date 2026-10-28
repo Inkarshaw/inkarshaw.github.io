@@ -88,6 +88,8 @@
     plainLink($('sourceKey'),p.answerKeyUrl,'Open official final answer key (PDF) ↗');
     $('paperFrame').src=safe(p.paperUrl)||'about:blank';
     $('paperFrame').title='TNPSC '+p.year+' official original question paper (PDF)';
+    const adapted=new URLSearchParams({exam:'TNPSC Group IV',year:String(p.year)});
+    $('adaptedQuizLink').href='pyq-full-quiz.html?'+adapted.toString();
     switchView('questions');
     const saved=read(p.id);
     if(saved&&(saved.version===1||saved.version===2)&&Array.isArray(saved.answers)&&saved.answers.length===p.questionCount&&
