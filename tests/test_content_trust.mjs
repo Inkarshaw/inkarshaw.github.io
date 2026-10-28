@@ -90,4 +90,39 @@ for(const name of ['exam-calendar.html','textbook-play.html','pyq-hub.html','das
   new vm.Script(match[2],{filename:name});
  }
 }
+
+const sampleHtml=read('practice-demo.html');
+const demoScript=sampleHtml.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert.ok(demoScript,'Demo quiz script missing');
+new vm.Script(demoScript,{filename:'practice-demo.html'});
+const questionSource=demoScript.match(/const questions=(\[[\s\S]*?\]);\s*let index=/)?.[1];
+assert.ok(questionSource,'Demo question bank missing');
+const samples=vm.runInNewContext(questionSource);
+assert.equal(samples.length,12,'Instant demo must show 12 real questions');
+for(const q of samples){
+ assert.ok(q.q.length>=18,'Question should be meaningful');
+ assert.equal(q.o.length,4,'Each question requires four options');
+ assert.equal(new Set(q.o).size,4,'Duplicate answer choices');
+ assert.ok(Number.isInteger(q.a)&&q.a>=0&&q.a<4,'Unambiguous answer index');
+ assert.ok(q.e.length>=45,'Explanation should teach the concept');
+}
+assert.match(sampleHtml,/not<\/strong> claimed to be previous-year/i);
+assert.match(sampleHtml,/\[hidden\]\{display:none!important\}/);
+assert.ok(!/\bfetch\s*\(/.test(demoScript),'Sample must not depend on remote questions');
+for(const name of ['tnpsc.html','upsc.html']){
+ const words=read(name).replace(/<[^>]*>/g,' ').split(/\s+/).filter(Boolean);
+ assert.ok(words.length>3000,name+': full syllabus study pillar should exceed 3000 words');
+ assert.match(read(name),/id="study-guide"/);
+}
+assert.match(read('index.html'),/editorial-policy\.html/);
+assert.match(read('index.html'),/practice-demo\.html/);
+assert.match(read('sitemap.xml'),/practice-demo\.html/);
+assert.match(read('sitemap.xml'),/editorial-policy\.html/);
+const noticeData=JSON.parse(read('data/exams/exam-notifications.json'));
+const stationMaster=noticeData.entries.find(e=>e.id==='railways-station-master-2026');
+assert.equal(stationMaster.applicationEnd,'2026-11-25');
+assert.ok(stationMaster.source.includes('pib.gov.in'));
+assert.ok(stationMaster.verifiedOn);
+assert.ok(review.boards.tnusrb.lastReviewed!=='2026-10-28','Do not mark TNUSRB verified without an official check');
+
 console.log('Content trust tests passed: notes, PYQ practice, calendar review, report form and progress transfer.');
