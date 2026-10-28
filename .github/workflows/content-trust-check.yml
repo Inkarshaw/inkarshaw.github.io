@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "pyq-hub.html"
+      - "pyq-original-paper.html"
+      - "pyq-full-quiz.html"
+      - "data/quizzes/original-paper-practice.json"
+      - "tests/test_pyq_original_paper.mjs"
       - "daily-quiz.html"
       - "textbook-play.html"
       - "textbook-topics.html"
@@ -27,6 +31,10 @@ on:
     branches: [main]
     paths:
       - "pyq-hub.html"
+      - "pyq-original-paper.html"
+      - "pyq-full-quiz.html"
+      - "data/quizzes/original-paper-practice.json"
+      - "tests/test_pyq_original_paper.mjs"
       - "daily-quiz.html"
       - "textbook-play.html"
       - "textbook-topics.html"
@@ -63,6 +71,8 @@ jobs:
         run: node tests/test_tnpsc_g4_2024_final_key.mjs
       - name: Validate full bilingual Group IIA notes
         run: node tests/test_group2a_text_notes.mjs
+      - name: Validate original full-paper PDF companion without transcription claims
+        run: node tests/test_pyq_original_paper.mjs
       - name: Validate year-wise PYQ routing
         run: node tests/test_pyq_yearwise.mjs
       - name: Audit source-attributed PYQ coverage
