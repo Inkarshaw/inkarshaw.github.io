@@ -40,4 +40,11 @@ assert.match(js,/localStorage\.setItem/);
 assert.match(js,/encodeURIComponent|URLSearchParams/);
 assert.ok(!js.includes('innerHTML'),'Quiz options must be inserted as plain text, not HTML');
 new vm.Script(js,{filename:'assets/js/ncert-school-book-quiz.js'});
+for(const page of ['index.html','practice.html','start.html','search.html','textbook-quiz.html']){
+ const content=get(page);
+ assert.match(content,/href="ncert-school-book-quiz\.html"/,page+' must link to NCERT quiz');
+ assert.match(content,/NCERT School Book Quiz/,page+' must use the student-facing name');
+}
+assert.match(get('sitemap.xml'),/https:\/\/clearexams\.ink\/ncert-school-book-quiz\.html/,'NCERT route missing from sitemap');
+assert.match(get('textbook-quiz.html'),/TN School Book Quiz/,'Keep existing TN School Book Quiz');
 console.log('NCERT School Book Quiz: '+bank.sets.length+' sets, '+count+' unique questions, Grades 6–12, UI and script validated.');
