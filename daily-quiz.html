@@ -74,36 +74,7 @@ function dateLabel(iso){return new Date(iso+"T00:00:00+05:30").toLocaleDateStrin
 function hash(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function valid(q){const status=String(q.Status||"").trim();return (!status||status==="Published")&&q.Question&&letters.every(l=>q["Option"+l]&&q["Explanation"+l])&&letters.includes((q.CorrectAnswer||"").toUpperCase())}
 function dailySet(rows,topic,date,context=""){const exact=rows.filter(q=>topicFor(q)===topic&&q.PublishDate===date);if(exact.length>=PRACTICE_COUNT)return exact.slice(0,PRACTICE_COUNT);const pool=rows.filter(q=>topicFor(q)===topic&&(!q.PublishDate||q.PublishDate<=date));const ranked=pool.map(q=>({q,rank:hash(date+"|"+context+"|"+topic+"|"+(q.ID||q.Question))})).sort((a,b)=>a.rank-b.rank);if(topic!=="Previous Year Questions")return ranked.slice(0,PRACTICE_COUNT).map(x=>x.q);const groups=new Map();ranked.forEach(x=>{const exam=x.q.SourceExam||"Unknown exam";if(!groups.has(exam))groups.set(exam,[]);groups.get(exam).push(x.q)});const names=[...groups.keys()].sort(),chosen=[],start=names.length?hash(date+"|"+context)%names.length:0;while(chosen.length<PRACTICE_COUNT){let added=false;for(let i=0;i<names.length&&chosen.length<PRACTICE_COUNT;i++){const items=groups.get(names[(i+start)%names.length]);if(items.length){chosen.push(items.shift());added=true}}if(!added)break}return chosen}
-async function loadBank(){
-  // Prioritise the repository's synchronised, same-origin bank. A slow or blocked
-  // Google Sheets request must never keep first-time learners on a spinner.
-  const merged=new Map();const errors=[];
-  async function addCSV(url,timeoutMs){
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
-    try{const res=await fetch(url,{cache:"no-store",signal:controller.signal});if(!res.ok)throw Error("HTTP "+res.status);
-      const rows=parseCSV(await res.text()).filter(valid);
-      if(!rows.length)throw Error("No valid questions returned");
-      rows.forEach(q=>merged.set(q.ID||[q.Exam,q.Subtopic,q.Topic,q.Question].join("|"),q));
-      return true;
-    }finally{clearTimeout(timer)}
-  }
-  // Always load locally first. Include the local verified PYQ bank where available.
-  let localOK=false;
-  try{localOK=await addCSV(FALLBACK_CSV_URL,5000)}catch(e){errors.push(e)}
-  try{
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),3000);
-    try{const res=await fetch(VERIFIED_PYQ_URL,{cache:"no-store",signal:controller.signal});
-      if(res.ok){const pyqs=await res.json();
-        if(Array.isArray(pyqs))pyqs.filter(q=>valid(q)&&q.SourceExam&&/^20\d{2}$/.test(String(q.SourceYear||""))&&/^https:\/\//.test(String(q.SourceURL||""))).forEach(q=>merged.set(q.ID,q));
-      }
-    }finally{clearTimeout(timer)}
-  }catch(e){console.warn("Optional verified PYQ bank unavailable",e)}
-  if(localOK&&merged.size)return [...merged.values()];
-  // Emergency online fallback only when the bundled CSV cannot be loaded.
-  try{await addCSV(GOOGLE_SHEET_CSV_URL,4500)}catch(e){errors.push(e)}
-  if(merged.size)return [...merged.values()];
-  throw errors[errors.length-1]||Error("No quiz source is available");
-}
+async function loadBank(){ const merged=new Map();const errors=[]; async function addCSV(url,timeoutMs){ const controller=typeof AbortController==="function"?new AbortController():null,timer=controller&&typeof setTimeout==="function"?setTimeout(()=>controller.abort(),timeoutMs):null; try{const res=await fetch(url,{cache:"no-store",...(controller?{signal:controller.signal}:{})});if(!res.ok)throw Error("HTTP "+res.status); const rows=parseCSV(await res.text()).filter(valid); if(!rows.length)throw Error("No valid questions returned"); rows.forEach(q=>merged.set(q.ID||[q.Exam,q.Subtopic,q.Topic,q.Question].join("|"),q)); return true; }finally{if(timer!==null&&typeof clearTimeout==="function")clearTimeout(timer)} } let localOK=false; try{localOK=await addCSV(FALLBACK_CSV_URL,5000)}catch(e){errors.push(e)} try{ const controller=typeof AbortController==="function"?new AbortController():null,timer=controller&&typeof setTimeout==="function"?setTimeout(()=>controller.abort(),3000):null; try{const res=await fetch(VERIFIED_PYQ_URL,{cache:"no-store",...(controller?{signal:controller.signal}:{})}); if(res.ok){const pyqs=await res.json(); if(Array.isArray(pyqs))pyqs.filter(q=>valid(q)&&q.SourceExam&&/^20\d{2}$/.test(String(q.SourceYear||""))&&/^https:\/\//.test(String(q.SourceURL||""))).forEach(q=>merged.set(q.ID,q)); } }finally{if(timer!==null&&typeof clearTimeout==="function")clearTimeout(timer)} }catch(e){console.warn("Optional verified PYQ bank unavailable",e)} if(localOK&&merged.size)return [...merged.values()]; try{await addCSV(GOOGLE_SHEET_CSV_URL,4500)}catch(e){errors.push(e)} if(merged.size)return [...merged.values()]; throw errors[errors.length-1]||Error("No quiz source is available"); } 
 function getQuizHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]")}catch{return[]}}
 function wrongBook(){try{return JSON.parse(localStorage.getItem(WRONG_KEY)||"[]")}catch{return[]}}
 function questionKey(q){return q.ID||[q.Exam,q.Subtopic,q.Topic,q.Question].join("|")}
