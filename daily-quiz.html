@@ -94,7 +94,7 @@ async function loadBank(){
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),3000);
     try{const res=await fetch(VERIFIED_PYQ_URL,{cache:"no-store",signal:controller.signal});
       if(res.ok){const pyqs=await res.json();
-        if(Array.isArray(pyqs))pyqs.filter(q=>valid(q)&&q.SourceExam&&/^20\\d{2}$/.test(String(q.SourceYear||""))&&/^https:\\/\\//.test(String(q.SourceURL||""))).forEach(q=>merged.set(q.ID,q));
+        if(Array.isArray(pyqs))pyqs.filter(q=>valid(q)&&q.SourceExam&&/^20\d{2}$/.test(String(q.SourceYear||""))&&/^https:\/\//.test(String(q.SourceURL||""))).forEach(q=>merged.set(q.ID,q));
       }
     }finally{clearTimeout(timer)}
   }catch(e){console.warn("Optional verified PYQ bank unavailable",e)}
