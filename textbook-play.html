@@ -44,12 +44,12 @@ h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9
 </main>
 <script src="assets/js/textbook-quality.js"></script>
 <script>
-const p=new URLSearchParams(location.search),mode=['practice','timed'].includes(p.get('mode'))?p.get('mode'):'standard',classNo=Number(p.get('class')||6),subjectSlug=p.get('subject')||(classNo>=11?'history':'science'),subject=(classNo===12&&subjectSlug==='geography')?'geography':classNo>=11?'history':(subjectSlug==='social-science'?'social-science':'science'),term=Number(p.get('term')||1),unit=Number(p.get('unit')||1),quizRaw=p.get('quiz')||'1',quizNo=quizRaw==='all'?'all':Number(quizRaw),DATA=classNo===11?'data/textbook/class-11/history/unit-'+String(unit).padStart(2,'0')+'.json':classNo===12?'data/textbook/class-12/'+subject+'/unit-'+unit+'.json':(classNo===6||classNo===7||classNo===8)?'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json':'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json',KEY='clearexamsTextbookProgressV2';
+const p=new URLSearchParams(location.search),mode=['practice','timed'].includes(p.get('mode'))?p.get('mode'):'standard',classNo=Number(p.get('class')||6),subjectSlug=p.get('subject')||(classNo>=11?'history':'science'),subject=(classNo===12&&subjectSlug==='geography')?'geography':classNo>=11?'history':(subjectSlug==='social-science'?'social-science':'science'),term=Number(p.get('term')||1),unit=Number(p.get('unit')||1),topicSlug=p.get('topic')||'',quizRaw=p.get('quiz')||(topicSlug?'all':'1'),quizNo=quizRaw==='all'?'all':Number(quizRaw),DATA=classNo===11?'data/textbook/class-11/history/unit-'+String(unit).padStart(2,'0')+'.json':classNo===12?'data/textbook/class-12/'+subject+'/unit-'+unit+'.json':(classNo===6||classNo===7||classNo===8)?'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json':'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json',KEY='clearexamsTextbookProgressV2';
 let sourceRegistry={},lang=localStorage.getItem('clearexamsTextbookLang')||'en',meta=null,qs=[],idx=0,answers=[],checked=[],marked=[],deadline=0,completed=false;
-const catalogParams=new URLSearchParams({class:String(classNo),subject,unit:String(unit)});if(classNo<=8)catalogParams.set('term',String(term));const catalogUrl='textbook-quiz.html?'+catalogParams.toString();
+const catalogParams=new URLSearchParams({class:String(classNo),subject,unit:String(unit)});if(classNo<=8)catalogParams.set('term',String(term));const catalogUrl=(topicSlug?'textbook-topics.html?':'textbook-quiz.html?')+catalogParams.toString();
 const bookmarkKey='clearexamsTextbookBookmarksV1';let bookmarks=new Set();try{bookmarks=new Set(JSON.parse(localStorage.getItem(bookmarkKey)||'[]'))}catch{}
 const questionKey=q=>String(q.id||classNo+'-'+subject+'-'+term+'-'+unit+'-'+q.q_en);
-const storageId='c'+classNo+'-'+subject+'-t'+term+'-u'+unit+'-q'+quizNo+(mode==='standard'?'':'-'+mode);
+const storageId='c'+classNo+'-'+subject+'-t'+term+'-u'+unit+(topicSlug?'-topic-'+topicSlug:'-q'+quizNo)+(mode==='standard'?'':'-'+mode);
 const $=id=>document.getElementById(id);
 $('backLink').href=catalogUrl;$('resultBack').href=catalogUrl;
 function txt(en,ta){return lang==='ta'?(ta??en):en}
@@ -98,12 +98,12 @@ function safeSourceUrl(q){
 }
 function render(){
  if(!qs.length||completed)return;
- const q=qs[idx],set=quizNo==='all'?{title_en:'Full Unit · All Questions',title_ta:'முழு அலகு · அனைத்து வினாக்கள்'}:(meta.quiz_sets.find(x=>Number(x.id)===quizNo)||{title_en:'Quiz '+quizNo,title_ta:'வினாடி வினா '+quizNo});
+ const q=qs[idx],set=topicSlug?(meta.topics||[]).find(t=>t.slug===topicSlug)||{title_en:'Topic quiz',title_ta:'தலைப்பு வினாடி வினா'}:quizNo==='all'?{title_en:'Full Unit · All Questions',title_ta:'முழு அலகு · அனைத்து வினாக்கள்'}:(meta.quiz_sets.find(x=>Number(x.id)===quizNo)||{title_en:'Quiz '+quizNo,title_ta:'வினாடி வினா '+quizNo});
  document.documentElement.lang=lang==='ta'?'ta':'en';
  const subjEn=subject==='history'?'History':subject==='geography'?'Geography':subject==='social-science'?'Social Science':'Science',subjTa=subject==='history'?'வரலாறு':subject==='geography'?'புவியியல்':subject==='social-science'?'சமூக அறிவியல்':'அறிவியல்',sectionEn=meta.section_en?' → '+meta.section_en:'',sectionTa=meta.section_ta?' → '+meta.section_ta:'',displayUnit=meta.display_unit??meta.unit,termEn=classNo<=8?' → Term '+(term===3?'III':term===2?'II':'I'):'',termTa=classNo<=8?' → '+(term===3?'மூன்றாம் பருவம்':term===2?'இரண்டாம் பருவம்':'முதல் பருவம்'):'';
  $('crumb').textContent=lang==='ta'?classNo+'ஆம் வகுப்பு → '+subjTa+termTa+sectionTa+' → அலகு '+displayUnit+' · '+(meta.unit_ta||''):classNo+'th Standard → '+subjEn+termEn+sectionEn+' → Unit '+displayUnit+' · '+(meta.unit_en||'');
- $('backLink').textContent=txt('← Back to selected unit','← தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
- $('resultBack').textContent=txt('Back to selected unit','தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
+ $('backLink').textContent=topicSlug?txt('← Back to topics','← தலைப்புகளுக்குத் திரும்பு'):txt('← Back to selected unit','← தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
+ $('resultBack').textContent=topicSlug?txt('Back to topics','தலைப்புகளுக்குத் திரும்பு'):txt('Back to selected unit','தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
  $('setBadge').textContent=txt(set.title_en,set.title_ta)+' · '+(idx+1)+' / '+qs.length;
  const pageRef=lang==='ta'?(q.page_ta??q.page_en??q.page):(q.page_en??q.page_ta??q.page);
  const src=safeSourceUrl(q),a=$('sourceLink');
@@ -134,7 +134,7 @@ function render(){
 $('bookmark').onclick=()=>{const k=questionKey(qs[idx]);if(bookmarks.has(k))bookmarks.delete(k);else bookmarks.add(k);localStorage.setItem(bookmarkKey,JSON.stringify([...bookmarks]));render()};
 $('mark').onclick=()=>{marked[idx]=!marked[idx];render()};
 $('report').onclick=async()=>{
- const q=qs[idx],report=['ClearExams textbook question report','Class: '+classNo,'Subject: '+subject,'Term: '+term,'Unit: '+unit,'Quiz: '+quizNo,'Question: '+(idx+1),'ID: '+(q.id||'Not set'),'Textbook page: '+(q.page||q.page_en||'Unverified'),'Question (English): '+q.q_en,'Suggested correction: '].join('\n');
+ const q=qs[idx],report=['ClearExams textbook question report','Class: '+classNo,'Subject: '+subject,'Term: '+term,'Unit: '+unit,'Quiz: '+quizNo,'Topic: '+(topicSlug||'Unit quiz'),'Question: '+(idx+1),'ID: '+(q.id||'Not set'),'Textbook page: '+(q.page||q.page_en||'Unverified'),'Question (English): '+q.q_en,'Suggested correction: '].join('\n');
  const url=new URL('https://github.com/Inkarshaw/inkarshaw.github.io/issues/new');
  url.searchParams.set('template','textbook-question.yml');
  url.searchParams.set('title','[Textbook question] '+String(q.id||classNo+'-'+subject+'-'+unit+'-'+(idx+1)));
@@ -160,7 +160,7 @@ function finish(retranslate=false){
  $('correctN').textContent=correct;$('wrongN').textContent=wrong;$('accuracy').textContent=pct+'%';
  $('resultBadge').textContent=txt('Completed','முடிக்கப்பட்டது');
  $('correctLabel').textContent=txt('Correct','சரி');$('wrongLabel').textContent=txt('Wrong','தவறு');$('accuracyLabel').textContent=txt('Accuracy','துல்லியம்');
- $('resultBack').textContent=txt('Back to selected unit','தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
+ $('resultBack').textContent=topicSlug?txt('Back to topics','தலைப்புகளுக்குத் திரும்பு'):txt('Back to selected unit','தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
  $('retry').textContent=txt('Retry quiz','மீண்டும் முயற்சி');
  $('resultTitle').textContent=txt(pct>=80?'Excellent work!':'Review and practise again',pct>=80?'சிறப்பு!':'மீண்டும் பயிற்சி செய்க');
  const r=$('review');r.replaceChildren();const h=document.createElement('h3');h.textContent=txt('Review','மீளாய்வு');r.appendChild(h);
@@ -206,7 +206,15 @@ async function loadQuizData(){
     e.questions=arr;
     return e;
   };
-  if(quizNo==='all'){
+  if(topicSlug){
+    const topic=(meta.topics||[]).find(t=>t.slug===topicSlug);
+    if(!topic||!Array.isArray(topic.question_ids)||!topic.question_ids.length){
+      $('quizCard').textContent=txt('Topic unavailable. Please select a listed topic.','இந்தத் தலைப்பு கிடைக்கவில்லை. பட்டியலில் உள்ள தலைப்பைத் தேர்ந்தெடுக்கவும்.');
+      return;
+    }
+    const topicIds=new Set(topic.question_ids);
+    qs=curatedBase.questions.filter(q=>topicIds.has(q.id));
+  }else if(quizNo==='all'){
     let all=Array.isArray(d.questions)?[...d.questions]:[];
     if(classNo===6||classNo===7||classNo===8){
       try{
