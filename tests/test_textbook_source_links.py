@@ -57,6 +57,9 @@ class TextbookSourceTests(unittest.TestCase):
     def test_full_question_bank_audit_runs(self):
         report = MODULE.audit()
         self.assertGreater(report["counts"]["question_entries"], 0)
+        for key in ("invalid_metadata_urls", "invalid_question_urls", "en_missing", "ta_missing",
+                    "unreadable_or_invalid_json_files", "invalid_question_records"):
+            self.assertEqual(report["counts"].get(key, 0), 0, f"Textbook source audit: {key}")
         self.assertEqual(report["counts"]["question_entries"] * 2,
                          sum(report["counts"].get(key, 0)
                              for key in ("en_linked", "en_missing", "ta_linked", "ta_missing")))
