@@ -16,8 +16,8 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
         self.assertEqual(index["meta"]["unit_count"], 10)
         self.assertEqual(len(index["units"]), 10)
         self.assertEqual([u["id"] for u in index["units"]], list(range(1, 11)))
-        self.assertEqual(sum(u["total"] for u in index["units"]), 100)
-        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 5)
+        self.assertEqual(sum(u["total"] for u in index["units"]), 120)
+        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 6)
         for unit in index["units"]:
             if unit["ready"]:
                 self.assertGreater(unit["total"], 0)
@@ -191,6 +191,46 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
         scale = next(q for q in qs if q["id"] == "C7SS3U5-Q002")
         self.assertEqual(scale["opts_en"][scale["correct"]], "40 km")
         self.assertEqual(scale["opts_ta"][scale["correct"]], "40 கி.மீ.")
+
+    def test_geography_natural_hazards_quiz_bilingual_and_complete(self):
+        index = json.loads((TERM / "index.json").read_text(encoding="utf-8"))
+        unit = index["units"][5]
+        self.assertEqual(unit["id"], 6)
+        self.assertTrue(unit["ready"])
+        self.assertEqual(unit["total"], 20)
+        self.assertEqual(unit["quiz_count"], 1)
+        bank = json.loads((TERM / unit["path"]).read_text(encoding="utf-8"))
+        self.assertEqual(bank["meta"]["edition"], 2024)
+        self.assertEqual(bank["meta"]["unit"], 6)
+        self.assertEqual(bank["meta"]["total_questions"], 20)
+        self.assertEqual(len(bank["meta"]["quiz_sets"]), 1)
+        qs = bank["questions"]
+        self.assertEqual(len(qs), 20)
+        self.assertEqual([q["id"] for q in qs],
+                         [f"C7SS3U6-Q{i:03d}" for i in range(1, 21)])
+        self.assertEqual([sum(q["correct"] == c for q in qs) for c in range(4)],
+                         [5, 5, 5, 5])
+        self.assertEqual(len({q["q_en"].casefold() for q in qs}), 20)
+        for q in qs:
+            with self.subTest(question=q["id"]):
+                self.assertEqual(q["quiz"], 1)
+                self.assertTrue(q["q_en"].endswith("?"))
+                self.assertTrue(q["q_ta"].endswith("?"))
+                self.assertNotIn("according to the textbook", q["q_en"].lower())
+                self.assertEqual(len(q["opts_en"]), 4)
+                self.assertEqual(len(q["opts_ta"]), 4)
+                self.assertEqual(len(set(x.casefold() for x in q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn(q["correct"], range(4))
+                self.assertGreaterEqual(len(q["exp_en"]), 70)
+                self.assertGreaterEqual(len(q["exp_ta"]), 55)
+                # Page numbers cannot be invented before checking the printed book.
+                self.assertNotIn("page", q)
+                self.assertNotIn("page_en", q)
+                self.assertNotIn("page_ta", q)
+        # Guard an important conceptual distinction used in competitive exams.
+        first = qs[0]
+        self.assertIn("ability to cope", first["opts_en"][first["correct"]])
 
     def test_source_registry_has_separate_english_and_tamil_links(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
