@@ -16,8 +16,8 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
         self.assertEqual(index["meta"]["unit_count"], 10)
         self.assertEqual(len(index["units"]), 10)
         self.assertEqual([u["id"] for u in index["units"]], list(range(1, 11)))
-        self.assertEqual(sum(u["total"] for u in index["units"]), 140)
-        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 7)
+        self.assertEqual(sum(u["total"] for u in index["units"]), 160)
+        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 8)
         for unit in index["units"]:
             if unit["ready"]:
                 self.assertGreater(unit["total"], 0)
@@ -273,6 +273,51 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
         gap = next(q for q in qs if q["id"] == "C7SS3U7-Q009")
         self.assertEqual(gap["opts_en"][gap["correct"]],
                          "16.68 percentage points")
+
+    def test_civics_market_consumer_protection_bilingual_quiz(self):
+        index = json.loads((TERM / "index.json").read_text(encoding="utf-8"))
+        entry = index["units"][7]
+        self.assertEqual(entry["id"], 8)
+        self.assertTrue(entry["ready"])
+        self.assertEqual(entry["total"], 20)
+        self.assertEqual(entry["quiz_count"], 1)
+        bank = json.loads((TERM / entry["path"]).read_text(encoding="utf-8"))
+        qs = bank["questions"]
+        self.assertEqual(bank["meta"]["unit"], 8)
+        self.assertEqual(bank["meta"]["edition"], 2024)
+        self.assertEqual(bank["meta"]["total_questions"], 20)
+        self.assertEqual(len(bank["meta"]["quiz_sets"]), 1)
+        self.assertEqual(len(qs), 20)
+        self.assertEqual([q["id"] for q in qs],
+                         [f"C7SS3U8-Q{i:03d}" for i in range(1, 21)])
+        self.assertEqual([sum(q["correct"] == c for q in qs) for c in range(4)],
+                         [5, 5, 5, 5])
+        self.assertEqual(len(set(q["q_en"].casefold() for q in qs)), 20)
+        for q in qs:
+            with self.subTest(question=q["id"]):
+                self.assertEqual(q["quiz"], 1)
+                self.assertTrue(q["q_en"].endswith("?"))
+                self.assertTrue(q["q_ta"].endswith("?"))
+                self.assertNotIn("according to the textbook", q["q_en"].lower())
+                self.assertEqual(len(q["opts_en"]), 4)
+                self.assertEqual(len(q["opts_ta"]), 4)
+                self.assertEqual(len(set(x.casefold() for x in q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn(q["correct"], range(4))
+                self.assertGreaterEqual(len(q["exp_en"]), 67)
+                self.assertGreaterEqual(len(q["exp_ta"]), 55)
+                self.assertNotIn("page", q)
+                self.assertNotIn("page_en", q)
+                self.assertNotIn("page_ta", q)
+        # Distinguish current consumer-law dates from the older 1986 framework.
+        act_date = next(q for q in qs if q["id"] == "C7SS3U8-Q019")
+        self.assertEqual(act_date["opts_en"][act_date["correct"]],
+                         "20 July 2020")
+        authority = next(q for q in qs if q["id"] == "C7SS3U8-Q020")
+        self.assertEqual(authority["opts_en"][authority["correct"]],
+                         "Central Consumer Protection Authority (CCPA)")
+        self.assertFalse(any(
+            "pecuniary jurisdiction" in q["q_en"].lower() for q in qs))
 
     def test_source_registry_has_separate_english_and_tamil_links(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
