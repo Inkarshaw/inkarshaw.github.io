@@ -51,6 +51,12 @@ function validate(paper){
        new Set(choices.map(c=>asText(q.options[l]?.[c]))).size!==4)
        add('Missing or repeated original '+l+' options on question '+q.number);
    }
+   if(typeof q.originalHasVisuals!=='boolean')add('Explicit visual-content review required for question '+q.number);
+   if(q.originalHasVisuals){
+     const images=Array.isArray(q.visuals)?q.visuals:[];
+     if(!images.length||images.some(v=>v?.verified!==true||!/^assets\\/pyq-original\\/[a-zA-Z0-9_./-]+\\.(?:png|jpg|jpeg|webp|svg)$/.test(asText(v?.src))||!asText(v?.alt)||!['stem','A','B','C','D'].includes(v.placement)))
+       add('Original diagrams/graphs/tables/option images missing or unverified for question '+q.number);
+   }
    if(!choices.includes(q.correct))add('Missing correct official key for question '+q.number);
    if(q.keyQuestionNumber!==q.number)add('Key number differs from original question '+q.number);
    if(q.textVerified!==true||q.optionsVerified!==true||q.finalKeyVerified!==true)
