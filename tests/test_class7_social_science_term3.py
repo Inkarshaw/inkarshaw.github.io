@@ -16,8 +16,8 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
         self.assertEqual(index["meta"]["unit_count"], 10)
         self.assertEqual(len(index["units"]), 10)
         self.assertEqual([u["id"] for u in index["units"]], list(range(1, 11)))
-        self.assertEqual(sum(u["total"] for u in index["units"]), 60)
-        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 3)
+        self.assertEqual(sum(u["total"] for u in index["units"]), 80)
+        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 4)
         for unit in index["units"]:
             if unit["ready"]:
                 self.assertGreater(unit["total"], 0)
@@ -108,6 +108,46 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
                 self.assertGreaterEqual(len(q["exp_ta"]), 55)
                 # Source chapter spans are cited in metadata until individual page
                 # numbers are independently mapped; do not invent q.page.
+                self.assertNotIn("page", q)
+                self.assertNotIn("page_en", q)
+                self.assertNotIn("page_ta", q)
+
+    def test_geography_unit_one_bilingual_continents_quiz(self):
+        index = json.loads((TERM / "index.json").read_text(encoding="utf-8"))
+        entry = index["units"][3]
+        self.assertEqual(entry["id"], 4)
+        self.assertEqual(entry["total"], 20)
+        self.assertEqual(entry["quiz_count"], 1)
+        self.assertTrue(entry["ready"])
+        bank = json.loads((TERM / entry["path"]).read_text(encoding="utf-8"))
+        self.assertEqual(bank["meta"]["unit"], 4)
+        self.assertEqual(bank["meta"]["edition"], 2024)
+        self.assertEqual(bank["meta"]["total_questions"], 20)
+        self.assertEqual(len(bank["meta"]["quiz_sets"]), 1)
+        qs = bank["questions"]
+        self.assertEqual(len(qs), 20)
+        self.assertEqual([q["id"] for q in qs],
+                         [f"C7SS3U4-Q{i:03d}" for i in range(1, 21)])
+        self.assertEqual([sum(q["correct"] == c for q in qs) for c in range(4)],
+                         [5, 5, 5, 5])
+        self.assertEqual(len({q["q_en"].casefold() for q in qs}), 20)
+        # Ten North America and ten South America questions, with answers
+        # independently checked against the cited English and Tamil lessons.
+        for q in qs:
+            with self.subTest(question=q["id"]):
+                self.assertEqual(q["quiz"], 1)
+                self.assertTrue(q["q_en"].endswith("?"))
+                self.assertTrue(q["q_ta"].endswith("?"))
+                self.assertNotIn("according to the textbook", q["q_en"].lower())
+                self.assertEqual(len(q["opts_en"]), 4)
+                self.assertEqual(len(q["opts_ta"]), 4)
+                self.assertEqual(len(set(o.casefold() for o in q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn(q["correct"], range(4))
+                self.assertGreaterEqual(len(q["exp_en"]), 70)
+                self.assertGreaterEqual(len(q["exp_ta"]), 55)
+                # Do not fabricate pages: references are to the chapter span
+                # until question-by-question source pagination is certified.
                 self.assertNotIn("page", q)
                 self.assertNotIn("page_en", q)
                 self.assertNotIn("page_ta", q)
