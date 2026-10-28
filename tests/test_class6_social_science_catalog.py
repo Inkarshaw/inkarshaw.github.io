@@ -60,8 +60,8 @@ class Class6SocialScienceCatalogueTests(unittest.TestCase):
         self.assertIn("1,580 questions live", html)
         for unit in index["units"]:
             pattern = (
-                r'href="textbook-play\\.html\\?class=6&subject=social-science'
-                rf'&term=1&unit={unit["id"]}&quiz=all">Full Unit · ([\\d,]+)'
+                r'href="textbook-play\.html\?class=6&subject=social-science'
+                rf'&term=1&unit={unit["id"]}&quiz=all">Full Unit · ([\d,]+)'
             )
             counts = re.findall(pattern, html)
             self.assertEqual(len(counts), 1, unit["unit_en"])
