@@ -12,7 +12,7 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 a{color:#1555b0}button{font:inherit;cursor:pointer}
 button:focus-visible,a:focus-visible{outline:3px solid #91bdff;outline-offset:2px}
-.wrap{max-width:1020px;margin:auto;padding:0 17px}
+.wrap{max-width:1060px;margin:auto;padding:0 17px}
 header{background:#fff;border-bottom:1px solid var(--line)}
 header .wrap{min-height:63px;display:flex;align-items:center;justify-content:space-between;gap:18px}
 .brand{color:var(--navy);font-weight:900;text-decoration:none}
@@ -38,7 +38,7 @@ button:disabled{opacity:.4}
 .slot.selected{outline:2px solid var(--blue)}
 .answers{display:flex;gap:12px;flex-wrap:wrap;margin:17px 0}
 .answers button{min-width:65px;min-height:55px;font-size:1.18rem}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}.timer-setting{display:flex;align-items:center;gap:7px;font-weight:760}.timer-setting input{accent-color:#1463ff;width:18px;height:18px}.clock{font-weight:800;color:#7e4a0c;background:#fff4dc;border-radius:7px;padding:7px 12px}
 #count{font-size:.87rem;color:var(--muted)}
 .answer-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin:20px 0}
 .answer-summary span{border:1px solid var(--line);border-radius:8px;padding:6px;font-size:.85rem}
@@ -50,17 +50,19 @@ button:disabled{opacity:.4}
 <main class="wrap">
 <h1>Original Previous-Year Paper Practice</h1>
 <p class="lead">Work through every numbered question in an official original paper. Open the paper PDF beside this answer sheet, record your answers, mark difficult questions, and compare with the official key.</p>
-<p class="note"><strong>Paper text is not transcribed.</strong> This is a full-length official-PDF companion, not a digital reproduction of the original paper. Automatic marking is disabled until the complete answer key is verified for the specific paper version.</p>
+<p class="note"><strong>Paper text is not transcribed.</strong> This offers all 200 original numbered answer positions for each available paper, but does not reproduce original paper text. Automatic marking is disabled until the complete answer key is verified for the specific paper version.</p>
 <section id="paperPicker" class="card"><h2>Choose an original paper</h2><p id="loading" role="status">Loading official papers…</p><div id="papers"></div></section>
 <section id="answerSheet" class="card" hidden>
 <div class="topline"><h2 id="examTitle">Original paper</h2><span id="count"></span></div>
 <p id="notice" class="note"></p>
 <div class="paper-source"><span id="sourcePaper"></span><span id="sourceKey"></span></div>
+<div class="topline"><label class="timer-setting"><input id="timed" type="checkbox"> Timed exam mode · 3 hours</label><span class="clock" id="timer" role="timer" hidden></span></div>
 <p class="lead">Keep the official PDF open while answering the questions here. Numbers correspond to the question numbers in that PDF; check the correct paper version.</p>
 <div id="status" aria-live="polite"></div><div class="progress"><div id="fill"></div></div>
 <details><summary><strong>Full question palette</strong> — green = answered, gold border = marked</summary><nav id="palette" class="palette" aria-label="All numbered original paper answers"></nav></details>
 <h3 id="number">Answer for original question 1</h3>
-<div id="answerChoices" class="answers" role="group" aria-label="Select option A, B, C or D"></div>
+<div id="answerChoices" class="answers" role="group" aria-label="Select OMR option A, B, C, D or E"></div>
+<p class="lead">In these official TNPSC booklets, <strong>E = Answer not known</strong> (விடை தெரியவில்லை). It is a valid OMR response, distinct from leaving a question blank.</p>
 <div class="actions">
 <button type="button" id="previous">Previous</button><button type="button" id="next">Next</button>
 <button type="button" id="clear">Clear</button><button type="button" id="flag">⚐ Mark for review</button>
