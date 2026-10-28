@@ -89,6 +89,7 @@
     const rows=document.createElement('div');rows.className='answer-summary';
     answers.forEach((v,i)=>{const s=document.createElement('span');s.textContent=(i+1)+': '+(v||'—');rows.append(s)});
     $('answerOverview').replaceChildren(rows);
+    plainLink($('resultSource'),currentPaper.answerKeyUrl,'Open the official final answer key PDF ↗');
     $('result').hidden=false;$('answerSheet').hidden=true;window.scrollTo(0,0);write();
   }
   $('previous').addEventListener('click',()=>{if(index>0){index--;write();render()}});
