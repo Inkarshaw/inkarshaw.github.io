@@ -28,7 +28,7 @@
 - `officialPaperUrl`, `finalKeyUrl`: matching authority-hosted PDFs
 - `reproductionPermission`: `{status:"approved", rightsHolder, evidence, reviewedBy}`
 - `editorialReview`: `{status:"complete", reviewedBy, reviewedOn:"YYYY-MM-DD", paperVersion, finalKeyVersion}`
-- `questions`: **exactly** `questionCount` objects in order, each with `number` (1-based), `text` keyed by original language, `options` keyed by language with `A/B/C/D`, `correct`, `keyQuestionNumber` and explicit `textVerified:true`, `optionsVerified:true`, `finalKeyVerified:true`
+- `questions`: **exactly** `questionCount` objects in order, each with `number` (1-based), `text` keyed by original language, `options` keyed by language with `A/B/C/D`, `correct`, `keyQuestionNumber` and explicit `textVerified:true`, `optionsVerified:true`, `finalKeyVerified:true`, plus `originalHasVisuals` (explicit boolean). If visual content occurs in the original, `visuals` must contain reviewed images under `assets/pyq-original/`, each with `src`, descriptive `alt`, `placement` (`stem` or `A/B/C/D`), optional `language`, and `verified:true`.
 
 The structural gate does **not** establish factual correctness, copyright licence validity or genuine final-key reconciliation on its own; those are human review prerequisites. Do not fabricate metadata or bulk-mark records verified without inspecting the originals.
 
