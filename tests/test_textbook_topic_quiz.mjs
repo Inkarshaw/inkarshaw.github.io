@@ -33,14 +33,14 @@ const catalog = read('textbook-quiz.html');
 const player = read('textbook-play.html');
 const picker = read('textbook-topics.html');
 for (const [name, html] of [['textbook-quiz.html', catalog], ['textbook-play.html', player], ['textbook-topics.html', picker]]) {
-  const scripts = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g)].map(m => m[1]).filter(Boolean);
+  const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m => m[1]).filter(Boolean);
   for (const script of scripts) new vm.Script(script, {filename:name});
 }
-assert.match(catalog, /u\\.topic_count/);
-assert.match(catalog, /textbook-topics\\.html\\?class=/);
-assert.match(picker, /textbook-play\\.html\\?/);
-assert.match(picker, /args\\.set\\('topic',t\\.slug\\)/);
-assert.match(player, /topicIds\\.has\\(q\\.id\\)/);
+assert.match(catalog, /u\.topic_count/);
+assert.match(catalog, /textbook-topics\.html\?class=/);
+assert.match(picker, /textbook-play\.html\?/);
+assert.match(picker, /args\.set\('topic',t\.slug\)/);
+assert.match(player, /topicIds\.has\(q\.id\)/);
 assert.match(player, /-topic-/);
 assert.match(player, /Back to topics/);
 assert.match(player, /TextbookQuality/);
