@@ -26,6 +26,13 @@
      b.addEventListener('click',()=>{state.index=i;persist();render()});box.append(b);
    });
  }
+ function makeVisuals(items,placement,language){
+   const fragment=document.createDocumentFragment();
+   (Array.isArray(items)?items:[]).filter(v=>v.placement===placement&&(v.language===language||v.language==='both'||!v.language)).forEach(v=>{
+     const img=document.createElement('img');img.src=v.src;img.alt=v.alt;img.loading='lazy';img.className='original-figure';fragment.append(img);
+   });
+   return fragment;
+ }
  function render(){
    if(!paper||!state||state.finished)return;
    document.documentElement.lang=lang;
@@ -36,11 +43,13 @@
    $('progressBar').style.width=(100*countAnswered()/paper.questionCount)+'%';
    $('number').textContent=text('Question '+q.number,'வினா '+q.number);
    $('questionText').textContent=q.text[lang]||q.text[paper.language==='ta-en'?'ta':paper.language];
+   const figures=$('questionFigures');figures.replaceChildren(makeVisuals(q.visuals,'stem',lang));
    const options=q.options[lang]||q.options[paper.language==='ta-en'?'ta':paper.language];
    const wrap=$('options');wrap.replaceChildren();
    ABC.forEach(letter=>{
      const b=document.createElement('button');b.type='button';b.className='option'+(state.answers[state.index]===letter?' selected':'');
      b.textContent=letter+'. '+options[letter];
+     b.append(makeVisuals(q.visuals,letter,lang));
      b.setAttribute('aria-pressed',state.answers[state.index]===letter?'true':'false');
      b.addEventListener('click',()=>{state.answers[state.index]=letter;persist();render()});
      wrap.append(b);
@@ -96,11 +105,13 @@
       if(filter==='unanswered'&&a)return;
       if(filter==='marked'&&!state.marked[i])return;
       const el=document.createElement('details');el.className='review-item';
+      el.append(makeVisuals(q.visuals,'stem',lang));
       const summary=document.createElement('summary');summary.textContent=q.number+'. '+(q.text[lang]||q.text[paper.language==='ta-en'?'ta':paper.language])+
         ' — '+(!a?'Unanswered':right?'Correct':'Incorrect');el.append(summary);
       const opts=q.options[lang]||q.options[paper.language==='ta-en'?'ta':paper.language];
       ABC.forEach(letter=>{
         const p=document.createElement('p');p.textContent=letter+'. '+opts[letter];
+        p.append(makeVisuals(q.visuals,letter,lang));
         if(letter===q.correct)p.className='correct';if(letter===a&&letter!==q.correct)p.className='incorrect';
         el.append(p);
       });
