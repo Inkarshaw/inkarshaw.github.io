@@ -54,7 +54,7 @@ function validate(paper){
    if(typeof q.originalHasVisuals!=='boolean')add('Explicit visual-content review required for question '+q.number);
    if(q.originalHasVisuals){
      const images=Array.isArray(q.visuals)?q.visuals:[];
-     if(!images.length||images.some(v=>v?.verified!==true||!/^assets\\/pyq-original\\/[a-zA-Z0-9_./-]+\\.(?:png|jpg|jpeg|webp|svg)$/.test(asText(v?.src))||!asText(v?.alt)||!['stem','A','B','C','D'].includes(v.placement)))
+     if(!images.length||images.some(v=>v?.verified!==true||!new RegExp('^assets/pyq-original/[a-zA-Z0-9_./-]+[.](?:png|jpg|jpeg|webp|svg)$').test(asText(v?.src))||!asText(v?.alt)||!['stem','A','B','C','D'].includes(v.placement)))
        add('Original diagrams/graphs/tables/option images missing or unverified for question '+q.number);
    }
    if(!choices.includes(q.correct))add('Missing correct official key for question '+q.number);
