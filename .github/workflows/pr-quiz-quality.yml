@@ -9,6 +9,9 @@ on:
       - "data/quizzes/pyq-yearwise-catalog.json"
       - "data/quizzes/verified-pyqs.json"
       - "textbook-*.html"
+      - "ncert-school-book-quiz.html"
+      - "assets/js/ncert-school-book-quiz.js"
+      - "data/ncert/**"
       - "index.html"
       - "dashboard.html"
       - "search.html"
@@ -43,6 +46,8 @@ jobs:
 
       - name: Validate Police Documents LTE and 5G cell identifiers
         run: python3 -m unittest discover -s tests -p "test_police_cell_tower_locator.py" -v
+      - name: Test NCERT School Book Quiz bank and player
+        run: node tests/test_ncert_school_book_quiz.mjs
       - name: Validate attributed previous-year questions and Daily Quiz loading
         run: node tests/test_daily_quiz_pyq.mjs
       - name: Validate year-wise paper catalog and PYQ year routing
@@ -193,7 +198,7 @@ jobs:
           python3 - <<'PY'
           import pathlib, re, subprocess
           files = [
-              "daily-quiz.html", "textbook-play.html", "textbook-quiz.html",
+              "daily-quiz.html", "textbook-play.html", "textbook-quiz.html", "ncert-school-book-quiz.html",
               "index.html", "dashboard.html", "search.html",
               "current-affairs/text/index.html", "current-affairs/text/2026-10-15.html",
           ]

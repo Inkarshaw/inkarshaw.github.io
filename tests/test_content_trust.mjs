@@ -148,4 +148,12 @@ assert.match(read('textbook-quiz.html'),/<title>TN School Book Quiz \| ClearExam
 assert.match(read('textbook-play.html'),/<title>TN School Book Quiz \| ClearExams<\/title>/);
 assert.match(read('assets/js/textbook-catalog-controls.js'),/TN School Book Quiz filters/);
 
+const ncertPage=read('ncert-school-book-quiz.html');
+assert.match(ncertPage,/<h1>NCERT School Book Quiz<\/h1>/);
+assert.match(ncertPage,/official NCERT textbook catalogue|NCERT textbook catalogue/);
+assert.match(read('index.html'),/href="ncert-school-book-quiz.html"/);
+assert.match(read('textbook-quiz.html'),/href="ncert-school-book-quiz.html"/);
+assert.match(read('search.html'),/NCERT School Book Quiz/);
+assert.match(read('sitemap.xml'),/ncert-school-book-quiz.html/);
+
 console.log('Content trust tests passed: notes, PYQ practice, calendar review, report form and progress transfer.');
