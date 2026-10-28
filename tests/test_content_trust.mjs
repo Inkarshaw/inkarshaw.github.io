@@ -137,4 +137,15 @@ for(const month of ['December 2026','February 2027','March 2027','June 2027']){
 const tnusrbPolicy=JSON.parse(read('data/exams/review-schedule.json'));
 assert.notEqual(tnusrbPolicy.boards.tnusrb.lastReviewed,'2026-10-28','Do not falsify an official TNUSRB review');
 
+// ClearExams student-facing textbook quiz name must be consistent, while public routes remain stable.
+for(const page of ['textbook-quiz.html','textbook-play.html','index.html','search.html','tn-school-notes.html']){
+ const html=read(page);
+ assert.match(html,/TN School Book Quiz/,page+': the renamed quiz label is missing');
+ assert.match(html,/textbook-quiz\.html/,page+': preserve existing published textbook quiz routes');
+}
+assert.match(read('textbook-quiz.html'),/<h1>TN School Book Quiz<\/h1>/);
+assert.match(read('textbook-quiz.html'),/<title>TN School Book Quiz \| ClearExams<\/title>/);
+assert.match(read('textbook-play.html'),/<title>TN School Book Quiz \| ClearExams<\/title>/);
+assert.match(read('assets/js/textbook-catalog-controls.js'),/TN School Book Quiz filters/);
+
 console.log('Content trust tests passed: notes, PYQ practice, calendar review, report form and progress transfer.');
