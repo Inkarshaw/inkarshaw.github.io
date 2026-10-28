@@ -57,7 +57,7 @@
     if ((m = /^(.*?) is in$/i.exec(stem))) return 'Where is ' + m[1] + ' located?';
     if ((m = /^(.*?) was called$/i.exec(stem))) return 'What was ' + m[1] + ' called?';
     if ((m = /^(.*?) is classified into how many types$/i.exec(stem)))
-      return 'How many types of ' + m[1].toLowerCase() + ' are identified in the textbook?';
+      return 'How many types of ' + m[1].toLowerCase() + ' identified?';
     if ((m = /^(.*?) are classified into how many types$/i.exec(stem)))
       return 'Into how many types are ' + m[1].toLowerCase() + ' classified?';
     if ((m = /^SI (fundamental )?unit of (.+)$/i.exec(stem)))
@@ -70,7 +70,7 @@
       return 'Which of the following is ' + m[1].toLowerCase() + ' ' + m[2] + '?';
     if (/^(Who|What|Which|Where|When|How|Why)\b/i.test(stem)) return stem + '?';
     if (/\b(is|are|was|were|on|in|at|from|by|as|to|for|of|called|means)$/i.test(stem))
-      return 'Complete the textbook statement: ' + stem + ' _____.';
+      return 'Complete the statement: ' + stem + ' _____.';
     if (/^(Number|Year|Date|Period|Capital|Core area|Place|Founder|Author|Ruler|Courtier|Visitor|Portuguese traveller|Italian visitor|Dynasty|Name|Meaning|Definition|Collective name|Prominent rallying point)\b/i.test(stem))
       return 'Identify the ' + stem.charAt(0).toLowerCase() + stem.slice(1) + '.';
     return 'Which of the following identifies the ' + stem.charAt(0).toLowerCase() + stem.slice(1) + '?';
@@ -82,7 +82,7 @@
     const fragment = match[1].trim();
     if (!/\b(?:is|are|was|were|as|on|in|at|from|by|for|to|about|called|means|a|an)$/i.test(fragment))
       return q;
-    return 'Complete the textbook statement: ' +
+    return 'Complete the statement: ' +
       fragment.charAt(0).toUpperCase() + fragment.slice(1) + ' _____.';
   }
   function rewriteTamil(raw) {
