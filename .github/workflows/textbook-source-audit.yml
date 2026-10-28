@@ -27,7 +27,7 @@ jobs:
       - name: Regression tests for safe textbook links
         run: python -m unittest discover -s tests -p test_textbook_source_links.py -v
       - name: Audit every textbook source (including supplemental quizzes)
-        run: python scripts/audit_textbook_source_links.py --json-out textbook-source-audit.json
+        run: python scripts/audit_textbook_source_links.py --strict --require-coverage --json-out textbook-source-audit.json
       - name: Publish audit summary and pending coverage counts
         run: |
           python - <<'PY'
