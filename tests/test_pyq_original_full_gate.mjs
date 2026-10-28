@@ -32,7 +32,7 @@ const template={
  questions:[1,2,3].map(n=>({
   number:n,text:{ta:'சோதனை வினா '+n+'?',en:'Sample exam question '+n+'?'},
   options:{ta:{A:'முதல்'+n,B:'இரண்டாம்'+n,C:'மூன்றாம்'+n,D:'நான்காம்'+n},en:{A:'First '+n,B:'Second '+n,C:'Third '+n,D:'Fourth '+n}},
-  correct:'B',keyQuestionNumber:n,textVerified:true,optionsVerified:true,finalKeyVerified:true
+  correct:'B',keyQuestionNumber:n,textVerified:true,optionsVerified:true,finalKeyVerified:true,originalHasVisuals:false
  }))
 };
 assert.equal(gate.validate(template).ok,true,'Valid complete licensed paper structure should pass');
@@ -42,4 +42,7 @@ assert.equal(gate.validate({...template,reproductionPermission:{status:'unknown'
 assert.equal(gate.validate({...template,editorialReview:{status:'pending'}}).ok,false,'Final key version review required');
 assert.equal(gate.validate({...template,questions:template.questions.map((q,i)=>i===1?{...q,options:{...q.options,en:{...q.options.en,D:''}}}:q)}).ok,false,'All original options required');
 assert.equal(gate.validate({...template,questions:template.questions.map((q,i)=>i===2?{...q,keyQuestionNumber:7}:q)}).ok,false,'Official answer number match required');
+assert.equal(gate.validate({...template,questions:template.questions.map((q,i)=>i===0?{...q,originalHasVisuals:true}:q)}).ok,false,'Untranscribed original figures rejected');
+assert.equal(gate.validate({...template,questions:template.questions.map((q,i)=>i===0?{...q,originalHasVisuals:true,visuals:[{src:'assets/pyq-original/example-chart.png',alt:'Original chart',placement:'stem',verified:true}]}:q)}).ok,true,'Reviewed original figures accepted');
+
 console.log('Full original-paper gate: completeness, sequence, language, answer key, rights, and JS syntax passed.');
