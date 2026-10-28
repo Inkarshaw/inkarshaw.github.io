@@ -43,7 +43,7 @@
   function addTools(){
     if(main.querySelector('#catalogTools'))return;
     const panel=main.querySelector('section.panel');if(!panel)return;
-    const div=document.createElement('section');div.id='catalogTools';div.className='catalog-tools';div.setAttribute('aria-label','Textbook quiz filters');
+    const div=document.createElement('section');div.id='catalogTools';div.className='catalog-tools';div.setAttribute('aria-label','TN School Book Quiz filters');
     const allowed=cls===11?[['history','History / வரலாறு']]:cls===12?[['history','History / வரலாறு'],['geography','Geography / புவியியல்']]:[['science','Science / அறிவியல்'],['social-science','Social Science / சமூக அறிவியல்']];
     div.appendChild(makeSelect('Class / வகுப்பு',[6,7,8,9,10,11,12].map(n=>[n,'Class '+n]),cls,v=>{
       const c=Number(v),s=c>=11?'history':allowed.some(a=>a[0]===subject)?subject:'science';
