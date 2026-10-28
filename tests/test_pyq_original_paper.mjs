@@ -35,6 +35,22 @@ assert.ok(!data.papers.some(x=>x.transcriptionStatus==='verified-full'));
 assert.match(html,/Paper text is not transcribed/);
 assert.match(html,/Automatic marking is disabled/);
 assert.match(html,/pyq-original-paper\.js/);
+assert.match(html,/id="paperFrame"/,'Official PDF has an inline viewer');
+assert.match(html,/id="showQuestions"/,'Mobile quiz tab available');
+assert.match(html,/id="showPaper"/,'Mobile paper tab available');
+assert.match(html,/id="quizWorkspace"/,'Responsive quiz workspace available');
+assert.match(html,/id="sourceQuestionNumber"/,'Original source numbering is shown');
+assert.match(html,/id="questionPanel"/,'Inline answer card available');
+assert.match(html,/id="paperPanel"/,'Official question paper panel available');
+assert.match(html,/id="adaptedQuizLink"/,'Adapted text MCQs clearly distinguished');
+assert.match(html,/aria-label="Select OMR option A, B, C, D or E"/);
+assert.match(js,/switchView\('questions'\)/);
+assert.match(js,/switchView\('paper'\)/);
+assert.match(js,/paperFrame'\)\.src=safe\(p\.paperUrl\)/,'Embed only a validated official paper URL');
+assert.match(js,/aria-pressed/,'Mobile view buttons and answers communicate state');
+assert.match(js,/new URLSearchParams\(\{exam:'TNPSC Group IV',year:String\(p\.year\)\}\)/);
+assert.ok(!js.includes('innerHTML'),'Do not insert paper URLs, text or answers as untrusted HTML');
+
 assert.match(html,/id="timed"/);
 assert.match(html,/id="timer"/);
 for(const id of ['papers','paperPicker','answerSheet','result','palette','answerChoices','answerOverview','sourcePaper','sourceKey','finish','returnToSheet']){
@@ -57,4 +73,4 @@ assert.match(adapted,/All Available Adapted PYQs/);
 assert.match(adapted,/Not a complete original paper/);
 assert.match(read('sitemap.xml'),/pyq-original-paper\.html/);
 new vm.Script(js,{filename:'assets/js/pyq-original-paper.js'});
-console.log('Three full-length official PDF quiz companions: 600 OMR slots, A–E, saved answers and optional timer.');
+console.log('Three split-screen original-PDF quiz setups: 600 A–E answer slots, mobile paper/quiz tabs, saved progress and official sources.');

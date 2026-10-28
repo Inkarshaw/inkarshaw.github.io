@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071c33">
 <meta name="description" content="Practise every numbered question in an original TNPSC previous-year paper using the official PDF and an answer sheet. No unofficial transcriptions.">
-<title>Original Previous-Year Paper Practice | ClearExams</title>
+<title>Full-Paper PYQ Quiz Practice | ClearExams</title>
 <link rel="canonical" href="https://clearexams.ink/pyq-original-paper.html">
 <style>
 :root{--navy:#071c33;--blue:#1463ff;--line:#d8e4ef;--ink:#152d45;--muted:#5c6d81;--bg:#f5f8fc}
@@ -43,33 +43,93 @@ button:disabled{opacity:.4}
 .answer-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin:20px 0}
 .answer-summary span{border:1px solid var(--line);border-radius:8px;padding:6px;font-size:.85rem}
 @media(max-width:550px){.card{padding:15px}.palette{grid-template-columns:repeat(6,1fr)}.answers button{flex:1}}
+
+.eyebrow,.section-label{display:block;font-size:.76rem;letter-spacing:.07em;font-weight:850;color:#1762b5;text-transform:uppercase}
+.quiz-shell{padding:19px!important}
+.quiz-shell h2{margin:5px 0}
+.quiz-toolbar{gap:12px;margin:12px 0}
+.quiz-toolbar .paper-source{margin:0}
+.quiz-toolbar .clock{white-space:nowrap}
+.view-toggle{display:flex;gap:3px;background:#e9eff7;border:1px solid var(--line);padding:4px;border-radius:10px}
+.view-toggle button{border:0;background:transparent;padding:8px 12px;font-size:.9rem}
+.view-toggle button[aria-pressed="true"]{color:#1253bd;background:#fff;box-shadow:0 2px 9px #10243e18}
+.toggle-row{margin:15px 0}
+.quiz-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:18px}
+.pdf-panel,.answer-panel{border:1px solid var(--line);border-radius:14px;padding:15px;background:#fbfdff;min-width:0}
+.pdf-panel h3{font-size:1.03rem;margin:0}
+.source-flag{color:#186944;font-size:.76rem;font-weight:800}
+.pdf-hint{color:var(--muted,#5c6d81);font-size:.81rem;margin:8px 0}
+#paperFrame{display:block;width:100%;height:min(75vh,850px);min-height:560px;border:1px solid #cbd9e7;border-radius:9px;background:#fff}
+.question-source{padding:12px;border-radius:10px;border:1px solid #d3e4fc;background:#eef5ff;color:#2b4c70}
+.answer-panel #number{font-size:1.17rem;margin:18px 0 9px}
+.answer-panel #status{font-size:.83rem;color:#50657d}
+.answer-panel .answers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.answer-panel .answers button{min-width:0;min-height:58px;line-height:1.35}
+.answer-panel .answers button:last-child{grid-column:1/-1;font-size:.93rem}
+.answer-panel .answers .selected{box-shadow:0 0 0 2px #b3ceff}
+.answer-panel .palette{grid-template-columns:repeat(7,minmax(0,1fr));max-height:190px;gap:5px}
+.answer-panel .palette button{min-width:0}
+.answer-panel #paletteDetails{margin:13px 0}
+.answer-panel #paletteDetails summary{color:#25466f;font-weight:650;cursor:pointer}
+.quiz-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.quiz-actions button{min-width:0}
+.quiz-actions .submit{grid-column:1/-1;background:#0c684f;border-color:#0c684f;color:white}
+.paper-choice{padding:15px;text-align:left;border:1px solid #d2e2f2;background:#fff;border-radius:11px;margin:11px 0;display:block;min-height:92px}
+.paper-choice strong{display:block;font-size:1.05rem;color:#153955}
+.paper-choice small{display:block;color:#59748a;margin:4px 0}
+.paper-choice span{color:#1455ad;font-weight:800}
+@media(max-width:850px){
+ .quiz-workspace{display:block}
+ .quiz-workspace.mobile-questions #paperPanel{display:none}
+ .quiz-workspace.mobile-paper #questionPanel{display:none}
+ #paperFrame{height:72vh;min-height:420px}
+ .pdf-panel,.answer-panel{padding:12px}
+ .quiz-shell{padding:12px!important}
+}
+@media(min-width:851px){.view-toggle{display:none}.pdf-panel{position:sticky;top:10px}}
+@media(max-width:420px){.view-toggle button{padding:7px;font-size:.8rem}.answer-panel .palette{grid-template-columns:repeat(6,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <header><div class="wrap"><a class="brand" href="index.html">ClearExams.</a><a href="pyq-hub.html">← PYQ Archive</a></div></header>
 <main class="wrap">
-<h1>Original Previous-Year Paper Practice</h1>
-<p class="lead">Work through every numbered question in an official original paper. Open the paper PDF beside this answer sheet, record your answers, mark difficult questions, and compare with the official key.</p>
+<h1>Full-Paper PYQ Quiz Practice</h1>
+<p class="lead">Choose a TNPSC exam year, read the original paper and answer questions A–E in a proper quiz interface. Navigate 200 questions, mark for review, and submit at the end.</p>
 <p class="note"><strong>Paper text is not transcribed.</strong> This offers all 200 original numbered answer positions for each available paper, but does not reproduce original paper text. Automatic marking is disabled until the complete answer key is verified for the specific paper version.</p>
 <section id="paperPicker" class="card"><h2>Choose an original paper</h2><p id="loading" role="status">Loading official papers…</p><div id="papers"></div></section>
-<section id="answerSheet" class="card" hidden>
-<div class="topline"><h2 id="examTitle">Original paper</h2><span id="count"></span></div>
+<section id="answerSheet" class="card quiz-shell" hidden>
+<div class="topline"><div><span class="eyebrow">Full-paper quiz · Official-PDF companion</span><h2 id="examTitle">Original paper</h2></div><span id="count"></span></div>
 <p id="notice" class="note"></p>
-<div class="paper-source"><span id="sourcePaper"></span><span id="sourceKey"></span></div>
-<div class="topline"><label class="timer-setting"><input id="timed" type="checkbox"> Timed exam mode · 3 hours</label><span class="clock" id="timer" role="timer" hidden></span></div>
-<p class="lead">Keep the official PDF open while answering the questions here. Numbers correspond to the question numbers in that PDF; check the correct paper version.</p>
-<div id="status" aria-live="polite"></div><div class="progress"><div id="fill"></div></div>
-<details><summary><strong>Full question palette</strong> — green = answered, gold border = marked</summary><nav id="palette" class="palette" aria-label="All numbered original paper answers"></nav></details>
-<h3 id="number">Answer for original question 1</h3>
-<div id="answerChoices" class="answers" role="group" aria-label="Select OMR option A, B, C, D or E"></div>
-<p class="lead">In these official TNPSC booklets, <strong>E = Answer not known</strong> (விடை தெரியவில்லை). It is a valid OMR response, distinct from leaving a question blank.</p>
-<div class="actions">
-<button type="button" id="previous">Previous</button><button type="button" id="next">Next</button>
-<button type="button" id="clear">Clear</button><button type="button" id="flag">⚐ Mark for review</button>
-<button type="button" class="primary" id="finish">Finish answer sheet</button>
+<div class="topline quiz-toolbar">
+  <div class="paper-source"><span id="sourcePaper"></span><span id="sourceKey"></span></div>
+  <span class="clock" id="timer" role="timer" hidden></span>
 </div>
-<p class="lead">Answers are saved locally in your browser; they are not transmitted to a server.</p>
-<button type="button" id="changePaper">← Change original paper</button>
+<div class="topline toggle-row"><div class="view-toggle" role="group" aria-label="Choose paper or answer view"><button type="button" id="showQuestions" aria-pressed="true">Answer questions</button><button type="button" id="showPaper" aria-pressed="false">View original paper</button></div><label class="timer-setting"><input id="timed" type="checkbox"> Timed · 3 hours</label></div>
+<div class="quiz-workspace" id="quizWorkspace">
+<section id="paperPanel" class="pdf-panel" aria-labelledby="paperPanelTitle">
+<div class="topline"><h3 id="paperPanelTitle">Original question-paper PDF</h3><span class="source-flag">Official TNPSC source</span></div>
+<p class="pdf-hint">Read the exact questions and options here. If the PDF is blocked by your browser, use the official paper link above to open it separately.</p>
+<iframe id="paperFrame" title="Original TNPSC question-paper PDF" loading="lazy" referrerpolicy="no-referrer" aria-describedby="paperFrameHelp"></iframe>
+<p id="paperFrameHelp" class="pdf-hint">The source is hosted on TNPSC, not ClearExams. The PDF may not display inside every mobile browser.</p>
+<p class="pdf-hint"><a id="adaptedQuizLink" href="pyq-full-quiz.html">Want questions displayed directly on screen? Try the smaller, adapted PYQ quiz (not the full original paper) →</a></p>
+</section>
+<section id="questionPanel" class="answer-panel" aria-labelledby="number">
+<div class="topline"><span class="section-label">QUESTION & RESPONSE</span><span id="status" aria-live="polite"></span></div>
+<div class="progress"><div id="fill"></div></div>
+<details id="paletteDetails"><summary><strong>Question palette</strong> · green answered · gold marked</summary><nav id="palette" class="palette" aria-label="All numbered original paper answers"></nav></details>
+<h3 id="number">Original question 1</h3>
+<p class="question-source">Read question <strong id="sourceQuestionNumber">1</strong> and its printed options from the official PDF. Select your response here.</p>
+<div id="answerChoices" class="answers" role="group" aria-label="Select OMR option A, B, C, D or E"></div>
+<p class="lead">E = Answer not known (விடை தெரியவில்லை). This is a valid response, not a skipped question.</p>
+<div class="actions quiz-actions">
+<button type="button" id="previous">← Previous</button><button type="button" id="next" class="primary">Save & Next →</button>
+<button type="button" id="clear">Clear</button><button type="button" id="flag">⚐ Mark for review</button>
+<button type="button" class="submit" id="finish">Submit quiz</button>
+</div>
+<p class="lead">Your choices save automatically on this device. You can return to the paper and resume later.</p>
+<button type="button" id="changePaper">← Change exam paper</button>
+</section>
+</div>
 </section>
 <section id="result" class="card" hidden>
 <h2 id="resultHeading">Original-paper answer sheet completed</h2>
