@@ -42,7 +42,7 @@ assert.ok(!js.includes('innerHTML'),'Quiz options must be inserted as plain text
 new vm.Script(js,{filename:'assets/js/ncert-school-book-quiz.js'});
 for(const page of ['index.html','practice.html','start.html','search.html','textbook-quiz.html']){
  const content=get(page);
- assert.match(content,/href="ncert-school-book-quiz\.html"/,page+' must link to NCERT quiz');
+ assert.match(content,page==='search.html'?/url:'ncert-school-book-quiz\.html'/:/href="ncert-school-book-quiz\.html"/,page+' must link to NCERT quiz');
  assert.match(content,/NCERT School Book Quiz/,page+' must use the student-facing name');
 }
 assert.match(get('sitemap.xml'),/https:\/\/clearexams\.ink\/ncert-school-book-quiz\.html/,'NCERT route missing from sitemap');
