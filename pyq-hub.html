@@ -58,7 +58,7 @@
 </div><div class="pyq-meta" id="catalogStats" aria-live="polite">Loading year-wise official sources…</div>
 <p class="pyq-note"><strong>Paper archive versus quiz:</strong> “Official archive” opens the examining body's paper list; it does not mean the complete paper has been copied to ClearExams. “Attempt adapted questions” appears only when at least 10 source-attributed MCQs exist for that exact exam-year. A 20-question option appears where all 20 adapted questions exist; this is still not the complete original paper. For SSC/Railways, individual question papers may require candidate login or an active access window.</p>
 </section>
-<section class="pyq-note" aria-labelledby="originalPaperHeading"><h2 id="originalPaperHeading" class="pyq-section-title">Original full-paper practice</h2><p>Practise every numbered question alongside the official PDF using a saved A–D answer sheet. This does not claim a verbatim transcription or automated answer-key scoring.</p><div class="pyq-links"><a href="pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies">TNPSC Group IV 2024 · Original 200-question PDF-linked practice →</a><a href="pyq-full-quiz.html">Practise all 150 available adapted PYQs →</a><a href="pyq-original-digital.html">Verified full original paper quiz · availability status →</a></div></section>
+<section class="pyq-note" aria-labelledby="originalPaperHeading"><h2 id="originalPaperHeading" class="pyq-section-title">Original full-paper practice</h2><p>Three complete 200-question original paper sessions (2022, 2024, 2025), using the official PDF, a saved A–E OMR answer sheet, and an optional three-hour timer. These are not verbatim digital transcriptions and cannot be auto-scored until their final keys are verified.</p><div class="pyq-links"><a href="pyq-original-paper.html?paper=tnpsc-group-iv-2025-general-tamil-general-studies">2025 · Full 200-question PDF-linked practice →</a><a href="pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies">2024 · Full 200-question PDF-linked practice →</a><a href="pyq-original-paper.html?paper=tnpsc-group-iv-2022-general-tamil-general-studies">2022 · Full 200-question PDF-linked practice →</a><a href="pyq-full-quiz.html">Practise all 150 available adapted PYQs →</a><a href="pyq-original-digital.html">Verified full original paper quiz · availability status →</a></div></section>
 <section aria-labelledby="resultsHeading"><h2 id="resultsHeading" class="pyq-section-title">Year-wise paper collection</h2>
 <div class="pyq-items" id="pyqItems"><p>Loading question-paper index…</p></div>
 <p id="emptyState" hidden>No matching year-wise entries found. Try a different board or year.</p></section>
@@ -93,8 +93,9 @@ function render(){
   function paperLink(url,label,type){const link=document.createElement("a");link.href=url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=label+" ↗";if(type)link.className=type;actions.append(link)}
   for(const doc of x.documents||[]){if(doc.url&&/^https:\/\//.test(doc.url)&&["paper","key"].includes(doc.type))paperLink(doc.url,doc.label,doc.type)}
   paperLink(x.url,x.access==="login-or-limited"?"Official access":x.access==="official-paper"?"Open paper":"Official archive", "archive");
-  if(x.id==="tnpsc-group-iv-2024-combined-civil-services-examination-iv-question-papers-and-keys"){
-   const original=document.createElement("a");original.className="quiz";original.href="pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies";original.textContent="Original 200-question paper · PDF answer sheet →";actions.append(original);
+  const supportedOriginalYear=x.category==="TNPSC"&&x.exam==="Group IV"&&[2022,2024,2025].includes(x.year);
+  if(supportedOriginalYear){
+   const original=document.createElement("a");original.className="quiz";original.href="pyq-original-paper.html?paper=tnpsc-group-iv-"+x.year+"-general-tamil-general-studies";original.textContent="Full 200-question original PDF quiz · A–E OMR →";actions.append(original);
   }
   const count=reviewedCount(x);
   if(count>=10&&x.quiz){
