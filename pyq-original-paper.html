@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071c33">
+<meta name="description" content="Practise every numbered question in an original TNPSC previous-year paper using the official PDF and an answer sheet. No unofficial transcriptions.">
+<title>Original Previous-Year Paper Practice | ClearExams</title>
+<link rel="canonical" href="https://clearexams.ink/pyq-original-paper.html">
+<style>
+:root{--navy:#071c33;--blue:#1463ff;--line:#d8e4ef;--ink:#152d45;--muted:#5c6d81;--bg:#f5f8fc}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:#1555b0}button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #91bdff;outline-offset:2px}
+.wrap{max-width:1020px;margin:auto;padding:0 17px}
+header{background:#fff;border-bottom:1px solid var(--line)}
+header .wrap{min-height:63px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{color:var(--navy);font-weight:900;text-decoration:none}
+main{padding-top:28px;padding-bottom:65px}
+h1{font-size:clamp(1.7rem,4vw,2.3rem);margin:5px 0}
+.lead{color:var(--muted);max-width:780px}
+.card{padding:23px;background:#fff;border:1px solid var(--line);border-radius:16px;margin:19px 0}
+.note{background:#edf4ff;border:1px solid #c7dcf8;border-radius:10px;color:#244268;padding:13px 15px}
+h2{font-size:1.25rem;margin:0 0 9px}
+button{padding:10px 13px;border:1px solid #bacde1;border-radius:9px;background:white;color:var(--ink);font-weight:750}
+button.primary,.answer.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
+button:disabled{opacity:.4}
+.paper-choice{display:block;text-align:left;width:100%;margin:10px 0}
+.paper-source{display:flex;gap:13px;flex-wrap:wrap;margin:16px 0}
+.paper-source a{font-weight:800;background:#eef4ff;padding:10px;border-radius:9px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.progress{height:10px;background:#e7eef7;border-radius:9px;overflow:hidden;margin:12px 0}
+.progress div{background:var(--blue);height:100%;width:0}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));max-height:250px;overflow-y:auto;gap:8px;padding:8px 2px;margin:10px 0}
+.slot{padding:8px 2px;border-radius:8px}
+.slot.done{background:#e2f4ea;border-color:#86c8aa;color:#176242}
+.slot.flagged{border:2px solid #a47b23}
+.slot.selected{outline:2px solid var(--blue)}
+.answers{display:flex;gap:12px;flex-wrap:wrap;margin:17px 0}
+.answers button{min-width:65px;min-height:55px;font-size:1.18rem}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}
+#count{font-size:.87rem;color:var(--muted)}
+.answer-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin:20px 0}
+.answer-summary span{border:1px solid var(--line);border-radius:8px;padding:6px;font-size:.85rem}
+@media(max-width:550px){.card{padding:15px}.palette{grid-template-columns:repeat(6,1fr)}.answers button{flex:1}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="brand" href="index.html">ClearExams.</a><a href="pyq-hub.html">← PYQ Archive</a></div></header>
+<main class="wrap">
+<h1>Original Previous-Year Paper Practice</h1>
+<p class="lead">Work through every numbered question in an official original paper. Open the paper PDF beside this answer sheet, record your answers, mark difficult questions, and compare with the official key.</p>
+<p class="note"><strong>Paper text is not transcribed.</strong> This is a full-length official-PDF companion, not a digital reproduction of the original paper. Automatic marking is disabled until the complete answer key is verified for the specific paper version.</p>
+<section id="paperPicker" class="card"><h2>Choose an original paper</h2><p id="loading" role="status">Loading official papers…</p><div id="papers"></div></section>
+<section id="answerSheet" class="card" hidden>
+<div class="topline"><h2 id="examTitle">Original paper</h2><span id="count"></span></div>
+<p id="notice" class="note"></p>
+<div class="paper-source"><span id="sourcePaper"></span><span id="sourceKey"></span></div>
+<p class="lead">Keep the official PDF open while answering the questions here. Numbers correspond to the question numbers in that PDF; check the correct paper version.</p>
+<div id="status" aria-live="polite"></div><div class="progress"><div id="fill"></div></div>
+<details><summary><strong>Full question palette</strong> — green = answered, gold border = marked</summary><nav id="palette" class="palette" aria-label="All numbered original paper answers"></nav></details>
+<h3 id="number">Answer for original question 1</h3>
+<div id="answerChoices" class="answers" role="group" aria-label="Select option A, B, C or D"></div>
+<div class="actions">
+<button type="button" id="previous">Previous</button><button type="button" id="next">Next</button>
+<button type="button" id="clear">Clear</button><button type="button" id="flag">⚐ Mark for review</button>
+<button type="button" class="primary" id="finish">Finish answer sheet</button>
+</div>
+<p class="lead">Answers are saved locally in your browser; they are not transmitted to a server.</p>
+<button type="button" id="changePaper">← Change original paper</button>
+</section>
+<section id="result" class="card" hidden>
+<h2 id="resultHeading">Original-paper answer sheet completed</h2>
+<p id="resultBody"></p><div class="paper-source"><span id="resultSource"></span></div>
+<div id="answerOverview"></div>
+<div class="actions"><button type="button" id="returnToSheet">Review or edit answers</button><button type="button" id="restart">Start over</button></div>
+</section>
+</main>
+<script src="assets/js/pyq-original-paper.js"></script>
+</body>
+</html>
