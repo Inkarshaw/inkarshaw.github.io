@@ -1,5 +1,5 @@
 /* Source-linked original-paper practice.
-   Displays the original official PDF in a separate tab and provides a saved
+   Displays the official question paper alongside an interactive quiz panel and a saved
    A–E answer sheet, including the printed E (Answer not known) response. This deliberately does not claim a verbatim transcription
    or score a paper without an audited complete original answer key. */
 (() => {
@@ -13,6 +13,16 @@
   const allowedLetters=['A','B','C','D','E'];
   const url=new URLSearchParams(location.search);
   let papers=[],currentPaper=null,answers=[],marked=[],index=0,deadline=0,timerHandle=null;
+  function switchView(view){
+    const paper=view==='paper';
+    $('quizWorkspace').classList.toggle('mobile-paper',paper);
+    $('quizWorkspace').classList.toggle('mobile-questions',!paper);
+    $('showPaper').setAttribute('aria-pressed',String(paper));
+    $('showQuestions').setAttribute('aria-pressed',String(!paper));
+  }
+  $('showPaper').addEventListener('click',()=>switchView('paper'));
+  $('showQuestions').addEventListener('click',()=>switchView('questions'));
+
   function write(){
     if(!currentPaper)return;
     try{localStorage.setItem(STORE+currentPaper.id,JSON.stringify({version:2,answers,marked,index,deadline,updatedAt:Date.now()}))}catch{}
@@ -51,7 +61,8 @@
   }
   function render(){
     if(!currentPaper)return;
-    $('number').textContent='Answer for original question '+(index+1)+' of '+answers.length;
+    $('number').textContent='Question '+(index+1)+' of '+answers.length;
+    $('sourceQuestionNumber').textContent=String(index+1);
     $('answerChoices').replaceChildren();
     for(const letter of currentPaper.optionLetters){
       const button=document.createElement('button');button.type='button';
@@ -75,6 +86,9 @@
     $('notice').textContent='Original full-length PDF-linked practice: '+p.questionCount+' numbered questions; A–D for an answer, E for Answer not known. The original question text is in the official PDF. Automatic scoring requires the audited version-matched final key and is not yet available.';
     plainLink($('sourcePaper'),p.paperUrl,'Open original official question paper (PDF) ↗');
     plainLink($('sourceKey'),p.answerKeyUrl,'Open official final answer key (PDF) ↗');
+    $('paperFrame').src=safe(p.paperUrl)||'about:blank';
+    $('paperFrame').title='TNPSC '+p.year+' official original question paper (PDF)';
+    switchView('questions');
     const saved=read(p.id);
     if(saved&&(saved.version===1||saved.version===2)&&Array.isArray(saved.answers)&&saved.answers.length===p.questionCount&&
        saved.answers.every(a=>a===null||allowedLetters.includes(a))&&Array.isArray(saved.marked)&&saved.marked.length===p.questionCount){
@@ -90,7 +104,7 @@
     const attempted=answers.filter(Boolean).length;
     if(!expired&&attempted<answers.length&&!confirm((answers.length-attempted)+' answers are blank. Finish this answer-sheet attempt?'))return;
     deadline=0;startOrStopTimer();
-    $('resultHeading').textContent=expired?'Time expired — original-paper responses saved':'Original-paper answer sheet completed';
+    $('resultHeading').textContent=expired?'Time expired — original-paper responses saved':'Full-paper quiz submitted';
     const unknown=answers.filter(a=>a==='E').length;
     $('resultBody').textContent=attempted+'/'+answers.length+' OMR responses recorded ('+unknown+' E / Answer not known). Because the official final answer key has not been digitised and cross-checked for this paper version, this page does not calculate marks or identify correct answers. Compare your selections with the official answer-key PDF.';
     const rows=document.createElement('div');rows.className='answer-summary';
@@ -116,6 +130,16 @@
     deadline=$('timed').checked?Date.now()+currentPaper.durationMinutes*60*1000:0;
     startOrStopTimer();write();
   });
+
+  // Paper browsing and answer entry remain separate: never present a letter as
+  // a verified correct answer without a complete, matched original final key.
+  document.addEventListener('keydown',event=>{
+    if(!currentPaper||$('answerSheet').hidden||event.altKey||event.ctrlKey||event.metaKey)return;
+    const target=event.target;
+    if(target&&['INPUT','TEXTAREA','SELECT'].includes(target.tagName))return;
+    if(event.key==='ArrowRight'&&index<answers.length-1){index++;write();render()}
+    if(event.key==='ArrowLeft'&&index>0){index--;write();render()}
+  });
   $('previous').addEventListener('click',()=>{if(index>0){index--;write();render()}});
   $('next').addEventListener('click',()=>{if(index<answers.length-1){index++;write();render()}});
   $('clear').addEventListener('click',()=>{answers[index]=null;write();render()});
@@ -139,10 +163,13 @@
       if(!papers.length)throw Error('No original-paper PDF practice available');
       for(const paper of papers){
         const b=document.createElement('button');b.type='button';b.className='paper-choice';
-        b.textContent=paper.board+' '+paper.exam+' · '+paper.year+' · '+paper.paper+' · '+paper.questionCount+' questions';
+        const title=document.createElement('strong');title.textContent=paper.board+' '+paper.exam+' · '+paper.year;
+        const detail=document.createElement('small');detail.textContent=paper.paper+' · '+paper.questionCount+' original question numbers · '+paper.durationMinutes+' minutes';
+        const cta=document.createElement('span');cta.textContent='Start / resume full-paper quiz →';
+        b.append(title,detail,cta);
         b.addEventListener('click',()=>setPaper(paper));$('papers').append(b);
       }
-      $('loading').textContent='Choose an original paper to practise. Answer the numbered questions using the official PDF.';
+      $('loading').textContent='Choose an exam year. The original paper opens alongside a full quiz answer interface.';
       const requested=papers.find(p=>p.id===url.get('paper'));
       if(requested)setPaper(requested);
     }).catch(err=>{$('loading').textContent=err.message});
