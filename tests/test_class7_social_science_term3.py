@@ -16,8 +16,8 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
         self.assertEqual(index["meta"]["unit_count"], 10)
         self.assertEqual(len(index["units"]), 10)
         self.assertEqual([u["id"] for u in index["units"]], list(range(1, 11)))
-        self.assertEqual(sum(u["total"] for u in index["units"]), 180)
-        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 9)
+        self.assertEqual(sum(u["total"] for u in index["units"]), 200)
+        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 10)
         for unit in index["units"]:
             if unit["ready"]:
                 self.assertGreater(unit["total"], 0)
@@ -364,6 +364,57 @@ class Class7Term3SocialScienceTests(unittest.TestCase):
         hospital = next(q for q in qs if q["id"] == "C7SS3U9-Q013")
         self.assertEqual(hospital["opts_en"][hospital["correct"]],
                          "Informatory sign")
+
+    def test_economics_tax_and_its_importance_bilingual_quiz(self):
+        index = json.loads((TERM / "index.json").read_text(encoding="utf-8"))
+        self.assertTrue(all(u["ready"] for u in index["units"]))
+        self.assertEqual(sum(u["total"] for u in index["units"]), 200)
+        self.assertEqual(sum(u["quiz_count"] for u in index["units"]), 10)
+        unit = index["units"][9]
+        self.assertEqual(unit["id"], 10)
+        self.assertEqual(unit["total"], 20)
+        self.assertEqual(unit["quiz_count"], 1)
+        self.assertIn("வரி மற்றும் அதன் முக்கியத்துவம்", unit["unit_ta"])
+        bank = json.loads((TERM / unit["path"]).read_text(encoding="utf-8"))
+        self.assertEqual(bank["meta"]["unit"], 10)
+        self.assertEqual(bank["meta"]["edition"], 2024)
+        self.assertEqual(bank["meta"]["total_questions"], 20)
+        self.assertEqual(len(bank["meta"]["quiz_sets"]), 1)
+        qs = bank["questions"]
+        self.assertEqual(len(qs), 20)
+        self.assertEqual([q["id"] for q in qs],
+                         [f"C7SS3U10-Q{i:03d}" for i in range(1, 21)])
+        self.assertEqual([sum(q["correct"] == c for q in qs) for c in range(4)],
+                         [5, 5, 5, 5])
+        self.assertEqual(len({q["q_en"].casefold() for q in qs}), 20)
+        for q in qs:
+            with self.subTest(question=q["id"]):
+                self.assertEqual(q["quiz"], 1)
+                self.assertTrue(q["q_en"].endswith("?"))
+                self.assertTrue(q["q_ta"].endswith("?"))
+                self.assertNotIn("according to the textbook", q["q_en"].lower())
+                self.assertEqual(len(q["opts_en"]), 4)
+                self.assertEqual(len(q["opts_ta"]), 4)
+                self.assertEqual(len(set(v.casefold() for v in q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn(q["correct"], range(4))
+                self.assertGreaterEqual(len(q["exp_en"]), 65)
+                self.assertGreaterEqual(len(q["exp_ta"]), 50)
+                self.assertNotIn("page", q)
+                self.assertNotIn("page_en", q)
+                self.assertNotIn("page_ta", q)
+        # Keep the 2017 GST introduction date distinct from current slab rates.
+        launched = next(q for q in qs if q["id"] == "C7SS3U10-Q016")
+        self.assertEqual(launched["opts_en"][launched["correct"]],
+                         "1 July 2017")
+        intra = next(q for q in qs if q["id"] == "C7SS3U10-Q017")
+        self.assertEqual(intra["opts_en"][intra["correct"]], "CGST and SGST")
+        inter = next(q for q in qs if q["id"] == "C7SS3U10-Q018")
+        self.assertEqual(inter["opts_en"][inter["correct"]], "IGST")
+        arithmetic = next(q for q in qs if q["id"] == "C7SS3U10-Q019")
+        self.assertEqual(arithmetic["opts_en"][arithmetic["correct"]],
+                         "₹1,180")
+        self.assertIn("illustrative", arithmetic["exp_en"].lower())
 
     def test_source_registry_has_separate_english_and_tamil_links(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
