@@ -38,7 +38,7 @@ TA_PATTERN = re.compile(r"முதல்|முதன்|கண்டுபி�
 EXCLUDE = re.compile(r"\b(?:first step|first example|first half|first thing|first stage)\b", re.I)
 
 
-def fetch_pdf(url, path, max_bytes=145 * 1024 * 1024):
+def fetch_pdf(url, path, max_bytes=260 * 1024 * 1024):
     host = (urlparse(url).hostname or "").lower()
     if host not in ALLOWED_HOSTS:
         raise ValueError("unexpected PDF source host: " + host)
@@ -136,7 +136,7 @@ def main():
                         "id": ident, "medium": lang, "pages": result["pages_total"],
                         "extractable": result["text_extractable_pages"],
                         "hits": result["text_hits"], "bytes": result["bytes"]}))
-                    del path
+                    path.unlink(missing_ok=True)
                 except Exception as exc:
                     errors.append({"id": ident, "language": lang, "error": str(exc)})
                     print("ORIGINAL_BOOK_ERROR " + json.dumps(errors[-1]))
