@@ -23,6 +23,31 @@ class CommercialReadinessTests(unittest.TestCase):
                 self.assertIn('href="index.html">Home</a>', text)
                 self.assertIn('@media(max-width:850px){.mobile-site-nav{display:block}}', text)
 
+    def test_core_student_pages_have_shared_mobile_navigation(self):
+        for path in ("start.html", "practice.html", "textbook-quiz.html",
+                     "ncert-school-book-quiz.html", "dashboard.html", "pyq-hub.html"):
+            with self.subTest(path=path):
+                text = content(path)
+                self.assertIn('class="ce-mobile-menu"', text)
+                self.assertIn('class="ce-mobile-panel"', text)
+                self.assertIn('aria-label="Mobile site navigation"', text)
+                self.assertIn('assets/css/mobile-navigation.css', text)
+                self.assertIn('href="daily-quiz.html"', text)
+        css = content("assets/css/mobile-navigation.css")
+        self.assertIn(".ce-mobile-panel a:focus-visible", css)
+        self.assertIn("@media(max-width:900px)", css)
+
+    def test_home_navigation_is_accessible_and_dismissible(self):
+        page = content("index.html")
+        self.assertIn('aria-controls="mobileMenu" aria-expanded="false"', page)
+        self.assertIn("btn.setAttribute('aria-expanded',String(open))", page)
+        self.assertIn("if(event.key==='Escape')setMobileMenu(false)", page)
+
+    def test_mobile_browser_smoke_is_configured(self):
+        workflow = content(".github/workflows/mobile-browser-smoke.yml")
+        self.assertIn("chromium-student-journey", workflow)
+        self.assertIn("node tests/smoke_student_journey.mjs", workflow)
+
     def test_sitemap_has_no_escaped_line_break_literals(self):
         text = content("sitemap.xml")
         self.assertNotIn(r"\n", text)
