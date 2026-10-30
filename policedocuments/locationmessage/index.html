@@ -74,7 +74,8 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 <div class="field"><label class="required" for="station">Police Station</label><select id="station" required><option value="">Select police station</option><option>G1 Vepery PS</option><option>G2 Periamet PS</option><option>G3 Kilpauk PS</option><option>G5 Secretariat Colony PS</option><option>G7 Chetpet PS</option><option>K2 Ayanavaram PS</option><option>K6 TP Chathram PS</option></select></div>
 <div class="field wide"><label for="csrReference">CR. No/CSR No &amp; Date</label><input id="csrReference" maxlength="130" placeholder="e.g. - (when not applicable)"></div>
 <div class="field"><label class="required" for="caseType">Cr. No. or CSR No.</label><select id="caseType" required><option value="Cr.No" selected>Cr. No.</option><option value="CSR No">CSR No.</option></select></div>
-<div class="field"><label class="required" for="crimeDetails">Case number / sections</label><input id="crimeDetails" required maxlength="300" placeholder="e.g. 17/2025 u/s 8(c), 22(b), 25, 29(1) NDPS Act"></div>
+<div class="field"><label class="required" for="crimeDetails">Case Number</label><input id="crimeDetails" required maxlength="100" placeholder="e.g. 17/2025"></div>
+<div class="field wide" id="sectionsField"><label class="required" for="sections">Sections of law (Cr. No. only)</label><input id="sections" required maxlength="220" placeholder="e.g. 8(c), 22(b), 25, 29(1) NDPS Act"><small>Not required for CSR No.</small></div>
 <div class="field wide"><label class="required" for="head">Head</label><input id="head" required maxlength="120" placeholder="e.g. NDPS"></div>
 </div>
 <hr class="divider">
@@ -162,7 +163,7 @@ return [
 "RANGE : "+value("range"),
 "Police Station : "+value("station"),
 "CR. No/CSR No & Date : "+(value("csrReference")||"-"),
-(value("caseType")==="CSR No"?"CSR No: ":"Cr.No: ")+value("crimeDetails"),
+(value("caseType")==="CSR No"?"CSR No: "+value("crimeDetails"):"Cr.No: "+value("crimeDetails")+" u/s "+value("sections").replace(/^u\/s\.?\s*/i,"")),
 "I/O. Name & Cell No : "+value("ioRank").replace(/\.+$/,"")+"."+value("ioName").replace(/^\.+/,""),
 value("ioPhone"),
 "Head : "+value("head"),
@@ -177,6 +178,16 @@ value("lbsNumber")+" - "+value("network"),
 value("locationType")
 ].join("\n");
 }
+function syncCaseType(){
+var isCSR=value("caseType")==="CSR No";
+var sectionsField=el("sectionsField");
+sectionsField.hidden=isCSR;
+el("sections").disabled=isCSR;
+el("sections").required=!isCSR;
+el("sections").setCustomValidity("");
+}
+el("caseType").addEventListener("change",syncCaseType);
+syncCaseType();
 form.addEventListener("submit",function(event){
 event.preventDefault();
 phones.forEach(function(id){el(id).setCustomValidity("");validateNumber(id)});
@@ -197,7 +208,7 @@ invalidate();
 }
 });
 form.addEventListener("change",invalidate);
-form.addEventListener("reset",function(){setTimeout(invalidate,0)});
+form.addEventListener("reset",function(){setTimeout(function(){syncCaseType();invalidate()},0)});
 el("copyButton").addEventListener("click",async function(){
 if(!generated)return;
 try{
