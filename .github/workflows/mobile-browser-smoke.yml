@@ -1,0 +1,49 @@
+name: ClearExams mobile browser smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "index.html"
+      - "start.html"
+      - "practice.html"
+      - "daily-quiz.html"
+      - "textbook-quiz.html"
+      - "ncert-school-book-quiz.html"
+      - "dashboard.html"
+      - "pyq-hub.html"
+      - "assets/css/mobile-navigation.css"
+      - "tests/smoke_student_journey.mjs"
+      - ".github/workflows/mobile-browser-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-student-journey:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install browser harness
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Serve the static site locally
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/clearexams-browser-server.log 2>&1 &
+          echo $! > /tmp/clearexams-browser-server.pid
+          for i in {1..20}; do
+            curl -fsS http://127.0.0.1:8765/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/clearexams-browser-server.log
+          exit 1
+      - name: Exercise student journeys in mobile Chromium
+        run: node tests/smoke_student_journey.mjs
