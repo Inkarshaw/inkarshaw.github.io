@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'scripts/audit_textbook_firsts.py'
+      - 'scripts/build_firsts_review_batch.py'
+      - 'data/special-quizzes/firsts-curation-manifest.json'
       - 'data/textbook/**'
       - 'data/special-quizzes/firsts.json'
       - '.github/workflows/firsts-audit.yml'
@@ -19,6 +21,8 @@ jobs:
           python-version: '3.11'
       - name: Inventory firsts in all available Classes 6-12 unit files
         run: python scripts/audit_textbook_firsts.py firsts-audit-candidates.json
+      - name: Prepare proposed bilingual Firsts expansion
+        run: python scripts/build_firsts_review_batch.py
       - name: Upload candidates and coverage evidence
         uses: actions/upload-artifact@v4
         if: always()
