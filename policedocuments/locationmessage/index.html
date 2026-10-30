@@ -37,6 +37,11 @@ button:hover{background:var(--brand-dark)}
 button.secondary{background:#e4edf1;color:var(--ink);border:1px solid #bbd1dd}
 button.secondary:hover{background:#d4e5ec}
 button:disabled{opacity:.55;cursor:not-allowed}
+.whatsapp-section{margin-top:18px;padding:16px;border:1px solid #bddbd3;border-radius:10px;background:#f2faf6}
+.whatsapp-section h3{margin:0 0 10px;color:#175f47}
+.whatsapp-section .whatsapp-button{background:#137b55;margin-top:12px;width:100%}
+.whatsapp-section .whatsapp-button:hover:not(:disabled){background:#0f6244}
+.whatsapp-section .note{margin-bottom:0}
 .output{white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f9fb;border:1px dashed #a6becb;border-radius:10px;padding:18px;min-height:295px;font:14px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace;user-select:text}
 .output.is-empty{color:#667f8f;font-family:inherit}
 .status{min-height:24px;font-size:14px;color:#245b6d;margin-top:12px}
@@ -45,7 +50,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 @media(max-width:875px){.shell{grid-template-columns:1fr}.panel{padding:18px}}
 @media(max-width:530px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.actions button{flex:1 1 135px}}
-@media print{body{background:white}.top,.intro,.edit-panel,.actions,.status,.note,footer{display:none!important}main{margin:0;padding:0;max-width:none}.shell{display:block}.preview-panel{border:0;box-shadow:none;padding:0}.output{border:0;background:white;padding:0;font-size:12pt}.output.is-empty{display:none}h2{font-size:16pt}@page{size:A4;margin:18mm}}
+@media print{body{background:white}.top,.intro,.edit-panel,.whatsapp-section,.actions,.status,.note,footer{display:none!important}main{margin:0;padding:0;max-width:none}.shell{display:block}.preview-panel{border:0;box-shadow:none;padding:0}.output{border:0;background:white;padding:0;font-size:12pt}.output.is-empty{display:none}h2{font-size:16pt}@page{size:A4;margin:18mm}}
 </style>
 </head>
 <body>
@@ -110,6 +115,14 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 <section class="panel preview-panel" aria-labelledby="previewTitle">
 <h2 id="previewTitle">Message preview</h2>
 <div id="message" class="output is-empty" aria-live="polite">Complete the request details and select “Generate message”.</div>
+<div class="whatsapp-section">
+<h3>Send via WhatsApp</h3>
+<label for="whatsappRecipient">Recipient WhatsApp number</label>
+<input id="whatsappRecipient" type="tel" inputmode="tel" autocomplete="off" value="+91 " maxlength="25" placeholder="+91 98765 43210" aria-describedby="whatsappHelp">
+<small id="whatsappHelp">Enter the recipient's complete WhatsApp number with country code (India: +91). The number is not added to the generated message or saved by this page.</small>
+<button id="whatsappButton" type="button" class="whatsapp-button" disabled>Open chat with message</button>
+<p class="note">Opens WhatsApp with the generated message prefilled. Check the number and tap Send inside WhatsApp. Nothing is sent automatically.</p>
+</div>
 <div class="actions">
 <button id="copyButton" type="button" disabled>Copy message</button>
 <button id="shareButton" type="button" class="secondary" disabled>Share</button>
@@ -117,7 +130,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 <button id="printButton" type="button" class="secondary" disabled>Print / PDF</button>
 </div>
 <div id="status" class="status" role="status" aria-live="polite"></div>
-<p class="note">Review the generated text before transmitting it by an approved channel. Sharing uses your device's share sheet when available; it does not automatically send anything.</p>
+<p class="note">Review the generated text before transmitting it by an approved channel. Opening WhatsApp passes the recipient number and prefilled message to WhatsApp; the website does not send the chat message automatically.</p>
 </section>
 </div>
 </main>
@@ -128,7 +141,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 var form=document.getElementById("requestForm");
 var messageNode=document.getElementById("message");
 var status=document.getElementById("status");
-var actions=["copyButton","shareButton","downloadButton","printButton"];
+var actions=["copyButton","shareButton","downloadButton","printButton","whatsappButton"];
 var phones=["ioPhone","coordinatorPhone","requestPhone","lbsNumber"];
 var generated="";
 var initialMessage='Complete the request details and select “Generate message”.';
@@ -209,6 +222,26 @@ invalidate();
 });
 form.addEventListener("change",invalidate);
 form.addEventListener("reset",function(){setTimeout(function(){syncCaseType();invalidate()},0)});
+el("whatsappRecipient").addEventListener("input",function(){
+el("whatsappRecipient").setCustomValidity("");
+updateStatus("",false);
+});
+el("whatsappButton").addEventListener("click",function(){
+if(!generated){updateStatus("Generate the message before opening WhatsApp.",true);return}
+var recipient=el("whatsappRecipient");
+var raw=recipient.value.trim();
+var digits=raw.replace(/[\s().-]/g,"").replace(/^\+/,"");
+if(!/^[1-9]\d{7,14}$/.test(digits)){
+recipient.setCustomValidity("Enter the full WhatsApp phone number with country code, such as +91 98765 43210.");
+recipient.reportValidity();
+updateStatus("Enter a valid WhatsApp recipient number including the country code.",true);
+return;
+}
+recipient.setCustomValidity("");
+var url="https://wa.me/"+digits+"?text="+encodeURIComponent(generated);
+window.open(url,"_blank","noopener,noreferrer");
+updateStatus("WhatsApp chat requested. Review the recipient and tap Send inside WhatsApp; this site has not sent the message.",false);
+});
 el("copyButton").addEventListener("click",async function(){
 if(!generated)return;
 try{
