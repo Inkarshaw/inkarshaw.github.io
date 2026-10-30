@@ -17,10 +17,12 @@ main{padding:30px 0 70px}.search{display:flex;gap:12px;align-items:center;flex-w
 .entry{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;margin:14px 0;box-shadow:0 9px 26px rgba(10,33,60,.06)}.entry h2{font-size:1.25rem;margin:8px 0}.entry p{color:#536b81}.tag{font-size:.77rem;color:#0a6b83;font-weight:900;letter-spacing:.04em;text-transform:uppercase}.links{display:flex;gap:12px;flex-wrap:wrap}.links a{display:inline-block;padding:10px 15px;border:1px solid #aac2e0;border-radius:10px;text-decoration:none;font-weight:800}.links a:first-child{background:#1762d0;color:#fff;border-color:#1762d0}
 .note{color:#576b7e;font-size:.93rem}footer{padding:24px;text-align:center;color:#c6d7e6;background:#071c33}
 @media(max-width:500px){.hero{padding:36px 0}.entry{padding:18px}.links{display:grid}.links a{text-align:center}}
+.note.overdue{padding:13px 16px;border:1px solid #d6a55d;border-radius:12px;background:#fff8e8;color:#674716;font-weight:700}
 </style></head><body>
 <header><nav class="wrap"><a href="../../index.html">ClearExams.</a><a href="../../daily-quiz.html">Daily Quiz</a><a href="../../index.html">Home</a></nav></header>
 <section class="hero"><div class="wrap"><div class="eyebrow">Read · Revise · Practice</div><h1>Daily Current Affairs<br>in Text</h1><p>Mobile-friendly competitive-exam notes, important facts, primary sources and daily MCQs. Read online without downloading PDFs.</p><div class="actions"><a class="btn primary" id="latestTextEdition" href="2026-10-26.html">Read Latest Text Edition · 2026-10-26</a></div></div></section>
 <main class="wrap"><h2>Text editions</h2><div class="search"><label for="filter">Find an edition</label><input id="filter" type="search" placeholder="Search date or subject…" autocomplete="off"></div>
+<p id="editionFreshness" class="note" role="status" aria-live="polite" hidden></p>
 <div id="editions">
 <article class="entry" data-edition-date="2026-10-26"><div class="tag">26 October 2026 · Source-linked edition</div><h2>Defence Acquisition Council grants AoN for proposals worth about ₹2.12 lakh crore · PAIMANA tracks 1,853 central infrastructure projects worth ₹37.56 lakh crore · RELIEF Component II extended until 31 March 2027 · TRAI recommends a distinct authorisation category for internet-based linear television</h2><p>Ten source-linked exam briefs on defence procurement, infrastructure monitoring, export support, broadcasting regulation, cyclone preparedness, ASEAN defence diplomacy, biotechnology, rural enterprise, naval cooperation and Tamil Nadu public debt.</p><div class="links"><a href="2026-10-26.html">Read Full Text</a></div></article>
 <article class="entry" data-edition-date="2026-10-25"><div class="tag">25 October 2026 · Source-linked edition</div><h2>NCB&#39;s Operation Trident targets a transnational narco-financial network · CCPA penalises misleading walkie-talkie advertisements · India&#39;s Ramsar network reaches 103 wetlands · Deep depression develops over the east-central Bay of Bengal</h2><p>Nine source-linked exam briefs on anti-narcotics enforcement, consumer regulation, wetlands, a Bay of Bengal weather system, para sport, urban governance, BRICS parliamentary diplomacy, Kashi–Tamil cultural exchange and AI-enabled food innovation.</p><div class="links"><a href="2026-10-25.html">Read Full Text</a></div></article>
@@ -44,6 +46,18 @@ const holder=document.querySelector('#editions');
 const empty=document.querySelector('#empty');
 let list=[...document.querySelectorAll('.entry')];
 const defaultLink=document.querySelector('.hero .actions .btn.primary');
+function updateEditionFreshness(stamp){
+  const notice=document.querySelector('#editionFreshness');
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const part=k=>p.find(x=>x.type===k)?.value;
+  const today=[part('year'),part('month'),part('day')].join('-');
+  const age=/^\d{4}-\d{2}-\d{2}$/.test(stamp||'')?Math.floor((Date.parse(today+'T00:00:00Z')-Date.parse(stamp+'T00:00:00Z'))/86400000):NaN;
+  notice.hidden=!Number.isFinite(age)||age<=1;
+  notice.classList.toggle('overdue',!notice.hidden);
+  if(!notice.hidden)notice.textContent='The latest available current-affairs edition is dated '+stamp+'. Newer editions have not yet been published. This archive remains available for revision.';
+}
+updateEditionFreshness(holder.querySelector('[data-edition-date]')?.dataset.editionDate);
+
 function search(){
 const q=filter.value.toLocaleLowerCase().trim();let count=0;
 list.forEach(entry=>{const match=entry.textContent.toLocaleLowerCase().includes(q);entry.hidden=!match;if(match)count++});
@@ -59,7 +73,7 @@ if(!valid.length)return;
 const staticLatest=holder.querySelector('[data-edition-date]')?.dataset.editionDate||'';
 if(staticLatest&&valid[0].date<staticLatest)return;
 const latest=valid[0],link=document.querySelector('#latestTextEdition');
-link.href=latest.file;link.textContent='Read Latest Text Edition · '+latest.date;
+link.href=latest.file;link.textContent='Read Latest Text Edition · '+latest.date;updateEditionFreshness(latest.date);
 holder.textContent='';list=[];
 for(const item of valid){
 const card=document.createElement('article');card.className='entry';card.dataset.editionDate=item.date;
