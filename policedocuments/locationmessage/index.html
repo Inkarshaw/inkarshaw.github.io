@@ -79,8 +79,9 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 <hr class="divider">
 <h3>Investigating officer (I/O)</h3>
 <div class="grid">
-<div class="field"><label class="required" for="ioName">I/O name with rank</label><input id="ioName" required maxlength="120" placeholder="e.g. SI.Tr. Officer Name"></div>
-<div class="field"><label class="required" for="ioPhone">I/O cell number</label><input id="ioPhone" required inputmode="tel" maxlength="22" placeholder="Mobile number"></div>
+<div class="field"><label class="required" for="ioRank">I/O Rank</label><select id="ioRank" required><option value="">Select I/O rank</option><option>SSI</option><option>SI</option><option>Inspector</option><option>AC</option><option>DC</option></select></div>
+<div class="field"><label class="required" for="ioName">I/O Name</label><input id="ioName" required maxlength="120" placeholder="e.g. Tr.Karthikeyan"><small>Enter the name as it should appear after the rank.</small></div>
+<div class="field wide"><label class="required" for="ioPhone">I/O cell number</label><input id="ioPhone" required inputmode="tel" maxlength="22" placeholder="Mobile number"></div>
 </div>
 <hr class="divider">
 <h3>District co-ordinator</h3>
@@ -161,7 +162,7 @@ return [
 "Police Station : "+value("station"),
 "CR. No/CSR No & Date : "+(value("csrReference")||"-"),
 "Cr.No: "+value("crimeDetails"),
-"I/O. Name & Cell No : "+value("ioName"),
+"I/O. Name & Cell No : "+value("ioRank").replace(/\.+$/,"")+"."+value("ioName").replace(/^\.+/,""),
 value("ioPhone"),
 "Head : "+value("head"),
 "Dist. Co-Ordinator & Cell No : "+value("coordinatorName")+" - "+value("coordinatorPhone"),
