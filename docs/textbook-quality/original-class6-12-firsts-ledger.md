@@ -12,7 +12,7 @@ The Padanool class-by-class original-book archive (source list linked below) sho
 | --- | ---: | ---: | ---: | --- |
 | 6 | 10 | 12 | 22 | Partial legacy quiz extraction; no complete original PDF sign-off |
 | 7 | 10 | 12 | 22 | Class 7 women's firsts compared with transcribed chapter; remaining books unverified |
-| 8 | 6 | 7 | 13 | Social Science originals located, content not yet fully checked |
+| 8 | 6 | 7 | 13 | One 2022 original Social Science English volume partly checked; newer edition unverified |
 | 9 | 6 | 7 | 13 | Social Science originals located, content not yet fully checked |
 | 10 | 6 | 7 | 13 | **One original revised-2022 English Social Science book partly reviewed; 7 new facts added** |
 | 11 | 40 | 44 | 84 | History quiz bank reviewed; Economics/Political Science/Science originals not yet fully checked |
@@ -38,7 +38,7 @@ Printed page evidence from the *actual book*, rather than prewritten MCQs:
 | 118 | History 10 | Madras legislature approved women's participation in electoral politics in 1921 | Added, explicitly scoped to textbook |
 | 195 | Geography 5: Population, Transport, Communication and Trade | First Indian postage stamp described as issued at Karachi in 1852 | Added, scoped to book |
 
-**7 extra bilingual MCQs added** to the Firsts Quiz (109 → **116**). The English *original PDF text* was checked for their facts; accompanying Tamil translations have **not** all been verified against the relevant printed Tamil-language original. Their per-record `review_status` says so. One-off checking of a fact on a page does **not** mean the whole page or chapter was exhaustively audited.
+**12 extra bilingual MCQs added** across original Class 8 and Class 10 Social Science books (109 → **121**). Class 8 newly checked selections: Dutch first factory at Masulipatnam (printed p.6), English first Bay of Bengal factory at Masulipatnam (p.6), University of Madras as first British-period Tamil Nadu university and National Education Policy 1968 (both p.55), and Pandita Ramabai's Sharada Sadan (p.80). The English *original PDF text* was checked for their facts; accompanying Tamil translations have **not** all been verified against the relevant printed Tamil-language original. Their per-record `review_status` says so. One-off checking of a fact on a page does **not** mean the whole page or chapter was exhaustively audited.
 
 ### Discrepancy requiring editorial resolution
 
@@ -69,4 +69,4 @@ A mechanical scan of a PDF, even one covering every page, **does not** establish
 - [ ] Resolve Swadesamitran and any other conflicts against authoritative original sources before claiming certified facts.
 - [ ] Re-run site navigation, bilingual tests, source integrity tests and actual mobile-player test, then publish a signed-off per-volume list.
 
-**Current honest status:** initial catalogue list established; one older original Class 10 English Social Science volume has been *partially* reviewed; remaining original volumes and current editions require review. The Firsts Quiz contains 116 curated questions, not a claim of complete Class 6–12 original-textbook coverage.
+**Current honest status:** initial catalogue list established; one older original Class 10 English Social Science volume has been *partially* reviewed; remaining original volumes and current editions require review. The Firsts Quiz contains 121 curated questions, not a claim of complete Class 6–12 original-textbook coverage.
