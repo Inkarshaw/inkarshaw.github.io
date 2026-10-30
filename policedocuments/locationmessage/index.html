@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Create and copy a police location-information request message with case, LBS number, network and officer details. Local-only form.">
+<meta name="description" content="Generate a formatted location request message with zone, district, range, case, officer details, network and address/location choice. Local-only form.">
 <link rel="canonical" href="https://clearexams.ink/policedocuments/locationmessage/">
 <title>Location Request Message | Police Documents · ClearExams</title>
 <style>
@@ -57,38 +57,49 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 <main>
 <div class="intro">
 <h1>📍 Location Request Message</h1>
-<p>Prepare a location-information requisition message using the same core fields as the Trichy District Police reference form, with editable unit and station details for use elsewhere.</p>
+<p>Prepare a location request message with the exact headings, field order and line breaks used in the supplied police message format. Edit every field for the relevant case.</p>
 <div class="privacy"><strong>Local-only draft:</strong> Details are processed in your browser and are not submitted to ClearExams. This tool does not retrieve a phone's location or send a request. Use only for duly authorised official work and check the recipient and legal process before sharing.</div>
 </div>
 <div class="shell">
 <section class="panel edit-panel" aria-labelledby="formTitle">
 <h2 id="formTitle">Request details</h2>
 <form id="requestForm" autocomplete="off">
+<h3>Reference &amp; police jurisdiction</h3>
 <div class="grid">
-<div class="field"><label class="required" for="serial">Serial / reference number</label><input id="serial" required maxlength="60" placeholder="e.g. 01/2026"></div>
-<div class="field"><label class="required" for="requestDate">Request date</label><input id="requestDate" type="date" required></div>
-<div class="field wide"><label class="required" for="unit">Police district / unit</label><input id="unit" required maxlength="110" placeholder="e.g. Greater Chennai Police / Trichy District Police"></div>
-<div class="field"><label class="required" for="division">Sub-division / range</label><input id="division" required maxlength="100" placeholder="e.g. Kilpauk"></div>
-<div class="field"><label class="required" for="station">Police station</label><input id="station" required maxlength="100" placeholder="e.g. G7 Chetpet"></div>
-<div class="field"><label class="required" for="caseNo">Crime / CSR number</label><input id="caseNo" required maxlength="100" placeholder="e.g. Cr. No. 123/2026"></div>
-<div class="field"><label class="required" for="sections">Sections of law</label><input id="sections" required maxlength="160" placeholder="Relevant legal sections"></div>
-<div class="field"><label class="required" for="lbsNumber">LBS / mobile number</label><input id="lbsNumber" required inputmode="tel" maxlength="22" placeholder="Number for which location is sought"><small>Enter the relevant number with country code if applicable.</small></div>
-<div class="field"><label class="required" for="network">Network</label><select id="network" required><option value="">Select network</option><option>Jio</option><option>Airtel</option><option>Vi (Vodafone Idea)</option><option>BSNL</option><option>Other / Unknown</option></select></div>
+<div class="field"><label class="required" for="serial">Request No</label><input id="serial" required maxlength="60" placeholder="e.g. K//2026"></div>
+<div class="field"><label class="required" for="requestDate">Date (Dt)</label><input id="requestDate" type="date" required><small>Output uses DD.MM.YYYY format.</small></div>
+<div class="field"><label class="required" for="zone">ZONE</label><input id="zone" required maxlength="80" placeholder="e.g. East"></div>
+<div class="field"><label class="required" for="district">DISTRICT</label><input id="district" required maxlength="100" placeholder="e.g. Kilpauk"></div>
+<div class="field"><label class="required" for="range">RANGE</label><input id="range" required maxlength="100" placeholder="e.g. Kilpauk"></div>
+<div class="field"><label class="required" for="station">Police Station</label><input id="station" required maxlength="100" placeholder="e.g. G7 PS"></div>
+<div class="field wide"><label for="csrReference">CR. No/CSR No &amp; Date</label><input id="csrReference" maxlength="130" placeholder="e.g. - (when not applicable)"></div>
+<div class="field wide"><label class="required" for="crimeDetails">Cr.No / case details with sections</label><input id="crimeDetails" required maxlength="300" placeholder="e.g. 17/2025 u/s 8(c), 22(b), 25, 29(1) NDPS Act"></div>
+<div class="field wide"><label class="required" for="head">Head</label><input id="head" required maxlength="120" placeholder="e.g. NDPS"></div>
 </div>
 <hr class="divider">
-<h3>Requesting officer</h3>
+<h3>Investigating officer (I/O)</h3>
 <div class="grid">
-<div class="field"><label class="required" for="requestRank">Rank / designation</label><input id="requestRank" required maxlength="70" placeholder="e.g. Sub-Inspector"></div>
-<div class="field"><label class="required" for="requestName">Officer name</label><input id="requestName" required maxlength="100" placeholder="Name"></div>
-<div class="field wide"><label class="required" for="requestPhone">Contact number</label><input id="requestPhone" required inputmode="tel" maxlength="22" placeholder="Official contact number"></div>
+<div class="field"><label class="required" for="ioName">I/O name with rank</label><input id="ioName" required maxlength="120" placeholder="e.g. SI.Tr. Officer Name"></div>
+<div class="field"><label class="required" for="ioPhone">I/O cell number</label><input id="ioPhone" required inputmode="tel" maxlength="22" placeholder="Mobile number"></div>
 </div>
 <hr class="divider">
-<h3>Sent by</h3>
-<label class="check" for="sameOfficer"><input type="checkbox" id="sameOfficer" checked> Same as requesting officer</label>
-<div class="grid" id="senderFields">
-<div class="field"><label for="senderRank">Rank / designation</label><input id="senderRank" disabled maxlength="70" placeholder="Rank"></div>
-<div class="field"><label for="senderName">Sender name</label><input id="senderName" disabled maxlength="100" placeholder="Name"></div>
-<div class="field wide"><label for="senderPhone">Sender contact number</label><input id="senderPhone" disabled inputmode="tel" maxlength="22" placeholder="Official contact number"></div>
+<h3>District co-ordinator</h3>
+<div class="grid">
+<div class="field"><label class="required" for="coordinatorName">Co-ordinator name</label><input id="coordinatorName" required maxlength="120" placeholder="e.g. Tr. Officer Name"></div>
+<div class="field"><label class="required" for="coordinatorPhone">Co-ordinator cell number</label><input id="coordinatorPhone" required inputmode="tel" maxlength="22" placeholder="Mobile number"></div>
+</div>
+<hr class="divider">
+<h3>Request by</h3>
+<div class="grid">
+<div class="field"><label class="required" for="requestName">Requesting officer name with rank</label><input id="requestName" required maxlength="120" placeholder="e.g. SI. Tr. Officer Name"></div>
+<div class="field"><label class="required" for="requestPhone">Requesting officer cell number</label><input id="requestPhone" required inputmode="tel" maxlength="22" placeholder="Mobile number"></div>
+</div>
+<hr class="divider">
+<h3>Number &amp; location request</h3>
+<div class="grid">
+<div class="field"><label class="required" for="lbsNumber">Request No (mobile)</label><input id="lbsNumber" required inputmode="tel" maxlength="22" placeholder="Number to be checked"></div>
+<div class="field"><label class="required" for="network">Network</label><select id="network" required><option value="">Select network</option><option>Jio</option><option>Airtel</option><option>Vi</option><option>BSNL</option><option>Other / Unknown</option></select></div>
+<div class="field wide"><label class="required" for="locationType">Location/Address?</label><select id="locationType" required><option value="Location">Location</option><option value="Address">Address</option><option value="Location &amp; Address">Location &amp; Address</option></select></div>
 </div>
 <div class="actions"><button type="submit">Generate message</button><button type="reset" class="secondary">Clear form</button></div>
 </form>
@@ -114,9 +125,8 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 var form=document.getElementById("requestForm");
 var messageNode=document.getElementById("message");
 var status=document.getElementById("status");
-var same=document.getElementById("sameOfficer");
-var senderIds=["senderRank","senderName","senderPhone"];
 var actions=["copyButton","shareButton","downloadButton","printButton"];
+var phones=["ioPhone","coordinatorPhone","requestPhone","lbsNumber"];
 var generated="";
 var initialMessage='Complete the request details and select “Generate message”.';
 function el(id){return document.getElementById(id)}
@@ -129,88 +139,68 @@ messageNode.classList.add("is-empty");
 actions.forEach(function(id){el(id).disabled=true});
 updateStatus("",false);
 }
-function toggleSender(){
-senderIds.forEach(function(id){el(id).disabled=same.checked;el(id).required=!same.checked});
-invalidate();
-}
-function validateNumber(id,label){
+function validateNumber(id){
 var number=value(id).replace(/[\s()+.-]/g,"");
 if(!/^\d{8,15}$/.test(number)){
-el(id).setCustomValidity(label+" must contain 8–15 digits.");
+el(id).setCustomValidity("Enter a valid number (8–15 digits).");
 return false;
 }
 el(id).setCustomValidity("");
 return true;
 }
-function textLine(label,content){return label+": "+content}
 function humanDate(date){
 var parts=date.split("-");
-return parts.length===3?parts[2]+"-"+parts[1]+"-"+parts[0]:date;
+return parts.length===3?parts[2]+"."+parts[1]+"."+parts[0]:date;
 }
 function build(){
-var senderRank=same.checked?value("requestRank"):value("senderRank");
-var senderName=same.checked?value("requestName"):value("senderName");
-var senderPhone=same.checked?value("requestPhone"):value("senderPhone");
 return [
-"REQUEST FOR LOCATION INFORMATION",
+"Request No : "+value("serial")+" Dt: "+humanDate(value("requestDate")),
+"ZONE : "+value("zone"),
+"DISTRICT : "+value("district"),
+"RANGE : "+value("range"),
+"Police Station : "+value("station"),
+"CR. No/CSR No & Date : "+(value("csrReference")||"-"),
+"Cr.No: "+value("crimeDetails"),
+"I/O. Name & Cell No : "+value("ioName"),
+value("ioPhone"),
+"Head : "+value("head"),
+"Dist. Co-Ordinator & Cell No : "+value("coordinatorName")+" - "+value("coordinatorPhone"),
+"Request By & Cell No: "+value("requestName")+" "+value("requestPhone"),
+"Request No & Network:",
 "",
-textLine("Date",humanDate(value("requestDate"))),
-textLine("Serial No.",value("serial")),
-textLine("Police Unit",value("unit")),
-textLine("Sub-Division / Range",value("division")),
-textLine("Police Station",value("station")),
-textLine("Crime / CSR No.",value("caseNo")),
-textLine("Sections of Law",value("sections")),
-textLine("LBS / Mobile No.",value("lbsNumber")),
-textLine("Network",value("network")),
+value("lbsNumber")+" - "+value("network"),
 "",
-"Request: Kindly furnish the available location information relating to the above number for an authorised investigation, in accordance with applicable law and procedure.",
+"Location/Address? :",
 "",
-"REQUESTING OFFICER",
-textLine("Rank",value("requestRank")),
-textLine("Name",value("requestName")),
-textLine("Contact",value("requestPhone")),
-"",
-"SENT BY",
-textLine("Rank",senderRank),
-textLine("Name",senderName),
-textLine("Contact",senderPhone)
+value("locationType")
 ].join("\n");
 }
 form.addEventListener("submit",function(event){
 event.preventDefault();
-["lbsNumber","requestPhone","senderPhone"].forEach(function(id){el(id).setCustomValidity("")});
-validateNumber("lbsNumber","LBS/mobile number");
-validateNumber("requestPhone","Requesting officer contact");
-if(!same.checked)validateNumber("senderPhone","Sender contact");
+phones.forEach(function(id){el(id).setCustomValidity("");validateNumber(id)});
 if(!form.reportValidity()){
-updateStatus("Please complete the required details and correct the highlighted field.",true);
+updateStatus("Please complete required details and correct the highlighted field.",true);
 return;
 }
 generated=build();
 messageNode.textContent=generated;
 messageNode.classList.remove("is-empty");
 actions.forEach(function(id){el(id).disabled=false});
-updateStatus("Message generated locally. Please review it before sharing.",false);
+updateStatus("Message generated in the requested format. Review it before sharing.",false);
 });
 form.addEventListener("input",function(event){
 if(event.target && event.target.id){
-if(event.target.setCustomValidity)event.target.setCustomValidity("");
+if(typeof event.target.setCustomValidity==="function")event.target.setCustomValidity("");
 invalidate();
 }
 });
-form.addEventListener("change",function(event){
-if(event.target!==same)invalidate();
-});
-form.addEventListener("reset",function(){
-setTimeout(function(){same.checked=true;senderIds.forEach(function(id){el(id).disabled=true;el(id).required=false});invalidate();},0);
-});
-same.addEventListener("change",toggleSender);
+form.addEventListener("change",invalidate);
+form.addEventListener("reset",function(){setTimeout(invalidate,0)});
 el("copyButton").addEventListener("click",async function(){
 if(!generated)return;
 try{
 await navigator.clipboard.writeText(generated);
-updateStatus("Message copied to clipboard.",false);
+updateStatus("Message copied with original line breaks.",false);
 }catch(e){
 updateStatus("Clipboard unavailable. Select the preview text and copy it manually.",true);
 }
