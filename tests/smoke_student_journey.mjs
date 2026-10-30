@@ -45,7 +45,7 @@ try {
   assert.equal(await homeMenu.getAttribute('aria-expanded'), 'false');
   await homeMenu.click();
   assert.equal(await homeMenu.getAttribute('aria-expanded'), 'true');
-  assert.ok(await page.locator('#mobileMenu a[href="textbook-quiz.html"]').count() === 0, 'homepage menu existing links checked');
+  assert.equal(await page.locator('#mobileMenu a[href="daily-quiz.html"]').isVisible(), true, 'homepage daily quiz accessible');
   await page.keyboard.press('Escape');
   assert.equal(await homeMenu.getAttribute('aria-expanded'), 'false');
   assert.deepEqual(pageErrors, [], 'homepage: runtime errors');
@@ -56,7 +56,7 @@ try {
   await page.waitForFunction(() => {
     const select = document.querySelector('#examSelect');
     return select && select.options.length > 1;
-  }, {timeout:20000});
+  }, undefined, {timeout:20000});
   assert.notEqual(await page.locator('#examSelect').inputValue(), 'Unavailable');
   assert.deepEqual(pageErrors, [], 'daily quiz: runtime errors');
   console.log('PASS daily quiz active question bank loaded');
@@ -66,7 +66,7 @@ try {
   await page.waitForFunction(() => {
     const items = document.querySelectorAll('#setGrid > *');
     return items.length > 0;
-  }, {timeout:20000});
+  }, undefined, {timeout:20000});
   assert.deepEqual(pageErrors, [], 'NCERT: runtime errors');
   console.log('PASS NCERT quiz catalog loaded');
 } finally {
