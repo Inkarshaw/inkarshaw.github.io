@@ -1,0 +1,69 @@
+name: Monitor daily current-affairs freshness
+
+on:
+  schedule:
+    - cron: "55 16 * * *" # 22:25 IST, after the planned evening edition
+  workflow_dispatch:
+  push:
+    paths:
+      - current-affairs/text/editions.json
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  verify-freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Evaluate publication recency in India
+        id: freshness
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from datetime import date, datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          today = datetime.now(ZoneInfo("Asia/Kolkata")).date()
+          editions = json.loads(Path("current-affairs/text/editions.json").read_text(encoding="utf-8"))
+          dates = []
+          for item in editions:
+              if item.get("status") not in ("complete", "partial"):
+                  continue
+              try:
+                  if item.get("file") == item.get("date", "") + ".html":
+                      dates.append(date.fromisoformat(item["date"]))
+              except (TypeError, ValueError, KeyError):
+                  continue
+          latest = max(dates) if dates else None
+          age = (today - latest).days if latest else 9999
+          stale = age > 1
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"stale={str(stale).lower()}\nlatest={latest or 'none'}\nage={age}\n")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as report:
+              report.write("## ClearExams current-affairs freshness\n")
+              report.write(f"- Today (IST): {today}\n- Latest published date: {latest or 'none'}\n- Age: {age} day(s)\n- Publication overdue: {stale}\n")
+          PY
+      - name: Open or resolve a freshness issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          STALE: ${{ steps.freshness.outputs.stale }}
+          LATEST: ${{ steps.freshness.outputs.latest }}
+          AGE: ${{ steps.freshness.outputs.age }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title="ClearExams current-affairs publication overdue"
+          issue=$(gh issue list --state open --search "in:title ClearExams current-affairs publication overdue" --json title,number --jq '.[] | select(.title=="ClearExams current-affairs publication overdue") | .number' | head -n 1)
+          if [ "$STALE" = "true" ]; then
+            if [ -z "$issue" ]; then
+              gh issue create --title "$title" --body "The source-backed text edition catalog has not received a recent edition. Latest: $LATEST ($AGE days old on this run). Check the daily publishing automation, editor-approved source JSON, website queue and deployment. Do not publish unverified or fabricated stories just to clear this alert."
+            else
+              echo "Existing issue #$issue remains open." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue close "$issue" --comment "The edition index is current again (latest: $LATEST). Closing the automated freshness incident."
+          fi
