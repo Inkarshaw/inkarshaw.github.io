@@ -28,6 +28,7 @@ ALLOWED_HOSTS = {
     "d21mc000xink7q.cloudfront.net",
     "www.srivenkateshwaraopenschool.com",
     "siddhiias.com",
+    "nammakalvi.com",
 }
 EN_PATTERN = re.compile(
     r"\b(?:first|earliest|pioneer(?:ing)?|invent(?:ed|or|ion)"
