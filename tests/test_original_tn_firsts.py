@@ -33,7 +33,7 @@ class OriginalBookFirstsTests(unittest.TestCase):
     def test_quiz_additions_have_page_provenance(self):
         items = self.quiz["questions"]
         self.assertEqual(self.quiz["meta"]["count"], len(items))
-        self.assertGreaterEqual(len(items), 116)
+        self.assertGreaterEqual(len(items), 121)
         ids = set()
         original = 0
         for q in items:
@@ -46,12 +46,12 @@ class OriginalBookFirstsTests(unittest.TestCase):
                 self.assertEqual(len(q[key]), 4, (q["id"],key))
                 self.assertEqual(len(set(q[key])), 4, (q["id"],key))
             if q.get("review_status") == "original_english_pdf_text_checked_tamil_edition_not_yet_certified":
-                self.assertEqual(q["class_no"], 10)
+                self.assertIn(q["class_no"], (8,10))
                 self.assertIsInstance(q["page"], int)
-                self.assertIn(q["page"], (106,111,116,118,195))
+                self.assertIn(q["page"], (6,55,80,106,111,116,118,195))
                 self.assertIn("2022", q["original_edition"])
                 original += 1
-        self.assertGreaterEqual(original, 7)
+        self.assertGreaterEqual(original, 12)
 
     def test_source_conflicts_not_silently_rewritten(self):
         swadesamitran = next(q for q in self.quiz["questions"] if q["id"] == "F019")
