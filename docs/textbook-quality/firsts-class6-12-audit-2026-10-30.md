@@ -1,5 +1,7 @@
 # TN School Book Firsts: Classes 6–12 repository audit
 
+**Historical snapshot:** This report records the *previous repository-bank-only 109-question stage*, not the current complete state. Original-book review has since expanded the quiz to **121**; see [the original-book ledger](original-class6-12-firsts-ledger.md). The original-source certification is still incomplete.
+
 Audit date: 30 October 2026  
 Site section: `textbook-firsts.html`  
 Published question bank: `data/special-quizzes/firsts.json`  

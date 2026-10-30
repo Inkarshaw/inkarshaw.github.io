@@ -1,0 +1,70 @@
+name: Inventory and review original TN textbooks
+on:
+  pull_request:
+    paths:
+      - 'scripts/inventory_tn_original_books.py'
+      - 'scripts/scan_original_tn_firsts.py'
+      - 'data/textbook/original-pdf-source-manifest.json'
+      - 'data/special-quizzes/firsts.json'
+      - 'tests/test_original_tn_firsts.py'
+      - '.github/workflows/original-tn-books.yml'
+  workflow_dispatch:
+    inputs:
+      source_ids:
+        description: "Space-separated IDs from original-pdf-source-manifest.json"
+        required: false
+        default: "c10-social-science-2022-revision"
+      language:
+        description: "Which original language editions to extract"
+        required: false
+        default: "en"
+        type: choice
+        options:
+          - en
+          - ta
+          - both
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inventory listed English and Tamil books in Classes 6–12
+        continue-on-error: true
+        run: python scripts/inventory_tn_original_books.py tn-original-book-inventory.json
+      - name: Upload listing and unavailable-page evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tn-original-book-inventory
+          path: tn-original-book-inventory.json
+          if-no-files-found: warn
+      - name: Validate Firsts provenance and bilingual questions
+        run: python -m unittest discover -s tests -p test_original_tn_firsts.py -v
+  original-pdf-extraction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PDF text parser
+        run: python -m pip install --disable-pip-version-check pymupdf
+      - name: Extract firsts candidates from real original book pages
+        continue-on-error: true
+        env:
+          BOOK_IDS: ${{ inputs.source_ids || 'c8-social-science-2022-revision c10-social-science-2022-revision c12-economics-full-year' }}
+          BOOK_LANGUAGE: ${{ inputs.language || 'en' }}
+        run: |
+          python scripts/scan_original_tn_firsts.py --ids $BOOK_IDS --language "$BOOK_LANGUAGE" --output original-firsts-candidates.json
+      - name: Upload PDF text audit, page numbers and source hashes
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-tn-firsts-page-evidence
+          path: original-firsts-candidates.json
+          if-no-files-found: warn
