@@ -40,6 +40,10 @@ Printed page evidence from the *actual book*, rather than prewritten MCQs:
 
 **12 extra bilingual MCQs added** across original Class 8 and Class 10 Social Science books (109 → **121**). Class 8 newly checked selections: Dutch first factory at Masulipatnam (printed p.6), English first Bay of Bengal factory at Masulipatnam (p.6), University of Madras as first British-period Tamil Nadu university and National Education Policy 1968 (both p.55), and Pandita Ramabai's Sharada Sadan (p.80). The English *original PDF text* was checked for their facts; accompanying Tamil translations have **not** all been verified against the relevant printed Tamil-language original. Their per-record `review_status` says so. One-off checking of a fact on a page does **not** mean the whole page or chapter was exhaustively audited.
 
+### Additional accuracy concern from Class 8 original text
+
+Class 8 History Unit 8 (2022 revised edition, printed p.79) labels Dr. Muthulakshmi Ammaiyar broadly as the first woman doctor in India. That **unqualified claim has not been imported**: women medical pioneers and qualifications differ, and competing candidate definitions require independent checking. The Class 8 additions instead use narrower facts whose subjects, places and years are supported in the chapter.
+
 ### Discrepancy requiring editorial resolution
 
 `F019`, Swadesamitran chronology:
@@ -69,4 +73,4 @@ A mechanical scan of a PDF, even one covering every page, **does not** establish
 - [ ] Resolve Swadesamitran and any other conflicts against authoritative original sources before claiming certified facts.
 - [ ] Re-run site navigation, bilingual tests, source integrity tests and actual mobile-player test, then publish a signed-off per-volume list.
 
-**Current honest status:** initial catalogue list established; one older original Class 10 English Social Science volume has been *partially* reviewed; remaining original volumes and current editions require review. The Firsts Quiz contains 121 curated questions, not a claim of complete Class 6–12 original-textbook coverage.
+**Current honest status:** initial catalogue list established; older original Class 8 and Class 10 English Social Science volumes have been *partially* reviewed; remaining original volumes and current editions require review. The Firsts Quiz contains 121 curated questions, not a claim of complete Class 6–12 original-textbook coverage.
