@@ -1,0 +1,36 @@
+name: Audit TN Textbook Firsts
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_textbook_firsts.py'
+      - 'scripts/build_firsts_review_batch.py'
+      - 'data/special-quizzes/firsts-curation-manifest.json'
+      - 'tests/test_firsts_special_quiz.py'
+      - 'textbook-firsts.html'
+      - 'data/textbook/**'
+      - 'data/special-quizzes/firsts.json'
+      - '.github/workflows/firsts-audit.yml'
+  workflow_dispatch:
+jobs:
+  scan-firsts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inventory firsts in all available Classes 6-12 unit files
+        run: python scripts/audit_textbook_firsts.py firsts-audit-candidates.json
+      - name: Prepare proposed bilingual Firsts expansion
+        run: python scripts/build_firsts_review_batch.py
+      - name: Validate published bilingual Firsts Quiz and class/topic sets
+        run: python -m unittest discover -s tests -p test_firsts_special_quiz.py -v
+      - name: Upload candidates and coverage evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: firsts-audit-candidates
+          path: firsts-audit-candidates.json
+          if-no-files-found: warn
