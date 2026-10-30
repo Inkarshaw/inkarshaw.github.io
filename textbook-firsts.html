@@ -89,7 +89,7 @@ function restoreSaved(){
   render();return true;
  }catch{return false}
 }
-fetch('data/textbook/firsts-quiz.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(data=>{if(!Array.isArray(data.questions)||data.questions.length!==data.meta.count)throw Error('Invalid quiz bank');bank=data.questions;$('status').textContent=t('status');let params=new URLSearchParams(location.search);const topic=params.get('topic'),set=params.get('set');if(['women','history','science'].includes(topic))$('topic').value=topic;syncSet();if($('topic').value==='all'&&['1','2'].includes(set))$('set').value=set;if(topic||set||!restoreSaved())choose();}).catch(err=>{$('status').textContent=t('failed');$('load').disabled=true;});
+fetch('data/special-quizzes/firsts.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(data=>{if(!Array.isArray(data.questions)||data.questions.length!==data.meta.count)throw Error('Invalid quiz bank');bank=data.questions;$('status').textContent=t('status');let params=new URLSearchParams(location.search);const topic=params.get('topic'),set=params.get('set');if(['women','history','science'].includes(topic))$('topic').value=topic;syncSet();if($('topic').value==='all'&&['1','2'].includes(set))$('set').value=set;if(topic||set||!restoreSaved())choose();}).catch(err=>{$('status').textContent=t('failed');$('load').disabled=true;});
 })();
 </script>
 </body>
