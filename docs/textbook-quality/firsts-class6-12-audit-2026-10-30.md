@@ -20,7 +20,7 @@ The reproducible CI audit completed with no JSON parsing errors:
 | High-priority *unverified* candidate matches | 398 |
 | Invalid source-bank answers/options among matched questions | 0 |
 | Source-bank read errors | 0 |
-| Curated bilingual MCQs in new Firsts quiz | **105** |
+| Curated bilingual MCQs in new Firsts quiz | **109** |
 
 **Interpretation:** 1,936 is an automated keyword match count, not the number of unique historical firsts; it contains duplicate facts, activity/sequencing prompts, contextual references, and mechanical reformulations. The 398 high-priority cases also require manual editorial and original-source confirmation.
 
@@ -32,10 +32,10 @@ The reproducible CI audit completed with no JSON parsing errors:
 | 7 | 46 | 3,788 | 101 | 30 | Science, Social Science | 32 |
 | 8 | 25 | 1,800 | 29 | 6 | Science only | 4 |
 | 9 | 8 | 2,000 | 49 | 7 | Science only | 1 |
-| 10 | 23 | 1,460 | 25 | 7 | Science only | **0** |
+| 10 | 23 | 1,460 | 25 | 7 | Science only | **4** |
 | 11 | 19 | 23,172 | 1,204 | 238 | History only | 27 |
 | 12 | 23 | 6,983 | 304 | 46 | History, Geography | 29 |
-| **Total** | **189** | **48,040** | **1,936** | **398** | — | **105** |
+| **Total** | **189** | **48,040** | **1,936** | **398** | — | **109** |
 
 *Class 7's count includes women-firsts drawn directly from the Women Empowerment lesson, not all present as existing unit MCQs. Other classes include selected, quality-edited facts and reworded MCQs, not a blind import of keyword hits.*
 
@@ -45,7 +45,7 @@ The reproducible CI audit completed with no JSON parsing errors:
 | --- | ---: |
 | First women and pioneers | 23 |
 | History, states, institutions and founding milestones | 65 |
-| Science, inventions, discoveries and space | 17 |
+| Science, inventions, discoveries and space | 21 |
 
 Each question includes four English options, four Tamil options, an answer key, both-language explanations and a book/reference link, with class metadata. Some older questions have chapter-level references only. Source links and transcribed source text do not alone certify a precise printed page or edition.
 
@@ -71,4 +71,4 @@ Do not conflate the first woman president of the Indian National Congress (**Ann
 
 ### Validation boundary
 
-A completed **repository-bank** scan is now reproducible in GitHub Actions, and the quiz has been expanded from 40 to 105 questions. A completed **all-original-textbooks** audit remains **open**, because the source materials and subjects listed above are not fully represented or verified. This is a documented limitation, not proof that missing original textbooks contain no firsts.
+A completed **repository-bank** scan is now reproducible in GitHub Actions, and the quiz has been expanded from 40 to 109 questions. A completed **all-original-textbooks** audit remains **open**, because the source materials and subjects listed above are not fully represented or verified. This is a documented limitation, not proof that missing original textbooks contain no firsts.
