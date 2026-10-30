@@ -4,8 +4,19 @@
   const area = document.getElementById('notices');
   try {
     const [catalog,data] = await Promise.all([json('data/exams/exam-catalog.json'),json('data/exams/exam-notifications.json')]);
-    document.getElementById('checkedOn').textContent = 'TNPSC official records updated ' + formatDate(data.tnpscUpdatedOn || data.checkedOn) + '. Other exam boards last manually reviewed ' + formatDate(data.checkedOn) + '. Reviews are not automatic confirmations of deadlines; always check official notices.';
-    try{const policy=await json('data/exams/review-schedule.json');const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());const asDate=s=>Date.parse(s+'T00:00:00Z'),due=Object.entries(policy.boards||{}).filter(([key,v])=>Number.isFinite(asDate(v.lastReviewed))&&Math.floor((Date.parse(today+'T00:00:00Z')-asDate(v.lastReviewed))/86400000)>Number(policy.cadenceDays?.[key]||7)).map(([,v])=>v.name);if(due.length)document.getElementById('checkedOn').textContent+=' REVIEW OVERDUE: '+due.join(', ')+'.';}catch{document.getElementById('checkedOn').textContent+=' Review schedule unavailable.';}
+    const status = document.getElementById('checkedOn');
+    status.textContent = 'Loading board-by-board review dates. Always verify official amendments.';
+    try {
+      const policy = await json('data/exams/review-schedule.json');
+      const today = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+      const ageDays = stamp => /^\d{4}-\d{2}-\d{2}$/.test(stamp||'') ? Math.floor((Date.parse(today+'T00:00:00Z')-Date.parse(stamp+'T00:00:00Z'))/86400000) : Infinity;
+      const reviews = Object.entries(policy.boards||{});
+      const overview = reviews.map(([key,board]) => board.name+': '+(board.lastReviewed ? formatDate(board.lastReviewed) : 'not verified'));
+      const due = reviews.filter(([key,board]) => ageDays(board.lastReviewed)>Number(policy.cadenceDays?.[key]||7)).map(([,board])=>board.name);
+      status.textContent = 'Recorded source review dates — '+overview.join(' · ')+'. '+(due.length?'REVIEW OVERDUE: '+due.join(', ')+'. ':'')+'These dates are not proof that all notices are current. Always confirm official amendments.';
+    } catch {
+      status.textContent = 'Board review records unavailable. Check the individual notice sources and verification dates before applying.';
+    }
     const filter = document.getElementById('categoryFilter');
     Object.entries(catalog).forEach(([key,body])=> {const option=document.createElement('option');option.value=key;option.textContent=body.name;filter.appendChild(option);});
     const initial = new URLSearchParams(location.search).get('category');

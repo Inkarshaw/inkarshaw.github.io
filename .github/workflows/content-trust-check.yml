@@ -22,6 +22,14 @@ on:
       - "dashboard.html"
       - "exam-calendar.html"
       - "assets/js/notes-quality.js"
+      - "index.html"
+      - "tnpsc.html"
+      - "upsc.html"
+      - "current-affairs/text/index.html"
+      - "assets/js/exam-notifications.js"
+      - "sitemap.xml"
+      - ".github/workflows/current-affairs-freshness.yml"
+      - "tests/test_commercial_readiness.py"
       - "assets/js/calendar-freshness.js"
       - "assets/js/progress-transfer.js"
       - "data/exams/review-schedule.json"
@@ -71,6 +79,8 @@ jobs:
           node-version: "22"
       - name: Test content quality and user interactions
         run: node tests/test_content_trust.mjs
+      - name: Verify commercial navigation and publication trust
+        run: python3 -m unittest discover -s tests -p 'test_commercial_readiness.py'
       - name: Validate TN textbook topic quiz and bilingual coverage
         run: node tests/test_textbook_topic_quiz.mjs
       - name: Reconcile new 2024 Group IV questions with official final key

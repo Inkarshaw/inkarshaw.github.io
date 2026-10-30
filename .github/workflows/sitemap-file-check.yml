@@ -28,6 +28,9 @@ jobs:
 
           root = Path('.')
           base = 'https://clearexams.ink/'
+          raw = Path('sitemap.xml').read_text(encoding='utf-8')
+          if '\\n' in raw:
+              raise SystemExit('Sitemap contains literal escaped newlines')
           tree = ET.parse('sitemap.xml')
           urls = [x.text for x in tree.getroot().iter() if x.tag.endswith('loc') and x.text]
 
