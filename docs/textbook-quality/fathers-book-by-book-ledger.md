@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 81 unique MCQs drawn from 42 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 84 unique MCQs drawn from 43 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -13,6 +13,7 @@
 | 7 | Social Science · Term I · Economics Unit 1 | 1 cross-reference | FA019 | 2019 SCERT English combined-volume text printed p.206 directly identifies Adam Smith as Father of Economics; Tamil original pending |
 | 7 | Science · Term II | 1 | FA004 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 8 | Science · Term I | 1 | FA002 | Curated from existing quiz bank; full original English/Tamil scan pending |
+| 8 | Social Science · Full Year, History 1/7, Geography 7, Economics 2 | 4 source mappings (3 new, Ripon cited again) | FA084, FA085, FA086, FA076 | English SCERT 2024 revised edition reproduction, printed pages 2, 70, 143, 240 explicitly checked; original page image/Tamil medium and current prescription pending |
 | 9 | Science · Full Year | 1 | FA006 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 9 | Social Science · Full Year, History 1/8 and Civics 5 | 3 mapped | FA001, FA005, FA076 | 2023 SCERT English reproduction, Civics Unit 5 p.272 explicitly calls Lord Ripon Father of Local Government; History questions previously curated; Tamil original pending |
 | 10 | Social Science · Full Year, History 4/10 and Civics 1 | 3 mapped (2 new, one Ambedkar cross-reference) | FA082–FA083, FA003 | Revised-2025 SCERT English text pp.41,117,239 inspected; 2025 original page images/Tamil originals pending |
@@ -418,6 +419,26 @@ This batch deliberately prioritises the underrepresented lower school books. It 
 - FA082 keeps the exact historical designation *Father of Modern China*; it is a traditional description, not an official award.
 - The cited 2025 English edition is newer than several earlier sources. It still does **not** establish whether the prescribed 2026–27 book has changed.
 - Original Tamil-medium page texts and the original printed page images have **not** been independently verified. The index lists only the reviewed passages, not a full textbook audit.
+
+## Class 8 Social Science 2024 review: archives, PSU, Nile and Ripon (31 October 2026)
+
+**Source:** [Tamil Nadu SCERT Standard Eight Social Science, revised edition 2024, English textbook text reproduction](https://www.scribd.com/document/1067654623/Class-8-Social-Science-English-Medium-2024-Edition-www-tntextbooks-in). The reproduction identifies the Government of Tamil Nadu, Tamil Nadu SCERT, first edition 2019 and revised editions 2020, 2022, 2023, 2024. Page labels used here are the **printed textbook pages**, not browser lines or a PDF viewer page count.
+
+| Chapter | Printed page | Exact designation in textbook | Person / object | Quiz action |
+| --- | ---: | --- | --- | --- |
+| History Unit 1 · Advent of the Europeans | **2** | Father of National Archives of India | George William Forrest | New **FA084** |
+| History Unit 7 · Urban Changes During the British Period | **70** | Father of Local Self-Government in India | Lord Ripon | Add cross-reference to **FA076** |
+| Geography Unit 7 · Exploring Continents: Africa, Australia and Antarctica | **143** | Father of African Rivers | River Nile | New **FA086**, expressly a **metaphorical river title**, not a human |
+| Economics Unit 2 · Public and Private Sectors | **240** | Father of Public Sector Undertakings in India | Dr. V. Krishnamurthy | New **FA085** |
+
+### Evidence and interpretation
+
+- On **History p.2**, the schoolbook describes **George William Forrest** as deserving the Father of National Archives of India title, within a paragraph about the National Archives (New Delhi) and Tamil Nadu Archives. This is an attributed description, **not** an official statutory rank. In the surrounding text, **H. H. Dodwell** is discussed separately in the Tamil Nadu Archives context, so do not treat those names as interchangeable.
+- On **History p.70**, the schoolbook describes Ripon's 1882 resolution as a milestone and calls him Father of Local Self-Government in India. Existing **FA076** already covers the same title from Classes 11 and 9, so Class 8 becomes a **third citation rather than a repeated question**.
+- On **Geography p.143**, the River Nile is expressly called Father of African Rivers. This figurative name for a **river** belongs in a Father-title themed quiz, but must never be treated as a pioneer, inventor or individual. The chapter distinguishes Nile from Congo, Niger and Zambezi.
+- On **Economics p.240**, the schoolbook names **Dr V. Krishnamurthy** Father of Public Sector Undertakings in India, separately discusses **Nehru's industrial policy** and **P. C. Mahalanobis's planning model**. Distinguish this PSU title from the role of prime ministers and economic planners.
+
+**Status:** The searchable **English 2024 SCERT text reproduction** was examined for the passages on printed pp.2,70,143,240. This is a meaningful selected-page check, **not** independent inspection of original printed PDF page images, 2026–27 prescribed editions, or the Tamil originals, and **not** a claim that all Class 8 units or all Class 6–12 books were completely audited. Three new bilingual questions, four source mappings and one indexed book were added.
 
 ## Audit process and quality rules
 
