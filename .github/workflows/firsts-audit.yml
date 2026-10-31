@@ -27,6 +27,14 @@ jobs:
         run: python scripts/build_firsts_review_batch.py
       - name: Validate published bilingual Firsts Quiz and class/topic sets
         run: python -m unittest discover -s tests -p test_firsts_special_quiz.py -v
+      - name: Certify structural and editorial Firsts invariants
+        run: python -m unittest discover -s tests -p 'test_firsts_certification.py' -v
+      - name: Install Chromium for functional smoke tests
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Test actual mobile/English/Tamil Firsts player in Chromium
+        run: python -m unittest discover -s tests -p 'test_firsts_browser_smoke.py' -v
       - name: Upload candidates and coverage evidence
         uses: actions/upload-artifact@v4
         if: always()
