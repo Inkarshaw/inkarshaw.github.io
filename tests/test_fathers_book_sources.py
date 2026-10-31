@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 37)
-        self.assertEqual(len(self.books), 17)
+        self.assertEqual(len(self.questions), 54)
+        self.assertEqual(len(self.books), 25)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -119,7 +119,7 @@ class FathersBookSourcesTests(unittest.TestCase):
                 self.assertTrue(q["edition_note"])
                 self.assertIn("original_english_pdf", q["review_status"])
                 self.assertIn("tamil_original_pending", q["review_status"])
-                self.assertEqual(len(q["source_references"]), 1)
+                self.assertEqual(len(q["source_references"]), 2 if qid == "FA030" else 1)
         self.assertIn("in India", by_id["FA030"]["q_en"])
         fisher = by_id["FA024"]
         sources = {r["book_id"] for r in fisher["source_references"]}
@@ -192,13 +192,42 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertEqual(len(by_id["FA036"]["source_references"]), 3)
         self.assertEqual(len(by_id["FA004"]["source_references"]), 3)
 
+    def test_nursing_politics_physics_and_biochemistry_titles(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA050": ("Sigmund Freud", 12, 98, "12-general-nursing-full"),
+            "FA051": ("Auguste Comte", 12, 102, "12-general-nursing-full"),
+            "FA052": ("Asclepiades of Bithynia", 12, 220, "12-general-nursing-full"),
+            "FA053": ("Verghese Kurien", 12, 180, "12-political-science-vol-1"),
+            "FA054": ("Manmohan Singh", 12, 183, "12-political-science-vol-1"),
+            "FA055": ("Joseph Engelberger", 12, 263, "12-physics-vol-2"),
+            "FA056": ("Carl Alexander Neuberg", 11, 1, "11-biochemistry-full"),
+        }
+        for qid, (answer, grade, page, book) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertEqual(q["class_no"], grade)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(q["book_id"], book)
+                self.assertIn("text_reproduction_checked", q["review_status"])
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertTrue(q["source_references"])
+                self.assertEqual(len(q["opts_en"]), len(q["opts_ta"]))
+        # One Indian Green Revolution question is shared by Science and Political Science.
+        self.assertIn("12-political-science-vol-1",
+                      {ref["book_id"] for ref in by_id["FA018"]["source_references"]})
+        # Qualify two contested nursing honorifics, rather than claiming exclusive consensus.
+        self.assertIn("not universally agreed", by_id["FA050"]["exp_en"])
+        self.assertIn("not a universal designation", by_id["FA052"]["exp_en"])
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("37 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("37 questions", self.page)
-        self.assertIn("17 source books", self.page)
+        self.assertIn("54 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("54 questions", self.page)
+        self.assertIn("25 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
