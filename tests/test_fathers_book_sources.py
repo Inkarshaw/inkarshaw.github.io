@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 71)
-        self.assertEqual(len(self.books), 38)
+        self.assertEqual(len(self.questions), 74)
+        self.assertEqual(len(self.books), 39)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -410,15 +410,48 @@ class FathersBookSourcesTests(unittest.TestCase):
         # Textbook citations can grow without creating duplicate quiz entries.
         self.assertEqual(sum(q["id"] == "FA002" for q in self.questions), 1)
         self.assertEqual(sum(q["id"] == "FA072" for q in self.questions), 1)
-        self.assertEqual(self.data["meta"]["chapter_count"], 67)
+        self.assertEqual(self.data["meta"]["chapter_count"], 70)
+
+    def test_political_science_sovereignty_liberalism_local_government(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA074": ("Jean Bodin", "11-political-science-vol-1", "unit-2", 22),
+            "FA075": ("John Locke", "11-political-science-vol-2", "unit-8", 136),
+            "FA076": ("Lord Ripon", "11-political-science-vol-2", "unit-12", 241),
+        }
+        for qid, (answer, book, chapter, page) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertEqual(q["book_id"], book)
+                self.assertEqual(q["chapter_id"], chapter)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(len(set(q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertEqual(len(q["source_references"]), 1)
+                self.assertIn("11th-Political-Science", q["source_link"])
+                self.assertTrue(q["exp_en"] and q["exp_ta"])
+        self.assertIn("Rippon", by_id["FA076"]["exp_en"])
+        self.assertIn("FA021", by_id["FA075"]["exp_en"])
+        self.assertEqual(by_id["FA021"]["opts_en"][by_id["FA021"]["correct"]],
+                         by_id["FA075"]["opts_en"][by_id["FA075"]["correct"]])
+        self.assertNotEqual(by_id["FA021"]["q_en"], by_id["FA075"]["q_en"])
+        for bid, count in (("11-political-science-vol-1", 3),
+                           ("11-political-science-vol-2", 2)):
+            b = next(x for x in self.books if x["id"] == bid)
+            self.assertEqual(b["count"], count)
+            self.assertEqual(sum(
+                any(ref["book_id"] == bid for ref in q["source_references"])
+                for q in self.questions), count)
 
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("71 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("71 questions", self.page)
-        self.assertIn("38 source books", self.page)
+        self.assertIn("74 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("74 questions", self.page)
+        self.assertIn("39 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
