@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertGreaterEqual(len(self.questions), 19)
-        self.assertGreaterEqual(len(self.books), 11)
+        self.assertGreaterEqual(len(self.questions), 25)
+        self.assertGreaterEqual(len(self.books), 13)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -58,6 +58,12 @@ class FathersBookSourcesTests(unittest.TestCase):
             "FA019": "Adam Smith",
             "FA020": "Aristotle",
             "FA021": "John Locke",
+            "FA022": "Sun Yat-sen",
+            "FA023": "Maraimalai Adigal",
+            "FA024": "Gottlieb Haberlandt",
+            "FA025": "Alexander von Humboldt",
+            "FA026": "Eugene P. Odum",
+            "FA027": "R. Misra",
         }
         for qid, person in answers.items():
             with self.subTest(id=qid):
@@ -70,14 +76,18 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("worldwide", by_id["FA017"]["q_en"].lower())
         self.assertIn("Indian", by_id["FA018"]["q_en"])
         self.assertIn("tamil_original_pending", by_id["FA016"]["review_status"])
+        self.assertEqual(len(by_id["FA016"]["source_references"]), 2)
+        self.assertEqual(len(by_id["FA018"]["source_references"]), 2)
+        self.assertEqual(by_id["FA025"]["opts_en"][by_id["FA025"]["correct"]], "Alexander von Humboldt")
+        self.assertIn("textbook", by_id["FA025"]["review_status"])
 
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("19 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("19 questions", self.page)
-        self.assertIn("11 source books", self.page)
+        self.assertIn("25 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("25 questions", self.page)
+        self.assertIn("13 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()

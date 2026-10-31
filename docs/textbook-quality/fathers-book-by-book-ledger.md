@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 19 unique MCQs drawn from 11 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 25 unique MCQs drawn from 13 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -15,10 +15,12 @@
 | 9 | Science · Full Year | 1 | FA006 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 9 | Social Science · Full Year | 2 | FA001, FA005 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 10 | Science · Full Year, Units 18 & 20 | 3 | FA016, FA017, FA018 | English original PDF text and visible page screenshots checked (pp. 261, 287); Tamil and current-edition comparison pending |
+| 10 | Social Science · Full Year, History Units 4 & 10 | 2 | FA022, FA023 | 2020 English original whole-book PDF text checked, pp. 41 & 117; screenshot request exceeded file-size limit; Tamil edition pending |
 | 11 | History · Full Year | 3 | FA007, FA008, FA009 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 11 | Economics · Full Year, Unit 1 | 1 | FA019 | 2020 English original PDF text checked (p.22), PDF too large for screenshot; Tamil original pending |
 | 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
 | 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
+| 12 | Botany · Full Year, Chs. 2, 3, 5 & 6 | 6 book mappings, 4 new MCQs | FA016, FA018, FA024, FA025, FA026, FA027 | Original 2019 English chapter PDF printed pp. 36, 71, 121, 136 visually checked; Tamil and later editions pending |
 
 Book/question counts are based on existing curated question-bank or source-text entries. **They are not proof that every page of an original printed textbook has been reviewed.**
 
@@ -42,6 +44,25 @@ The same question may refer to multiple source books: Charles Babbage (Class 6 a
 
 **Review status policy:** The Class 10 screenshot checks establish the English source page's stated title only. They do not certify whole chapters, complete subject books, translation fidelity, or the 2026–27 prescribed editions. Original Tamil references should be added only after a source edition is inspected; until then Tamil explanations are explicitly editorial translations.
 
+## Continued original-book review — Class 10 Social Science and Class 12 Botany (31 October 2026)
+
+### Class 10 Social Science (2020 revision, original English pages, PDF text checked)
+
+- **History Unit 4, printed p.41:** Sun Yat-sen is described as the **Father of Modern China** (FA022). The textbook discusses his Three Principles: nationalism, democracy and people's livelihood. [2020 government textbook reproduction](https://vinayakarmatriculationschool.com/documents/books/10th/10-A-SS-B1.pdf).
+- **History Unit 10, printed p.117:** Maraimalai Adigal is called the **Father of Tamil Linguistic Purism**, and is linked to the **Tani Tamil Movement** (FA023). This is distinct from Tamil prose/pioneering printing titles elsewhere in the combined quiz. Same 2020 English PDF.
+- The 52 MB 2020 original full-book PDF was searchable, but fetching screenshots exceeded online size limits. The earlier 2019 English original volume also contains Sun Yat-sen at its printed p.50; **question source pages use the explicitly linked 2020 edition**, not interchangeable pagination. Visual source audit of these two 2020 pages and Tamil text comparison remain pending.
+
+### Class 12 Botany (2019 original English chapter-by-chapter PDF pages visually checked)
+
+- **Chapter 2, Classical Genetics, printed p.36**: Gregor Johann Mendel as Father of Genetics. [Chapter 2 PDF](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-12-Botany-Chapter-2.pdf). **Already in FA016:** append a second source reference, no duplicate question.
+- **Chapter 3, Chromosomal Basis of Inheritance, printed p.71**: M. S. Swaminathan as Father of Indian Green Revolution, linked to Sharbati Sonora wheat. [Chapter 3 PDF](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-12-Botany-Chapter-3.pdf). **Already in FA018:** append a second source reference, no duplicate question.
+- **Chapter 5, Plant Tissue Culture, printed p.121**: Gottlieb Haberlandt is called Father of Tissue Culture, in connection with his 1902 experimental cultures and the concept of totipotency. [Chapter 5 PDF](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-12-Botany-Chapter-5.pdf). Add FA024.
+- **Chapter 6, Principles of Ecology, printed p.136**: a box lists Alexander von **Humbolt** (spelling in that edition; commonly spelled **Humboldt**) as Father of Ecology (FA025), Eugene P. Odum as Father of Modern Ecology (FA026), and R. Misra as Father of Indian Ecology (FA027). [Chapter 6 PDF](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-12-Botany-Chapter-6.pdf).
+- **Editorial caution about 'Father of Ecology':** Attribution varies by source and the textbook itself separately recognizes Ernst Haeckel for a prominent definition of ecology. FA025 explicitly qualifies the question as **the label in the Tamil Nadu Botany honorific box**, rather than unqualified consensus.
+- **Edition caveat:** a revised 2020 Botany book starts its Chapter 6 at printed p.109, whereas this verified first edition of 2019 has the box at p.136. All new source links above point to the **2019 edition**, not the 2020/2023 editions. English page images were inspected; Tamil original and current edition still need comparison.
+
+**This pass: six unique new questions across two new book entries; two existing questions gain new original-book references. Combined total: 25 distinct MCQs across 13 source-book entries.** No separate per-book quiz was created.
+
 ## Audit process and quality rules
 
 1. Review each book and term separately: Science and Social Science (Classes 6–10) followed by History, Geography, Economics, Political Science and other relevant books (Classes 11–12).
@@ -54,8 +75,8 @@ The same question may refer to multiple source books: Charles Babbage (Class 6 a
 ## Outstanding work
 
 - Class 6–9: review **all remaining subject/term volumes** beyond the selected units above.
-- Class 10: selected original English page evidence from Science Units 18 and 20 is now included; the remaining Science original pages and Social Science/other books are not exhaustively checked.
-- Class 11–12: audit all remaining relevant books and chapters, including Science, Economics, Geography and Political Science, beyond the selected 11th Economics and Political Science pages and History units already cited.
+- Class 10: selected original English evidence from Science Units 18 and 20 and Social Science History Units 4 and 10 is included; other units/books and original Tamil comparison are not exhaustively checked.
+- Class 11–12: audit remaining Science, Botany, Zoology, Economics, Geography, Political Science, History and other relevant book chapters beyond the selected passages already cited.
 - Verify direct original-book PDF source links and corresponding Tamil-medium printed pages where a chapter bank currently supplies the English title or page.
 - Complete the original English/Tamil book-by-book coverage and duplicate checks before claiming exhaustive TNPSC/TNUSRB source coverage.
 
