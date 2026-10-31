@@ -28,6 +28,24 @@ class Class6Term1SourceTests(unittest.TestCase):
                 self.assertTrue(q["source_evidence_id"])
                 self.assertIn("garbled",q["source_pdf_text_review_note"])
 
+    def test_social_science_source_fact_pointers(self):
+        bank={q["id"]:q for q in self.quiz["questions"]}
+        for id,pdfpage,printed in (("F043",31,133),("F044",105,209)):
+            with self.subTest(id=id):
+                q=bank[id]
+                self.assertEqual(q["original_pdf_page_checked"],pdfpage)
+                self.assertEqual(q["source_printed_page"],printed)
+                self.assertIn("2025",q["original_edition"])
+                self.assertIn("pending",q["review_status"])
+                self.assertIn("1WJn-q7",q["source_link"])
+                self.assertIn("1xz06oz",q["source_ta_link"])
+        volumes=[v for v in self.registry["volumes"] if v["id"]=="c6-social-science-term1-2025-volume3"]
+        self.assertEqual(len(volumes),1)
+        self.assertNotEqual(volumes[0]["chapter_coverage"],"certified")
+        doc=(ROOT/"docs/textbook-quality/class6-term1-social-original-pdf-2025-review.md").read_text(encoding="utf-8")
+        for marker in ("F043","F044","NOT CERTIFIED","110","Chandrayaan"):
+            self.assertIn(marker,doc)
+
     def test_book_pair_is_only_partially_checked(self):
         volumes=[b for b in self.registry["volumes"] if b["id"]=="c6-science-social-term1-2025-volume3"]
         self.assertEqual(len(volumes),1)
