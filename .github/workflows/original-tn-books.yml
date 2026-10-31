@@ -7,6 +7,8 @@ on:
       - 'data/textbook/original-pdf-source-manifest.json'
       - 'data/special-quizzes/firsts.json'
       - 'tests/test_original_tn_firsts.py'
+      - 'tests/test_original_class9_firsts.py'
+      - 'data/textbook/original-page-review-evidence-class9-2020.json'
       - '.github/workflows/original-tn-books.yml'
   workflow_dispatch:
     inputs:
@@ -44,6 +46,8 @@ jobs:
           if-no-files-found: warn
       - name: Validate Firsts provenance and bilingual questions
         run: python -m unittest discover -s tests -p test_original_tn_firsts.py -v
+      - name: Check Class 9 original English evidence and pending Tamil review
+        run: python -m unittest discover -s tests -p test_original_class9_firsts.py -v
   original-pdf-extraction:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -57,7 +61,7 @@ jobs:
       - name: Extract firsts candidates from real original book pages
         continue-on-error: true
         env:
-          BOOK_IDS: ${{ inputs.source_ids || 'c8-social-science-2022-revision c10-social-science-2022-revision c12-economics-full-year' }}
+          BOOK_IDS: ${{ inputs.source_ids || 'c9-social-science-2020-revision' }}
           BOOK_LANGUAGE: ${{ inputs.language || 'en' }}
         run: |
           python scripts/scan_original_tn_firsts.py --ids $BOOK_IDS --language "$BOOK_LANGUAGE" --output original-firsts-candidates.json

@@ -1,6 +1,6 @@
 # Original Tamil Nadu textbooks, Classes 6–12: firsts audit ledger
 
-**Date:** 30 October 2026  
+**Date:** 31 October 2026  
 **Scope:** Original government-published books in *both English and Tamil editions*, as available in public catalogues. This is intentionally distinct from a scan of existing ClearExams quiz-bank JSON files.  
 **Status:** IN PROGRESS — **full original-textbook certification is not complete**.
 
@@ -13,7 +13,7 @@ The Padanool class-by-class original-book archive (source list linked below) sho
 | 6 | 10 | 12 | 22 | Partial legacy quiz extraction; no complete original PDF sign-off |
 | 7 | 10 | 12 | 22 | Class 7 women's firsts compared with transcribed chapter; remaining books unverified |
 | 8 | 6 | 7 | 13 | One 2022 original Social Science English volume partly checked; newer edition unverified |
-| 9 | 6 | 7 | 13 | Social Science originals located, content not yet fully checked |
+| 9 | 6 | 7 | 13 | **2018/2019/2020 revised English Social Science text partially reviewed**; Tamil and recent edition pending |
 | 10 | 6 | 7 | 13 | **One original revised-2022 English Social Science book partly reviewed; 7 new facts added** |
 | 11 | 40 | 44 | 84 | History quiz bank reviewed; Economics/Political Science/Science originals not yet fully checked |
 | 12 | 40 | 44 | 84 | History/Geography quiz banks reviewed; other original volumes not yet fully checked |
@@ -38,7 +38,7 @@ Printed page evidence from the *actual book*, rather than prewritten MCQs:
 | 118 | History 10 | Madras legislature approved women's participation in electoral politics in 1921 | Added, explicitly scoped to textbook |
 | 195 | Geography 5: Population, Transport, Communication and Trade | First Indian postage stamp described as issued at Karachi in 1852 | Added, scoped to book |
 
-**12 extra bilingual MCQs added** across original Class 8 and Class 10 Social Science books (109 → **121**). Class 8 newly checked selections: Dutch first factory at Masulipatnam (printed p.6), English first Bay of Bengal factory at Masulipatnam (p.6), University of Madras as first British-period Tamil Nadu university and National Education Policy 1968 (both p.55), and Pandita Ramabai's Sharada Sadan (p.80). The English *original PDF text* was checked for their facts; accompanying Tamil translations have **not** all been verified against the relevant printed Tamil-language original. Their per-record `review_status` says so. One-off checking of a fact on a page does **not** mean the whole page or chapter was exhaustively audited.
+**12 bilingual MCQs added** across original Class 8 and Class 10 Social Science books (109 → **121**). Class 8 newly checked selections: Dutch first factory at Masulipatnam (printed p.6), English first Bay of Bengal factory at Masulipatnam (p.6), University of Madras as first British-period Tamil Nadu university and National Education Policy 1968 (both p.55), and Pandita Ramabai's Sharada Sadan (p.80). The English *original PDF text* was checked for their facts; accompanying Tamil translations have **not** all been verified against the relevant printed Tamil-language original. Their per-record `review_status` says so. One-off checking of a fact on a page does **not** mean the whole page or chapter was exhaustively audited.
 
 ### Additional accuracy concern from Class 8 original text
 
@@ -51,6 +51,32 @@ Class 8 History Unit 8 (2022 revised edition, printed p.79) labels Dr. Muthulaks
 - Existing Class 12 History bank: began **1882**, became daily **1889**.
 
 The existing quiz answer is a *type of publication*, not a year. Its explanation has been amended to flag this unresolved source conflict without endorsing either timeline. Original newer history editions and reliable primary reference works should be checked before publishing any date-based question. No claim of resolving this conflict has been made.
+
+## 31 October 2026: Class 9 original Social Science English-text review
+
+**Source:** Government of Tamil Nadu, SCERT, *Standard Nine: Social Science*, first edition 2018; revised 2019 and 2020. The actual SCERT publication is hosted as a third-party PDF mirror at:
+https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-Class-9-Social-Science-Textbook-English.pdf
+
+The English PDF's publication information and contents were checked. From the PDF's searchable original-book text, selected History facts were checked against these **printed pages**:
+
+| Unit | Pages examined for selected facts | Firsts / milestone fact checked | New question IDs |
+| --- | --- | --- | --- |
+| History 1, Human Evolution | 2 | Herodotus as Father of History; early Ennigaldi-Nanna museum | F122–F123 |
+| History 2, Ancient Civilisations | 23 | Qin Shi Huang as first emperor of unified China | F124 |
+| History 8, Beginning of the Modern Age | 103 | Petrarch as Father of Humanism | F125 |
+| History 9, Age of Revolutions | 117 | George Washington; First Continental Congress city and date | F126–F128 |
+| History 10, Industrial Revolution | 133 | Stockton–Darlington 1825; Robert Fulton and the 1807 Clermont | F129–F130 |
+| History 10, Industrial Revolution | 137 | Trevithick's Puffing Devil; John Kay's flying shuttle; Hargreaves's Spinning Jenny | F131–F133 |
+
+**Reproducible source-PDF scan result (GitHub Actions, 31 October 2026):** The source downloader and PyMuPDF text scanner successfully processed the **entire original 328-page English PDF**, with **322 text-extractable pages** and **6 pages requiring visual or OCR review**. It produced **302 broad "firsts"/discovery/invention candidate matches**, with zero source download errors. This means **all 328 page objects were machine-inspected for extractable text**; it does *not* mean 328 pages or 302 matches were manually fact-reviewed. The candidate-match count includes process steps and duplicates. See [successful source scan CI run](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41164365171) and the JSON evidence ledger.
+
+**12 additional English/Tamil MCQs were added, increasing 121 → 133.** English question facts were checked against the original English book's searchable text and labelled page location. Tamil questions/options are editorial translations; the Tamil original book was **not** inspected in this batch. The 2026–27 prescribed-edition mapping is **not confirmed**.
+
+**Explicit limitation:** Requests to capture actual PDF page screenshots failed because the online PDF exceeds the browser screenshot size limit. No visual layout, fact-box graphic or scanned marginal text was independently verified. This is *selected fact review*, not complete reading/certification of the six pages, five units, entire English volume or Tamil edition. The evidence records in `data/textbook/original-page-review-evidence-class9-2020.json` retain these limits for each source-mapped MCQ.
+
+**Additional Tamil comparison (one fact only):** The 2018 Tamil-medium Class 9 Social Science **Term II**, History Unit 4.2(b), also identifies Petrarch as the Father of Humanism. This independently corroborates the answer to **F125**, which now links the 2018 Tamil original. Since the Tamil source is an earlier **term-based edition** and the English source is a revised-2020 **full-year edition**, it does not establish same-edition pagination or full Tamil translation/page certification. Original Tamil source: https://cdn1.byjus.com/wp-content/uploads/2020/06/TN-Board-class-9-Social-Science-Term-2-Book-tamil-medium.pdf
+
+**Audit counts remain:** 251 catalogue-listed editions; **0/251 fully English-and-Tamil certified**. Do not add 1 to the completed-books numerator for this partial review.
 
 ## Reproducible full-original review tooling now available
 
@@ -73,4 +99,4 @@ A mechanical scan of a PDF, even one covering every page, **does not** establish
 - [ ] Resolve Swadesamitran and any other conflicts against authoritative original sources before claiming certified facts.
 - [ ] Re-run site navigation, bilingual tests, source integrity tests and actual mobile-player test, then publish a signed-off per-volume list.
 
-**Current honest status:** initial catalogue list established; older original Class 8 and Class 10 English Social Science volumes have been *partially* reviewed; remaining original volumes and current editions require review. The Firsts Quiz contains 121 curated questions, not a claim of complete Class 6–12 original-textbook coverage.
+**Current honest status:** initial catalogue list established; selected pages from older original Class 8, 9 and 10 English Social Science editions have been *partially* reviewed; remaining pages, Tamil counterparts and newer original volumes require review. The Firsts Quiz contains **133 curated bilingual questions**; this does **not** establish complete Class 6–12 original-textbook coverage.

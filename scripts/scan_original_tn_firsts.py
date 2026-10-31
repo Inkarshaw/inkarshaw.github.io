@@ -29,6 +29,7 @@ ALLOWED_HOSTS = {
     "www.srivenkateshwaraopenschool.com",
     "siddhiias.com",
     "nammakalvi.com",
+    "cdn1.byjus.com",
 }
 EN_PATTERN = re.compile(
     r"\b(?:first|earliest|pioneer(?:ing)?|invent(?:ed|or|ion)"
