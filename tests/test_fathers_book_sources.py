@@ -718,7 +718,7 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("page_review_status", self.page)
         self.assertIn('aria-label="Fathers Quiz filters"', self.page)
         self.assertNotRegex(
-            self.page, r"\\.filters\\s*>\\s*div\\s*\\{\\s*display\\s*:\\s*none"
+            self.page, r"\.filters\s*>\s*div\s*\{\s*display\s*:\s*none"
         )
         for filter_id in ("topic", "classFilter", "bookFilter", "set"):
             self.assertIn('id="' + filter_id + '"', self.page)
