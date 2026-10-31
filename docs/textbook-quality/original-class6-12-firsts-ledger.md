@@ -99,7 +99,7 @@ A mechanical scan of a PDF, even one covering every page, **does not** establish
 - [ ] Resolve Swadesamitran and any other conflicts against authoritative original sources before claiming certified facts.
 - [ ] Re-run site navigation, bilingual tests, source integrity tests and actual mobile-player test, then publish a signed-off per-volume list.
 
-**Current honest status:** initial catalogue list established; selected pages from older original Class 8, 9 and 10 English Social Science editions have been *partially* reviewed; remaining pages, Tamil counterparts and newer original volumes require review. The Firsts Quiz contains **143 curated bilingual questions**; this does **not** establish complete Class 6–12 original-textbook coverage.
+**Current honest status:** initial catalogue list established; selected pages from older original Class 8, 9 and 10 English Social Science editions have been *partially* reviewed; remaining pages, Tamil counterparts and newer original volumes require review. The Firsts Quiz contains **148 curated bilingual questions**; this does **not** establish complete Class 6–12 original-textbook coverage.
 
 
 ## 31 October continuation: measurable certification gaps
@@ -177,3 +177,44 @@ GitHub CI inventory run before this reconciliation: https://github.com/Inkarshaw
 GitHub Actions attempt https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41169349147 to download and mechanically scan the **2022-revised Class 12 Political Science English PDF** failed with `<urlopen error timed out>`. **No 2022 Class 12 page count, full-PDF text-hits count, unreadable-page count, or SHA-256 hash was obtained.** Earlier CI had `continue-on-error: true`, so its top-level extraction job appeared green despite the error. This has been changed to fail on real extraction errors, with the automated PR smoke extraction temporarily restored to the previously accessible Class 9 original source; the Class 12 URL must be repaired or an equivalent edition mirror found before rerunning it.
 
 The five Class 12 facts above were reviewed from *selected PDF passages exposed by the source reader* and independently corroborated. That is a strictly narrower achievement than a full original-textbook scan or full printed-page certification.
+
+
+## 31 October: selected original Class 12 Economics and a second all-subject catalogue
+
+### Class 12 Economics original English book
+
+The 2019 **Government of Tamil Nadu, SCERT, Higher Secondary Second Year Economics** first edition was inspected through its original textbook PDF text and printed page labels:
+https://www.nesto.in/wp-content/uploads/2024/08/12th-economics.pdf . Selected passages were compared with a transcription of the **2023 revised / 2024 reprinted** book at https://studylib.net/doc/27783099/class-12-tn-economics . This comparison **does not** prove all editions are identical. The screenshot tool rejected the large original file, so no page-image sign-off was made. The 2026 edition and matching original Tamil pages remain unverified.
+
+**Five new bilingual MCQs (F144–F148) bring the source-curated Firsts bank from 143 to 148:**
+
+| Printed page (2019 English) | Chapter | Scope-qualified Firsts fact | Institutional cross-check |
+| --- | --- | --- | --- |
+| 1 | 1: Introduction to Macro Economics | Ragnar Frisch was Norwegian co-winner of the first Economic Sciences Prize (with Jan Tinbergen, 1969) | [NobelPrize.org](https://www.nobelprize.org/prizes/lists/all-nobel-prizes/all/?gallery_style=page) |
+| 95 | 6: Banking | Sveriges Riksbank, founded 1668, is the world's oldest central bank | [Riksbank history](https://www.riksbank.se/en-gb/about-the-riksbank/history/historical-timeline/1600-1699/sveriges-riksbank-is-founded/) |
+| 102 | 6: Banking | Sir Osborne Smith was first RBI Governor when RBI began work in 1935 | [RBI chronology](https://systemhealth.rbi.org.in/Scripts/chro_1935.aspx.html) |
+| 102 | 6: Banking | Sher Shah Suri's silver Rupiya was a precursor of the modern Indian rupee | [RBI coin museum](https://systemhealth.rbi.org.in/Scripts/mc_mughal.aspx.html) |
+| 162 | 8: International Economic Organisations | Singapore hosted the first WTO Ministerial Conference in 1996 | [WTO 1996 records](https://www.wto.org/english/thewto_e/minist_e/min96_e/min96_e.htm) |
+
+File: `data/textbook/original-page-review-evidence-class12-economics-2019.json`. The excluded-claims ledger explicitly rejects two overgeneralised or incorrect historical source statements: that Simon Kuznets *first conceived national income* (ideas/estimates predate him), and that the Bank of England was the "first bank of issues" in **1864** (unsupported chronology). It also corrects the book's Sweden predecessor date **1656** versus actual central-bank foundation **1668**. We have not certified all book pages, graphics, exercises or Tamil versions.
+
+### Reconciling an additional original-book catalogue
+
+The second public 2024–25 textbook locator, https://tnkalvi.online/textbooks/class/12 , exposes a **different indexing system** from Padanool. Headers checked on its seven class pages (accessed 31 October 2026) list:
+
+| Class | Catalogue selections | Catalogue's reported unique PDFs |
+| --- | ---: | ---: |
+| 6 | 30 | 24 |
+| 7 | 30 | 24 |
+| 8 | 12 | 10 |
+| 9 | 10 | 8 |
+| 10 | 12 | 10 |
+| 11 | 81 | 78 |
+| 12 | 82 | 78 |
+| **Total** | **257** | **232** |
+
+Here **257** is the sum of English/Tamil subject-and-term *selections*, and **232** is the sum of per-class counts of distinct PDF links as reported by that separate site. Neither is automatically the number of unique currently prescribed government publications or 2026–27 editions. **The older Padanool counts of 215 detail links and 251 historical listings measure different entities.** There is no valid subtraction or completion percentage across these three counts. Some Tamil/English *language* books have the same PDF in both medium selectors, and some 11–12 vocational subjects have separate textbook volumes. The source index must be reconciled to exact edition, subject, volume and language ID before whole-book certification.
+
+A new scanner `scripts/inventory_tnkalvi_original_books.py` will output exact per-subject/term/medium detail links with explicit `catalogue_detail_link_only` status, and `.github/workflows/original-tn-books.yml` uploads its JSON evidence after validation. The catalogue is independent and **not an official government certification of edition currency**. Source PDF downloading, complete visual and Tamil page review, and editorial proof of every candidate are still outstanding.
+
+**Current original-book sign-off: zero fully certified complete English/Tamil volume pairs.**
