@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 58 unique MCQs drawn from 26 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 65 unique MCQs drawn from 30 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -22,6 +22,7 @@
 | 11 | Biochemistry · Unit 1 | 1 | FA056 | English SCERT text reproduction p.1 checked; original page image, Tamil and edition comparison pending |
 | 11 | Bio-Zoology · Chapter 1 | 3 mapped (2 new + FA004 cited again) | FA035–FA036, FA004 | SCERT English Chapter 1 pp.4–5 screenshot verified; Tamil original pending |
 | 11 | Computer Science · Chapter 1 | 1 cross-reference | FA002 | English SCERT text reproduction p.1 identifies Babbage; original printed page screenshot and Tamil original pending |
+| 11 | Vocational Nursing · Unit 3, Psychology and Sociology | 2 mapped (1 new FA067; Comte cross-reference FA051) | FA067, FA051 | Original English SCERT textbook text reproduction pp.53 and 78; Psychology title contradicts Class 12 General Nursing's Freud attribution; scope questions by book, original page images/Tamil pending |
 | 11 | Microbiology · Chapters 1, 10 | 6 | FA040–FA045 | English SCERT text reproduction pp.3, 6, 150–151 checked; original page images, Tamil and current-edition review pending |
 | 11 | Statistics · Chapter 1 | 1 cross-reference | FA030 | English SCERT text reproduction p.1 identifies Mahalanobis; original page screenshot and Tamil original pending |
 | 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
@@ -29,6 +30,9 @@
 | 12 | General Nursing · Chapters 3, 4, 10 | 3 | FA050–FA052 | English SCERT reproduction pp.98, 102, 220 checked; includes qualified textbook-specific titles and printed spelling corrections; Tamil original pending |
 | 12 | Vocational Nursing (Theory & Practical) · Chapters 1, 4 | 3 | FA058–FA060 | SCERT original English PDF directly inspected as searchable text: printed pp.16,104; PDF screenshot too large; Tamil original/current edition pending |
 | 12 | Physics · Volume II, Unit 11 | 1 | FA055 | English SCERT reproduction p.263 checked; original page image and Tamil original pending |
+| 12 | Basic Mechanical Engineering · Chapters 1, 9, 10 | 4 mapped (3 new, Taylor cross-reference) | FA061–FA063, FA057 | 2023-revised/2024-reprint SCERT English reproduced text pp.3,130–131,145; Tamil original/page images pending |
+| 12 | Computer Applications · Chapters 10, 18 | 2 | FA065–FA066 | 2023-revised SCERT English reproduced text pp.139,247,252–253; Tamil original/page images pending |
+| 12 | Textiles and Dress Designing · Chapter 13 | 1 | FA064 | English SCERT text p.202 calls Luca Pacioli Father of Accounting and Bookkeeping; Tamil original/page images pending |
 | 12 | Political Science · Volume I, Unit 8 | 3 mappings (2 new, FA018 cross-source) | FA053–FA054, FA018 | English SCERT reproduction pp.180,183,185 checked; original page images and Tamil original pending |
 | 12 | Commerce · Chapters 1, 16 | 3 | FA025, FA026, FA057 | Original English textbook p.8 and pp.130,136 previously checked; 2024 English reprint text reconfirmed Fayol and Nader; new Taylor scientific-management attribution pp.4–7 is linked to explicit official TNPSC May 2024 departmental question 19; original page images and Tamil still pending |
 | 12 | Microbiology · Chapters 7, 9, 10, 11 | 4 | FA046–FA049 | English SCERT text reproduction pp.114, 188, 206, 241 checked; original page images, Tamil and current-edition review pending |
@@ -232,6 +236,40 @@ The PDF was opened as the actual SCERT book with its title/edition page, and its
 **Page detail:** The text calls Patanjali the Father of Yoga at printed p.16, in the context of classical yoga philosophy. Printed p.104 separately attributes Nutrition to Lavoisier and Medicine to Hippocrates; the two labels belong to different people and should not be confused. These are traditional honorific descriptions and do not assert exclusive invention of either field.
 
 **Audit discipline:** The full PDF is available as a searchable text source, but the selected lines are not evidence that all chapters were exhaustively reviewed; this batch records two chapters and their relevant pages only.
+
+## New source audit: mechanical engineering, computing, textiles and vocational nursing (31 October 2026)
+
+**Seven new bilingual MCQs (FA061–FA067)** were added from four more indexed TN SCERT books. Searchable **English textbook reproductions** and printed page references were directly inspected. Original page-image comparison, prescribed 2026–27 edition matching and Tamil-medium review remain pending.
+
+| Class/book | Chapter | Printed page | Textbook-specific title | Person / Quiz |
+| --- | --- | ---: | --- | --- |
+| 12 Basic Mechanical Engineering | 1 · Lathe | 3 | Father of Machine Tools | Henry Maudslay · FA061 |
+| 12 Basic Mechanical Engineering | 9 · Automation and Robotics | 130 | Father of Automation | Nikola Tesla · FA062 |
+| 12 Basic Mechanical Engineering | 9 · Automation and Robotics | 131 | Father of Robotics | George Devol · FA063 |
+| 12 Textiles & Dress Designing | 13 · Entrepreneurship Development | 202 | Father of Accounting and Bookkeeping | Luca Pacioli · FA064 |
+| 12 Computer Applications | 10 · Introduction to Computer Networks | 139 | Father of the Internet | Vint Cerf · FA065 |
+| 12 Computer Applications | 18 · Electronic Data Interchange | 247,252–253 | Father of EDI | Ed Guilbert · FA066 |
+| 11 Vocational Nursing | 3 · Introduction to Psychology and Sociology | 53 | Father of Psychology (textbook attribution) | Wilhelm Wundt · FA067 |
+
+### Source publications and cross-references
+
+- [Class 12 Basic Mechanical Engineering — SCERT English reproduced text, 2023 revision, 2024 reprint](https://www.scribd.com/document/821082406/12th-Basic-Mechanical-Engineering-English-Medium-Text-Www-tntextbooks-in): Lathe p.3 explicitly calls **Henry Maudslay** Father of Machine Tools; Automation and Robotics pp.130–131 explicitly name **Nikola Tesla** Father of Automation and **George Devol** Father of Robotics. Chapter 10 p.145 independently includes an official textbook MCQ identifying **F. W. Taylor** as Father of Scientific Management, cross-linked to existing FA057 rather than creating another question.
+- [Class 12 Computer Applications — SCERT English revised 2023](https://www.scribd.com/document/833406584/12th-Computer-Application-EM-TJ-V23): Chapter 10 p.139 calls **Vint Cerf** Father of the Internet and names **Robert Kahn** as collaborator. The Internet is a collective invention; avoid sole-inventor language. Chapter 18 p.247 and points-to-remember p.252 identify **Ed Guilbert** Father of EDI; p.253 repeats this in an exercise.
+- [Class 12 Textiles and Dress Designing — SCERT English 2019](https://www.scribd.com/document/809268057/document): Chapter 13 p.202 describes **Luca Pacioli** as Father of Accounting and Bookkeeping for his treatise on double-entry bookkeeping. Do not imply he invented all accounting.
+- [Class 11 Vocational Nursing — SCERT English 2018/2019](https://www.scribd.com/document/928256789/TN-Board-Class-11-Nursing-Vocational-Textbook): Unit 3 p.53 identifies **Wilhelm Wundt** as Father of Psychology and founder of modern psychology; p.78 explicitly names **Auguste Comte** Father of Sociology, added as a cross-reference to existing FA051.
+
+### Important contradiction in two TN school books
+
+- **Class 11 Vocational Nursing, Unit 3, p.53:** *Wilhelm Wundt* is called Father of Psychology, with a reference to his 1879 laboratory.
+- **Class 12 General Nursing, Chapter 3, p.98:** *Sigmund Freud* is called Father of Psychology.
+
+Both statements appear in the printed English source text reproductions. They do **not** establish that two different people each exclusively held an official title. **FA050** now asks specifically about the Class 12 General Nursing book (Freud), while **FA067** specifically asks about Class 11 Vocational Nursing (Wundt). Explanations cross-reference the conflict; they must never be simplified to an unqualified single-answer "Father of Psychology" MCQ. These are book-specific facts, not an endorsed consensus.
+
+### Further editorial distinctions
+
+- Class 12 Basic Mechanical Engineering calls George Devol **Father of Robotics**; Class 12 Physics FA055 uses **Father of the modern robotics industry** for Joseph Engelberger. Maintain the exact title wording.
+- The automation label for Nikola Tesla is source-specific and should not be universalized.
+- Original Tamil and current textbook source confirmation is pending. Reviewing a handful of passages in a book does **not** certify that every page of that book has been audited.
 
 ## Audit process and quality rules
 
