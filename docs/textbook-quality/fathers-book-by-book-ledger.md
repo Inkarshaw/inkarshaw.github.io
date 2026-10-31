@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 77 unique MCQs drawn from 39 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 79 unique MCQs drawn from 40 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -17,6 +17,7 @@
 | 10 | Science · Full Year, Units 18 & 20 | 3 | FA016, FA017, FA018 | English original PDF text and visible page screenshots checked (pp. 261, 287); Tamil and current-edition comparison pending |
 | 11 | History · Full Year | 3 | FA007, FA008, FA009 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 11 | Economics · Full Year, Unit 1 | 1 | FA019 | 2020 English original PDF text checked (p.22), PDF too large for screenshot; Tamil original pending |
+| 11 | Accountancy · Unit 14, Computerised Accounting | 1 cross-reference | FA064 | SCERT English 2024 text p.327 explicitly calls Pacioli Father of Accounting and Bookkeeping in Europe; a second source, no duplicate MCQ; Tamil original pending |
 | 11 | Business Mathematics & Statistics · Chapters 2, 3, 8 | 3 | FA022, FA023, FA024 | English original PDF text checked (pp.25,51,178); page screenshots failed due PDF size; Tamil original pending |
 | 11 | Bio-Botany · Chapters 1, 2, 5, 9 | 8 mapped (7 distinct, plus source repeats) | FA031–FA034, FA036–FA038; FA004 | English Ch.5 pp.86,95,103 screenshots verified; existing chapters partly checked; Tamil original pending |
 | 11 | Biochemistry · Unit 1 | 1 | FA056 | English SCERT text reproduction p.1 checked; original page image, Tamil and edition comparison pending |
@@ -31,7 +32,7 @@
 | 11 | Statistics · Chapter 1 | 1 cross-reference | FA030 | English SCERT text reproduction p.1 identifies Mahalanobis; original page screenshot and Tamil original pending |
 | 11 | Political Science · Volume I, Units 1, 2 & 7 | 3 | FA020, FA021, FA074 | 2020 English source Unit 2 p.22 identifies Jean Bodin; older Unit 7 pp.109,119 already checked; original Tamil/page-image comparison pending |
 | 11 | Political Science · Volume II, Units 8 & 12 | 2 | FA075, FA076 | 2020 English textbook reproduction p.136 John Locke and p.241 Lord Ripon ('Rippon' in source); original Tamil/page-image comparison pending |
-| 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
+| 12 | History · Full Year, Volumes I and II | 7 | FA005, FA010, FA011, FA013, FA014, FA080, FA081 | Existing curated references; new original SCERT English Volume II reproduction Unit10 p.19 and Unit11 pp.57,61 checked; original Tamil/page images and 2026–27 edition pending |
 | 12 | General Nursing · Chapters 3, 4, 10 | 3 | FA050–FA052 | English SCERT reproduction pp.98, 102, 220 checked; includes qualified textbook-specific titles and printed spelling corrections; Tamil original pending |
 | 12 | Vocational Nursing (Theory & Practical) · Chapters 1, 4 | 3 | FA058–FA060 | SCERT original English PDF directly inspected as searchable text: printed pp.16,104; PDF screenshot too large; Tamil original/current edition pending |
 | 12 | Physics · Volume II, Unit 11 | 1 | FA055 | English SCERT reproduction p.263 checked; original page image and Tamil original pending |
@@ -366,6 +367,30 @@ The latest reviewed source is the [Class 11 Political Science English SCERT text
 | FA079 | Father of Indian Ecology | **R. Misra** | Preserve first initial as in textbook; distinguish from global/modern ecology titles |
 
 **Review status and caution:** The printed p.109 SCERT English text was read in the complete online 2024-reprinted textbook reproduction. Original PDF page-image inspection, Tamil-medium page comparison and the currently prescribed 2026–27 edition have **not** been independently checked. The claims are explicitly customary textbook titles and must not be presented as official exclusive awards. The rest of Chapter 6 and all 6–12 books remain subject to ongoing page-by-page audit.
+
+## New verification: Class 12 History Volume II and Class 11 Accountancy (31 October 2026)
+
+This continuation adds **two new English–Tamil MCQs (FA080–FA081)** from Class 12 History Volume II, and a **cross-book source reference for FA064** from Class 11 Accountancy.
+
+### Explicitly supported new titles
+
+| Source | Printed page | Textbook's designation | Correct person | Quiz action |
+| --- | ---: | --- | --- | --- |
+| 12 History Volume II, Unit 10 · Modern World: The Age of Reason | 19 | Father of Italian Renaissance Literature | **Petrarch** | FA080 new |
+| 12 History Volume II, Unit 11 · The Age of Revolutions | 57; exercise p.61 | Father of the American Industrial Revolution | **Samuel Slater** | FA081 new |
+| 11 Accountancy, Unit 14 · Computerised Accounting | 327 | Father of Accounting and Bookkeeping *in Europe* | **Luca Pacioli** | Cross-reference FA064 |
+
+### Verified material
+
+- [Tamil Nadu SCERT Class 12 History, Volume II, 2019 English textbook reproduction](https://www.scribd.com/document/474982581/12th-History-EM-V2-Combined-26-09-2019-pdf): Unit 10 p.19 explicitly identifies **Petrarch** as Father of Italian Renaissance Literature. Existing **FA005** covers Petrarch as Father of Humanism; titles differ and both are source-grounded. The same volume's Unit 11 p.57 says US President **Andrew Jackson** hailed **Samuel Slater** as Father of the American Industrial Revolution for his role in developing early water-powered textile mills in Rhode Island. The exercise on p.61 asks why Slater has that title.
+- [Tamil Nadu SCERT Class 11 Accountancy, revised 2022, reprinted 2024, English textbook reproduction](https://www.scribd.com/document/952013555/Class-11-Accountancy-English-Medium-2024-Edition-www-tntextbooks-in): Unit 14, p.327 MS Word practical passage explicitly calls **Fra Luca Bartolomeo de Pacioli** the Father of Accounting and Bookkeeping **in Europe**, and the p.327–328 formatting exercise repeats the wording. Earlier FA064 already covers Luca Pacioli using the Class 12 Textiles & Dress Designing source, so this is an additional cited source, not a duplicate question.
+
+### Quality controls and limits
+
+- Keep the title **Italian Renaissance Literature** precise rather than replacing the Humanism question or pretending every title is universally exclusive.
+- The *American* qualifier is essential for Samuel Slater: do not conflate the American and British Industrial Revolutions.
+- Class 11 Accountancy is newly indexed only for the cited **Unit 14, printed p.327**, not the complete 14-unit book; the source was selected for an exact explicit Father reference.
+- The sources are searchable English SCERT textbook reproductions, not independently checked original printed page images. Original Tamil-medium wording, revised/current 2026–27 editions and complete Classes 6–12 chapter-by-chapter coverage remain unverified.
 
 ## Audit process and quality rules
 
