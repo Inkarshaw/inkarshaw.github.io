@@ -4,15 +4,15 @@
 **Quiz:** [ClearExams Firsts Quiz](../../textbook-firsts.html)  
 **Bank:** `data/special-quizzes/firsts.json`, revision 11  
 **Scope:** Entire 148-question published *curated bank*, Classes 6–12  
-**Sign-off classification:** **STRUCTURAL / TARGETED EDITORIAL QA**, pending successful pull-request CI and live deployment. **NOT ORIGINAL-TEXTBOOK CERTIFIED.**
+**Sign-off classification:** **STRUCTURAL / TARGETED EDITORIAL + CHROMIUM FUNCTIONAL QA PASSED**, GitHub Actions [Audit TN Textbook Firsts run 41189707667](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41189707667) on 31 October 2026. **NOT ORIGINAL-TEXTBOOK CERTIFIED.** Live production availability remains unverified.
 
 ## Certification boundaries (read before using the badge)
 
 | Gate | Outcome | Evidence / limitation |
 | --- | --- | --- |
-| Bank JSON, IDs, classes, categories, four English options, four Tamil options, answer-index validity, required explanations | Automated structural checks established; final CI outcome to be recorded separately | `tests/test_firsts_certification.py`; `tests/test_firsts_special_quiz.py` |
+| Bank JSON, IDs, classes, categories, four English options, four Tamil options, answer-index validity, required explanations | **PASS**: structural and editorial certification tests in GitHub Actions run 41189707667 | `tests/test_firsts_certification.py`; `tests/test_firsts_special_quiz.py` |
 | Date/year distractors and known prompt/translation defects | Corrected, guarded in tests | F029, F033–F034, F042, F044, F050, F052, F079, F085, F094, F112, F114, F116 |
-| Quiz player: 20-question default, skip, unanswered scoring, retry, Tamil toggle, restore, mobile layout | Implemented in proposed change; actual Chromium test required before declaring browser pass | `tests/test_firsts_browser_smoke.py` |
+| Quiz player: 20-question default, skip, unanswered scoring, retry, Tamil toggle, restore, mobile layout | **PASS**: real Chromium mobile/bilingual smoke tests in GitHub Actions run 41189707667 | `tests/test_firsts_browser_smoke.py` |
 | Direct English/Tamil original textbook verification for every MCQ | **NOT CERTIFIED** | Many records still derive from unit banks rather than edition/page-checked originals |
 | Complete coverage of all Firsts in 2026–27 TN School Books, both media, all classes/subjects/terms | **NOT CERTIFIED** | Source archive/edition inventory and manual complete-book review unfinished |
 | Live site deployment and HTTP availability | **NOT CERTIFIED by this change** | Verify production after merge; do not infer from branch contents |
@@ -48,7 +48,7 @@ The PR workflow `.github/workflows/firsts-audit.yml` runs existing question-bank
 - Retry wrong/unanswered, Tamil language switch, and reload restoration.
 - Topic + class filtering; All-questions mode; mobile viewport overflow.
 
-A test *file* or workflow definition is not itself proof of a passing run. Record the PR Actions run link and conclusion when available. Only after successful CI may the **structural and tested-player** gates be signed off; factual textbook certification still remains open.
+**Verified CI result:** [Audit TN Textbook Firsts run 41189707667](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41189707667) completed **successfully** on 31 October 2026, including structural/editorial and actual Chromium mobile-player tests. Other PR CI workflows (quiz/text quality, content trust/UX, main mobile smoke, original-volume inventory) also passed for this revision. Factual textbook certification and live-domain availability remain open.
 
 ## Recommendation
 
