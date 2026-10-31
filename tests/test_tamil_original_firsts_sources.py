@@ -32,5 +32,24 @@ class TamilOriginalFirstsSourceTests(unittest.TestCase):
         self.assertNotEqual(v["chapter_coverage"], "certified")
         self.assertTrue(v["tamil_url"].endswith(".pdf"))
 
+
+    def test_saved_source_evidence_keeps_partial_fact_scope(self):
+        evidence = json.loads((ROOT / "data/textbook/original-tamil-firsts-evidence-class12-economics-2024.json").read_text(encoding="utf8"))
+        self.assertEqual(evidence["total_pdf_pages"], 336)
+        self.assertEqual(evidence["pages_with_substantial_tamil_codepoints"], 335)
+        self.assertEqual(evidence["original_tamil_fact_claims_certified"], 0)
+        self.assertFalse(evidence["whole_original_book_fact_review_completed"])
+        self.assertFalse(evidence["tamil_to_english_edition_page_alignment_completed"])
+        self.assertEqual({r["quiz_id"] for r in evidence["targets"]}, {f"F{i}" for i in range(144, 149)})
+        for entry in evidence["targets"]:
+            self.assertTrue(entry["do_not_upgrade_quiz_certification"])
+        names_only = next(x for x in evidence["targets"] if x["quiz_id"] == "F144")
+        self.assertIn("not_1969_prize", names_only["visual_excerpt_status"])
+        visual = evidence["small_visual_excerpt_review"]
+        self.assertFalse(visual["complete_page_visual_review"])
+        self.assertEqual(len(visual["images_reviewed"]), 5)
+        self.assertEqual(set(evidence["selected_tamil_excerpt_core_fact_corroborations"]),
+                         {"F145", "F146", "F147", "F148"})
+
 if __name__ == "__main__":
     unittest.main()
