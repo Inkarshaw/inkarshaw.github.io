@@ -72,6 +72,8 @@ The English PDF's publication information and contents were checked. From the PD
 
 **Explicit limitation:** Requests to capture actual PDF page screenshots failed because the online PDF exceeds the browser screenshot size limit. No visual layout, fact-box graphic or scanned marginal text was independently verified. This is *selected fact review*, not complete reading/certification of the six pages, five units, entire English volume or Tamil edition. The evidence records in `data/textbook/original-page-review-evidence-class9-2020.json` retain these limits for each source-mapped MCQ.
 
+**Additional Tamil comparison (one fact only):** The 2018 Tamil-medium Class 9 Social Science **Term II**, History Unit 4.2(b), also identifies Petrarch as the Father of Humanism. This independently corroborates the answer to **F125**, which now links the 2018 Tamil original. Since the Tamil source is an earlier **term-based edition** and the English source is a revised-2020 **full-year edition**, it does not establish same-edition pagination or full Tamil translation/page certification. Original Tamil source: https://cdn1.byjus.com/wp-content/uploads/2020/06/TN-Board-class-9-Social-Science-Term-2-Book-tamil-medium.pdf
+
 **Audit counts remain:** 251 catalogue-listed editions; **0/251 fully English-and-Tamil certified**. Do not add 1 to the completed-books numerator for this partial review.
 
 ## Reproducible full-original review tooling now available
