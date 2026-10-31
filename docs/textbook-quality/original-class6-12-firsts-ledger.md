@@ -218,3 +218,35 @@ Here **257** is the sum of English/Tamil subject-and-term *selections*, and **23
 A new scanner `scripts/inventory_tnkalvi_original_books.py` will output exact per-subject/term/medium detail links with explicit `catalogue_detail_link_only` status, and `.github/workflows/original-tn-books.yml` uploads its JSON evidence after validation. The catalogue is independent and **not an official government certification of edition currency**. Source PDF downloading, complete visual and Tamil page review, and editorial proof of every candidate are still outstanding.
 
 **Current original-book sign-off: zero fully certified complete English/Tamil volume pairs.**
+
+
+## 31 October: actual full-file Tamil original scan and selected cropped-page review
+
+This batch moves beyond an English-to-Tamil *editorial translation*. GitHub Actions downloaded the **2024 archived Tamil-medium Class 12 Economics original SCERT PDF** from https://padanool.in/dl/class-12-economics-tamil-medium.pdf (catalogue https://padanool.in/ta/class-12/tamil-medium/economics/ ).
+
+The complete file was mechanically parsed with PyMuPDF:
+
+| Direct original-file measurement | Result |
+| --- | --- |
+| SHA-256 | `481e90f5899f871582bf1620dedd304a9440291f9a65fd653fdf7d9c006b533f` |
+| Bytes downloaded | 32,258,434 |
+| PDF pages processed | 336 |
+| Pages with some text | 336 |
+| Pages with substantial Tamil Unicode text | 335 |
+| Tamil codepoints found | 531,699 |
+| Current prescribed 2026–27 edition verified | No |
+| Whole-volume human page/visual certification | No |
+
+The full source-extraction evidence was uploaded as a GitHub Actions artifact. A second visual review rendered **five small, source-wording crops** from the original PDF, not the complete pages: https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41177471186 . We inspected all five crops and recorded outcomes in `data/textbook/original-tamil-firsts-evidence-class12-economics-2024.json`.
+
+| Existing quiz question | Tamil original PDF page index (not printed page) | Cross-edition finding |
+| --- | --- | --- |
+| F144: Ragnar Frisch co-won first Economic Sciences prize (1969) | 325–326 | The book contains his **econometrics** contribution/name but the first-1969-prize fact was **not established** by the Tamil passage; retains independent Nobel source |
+| F145: world's oldest central bank, Sveriges Riksbank | 117 | Tamil original calls Sweden's Riksbank the first central bank; the accompanying **1897** year refers to its full banknote-issue rights, **not** foundation. Founding year **1668** must be grounded in Riksbank's own history |
+| F146: first RBI Governor Sir Osborne Smith | 127 | Original Tamil visual snippet expressly labels Osborne Smith as RBI's first Governor |
+| F147: Sher Shah Suri and the early silver Rupiya | 127 | Original Tamil visual paragraph connects Sher Shah Suri to introduction of the rupee, consistent with the narrowly framed quiz answer |
+| F148: first WTO ministerial conference, Singapore 1996 | 196 (also candidate p.199) | Original Tamil source text and clipped image show Singapore/1996 conference chronology |
+
+**Crucial:** the source for these new Tamil candidates is a **2024 archive**, whereas the original English source citations in the published questions include a **2019 edition**. The wording and printed page indices may differ. The five cropped facts have been reviewed individually, but that is **not** review of all tables, exercises, maps, images or pages, and is **not** proof that the same exact edition is prescribed in 2026. The Firsts bank remains **148 MCQs**; no new question was added merely from keyword matches. The original-source manifest is now **18 seed records** (not 18 certified books), and **zero complete English/Tamil edition pairs** have a full signed-off audit.
+
+The source scan now uses an allowlisted, size-limited downloader and the original-book CI has a dedicated Tamil job. Machine matches remain `automated_tamil_text_candidate_only`, and the separate editorial record explains what was and was not visually corroborated.
