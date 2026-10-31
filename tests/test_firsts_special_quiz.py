@@ -56,6 +56,9 @@ class FirstsSpecialQuizTests(unittest.TestCase):
         self.assertIn("filteredBank()", self.page)
         self.assertIn("class_no", self.page)
         self.assertIn("clearexamsFirstsProgressV1", self.page)
+        self.assertIn("source_ta_pdf_page", self.page)
+        self.assertIn("taArchive", self.page)
+        self.assertIn("2024 தமிழ் பதிப்பு", self.page)
 
     def test_homepage_and_practice_entrypoints(self):
         for path in ("index.html", "practice.html", "textbook-quiz.html"):

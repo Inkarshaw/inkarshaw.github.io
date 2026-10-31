@@ -44,7 +44,15 @@ class Class12EconomicsFirstsTests(unittest.TestCase):
                 self.assertEqual(q["opts_en"][q["correct"]], evidence["answer"])
                 self.assertEqual(q["review_status"],
                                  "original_english_pdf_text_checked_tamil_and_visual_pages_pending")
-                self.assertIsNone(q["source_ta_link"])
+                if q["id"] == "F144":
+                    self.assertIsNone(q["source_ta_link"])
+                else:
+                    self.assertEqual(q["source_ta_link"],
+                                     "https://padanool.in/dl/class-12-economics-tamil-medium.pdf")
+                    self.assertEqual(q["source_ta_pdf_page"],
+                                     {"F145": 117, "F146": 127, "F147": 127, "F148": 196}[q["id"]])
+                    self.assertIn("2024", q["source_ta_edition"])
+                    self.assertIn("not_full_volume_certification", q["tamil_original_excerpt_status"])
                 self.assertEqual(q["original_medium_checked"], "English")
                 self.assertEqual(evidence["visual_page_verification"], "pending")
                 self.assertEqual(evidence["tamil_source_verification"], "pending")

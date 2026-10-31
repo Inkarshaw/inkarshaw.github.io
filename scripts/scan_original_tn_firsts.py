@@ -30,6 +30,7 @@ ALLOWED_HOSTS = {
     "siddhiias.com",
     "nammakalvi.com",
     "www.nesto.in",
+    "padanool.in",
     "cdn1.byjus.com",
 }
 EN_PATTERN = re.compile(
