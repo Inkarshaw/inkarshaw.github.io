@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertGreaterEqual(len(self.questions), 19)
-        self.assertGreaterEqual(len(self.books), 11)
+        self.assertEqual(len(self.questions), 24)
+        self.assertEqual(len(self.books), 13)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -71,13 +71,37 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("Indian", by_id["FA018"]["q_en"])
         self.assertIn("tamil_original_pending", by_id["FA016"]["review_status"])
 
+    def test_business_maths_and_commerce_original_book_titles(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA022": ("Al-Khwarizmi", 11, 25, "chapter-2"),
+            "FA023": ("René Descartes", 11, 51, "chapter-3"),
+            "FA024": ("Ronald A. Fisher", 11, 178, "chapter-8"),
+            "FA025": ("Henry Fayol", 12, 8, "chapter-1"),
+            "FA026": ("Ralph Nader", 12, 130, "chapter-16"),
+        }
+        for qid, (person, grade, page, chapter) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], person)
+                self.assertEqual(q["class_no"], grade)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(q["chapter_id"], chapter)
+                self.assertIn("original_english_pdf_text_checked", q["review_status"])
+                self.assertIn("page_image_unavailable", q["review_status"])
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertTrue(q["edition_note"])
+        self.assertIn("a father of statistics", by_id["FA024"]["q_en"].lower())
+        self.assertIn("not the exclusive father", by_id["FA024"]["exp_en"])
+        self.assertNotIn("Father of Scientific Management", " ".join(q["q_en"] for q in self.questions))
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("19 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("19 questions", self.page)
-        self.assertIn("11 source books", self.page)
+        self.assertIn("24 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("24 questions", self.page)
+        self.assertIn("13 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
