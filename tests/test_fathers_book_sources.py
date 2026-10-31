@@ -26,7 +26,7 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
         self.assertIn("All books", self.page)
-        self.assertIn("ONE quiz", self.page)
+        self.assertIn("ONE combined quiz", self.page)
         self.assertIn("distinct questions", self.page)
         self.assertNotIn("b.question_count+", self.page)
 
@@ -716,6 +716,12 @@ class FathersBookSourcesTests(unittest.TestCase):
             self.page
         )
         self.assertIn("page_review_status", self.page)
+        self.assertIn('aria-label="Fathers Quiz filters"', self.page)
+        self.assertNotRegex(
+            self.page, r"\\.filters\\s*>\\s*div\\s*\\{\\s*display\\s*:\\s*none"
+        )
+        for filter_id in ("topic", "classFilter", "bookFilter", "set"):
+            self.assertIn('id="' + filter_id + '"', self.page)
 
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
