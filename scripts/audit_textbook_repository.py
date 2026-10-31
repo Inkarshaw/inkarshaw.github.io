@@ -137,7 +137,11 @@ def bank_paths(args: argparse.Namespace) -> list[Path]:
         )
         return [
             ROOT / line for line in result.stdout.splitlines()
-            if line.endswith(".json") and not Path(line).name.startswith("index")
+            if (line.endswith(".json")
+                and len(Path(line).parts) >= 4
+                and Path(line).parts[:2] == ("data", "textbook")
+                and re.fullmatch(r"class-(?:6|7|8|9|10|11|12)", Path(line).parts[2])
+                and not Path(line).name.startswith("index"))
         ]
     return [Path(value).resolve() for value in args.paths]
 
