@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 24 unique MCQs drawn from 13 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 32 unique MCQs drawn from 15 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -18,9 +18,11 @@
 | 11 | History · Full Year | 3 | FA007, FA008, FA009 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 11 | Economics · Full Year, Unit 1 | 1 | FA019 | 2020 English original PDF text checked (p.22), PDF too large for screenshot; Tamil original pending |
 | 11 | Business Mathematics & Statistics · Chapters 2, 3, 8 | 3 | FA022, FA023, FA024 | English original PDF text checked (pp.25,51,178); page screenshots failed due PDF size; Tamil original pending |
+| 11 | Bio-Botany · Chapters 2, 9 | 4 | FA031–FA034 | Source-English chapter PDFs inspected (pp.33,37,43,168); chapter 9 visual screenshot verified; chapter 2 screenshot access failed; Tamil original pending |
 | 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
 | 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 12 | Commerce · Chapters 1, 16 | 2 | FA025, FA026 | SCERT English original PDF text checked (pp.8,130), PDF screenshot attempted but unavailable; Tamil original pending |
+| 12 | Economics · Chapters 1, 12 | 5 mapped (4 new + FA024 sourced again) | FA027–FA030; FA024 | Revised 2022 SCERT English source pp.1,5,6,257–258; original page screenshots verified; Tamil original pending |
 
 Book/question counts are based on existing curated question-bank or source-text entries. **They are not proof that every page of an original printed textbook has been reviewed.**
 
@@ -61,6 +63,29 @@ The same question may refer to multiple source books: Charles Babbage (Class 6 a
 
 **Verification standards:** Only title-to-person pairs explicitly present in original-source **English searchable PDF text** were added. **F. W. Taylor as Father of Scientific Management** is a common general-knowledge answer and is discussed as a pioneer in Commerce Chapter 1, but was **not added** here because the reviewed original passage did not explicitly attach that exact honorific. No complete page-by-page audit has been claimed. All Tamil question wording and explanations in this batch are editorial translations, not yet original Tamil textbook quotations.
 
+## New Class 11 Bio-Botany and Class 12 Economics review (31 October 2026)
+
+### Class 11 Bio-Botany — Chapter 2, Plant Kingdom
+- [Original SCERT Chapter 2 English PDF](https://tuv.oer4pacific.org/id/eprint/212/3/Higher-Secondary-Biology-Chapter2-Diversity-of-Living-World.pdf), 2020 layout, printed pages 31–51. Relevant passages were inspected in the source PDF text:
+  - Printed **p.33**: **M. O. Parthasarathy Iyengar (M. O. P. Iyengar)** is identified as Father of Indian Phycology (FA031). Spell out surname Iyengar; don't incorrectly use the shorter first name alone.
+  - Printed **p.37**: **Shiv Ram Kashyap** is identified as Father of Indian Bryology (FA032).
+  - Printed **p.43**: **Prof. Birbal Sahni** is identified as Father of Indian Palaeobotany (FA033).
+- Screenshot retrieval for this PDF was attempted but the source host disabled that endpoint. Record as **original English PDF text reviewed; page images not independently verified**.
+
+### Class 11 Bio-Botany — Chapter 9, Tissue and Tissue System
+- [Original SCERT Chapter 9 English PDF](https://slb.oer4pacific.org/id/eprint/219/1/Higher-Secondary-Biology-Chapter9-Tissue-Tissue-System.pdf), printed **p.168**. **Nehemiah Grew (1641–1712)** is explicitly called Father of Plant Anatomy (FA034).
+- The PDF's **first page screenshot was successfully inspected**, showing the boxed title and identity.
+
+### Class 12 Economics — Chapter 1 and Chapter 12
+- [Original SCERT English full-book PDF, revised 2022](https://www.srivenkateshwaraopenschool.com/wp-content/uploads/2023/11/12th_Economics_EM-www.tntextbooks.in_-1.pdf). Selected relevant pages were **visually inspected** as PDF screenshots, as well as in the text:
+  - Printed **p.1**: **John Maynard Keynes**, Father of Modern Macro Economics (FA027).
+  - Printed **p.5**: **Adam Smith**, Father of Capitalism (FA028). This is a **distinct title** from his already present Father of Economics MCQ FA019, so both are retained.
+  - Printed **p.6**: **Karl Marx**, Father of Socialism (FA029); this is a textbook-specific conventional designation, not a claim that all socialist thought started with him.
+  - Printed **p.258**: **P. C. Mahalanobis**, Father of Statistics in India (FA030). The question explicitly says *in India* to distinguish the title from Ronald A. Fisher.
+  - Printed **pp.257–258**: **Ronald A. Fisher** is also labelled Father of Statistics. Rather than create another Fisher MCQ, the second book source has been added to **existing FA024** as a separate `source_references` entry.
+- The printed-page numbering is distinct from the PDF 0-based pages: printed pages 1, 5, 6, 258 appear in screenshots of PDF pages 6, 10, 11, 263 respectively.
+- No original Tamil PDF pages, prescribed 2026–27 edition, or complete-book scan have been certified. Tamil questions are editorial translations.
+
 ## Audit process and quality rules
 
 1. Review each book and term separately: Science and Social Science (Classes 6–10) followed by History, Geography, Economics, Political Science and other relevant books (Classes 11–12).
@@ -74,7 +99,7 @@ The same question may refer to multiple source books: Charles Babbage (Class 6 a
 
 - Class 6–9: review **all remaining subject/term volumes** beyond the selected units above.
 - Class 10: selected original English page evidence from Science Units 18 and 20 is now included; the remaining Science original pages and Social Science/other books are not exhaustively checked.
-- Class 11–12: audit all remaining relevant books and chapters, including Science, Economics, Geography and Political Science, beyond the selected 11th Business Mathematics, Economics and Political Science passages, 12th Commerce pages, and History units already cited.
+- Class 11–12: audit all remaining relevant books and chapters, including Science, Economics, Geography and Political Science, beyond selected 11th Business Mathematics, Bio-Botany, Economics and Political Science passages, and 12th Commerce, Economics and History pages already cited.
 - Verify direct original-book PDF source links and corresponding Tamil-medium printed pages where a chapter bank currently supplies the English title or page.
 - Complete the original English/Tamil book-by-book coverage and duplicate checks before claiming exhaustive TNPSC/TNUSRB source coverage.
 
