@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 37 unique MCQs drawn from 17 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 47 unique MCQs drawn from 21 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -20,9 +20,13 @@
 | 11 | Business Mathematics & Statistics · Chapters 2, 3, 8 | 3 | FA022, FA023, FA024 | English original PDF text checked (pp.25,51,178); page screenshots failed due PDF size; Tamil original pending |
 | 11 | Bio-Botany · Chapters 1, 2, 5, 9 | 8 mapped (7 distinct, plus source repeats) | FA031–FA034, FA036–FA038; FA004 | English Ch.5 pp.86,95,103 screenshots verified; existing chapters partly checked; Tamil original pending |
 | 11 | Bio-Zoology · Chapter 1 | 3 mapped (2 new + FA004 cited again) | FA035–FA036, FA004 | SCERT English Chapter 1 pp.4–5 screenshot verified; Tamil original pending |
+| 11 | Computer Science · Chapter 1 | 1 cross-reference | FA002 | English SCERT text reproduction p.1 identifies Babbage; original printed page screenshot and Tamil original pending |
+| 11 | Microbiology · Chapters 1, 10 | 6 | FA040–FA045 | English SCERT text reproduction pp.3, 6, 150–151 checked; original page images, Tamil and current-edition review pending |
+| 11 | Statistics · Chapter 1 | 1 cross-reference | FA030 | English SCERT text reproduction p.1 identifies Mahalanobis; original page screenshot and Tamil original pending |
 | 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
 | 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 12 | Commerce · Chapters 1, 16 | 2 | FA025, FA026 | SCERT English original PDF text checked (pp.8,130), PDF screenshot attempted but unavailable; Tamil original pending |
+| 12 | Microbiology · Chapters 7, 9, 10, 11 | 4 | FA046–FA049 | English SCERT text reproduction pp.114, 188, 206, 241 checked; original page images, Tamil and current-edition review pending |
 | 12 | Bio-Botany · Chapters 2, 5, 9 | 3 mapped (1 new, 2 cross-citations) | FA039; FA016, FA018 | Original English pp.36,121,222 screenshots checked; Tamil original pending |
 | 12 | Economics · Chapters 1, 12 | 5 mapped (4 new + FA024 sourced again) | FA027–FA030; FA024 | Revised 2022 SCERT English source pp.1,5,6,257–258; original page screenshots verified; Tamil original pending |
 
@@ -120,6 +124,43 @@ Three original English chapter PDFs, from the SCERT 2019 edition, were visually 
 **Deduplication policy:** A single question may now have multiple **chapters from the same textbook**, and the same title may also have citations to separate classes. Duplicate checking uses the *source ID* (book/chapter/page/fact), not just book ID, while the exam player continues to present one combined quiz. The `books` table lists **distinct mapped question IDs**, not merely the number of source references. Titles and their exact scope must be checked in the corresponding page image.
 
 **Review limitations:** The original English SCERT book excerpts above were checked, but neither the original Tamil medium wording nor the presently prescribed 2026–27 edition across all chapters has been audited. Source snippets do not constitute full Class 6–12 textbook completion.
+
+## New source review: Classes 11 and 12 Microbiology (31 October 2026)
+
+This batch adds ten distinct **English/Tamil bilingual MCQs**, FA040–FA049. Every fact below is sourced to a **searchable reproduction of the English Tamil Nadu SCERT textbook text**. The quoted printed-page numbers were checked in that reproduction; **the full original printed page images have not yet been independently examined**. Tamil originals and the 2026–27 edition remain pending.
+
+### Class 11 Microbiology
+
+Source: [Class 11 Microbiology English SCERT text reproduction](https://ru.scribd.com/document/683613057/11th-Micro-Biology-English-Medium-Text).
+
+| Chapter | Printed page | Explicit designation | Person | MCQ |
+| --- | ---: | --- | --- | --- |
+| 1 · Introduction to Microbiology | 3 | Father of Microbiology | Antonie van Leeuwenhoek | FA040 |
+| 1 · Introduction to Microbiology | 3 | Father of Modern Microbiology | Louis Pasteur | FA041 |
+| 1 · Introduction to Microbiology | 6 | Father of Immunology | Edward Jenner | FA042 |
+| 1 · Introduction to Microbiology | 6 | Father of Medical Microbiology | Robert Koch | FA043 |
+| 10 · Soil Microbiology | 150–151 | Father of Soil Microbiology | Sergei Winogradsky | FA044 |
+| 10 · Soil Microbiology | 151 | Father of Microbial Ecology | Martinus Beijerinck | FA045 |
+
+### Class 12 Microbiology
+
+Source: [Class 12 Microbiology English SCERT text reproduction](https://www.scribd.com/document/527198339/Std12-Microbiology-EM-Www-tntextbooks-in).
+
+| Chapter | Printed page | Explicit designation | Person | MCQ |
+| --- | ---: | --- | --- | --- |
+| 7 · Medical Bacteriology | 114 | Father of Bacteriology | Robert Koch | FA046 |
+| 9 · Medical Mycology | 188 | Father of Medical Mycology | Raymond Jacques Sabouraud | FA047 |
+| 10 · Medical Virology | 206 | Father of Virology | Martinus Beijerinck | FA048 |
+| 11 · Immunology | 241 | Father of Immunization | Edward Jenner | FA049 |
+
+These are distinct honorifics even when attributed to the same person; do not collapse *Father of Immunology* with *Father of Immunization*, *Father of Medical Microbiology* with *Father of Bacteriology*, or *Father of Microbial Ecology* with *Father of Virology*.
+
+### Additional Class 11 cross-book confirmations
+
+- **Computer Science, Chapter 1, printed p.1:** [English 2024 SCERT text reproduction](https://www.slideshare.net/slideshow/class_11_computer_science_english_medium-2024_edition-www-tntextbooks-in-pdf/283291774) explicitly calls **Charles Babbage** Father of Computer. Existing FA002 gained this source reference, not a duplicate MCQ.
+- **Statistics, Chapter 1, printed p.1:** [English SCERT text reproduction](https://www.scribd.com/document/627737963/11th-Statistics-EM-Www-tntextbooks-in) describes **P. C. Mahalanobis** as Father of Indian Statistics. Existing FA030 gained this source reference, not a duplicate MCQ.
+
+**Source-quality boundary:** These are English SCERT text reproductions, not a verified complete scan of the printed original. Page images, Tamil-medium official wording, source-host stability, and textbook edition comparison remain pending.
 
 ## Audit process and quality rules
 
