@@ -150,3 +150,23 @@ https://www.srivenkateshwaraopenschool.com/wp-content/uploads/2023/11/12th_Polit
 **Discrepancy excluded from the published quiz:** the printed p.139 discussion blurs the distinction between *Andhra State* (established 1953) and *Andhra Pradesh* (formed 1956). An unqualified "first linguistic state" claim has **not** been imported; verify against government records and any updated edition before publishing.
 
 The evidence file `data/textbook/original-page-review-evidence-class12-political-science-2022.json` has selected page-by-page support, independent source links and explicit open limitations. The screenshot renderer returned an error for this large PDF. **This is not full-page visual review or confirmation of the matching Tamil original**. Current prescribed 2026 book editions may differ. The manifest now contains **16 source records**; the historical 251 listings remain a separate incomplete baseline. The audit does **not** certify any full volume or every original subject.
+
+
+## 31 October: live catalogue reconciliation (historical 251 vs current 215)
+
+The 31 October GitHub Actions inventory retrieved **all 14 class/medium catalogue pages** from the external Padanool archive, with **0 fetch errors**. The inventory script counted **215 distinct *book detail links***; the previous 251 is an earlier *listing snapshot* from a less restrictive inventory and is not comparable without resolving the link taxonomy.
+
+| Class | Historical English / Tamil listings | Current detail-link count English / Tamil | Total current |
+| --- | --- | --- | ---: |
+| 6 | 10 / 12 | 4 / 5 | 9 |
+| 7 | 10 / 12 | 4 / 5 | 9 |
+| 8 | 6 / 7 | 5 / 6 | 11 |
+| 9 | 6 / 7 | 5 / 6 | 11 |
+| 10 | 6 / 7 | 5 / 6 | 11 |
+| 11 | 40 / 44 | 39 / 43 | 82 |
+| 12 | 40 / 44 | 39 / 43 | 82 |
+| **Total** | **118 / 133 = 251** | **101 / 114 = 215** | **215** |
+
+**Interpretation:** 215 is not the final number of original government textbooks, physical volumes, separate terms, current editions or units. The crawler filters archive sub-page links and may omit titles represented through another page structure; 251 may have included repeated formats. Neither figure establishes coverage of all 2026–27 prescribed SCERT books. The script `scripts/report_original_tn_coverage.py` now ingests `tn-original-book-inventory.json` as a **separate live count**, reports differences by class and medium, and refuses to treat 16 seed source records as a percentage of 215 or 251. A source title-to-edition canonical inventory is still required.
+
+GitHub CI inventory run before this reconciliation: https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41169349147 (14 archive pages, 215 detail listings). The new version includes safeguards and unit tests to ensure a future different live count is not silently treated as the historical baseline.
