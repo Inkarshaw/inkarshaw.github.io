@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'scripts/inventory_tn_original_books.py'
+      - 'scripts/report_original_tn_coverage.py'
       - 'scripts/scan_original_tn_firsts.py'
       - 'data/textbook/original-pdf-source-manifest.json'
       - 'data/special-quizzes/firsts.json'
@@ -44,6 +45,15 @@ jobs:
           name: tn-original-book-inventory
           path: tn-original-book-inventory.json
           if-no-files-found: warn
+      - name: Reconcile listed books against original PDF seed manifest
+        run: python scripts/report_original_tn_coverage.py original-books-coverage.json
+      - name: Upload coverage gaps and certification status
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tn-original-coverage-gaps
+          path: original-books-coverage.json
+          if-no-files-found: error
       - name: Validate Firsts provenance and bilingual questions
         run: python -m unittest discover -s tests -p test_original_tn_firsts.py -v
       - name: Check Class 9 original English evidence and pending Tamil review
