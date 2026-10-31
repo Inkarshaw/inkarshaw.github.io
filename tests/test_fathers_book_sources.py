@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 24)
-        self.assertEqual(len(self.books), 13)
+        self.assertEqual(len(self.questions), 32)
+        self.assertEqual(len(self.books), 15)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -95,13 +95,45 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("not the exclusive father", by_id["FA024"]["exp_en"])
         self.assertNotIn("Father of Scientific Management", " ".join(q["q_en"] for q in self.questions))
 
+    def test_2022_english_science_economics_book_pages(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA027": ("John Maynard Keynes", 12, 1, "chapter-1"),
+            "FA028": ("Adam Smith", 12, 5, "chapter-1"),
+            "FA029": ("Karl Marx", 12, 6, "chapter-1"),
+            "FA030": ("P. C. Mahalanobis", 12, 258, "chapter-12"),
+            "FA031": ("M. O. P. Iyengar", 11, 33, "chapter-2"),
+            "FA032": ("Shiv Ram Kashyap", 11, 37, "chapter-2"),
+            "FA033": ("Birbal Sahni", 11, 43, "chapter-2"),
+            "FA034": ("Nehemiah Grew", 11, 168, "chapter-9"),
+        }
+        for qid, (answer, grade, page, chapter) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertEqual(q["class_no"], grade)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(q["chapter_id"], chapter)
+                self.assertTrue(q["edition_note"])
+                self.assertIn("original_english_pdf", q["review_status"])
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertEqual(len(q["source_references"]), 1)
+        self.assertIn("in India", by_id["FA030"]["q_en"])
+        fisher = by_id["FA024"]
+        sources = {r["book_id"] for r in fisher["source_references"]}
+        self.assertEqual(len(sources), len(fisher["source_references"]))
+        self.assertIn("11-business-maths-statistics-full", sources)
+        self.assertIn("12-economics-full", sources)
+        self.assertIn("Father of Economics", by_id["FA019"]["q_en"])
+        self.assertIn("Father of Capitalism", by_id["FA028"]["q_en"])
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("24 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("24 questions", self.page)
-        self.assertIn("13 source books", self.page)
+        self.assertIn("32 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("32 questions", self.page)
+        self.assertIn("15 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
