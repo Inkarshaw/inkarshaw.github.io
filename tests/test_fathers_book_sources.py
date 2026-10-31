@@ -429,7 +429,12 @@ class FathersBookSourcesTests(unittest.TestCase):
                 self.assertEqual(len(set(q["opts_en"])), 4)
                 self.assertEqual(len(set(q["opts_ta"])), 4)
                 self.assertIn("tamil_original_pending", q["review_status"])
-                self.assertEqual(len(q["source_references"]), 1)
+                # A cited title may recur in other books; retain its original source.
+                self.assertTrue(any(
+                    ref["book_id"] == book and ref["page"] == page
+                    for ref in q["source_references"]
+                ))
+                self.assertGreaterEqual(len(q["source_references"]), 1)
                 self.assertIn("11th-Political-Science", q["source_link"])
                 self.assertTrue(q["exp_en"] and q["exp_ta"])
         self.assertIn("Rippon", by_id["FA076"]["exp_en"])
