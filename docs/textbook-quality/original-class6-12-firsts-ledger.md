@@ -100,3 +100,12 @@ A mechanical scan of a PDF, even one covering every page, **does not** establish
 - [ ] Re-run site navigation, bilingual tests, source integrity tests and actual mobile-player test, then publish a signed-off per-volume list.
 
 **Current honest status:** initial catalogue list established; selected pages from older original Class 8, 9 and 10 English Social Science editions have been *partially* reviewed; remaining pages, Tamil counterparts and newer original volumes require review. The Firsts Quiz contains **133 curated bilingual questions**; this does **not** establish complete Class 6–12 original-textbook coverage.
+
+
+## 31 October continuation: measurable certification gaps
+
+The audit now runs `scripts/report_original_tn_coverage.py` in CI and uploads `original-books-coverage.json`. It compares the 251 *archive listings* with the 14 current seed PDF records, by class and language. These are different units of measurement: a seed record can contain two URLs, and archive listings can include distinct terms, editions and media. Therefore **251 − 14 is not a valid count of missing PDFs**.
+
+The report explicitly records that the original-source seed registry is **not exhaustive**, that listed titles are **not certified**, and that there are **zero demonstrated fully signed-off book pairs**. Downloading and extracting text never changes certification automatically. A future per-volume sign-off must include complete chapter/page coverage, printed edition identity, text/visual review and both language versions.
+
+**Next source-work priority:** establish a one-to-one stable edition manifest from all 14 class/medium catalogue pages; download each accessible official PDF; log URL, content hash, page count and unreadable pages; review all pages and both editions; reconcile conflicting firsts; only then certify the title and publish further questions. The present change adds an audit safeguard, not new original-page claims.
