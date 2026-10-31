@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 69)
-        self.assertEqual(len(self.books), 35)
+        self.assertEqual(len(self.questions), 71)
+        self.assertEqual(len(self.books), 38)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -370,13 +370,55 @@ class FathersBookSourcesTests(unittest.TestCase):
                                          for ref in q["source_references"])
                                      for q in self.questions), count)
 
+    def test_computing_fathers_and_cross_book_deduplication(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA072": ("Dan Bricklin", "11-computer-applications-full", 102),
+            "FA073": ("Edgar Frank Codd", "12-computer-science-full", 191),
+        }
+        for qid, (answer, bid, page) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertEqual(q["book_id"], bid)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(len(set(q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertTrue(q["q_ta"] and q["exp_ta"])
+        self.assertIn("Bob Frankston", by_id["FA072"]["exp_en"])
+        self.assertIn("Peter Chen", by_id["FA073"]["exp_en"])
+        self.assertEqual(
+            {r["book_id"] for r in by_id["FA072"]["source_references"]},
+            {"11-computer-applications-full", "11-computer-technology-full"}
+        )
+        for bid in ("11-computer-applications-full", "11-computer-technology-full"):
+            self.assertIn(bid, {r["book_id"] for r in by_id["FA002"]["source_references"]})
+        expected_counts = {
+            "11-computer-applications-full": 2,
+            "11-computer-technology-full": 2,
+            "12-computer-science-full": 1,
+        }
+        for bid, total in expected_counts.items():
+            with self.subTest(book=bid):
+                b = next(x for x in self.books if x["id"] == bid)
+                self.assertEqual(b["count"], total)
+                self.assertEqual(
+                    sum(any(ref["book_id"] == bid for ref in q["source_references"])
+                        for q in self.questions), total
+                )
+        # Textbook citations can grow without creating duplicate quiz entries.
+        self.assertEqual(sum(q["id"] == "FA002" for q in self.questions), 1)
+        self.assertEqual(sum(q["id"] == "FA072" for q in self.questions), 1)
+        self.assertEqual(self.data["meta"]["chapter_count"], 67)
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("69 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("69 questions", self.page)
-        self.assertIn("35 source books", self.page)
+        self.assertIn("71 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("71 questions", self.page)
+        self.assertIn("38 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
