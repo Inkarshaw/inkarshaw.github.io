@@ -26,7 +26,9 @@ class TamilOriginalFirstsSourceTests(unittest.TestCase):
     def test_citations_are_not_prematurely_certified(self):
         m = json.loads((ROOT/"data/textbook/original-pdf-source-manifest.json").read_text(encoding="utf8"))
         v = next(x for x in m["volumes"] if x["id"] == "c12-economics-2024-tamil")
-        self.assertEqual(v["tamil_pdf_review"], "not-started")
+        self.assertEqual(v["tamil_pdf_review"], "text-extracted")
+        self.assertFalse(v["tamil_pdf_text_scan"]["all_book_pages_visually_verified"])
+        self.assertFalse(v["tamil_pdf_text_scan"]["all_target_claims_manually_verified"])
         self.assertNotEqual(v["chapter_coverage"], "certified")
         self.assertTrue(v["tamil_url"].endswith(".pdf"))
 
