@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 55)
-        self.assertEqual(len(self.books), 25)
+        self.assertEqual(len(self.questions), 58)
+        self.assertEqual(len(self.books), 26)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -240,13 +240,44 @@ class FathersBookSourcesTests(unittest.TestCase):
             self.assertTrue(any("SCERT12-COMMERCE-2024-" in r["source_id"]
                                 for r in by_id[qid]["source_references"]))
 
+    def test_vocational_nursing_original_scert_titles(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA058": ("Maharishi Patanjali", 16, "chapter-1"),
+            "FA059": ("Antoine Lavoisier", 104, "chapter-4"),
+            "FA060": ("Hippocrates", 104, "chapter-4"),
+        }
+        for qid, (answer, printed_page, chapter_id) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["book_id"], "12-vocational-nursing-full")
+                self.assertEqual(q["class_no"], 12)
+                self.assertEqual(q["page"], printed_page)
+                self.assertEqual(q["chapter_id"], chapter_id)
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertIn("original_scert_english_pdf_text_checked", q["review_status"])
+                self.assertIn("page_image_unavailable", q["review_status"])
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertEqual(len(q["source_references"]), 1)
+                self.assertTrue(q["source_link"].endswith("12th_Nursing_Vocational_EM.pdf"))
+                self.assertTrue(q["q_ta"] and q["exp_ta"])
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+        nursing = next(b for b in self.books if b["id"] == "12-vocational-nursing-full")
+        self.assertEqual(nursing["count"], 3)
+        self.assertEqual(len(nursing["chapters"]), 2)
+        self.assertIn("Maharishi Patanjali", by_id["FA058"]["opts_en"])
+        self.assertIn("traditional", by_id["FA060"]["exp_en"])
+        # The page counters must derive from the bank after loading, not only static markup.
+        self.assertIn("data.meta.count", self.page)
+        self.assertIn("data.books.length", self.page)
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("55 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("55 questions", self.page)
-        self.assertIn("25 source books", self.page)
+        self.assertIn("58 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("58 questions", self.page)
+        self.assertIn("26 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
