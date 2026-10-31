@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 77)
-        self.assertEqual(len(self.books), 39)
+        self.assertEqual(len(self.questions), 79)
+        self.assertEqual(len(self.books), 40)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -410,7 +410,7 @@ class FathersBookSourcesTests(unittest.TestCase):
         # Textbook citations can grow without creating duplicate quiz entries.
         self.assertEqual(sum(q["id"] == "FA002" for q in self.questions), 1)
         self.assertEqual(sum(q["id"] == "FA072" for q in self.questions), 1)
-        self.assertEqual(self.data["meta"]["chapter_count"], 71)
+        self.assertEqual(self.data["meta"]["chapter_count"], 73)
 
     def test_political_science_sovereignty_liberalism_local_government(self):
         by_id = {q["id"]: q for q in self.questions}
@@ -469,7 +469,7 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("textbook-specific", by_id["FA077"]["exp_en"])
         self.assertIn("Modern Ecology", by_id["FA078"]["q_en"])
         self.assertIn("Indian Ecology", by_id["FA079"]["q_en"])
-        self.assertEqual(self.data["meta"]["chapter_count"], 71)
+        self.assertEqual(self.data["meta"]["chapter_count"], 73)
         source_book = next(b for b in self.books if b["id"] == "12-bio-botany-full")
         self.assertEqual(source_book["count"], 6)
         self.assertIn("chapter-6", {c["id"] for c in source_book["chapters"]})
@@ -477,13 +477,63 @@ class FathersBookSourcesTests(unittest.TestCase):
                                  for ref in q["source_references"])
                              for q in self.questions), source_book["count"])
 
+    def test_class12_history_italian_literature_and_us_industrial_revolution(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA080": ("Petrarch", "unit-10", 19),
+            "FA081": ("Samuel Slater", "unit-11", 57),
+        }
+        for qid, (answer, chapter, page) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertEqual(q["book_id"], "12-history-full")
+                self.assertEqual(q["chapter_id"], chapter)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(len(q["opts_en"]), 4)
+                self.assertEqual(len(q["opts_ta"]), 4)
+                self.assertEqual(len(set(q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertEqual(len(q["source_references"]), 1)
+                self.assertTrue(q["exp_en"] and q["exp_ta"] and q["q_ta"])
+        self.assertIn("Italian Renaissance Literature", by_id["FA080"]["q_en"])
+        self.assertIn("Father of Humanism", by_id["FA080"]["exp_en"])
+        self.assertIn("Andrew Jackson", by_id["FA081"]["exp_en"])
+        self.assertIn("p.61", by_id["FA081"]["exp_en"])
+        self.assertNotEqual(by_id["FA005"]["q_en"], by_id["FA080"]["q_en"])
+        self.assertEqual(by_id["FA005"]["opts_en"][by_id["FA005"]["correct"]], "Petrarch")
+        self.assertEqual(
+            next(b for b in self.books if b["id"] == "12-history-full")["count"], 7
+        )
+        history = next(b for b in self.books if b["id"] == "12-history-full")
+        self.assertIn("unit-11", {c["id"] for c in history["chapters"]})
+
+    def test_class11_accountancy_explicit_pacioli_cross_reference(self):
+        by_id = {q["id"]: q for q in self.questions}
+        pacioli = by_id["FA064"]
+        self.assertEqual(pacioli["opts_en"][pacioli["correct"]], "Luca Pacioli")
+        refs = pacioli["source_references"]
+        self.assertIn("11-accountancy-full", {r["book_id"] for r in refs})
+        self.assertTrue(any(
+            r["book_id"] == "11-accountancy-full" and r["page"] == 327
+            for r in refs
+        ))
+        accountancy = next(b for b in self.books if b["id"] == "11-accountancy-full")
+        self.assertEqual(accountancy["count"], 1)
+        self.assertIn("unit-14", {c["id"] for c in accountancy["chapters"]})
+        self.assertEqual(sum(any(r["book_id"] == accountancy["id"]
+                             for r in q["source_references"])
+                             for q in self.questions), 1)
+        self.assertEqual(sum(q["id"] == "FA064" for q in self.questions), 1)
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("77 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("77 questions", self.page)
-        self.assertIn("39 source books", self.page)
+        self.assertIn("79 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("79 questions", self.page)
+        self.assertIn("40 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
