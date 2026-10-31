@@ -266,7 +266,7 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertEqual(nursing["count"], 3)
         self.assertEqual(len(nursing["chapters"]), 2)
         self.assertIn("Maharishi Patanjali", by_id["FA058"]["opts_en"])
-        self.assertIn("traditional", by_id["FA060"]["exp_en"])
+        self.assertIn("tradition", by_id["FA060"]["exp_en"])
         # The page counters must derive from the bank after loading, not only static markup.
         self.assertIn("data.meta.count", self.page)
         self.assertIn("data.books.length", self.page)
