@@ -95,7 +95,11 @@ class FathersBookSourcesTests(unittest.TestCase):
                 self.assertTrue(q["edition_note"])
         self.assertIn("a father of statistics", by_id["FA024"]["q_en"].lower())
         self.assertIn("not the exclusive father", by_id["FA024"]["exp_en"])
-        self.assertNotIn("Father of Scientific Management", " ".join(q["q_en"] for q in self.questions))
+        self.assertEqual(
+            sum("Father of Scientific Management" in q["q_en"] for q in self.questions), 1
+        )
+        taylor = next(q for q in self.questions if "Father of Scientific Management" in q["q_en"])
+        self.assertEqual(taylor["opts_en"][taylor["correct"]], "Frederick Winslow Taylor")
 
     def test_2022_english_science_economics_book_pages(self):
         by_id = {q["id"]: q for q in self.questions}
