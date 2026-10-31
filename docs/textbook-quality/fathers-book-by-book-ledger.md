@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 54 unique MCQs drawn from 25 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 55 unique MCQs drawn from 25 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -29,7 +29,7 @@
 | 12 | General Nursing · Chapters 3, 4, 10 | 3 | FA050–FA052 | English SCERT reproduction pp.98, 102, 220 checked; includes qualified textbook-specific titles and printed spelling corrections; Tamil original pending |
 | 12 | Physics · Volume II, Unit 11 | 1 | FA055 | English SCERT reproduction p.263 checked; original page image and Tamil original pending |
 | 12 | Political Science · Volume I, Unit 8 | 3 mappings (2 new, FA018 cross-source) | FA053–FA054, FA018 | English SCERT reproduction pp.180,183,185 checked; original page images and Tamil original pending |
-| 12 | Commerce · Chapters 1, 16 | 2 | FA025, FA026 | SCERT English original PDF text checked (pp.8,130), PDF screenshot attempted but unavailable; Tamil original pending |
+| 12 | Commerce · Chapters 1, 16 | 3 | FA025, FA026, FA057 | Original English textbook p.8 and pp.130,136 previously checked; 2024 English reprint text reconfirmed Fayol and Nader; new Taylor scientific-management attribution pp.4–7 is linked to explicit official TNPSC May 2024 departmental question 19; original page images and Tamil still pending |
 | 12 | Microbiology · Chapters 7, 9, 10, 11 | 4 | FA046–FA049 | English SCERT text reproduction pp.114, 188, 206, 241 checked; original page images, Tamil and current-edition review pending |
 | 12 | Bio-Botany · Chapters 2, 5, 9 | 3 mapped (1 new, 2 cross-citations) | FA039; FA016, FA018 | Original English pp.36,121,222 screenshots checked; Tamil original pending |
 | 12 | Economics · Chapters 1, 12 | 5 mapped (4 new + FA024 sourced again) | FA027–FA030; FA024 | Revised 2022 SCERT English source pp.1,5,6,257–258; original page screenshots verified; Tamil original pending |
@@ -188,6 +188,33 @@ These are distinct honorifics even when attributed to the same person; do not co
 - [Class 11 Biochemistry English SCERT text reproduction](https://www.scribd.com/document/1034155153/XI-biochemistry-Final-21-05-18-15-15), Unit 1, p.1 names **Carl Alexander Neuberg** Father of Modern Biochemistry.
 
 **Outstanding checks for this batch:** Independently view each original printed English page, compare original Tamil wording and prescribed 2026–27 editions, and repair any source links that fail access. These seven additions do **not** establish full Class 6–12 coverage.
+
+## Book-by-book continuation: Class 12 Commerce and Class 11 Geography (31 October 2026)
+
+### Class 12 Commerce — English 2024 reprint
+
+Rechecked the [English 2024 SCERT Commerce textbook text reproduction](https://www.scribd.com/document/1074624974/Class-12-Commerce-English-2024-Edition-www-tntextbooks-in), including Chapter 1 (*Principles of Management*) and Chapter 16 (*Consumerism*).
+
+| Item | Printed page | Verified content | Action |
+| --- | ---: | --- | --- |
+| Chapter 1, section 1.05 | 4–7 | Frederick Winslow Taylor developed and promoted scientific management principles | New FA057, with a carefully qualified title |
+| Chapter 1, section 1.06 | 8 | Henri (Henry) Fayol explicitly identified as Father of Modern Management | Existing FA025: append 2024 reprint source |
+| Chapter 16 | 130, 136 | Ralph Nader described as Father of the Consumer Movement; exercise repeats title | Existing FA026: append 2024 reprint source |
+
+**Critical title-source distinction:** The SCERT Chapter 1 text attributes scientific management to **F. W. Taylor**, but its searchable reproduction does **not** explicitly call him the *Father of Scientific Management*. The exact honorific is independently printed in the [official TNPSC May 2024 Co-operative Management departmental test, paper 068, question 19](https://tnpsc.gov.in/static_pdf/anskeys/Deptl/May2024/068.pdf) (alongside question 17 for Father of Management). **FA057 therefore distinguishes (1) textbook chapter attribution and (2) exam wording.** The official PDF's searchable text was inspected; its web screenshot request timed out. Do not label its page image as checked.
+
+Class 12 Commerce has at least **33 chapters** in the listed 2024 edition. The reviewed passages were checked for explicit/title-related facts, but this is **not** certification of every page or of a complete Tamil-medium audit.
+
+### Class 11 Geography — Unit 1, Fundamentals of Geography
+
+Read the [2024-reprint SCERT English Geography text reproduction](https://www.scribd.com/document/1050161946/11th-Geography-EM-Text), Unit 1, printed pp.1–2. Page 2 says the term *Geography* was coined by **Eratosthenes**; it calls **Herodotus** the first Greek geographer. It does **not** explicitly designate Eratosthenes the *Father of Geography*. Therefore **no new 'Father of Geography' question** was added merely by extrapolating from the passage. Further chapter and original Tamil page review remains required.
+
+### Source-confidence and remaining limitations
+
+- SCERT 2024 English textbook reproductions: page text checked, but original English page-image and source-host completeness not independently checked.
+- TNPSC 2024 official PDF: exact phrase and competing options inspected in searchable text; screenshot endpoint timed out.
+- The original Tamil-medium wording, prescribed 2026–27 updates and complete page-by-page Class 6–12 coverage are **still pending**.
+- Do not confuse **Father of Scientific Management — F. W. Taylor** with **Father of Modern Management — Henri Fayol**.
 
 ## Audit process and quality rules
 
