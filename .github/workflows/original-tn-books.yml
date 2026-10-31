@@ -125,11 +125,19 @@ jobs:
       - name: Validate Tamil original candidate review semantics
         run: python -m unittest discover -s tests -p test_tamil_original_firsts_sources.py -v
       - name: Download and scan complete original Tamil Economics book for five candidate facts
-        run: python scripts/check_tamil_firsts_sources.py --id c12-economics-2024-tamil --output tamil-original-firsts-targets.json
+        run: python scripts/check_tamil_firsts_sources.py --id c12-economics-2024-tamil --output tamil-original-firsts-targets.json --preview-dir tamil-original-evidence-previews
       - name: Upload page-level candidate hits and PDF digest
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: class12-tamil-economics-firsts-extraction
           path: tamil-original-firsts-targets.json
+          if-no-files-found: warn
+
+      - name: Upload bounded visual source excerpts for editorial confirmation
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: class12-tamil-economics-page-excerpts
+          path: tamil-original-evidence-previews/
           if-no-files-found: warn
