@@ -99,7 +99,7 @@ A mechanical scan of a PDF, even one covering every page, **does not** establish
 - [ ] Resolve Swadesamitran and any other conflicts against authoritative original sources before claiming certified facts.
 - [ ] Re-run site navigation, bilingual tests, source integrity tests and actual mobile-player test, then publish a signed-off per-volume list.
 
-**Current honest status:** initial catalogue list established; selected pages from older original Class 8, 9 and 10 English Social Science editions have been *partially* reviewed; remaining pages, Tamil counterparts and newer original volumes require review. The Firsts Quiz contains **138 curated bilingual questions**; this does **not** establish complete Class 6–12 original-textbook coverage.
+**Current honest status:** initial catalogue list established; selected pages from older original Class 8, 9 and 10 English Social Science editions have been *partially* reviewed; remaining pages, Tamil counterparts and newer original volumes require review. The Firsts Quiz contains **143 curated bilingual questions**; this does **not** establish complete Class 6–12 original-textbook coverage.
 
 
 ## 31 October continuation: measurable certification gaps
@@ -130,3 +130,50 @@ These are **selected source-text confirmations, not a full book review**. Both p
 The original source seed manifest now has **15 entries**, compared with **251 historical English/Tamil archive listings**. This is **not** evidence that only 15 textbooks exist or that 236 identifiable PDFs are missing; the manifest is an incomplete, mixed-granularity seed registry.
 
 **Status remains: zero volumes fully signed off for 2026–27 English and Tamil editions.** Original-book audit must continue across all other chapters, images, source revisions, and missing course subjects.
+
+
+## 31 October: original Class 12 Political Science English edition
+
+The SCERT *Higher Secondary Second Year Political Science* (first edition 2019; revised 2020, **2022**) was inspected using its original English PDF text:
+https://www.srivenkateshwaraopenschool.com/wp-content/uploads/2023/11/12th_Political-Science_EM-www.tntextbooks.in_.pdf .
+
+**Five independently cross-checked bilingual Firsts questions (F139–F143), 138 → 143**, were added from the following selected printed pages:
+
+| Unit | Printed page | Question claim | Independent cross-check |
+| --- | ---: | --- | --- |
+| 6: Administrative Machinery in India | 118 | Sir Ross Barker first chaired the Public Service Commission set up in 1926 | PIB, [UPSC centenary background](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2316840&lang=2&reg=48) |
+| 6: Administrative Machinery in India | 118 | First Public Service Commission set up on 1 October 1926 | PIB, [UPSC centenary year](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2155432&lang=2&reg=3) |
+| 1: Constitution of India | 11 | M. R. Masani was first opposition-side Public Accounts Committee Chairman in 1967 | [Contemporary parliamentary record, April 1967](https://eparlib.sansad.in/bitstream/123456789/764119/1/jpi_April_1967.pdf) (textbook supplies the precedent and year, Parliament supplies the person's name) |
+| 1: Constitution of India | 11 | First post-Constitution elected Madras Legislative Assembly met on 3 May 1952 | [Madras Assembly historical review](https://citeseerx.ist.psu.edu/document?doi=b34a68778befbdf7f71fee55eb3bca43faa3579d&repid=rep1&type=pdf) |
+| 7: Challenges of Nation Building | 139 | S. K. Dhar chaired the 1948 Linguistic Provinces Commission | [1955 States Reorganisation Commission report](https://www.mha.gov.in/sites/default/files/State%20Reorganisation%20Commisison%20Report%20of%201955_270614.pdf) |
+
+**Discrepancy excluded from the published quiz:** the printed p.139 discussion blurs the distinction between *Andhra State* (established 1953) and *Andhra Pradesh* (formed 1956). An unqualified "first linguistic state" claim has **not** been imported; verify against government records and any updated edition before publishing.
+
+The evidence file `data/textbook/original-page-review-evidence-class12-political-science-2022.json` has selected page-by-page support, independent source links and explicit open limitations. The screenshot renderer returned an error for this large PDF. **This is not full-page visual review or confirmation of the matching Tamil original**. Current prescribed 2026 book editions may differ. The manifest now contains **16 source records**; the historical 251 listings remain a separate incomplete baseline. The audit does **not** certify any full volume or every original subject.
+
+
+## 31 October: live catalogue reconciliation (historical 251 vs current 215)
+
+The 31 October GitHub Actions inventory retrieved **all 14 class/medium catalogue pages** from the external Padanool archive, with **0 fetch errors**. The inventory script counted **215 distinct *book detail links***; the previous 251 is an earlier *listing snapshot* from a less restrictive inventory and is not comparable without resolving the link taxonomy.
+
+| Class | Historical English / Tamil listings | Current detail-link count English / Tamil | Total current |
+| --- | --- | --- | ---: |
+| 6 | 10 / 12 | 4 / 5 | 9 |
+| 7 | 10 / 12 | 4 / 5 | 9 |
+| 8 | 6 / 7 | 5 / 6 | 11 |
+| 9 | 6 / 7 | 5 / 6 | 11 |
+| 10 | 6 / 7 | 5 / 6 | 11 |
+| 11 | 40 / 44 | 39 / 43 | 82 |
+| 12 | 40 / 44 | 39 / 43 | 82 |
+| **Total** | **118 / 133 = 251** | **101 / 114 = 215** | **215** |
+
+**Interpretation:** 215 is not the final number of original government textbooks, physical volumes, separate terms, current editions or units. The crawler filters archive sub-page links and may omit titles represented through another page structure; 251 may have included repeated formats. Neither figure establishes coverage of all 2026–27 prescribed SCERT books. The script `scripts/report_original_tn_coverage.py` now ingests `tn-original-book-inventory.json` as a **separate live count**, reports differences by class and medium, and refuses to treat 16 seed source records as a percentage of 215 or 251. A source title-to-edition canonical inventory is still required.
+
+GitHub CI inventory run before this reconciliation: https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41169349147 (14 archive pages, 215 detail listings). The new version includes safeguards and unit tests to ensure a future different live count is not silently treated as the historical baseline.
+
+
+### Class 12 full-PDF machine scan failure and remediation
+
+GitHub Actions attempt https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41169349147 to download and mechanically scan the **2022-revised Class 12 Political Science English PDF** failed with `<urlopen error timed out>`. **No 2022 Class 12 page count, full-PDF text-hits count, unreadable-page count, or SHA-256 hash was obtained.** Earlier CI had `continue-on-error: true`, so its top-level extraction job appeared green despite the error. This has been changed to fail on real extraction errors, with the automated PR smoke extraction temporarily restored to the previously accessible Class 9 original source; the Class 12 URL must be repaired or an equivalent edition mirror found before rerunning it.
+
+The five Class 12 facts above were reviewed from *selected PDF passages exposed by the source reader* and independently corroborated. That is a strictly narrower achievement than a full original-textbook scan or full printed-page certification.
