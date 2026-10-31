@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 79)
-        self.assertEqual(len(self.books), 40)
+        self.assertEqual(len(self.questions), 81)
+        self.assertEqual(len(self.books), 42)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -410,7 +410,7 @@ class FathersBookSourcesTests(unittest.TestCase):
         # Textbook citations can grow without creating duplicate quiz entries.
         self.assertEqual(sum(q["id"] == "FA002" for q in self.questions), 1)
         self.assertEqual(sum(q["id"] == "FA072" for q in self.questions), 1)
-        self.assertEqual(self.data["meta"]["chapter_count"], 73)
+        self.assertEqual(self.data["meta"]["chapter_count"], 78)
 
     def test_political_science_sovereignty_liberalism_local_government(self):
         by_id = {q["id"]: q for q in self.questions}
@@ -469,7 +469,7 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("textbook-specific", by_id["FA077"]["exp_en"])
         self.assertIn("Modern Ecology", by_id["FA078"]["q_en"])
         self.assertIn("Indian Ecology", by_id["FA079"]["q_en"])
-        self.assertEqual(self.data["meta"]["chapter_count"], 73)
+        self.assertEqual(self.data["meta"]["chapter_count"], 78)
         source_book = next(b for b in self.books if b["id"] == "12-bio-botany-full")
         self.assertEqual(source_book["count"], 6)
         self.assertIn("chapter-6", {c["id"] for c in source_book["chapters"]})
@@ -527,13 +527,55 @@ class FathersBookSourcesTests(unittest.TestCase):
                              for q in self.questions), 1)
         self.assertEqual(sum(q["id"] == "FA064" for q in self.questions), 1)
 
+    def test_class7_to_10_social_science_fathers_and_cross_sources(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA082": ("Sun Yat-sen", "history-4", 41),
+            "FA083": ("Maraimalai Adigal", "history-10", 117),
+        }
+        for qid, (answer, chapter, page) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertEqual(q["book_id"], "10-social-science-full")
+                self.assertEqual(q["chapter_id"], chapter)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(len(set(q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertTrue(q["exp_ta"] and q["q_ta"])
+        self.assertIn("Parithimar Kalaignar", by_id["FA083"]["exp_en"])
+        self.assertIn("2025", by_id["FA082"]["source_link"])
+        for qid, bid, page in (
+            ("FA003", "10-social-science-full", 239),
+            ("FA019", "7-social-science-term-1", 206),
+            ("FA076", "9-social-science-full", 272),
+        ):
+            with self.subTest(cross_reference=qid):
+                q = by_id[qid]
+                self.assertTrue(any(r["book_id"] == bid and r["page"] == page
+                                    for r in q["source_references"]))
+        for bid, expected_count in (
+            ("10-social-science-full", 3),
+            ("7-social-science-term-1", 1),
+            ("9-social-science-full", 3),
+        ):
+            with self.subTest(source_book=bid):
+                book = next(b for b in self.books if b["id"] == bid)
+                self.assertEqual(book["count"], expected_count)
+                self.assertEqual(
+                    sum(any(r["book_id"] == bid for r in q["source_references"])
+                        for q in self.questions), expected_count
+                )
+        self.assertEqual(self.data["meta"]["chapter_count"], 78)
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("79 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("79 questions", self.page)
-        self.assertIn("40 source books", self.page)
+        self.assertIn("81 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("81 questions", self.page)
+        self.assertIn("42 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
