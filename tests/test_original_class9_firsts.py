@@ -66,7 +66,7 @@ class OriginalClass9ReviewTests(unittest.TestCase):
     def test_not_every_original_volume_is_certified(self):
         text = (ROOT / "docs/textbook-quality/original-class6-12-firsts-ledger.md").read_text(encoding="utf-8")
         self.assertIn("0/251 fully", text)
-        self.assertIn("133 curated bilingual questions", text)
+        self.assertIn(f"{len(self.quiz['questions'])} curated bilingual questions", text)
         self.assertEqual(self.quiz["meta"]["count"], len(self.quiz["questions"]))
 
 

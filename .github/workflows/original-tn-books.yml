@@ -9,6 +9,8 @@ on:
       - 'data/special-quizzes/firsts.json'
       - 'tests/test_original_tn_firsts.py'
       - 'tests/test_original_class9_firsts.py'
+      - 'tests/test_original_class11_political_science_firsts.py'
+      - 'data/textbook/original-page-review-evidence-class11-political-science-2022.json'
       - 'data/textbook/original-page-review-evidence-class9-2020.json'
       - '.github/workflows/original-tn-books.yml'
   workflow_dispatch:
@@ -56,6 +58,8 @@ jobs:
           if-no-files-found: error
       - name: Validate Firsts provenance and bilingual questions
         run: python -m unittest discover -s tests -p test_original_tn_firsts.py -v
+      - name: Check Class 11 Political Science source facts and pending Tamil review
+        run: python -m unittest discover -s tests -p test_original_class11_political_science_firsts.py -v
       - name: Check Class 9 original English evidence and pending Tamil review
         run: python -m unittest discover -s tests -p test_original_class9_firsts.py -v
   original-pdf-extraction:
