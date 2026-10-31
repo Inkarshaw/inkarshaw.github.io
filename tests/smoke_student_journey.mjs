@@ -69,6 +69,47 @@ try {
   }, undefined, {timeout:20000});
   assert.deepEqual(pageErrors, [], 'NCERT: runtime errors');
   console.log('PASS NCERT quiz catalog loaded');
+
+  // Fathers Quiz: class/book controls, bilingual answer flow, resume, source provenance.
+  pageErrors.length = 0;
+  const fathersResponse = await page.goto(origin + '/textbook-fathers.html', {
+    waitUntil: 'domcontentloaded', timeout: 30000
+  });
+  assert.equal(fathersResponse?.status(), 200, 'Fathers: HTTP response');
+  await page.waitForFunction(() => document.querySelector('#countPill')?.textContent?.includes('84 questions')
+    && document.querySelector('#bookFilter')?.options?.length > 30, undefined, {timeout: 20000});
+  for (const id of ['topic', 'classFilter', 'bookFilter', 'set']) {
+    assert.equal(await page.locator('#' + id).isVisible(), true, 'Fathers filter visible: ' + id);
+  }
+  await page.locator('#classFilter').selectOption('8');
+  await page.locator('#bookFilter').selectOption('8-social-science-full');
+  await page.locator('#load').click();
+  assert.ok((await page.locator('#badge').innerText()).includes('of 4'),
+    'Fathers: 4 Class 8 Social Science questions including the Ripon cross-reference');
+  const initialQuestion = await page.locator('#question').innerText();
+  assert.equal(await page.locator('#options button').count(), 4, 'Fathers: four answer options');
+  await page.locator('#options button').first().click();
+  await page.locator('#next').click();
+  assert.equal(await page.locator('#feedback').isVisible(), true, 'Fathers: answer feedback');
+  const progress = await page.evaluate(() => localStorage.getItem('clearexamsFathersProgressV2'));
+  assert.ok(progress && JSON.parse(progress).checked[0], 'Fathers: V2 progress saved');
+  await page.reload({waitUntil: 'domcontentloaded'});
+  await page.waitForFunction(() => document.querySelector('#feedback')?.classList.contains('show'), undefined, {timeout: 20000});
+  assert.equal(await page.locator('#question').innerText(), initialQuestion, 'Fathers: V2 progress resumed after reload');
+  await page.locator('#ta').click();
+  assert.equal(await page.locator('html').getAttribute('lang'), 'ta', 'Fathers: Tamil UI toggled');
+  assert.match(await page.locator('#question').innerText(), /[\u0B80-\u0BFF]/, 'Fathers: Tamil question visible');
+  await page.locator('#en').click();
+  await page.locator('#classFilter').selectOption('8');
+  await page.locator('#bookFilter').selectOption('8-science-term-1');
+  await page.locator('#load').click();
+  assert.match(await page.locator('#source').innerText(), /printed page unverified/,
+    'Fathers: unknown original page is disclosed instead of guessed');
+  const fathersOverflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  assert.ok(fathersOverflow <= 3, 'Fathers mobile horizontal overflow ' + fathersOverflow + 'px');
+  assert.deepEqual(pageErrors, [], 'Fathers: no runtime errors');
+  console.log('PASS Fathers quiz: filters, Tamil, citations, save/resume and mobile layout');
+
 } finally {
   await browser.close();
 }

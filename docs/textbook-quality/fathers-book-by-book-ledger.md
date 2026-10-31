@@ -4,6 +4,141 @@
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
 **Scope:** 84 unique MCQs drawn from 43 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
+## Repository-wide structural census and full textbook audit gap report (31 October 2026)
+
+> **Audit verdict: NOT certified complete.** This section is a complete integrity census of the **existing** Fathers bank, **not** a claim that every original Tamil Nadu textbook, school subject, term, edition or chapter has been read. Previous sections document selected manually reviewed source pages. The terms *indexed*, *chapter mapping*, *text checked*, *original page checked* and *book completely audited* must remain distinct.
+
+### A. Bank-wide reconciled numbers
+
+| Metric | Audited value | Meaning |
+| --- | ---: | --- |
+| Distinct bilingual MCQs | **84** | One `FA` question ID per distinct curated MCQ; all contain English/Tamil stems, four unique options in each language and two explanations |
+| Indexed source books | **43** | A book is *represented*, not exhaustively reviewed |
+| Indexed chapter mappings | **82** | Metadata chapter listings, not the total chapter count of the original curricula |
+| Source-reference entries | **111** | Individual question-to-book/page citations; the same question may cite several books |
+| Distinct source URLs | **53** | Unique links in the 111 source entries; accessibility and provenance must be independently verified |
+| Original Tamil-medium textbook pages **certified** | **0** | Tamil question text exists, but source-book Tamil wording has not been certified |
+| Entire original textbooks **certified page-by-page complete** | **0** | Selected page checks do not certify complete-book inspection |
+| Book count mismatches after correction | **0** | `11-bio-botany-full` was incorrectly 9; actual 8 distinct mapped questions, corrected to 8 |
+| Source citations without verified printed page | **1** | FA002, Class 8 Science / Introduction to the Information Age; displayed as *printed page unverified*, not assigned a guessed page |
+| Live `clearexams.ink` deployment | **Not independently verified** | GitHub branch/CI checks are distinct from testing the public Pages deployment |
+
+A separate website defect was fixed: progress was saved under `clearexamsFathersProgressV2` but attempted to restore from `clearexamsFathersProgressV1`. The page now reads V2 first with V1 fallback to preserve older saved sessions.
+
+### B. Grade-by-grade state of this existing bank
+
+| Class | Indexed books | Mapped chapters | Primary-question count | Fully book-scanned and Tamil-certified? |
+| ---: | ---: | ---: | ---: | --- |
+| 6 | 2 | 2 | 2 | No |
+| 7 | 2 | 2 | 1 | No |
+| 8 | 2 | 5 | 3 | No |
+| 9 | 2 | 4 | 3 | No |
+| 10 | 2 | 5 | 5 | No |
+| 11 | 17 | 30 | 31 | No |
+| 12 | 16 | 34 | 39 | No |
+
+*Primary-question count* counts each question under its main book/class only. Cross-book reference counts are larger, and rows across classes should not be summed as source coverage. Likewise, a Class 11 or 12 source might be a volume, vocational text, or one unit, not a complete curricular subject inventory.
+
+### C. Class 6–10 Science and Social Science term-slot checklist
+
+This is only a **minimum core Science/Social Science** matrix, not the full curriculum. Classes 6–7 use three terms for these subjects (two subjects × three terms × two classes = 12 subject-term slots); Classes 8–10 are enumerated here as annual Science/Social Science subjects (six slots). **10 of 18 slots have at least one indexed quiz source, and 8 have none**. Every indexed slot still needs an all-units/all-pages original text review. The `8-science-term-1` identifier is inconsistent with the annual Class 8 listing and must be reconciled against the actual edition before changing its label.
+
+| Class | Subject | Term / volume | Book ID | Status |
+| --- | --- | --- | --- | --- |
+| 6 | Science | Term I | `6-science-term-1` | indexed only |
+| 6 | Science | Term II | `6-science-term-2` | not indexed |
+| 6 | Science | Term III | `6-science-term-3` | not indexed |
+| 6 | Social Science | Term I | `6-social-science-term-1` | not indexed |
+| 6 | Social Science | Term II | `6-social-science-term-2` | indexed only |
+| 6 | Social Science | Term III | `6-social-science-term-3` | not indexed |
+| 7 | Science | Term I | `7-science-term-1` | not indexed |
+| 7 | Science | Term II | `7-science-term-2` | indexed only |
+| 7 | Science | Term III | `7-science-term-3` | not indexed |
+| 7 | Social Science | Term I | `7-social-science-term-1` | indexed only |
+| 7 | Social Science | Term II | `7-social-science-term-2` | not indexed |
+| 7 | Social Science | Term III | `7-social-science-term-3` | not indexed |
+| 8 | Science | Annual (edition verification needed) | `8-science-term-1` | indexed, term mismatch needs inspection |
+| 8 | Social Science | Annual | `8-social-science-full` | indexed only |
+| 9 | Science | Annual | `9-science-full` | indexed only |
+| 9 | Social Science | Annual | `9-social-science-full` | indexed only |
+| 10 | Science | Annual | `10-science-full` | indexed only |
+| 10 | Social Science | Annual | `10-social-science-full` | indexed only |
+
+**Eight known absent core slots:** Class 6 Science Terms II and III; Class 6 Social Science Terms I and III; Class 7 Science Terms I and III; Class 7 Social Science Terms II and III. This matrix does not encompass the Class 6–10 Tamil, English and Mathematics books, all of which must also be added to any **full all-subject** audit.
+
+### D. All 43 indexed book records audited for internal count consistency
+
+The following table is a **complete census of the current quiz index**, not a list of all textbooks published by Tamil Nadu. There are **zero books certified completely reviewed**. The rightmost two columns are deliberately "No" throughout; this means no **full-book certification**, not that every individual English passage lacks evidence.
+
+| Grade | Indexed source book | Chapters mapped | Distinct linked MCQs | Complete English page scan? | Tamil original checked? |
+| ---: | --- | ---: | ---: | --- | --- |
+| 6 | `6-science-term-1` | 1 | 1 | No | No |
+| 6 | `6-social-science-term-2` | 1 | 1 | No | No |
+| 7 | `7-science-term-2` | 1 | 1 | No | No |
+| 8 | `8-science-term-1` | 1 | 1 | No | No |
+| 9 | `9-science-full` | 1 | 1 | No | No |
+| 9 | `9-social-science-full` | 3 | 3 | No | No |
+| 10 | `10-science-full` | 2 | 3 | No | No |
+| 11 | `11-bio-botany-full` | 4 | 8 | No | No |
+| 11 | `11-bio-zoology-full` | 1 | 3 | No | No |
+| 11 | `11-business-maths-statistics-full` | 3 | 3 | No | No |
+| 11 | `11-economics-full` | 1 | 1 | No | No |
+| 11 | `11-history-full` | 2 | 3 | No | No |
+| 11 | `11-political-science-vol-1` | 3 | 3 | No | No |
+| 12 | `12-bio-botany-full` | 4 | 6 | No | No |
+| 12 | `12-commerce-full` | 2 | 3 | No | No |
+| 12 | `12-economics-full` | 2 | 5 | No | No |
+| 12 | `12-history-full` | 4 | 7 | No | No |
+| 11 | `11-micro-biology-full` | 2 | 6 | No | No |
+| 12 | `12-micro-biology-full` | 4 | 4 | No | No |
+| 11 | `11-computer-science-full` | 1 | 1 | No | No |
+| 11 | `11-statistics-full` | 1 | 1 | No | No |
+| 12 | `12-general-nursing-full` | 3 | 3 | No | No |
+| 12 | `12-political-science-vol-1` | 1 | 3 | No | No |
+| 12 | `12-physics-vol-2` | 1 | 1 | No | No |
+| 11 | `11-biochemistry-full` | 1 | 1 | No | No |
+| 12 | `12-vocational-nursing-full` | 2 | 3 | No | No |
+| 12 | `12-basic-mechanical-engineering-full` | 3 | 4 | No | No |
+| 12 | `12-computer-applications-full` | 2 | 2 | No | No |
+| 12 | `12-textiles-dress-designing-full` | 1 | 1 | No | No |
+| 11 | `11-vocational-nursing-full` | 1 | 2 | No | No |
+| 11 | `11-textiles-dress-designing-full` | 2 | 2 | No | No |
+| 12 | `12-food-service-management-full` | 1 | 1 | No | No |
+| 12 | `12-biochemistry-full` | 2 | 2 | No | No |
+| 11 | `11-home-science-full` | 1 | 1 | No | No |
+| 12 | `12-home-science-full` | 1 | 1 | No | No |
+| 11 | `11-computer-applications-full` | 2 | 2 | No | No |
+| 11 | `11-computer-technology-full` | 2 | 2 | No | No |
+| 12 | `12-computer-science-full` | 1 | 1 | No | No |
+| 11 | `11-political-science-vol-2` | 2 | 2 | No | No |
+| 11 | `11-accountancy-full` | 1 | 1 | No | No |
+| 10 | `10-social-science-full` | 3 | 3 | No | No |
+| 7 | `7-social-science-term-1` | 1 | 1 | No | No |
+| 8 | `8-social-science-full` | 4 | 4 | No | No |
+
+### E. High-risk editorial findings requiring original-page comparison
+
+1. **FA050 / FA067 Psychology**: Class 12 General Nursing names Freud, while Class 11 Vocational Nursing names Wilhelm Wundt. Questions are explicitly scoped to different books. Resolve the contradiction with original English/Tamil page images and record what each printed edition says.
+2. **FA077 Ecology**: Class 12 Bio-Botany names Alexander von "Humbolt" (conventional spelling Humboldt); other authorities sometimes name Ernst Haeckel. Keep the question tied to the exact source chapter and verify original wording.
+3. **FA063 / FA055 robotics**: George Devol is called Father of Robotics in Mechanical Engineering, while Joseph Engelberger is called father of the modern robotics industry in Physics. Titles are not identical.
+4. **FA014 Father of the Nation**: Bose's address to Gandhi is a historical usage, not a legal/constitutional designation.
+5. **FA057 scientific management**: Class 12 Commerce outlines Taylor's work, while the exact "Father of Scientific Management" phrase is independently grounded in an official TNPSC departmental exam and Class 12 Basic Mechanical Engineering's exercise.
+6. **FA070 personnel management**: Class 12 Food Service Management says **a** father of personnel management (Robert Owen), not a sole inventor.
+7. **FA086 Nile**: "Father of African Rivers" is a figure of speech for a river, not a person's achievement. Consider a separate "honorific places" filter if this themed collection grows.
+8. **FA002 missing page**: Legacy Class 8 Science reference `C08S-T1-U09-Q0002` has no verified printed page; do not supply one from guesswork. Check current Class 8 science annual/term scheme against the actual printed book.
+9. **Source links**: Many older citations use Google Drive, Scribd, SlideShare, third-party PDF mirrors or internal question-bank paths. A valid HTTPS link or a successful source-text search **does not** certify official provenance, page images, link longevity, or 2026–27 currency.
+10. **Tamil quality**: All 84 questions have authored Tamil text, but exact Tamil-medium source wording, spelling, technical terminology, distractors and answer correctness still need human/primary-book checks.
+
+### F. Completion acceptance criteria, in order
+
+- **Build the authoritative original-book manifest**: Grade, subject, term or volume, medium, academic year, chapter/unit count, official publisher PDF URL, page boundaries and SHA/hash if available, including elective/vocational texts for Classes 11–12. Verify against the [Government of Tamil Nadu Textbook and Educational Services Corporation](https://www.textbookcorp.in/) and Education Department listings. On **31 Oct 2026**, the Corporation advertises 2026–27 Term II distribution for lower classes, but this notice is **not** proof of a complete downloadable current-edition PDF catalog.
+- **Acquire and check both media**: For every manifest entry read all English and Tamil pages, identify *Father / founder / pioneer* passages plus Tamil equivalents, review infoboxes/exercises and list source exact wording, correct answer, title scope, page, edition, and reviewer/date.
+- **Resolve all source conflicts/typos** against the primary page, not the reproduced transcript; if genuinely disputed, phrase stems with context, record alternatives, and avoid a misleading universal single-answer claim.
+- **Reconcile completeness mathematically**: Each expected book and chapter marked `unopened / partly reviewed / completely reviewed / not yet available`, record 0-fact chapters explicitly, and enforce source-to-question coverage without counting cross-references as extra questions.
+- **Finish editorial and browser checks**: English/Tamil linguistic review, answer-key validity, accessibility, mobile navigation, result/retry, resume persistence, and live GitHub Pages deployment checked after publishing. Keep automated tests as safeguards, not substitutes for primary-source reading.
+
+**Certification condition:** Claim "full Classes 6–12 Fathers audit complete" only once the official edition-specific manuscript inventory is reconciled and **every in-scope original book/chapter in both media** has a recorded checked outcome. Until then this remains a **partial textbook source review, with the repository bank structurally audited**.
+
 ## Checked in existing school-book question banks and selected original textbook pages
 
 | Class | Source book / term | Distinct mapped questions | Question IDs | Review status |

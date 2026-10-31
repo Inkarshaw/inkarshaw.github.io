@@ -26,7 +26,7 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
         self.assertIn("All books", self.page)
-        self.assertIn("ONE quiz", self.page)
+        self.assertIn("ONE combined quiz", self.page)
         self.assertIn("distinct questions", self.page)
         self.assertNotIn("b.question_count+", self.page)
 
@@ -611,6 +611,117 @@ class FathersBookSourcesTests(unittest.TestCase):
             for q in self.questions
         ), 4)
         self.assertEqual(self.data["meta"]["chapter_count"], 82)
+
+    def test_complete_existing_bank_source_count_census(self):
+        self.assertEqual(len(self.questions), 84)
+        self.assertEqual(len(self.books), 43)
+        self.assertEqual(
+            self.data["meta"]["chapter_count"],
+            sum(len(b["chapters"]) for b in self.books)
+        )
+        self.assertEqual(self.data["meta"]["chapter_count"], 82)
+        refs = [r for q in self.questions for r in q["source_references"]]
+        self.assertEqual(len(refs), 111)
+        self.assertEqual(len({r["source_link"] for r in refs}), 53)
+        self.assertEqual(len({r["source_id"] for r in refs}), 111)
+        indexed_books = {b["id"]: b for b in self.books}
+        for book_id, book in indexed_books.items():
+            with self.subTest(book=book_id):
+                linked_questions = [
+                    q for q in self.questions
+                    if any(r["book_id"] == book_id for r in q["source_references"])
+                ]
+                self.assertEqual(book["count"], len(linked_questions))
+                self.assertGreater(len(book["chapters"]), 0)
+                self.assertEqual(
+                    len({ch["id"] for ch in book["chapters"]}), len(book["chapters"])
+                )
+                for chapter in book["chapters"]:
+                    self.assertEqual(chapter["book_id"], book_id)
+        self.assertEqual(
+            indexed_books["11-bio-botany-full"]["count"], 8,
+            "Class 11 Bio-Botany had a stale declared count of 9"
+        )
+        for q in self.questions:
+            with self.subTest(primary_chapter=q["id"]):
+                self.assertIn(q["book_id"], indexed_books)
+                self.assertIn(q["chapter_id"],
+                              {c["id"] for c in indexed_books[q["book_id"]]["chapters"]})
+
+    def test_missing_printed_page_is_explicitly_unverified(self):
+        unverified = [
+            (q["id"], r) for q in self.questions for r in q["source_references"]
+            if r.get("page") is None
+        ]
+        self.assertEqual(len(unverified), 1)
+        qid, reference = unverified[0]
+        self.assertEqual(qid, "FA002")
+        self.assertEqual(reference["book_id"], "8-science-term-1")
+        self.assertEqual(reference["source_id"], "C08S-T1-U09-Q0002")
+        self.assertEqual(
+            reference["page_review_status"], "not_verified_in_original_textbook"
+        )
+        self.assertTrue(reference["page_note_en"] and reference["page_note_ta"])
+        self.assertIn("printed page unverified", self.page)
+        self.assertIn("அச்சுப் பக்கம் சரிபார்க்கப்படவில்லை", self.page)
+
+    def test_source_completeness_status_does_not_claim_all_textbooks_audited(self):
+        audit = self.data["meta"]["audit_status"]
+        self.assertEqual(audit["bank_integrity"], "checked")
+        self.assertEqual(audit["content_and_source_certification"], "incomplete")
+        self.assertEqual(audit["questions"], 84)
+        self.assertEqual(audit["indexed_books"], 43)
+        self.assertEqual(audit["indexed_chapter_mappings"], 82)
+        self.assertEqual(audit["source_reference_instances"], 111)
+        self.assertEqual(audit["distinct_source_links"], 53)
+        self.assertEqual(audit["original_tamil_pages_certified"], 0)
+        self.assertEqual(audit["fully_scanned_books_certified"], 0)
+        self.assertEqual(audit["source_references_with_unverified_printed_page"], 1)
+        self.assertEqual(self.data["meta"]["pending_classes"], [6,7,8,9,10,11,12])
+        slots = audit["lower_school_science_social_slots"]
+        self.assertEqual(slots["slots_expected"], 18)
+        self.assertEqual(slots["slots_indexed_at_least_once"], 10)
+        self.assertEqual(slots["unindexed_slots"], 8)
+        missing = set(audit["missing_core_slots"])
+        self.assertEqual(missing, {
+            "6-science-term-2", "6-science-term-3",
+            "6-social-science-term-1", "6-social-science-term-3",
+            "7-science-term-1", "7-science-term-3",
+            "7-social-science-term-2", "7-social-science-term-3"
+        })
+        indexed = {book["id"] for book in self.books}
+        self.assertFalse(indexed.intersection(missing))
+        ledger = (ROOT / "docs/textbook-quality/fathers-book-by-book-ledger.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Repository-wide structural census", ledger)
+        self.assertIn("NOT certified complete", ledger)
+        self.assertIn("111", ledger)
+        for book_id in indexed:
+            self.assertIn("`" + book_id + "`", ledger)
+
+    def test_progress_resume_reads_the_same_key_that_it_writes(self):
+        self.assertIn(
+            "localStorage.setItem('clearexamsFathersProgressV2'", self.page
+        )
+        self.assertIn(
+            "localStorage.getItem('clearexamsFathersProgressV2')", self.page
+        )
+        self.assertIn(
+            "localStorage.getItem('clearexamsFathersProgressV1')", self.page
+        )
+        # A reader using V1 alone would silently lose active V2 sessions.
+        self.assertNotIn(
+            "JSON.parse(localStorage.getItem('clearexamsFathersProgressV1')||'null')",
+            self.page
+        )
+        self.assertIn("page_review_status", self.page)
+        self.assertIn('aria-label="Fathers Quiz filters"', self.page)
+        self.assertNotRegex(
+            self.page, r"\.filters\s*>\s*div\s*\{\s*display\s*:\s*none"
+        )
+        for filter_id in ("topic", "classFilter", "bookFilter", "set"):
+            self.assertIn('id="' + filter_id + '"', self.page)
 
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
