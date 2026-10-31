@@ -262,7 +262,13 @@ class FathersBookSourcesTests(unittest.TestCase):
                 self.assertIn("original_scert_english_pdf_text_checked", q["review_status"])
                 self.assertIn("page_image_unavailable", q["review_status"])
                 self.assertIn("tamil_original_pending", q["review_status"])
-                self.assertEqual(len(q["source_references"]), 1)
+                # Keep the original Nursing citation while allowing verified cross-book sources.
+                self.assertTrue(any(
+                    ref["book_id"] == "12-vocational-nursing-full"
+                    and ref["page"] == printed_page
+                    for ref in q["source_references"]
+                ))
+                self.assertGreaterEqual(len(q["source_references"]), 1)
                 self.assertTrue(q["source_link"].endswith("12th_Nursing_Vocational_EM.pdf"))
                 self.assertTrue(q["q_ta"] and q["exp_ta"])
                 self.assertEqual(len(set(q["opts_ta"])), 4)
