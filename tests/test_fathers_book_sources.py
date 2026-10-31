@@ -27,6 +27,8 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("source_references", self.page)
         self.assertIn("All books", self.page)
         self.assertIn("ONE quiz", self.page)
+        self.assertIn("distinct questions", self.page)
+        self.assertNotIn("b.question_count+", self.page)
 
     def test_bilingual_source_provenance_and_no_duplicate_stems(self):
         ids, english_stems, book_ids = set(), set(), {b["id"] for b in self.books}
