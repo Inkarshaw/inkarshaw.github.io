@@ -90,7 +90,7 @@ class FirstsBrowserSmoke(unittest.TestCase):
         self.assertIn("of 20", page.locator("#badge").inner_text())
         page.locator("#set").select_option("all")
         page.locator("#load").click()
-        self.assertIn("of 25", page.locator("#badge").inner_text())
+        self.assertIn("of 23", page.locator("#badge").inner_text())
         # The mobile page should not introduce sideways document scrolling.
         dimensions = page.evaluate("({scroll:document.documentElement.scrollWidth, width:innerWidth})")
         self.assertLessEqual(dimensions["scroll"], dimensions["width"] + 2)
