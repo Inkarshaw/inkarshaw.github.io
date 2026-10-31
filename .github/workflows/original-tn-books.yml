@@ -4,6 +4,7 @@ on:
     paths:
       - 'scripts/inventory_tn_original_books.py'
       - 'scripts/report_original_tn_coverage.py'
+      - 'tests/test_original_coverage_reconciliation.py'
       - 'scripts/scan_original_tn_firsts.py'
       - 'data/textbook/original-pdf-source-manifest.json'
       - 'data/special-quizzes/firsts.json'
@@ -50,7 +51,7 @@ jobs:
           path: tn-original-book-inventory.json
           if-no-files-found: warn
       - name: Reconcile listed books against original PDF seed manifest
-        run: python scripts/report_original_tn_coverage.py --output original-books-coverage.json
+        run: python scripts/report_original_tn_coverage.py --inventory tn-original-book-inventory.json --output original-books-coverage.json
       - name: Upload coverage gaps and certification status
         uses: actions/upload-artifact@v4
         if: always()
@@ -60,6 +61,8 @@ jobs:
           if-no-files-found: error
       - name: Validate Firsts provenance and bilingual questions
         run: python -m unittest discover -s tests -p test_original_tn_firsts.py -v
+      - name: Check historical/live catalogue reconciliation tests
+        run: python -m unittest discover -s tests -p test_original_coverage_reconciliation.py -v
       - name: Check Class 12 Political Science source facts and pending Tamil review
         run: python -m unittest discover -s tests -p test_original_class12_political_science_firsts.py -v
       - name: Check Class 11 Political Science source facts and pending Tamil review
