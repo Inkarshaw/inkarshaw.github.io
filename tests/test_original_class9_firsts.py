@@ -29,6 +29,13 @@ class OriginalClass9ReviewTests(unittest.TestCase):
         self.assertFalse(self.evidence["visual_pdf_page_review_completed"])
         self.assertFalse(self.evidence["tamil_original_pages_checked"])
         self.assertFalse(self.evidence["current_prescribed_2026_edition_verified"])
+        scan = self.evidence["machine_scan"]
+        self.assertEqual(scan["original_english_pdf_pages"], 328)
+        self.assertEqual(scan["text_extractable_pages"], 322)
+        self.assertEqual(scan["pages_needing_visual_review"], 6)
+        self.assertEqual(scan["broad_keyword_candidate_hits"], 302)
+        self.assertFalse(scan["manual_all_candidates_reviewed"])
+        self.assertFalse(scan["full_volume_certified"])
 
     def test_page_evidence_references_every_new_question(self):
         self.assertEqual(len(self.new_questions), 12)
