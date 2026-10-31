@@ -255,3 +255,10 @@ The source scan now uses an allowlisted, size-limited downloader and the origina
 ### Bilingual player source-link correction
 
 For F145–F148, the Tamil-mode Firsts player now offers the visually corroborating **2024 Tamil original PDF** (the archive's exact source URL) and displays its **actual 1-based PDF page index** — 117, 127, 127 and 196 respectively — instead of incorrectly reusing the older 2019 English book's printed page numbers. The link is explicitly labelled as a **2024 Tamil archival edition**, not a certified same-edition translation. F144 intentionally retains its English/independent source rather than linking to a Tamil passage about Frisch's econometrics that does *not* substantiate the 1969 prize question. The bank remains 148 MCQs; selected Tamil excerpt correspondence is not full-volume certification.
+
+
+## 31 October 2026: Book 1 — Class 6 Term I Volume 3 (Science, bilingual)
+
+**Specific question facts cross-checked: F033–F035.** The 2025-revised government English original PDF (108 pages) and Tamil original PDF (107 pages) were both downloaded, hashed and screened; the English original PDF places the selected Computer chapter statements on PDF pages 102–103. The Tamil PDF text layer is partially corrupted, so the exact Tamil phrasing was also checked against a separate 2025 Tamil textbook transcription. **This is partial fact corroboration, not whole-book certification or a 2026–27 prescribed-edition sign-off.**
+
+[See the per-volume evidence with SHA-256 source fingerprints, page locations, method and limitations](class6-term1-original-pdf-2025-review.md). **Fully certified original-book pairs remain 0**, and the historical 251 catalogue listings remain an inventory baseline, not a count of signed-off books.
