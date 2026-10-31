@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 58)
-        self.assertEqual(len(self.books), 26)
+        self.assertEqual(len(self.questions), 65)
+        self.assertEqual(len(self.books), 30)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -275,13 +275,57 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("data.meta.count", self.page)
         self.assertIn("data.books.length", self.page)
 
+    def test_technology_and_vocational_source_titles_and_conflict(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA061": ("Henry Maudslay", "12-basic-mechanical-engineering-full", 3),
+            "FA062": ("Nikola Tesla", "12-basic-mechanical-engineering-full", 130),
+            "FA063": ("George Devol", "12-basic-mechanical-engineering-full", 131),
+            "FA064": ("Luca Pacioli", "12-textiles-dress-designing-full", 202),
+            "FA065": ("Vint Cerf", "12-computer-applications-full", 139),
+            "FA066": ("Ed Guilbert", "12-computer-applications-full", 252),
+            "FA067": ("Wilhelm Wundt", "11-vocational-nursing-full", 53),
+        }
+        for qid, (answer, book, page) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertEqual(q["book_id"], book)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(len(set(q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn("tamil_original_pending", q["review_status"])
+        # Book-specific statements must not be flattened into one universal answer.
+        self.assertIn("Class 12 General Nursing", by_id["FA050"]["q_en"])
+        self.assertIn("Class 11 Vocational Nursing", by_id["FA067"]["q_en"])
+        self.assertEqual(by_id["FA050"]["opts_en"][by_id["FA050"]["correct"]], "Sigmund Freud")
+        self.assertEqual(by_id["FA067"]["opts_en"][by_id["FA067"]["correct"]], "Wilhelm Wundt")
+        self.assertIn("conflict", by_id["FA050"]["exp_en"])
+        self.assertIn("11-vocational-nursing-full",
+                      {r["book_id"] for r in by_id["FA051"]["source_references"]})
+        self.assertIn("12-basic-mechanical-engineering-full",
+                      {r["book_id"] for r in by_id["FA057"]["source_references"]})
+        expected_books = {
+            "12-basic-mechanical-engineering-full": 4,
+            "12-computer-applications-full": 2,
+            "12-textiles-dress-designing-full": 1,
+            "11-vocational-nursing-full": 2,
+        }
+        for bid, count in expected_books.items():
+            b = next(book for book in self.books if book["id"] == bid)
+            self.assertEqual(b["count"], count)
+            self.assertEqual(
+                len([q for q in self.questions if any(ref["book_id"] == bid
+                    for ref in q["source_references"])]), count
+            )
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("58 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("58 questions", self.page)
-        self.assertIn("26 source books", self.page)
+        self.assertIn("65 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("65 questions", self.page)
+        self.assertIn("30 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
