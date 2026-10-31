@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 65)
-        self.assertEqual(len(self.books), 30)
+        self.assertEqual(len(self.questions), 69)
+        self.assertEqual(len(self.books), 35)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -319,13 +319,58 @@ class FathersBookSourcesTests(unittest.TestCase):
                     for ref in q["source_references"])]), count
             )
 
+    def test_home_science_textiles_food_service_and_biochemistry_titles(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA068": ("Frederick W. Taylor", "11-textiles-dress-designing-full", 153),
+            "FA069": ("Charles Frederick Worth", "11-textiles-dress-designing-full", 167),
+            "FA070": ("Robert Owen", "12-food-service-management-full", 145),
+            "FA071": ("Antoine Lavoisier", "12-biochemistry-full", 187),
+        }
+        for qid, (answer, bid, page) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], answer)
+                self.assertEqual(q["book_id"], bid)
+                self.assertEqual(q["page"], page)
+                self.assertEqual(len(set(q["opts_en"])), 4)
+                self.assertEqual(len(set(q["opts_ta"])), 4)
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertEqual(len(q["source_references"]), 1)
+        self.assertIn("a father of personnel management", by_id["FA070"]["q_en"].lower())
+        self.assertIn("non-exclusive", by_id["FA070"]["exp_en"])
+        self.assertIn("Father of Industrial Engineering", by_id["FA068"]["q_en"])
+        self.assertIn("Father of Modern Chemistry", by_id["FA071"]["q_en"])
+        self.assertNotEqual(by_id["FA068"]["q_en"], by_id["FA057"]["q_en"])
+        self.assertNotEqual(by_id["FA071"]["q_en"], by_id["FA059"]["q_en"])
+        for qid, bid in {
+            "FA059": "11-home-science-full",
+            "FA025": "12-home-science-full",
+            "FA042": "12-biochemistry-full",
+        }.items():
+            self.assertIn(bid, {r["book_id"] for r in by_id[qid]["source_references"]})
+        expected_book_counts = {
+            "11-textiles-dress-designing-full": 2,
+            "12-food-service-management-full": 1,
+            "12-biochemistry-full": 2,
+            "11-home-science-full": 1,
+            "12-home-science-full": 1,
+        }
+        for bid, count in expected_book_counts.items():
+            with self.subTest(book=bid):
+                source_book = next(b for b in self.books if b["id"] == bid)
+                self.assertEqual(source_book["count"], count)
+                self.assertEqual(sum(any(ref["book_id"] == bid
+                                         for ref in q["source_references"])
+                                     for q in self.questions), count)
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("65 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("65 questions", self.page)
-        self.assertIn("30 source books", self.page)
+        self.assertIn("69 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("69 questions", self.page)
+        self.assertIn("35 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
