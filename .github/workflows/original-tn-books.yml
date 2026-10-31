@@ -21,7 +21,7 @@ on:
       source_ids:
         description: "Space-separated IDs from original-pdf-source-manifest.json"
         required: false
-        default: "c10-social-science-2022-revision"
+        default: "c9-social-science-2020-revision"
       language:
         description: "Which original language editions to extract"
         required: false
@@ -80,9 +80,8 @@ jobs:
       - name: Install PDF text parser
         run: python -m pip install --disable-pip-version-check pymupdf
       - name: Extract firsts candidates from real original book pages
-        continue-on-error: true
         env:
-          BOOK_IDS: ${{ inputs.source_ids || 'c12-political-science-2022-revision' }}
+          BOOK_IDS: ${{ inputs.source_ids || 'c9-social-science-2020-revision' }}
           BOOK_LANGUAGE: ${{ inputs.language || 'en' }}
         run: |
           python scripts/scan_original_tn_firsts.py --ids $BOOK_IDS --language "$BOOK_LANGUAGE" --output original-firsts-candidates.json
