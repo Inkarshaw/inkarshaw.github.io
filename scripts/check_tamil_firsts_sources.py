@@ -22,13 +22,13 @@ from scan_original_tn_firsts import ROOT, SOURCE_FILE, fetch_pdf
 TARGETS = {
     "c12-economics-2024-tamil": [
         {"quiz_id": "F144", "en_fact": "Ragnar Frisch and Jan Tinbergen first economic sciences prize",
-         "tamil_hints": ["ரக்னார்", "ரங்னார்", "ஃப்ரிஷ்", "டின்பெர்கன்", "ஃபிரிஷ்"]},
+         "tamil_hints": ["ரக்னார்", "ரங்னார்", "ரேக்னர்", "ரேக்ன", "ஃப்ரிஷ்", "ஃபிரிஷ்", "ஃபிரிஷ்க்", "டின்பெர்கன்"]},
         {"quiz_id": "F145", "en_fact": "Oldest central bank Sveriges Riksbank",
-         "tamil_hints": ["ரிக்ஸ்பேங்க்", "ரிக்ஸ்பாங்க்", "சுவீடன்", "ஸ்வீடன்", "1668"]},
+         "tamil_hints": ["ரிக்ஸ்பேங்க்", "ரிக்ஸ்பாங்க்", "ரிக்ஸ் வங்", "ரிக்ஸ்", "சுவீடன்", "ஸ்வீடன்", "1668"]},
         {"quiz_id": "F146", "en_fact": "First RBI Governor Osborne Smith",
-         "tamil_hints": ["ஆஸ்போர்ன்", "ஆஸ்போர்ன் ஸ்மித்", "ஒஸ்போர்ன்", "ஸ்மித்"]},
+         "tamil_hints": ["ஆஸ்போர்ன்", "ஓஸ்போர்ன்", "ஒஸ்போர்ன்", "ஆஸ்போர்ன் ஸ்மித்"]},
         {"quiz_id": "F147", "en_fact": "Sher Shah Suri's silver Rupiya coin",
-         "tamil_hints": ["ஷேர் ஷா", "ஷெர்ஷா", "ரூபியா", "ருபியா"]},
+         "tamil_hints": ["ஷேர் ஷா", "ஷேர்ஷா", "ஷெர்ஷா", "செர்ஷா", "சேர்ஷா", "ரூபியா", "ருபியா", "சூரி"]},
         {"quiz_id": "F148", "en_fact": "First WTO Ministerial Conference Singapore",
          "tamil_hints": ["சிங்கப்பூர்", "முதலாவது அமைச்சர்கள் மாநாடு", "1996"]},
     ],
