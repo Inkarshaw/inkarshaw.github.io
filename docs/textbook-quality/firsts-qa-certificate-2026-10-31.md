@@ -24,7 +24,7 @@
 - English and Tamil questions, explanations, four options, and answer index are present in all 148 records. This is **field completeness**, not translation certification.
 - Every record has an HTTPS source URL field. **Live link validity and whether it lands on the precise claimed page have NOT been certified.**
 - **26** records have no dedicated `source_ta_link`. Another **14** reuse the English URL as `source_ta_link`. Accordingly **40** do not expose a *distinct* Tamil-specific destination.
-- **27** records have a dedicated `source_printed_page`; **121** do not. Separately, **26** records have no general `page` field.
+- **32** records have a dedicated `source_printed_page`; **116** do not. Five Class 6 Term I original English-text locations (F033–F035, F043–F044) were newly mapped; this does **not** imply full-bilingual source-page certification. Separately, **26** records have no general `page` field.
 - Older original-volume catalogue: **251 historical English/Tamil edition listings**; **zero volumes fully certified in both media**. This catalogue is NOT an authoritative 2026–27 unique-book count; see `original-class6-12-firsts-ledger.md`.
 
 ## Editorial exceptions and explicit pending checks
@@ -67,3 +67,9 @@ Do not display a general **“TN School Books Fully Certified”** badge. The ac
 **Published release fingerprint:** 148 questions, bank version 11, 20-question set size; updated skip/unanswered/20-question-default UI; homepage women/history/science counts 26/96/26; corrected F042 and F052 choices. **11 of 11 checks passed.** GitHub Actions run: [Verify live Firsts Quiz deployment #41190241454](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41190241454).
 
 This confirms the live site serves the updated HTML and JSON at that observation time. It does **not** establish that all external source links work, that every original textbook fact is certified, or that a live-site interactive browser session has been tested.
+
+## Selective original-source evidence update — Class 6, Term I
+
+Five published Firsts questions (**F033–F035, F043–F044**) have been matched to original **2025-revised English SCERT PDFs**, with matching facts in the **2025 Tamil textbook transcription** and original Tamil PDFs downloaded and hashed. The 2025 original Tamil PDF text layer is partly garbled, so individual Tamil pages have not all received visual sign-off. Evidence: [Science](class6-term1-original-pdf-2025-review.md) and [Social Science](class6-term1-social-original-pdf-2025-review.md).
+
+**Scope unchanged:** these are selected factual checks in two subject components, not a complete firsts audit of every page or every original volume. Whole-book bilingual certified pairs remain **0**. The historical 251 archive listings are an old catalogue baseline, not a certified count of 2026–27 textbooks.
