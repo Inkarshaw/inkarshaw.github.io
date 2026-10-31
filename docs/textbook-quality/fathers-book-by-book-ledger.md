@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 47 unique MCQs drawn from 21 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 54 unique MCQs drawn from 25 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -19,12 +19,16 @@
 | 11 | Economics · Full Year, Unit 1 | 1 | FA019 | 2020 English original PDF text checked (p.22), PDF too large for screenshot; Tamil original pending |
 | 11 | Business Mathematics & Statistics · Chapters 2, 3, 8 | 3 | FA022, FA023, FA024 | English original PDF text checked (pp.25,51,178); page screenshots failed due PDF size; Tamil original pending |
 | 11 | Bio-Botany · Chapters 1, 2, 5, 9 | 8 mapped (7 distinct, plus source repeats) | FA031–FA034, FA036–FA038; FA004 | English Ch.5 pp.86,95,103 screenshots verified; existing chapters partly checked; Tamil original pending |
+| 11 | Biochemistry · Unit 1 | 1 | FA056 | English SCERT text reproduction p.1 checked; original page image, Tamil and edition comparison pending |
 | 11 | Bio-Zoology · Chapter 1 | 3 mapped (2 new + FA004 cited again) | FA035–FA036, FA004 | SCERT English Chapter 1 pp.4–5 screenshot verified; Tamil original pending |
 | 11 | Computer Science · Chapter 1 | 1 cross-reference | FA002 | English SCERT text reproduction p.1 identifies Babbage; original printed page screenshot and Tamil original pending |
 | 11 | Microbiology · Chapters 1, 10 | 6 | FA040–FA045 | English SCERT text reproduction pp.3, 6, 150–151 checked; original page images, Tamil and current-edition review pending |
 | 11 | Statistics · Chapter 1 | 1 cross-reference | FA030 | English SCERT text reproduction p.1 identifies Mahalanobis; original page screenshot and Tamil original pending |
 | 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
 | 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
+| 12 | General Nursing · Chapters 3, 4, 10 | 3 | FA050–FA052 | English SCERT reproduction pp.98, 102, 220 checked; includes qualified textbook-specific titles and printed spelling corrections; Tamil original pending |
+| 12 | Physics · Volume II, Unit 11 | 1 | FA055 | English SCERT reproduction p.263 checked; original page image and Tamil original pending |
+| 12 | Political Science · Volume I, Unit 8 | 3 mappings (2 new, FA018 cross-source) | FA053–FA054, FA018 | English SCERT reproduction pp.180,183,185 checked; original page images and Tamil original pending |
 | 12 | Commerce · Chapters 1, 16 | 2 | FA025, FA026 | SCERT English original PDF text checked (pp.8,130), PDF screenshot attempted but unavailable; Tamil original pending |
 | 12 | Microbiology · Chapters 7, 9, 10, 11 | 4 | FA046–FA049 | English SCERT text reproduction pp.114, 188, 206, 241 checked; original page images, Tamil and current-edition review pending |
 | 12 | Bio-Botany · Chapters 2, 5, 9 | 3 mapped (1 new, 2 cross-citations) | FA039; FA016, FA018 | Original English pp.36,121,222 screenshots checked; Tamil original pending |
@@ -161,6 +165,29 @@ These are distinct honorifics even when attributed to the same person; do not co
 - **Statistics, Chapter 1, printed p.1:** [English SCERT text reproduction](https://www.scribd.com/document/627737963/11th-Statistics-EM-Www-tntextbooks-in) describes **P. C. Mahalanobis** as Father of Indian Statistics. Existing FA030 gained this source reference, not a duplicate MCQ.
 
 **Source-quality boundary:** These are English SCERT text reproductions, not a verified complete scan of the printed original. Page images, Tamil-medium official wording, source-host stability, and textbook edition comparison remain pending.
+
+## New book review: Nursing, Political Science, Physics and Biochemistry (31 October 2026)
+
+**Seven new bilingual MCQs (FA050–FA056)** and one additional textbook cross-reference to existing **FA018** are indexed. All are grounded in **English SCERT textbook-text reproductions** with printed page references. These have **not** been independently verified against the original printed page images or official Tamil editions; do not label them “original-page visually verified”.
+
+| Class and book | Unit / chapter | Printed page | Exact or narrowly described honorary title | Person | MCQ |
+| --- | --- | ---: | --- | --- | --- |
+| 12 General Nursing | 3 · Applied Psychology | 98 | Father of Psychology (source-specific label, not universally agreed) | Sigmund Freud | FA050 |
+| 12 General Nursing | 4 · Applied Sociology | 102 | Father of Sociology | Auguste Comte | FA051 |
+| 12 General Nursing | 10 · Mental Health Nursing | 220 | Father of Psychiatry (historical textbook usage) | Asclepiades of Bithynia | FA052 |
+| 12 Political Science Volume I | 8 · Planning and Development Politics | 180 | Father of the White Revolution in India | Verghese Kurien | FA053 |
+| 12 Political Science Volume I | 8 · Planning and Development Politics | 183 | Father of New Economic Policy of India | Dr. Manmohan Singh | FA054 |
+| 12 Physics Volume II | 11 · Recent Developments in Physics | 263 | Father of the modern robotics industry | Joseph Engelberger | FA055 |
+| 11 Biochemistry | 1 · Basic Concepts of Biochemistry and Cell Biology | 1 | Father of Modern Biochemistry | Carl Alexander Neuberg | FA056 |
+
+### Source links and editorial distinctions
+
+- [Class 12 General Nursing English SCERT text reproduction](https://www.scribd.com/document/981648483/12th-General-Nursing-EM-Www-tntextbooks-in-1), chapters 3, 4, and 10. The text calls Freud “Father of Psychology”, although the designation is debated: Freud founded psychoanalysis; Wundt is widely called the father of experimental psychology. **Limit FA050 to its cited course context.** It spells Comte's surname “Comete” (correct: Auguste Comte) and Asclepiades “Asciepiades” (correct: Asclepiades), so the questions use corrected names while recording the source's spellings. **FA052 is source-specific, not a claim of global consensus.**
+- [Class 12 Political Science English SCERT 2024 text reproduction](https://www.scribd.com/document/893037962/Class-12-Political-Science-English-Medium-2024-Edition-www-tntextbooks-in), Unit 8, p.180 identifies Verghese Kurien; p.183 calls Dr. Manmohan Singh Father of India's New Economic Policy. The printed MCQ on p.185 asks about the Indian Green Revolution title; FA018 gains this source without creating a duplicate.
+- [Class 12 Physics Volume II English SCERT text reproduction](https://www.scribd.com/document/685856455/12th-Physics-Vol-2-EM-Www-tntextbooks-in), Unit 11, p.263. The source distinguishes **George Devol**, inventor of Unimate, from **Joseph Engelberger**, described as father of the modern robotics industry. Do not shorten the question to “Father of Robotics”.
+- [Class 11 Biochemistry English SCERT text reproduction](https://www.scribd.com/document/1034155153/XI-biochemistry-Final-21-05-18-15-15), Unit 1, p.1 names **Carl Alexander Neuberg** Father of Modern Biochemistry.
+
+**Outstanding checks for this batch:** Independently view each original printed English page, compare original Tamil wording and prescribed 2026–27 editions, and repair any source links that fail access. These seven additions do **not** establish full Class 6–12 coverage.
 
 ## Audit process and quality rules
 
