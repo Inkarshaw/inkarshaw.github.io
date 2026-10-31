@@ -3,8 +3,11 @@ on:
   pull_request:
     paths:
       - 'scripts/inventory_tn_original_books.py'
+      - 'scripts/inventory_tnkalvi_original_books.py'
       - 'scripts/report_original_tn_coverage.py'
       - 'tests/test_original_coverage_reconciliation.py'
+      - 'tests/test_tnkalvi_original_inventory.py'
+      - 'tests/test_original_class12_economics_firsts.py'
       - 'scripts/scan_original_tn_firsts.py'
       - 'data/textbook/original-pdf-source-manifest.json'
       - 'data/special-quizzes/firsts.json'
@@ -14,6 +17,7 @@ on:
       - 'tests/test_original_class12_political_science_firsts.py'
       - 'data/textbook/original-page-review-evidence-class11-political-science-2022.json'
       - 'data/textbook/original-page-review-evidence-class12-political-science-2022.json'
+      - 'data/textbook/original-page-review-evidence-class12-economics-2019.json'
       - 'data/textbook/original-page-review-evidence-class9-2020.json'
       - '.github/workflows/original-tn-books.yml'
   workflow_dispatch:
@@ -50,6 +54,15 @@ jobs:
           name: tn-original-book-inventory
           path: tn-original-book-inventory.json
           if-no-files-found: warn
+      - name: Inventory all Classes 6–12 terms, subjects and mediums in second catalogue
+        run: python scripts/inventory_tnkalvi_original_books.py tnkalvi-original-inventory.json
+      - name: Upload second-catalogue coverage evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tnkalvi-original-book-index
+          path: tnkalvi-original-inventory.json
+          if-no-files-found: warn
       - name: Reconcile listed books against original PDF seed manifest
         run: python scripts/report_original_tn_coverage.py --inventory tn-original-book-inventory.json --output original-books-coverage.json
       - name: Upload coverage gaps and certification status
@@ -61,6 +74,10 @@ jobs:
           if-no-files-found: error
       - name: Validate Firsts provenance and bilingual questions
         run: python -m unittest discover -s tests -p test_original_tn_firsts.py -v
+      - name: Test secondary catalogue parser and honest coverage statuses
+        run: python -m unittest discover -s tests -p test_tnkalvi_original_inventory.py -v
+      - name: Check Class 12 Economics original source and excluded claims
+        run: python -m unittest discover -s tests -p test_original_class12_economics_firsts.py -v
       - name: Check historical/live catalogue reconciliation tests
         run: python -m unittest discover -s tests -p test_original_coverage_reconciliation.py -v
       - name: Check Class 12 Political Science source facts and pending Tamil review
