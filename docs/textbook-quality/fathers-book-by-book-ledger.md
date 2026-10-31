@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 35 unique MCQs drawn from 16 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 37 unique MCQs drawn from 17 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -18,11 +18,12 @@
 | 11 | History · Full Year | 3 | FA007, FA008, FA009 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 11 | Economics · Full Year, Unit 1 | 1 | FA019 | 2020 English original PDF text checked (p.22), PDF too large for screenshot; Tamil original pending |
 | 11 | Business Mathematics & Statistics · Chapters 2, 3, 8 | 3 | FA022, FA023, FA024 | English original PDF text checked (pp.25,51,178); page screenshots failed due PDF size; Tamil original pending |
-| 11 | Bio-Botany · Chapters 1, 2, 9 | 6 | FA031–FA034, FA036–FA037 | English chapter 1 pp.8,21 and chapter 9 p.168 screenshot verified; chapter 2 pages inspected as text; Tamil original pending |
+| 11 | Bio-Botany · Chapters 1, 2, 5, 9 | 8 mapped (7 distinct, plus source repeats) | FA031–FA034, FA036–FA038; FA004 | English Ch.5 pp.86,95,103 screenshots verified; existing chapters partly checked; Tamil original pending |
 | 11 | Bio-Zoology · Chapter 1 | 3 mapped (2 new + FA004 cited again) | FA035–FA036, FA004 | SCERT English Chapter 1 pp.4–5 screenshot verified; Tamil original pending |
 | 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
 | 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 12 | Commerce · Chapters 1, 16 | 2 | FA025, FA026 | SCERT English original PDF text checked (pp.8,130), PDF screenshot attempted but unavailable; Tamil original pending |
+| 12 | Bio-Botany · Chapters 2, 5, 9 | 3 mapped (1 new, 2 cross-citations) | FA039; FA016, FA018 | Original English pp.36,121,222 screenshots checked; Tamil original pending |
 | 12 | Economics · Chapters 1, 12 | 5 mapped (4 new + FA024 sourced again) | FA027–FA030; FA024 | Revised 2022 SCERT English source pp.1,5,6,257–258; original page screenshots verified; Tamil original pending |
 
 Book/question counts are based on existing curated question-bank or source-text entries. **They are not proof that every page of an original printed textbook has been reviewed.**
@@ -98,6 +99,28 @@ The same question may refer to multiple source books: Charles Babbage (Class 6 a
 
 **Review limitations:** Printed source-book page numbers are not PDF viewer indices. The English pages cited above have been visually checked; the corresponding original Tamil-medium page expressions, latest prescribed 2026–27 editions, and remaining pages of each complete book are still pending. Tamil questions/explanations are editorial translations. One combined quiz still contains all classes and source books.
 
+## Additional original textbook audit: DNA barcoding and tissue culture (31 October 2026)
+
+### Class 11 Bio-Botany, Chapter 5 — Taxonomy and Systematic Botany
+
+[2020 SCERT English chapter PDF](https://tuv.oer4pacific.org/id/eprint/215/3/Higher-Secondary-Biology-Chapter5-Taxonomy-and-Systematic-Botany.pdf). Three separate original page images were inspected:
+
+- **Printed p.86 (PDF page index 0):** **Theophrastus** is expressly called *Father of Botany*. This is already FA036, so a **new source chapter citation** was attached to the existing question instead of adding a duplicate.
+- **Printed p.95 (PDF page index 9):** **Carolus Linnaeus** is described as *Father of Taxonomy*. Existing FA004 asks about his *modern taxonomy* title and already links another original school chapter; this chapter has been added as a contextual reference, not as a repeat question.
+- **Printed p.103 (PDF page index 17):** **Paul Hebert** (spelled *Hebert* in this SCERT English page) is explicitly named *Father of barcoding* for his 2003 DNA-barcoding proposal. New **FA038** uses the more precise label *Father of DNA Barcoding*. This SCERT spelling follows the inspected page.
+
+### Class 12 Bio-Botany, Chapters 2, 5, 9
+
+Three original English chapter PDFs, from the SCERT 2019 edition, were visually inspected:
+
+- [Chapter 2, Classical Genetics, p.36 (PDF page index 1)](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-12-Botany-Chapter-2.pdf): **Gregor Johann Mendel**, *Father of Genetics*. Added a new citation to existing **FA016**, no extra question.
+- [Chapter 5, Plant Tissue Culture, p.121 (PDF page index 0)](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-12-Botany-Chapter-5.pdf): **Gottlieb Haberlandt**, *Father of Tissue Culture*. New **FA039**, describing his 1902 experiments and totipotency.
+- [Chapter 9, Plant Breeding, p.222 (PDF page index 10)](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-12-Botany-Chapter-9.pdf): **M. S. Swaminathan**, *Father of Green Revolution in India*. Added another textbook reference to existing **FA018**.
+
+**Deduplication policy:** A single question may now have multiple **chapters from the same textbook**, and the same title may also have citations to separate classes. Duplicate checking uses the *source ID* (book/chapter/page/fact), not just book ID, while the exam player continues to present one combined quiz. The `books` table lists **distinct mapped question IDs**, not merely the number of source references. Titles and their exact scope must be checked in the corresponding page image.
+
+**Review limitations:** The original English SCERT book excerpts above were checked, but neither the original Tamil medium wording nor the presently prescribed 2026–27 edition across all chapters has been audited. Source snippets do not constitute full Class 6–12 textbook completion.
+
 ## Audit process and quality rules
 
 1. Review each book and term separately: Science and Social Science (Classes 6–10) followed by History, Geography, Economics, Political Science and other relevant books (Classes 11–12).
@@ -111,7 +134,7 @@ The same question may refer to multiple source books: Charles Babbage (Class 6 a
 
 - Class 6–9: review **all remaining subject/term volumes** beyond the selected units above.
 - Class 10: selected original English page evidence from Science Units 18 and 20 is now included; the remaining Science original pages and Social Science/other books are not exhaustively checked.
-- Class 11–12: audit all remaining relevant books and chapters, including Science, Economics, Geography and Political Science, beyond selected 11th Business Mathematics, Bio-Botany, Bio-Zoology, Economics and Political Science passages, and 12th Commerce, Economics and History pages already cited.
+- Class 11–12: audit all remaining relevant books and chapters, including Science, Economics, Geography and Political Science, beyond selected 11th Business Mathematics, Bio-Botany, Bio-Zoology, Economics and Political Science passages, and 12th Bio-Botany, Commerce, Economics and History pages already cited.
 - Verify direct original-book PDF source links and corresponding Tamil-medium printed pages where a chapter bank currently supplies the English title or page.
 - Complete the original English/Tamil book-by-book coverage and duplicate checks before claiming exhaustive TNPSC/TNUSRB source coverage.
 
