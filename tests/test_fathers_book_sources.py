@@ -34,7 +34,7 @@ class FathersBookSourcesTests(unittest.TestCase):
             with self.subTest(question=q.get("id")):
                 self.assertNotIn(q["id"], ids)
                 ids.add(q["id"])
-                stem = re.sub(r"\\s+", " ", q["q_en"].lower().strip())
+                stem = re.sub(r"\s+", " ", q["q_en"].lower().strip())
                 self.assertNotIn(stem, english_stems)
                 english_stems.add(stem)
                 self.assertNotRegex(stem, r"according to (the )?textbook")
