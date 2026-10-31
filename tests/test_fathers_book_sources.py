@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 32)
-        self.assertEqual(len(self.books), 15)
+        self.assertEqual(len(self.questions), 35)
+        self.assertEqual(len(self.books), 16)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -127,13 +127,45 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("Father of Economics", by_id["FA019"]["q_en"])
         self.assertIn("Father of Capitalism", by_id["FA028"]["q_en"])
 
+    def test_zoology_botany_original_pages_and_cross_book_sources(self):
+        by_id = {q["id"]: q for q in self.questions}
+        expected = {
+            "FA035": ("Aristotle", 4, "11-bio-zoology-full"),
+            "FA036": ("Theophrastus", 8, "11-bio-botany-full"),
+            "FA037": ("E. J. Butler", 21, "11-bio-botany-full"),
+        }
+        for qid, (correct_answer, printed_page, primary_book) in expected.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], correct_answer)
+                self.assertEqual(q["page"], printed_page)
+                self.assertEqual(q["book_id"], primary_book)
+                self.assertIn("original_english_pdf_text_and_page_image_checked", q["review_status"])
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertTrue(q["edition_note"])
+        self.assertIn("Classical Taxonomy", by_id["FA035"]["q_en"])
+        self.assertIn("Indian Mycology", by_id["FA037"]["q_en"])
+        self.assertEqual(
+            {r["book_id"] for r in by_id["FA036"]["source_references"]},
+            {"11-bio-botany-full", "11-bio-zoology-full"},
+        )
+        # Adding a second textbook for Linnaeus must not produce a second MCQ.
+        self.assertEqual(
+            {r["book_id"] for r in by_id["FA004"]["source_references"]},
+            {"7-science-term-2", "11-bio-zoology-full"},
+        )
+        self.assertEqual(
+            len({r["book_id"] for r in by_id["FA004"]["source_references"]}),
+            len(by_id["FA004"]["source_references"]),
+        )
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("32 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("32 questions", self.page)
-        self.assertIn("15 source books", self.page)
+        self.assertIn("35 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("35 questions", self.page)
+        self.assertIn("16 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
