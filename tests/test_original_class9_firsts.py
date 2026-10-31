@@ -45,11 +45,16 @@ class OriginalClass9ReviewTests(unittest.TestCase):
                 self.assertEqual(q["review_status"], "original_english_pdf_text_checked_tamil_and_visual_pages_pending")
                 self.assertEqual(q["original_medium_checked"], "English")
                 self.assertIn(q["page"], self.evidence["reviewed_printed_pages"])
-                self.assertEqual(e["tamil_source_verification"], "pending")
+                if q["id"] == "F125":
+                    self.assertEqual(e["tamil_source_verification"], "2018_tamil_term2_original_text_checked_different_edition_2020_pending")
+                    self.assertEqual(q["source_ta_link"], e["tamil_source_reference_url"])
+                else:
+                    self.assertEqual(e["tamil_source_verification"], "pending")
                 self.assertEqual(e["visual_page_verification"], "pending")
                 self.assertEqual(e["answer"], q["opts_en"][q["correct"]])
                 self.assertTrue(re.search(r"[\u0B80-\u0BFF]", q["q_ta"]))
-                self.assertIsNone(q["source_ta_link"])  # Do not imply source Tamil text was inspected
+                if q["id"] != "F125":
+                    self.assertIsNone(q["source_ta_link"])
 
     def test_not_every_original_volume_is_certified(self):
         text = (ROOT / "docs/textbook-quality/original-class6-12-firsts-ledger.md").read_text(encoding="utf-8")
