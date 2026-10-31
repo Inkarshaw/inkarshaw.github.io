@@ -55,7 +55,7 @@ class PoliticalScienceSourceReviewTests(unittest.TestCase):
         self.assertGreaterEqual(len(self.quiz["questions"]), 138)
         self.assertIn("2022", self.source["edition"])
         self.assertIn("pending", self.quiz["meta"]["edition_note"].lower())
-        self.assertIn("needs visual", next(x["source_text_location"] for x in
+        self.assertIn("verify visually", next(x["source_text_location"] for x in
                       self.evidence["evidence"] if x["quiz_id"] == "F137"))
 if __name__ == "__main__":
     unittest.main()
