@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 65 unique MCQs drawn from 30 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 69 unique MCQs drawn from 35 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -22,6 +22,8 @@
 | 11 | Biochemistry · Unit 1 | 1 | FA056 | English SCERT text reproduction p.1 checked; original page image, Tamil and edition comparison pending |
 | 11 | Bio-Zoology · Chapter 1 | 3 mapped (2 new + FA004 cited again) | FA035–FA036, FA004 | SCERT English Chapter 1 pp.4–5 screenshot verified; Tamil original pending |
 | 11 | Computer Science · Chapter 1 | 1 cross-reference | FA002 | English SCERT text reproduction p.1 identifies Babbage; original printed page screenshot and Tamil original pending |
+| 11 | Textiles and Dress Designing · Chapters 14, 15 | 2 | FA068–FA069 | SCERT English reproduced text pp.153,167; Taylor and Worth explicitly labelled; page images and Tamil original pending |
+| 11 | Home Science · Chapter 5 | 1 cross-reference | FA059 | SCERT English text reproduction p.88 independently calls Lavoisier Father of Nutrition; no duplicate MCQ; Tamil original pending |
 | 11 | Vocational Nursing · Unit 3, Psychology and Sociology | 2 mapped (1 new FA067; Comte cross-reference FA051) | FA067, FA051 | Original English SCERT textbook text reproduction pp.53 and 78; Psychology title contradicts Class 12 General Nursing's Freud attribution; scope questions by book, original page images/Tamil pending |
 | 11 | Microbiology · Chapters 1, 10 | 6 | FA040–FA045 | English SCERT text reproduction pp.3, 6, 150–151 checked; original page images, Tamil and current-edition review pending |
 | 11 | Statistics · Chapter 1 | 1 cross-reference | FA030 | English SCERT text reproduction p.1 identifies Mahalanobis; original page screenshot and Tamil original pending |
@@ -35,6 +37,9 @@
 | 12 | Textiles and Dress Designing · Chapter 13 | 1 | FA064 | English SCERT text p.202 calls Luca Pacioli Father of Accounting and Bookkeeping; Tamil original/page images pending |
 | 12 | Political Science · Volume I, Unit 8 | 3 mappings (2 new, FA018 cross-source) | FA053–FA054, FA018 | English SCERT reproduction pp.180,183,185 checked; original page images and Tamil original pending |
 | 12 | Commerce · Chapters 1, 16 | 3 | FA025, FA026, FA057 | Original English textbook p.8 and pp.130,136 previously checked; 2024 English reprint text reconfirmed Fayol and Nader; new Taylor scientific-management attribution pp.4–7 is linked to explicit official TNPSC May 2024 departmental question 19; original page images and Tamil still pending |
+| 12 | Food Service Management · Chapter 7 | 1 | FA070 | English SCERT textbook reproduction p.145 explicitly calls Robert Owen **a** father of personnel management; exercise p.159; Tamil original pending |
+| 12 | Biochemistry · Units 8, 10 | 2 mapped (one new, Jenner cross-reference) | FA071, FA042 | English SCERT textbook reproduction p.187 names Lavoisier Father of Modern Chemistry; Immunology exercise p.261 repeats Jenner; Tamil pending |
+| 12 | Home Science · Unit 7 | 1 cross-reference | FA025 | English SCERT text reproduction p.183 calls Henri Fayol father of management principles; no duplicate MCQ; Tamil original pending |
 | 12 | Microbiology · Chapters 7, 9, 10, 11 | 4 | FA046–FA049 | English SCERT text reproduction pp.114, 188, 206, 241 checked; original page images, Tamil and current-edition review pending |
 | 12 | Bio-Botany · Chapters 2, 5, 9 | 3 mapped (1 new, 2 cross-citations) | FA039; FA016, FA018 | Original English pp.36,121,222 screenshots checked; Tamil original pending |
 | 12 | Economics · Chapters 1, 12 | 5 mapped (4 new + FA024 sourced again) | FA027–FA030; FA024 | Revised 2022 SCERT English source pp.1,5,6,257–258; original page screenshots verified; Tamil original pending |
@@ -270,6 +275,35 @@ Both statements appear in the printed English source text reproductions. They do
 - Class 12 Basic Mechanical Engineering calls George Devol **Father of Robotics**; Class 12 Physics FA055 uses **Father of the modern robotics industry** for Joseph Engelberger. Maintain the exact title wording.
 - The automation label for Nikola Tesla is source-specific and should not be universalized.
 - Original Tamil and current textbook source confirmation is pending. Reviewing a handful of passages in a book does **not** certify that every page of that book has been audited.
+
+## Review of Class 11/12 textiles, home science, food-service management and biochemistry (31 October 2026)
+
+This batch adds **four new bilingual titles (FA068–FA071)** and links three existing answers to additional textbooks, covering five newly indexed SCERT subject books. The selected facts and printed page numbers were checked in online **English textbook text reproductions**, not independently against photographed original page images. Tamil-medium originals and 2026–27 editions remain to be checked.
+
+| Class / source | Chapter | Printed page | Exact source designation | Person | Action |
+| --- | --- | ---: | --- | --- | --- |
+| 11 Textiles & Dress Designing | 14 Industrial Engineering | 153 | Father of Industrial Engineering | Frederick W. Taylor | FA068 new |
+| 11 Textiles & Dress Designing | 15 Fashion Concepts | 167 | Father of Haute Couture | Charles Frederick Worth | FA069 new |
+| 12 Food Service Management | 7 Human Resource Management | 145, 159 | **A** father of personnel management | Robert Owen | FA070 new |
+| 12 Biochemistry | 8 Biological Oxidation | 187 | Father of Modern Chemistry | Antoine Lavoisier | FA071 new |
+| 11 Home Science | 5 Nutrition | 88 | Father of Nutrition | Antoine Lavoisier | Add reference to FA059 |
+| 12 Home Science | 7 Entrepreneurship | 183, 197 (MCQ) | Father of Principles of Management | Henri Fayol | Add reference to FA025 |
+| 12 Biochemistry | 10 Immunology | 261 (MCQ) | Father of Immunology | Edward Jenner | Add reference to FA042 |
+
+### Checked textbook sources
+
+- [Class 11 Textiles and Dress Designing — SCERT English 2022 revision](https://www.scribd.com/document/791560626/11th-Textile-and-Dress-Designing-EM-www-tntextbooks-in): Chapter 14 p.153 explicitly gives Frederick W. Taylor's industrial engineering designation; Chapter 15 p.167 describes Charles Frederick Worth as regarded by many historians as father of haute couture.
+- [Class 12 Food Service Management — SCERT English 2020 revision](https://www.scribd.com/document/796118050/12th-Std-Food-Service-Management-EM-Optimised): Chapter 7 p.145 explicitly describes Robert Owen as **“a father of personnel management”**, rather than making him the sole father. The exercise on p.159 names him among choices. Preserve the non-exclusive wording.
+- [Class 12 Biochemistry — SCERT English revised 2020/2022](https://www.scribd.com/document/797954520/12th-Bio-Chemistry-EM-Text): Unit 8 p.187 explicitly calls Antoine Lavoisier father of modern chemistry. Unit 10 p.261 includes a multiple-choice question identifying Edward Jenner as father of immunology. The latter is a **cross-book citation for FA042**, not a new question.
+- [Class 11 Home Science — SCERT English revised 2022](https://www.scribd.com/document/785978519/11th-Home-Science-EM-Text): Chapter 5 p.88 explicitly calls Antoine Lavoisier father of nutrition and mentions his calorimeter, supporting the existing FA059 rather than creating a duplicate.
+- [Class 12 Home Science — SCERT English revised 2022](https://www.scribd.com/document/774262534/Home-Science-Class-12-Home-Science-Em-From-2019): Unit 7 p.183 explicitly calls Henri Fayol father of principles of management, with an exercise on p.197. Existing **FA025** already covers Fayol's father-of-modern-management title; this is linked as an additional source for the same management pioneer without needlessly repeating the answer.
+
+### Quality choices
+
+1. **FA068 versus FA057:** Taylor is credited with *Industrial Engineering* in the textiles course; existing FA057 covers *Scientific Management*. Distinct titles, same pioneer.
+2. **FA071 versus FA059:** Lavoisier is called *Father of Modern Chemistry* by Biochemistry and *Father of Nutrition* by Home Science and Vocational Nursing. Distinct fields, same scientist.
+3. **FA070:** The textbook uses **“a father”**, and the question does not assert a universally unique founder.
+4. **Evidence status:** Checked pages are curated extracts; do not mark all chapters of any book as complete, and do not claim original Tamil page-image verification.
 
 ## Audit process and quality rules
 
