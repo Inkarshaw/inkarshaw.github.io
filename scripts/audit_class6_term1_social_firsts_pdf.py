@@ -75,8 +75,9 @@ def main():
                                 candidate_previews.append({"pdf_page":page_num,"preview":page_text[a:b]})
                     else:
                         candidate_previews=[{"pdf_page":i,"preview":" ".join(pages[i-1].split())[:600]} for i in [101,102,103,104] if i<=len(pages)]
+                    footer_samples={str(i):" ".join(pages[i-1].split())[-140:] for i in [31,105,107] if i<=len(pages)}
                     frontmatter=" ".join(" ".join(pages[:6]).split())[:700]
-                    row={"id":spec["id"],"language":spec["lang"],"url":spec["url"],"sha256":sha,"bytes":len(data),"pdf_pages":len(pdf),"low_text_pages":missing[:100],"keyword_candidate_pages":len(candidates),"first_candidate_pdf_pages":candidates[:30],"candidate_previews":candidate_previews,"frontmatter_excerpt":frontmatter,"quiz_matches":found,"whole_volume_manual_review":False,"layout_and_image_review":False}
+                    row={"id":spec["id"],"language":spec["lang"],"url":spec["url"],"sha256":sha,"bytes":len(data),"pdf_pages":len(pdf),"low_text_pages":missing[:100],"keyword_candidate_pages":len(candidates),"first_candidate_pdf_pages":candidates[:30],"candidate_previews":candidate_previews,"footer_samples":footer_samples,"frontmatter_excerpt":frontmatter,"quiz_matches":found,"whole_volume_manual_review":False,"layout_and_image_review":False}
                     out["volumes"].append(row)
                     print("BOOK_RESULT",json.dumps(row,ensure_ascii=False),flush=True)
             except Exception as e:
