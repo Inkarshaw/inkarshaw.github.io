@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 69 unique MCQs drawn from 35 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 71 unique MCQs drawn from 38 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -22,6 +22,8 @@
 | 11 | Biochemistry · Unit 1 | 1 | FA056 | English SCERT text reproduction p.1 checked; original page image, Tamil and edition comparison pending |
 | 11 | Bio-Zoology · Chapter 1 | 3 mapped (2 new + FA004 cited again) | FA035–FA036, FA004 | SCERT English Chapter 1 pp.4–5 screenshot verified; Tamil original pending |
 | 11 | Computer Science · Chapter 1 | 1 cross-reference | FA002 | English SCERT text reproduction p.1 identifies Babbage; original printed page screenshot and Tamil original pending |
+| 11 | Computer Applications · Chapters 1, 7 | 2 mappings (FA072 new, FA002 cross-source) | FA072, FA002 | Original SCERT English PDF 2020 edition pp.1,102 searchable text verified; PDF screenshot too large; original Tamil pending |
+| 11 | Computer Technology · Chapters 1, 9 | 2 cross-source mappings (FA072 spreadsheet, FA002 Babbage) | FA072, FA002 | Original SCERT English PDF 2019 edition pp.1,135 searchable text verified; screenshot disabled; original Tamil pending |
 | 11 | Textiles and Dress Designing · Chapters 14, 15 | 2 | FA068–FA069 | SCERT English reproduced text pp.153,167; Taylor and Worth explicitly labelled; page images and Tamil original pending |
 | 11 | Home Science · Chapter 5 | 1 cross-reference | FA059 | SCERT English text reproduction p.88 independently calls Lavoisier Father of Nutrition; no duplicate MCQ; Tamil original pending |
 | 11 | Vocational Nursing · Unit 3, Psychology and Sociology | 2 mapped (1 new FA067; Comte cross-reference FA051) | FA067, FA051 | Original English SCERT textbook text reproduction pp.53 and 78; Psychology title contradicts Class 12 General Nursing's Freud attribution; scope questions by book, original page images/Tamil pending |
@@ -34,6 +36,7 @@
 | 12 | Physics · Volume II, Unit 11 | 1 | FA055 | English SCERT reproduction p.263 checked; original page image and Tamil original pending |
 | 12 | Basic Mechanical Engineering · Chapters 1, 9, 10 | 4 mapped (3 new, Taylor cross-reference) | FA061–FA063, FA057 | 2023-revised/2024-reprint SCERT English reproduced text pp.3,130–131,145; Tamil original/page images pending |
 | 12 | Computer Applications · Chapters 10, 18 | 2 | FA065–FA066 | 2023-revised SCERT English reproduced text pp.139,247,252–253; Tamil original/page images pending |
+| 12 | Computer Science · Chapter 11 | 1 new | FA073 | Revised 2023 SCERT English text reproduction p.191 explicitly names E. F. Codd; p.196 exercise repeats title; original page image and Tamil pending |
 | 12 | Textiles and Dress Designing · Chapter 13 | 1 | FA064 | English SCERT text p.202 calls Luca Pacioli Father of Accounting and Bookkeeping; Tamil original/page images pending |
 | 12 | Political Science · Volume I, Unit 8 | 3 mappings (2 new, FA018 cross-source) | FA053–FA054, FA018 | English SCERT reproduction pp.180,183,185 checked; original page images and Tamil original pending |
 | 12 | Commerce · Chapters 1, 16 | 3 | FA025, FA026, FA057 | Original English textbook p.8 and pp.130,136 previously checked; 2024 English reprint text reconfirmed Fayol and Nader; new Taylor scientific-management attribution pp.4–7 is linked to explicit official TNPSC May 2024 departmental question 19; original page images and Tamil still pending |
@@ -304,6 +307,31 @@ This batch adds **four new bilingual titles (FA068–FA071)** and links three ex
 2. **FA071 versus FA059:** Lavoisier is called *Father of Modern Chemistry* by Biochemistry and *Father of Nutrition* by Home Science and Vocational Nursing. Distinct fields, same scientist.
 3. **FA070:** The textbook uses **“a father”**, and the question does not assert a universally unique founder.
 4. **Evidence status:** Checked pages are curated extracts; do not mark all chapters of any book as complete, and do not claim original Tamil page-image verification.
+
+## Computer Applications, Computer Technology and Computer Science source review (31 October 2026)
+
+The latest check adds **two new English/Tamil MCQs** and indexes **three distinct source books**. The pair is deliberately not inflated into extra questions just because the same fact occurs in more than one class book.
+
+| Source | Printed page | Textbook title | Correct answer | Quiz action |
+| --- | ---: | --- | --- | --- |
+| Class 11 Computer Applications, Chapter 7 · Working with OpenOffice Calc | 102 | Father of the Spreadsheet | Daniel Singer “Dan” Bricklin | **New FA072** |
+| Class 11 Computer Technology, Chapter 9 · Introduction to Spreadsheet | 135 | Father of the Spreadsheet | Daniel Singer “Dan” Bricklin | Add second source to FA072 |
+| Class 12 Computer Science, Chapter 11 · Database Concepts | 191; exercise 196 | Father of the Relational Database | Edgar Frank Codd | **New FA073** |
+| Class 11 Computer Applications, Chapter 1 · Introduction to Computers | 1 | Father of the Computer | Charles Babbage | Cross-reference existing FA002 |
+| Class 11 Computer Technology, Chapter 1 · Introduction to Computers | 1 | Father of the Computer | Charles Babbage | Cross-reference existing FA002 |
+
+### Primary and text-reproduction sources
+
+- [Class 11 Computer Applications, original SCERT English revised 2020 PDF](https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-Class-11-Computer-Applications-Textbook.pdf). Printed p.102 contains a labelled **“The Father of Spreadsheet”** sidebar for **Dan Bricklin** and credits **Bob Frankston** as joint VisiCalc creator. Its Chapter 1 p.1 calls **Charles Babbage** Father of the Computer. PDF text was examined directly. PDF screenshot request failed because the file was too large (~14.7 MB), so **page-image review is not certified**.
+- [Class 11 Computer Technology, original SCERT English 2019 PDF](https://www.winmeen.com/wp-content/uploads/2020/09/11th-Std-Computer-Technology-English-Medium.pdf). Chapter 9 p.135 independently has a **Dan Bricklin — Father of Spreadsheet** sidebar. Chapter 1 p.1 also names **Charles Babbage**. Searchable PDF text was verified; PDF screenshot service returned an access failure, so no original printed-page visual verification is claimed.
+- [Class 12 Computer Science, SCERT English revised 2023 reproduction](https://www.scribd.com/document/736861822/12th-Computer-Science-EM-FTB-V23-1). Chapter 11 p.191 labels **Edgar Frank Codd** as **Father of Relational DataBase**, and its p.196 multiple-choice question repeats this. This was reviewed via the reproduced textbook text, not an original PDF screenshot.
+
+### Editorial checks
+
+- Bricklin was **co-creator**, with Frankston, of VisiCalc. The customary title is not a claim of sole invention.
+- Relational databases were pioneered by **E. F. Codd**; the entity-relationship model associated with **Peter Chen** is distinct.
+- The Computer Technology and Computer Applications chapters use the same two honorees; no duplicate FA002 or FA072 question is created.
+- These are **five audited source passages**, not an exhaustive audit of the three books. Tamil originals and the 2026–27 prescribed edition are still outstanding.
 
 ## Audit process and quality rules
 
