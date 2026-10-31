@@ -262,3 +262,10 @@ For F145–F148, the Tamil-mode Firsts player now offers the visually corroborat
 **Specific question facts cross-checked: F033–F035.** The 2025-revised government English original PDF (108 pages) and Tamil original PDF (107 pages) were both downloaded, hashed and screened; the English original PDF places the selected Computer chapter statements on PDF pages 102–103. The Tamil PDF text layer is partially corrupted, so the exact Tamil phrasing was also checked against a separate 2025 Tamil textbook transcription. **This is partial fact corroboration, not whole-book certification or a 2026–27 prescribed-edition sign-off.**
 
 [See the per-volume evidence with SHA-256 source fingerprints, page locations, method and limitations](class6-term1-original-pdf-2025-review.md). **Fully certified original-book pairs remain 0**, and the historical 251 catalogue listings remain an inventory baseline, not a count of signed-off books.
+
+
+## 31 October 2026: Book 2 — Class 6 Term I Social Science (bilingual)
+
+2025-revised original PDFs in both languages successfully downloaded and hashed: **110 pages per medium**. Two existing Firsts Quiz answers have selected original English page-text and Tamil-transcription corroboration: **F043 Charles Masson** (original printed p.133, PDF p.31) and **F044 Viswanathan Anand** (narrative printed p.207/PDF p.105, exercise printed p.209/PDF p.107). The Tamil original PDF has a partly garbled text layer; visual and complete original-volume review remain open. This also exposed further candidate Firsts such as Uranus/William Herschel, Chandrayaan-1, Ambedkar and Anand's first-grandmaster achievement.
+
+[Read the separate 2025 Social Science original-PDF evidence and pending candidate list](class6-term1-social-original-pdf-2025-review.md). **Whole-book English/Tamil certifications still = 0**; the selective five-question (F033–F035, F043–F044) check does not establish completeness.
