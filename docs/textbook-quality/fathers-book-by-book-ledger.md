@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 74 unique MCQs drawn from 39 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 77 unique MCQs drawn from 39 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -45,7 +45,7 @@
 | 12 | Biochemistry · Units 8, 10 | 2 mapped (one new, Jenner cross-reference) | FA071, FA042 | English SCERT textbook reproduction p.187 names Lavoisier Father of Modern Chemistry; Immunology exercise p.261 repeats Jenner; Tamil pending |
 | 12 | Home Science · Unit 7 | 1 cross-reference | FA025 | English SCERT text reproduction p.183 calls Henri Fayol father of management principles; no duplicate MCQ; Tamil original pending |
 | 12 | Microbiology · Chapters 7, 9, 10, 11 | 4 | FA046–FA049 | English SCERT text reproduction pp.114, 188, 206, 241 checked; original page images, Tamil and current-edition review pending |
-| 12 | Bio-Botany · Chapters 2, 5, 9 | 3 mapped (1 new, 2 cross-citations) | FA039; FA016, FA018 | Original English pp.36,121,222 screenshots checked; Tamil original pending |
+| 12 | Bio-Botany · Chapters 2, 5, 6, 9 | 6 mapped (4 new, 2 cross-citations) | FA039, FA077–FA079; FA016, FA018 | Original older English pp.36,121,222 screenshots previously checked; new revised-2023/reprinted-2024 English Ch6 p.109 text checked (Ecology, Modern Ecology, Indian Ecology), but screenshot and Tamil pending |
 | 12 | Economics · Chapters 1, 12 | 5 mapped (4 new + FA024 sourced again) | FA027–FA030; FA024 | Revised 2022 SCERT English source pp.1,5,6,257–258; original page screenshots verified; Tamil original pending |
 
 Book/question counts are based on existing curated question-bank or source-text entries. **They are not proof that every page of an original printed textbook has been reviewed.**
@@ -352,6 +352,20 @@ The latest reviewed source is the [Class 11 Political Science English SCERT text
 - The title **Father of Postmodernism** also appears as an exercise question in Class 11 Political Science Unit 9, p.184; **no new quiz entry was made** because the four choices include multiple postmodernism-associated thinkers and the provided extracted passage does not itself establish an unambiguous answer.
 
 **Originality and verification:** The English reproduced text and printed-page labels were inspected. Original PDF page screenshots, original Tamil-medium wording and currently prescribed 2026–27 editions remain unchecked. Record these as pending rather than certifying full Class 11 Political Science coverage.
+
+## Class 12 Bio-Botany — three ecology 'Father of' titles (31 October 2026)
+
+**Book:** [Higher Secondary Second Year Biology – Botany, revised 2023 / reprinted 2024, English SCERT textbook reproduction](https://www.scribd.com/document/775474627/12th-Bio-Botany-EM-Text). This is a new chapter review under the already indexed **Class 12 Bio-Botany** source, not a new book.
+
+**Selected page inspected:** **Chapter 6, *Principles of Ecology*, printed p.109** (Unit IX: Plant Ecology). The lesson directly lists all three differently qualified titles in the same box, while separately crediting Ernst Haeckel with an influential definition of ecology.
+
+| Question | Printed title in the SCERT English source | Answer used in quiz | Detail |
+| --- | --- | --- | --- |
+| FA077 | Father of Ecology | Alexander von **Humboldt** | Source spells surname **“Humbolt”**; broader title also given to **Ernst Haeckel** by some other references, so question is explicitly confined to Class 12 Bio-Botany |
+| FA078 | Father of modern Ecology | **Eugene P. Odum** | Ecosystem ecology pioneer; distinguish from broad 'Father of Ecology' |
+| FA079 | Father of Indian Ecology | **R. Misra** | Preserve first initial as in textbook; distinguish from global/modern ecology titles |
+
+**Review status and caution:** The printed p.109 SCERT English text was read in the complete online 2024-reprinted textbook reproduction. Original PDF page-image inspection, Tamil-medium page comparison and the currently prescribed 2026–27 edition have **not** been independently checked. The claims are explicitly customary textbook titles and must not be presented as official exclusive awards. The rest of Chapter 6 and all 6–12 books remain subject to ongoing page-by-page audit.
 
 ## Audit process and quality rules
 
