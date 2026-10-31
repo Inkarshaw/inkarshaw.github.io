@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 79 unique MCQs drawn from 40 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 81 unique MCQs drawn from 42 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -10,10 +10,12 @@
 | --- | --- | ---: | --- | --- |
 | 6 | Science · Term I | 1 | FA002 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 6 | Social Science · Term II | 1 | FA003 | Curated from existing quiz bank; full original English/Tamil scan pending |
+| 7 | Social Science · Term I · Economics Unit 1 | 1 cross-reference | FA019 | 2019 SCERT English combined-volume text printed p.206 directly identifies Adam Smith as Father of Economics; Tamil original pending |
 | 7 | Science · Term II | 1 | FA004 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 8 | Science · Term I | 1 | FA002 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 9 | Science · Full Year | 1 | FA006 | Curated from existing quiz bank; full original English/Tamil scan pending |
-| 9 | Social Science · Full Year | 2 | FA001, FA005 | Curated from existing quiz bank; full original English/Tamil scan pending |
+| 9 | Social Science · Full Year, History 1/8 and Civics 5 | 3 mapped | FA001, FA005, FA076 | 2023 SCERT English reproduction, Civics Unit 5 p.272 explicitly calls Lord Ripon Father of Local Government; History questions previously curated; Tamil original pending |
+| 10 | Social Science · Full Year, History 4/10 and Civics 1 | 3 mapped (2 new, one Ambedkar cross-reference) | FA082–FA083, FA003 | Revised-2025 SCERT English text pp.41,117,239 inspected; 2025 original page images/Tamil originals pending |
 | 10 | Science · Full Year, Units 18 & 20 | 3 | FA016, FA017, FA018 | English original PDF text and visible page screenshots checked (pp. 261, 287); Tamil and current-edition comparison pending |
 | 11 | History · Full Year | 3 | FA007, FA008, FA009 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 11 | Economics · Full Year, Unit 1 | 1 | FA019 | 2020 English original PDF text checked (p.22), PDF too large for screenshot; Tamil original pending |
@@ -391,6 +393,31 @@ This continuation adds **two new English–Tamil MCQs (FA080–FA081)** from Cla
 - The *American* qualifier is essential for Samuel Slater: do not conflate the American and British Industrial Revolutions.
 - Class 11 Accountancy is newly indexed only for the cited **Unit 14, printed p.327**, not the complete 14-unit book; the source was selected for an exact explicit Father reference.
 - The sources are searchable English SCERT textbook reproductions, not independently checked original printed page images. Original Tamil-medium wording, revised/current 2026–27 editions and complete Classes 6–12 chapter-by-chapter coverage remain unverified.
+
+## Lower-class audit: Classes 7, 9, 10 Social Science (31 October 2026)
+
+This batch deliberately prioritises the underrepresented lower school books. It adds **two new factual bilingual MCQs** (FA082–FA083) and **three cross-book references** (FA003, FA019, FA076), while indexing **two new source books**. Each page below was read in the identified SCERT English textbook reproduction, rather than reconstructed from coaching notes.
+
+| Class / unit | Printed page | Source wording | Answer | Action |
+| --- | ---: | --- | --- | --- |
+| 10 Social Science, History Unit 4 · The World After World War II | **41** | Father of Modern China | **Sun Yat-sen** | New FA082 |
+| 10 Social Science, History Unit 10 · Social Transformation in Tamil Nadu | **117** (exercise 123) | Father of Tamil Linguistic Purism | **Maraimalai Adigal** | New FA083 |
+| 10 Social Science, Civics Unit 1 · Indian Constitution | **239** | Father of the Constitution of India | **B. R. Ambedkar** | Add reference FA003 |
+| 9 Social Science, Civics Unit 5 · Local Self Government | **272** | Father of Local Government | **Lord Ripon** | Add reference FA076 |
+| 7 Social Science, Term I, Economics Unit 1 · Production | **206** | Father of Economics | **Adam Smith** | Add reference FA019 |
+
+### English textbook sources verified
+
+- [Class 10 Social Science, revised **2025** English SCERT textbook reproduction](https://www.scribd.com/document/1054719724/Class-10-Social-Science-English-2025-Edition-www-tntextbooks-in): History Unit 4 p.41 directly calls **Dr. Sun Yat-sen** Father of Modern China. History Unit 10 p.117 directly calls **Maraimalai Adigal** father of Tamil linguistic purism and founder of **Tani Tamil Iyakkam**, and its p.123 fill-in-the-blank repeats the title. Civics Unit 1 p.239 names **Dr. B. R. Ambedkar** Father of the Constitution of India.
+- [Class 9 Social Science, revised-2023 English SCERT reproduction](https://www.scribd.com/document/762726313/9th-social-Science): Civics Unit 5, p.272 describes **Lord Ripon** as Father of Local Government for the 1882 resolution. Existing FA076 already tests this person/title and is cross-referenced, not duplicated.
+- [Class 7 Term I combined Science/Social Science, SCERT 2019 English reproduction](https://www.scribd.com/document/461052380/7-T1-SciSoc-EM-pdf): Social Science Economics Unit 1 p.206 explicitly identifies **Adam Smith** as Father of Economics. Existing FA019 is linked rather than duplicated.
+
+### Editorial safeguards
+
+- FA083 distinguishes **Maraimalai Adigal**, associated with Tamil linguistic purism and the Pure Tamil Movement, from **Parithimar Kalaignar**, who advocated classical-language recognition for Tamil.
+- FA082 keeps the exact historical designation *Father of Modern China*; it is a traditional description, not an official award.
+- The cited 2025 English edition is newer than several earlier sources. It still does **not** establish whether the prescribed 2026–27 book has changed.
+- Original Tamil-medium page texts and the original printed page images have **not** been independently verified. The index lists only the reviewed passages, not a full textbook audit.
 
 ## Audit process and quality rules
 
