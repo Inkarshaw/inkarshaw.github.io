@@ -29,6 +29,7 @@ ALLOWED_HOSTS = {
     "www.srivenkateshwaraopenschool.com",
     "siddhiias.com",
     "nammakalvi.com",
+    "www.nesto.in",
     "cdn1.byjus.com",
 }
 EN_PATTERN = re.compile(
