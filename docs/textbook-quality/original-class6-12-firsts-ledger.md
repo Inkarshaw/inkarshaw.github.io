@@ -170,3 +170,10 @@ The 31 October GitHub Actions inventory retrieved **all 14 class/medium catalogu
 **Interpretation:** 215 is not the final number of original government textbooks, physical volumes, separate terms, current editions or units. The crawler filters archive sub-page links and may omit titles represented through another page structure; 251 may have included repeated formats. Neither figure establishes coverage of all 2026–27 prescribed SCERT books. The script `scripts/report_original_tn_coverage.py` now ingests `tn-original-book-inventory.json` as a **separate live count**, reports differences by class and medium, and refuses to treat 16 seed source records as a percentage of 215 or 251. A source title-to-edition canonical inventory is still required.
 
 GitHub CI inventory run before this reconciliation: https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41169349147 (14 archive pages, 215 detail listings). The new version includes safeguards and unit tests to ensure a future different live count is not silently treated as the historical baseline.
+
+
+### Class 12 full-PDF machine scan failure and remediation
+
+GitHub Actions attempt https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41169349147 to download and mechanically scan the **2022-revised Class 12 Political Science English PDF** failed with `<urlopen error timed out>`. **No 2022 Class 12 page count, full-PDF text-hits count, unreadable-page count, or SHA-256 hash was obtained.** Earlier CI had `continue-on-error: true`, so its top-level extraction job appeared green despite the error. This has been changed to fail on real extraction errors, with the automated PR smoke extraction temporarily restored to the previously accessible Class 9 original source; the Class 12 URL must be repaired or an equivalent edition mirror found before rerunning it.
+
+The five Class 12 facts above were reviewed from *selected PDF passages exposed by the source reader* and independently corroborated. That is a strictly narrower achievement than a full original-textbook scan or full printed-page certification.
