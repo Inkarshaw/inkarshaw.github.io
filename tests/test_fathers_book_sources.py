@@ -20,8 +20,8 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 35)
-        self.assertEqual(len(self.books), 16)
+        self.assertEqual(len(self.questions), 37)
+        self.assertEqual(len(self.books), 17)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
         self.assertIn("source_references", self.page)
@@ -152,20 +152,51 @@ class FathersBookSourcesTests(unittest.TestCase):
         # Adding a second textbook for Linnaeus must not produce a second MCQ.
         self.assertEqual(
             {r["book_id"] for r in by_id["FA004"]["source_references"]},
-            {"7-science-term-2", "11-bio-zoology-full"},
+            {"7-science-term-2", "11-bio-zoology-full", "11-bio-botany-full"},
         )
         self.assertEqual(
-            len({r["book_id"] for r in by_id["FA004"]["source_references"]}),
+            len({r["source_id"] for r in by_id["FA004"]["source_references"]}),
             len(by_id["FA004"]["source_references"]),
         )
+
+    def test_dna_barcoding_tissue_culture_and_multi_chapter_citations(self):
+        by_id = {q["id"]: q for q in self.questions}
+        additions = {
+            "FA038": ("Paul Hebert", 11, 103, "chapter-5"),
+            "FA039": ("Gottlieb Haberlandt", 12, 121, "chapter-5"),
+        }
+        for qid, (person, grade, printed_page, chapter) in additions.items():
+            with self.subTest(question=qid):
+                q = by_id[qid]
+                self.assertEqual(q["opts_en"][q["correct"]], person)
+                self.assertEqual(q["class_no"], grade)
+                self.assertEqual(q["page"], printed_page)
+                self.assertEqual(q["chapter_id"], chapter)
+                self.assertIn("original_english_pdf_text_and_page_image_checked", q["review_status"])
+                self.assertIn("tamil_original_pending", q["review_status"])
+                self.assertEqual(len(q["source_references"]), 1)
+        # Multiple pages from the same source book are allowed when chapters differ.
+        expected = {
+            "FA036": ("11-bio-botany-full", 86),
+            "FA004": ("11-bio-botany-full", 95),
+            "FA016": ("12-bio-botany-full", 36),
+            "FA018": ("12-bio-botany-full", 222),
+        }
+        for qid, (book, page) in expected.items():
+            with self.subTest(existing=qid):
+                refs = by_id[qid]["source_references"]
+                self.assertTrue(any(r["book_id"] == book and r["page"] == page for r in refs))
+                self.assertEqual(len({r["source_id"] for r in refs}), len(refs))
+        self.assertEqual(len(by_id["FA036"]["source_references"]), 3)
+        self.assertEqual(len(by_id["FA004"]["source_references"]), 3)
 
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("35 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("35 questions", self.page)
-        self.assertIn("16 source books", self.page)
+        self.assertIn("37 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("37 questions", self.page)
+        self.assertIn("17 source books", self.page)
 
 if __name__ == "__main__":
     unittest.main()
