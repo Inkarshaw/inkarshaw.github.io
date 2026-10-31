@@ -4,7 +4,7 @@
 **Quiz:** [ClearExams Firsts Quiz](../../textbook-firsts.html)  
 **Bank:** `data/special-quizzes/firsts.json`, revision 11  
 **Scope:** Entire 148-question published *curated bank*, Classes 6–12  
-**Sign-off classification:** **STRUCTURAL / TARGETED EDITORIAL + CHROMIUM FUNCTIONAL QA PASSED**, GitHub Actions [Audit TN Textbook Firsts run 41189707667](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41189707667) on 31 October 2026. **NOT ORIGINAL-TEXTBOOK CERTIFIED.** Live production availability remains unverified.
+**Sign-off classification:** **STRUCTURAL / TARGETED EDITORIAL + CHROMIUM FUNCTIONAL QA PASSED**, GitHub Actions [Audit TN Textbook Firsts run 41189707667](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41189707667) on 31 October 2026. **NOT ORIGINAL-TEXTBOOK CERTIFIED.** Live production HTTP deployment independently verified on 31 October 2026 via [GitHub Actions live check 41190241454](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41190241454).
 
 ## Certification boundaries (read before using the badge)
 
@@ -15,7 +15,7 @@
 | Quiz player: 20-question default, skip, unanswered scoring, retry, Tamil toggle, restore, mobile layout | **PASS**: real Chromium mobile/bilingual smoke tests in GitHub Actions run 41189707667 | `tests/test_firsts_browser_smoke.py` |
 | Direct English/Tamil original textbook verification for every MCQ | **NOT CERTIFIED** | Many records still derive from unit banks rather than edition/page-checked originals |
 | Complete coverage of all Firsts in 2026–27 TN School Books, both media, all classes/subjects/terms | **NOT CERTIFIED** | Source archive/edition inventory and manual complete-book review unfinished |
-| Live site deployment and HTTP availability | **NOT CERTIFIED by this change** | Verify production after merge; do not infer from branch contents |
+| Live site deployment and HTTP availability | **PASS — live HTTP and release-fingerprint check** | External GitHub runner returned HTTP 200 for quiz page, JSON and homepage; 11 release assertions passed (run 41190241454). Not a direct live-browser interactive test. |
 
 ## Inventory reproduced from bank
 
@@ -48,8 +48,22 @@ The PR workflow `.github/workflows/firsts-audit.yml` runs existing question-bank
 - Retry wrong/unanswered, Tamil language switch, and reload restoration.
 - Topic + class filtering; All-questions mode; mobile viewport overflow.
 
-**Verified CI result:** [Audit TN Textbook Firsts run 41189707667](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41189707667) completed **successfully** on 31 October 2026, including structural/editorial and actual Chromium mobile-player tests. Other PR CI workflows (quiz/text quality, content trust/UX, main mobile smoke, original-volume inventory) also passed for this revision. Factual textbook certification and live-domain availability remain open.
+**Verified CI result:** [Audit TN Textbook Firsts run 41189707667](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41189707667) completed **successfully** on 31 October 2026, including structural/editorial and actual Chromium mobile-player tests. Other PR CI workflows (quiz/text quality, content trust/UX, main mobile smoke, original-volume inventory) also passed for this revision. Factual textbook certification remains open. Live HTTP deployment was subsequently confirmed by [independent GitHub-hosted request tests](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41190241454), including matching the v11 bank, 148 records, corrected items, homepage category counts and new UI controls.
 
 ## Recommendation
 
 Do not display a general **“TN School Books Fully Certified”** badge. The accurate public description is: **“148 bilingual, curated Firsts MCQs; structural QA tested; original textbook source audit in progress.”** Publish further *source-verified* additions only with edition IDs, original English/Tamil page evidence, reviewed explanations, independent verification for contested firsts, and a completed per-book checklist.
+
+## 31 October 2026: independent production HTTP verification
+
+**Method:** GitHub-hosted Ubuntu runner performed real DNS lookup and three uncached public HTTPS GET requests against `clearexams.ink`, independent of this assistant's network and GitHub repository file fetching.
+
+| Live request | HTTP status |
+| --- | --- |
+| `https://clearexams.ink/textbook-firsts.html` | **200** |
+| `https://clearexams.ink/data/special-quizzes/firsts.json` | **200** |
+| `https://clearexams.ink/` | **200** |
+
+**Published release fingerprint:** 148 questions, bank version 11, 20-question set size; updated skip/unanswered/20-question-default UI; homepage women/history/science counts 26/96/26; corrected F042 and F052 choices. **11 of 11 checks passed.** GitHub Actions run: [Verify live Firsts Quiz deployment #41190241454](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41190241454).
+
+This confirms the live site serves the updated HTML and JSON at that observation time. It does **not** establish that all external source links work, that every original textbook fact is certified, or that a live-site interactive browser session has been tested.
