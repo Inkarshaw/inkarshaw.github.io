@@ -81,10 +81,59 @@ def inspect_original(pdf_path, source_id):
         "book_fully_reviewed": False, "tamil_original_fact_confirmations": 0,
     }
 
+
+# Small visual excerpts from search hits, NOT full textbook pages.
+# Keyed by PDF page index (1-based), never confused with printed book pages.
+PREVIEW_SAMPLES = {
+    "c12-economics-2024-tamil": [
+        ("F144", 325, "ரேக்னர்"),
+        ("F145", 117, "ரிக்ஸ் வங்"),
+        ("F146", 127, "ஓஸ்போர்ன்"),
+        ("F147", 127, "சூரி"),
+        ("F148", 196, "சிங்கப்பூர்"),
+    ],
+}
+
+def render_small_source_excerpts(pdf_path, source_id, output_dir):
+    """Render only short source snippets around a matching term for human comparison."""
+    dest = Path(output_dir)
+    dest.mkdir(parents=True, exist_ok=True)
+    doc = fitz.open(pdf_path)
+    records = []
+    for quiz_id, pdf_page, term in PREVIEW_SAMPLES.get(source_id, []):
+        if pdf_page > len(doc):
+            records.append({"quiz_id": quiz_id, "pdf_page": pdf_page, "rendered": False,
+                            "error": "page_out_of_range"})
+            continue
+        page = doc.load_page(pdf_page - 1)
+        matches = page.search_for(term)
+        if not matches:
+            records.append({"quiz_id": quiz_id, "pdf_page": pdf_page, "rendered": False,
+                            "error": "term_not_located_in_page_geometry"})
+            continue
+        rect = matches[0]
+        # Upper bound prevents accidental capture of whole copyrighted pages.
+        clip = fitz.Rect(rect.x0 - 110, rect.y0 - 35, rect.x1 + 170, rect.y1 + 40)
+        clip = clip & page.rect
+        if clip.width > 420 or clip.height > 130:
+            raise ValueError("source snippet clip exceeds review-size limit")
+        filename = f"{quiz_id}-pdf-page-{pdf_page}.png"
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=clip, alpha=False)
+        pix.save(str(dest / filename))
+        records.append({"quiz_id": quiz_id, "pdf_page": pdf_page, "rendered": True,
+                        "filename": filename, "clip_rect": [round(v, 1) for v in clip]})
+    doc.close()
+    (dest / "snippet-index.json").write_text(json.dumps(
+        {"source_id": source_id, "source_image_type": "brief cropped PDF text excerpt",
+         "visual_excerpt_not_complete_page_review": True, "results": records},
+        ensure_ascii=False, indent=2) + "\n", encoding="utf8")
+    return records
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--id", default="c12-economics-2024-tamil", choices=sorted(TARGETS))
     parser.add_argument("--output", default="tamil-original-firsts-targets.json")
+    parser.add_argument("--preview-dir", default=None, help="Render only five bounded text snippets for editorial visual review")
     args = parser.parse_args()
     sources = json.loads(SOURCE_FILE.read_text(encoding="utf8"))["volumes"]
     source = next(x for x in sources if x["id"] == args.id)
@@ -95,6 +144,8 @@ def main():
         dest = Path(tmp) / "source.pdf"
         provenance = fetch_pdf(url, dest)
         result = inspect_original(dest, args.id)
+        if args.preview_dir:
+            result['small_source_snippets'] = render_small_source_excerpts(dest, args.id, args.preview_dir)
     result.update(provenance)
     result["source_url"] = url
     result["source_edition_from_catalogue"] = source["edition"]
