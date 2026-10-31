@@ -20,7 +20,7 @@ class FathersBookSourcesTests(unittest.TestCase):
     def test_one_quiz_for_all_books(self):
         self.assertEqual(len(self.questions), self.data["meta"]["count"])
         self.assertEqual(len(self.books), self.data["meta"]["book_count"])
-        self.assertEqual(len(self.questions), 54)
+        self.assertEqual(len(self.questions), 55)
         self.assertEqual(len(self.books), 25)
         self.assertIn("data/special-quizzes/fathers.json", self.page)
         self.assertIn("filteredBank()", self.page)
@@ -221,12 +221,31 @@ class FathersBookSourcesTests(unittest.TestCase):
         self.assertIn("not universally agreed", by_id["FA050"]["exp_en"])
         self.assertIn("not a universal designation", by_id["FA052"]["exp_en"])
 
+    def test_scientific_management_title_and_2024_scert_references(self):
+        by_id = {q["id"]: q for q in self.questions}
+        taylor = by_id["FA057"]
+        self.assertEqual(taylor["opts_en"][taylor["correct"]], "Frederick Winslow Taylor")
+        self.assertEqual(taylor["book_id"], "12-commerce-full")
+        self.assertEqual(taylor["chapter_id"], "chapter-1")
+        self.assertIn("does not explicitly use the Father title", taylor["exp_en"])
+        self.assertTrue(taylor["external_exam_source"].startswith("https://tnpsc.gov.in/"))
+        self.assertEqual(len(taylor["opts_en"]), len(taylor["opts_ta"]))
+        self.assertEqual(
+            by_id["FA025"]["opts_en"][by_id["FA025"]["correct"]], "Henry Fayol"
+        )
+        self.assertEqual(
+            next(b for b in self.books if b["id"] == "12-commerce-full")["count"], 3
+        )
+        for qid in ("FA025", "FA026"):
+            self.assertTrue(any("SCERT12-COMMERCE-2024-" in r["source_id"]
+                                for r in by_id[qid]["source_references"]))
+
     def test_website_entrypoints(self):
         for name in ("index.html", "textbook-quiz.html", "search.html", "sitemap.xml"):
             with self.subTest(file=name):
                 self.assertIn("textbook-fathers.html", (ROOT / name).read_text(encoding="utf-8"))
-        self.assertIn("54 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
-        self.assertIn("54 questions", self.page)
+        self.assertIn("55 unique", (ROOT / "textbook-quiz.html").read_text(encoding="utf-8"))
+        self.assertIn("55 questions", self.page)
         self.assertIn("25 source books", self.page)
 
 if __name__ == "__main__":
