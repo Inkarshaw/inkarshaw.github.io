@@ -99,7 +99,7 @@ A mechanical scan of a PDF, even one covering every page, **does not** establish
 - [ ] Resolve Swadesamitran and any other conflicts against authoritative original sources before claiming certified facts.
 - [ ] Re-run site navigation, bilingual tests, source integrity tests and actual mobile-player test, then publish a signed-off per-volume list.
 
-**Current honest status:** initial catalogue list established; selected pages from older original Class 8, 9 and 10 English Social Science editions have been *partially* reviewed; remaining pages, Tamil counterparts and newer original volumes require review. The Firsts Quiz contains **133 curated bilingual questions**; this does **not** establish complete Class 6–12 original-textbook coverage.
+**Current honest status:** initial catalogue list established; selected pages from older original Class 8, 9 and 10 English Social Science editions have been *partially* reviewed; remaining pages, Tamil counterparts and newer original volumes require review. The Firsts Quiz contains **138 curated bilingual questions**; this does **not** establish complete Class 6–12 original-textbook coverage.
 
 
 ## 31 October continuation: measurable certification gaps
@@ -109,3 +109,24 @@ The audit now runs `scripts/report_original_tn_coverage.py` in CI and uploads `o
 The report explicitly records that the original-source seed registry is **not exhaustive**, that listed titles are **not certified**, and that there are **zero demonstrated fully signed-off book pairs**. Downloading and extracting text never changes certification automatically. A future per-volume sign-off must include complete chapter/page coverage, printed edition identity, text/visual review and both language versions.
 
 **Next source-work priority:** establish a one-to-one stable edition manifest from all 14 class/medium catalogue pages; download each accessible official PDF; log URL, content hash, page count and unreadable pages; review all pages and both editions; reconcile conflicting firsts; only then certify the title and publish further questions. The present change adds an audit safeguard, not new original-page claims.
+
+
+## 31 October: selected original Class 11 Political Science review
+
+The **2018 first edition, revised 2019/2020/2022** English SCERT *Higher Secondary First Year Political Science* original PDF was identified using its inner title/printing page: https://www.srivenkateshwaraopenschool.com/wp-content/uploads/2023/11/11th_Political_Science_EM-www.tntextbooks.in_.pdf .
+
+**Five bilingual MCQs (F134–F138) were added** (133 → **138**), with uniquely keyed original page evidence in `data/textbook/original-page-review-evidence-class11-political-science-2022.json`:
+
+| Unit | Printed page (textual attribution) | Fact selected | Quiz |
+| --- | ---: | --- | --- |
+| 8: Political Ideologies – Part I | 139 | Margaret Thatcher: first woman UK Prime Minister | F134 |
+| 13: Social Justice | 251 | Kaka Kalelkar chaired the First Backward Classes Commission (1953) | F135 |
+| 14: Political Developments in Tamil Nadu | approximately 267 | A. Subbarayalu Reddiar headed first Justice Party ministry after 1920 dyarchy election | F136 |
+| 14: Political Developments in Tamil Nadu | approximately 269 | First provincial Self-Respect Conference held at Chengalpattu in 1929 | F137 |
+| 15: Tamil Nadu Political Thought | 288 | Subramania Bharati's *India* weekly pioneered political cartoons in Tamil Nadu | F138 |
+
+These are **selected source-text confirmations, not a full book review**. Both page locations in Unit 14 should be cross-checked visually before final edition certification; the PDF screenshot provider could not render this large mirror. An independently matching Tamil original has **not** been checked. Current prescribed 2026 editions are not established by the 2022 imprint. An independent history work corroborates the 1929 Chengalpattu conference (Tamil Nadu History Congress: https://www.tnhc.org.in/docs/proceedings/Chidambaram-2012.pdf), and other sources are linked per evidence record.
+
+The original source seed manifest now has **15 entries**, compared with **251 historical English/Tamil archive listings**. This is **not** evidence that only 15 textbooks exist or that 236 identifiable PDFs are missing; the manifest is an incomplete, mixed-granularity seed registry.
+
+**Status remains: zero volumes fully signed off for 2026–27 English and Tamil editions.** Original-book audit must continue across all other chapters, images, source revisions, and missing course subjects.
