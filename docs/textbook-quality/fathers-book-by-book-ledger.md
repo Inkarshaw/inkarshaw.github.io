@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 55 unique MCQs drawn from 25 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 58 unique MCQs drawn from 26 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -27,6 +27,7 @@
 | 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
 | 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 12 | General Nursing · Chapters 3, 4, 10 | 3 | FA050–FA052 | English SCERT reproduction pp.98, 102, 220 checked; includes qualified textbook-specific titles and printed spelling corrections; Tamil original pending |
+| 12 | Vocational Nursing (Theory & Practical) · Chapters 1, 4 | 3 | FA058–FA060 | SCERT original English PDF directly inspected as searchable text: printed pp.16,104; PDF screenshot too large; Tamil original/current edition pending |
 | 12 | Physics · Volume II, Unit 11 | 1 | FA055 | English SCERT reproduction p.263 checked; original page image and Tamil original pending |
 | 12 | Political Science · Volume I, Unit 8 | 3 mappings (2 new, FA018 cross-source) | FA053–FA054, FA018 | English SCERT reproduction pp.180,183,185 checked; original page images and Tamil original pending |
 | 12 | Commerce · Chapters 1, 16 | 3 | FA025, FA026, FA057 | Original English textbook p.8 and pp.130,136 previously checked; 2024 English reprint text reconfirmed Fayol and Nader; new Taylor scientific-management attribution pp.4–7 is linked to explicit official TNPSC May 2024 departmental question 19; original page images and Tamil still pending |
@@ -215,6 +216,22 @@ Read the [2024-reprint SCERT English Geography text reproduction](https://www.sc
 - TNPSC 2024 official PDF: exact phrase and competing options inspected in searchable text; screenshot endpoint timed out.
 - The original Tamil-medium wording, prescribed 2026–27 updates and complete page-by-page Class 6–12 coverage are **still pending**.
 - Do not confuse **Father of Scientific Management — F. W. Taylor** with **Father of Modern Management — Henri Fayol**.
+
+## Class 12 Vocational Nursing — original SCERT PDF text review (31 October 2026)
+
+This is **Vocational Education Nursing (Theory & Practical)**, a distinct publication from the **Class 12 General Nursing** book already indexed. [Read the original government SCERT Nursing Vocational English textbook PDF, first edition 2019 / revised 2020](https://samacheerkalvistudents.in/Books/Books%20samacheerkalvi/12th%20std%20school%20books/New%20Books/Vocational%20Subject%20English/12th_Nursing_Vocational_EM.pdf).
+
+The PDF was opened as the actual SCERT book with its title/edition page, and its searchable text was inspected for each explicit "Father of" designation. The PDF screenshot service rejected this approximately 43 MB file, so none of these three page images is claimed to have been visually checked. Original Tamil-medium and 2026–27 prescribed editions also remain pending.
+
+| Chapter | Printed page | Exact English textbook designation | Person | Quiz ID |
+| --- | ---: | --- | --- | --- |
+| 1 · Home Nursing, AYUSH / Yoga section | 16 | Father of Yoga | Maharishi Patanjali | FA058 |
+| 4 · Nutrition, introductory section | 104 | Father of Nutrition | Antoine Lavoisier | FA059 |
+| 4 · Nutrition, introductory section | 104 | Father of Medicine | Hippocrates | FA060 |
+
+**Page detail:** The text calls Patanjali the Father of Yoga at printed p.16, in the context of classical yoga philosophy. Printed p.104 separately attributes Nutrition to Lavoisier and Medicine to Hippocrates; the two labels belong to different people and should not be confused. These are traditional honorific descriptions and do not assert exclusive invention of either field.
+
+**Audit discipline:** The full PDF is available as a searchable text source, but the selected lines are not evidence that all chapters were exhaustively reviewed; this batch records two chapters and their relevant pages only.
 
 ## Audit process and quality rules
 
