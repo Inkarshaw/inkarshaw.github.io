@@ -1,0 +1,33 @@
+name: Check Class 6 Term 1 original PDFs for Firsts
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/class6-firsts-source-check.yml'
+      - 'scripts/audit_class6_term1_firsts_pdf.py'
+      - 'scripts/audit_class6_term1_social_firsts_pdf.py'
+  workflow_dispatch:
+jobs:
+  compare-original-pdfs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PDF reader and public file downloader
+        run: python -m pip install pymupdf gdown
+      - name: Inspect Class 6 Science Term I in English and Tamil originals
+        run: python scripts/audit_class6_term1_firsts_pdf.py
+      - name: Inspect Class 6 Social Science Term I in English and Tamil originals
+        run: python scripts/audit_class6_term1_social_firsts_pdf.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: class6-term1-firsts-original-pdf-evidence
+          path: |
+            data/textbook/class6-term1-pdf-evidence.json
+            data/textbook/class6-term1-social-pdf-evidence.json
+          if-no-files-found: warn

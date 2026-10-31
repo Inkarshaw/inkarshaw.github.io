@@ -110,7 +110,7 @@ class FirstsCertificationTests(unittest.TestCase):
         original_page = sum(bool(q.get("source_printed_page")) for q in self.questions)
         missing_distinct_tamil = sum(not q.get("source_ta_link") or
                                      q["source_ta_link"] == q["source_link"] for q in self.questions)
-        self.assertEqual(original_page, 27)
+        self.assertGreaterEqual(original_page, 30)
         self.assertEqual(missing_distinct_tamil, 40)
         self.assertIn("original_bilingual_source_certification_pending",
                       self.bank["meta"]["certification_status"])
