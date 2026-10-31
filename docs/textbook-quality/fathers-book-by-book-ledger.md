@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 71 unique MCQs drawn from 38 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 74 unique MCQs drawn from 39 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -29,7 +29,8 @@
 | 11 | Vocational Nursing · Unit 3, Psychology and Sociology | 2 mapped (1 new FA067; Comte cross-reference FA051) | FA067, FA051 | Original English SCERT textbook text reproduction pp.53 and 78; Psychology title contradicts Class 12 General Nursing's Freud attribution; scope questions by book, original page images/Tamil pending |
 | 11 | Microbiology · Chapters 1, 10 | 6 | FA040–FA045 | English SCERT text reproduction pp.3, 6, 150–151 checked; original page images, Tamil and current-edition review pending |
 | 11 | Statistics · Chapter 1 | 1 cross-reference | FA030 | English SCERT text reproduction p.1 identifies Mahalanobis; original page screenshot and Tamil original pending |
-| 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
+| 11 | Political Science · Volume I, Units 1, 2 & 7 | 3 | FA020, FA021, FA074 | 2020 English source Unit 2 p.22 identifies Jean Bodin; older Unit 7 pp.109,119 already checked; original Tamil/page-image comparison pending |
+| 11 | Political Science · Volume II, Units 8 & 12 | 2 | FA075, FA076 | 2020 English textbook reproduction p.136 John Locke and p.241 Lord Ripon ('Rippon' in source); original Tamil/page-image comparison pending |
 | 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 12 | General Nursing · Chapters 3, 4, 10 | 3 | FA050–FA052 | English SCERT reproduction pp.98, 102, 220 checked; includes qualified textbook-specific titles and printed spelling corrections; Tamil original pending |
 | 12 | Vocational Nursing (Theory & Practical) · Chapters 1, 4 | 3 | FA058–FA060 | SCERT original English PDF directly inspected as searchable text: printed pp.16,104; PDF screenshot too large; Tamil original/current edition pending |
@@ -332,6 +333,25 @@ The latest check adds **two new English/Tamil MCQs** and indexes **three distinc
 - Relational databases were pioneered by **E. F. Codd**; the entity-relationship model associated with **Peter Chen** is distinct.
 - The Computer Technology and Computer Applications chapters use the same two honorees; no duplicate FA002 or FA072 question is created.
 - These are **five audited source passages**, not an exhaustive audit of the three books. Tamil originals and the 2026–27 prescribed edition are still outstanding.
+
+## Class 11 Political Science — sovereignty, classical liberalism and local government (31 October 2026)
+
+The latest reviewed source is the [Class 11 Political Science English SCERT textbook (Volumes I and II), published text reproduction](https://www.scribd.com/document/595416584/11th-Political-Science-EM-Www-tntextbooks-in). The text has printed SCERT page labels. Three **distinct title–person questions** were added as FA074–FA076. **No complete textbook page-by-page certification is claimed.**
+
+| Volume · Unit | Printed page | Wording in English source | Answer | New MCQ |
+| --- | ---: | --- | --- | --- |
+| I · Unit 2, State | 22 (chapter exercise p.28) | Father of the Modern Theory of Sovereignty | Jean Bodin | FA074 |
+| II · Unit 8, Political Ideologies – Part I | 136 | Father of Classical Liberalism | John Locke | FA075 |
+| II · Unit 12, Local Governments | 241 (evaluation MCQ 11) | Father of Local Self-Government in India | Lord Ripon | FA076 |
+
+**Page evidence and qualifications:**
+
+- **Bodin:** Unit 2, printed p.22 directly identifies Jean Bodin as the father of the modern theory of sovereignty; p.28 repeats this as an examination-style MCQ. The answer is specific to the development of modern sovereignty theory, not an all-purpose 'father of the state' title.
+- **Locke:** Unit 8, printed p.136 explicitly titles John Locke the **Father of Classical Liberalism**; Unit 7, p.119 already identifies him as **Father of Philosophical Liberalism** (FA021). The titles are related but worded differently in the textbook. FA075 keeps the unit-specific wording.
+- **Ripon:** Unit 12, printed p.241 exercise question 11 asks for the Father of Local Self-Government in India and gives Lord 'Rippon' among its options. The common historical spelling is **Lord Ripon**, used for the quiz, with the textbook spelling noted in the explanation. The context is his **1882 local self-government resolution**, distinct from India's post-independence constitutional amendments.
+- The title **Father of Postmodernism** also appears as an exercise question in Class 11 Political Science Unit 9, p.184; **no new quiz entry was made** because the four choices include multiple postmodernism-associated thinkers and the provided extracted passage does not itself establish an unambiguous answer.
+
+**Originality and verification:** The English reproduced text and printed-page labels were inspected. Original PDF page screenshots, original Tamil-medium wording and currently prescribed 2026–27 editions remain unchecked. Record these as pending rather than certifying full Class 11 Political Science coverage.
 
 ## Audit process and quality rules
 
