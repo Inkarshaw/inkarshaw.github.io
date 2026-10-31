@@ -2,7 +2,7 @@
 
 **Date:** 31 October 2026  
 **Output:** One combined bilingual quiz: `textbook-fathers.html` using `data/special-quizzes/fathers.json`.  
-**Scope:** 32 unique MCQs drawn from 15 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
+**Scope:** 35 unique MCQs drawn from 16 separately indexed Tamil Nadu school-book sources; source-specific duplicates are merged and cited under the same question.
 
 ## Checked in existing school-book question banks and selected original textbook pages
 
@@ -18,7 +18,8 @@
 | 11 | History · Full Year | 3 | FA007, FA008, FA009 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 11 | Economics · Full Year, Unit 1 | 1 | FA019 | 2020 English original PDF text checked (p.22), PDF too large for screenshot; Tamil original pending |
 | 11 | Business Mathematics & Statistics · Chapters 2, 3, 8 | 3 | FA022, FA023, FA024 | English original PDF text checked (pp.25,51,178); page screenshots failed due PDF size; Tamil original pending |
-| 11 | Bio-Botany · Chapters 2, 9 | 4 | FA031–FA034 | Source-English chapter PDFs inspected (pp.33,37,43,168); chapter 9 visual screenshot verified; chapter 2 screenshot access failed; Tamil original pending |
+| 11 | Bio-Botany · Chapters 1, 2, 9 | 6 | FA031–FA034, FA036–FA037 | English chapter 1 pp.8,21 and chapter 9 p.168 screenshot verified; chapter 2 pages inspected as text; Tamil original pending |
+| 11 | Bio-Zoology · Chapter 1 | 3 mapped (2 new + FA004 cited again) | FA035–FA036, FA004 | SCERT English Chapter 1 pp.4–5 screenshot verified; Tamil original pending |
 | 11 | Political Science · Volume I, Units 1 & 7 | 2 | FA020, FA021 | 2020 English original PDF text checked (pp.109,119), PDF too large for screenshot; Tamil original pending |
 | 12 | History · Full Year | 5 | FA005, FA010, FA011, FA013, FA014 | Curated from existing quiz bank; full original English/Tamil scan pending |
 | 12 | Commerce · Chapters 1, 16 | 2 | FA025, FA026 | SCERT English original PDF text checked (pp.8,130), PDF screenshot attempted but unavailable; Tamil original pending |
@@ -86,6 +87,17 @@ The same question may refer to multiple source books: Charles Babbage (Class 6 a
 - The printed-page numbering is distinct from the PDF 0-based pages: printed pages 1, 5, 6, 258 appear in screenshots of PDF pages 6, 10, 11, 263 respectively.
 - No original Tamil PDF pages, prescribed 2026–27 edition, or complete-book scan have been certified. Tamil questions are editorial translations.
 
+## New textbook review: Class 11 Bio-Zoology and Bio-Botany Chapter 1 (31 October 2026)
+
+**Primary chapter PDFs checked by reading original page images and original searchable text:**
+
+1. [Class 11 Bio-Zoology Chapter 1, *The Living World*](https://cdn1.byjus.com/wp-content/uploads/2019/04/Tamilnadu-Board-Class-11-Zoology-Chapter-1.pdf), SCERT original English chapter (first 2018 edition era). Original **printed p.4** explicitly distinguishes **Aristotle, father of classical taxonomy** from **Carolus Linnaeus, father of modern taxonomy** (new FA035 and existing FA004 source citation). Screenshot: zero-based PDF page 3.
+2. Same Bio-Zoology PDF, **printed p.5**: **Theophrastus, Father of Botany**, in the narrative following Aristotle's classification. Screenshot: zero-based PDF page 4.
+3. [Class 11 Bio-Botany Chapter 1, *Living World*](https://nru.oer4pacific.org/id/eprint/211/3/Higher-Secondary-Biology-Chapter1-Living-World.pdf), SCERT original English 2020 chapter. **Printed p.8** says **Theophrastus, Father of Botany** (new FA036). Screenshot: zero-based PDF page 7. This is the **same fact** as in Bio-Zoology, so FA036 records **both textbook citations** instead of a duplicate MCQ.
+4. Same Bio-Botany PDF, **printed p.21**: **E. J. Butler (1874–1943), Father of Indian Mycology** (new FA037). Screenshot: zero-based PDF page 20. The same paragraph calls **P. A. Micheli "founder of mycology"**; that separate designation was **not inserted** as a "Father" question to keep exact textbook/title scope.
+
+**Review limitations:** Printed source-book page numbers are not PDF viewer indices. The English pages cited above have been visually checked; the corresponding original Tamil-medium page expressions, latest prescribed 2026–27 editions, and remaining pages of each complete book are still pending. Tamil questions/explanations are editorial translations. One combined quiz still contains all classes and source books.
+
 ## Audit process and quality rules
 
 1. Review each book and term separately: Science and Social Science (Classes 6–10) followed by History, Geography, Economics, Political Science and other relevant books (Classes 11–12).
@@ -99,7 +111,7 @@ The same question may refer to multiple source books: Charles Babbage (Class 6 a
 
 - Class 6–9: review **all remaining subject/term volumes** beyond the selected units above.
 - Class 10: selected original English page evidence from Science Units 18 and 20 is now included; the remaining Science original pages and Social Science/other books are not exhaustively checked.
-- Class 11–12: audit all remaining relevant books and chapters, including Science, Economics, Geography and Political Science, beyond selected 11th Business Mathematics, Bio-Botany, Economics and Political Science passages, and 12th Commerce, Economics and History pages already cited.
+- Class 11–12: audit all remaining relevant books and chapters, including Science, Economics, Geography and Political Science, beyond selected 11th Business Mathematics, Bio-Botany, Bio-Zoology, Economics and Political Science passages, and 12th Commerce, Economics and History pages already cited.
 - Verify direct original-book PDF source links and corresponding Tamil-medium printed pages where a chapter bank currently supplies the English title or page.
 - Complete the original English/Tamil book-by-book coverage and duplicate checks before claiming exhaustive TNPSC/TNUSRB source coverage.
 
