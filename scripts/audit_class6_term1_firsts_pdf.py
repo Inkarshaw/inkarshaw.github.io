@@ -33,7 +33,7 @@ TARGETS = [
         }
     },
 ]
-PATTERN = re.compile(r"\\b(first|earliest|invented|discovered|pioneering|founded|oldest)\\b", re.I)
+PATTERN = re.compile(r"\b(first|earliest|invented|discovered|pioneering|founded|oldest)\b", re.I)
 
 def main():
     out = {"audit": "Class 6 Term 1 Science both mediums", "ran_at": datetime.now(timezone.utc).isoformat(), "original_textbook_complete_certification": False, "volumes": []}
@@ -75,7 +75,7 @@ def main():
                 print("BOOK_ERROR",json.dumps(row,ensure_ascii=False),flush=True)
     dest=ROOT/"data/textbook/class6-term1-pdf-evidence.json"
     dest.parent.mkdir(parents=True,exist_ok=True)
-    dest.write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    dest.write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     if any("error" in b for b in out["volumes"]):
         print("INCOMPLETE: one or more source PDFs unavailable")
         return 1
