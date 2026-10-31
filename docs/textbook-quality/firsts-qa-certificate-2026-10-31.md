@@ -2,7 +2,7 @@
 
 **Audit date:** 31 October 2026  
 **Quiz:** [ClearExams Firsts Quiz](../../textbook-firsts.html)  
-**Bank:** `data/special-quizzes/firsts.json`, revision 11  
+**Bank:** `data/special-quizzes/firsts.json`, revision 12  
 **Scope:** Entire 148-question published *curated bank*, Classes 6–12  
 **Sign-off classification:** **STRUCTURAL / TARGETED EDITORIAL + CHROMIUM FUNCTIONAL QA PASSED**, GitHub Actions [Audit TN Textbook Firsts run 41189707667](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41189707667) on 31 October 2026. **NOT ORIGINAL-TEXTBOOK CERTIFIED.** Live production HTTP deployment independently verified on 31 October 2026 via [GitHub Actions live check 41190241454](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41190241454).
 
