@@ -42,7 +42,7 @@ def main():
             filename = str(Path(d) / (spec["id"] + ".pdf"))
             print("BOOK_START", spec["id"], spec["url"], flush=True)
             try:
-                downloaded = gdown.download(id=spec["google_id"], output=filename, quiet=True, fuzzy=True)
+                downloaded = gdown.download(id=spec["google_id"], output=filename, quiet=True)
                 if not downloaded:
                     raise RuntimeError("Google Drive download was not completed")
                 data=Path(filename).read_bytes()
