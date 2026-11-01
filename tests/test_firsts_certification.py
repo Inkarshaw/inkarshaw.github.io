@@ -29,13 +29,13 @@ class FirstsCertificationTests(unittest.TestCase):
         cls.page = PAGE.read_text(encoding="utf-8")
         cls.home = HOME.read_text(encoding="utf-8")
 
-    def test_all_148_records_and_topics(self):
-        self.assertEqual(len(self.questions), 148)
+    def test_all_151_records_and_topics(self):
+        self.assertEqual(len(self.questions), 151)
         self.assertEqual(self.bank["meta"]["count"], len(self.questions))
         self.assertEqual(len(self.by_id), len(self.questions))
-        self.assertEqual(set(self.by_id), {f"F{i:03d}" for i in range(1, 149)})
+        self.assertEqual(set(self.by_id), {f"F{i:03d}" for i in range(1, 152)})
         self.assertEqual(Counter(q["category"] for q in self.questions),
-                         {"history": 96, "women": 26, "science": 26})
+                         {"history": 97, "women": 26, "science": 28})
         self.assertEqual({q["class_no"] for q in self.questions}, set(range(6, 13)))
 
     def test_all_answers_bilingual_and_unique(self):
@@ -90,8 +90,8 @@ class FirstsCertificationTests(unittest.TestCase):
     def test_homepage_counts_consistent(self):
         for category, phrase in [
             ("women", "other pioneers · 26 MCQs."),
-            ("history", "major events · 96 MCQs."),
-            ("science", "discoveries · 26 MCQs."),
+            ("history", "major events · 97 MCQs."),
+            ("science", "discoveries · 28 MCQs."),
         ]:
             with self.subTest(category=category):
                 self.assertIn(phrase, self.home)
@@ -104,6 +104,28 @@ class FirstsCertificationTests(unittest.TestCase):
         ]:
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, self.page)
+
+    def test_class6_term1_original_pdf_evidence(self):
+        questions = ("F033", "F034", "F035", "F043", "F044", "F149", "F150", "F151")
+        self.assertEqual(sum(q["class_no"] == 6 for q in self.questions), 15)
+        for id in questions:
+            with self.subTest(id=id):
+                q = self.by_id[id]
+                self.assertEqual(q["class_no"], 6)
+                self.assertIn("cloudfront.net", q["source_link"])
+                self.assertIn("cloudfront.net", q["source_ta_link"])
+                self.assertGreater(q["source_pdf_page_en"], 0)
+                self.assertGreater(q["source_ta_pdf_page"], 0)
+                self.assertIn("pending", q["review_status"])
+        self.assertEqual(self.by_id["F149"]["opts_en"][0], "Viswanathan Anand")
+        self.assertEqual(self.by_id["F150"]["opts_en"][0], "William Herschel")
+        self.assertEqual(self.by_id["F151"]["opts_en"][0], "Chandrayaan-1")
+        self.assertEqual(self.by_id["F043"]["opts_en"], [
+            "Alexander Cunningham", "Charles Masson", "R. D. Banerji", "John Marshall"
+        ])
+        self.assertEqual(self.by_id["F044"]["opts_en"], [
+            "Viswanathan Anand", "Sachin Tendulkar", "Karnam Malleswari", "Abhinav Bindra"
+        ])
 
     def test_provenance_limitations_visible(self):
         # The remaining gaps must be reported, NOT silently treated as certified.
