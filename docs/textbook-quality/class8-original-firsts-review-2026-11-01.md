@@ -55,3 +55,9 @@ The source scan verified the original printed bibliographic SCERT authorship; **
 **Proposed Firsts quiz release:** **174** curated bilingual questions (version **19**), Women **27**, History **111**, Science **36**. The new MCQs include four choices, English/Tamil explanations, direct original English/Tamil SCERT PDF source URLs, PDF page indexes and explicit incomplete-book statuses.
 
 **No Class 8 full-year textbook has received whole-volume certification.** The total number of fully English/Tamil paired textbooks signed off Classes 6–12 remains zero under the audit's strict definition. 
+
+## Verified public deployment — 1 November 2026
+
+A GitHub-hosted independent live-HTTP runner fetched the public `clearexams.ink` Firsts player, JSON and homepage, all returning HTTP **200**. After the normal Pages publication delay, retrying the verification passed **53/53 checks**, including **the entire public 174-question bilingual JSON matching merged GitHub main**, version 19, category totals Women 27 / History 111 / Science 36, all four F171–F174 answers, and ten current Class 8 original Tamil PDF URLs and one-based page references.
+
+[Public Firsts 174/v19 verification #41306156653](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41306156653). The first attempt saw v18 during publication; the *second attempt passed*. Site deployment does **not** establish all-book fact or image certification.
