@@ -21,6 +21,17 @@ jobs:
         run: python -m pip install pymupdf
       - name: Fetch and scan original Class 8 four PDF books
         run: python scripts/audit_class8_originals.py
+      - name: Capture selected original Class 8 bilingual passages and page images
+        run: python scripts/review_class8_source_pages.py
+      - name: Preserve private selected source-page review images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class8-original-selected-page-review
+          path: |
+            data/textbook/class8-source-page-probe-2026-11-01.json
+            data/textbook/_class8_private_review_images/
+          if-no-files-found: warn
       - name: Preserve original textbook provenance and candidates
         if: always()
         uses: actions/upload-artifact@v4
