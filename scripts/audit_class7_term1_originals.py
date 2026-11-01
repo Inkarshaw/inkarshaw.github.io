@@ -93,6 +93,14 @@ def main():
   "method":"all-page text layer scan and selected keyword passage identification; no exhaustive visual/book signoff",
   "files":{}}
  for key,urls in SOURCES.items():
+  # Avoid redundant 100+ MB compiled-volume downloads when separate original
+  # subject books for the same medium were already verified.
+  if key.startswith("combined_"):
+   medium=key.rsplit("_",1)[1]
+   if all(report["files"].get(f"{subject}_{medium}",{}).get("status")=="all_page_text_scanned_not_original_book_certified" for subject in ("science","social")):
+    report["files"][key]={"status":"not_needed_both_component_books_verified"}
+    print("SOURCE_SKIP",key,"both component volumes verified",flush=True)
+    continue
   errors=[];file=None;url_used=None
   for url in urls:
    try:
