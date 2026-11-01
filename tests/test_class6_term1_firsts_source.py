@@ -1,63 +1,63 @@
 #!/usr/bin/env python3
-"""Class 6 2025 PDF source provenance without premature whole-book sign-off."""
+"""Class 6 Term I original English/Tamil source provenance and incomplete-certification gates."""
 import json
 import unittest
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class Class6Term1SourceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.quiz=json.loads((ROOT/"data/special-quizzes/firsts.json").read_text(encoding="utf-8"))
-        cls.registry=json.loads((ROOT/"data/textbook/original-pdf-source-manifest.json").read_text(encoding="utf-8"))
+        cls.quiz = json.loads((ROOT / "data/special-quizzes/firsts.json").read_text(encoding="utf-8"))
+        cls.registry = json.loads((ROOT / "data/textbook/original-pdf-source-manifest.json").read_text(encoding="utf-8"))
+        cls.byid = {q["id"]: q for q in cls.quiz["questions"]}
 
-    def test_three_original_pdf_fact_pointers(self):
-        bank={q["id"]:q for q in self.quiz["questions"]}
-        for id,page in (("F033",102),("F034",102),("F035",103)):
+    def test_original_pdf_source_pair_replaces_legacy_drive_links(self):
+        expected = {
+            "F033": (102, 102), "F034": (102, 102), "F035": (103, 103),
+            "F043": (137, 137), "F044": (211, 213),
+            "F149": (211, 213), "F150": (169, 170), "F151": (171, 171),
+        }
+        for id, (en_page, ta_page) in expected.items():
             with self.subTest(id=id):
-                q=bank[id]
-                self.assertEqual(q["class_no"],6)
-                self.assertIn("2025",q["original_edition"])
-                self.assertEqual(q["original_pdf_page_checked"],page)
-                self.assertTrue(q["source_printed_page"] in (98,99))
-                self.assertTrue(q["source_link"].startswith("https://drive.google.com/file/d/1MNff"))
-                self.assertTrue(q["source_ta_link"].startswith("https://drive.google.com/file/d/1HeN"))
-                self.assertIn("pending",q["review_status"])
+                q = self.byid[id]
+                self.assertEqual(q["class_no"], 6)
+                self.assertIn("d21mc000xink7q.cloudfront.net", q["source_link"])
+                self.assertIn("d21mc000xink7q.cloudfront.net", q["source_ta_link"])
+                self.assertIn("_EM_", q["source_link"])
+                self.assertIn("_TM_", q["source_ta_link"])
+                self.assertEqual(q["source_pdf_page_en"], en_page)
+                self.assertEqual(q["source_ta_pdf_page"], ta_page)
                 self.assertTrue(q["source_evidence_id"])
-                self.assertIn("garbled",q["source_pdf_text_review_note"])
+                self.assertIn("pending", q["review_status"])
+                self.assertIn("2025", q["original_edition"])
 
-    def test_social_science_source_fact_pointers(self):
-        bank={q["id"]:q for q in self.quiz["questions"]}
-        for id,pdfpage,printed in (("F043",31,133),("F044",105,209)):
-            with self.subTest(id=id):
-                q=bank[id]
-                self.assertEqual(q["original_pdf_page_checked"],pdfpage)
-                self.assertEqual(q["source_printed_page"],printed)
-                self.assertIn("2025",q["original_edition"])
-                self.assertIn("pending",q["review_status"])
-                self.assertIn("1WJn-q7",q["source_link"])
-                self.assertIn("1xz06oz",q["source_ta_link"])
-        volumes=[v for v in self.registry["volumes"] if v["id"]=="c6-social-science-term1-2025-volume3"]
-        self.assertEqual(len(volumes),1)
-        self.assertNotEqual(volumes[0]["chapter_coverage"],"certified")
-        doc=(ROOT/"docs/textbook-quality/class6-term1-social-original-pdf-2025-review.md").read_text(encoding="utf-8")
-        for marker in ("F043","F044","NOT CERTIFIED","110","Chandrayaan"):
-            self.assertIn(marker,doc)
+    def test_originals_scanned_but_book_not_certified(self):
+        rows = [x for x in self.registry["volumes"] if x["id"] == "c6-science-social-science-term-1"]
+        self.assertEqual(len(rows), 1)
+        volume = rows[0]
+        self.assertEqual(volume["verified_pdf_page_count"], {
+            "english": 216, "tamil": 216, "english_text_extractable": 216, "tamil_text_extractable": 216
+        })
+        self.assertFalse(volume["complete_english_tamil_original_book_certification"])
+        self.assertEqual(len(volume["fact_checks"]), 8)
+        self.assertIn("visual_pending", volume["english_pdf_review"])
+        self.assertIn("visual_pending", volume["tamil_pdf_review"])
+        document = (ROOT / "docs/textbook-quality/class6-term1-firsts-review-2026-11-01.md").read_text(encoding="utf-8")
+        for marker in ("F033", "F034", "F035", "F043", "F044", "F149", "F150", "F151",
+                       "NOT CERTIFIED", "216", "2026–27"):
+            self.assertIn(marker, document)
 
-    def test_book_pair_is_only_partially_checked(self):
-        volumes=[b for b in self.registry["volumes"] if b["id"]=="c6-science-social-term1-2025-volume3"]
-        self.assertEqual(len(volumes),1)
-        volume=volumes[0]
-        self.assertEqual(volume["english_pdf_review"],"text-extracted")
-        self.assertEqual(volume["tamil_pdf_review"],"text-extracted")
-        self.assertNotEqual(volume["chapter_coverage"],"certified")
-        self.assertIn("selected",volume["chapter_coverage"])
-        doc=(ROOT/"docs/textbook-quality/class6-term1-original-pdf-2025-review.md").read_text(encoding="utf-8")
-        for marker in ("F033","F034","F035","NOT CERTIFIED","108","107"):
-            self.assertIn(marker,doc)
+    def test_new_mcq_answers_from_book(self):
+        for id, value in [("F149", "Viswanathan Anand"),
+                          ("F150", "William Herschel"), ("F151", "Chandrayaan-1")]:
+            q = self.byid[id]
+            self.assertEqual(q["opts_en"][q["correct"]], value)
+            self.assertEqual(len(q["opts_ta"]), 4)
+            self.assertTrue(q["exp_en"])
+            self.assertTrue(q["exp_ta"])
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()
