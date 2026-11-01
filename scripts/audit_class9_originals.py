@@ -19,7 +19,7 @@ MIRROR="https://cleartnpsc.com/books/download/"
 SOURCES={
  "science_en":[MIRROR+"class-9-science-english.pdf", BASE+"9th_Science_EM_Text.pdf"],
  "science_ta":[MIRROR+"class-9-science-tamil.pdf", BASE+"9th_Science_TM_Text.pdf"],
- "social_en":[MIRROR+"class-9-social-science-english.pdf", BASE+"9th_Social%20Science%20_EM%20_Text.pdf", "https://nammakalvi.com/books/8em/ss.pdf"],
+ "social_en":[MIRROR+"class-9-social-science-english.pdf", BASE+"9th_Social%20Science%20_EM%20_Text.pdf", "https://cdn1.byjus.com/wp-content/uploads/2022/08/TN-Board-Class-9-Social-Science-Textbook-English.pdf"],
  "social_ta":[MIRROR+"class-9-social-science-tamil.pdf", BASE+"9th_Social%20Science_TM_Text.pdf"],
 }
 E=re.compile(r"\b(first|earliest|founder|pioneer|invention|invented|discovery|discovered|firstly|introduced|established|began|oldest)\b",re.I)
