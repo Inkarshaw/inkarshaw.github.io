@@ -45,6 +45,11 @@ jobs:
           bank = json.loads(get('/data/special-quizzes/firsts.json'))
           home = get('/')
           questions = bank['questions']
+          expected_repo = json.loads(open('data/special-quizzes/firsts.json',encoding='utf-8').read())
+          print('LIVE_RELEASE:', len(questions), 'questions, version', bank.get('meta',{}).get('version'), 'last ID', questions[-1]['id'] if questions else '-')
+          print('REPO_RELEASE:', len(expected_repo['questions']), 'questions, version', expected_repo.get('meta',{}).get('version'))
+          if len(questions) < 161 or not any(q.get('id') == 'F161' for q in questions):
+              raise SystemExit('Public GitHub Pages deployment is still on an earlier Firsts edition; latest version 16 is not yet served')
           expected = [
               (len(questions)==161,'161 questions'),
               (bank['meta']['version']>=16,'updated bank v16'),
