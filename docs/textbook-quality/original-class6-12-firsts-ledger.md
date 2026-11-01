@@ -347,3 +347,9 @@ All four **SCERT-authored full-year** originals independently retrieved and hash
 **Six existing firsts F036–F038 (space), F057 (neutron), F117–F118 (Dutch/English trading factories) have new English/Tamil current full-year original source PDF links and 1-based page indexes.** Four independent/SCERT-corroborated Firsts **F171 Puducherry first KVK (1974), F172 Satyendranath Tagore first Indian ICS candidate, F173 William Gilbert versorium early electroscope, F174 Francisco de Almeida first Portuguese viceroy** added with bilingual questions/choices/explanations, precise source links and page indexes. F119–F121 and certain tempting absolute-first claims remain open for future source-quality checks.
 
 **New proposed quiz release: 174 curated bilingual questions, version 19 (Women 27, History 111, Science 36).** Detailed [Class 8 bilingual audit](class8-original-firsts-review-2026-11-01.md). This does **not** certify either original Class 8 book end-to-end in both languages, and the official prescribed 2026–27 edition has not been established. Historic counts above remain earlier snapshots.
+
+## 1 November 2026 — Firsts v19 public release verified
+
+The public `clearexams.ink` Firsts Quiz now serves **174 curated bilingual questions** (Women 27, History 111, Science 36), including F171–F174 and the corrected Class 8 original bilingual PDF links/page indexes. Independent public HTTP GitHub Actions checked homepage, player and JSON status **200** and confirmed the entire live question bank matches merged `main`. **53/53 release checks passed**, after an initial check occurred during GitHub Pages publication: [live verification run #41306156653](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41306156653).
+
+Whole-book certification remains **zero fully completed English/Tamil paired SCERT volumes**; the 2026–27 prescribed-edition match still needs confirmation. Historic inventory counts are not proof of all-page reading.
