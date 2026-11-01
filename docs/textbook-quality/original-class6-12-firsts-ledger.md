@@ -365,3 +365,9 @@ The previous Class 9 History Firsts **F122–F133** now link to the revised orig
 **Release proposal: 178 curated bilingual questions, version 20** — Women **27**, History **113**, Science **38**. Historical totals above are earlier release snapshots, not current total. Detailed source-page and certification caveats: [Class 9 original English/Tamil Firsts audit](class9-original-firsts-review-2026-11-01.md), [all-page source evidence #41315673666](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41315673666), and [original selected page review #41316311039](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41316311039).
 
 **Whole-book certification remains zero** pending complete image/diagram/table examination, all-new Firsts editorial reconciliation and current edition verification.
+
+## 1 November 2026 — Firsts v20 live deployment verified
+
+The public ClearExams site serves **178 curated bilingual questions**, Firsts bank version **20**, Women **27**, History **113**, Science **38**. A GitHub-hosted independent source checked HTTP 200 on `https://clearexams.ink/`, `/textbook-firsts.html` and `/data/special-quizzes/firsts.json`; the live bank matched merged `main` exactly and all **63/63 release checks passed**. [Public live verification #41317730247](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41317730247).
+
+No English/Tamil SCERT full original-book pair is certified end-to-end from this deployment. The remaining Class 9 newer Tamil original source-page mapping for F122–F133 and overall 2026–27 prescribed-edition comparison remain pending.
