@@ -22,7 +22,7 @@ class OriginalBookFirstsTests(unittest.TestCase):
             self.assertNotIn(source["id"], ids)
             ids.add(source["id"])
             standards.add(source["class"])
-            self.assertIn(source["english_pdf_review"], ("not-started","downloaded","text-extracted","selected_history_units_extracted_from_original_pdf","all_216_pages_text_extracted_selected_firsts_facts_checked_visual_pending","all_88_pages_text_extracted_selected_original_fact_visual_checked","all_138_pages_text_extracted_selected_original_fact_visual_checked","all_pages_text_extracted_selected_passages_images_reviewed_not_complete","all_pages_text_extracted_selected_original_text_and_images_checked_not_complete"))
+            self.assertIn(source["english_pdf_review"], ("not-started","downloaded","text-extracted","selected_history_units_extracted_from_original_pdf","all_216_pages_text_extracted_selected_firsts_facts_checked_visual_pending","all_88_pages_text_extracted_selected_original_fact_visual_checked","all_138_pages_text_extracted_selected_original_fact_visual_checked","all_pages_text_extracted_selected_passages_images_reviewed_not_complete","all_pages_text_extracted_selected_original_text_and_images_checked_not_complete","all_pages_text_extracted_selected_bilingual_passages_and_images_reviewed_not_complete"))
             self.assertNotEqual(source["chapter_coverage"], "complete")
             self.assertEqual(urlparse(source["english_url"]).scheme, "https")
             if source.get("tamil_url"):
