@@ -10,7 +10,7 @@ The Padanool class-by-class original-book archive (source list linked below) sho
 
 | Standard | English listed | Tamil listed | Combined editions | Original edition audit |
 | --- | ---: | ---: | ---: | --- |
-| 6 | 10 | 12 | 22 | **Term I bilingual original PDF pair scanned 216+216 pages; 8 selected facts cross-checked, 3 new MCQs; no full volume sign-off** |
+| 6 | 10 | 12 | 22 | **Terms I & II: original English/Tamil PDFs text-scanned; Term II 4 PDFs, 420 pages, selected facts checked, 3 new questions; no complete-volume sign-off** |
 | 7 | 10 | 12 | 22 | Class 7 women's firsts compared with transcribed chapter; remaining books unverified |
 | 8 | 6 | 7 | 13 | One 2022 original Social Science English volume partly checked; newer edition unverified |
 | 9 | 6 | 7 | 13 | **2018/2019/2020 revised English Social Science text partially reviewed**; Tamil and recent edition pending |
@@ -280,3 +280,10 @@ The Firsts Quiz now has **151 curated bilingual questions**, including the three
 
 Evidence and per-question page indexes: [Class 6 Term I bilingual review](class6-term1-firsts-review-2026-11-01.md); [source scan GitHub Actions](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41268000582).
 \n
+## 1 November 2026 — Class 6 Term II Science & Social Science bilingual originals
+
+Both the **English and Tamil 2024 SCERT reprints** of Term II **Science** and **Social Science** were downloaded as complete PDF files from independent mirror links. The original government-written content was inspected with PyMuPDF: Science 100 English +107 Tamil pages; Social Science 103 English +110 Tamil pages; **all 420 PDF pages yielded some extractable text**. Full original PDF SHA-256 fingerprints and page-level scan evidence: [Term II audit report](class6-term2-firsts-review-2026-11-01.md) and [run 41269385788](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41269385788). **Machine extraction does NOT mean complete visual/textbook certification.**
+
+Selected original-language facts checked: F041 Robert Hooke in 1665, F068 Rishabha first Tirthankara in Jain tradition, F069 Sarnath first sermon, F070 Dharmachakra, F071 First Buddhist Council Rajagriha, F072 Ajatashatru; the five pre-existing Class 11 Jain/Buddhist questions are **cross-referenced, not duplicated**. Existing MCQ distractors and F041 English/Tamil explanations improved. New bilingual source-checked facts **F152 Mahapadma Nanda**, **F153 Gudiyatham 1947 Independence Day flag**, **F154 Jana Gana Mana at 1911 Calcutta Congress** were added with original PDF page references. Firsts bank now has **154 curated bilingual questions**, category 26 women / 100 history / 28 science. This supersedes the earlier interim **151** inventory but does not invalidate earlier published QA release evidence.
+
+**No Class 6 Term II book can be certified as exhaustively reviewed yet.** Need all-page visual, full Firsts editorial screening, updated official 2026–27 edition confirmation and final bilingual quality certification. Overall original-book full-pair certification remains **0**.

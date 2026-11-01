@@ -1,0 +1,29 @@
+name: Audit original Class 6 Term II textbooks
+on:
+  pull_request:
+    paths:
+      - scripts/audit_class6_term2_originals.py
+      - .github/workflows/class6-term2-original-audit.yml
+  workflow_dispatch:
+jobs:
+  original-books:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PDF reader and Drive downloader
+        run: python -m pip install pymupdf gdown
+      - name: Scan original English and Tamil PDFs and matched passages
+        run: python scripts/audit_class6_term2_originals.py
+      - name: Upload exact PDF fingerprints and page-level evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class6-term2-original-pdf-evidence
+          path: data/textbook/class6-term2-original-audit-2026-11-01.json
+          if-no-files-found: warn
