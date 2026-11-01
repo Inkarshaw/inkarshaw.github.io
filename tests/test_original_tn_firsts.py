@@ -22,7 +22,7 @@ class OriginalBookFirstsTests(unittest.TestCase):
             self.assertNotIn(source["id"], ids)
             ids.add(source["id"])
             standards.add(source["class"])
-            self.assertIn(source["english_pdf_review"], ("not-started","downloaded","text-extracted","selected_history_units_extracted_from_original_pdf"))
+            self.assertIn(source["english_pdf_review"], ("not-started","downloaded","text-extracted","selected_history_units_extracted_from_original_pdf","all_216_pages_text_extracted_selected_firsts_facts_checked_visual_pending"))
             self.assertNotEqual(source["chapter_coverage"], "complete")
             self.assertEqual(urlparse(source["english_url"]).scheme, "https")
             if source.get("tamil_url"):
