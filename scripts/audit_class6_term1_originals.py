@@ -42,6 +42,9 @@ FACT_TERMS = {
  "F035": {"en": ["ENIAC", "1946"], "ta": ["ENIAC"]},
  "F043": {"en": ["Charles Masson", "Harappa"], "ta": ["மேசன்", "ஹரப்பா"]},
  "F044": {"en": ["Viswanathan Anand", "Khel Ratna"], "ta": ["ஆனந்த்", "கேல்"]},
+ "C6-T1-NEW-CHESS": {"en": ["first grandmaster", "1988"], "ta": ["கிராண்ட் மாஸ்டர்", "1988"]},
+ "C6-T1-NEW-URANUS": {"en": ["Uranus", "Herschel", "telescope"], "ta": ["யுரேனஸ்", "உரேனஸ்", "ஹெர்ஷல்", "தொலைநோக்கி"]},
+ "C6-T1-NEW-MOON": {"en": ["Chandrayaan", "Moon mission", "2008"], "ta": ["சந்திரயான்", "நிலவுத்", "2008"]},
 }
 MAX_BYTES = 165*1024*1024
 def download(label, urls):
@@ -125,6 +128,7 @@ def main():
     ]
   }
   cache={}
+  full_pdf_pages={}
   for label, urls in SOURCES.items():
     info, data=download(label,urls)
     report["sources"][label]=info
@@ -136,6 +140,7 @@ def main():
         scanned,pages=scan_pdf(data,lang)
         report["sources"][label]["scan"]=scanned
         cache[label]="\n".join(pages)
+        full_pdf_pages[label]=pages
       except Exception as exc:
         report["sources"][label]["error_read"]=str(exc)
         continue
@@ -155,7 +160,18 @@ def main():
     for label,source_text in cache.items():
       lang="en" if label.startswith("english") else "ta"
       report["question_evidence"][qid][label]=windowed_evidence(source_text,terms[lang])
-    print("QUESTION",qid,json.dumps(report["question_evidence"][qid],ensure_ascii=False)[:2300],flush=True)
+    for label,pages in full_pdf_pages.items():
+      lang="en" if label.startswith("english") else "ta"
+      hits={}
+      for needle in terms[lang]:
+        hitlist=[]
+        for p,t in enumerate(pages):
+          pos=t.casefold().find(needle.casefold())
+          if pos>=0:
+            hitlist.append({"pdf_page":p+1,"excerpt":" ".join(t[max(0,pos-130):min(len(t),pos+260)].split())[:360]})
+        hits[needle]=hitlist[:5]
+      report["question_evidence"][qid][label+"_page_hits"]=hits
+    print("QUESTION",qid,json.dumps(report["question_evidence"][qid],ensure_ascii=False)[:5500],flush=True)
   DEST.parent.mkdir(parents=True,exist_ok=True)
   DEST.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
   print("SUMMARY",json.dumps({"output":str(DEST),"available_sources":list(cache),"certification":report["certification"]}),flush=True)
