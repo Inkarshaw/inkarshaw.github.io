@@ -50,3 +50,11 @@ Source image spot-checks include English Science p40–41 and p72, Tamil Science
 **Whole book signoff:** **NO**, both Class 7 Term III books require full visual reading and reconciliation to the officially prescribed 2026–27 edition. Historical catalogue counts do not imply complete coverage.
 
 **Next unit in source order:** Class 8 original Social Science / Science (all prescribed volume editions), once this release passes CI and public verification.
+
+## Verified public deployment — 1 November 2026
+
+GitHub Actions fetched the **actual public** `clearexams.ink` homepage, Firsts player and JSON (HTTP **200**), checked the complete live 170-question JSON against merged `main` byte-for-byte after parsing, and passed **47/47 release assertions**. This confirms **Firsts Quiz v18 (170 bilingual MCQs, Women 27 / History 109 / Science 34)** including F166–F170 and original Tamil PDF source links and page indexes.
+
+[Independent live deployment verification #41304215805](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41304215805).
+
+**This does not certify all textbook facts, all 500 PDF page images, or the current 2026–27 prescribed-edition identity.**
