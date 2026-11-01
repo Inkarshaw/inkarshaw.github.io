@@ -81,3 +81,9 @@ This document is a **31 October 2026 release certificate** for the earlier 148-q
 The proposed **1 November version 13** contains **151 questions** (Women 26, History 97, Science 28). Eight Class 6 Term I facts were checked in extracted source passages of the **two original PDFs, 216 pages each**, including 3 new questions F149–F151. See [Class 6 Term I book review](class6-term1-firsts-review-2026-11-01.md) and [original-PDF scan evidence](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41268000582). The new release's CI and actual site-deployment verification must be recorded independently after merging; the previous live check does not prove this release is deployed.
 
 The full original English–Tamil series still has **zero completely certified textbook-edition pairs**. Text extraction on all PDF pages and selected fact verification alone are not sufficient for a whole-book certification stamp.
+
+## Subsequent release — 1 November 2026, Firsts v16
+
+This is a historical 31 October QA certificate. The latest 1 November source-reviewed bank now has **161** bilingual questions (Women **27**, History **104**, Science **30**). The Class 7 Term I update has nine selected original English/Tamil source-page checks (F051–F054 and F157–F161). The Class 7 [book-level evidence report](class7-term1-firsts-review-2026-11-01.md) records exact PDF hashes, page locations and limitations. An independent GitHub-hosted HTTP run [#41283259549](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41283259549) confirmed the **161/v16 release live** at clearexams.ink; **34/34** assertions passed, including full live JSON equality to main.
+
+**Original-textbook qualification unchanged:** no complete English/Tamil volume pair has been exhaustively certified; the selected fact checks and all-page PDF text scans are not comprehensive visual or editorial source sign-off.
