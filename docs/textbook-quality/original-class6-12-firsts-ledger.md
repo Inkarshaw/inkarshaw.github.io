@@ -11,7 +11,7 @@ The Padanool class-by-class original-book archive (source list linked below) sho
 | Standard | English listed | Tamil listed | Combined editions | Original edition audit |
 | --- | ---: | ---: | ---: | --- |
 | 6 | 10 | 12 | 22 | **Terms I–III: bilingual original PDFs source-scanned, including Term III 476 pages across 4 files; selected fact checks only, no complete-volume sign-off** |
-| 7 | 10 | 12 | 22 | Class 7 women's firsts compared with transcribed chapter; remaining books unverified |
+| 7 | 10 | 12 | 22 | **Term I Science and Social Science: four separate bilingual originals text-scanned (428 pages) plus compiled copies; 9 selected Firsts facts checked; no whole-book sign-off** |
 | 8 | 6 | 7 | 13 | One 2022 original Social Science English volume partly checked; newer edition unverified |
 | 9 | 6 | 7 | 13 | **2018/2019/2020 revised English Social Science text partially reviewed**; Tamil and recent edition pending |
 | 10 | 6 | 7 | 13 | **One original revised-2022 English Social Science book partly reviewed; 7 new facts added** |
@@ -297,3 +297,13 @@ Original page images and short bilingual source passages were examined for six e
 The Firsts Quiz now has **156 curated bilingual questions** (26 women / 102 history / 28 science). The historical 151 and 154 counts above are earlier **revision snapshots**, not current counts.
 
 **Book sign-off:** **0** newly fully certified English/Tamil original pairs. Four PDFs are completely text-extracted, but 2026–27 edition parity, complete images/graphics/page-by-page reading and exhaustive editorial candidate reconciliation remain outstanding.
+
+## 1 November 2026 — Class 7 Term I English/Tamil original books
+
+Original SCERT-authored **Science** and **Social Science** files were downloaded in both languages and SHA-256 verified. The separate volumes contain **102 English Science + 103 Tamil Science + 100 English Social Science + 123 Tamil Social Science = 428 PDF pages**, with extractable text on every page. Independently, combined-volume English (**200 pages**) and Tamil (**224 pages**) PDFs were retrieved; these duplicate subject content and must not be added to unique-book coverage.
+
+Four existing Firsts (F051 Nagabhatta I, F052/F053 1191 Tarain, F054 Qutb-ud-din Aibak) received bilingual original-page corroboration, improved English/Tamil distractors and direct PDF pointers. Five new carefully scoped bilingual Firsts (F157 Boyle's modern elements concept, F158 Dalton's atom-linked symbols, F159 Gopala founding the Palas, F160 Hasan Nizami's Taj-ul-Ma'asir, F161 Delhi's first woman ruler Razia Sultan) were added from checked original passages and selected page images. Boyle and Razia historical qualifications were independently corroborated; questionable "world's first" candidates were excluded.
+
+Bank release proposal: **161 curated bilingual questions** (Women 27, History 104, Science 30). Detailed evidence: [Class 7 Term I Firsts original-source review](class7-term1-firsts-review-2026-11-01.md), [all-page source scan](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41282143313), and [selected bilingual page-image review](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41282538319).
+
+**Certification remains: zero complete English/Tamil original-book pairs fully signed off.** Text extraction and targeted page-image inspection do not prove all-page visual, all-firsts editorial, or prescribed 2026–27 edition parity.
