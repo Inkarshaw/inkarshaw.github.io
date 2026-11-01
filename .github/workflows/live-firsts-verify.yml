@@ -48,18 +48,18 @@ jobs:
           expected_repo = json.loads(open('data/special-quizzes/firsts.json',encoding='utf-8').read())
           print('LIVE_RELEASE:', len(questions), 'questions, version', bank.get('meta',{}).get('version'), 'last ID', questions[-1]['id'] if questions else '-')
           print('REPO_RELEASE:', len(expected_repo['questions']), 'questions, version', expected_repo.get('meta',{}).get('version'))
-          if len(questions) < 178 or not any(q.get('id') == 'F178' for q in questions):
-              raise SystemExit('Public GitHub Pages deployment is still on an earlier Firsts edition; latest version 20 is not yet served')
+          if len(questions) < 182 or not any(q.get('id') == 'F182' for q in questions):
+              raise SystemExit('Public GitHub Pages deployment is still on an earlier Firsts edition; latest version 21 is not yet served')
           expected = [
-              (len(questions)==178,'178 questions'),
-              (bank['meta']['version']>=20,'updated bank v20'),
+              (len(questions)==182,'182 questions'),
+              (bank['meta']['version']>=21,'updated bank v21'),
               (bank['meta']['quiz_size']==20,'20-question sets'),
               ('id="skip"' in html,'skip control deployed'),
               ('id="unanswered"' in html,'unanswered result deployed'),
               ("$('set').value='1'" in html,'20-question default deployed'),
               ('other pioneers · 27 MCQs.' in home,'women count corrected'),
               ('major events · 113 MCQs.' in home,'history count corrected'),
-              ('discoveries · 38 MCQs.' in home,'science count corrected'),
+              ('discoveries · 42 MCQs.' in home,'science count corrected'),
               (next(q for q in questions if q['id']=='F042')['opts_en']==['1814','1824','1834','1844'],'F042 corrected'),
               (next(q for q in questions if q['id']=='F052')['opts_en']==['1206','1192','1191','1194'],'F052 corrected'),
               (next(q for q in questions if q['id']=='F149')['opts_en'][0]=='Viswanathan Anand','new Class 6 chess Firsts question'),
@@ -113,11 +113,18 @@ jobs:
               (all(next(q for q in questions if q['id']==id).get('historical_source_link') for id in ('F122','F123','F124','F125','F126','F127','F128','F129','F130','F131','F132','F133')),'older Class 9 audit original 2020 links retained'),
               (next(q for q in questions if q['id']=='F039')['opts_en'][next(q for q in questions if q['id']=='F039')['correct']]=='Sputnik 1' and '1957' in next(q for q in questions if q['id']=='F039')['q_en'],'Sputnik 1957 historical correction preserved'),
               (next(q for q in questions if q['id']=='F177')['source_conflict']['independently_verified_year']=='1676','Rømer wrong textbook year documented'),
+              (next(q for q in questions if q['id']=='F179')['opts_en'][0]=='Apsara','Class 10 first research reactor Apsara'),
+              (next(q for q in questions if q['id']=='F180')['opts_en'][0]=='Tarapur Atomic Power Station','Class 10 first nuclear electricity station Tarapur'),
+              (next(q for q in questions if q['id']=='F181')['opts_en'][0]=='Homi Jehangir Bhabha','Class 10 original AEC first chair'),
+              (next(q for q in questions if q['id']=='F182')['opts_en'][1]=='1952','Class 10 national family planning year'),
+              (all('class-10-' in next(q for q in questions if q['id']==id)['source_ta_link'] for id in ('F106','F110','F111','F112','F113','F115','F116','F179','F180','F181','F182')),'Class 10 original Tamil PDF links deployed'),
+              (all(next(q for q in questions if q['id']==id)['source_ta_pdf_page']>0 for id in ('F106','F110','F111','F112','F113','F115','F116','F179','F180','F181','F182')),'Class 10 source PDF page indexes deployed'),
+              (next(q for q in questions if q['id']=='F019')['source_conflict']['status']=='open_requires_original_edition_comparison','Swadesamitran date conflict remains open'),
                             (bank==json.loads(open('data/special-quizzes/firsts.json',encoding='utf-8').read()),'full live JSON matches merged repository bank'),
           ]
           for passed, name in expected:
               print(('PASS' if passed else 'FAIL'), name)
           if not all(p for p,_ in expected):
               raise SystemExit('Live deployment does not match the merged Firsts release')
-          print('CONFIRMED: public live URLs serve complete Class 9 bilingual-selected-originals Firsts release 178/v20')
+          print('CONFIRMED: public live URLs serve complete Class 10 bilingual-selected-originals Firsts release 182/v21')
           PY
