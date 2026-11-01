@@ -1,0 +1,41 @@
+name: Audit Class 7 Term III original English Tamil books
+on:
+  pull_request:
+    paths:
+      - scripts/audit_class7_term3_originals.py
+      - scripts/review_class7_term3_source_pages.py
+      - .github/workflows/class7-term3-original-audit.yml
+  workflow_dispatch:
+jobs:
+  original-books:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original PDF reader
+        run: python -m pip install pymupdf
+      - name: Scan original English Tamil Class 7 Term III source PDFs
+        run: python scripts/audit_class7_term3_originals.py
+      - name: Review selected original bilingual source page contexts and images
+        run: python scripts/review_class7_term3_source_pages.py
+      - name: Preserve selected internal source page evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class7-term3-selected-page-review
+          path: |
+            data/textbook/class7-term3-source-probe-2026-11-01.json
+            data/textbook/_class7_term3_private_review_images/
+          if-no-files-found: warn
+      - name: Store all-page candidate and provenance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class7-term3-original-pdf-evidence
+          path: data/textbook/class7-term3-original-audit-2026-11-01.json
+          if-no-files-found: warn

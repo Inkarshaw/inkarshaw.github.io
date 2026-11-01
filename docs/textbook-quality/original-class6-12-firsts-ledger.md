@@ -323,3 +323,13 @@ Existing Firsts **F050** (Calcutta Electric Supply Corporation, first thermal st
 ## 1 November 2026 — Firsts v17 public deployment verified
 
 The **165-question** Firsts bank (Women 27, History 107, Science 31) and original bilingual Class 7 Term II source references were successfully served by `clearexams.ink`, with actual JSON identical to `main`. Independent [public HTTP smoke run #41301899919](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41301899919) passed **40/40** checks. This is a release/deployment confirmation only. The count of **fully certified original English/Tamil textbook pairs remains zero**.
+
+## 1 November 2026 — Class 7 Term III original English/Tamil books
+
+Four original SCERT-authored Science and Social Science Term III files successfully downloaded, hashed and all their extractable text processed: English Science **106**, Tamil Science **129**, English Social Science **120**, Tamil Social Science **145**. **500/500 PDF pages have extractable text**, and broad keyword scanning produced **231 candidate lines**; these are not all true or verified historical firsts. Targeted original-source page images and passages were checked in English and Tamil.
+
+Five narrowly framed bilingual source-linked Firsts **F166–F170** have been added in the review branch: indigenous SLV-3's first successful satellite **Rohini RS-1 (1980)**, India's first interplanetary mission **Mangalyaan**, traditional first Jain Council at **Pataliputra**, Pallava architectural innovator **Mahendravarman I** and **Fleming's penicillin discovery**. Existing Sputnik/Aryabhata/Guru Nanak/women pioneers are not duplicated. Temple chronology and textbook Parkesine inventor naming are explicitly flagged and excluded from unsupported absolute-first quiz claims.
+
+**New release proposal: 170 curated bilingual questions** (Women **27**, History **109**, Science **34**). Detailed evidence: [Class 7 Term III review](class7-term3-firsts-review-2026-11-01.md), [full text-layer extraction](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41302645630), [selected original pages](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41303212680).
+
+**Original-book certification remains incomplete: zero fully audited paired English/Tamil volumes** under all-page visual and full factual/edition-review criteria; 2026–27 prescribed identity unverified. The historic counts above refer to prior release snapshots.
