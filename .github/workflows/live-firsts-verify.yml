@@ -48,18 +48,18 @@ jobs:
           expected_repo = json.loads(open('data/special-quizzes/firsts.json',encoding='utf-8').read())
           print('LIVE_RELEASE:', len(questions), 'questions, version', bank.get('meta',{}).get('version'), 'last ID', questions[-1]['id'] if questions else '-')
           print('REPO_RELEASE:', len(expected_repo['questions']), 'questions, version', expected_repo.get('meta',{}).get('version'))
-          if len(questions) < 165 or not any(q.get('id') == 'F165' for q in questions):
-              raise SystemExit('Public GitHub Pages deployment is still on an earlier Firsts edition; latest version 17 is not yet served')
+          if len(questions) < 170 or not any(q.get('id') == 'F170' for q in questions):
+              raise SystemExit('Public GitHub Pages deployment is still on an earlier Firsts edition; latest version 18 is not yet served')
           expected = [
-              (len(questions)==165,'165 questions'),
-              (bank['meta']['version']>=17,'updated bank v17'),
+              (len(questions)==170,'170 questions'),
+              (bank['meta']['version']>=18,'updated bank v18'),
               (bank['meta']['quiz_size']==20,'20-question sets'),
               ('id="skip"' in html,'skip control deployed'),
               ('id="unanswered"' in html,'unanswered result deployed'),
               ("$('set').value='1'" in html,'20-question default deployed'),
               ('other pioneers · 27 MCQs.' in home,'women count corrected'),
-              ('major events · 107 MCQs.' in home,'history count corrected'),
-              ('discoveries · 31 MCQs.' in home,'science count corrected'),
+              ('major events · 109 MCQs.' in home,'history count corrected'),
+              ('discoveries · 34 MCQs.' in home,'science count corrected'),
               (next(q for q in questions if q['id']=='F042')['opts_en']==['1814','1824','1834','1844'],'F042 corrected'),
               (next(q for q in questions if q['id']=='F052')['opts_en']==['1206','1192','1191','1194'],'F052 corrected'),
               (next(q for q in questions if q['id']=='F149')['opts_en'][0]=='Viswanathan Anand','new Class 6 chess Firsts question'),
@@ -90,11 +90,18 @@ jobs:
               (next(q for q in questions if q['id']=='F165')['opts_en'][1]=='Akbar','new Akbar Mansabdari source question'),
               (all('class-7-term-2-' in next(q for q in questions if q['id']==id)['source_ta_link'] for id in ('F050','F055','F162','F163','F164','F165')),'Class 7 Term II original Tamil source links live'),
               (all(next(q for q in questions if q['id']==id)['source_ta_pdf_page']>0 for id in ('F050','F055','F162','F163','F164','F165')),'Class 7 Term II original Tamil PDF page indexes live'),
+              (next(q for q in questions if q['id']=='F166')['opts_en'][0]=='Rohini RS-1','Class 7 Term III indigenous Rohini first'),
+              (next(q for q in questions if q['id']=='F167')['opts_en'][0]=='Mars Orbiter Mission (Mangalyaan)','first Indian Mars mission'),
+              (next(q for q in questions if q['id']=='F168')['opts_en'][0]=='Pataliputra','first Jain council tradition'),
+              (next(q for q in questions if q['id']=='F169')['opts_en'][0]=='Mahendravarman I','Mandagapattu Pallava pioneer'),
+              (next(q for q in questions if q['id']=='F170')['opts_en'][0]=='Alexander Fleming','1928 penicillin discovery'),
+              (all('class-7-term-3-' in next(q for q in questions if q['id']==id)['source_ta_link'] for id in ('F166','F167','F168','F169','F170')),'Class 7 Term III Tamil original PDF sources deployed'),
+              (all(next(q for q in questions if q['id']==id)['source_ta_pdf_page']>0 for id in ('F166','F167','F168','F169','F170')),'five source-backed Tamil PDF page indexes deployed'),
                             (bank==json.loads(open('data/special-quizzes/firsts.json',encoding='utf-8').read()),'full live JSON matches merged repository bank'),
           ]
           for passed, name in expected:
               print(('PASS' if passed else 'FAIL'), name)
           if not all(p for p,_ in expected):
               raise SystemExit('Live deployment does not match the merged Firsts release')
-          print('CONFIRMED: public live URLs serve complete Class 7 Term II-reviewed Firsts release 165/v17')
+          print('CONFIRMED: public live URLs serve complete Class 7 Term III-reviewed Firsts release 170/v18')
           PY
