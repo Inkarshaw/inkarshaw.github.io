@@ -53,3 +53,9 @@ The last three facts are separate from the already-published Firsts bank. Existi
 - [ ] Final bilingual proofreading and a book-level sign-off with an independent reviewer.
 
 **Audited question-bank result:** planned 151 → **154 bilingual MCQs**, bank version **14**, class 6 count 18, category counts Women 26, History 100, Science 28. This is a **partial original source fact check**, not whole-volume certification. Complete original-book certifications across the historical Classes 6–12 catalogue remain **0**.
+
+## 1 November 2026 — independent live deployment confirmation
+
+[GitHub Actions public-HTTP run **#41270064750**](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41270064750) completed successfully. From an external GitHub runner, `https://clearexams.ink/`, `/textbook-firsts.html` and `/data/special-quizzes/firsts.json` **all returned HTTP 200**. The complete live JSON file matched the merged repository bank, containing **154 questions, version 14**; homepage Women/History/Science counts were **26/100/28**, and new F152, F153 and F154, F041 fixes and four source-PDF link changes were confirmed live. **21/21 release assertions passed**. Browser tests passed on the repository build, not through a separate interactive live-browser session.
+
+This is **website deployment verification**, not a certificate that all pages of the four books or the current academic-year edition have been reviewed.
