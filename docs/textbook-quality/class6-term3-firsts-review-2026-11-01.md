@@ -19,7 +19,7 @@ Reproducible [all-PDF text scan #41275620108](https://github.com/Inkarshaw/inkar
 
 ## Question-by-question bilingual fact review
 
-**PDF page numbers below are 1-based physical PDF pages; printed-page numbers can differ substantially between languages.** Seven existing and new claims have selected original bilingual text corroboration; selected relevant page images were also inspected. **Six existing questions** F042/F045–F049 were corrected or source-updated; **two** new Firsts added (F155–F156).
+**PDF page numbers below are 1-based physical PDF pages; printed-page numbers can differ substantially between languages.** All eight listed claims have selected original bilingual text corroboration; relevant page images were inspected for a subset, while the full original-volume visual audit remains pending. **Six existing questions** F042 and F045–F049 were corrected or source-updated; **two** new Firsts added (F155–F156).
 
 | ID | English original PDF page | Tamil original PDF page | Textbook source fact and audit outcome |
 | --- | ---: | ---: | --- |
