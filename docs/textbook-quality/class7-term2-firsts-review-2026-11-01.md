@@ -58,3 +58,11 @@ All six question records have individual **one-based physical PDF page indexes f
 - [ ] Resolve any contested historical superlatives against the original passage plus independent reliable evidence.
 
 **Release proposal:** move Firsts bank from **161 bilingual questions (v16)** to **165 (v17)**: Women 27 / History **107** / Science **31**. **No Class 7 Term II book is certified complete** and no Classes 6–12 overall full-coverage claim is authorized.
+
+## Live deployment confirmation — 1 November 2026
+
+After merging source-audit PR [#210](https://github.com/Inkarshaw/inkarshaw.github.io/pull/210), an independent GitHub-hosted public-HTTP deployment test successfully loaded `https://clearexams.ink/textbook-firsts.html`, `/data/special-quizzes/firsts.json` and the homepage (all HTTP **200**). The **actual public 165-question JSON version 17 exactly matched the merged repository file**. All **40/40** live release checks passed, including new F162–F165, corrected existing F050/F055 source links and original Tamil PDF page indexes.
+
+Evidence: [Live Firsts version 17 verification run #41301899919](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41301899919).
+
+**This validates deployment and selected original-page facts; it does not certify all four textbook editions or complete Classes 6–12 coverage.**
