@@ -159,10 +159,10 @@ class FirstsCertificationTests(unittest.TestCase):
             "F045": ("social-science", 123, 136),
             "F046": ("social-science", 122, 135),
             "F047": ("social-science", 37, 40),
-            "F048": ("social-science", 19, None),
+            "F048": ("social-science", 19, 21),
             "F049": ("science", 9, 17),
             "F155": ("social-science", 122, 135),
-            "F156": ("social-science", 118, None),
+            "F156": ("social-science", 118, 131),
         }
         for id, (book, en, ta) in selected.items():
             with self.subTest(id=id):
