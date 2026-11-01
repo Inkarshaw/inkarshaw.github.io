@@ -22,7 +22,7 @@ class OriginalBookFirstsTests(unittest.TestCase):
             self.assertNotIn(source["id"], ids)
             ids.add(source["id"])
             standards.add(source["class"])
-            self.assertIn(source["english_pdf_review"], ("not-started","downloaded","text-extracted","selected_history_units_extracted_from_original_pdf","all_216_pages_text_extracted_selected_firsts_facts_checked_visual_pending","all_88_pages_text_extracted_selected_original_fact_visual_checked","all_138_pages_text_extracted_selected_original_fact_visual_checked","all_pages_text_extracted_selected_passages_images_reviewed_not_complete","all_pages_text_extracted_selected_original_text_and_images_checked_not_complete","all_pages_text_extracted_selected_bilingual_passages_and_images_reviewed_not_complete","all_pages_text_extracted_selected_original_source_text_and_images_checked_not_complete"))
+            self.assertIn(source["english_pdf_review"], ("not-started","downloaded","text-extracted","selected_history_units_extracted_from_original_pdf","all_216_pages_text_extracted_selected_firsts_facts_checked_visual_pending","all_88_pages_text_extracted_selected_original_fact_visual_checked","all_138_pages_text_extracted_selected_original_fact_visual_checked","all_pages_text_extracted_selected_passages_images_reviewed_not_complete","all_pages_text_extracted_selected_original_text_and_images_checked_not_complete","all_pages_text_extracted_selected_bilingual_passages_and_images_reviewed_not_complete","all_pages_text_extracted_selected_original_source_text_and_images_checked_not_complete","all_pages_text_extracted_selected_original_bilingual_passages_images_checked_not_complete"))
             self.assertNotEqual(source["chapter_coverage"], "complete")
             self.assertEqual(urlparse(source["english_url"]).scheme, "https")
             if source.get("tamil_url"):
@@ -51,7 +51,14 @@ class OriginalBookFirstsTests(unittest.TestCase):
                 self.assertIn(q["page"], (6,55,80,106,111,116,118,195))
                 self.assertIn("2022", q["original_edition"])
                 original += 1
-        self.assertGreaterEqual(original, 10)
+        self.assertGreaterEqual(original, 4)
+        # Class 10 older English-only entries were promoted to selected
+        # original English/Tamil source pages. Keep explicit proof.
+        for id in ("F110","F111","F112","F113","F115","F116"):
+            q = next(item for item in items if item["id"] == id)
+            self.assertIn("class-10-social-science-tamil.pdf", q["source_ta_link"])
+            self.assertGreater(q["source_ta_pdf_page"], 0)
+            self.assertIn("pending", q["review_status"])
         # F117/F118 advanced from original-English-only to selected
         # original English/Tamil facts; they must not be counted as still
         # awaiting their first Tamil original-page check.
