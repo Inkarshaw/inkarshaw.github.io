@@ -10,7 +10,7 @@ The Padanool class-by-class original-book archive (source list linked below) sho
 
 | Standard | English listed | Tamil listed | Combined editions | Original edition audit |
 | --- | ---: | ---: | ---: | --- |
-| 6 | 10 | 12 | 22 | Partial legacy quiz extraction; no complete original PDF sign-off |
+| 6 | 10 | 12 | 22 | **Term I bilingual original PDF pair scanned 216+216 pages; 8 selected facts cross-checked, 3 new MCQs; no full volume sign-off** |
 | 7 | 10 | 12 | 22 | Class 7 women's firsts compared with transcribed chapter; remaining books unverified |
 | 8 | 6 | 7 | 13 | One 2022 original Social Science English volume partly checked; newer edition unverified |
 | 9 | 6 | 7 | 13 | **2018/2019/2020 revised English Social Science text partially reviewed**; Tamil and recent edition pending |
@@ -269,3 +269,14 @@ For F145–F148, the Tamil-mode Firsts player now offers the visually corroborat
 2025-revised original PDFs in both languages successfully downloaded and hashed: **110 pages per medium**. Two existing Firsts Quiz answers have selected original English page-text and Tamil-transcription corroboration: **F043 Charles Masson** (original printed p.133, PDF p.31) and **F044 Viswanathan Anand** (narrative printed p.207/PDF p.105, exercise printed p.209/PDF p.107). The Tamil original PDF has a partly garbled text layer; visual and complete original-volume review remain open. This also exposed further candidate Firsts such as Uranus/William Herschel, Chandrayaan-1, Ambedkar and Anand's first-grandmaster achievement.
 
 [Read the separate 2025 Social Science original-PDF evidence and pending candidate list](class6-term1-social-original-pdf-2025-review.md). **Whole-book English/Tamil certifications still = 0**; the selective five-question (F033–F035, F043–F044) check does not establish completeness.
+
+## 1 November 2026 — Class 6 Term I Volume 3 book-by-book inspection
+
+Both English and Tamil **original SCERT Science + Social Science combined PDFs** were downloaded with SHA-256 fingerprints, each containing **216 PDF pages**. The automated source scanner extracted text from **all 216 English and 216 Tamil pages** and retained a page-level audit artifact. This is complete **text extraction coverage**, not complete manual or image-content certification.
+
+The Firsts Quiz now has **151 curated bilingual questions**, including the three additions from this Class 6 Term I review.\n\nFive existing questions F033–F035, F043 and F044 were matched to source passages in both language versions (Tamil F044 also checked against the Tamil exercise and 2025-labelled transcript). Weak distractors in F033/F043/F044 were improved, ENIAC's status was qualified, and direct original PDFs replace older Drive source links. Three additional bilingual questions F149–F151 were created from independently checked English/Tamil textbook facts: India's first chess Grandmaster, Uranus as the first planet found with a telescope, and India's first Moon mission Chandrayaan-1.
+
+**Full original-book status: NOT CERTIFIED** until all text/visual content, chapter-level candidates, edition identity, and full Tamil–English printed-page comparison have been manually checked. The original archive total stays **251 listings, zero fully certified pairs**.
+
+Evidence and per-question page indexes: [Class 6 Term I bilingual review](class6-term1-firsts-review-2026-11-01.md); [source scan GitHub Actions](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41268000582).
+\n
