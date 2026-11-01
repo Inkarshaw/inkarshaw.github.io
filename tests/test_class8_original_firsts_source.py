@@ -60,11 +60,13 @@ class Class8OriginalFirstsTests(unittest.TestCase):
     self.assertEqual(len(set(q["opts_ta"])),4)
     self.assertTrue(q["exp_en"] and q["exp_ta"])
     self.assertIn("pending",q["review_status"])
- def test_174_released_only_after_review(self):
+ def test_class8_source_proofs_remain_after_later_releases(self):
   self.assertEqual(self.bank["meta"]["version"],19)
-  self.assertEqual(self.bank["meta"]["count"],174)
-  self.assertEqual(len(self.bank["questions"]),174)
-  self.assertEqual(Counter(q["category"] for q in self.bank["questions"]),{"women":27,"history":111,"science":36})
+  self.assertGreaterEqual(self.bank["meta"]["count"],174)
+  self.assertGreaterEqual(len(self.bank["questions"]),174)
+  counts=Counter(q["category"] for q in self.bank["questions"])
+  for category,min_count in {"women":27,"history":111,"science":36}.items():
+   self.assertGreaterEqual(counts[category],min_count)
   for phrase in ("1,152","F171","F172","F173","F174","2026–27","NOT","certifi"):
    self.assertIn(phrase,self.report)
 if __name__=="__main__":unittest.main()

@@ -1,0 +1,52 @@
+name: Audit original Class 9 English and Tamil Science Social Science
+on:
+  pull_request:
+    paths:
+      - scripts/audit_class9_originals.py
+      - scripts/review_class9_source_pages.py
+      - scripts/review_class9_focused_pairs.py
+      - .github/workflows/class9-original-audit.yml
+  workflow_dispatch:
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pymupdf
+      - name: Download and text-scan four Class 9 SCERT original books
+        run: python scripts/audit_class9_originals.py
+      - name: Inspect selected original English and Tamil PDF facts/pages
+        run: python scripts/review_class9_source_pages.py
+      - name: Preserve internal source page images and editorial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class9-selected-bilingual-source-page-review
+          path: |
+            data/textbook/class9-source-page-probe-2026-11-01.json
+            data/textbook/_class9_private_review_images/
+          if-no-files-found: warn
+      - name: Check further precise Class 9 original English/Tamil firsts pages
+        run: python scripts/review_class9_focused_pairs.py
+      - name: Preserve internal high-resolution selected source images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class9-final-selected-bilingual-original-pages
+          path: |
+            data/textbook/class9-final-firsts-page-evidence-2026-11-01.json
+            data/textbook/_class9_final_private_pages/
+          if-no-files-found: warn
+      - name: Preserve original book fingerprints and candidate excerpts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class9-four-original-books-source-evidence
+          path: data/textbook/class9-full-year-original-audit-2026-11-01.json
+          if-no-files-found: warn
