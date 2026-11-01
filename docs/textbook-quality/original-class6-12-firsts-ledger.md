@@ -10,7 +10,7 @@ The Padanool class-by-class original-book archive (source list linked below) sho
 
 | Standard | English listed | Tamil listed | Combined editions | Original edition audit |
 | --- | ---: | ---: | ---: | --- |
-| 6 | 10 | 12 | 22 | **Terms I & II: original English/Tamil PDFs text-scanned; Term II 4 PDFs, 420 pages, selected facts checked, 3 new questions; no complete-volume sign-off** |
+| 6 | 10 | 12 | 22 | **Terms I–III: bilingual original PDFs source-scanned, including Term III 476 pages across 4 files; selected fact checks only, no complete-volume sign-off** |
 | 7 | 10 | 12 | 22 | Class 7 women's firsts compared with transcribed chapter; remaining books unverified |
 | 8 | 6 | 7 | 13 | One 2022 original Social Science English volume partly checked; newer edition unverified |
 | 9 | 6 | 7 | 13 | **2018/2019/2020 revised English Social Science text partially reviewed**; Tamil and recent edition pending |
@@ -287,3 +287,13 @@ Both the **English and Tamil 2024 SCERT reprints** of Term II **Science** and **
 Selected original-language facts checked: F041 Robert Hooke in 1665, F068 Rishabha first Tirthankara in Jain tradition, F069 Sarnath first sermon, F070 Dharmachakra, F071 First Buddhist Council Rajagriha, F072 Ajatashatru; the five pre-existing Class 11 Jain/Buddhist questions are **cross-referenced, not duplicated**. Existing MCQ distractors and F041 English/Tamil explanations improved. New bilingual source-checked facts **F152 Mahapadma Nanda**, **F153 Gudiyatham 1947 Independence Day flag**, **F154 Jana Gana Mana at 1911 Calcutta Congress** were added with original PDF page references. Firsts bank now has **154 curated bilingual questions**, category 26 women / 100 history / 28 science. This supersedes the earlier interim **151** inventory but does not invalidate earlier published QA release evidence.
 
 **No Class 6 Term II book can be certified as exhaustively reviewed yet.** Need all-page visual, full Firsts editorial screening, updated official 2026–27 edition confirmation and final bilingual quality certification. Overall original-book full-pair certification remains **0**.
+
+## 1 November 2026 — Class 6 Term III original English/Tamil Science and Social Science
+
+**Both original subject books, two language editions each, were downloaded and SHA-256 fingerprinted** (full URLs and hashes in [Class 6 Term III review](class6-term3-firsts-review-2026-11-01.md)). Entire embedded text layers were processed: Science **88 English + 96 Tamil**, Social Science **138 English + 154 Tamil** — **476 of 476 PDF pages have some extractable text**. Text extraction is **not** exhaustive editorial/visual reading.
+
+Original page images and short bilingual source passages were examined for six existing questions **F042, F045–F049**. F049's duplicate answers “Chinese”/“China” were replaced with distinct alternatives; F042 changed from a patent claim not stated in the book to the supported **1824 development**; F047 and F048 distractors and explanations were repaired; all six direct English and Tamil source links and physical PDF pages were recorded. Two additional selected-source facts **F155 Chennai Corporation founded 1688/oldest local body** and **F156 New Zealand 1893 national women's suffrage (carefully limited to self-governing parliamentary-election scope, separately confirmed by NZ government)** were added.
+
+The Firsts Quiz now has **156 curated bilingual questions** (26 women / 102 history / 28 science). The historical 151 and 154 counts above are earlier **revision snapshots**, not current counts.
+
+**Book sign-off:** **0** newly fully certified English/Tamil original pairs. Four PDFs are completely text-extracted, but 2026–27 edition parity, complete images/graphics/page-by-page reading and exhaustive editorial candidate reconciliation remain outstanding.
