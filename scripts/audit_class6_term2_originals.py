@@ -23,10 +23,10 @@ MAX_BYTES = 170*1024*1024
 PDFS = {
  "combined_en": "https://www.freetnbooks.com/wp-content/uploads/2025/10/6th-Std-Science-Book_Term-2_EM.pdf",
  "combined_ta": "https://www.freetnbooks.com/wp-content/uploads/2025/10/6th-Std-Science-Book_Term-2_TM.pdf",
- "science_en": "https://drive.google.com/file/d/1qgd4KO23frMWGpKFNYW5yKM-8nwAAt_b/view",
- "science_ta": "https://drive.google.com/file/d/1z8NtNrp0uqYsNSVLCVwCnLrW5uJB7pvc/view",
- "social_en": "https://drive.google.com/file/d/152VLmu2VZcCh7_EnkbPOjEOHHizLvnNU/view",
- "social_ta": "https://drive.google.com/file/d/1Q87SpVWx0D64OAnuM7goGASkPCRIIpBG/view",
+ "science_en": "https://cleartnpsc.com/books/download/class-6-term-2-science-english.pdf",
+ "science_ta": "https://cleartnpsc.com/books/download/class-6-term-2-science-tamil.pdf",
+ "social_en": "https://cleartnpsc.com/books/download/class-6-term-2-social-science-english.pdf",
+ "social_ta": "https://cleartnpsc.com/books/download/class-6-term-2-social-science-tamil.pdf",
 }
 TERMS_EN = re.compile(r"\b(first|earliest|founder|discover(?:ed|y)?|invent(?:ed|ion|or)|pione(?:er|ering)|introduc(?:ed|tion)|origin(?:al|ated)?|establish(?:ed|ment)|oldest|initially)\b", re.I)
 TERMS_TA = re.compile(r"(முதல்|முதன்|முதலாவது|முதன்முறை|கண்டுபிடி|கண்டறி|நிறுவிய|தொடங்கிய|முன்னோடி|பழமையான)")
@@ -147,7 +147,7 @@ def main():
             print("SOURCE_SKIPPED",key,"original bilingual combined volume available",flush=True)
             continue
         try:
-            if key in ("science_en","science_ta","social_en","social_ta"):
+            if "drive.google.com" in url:
                 # Drive can be rate-limited; combined original PDFs are preferred.
                 data,ctype=fetch_gdrive(url)
             else:
