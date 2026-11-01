@@ -69,6 +69,8 @@ class Class9FullYearOriginalSourceTests(unittest.TestCase):
   self.assertEqual(self.quiz["meta"]["version"],20)
   self.assertEqual(self.quiz["meta"]["count"],178)
   self.assertEqual(Counter(q["category"] for q in self.quiz["questions"]),{"women":27,"history":113,"science":38})
+  self.assertEqual(self.q["F039"]["opts_en"][self.q["F039"]["correct"]],"Sputnik 1")
+  self.assertIn("1957",self.q["F039"]["q_en"])
   self.assertIn("1956",self.q["F039"]["source_conflict_note"])
   self.assertIn("1957",self.q["F039"]["source_conflict_note"])
   self.assertEqual(self.q["F177"]["source_conflict"]["independently_verified_year"],"1676")
