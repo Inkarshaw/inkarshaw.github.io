@@ -1,0 +1,28 @@
+name: Audit original Class 7 Term I English Tamil textbooks
+on:
+  pull_request:
+    paths:
+      - scripts/audit_class7_term1_originals.py
+      - .github/workflows/class7-term1-original-audit.yml
+  workflow_dispatch:
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pymupdf
+      - name: Scan original Class 7 Term I English Tamil PDF books
+        run: python scripts/audit_class7_term1_originals.py
+      - name: Store original PDF inventory and candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class7-term1-original-pdf-evidence
+          path: data/textbook/class7-term1-original-audit-2026-11-01.json
+          if-no-files-found: warn
