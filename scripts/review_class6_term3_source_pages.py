@@ -20,15 +20,15 @@ PROBES={
  },
  "science_ta":{
   "terms":["1824","Aspdin","Portland","சீனர்","சீன","திசைகாட்டி","ஆஸ்ப்டின்","போர்ட்லேண்ட்"],
-  "pages":[10,12,45]
+  "pages":[9,10,12,17,45,46]
  },
  "social_en":{
   "terms":["Walajahpet","town Panchayat","first state","Susruta","Vasudeva","first Gupta ruler","first Indian astronomer","Girnar inscription","first emporium","oldest local body","first country"],
   "pages":[13,19,20,31,37,118,122,123]
  },
  "social_ta":{
-  "terms":["வாலாஜாபேட்டை","வாலாஜா","வாசுதேவ","சுசுருத","சுஸ்ருத","பேரூராட்சி","நகராட்சி","கண்வ","குப்தர்","1781"],
-  "pages":[20,22,42,134,135,136,137,138]
+  "terms":["வாலாஜாபேட்டை","வாலாஜா","வாசுதேவ","வாசு","சுசுருத","சுஸ்ருத","பேரூராட்சி","நகராட்சி","கண்வ","குப்தர்","1893","1688","நியூசி"],
+  "pages":[20,21,22,40,42,110,111,133,134,135,136,137,138]
  }
 }
 def main():
