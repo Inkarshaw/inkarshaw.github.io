@@ -29,13 +29,13 @@ class FirstsCertificationTests(unittest.TestCase):
         cls.page = PAGE.read_text(encoding="utf-8")
         cls.home = HOME.read_text(encoding="utf-8")
 
-    def test_all_156_records_and_topics(self):
-        self.assertEqual(len(self.questions), 156)
+    def test_all_161_records_and_topics(self):
+        self.assertEqual(len(self.questions), 161)
         self.assertEqual(self.bank["meta"]["count"], len(self.questions))
         self.assertEqual(len(self.by_id), len(self.questions))
-        self.assertEqual(set(self.by_id), {f"F{i:03d}" for i in range(1, 157)})
+        self.assertEqual(set(self.by_id), {f"F{i:03d}" for i in range(1, 162)})
         self.assertEqual(Counter(q["category"] for q in self.questions),
-                         {"history": 102, "women": 26, "science": 28})
+                         {"history": 104, "women": 27, "science": 30})
         self.assertEqual({q["class_no"] for q in self.questions}, set(range(6, 13)))
 
     def test_all_answers_bilingual_and_unique(self):
@@ -89,9 +89,9 @@ class FirstsCertificationTests(unittest.TestCase):
 
     def test_homepage_counts_consistent(self):
         for category, phrase in [
-            ("women", "other pioneers · 26 MCQs."),
-            ("history", "major events · 102 MCQs."),
-            ("science", "discoveries · 28 MCQs."),
+            ("women", "other pioneers · 27 MCQs."),
+            ("history", "major events · 104 MCQs."),
+            ("science", "discoveries · 30 MCQs."),
         ]:
             with self.subTest(category=category):
                 self.assertIn(phrase, self.home)

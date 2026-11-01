@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Real Chromium exercise of the Firsts player, including mobile and Tamil mode."""
 import functools
+import json
 import threading
 import unittest
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -90,7 +91,9 @@ class FirstsBrowserSmoke(unittest.TestCase):
         self.assertIn("of 20", page.locator("#badge").inner_text())
         page.locator("#set").select_option("all")
         page.locator("#load").click()
-        self.assertIn("of 23", page.locator("#badge").inner_text())
+        questions = json.loads((ROOT / "data/special-quizzes/firsts.json").read_text(encoding="utf-8"))["questions"]
+        expected = sum(q["class_no"] == 7 and q["category"] == "women" for q in questions)
+        self.assertIn(f"of {expected}", page.locator("#badge").inner_text())
         # The mobile page should not introduce sideways document scrolling.
         dimensions = page.evaluate("({scroll:document.documentElement.scrollWidth, width:innerWidth})")
         self.assertLessEqual(dimensions["scroll"], dimensions["width"] + 2)
