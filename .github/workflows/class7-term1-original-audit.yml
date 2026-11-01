@@ -19,10 +19,21 @@ jobs:
       - run: python -m pip install pymupdf
       - name: Scan original Class 7 Term I English Tamil PDF books
         run: python scripts/audit_class7_term1_originals.py
+      - name: Capture selected bilingual original-page passages and images
+        run: python scripts/review_class7_term1_source_pages.py
       - name: Store original PDF inventory and candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: class7-term1-original-pdf-evidence
           path: data/textbook/class7-term1-original-audit-2026-11-01.json
+          if-no-files-found: warn
+      - name: Preserve focused internal original-page review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class7-term1-source-pages-private-review
+          path: |
+            data/textbook/class7-term1-source-probe-2026-11-01.json
+            data/textbook/_class7_term1_private_review_images/
           if-no-files-found: warn
