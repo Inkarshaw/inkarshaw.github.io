@@ -333,3 +333,9 @@ Five narrowly framed bilingual source-linked Firsts **F166–F170** have been ad
 **New release proposal: 170 curated bilingual questions** (Women **27**, History **109**, Science **34**). Detailed evidence: [Class 7 Term III review](class7-term3-firsts-review-2026-11-01.md), [full text-layer extraction](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41302645630), [selected original pages](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41303212680).
 
 **Original-book certification remains incomplete: zero fully audited paired English/Tamil volumes** under all-page visual and full factual/edition-review criteria; 2026–27 prescribed identity unverified. The historic counts above refer to prior release snapshots.
+
+## 1 November 2026 — Firsts v18 live on clearexams.ink
+
+The **170-question** Firsts bank (Women 27, History 109, Science 34), with the five Class 7 Term III bilingual source-linked additions F166–F170, is served on the actual public `clearexams.ink` domain. A GitHub-hosted runner confirmed HTTP **200** for player, JSON and homepage; the live bank matched the merged repository exactly. **47/47** release checks passed in [public live verification #41304215805](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41304215805). Historical earlier totals in this ledger refer to prior release snapshots, not current release.
+
+**Full source-book certification remains incomplete**; site deployment is a different claim from entire-English/Tamil-volume source verification.
