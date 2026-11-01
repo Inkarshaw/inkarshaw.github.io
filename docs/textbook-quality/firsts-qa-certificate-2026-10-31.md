@@ -73,3 +73,11 @@ This confirms the live site serves the updated HTML and JSON at that observation
 Five published Firsts questions (**F033–F035, F043–F044**) have been matched to original **2025-revised English SCERT PDFs**, with matching facts in the **2025 Tamil textbook transcription** and original Tamil PDFs downloaded and hashed. The 2025 original Tamil PDF text layer is partly garbled, so individual Tamil pages have not all received visual sign-off. Evidence: [Science](class6-term1-original-pdf-2025-review.md) and [Social Science](class6-term1-social-original-pdf-2025-review.md).
 
 **Scope unchanged:** these are selected factual checks in two subject components, not a complete firsts audit of every page or every original volume. Whole-book bilingual certified pairs remain **0**. The historical 251 archive listings are an old catalogue baseline, not a certified count of 2026–27 textbooks.
+
+## Later update — 1 November 2026: Class 6 Term I source-backed expansion
+
+This document is a **31 October 2026 release certificate** for the earlier 148-question version; its earlier frozen figures and 11/11 live-HTTP check apply to that earlier release, not automatically to subsequent revisions.
+
+The proposed **1 November version 13** contains **151 questions** (Women 26, History 97, Science 28). Eight Class 6 Term I facts were checked in extracted source passages of the **two original PDFs, 216 pages each**, including 3 new questions F149–F151. See [Class 6 Term I book review](class6-term1-firsts-review-2026-11-01.md) and [original-PDF scan evidence](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41268000582). The new release's CI and actual site-deployment verification must be recorded independently after merging; the previous live check does not prove this release is deployed.
+
+The full original English–Tamil series still has **zero completely certified textbook-edition pairs**. Text extraction on all PDF pages and selected fact verification alone are not sufficient for a whole-book certification stamp.
