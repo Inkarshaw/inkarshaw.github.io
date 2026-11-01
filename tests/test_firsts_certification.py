@@ -29,13 +29,13 @@ class FirstsCertificationTests(unittest.TestCase):
         cls.page = PAGE.read_text(encoding="utf-8")
         cls.home = HOME.read_text(encoding="utf-8")
 
-    def test_all_154_records_and_topics(self):
-        self.assertEqual(len(self.questions), 154)
+    def test_all_156_records_and_topics(self):
+        self.assertEqual(len(self.questions), 156)
         self.assertEqual(self.bank["meta"]["count"], len(self.questions))
         self.assertEqual(len(self.by_id), len(self.questions))
-        self.assertEqual(set(self.by_id), {f"F{i:03d}" for i in range(1, 155)})
+        self.assertEqual(set(self.by_id), {f"F{i:03d}" for i in range(1, 157)})
         self.assertEqual(Counter(q["category"] for q in self.questions),
-                         {"history": 100, "women": 26, "science": 28})
+                         {"history": 102, "women": 26, "science": 28})
         self.assertEqual({q["class_no"] for q in self.questions}, set(range(6, 13)))
 
     def test_all_answers_bilingual_and_unique(self):
@@ -90,7 +90,7 @@ class FirstsCertificationTests(unittest.TestCase):
     def test_homepage_counts_consistent(self):
         for category, phrase in [
             ("women", "other pioneers · 26 MCQs."),
-            ("history", "major events · 100 MCQs."),
+            ("history", "major events · 102 MCQs."),
             ("science", "discoveries · 28 MCQs."),
         ]:
             with self.subTest(category=category):
@@ -107,7 +107,7 @@ class FirstsCertificationTests(unittest.TestCase):
 
     def test_class6_term1_original_pdf_evidence(self):
         questions = ("F033", "F034", "F035", "F043", "F044", "F149", "F150", "F151")
-        self.assertEqual(sum(q["class_no"] == 6 for q in self.questions), 18)
+        self.assertEqual(sum(q["class_no"] == 6 for q in self.questions), 20)
         for id in questions:
             with self.subTest(id=id):
                 q = self.by_id[id]
@@ -152,6 +152,32 @@ class FirstsCertificationTests(unittest.TestCase):
             "Rishabha", "Mahavira", "Parshvanatha", "Neminatha"])
         self.assertEqual(self.by_id["F072"]["opts_en"], [
             "Bimbisara", "Kalasoka", "Ashoka", "Ajatashatru"])
+
+    def test_class6_term3_original_source_and_editorial_review(self):
+        selected = {
+            "F042": ("science", 43, 46),
+            "F045": ("social-science", 123, 136),
+            "F046": ("social-science", 122, 135),
+            "F047": ("social-science", 37, 40),
+            "F048": ("social-science", 19, None),
+            "F049": ("science", 9, 17),
+            "F155": ("social-science", 122, 135),
+            "F156": ("social-science", 118, None),
+        }
+        for id, (book, en, ta) in selected.items():
+            with self.subTest(id=id):
+                q = self.by_id[id]
+                self.assertEqual(q["class_no"], 6)
+                self.assertIn("class-6-term-3-"+book, q["source_link"])
+                self.assertIn("class-6-term-3-"+book, q["source_ta_link"])
+                self.assertEqual(q["source_pdf_page_en"], en)
+                self.assertEqual(q.get("source_ta_pdf_page"), ta)
+                self.assertIn("pending", q["review_status"])
+        self.assertEqual(len(set(self.by_id["F049"]["opts_en"])), 4)
+        self.assertEqual(self.by_id["F049"]["opts_en"][1], "Chinese mariners")
+        self.assertEqual(self.by_id["F047"]["opts_en"][0], "Susruta")
+        self.assertEqual(self.by_id["F155"]["opts_en"][1], "Chennai Municipal Corporation")
+        self.assertEqual(self.by_id["F156"]["opts_en"][2], "New Zealand")
 
     def test_provenance_limitations_visible(self):
         # The remaining gaps must be reported, NOT silently treated as certified.
