@@ -3,7 +3,7 @@
 **Audit date:** 1 November 2026  
 **Book:** Government of Tamil Nadu / SCERT, Standard Six, Term I, Volume 3, Science + Social Science  
 **Status:** **PARTIAL SOURCE-FACT CERTIFICATION — EIGHT MCQs CROSS-CHECKED; COMPLETE BOOK NOT CERTIFIED.**  
-**Live deployment:** Not asserted by this record.  
+**Live deployment:** **Confirmed** on 1 November 2026 by independent public-HTTP GitHub Actions ([run #41268805049](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41268805049)).  
 **Auditor method:** Independently downloaded both original SCERT PDFs, extracted page text from every page, reviewed selected English and Tamil source passages and 2025 English/Tamil transcriptions. Visual inspection of *every page* and 2026–27 edition matching remain open.
 
 ## Two original files inspected
@@ -52,3 +52,9 @@ All eight have specified English and Tamil source URLs, recorded PDF page indexe
 - [ ] Perform bilingual editorial proofreading for all relevant questions and alternative answers, and finish a complete volume/term coverage sign-off.
 
 **Result:** Book 1 has a verified original bilingual PDF pair and eight checked source-fact MCQs. This is **meaningful partial verification**, not a finished / certified English–Tamil book pair. Full-series count of completely certified original book pairs remains **0**.
+
+## 1 November 2026: live deployment check
+
+An independent GitHub Actions runner fetched the **public custom domain**, not repository files, and obtained HTTP **200** for `/textbook-firsts.html`, `/data/special-quizzes/firsts.json` and `/`. The complete live JSON content matched the merged GitHub repository bank, with **151 questions, version 13**, corrected women/history/science homepage counts **26/97/28**, new F149–F151 answers, and direct Tamil original PDF links for all eight verified Class 6 Term I facts.
+
+The [independent live audit run 41268805049](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41268805049) returned **16/16 passing release assertions**. This confirms live deployment of the selected-fact updates, **not** entire textbook factual/visual certification.
