@@ -49,6 +49,21 @@ Reproducible [all-PDF text scan #41275620108](https://github.com/Inkarshaw/inkar
 - [ ] Reconcile original-page extraction with every Firsts candidate in *all* chapters (including statements with no firsts keywords), document discarded claims, and check all remaining translated answer explanations.
 - [ ] Confirm inner printing/edition pages and map files to the **2026–27 prescribed editions**, including whether distinct 2024/2025 versions changed facts.
 - [ ] Confirm exact printed page numbers (especially Tamil), and manually sign off Tamil original page image around F156.
-- [ ] Complete full source-link reachability, live Quiz English/Tamil mobile-player checks and published deployment verification of version **15 / 156 questions**.
+- [x] Live release deployed at clearexams.ink: independent HTTPS check confirms homepage, quiz page and bank JSON HTTP 200; 156/v15 and all 26 release fingerprints passed (see details below).
+- [ ] Complete a fresh public-domain interactive browser session of the live release and independently check reachability of *every* external textbook source link; repository mobile-player smoke and targeted source downloads already passed.
 
 **Original-book certification result: 0 new fully completed original English/Tamil subject-book pairs.** Historical catalogue totals are not a completion denominator for page audits.
+
+## Live production verification — 1 November 2026
+
+An independent GitHub-hosted runner fetched these **actual public URLs**:
+
+| Public source | HTTP response |
+| --- | --- |
+| `https://clearexams.ink/textbook-firsts.html` | **200** |
+| `https://clearexams.ink/data/special-quizzes/firsts.json` | **200** |
+| `https://clearexams.ink/` | **200** |
+
+The live JSON matched the entire GitHub `main` question-bank file, including **156 Firsts / bank version 15**, F049 revised distinct compass answer choices, F155 Chennai Corporation, F156 New Zealand women’s national suffrage, all eight direct bilingual Class 6 Term III PDF links and nonzero Tamil PDF page indexes. Homepage counts matched women **26**, history **102**, science **28**. All **26/26 automated live assertions passed** in [GitHub Actions #41281714059](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41281714059).
+
+This verifies **deployment**, not exhaustive visual/curriculum accuracy of complete original textbook editions.
