@@ -50,15 +50,14 @@ def fetch(url):
  if not data.startswith(b"%PDF"):raise ValueError(f"not PDF: {data[:75]!r}")
  return data
 
-def page_windows(pdf, keywords, max_pages_per_term=4):
+def page_windows(texts, keywords, max_pages_per_term=4):
  """Full-paragraph windows. Keyword hits are only potential evidence."""
  found={}
  for name,terms in keywords.items():
   rows=[]
   for term in terms:
    shown=0
-   for p,page in enumerate(pdf):
-    text=page.get_text("text")
+   for p,text in enumerate(texts):
     at=text.casefold().find(term.casefold())
     if at<0:continue
     context=" ".join(text[max(0,at-230):at+390].split())[:600]
@@ -84,7 +83,7 @@ def scan_pdf(data,key):
  total=sum(x["candidate_lines"] for x in page_stats)
  results={"pdf_pages":len(doc),"pages_with_text":sum(bool(t.strip()) for t in texts),"pages_with_images":sum(x["images"]>0 for x in page_stats),
  "keyword_candidate_lines":total,"candidate_sample":candidate[:320],"page_statistics":page_stats,
- "target_windows":page_windows(doc,TARGETS)}
+ "target_windows":page_windows(texts,TARGETS)}
  doc.close()
  return results
 
