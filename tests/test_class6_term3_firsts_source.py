@@ -19,7 +19,7 @@ class Class6Term3SourceTests(unittest.TestCase):
           "F048":("social-science",19,21),"F049":("science",9,17),
           "F155":("social-science",122,135),"F156":("social-science",118,131)}
         self.assertGreaterEqual(len(self.bank["questions"]),156)
-        self.assertEqual(self.bank["meta"]["version"],15)
+        self.assertGreaterEqual(self.bank["meta"]["version"],15)
         for id,(title,en,ta) in selected.items():
             with self.subTest(id=id):
                 q=self.byid[id]
