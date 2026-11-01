@@ -3,6 +3,8 @@
 **Review date:** 1 November 2026  
 **Scope:** Standard Seven, Term I, Science and Social Science; English and Tamil originals  
 **Status:** **9 selected Firsts facts corroborated; original textbook edition pairs NOT fully certified.**  
+**Live deployment:** **CONFIRMED** on 1 November 2026 by [independent GitHub-hosted public-domain HTTP test #41283259549](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41283259549). The public site served 161 questions / version 16; all **34/34** live release assertions passed, including original Tamil PDF pointers and complete live JSON equality with the repository. This establishes live deployment, **not** whole-book factual certification.
+
 **Source method:** Independently downloaded SCERT-authored PDFs and checked SHA-256; scanned embedded text on every PDF page; manually reviewed selected original-page images, including both Tamil and English passages. Current 2026–27 prescribed-edition identity has not been independently confirmed.
 
 ## Original PDF inventory and independently measured pages
