@@ -381,3 +381,9 @@ Four **SCERT-authored original full-year PDFs** were downloaded and SHA-256 veri
 **Release proposal: 182 curated bilingual questions (Women 27, History 113, Science 42; v21).** Evidence: [Class 10 original bilingual review](class10-original-firsts-review-2026-11-02.md), [all-page text/source fingerprint scan](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41343636988), [selected English/Tamil page images](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41344088644).
 
 **No full English/Tamil SCERT textbook pair certified.** Selected page proof and live website verification are separate achievements; the remainder of the Class 10 pages and 2026–27 editions need further work.
+
+## 2 November 2026 — Firsts Quiz v21 public deployment proof
+
+The public `clearexams.ink` domain now serves **182 curated bilingual questions**, version 21: Women **27**, History **113**, Science **42**. The four Class 10 original-source additions F179–F182 and seven selected bilingual source-link/page-index repairs are present live. Independent CI HTTP 200 for page, homepage and JSON, full live question-bank equality to merged `main`, and **70/70** release checks were confirmed by [GitHub Actions live verification #41345234145](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41345234145).
+
+**Zero entire SCERT English/Tamil pairs certified** under all-page image, complete firsts fact, full translation/editorial and prescribed 2026–27 source-edition criteria. Deployment proof is not book certification.
