@@ -32,7 +32,7 @@ class Class6Term1SourceTests(unittest.TestCase):
                 self.assertEqual(q["source_ta_pdf_page"], ta_page)
                 self.assertTrue(q["source_evidence_id"])
                 self.assertIn("pending", q["review_status"])
-                self.assertIn("2025", q["original_edition"])
+                self.assertIn("Term I", q["original_edition"])
 
     def test_originals_scanned_but_book_not_certified(self):
         rows = [x for x in self.registry["volumes"] if x["id"] == "c6-science-social-science-term-1"]
