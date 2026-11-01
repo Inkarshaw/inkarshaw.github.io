@@ -51,3 +51,9 @@ Four question records include original URLs, Tamil and English choices, explanat
 This review proposes **178 curated bilingual Firsts**, version **20**: **Women 27; History 113; Science 38**. It uses structurally distinct four-choice Tamil/English answers and 20-question quiz sets.
 
 **No Class 9 full-year original English/Tamil pair is certified completely.** The remaining work includes matching all twelve older original Class 9 History Firsts to exact newer Tamil source pages, checking every remaining textbook page image and non-searchable content, confirming the prescribed 2026–27 original revision, and reviewing all further distinct firsts candidates. Releasing the quiz on ClearExams will be verified separately by fetching the public site.
+
+## Public ClearExams deployment independently verified — 1 November 2026
+
+A GitHub Actions runner fetched the **actual public** `clearexams.ink` homepage, quiz page and Firsts JSON; all returned HTTP **200**. The entire live bilingual question bank matched merged GitHub `main` exactly: **178 MCQs**, version **20**, Women 27 / History 113 / Science 38. **63/63** deployment assertions passed, including Class 9 F175–F178 correct answers, five original bilingual PDF source links and page indexes, 12 upgraded English source links with retained 2020 history, and the Sputnik/Rømer chronology corrections.
+
+[Public live Firsts verification #41317730247](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41317730247). This verifies deployed website files and question metadata, **not** full all-page factual or visual textbook certification.
