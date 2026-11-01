@@ -43,7 +43,7 @@ class Class6Term3SourceTests(unittest.TestCase):
                 self.assertFalse(v["complete_original_book_certification"])
                 self.assertIn("pending",str(self.bank["meta"]["certification_status"]))
         doc=(ROOT/"docs/textbook-quality/class6-term3-firsts-review-2026-11-01.md").read_text(encoding="utf-8")
-        for required in ("476", "NOT", "F042", "F049", "F155", "F156", "2026–27"):
+        for required in ("476", "NEITHER BOOK FULLY CERTIFIED", "F042", "F049", "F155", "F156", "2026–27"):
             self.assertIn(required,doc)
 
     def test_clear_choices_and_historical_qualifications(self):
