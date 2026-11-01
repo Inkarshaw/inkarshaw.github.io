@@ -185,7 +185,7 @@ class FirstsCertificationTests(unittest.TestCase):
         missing_distinct_tamil = sum(not q.get("source_ta_link") or
                                      q["source_ta_link"] == q["source_link"] for q in self.questions)
         self.assertGreaterEqual(original_page, 30)
-        self.assertEqual(missing_distinct_tamil, 36)
+        self.assertEqual(missing_distinct_tamil, 35)
         self.assertIn("original_bilingual_source_certification_pending",
                       self.bank["meta"]["certification_status"])
         self.assertIn("audit remains open", self.page)
