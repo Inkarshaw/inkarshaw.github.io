@@ -311,3 +311,11 @@ Bank release proposal: **161 curated bilingual questions** (Women 27, History 10
 ## 1 November 2026 — live Firsts v16 confirmation
 
 The 161-question bilingual Firsts bank (Women 27; History 104; Science 30) was independently fetched from the **public** `clearexams.ink` custom domain. The live JSON matched the merged repository exactly and all **34 of 34** release checks passed: [public live verification #41283259549](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41283259549). This confirms deployment of the Class 7 Term I selected-page results, **not** complete original-textbook certification.
+
+## 1 November 2026 — Class 7 Term II original four-file selected-fact review
+
+Government-authored 2024-reprint English/Tamil Class 7 Term II Science and Social Science files successfully retrieved and fingerprinted. **97 + 114 Science** and **89 + 104 Social Science** original physical PDF pages: **404/404 contain extractable text**. This is a successful source-text inventory, **not all-page visual/editorial certification**. 2026–27 prescribed-book confirmation remains outstanding.
+
+Existing Firsts **F050** (Calcutta Electric Supply Corporation, first thermal station April 1899) and **F055** (Alauddin Hasan Gangu, Bahmani kingdom 1347) were matched in selected original English and Tamil passages and re-linked to the direct source PDFs. Four proposed new Firsts **F162 Volta's voltaic pile (1800), F163 Harihara/Bukka founding Vijayanagara (1336), F164 Babur founding the Mughal Empire in India (1526), F165 Akbar's Mansabdari system** are all framed narrowly and cross-checked in selected original bilingual passages; page render review is partial. Avoid unsupported Gutenberg/bulb/first-fort absolute claims.
+
+**Proposed current total: 165 curated bilingual questions (Women 27; History 107; Science 31).** Earlier section totals are historical release snapshots; no full Class 6–12 original English/Tamil textbook pair is certified. Detailed review: [Class 7 Term II](class7-term2-firsts-review-2026-11-01.md); [all-text source scan](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41300186396); [selected page images and passages](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41300895614).
