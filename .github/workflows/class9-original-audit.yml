@@ -1,0 +1,29 @@
+name: Audit original Class 9 English and Tamil Science Social Science
+on:
+  pull_request:
+    paths:
+      - scripts/audit_class9_originals.py
+      - scripts/review_class9_source_pages.py
+      - .github/workflows/class9-original-audit.yml
+  workflow_dispatch:
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pymupdf
+      - name: Download and text-scan four Class 9 SCERT original books
+        run: python scripts/audit_class9_originals.py
+      - name: Preserve original book fingerprints and candidate excerpts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class9-four-original-books-source-evidence
+          path: data/textbook/class9-full-year-original-audit-2026-11-01.json
+          if-no-files-found: warn
