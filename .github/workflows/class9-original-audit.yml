@@ -4,6 +4,7 @@ on:
     paths:
       - scripts/audit_class9_originals.py
       - scripts/review_class9_source_pages.py
+      - scripts/review_class9_focused_pairs.py
       - .github/workflows/class9-original-audit.yml
   workflow_dispatch:
 jobs:
@@ -30,6 +31,17 @@ jobs:
           path: |
             data/textbook/class9-source-page-probe-2026-11-01.json
             data/textbook/_class9_private_review_images/
+          if-no-files-found: warn
+      - name: Check further precise Class 9 original English/Tamil firsts pages
+        run: python scripts/review_class9_focused_pairs.py
+      - name: Preserve internal high-resolution selected source images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class9-final-selected-bilingual-original-pages
+          path: |
+            data/textbook/class9-final-firsts-page-evidence-2026-11-01.json
+            data/textbook/_class9_final_private_pages/
           if-no-files-found: warn
       - name: Preserve original book fingerprints and candidate excerpts
         if: always()
