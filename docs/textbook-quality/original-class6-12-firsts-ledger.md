@@ -307,3 +307,7 @@ Four existing Firsts (F051 Nagabhatta I, F052/F053 1191 Tarain, F054 Qutb-ud-din
 Bank release proposal: **161 curated bilingual questions** (Women 27, History 104, Science 30). Detailed evidence: [Class 7 Term I Firsts original-source review](class7-term1-firsts-review-2026-11-01.md), [all-page source scan](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41282143313), and [selected bilingual page-image review](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41282538319).
 
 **Certification remains: zero complete English/Tamil original-book pairs fully signed off.** Text extraction and targeted page-image inspection do not prove all-page visual, all-firsts editorial, or prescribed 2026–27 edition parity.
+
+## 1 November 2026 — live Firsts v16 confirmation
+
+The 161-question bilingual Firsts bank (Women 27; History 104; Science 30) was independently fetched from the **public** `clearexams.ink` custom domain. The live JSON matched the merged repository exactly and all **34 of 34** release checks passed: [public live verification #41283259549](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41283259549). This confirms deployment of the Class 7 Term I selected-page results, **not** complete original-textbook certification.
