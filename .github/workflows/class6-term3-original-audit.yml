@@ -19,10 +19,15 @@ jobs:
       - run: python -m pip install pymupdf
       - name: Scan four original SCERT Term III source PDFs
         run: python scripts/audit_class6_term3_originals.py
+      - name: Extract selected page images and original fact contexts
+        run: python scripts/review_class6_term3_source_pages.py
       - name: Preserve provenance and candidates
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: class6-term3-original-pdf-evidence
-          path: data/textbook/class6-term3-original-audit-2026-11-01.json
+          path: |
+            data/textbook/class6-term3-original-audit-2026-11-01.json
+            data/textbook/class6-term3-source-probe-2026-11-01.json
+            data/textbook/_term3_private_review_images/*.png
           if-no-files-found: warn
