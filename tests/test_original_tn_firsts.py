@@ -22,7 +22,7 @@ class OriginalBookFirstsTests(unittest.TestCase):
             self.assertNotIn(source["id"], ids)
             ids.add(source["id"])
             standards.add(source["class"])
-            self.assertIn(source["english_pdf_review"], ("not-started","downloaded","text-extracted","selected_history_units_extracted_from_original_pdf","all_216_pages_text_extracted_selected_firsts_facts_checked_visual_pending","all_88_pages_text_extracted_selected_original_fact_visual_checked","all_138_pages_text_extracted_selected_original_fact_visual_checked","all_pages_text_extracted_selected_passages_images_reviewed_not_complete","all_pages_text_extracted_selected_original_text_and_images_checked_not_complete"))
+            self.assertIn(source["english_pdf_review"], ("not-started","downloaded","text-extracted","selected_history_units_extracted_from_original_pdf","all_216_pages_text_extracted_selected_firsts_facts_checked_visual_pending","all_88_pages_text_extracted_selected_original_fact_visual_checked","all_138_pages_text_extracted_selected_original_fact_visual_checked","all_pages_text_extracted_selected_passages_images_reviewed_not_complete","all_pages_text_extracted_selected_original_text_and_images_checked_not_complete","all_pages_text_extracted_selected_bilingual_passages_and_images_reviewed_not_complete"))
             self.assertNotEqual(source["chapter_coverage"], "complete")
             self.assertEqual(urlparse(source["english_url"]).scheme, "https")
             if source.get("tamil_url"):
@@ -51,7 +51,15 @@ class OriginalBookFirstsTests(unittest.TestCase):
                 self.assertIn(q["page"], (6,55,80,106,111,116,118,195))
                 self.assertIn("2022", q["original_edition"])
                 original += 1
-        self.assertGreaterEqual(original, 12)
+        self.assertGreaterEqual(original, 10)
+        # F117/F118 advanced from original-English-only to selected
+        # original English/Tamil facts; they must not be counted as still
+        # awaiting their first Tamil original-page check.
+        for id in ("F117", "F118"):
+            q = next(item for item in items if item["id"] == id)
+            self.assertIn("class-8-social-science-tamil.pdf", q["source_ta_link"])
+            self.assertGreater(q["source_ta_pdf_page"], 0)
+            self.assertIn("pending", q["review_status"])
 
     def test_source_conflicts_not_silently_rewritten(self):
         swadesamitran = next(q for q in self.quiz["questions"] if q["id"] == "F019")

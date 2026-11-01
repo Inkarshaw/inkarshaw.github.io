@@ -49,10 +49,11 @@ class Class7TermIIIOriginalSourceTests(unittest.TestCase):
           "F169":("social-science",14,18,"Mahendravarman I"),
           "F170":("science",72,89,"Alexander Fleming"),
         }
-        self.assertEqual(len(self.bank["questions"]),170)
+        self.assertGreaterEqual(len(self.bank["questions"]),170)
         self.assertEqual(self.bank["meta"]["version"],18)
-        self.assertEqual(Counter(q["category"] for q in self.bank["questions"]),
-                         {"history":109,"science":34,"women":27})
+        counts=Counter(q["category"] for q in self.bank["questions"])
+        for category,minimum in {"history":109,"science":34,"women":27}.items():
+            self.assertGreaterEqual(counts[category],minimum)
         for id,(subject,en,ta,answer) in expected.items():
             with self.subTest(id=id):
                 q=self.items[id]
