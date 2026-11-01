@@ -21,8 +21,7 @@ HF = "https://huggingface.co/datasets/Joemn/TamilNadu-State-board-books-2025-Tam
 UA = "Mozilla/5.0 (compatible; ClearExams term-II source audit; +https://clearexams.ink)"
 MAX_BYTES = 170*1024*1024
 PDFS = {
- "combined_en": "https://www.freetnbooks.com/wp-content/uploads/2025/10/6th-Std-Science-Book_Term-2_EM.pdf",
- "combined_ta": "https://www.freetnbooks.com/wp-content/uploads/2025/10/6th-Std-Science-Book_Term-2_TM.pdf",
+ # Four separately published subject-medium SCERT book PDFs (2024 reprint).
  "science_en": "https://cleartnpsc.com/books/download/class-6-term-2-science-english.pdf",
  "science_ta": "https://cleartnpsc.com/books/download/class-6-term-2-science-tamil.pdf",
  "social_en": "https://cleartnpsc.com/books/download/class-6-term-2-social-science-english.pdf",
@@ -142,10 +141,6 @@ def main():
             "meaning":"All-page text scans with targeted fact review only; images not exhaustively visually inspected",
             "sources":{},"transcriptions":{},"errors":[]}
     for key,url in PDFS.items():
-        if key.startswith(("science_", "social_")) and              "sha256" in report["sources"].get("combined_en",{}) and              "sha256" in report["sources"].get("combined_ta",{}):
-            report["sources"][key]={"url":url,"status":"not_downloaded_separate_2024_source_complete_bilingual_combined_volume_available"}
-            print("SOURCE_SKIPPED",key,"original bilingual combined volume available",flush=True)
-            continue
         try:
             if "drive.google.com" in url:
                 # Drive can be rate-limited; combined original PDFs are preferred.
