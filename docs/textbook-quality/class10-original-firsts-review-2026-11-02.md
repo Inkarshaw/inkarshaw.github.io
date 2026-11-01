@@ -57,3 +57,9 @@ Previous source links were not assumed interchangeable with the scanned full-yea
 **Proposed Firsts v21:** **182 bilingual MCQs** — Women **27**, History **113**, Science **42**. Four new questions F179–F182 have English and Tamil questions, four options, answer, explanation, original links, original PDF page indexes and primary corroboration.
 
 **Whole-volume certification: 0** English/Tamil paired books newly signed off; all-page visual, bilingual proofreading, systematic reconciliation of every firsts candidate and 2026–27 edition confirmation remain pending. Website deployment and live JSON parity must be checked separately after CI and merge.
+
+## Independently verified public deployment — 2 November 2026
+
+A GitHub Actions runner fetched the **actual public `clearexams.ink`** Firsts player, JSON and homepage (all HTTP **200**). The complete **182-question** live JSON matched the merged GitHub `main` question bank exactly, version **21**, categories Women 27 / History 113 / Science 42, and all Class 10 F179–F182 correct choices, original Tamil SCERT PDF links/page indexes, and intentionally unresolved Swadesamitran source chronology. All **70 of 70** release assertions passed.
+
+[Live public site verification #41345234145](https://github.com/Inkarshaw/inkarshaw.github.io/actions/runs/41345234145). This verifies the **deployed website**, not entire-book source certification or 2026–27 edition identity.
