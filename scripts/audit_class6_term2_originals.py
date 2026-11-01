@@ -57,7 +57,8 @@ def fetch_gdrive(url):
     import tempfile
     with tempfile.TemporaryDirectory() as temp:
         out=Path(temp)/"source.pdf"
-        result=gdown.download(url=url,output=str(out),quiet=True,fuzzy=True)
+        file_id=url.split("/file/d/",1)[1].split("/",1)[0]
+        result=gdown.download(id=file_id,output=str(out),quiet=True)
         if not result or not out.exists():raise ValueError("Google Drive download refused")
         if out.stat().st_size>MAX_BYTES:raise ValueError("Drive PDF too large")
         return out.read_bytes(),"application/pdf; gdown"
@@ -113,6 +114,7 @@ def fetch_transcriptions(report):
             raw,_=fetch(uri,size_cap=2*1024*1024,timeout=20)
             files=[x["path"] for x in json.loads(raw) if x.get("type")=="file"
                    and re.search(r"term.?_?2",x.get("path",""),re.I)
+                   and x["path"].endswith(".md")
                    and ("Science_" in x["path"] or "Social_Science_" in x["path"])]
             report["transcriptions"][medium]={"candidate_files":files}
             print("TRANSCRIPTS",medium,json.dumps(files),flush=True)
