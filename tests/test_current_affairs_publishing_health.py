@@ -22,10 +22,17 @@ class CurrentAffairsPublishingHealthTests(unittest.TestCase):
         self.assertEqual(MONITOR.latest_date(entries), date(2026, 11, 1))
 
     def test_current_source_and_verified_live_page_are_healthy(self):
-        result = MONITOR.evaluate(date(2026, 11, 2), date(2026, 11, 1),
-                                  date(2026, 11, 1), True)
+        result = MONITOR.evaluate(date(2026, 11, 2), date(2026, 11, 2),
+                                  date(2026, 11, 2), True)
         self.assertFalse(result["stale"])
         self.assertEqual(result["reason"], "current")
+
+    def test_yesterday_source_is_overdue_after_evening_deadline(self):
+        result = MONITOR.evaluate(date(2026, 11, 2), date(2026, 11, 1),
+                                  date(2026, 11, 1), True)
+        self.assertTrue(result["stale"])
+        self.assertEqual(result["reason"], "editorial_source_overdue")
+        self.assertEqual(result["age"], 1)
 
     def test_recent_source_with_old_publication_is_not_falsely_cleared(self):
         result = MONITOR.evaluate(date(2026, 11, 2), date(2026, 11, 1),
