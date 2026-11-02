@@ -52,27 +52,17 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_current_affairs_archive.py' -v
           test "$(tr -d '\r\n' < CNAME)" = "clearexams.ink"
 
-      - name: Setup Pages
+      # prepare writes the verified source files to main. That push triggers
+      # jekyll-gh-pages.yml, the single canonical production deployment.
+      # Never launch a second Pages deploy here: it can overtake the main
+      # deployment and leave students with an older edition.
+      - name: Explain the deployment handoff
         if: steps.queue.outputs.has_jobs == 'true'
-        uses: actions/configure-pages@v5
+        run: |
+          echo "Verified source files pushed to main; the normal Pages workflow builds and deploys them." >> "$GITHUB_STEP_SUMMARY"
+          echo "Finalize will verify the live article, source checksum and archive before acknowledging the job." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Build with Jekyll
-        if: steps.queue.outputs.has_jobs == 'true'
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./
-          destination: ./_site
-
-      - name: Upload Pages artifact
-        if: steps.queue.outputs.has_jobs == 'true'
-        uses: actions/upload-pages-artifact@v3
-
-      - name: Deploy Pages
-        if: steps.queue.outputs.has_jobs == 'true'
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Mark Website Queue jobs published
+      - name: Verify and acknowledge published Website Queue jobs
         if: steps.queue.outputs.has_jobs == 'true' && success()
         env:
           WEBSITE_BRIDGE_URL: "https://website-automation-production-cd3b.up.railway.app"
@@ -80,11 +70,11 @@ jobs:
           python3 scripts/website_queue_runner.py finalize \
             --manifest "$RUNNER_TEMP/website-jobs.json"
 
-      - name: Return failed deployment to retry queue
+      - name: Return unverified publication to retry queue
         if: steps.queue.outputs.has_jobs == 'true' && failure()
         env:
           WEBSITE_BRIDGE_URL: "https://website-automation-production-cd3b.up.railway.app"
         run: |
           python3 scripts/website_queue_runner.py fail-pending \
             --manifest "$RUNNER_TEMP/website-jobs.json" \
-            --message "GitHub Pages deployment failed in $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            --message "Current Affairs publication verification failed in $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
