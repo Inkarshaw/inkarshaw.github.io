@@ -131,6 +131,18 @@ class CommercialReadinessTests(unittest.TestCase):
         self.assertIn('html[data-ce-theme="dark"] .target-context a{color:#b8d2ff}', page)
         self.assertNotIn('aria-label="ClearExams home"', page)
 
+    def test_home_defers_nonessential_analytics_without_breaking_event_queue(self):
+        home = content("index.html")
+        self.assertNotIn('<script async src="https://www.googletagmanager.com/gtag/js?', home)
+        self.assertIn("window.dataLayer=window.dataLayer||[]", home)
+        self.assertIn("function gtag(){dataLayer.push(arguments)}", home)
+        self.assertIn("window.addEventListener('load',()=>{", home)
+        self.assertIn("window.setTimeout(()=>{", home)
+        self.assertIn("},4500);", home)
+        self.assertIn("script.dataset.ceAnalytics='true'", home)
+        self.assertIn('Start preparation</a>', home)
+        self.assertNotIn('href="start.html">Start</a>', home)
+
 
 if __name__ == "__main__":
     unittest.main()
