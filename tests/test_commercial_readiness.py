@@ -79,6 +79,31 @@ class CommercialReadinessTests(unittest.TestCase):
         self.assertIn('gh issue list --state open', workflow)
         self.assertIn('gh issue close', workflow)
 
+    def test_home_is_accessible_and_follows_text_only_current_affairs_policy(self):
+        home = content("index.html")
+        self.assertIn('class="skip-link" href="#mainContent"', home)
+        self.assertIn('<main id="mainContent" tabindex="-1">', home)
+        self.assertIn('a:focus-visible,button:focus-visible,select:focus-visible', home)
+        self.assertIn('@media(prefers-reduced-motion:reduce)', home)
+        self.assertIn('Latest Available Current Affairs', home)
+        self.assertIn('href="current-affairs/text/">Revise →</a>', home)
+        self.assertNotIn('Current-affairs compilations and weak areas.', home)
+        self.assertNotIn('href="current-affairs/compilations.html">Revise →</a>', home)
+
+    def test_old_pdf_daily_page_is_clearly_historical(self):
+        page = content("current-affairs/daily.html")
+        self.assertIn("Historical PDF edition", page)
+        self.assertIn("All historical PDFs", page)
+        self.assertIn('href="text/"', page)
+        self.assertNotIn("Open compilations →", page)
+
+    def test_legacy_pdf_page_cannot_claim_new_auto_published_compilations(self):
+        page = content("current-affairs/compilations.html")
+        self.assertIn("Historical PDF archive", page)
+        self.assertIn("No new PDF compilations are being issued.", page)
+        self.assertIn('href="text/"', page)
+        self.assertNotIn("rebuilt automatically as new daily Current Affairs PDFs are published", page)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,27 @@
+name: ClearExams commercial readiness PR checks
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "current-affairs/compilations.html"
+      - "current-affairs/daily.html"
+      - "current-affairs/text/**"
+      - "tests/test_commercial_readiness.py"
+      - ".github/workflows/commercial-readiness-pr.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  content-and-accessibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check navigation, content freshness and accessibility contracts
+        run: python3 -m unittest discover -s tests -p 'test_commercial_readiness.py' -v
