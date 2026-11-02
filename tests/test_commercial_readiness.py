@@ -75,7 +75,7 @@ class CommercialReadinessTests(unittest.TestCase):
     def test_freshness_monitor_is_issue_deduplicated(self):
         workflow = content(".github/workflows/current-affairs-freshness.yml")
         self.assertIn('55 16 * * *', workflow)
-        self.assertIn('Asia/Kolkata', workflow)
+        self.assertIn('Asia/Kolkata', content('scripts/check_current_affairs_freshness.py'))
         self.assertIn('gh issue list --state open', workflow)
         self.assertIn('gh issue close', workflow)
 
