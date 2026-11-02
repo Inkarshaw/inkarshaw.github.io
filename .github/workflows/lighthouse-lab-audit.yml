@@ -1,0 +1,83 @@
+name: ClearExams mobile performance and accessibility audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 4 * * 1" # Weekly Monday lab baseline (UTC)
+  pull_request:
+    paths:
+      - ".github/workflows/lighthouse-lab-audit.yml"
+      - "scripts/lighthouse_summary.mjs"
+      - "tests/test_lighthouse_summary.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Lighthouse CLI
+        run: npm install --no-save --no-package-lock --ignore-scripts lighthouse@13.6.0
+      - name: Install stable Chrome for Testing
+        uses: browser-actions/setup-chrome@v2.2.0
+        with:
+          chrome-version: stable
+          install-dependencies: true
+      - name: Generate current affairs static archive
+        run: python3 current-affairs/text/build_text_editions.py
+      - name: Start local website
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/clearexams-lighthouse-server.log 2>&1 &
+          for i in {1..25}; do
+            if curl -fsS http://127.0.0.1:8765/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/clearexams-lighthouse-server.log
+          exit 1
+      - name: Confirm summary script handles real and missing metrics
+        run: node tests/test_lighthouse_summary.mjs
+      - name: Run mobile Lighthouse on five student journeys
+        env:
+          CHROME_PATH: chrome
+        run: |
+          set -euo pipefail
+          mkdir -p .qa/lighthouse
+          for item in \
+            "home:/" \
+            "daily-quiz:/daily-quiz.html" \
+            "tn-school-book:/textbook-quiz.html" \
+            "ncert-school-book:/ncert-school-book-quiz.html" \
+            "current-affairs:/current-affairs/text/"; do
+            name="${item%%:*}"
+            page="${item#*:}"
+            echo "::group::Mobile audit ${name}"
+            ./node_modules/.bin/lighthouse "http://127.0.0.1:8765${page}" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" \
+              --output=json --output-path=".qa/lighthouse/${name}.json" --quiet
+            echo "::endgroup::"
+          done
+      - name: Publish honest lab baseline and target warnings
+        if: always()
+        run: |
+          if test -f .qa/lighthouse/home.json; then
+            node scripts/lighthouse_summary.mjs .qa/lighthouse
+          else
+            echo "No complete mobile Lighthouse baseline was produced." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+      - name: Save detailed Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clearexams-mobile-lighthouse
+          path: .qa/lighthouse/
+          if-no-files-found: warn
