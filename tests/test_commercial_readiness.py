@@ -104,6 +104,25 @@ class CommercialReadinessTests(unittest.TestCase):
         self.assertIn('href="text/"', page)
         self.assertNotIn("rebuilt automatically as new daily Current Affairs PDFs are published", page)
 
+    def test_home_featured_quiz_counts_match_current_banks(self):
+        """Never advertise an old count or confuse mapped books with certified volumes."""
+        firsts = json.loads(content("data/special-quizzes/firsts.json"))
+        fathers = json.loads(content("data/special-quizzes/fathers.json"))
+        home = content("index.html")
+        self.assertIn(f'Start {len(firsts["questions"])} MCQs', home)
+        self.assertIn(f'{len(fathers["questions"])} MCQs mapped to {len(fathers["books"])} source books', home)
+        for category, label in (
+            ("women", "First Women"),
+            ("history", "Historical Firsts"),
+            ("science", "Science Firsts"),
+        ):
+            count = sum(1 for question in firsts["questions"] if question["category"] == category)
+            card = re.search(r'<h3>[^<]*' + label + r'.*?</article>', home, re.S)
+            self.assertIsNotNone(card)
+            self.assertIn(f'{count} MCQs', card.group(0))
+        self.assertIn('Full textbook-page audit ongoing', home)
+        self.assertNotIn('37 distinct source-linked questions', home)
+
 
 if __name__ == "__main__":
     unittest.main()
