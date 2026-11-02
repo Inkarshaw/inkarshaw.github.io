@@ -161,9 +161,9 @@ def prepare(manifest_path):
         summary = os.environ.get("GITHUB_STEP_SUMMARY")
         if summary:
             with open(summary, "a", encoding="utf-8") as out:
-                out.write("## Website Queue: no publication was attempted\\n")
-                out.write("No READY jobs were returned; this run did not create or publish a daily edition.\\n")
-                out.write("Check the separate Daily CA Text Publish task and editorial source files.\\n")
+                out.write("## Website Queue: no publication was attempted\n")
+                out.write("No READY jobs were returned; this run did not create or publish a daily edition.\n")
+                out.write("Check the separate Daily CA Text Publish task and editorial source files.\n")
     pending = []
 
     for job in jobs[:10]:
