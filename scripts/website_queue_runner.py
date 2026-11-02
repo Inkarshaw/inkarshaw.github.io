@@ -62,7 +62,7 @@ def ca_publication_details(job):
             "editionDate": (pdf_match or text_match).group(1),
             "textEdition": bool(text_match)}
 
-def verify_url(url, attempts=12, delay=5, expected_sha256=None, expected_edition=None):
+def verify_url(url, attempts=24, delay=8, expected_sha256=None, expected_edition=None):
     last = None
     for i in range(attempts):
         try:
@@ -155,6 +155,15 @@ def prepare(manifest_path):
     payload = request("/jobs")
     jobs = payload.get("jobs") or []
     print(f"Due website jobs: {len(jobs)}")
+    if not jobs:
+        # The queue is optional when the editorial automation writes straight
+        # to GitHub. Do not present an empty queue run as a new edition.
+        summary = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary:
+            with open(summary, "a", encoding="utf-8") as out:
+                out.write("## Website Queue: no publication was attempted\\n")
+                out.write("No READY jobs were returned; this run did not create or publish a daily edition.\\n")
+                out.write("Check the separate Daily CA Text Publish task and editorial source files.\\n")
     pending = []
 
     for job in jobs[:10]:
@@ -201,15 +210,16 @@ def finalize(manifest_path):
         try:
             if item.get("textEdition"):
                 last = None
-                for attempt in range(12):
+                for attempt in range(24):
                     try:
                         verify_live_text(item["url"], item["editionDate"], item["expectedSha256"])
                         last = None
                         break
                     except Exception as exc:
                         last = exc
-                        print(f"Text deployment verification ({attempt+1}/12): {exc}")
-                        time.sleep(5)
+                        print(f"Text deployment verification ({attempt+1}/24): {exc}")
+                        if attempt < 23:
+                            time.sleep(8)
                 if last:
                     raise last
             else:
