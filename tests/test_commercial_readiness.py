@@ -90,6 +90,13 @@ class CommercialReadinessTests(unittest.TestCase):
         self.assertNotIn('Current-affairs compilations and weak areas.', home)
         self.assertNotIn('href="current-affairs/compilations.html">Revise →</a>', home)
 
+    def test_old_pdf_daily_page_is_clearly_historical(self):
+        page = content("current-affairs/daily.html")
+        self.assertIn("Historical PDF edition", page)
+        self.assertIn("All historical PDFs", page)
+        self.assertIn('href="text/"', page)
+        self.assertNotIn("Open compilations →", page)
+
     def test_legacy_pdf_page_cannot_claim_new_auto_published_compilations(self):
         page = content("current-affairs/compilations.html")
         self.assertIn("Historical PDF archive", page)
