@@ -40,7 +40,7 @@ def latest_date(entries):
 def evaluate(today, source_latest, live_latest, live_page_ok, deployment_only=False):
     """Pure decision function shared by CLI and offline unit tests."""
     age = (today - source_latest).days if source_latest else 9999
-    source_overdue = not deployment_only and age > 1
+    source_overdue = not deployment_only and age >= 1
     deployment_lag = (source_latest is None or live_latest is None
                       or live_latest < source_latest or not live_page_ok)
     flags = []
