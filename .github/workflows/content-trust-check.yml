@@ -30,6 +30,10 @@ on:
       - "sitemap.xml"
       - ".github/workflows/current-affairs-freshness.yml"
       - "tests/test_commercial_readiness.py"
+      - "scripts/check_current_affairs_freshness.py"
+      - "tests/test_current_affairs_publishing_health.py"
+      - ".github/workflows/current-affairs-freshness.yml"
+      - ".github/workflows/jekyll-gh-pages.yml"
       - "assets/js/calendar-freshness.js"
       - "assets/js/progress-transfer.js"
       - "data/exams/review-schedule.json"
@@ -81,6 +85,8 @@ jobs:
         run: node tests/test_content_trust.mjs
       - name: Verify commercial navigation and publication trust
         run: python3 -m unittest discover -s tests -p 'test_commercial_readiness.py'
+      - name: Test live Current Affairs publishing and source freshness guards
+        run: python3 -m unittest discover -s tests -p 'test_current_affairs_publishing_health.py' -v
       - name: Validate TN textbook topic quiz and bilingual coverage
         run: node tests/test_textbook_topic_quiz.mjs
       - name: Reconcile new 2024 Group IV questions with official final key

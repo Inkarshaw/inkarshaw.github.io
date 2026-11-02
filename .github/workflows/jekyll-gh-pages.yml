@@ -70,3 +70,9 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Checkout vetted source data for production verification
+        uses: actions/checkout@v4
+      - name: Verify deployed Current Affairs text edition matches vetted sources
+        run: |
+          python3 current-affairs/text/build_text_editions.py
+          python3 scripts/check_current_affairs_freshness.py --deployment-only --retries 12 --pause 10
