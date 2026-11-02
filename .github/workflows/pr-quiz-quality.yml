@@ -21,6 +21,8 @@ on:
       - "assets/js/syllabus-reader.js"
       - "data/textbook/**"
       - "current-affairs/text/**"
+      - "scripts/website_queue_runner.py"
+      - ".github/workflows/website-queue-publisher.yml"
       - "tests/**"
       - "scripts/audit_textbook_quiz_quality.py"
       - "scripts/audit_textbook_repository.py"
@@ -45,6 +47,8 @@ jobs:
         run: node tests/test_service_worker_cache.mjs
       - name: Verify Lighthouse lab-report integrity
         run: node tests/test_lighthouse_summary.mjs
+      - name: Verify Current Affairs publication handoff and source checks
+        run: python3 -m unittest discover -s tests -p 'test_ca_delivery_pipeline.py' -v
       - name: Run ClearExams regression tests
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
       - name: Regression checks for generated archive links and shared daily-quiz banks
