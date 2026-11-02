@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - "daily-quiz.html"
+      - "service-worker.js"
+      - "tests/test_service_worker_cache.mjs"
       - "pyq-hub.html"
       - "data/quizzes/pyq-yearwise-catalog.json"
       - "data/quizzes/verified-pyqs.json"
@@ -39,6 +41,8 @@ jobs:
           fetch-depth: 0
       - name: Verify Group IIA syllabus and linked Tamil Nadu textbook notes
         run: node tests/test_group2a_text_notes.mjs
+      - name: Verify cache freshness, offline support and private-route exclusions
+        run: node tests/test_service_worker_cache.mjs
       - name: Run ClearExams regression tests
         run: python3 -m unittest discover -s tests -p "test_clear_exams_regressions.py" -v
       - name: Regression checks for generated archive links and shared daily-quiz banks
