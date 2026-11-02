@@ -7,7 +7,7 @@
 - **Daily CA Text Publish** at **21:30 IST** (enabled).
 - **Daily CA Cover** at 21:05 IST (disabled, no longer needed).
 - Other non-PDF projects, including independently scheduled Instagram infographics, are separate and not inputs to the text publisher.
-- GitHub Pages automatically builds and publishes new vetted text JSON; the Website Queue runs every five minutes if needed.
+- GitHub Pages automatically builds and publishes new vetted text JSON. The Website Queue checks for READY jobs on its configured GitHub Actions schedule (GitHub may delay scheduled runs), commits approved files to main, then waits for the SAME canonical Pages workflow to deploy. Queue runs with no jobs are not new publications.
 
 ## Editorial data
 
@@ -48,7 +48,7 @@ Only if direct GitHub publishing is unavailable, place the *verified exact JSON 
 | Status | `READY` |
 | Notes | `sha256=<64-hex checksum>; edition=YYYY-MM-DD` |
 
-Preserve all other queue fields and ongoing jobs. The publisher verifies exact JSON bytes, edition date, original sources/MCQ structure and resulting live HTML/catalog before reporting success. Never submit `current-affairs/YYYY-MM-DD.pdf` jobs; these are now rejected.
+Preserve all other queue fields and ongoing jobs. The publisher verifies exact JSON bytes, edition date, original sources/MCQ structure and resulting live HTML/catalog before reporting success. The queue does not deploy Pages itself; its push to main starts `jekyll-gh-pages.yml` and finalization waits for the live article, checksum and archive. Avoid running competing Pages deployments. Never submit `current-affairs/YYYY-MM-DD.pdf` jobs; these are now rejected.
 
 ## PDF publication disabled
 
