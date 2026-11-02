@@ -123,6 +123,14 @@ class CommercialReadinessTests(unittest.TestCase):
         self.assertIn('Full textbook-page audit ongoing', home)
         self.assertNotIn('37 distinct source-linked questions', home)
 
+    def test_daily_quiz_mobile_accessibility_labels_and_contrast(self):
+        page = content("daily-quiz.html")
+        self.assertIn('<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">C</span>', page)
+        self.assertIn('<a class="back" href="index.html" aria-label="Back to home">', page)
+        self.assertIn('.target-context a{font-weight:850;color:#1654b8;', page)
+        self.assertIn('html[data-ce-theme="dark"] .target-context a{color:#b8d2ff}', page)
+        self.assertNotIn('aria-label="ClearExams home"', page)
+
 
 if __name__ == "__main__":
     unittest.main()
