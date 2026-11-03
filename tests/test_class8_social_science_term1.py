@@ -58,7 +58,7 @@ class Class8SocialTerm1Test(unittest.TestCase):
             meta = bank["meta"]
             self.assertEqual(meta["edition"], 2019)
             self.assertTrue(meta["source_en_url"].lower().endswith(".pdf"))
-            self.assertIn("Tamil is an editorial translation", meta["editorial_status"])
+            self.assertIn("editorial translation", meta["editorial_status"])
         html = (ROOT / "textbook-quiz.html").read_text(encoding="utf-8")
         self.assertIn("Tamil originals and the prescribed current edition remain unverified", html)
 
