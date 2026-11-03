@@ -11,18 +11,18 @@ class Class8SocialTerm1Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.index = json.loads((DIR / "index.json").read_text(encoding="utf-8"))
-        cls.banks = {unit: json.loads((DIR / f"unit-{unit}.json").read_text(encoding="utf-8")) for unit in (1, 2, 3, 4, 5)}
+        cls.banks = {unit: json.loads((DIR / f"unit-{unit}.json").read_text(encoding="utf-8")) for unit in (1, 2, 3, 4, 5, 6, 7)}
 
     def test_all_ten_chapters_are_listed_without_false_readiness(self):
         units = self.index["units"]
         self.assertEqual(len(units), 10)
         self.assertEqual(self.index["meta"]["unit_count"], 10)
         self.assertEqual([u["id"] for u in units], list(range(1, 11)))
-        self.assertEqual([u["id"] for u in units if u["ready"]], [1, 2, 3, 4, 5])
-        self.assertEqual(self.index["meta"]["total_questions"], 100)
-        self.assertEqual(sum(u["total"] for u in units if u["ready"]), 100)
-        self.assertEqual(self.index["meta"]["total_quiz_sets"], 5)
-        for unit in units[5:]:
+        self.assertEqual([u["id"] for u in units if u["ready"]], [1, 2, 3, 4, 5, 6, 7])
+        self.assertEqual(self.index["meta"]["total_questions"], 140)
+        self.assertEqual(sum(u["total"] for u in units if u["ready"]), 140)
+        self.assertEqual(self.index["meta"]["total_quiz_sets"], 7)
+        for unit in units[7:]:
             self.assertEqual(unit["total"], 0)
             self.assertEqual(unit["quiz_count"], 0)
             self.assertIsNone(unit["path"])
@@ -31,8 +31,10 @@ class Class8SocialTerm1Test(unittest.TestCase):
         self.assertEqual(units[2]["path"], "unit-3.json")
         self.assertEqual(units[3]["path"], "unit-4.json")
         self.assertEqual(units[4]["path"], "unit-5.json")
+        self.assertEqual(units[5]["path"], "unit-6.json")
+        self.assertEqual(units[6]["path"], "unit-7.json")
 
-    def test_five_published_units_each_have_twenty_valid_bilingual_questions(self):
+    def test_seven_published_units_each_have_twenty_valid_bilingual_questions(self):
         for unit_no, bank in self.banks.items():
             questions = bank["questions"]
             self.assertEqual(bank["meta"]["total_questions"], 20)
@@ -53,7 +55,7 @@ class Class8SocialTerm1Test(unittest.TestCase):
                     self.assertIn(q["correct"], range(4))
                     self.assertGreaterEqual(len(q["exp_en"]), 75)
                     self.assertGreaterEqual(len(q["exp_ta"]), 50)
-                    self.assertIn(q["page_en"], range(({1:125,2:135,3:150,4:159,5:171})[unit_no],({1:132,2:147,3:159,4:170,5:181})[unit_no]))
+                    self.assertIn(q["page_en"], range(({1:125,2:135,3:150,4:159,5:171,6:182,7:192})[unit_no],({1:132,2:147,3:159,4:170,5:181,6:192,7:201})[unit_no]))
             self.assertEqual(len(set(q["q_en"].casefold() for q in questions)), 20)
 
     def test_source_limitations_are_visible(self):
