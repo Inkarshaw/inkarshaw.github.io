@@ -42,7 +42,7 @@ class Class8SocialTerm1Test(unittest.TestCase):
             for q in questions:
                 with self.subTest(unit=unit_no, question=q["id"]):
                     self.assertEqual(q["quiz"], 1)
-                    self.assertTrue(re.search(r"[\\u0b80-\\u0bff]", q["q_ta"]))
+                    self.assertTrue(re.search(r"[\u0b80-\u0bff]", q["q_ta"]))
                     self.assertEqual(len(q["opts_en"]), 4)
                     self.assertEqual(len(q["opts_ta"]), 4)
                     self.assertEqual(len(set(s.casefold() for s in q["opts_en"])), 4)
