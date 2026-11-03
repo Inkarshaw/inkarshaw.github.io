@@ -11,25 +11,26 @@ class Class8SocialTerm1Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.index = json.loads((DIR / "index.json").read_text(encoding="utf-8"))
-        cls.banks = {unit: json.loads((DIR / f"unit-{unit}.json").read_text(encoding="utf-8")) for unit in (1, 2)}
+        cls.banks = {unit: json.loads((DIR / f"unit-{unit}.json").read_text(encoding="utf-8")) for unit in (1, 2, 3)}
 
     def test_all_ten_chapters_are_listed_without_false_readiness(self):
         units = self.index["units"]
         self.assertEqual(len(units), 10)
         self.assertEqual(self.index["meta"]["unit_count"], 10)
         self.assertEqual([u["id"] for u in units], list(range(1, 11)))
-        self.assertEqual([u["id"] for u in units if u["ready"]], [1, 2])
-        self.assertEqual(self.index["meta"]["total_questions"], 40)
-        self.assertEqual(sum(u["total"] for u in units if u["ready"]), 40)
-        self.assertEqual(self.index["meta"]["total_quiz_sets"], 2)
-        for unit in units[2:]:
+        self.assertEqual([u["id"] for u in units if u["ready"]], [1, 2, 3])
+        self.assertEqual(self.index["meta"]["total_questions"], 60)
+        self.assertEqual(sum(u["total"] for u in units if u["ready"]), 60)
+        self.assertEqual(self.index["meta"]["total_quiz_sets"], 3)
+        for unit in units[3:]:
             self.assertEqual(unit["total"], 0)
             self.assertEqual(unit["quiz_count"], 0)
             self.assertIsNone(unit["path"])
         self.assertEqual(units[0]["path"], "unit-1.json")
         self.assertEqual(units[1]["path"], "unit-2.json")
+        self.assertEqual(units[2]["path"], "unit-3.json")
 
-    def test_two_history_units_each_have_twenty_valid_bilingual_questions(self):
+    def test_three_history_units_each_have_twenty_valid_bilingual_questions(self):
         for unit_no, bank in self.banks.items():
             questions = bank["questions"]
             self.assertEqual(bank["meta"]["total_questions"], 20)
@@ -50,7 +51,7 @@ class Class8SocialTerm1Test(unittest.TestCase):
                     self.assertIn(q["correct"], range(4))
                     self.assertGreaterEqual(len(q["exp_en"]), 75)
                     self.assertGreaterEqual(len(q["exp_ta"]), 50)
-                    self.assertIn(q["page_en"], range(125 if unit_no == 1 else 135, 132 if unit_no == 1 else 147))
+                    self.assertIn(q["page_en"], range(125 if unit_no == 1 else (135 if unit_no == 2 else 150), 132 if unit_no == 1 else (147 if unit_no == 2 else 159)))
             self.assertEqual(len(set(q["q_en"].casefold() for q in questions)), 20)
 
     def test_source_limitations_are_visible(self):
