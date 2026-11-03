@@ -257,7 +257,9 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
           '<div class="sets quizsets"><div class="quizset-count">'+quizCount+' quiz sets available</div>'+quizButtons+
           '<a class="btn" href="'+full+'">Full Unit'+(u.total?' · '+u.total.toLocaleString('en-IN'):'')+'</a>'+(u.topic_count?'<a class="btn primary" href="textbook-topics.html?class='+cls+'&subject='+subject+termArg+'&unit='+u.id+'">Topic-wise Quiz · '+u.topic_count+' topics</a>':'')+'</div></article>';
       }).join('')+'</div></section>'+
-      '<div class="note"><strong>Source-first design:</strong> questions are grounded in the supplied Tamil Nadu State Board '+edition+' English and Tamil '+subjEn+' textbooks and filtered for competitive-exam relevance.</div>';
+      (cls===8&&subject==='social-science'&&term===1?
+        '<div class="note"><strong>Source status:</strong> This initial History quiz is grounded in the 2019 Tamil Nadu Term I English textbook. Tamil is an editorial translation; Tamil originals and the prescribed current edition remain unverified. Remaining chapters are not published.</div>':
+        '<div class="note"><strong>Source-first design:</strong> questions are grounded in the supplied Tamil Nadu State Board '+edition+' English and Tamil '+subjEn+' textbooks and filtered for competitive-exam relevance.</div>');
   }
   render().catch(err=>{
     const subj=subject==='geography'?'Geography':subject==='social-science'?'Social Science':subject==='science'?'Science':'History';
