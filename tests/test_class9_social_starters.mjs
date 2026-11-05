@@ -20,14 +20,14 @@ assert.deepEqual([
   index.units.filter(u=>u.section_en==='Civics').length,
   index.units.filter(u=>u.section_en==='Economics').length
 ],[11,8,6,5]);
-assert.equal(index.meta.total_questions,320);
-assert.equal(index.meta.total_quiz_sets,16);
-assert.equal(index.meta.published_unit_count,16);
+assert.equal(index.meta.total_questions,400);
+assert.equal(index.meta.total_quiz_sets,20);
+assert.equal(index.meta.published_unit_count,20);
 assert.equal(index.meta.source_en_url,source);
 const ready=index.units.filter(u=>u.ready);
 const pending=index.units.filter(u=>!u.ready);
-assert.deepEqual(ready.map(u=>u.id),[1,2,3,4,12,13,14,15,20,21,22,23,26,27,28,29]);
-assert.equal(pending.length,14);
+assert.deepEqual(ready.map(u=>u.id),[1,2,3,4,5,12,13,14,15,16,20,21,22,23,24,26,27,28,29,30]);
+assert.equal(pending.length,10);
 for(const u of pending){
  assert.equal(u.total,0);
  assert.equal(u.quiz_count,0);
@@ -37,7 +37,7 @@ for(const u of pending){
 const ctx=vm.createContext({window:{}});
 vm.runInContext(read('assets/js/textbook-quality.js'),ctx);
 const quality=ctx.window.TextbookQuality;
-const ranges={1:[1,15],2:[16,32],3:[33,52],4:[53,65],12:[157,166],13:[167,179],14:[180,191],15:[192,201],20:[238,245],21:[246,252],22:[253,264],23:[265,270],26:[284,292],27:[293,299],28:[300,306],29:[307,312]};
+const ranges={1:[1,15],2:[16,32],3:[33,52],4:[53,65],5:[66,76],12:[157,166],13:[167,179],14:[180,191],15:[192,201],16:[202,209],20:[238,245],21:[246,252],22:[253,264],23:[265,270],24:[271,278],26:[284,292],27:[293,299],28:[300,306],29:[307,312],30:[313,317]};
 const allIds=new Set();
 for(const u of ready){
  assert.equal(u.total,20);assert.equal(u.quiz_count,1);
@@ -72,11 +72,11 @@ for(const u of ready){
  assert.equal(curated.length,20,'Player should retain all 20 MCQs in unit '+u.id);
  assert.deepEqual(Array.from(curated,q=>q.id).sort(),doc.questions.map(q=>q.id).sort());
 }
-assert.equal(allIds.size,320);
+assert.equal(allIds.size,400);
 const catalog=read('textbook-quiz.html');
 const player=read('textbook-play.html');
 assert.ok(catalog.includes("'data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json'"));
 assert.ok(catalog.includes('if(!u.ready)'));
-assert.ok(catalog.includes('All 30 Class 9 Social Science chapters are listed, but only sixteen chapters'));
+assert.ok(catalog.includes('All 30 Class 9 Social Science chapters are listed, but only twenty chapters'));
 assert.ok(player.includes("'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json'")||player.includes("'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json'"));
-console.log('Class 9 Social Science: 30 indexed chapters, 320 bilingual MCQs in 16 ready units, 14 honestly pending.');
+console.log('Class 9 Social Science: 30 indexed chapters, 400 bilingual MCQs in 20 ready units, 10 honestly pending.');
