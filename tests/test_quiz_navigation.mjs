@@ -71,7 +71,7 @@ assert.match(textbook, /விடையளிக்காத அடுத்த 
 
 // Check both inline quiz scripts still parse as JavaScript.
 for (const [name, html] of [['daily-quiz.html',daily],['textbook-play.html',textbook]]) {
-  const inline = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g)].map(m=>m[1]).filter(Boolean);
+  const inline = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(Boolean);
   for (const code of inline) new vm.Script(code, {filename:name});
 }
 console.log('Class navigation and both complete-answer quiz flows passed.');
