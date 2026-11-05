@@ -81,5 +81,6 @@ const player=read('textbook-play.html');
 assert.ok(catalog.includes("'data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json'"));
 assert.ok(catalog.includes('if(!u.ready)'));
 assert.ok(catalog.includes('u.quiz_count'));
+assert.ok(catalog.includes('All seven Term II chapters have one English/Tamil starter quiz of 20 questions (140 total)'), 'Catalogue must disclose partial editorial status');
 assert.ok(player.includes("'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json'"));
 console.log('Class 8 Term II Social Science: seven source-linked chapters, 140 playable bilingual starter MCQs, all unit routes active.');
