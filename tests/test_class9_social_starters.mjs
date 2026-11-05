@@ -20,14 +20,15 @@ assert.deepEqual([
   index.units.filter(u=>u.section_en==='Civics').length,
   index.units.filter(u=>u.section_en==='Economics').length
 ],[11,8,6,5]);
-assert.equal(index.meta.total_questions,480);
-assert.equal(index.meta.total_quiz_sets,24);
-assert.equal(index.meta.published_unit_count,24);
+assert.equal(index.meta.total_questions,600);
+assert.equal(index.meta.total_quiz_sets,30);
+assert.equal(index.meta.published_unit_count,30);
 assert.equal(index.meta.source_en_url,source);
 const ready=index.units.filter(u=>u.ready);
 const pending=index.units.filter(u=>!u.ready);
-assert.deepEqual(ready.map(u=>u.id),[1,2,3,4,5,6,7,12,13,14,15,16,17,20,21,22,23,24,25,26,27,28,29,30]);
-assert.equal(pending.length,6);
+assert.deepEqual(ready.map(u=>u.id),Array.from({length:30},(_,i)=>i+1));
+assert.equal(pending.length,0);
+assert.ok(index.meta.publication_status.includes('not exhaustive'),'Do not imply exhaustive or prescribed-edition certification');
 for(const u of pending){
  assert.equal(u.total,0);
  assert.equal(u.quiz_count,0);
@@ -37,7 +38,7 @@ for(const u of pending){
 const ctx=vm.createContext({window:{}});
 vm.runInContext(read('assets/js/textbook-quality.js'),ctx);
 const quality=ctx.window.TextbookQuality;
-const ranges={1:[1,15],2:[16,32],3:[33,52],4:[53,65],5:[66,76],6:[77,87],7:[88,100],12:[157,166],13:[167,179],14:[180,191],15:[192,201],16:[202,209],17:[210,219],20:[238,245],21:[246,252],22:[253,264],23:[265,270],24:[271,278],25:[279,283],26:[284,292],27:[293,299],28:[300,306],29:[307,312],30:[313,317]};
+const ranges={1:[1,15],2:[16,32],3:[33,52],4:[53,65],5:[66,76],6:[77,87],7:[88,100],8:[101,112],9:[113,129],10:[130,141],11:[142,156],12:[157,166],13:[167,179],14:[180,191],15:[192,201],16:[202,209],17:[210,219],18:[220,229],19:[230,237],20:[238,245],21:[246,252],22:[253,264],23:[265,270],24:[271,278],25:[279,283],26:[284,292],27:[293,299],28:[300,306],29:[307,312],30:[313,317]};
 const allIds=new Set();
 for(const u of ready){
  assert.equal(u.total,20);assert.equal(u.quiz_count,1);
@@ -72,11 +73,11 @@ for(const u of ready){
  assert.equal(curated.length,20,'Player should retain all 20 MCQs in unit '+u.id);
  assert.deepEqual(Array.from(curated,q=>q.id).sort(),doc.questions.map(q=>q.id).sort());
 }
-assert.equal(allIds.size,480);
+assert.equal(allIds.size,600);
 const catalog=read('textbook-quiz.html');
 const player=read('textbook-play.html');
 assert.ok(catalog.includes("'data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json'"));
 assert.ok(catalog.includes('if(!u.ready)'));
-assert.ok(catalog.includes('All 30 Class 9 Social Science chapters are listed, but only twenty-four chapters'));
+assert.ok(catalog.includes('All 30 Class 9 Social Science chapters now have a 20-question bilingual starter quiz'));
 assert.ok(player.includes("'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json'")||player.includes("'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json'"));
-console.log('Class 9 Social Science: 30 indexed chapters, 480 bilingual MCQs in 24 ready units, 6 honestly pending.');
+console.log('Class 9 Social Science: 30 indexed and playable starter chapters, 600 bilingual MCQs, no empty units.');
