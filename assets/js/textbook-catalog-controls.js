@@ -5,8 +5,9 @@
   if(!main)return;
   const p=new URLSearchParams(location.search);
   const cls=Number(p.get('class')||6);
-  const subject=p.get('subject')||(cls>=11?'history':'science');
-  const term=Number(p.get('term')||1);
+  const subject=subjectForClass(cls,p.get('subject')||(cls>=11?'history':'science'));
+  const requestedTerm=Number(p.get('term')||1);
+  const term=cls<=8&&[1,2,3].includes(requestedTerm)?requestedTerm:1;
   const selectedUnit=Number(p.get('unit')||0);
   let searchText='',didJump=false,scheduled=false;
   const labels={science:'Science','social-science':'Social Science',history:'History',geography:'Geography'};
@@ -27,6 +28,13 @@
     '@media(max-width:440px){.catalog-tools{grid-template-columns:1fr}}'
   ].join('');
   document.head.appendChild(styles);
+  function subjectChoicesForClass(c){
+    return c===11?[['history','History / வரலாறு']]:c===12?[['history','History / வரலாறு'],['geography','Geography / புவியியல்']]:[['science','Science / அறிவியல்'],['social-science','Social Science / சமூக அறிவியல்']];
+  }
+  function subjectForClass(c,preferred){
+    const choices=subjectChoicesForClass(c);
+    return choices.some(([slug])=>slug===preferred)?preferred:choices[0][0];
+  }
   function urlFor(c,s,t){
     const a=new URLSearchParams({class:String(c),subject:s});
     if(c<=8)a.set('term',String(t));
@@ -44,9 +52,9 @@
     if(main.querySelector('#catalogTools'))return;
     const panel=main.querySelector('section.panel');if(!panel)return;
     const div=document.createElement('section');div.id='catalogTools';div.className='catalog-tools';div.setAttribute('aria-label','TN School Book Quiz filters');
-    const allowed=cls===11?[['history','History / வரலாறு']]:cls===12?[['history','History / வரலாறு'],['geography','Geography / புவியியல்']]:[['science','Science / அறிவியல்'],['social-science','Social Science / சமூக அறிவியல்']];
+    const allowed=subjectChoicesForClass(cls);
     div.appendChild(makeSelect('Class / வகுப்பு',[6,7,8,9,10,11,12].map(n=>[n,'Class '+n]),cls,v=>{
-      const c=Number(v),s=c>=11?'history':allowed.some(a=>a[0]===subject)?subject:'science';
+      const c=Number(v),s=subjectForClass(c,subject);
       location.href=urlFor(c,s,term);
     }));
     div.appendChild(makeSelect('Subject / பாடம்',allowed,allowed.some(a=>a[0]===subject)?subject:allowed[0][0],v=>location.href=urlFor(cls,v,term)));
