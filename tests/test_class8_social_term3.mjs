@@ -15,13 +15,13 @@ assert.equal(index.meta.edition, 2019);
 assert.equal(index.meta.unit_count, 8);
 assert.equal(index.units.length, 8);
 assert.deepEqual(index.units.map(u => u.chapter_page_en), pageStarts);
-assert.equal(index.meta.published_unit_count, 4);
-assert.equal(index.meta.total_questions, 80);
-assert.equal(index.meta.total_quiz_sets, 4);
+assert.equal(index.meta.published_unit_count, 8);
+assert.equal(index.meta.total_questions, 160);
+assert.equal(index.meta.total_quiz_sets, 8);
 const ready = index.units.filter(u => u.ready);
 const pending = index.units.filter(u => !u.ready);
-assert.deepEqual(ready.map(u => u.id), [1,3,7,8]);
-assert.deepEqual(pending.map(u => u.id), [2,4,5,6]);
+assert.deepEqual(ready.map(u => u.id), [1,2,3,4,5,6,7,8]);
+assert.deepEqual(pending.map(u => u.id), []);
 for (const u of pending) {
   assert.equal(u.total, 0);
   assert.equal(u.quiz_count, 0);
@@ -33,7 +33,7 @@ vm.runInContext(read('assets/js/textbook-quality.js'), qc);
 const quality = qc.window.TextbookQuality;
 const en = 'https://cdn1.byjus.com/wp-content/uploads/2020/01/Samacheer-Kalvi-Class-8-Social-Science_Term_IIIEM.pdf';
 const ta = 'https://cdn1.byjus.com/wp-content/uploads/2020/01/Samacheer-Kalvi-Class-8-Social-Science_Term_IIITM.pdf';
-const pages = {1:[122,130],3:[140,146],7:[187,194],8:[196,205]};
+const pages = {1:[122,130],2:[131,139],3:[140,146],4:[147,163],5:[164,175],6:[177,186],7:[187,194],8:[196,205]};
 const ids = new Set();
 for (const u of ready) {
   assert.equal(u.total, 20);
@@ -76,11 +76,11 @@ for (const u of ready) {
   assert.equal(curated.length, 20, 'All questions must be playable in unit ' + u.id);
   assert.deepEqual(Array.from(curated, q => q.id).sort(), d.questions.map(q => q.id).sort());
 }
-assert.equal(ids.size, 80);
+assert.equal(ids.size, 160);
 const catalog = read('textbook-quiz.html');
 const player = read('textbook-play.html');
 assert.ok(catalog.includes("'data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json'"));
 assert.ok(catalog.includes('if(!u.ready)'));
-assert.ok(catalog.includes('Four of eight Term III Social Science chapters currently have 20-question bilingual starter quizzes'));
+assert.ok(catalog.includes('All eight Term III Social Science chapters now have one English/Tamil starter quiz'));
 assert.ok(player.includes("'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json'"));
-console.log('Class 8 Term III: four source-linked ready units, 80 bilingual MCQs, four clearly pending units.');
+console.log('Class 8 Term III: all eight chapters ready with 160 English/Tamil starter MCQs and a clear source-status note.');
