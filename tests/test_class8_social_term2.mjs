@@ -12,12 +12,13 @@ assert.equal(index.meta.term,2);
 assert.equal(index.units.length,7);
 assert.deepEqual(index.units.map(u=>u.chapter_page_en),expected);
 assert.deepEqual(index.units.map(u=>u.chapter_page_ta),expectedTamil);
-assert.equal(index.meta.total_questions,40);
-assert.equal(index.meta.total_quiz_sets,2);
+assert.equal(index.meta.total_questions,80);
+assert.equal(index.meta.published_unit_count,4);
+assert.equal(index.meta.total_quiz_sets,4);
 const ready=index.units.filter(u=>u.ready);
-assert.deepEqual(ready.map(u=>u.id),[1,5]);
+assert.deepEqual(ready.map(u=>u.id),[1,2,3,5]);
 const pending=index.units.filter(u=>!u.ready);
-assert.equal(pending.length,5);
+assert.equal(pending.length,3);
 for(const u of pending){
  assert.equal(u.total,0);
  assert.equal(u.quiz_count,0);
@@ -54,8 +55,8 @@ for(const u of ready){
   assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<4);
   answerPositions.add(q.correct);
   assert.ok(q.exp_en.trim().length>=25&&q.exp_ta.trim().length>=15);
-  const lo=u.id===1?86:129,hi=u.id===1?97:135;
-  const taLo=u.id===1?98:148,taHi=u.id===1?111:155;
+  const ranges={1:[86,97,98,111],2:[98,107,112,123],3:[108,117,124,135],5:[129,135,148,155]};
+  const [lo,hi,taLo,taHi]=ranges[u.id];
   assert.ok(q.page_en>=lo&&q.page_en<=hi,'English page scope '+q.id);
   assert.ok(q.page_ta>=taLo&&q.page_ta<=taHi,'Tamil page scope '+q.id);
   assert.ok(quality.valid(q),'Player rejects '+q.id);
@@ -72,4 +73,4 @@ assert.ok(catalog.includes("'data/textbook/class-'+cls+'/'+subject+termSegment+'
 assert.ok(catalog.includes('if(!u.ready)'));
 assert.ok(catalog.includes('u.quiz_count'));
 assert.ok(player.includes("'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json'"));
-console.log('Class 8 Term II Social Science: seven sourced chapter titles, 40 playable bilingual MCQs, five honest pending chapters.');
+console.log('Class 8 Term II Social Science: seven sourced chapter titles, 80 playable bilingual MCQs, three honest pending chapters.');
