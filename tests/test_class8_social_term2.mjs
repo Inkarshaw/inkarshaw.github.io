@@ -12,13 +12,13 @@ assert.equal(index.meta.term,2);
 assert.equal(index.units.length,7);
 assert.deepEqual(index.units.map(u=>u.chapter_page_en),expected);
 assert.deepEqual(index.units.map(u=>u.chapter_page_ta),expectedTamil);
-assert.equal(index.meta.total_questions,80);
-assert.equal(index.meta.published_unit_count,4);
-assert.equal(index.meta.total_quiz_sets,4);
+assert.equal(index.meta.total_questions,140);
+assert.equal(index.meta.published_unit_count,7);
+assert.equal(index.meta.total_quiz_sets,7);
 const ready=index.units.filter(u=>u.ready);
-assert.deepEqual(ready.map(u=>u.id),[1,2,3,5]);
+assert.deepEqual(ready.map(u=>u.id),[1,2,3,4,5,6,7]);
 const pending=index.units.filter(u=>!u.ready);
-assert.equal(pending.length,3);
+assert.equal(pending.length,0);
 for(const u of pending){
  assert.equal(u.total,0);
  assert.equal(u.quiz_count,0);
@@ -55,7 +55,7 @@ for(const u of ready){
   assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<4);
   answerPositions.add(q.correct);
   assert.ok(q.exp_en.trim().length>=25&&q.exp_ta.trim().length>=15);
-  const ranges={1:[86,97,98,111],2:[98,107,112,123],3:[108,117,124,135],5:[129,135,148,155]};
+  const ranges={1:[86,97,98,111],2:[98,107,112,123],3:[108,117,124,135],4:[118,128,136,147],5:[129,135,148,155],6:[136,144,156,166],7:[145,153,167,179]};
   const [lo,hi,taLo,taHi]=ranges[u.id];
   assert.ok(q.page_en>=lo&&q.page_en<=hi,'English page scope '+q.id);
   assert.ok(q.page_ta>=taLo&&q.page_ta<=taHi,'Tamil page scope '+q.id);
@@ -67,10 +67,19 @@ for(const u of ready){
  assert.equal(playable.length,20,'All 20 questions must survive live curation');
  assert.deepEqual(Array.from(playable,q=>q.id).sort(),d.questions.map(q=>q.id).sort());
 }
+
+// Guard historical-book questions against mistakenly teaching obsolete statutes or
+// helpline routes as present-day facts; the 2019 book includes old legal details.
+for(const id of [6,7]){
+ const bank=JSON.parse(read(root+'unit-'+id+'.json'));
+ const active=bank.questions.map(q=>q.q_en+' '+q.exp_en).join(' ').toLowerCase();
+ assert.ok(!/ipc\s*304\s*a|ipc\s*304a|chairperson.*five years|10(?:8|3) emergency response service/.test(active),
+  'Unit '+id+' must not teach potentially obsolete legal or emergency-service details');
+}
 const catalog=read('textbook-quiz.html');
 const player=read('textbook-play.html');
 assert.ok(catalog.includes("'data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json'"));
 assert.ok(catalog.includes('if(!u.ready)'));
 assert.ok(catalog.includes('u.quiz_count'));
 assert.ok(player.includes("'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json'"));
-console.log('Class 8 Term II Social Science: seven sourced chapter titles, 80 playable bilingual MCQs, three honest pending chapters.');
+console.log('Class 8 Term II Social Science: seven source-linked chapters, 140 playable bilingual starter MCQs, all unit routes active.');
