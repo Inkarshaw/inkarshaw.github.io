@@ -11,11 +11,11 @@ assert.ok(unit?.ready&&unit.path==='unit-11.json');
 assert.equal(unit.total,20);
 assert.equal(unit.quiz_count,1);
 assert.equal(catalog.meta.unit_count,25);
-assert.equal(catalog.meta.published_unit_count,14);
-assert.equal(catalog.meta.total_questions,2120);
-assert.equal(catalog.meta.total_quiz_sets,106);
-assert.equal(catalog.units.filter(u=>!u.ready).length,11);
-for(const u of catalog.units.slice(14)){
+assert.equal(catalog.meta.published_unit_count,15);
+assert.equal(catalog.meta.total_questions,2140);
+assert.equal(catalog.meta.total_quiz_sets,107);
+assert.equal(catalog.units.filter(u=>!u.ready).length,10);
+for(const u of catalog.units.slice(15)){
  assert.equal(u.ready,false);
  assert.equal(u.total,0);
  assert.equal(u.quiz_count,0);
@@ -82,4 +82,4 @@ assert.deepEqual(keys,[5,5,5,5]);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.equal(JSON.stringify(Array.from(curated,q=>q.id).sort()),JSON.stringify(doc.questions.map(q=>q.id).sort()),'Player preserves all question IDs');
-console.log('Class 9 Atomic Structure: 20 bilingual original questions, verified answer indices; 14/25 units playable (2,120 MCQs).');
+console.log('Class 9 Atomic Structure: 20 bilingual original questions, verified answer indices; 15/25 units playable (2,140 MCQs).');
