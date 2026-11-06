@@ -43,7 +43,7 @@ const normalizedTamilStems=new Map();
 for(const u of ready){
  assert.ok(u.total>=20&&u.total%20===0,'Every published chapter must have complete 20-question sets');
  assert.equal(u.quiz_count,u.total/20,'Quiz count must reflect actual chapter size');
- if(u.id===18||u.id===19)assert.ok(u.quiz_count>=2,'Retain second Civics quiz for chapter '+u.id);
+ if([18,19,20].includes(u.id))assert.ok(u.quiz_count>=2,'Retain second Civics quiz for chapter '+u.id);
  assert.equal(u.path,'unit-'+u.id+'.json');
  const doc=JSON.parse(read(root+u.path));
  assert.equal(doc.meta.class,10);
