@@ -21,6 +21,34 @@ assert.match(catalog, /const subject=subjectForClass\(cls,/);
 assert.match(catalog, /const c=Number\(v\),s=subjectForClass\(c,subject\)/);
 assert.match(catalog, /\[1,2,3\]\.includes\(requestedTerm\)/);
 
+// Saved data is controlled by the visitor's browser and may be malformed or left
+// behind by an older version. A damaged value must not stop the Daily Quiz loading.
+const saved = new Map();
+const savedCtx = vm.createContext({
+  HISTORY_KEY:'history', WRONG_KEY:'wrong', SESSION_KEY:'session',
+  localStorage:{getItem(key){return saved.has(key)?saved.get(key):null}}
+});
+const savedFunctions = ['storedRows','getQuizHistory','wrongBook','quizSession'].map(name=>{
+  const line=daily.split('\n').find(s=>s.startsWith('function '+name+'('));
+  assert.ok(line, 'Saved-data function missing: '+name);
+  return line;
+}).join('\n');
+vm.runInContext(savedFunctions,savedCtx);
+for(const malformed of ['{','null','{}','42','"not-an-array"']){
+  saved.set('history',malformed);saved.set('wrong',malformed);
+  assert.equal(savedCtx.getQuizHistory().length,0,'Ignore damaged history: '+malformed);
+  assert.equal(savedCtx.wrongBook().length,0,'Ignore damaged notebook: '+malformed);
+}
+saved.set('history',JSON.stringify([null,17,[],{}, {date:'2026-11-06',score:8,total:10}]));
+assert.equal(savedCtx.getQuizHistory().length,2,'Retain only object-shaped history records');
+saved.set('wrong',JSON.stringify([null,[],{}, {id:4},{id:' '},{id:'question-1',status:'needs-review'}]));
+assert.equal(savedCtx.wrongBook().length,1,'Retain only valid notebook IDs');
+saved.set('session','[]');assert.equal(savedCtx.quizSession(),null,'A session cannot be an array');
+saved.set('session','"stale"');assert.equal(savedCtx.quizSession(),null,'A session cannot be a string');
+saved.set('session','{');assert.equal(savedCtx.quizSession(),null,'A damaged session cannot crash startup');
+saved.set('session',JSON.stringify({date:'2026-11-06',current:2}));
+assert.equal(savedCtx.quizSession().current,2,'Keep valid saved sessions');
+
 // Exercise actual Daily Quiz navigation handler, not a copied implementation.
 function functionLine(src, name) {
   const line = src.split('\n').find(s => s.startsWith('function ' + name + '('));
