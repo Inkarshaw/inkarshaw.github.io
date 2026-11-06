@@ -357,7 +357,7 @@ class Class10ScienceUnits14To17Tests(unittest.TestCase):
         self.assertEqual(INDEX["meta"]["total_quiz_sets"], 74)
         self.assertEqual([u["id"] for u in INDEX["units"][:17]], list(range(1, 18)))
         self.assertEqual([u["total"] for u in INDEX["units"][:13]],
-                         [580, 40] + [40] * 11)
+                         [580, 60] + [40] * 11)
         for unit in INDEX["units"][13:17]:
             self.assertTrue(unit["ready"])
             self.assertEqual(unit["total"], 40)
