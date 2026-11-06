@@ -270,10 +270,10 @@ SPEC.loader.exec_module(AUDIT)
 class Class10PhysicsUnitsThreeToFiveTests(unittest.TestCase):
     def test_catalogue(self):
         self.assertEqual(INDEX["meta"]["unit_count"], 23)
-        self.assertEqual(INDEX["meta"]["total_questions"], 1460)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 73)
+        self.assertEqual(INDEX["meta"]["total_questions"], 1480)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 74)
         self.assertEqual([u["id"] for u in INDEX["units"][:5]], [1, 2, 3, 4, 5])
-        self.assertEqual([u["total"] for u in INDEX["units"][:5]], [580, 40, 40, 40, 40])
+        self.assertEqual([u["total"] for u in INDEX["units"][:5]], [580, 60, 40, 40, 40])
         for unit in INDEX["units"][2:5]:
             self.assertTrue(unit["ready"])
             self.assertEqual(unit["quiz_count"], 2)

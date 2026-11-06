@@ -188,11 +188,11 @@ SPEC.loader.exec_module(AUDIT)
 class Class10ScienceCompleteChapterTests(unittest.TestCase):
     def test_complete_catalogue(self):
         self.assertEqual(INDEX["meta"]["unit_count"],23)
-        self.assertEqual(INDEX["meta"]["total_questions"],1460)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"],73)
+        self.assertEqual(INDEX["meta"]["total_questions"],1480)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"],74)
         self.assertEqual([u["id"] for u in INDEX["units"]],list(range(1,24)))
         self.assertEqual([u["total"] for u in INDEX["units"]],
-                         [580, 40] + [40] * 21)
+                         [580, 60] + [40] * 21)
         self.assertTrue(all(u["ready"] for u in INDEX["units"]))
         for unit in INDEX["units"][-2:]:
             self.assertEqual(unit["quiz_count"],2)
