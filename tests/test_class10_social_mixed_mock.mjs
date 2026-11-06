@@ -13,9 +13,11 @@ const units=core.validateIndex(index);
 assert.equal(units.length,27);
 const docs=units.map(u=>JSON.parse(read(root+u.path)));
 const bank=core.assemble(units,docs);
-assert.equal(bank.length,560);
-assert.equal(new Set(bank.map(q=>q.id)).size,560);
-assert.equal(bank.filter(q=>q.unitId===18&&q.quiz===2).length,20,'New Civics set must be available to mixed mock');
+assert.ok(bank.length>=580,'Keep previously published bilingual MCQ coverage');
+assert.equal(bank.length,index.meta.total_questions,'Mock bank should equal published catalogue total');
+assert.equal(new Set(bank.map(q=>q.id)).size,bank.length);
+assert.equal(bank.filter(q=>q.unitId===18&&q.quiz===2).length,20,'Indian Constitution Quiz 2 must be available');
+assert.equal(bank.filter(q=>q.unitId===19&&q.quiz===2).length,20,'Central Government Quiz 2 must be available');
 for(const [size,distribution] of [
   [20,[8,5,4,3]],[50,[20,13,9,8]],[100,[40,25,18,17]]
 ]){
@@ -41,12 +43,14 @@ const wrongGroup=docs.map(d=>structuredClone(d));
 wrongGroup[17].questions[20].quiz=1;
 assert.throws(()=>core.assemble(units,wrongGroup),/20 questions per quiz/,'Reject unequal quiz groups');
 const inaccurate=structuredClone(index);
-inaccurate.meta.total_questions=540;
+inaccurate.meta.total_questions=index.meta.total_questions-1;
 assert.throws(()=>core.validateIndex(inaccurate),/Question count disagrees/,'Reject inaccurate catalogue totals');
 assert.throws(()=>core.draw(bank,13),/Choose 20, 50 or 100/,'Reject unsupported paper size');
 const html=read('class10-social-mock.html');
 const catalog=read('textbook-quiz.html');
 assert.ok(catalog.includes('href="class10-social-mock.html"'),'Mixed mock must be discoverable from the catalogue');
+assert.ok(catalog.includes(index.meta.total_questions+'-question pool'),'Catalogue mock link must show current number of questions');
+assert.ok(html.includes(index.meta.total_questions+' available questions'),'Mock intro must show current number of questions');
 assert.ok(catalog.includes("cls===10&&subject==='social-science'?"),'Link must be visible on the correct class/subject route');
 assert.ok(html.includes('assets/js/class10-social-mock-core.js'),'Mixed mock must load tested helpers');
 assert.ok(html.includes("'&quiz='+q.quiz"),'Review links must take learners to the actual quiz set, not always Quiz 1');
@@ -59,4 +63,4 @@ const scriptStart=html.lastIndexOf('<script>');
 const scriptEnd=html.lastIndexOf('</script>');
 assert.ok(scriptStart>=0&&scriptEnd>scriptStart,'Missing browser script');
 new vm.Script(html.slice(scriptStart+'<script>'.length,scriptEnd),{filename:'class10-social-mock.html'});
-console.log('Class 10 Social Science mixed mock: 27 chapters, 560 questions, 20/50/100 balanced papers, answer scoring, error handling and UI wiring verified.');
+console.log('Class 10 Social Science mixed mock: 27 chapters, '+bank.length+' questions, 20/50/100 balanced papers, answer scoring, error handling and UI wiring verified.');
