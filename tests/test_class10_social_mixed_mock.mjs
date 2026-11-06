@@ -49,6 +49,7 @@ const catalog=read('textbook-quiz.html');
 assert.ok(catalog.includes('href="class10-social-mock.html"'),'Mixed mock must be discoverable from the catalogue');
 assert.ok(catalog.includes("cls===10&&subject==='social-science'?"),'Link must be visible on the correct class/subject route');
 assert.ok(html.includes('assets/js/class10-social-mock-core.js'),'Mixed mock must load tested helpers');
+assert.ok(html.includes("'&quiz='+q.quiz"),'Review links must take learners to the actual quiz set, not always Quiz 1');
 assert.ok(html.includes('fetch(\'data/textbook/class-10/social-science/index.json\''),'Mock must load live 27-chapter catalogue');
 assert.ok(!html.includes('Math.random()*20'),'Mock should use subject quotas rather than a hard-coded small pool');
 for(const id of ['setup','paper','result','size','start','submit','palette','question','options','reviewList','subjectRows','previous','next','again']){
