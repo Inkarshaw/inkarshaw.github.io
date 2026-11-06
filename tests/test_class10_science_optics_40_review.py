@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Class 10 Science Optics: forty bilingual MCQ answer/regression checks."""
+"""Class 10 Science Optics: sixty bilingual MCQ answer/regression checks."""
 import importlib.util
 import json
 import unittest
@@ -169,15 +169,98 @@ EXPECTED=[
     "அதன் அதிர்வெண்"
   ]
 ]
+# Quiz 3: fixed independent answer keys, not derived from the data being tested.
+EXPECTED.extend([
+  [
+    "The switched-on LED",
+    "ஒளிரும் LED"
+  ],
+  [
+    "It becomes one-third",
+    "மூன்றில் ஒரு பங்காகும்"
+  ],
+  [
+    "It continues along the normal",
+    "செங்குத்துக் கோட்டிலேயே தொடரும்"
+  ],
+  [
+    "Away from the normal",
+    "செங்குத்துக் கோட்டைவிட்டு விலகி"
+  ],
+  [
+    "0.40",
+    "0.40"
+  ],
+  [
+    "Red",
+    "சிவப்பு"
+  ],
+  [
+    "One-sixteenth as much",
+    "பதினாறில் ஒரு பங்கு"
+  ],
+  [
+    "Particles comparable to or larger than the light wavelength",
+    "ஒளியின் அலைநீளத்துக்கு ஒப்பான அல்லது அதைவிடப் பெரிய துகள்கள்"
+  ],
+  [
+    "Rayleigh line",
+    "ராலே வரி"
+  ],
+  [
+    "One plane and one outwardly curved surface",
+    "ஒரு தட்டை மற்றும் ஒரு புறம் குவிந்த வளைவு மேற்பரப்பு"
+  ],
+  [
+    "Parallel to the principal axis",
+    "முதன்மை அச்சுக்கு இணையாக"
+  ],
+  [
+    "At the principal focus on the image side",
+    "பிம்பப் பக்க முதன்மைக் குவியத்தில்"
+  ],
+  [
+    "Between the optical centre and the focus on the object's side",
+    "பொருள் பக்கத்தில் ஒளியியல் மையத்துக்கும் குவியத்துக்கும் இடையில்"
+  ],
+  [
+    "−0.5",
+    "−0.5"
+  ],
+  [
+    "20 cm",
+    "20 cm"
+  ],
+  [
+    "Cornea",
+    "கருவிழிப்படலம் (கார்னியா)"
+  ],
+  [
+    "Optic nerve",
+    "பார்வை நரம்பு"
+  ],
+  [
+    "Myopia",
+    "கிட்டப்பார்வைக் குறைபாடு"
+  ],
+  [
+    "6",
+    "6"
+  ],
+  [
+    "20",
+    "20"
+  ]
+])
 SPEC=importlib.util.spec_from_file_location("audit",ROOT/"scripts/audit_textbook_quiz_quality.py")
 AUDIT=importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 class OpticsReviewTests(unittest.TestCase):
     def test_all_quizzes_and_bilingual_answers(self):
-        self.assertEqual(len(BANK["questions"]),40)
-        self.assertEqual(BANK["meta"]["total_questions"],40)
-        self.assertEqual(len(BANK["meta"]["quiz_sets"]),2)
-        self.assertEqual(Counter(q["correct"] for q in BANK["questions"]),Counter({0:10,1:10,2:10,3:10}))
+        self.assertEqual(len(BANK["questions"]),60)
+        self.assertEqual(BANK["meta"]["total_questions"],60)
+        self.assertEqual(len(BANK["meta"]["quiz_sets"]),3)
+        self.assertEqual(Counter(q["correct"] for q in BANK["questions"]),Counter({0:15,1:15,2:15,3:15}))
         for i,(q,(en,ta)) in enumerate(zip(BANK["questions"],EXPECTED),1):
             with self.subTest(i=i):
                 self.assertEqual(q["id"],f"C10SCI-U02-Q{i:04d}")
@@ -190,7 +273,15 @@ class OpticsReviewTests(unittest.TestCase):
                     self.assertEqual(len({s.casefold().strip() for s in opts}),4)
                     self.assertIn(opts[q["correct"]],q[f"exp_{lang}"])
                     self.assertGreater(len(q[f"exp_{lang}"]),48)
-        result=AUDIT.audit(BANK["questions"],start=0,count=40)
+        self.assertEqual(len(EXPECTED),60)
+        self.assertEqual(len({q["q_en"].casefold().strip() for q in BANK["questions"]}),60)
+        self.assertEqual(len({q["q_ta"].strip() for q in BANK["questions"]}),60)
+        for q in BANK["questions"][40:]:
+            self.assertEqual(q["quiz"],3)
+            self.assertIn(q["type"],{"concept","application","reasoning","numerical"})
+            self.assertGreaterEqual(int(q["page"]),16)
+            self.assertLessEqual(int(q["page"]),27)
+        result=AUDIT.audit(BANK["questions"],start=0,count=60)
         self.assertEqual(result["errors"],[],result["errors"])
         self.assertEqual(result["warnings"],[],result["warnings"])
 if __name__=="__main__": unittest.main()
