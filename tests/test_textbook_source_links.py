@@ -23,6 +23,17 @@ class TextbookSourceTests(unittest.TestCase):
                 if row.get(field):
                     self.assertTrue(MODULE.is_direct_book_url(row[field]), (key, field))
 
+    def test_class_9_science_tamil_pdf_and_edition_mismatch_are_explicit(self):
+        registry = json.loads((ROOT / "data/textbook/source-registry.json")
+                              .read_text(encoding="utf-8"))["books"]
+        row = registry["class-9/science"]
+        self.assertTrue(MODULE.is_direct_book_url(row["source_en_url"]))
+        self.assertTrue(MODULE.is_direct_book_url(row["source_ta_url"]))
+        self.assertIn("science-tm.pdf", row["source_ta_url"])
+        self.assertIn("2022", row["edition_note"])
+        self.assertIn("NOT an independently verified same-revision", row["edition_note"])
+        self.assertIn("2026", row["edition_note"])
+
     def test_class_10_social_science_has_labelled_2022_tamil_reference(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
                               .read_text(encoding="utf-8"))["books"]
