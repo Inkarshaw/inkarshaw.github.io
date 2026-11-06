@@ -18,6 +18,7 @@ assert.equal(bank.length,index.meta.total_questions,'Mock bank should equal publ
 assert.equal(new Set(bank.map(q=>q.id)).size,bank.length);
 assert.equal(bank.filter(q=>q.unitId===18&&q.quiz===2).length,20,'Indian Constitution Quiz 2 must be available');
 assert.equal(bank.filter(q=>q.unitId===19&&q.quiz===2).length,20,'Central Government Quiz 2 must be available');
+assert.equal(bank.filter(q=>q.unitId===20&&q.quiz===2).length,20,'State Government Quiz 2 must be available');
 for(const [size,distribution] of [
   [20,[8,5,4,3]],[50,[20,13,9,8]],[100,[40,25,18,17]]
 ]){
