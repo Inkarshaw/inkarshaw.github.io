@@ -50,8 +50,14 @@ assert.throws(()=>core.draw(bank,13),/Choose 20, 50 or 100/,'Reject unsupported 
 const html=read('class10-social-mock.html');
 const catalog=read('textbook-quiz.html');
 assert.ok(catalog.includes('href="class10-social-mock.html"'),'Mixed mock must be discoverable from the catalogue');
-assert.ok(catalog.includes(index.meta.total_questions+'-question pool'),'Catalogue mock link must show current number of questions');
-assert.ok(html.includes(index.meta.total_questions+' available questions'),'Mock intro must show current number of questions');
+assert.ok(catalog.includes("socialStats.questions+'-question pool"),'Catalogue mock badge must use the current chapter index total');
+assert.ok(catalog.includes("socialStats.sets+' quiz sets"),'Catalogue source status must use the current quiz-set count');
+assert.ok(catalog.includes('socialStats={questions,sets}'),'Catalogue must read counts from published index metadata');
+assert.ok(html.includes('displayedQuestions=index.meta.total_questions'),'Mixed mock must read the actual index count');
+assert.ok(html.includes("'+displayedQuestions+' available questions"),'Mixed mock coverage must render the loaded count');
+assert.ok(html.includes('loadIndex().catch('),'Mixed mock must load coverage at first visit and handle unavailable catalogues');
+assert.ok(!catalog.includes('600-question pool'),'Catalogue must not hard-code the current number of questions');
+assert.ok(!html.includes('600 available questions'),'Mixed mock must not hard-code the current number of questions');
 assert.ok(catalog.includes("cls===10&&subject==='social-science'?"),'Link must be visible on the correct class/subject route');
 assert.ok(html.includes('assets/js/class10-social-mock-core.js'),'Mixed mock must load tested helpers');
 assert.ok(html.includes("'&quiz='+q.quiz"),'Review links must take learners to the actual quiz set, not always Quiz 1');
