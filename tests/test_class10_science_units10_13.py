@@ -360,7 +360,7 @@ class Class10ScienceUnits10To13Tests(unittest.TestCase):
         self.assertEqual([u["id"] for u in INDEX["units"][:13]],
                          list(range(1, 14)))
         self.assertEqual([u["total"] for u in INDEX["units"][:9]],
-                         [580, 40, 40, 40, 40, 40, 40, 40, 40])
+                         [580, 60, 40, 40, 40, 40, 40, 40, 40])
         for u in INDEX["units"][9:13]:
             self.assertTrue(u["ready"])
             self.assertEqual(u["total"], 40)
