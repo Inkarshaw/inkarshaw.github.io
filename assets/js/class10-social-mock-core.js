@@ -15,12 +15,14 @@
     for(const u of index.units){
       assert(Number.isInteger(u.id)&&u.id>=1&&u.id<=27&&!ids.has(u.id),'Invalid chapter identifier in catalogue.');
       ids.add(u.id);
-      assert(u.ready===true&&u.total===20&&u.path==='unit-'+u.id+'.json','A starter chapter is missing or unpublished.');
+      assert(u.ready===true&&Number.isInteger(u.total)&&u.total>=20&&u.total%20===0&&u.quiz_count===u.total/20&&u.path==='unit-'+u.id+'.json','A starter chapter is missing or its quiz count is invalid.');
       assert(sections.includes(u.section_en),'Unknown Social Science section.');
     }
     for(const [section,count] of [['History',10],['Geography',7],['Civics',5],['Economics',5]]){
       assert(index.units.filter(u=>u.section_en===section).length===count,'Unexpected chapter distribution: '+section);
     }
+    assert(index.meta.total_questions===index.units.reduce((n,u)=>n+u.total,0),'Question count disagrees with catalogue.');
+    assert(index.meta.total_quiz_sets===index.units.reduce((n,u)=>n+u.quiz_count,0),'Quiz-set count disagrees with catalogue.');
     return index.units;
   }
   function assemble(units,documents){
@@ -28,7 +30,8 @@
     const result=[],seen=new Set();
     for(let i=0;i<units.length;i++){
       const u=units[i],d=documents[i];
-      assert(d&&d.meta&&d.meta.unit===u.id&&Array.isArray(d.questions)&&d.questions.length===20,'Invalid question bank for chapter '+u.id);
+      assert(d&&d.meta&&d.meta.unit===u.id&&d.meta.total_questions===u.total&&Array.isArray(d.meta.quiz_sets)&&d.meta.quiz_sets.length===u.quiz_count&&Array.isArray(d.questions)&&d.questions.length===u.total,'Invalid question bank for chapter '+u.id);
+      const perSet=Array(u.quiz_count).fill(0);
       for(const q of d.questions){
         assert(q&&typeof q.id==='string'&&!seen.has(q.id),'Duplicate or absent question ID.');
         seen.add(q.id);
@@ -37,10 +40,13 @@
         assert(q.opts_en.every(s=>typeof s==='string'&&s.trim())&&q.opts_ta.every(s=>typeof s==='string'&&s.trim()),'Empty option '+q.id);
         assert(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<4,'Invalid correct option '+q.id);
         assert(typeof q.exp_en==='string'&&q.exp_en.trim()&&typeof q.exp_ta==='string'&&q.exp_ta.trim(),'Missing bilingual explanation '+q.id);
+        assert(Number.isInteger(q.quiz)&&q.quiz>=1&&q.quiz<=u.quiz_count,'Invalid quiz group '+q.id);
+        perSet[q.quiz-1]++;
         result.push({...q,unitId:u.id,sectionEn:u.section_en,sectionTa:u.section_ta,unitEn:u.unit_en,unitTa:u.unit_ta});
       }
+      assert(perSet.every(count=>count===20),'Chapter '+u.id+' must contain 20 questions per quiz.');
     }
-    assert(result.length===540,'The question set is incomplete.');
+    assert(result.length===units.reduce((n,u)=>n+u.total,0),'The question set is incomplete.');
     return result;
   }
   function shuffle(input,rng){
