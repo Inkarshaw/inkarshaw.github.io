@@ -1,0 +1,53 @@
+// Class 9 Tamil Nadu SCERT Science Unit 10: Matter Around Us (2020 English).
+// Enforce playable bilingual starter quality, with source-language uncertainty disclosed.
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const root='data/textbook/class-9/science/';
+const index=JSON.parse(read(root+'index.json'));
+const entry=index.units.find(x=>x.id===10);
+assert.ok(entry?.ready&&entry.path==='unit-10.json');
+assert.equal(entry.total,20);assert.equal(entry.quiz_count,1);
+assert.equal(index.meta.published_unit_count,10);
+assert.equal(index.meta.total_questions,2040);
+assert.equal(index.meta.total_quiz_sets,102);
+assert.equal(index.units.filter(u=>!u.ready).length,15);
+const doc=JSON.parse(read(root+entry.path));
+assert.equal(doc.meta.class,9);
+assert.equal(doc.meta.unit,10);
+assert.equal(doc.meta.edition,2020);
+assert.equal(doc.meta.total_questions,20);
+assert.equal(doc.questions.length,20);
+assert.equal(doc.meta.quiz_sets.length,1);
+assert.ok(doc.meta.source_en_url.endsWith('/Junior-Secondary-Science-Chapter10-Matter.pdf'));
+assert.ok(doc.meta.source_ta_url.endsWith('/science-tm.pdf'));
+assert.match(doc.meta.source_review,/2026/);
+assert.match(doc.meta.source_review,/Tamil/);
+const ctx=vm.createContext({window:{}});
+vm.runInContext(read('assets/js/textbook-quality.js'),ctx);
+const quality=ctx.window.TextbookQuality;
+const ids=new Set(),types=new Set(),stems=new Set(),tamilStems=new Set(),answers=[0,0,0,0];
+for(const [i,q] of doc.questions.entries()){
+  assert.equal(q.id,'C09SCI-U10-Q'+String(i+1).padStart(4,'0'));
+  assert.equal(q.quiz,1);
+  assert.ok(!ids.has(q.id));ids.add(q.id);
+  assert.ok(!types.has(q.type));types.add(q.type);
+  assert.ok(!stems.has(q.q_en));stems.add(q.q_en);
+  assert.ok(!tamilStems.has(q.q_ta));tamilStems.add(q.q_ta);
+  assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'));
+  assert.equal(q.opts_en.length,4);assert.equal(q.opts_ta.length,4);
+  assert.equal(new Set(q.opts_en.map(x=>x.trim().toLowerCase())).size,4);
+  assert.equal(new Set(q.opts_ta.map(x=>x.trim())).size,4);
+  assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<4);
+  answers[q.correct]++;
+  assert.ok(q.exp_en.length>=35&&q.exp_ta.length>=25);
+  assert.ok(Number(q.page)>=113&&Number(q.page)<=124);
+  assert.ok(quality.valid(q),'Player should accept '+q.id);
+  assert.ok(!quality.isBoilerplate(q.q_en),'Avoid generic mechanical stem '+q.id);
+}
+assert.deepEqual(answers,[5,5,5,5]);
+const curated=quality.curate(doc.questions).questions;
+assert.equal(curated.length,20);
+assert.deepEqual(curated.map(q=>q.id).sort(),doc.questions.map(q=>q.id).sort());
+console.log('Class 9 Science Unit 10: original 20-question bilingual MCQ bank valid; 10/25 chapters playable, 15 pending.');
