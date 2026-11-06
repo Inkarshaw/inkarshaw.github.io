@@ -70,6 +70,8 @@ def audit():
     registry = json.loads((DATA / "source-registry.json").read_text(encoding="utf-8"))["books"]
     counts = Counter()
     missing_by_book = Counter()
+    fallback_by_book = Counter()  # (book, display language, source type)
+    fallback_examples = {}  # first example for each book/language/source type
     missing_examples, invalid_examples, files = [], [], []
     for path in sorted(DATA.rglob("*.json")):
         if path.name in ("index.json", "source-registry.json"):
@@ -120,9 +122,32 @@ def audit():
                              registered.get("source_" + language + "_url")))
                 if valid and not exact:
                     counts[language + "_fallback_to_other_or_unspecified"] += 1
+                    # The runtime picks a generic source before an explicitly other-language
+                    # one. Distinguish these routes; neither proves a matching-medium book.
+                    generic = any(is_direct_book_url(v) for v in (
+                        q.get("source_url"), meta.get("source_url"), meta.get("textbook_url")))
+                    kind = "unspecified" if generic else "other_language"
+                    counts[language + "_fallback_" + kind] += 1
+                    group = (parent_key, language, kind)
+                    fallback_by_book[group] += 1
+                    fallback_examples.setdefault(group, {
+                        "file": relative, "question": q.get("id", n),
+                        "view_language": language, "fallback_type": kind})
                 if not valid and len(missing_examples) < 35:
                     missing_examples.append({"file": relative, "question": q.get("id", n), "language": language})
-    return {"counts": dict(sorted(counts.items())), "missing_by_book": dict(missing_by_book.most_common()), "files_scanned": files,
+    rows = {}
+    for (book, language, kind), count in fallback_by_book.items():
+        row = rows.setdefault(book, {
+            "book": book, "en_unspecified": 0, "en_other_language": 0,
+            "ta_unspecified": 0, "ta_other_language": 0})
+        row[language + "_" + kind] += count
+    for row in rows.values():
+        row["total"] = sum(row[k] for k in (
+            "en_unspecified", "en_other_language", "ta_unspecified", "ta_other_language"))
+    priorities = sorted(rows.values(), key=lambda row: (-row["total"], row["book"]))
+    samples = [fallback_examples[key] for key, _ in fallback_by_book.most_common(100)]
+    return {"counts": dict(sorted(counts.items())), "missing_by_book": dict(missing_by_book.most_common()),
+            "fallback_by_book": priorities, "fallback_examples": samples, "files_scanned": files,
             "missing_examples": missing_examples, "invalid_examples": invalid_examples}
 
 
@@ -142,6 +167,7 @@ def main():
     print("Missing by textbook:", json.dumps(dict(list(report["missing_by_book"].items())[:30]), ensure_ascii=False))
     print("Missing examples:", json.dumps(report["missing_examples"][:12], ensure_ascii=False))
     print("Invalid examples:", json.dumps(report["invalid_examples"][:12], ensure_ascii=False))
+    print("Top books needing medium-specific source review:", json.dumps(report["fallback_by_book"][:8], ensure_ascii=False))
     counts = report["counts"]
     if args.strict and any(counts.get(k, 0) for k in (
             "invalid_metadata_urls", "invalid_question_urls", "unreadable_or_invalid_json_files", "invalid_question_records")):

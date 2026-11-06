@@ -40,8 +40,15 @@ jobs:
                  f"- Tamil link missing: {c.get('ta_missing',0)}",
                  f"- Invalid explicit question URLs: {c.get('invalid_question_urls',0)}",
                  f"- Invalid explicit unit URLs: {c.get('invalid_metadata_urls',0)}",
+                 f"- English view using unspecified or other-medium source: {c.get('en_fallback_to_other_or_unspecified',0)}",
+                 f"- Tamil view using unspecified or other-medium source: {c.get('ta_fallback_to_other_or_unspecified',0)}",
+                 '',
+                 'Top books for source-medium editorial review:',
+                 *(f"- {row['book']}: {row['total']} fallback question-view links (EN generic {row['en_unspecified']}, EN other {row['en_other_language']}; TA generic {row['ta_unspecified']}, TA other {row['ta_other_language']})"
+                   for row in r.get('fallback_by_book', [])[:6]),
                  '',
                  'Only real PDF / Drive-book / specific chapter destinations are displayed. Missing links are clearly labelled pending verification.',
+                 'Medium fallbacks are NOT proof of a matching-language textbook; verify the actual edition and original-book pages.',
                  'The report is a structural audit, not a live HTTP or edition/page correspondence check.']
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as f:f.write('\n'.join(lines)+'\n')
           if any(c.get(k,0) for k in ('en_missing','ta_missing','invalid_question_urls','invalid_metadata_urls')):

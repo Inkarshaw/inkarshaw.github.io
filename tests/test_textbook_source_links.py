@@ -54,6 +54,29 @@ class TextbookSourceTests(unittest.TestCase):
         self.assertIn("a.removeAttribute('href')", html)
         self.assertIn("Source PDF pending verification", html)
 
+    def test_language_fallback_priorities_reconcile_with_audit_totals(self):
+        report = MODULE.audit()
+        counts = report["counts"]
+        priorities = report["fallback_by_book"]
+        self.assertTrue(priorities, "Source-medium editorial priorities should be listed")
+        self.assertEqual([row["total"] for row in priorities],
+                         sorted((row["total"] for row in priorities), reverse=True))
+        for language in ("en", "ta"):
+            combined = sum(row[language + "_unspecified"] +
+                           row[language + "_other_language"] for row in priorities)
+            self.assertEqual(combined, counts.get(language + "_fallback_to_other_or_unspecified", 0))
+            self.assertEqual(combined,
+                             counts.get(language + "_fallback_unspecified", 0) +
+                             counts.get(language + "_fallback_other_language", 0))
+        for row in priorities:
+            self.assertGreater(row["total"], 0)
+            self.assertEqual(row["total"], sum(row[k] for k in (
+                "en_unspecified", "en_other_language", "ta_unspecified", "ta_other_language")))
+        for sample in report["fallback_examples"]:
+            self.assertIn(sample["view_language"], ("en", "ta"))
+            self.assertIn(sample["fallback_type"], ("unspecified", "other_language"))
+            self.assertTrue(sample["file"])
+
     def test_full_question_bank_audit_runs(self):
         report = MODULE.audit()
         self.assertGreater(report["counts"]["question_entries"], 0)
