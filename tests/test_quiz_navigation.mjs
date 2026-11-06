@@ -49,6 +49,31 @@ saved.set('session','{');assert.equal(savedCtx.quizSession(),null,'A damaged ses
 saved.set('session',JSON.stringify({date:'2026-11-06',current:2}));
 assert.equal(savedCtx.quizSession().current,2,'Keep valid saved sessions');
 
+// An otherwise matching legacy session may still contain a fractional index,
+// invalid answers or checked flags. Those must not make the quiz unanswerable.
+const savedContext = {exam:'TNPSC Group IV',subject:'Science',topic:'Laws of Motion',date:'2026-11-06',count:10,pyqYear:''};
+let fixture={...savedContext,quizIds:['a','b','c'],answers:['A','B',null],checked:[true,false,false],current:1};
+const resumeCtx=vm.createContext({
+  quiz:[{ID:'a'},{ID:'b'},{ID:'c'}],letters:['A','B','C','D'],
+  current:0,answers:[],checked:[],
+  quizSession:()=>fixture,currentQuizContext:()=>savedContext
+});
+const restoreLine=daily.split('\n').find(line=>line.startsWith('function restoreQuizSession('));
+assert.ok(restoreLine,'Session restoration function must be tested');
+vm.runInContext(restoreLine,resumeCtx);
+assert.equal(resumeCtx.restoreQuizSession(),true);
+assert.equal(resumeCtx.current,1,'Resume at the saved valid integer position');
+assert.equal(resumeCtx.checked[0],true,'Preserve genuine checked answers');
+fixture={...fixture,answers:['B',null,'Z'],checked:['true',true,true],current:1.5};
+assert.equal(resumeCtx.restoreQuizSession(),true);
+assert.equal(resumeCtx.current,0,'Reject fractional saved question positions');
+assert.equal(JSON.stringify(resumeCtx.answers),JSON.stringify(['B',null,null]),'Remove invalid saved answer choices');
+assert.equal(resumeCtx.checked.filter(Boolean).length,0,'Only preserve checked flags backed by valid answers');
+fixture={...fixture,answers:null,checked:[true,true,true],current:999};
+assert.equal(resumeCtx.restoreQuizSession(),true);
+assert.equal(resumeCtx.current,2,'Clamp an out-of-range integer to final question');
+assert.equal(resumeCtx.answers.filter(Boolean).length,0);
+assert.equal(resumeCtx.checked.filter(Boolean).length,0);
 // Exercise actual Daily Quiz navigation handler, not a copied implementation.
 function functionLine(src, name) {
   const line = src.split('\n').find(s => s.startsWith('function ' + name + '('));
