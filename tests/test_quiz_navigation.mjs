@@ -29,7 +29,7 @@ const savedCtx = vm.createContext({
   localStorage:{getItem(key){return saved.has(key)?saved.get(key):null}}
 });
 const savedFunctions = ['storedRows','getQuizHistory','wrongBook','quizSession'].map(name=>{
-  const line=daily.split('\\n').find(s=>s.startsWith('function '+name+'('));
+  const line=daily.split('\n').find(s=>s.startsWith('function '+name+'('));
   assert.ok(line, 'Saved-data function missing: '+name);
   return line;
 }).join('\\n');
