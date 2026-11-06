@@ -32,7 +32,7 @@ const savedFunctions = ['storedRows','getQuizHistory','wrongBook','quizSession']
   const line=daily.split('\n').find(s=>s.startsWith('function '+name+'('));
   assert.ok(line, 'Saved-data function missing: '+name);
   return line;
-}).join('\\n');
+}).join('\n');
 vm.runInContext(savedFunctions,savedCtx);
 for(const malformed of ['{','null','{}','42','"not-an-array"']){
   saved.set('history',malformed);saved.set('wrong',malformed);
