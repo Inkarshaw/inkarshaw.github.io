@@ -21,7 +21,7 @@ for(const [size,distribution] of [
   const sample=core.draw(bank,size,()=>.37);
   assert.equal(sample.length,size);
   assert.equal(new Set(sample.map(q=>q.id)).size,size,'Repeated question in mixed mock');
-  assert.deepEqual(core.sections.map(section=>sample.filter(q=>q.sectionEn===section).length),distribution,'Subject quota for '+size);
+  assert.deepEqual(Array.from(core.sections,section=>sample.filter(q=>q.sectionEn===section).length),distribution,'Subject quota for '+size);
   const correct=core.grade(sample,sample.map(q=>q.correct));
   assert.equal(correct.correct,size);assert.equal(correct.wrong,0);assert.equal(correct.blank,0);assert.equal(correct.percent,100);
   const blank=core.grade(sample,sample.map(()=>null));
