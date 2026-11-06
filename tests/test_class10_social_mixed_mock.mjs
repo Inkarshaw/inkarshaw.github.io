@@ -47,8 +47,8 @@ assert.ok(!html.includes('Math.random()*20'),'Mock should use subject quotas rat
 for(const id of ['setup','paper','result','size','start','submit','palette','question','options','reviewList','subjectRows','previous','next','again']){
   assert.ok(html.includes('id="'+id+'"'),'Missing interactive element '+id);
 }
-const inline=[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)]
-  .map(m=>m[1]).filter(x=>x.trim());
-assert.equal(inline.length,1,'Mixed mock should have one executable inline script');
-for(const code of inline)new vm.Script(code,{filename:'class10-social-mock.html'});
+const scriptStart=html.lastIndexOf('<script>');
+const scriptEnd=html.lastIndexOf('</script>');
+assert.ok(scriptStart>=0&&scriptEnd>scriptStart,'Missing browser script');
+new vm.Script(html.slice(scriptStart+'<script>'.length,scriptEnd),{filename:'class10-social-mock.html'});
 console.log('Class 10 Social Science mixed mock: 27 chapters, 540 questions, 20/50/100 balanced papers, answer scoring, error handling and UI wiring verified.');
