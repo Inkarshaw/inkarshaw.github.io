@@ -19,8 +19,10 @@ assert.deepEqual(index.units.map(u=>u.id),Array.from({length:27},(_,i)=>i+1));
 assert.deepEqual(index.units.map(u=>u.chapter_page_en),starts);
 assert.deepEqual(['History','Geography','Civics','Economics'].map(s=>index.units.filter(u=>u.section_en===s).length),[10,7,5,5]);
 assert.equal(index.meta.published_unit_count,27);
-assert.equal(index.meta.total_questions,560);
-assert.equal(index.meta.total_quiz_sets,28);
+assert.ok(index.meta.total_questions>=580,'Do not regress below the 580 reviewed starter and expanded MCQs');
+assert.ok(index.meta.total_quiz_sets>=29,'Do not remove reviewed chapter quiz sets');
+assert.equal(index.meta.total_questions,index.units.reduce((n,u)=>n+u.total,0),'Catalogue question totals must match units');
+assert.equal(index.meta.total_quiz_sets,index.units.reduce((n,u)=>n+u.quiz_count,0),'Catalogue quiz totals must match units');
 assert.ok(/2026|prescribed|current/i.test(index.meta.editorial_status));
 const ready=index.units.filter(u=>u.ready);
 const pending=index.units.filter(u=>!u.ready);
@@ -39,8 +41,9 @@ const allIds=new Set();
 const normalizedEnglishStems=new Map();
 const normalizedTamilStems=new Map();
 for(const u of ready){
- assert.equal(u.total,u.id===18?40:20);
- assert.equal(u.quiz_count,u.id===18?2:1);
+ assert.ok(u.total>=20&&u.total%20===0,'Every published chapter must have complete 20-question sets');
+ assert.equal(u.quiz_count,u.total/20,'Quiz count must reflect actual chapter size');
+ if(u.id===18||u.id===19)assert.ok(u.quiz_count>=2,'Retain second Civics quiz for chapter '+u.id);
  assert.equal(u.path,'unit-'+u.id+'.json');
  const doc=JSON.parse(read(root+u.path));
  assert.equal(doc.meta.class,10);
@@ -82,11 +85,16 @@ for(const u of ready){
   assert.ok(!quality.isBoilerplate(q.q_en),'Mechanical stem '+q.id);
  }
  assert.ok(positions.size>=3,'Answer distribution in unit '+u.id);
+ for(let quiz=1;quiz<=u.quiz_count;quiz++){
+  const group=doc.questions.filter(q=>q.quiz===quiz);
+  assert.equal(group.length,20,'Each published quiz must contain 20 questions: chapter '+u.id+', quiz '+quiz);
+  assert.ok(new Set(group.map(q=>q.correct)).size>=3,'Balance keyed answers per quiz: '+u.id+'/'+quiz);
+ }
  const curated=quality.curate(doc.questions).questions;
  assert.equal(curated.length,u.total,'Player should retain all questions in unit '+u.id);
  assert.deepEqual(Array.from(curated,q=>q.id).sort(),doc.questions.map(q=>q.id).sort());
 }
-assert.equal(allIds.size,560);
+assert.equal(allIds.size,index.meta.total_questions);
 const catalog=read('textbook-quiz.html');
 const player=read('textbook-play.html');
 assert.ok(catalog.includes("'data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json'"));
@@ -94,4 +102,4 @@ assert.ok(catalog.includes('if(!u.ready)'));
 assert.ok(catalog.includes('All 27 Class 10 Social Science chapters are indexed and have playable English–Tamil'));
 assert.ok(catalog.includes('No chapters remain without a playable starter quiz'));
 assert.ok(player.includes("'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json'")||player.includes("'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json'"));
-console.log('Class 10 Social Science: 27 indexed chapters, 560 bilingual MCQs in 28 playable quiz sets, 0 pending.');
+console.log('Class 10 Social Science: 27 indexed chapters, '+index.meta.total_questions+' bilingual MCQs in '+index.meta.total_quiz_sets+' playable quiz sets, 0 pending.');
