@@ -63,7 +63,7 @@ for(const u of ready){
    ['English',q.q_en,normalizedEnglishStems],
    ['Tamil',q.q_ta,normalizedTamilStems],
   ]){
-   const normalized=stem.normalize('NFKC').toLowerCase().replace(/[\\p{P}\\p{S}\\s]+/gu,' ').trim();
+   const normalized=stem.normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}\s]+/gu,' ').trim();
    assert.ok(normalized.length>=8,q.id+' '+label+' normalized stem too short');
    assert.ok(!seen.has(normalized),q.id+' duplicates '+label+' stem from '+seen.get(normalized));
    seen.set(normalized,q.id);
