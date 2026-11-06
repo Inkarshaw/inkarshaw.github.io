@@ -54,7 +54,7 @@ const expectedKeys=[
   "Diacidic base",
   "Blue to red",
   "Pink",
-  "Pink",
+  "Basic",
   "Acidic",
   "Sodium chloride and water",
   "Acid salt",
