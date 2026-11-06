@@ -19,8 +19,8 @@ assert.deepEqual(index.units.map(u=>u.id),Array.from({length:27},(_,i)=>i+1));
 assert.deepEqual(index.units.map(u=>u.chapter_page_en),starts);
 assert.deepEqual(['History','Geography','Civics','Economics'].map(s=>index.units.filter(u=>u.section_en===s).length),[10,7,5,5]);
 assert.equal(index.meta.published_unit_count,27);
-assert.equal(index.meta.total_questions,540);
-assert.equal(index.meta.total_quiz_sets,27);
+assert.equal(index.meta.total_questions,560);
+assert.equal(index.meta.total_quiz_sets,28);
 assert.ok(/2026|prescribed|current/i.test(index.meta.editorial_status));
 const ready=index.units.filter(u=>u.ready);
 const pending=index.units.filter(u=>!u.ready);
@@ -39,8 +39,8 @@ const allIds=new Set();
 const normalizedEnglishStems=new Map();
 const normalizedTamilStems=new Map();
 for(const u of ready){
- assert.equal(u.total,20);
- assert.equal(u.quiz_count,1);
+ assert.equal(u.total,u.id===18?40:20);
+ assert.equal(u.quiz_count,u.id===18?2:1);
  assert.equal(u.path,'unit-'+u.id+'.json');
  const doc=JSON.parse(read(root+u.path));
  assert.equal(doc.meta.class,10);
@@ -48,9 +48,9 @@ for(const u of ready){
  assert.equal(doc.meta.edition,2022);
  assert.equal(doc.meta.subject,'Social Science');
  assert.equal(doc.meta.source_en_url,source);
- assert.equal(doc.meta.total_questions,20);
- assert.equal(doc.meta.quiz_sets.length,1);
- assert.equal(doc.questions.length,20);
+ assert.equal(doc.meta.total_questions,u.total);
+ assert.equal(doc.meta.quiz_sets.length,u.quiz_count);
+ assert.equal(doc.questions.length,u.total);
  assert.ok(/2026|prescribed|current/i.test(doc.meta.editorial_status));
  const positions=new Set();
  for(const [i,q] of doc.questions.entries()){
@@ -68,7 +68,7 @@ for(const u of ready){
    assert.ok(!seen.has(normalized),q.id+' duplicates '+label+' stem from '+seen.get(normalized));
    seen.set(normalized,q.id);
   }
-  assert.equal(q.quiz,1);
+  assert.equal(q.quiz,Math.floor(i/20)+1);
   assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' bilingual question');
   assert.ok(q.q_en.trim().length>=22&&q.q_ta.trim().length>=10,q.id+' meaningful stems');
   assert.equal(q.opts_en.length,4);assert.equal(q.opts_ta.length,4);
@@ -83,10 +83,10 @@ for(const u of ready){
  }
  assert.ok(positions.size>=3,'Answer distribution in unit '+u.id);
  const curated=quality.curate(doc.questions).questions;
- assert.equal(curated.length,20,'Player should retain 20 questions in unit '+u.id);
+ assert.equal(curated.length,u.total,'Player should retain all questions in unit '+u.id);
  assert.deepEqual(Array.from(curated,q=>q.id).sort(),doc.questions.map(q=>q.id).sort());
 }
-assert.equal(allIds.size,540);
+assert.equal(allIds.size,560);
 const catalog=read('textbook-quiz.html');
 const player=read('textbook-play.html');
 assert.ok(catalog.includes("'data/textbook/class-'+cls+'/'+subject+termSegment+'/index.json'"));
@@ -94,4 +94,4 @@ assert.ok(catalog.includes('if(!u.ready)'));
 assert.ok(catalog.includes('All 27 Class 10 Social Science chapters are indexed and have playable English–Tamil'));
 assert.ok(catalog.includes('No chapters remain without a playable starter quiz'));
 assert.ok(player.includes("'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json'")||player.includes("'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json'"));
-console.log('Class 10 Social Science: 27 indexed chapters, 540 bilingual MCQs in 27 playable starter units, 0 pending.');
+console.log('Class 10 Social Science: 27 indexed chapters, 560 bilingual MCQs in 28 playable quiz sets, 0 pending.');
