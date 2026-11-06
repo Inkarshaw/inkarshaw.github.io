@@ -32,7 +32,7 @@ main{padding:20px 0 64px}.card{background:#fff;border:1px solid var(--line);bord
 <main class="wrap">
 <section id="setup" class="card">
 <h2 id="setupHeading">Build your practice paper</h2>
-<p id="coverage" class="muted">27 chapters · 600 available questions · one combined bilingual question bank.</p>
+<p id="coverage" class="muted">27 chapters · Loading current question count…</p>
 <div class="setup"><label for="size"><span id="sizeLabel">Number of questions</span><select id="size"><option value="20">20</option><option value="50" selected>50</option><option value="100">100</option></select></label><button class="btn primary" id="start" type="button">Start mixed mock</button></div>
 <p id="distribution" class="meta">For 50 questions: History 20 · Geography 13 · Civics 9 · Economics 8.</p>
 <p class="note" id="sourceNote">Source note: Questions are starter-level originals based on a 2022 revised English Tamil Nadu textbook; Tamil is an editorial translation. The prescribed 2026–27 edition and original Tamil page matching are not independently verified. This is not a certified current-exam syllabus mock.</p>
@@ -60,14 +60,14 @@ main{padding:20px 0 64px}.card{background:#fff;border:1px solid var(--line);bord
 'use strict';
 const core=window.Class10SocialMockCore;
 const $=id=>document.getElementById(id);
-let lang='en',bank=null,questions=[],answers=[],current=0,finished=false,report=null;
+let lang='en',bank=null,indexPromise=null,displayedQuestions=null,questions=[],answers=[],current=0,finished=false,report=null;
 try{lang=localStorage.getItem('clearexamsTextbookLang')==='ta'?'ta':'en'}catch{}
 const trans=(en,ta)=>lang==='ta'?ta:en;
 const labels={
  pageTitle:['Class 10 Social Science · Mixed Mock','10ஆம் வகுப்பு சமூக அறிவியல் · கலப்பு மாதிரித் தேர்வு'],
  intro:['Revise History, Geography, Civics and Economics together. Choose a 20, 50 or 100-question paper, answer at your own pace and review explanations in English or Tamil.','வரலாறு, புவியியல், குடிமையியல், பொருளியல் பாடங்களை ஒன்றாகப் பயிற்சி செய்யுங்கள். 20, 50 அல்லது 100 வினாக்களைத் தேர்ந்தெடுத்து விடையளித்து விளக்கங்களை ஆங்கிலம் அல்லது தமிழில் படியுங்கள்.'],
  setupHeading:['Build your practice paper','உங்கள் பயிற்சித் தாளை உருவாக்குங்கள்'],
- coverage:['27 chapters · 600 available questions · one combined bilingual question bank.','27 பாடங்கள் · 600 வினாக்கள் · ஒருங்கிணைந்த இருமொழி வினாவங்கி.'],
+ coverage:['27 chapters · Loading current question count…','27 பாடங்கள் · தற்போதைய வினாக்களின் எண்ணிக்கை ஏற்றப்படுகிறது…'],
  sizeLabel:['Number of questions','வினாக்களின் எண்ணிக்கை'],
  start:['Start mixed mock','கலப்பு மாதிரித் தேர்வைத் தொடங்கு'],
  sourceNote:['Source note: Questions are starter-level originals based on a 2022 revised English Tamil Nadu textbook; Tamil is an editorial translation. The prescribed 2026–27 edition and original Tamil page matching are not independently verified. This is not a certified current-exam syllabus mock.','ஆதாரக் குறிப்பு: இவ்வினாக்கள் 2022 திருத்தப்பட்ட ஆங்கிலத் தமிழ்நாடு பாடநூலை அடிப்படையாகக் கொண்ட தொடக்கநிலை வினாக்கள். தமிழ் உரை தொகுப்பாசிரியரின் மொழிபெயர்ப்பு. 2026–27 நடப்பு பதிப்பும் மூலத் தமிழ்ப் பக்க ஒப்பீடும் சுயாதீனமாக உறுதிப்படுத்தப்படவில்லை. இது நடப்புத் தேர்வுப் பாடத்திட்டச் சான்றளிக்கப்பட்ட மாதிரித் தேர்வு அல்ல.'],
@@ -84,6 +84,9 @@ const labels={
 function displayLabels(){
   document.documentElement.lang=lang==='ta'?'ta':'en';
   for(const [id,pair] of Object.entries(labels))$(id).textContent=trans(...pair);
+  if(displayedQuestions!==null){
+    $('coverage').textContent=trans('27 chapters · '+displayedQuestions+' available questions · one combined bilingual question bank.','27 பாடங்கள் · '+displayedQuestions+' வினாக்கள் · ஒருங்கிணைந்த இருமொழி வினாவங்கி.');
+  }
   $('en').classList.toggle('active',lang==='en');$('ta').classList.toggle('active',lang==='ta');
   $('en').setAttribute('aria-pressed',lang==='en'?'true':'false');
   $('ta').setAttribute('aria-pressed',lang==='ta'?'true':'false');
@@ -95,11 +98,23 @@ function setLang(next){lang=next;try{localStorage.setItem('clearexamsTextbookLan
 $('en').onclick=()=>setLang('en');$('ta').onclick=()=>setLang('ta');
 $('size').onchange=displayLabels;
 function addText(tag,txt,cls){const e=document.createElement(tag);e.textContent=txt;if(cls)e.className=cls;return e}
+async function loadIndex(){
+  if(!indexPromise){
+    indexPromise=(async()=>{
+      const r=await fetch('data/textbook/class-10/social-science/index.json',{cache:'no-store'});
+      if(!r.ok)throw Error('Could not load the chapter catalogue.');
+      const index=await r.json();
+      core.validateIndex(index);
+      displayedQuestions=index.meta.total_questions;
+      displayLabels();
+      return index;
+    })().catch(error=>{indexPromise=null;throw error});
+  }
+  return indexPromise;
+}
 async function loadBank(){
   if(bank)return bank;
-  const r=await fetch('data/textbook/class-10/social-science/index.json',{cache:'no-store'});
-  if(!r.ok)throw Error('Could not load the chapter catalogue.');
-  const units=core.validateIndex(await r.json()),docs=[];
+  const index=await loadIndex(),units=index.units,docs=[];
   for(let offset=0;offset<units.length;offset+=6){
     const chunk=units.slice(offset,offset+6);
     const results=await Promise.all(chunk.map(async u=>{
@@ -194,6 +209,9 @@ function renderResult(){
 }
 $('again').onclick=()=>{if(!bank)return;startPaper()};
 displayLabels();
+loadIndex().catch(()=>{
+  $('coverage').textContent=trans('Question count temporarily unavailable. Try starting the mock again.','வினாக்களின் எண்ணிக்கையைத் தற்காலிகமாக ஏற்ற முடியவில்லை. தேர்வை மீண்டும் தொடங்க முயலுங்கள்.');
+});
 })();
 </script>
 </body>
