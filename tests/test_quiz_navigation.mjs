@@ -49,6 +49,29 @@ saved.set('session','{');assert.equal(savedCtx.quizSession(),null,'A damaged ses
 saved.set('session',JSON.stringify({date:'2026-11-06',current:2}));
 assert.equal(savedCtx.quizSession().current,2,'Keep valid saved sessions');
 
+
+ // A matching legacy session may still have invalid answer letters, fractional
+ // question positions, or checked flags. Restore only recoverable progress.
+const savedContext={exam:'TNPSC Group IV',subject:'Science',topic:'Laws of Motion',date:'2026-11-06',count:10,pyqYear:''};
+let fixture={...savedContext,quizIds:['a','b','c'],answers:['A','B',null],checked:[true,false,false],current:1};
+const resumeCtx=vm.createContext({quiz:[{ID:'a'},{ID:'b'},{ID:'c'}],letters:['A','B','C','D'],current:0,answers:[],checked:[],quizSession:()=>fixture,currentQuizContext:()=>savedContext});
+const restoreLine=daily.split('\n').find(line=>line.startsWith('function restoreQuizSession('));
+assert.ok(restoreLine,'Session restoration function must be tested');
+vm.runInContext(restoreLine,resumeCtx);
+assert.equal(resumeCtx.restoreQuizSession(),true);
+assert.equal(resumeCtx.current,1,'Resume at the saved integer position');
+assert.equal(resumeCtx.checked[0],true,'Preserve a genuine checked answer');
+fixture={...fixture,answers:['B',null,'Z'],checked:['true',true,true],current:1.5};
+assert.equal(resumeCtx.restoreQuizSession(),true);
+assert.equal(resumeCtx.current,0,'Reject a fractional position');
+assert.equal(JSON.stringify(resumeCtx.answers),JSON.stringify(['B',null,null]),'Remove invalid answers');
+assert.equal(resumeCtx.checked.filter(Boolean).length,0,'Reject invalid checked flags');
+fixture={...fixture,answers:null,checked:[true,true,true],current:999};
+assert.equal(resumeCtx.restoreQuizSession(),true);
+assert.equal(resumeCtx.current,2,'Clamp a high integer position');
+assert.equal(resumeCtx.answers.filter(Boolean).length,0);
+assert.equal(resumeCtx.checked.filter(Boolean).length,0);
+
 // Exercise actual Daily Quiz navigation handler, not a copied implementation.
 function functionLine(src, name) {
   const line = src.split('\n').find(s => s.startsWith('function ' + name + '('));
