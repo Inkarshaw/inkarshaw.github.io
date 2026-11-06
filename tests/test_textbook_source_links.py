@@ -23,6 +23,17 @@ class TextbookSourceTests(unittest.TestCase):
                 if row.get(field):
                     self.assertTrue(MODULE.is_direct_book_url(row[field]), (key, field))
 
+    def test_class_10_social_science_has_labelled_2022_tamil_reference(self):
+        registry = json.loads((ROOT / "data/textbook/source-registry.json")
+                              .read_text(encoding="utf-8"))["books"]
+        row = registry["class-10/social-science"]
+        self.assertTrue(MODULE.is_direct_book_url(row["source_en_url"]))
+        self.assertTrue(MODULE.is_direct_book_url(row["source_ta_url"]))
+        self.assertIn("drive.google.com/file/d/", row["source_ta_url"])
+        self.assertIn("2022", row["edition_note"])
+        self.assertIn("unverified", row["edition_note"])
+        self.assertIn("tntextbooks.in/p/10th-books.html", row["catalogue"])
+
     def test_class_11_history_2025_has_real_book_files(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json").read_text(encoding="utf-8"))["books"]
         row = registry["class-11/history"]
