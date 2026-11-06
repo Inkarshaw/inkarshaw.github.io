@@ -36,6 +36,8 @@ const ctx=vm.createContext({window:{}});
 vm.runInContext(read('assets/js/textbook-quality.js'),ctx);
 const quality=ctx.window.TextbookQuality;
 const allIds=new Set();
+const normalizedEnglishStems=new Map();
+const normalizedTamilStems=new Map();
 for(const u of ready){
  assert.equal(u.total,20);
  assert.equal(u.quiz_count,1);
@@ -55,6 +57,17 @@ for(const u of ready){
   assert.equal(q.id,'C10SSU'+u.id+'-Q'+String(i+1).padStart(3,'0'));
   assert.ok(!allIds.has(q.id),'Duplicate ID '+q.id);
   allIds.add(q.id);
+  // Catch copy-pasted questions across separate chapter banks; punctuation and whitespace
+  // differences should not conceal the same stem. This checks text identity, not facts.
+  for(const [label,stem,seen] of [
+   ['English',q.q_en,normalizedEnglishStems],
+   ['Tamil',q.q_ta,normalizedTamilStems],
+  ]){
+   const normalized=stem.normalize('NFKC').toLowerCase().replace(/[\\p{P}\\p{S}\\s]+/gu,' ').trim();
+   assert.ok(normalized.length>=8,q.id+' '+label+' normalized stem too short');
+   assert.ok(!seen.has(normalized),q.id+' duplicates '+label+' stem from '+seen.get(normalized));
+   seen.set(normalized,q.id);
+  }
   assert.equal(q.quiz,1);
   assert.ok(q.q_en.endsWith('?')&&q.q_ta.endsWith('?'),q.id+' bilingual question');
   assert.ok(q.q_en.trim().length>=22&&q.q_ta.trim().length>=10,q.id+' meaningful stems');
