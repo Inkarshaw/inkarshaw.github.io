@@ -353,11 +353,11 @@ SPEC.loader.exec_module(AUDIT)
 class Class10ScienceUnits6To9Tests(unittest.TestCase):
     def test_catalogue_is_complete_through_unit_nine(self):
         self.assertEqual(INDEX["meta"]["unit_count"], 23)
-        self.assertEqual(INDEX["meta"]["total_questions"], 1460)
-        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 73)
+        self.assertEqual(INDEX["meta"]["total_questions"], 1480)
+        self.assertEqual(INDEX["meta"]["total_quiz_sets"], 74)
         self.assertEqual([u["id"] for u in INDEX["units"][:9]], list(range(1, 10)))
         self.assertEqual([u["total"] for u in INDEX["units"][:5]],
-                         [580, 40, 40, 40, 40])
+                         [580, 60, 40, 40, 40])
         self.assertTrue(all(u["ready"] and u["total"] == 40 and u["quiz_count"] == 2
                             for u in INDEX["units"][5:9]))
 
