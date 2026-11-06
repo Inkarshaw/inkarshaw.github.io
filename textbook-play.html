@@ -68,6 +68,29 @@ function renderPalette(){
   b.setAttribute('aria-label',txt('Question ','வினா ')+(i+1)+(marked[i]?' ⚑':''));if(i===idx)b.setAttribute('aria-current','step');b.onclick=()=>{idx=i;render()};box.appendChild(b);last=i;
  }
 }
+// An English printed page number must not be passed off as a Tamil-edition page citation.
+function textbookPageLabel(q,selectedLang,sourceMeta){
+ const has=value=>value!==undefined&&value!==null&&String(value).trim()!=='';
+ const chosen=selectedLang==='ta'?'ta':'en',other=chosen==='ta'?'en':'ta';
+ let page,sourceLanguage=null;
+ if(has(q['page_'+chosen])){page=q['page_'+chosen];sourceLanguage=chosen}
+ else if(has(q['page_'+other])){page=q['page_'+other];sourceLanguage=other}
+ else if(has(q.page)){page=q.page}
+ else return chosen==='ta'?'பாடநூல் பக்கம் —':'Textbook page —';
+ const prefix=chosen==='ta'
+  ?(sourceLanguage==='en'?'ஆங்கிலப் பாடநூல் பக்கம் ':sourceLanguage==='ta'?'தமிழ்ப் பாடநூல் பக்கம் ':'பாடநூல் பக்கம் ')
+  :(sourceLanguage==='en'?'English textbook page ':sourceLanguage==='ta'?'Tamil textbook page ':'Textbook page ');
+ const notes=[q.page_status,sourceMeta&&sourceMeta.source_review,sourceMeta&&sourceMeta.source_text_review,
+  sourceMeta&&sourceMeta.editorial_status].filter(Boolean).join(' ').toLowerCase();
+ const approximate=q.page_verified!==true&&(/approximate|page[^.]*not independently verified|page[^.]*unverified/.test(notes));
+ const suffix=approximate?(chosen==='ta'?' (தோராயமான பக்க எண்)':' (approximate page)'):'';
+ return prefix+String(page)+suffix;
+}
+function textbookSourceLabel(src,selectedLang){
+ if(src.language==='en')return selectedLang==='ta'?'ஆங்கிலப் பாடநூலைத் திற ↗':'View English textbook ↗';
+ if(src.language==='ta')return selectedLang==='ta'?'தமிழ்ப் பாடநூலைத் திற ↗':'View Tamil textbook ↗';
+ return selectedLang==='ta'?'பாடநூல் மூலம் (மொழி உறுதிசெய்யப்படவில்லை) ↗':'View textbook source (language unverified) ↗';
+}
 function safeSourceUrl(q){
  // Never treat the quiz page, a generic catalogue, or an unverified landing page as a cited textbook.
  const key=classNo<=8?'class-'+classNo+'/'+subject+'/term-'+term:'class-'+classNo+'/'+subject;
@@ -105,13 +128,10 @@ function render(){
  $('backLink').textContent=topicSlug?txt('← Back to topics','← தலைப்புகளுக்குத் திரும்பு'):txt('← Back to selected unit','← தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
  $('resultBack').textContent=topicSlug?txt('Back to topics','தலைப்புகளுக்குத் திரும்பு'):txt('Back to selected unit','தேர்ந்தெடுத்த அலகுக்குத் திரும்பு');
  $('setBadge').textContent=txt(set.title_en,set.title_ta)+' · '+(idx+1)+' / '+qs.length;
- const pageRef=lang==='ta'?(q.page_ta??q.page_en??q.page):(q.page_en??q.page_ta??q.page);
  const src=safeSourceUrl(q),a=$('sourceLink');
- $('source').textContent=txt('Textbook page ','பாடநூல் பக்கம் ')+(pageRef??'—')+(src?'':txt(' · Source PDF pending verification',' · மூல பாடநூல் PDF சரிபார்ப்பு நிலுவையில் உள்ளது'));
+ $('source').textContent=textbookPageLabel(q,lang,meta)+(src?'':txt(' · Source PDF pending verification',' · மூல பாடநூல் PDF சரிபார்ப்பு நிலுவையில் உள்ளது'));
  a.hidden=!src;if(src)a.href=src.href;else a.removeAttribute('href');
- a.textContent=src&&src.language&&src.language!==lang
-  ?(src.language==='ta'?txt('View Tamil textbook ↗','தமிழ் பாடநூலைத் திற ↗'):txt('View English textbook ↗','ஆங்கிலப் பாடநூலைத் திற ↗'))
-  :txt('View textbook ↗','பாடநூலைத் திற ↗');
+ a.textContent=src?textbookSourceLabel(src,lang):'';
  $('bar').style.width=((idx+1)/qs.length*100)+'%';
  $('question').textContent=txt(q.q_en,q.q_ta)||q.q_en;
  const box=$('options');box.replaceChildren();const opts=lang==='ta'&&Array.isArray(q.opts_ta)&&q.opts_ta.length===4?q.opts_ta:q.opts_en;
