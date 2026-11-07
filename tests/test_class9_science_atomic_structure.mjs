@@ -14,7 +14,7 @@ assert.equal(catalog.meta.unit_count,25);
 assert.equal(catalog.meta.published_unit_count,17);
 assert.equal(catalog.meta.total_questions,2180);
 assert.equal(catalog.meta.total_quiz_sets,109);
-assert.equal(catalog.units.filter(u=>!u.ready).length,9);
+assert.equal(catalog.units.filter(u=>!u.ready).length,8);
 for(const u of catalog.units.slice(17)){
  assert.equal(u.ready,false);
  assert.equal(u.total,0);
