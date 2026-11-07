@@ -88,6 +88,9 @@ footer a{color:#e1ebff}
 <p id="ncertSummary">Loading NCERT question sets…</p>
 <p>The current bank includes concept-practice sets and selected source-linked chapters. The complete revised 2026–27 NCERT book-and-chapter inventory is <strong>not yet certified</strong>; 10-question topic sets do not constitute full chapter coverage. See the <a href="https://ncert.nic.in/textbook.php" target="_blank" rel="noopener noreferrer">official NCERT textbook catalogue</a>.</p>
 <a href="ncert-school-book-quiz.html">Practise NCERT questions</a>
+<h3>Class 10 Science: chapter-by-chapter</h3>
+<p id="ncert10Status" role="status" aria-live="polite">Loading official-contents chapter inventory…</p>
+<div class="catalogs" id="ncert10Chapters"></div>
 </section>
 <h2>Publication requirements</h2>
 <section class="panel">
@@ -151,7 +154,28 @@ try{
  const bank=await fetchJSON(scope.ncertBank);const sets=bank.sets||[],count=sets.reduce((n,s)=>n+(s.questions||[]).length,0), bilingual=sets.filter(s=>s.language==='en-ta').length;
  el('ncertCount').textContent=formatter.format(count);
  el('ncertSummary').textContent=sets.length+' topic sets · '+formatter.format(count)+' questions · '+bilingual+' bilingual sets · '+(sets.length-bilingual)+' English-only sets. Classes 6–12 have introductory coverage, but most NCERT chapters are not yet independently mapped.';
-}catch(e){el('ncertCount').textContent='Unavailable';el('ncertSummary').textContent='NCERT catalogue could not be loaded: '+e.message}
+ const inventory=await fetchJSON('data/ncert/class10-science-chapter-inventory.json');
+ const chapters=inventory.chapters||[];
+ let mapped=0,missing=0;
+ for(const ch of chapters){
+   const setsFor=sets.filter(s=>s.classLevel===10&&s.subject==='Science'&&s.source?.chapter===ch.number);
+   const total=setsFor.reduce((n,s)=>n+s.questions.length,0);
+   if(total) mapped++;else missing++;
+   const item=newEl('article',null,'card');
+   item.append(newEl('h3',ch.number+'. '+ch.title));
+   item.append(newEl('p',total
+      ? total+' source-linked bilingual MCQs · '+setsFor.length+' sets · editorial source-page review pending'
+      : 'No source-linked chapter sets yet · authoring required'));
+   if(total){
+     const link=newEl('a','Open Class 10 Science practice');
+     link.href='ncert-school-book-quiz.html?class=10&subject=Science';
+     item.append(link);
+   }
+   el('ncert10Chapters').append(item);
+ }
+ el('ncert10Status').textContent=mapped+'/'+chapters.length+' chapters have source-linked question sets; '+missing+' chapters have none yet. The inventory uses a 2025–26 official contents reference; exact 2026–27 alignment must be reconfirmed.';
+
+}catch(e){el('ncertCount').textContent='Unavailable';el('ncertSummary').textContent='NCERT catalogue could not be loaded: '+e.message;el('ncert10Status').textContent='NCERT chapter inventory could not be loaded.'}
 el('loading').textContent=failed?'Some catalogs could not be loaded; totals below cover accessible catalogs only.':'Live catalogue totals loaded. Full curriculum and bilingual source verification remain open.';
 }catch(e){el('loading').textContent='Could not check quiz coverage. Refresh the page to retry. '+e.message;el('scertMessage').textContent='Coverage data unavailable';}
 })();
