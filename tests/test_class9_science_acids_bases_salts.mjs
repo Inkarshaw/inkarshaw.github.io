@@ -11,8 +11,8 @@ assert.equal(catalog.meta.published_unit_count,17);
 assert.equal(catalog.meta.total_questions,2180);
 assert.equal(catalog.meta.total_quiz_sets,109);
 assert.deepEqual(catalog.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:17},(_,i)=>i+1));
-assert.equal(catalog.units.reduce((n,u)=>n+u.total,0),2160);
-assert.equal(catalog.units.reduce((n,u)=>n+u.quiz_count,0),108);
+assert.equal(catalog.units.reduce((n,u)=>n+u.total,0),2180);
+assert.equal(catalog.units.reduce((n,u)=>n+u.quiz_count,0),109);
 for(const u of catalog.units.slice(17)){
  assert.equal(u.ready,false,'Pending unit '+u.id);
  assert.equal(u.total,0);
