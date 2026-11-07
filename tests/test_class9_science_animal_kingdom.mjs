@@ -6,13 +6,13 @@ const read = p => readFileSync(new URL('../'+p, import.meta.url), 'utf8');
 const root = 'data/textbook/class-9/science/';
 const index = JSON.parse(read(root+'index.json'));
 assert.equal(index.units.length,25);
-assert.equal(index.meta.published_unit_count,19);
-assert.equal(index.meta.total_questions,2220);
-assert.equal(index.meta.total_quiz_sets,111);
-assert.deepEqual(index.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:19},(_,i)=>i+1));
-assert.equal(index.units.reduce((n,u)=>n+u.total,0),2220);
-assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),111);
-for(const u of index.units.slice(19)){
+assert.equal(index.meta.published_unit_count,20);
+assert.equal(index.meta.total_questions,2240);
+assert.equal(index.meta.total_quiz_sets,112);
+assert.deepEqual(index.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:20},(_,i)=>i+1));
+assert.equal(index.units.reduce((n,u)=>n+u.total,0),2240);
+assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),112);
+for(const u of index.units.slice(20)){
   assert.equal(u.ready,false,'Unpublished chapter must not have a live quiz: '+u.id);
   assert.equal(u.total,0);
   assert.equal(u.quiz_count,0);
@@ -72,4 +72,4 @@ assert.ok(pages.size>=8,'All reviewed textbook chapter topic ranges should be re
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.deepEqual(Array.from(curated,q=>q.id).sort(),doc.questions.map(q=>q.id).sort());
-console.log('Class 9 Animal Kingdom: 20 bilingual keyed MCQs; 19/25 playable units, 2,220 questions and 111 sets.');
+console.log('Class 9 Animal Kingdom: 20 bilingual keyed MCQs; 20/25 playable units, 2,240 questions and 112 sets.');
