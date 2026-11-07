@@ -64,6 +64,26 @@ class TextbookSourceTests(unittest.TestCase):
         self.assertIn("unverified", row["edition_note"])
         self.assertIn("tntextbooks.in/p/10th-books.html", row["catalogue"])
 
+    def test_class_10_science_2020_tamil_scert_is_explicitly_revised(self):
+        registry = json.loads((ROOT / "data/textbook/source-registry.json")
+                              .read_text(encoding="utf-8"))["books"]
+        row = registry["class-10/science"]
+        self.assertTrue(MODULE.is_direct_book_url(row["source_ta_url"]))
+        self.assertIn("winmeen.com", row["source_ta_url"])
+        self.assertIn("10th-Science-Book-Winmeen-com.pdf", row["source_ta_url"])
+        self.assertIn("2019", row["edition_note"])
+        self.assertIn("2020", row["edition_note"])
+        self.assertIn("2026", row["edition_note"])
+        self.assertIn("not independently line-reviewed", row["edition_note"])
+        self.assertIn("2020", row["source_note_ta"])
+        self.assertIn("2026-11-07", row["source_checked_on"])
+        doc = json.loads((ROOT / "data/textbook/class-10/science/unit-2.json")
+                         .read_text(encoding="utf-8"))
+        self.assertEqual(doc["meta"]["edition"], 2019)
+        opts = MODULE.source_choices(doc["questions"][0], doc["meta"], row, "ta")
+        first_valid = next((u for u in opts if MODULE.is_direct_book_url(u)), None)
+        self.assertEqual(first_valid, row["source_ta_url"])
+
     def test_class_8_science_term1_historical_tamil_reference_is_explicit(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
                               .read_text(encoding="utf-8"))["books"]
@@ -162,6 +182,9 @@ class TextbookSourceTests(unittest.TestCase):
         self.assertFalse(any(row["book"] == "class-8/science/term-1" and
                              row["ta_other_language"] > 0 for row in priorities),
                          "Class 8 Science Term I Tamil questions still fall back to English source")
+        self.assertFalse(any(row["book"] == "class-10/science" and
+                             row["ta_other_language"] > 0 for row in priorities),
+                         "Class 10 Science Tamil views should select the registered SCERT Tamil PDF")
         for row in priorities:
             self.assertGreater(row["total"], 0)
             self.assertEqual(row["total"], sum(row[k] for k in (
