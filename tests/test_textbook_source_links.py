@@ -64,6 +64,26 @@ class TextbookSourceTests(unittest.TestCase):
         self.assertIn("unverified", row["edition_note"])
         self.assertIn("tntextbooks.in/p/10th-books.html", row["catalogue"])
 
+    def test_class_12_history_2025_english_has_named_direct_book_with_limits(self):
+        registry = json.loads((ROOT / "data/textbook/source-registry.json")
+                              .read_text(encoding="utf-8"))["books"]
+        row = registry["class-12/history"]
+        self.assertTrue(MODULE.is_direct_book_url(row["source_en_url"]))
+        self.assertTrue(MODULE.is_direct_book_url(row["source_ta_url"]))
+        self.assertIn("1g2bTvJ7iDUbr8BbfPLEOI-0bismofCFH", row["source_en_url"])
+        self.assertIn("1xTzHWDRSt-yrBI1OWXXfSpb7mMFhC1vj", row["source_ta_url"])
+        self.assertIn("2025", row["edition_note"])
+        self.assertIn("could NOT be independently downloaded", row["edition_note"])
+        self.assertIn("NOT independently certified", row["edition_note"])
+        self.assertIn("2026", row["edition_note"])
+        # The English question view should resolve the matching-language book
+        # without using the Tamil fallback or fabricating any page mapping.
+        unit = json.loads((ROOT / "data/textbook/class-12/history/unit-1.json")
+                          .read_text(encoding="utf-8"))
+        choices = MODULE.source_choices(unit["questions"][0], unit["meta"], row, "en")
+        first_valid = next((u for u in choices if MODULE.is_direct_book_url(u)), None)
+        self.assertEqual(first_valid, row["source_en_url"])
+
     def test_class_11_history_2025_has_real_book_files(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json").read_text(encoding="utf-8"))["books"]
         row = registry["class-11/history"]
@@ -113,6 +133,9 @@ class TextbookSourceTests(unittest.TestCase):
         # English-book fallback links for that subject in the Tamil UI.
         self.assertFalse(any(row["book"] == "class-9/social-science" for row in priorities),
                          "Class 9 Social Science still uses a source from another language")
+        self.assertFalse(any(row["book"].startswith("class-12/history") and
+                             row["en_other_language"] > 0 for row in priorities),
+                         "Class 12 History English questions still fall back to Tamil book")
         for row in priorities:
             self.assertGreater(row["total"], 0)
             self.assertEqual(row["total"], sum(row[k] for k in (
