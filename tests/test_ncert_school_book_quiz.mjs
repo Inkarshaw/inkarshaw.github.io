@@ -41,10 +41,10 @@ for(const set of bank.sets){
     }
   }
 }
-assert.ok(count>=290);
+assert.ok(count>=330);
 const acids=bank.sets.filter(s=>s.source?.chapter===2).flatMap(s=>s.questions);
-assert.equal(acids.length,20);
-assert.deepEqual(acids.map(q=>q.options[q.answer]),["Acidic and basic", "Dilute sodium hydroxide", "It burns with a pop near a flame.", "Sodium chloride, water and carbon dioxide", "Soluble calcium hydrogencarbonate forms.", "H⁺ and OH⁻ combine to form water.", "Copper(II) chloride", "The acid produces mobile ions in water, while dissolved glucose does not.", "Water enables formation of hydronium ions.", "The number of hydronium ions", "pH 2", "It helps neutralise acids made by mouth bacteria.", "A stronger acid", "Sodium sulphate and potassium sulphate", "Sodium carbonate", "Chlorine and hydrogen", "Bleaching powder forms.", "Carbon dioxide", "Ten waters of crystallisation per formula unit of sodium carbonate", "Gypsum"]);
+assert.equal(acids.length,40);
+assert.deepEqual(acids.slice(0,20).map(q=>q.options[q.answer]),["Acidic and basic", "Dilute sodium hydroxide", "It burns with a pop near a flame.", "Sodium chloride, water and carbon dioxide", "Soluble calcium hydrogencarbonate forms.", "H⁺ and OH⁻ combine to form water.", "Copper(II) chloride", "The acid produces mobile ions in water, while dissolved glucose does not.", "Water enables formation of hydronium ions.", "The number of hydronium ions", "pH 2", "It helps neutralise acids made by mouth bacteria.", "A stronger acid", "Sodium sulphate and potassium sulphate", "Sodium carbonate", "Chlorine and hydrogen", "Bleaching powder forms.", "Carbon dioxide", "Ten waters of crystallisation per formula unit of sodium carbonate", "Gypsum"]);
 const chapterQuestions=bank.sets.filter(set=>set.id.startsWith('c10-chemical-')).flatMap(set=>set.questions);
 assert.equal(chapterQuestions.length,20);
 assert.deepEqual(chapterQuestions.map(q=>q.options[q.answer]),[
@@ -58,6 +58,26 @@ assert.deepEqual(chapterQuestions.map(q=>q.options[q.answer]),[
   'Ba²⁺ and SO₄²⁻','CuO, because it loses oxygen.','It gains oxygen and is oxidised.',
   'A green coating develops on copper exposed to air.',
   'It reduces the amount of oxygen available to oxidise the oils.'
+]);
+
+const newSetIds=['c10-equation-application','c10-reaction-reasoning',
+  'c10-acid-base-reasoning','c10-ph-salt-application'];
+const newSets=newSetIds.map(id=>bank.sets.find(s=>s.id===id));
+assert.ok(newSets.every(Boolean),'Four advanced bilingual chemistry sets are required');
+assert.equal(newSets.flatMap(s=>s.questions).length,40);
+for(const set of newSets){
+  assert.equal(set.questions.length,10);
+  assert.equal(set.language,'en-ta');
+  assert.equal(set.reviewStatus,'editorial-review-pending');
+  assert.match(set.reviewNote,/independent.*review|human review/i);
+  assert.ok(set.source.url.startsWith('https://ncert.nic.in/textbook/pdf/'));
+  assert.ok(set.questions.every(q=>q.page>= (set.source.chapter===2?17:1) && q.page <= (set.source.chapter===2?33:13)));
+}
+assert.deepEqual(newSets.map(s=>s.questions.map(q=>q.answer)),[
+  [1,0,2,3,2,0,1,3,2,1],
+  [1,2,0,3,1,2,2,0,3,1],
+  [0,1,2,3,2,1,3,0,2,3],
+  [0,1,2,3,1,2,0,2,1,3],
 ]);
 for(const id of ['classPicker','subjectPicker','topicSearch','setGrid','quizSection','quizTitle','options','feedback','checkAnswer','nextQuestion','resultSection','resultScore','reviewList','retryQuiz','chooseAnother']){
  assert.match(html,new RegExp('id="'+id+'"'),id+' missing in UI');
