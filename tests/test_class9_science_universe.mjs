@@ -61,4 +61,4 @@ for(const [i,q] of doc.questions.entries()){
 }
 assert.deepEqual(counts,[5,5,5,5]);
 assert.equal(quality.curate(doc.questions).questions.length,20);
-console.log('Class 9 Science: 25 indexed, 16 playable, 9 explicitly pending; Unit 9–16 starter banks.');
+console.log('Class 9 Science: 25 indexed, 17 playable, 8 explicitly pending; Unit 9–17 starter banks.');
