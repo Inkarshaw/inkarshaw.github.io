@@ -34,6 +34,25 @@ class TextbookSourceTests(unittest.TestCase):
         self.assertIn("NOT an independently verified same-revision", row["edition_note"])
         self.assertIn("2026", row["edition_note"])
 
+    def test_class_9_social_science_has_real_tamil_medium_textbook(self):
+        registry = json.loads((ROOT / "data/textbook/source-registry.json")
+                              .read_text(encoding="utf-8"))["books"]
+        row = registry["class-9/social-science"]
+        self.assertTrue(MODULE.is_direct_book_url(row["source_en_url"]))
+        self.assertTrue(MODULE.is_direct_book_url(row["source_ta_url"]))
+        self.assertIn("Social-Science-Textbook-Tamil.pdf", row["source_ta_url"])
+        self.assertIn("2026", row["edition_note"])
+        self.assertIn("NOT independently matched", row["edition_note"])
+        self.assertIn("2026-11-07", row["source_checked_on"])
+        # Test the actual fallback order for an existing 2019 English-origin
+        # question: the Tamil UI should now resolve a Tamil textbook, without
+        # falsely asserting that its pages match the English original.
+        doc = json.loads((ROOT / "data/textbook/class-9/social-science/unit-1.json")
+                         .read_text(encoding="utf-8"))
+        choices = MODULE.source_choices(doc["questions"][0], doc["meta"], row, "ta")
+        first_valid = next((u for u in choices if MODULE.is_direct_book_url(u)), None)
+        self.assertEqual(first_valid, row["source_ta_url"])
+
     def test_class_10_social_science_has_labelled_2022_tamil_reference(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
                               .read_text(encoding="utf-8"))["books"]
@@ -90,6 +109,10 @@ class TextbookSourceTests(unittest.TestCase):
             self.assertEqual(combined,
                              counts.get(language + "_fallback_unspecified", 0) +
                              counts.get(language + "_fallback_other_language", 0))
+        # A genuine Class 9 Tamil Social Science book replaces all legacy
+        # English-book fallback links for that subject in the Tamil UI.
+        self.assertFalse(any(row["book"] == "class-9/social-science" for row in priorities),
+                         "Class 9 Social Science still uses a source from another language")
         for row in priorities:
             self.assertGreater(row["total"], 0)
             self.assertEqual(row["total"], sum(row[k] for k in (
