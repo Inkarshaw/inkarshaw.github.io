@@ -18,7 +18,8 @@ for(const set of bank.sets){
   assert.ok(['en','en-ta'].includes(set.language));
   if(set.language==='en-ta'){
     assert.equal(set.source.edition,'2026–27');
-    assert.equal(set.source.chapter,1);
+    assert.ok([1,2].includes(set.source.chapter));
+    assert.equal(set.source.firstPage??1,set.source.chapter===2?17:1);
     assert.equal(new URL(set.source.url).hostname,'ncert.nic.in');
   }
   assert.equal(set.questions.length,10,'A set must contain ten questions: '+set.id);
@@ -36,11 +37,14 @@ for(const set of bank.sets){
       assert.match(q.tamil.explanation,/[\u0B80-\u0BFF]/);
       assert.equal(q.tamil.options.length,4);
       assert.equal(new Set(q.tamil.options).size,4);
-      assert.ok(Number.isInteger(q.page)&&q.page>=1&&q.page<=13);
+      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=(set.source.chapter===2?33:13));
     }
   }
 }
-assert.ok(count>=270);
+assert.ok(count>=290);
+const acids=bank.sets.filter(s=>s.source?.chapter===2).flatMap(s=>s.questions);
+assert.equal(acids.length,20);
+assert.deepEqual(acids.map(q=>q.options[q.answer]),["Acidic and basic", "Dilute sodium hydroxide", "It burns with a pop near a flame.", "Sodium chloride, water and carbon dioxide", "Soluble calcium hydrogencarbonate forms.", "H⁺ and OH⁻ combine to form water.", "Copper(II) chloride", "The acid produces mobile ions in water, while dissolved glucose does not.", "Water enables formation of hydronium ions.", "The number of hydronium ions", "pH 2", "It helps neutralise acids made by mouth bacteria.", "A stronger acid", "Sodium sulphate and potassium sulphate", "Sodium carbonate", "Chlorine and hydrogen", "Bleaching powder forms.", "Carbon dioxide", "Ten waters of crystallisation per formula unit of sodium carbonate", "Gypsum"]);
 const chapterQuestions=bank.sets.filter(set=>set.id.startsWith('c10-chemical-')).flatMap(set=>set.questions);
 assert.equal(chapterQuestions.length,20);
 assert.deepEqual(chapterQuestions.map(q=>q.options[q.answer]),[

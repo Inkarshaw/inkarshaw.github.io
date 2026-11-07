@@ -25,11 +25,12 @@ function addChapterSource(element,set,question){
   if(!set.source||!question.page)return;
   const note=document.createElement('p');
   note.className='chapter-source source';
+  const pdfPage=question.page-(set.source.firstPage??1)+1;
   const link=document.createElement('a');
-  link.href=set.source.url+'#page='+question.page;
+  link.href=set.source.url+'#page='+pdfPage;
   link.textContent='NCERT '+set.source.edition+' · Ch. '+set.source.chapter+' · English p. '+question.page;
   const mirror=document.createElement('a');
-  mirror.href=set.source.mirrorUrl+'#page='+question.page;
+  mirror.href=set.source.mirrorUrl+'#page='+pdfPage;
   mirror.textContent='Textbook mirror';
   for(const a of [link,mirror]){
     a.target='_blank';
