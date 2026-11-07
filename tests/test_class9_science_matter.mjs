@@ -50,4 +50,4 @@ assert.deepEqual(answers,[5,5,5,5]);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.equal(JSON.stringify(Array.from(curated,q=>q.id).sort()),JSON.stringify(doc.questions.map(q=>q.id).sort()),'Player should preserve all twenty original question IDs');
-console.log('Class 9 Science Unit 10: original 20-question bilingual MCQ bank valid; 16/25 chapters playable, 9 pending.');
+console.log('Class 9 Science Unit 10: original 20-question bilingual MCQ bank valid; 17/25 chapters playable, 8 pending.');
