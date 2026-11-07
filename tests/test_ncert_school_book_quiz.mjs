@@ -18,8 +18,8 @@ for(const set of bank.sets){
   assert.ok(['en','en-ta'].includes(set.language));
   if(set.language==='en-ta'){
     assert.equal(set.source.edition,'2026–27');
-    assert.ok([1,2,3,4,5].includes(set.source.chapter));
-    assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79})[set.source.chapter]);
+    assert.ok([1,2,3,4,5,6].includes(set.source.chapter));
+    assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79,6:100})[set.source.chapter]);
     assert.equal(new URL(set.source.url).hostname,'ncert.nic.in');
   }
   assert.equal(set.questions.length,10,'A set must contain ten questions: '+set.id);
@@ -37,11 +37,11 @@ for(const set of bank.sets){
       assert.match(q.tamil.explanation,/[\u0B80-\u0BFF]/);
       assert.equal(q.tamil.options.length,4);
       assert.equal(new Set(q.tamil.options).size,4);
-      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99})[set.source.chapter]);
+      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112})[set.source.chapter]);
     }
   }
 }
-assert.ok(count>=430);
+assert.ok(count>=470);
 const acids=bank.sets.filter(s=>s.source?.chapter===2).flatMap(s=>s.questions);
 assert.equal(acids.length,40);
 assert.deepEqual(acids.slice(0,20).map(q=>q.options[q.answer]),["Acidic and basic", "Dilute sodium hydroxide", "It burns with a pop near a flame.", "Sodium chloride, water and carbon dioxide", "Soluble calcium hydrogencarbonate forms.", "H⁺ and OH⁻ combine to form water.", "Copper(II) chloride", "The acid produces mobile ions in water, while dissolved glucose does not.", "Water enables formation of hydronium ions.", "The number of hydronium ions", "pH 2", "It helps neutralise acids made by mouth bacteria.", "A stronger acid", "Sodium sulphate and potassium sulphate", "Sodium carbonate", "Chlorine and hydrogen", "Bleaching powder forms.", "Carbon dioxide", "Ten waters of crystallisation per formula unit of sodium carbonate", "Gypsum"]);
@@ -91,7 +91,7 @@ assert.deepEqual(metalSets.map(s=>s.questions.map(q=>q.answer)),[
  [1,2,0,3,1,2,0,3,1,2]
 ]);
 const currentChapterCoverage=new Set(bank.sets.filter(s=>s.classLevel===10&&s.subject==='Science'&&s.source?.chapter).map(s=>s.source.chapter));
-assert.deepEqual([...currentChapterCoverage].sort((a,b)=>a-b),[1,2,3,4,5]);
+assert.deepEqual([...currentChapterCoverage].sort((a,b)=>a-b),[1,2,3,4,5,6]);
 const carbonIds=['c10-carbon-bonding-catenation','c10-carbon-homologous-naming','c10-carbon-reactions','c10-carbon-ethanol-acids-soaps'];
 const carbonSets=carbonIds.map(id=>bank.sets.find(s=>s.id===id));
 assert.ok(carbonSets.every(Boolean),'Four English–Tamil Carbon chapter sets required');
@@ -124,6 +124,26 @@ assert.deepEqual(lifeSets.map(s=>s.questions.map(q=>q.answer)),[
  [2,3,0,1,1,2,3,0,1,0],
  [1,3,0,2,0,1,3,2,0,3]
 ]);
+const controlIds=['c10-control-neurons-reflexes','c10-control-brain-protection',
+  'c10-control-plant-tropisms','c10-control-endocrine-feedback'];
+const controlSets=controlIds.map(id=>bank.sets.find(s=>s.id===id));
+assert.ok(controlSets.every(Boolean),'Four NCERT Chapter 6 bilingual sets are required');
+assert.equal(controlSets.flatMap(s=>s.questions).length,40);
+assert.ok(controlSets.every(s=>s.language==='en-ta'&&s.questions.length===10));
+assert.ok(controlSets.every(s=>s.source.chapter===6&&s.source.firstPage===100));
+assert.ok(controlSets.every(s=>s.source.url==='https://ncert.nic.in/textbook/pdf/jesc106.pdf'));
+assert.ok(controlSets.every(s=>s.source.mirrorEdition==='2025–26'&&s.source.pageReferenceEdition==='2025–26'));
+assert.ok(controlSets.every(s=>s.reviewStatus==='editorial-review-pending'));
+assert.ok(controlSets.every(s=>s.questions.every(q=>q.page>=100&&q.page<=112)));
+assert.deepEqual(controlSets.map(s=>s.questions.map(q=>q.answer)),[
+  [1,1,0,2,2,1,0,3,2,1],
+  [0,1,2,3,0,1,2,3,0,1],
+  [1,0,2,3,0,1,2,3,0,1],
+  [2,0,1,3,2,1,0,2,1,3]
+]);
+const controlQs=controlSets.flatMap(s=>s.questions);
+assert.equal(new Set(controlQs.map(q=>q.id)).size,40);
+assert.ok(controlQs.every(q=>q.tamil.options.every(a=>/[^\x00-\x7F]/.test(a))), 'Tamil options must contain translated non-ASCII content');
 for(const id of ['classPicker','subjectPicker','topicSearch','setGrid','quizSection','quizTitle','options','feedback','checkAnswer','nextQuestion','resultSection','resultScore','reviewList','retryQuiz','chooseAnother']){
  assert.match(html,new RegExp('id="'+id+'"'),id+' missing in UI');
 }
