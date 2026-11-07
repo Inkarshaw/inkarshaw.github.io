@@ -10,8 +10,8 @@ assert.equal(catalog.meta.published_unit_count,17);
 assert.equal(catalog.meta.total_questions,2180);
 assert.equal(catalog.meta.total_quiz_sets,109);
 assert.deepEqual(catalog.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:17},(_,i)=>i+1));
-assert.equal(catalog.units.reduce((n,u)=>n+u.total,0),2160);
-assert.equal(catalog.units.reduce((n,u)=>n+u.quiz_count,0),108);
+assert.equal(catalog.units.reduce((n,u)=>n+u.total,0),2180);
+assert.equal(catalog.units.reduce((n,u)=>n+u.quiz_count,0),109);
 for(const u of catalog.units.slice(17)){
   assert.equal(u.ready,false,'Pending chapter must not be playable: '+u.id);
   assert.equal(u.total,0);
@@ -90,4 +90,4 @@ assert.ok(branches.size>=9,'Cover multiple Applied Chemistry source sections');
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.equal(JSON.stringify(Array.from(curated,q=>q.id).sort()),JSON.stringify(doc.questions.map(q=>q.id).sort()),'Curation must preserve all original questions');
-console.log('Class 9 Science Unit 16 Applied Chemistry: 20 keyed bilingual questions; 16/25 units and 2,180 questions.');
+console.log('Class 9 Science Unit 16 Applied Chemistry: 20 keyed bilingual questions; 17/25 units and 2,180 questions.');
