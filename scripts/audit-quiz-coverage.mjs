@@ -118,6 +118,26 @@ try {
   for(let c=6;c<=12;c++) if(!classes.has(c)) errors.push('NCERT class absent: '+c);
 } catch(e) { errors.push('NCERT bank missing or invalid: '+e.message); }
 
+let ncert10Science={chapters:0,chaptersWithLinkedQuestions:0,chaptersWithoutLinkedQuestions:[],linkedQuestions:0,fullyCertified:false};
+try {
+  const chapterInventory=readJson('data/ncert/class10-science-chapter-inventory.json');
+  const bank=readJson(scope.ncertBank);
+  const chapters=chapterInventory.chapters;
+  if(!Array.isArray(chapters)||chapters.length!==chapterInventory.chapterCount) throw new Error('Chapter inventory size mismatch');
+  const numbers=new Set(chapters.map(ch=>ch.number));
+  if(numbers.size!==chapters.length||chapters.some((ch,i)=>ch.number!==i+1)) throw new Error('Chapter inventory numbering not sequential');
+  ncert10Science.chapters=chapters.length;
+  for(const ch of chapters){
+    const sets=bank.sets.filter(s=>s.classLevel===10&&s.subject==='Science'&&s.source?.chapter===ch.number);
+    const questions=sets.reduce((n,s)=>n+s.questions.length,0);
+    ncert10Science.linkedQuestions+=questions;
+    if(questions)ncert10Science.chaptersWithLinkedQuestions++;
+    else ncert10Science.chaptersWithoutLinkedQuestions.push(ch.number);
+  }
+  const orphan=bank.sets.filter(s=>s.classLevel===10&&s.subject==='Science'&&s.source?.chapter&&!numbers.has(s.source.chapter));
+  if(orphan.length)errors.push('NCERT Class 10 Science set refers to unlisted chapter: '+orphan.map(s=>s.id).join(', '));
+}catch(e){errors.push('NCERT Class 10 Science inventory invalid: '+e.message)}
+
 const missingSubjects=scope.scertAdditionalSubjectsNotCataloged.flatMap(x=>
   x.subjects.map(subject=>({classLevel:x.classLevel,subject})));
 const blockers=[];
@@ -126,11 +146,12 @@ if(totals.readyUnits!==totals.units) blockers.push((totals.units-totals.readyUni
 if(totals.independentlyCertifiedUnits!==totals.units)
   blockers.push((totals.units-totals.independentlyCertifiedUnits)+' indexed SCERT units are not independently certified against current editions in both languages');
 if(!ncert.chapterInventoryCertified) blockers.push('NCERT 2026–27 book-by-book chapter inventory is not certified');
+if(ncert10Science.chaptersWithoutLinkedQuestions.length) blockers.push(ncert10Science.chaptersWithoutLinkedQuestions.length+' of '+ncert10Science.chapters+' NCERT Class 10 Science chapters lack source-linked quizzes');
 if(ncert.englishOnlySets) blockers.push(ncert.englishOnlySets+' NCERT sets are English-only');
 if(errors.length) blockers.push(errors.length+' structural catalog errors');
 const report={asOf:scope.asOf,edition:scope.currentEdition,
   note:scope.meaningOfReady,scert:totals,byClass:[...byClass.values()].sort((a,b)=>a.classLevel-b.classLevel),
-  missingScertSubjectAreas:missingSubjects,ncert,errors,warnings,
+  missingScertSubjectAreas:missingSubjects,ncert,ncert10Science,errors,warnings,
   fullCoverageCertified:blockers.length===0,blockers};
 if(args.has('--json')) console.log(JSON.stringify(report,null,2));
 else {
