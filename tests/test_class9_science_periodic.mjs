@@ -9,12 +9,12 @@ const catalog=JSON.parse(read(root+'index.json'));
 const entry=catalog.units.find(u=>u.id===12);
 assert.ok(entry?.ready&&entry.path==='unit-12.json');
 assert.equal(entry.total,20);assert.equal(entry.quiz_count,1);
-assert.equal(catalog.meta.published_unit_count,24);
-assert.equal(catalog.meta.total_questions,2320);
-assert.equal(catalog.meta.total_quiz_sets,116);
+assert.equal(catalog.meta.published_unit_count,25);
+assert.equal(catalog.meta.total_questions,2340);
+assert.equal(catalog.meta.total_quiz_sets,117);
 assert.equal(catalog.units.length,25);
-assert.equal(catalog.units.filter(u=>!u.ready).length,1);
-for(const u of catalog.units.slice(24)){
+assert.equal(catalog.units.filter(u=>!u.ready).length,0);
+for(const u of catalog.units.slice(25)){
  assert.equal(u.ready,false,'Unpublished unit '+u.id);
  assert.equal(u.total,0);assert.equal(u.quiz_count,0);
  assert.ok(!u.path);
@@ -80,4 +80,4 @@ assert.deepEqual(positions,[5,5,5,5]);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.equal(JSON.stringify(Array.from(curated,q=>q.id).sort()),JSON.stringify(doc.questions.map(q=>q.id).sort()));
-console.log('Class 9 Science Unit 12: 20 bilingual SCERT-source-aware starter MCQs valid; 24/25 chapters and 2,320 total questions.');
+console.log('Class 9 Science Unit 12: 20 bilingual SCERT-source-aware starter MCQs valid; 25/25 chapters and 2,340 total questions.');
