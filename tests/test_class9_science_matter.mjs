@@ -12,7 +12,7 @@ assert.equal(entry.total,20);assert.equal(entry.quiz_count,1);
 assert.equal(index.meta.published_unit_count,17);
 assert.equal(index.meta.total_questions,2180);
 assert.equal(index.meta.total_quiz_sets,109);
-assert.equal(index.units.filter(u=>!u.ready).length,9);
+assert.equal(index.units.filter(u=>!u.ready).length,8);
 const doc=JSON.parse(read(root+entry.path));
 assert.equal(doc.meta.class,9);
 assert.equal(doc.meta.unit,10);
