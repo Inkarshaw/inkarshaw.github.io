@@ -43,7 +43,7 @@ const normalizedTamilStems=new Map();
 for(const u of ready){
  assert.ok(u.total>=20&&u.total%20===0,'Every published chapter must have complete 20-question sets');
  assert.equal(u.quiz_count,u.total/20,'Quiz count must reflect actual chapter size');
- if([2,3,4,18,19,20].includes(u.id))assert.ok(u.quiz_count>=2,'Retain reviewed second quiz for chapter '+u.id);
+ if([2,3,4,5,18,19,20].includes(u.id))assert.ok(u.quiz_count>=2,'Retain reviewed second quiz for chapter '+u.id);
  assert.equal(u.path,'unit-'+u.id+'.json');
  const doc=JSON.parse(read(root+u.path));
  assert.equal(doc.meta.class,10);
@@ -81,6 +81,10 @@ for(const u of ready){
   positions.add(q.correct);
   assert.ok(q.exp_en.length>=30&&q.exp_ta.length>=15,q.id+' bilingual explanation');
   assert.ok(q.page_en>=ranges[u.id][0]&&q.page_en<=ranges[u.id][1],q.id+' printed English page range');
+  if(u.id===5&&q.quiz===2){
+   assert.equal(q.page_verified,true);
+   assert.match(q.source_en_url,/vinayakarmatriculationschool\.com.*10-A-SS-B1\.pdf$/);
+  }
   assert.ok(quality.valid(q),'Player invalid '+q.id);
   assert.ok(!quality.isBoilerplate(q.q_en),'Mechanical stem '+q.id);
  }

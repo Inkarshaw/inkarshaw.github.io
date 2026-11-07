@@ -8,14 +8,19 @@ const js=get('assets/js/ncert-school-book-quiz.js');
 assert.equal(bank.schemaVersion,1);
 assert.equal(bank.title,'NCERT School Book Quiz');
 assert.equal(bank.source.catalogueUrl,'https://ncert.nic.in/textbook.php');
-assert.match(bank.description,/Original English-language/);
+assert.match(bank.description,/source-linked English–Tamil chapter sets/);
 assert.deepEqual([...new Set(bank.sets.map(s=>s.classLevel))].sort((a,b)=>a-b),[6,7,8,9,10,11,12]);
 assert.ok(bank.sets.length>=21,'All classes must have multiple populated topics');
 const ids=new Set();const questions=new Set();let count=0;
 for(const set of bank.sets){
   assert.ok(/^c(?:6|7|8|9|10|11|12)-[a-z-]+$/.test(set.id),set.id);
   assert.ok(set.subject && set.topic && set.kind==='original-concept-practice');
-  assert.equal(set.language,'en');
+  assert.ok(['en','en-ta'].includes(set.language));
+  if(set.language==='en-ta'){
+    assert.equal(set.source.edition,'2026–27');
+    assert.equal(set.source.chapter,1);
+    assert.equal(new URL(set.source.url).hostname,'ncert.nic.in');
+  }
   assert.equal(set.questions.length,10,'A set must contain ten questions: '+set.id);
   for(const q of set.questions){
     count++;
@@ -26,9 +31,30 @@ for(const set of bank.sets){
     assert.equal(new Set(q.options).size,4,'Repeated distractor');
     assert.ok(Number.isInteger(q.answer)&&q.answer>=0&&q.answer<4);
     assert.ok(q.explanation.length>=40,q.id+' explanation too brief');
+    if(set.language==='en-ta'){
+      assert.match(q.tamil.question,/[\u0B80-\u0BFF]/);
+      assert.match(q.tamil.explanation,/[\u0B80-\u0BFF]/);
+      assert.equal(q.tamil.options.length,4);
+      assert.equal(new Set(q.tamil.options).size,4);
+      assert.ok(Number.isInteger(q.page)&&q.page>=1&&q.page<=13);
+    }
   }
 }
-assert.equal(count,250);
+assert.ok(count>=270);
+const chapterQuestions=bank.sets.filter(set=>set.id.startsWith('c10-chemical-')).flatMap(set=>set.questions);
+assert.equal(chapterQuestions.length,20);
+assert.deepEqual(chapterQuestions.map(q=>q.options[q.answer]),[
+  'To remove the oxide layer on its surface','Formation of a precipitate',
+  'It names the reactants and product but has unequal oxygen atom counts.',
+  'Coefficients change the amounts represented without changing the substances.',
+  '4','The substance is dissolved in water.','Two reactants form one product and release heat.',
+  'Glucose reacts with oxygen and releases energy.','Calcium oxide','Nitrogen dioxide','2:1',
+  'Silver metal forms as silver chloride decomposes.','Silver bromide decomposition — light',
+  'A brown copper deposit forms and the blue colour fades.','Copper will not displace zinc.',
+  'Ba²⁺ and SO₄²⁻','CuO, because it loses oxygen.','It gains oxygen and is oxidised.',
+  'A green coating develops on copper exposed to air.',
+  'It reduces the amount of oxygen available to oxidise the oils.'
+]);
 for(const id of ['classPicker','subjectPicker','topicSearch','setGrid','quizSection','quizTitle','options','feedback','checkAnswer','nextQuestion','resultSection','resultScore','reviewList','retryQuiz','chooseAnother']){
  assert.match(html,new RegExp('id="'+id+'"'),id+' missing in UI');
 }
