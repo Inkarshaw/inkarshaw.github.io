@@ -7,13 +7,13 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const root='data/textbook/class-9/science/';
 const index=JSON.parse(read(root+'index.json'));
 assert.equal(index.units.length,25);
-assert.equal(index.meta.published_unit_count,18);
-assert.equal(index.meta.total_questions,2200);
-assert.equal(index.meta.total_quiz_sets,110);
-assert.deepEqual(index.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:18},(_,i)=>i+1));
-assert.equal(index.units.reduce((n,u)=>n+u.total,0),2200);
-assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),110);
-for(const u of index.units.slice(18)){
+assert.equal(index.meta.published_unit_count,19);
+assert.equal(index.meta.total_questions,2220);
+assert.equal(index.meta.total_quiz_sets,111);
+assert.deepEqual(index.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:19},(_,i)=>i+1));
+assert.equal(index.units.reduce((n,u)=>n+u.total,0),2220);
+assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),111);
+for(const u of index.units.slice(19)){
  assert.equal(u.ready,false,'Pending chapter '+u.id);
  assert.equal(u.total,0);
  assert.equal(u.quiz_count,0);
@@ -84,4 +84,4 @@ assert.deepEqual(keys,[5,5,5,5]);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.equal(JSON.stringify(Array.from(curated,q=>q.id).sort()),JSON.stringify(doc.questions.map(q=>q.id).sort()));
-console.log('Class 9 Carbon and its Compounds: 20 original bilingual MCQs, 18/25 playable, 2,200 questions and 110 sets.');
+console.log('Class 9 Carbon and its Compounds: 20 original bilingual MCQs, 19/25 playable, 2,220 questions and 111 sets.');
