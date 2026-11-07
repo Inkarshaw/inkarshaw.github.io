@@ -29,7 +29,8 @@ try {
     assert.equal(await menu.getAttribute('open'), '', path + ': menu opened');
     const panel = menu.locator('.ce-mobile-panel');
     assert.equal(await panel.isVisible(), true, path + ': mobile navigation visible');
-    assert.equal(await panel.locator('a').count(), 9, path + ': all student destinations');
+    assert.equal(await panel.locator('a').count(), path==='ncert-school-book-quiz.html'?10:9, path + ': all student destinations');
+    if(path==='ncert-school-book-quiz.html') assert.equal(await panel.locator('a[href="quiz-coverage.html"]').count(),1,'NCERT: coverage tracker accessible');
     assert.ok(await panel.locator('a[href="daily-quiz.html"]').isVisible(), path + ': daily quiz accessible');
     await menu.locator('summary').click();
     assert.equal(await panel.isVisible(), false, path + ': mobile menu collapses');
