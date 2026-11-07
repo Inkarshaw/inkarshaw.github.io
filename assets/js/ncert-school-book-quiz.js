@@ -28,10 +28,10 @@ function addChapterSource(element,set,question){
   const pdfPage=question.page-(set.source.firstPage??1)+1;
   const link=document.createElement('a');
   link.href=set.source.url+'#page='+pdfPage;
-  link.textContent='NCERT '+set.source.edition+' · Ch. '+set.source.chapter+' · English p. '+question.page;
+  link.textContent='NCERT '+set.source.edition+' · Ch. '+set.source.chapter+' · English p. '+question.page+(set.reviewStatus==='editorial-review-pending'?' · edition/page cross-check pending':'');
   const mirror=document.createElement('a');
   mirror.href=set.source.mirrorUrl+'#page='+pdfPage;
-  mirror.textContent='Textbook mirror';
+  mirror.textContent=set.source.mirrorEdition?'Earlier textbook reprint ('+set.source.mirrorEdition+')':'Textbook mirror';
   for(const a of [link,mirror]){
     a.target='_blank';
     a.rel='noopener noreferrer';
