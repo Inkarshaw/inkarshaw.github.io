@@ -6,7 +6,7 @@
 <title>TN School Book Quiz | ClearExams</title>
 <style>
 :root{--navy:#071c33;--blue:#1463ff;--ink:#10233b;--muted:#607086;--line:#dfe7f0;--bg:#f5f8fc;--green:#0f7a55;--red:#b93652}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,a{font:inherit}a{text-decoration:none;color:inherit}.wrap{width:min(900px,calc(100% - 22px));margin:auto}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,a{font:inherit}a{text-decoration:none;color:inherit}.source-medium-note{display:block;margin:8px 0 0;padding:9px 11px;border:1px solid #d2e1f0;border-radius:9px;background:#f7faff;color:#31516f;font-size:.79rem}.source-medium-note[hidden]{display:none}.wrap{width:min(900px,calc(100% - 22px));margin:auto}
 header{background:#fff;border-bottom:1px solid var(--line)}nav{min-height:62px;display:flex;align-items:center;gap:10px}.brand{font-weight:900}.spacer{flex:1}.lang{display:flex;border:1px solid #cbd7e5;border-radius:10px;overflow:hidden}.lang button{border:0;background:#fff;padding:9px 11px;font-weight:850;cursor:pointer}.lang button.active{background:#eef5ff;color:#1357c4}
 main{padding:18px 0 56px}.crumb{font-size:.78rem;color:var(--muted);font-weight:800;margin-bottom:9px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.badge{font-size:.74rem;font-weight:900;color:#1555bc;background:#eef5ff;border-radius:999px;padding:5px 9px}.source{font-size:.76rem;color:var(--muted)}.progress{height:7px;background:#edf2f7;border-radius:99px;overflow:hidden;margin:14px 0 18px}.progress i{display:block;height:100%;background:var(--blue);width:0}
 h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9px}.option{width:100%;text-align:left;border:1px solid #d5e0eb;background:#fff;border-radius:11px;padding:12px;cursor:pointer;color:var(--ink)}.option:hover{border-color:#9bbdff}.option.selected{border-color:#1463ff;background:#eef5ff}.option.correct{border-color:#8ac8ab;background:#eef9f3}.option.wrong{border-color:#e5a7b4;background:#fff2f5}.feedback{display:none;margin-top:14px;padding:13px;border-radius:11px;background:#f7f9fc;color:#405970}.feedback.show{display:block}.feedback strong{color:var(--ink)}
@@ -26,6 +26,7 @@ h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9
 <div class="crumb" id="crumb">Loading TN School Book Quiz…</div>
 <section class="card" id="quizCard">
 <div class="top"><span class="badge" id="setBadge">Quiz</span><span class="source"><span id="source"></span> <a id="sourceLink" hidden target="_blank" rel="noopener noreferrer"></a></span></div>
+<p class="source-medium-note" id="sourceMediumNotice" role="status" hidden></p>
 <div class="quiztools"><button class="btn" id="bookmark" type="button">☆ Bookmark</button><button class="btn" id="mark" type="button">⚑ Mark for review</button><button class="btn" id="report" type="button">Report question</button><span id="timer" class="badge" hidden></span></div>
 <div class="report-status" id="reportStatus" role="status"></div><a id="reportSubmitLink" href="https://github.com/Inkarshaw/inkarshaw.github.io/issues/new?template=textbook-question.yml" target="_blank" rel="noopener noreferrer" hidden>Submit correction on GitHub ↗</a><p class="source" id="reportHelp" hidden>Opening the report form requires a GitHub account. Paste the copied question details into the form; no report is submitted by copying alone.</p>
 <div class="progress"><i id="bar"></i></div>
@@ -91,6 +92,24 @@ function textbookSourceLabel(src,selectedLang){
  if(src.language==='ta')return selectedLang==='ta'?'தமிழ்ப் பாடநூலைத் திற ↗':'View Tamil textbook ↗';
  return selectedLang==='ta'?'பாடநூல் மூலம் (மொழி உறுதிசெய்யப்படவில்லை) ↗':'View textbook source (language unverified) ↗';
 }
+function textbookMediumNotice(src,selectedLang){
+ if(!src)return '';
+ const tamil=selectedLang==='ta';
+ if(src.language===null){
+  return tamil
+   ?'இந்தப் பாடநூல் மூலத்தின் மொழி உறுதிசெய்யப்படவில்லை. இணைக்கப்பட்ட நூலும் பக்க எண்ணும் சரிபார்க்கப்பட வேண்டும்.'
+   :'The textbook source language is unverified. Check the linked edition and page before citing it.';
+ }
+ if(src.language===selectedLang)return '';
+ if(src.language==='en'){
+  return tamil
+   ?'தமிழ் மூலப் பாடநூலுக்கான தனி இணைப்பு உறுதிசெய்யப்படவில்லை. இது ஆங்கிலப் பாடநூல் இணைப்பு; பக்க எண் பொருந்துகிறதா சரிபார்க்கவும்.'
+   :'';
+ }
+ return tamil
+  ?''
+  :'An English-medium source has not been verified for this question. This link opens a Tamil textbook; check the edition and printed page before citing.';
+}
 function safeSourceUrl(q){
  // Never treat the quiz page, a generic catalogue, or an unverified landing page as a cited textbook.
  const key=classNo<=8?'class-'+classNo+'/'+subject+'/term-'+term:'class-'+classNo+'/'+subject;
@@ -132,6 +151,8 @@ function render(){
  $('source').textContent=textbookPageLabel(q,lang,meta)+(src?'':txt(' · Source PDF pending verification',' · மூல பாடநூல் PDF சரிபார்ப்பு நிலுவையில் உள்ளது'));
  a.hidden=!src;if(src)a.href=src.href;else a.removeAttribute('href');
  a.textContent=src?textbookSourceLabel(src,lang):'';
+ const mediumNotice=textbookMediumNotice(src,lang),notice=$('sourceMediumNotice');
+ notice.textContent=mediumNotice;notice.hidden=!mediumNotice;
  $('bar').style.width=((idx+1)/qs.length*100)+'%';
  $('question').textContent=txt(q.q_en,q.q_ta)||q.q_en;
  const box=$('options');box.replaceChildren();const opts=lang==='ta'&&Array.isArray(q.opts_ta)&&q.opts_ta.length===4?q.opts_ta:q.opts_en;
