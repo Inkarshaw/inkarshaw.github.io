@@ -29,7 +29,8 @@ try {
     assert.equal(await menu.getAttribute('open'), '', path + ': menu opened');
     const panel = menu.locator('.ce-mobile-panel');
     assert.equal(await panel.isVisible(), true, path + ': mobile navigation visible');
-    assert.equal(await panel.locator('a').count(), 9, path + ': all student destinations');
+    assert.equal(await panel.locator('a').count(), path==='ncert-school-book-quiz.html'?10:9, path + ': all student destinations');
+    if(path==='ncert-school-book-quiz.html') assert.equal(await panel.locator('a[href="quiz-coverage.html"]').count(),1,'NCERT: coverage tracker accessible');
     assert.ok(await panel.locator('a[href="daily-quiz.html"]').isVisible(), path + ': daily quiz accessible');
     await menu.locator('summary').click();
     assert.equal(await panel.isVisible(), false, path + ': mobile menu collapses');
@@ -69,6 +70,22 @@ try {
   }, undefined, {timeout:20000});
   assert.deepEqual(pageErrors, [], 'NCERT: runtime errors');
   console.log('PASS NCERT quiz catalog loaded');
+
+  // Live curriculum tracker must render actual indexes, not a static "100%" claim.
+  pageErrors.length = 0;
+  const coverageResponse = await page.goto(origin + '/quiz-coverage.html', {waitUntil:'domcontentloaded'});
+  assert.equal(coverageResponse?.status(), 200, 'Coverage: HTTP response');
+  await page.waitForFunction(() => {
+    const units=document.querySelector('#unitCount')?.textContent||'';
+    const ncert=document.querySelector('#ncertCount')?.textContent||'';
+    return units==='288/288' && ncert.includes('290');
+  }, undefined, {timeout:20000});
+  assert.equal(await page.locator('#catalogs > article').count(),25,'Coverage: indexed catalog cards');
+  await page.locator('#classSelect').selectOption('6');
+  assert.equal(await page.locator('#catalogs > article').count(),6,'Coverage: Class 6 subject/term filter');
+  assert.ok((await page.locator('#loading').innerText()).includes('Full curriculum'));
+  assert.deepEqual(pageErrors, [], 'Coverage: no runtime JS errors');
+  console.log('PASS live SCERT/NCERT coverage tracker');
 
   // Fathers Quiz: class/book controls, bilingual answer flow, resume, source provenance.
   pageErrors.length = 0;
