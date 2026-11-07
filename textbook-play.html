@@ -110,6 +110,12 @@ function textbookMediumNotice(src,selectedLang){
   ?''
   :'An English-medium source has not been verified for this question. This link opens a Tamil textbook; check the edition and printed page before citing.';
 }
+function textbookEditionNotice(src,selectedLang,registryRow){
+ if(!src||!registryRow)return '';
+ const registeredLinks=[registryRow.source_en_url,registryRow.source_ta_url].filter(Boolean);
+ if(!registeredLinks.includes(src.href))return '';
+ return String(selectedLang==='ta'?registryRow.source_note_ta||'':registryRow.source_note_en||'');
+}
 function safeSourceUrl(q){
  // Never treat the quiz page, a generic catalogue, or an unverified landing page as a cited textbook.
  const key=classNo<=8?'class-'+classNo+'/'+subject+'/term-'+term:'class-'+classNo+'/'+subject;
@@ -151,7 +157,10 @@ function render(){
  $('source').textContent=textbookPageLabel(q,lang,meta)+(src?'':txt(' · Source PDF pending verification',' · மூல பாடநூல் PDF சரிபார்ப்பு நிலுவையில் உள்ளது'));
  a.hidden=!src;if(src)a.href=src.href;else a.removeAttribute('href');
  a.textContent=src?textbookSourceLabel(src,lang):'';
- const mediumNotice=textbookMediumNotice(src,lang),notice=$('sourceMediumNotice');
+ const referenceKey=classNo<=8?'class-'+classNo+'/'+subject+'/term-'+term:'class-'+classNo+'/'+subject;
+ const referenceNote=textbookEditionNotice(src,lang,sourceRegistry[referenceKey]);
+ const mediumNotice=[textbookMediumNotice(src,lang),referenceNote].filter(Boolean).join(' ');
+ const notice=$('sourceMediumNotice');
  notice.textContent=mediumNotice;notice.hidden=!mediumNotice;
  $('bar').style.width=((idx+1)/qs.length*100)+'%';
  $('question').textContent=txt(q.q_en,q.q_ta)||q.q_en;
