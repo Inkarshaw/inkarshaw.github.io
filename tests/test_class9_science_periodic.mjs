@@ -80,4 +80,4 @@ assert.deepEqual(positions,[5,5,5,5]);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.equal(JSON.stringify(Array.from(curated,q=>q.id).sort()),JSON.stringify(doc.questions.map(q=>q.id).sort()));
-console.log('Class 9 Science Unit 12: 20 bilingual SCERT-source-aware starter MCQs valid; 16/25 chapters and 2,180 total questions.');
+console.log('Class 9 Science Unit 12: 20 bilingual SCERT-source-aware starter MCQs valid; 17/25 chapters and 2,180 total questions.');
