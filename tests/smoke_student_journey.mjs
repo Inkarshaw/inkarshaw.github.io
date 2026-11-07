@@ -78,11 +78,11 @@ try {
   await page.waitForFunction(() => {
     const units=document.querySelector('#unitCount')?.textContent||'';
     const ncert=document.querySelector('#ncertCount')?.textContent||'';
-    return units==='288/288' && Number(ncert.replaceAll(',',''))>=470;
+    return units==='288/288' && Number(ncert.replaceAll(',','')) >=490;
   }, undefined, {timeout:20000});
   assert.equal(await page.locator('#catalogs > article').count(),25,'Coverage: indexed catalog cards');
   assert.equal(await page.locator('#ncert10Chapters > article').count(),13,'NCERT Class 10 chapter inventory');
-  assert.match(await page.locator('#ncert10Status').innerText(),/6\/13 chapters/);
+  assert.match(await page.locator('#ncert10Status').innerText(),/7\/13 chapters/);
   await page.locator('#classSelect').selectOption('6');
   assert.equal(await page.locator('#catalogs > article').count(),6,'Coverage: Class 6 subject/term filter');
   assert.ok((await page.locator('#loading').innerText()).includes('Full curriculum'));
