@@ -7,8 +7,11 @@ document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.c
 
 const THEME_KEY='clearexamsThemeV1',TARGET_KEY='clearexamsTargetExamV1';
 const targetNames={tnpsc:'TNPSC',tnusrb:'TNUSRB',upsc:'UPSC',ssc:'SSC',banking:'Banking',railways:'Railways'};
-function theme(){return localStorage.getItem(THEME_KEY)||'light'}
-function applyTheme(value){document.documentElement.dataset.ceTheme=value;localStorage.setItem(THEME_KEY,value);const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=value==='dark'?'#08131f':'#071c33';document.querySelectorAll('[data-ce-theme-label]').forEach(x=>x.textContent=value==='dark'?'Use light mode':'Use dark mode')}
+function readPreference(key){
+  try{return localStorage.getItem(key)}catch{return null}
+}
+function theme(){return document.documentElement.dataset.ceTheme||readPreference(THEME_KEY)||'light'}
+function applyTheme(value){document.documentElement.dataset.ceTheme=value;try{localStorage.setItem(THEME_KEY,value)}catch{}const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=value==='dark'?'#08131f':'#071c33';document.querySelectorAll('[data-ce-theme-label]').forEach(x=>x.textContent=value==='dark'?'Use light mode':'Use dark mode')}
 applyTheme(theme());
 
 const style=document.createElement('style');style.textContent=`
@@ -41,7 +44,7 @@ function initShell(){
  const more=document.createElement('button');more.type='button';more.id='ceMoreBtn';if(!primaryActive)more.classList.add('active');more.innerHTML='<span class="ico">•••</span><span>More</span>';nav.appendChild(more);document.body.appendChild(nav);
  const backdrop=document.createElement('div');backdrop.className='ce-more-backdrop';document.body.appendChild(backdrop);
  const sheet=document.createElement('div');sheet.className='ce-more-sheet';sheet.innerHTML='<div class="ce-more-grid"><a href="/start.html">🚀 Start</a><a href="/syllabus.html">📚 Syllabus</a><a href="/pyq-hub.html">📝 PYQs</a><a href="/exam-calendar.html">📅 Calendar</a><a href="/exam-notifications.html">🔔 Notifications</a><a href="/search.html">🔎 Search</a><button type="button" id="ceThemeToggle">◐ <span data-ce-theme-label></span></button><button type="button" id="ceInstallApp" hidden>⬇ Install app</button><a href="/exam-posts.html">☰ All exams</a></div>';document.body.appendChild(sheet);
- const target=localStorage.getItem(TARGET_KEY)||'';if(targetNames[target]){const chip=document.createElement('a');chip.className='ce-target-chip';chip.href='/dashboard.html';chip.textContent=targetNames[target];document.body.appendChild(chip)}
+ const target=readPreference(TARGET_KEY);if(targetNames[target]){const chip=document.createElement('a');chip.className='ce-target-chip';chip.href='/dashboard.html';chip.textContent=targetNames[target];document.body.appendChild(chip)}
  const close=()=>{sheet.classList.remove('open');backdrop.classList.remove('open');more.setAttribute('aria-expanded','false')};const open=()=>{sheet.classList.add('open');backdrop.classList.add('open');more.setAttribute('aria-expanded','true')};
  more.setAttribute('aria-expanded','false');more.onclick=()=>sheet.classList.contains('open')?close():open;backdrop.onclick=close;
  sheet.querySelector('#ceThemeToggle').onclick=()=>applyTheme(theme()==='dark'?'light':'dark');applyTheme(theme());
