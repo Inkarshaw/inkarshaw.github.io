@@ -82,4 +82,4 @@ assert.deepEqual(keys,[5,5,5,5]);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.equal(JSON.stringify(Array.from(curated,q=>q.id).sort()),JSON.stringify(doc.questions.map(q=>q.id).sort()),'Player preserves all question IDs');
-console.log('Class 9 Atomic Structure: 20 bilingual original questions, verified answer indices; 16/25 units playable (2,180 MCQs).');
+console.log('Class 9 Atomic Structure: 20 bilingual original questions, verified answer indices; 17/25 units playable (2,180 MCQs).');
