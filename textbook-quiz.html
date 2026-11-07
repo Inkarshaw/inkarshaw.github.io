@@ -206,6 +206,11 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
     const subjEn=subject==='geography'?'Geography':subject==='social-science'?'Social Science':subject==='science'?'Science':'History';
     const subjTa=subject==='geography'?'புவியியல்':subject==='social-science'?'சமூக அறிவியல்':subject==='science'?'அறிவியல்':'வரலாறு';
     const totalKnown=units.reduce((n,u)=>n+(u.ready&&u.total?u.total:0),0);
+    const playableCount=units.filter(u=>u.ready&&Number(u.total)>0).length;
+    const availableSets=units.reduce((n,u)=>n+(u.ready?Number(u.quiz_count||0):0),0);
+    // English and Tamil reference books may be different revisions; the Class 9
+    // Science metadata's edition=2022 must not be presented as an English source edition.
+    const editionLabel=cls===9&&subject==='science'?'English reference 2019/2020 · Tamil revision 2022 review pending':edition+' Edition';
     const switcher=cls>=6&&cls<=10?
       '<div class="sets" style="margin:0 0 16px">'+
       '<a class="btn '+(subject==='science'?'primary':'')+'" href="textbook-quiz.html?class='+cls+'&subject=science'+(cls<=8?'&term='+term:'')+'">Science / அறிவியல்</a>'+
@@ -242,9 +247,10 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
     main.innerHTML=
       classPicker+
       '<section class="section panel">'+
-      '<div class="crumb">'+cls+'th Standard → '+subjEn+(cls<=8?' → Term '+(term===3?'III':term===2?'II':'I'):'')+' → '+edition+' Edition</div>'+
+      '<div class="crumb">'+cls+'th Standard → '+subjEn+(cls<=8?' → Term '+(term===3?'III':term===2?'II':'I'):'')+' → '+editionLabel+'</div>'+
       '<div class="head" style="margin-top:7px"><div><h2>'+cls+'th '+subjEn+' / '+cls+'ஆம் வகுப்பு '+subjTa+'</h2>'+
       '<p>Competitive-exam-focused bilingual textbook quizzes. Choose a unit to start.</p></div>'+
+      (cls===9&&subject==='science'?'<span class="tag">'+playableCount+'/'+units.length+' chapters playable</span>':'')+
       (totalKnown?'<span class="tag">'+totalKnown.toLocaleString('en-IN')+' questions live</span>':'')+'</div>'+
       switcher+
       '<div class="unitgrid">'+units.map(u=>{
@@ -260,9 +266,9 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
           return '<a class="btn primary" href="'+href+'">Quiz '+n+'</a>';
         }).join('');
         return '<article class="unit ready"><h3>'+u.id+'. '+u.unit_en+' / '+u.unit_ta+'</h3>'+
-          '<p>'+(u.total?u.total.toLocaleString('en-IN')+' source-grounded questions available.':edition+' textbook unit quiz bank.')+'</p>'+
+          '<p>'+(u.total?u.total.toLocaleString('en-IN')+' playable questions available.':edition+' textbook unit quiz bank.')+'</p>'+
           '<div class="sets quizsets"><div class="quizset-count">'+quizCount+' quiz sets available</div>'+quizButtons+
-          '<a class="btn" href="'+full+'">Full Unit'+(u.total?' · '+u.total.toLocaleString('en-IN'):'')+'</a>'+(u.topic_count?'<a class="btn primary" href="textbook-topics.html?class='+cls+'&subject='+subject+termArg+'&unit='+u.id+'">Topic-wise Quiz · '+u.topic_count+' topics</a>':'')+'</div></article>';
+          '<a class="btn" href="'+full+'">'+(cls===9&&subject==='science'?'All available questions':'Full Unit')+(u.total?' · '+u.total.toLocaleString('en-IN'):'')+'</a>'+(u.topic_count?'<a class="btn primary" href="textbook-topics.html?class='+cls+'&subject='+subject+termArg+'&unit='+u.id+'">Topic-wise Quiz · '+u.topic_count+' topics</a>':'')+'</div></article>';
       }).join('')+'</div></section>'+
       (cls===8&&subject==='social-science'&&term===1?
         '<div class="note"><strong>Source status:</strong> All ten chapters now have 20-question bilingual starter quizzes grounded in the 2019 Tamil Nadu Term I English textbook and qualified applied practice. Tamil is an editorial translation; Tamil originals and the prescribed current edition remain unverified. More quiz sets and page-level certification remain pending.</div>':
@@ -274,7 +280,9 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
         '<section class="section panel"><div class="head"><div><h2>Class 10 Social Science · Mixed Mock / கலப்பு மாதிரித் தேர்வு</h2><p>Prepare from all 27 chapters in one mixed paper. Choose 20, 50 or 100 English–Tamil questions, then review your score by subject and read explanations.</p></div><span class="tag">'+socialStats.questions+'-question pool</span></div><div class="sets"><a class="btn primary" href="class10-social-mock.html">Start Mixed Mock · 20 / 50 / 100</a></div></section><div class="note"><strong>Source status:</strong> All 27 Class 10 Social Science chapters are indexed and have playable English–Tamil starter quizzes ('+socialStats.questions+' questions across '+socialStats.sets+' quiz sets, including expanded Civics practice): all ten History chapters, seven Geography chapters, five Civics chapters and five Economics chapters. No chapters remain without a playable starter quiz. Questions use a Tamil Nadu SCERT English volume revised in 2022; Tamil is editorial translation awaiting original-book proofreading and the currently prescribed 2026–27 edition remains unverified. These are starter quizzes, not exhaustive chapter or current-syllabus certification.</div>':
       cls===9&&subject==='social-science'?
         '<div class="note"><strong>Source status:</strong> All 30 Class 9 Social Science chapters now have a 20-question bilingual starter quiz (600 questions total): 11 History, 8 Geography, 6 Civics and 5 Economics. This is complete starter availability, not exhaustive textbook question coverage. The facts are based on the 2019 Tamil Nadu SCERT English textbook; Tamil wording is editorial translation pending original-book review, and conformity with the currently prescribed 2026–27 edition remains independently unverified.</div>':
-        '<div class="note"><strong>Source-first design:</strong> questions are grounded in the supplied Tamil Nadu State Board '+edition+' English and Tamil '+subjEn+' textbooks and filtered for competitive-exam relevance.</div>');
+      cls===9&&subject==='science'?
+        '<div class="note" role="status"><strong>Class 9 Science source and coverage / 9ஆம் வகுப்பு அறிவியல்:</strong> '+playableCount+' of '+units.length+' chapters have playable English–Tamil starter banks ('+totalKnown.toLocaleString('en-IN')+' available questions in '+availableSets+' quiz sets). These are starter banks, not exhaustive chapter coverage. Questions in newer units were aligned to SCERT English editions revised in 2019/2020; Tamil questions and explanations are editorial translations, not independently checked against the revised 2022 Tamil SCERT book. The currently prescribed 2026–27 edition and exact item-to-page matches are unverified. / தமிழ் மூலநூல் ஒப்பீடும் நடப்பு பாடநூல் பதிப்புச் சரிபார்ப்பும் நிலுவையில் உள்ளன.</div>':
+        '<div class="note"><strong>Editorial status:</strong> Available bilingual questions are intended for competitive-exam practice. Original English and Tamil textbook alignment, page citations and currently prescribed edition must be independently checked; playable availability does not certify complete chapter coverage.</div>');
   }
   render().catch(err=>{
     const subj=subject==='geography'?'Geography':subject==='social-science'?'Social Science':subject==='science'?'Science':'History';
