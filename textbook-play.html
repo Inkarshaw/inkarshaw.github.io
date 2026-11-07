@@ -46,7 +46,10 @@ h1{font-size:1.28rem;line-height:1.4;margin:0 0 14px}.options{display:grid;gap:9
 <script src="assets/js/textbook-quality.js"></script>
 <script>
 const p=new URLSearchParams(location.search),mode=['practice','timed'].includes(p.get('mode'))?p.get('mode'):'standard',classNo=Number(p.get('class')||6),subjectSlug=p.get('subject')||(classNo>=11?'history':'science'),subject=(classNo===12&&subjectSlug==='geography')?'geography':classNo>=11?'history':(subjectSlug==='social-science'?'social-science':'science'),term=Number(p.get('term')||1),unit=Number(p.get('unit')||1),topicSlug=p.get('topic')||'',quizRaw=p.get('quiz')||(topicSlug?'all':'1'),quizNo=quizRaw==='all'?'all':Number(quizRaw),DATA=classNo===11?'data/textbook/class-11/history/unit-'+String(unit).padStart(2,'0')+'.json':classNo===12?'data/textbook/class-12/'+subject+'/unit-'+unit+'.json':(classNo===6||classNo===7||classNo===8)?'data/textbook/class-'+classNo+'/'+subject+'/term-'+term+'/unit-'+unit+'.json':'data/textbook/class-'+classNo+'/'+subject+'/unit-'+unit+'.json',KEY='clearexamsTextbookProgressV2';
-let sourceRegistry={},lang=localStorage.getItem('clearexamsTextbookLang')||'en',meta=null,qs=[],idx=0,answers=[],checked=[],marked=[],deadline=0,completed=false;
+// Local storage can be disabled on privacy-restricted mobile browsers.
+function safeTextbookRead(key){try{return localStorage.getItem(key)}catch{return null}}
+function safeTextbookWrite(key,value){try{localStorage.setItem(key,value)}catch{}}
+let sourceRegistry={},lang=safeTextbookRead('clearexamsTextbookLang')==='ta'?'ta':'en',meta=null,qs=[],idx=0,answers=[],checked=[],marked=[],deadline=0,completed=false;
 const catalogParams=new URLSearchParams({class:String(classNo),subject,unit:String(unit)});if(classNo<=8)catalogParams.set('term',String(term));const catalogUrl=(topicSlug?'textbook-topics.html?':'textbook-quiz.html?')+catalogParams.toString();
 const bookmarkKey='clearexamsTextbookBookmarksV1';let bookmarks=new Set();try{bookmarks=new Set(JSON.parse(localStorage.getItem(bookmarkKey)||'[]'))}catch{}
 const questionKey=q=>String(q.id||classNo+'-'+subject+'-'+term+'-'+unit+'-'+q.q_en);
@@ -54,11 +57,27 @@ const storageId='c'+classNo+'-'+subject+'-t'+term+'-u'+unit+(topicSlug?'-topic-'
 const $=id=>document.getElementById(id);
 $('backLink').href=catalogUrl;$('resultBack').href=catalogUrl;
 function txt(en,ta){return lang==='ta'?(ta??en):en}
-function setLang(v){lang=v;localStorage.setItem('clearexamsTextbookLang',v);$('enBtn').classList.toggle('active',v==='en');$('taBtn').classList.toggle('active',v==='ta');if(completed){finish(true)}else render()}
+function setLang(v){lang=v;safeTextbookWrite('clearexamsTextbookLang',v);$('enBtn').classList.toggle('active',v==='en');$('taBtn').classList.toggle('active',v==='ta');if(completed){finish(true)}else render()}
 $('enBtn').onclick=()=>setLang('en');$('taBtn').onclick=()=>setLang('ta');
 
 function save(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}');all[storageId]={idx,answers,checked,marked,deadline,ts:Date.now()};localStorage.setItem(KEY,JSON.stringify(all))}catch{}}
-function loadSaved(){try{const all=JSON.parse(localStorage.getItem(KEY)||'{}'),v=all[storageId];if(v&&Array.isArray(v.answers)&&v.answers.length===qs.length){idx=Math.max(0,Math.min(Number(v.idx)||0,qs.length-1));answers=v.answers;checked=v.checked||Array(qs.length).fill(false);marked=v.marked||Array(qs.length).fill(false);deadline=Number(v.deadline)||0}}catch{}}
+function loadSaved(){
+  try{
+    const all=JSON.parse(safeTextbookRead(KEY)||'{}');
+    const v=all&&typeof all==='object'&&!Array.isArray(all)?all[storageId]:null;
+    if(!v||!Array.isArray(v.answers)||v.answers.length!==qs.length)return;
+    const position=Number(v.idx);
+    idx=Number.isInteger(position)?Math.max(0,Math.min(position,qs.length-1)):0;
+    answers=qs.map((q,i)=>{
+      const choice=v.answers[i],limit=Array.isArray(q.opts_en)?q.opts_en.length:4;
+      return Number.isInteger(choice)&&choice>=0&&choice<limit?choice:null;
+    });
+    checked=qs.map((_,i)=>Array.isArray(v.checked)&&v.checked[i]===true&&answers[i]!==null);
+    marked=qs.map((_,i)=>Array.isArray(v.marked)&&v.marked[i]===true);
+    const savedDeadline=Number(v.deadline);
+    deadline=Number.isFinite(savedDeadline)&&savedDeadline>0?savedDeadline:0;
+  }catch{}
+}
 function renderPalette(){
  const box=$('palette');box.replaceChildren();const n=qs.length;
  const indices=n<=45?Array.from({length:n},(_,i)=>i):[0,...Array.from({length:Math.min(n,31)},(_,j)=>Math.min(Math.max(idx-15,1),Math.max(n-31,1))+j).filter(i=>i>0&&i<n-1),n-1];
@@ -181,7 +200,7 @@ function render(){
  $('correctLabel').textContent=txt('Correct','சரி');$('wrongLabel').textContent=txt('Wrong','தவறு');$('accuracyLabel').textContent=txt('Accuracy','துல்லியம்');$('retry').textContent=txt('Retry quiz','மீண்டும் முயற்சி');
  renderPalette();save();
 }
-$('bookmark').onclick=()=>{const k=questionKey(qs[idx]);if(bookmarks.has(k))bookmarks.delete(k);else bookmarks.add(k);localStorage.setItem(bookmarkKey,JSON.stringify([...bookmarks]));render()};
+$('bookmark').onclick=()=>{const k=questionKey(qs[idx]);if(bookmarks.has(k))bookmarks.delete(k);else bookmarks.add(k);safeTextbookWrite(bookmarkKey,JSON.stringify([...bookmarks]));render()};
 $('mark').onclick=()=>{marked[idx]=!marked[idx];render()};
 $('report').onclick=async()=>{
  const q=qs[idx],report=['ClearExams textbook question report','Class: '+classNo,'Subject: '+subject,'Term: '+term,'Unit: '+unit,'Quiz: '+quizNo,'Topic: '+(topicSlug||'Unit quiz'),'Question: '+(idx+1),'ID: '+(q.id||'Not set'),'Textbook page: '+(q.page||q.page_en||'Unverified'),'Question (English): '+q.q_en,'Suggested correction: '].join('\n');
@@ -321,6 +340,19 @@ async function loadQuizData(){
   if(mode==='timed'){if(!deadline)deadline=Date.now()+20*60*1000;tickClock()}
   setLang(lang);
 }
-loadQuizData().catch(e=>{$('quizCard').innerHTML='<p>Could not load this textbook quiz.</p>'});
+loadQuizData().catch(err=>{
+  console.error('Textbook quiz loading failed',err);
+  const card=$('quizCard');card.replaceChildren();
+  const title=document.createElement('h2');
+  title.textContent=txt('This quiz could not load','இந்த வினாடி வினாவைத் திறக்க முடியவில்லை');
+  const message=document.createElement('p');
+  message.textContent=txt('Check your connection and retry, or return to the chapter list. Your existing progress has not been deleted.','இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும் அல்லது பாடப் பட்டியலுக்குத் திரும்பவும். ஏற்கெனவே சேமித்த முன்னேற்றம் நீக்கப்படவில்லை.');
+  const actions=document.createElement('div');actions.className='actions';
+  const retry=document.createElement('button');retry.type='button';retry.className='btn primary';
+  retry.textContent=txt('Retry loading','மீண்டும் முயற்சி செய்');retry.onclick=()=>location.reload();
+  const back=document.createElement('a');back.className='btn';back.href=catalogUrl;
+  back.textContent=txt('Return to chapters','பாடங்களுக்குத் திரும்பு');
+  actions.append(retry,back);card.append(title,message,actions);
+});
 </script>
 </body></html>
