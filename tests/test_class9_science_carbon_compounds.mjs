@@ -11,8 +11,8 @@ assert.equal(index.meta.published_unit_count,17);
 assert.equal(index.meta.total_questions,2180);
 assert.equal(index.meta.total_quiz_sets,109);
 assert.deepEqual(index.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:17},(_,i)=>i+1));
-assert.equal(index.units.reduce((n,u)=>n+u.total,0),2160);
-assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),108);
+assert.equal(index.units.reduce((n,u)=>n+u.total,0),2180);
+assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),109);
 for(const u of index.units.slice(17)){
  assert.equal(u.ready,false,'Pending chapter '+u.id);
  assert.equal(u.total,0);
