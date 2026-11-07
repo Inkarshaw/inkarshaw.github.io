@@ -6,13 +6,13 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const root='data/textbook/class-9/science/';
 const catalogue=JSON.parse(read(root+'index.json'));
 assert.equal(catalogue.units.length,25);
-assert.equal(catalogue.meta.published_unit_count,22);
-assert.equal(catalogue.meta.total_questions,2280);
-assert.equal(catalogue.meta.total_quiz_sets,114);
-assert.deepEqual(catalogue.units.filter(x=>x.ready).map(x=>x.id),Array.from({length:22},(_,i)=>i+1));
-assert.equal(catalogue.units.reduce((n,x)=>n+x.total,0),2280);
-assert.equal(catalogue.units.reduce((n,x)=>n+x.quiz_count,0),114);
-for(const u of catalogue.units.slice(22)){
+assert.equal(catalogue.meta.published_unit_count,23);
+assert.equal(catalogue.meta.total_questions,2300);
+assert.equal(catalogue.meta.total_quiz_sets,115);
+assert.deepEqual(catalogue.units.filter(x=>x.ready).map(x=>x.id),Array.from({length:23},(_,i)=>i+1));
+assert.equal(catalogue.units.reduce((n,x)=>n+x.total,0),2300);
+assert.equal(catalogue.units.reduce((n,x)=>n+x.quiz_count,0),115);
+for(const u of catalogue.units.slice(23)){
   assert.equal(u.ready,false,'Pending Unit '+u.id);
   assert.equal(u.total,0);assert.equal(u.quiz_count,0);assert.ok(!u.path);
   assert.equal(existsSync(new URL('../'+root+'unit-'+u.id+'.json',import.meta.url)),false);
@@ -73,4 +73,4 @@ assert.deepEqual(Array.from(pages).sort(),[226,227,228,229]);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.deepEqual(Array.from(curated,q=>q.id).sort(),doc.questions.map(q=>q.id).sort());
-console.log('Class 9 Plant Physiology: 20 original bilingual MCQs; 22/25 playable units, 2,280 questions in 114 sets.');
+console.log('Class 9 Plant Physiology: 20 original bilingual MCQs; 23/25 playable units, 2,300 questions in 115 sets.');
