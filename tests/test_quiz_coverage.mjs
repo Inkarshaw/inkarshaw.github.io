@@ -28,8 +28,17 @@ assert.ok(audit.scert.units>=288,'All 288 already-indexed units must remain trac
 assert.equal(audit.scert.readyUnits,audit.scert.units,'Every tracked canonical bank should be playable');
 assert.ok(audit.scert.indexedQuestions>=39000);
 assert.equal(audit.ncert.classes.length,7);
-assert.ok(audit.ncert.questions>=290);
+assert.ok(audit.ncert.questions>=350);
 assert.ok(audit.missingScertSubjectAreas.length>0);
+const chapters=JSON.parse(get('data/ncert/class10-science-chapter-inventory.json'));
+assert.equal(chapters.chapterCount,13);
+assert.equal(chapters.chapters.length,13);
+assert.equal(chapters.chapters[0].title,'Chemical Reactions and Equations');
+assert.equal(chapters.chapters[2].title,'Metals and Non-metals');
+assert.match(page,/ncert10Chapters/);
+const ncertBank=JSON.parse(get('data/ncert/quiz-bank.json'));
+const sourced=new Set(ncertBank.sets.filter(s=>s.classLevel===10&&s.source?.chapter).map(s=>s.source.chapter));
+assert.deepEqual([...sourced].sort((a,b)=>a-b),[1,2,3]);
 assert.equal(audit.fullCoverageCertified,false,
  'Never claim complete SCERT/NCERT coverage before book-level bilingual review');
 console.log('Quiz coverage: '+audit.scert.readyUnits+'/'+audit.scert.units+
