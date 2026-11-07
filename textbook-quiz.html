@@ -194,7 +194,12 @@ footer{padding:28px 0;background:#061629;color:#cbd8e5}
         if(!units.length)upcoming=true;
       }
     }else if(cls===11){
-      units=units11.map(x=>({id:x[0],unit_en:x[1],unit_ta:x[2],raw_records:x[3],total:x[5],quiz_count:x[4],ready:true}));
+      const r=await fetch('data/textbook/class-11/history/index.json',{cache:'no-store'});
+      if(!r.ok) throw new Error('Class 11 History index unavailable');
+      const d=await r.json();
+      edition=d.meta?.edition||2025;
+      units=(d.units||[]).map(x=>({...x,total:x.total??null,ready:x.ready!==false}));
+      if(!units.length) throw new Error('Class 11 History index has no published units');
     }else{
       edition=subject==='geography'?2024:2025;
       const r=await fetch('data/textbook/class-12/'+subject+'/index.json',{cache:'no-store'});
