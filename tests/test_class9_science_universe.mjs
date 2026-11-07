@@ -15,8 +15,8 @@ assert.deepEqual(index.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:
 assert.equal(index.meta.published_unit_count,17);
 assert.equal(index.meta.total_questions,2180);
 assert.equal(index.meta.total_quiz_sets,109);
-assert.equal(index.units.reduce((n,u)=>n+u.total,0),2160);
-assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),108);
+assert.equal(index.units.reduce((n,u)=>n+u.total,0),2180);
+assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),109);
 assert.ok(/2020/.test(index.meta.source_edition_note));
 assert.ok(/2026/.test(index.meta.source_edition_note));
 assert.ok(/Tamil/.test(index.meta.editorial_status));
