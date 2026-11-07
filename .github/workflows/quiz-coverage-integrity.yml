@@ -1,0 +1,45 @@
+name: Quiz coverage and completion integrity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/textbook/**'
+      - 'data/ncert/**'
+      - 'data/quizzes/coverage-scope.json'
+      - 'scripts/audit-quiz-coverage.mjs'
+      - 'tests/test_quiz_coverage.mjs'
+      - 'quiz-coverage.html'
+      - 'textbook-quiz.html'
+      - 'ncert-school-book-quiz.html'
+  pull_request:
+    paths:
+      - 'data/textbook/**'
+      - 'data/ncert/**'
+      - 'data/quizzes/coverage-scope.json'
+      - 'scripts/audit-quiz-coverage.mjs'
+      - 'tests/test_quiz_coverage.mjs'
+      - 'quiz-coverage.html'
+      - 'textbook-quiz.html'
+      - 'ncert-school-book-quiz.html'
+  schedule:
+    - cron: '20 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ensure SCERT catalogs are present and playable
+        run: node scripts/audit-quiz-coverage.mjs --strict
+      - name: Test coverage dashboard and missing-subject disclosure
+        run: node tests/test_quiz_coverage.mjs
+      - name: Test NCERT bank and quiz page
+        run: node tests/test_ncert_school_book_quiz.mjs
