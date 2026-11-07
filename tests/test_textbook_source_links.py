@@ -64,6 +64,29 @@ class TextbookSourceTests(unittest.TestCase):
         self.assertIn("unverified", row["edition_note"])
         self.assertIn("tntextbooks.in/p/10th-books.html", row["catalogue"])
 
+    def test_class_8_science_term1_historical_tamil_reference_is_explicit(self):
+        registry = json.loads((ROOT / "data/textbook/source-registry.json")
+                              .read_text(encoding="utf-8"))["books"]
+        row = registry["class-8/science/term-1"]
+        self.assertTrue(MODULE.is_direct_book_url(row["source_ta_url"]))
+        self.assertTrue(MODULE.is_direct_book_url(row["source_en_url"]))
+        self.assertIn("1Jnhn4GmWNVgRbrUImZDyjmKwRGqllMA8", row["source_ta_url"])
+        self.assertIn("2019", row["edition_note"])
+        self.assertIn("2025", row["edition_note"])
+        self.assertIn("2026", row["edition_note"])
+        self.assertIn("NOT independently certified", row["edition_note"])
+        self.assertIn("page-verified", row["edition_note"])
+        self.assertIn("2026-11-07", row["source_checked_on"])
+        # The actual bank still describes its own edition as 2025. The
+        # historical 2019 source supplies a Tamil topic reference, not proof
+        # of an identical textbook edition or matching printed page.
+        doc = json.loads((ROOT / "data/textbook/class-8/science/term-1/unit-1.json")
+                         .read_text(encoding="utf-8"))
+        self.assertEqual(doc["meta"]["edition"], 2025)
+        choices = MODULE.source_choices(doc["questions"][0], doc["meta"], row, "ta")
+        first_valid = next((v for v in choices if MODULE.is_direct_book_url(v)), None)
+        self.assertEqual(first_valid, row["source_ta_url"])
+
     def test_class_12_history_2025_english_has_named_direct_book_with_limits(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
                               .read_text(encoding="utf-8"))["books"]
@@ -136,6 +159,9 @@ class TextbookSourceTests(unittest.TestCase):
         self.assertFalse(any(row["book"].startswith("class-12/history") and
                              row["en_other_language"] > 0 for row in priorities),
                          "Class 12 History English questions still fall back to Tamil book")
+        self.assertFalse(any(row["book"] == "class-8/science/term-1" and
+                             row["ta_other_language"] > 0 for row in priorities),
+                         "Class 8 Science Term I Tamil questions still fall back to English source")
         for row in priorities:
             self.assertGreater(row["total"], 0)
             self.assertEqual(row["total"], sum(row[k] for k in (
