@@ -197,7 +197,12 @@ class TextbookSourceTests(unittest.TestCase):
         report = MODULE.audit()
         counts = report["counts"]
         priorities = report["fallback_by_book"]
-        self.assertTrue(priorities, "Source-medium editorial priorities should be listed")
+        # A complete set of matching-medium references has no fallback
+        # priorities; the absence of problems is now a valid audit outcome.
+        # When gaps recur, sorted priority totals are still reconciled below.
+        if not priorities:
+            self.assertEqual(counts.get("en_fallback_to_other_or_unspecified", 0), 0)
+            self.assertEqual(counts.get("ta_fallback_to_other_or_unspecified", 0), 0)
         self.assertEqual([row["total"] for row in priorities],
                          sorted((row["total"] for row in priorities), reverse=True))
         for language in ("en", "ta"):
