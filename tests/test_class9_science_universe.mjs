@@ -11,16 +11,16 @@ assert.equal(index.meta.unit_count,25);
 assert.equal(index.units.length,25);
 assert.deepEqual(index.units.map(u=>u.id),Array.from({length:25},(_,i)=>i+1));
 assert.deepEqual(index.units.slice(8).map(u=>u.chapter_page_en),starts.slice(8));
-assert.deepEqual(index.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:17},(_,i)=>i+1));
-assert.equal(index.meta.published_unit_count,17);
-assert.equal(index.meta.total_questions,2180);
-assert.equal(index.meta.total_quiz_sets,109);
-assert.equal(index.units.reduce((n,u)=>n+u.total,0),2180);
-assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),109);
+assert.deepEqual(index.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:18},(_,i)=>i+1));
+assert.equal(index.meta.published_unit_count,18);
+assert.equal(index.meta.total_questions,2200);
+assert.equal(index.meta.total_quiz_sets,110);
+assert.equal(index.units.reduce((n,u)=>n+u.total,0),2200);
+assert.equal(index.units.reduce((n,u)=>n+u.quiz_count,0),110);
 assert.ok(/2020/.test(index.meta.source_edition_note));
 assert.ok(/2026/.test(index.meta.source_edition_note));
 assert.ok(/Tamil/.test(index.meta.editorial_status));
-for(const u of index.units.slice(17)){
+for(const u of index.units.slice(18)){
   assert.equal(u.ready,false,'Do not falsely publish unit '+u.id);
   assert.equal(u.total,0);
   assert.equal(u.quiz_count,0);
@@ -61,4 +61,4 @@ for(const [i,q] of doc.questions.entries()){
 }
 assert.deepEqual(counts,[5,5,5,5]);
 assert.equal(quality.curate(doc.questions).questions.length,20);
-console.log('Class 9 Science: 25 indexed, 17 playable, 8 explicitly pending; Unit 9–17 starter banks.');
+console.log('Class 9 Science: 25 indexed, 18 playable, 7 explicitly pending; Unit 9–18 starter banks.');
