@@ -64,6 +64,41 @@ class TextbookSourceTests(unittest.TestCase):
         self.assertIn("unverified", row["edition_note"])
         self.assertIn("tntextbooks.in/p/10th-books.html", row["catalogue"])
 
+    def test_remaining_three_class_8_tamil_book_refs_resolve_without_english_fallback(self):
+        registry = json.loads((ROOT / "data/textbook/source-registry.json")
+                              .read_text(encoding="utf-8"))["books"]
+        fixtures = (
+            ("class-8/science/term-2", "class-8/science/term-2/unit-1.json",
+             "1JcsUT34w0dRvMdFIj88LUS1mvbF61FRj", 2019, 420),
+            ("class-8/science/term-3", "class-8/science/term-3/unit-1.json",
+             "Samacheer-Kalvi-Class-8-Term-3_Science-BookTM.pdf", 2019, 300),
+            ("class-8/social-science/term-1", "class-8/social-science/term-1/unit-1.json",
+             "1ftndkWf06zByB5X5gTDAx3qDOWmSRUj9", 2019, 200),
+        )
+        for key, path, source_identifier, edition, expected_views in fixtures:
+            with self.subTest(book=key):
+                row = registry[key]
+                self.assertTrue(MODULE.is_direct_book_url(row["source_ta_url"]))
+                self.assertIn(source_identifier, row["source_ta_url"])
+                self.assertIn("2019", row["edition_note"])
+                self.assertIn("2026", row["edition_note"])
+                self.assertIn("not", row["edition_note"].lower())
+                self.assertIn("2019", row["source_note_ta"])
+                self.assertEqual(row["source_checked_on"], "2026-11-07")
+                doc = json.loads((ROOT / "data/textbook" / path).read_text(encoding="utf-8"))
+                self.assertEqual(doc["meta"]["edition"], edition)
+                choices = MODULE.source_choices(doc["questions"][0], doc["meta"], row, "ta")
+                first = next((url for url in choices if MODULE.is_direct_book_url(url)), None)
+                self.assertEqual(first, row["source_ta_url"])
+                # Audited counts refer to Tamil UI views, not to unique items.
+                self.assertGreater(expected_views, 0)
+        audit = MODULE.audit()
+        priorities = audit["fallback_by_book"]
+        self.assertFalse(any(row["book"] in (key for key, *_ in fixtures) for row in priorities),
+                         "All three Class 8 books now need correct-medium links")
+        self.assertEqual(audit["counts"].get("en_fallback_to_other_or_unspecified", 0), 0)
+        self.assertEqual(audit["counts"].get("ta_fallback_to_other_or_unspecified", 0), 0)
+
     def test_class_10_science_2020_tamil_scert_is_explicitly_revised(self):
         registry = json.loads((ROOT / "data/textbook/source-registry.json")
                               .read_text(encoding="utf-8"))["books"]
