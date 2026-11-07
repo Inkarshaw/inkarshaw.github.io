@@ -6,13 +6,13 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const root='data/textbook/class-9/science/';
 const idx=JSON.parse(read(root+'index.json'));
 assert.equal(idx.units.length,25);
-assert.equal(idx.meta.published_unit_count,20);
-assert.equal(idx.meta.total_questions,2240);
-assert.equal(idx.meta.total_quiz_sets,112);
-assert.deepEqual(idx.units.filter(x=>x.ready).map(x=>x.id),Array.from({length:20},(_,i)=>i+1));
-assert.equal(idx.units.reduce((n,x)=>n+x.total,0),2240);
-assert.equal(idx.units.reduce((n,x)=>n+x.quiz_count,0),112);
-for(const u of idx.units.slice(20)){
+assert.equal(idx.meta.published_unit_count,21);
+assert.equal(idx.meta.total_questions,2260);
+assert.equal(idx.meta.total_quiz_sets,113);
+assert.deepEqual(idx.units.filter(x=>x.ready).map(x=>x.id),Array.from({length:21},(_,i)=>i+1));
+assert.equal(idx.units.reduce((n,x)=>n+x.total,0),2260);
+assert.equal(idx.units.reduce((n,x)=>n+x.quiz_count,0),113);
+for(const u of idx.units.slice(21)){
   assert.equal(u.ready,false,'Pending Unit '+u.id);
   assert.equal(u.total,0);assert.equal(u.quiz_count,0);assert.ok(!u.path);
   assert.equal(existsSync(new URL('../'+root+'unit-'+u.id+'.json',import.meta.url)),false);
@@ -70,4 +70,4 @@ assert.ok(pages.size>=8);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.deepEqual(Array.from(curated,q=>q.id).sort(),doc.questions.map(q=>q.id).sort());
-console.log('Class 9 Animal Organ Systems: 20 original bilingual MCQs, 20/25 playable units, 2,240 questions and 112 sets.');
+console.log('Class 9 Animal Organ Systems: 20 original bilingual MCQs, 21/25 playable units, 2,260 questions and 113 sets.');
