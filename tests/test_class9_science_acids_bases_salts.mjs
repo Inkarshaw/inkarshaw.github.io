@@ -7,13 +7,13 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const root='data/textbook/class-9/science/';
 const catalog=JSON.parse(read(root+'index.json'));
 assert.equal(catalog.units.length,25);
-assert.equal(catalog.meta.published_unit_count,20);
-assert.equal(catalog.meta.total_questions,2240);
-assert.equal(catalog.meta.total_quiz_sets,112);
-assert.deepEqual(catalog.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:20},(_,i)=>i+1));
-assert.equal(catalog.units.reduce((n,u)=>n+u.total,0),2240);
-assert.equal(catalog.units.reduce((n,u)=>n+u.quiz_count,0),112);
-for(const u of catalog.units.slice(20)){
+assert.equal(catalog.meta.published_unit_count,21);
+assert.equal(catalog.meta.total_questions,2260);
+assert.equal(catalog.meta.total_quiz_sets,113);
+assert.deepEqual(catalog.units.filter(u=>u.ready).map(u=>u.id),Array.from({length:21},(_,i)=>i+1));
+assert.equal(catalog.units.reduce((n,u)=>n+u.total,0),2260);
+assert.equal(catalog.units.reduce((n,u)=>n+u.quiz_count,0),113);
+for(const u of catalog.units.slice(21)){
  assert.equal(u.ready,false,'Pending unit '+u.id);
  assert.equal(u.total,0);
  assert.equal(u.quiz_count,0);
@@ -87,4 +87,4 @@ assert.deepEqual(positionCounts,[5,5,5,5]);
 const curated=quality.curate(doc.questions).questions;
 assert.equal(curated.length,20);
 assert.equal(JSON.stringify(Array.from(curated,q=>q.id).sort()),JSON.stringify(doc.questions.map(q=>q.id).sort()));
-console.log('Class 9 Science Unit 14: 20 original bilingual questions; 20/25 playable, 2,240 MCQs and 112 sets.');
+console.log('Class 9 Science Unit 14: 20 original bilingual questions; 21/25 playable, 2,260 MCQs and 113 sets.');
