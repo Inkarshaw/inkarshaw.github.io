@@ -199,7 +199,7 @@ try {
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'Topic practice mobile has no horizontal overflow');
   await page.goto(origin+'/pyq-hub.html',{waitUntil:'domcontentloaded'});
-  assert.equal(await page.locator('.ce-year-nav .ce-yearlink').count(),6);
+  assert.ok(await page.locator('.ce-year-nav .ce-yearlink').count()>=6,'Year navigation supports expanding verified paper catalog');
   assert.deepEqual(pageErrors,[],'Group I syllabus-first path has no JS runtime errors');
   console.log('PASS syllabus-first Group I: 8 units, 42 topics, search, revision saves, four original biology MCQs, figure warnings and topic reset');
 
