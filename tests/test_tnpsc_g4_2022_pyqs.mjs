@@ -44,8 +44,9 @@ for(const year of expectedYears){
 assert.ok(directPapers>=6);
 assert.ok(officialKeys>=3);
 assert.match(page,/for\(const doc of x\.documents\|\|\[\]\)/);
-assert.match(page,/Practise 10 adapted PYQs/);
-assert.match(page,/Practise all 20 adapted PYQs/);
+assert.match(page,/Start 10-question quiz/);
+assert.match(page,/count=10&start=1/);
+assert.match(read('pyq-full-quiz.html'),/value="20">20 questions/);
 assert.match(page,/Official final answer key reconciled/);
 const line=quiz.split("\n").find(s=>s.startsWith("function yearFiltered("));
 assert.ok(line);

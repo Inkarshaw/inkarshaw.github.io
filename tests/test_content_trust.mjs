@@ -75,7 +75,9 @@ assert.match(read('.github/ISSUE_TEMPLATE/textbook-question.yml'),/Question ID/)
 const hub=read('pyq-hub.html');
 const daily=read('daily-quiz.html');
 assert.match(daily,/ALLOWED_COUNTS=\[10,20,25,50,100\]/);
-assert.match(hub,/Practise all 20 adapted PYQs/);
+assert.match(hub,/Start 10-question quiz/);
+assert.match(hub,/count=10&start=1/);
+assert.match(read('pyq-full-quiz.html'),/id="lengthSelect"/);
 assert.match(hub,/Official final-key check incomplete or not documented/);
 const bank=JSON.parse(read('data/quizzes/verified-pyqs.json'));
 assert.equal(bank.length,160,'Ten more sourced 2024 Group IV adaptations digitized');
