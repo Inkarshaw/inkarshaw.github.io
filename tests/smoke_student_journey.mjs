@@ -116,6 +116,38 @@ try {
   assert.deepEqual(pageErrors,[],'PYQ practice/exam modes have no runtime JavaScript errors');
   console.log('PASS PYQ exam-mode separation: no live feedback');
 
+  // Exact 200-number official paper by year, source-synchronized on mobile.
+  pageErrors.length = 0;
+  await page.goto(origin+'/pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies',{waitUntil:'domcontentloaded'});
+  await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
+  assert.equal(await page.locator('#papers .paper-choice').count(),3,'All 2022/2024/2025 original-paper modes load');
+  assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
+  assert.equal(await page.locator('#showBoth').getAttribute('aria-pressed'),'true','Source and answers are combined by default');
+  assert.equal(await page.locator('#paperPanel').isVisible(),true,'Official original PDF visible');
+  assert.equal(await page.locator('#questionPanel').isVisible(),true,'Interactive original-number response visible');
+  assert.equal(await page.locator('#mobileAnswerDock').isVisible(),true,'One-tap A–E dock visible');
+  assert.equal(await page.locator('#dockChoices button').count(),5,'Original A–E answer controls including E');
+  await page.locator('#dockChoices button').first().click();
+  assert.match(await page.locator('#status').innerText(),/1\/200 answered/);
+  assert.equal(await page.locator('#dockChoices button').first().getAttribute('aria-pressed'),'true');
+  await page.locator('#dockNext').click();
+  assert.match(await page.locator('#number').innerText(),/Question 2 of 200/);
+  await page.locator('#paletteDetails summary').click();
+  await page.locator('#palette button').nth(99).click();
+  assert.match(await page.locator('#number').innerText(),/Question 100 of 200/);
+  assert.equal(await page.locator('#pdfPage').inputValue(),'28','Question 100 points to its verified PDF source page');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
+  assert.match(await page.locator('#number').innerText(),/Question 100 of 200/);
+  assert.match(await page.locator('#status').innerText(),/1\/200 answered/,'Original answer survives reload');
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,'Original 200-question phone layout has no overflow');
+  await page.goto(origin+'/pyq-original-paper.html?paper=tnpsc-group-iv-2025-general-tamil-general-studies',{waitUntil:'domcontentloaded'});
+  await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
+  assert.match(await page.locator('#examTitle').innerText(),/2025/,'Yearwise 2025 original source not silently excluded');
+  assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
+  assert.deepEqual(pageErrors,[],'Original 200-question sessions have no runtime errors');
+  console.log('PASS 200 original questions: source PDF, matching numbered responses, save/resume and year switch');
+
   // Local-only original-PYQ staging: no paper text published without review.
   pageErrors.length = 0;
   const digitizeResponse=await page.goto(origin+'/pyq-digitize.html',{waitUntil:'domcontentloaded'});
