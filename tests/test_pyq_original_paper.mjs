@@ -23,7 +23,7 @@ for(const paper of data.papers){
   assert.deepEqual(paper.correctOptionLetters,['A','B','C','D']);
   assert.equal(paper.unknownOption,'E');
   assert.equal(paper.transcriptionStatus,'not-transcribed');
-  assert.equal(paper.answerKeyStatus,'official-pdf-only');
+  assert.equal(paper.answerKeyStatus,paper.year===2025?'official-final-key-mapped-subject-496':'official-pdf-only');
   assert.equal(paper.copyrightClearance,'not-confirmed');
   assert.equal(paper.format,'official-pdf-answer-sheet');
   assert.match(paper.paperUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
@@ -50,8 +50,8 @@ assert.equal(paper2024.firstQuestionPdfPage,3,'First original question is on PDF
 assert.equal(paper2024.annotatedSource,true,'Annotated source scans warn candidates about visible ticks');
 const keyManifest=JSON.parse(read('data/quizzes/original-final-keys.json'));
 assert.equal(keyManifest.schemaVersion,1);
-assert.equal(keyManifest.papers.length,1);
-const officialKey=keyManifest.papers[0];
+assert.equal(keyManifest.papers.length,2);
+const officialKey=keyManifest.papers.find(p=>p.id===paper2024.id);
 assert.equal(officialKey.id,paper2024.id);
 assert.equal(officialKey.paperVersion,paper2024.paperVersion);
 assert.equal(officialKey.questionCount,200);
@@ -67,6 +67,40 @@ for(const [number,answer] of Object.entries(important)){
 assert.equal(officialKey.answers.filter(x=>x==='ALL').length,4);
 assert.equal(officialKey.answers.filter(x=>x.includes('/')).length,5);
 assert.equal(officialKey.answers.length-officialKey.answers.filter(x=>x==='ALL').length,196);
+const pages2025=JSON.parse(read('data/quizzes/tnpsc-g4-2025-original-page-index.json'));
+const paper2025=data.papers.find(p=>p.year===2025);
+assert.equal(paper2025.firstQuestionPdfPage,3);
+assert.equal(paper2025.annotatedSource,true);
+assert.equal(pages2025.paperId,paper2025.id);
+assert.equal(pages2025.paperVersion,paper2025.paperVersion);
+assert.equal(pages2025.questionCount,200);
+const locs2025=Array(200).fill(null);
+for(const span of pages2025.pageSpans){
+ assert.ok(Number.isInteger(span.pdfPage)&&span.pdfPage>=3&&span.pdfPage<=123);
+ assert.ok(span.firstQuestion>=1&&span.lastQuestion<=200&&span.firstQuestion<=span.lastQuestion);
+ for(let n=span.firstQuestion;n<=span.lastQuestion;n++){
+  assert.equal(locs2025[n-1],null,'No duplicate 2025 source question Q'+n);
+  locs2025[n-1]=span.pdfPage;
+ }
+}
+assert.ok(locs2025.every(Number.isInteger),'2025: all 200 source PDF pages present');
+for(const [n,p] of [[1,3],[44,21],[100,44],[101,45],[112,54],[151,83],[189,118],[200,123]]){
+ assert.equal(locs2025[n-1],p,'Original 2025 question '+n+' is on PDF page '+p);
+}
+const key2025=keyManifest.papers.find(p=>p.id===paper2025.id);
+assert.equal(key2025.paperVersion,paper2025.paperVersion);
+assert.equal(key2025.sourceUrl,paper2025.answerKeyUrl);
+assert.equal(key2025.questionCount,200);
+assert.equal(key2025.answers.length,200);
+assert.equal(key2025.marksPerQuestion,1.5);
+assert.ok(key2025.answers.every(x=>/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/.test(x)));
+for(const [n,key] of Object.entries({1:'C',6:'ALL',44:'C',56:'ALL',68:'A/B/C',74:'ALL',77:'C/D',
+  78:'C/D',100:'C',101:'C',107:'ALL',112:'ALL',122:'B/C',126:'B/C',138:'ALL',161:'ALL',162:'ALL',200:'B'})){
+ assert.equal(key2025.answers[Number(n)-1],key,'2025 final key Q'+n);
+}
+assert.equal(key2025.answers.filter(x=>x==='ALL').length,8);
+assert.equal(key2025.answers.filter(x=>x.includes('/')).length,5);
+assert.equal(key2025.answers.length-key2025.answers.filter(x=>x==='ALL').length,192);
 assert.equal(bank.filter(q=>q.SourceExam==='TNPSC Group IV'&&q.SourceYear==='2024').length,30,'Adapted questions remain separate');
 assert.ok(!data.papers.some(x=>x.transcriptionStatus==='verified-full'));
 assert.match(html,/The paper is not copied or transcribed into ClearExams/);
@@ -90,6 +124,7 @@ assert.match(js,/currentKey\.answers/,'Check against original official key optio
 assert.match(js,/token==='ALL'/,'Do not silently score ALL entries');
 assert.match(js,/safe\(currentPaper\.paperUrl\)/,'Page navigation stays on verified official source');
 assert.match(js,/tnpsc-g4-2024-original-page-index\.json/);
+assert.match(js,/tnpsc-g4-2025-original-page-index\.json/);
 assert.match(js,/lastShownPdfPage!==originalPage\)jumpPdfPage\(originalPage\)/,'Automatically synchronize PDF page to question');
 assert.match(html,/id="goPdfPage"/);
 assert.match(html,/id="readOriginal"/);
@@ -122,4 +157,4 @@ assert.match(adapted,/All Available Adapted PYQs/);
 assert.match(adapted,/Not a complete original paper/);
 assert.match(read('sitemap.xml'),/pyq-original-paper\.html/);
 new vm.Script(js,{filename:'assets/js/pyq-original-paper.js'});
-console.log('Three original-PDF quiz sessions, 600 A–E slots, 2024 Version A 200-position key map, multi-answer exceptions and mobile source navigation validated.');
+console.log('Three source-PDF quiz sessions; 2024+2025 final keys and all 400 original-source page positions reconciled; 2022 awaiting scoring.');
