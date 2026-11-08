@@ -69,7 +69,18 @@ kbd{font:inherit;color:#ffdb91}.meta{display:grid;grid-template-columns:repeat(2
 <div class="field"><label for="request">Request ID</label><input id="request" type="text" autocomplete="off"></div>
 <div class="field full"><label for="reference">Reference coordinate represents</label><select id="reference"><option value="Provider-reported point (location meaning unverified)">Provider-reported point — unverified</option><option value="Verified antenna / tower coordinate entered by investigator">Verified tower coordinate — investigator confirmed</option></select></div>
 </div>
-<h3>3. Sector diagram settings</h3>
+<h3>3. Verified tower / azimuth information (optional)</h3>
+<p class="small">C-Trace can query its own tower database. This independent page has no access to that private service. You can enter a separately verified tower site or load an authorised CSV locally.</p>
+<div class="fields">
+<div class="field"><label for="towerLat">Verified tower latitude</label><input id="towerLat" type="number" min="-90" max="90" step="any" placeholder="Tower latitude"></div>
+<div class="field"><label for="towerLon">Verified tower longitude</label><input id="towerLon" type="number" min="-180" max="180" step="any" placeholder="Tower longitude"></div>
+<div class="field full"><label for="towerSource">Tower source / provenance</label><input id="towerSource" type="text" placeholder="e.g. dated operator cell-site sheet"></div>
+<div class="field full"><label for="towerCsv">Import authorised tower CSV (local only)</label><input id="towerCsv" type="file" accept=".csv,.tsv,.txt,text/csv"></div>
+</div>
+<p class="small">CSV columns: <code>cgi,latitude,longitude,azimuth,beamwidth,site_name</code>. The full CGI is matched exactly; no Cell ID direction is guessed. Where a unique CGI match is found, the sector bearing and site coordinates can be applied. Imported data stays on your device.</p>
+<div class="row"><button type="button" class="btn alt" id="matchTower">Find CGI in CSV</button><button type="button" class="btn alt" id="resetTower">Clear tower data</button></div>
+<p class="small" id="towerStatus" aria-live="polite">No tower data loaded.</p>
+<h3>4. Sector diagram settings</h3>
 <div class="fields">
 <div class="field"><label for="sectors">Sector count</label><select id="sectors"><option>3</option><option>1</option><option>2</option><option>4</option><option>6</option></select></div>
 <div class="field"><label for="view">Display sector</label><select id="view"><option value="all">All sectors</option><option value="0">A / 1</option><option value="1">B / 2</option><option value="2">C / 3</option></select></div>
@@ -93,7 +104,7 @@ kbd{font:inherit;color:#ffdb91}.meta{display:grid;grid-template-columns:repeat(2
 <div class="small" id="coords">Paste a message or enter latitude and longitude.</div>
 </section>
 <section class="panel actionPanel">
-<h2>4. Export your sector map</h2>
+<h2>5. Export your sector map</h2>
 <div class="row">
 <button type="button" class="btn" id="png">Download PNG diagram</button>
 <button type="button" class="btn alt" id="geojson">Download GeoJSON</button>
@@ -118,7 +129,7 @@ kbd{font:inherit;color:#ffdb91}.meta{display:grid;grid-template-columns:repeat(2
 const $=id=>document.getElementById(id);
 const keys=['mob','activity','cgi','vlr','imsi','lat','lon','lbs','request'];
 const colors=['#ffb547','#3de0ca','#9b95ff','#ff7586','#71cbff','#d5ed72'];
-let map=null,layer=null,tileLayer=null,latest=null;
+let map=null,layer=null,tileLayer=null,latest=null,towerRecords=null;
 const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const val=id=>$(id).value.trim();
 const n=id=>Number(val(id));
@@ -150,8 +161,12 @@ function parseMessage(text){
  return count;
 }
 function readGeometry(){
- const lat=n('lat'),lon=n('lon'),count=Number(val('sectors')),radius=n('radius'),span=n('span'),bearing=n('bearing');
- if(!val('lat')||!val('lon')||![lat,lon,radius,span,bearing].every(Number.isFinite)||Math.abs(lat)>90||Math.abs(lon)>180||radius<10||radius>50000||span<=0||span>360){throw new Error('Enter valid latitude/longitude, bearing (0–360), width (1–360) and radius (10–50,000 m).');}
+ const reportedLat=n('lat'),reportedLon=n('lon'),hasTower=!!val('towerLat')||!!val('towerLon');
+ const lat=hasTower?n('towerLat'):reportedLat,lon=hasTower?n('towerLon'):reportedLon;
+ const count=Number(val('sectors')),radius=n('radius'),span=n('span'),bearing=n('bearing');
+ if(!val('lat')||!val('lon')||![reportedLat,reportedLon].every(Number.isFinite)||Math.abs(reportedLat)>90||Math.abs(reportedLon)>180){throw new Error('Enter valid provider-reported latitude and longitude.');}
+ if(hasTower&&(!val('towerLat')||!val('towerLon'))){throw new Error('Enter both tower coordinates for a separate tower location.');}
+ if(![lat,lon,radius,span,bearing].every(Number.isFinite)||Math.abs(lat)>90||Math.abs(lon)>180||radius<10||radius>50000||bearing<0||bearing>=360||span<=0||span>360){throw new Error('Check tower coordinates, azimuth (0–359.99), wedge width (1–360), and illustrative radius (10–50,000 m).');}
  if(![1,2,3,4,6].includes(count)){throw new Error('Choose a valid sector count.');}
  const cells=Array.from({length:count},(_,i)=>{
   const center=norm(bearing+i*360/count);
@@ -161,7 +176,7 @@ function readGeometry(){
   points.push([lat,lon]);
   return {index:i,name:'Sector '+String.fromCharCode(65+i),center,points,color:colors[i]};
  });
- return {lat,lon,count,radius,span,bearing,cells,ref:val('reference')};
+ return {lat,lon,reportedLat,reportedLon,hasTower,towerSource:val('towerSource'),count,radius,span,bearing,cells,ref:val('reference')};
 }
 function setupMap(){
  if(!window.L){$('mapFallback').style.display='block';$('status').textContent='Leaflet could not load; online interactive map unavailable.';return;}
@@ -175,8 +190,8 @@ function draw(fit){
   const g=readGeometry();latest=g;
   $('status').textContent='Sector geometry updated. Unverified assumptions are shown as illustrative.';
   $('status').style.color='#9be8d1';
-  $('google').href='https://maps.google.com/maps?q='+encodeURIComponent(g.lat+','+g.lon);
-  $('coords').textContent='Reference: '+g.lat.toFixed(6)+', '+g.lon.toFixed(6)+' • '+g.radius+' m radius • '+g.span+'° wedge width • Sector A '+norm(g.bearing).toFixed(1)+'° (editable)';
+  $('google').href='https://maps.google.com/maps?q='+encodeURIComponent(g.reportedLat+','+g.reportedLon);
+  $('coords').textContent='LBS point: '+g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6)+' • Sector anchor: '+g.lat.toFixed(6)+', '+g.lon.toFixed(6)+(g.hasTower?' (entered tower record)':' (unverified LBS point)')+' • '+g.radius+' m illustrative radius';
   $('legend').innerHTML=g.cells.map(s=>'<span><b style="background:'+s.color+'"></b>'+escapeHTML(s.name)+' '+s.center.toFixed(1)+'°</span>').join('')+'<span>● Reference coordinate</span>';
   if(map){
    layer.clearLayers();
@@ -187,12 +202,16 @@ function draw(fit){
     layer.addLayer(poly);
     layer.addLayer(L.polyline([[g.lat,g.lon],destination(g.lat,g.lon,s.center,g.radius)],{color:s.color,weight:3,opacity:0.85,dashArray:'8,6'}));
    }
-   layer.addLayer(L.circleMarker([g.lat,g.lon],{radius:8,color:'#ffffff',weight:2,fillColor:'#f59c37',fillOpacity:1}).bindPopup('<strong>Telecom-provided coordinate</strong><br>'+g.lat.toFixed(6)+', '+g.lon.toFixed(6)+'<br>'+escapeHTML(g.ref)+'<br><em>Not necessarily the handset or tower position</em>'));
-   if(fit)map.fitBounds(L.latLngBounds(g.cells.flatMap(c=>c.points)).pad(0.15),{maxZoom:15});
+   layer.addLayer(L.circleMarker([g.lat,g.lon],{radius:9,color:'#ffffff',weight:2,fillColor:g.hasTower?'#4aafff':'#f59c37',fillOpacity:1}).bindPopup('<strong>'+(g.hasTower?'Entered tower site':'LBS coordinate used as assumed centre')+'</strong><br>'+g.lat.toFixed(6)+', '+g.lon.toFixed(6)+'<br>'+escapeHTML(g.hasTower?g.towerSource:g.ref)));
+   if(g.hasTower){layer.addLayer(L.circleMarker([g.reportedLat,g.reportedLon],{radius:8,color:'#ffffff',weight:2,fillColor:'#f59c37',fillOpacity:1}).bindPopup('<strong>Provider-reported LBS point</strong><br>'+g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6)+'<br>Location type and accuracy not confirmed'));
+    layer.addLayer(L.polyline([[g.lat,g.lon],[g.reportedLat,g.reportedLon]],{color:'#ffffff',weight:1.5,dashArray:'3,7'}));}
+   if(fit)map.fitBounds(L.latLngBounds([...g.cells.flatMap(c=>c.points),[g.reportedLat,g.reportedLon]]).pad(0.15),{maxZoom:15});
    setTimeout(()=>map.invalidateSize(),80);
   }
   const summary=[
-    ['Reference point',g.lat.toFixed(6)+', '+g.lon.toFixed(6)],
+    ['LBS reported point',g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6)],
+    ['Sector anchor',g.lat.toFixed(6)+', '+g.lon.toFixed(6)+(g.hasTower?' (separately entered tower)':' (assumed; no tower record)')],
+    ['Tower data provenance',g.hasTower?(g.towerSource||'Not specified'):'Not provided'],
     ['CGI',val('cgi')||'—'],['LBS type',val('lbs')||'—'],
     ['Last activity',val('activity')||'—'],
     ['Angular configuration',g.count+' × '+g.span+'° wedges'],
@@ -205,7 +224,8 @@ function draw(fit){
  }catch(e){latest=null;$('status').textContent=e.message;$('status').style.color='#ffc1b4';return null;}
 }
 function featureCollection(g){
- const features=[{type:'Feature',geometry:{type:'Point',coordinates:[g.lon,g.lat]},properties:{name:'Provider coordinate',reference:g.ref,warning:'Not necessarily tower or handset location'}}];
+ const features=[{type:'Feature',geometry:{type:'Point',coordinates:[g.reportedLon,g.reportedLat]},properties:{name:'Provider-reported LBS point',reference:g.ref,warning:'Not necessarily tower or handset location'}}];
+ if(g.hasTower)features.push({type:'Feature',geometry:{type:'Point',coordinates:[g.lon,g.lat]},properties:{name:'Entered tower site',towerSource:g.towerSource||'Not supplied',warning:'Subject to verification with carrier'}});
  for(const s of g.cells){
   features.push({type:'Feature',geometry:{type:'Polygon',coordinates:[s.points.map(p=>[p[1],p[0]])]},properties:{name:s.name,assumedAzimuthDegrees:s.center,wedgeWidthDegrees:g.span,illustrativeRadiusMeters:g.radius,verification:'Hypothetical only; not a measured cell sector'}});
  }
@@ -223,7 +243,8 @@ function exportKml(){
  const g=draw(false);if(!g)return;
  const placemark=(name,geom,desc)=>'<Placemark><name>'+xml(name)+'</name><description>'+xml(desc)+'</description>'+geom+'</Placemark>';
  const pt='<Point><coordinates>'+g.lon+','+g.lat+',0</coordinates></Point>';
- let body=placemark('Reported reference coordinate',pt,'Location meaning unverified: '+g.ref);
+ let body=placemark('Reported LBS coordinate','<Point><coordinates>'+g.reportedLon+','+g.reportedLat+',0</coordinates></Point>','Location meaning unverified: '+g.ref);
+ if(g.hasTower)body+=placemark('Entered tower site',pt,'Tower source: '+(g.towerSource||'not supplied'));
  for(const s of g.cells){const coords=s.points.map(p=>p[1]+','+p[0]+',0').join(' ');body+=placemark(s.name,'<Polygon><outerBoundaryIs><LinearRing><coordinates>'+coords+'</coordinates></LinearRing></outerBoundaryIs></Polygon>','Illustrative only. Assumed azimuth '+s.center.toFixed(1)+' degrees; radius '+g.radius+' metres.');}
  download('lbs-sector-map.kml','<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>LBS illustrative sectors</name><description>Not a verified handset location or cell coverage</description>'+body+'</Document></kml>','application/vnd.google-earth.kml+xml');
 }
@@ -253,9 +274,9 @@ function exportPng(){
  ctx.font='bold 21px Arial';ctx.fillText('N',cx-8,cy-R-38);
  ctx.font='17px Arial';ctx.fillStyle='#526d7f';ctx.fillText(g.radius+' m diagram radius',cx+R-230,cy+R+56);
  ctx.fillStyle='#122e41';ctx.font='bold 23px Arial';ctx.fillText('REFERENCE DATA',1070,223);
- const details=[['LAT',g.lat.toFixed(6)],['LON',g.lon.toFixed(6)],['CGI',val('cgi')||'—'],['LBS TYPE',val('lbs')||'—'],['LAST ACTIVITY',val('activity')||'—'],['SECTORS',String(g.count)],['WEDGE WIDTH',g.span+'°'],['BEARING A',g.bearing+'°'],['RADIUS',g.radius+' m']];
- ctx.font='19px Arial';let yy=275;
- for(const [k,v] of details){ctx.fillStyle='#668294';ctx.fillText(k,1070,yy);ctx.fillStyle='#122e41';const short=String(v).length>21?String(v).slice(0,21)+'…':String(v);ctx.fillText(short,1070,yy+27);yy+=80;}
+ const details=[['LBS LAT',g.reportedLat.toFixed(6)],['LBS LON',g.reportedLon.toFixed(6)],['TOWER LAT',g.hasTower?g.lat.toFixed(6):'Not supplied'],['TOWER LON',g.hasTower?g.lon.toFixed(6):'Not supplied'],['CGI',val('cgi')||'—'],['LBS TYPE',val('lbs')||'—'],['LAST ACTIVITY',val('activity')||'—'],['SECTORS',String(g.count)],['WEDGE WIDTH',g.span+'°'],['BEARING A',g.bearing+'°'],['RADIUS',g.radius+' m']];
+ ctx.font='19px Arial';let yy=220;
+ for(const [k,v] of details){ctx.fillStyle='#668294';ctx.fillText(k,1070,yy);ctx.fillStyle='#122e41';const short=String(v).length>21?String(v).slice(0,21)+'…':String(v);ctx.fillText(short,1070,yy+23);yy+=69;}
  ctx.fillStyle='#b3502c';ctx.font='bold 20px Arial';ctx.fillText('ALL SECTORS HYPOTHETICAL UNTIL VERIFIED',65,1099);
  canvas.toBlob(b=>{if(b){const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='lbs-sector-map.png';a.click();setTimeout(()=>URL.revokeObjectURL(u),5000);}},'image/png');
 }
@@ -271,7 +292,7 @@ function updateTiles(){
 }
 $('parse').addEventListener('click',()=>{const ct=parseMessage(val('message'));if(!ct){$('status').textContent='No known LBS fields found. Please check message text.';return;}updateSectorOptions();draw(true);$('status').textContent='Parsed '+ct+' field(s). Check values and unverified assumptions.';});
 $('draw').addEventListener('click',()=>draw(true));$('fit').addEventListener('click',()=>draw(true));
-$('clear').addEventListener('click',()=>{keys.forEach(k=>$(k).value='');$('message').value='';$('reference').selectedIndex=0;$('bearing').value='0';$('rotate').value='0';$('span').value='120';$('radius').value='1000';$('sectors').value='3';updateSectorOptions();latest=null;if(layer)layer.clearLayers();$('summary').innerHTML='';$('coords').textContent='Enter coordinates to draw sectors.';$('legend').innerHTML='';$('status').textContent='Cleared. No private details are saved by this tool.';});
+$('clear').addEventListener('click',()=>{keys.forEach(k=>$(k).value='');$('towerLat').value='';$('towerLon').value='';$('towerSource').value='';$('towerCsv').value='';towerRecords=null;$('towerStatus').textContent='No tower data loaded.';$('message').value='';$('reference').selectedIndex=0;$('bearing').value='0';$('rotate').value='0';$('span').value='120';$('radius').value='1000';$('sectors').value='3';updateSectorOptions();latest=null;if(layer)layer.clearLayers();$('summary').innerHTML='';$('coords').textContent='Enter coordinates to draw sectors.';$('legend').innerHTML='';$('status').textContent='Cleared. No private details are saved by this tool.';});
 $('sectors').addEventListener('change',()=>{updateSectorOptions();if(latest)draw(false);});
 for(const id of ['view','span','radius','reference'])$(id).addEventListener('change',()=>{if(latest)draw(false);});
 $('bearing').addEventListener('input',()=>{$('rotate').value=String(Math.round(n('bearing')));if(latest)draw(false);});
