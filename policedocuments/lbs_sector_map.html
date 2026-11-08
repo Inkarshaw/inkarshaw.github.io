@@ -280,6 +280,44 @@ function exportPng(){
  ctx.fillStyle='#b3502c';ctx.font='bold 20px Arial';ctx.fillText('ALL SECTORS HYPOTHETICAL UNTIL VERIFIED',65,1099);
  canvas.toBlob(b=>{if(b){const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='lbs-sector-map.png';a.click();setTimeout(()=>URL.revokeObjectURL(u),5000);}},'image/png');
 }
+function parseTowerCsv(data){
+ const headerLine=data.split(/\r?\n/,1)[0],sep=headerLine.includes('\t')?'\t':',';
+ const rows=[];let row=[],cell='',quoted=false;
+ for(let i=0;i<data.length;i++){
+  const c=data[i];if(c==='"'){if(quoted&&data[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}
+  else if(!quoted&&c===sep){row.push(cell.trim());cell='';}
+  else if(!quoted&&(c==='\r'||c==='\n')){if(c==='\r'&&data[i+1]==='\n')i++;row.push(cell.trim());if(row.some(Boolean))rows.push(row);row=[];cell='';}
+  else cell+=c;
+ }
+ if(quoted)throw new Error('Unclosed quoted field.');
+ row.push(cell.trim());if(row.some(Boolean))rows.push(row);
+ if(rows.length<2)throw new Error('Needs header and at least one data row.');
+ const heads=rows[0].map(h=>h.toLowerCase().replace(/[^a-z0-9]/g,''));
+ const field=(r,ns)=>{for(const name of ns){let k=heads.indexOf(name);if(k>=0)return r[k]||'';}return '';};
+ if(!heads.includes('cgi'))throw new Error('Missing CGI header. Use cgi,latitude,longitude,azimuth,beamwidth,site_name.');
+ return rows.slice(1,100002).map(r=>({
+  cgi:field(r,['cgi']),lat:field(r,['latitude','lat']),lon:field(r,['longitude','lon','lng']),
+  azimuth:field(r,['azimuth','direction','bearing']),beamwidth:field(r,['beamwidth','horizbeam','horizontalbeamwidth']),
+  name:field(r,['sitename','site','towername'])
+ })).filter(r=>r.cgi);
+}
+function findTowerMatch(){
+ if(!towerRecords){$('towerStatus').textContent='Select a local CSV first.';return;}
+ const normCGI=s=>String(s).replace(/[^0-9]/g,'');
+ const target=normCGI(val('cgi'));if(!target){$('towerStatus').textContent='Paste the full CGI first.';return;}
+ const matches=towerRecords.filter(r=>normCGI(r.cgi)===target);
+ if(matches.length!==1){$('towerStatus').textContent=matches.length?'Found '+matches.length+' matching rows: ambiguous, not applied. Review sector/technology manually.':'No exact full-CGI match. No tower location inferred.';return;}
+ const r=matches[0],lat=Number(r.lat),lon=Number(r.lon),bearing=Number(r.azimuth),beam=Number(r.beamwidth);
+ if(!r.lat||!r.lon||!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180){$('towerStatus').textContent='CGI row has invalid tower coordinates; nothing applied.';return;}
+ if(r.azimuth===''||!Number.isFinite(bearing)||bearing<0||bearing>=360){$('towerStatus').textContent='CGI row missing a valid azimuth; nothing applied. Provide verified antenna direction.';return;}
+ $('towerLat').value=r.lat;$('towerLon').value=r.lon;
+ $('towerSource').value='Local operator CSV'+(r.name?' · '+r.name:'')+' (source requires confirmation)';
+ $('bearing').value=bearing;$('rotate').value=Math.round(bearing);
+ if(r.beamwidth!==''&&Number.isFinite(beam)&&beam>0&&beam<=360)$('span').value=beam;
+ $('sectors').value='1';updateSectorOptions();$('view').value='all';
+ $('towerStatus').textContent='Matched one full CGI to '+(r.name||'tower row')+'. Review site, antenna azimuth, beamwidth and historical validity.';
+ draw(true);
+}
 function updateSectorOptions(){
  const old=val('view'),count=Number(val('sectors'));$('view').innerHTML='<option value="all">All sectors</option>'+
  Array.from({length:count},(_,i)=>'<option value="'+i+'">Sector '+String.fromCharCode(65+i)+'</option>').join('');
@@ -298,6 +336,14 @@ for(const id of ['view','span','radius','reference'])$(id).addEventListener('cha
 $('bearing').addEventListener('input',()=>{$('rotate').value=String(Math.round(n('bearing')));if(latest)draw(false);});
 $('rotate').addEventListener('input',()=>{$('bearing').value=val('rotate');if(latest)draw(false);});
 $('tiles').addEventListener('change',updateTiles);
+$('matchTower').addEventListener('click',findTowerMatch);
+$('resetTower').addEventListener('click',()=>{$('towerLat').value='';$('towerLon').value='';$('towerSource').value='';$('towerCsv').value='';towerRecords=null;$('towerStatus').textContent='Tower data cleared; sector anchor will be unverified LBS coordinates.';if(latest)draw(true);});
+$('towerCsv').addEventListener('change',async()=>{
+ const file=$('towerCsv').files?.[0];if(!file)return;
+ if(file.size>5*1024*1024){$('towerStatus').textContent='Maximum CSV size is 5 MB.';return;}
+ try{towerRecords=parseTowerCsv(await file.text());$('towerStatus').textContent='Loaded '+towerRecords.length+' rows locally. Select Find CGI in CSV.';}
+ catch(e){towerRecords=null;$('towerStatus').textContent='CSV error: '+e.message;}
+});
 $('png').addEventListener('click',exportPng);$('geojson').addEventListener('click',exportGeo);$('kml').addEventListener('click',exportKml);
 $('print').addEventListener('click',()=>{if(draw(false))window.print();});
 updateSectorOptions();setupMap();
