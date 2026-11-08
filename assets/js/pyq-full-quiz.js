@@ -10,6 +10,10 @@
   const urlParams=new URLSearchParams(location.search);
   const safeText=value=>String(value??'').trim();
   const active=q=>safeText(q.Active).toUpperCase()!=='FALSE';
+  // Newly adapted Tamil questions retain English text while existing questions
+  // fall back to English until translations have been individually reviewed.
+  const display=(q,field)=>$('quizLanguage').value==='ta'
+    ?safeText(q[field+'Tamil'])||safeText(q[field]):safeText(q[field]);
   const safeSource=url=>{
     try {
       const u=new URL(url);
@@ -115,14 +119,14 @@
     $('questionNumber').textContent='Question '+(i+1)+' of '+qs.length;
     $('sourceLabel').textContent=q.SourceExam+' · '+q.SourceYear+(q.SourcePaper?' · '+q.SourcePaper:'')+
       (q.SourceQuestion?' · source Q'+q.SourceQuestion:'');
-    $('questionText').textContent=q.Question;
+    $('questionText').textContent=display(q,'Question');
     const options=$('options');options.replaceChildren();
     abc.forEach(letter=>{
       const b=document.createElement('button');b.type='button';b.className='option';
       if(session.answers[i]===letter)b.classList.add('selected');
       b.setAttribute('aria-pressed',String(session.answers[i]===letter));
       const lead=document.createElement('strong');lead.textContent=letter+'. ';
-      b.append(lead,document.createTextNode(safeText(q['Option'+letter])));
+      b.append(lead,document.createTextNode(display(q,'Option'+letter)));
       b.addEventListener('click',()=>{session.answers[i]=letter;save();renderQuestion()});
       options.append(b);
     });
@@ -172,19 +176,19 @@
       if(filter==='unanswered'&&answer!==null)return;
       if(filter==='review'&&!session.marked[i])return;
       const item=document.createElement('details');item.className='review-item';
-      const head=document.createElement('summary');head.textContent=(i+1)+'. '+q.Question+' — '+(answer===null?'Unattempted':right?'Correct':'Incorrect');
+      const head=document.createElement('summary');head.textContent=(i+1)+'. '+display(q,'Question')+' — '+(answer===null?'Unattempted':right?'Correct':'Incorrect');
       item.append(head);
       const caption=document.createElement('p');caption.textContent=q.SourceExam+' · '+q.SourceYear+
         (q.SourceQuestion?' · original question '+q.SourceQuestion:'');
       item.append(caption);
       const result=document.createElement('p');result.className=right?'correct-text':'wrong-text';
-      result.textContent='Your answer: '+(answer?answer+'. '+q['Option'+answer]:'Not answered')+
-        ' | Correct: '+q.CorrectAnswer+'. '+q['Option'+q.CorrectAnswer];
+      result.textContent='Your answer: '+(answer?answer+'. '+display(q,'Option'+answer):'Not answered')+
+        ' | Correct: '+q.CorrectAnswer+'. '+display(q,'Option'+q.CorrectAnswer);
       item.append(result);
       const options=document.createElement('div');options.className='review-options';
       abc.forEach(letter=>{
-        const block=document.createElement('p');const text=letter+'. '+q['Option'+letter];
-        block.textContent=text+' — '+(q['Explanation'+letter]||'Explanation not recorded');
+        const block=document.createElement('p');const text=letter+'. '+display(q,'Option'+letter);
+        block.textContent=text+' — '+(display(q,'Explanation'+letter)||'Explanation not recorded');
         if(letter===q.CorrectAnswer)block.classList.add('correct-text');
         options.append(block);
       });
@@ -198,6 +202,7 @@
     });
     if(!list.childElementCount)list.textContent='No questions match this review filter.';
   }
+  $('quizLanguage').addEventListener('change',()=>{if(session){if(session.finished)renderReview();else renderQuestion()}});
   $('examSelect').addEventListener('change',()=>{updateYears('');updatePreview()});
   $('yearSelect').addEventListener('change',updatePreview);
   $('startBtn').addEventListener('click',start);
