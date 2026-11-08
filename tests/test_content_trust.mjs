@@ -78,10 +78,13 @@ assert.match(daily,/ALLOWED_COUNTS=\[10,20,25,50,100\]/);
 assert.match(hub,/Practise all 20 adapted PYQs/);
 assert.match(hub,/Official final-key check incomplete or not documented/);
 const bank=JSON.parse(read('data/quizzes/verified-pyqs.json'));
-assert.equal(bank.length,150,'Only ten documented 2024 Group IV additions permitted');
+assert.equal(bank.length,160,'Ten more sourced 2024 Group IV adaptations digitized');
 const group42024=bank.filter(q=>q.SourceExam==='TNPSC Group IV'&&q.SourceYear==='2024');
-assert.equal(group42024.length,20);
+assert.equal(group42024.length,30);
 assert.ok(group42024.every(q=>q.AnswerKeyURL?.includes('01_2024_Final%20_Answer_Key_GT_GE.pdf')));
+assert.equal(group42024.filter(q=>Number(q.SourceQuestion)<=10).length,10);
+assert.match(read('pyq-full-quiz.html'),/id="quizLanguage"/);
+assert.match(read('assets/js/pyq-full-quiz.js'),/q\[field\+'Tamil'\]/);
 
 for(const name of ['exam-calendar.html','textbook-play.html','pyq-hub.html','dashboard.html','tn-school-notes.html']){
  const html=read(name);
