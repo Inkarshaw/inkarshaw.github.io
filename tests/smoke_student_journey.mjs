@@ -167,10 +167,10 @@ try {
   assert.match(await page.locator('#feedback').innerText(),/secondary answer-table entry: C/);
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true);
   await page.locator('.palette-details summary').click();
-  const nums=await page.locator('#palette button').allTextContents();
-  assert.equal(nums.length,109,'Only 109 source-readable/key-consistent entries are playable');
+  const si2015Nums=await page.locator('#palette button').allTextContents();
+  assert.equal(si2015Nums.length,109,'Only 109 source-readable/key-consistent entries are playable');
   for(const missing of [8,9,14,21,27,29,30,34,45,60,65,66,73,80,84,90,92,93,95,99,100,101,102,103,104,109,119,120,127,129]){
-    assert.equal(nums.includes(String(missing)),false,'Do not silently grade disputed source Q'+missing);
+    assert.equal(si2015Nums.includes(String(missing)),false,'Do not silently grade disputed source Q'+missing);
   }
   await page.locator('#palette button').filter({hasText:/^132$/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
