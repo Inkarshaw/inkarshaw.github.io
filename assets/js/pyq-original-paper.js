@@ -153,6 +153,8 @@
     $('scanWarning').hidden=!p.annotatedSource;
     $('pdfPage').value='1';
     $('firstQuestion').hidden=!Number.isInteger(p.firstQuestionPdfPage);
+    // Open the first actual printed question instead of leaving users on the cover.
+    if(Number.isInteger(p.firstQuestionPdfPage))jumpPdfPage(p.firstQuestionPdfPage);
     $('paperFrame').title='TNPSC '+p.year+' official original question paper (PDF)';
     const isGroupIV=p.exam==='Group IV';
     $('adaptedQuizLink').hidden=!isGroupIV;
