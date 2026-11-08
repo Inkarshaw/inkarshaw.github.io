@@ -12,7 +12,7 @@
   };
   const allowedLetters=['A','B','C','D','E'];
   const url=new URLSearchParams(location.search);
-  let papers=[],keyRecords=[],currentPaper=null,currentKey=null,answers=[],marked=[],index=0,deadline=0,timerHandle=null;
+  let papers=[],keyRecords=[],questionPageIndex=null,currentPaper=null,currentKey=null,answers=[],marked=[],index=0,deadline=0,timerHandle=null,lastShownPdfPage=0;
   const keyToken=/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/;
   function validFinalKey(k,p){
     return k&&k.id===p.id&&k.paperVersion===p.paperVersion&&
@@ -43,6 +43,7 @@
     if(!Number.isInteger(n)||n<1||n>500)return;
     $('pdfPage').value=String(n);
     $('paperFrame').src=(safe(currentPaper.paperUrl)||'about:blank')+'#page='+n;
+    lastShownPdfPage=n;
   }
   function switchView(view){
     const paper=view==='paper';
@@ -94,6 +95,12 @@
     if(!currentPaper)return;
     $('number').textContent='Question '+(index+1)+' of '+answers.length;
     $('sourceQuestionNumber').textContent=String(index+1);
+    const originalPage=currentPaper.id===questionPageIndex?.paperId?questionPageIndex.pageByQuestion[index]:null;
+    $('paperQuestionPage').textContent=Number.isInteger(originalPage)?
+      'Original question '+(index+1)+' is on official PDF page '+originalPage+
+      '. The PDF view follows your question automatically.':
+      'Open the official paper and use the PDF page selector to locate the question.';
+    if(Number.isInteger(originalPage)&&lastShownPdfPage!==originalPage)jumpPdfPage(originalPage);
     $('answerChoices').replaceChildren();
     for(const letter of currentPaper.optionLetters){
       const button=document.createElement('button');button.type='button';
@@ -111,7 +118,7 @@
     renderPalette();
   }
   function setPaper(p){
-    currentPaper=p;index=0;
+    currentPaper=p;index=0;lastShownPdfPage=0;
     $('examTitle').textContent=p.board+' '+p.exam+' · '+p.year+' · '+p.paper;
     $('count').textContent=p.questionCount+' original numbered questions';
     currentKey=keyRecords.find(k=>validFinalKey(k,p))||null;
@@ -219,10 +226,29 @@
   Promise.all([
     fetch('data/quizzes/original-paper-practice.json',{cache:'no-store'})
       .then(r=>{if(!r.ok)throw Error('Official paper index unavailable');return r.json()}),
+    fetch('data/quizzes/tnpsc-g4-2024-original-page-index.json',{cache:'no-store'})
+      .then(r=>r.ok?r.json():null).catch(()=>null),
     fetch('data/quizzes/original-final-keys.json',{cache:'no-store'})
       .then(r=>{if(!r.ok)throw Error('Official answer-key map unavailable');return r.json()})
       .catch(()=>null)
-  ]).then(([data,keyData])=>{
+  ]).then(([data,pageData,keyData])=>{
+      questionPageIndex=null;
+      if(pageData?.schemaVersion===1&&pageData.paperId==='tnpsc-group-iv-2024-general-tamil-general-studies'&&
+         pageData.questionCount===200&&Array.isArray(pageData.pageSpans)){
+        const pages=Array(200).fill(null);
+        let valid=true;
+        for(const span of pageData.pageSpans){
+          if(!Number.isInteger(span.pdfPage)||span.pdfPage<3||span.pdfPage>91||
+             !Number.isInteger(span.firstQuestion)||!Number.isInteger(span.lastQuestion)||
+             span.firstQuestion<1||span.lastQuestion>200||span.firstQuestion>span.lastQuestion){valid=false;break}
+          for(let n=span.firstQuestion;n<=span.lastQuestion;n++){
+            if(pages[n-1]!==null){valid=false;break}
+            pages[n-1]=span.pdfPage;
+          }
+          if(!valid)break;
+        }
+        if(valid&&pages.every(Number.isInteger))questionPageIndex={paperId:pageData.paperId,pageByQuestion:pages};
+      }
       keyRecords=keyData?.schemaVersion===1&&Array.isArray(keyData.papers)?keyData.papers:[];
       if(!data||data.schemaVersion!==1||!Array.isArray(data.papers))throw Error('Invalid paper index');
       papers=data.papers.filter(validPaper);
