@@ -75,7 +75,7 @@
     return p&&/^[a-z0-9-]+$/.test(String(p.id||''))&&
       Number.isInteger(p.questionCount)&&p.questionCount>=1&&p.questionCount<=300&&
       p.format==='official-pdf-answer-sheet'&&p.transcriptionStatus==='not-transcribed'&&
-      ['official-pdf-only','official-final-key-mapped-subject-496','official-final-key-series-d'].includes(p.answerKeyStatus)&&
+      ['official-pdf-only','official-final-key-mapped-subject-003','official-final-key-mapped-subject-496','official-final-key-series-d'].includes(p.answerKeyStatus)&&
       !!safe(p.paperUrl)&&!!safe(p.answerKeyUrl)&&
       Array.isArray(p.optionLetters)&&['A,B,C,D','A,B,C,D,E'].includes(p.optionLetters.join(','))&&
       Number.isInteger(p.durationMinutes)&&p.durationMinutes>=30&&p.durationMinutes<=240;
