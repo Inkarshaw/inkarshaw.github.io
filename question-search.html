@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09233e">
+<meta name="description" content="Search 426 curated and source-attributed questions across Firsts, Fathers and reviewed previous-year question banks. Filter by source exam, subject and English/Tamil availability.">
+<link rel="canonical" href="https://clearexams.ink/question-search.html">
+<title>Search Questions · ClearExams</title>
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/clearexams-icon.svg" type="image/svg+xml"><script src="assets/js/pwa.js" defer></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"ClearExams Question Finder","url":"https://clearexams.ink/question-search.html","inLanguage":["en","ta"],"learningResourceType":"Question bank","educationalUse":"Practice","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ClearExams","url":"https://clearexams.ink/"}}</script>
+<style>
+:root{--navy:#09233e;--blue:#165cc5;--line:#cbd8e6;--muted:#4f657b;--bg:#f4f8fc}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#163149;font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+a{color:var(--blue)}.wrap{width:min(1050px,calc(100% - 28px));margin:auto}
+header{background:var(--navy);color:#fff}header .wrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:15px 0}header a{color:#fff;text-decoration:none;font-weight:750}
+header nav{display:flex;gap:18px;flex-wrap:wrap}
+main{padding:30px 0 70px}
+h1{font-size:clamp(2rem,6vw,3rem);line-height:1.14;margin:0 0 8px;letter-spacing:-.035em}h2{font-size:1.3rem}
+.intro{max-width:780px;color:var(--muted);margin:0 0 24px}
+.panel,.question{background:#fff;border:1px solid var(--line);border-radius:16px;padding:21px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+label{display:block;font-weight:800;font-size:.88rem;margin-bottom:5px}
+input,select{width:100%;min-height:44px;border:1px solid #abbfd3;border-radius:9px;padding:9px 12px;font:inherit;background:#fff;color:#163149}
+.filter-help{font-size:.85rem;color:var(--muted);margin:11px 0 0}
+button{min-height:46px;padding:10px 17px;border:0;border-radius:10px;background:var(--blue);color:#fff;font:inherit;font-weight:800;cursor:pointer}
+button:disabled{opacity:.65;cursor:wait}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #d6830b;outline-offset:3px}
+.actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:18px}
+.status{color:#385777;margin:16px 0;min-height:24px}
+.question h3{font-size:1.08rem;margin:10px 0 12px}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tag{border-radius:50px;padding:4px 9px;background:#eef4fc;color:#194d83;font-weight:700;font-size:.76rem}
+.options{list-style:upper-alpha;padding-left:28px;margin:0 0 12px}
+.options li{padding:4px 0}
+details{border-top:1px solid #dae4ee;margin-top:12px;padding-top:12px}
+summary{cursor:pointer;color:#165cc5;font-weight:850;min-height:35px}
+.answer{margin:9px 0;font-weight:750;color:#126145}.explanation{white-space:pre-wrap}
+.reference{font-size:.86rem;color:var(--muted)}
+.reference a{font-weight:750}
+.note{font-size:.88rem;color:#4e6074}
+.empty{padding:22px;border:1px dashed #9fb3c9;border-radius:12px;color:var(--muted)}
+footer{background:var(--navy);color:#fff;padding:22px 0}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.panel,.question{padding:15px}main{padding-top:22px}.actions{align-items:stretch;flex-direction:column}.actions button{width:100%}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a href="index.html">ClearExams.</a><nav aria-label="Site"><a href="search.html">Resource search</a><a href="textbook-quiz.html">Textbook quizzes</a><a href="pyq-hub.html">PYQs</a><a href="index.html">Home</a></nav></div></header>
+<main class="wrap">
+<h1>Search practice questions</h1>
+<p class="intro">Find questions across 182 Firsts MCQs, 84 Fathers MCQs and 160 source-attributed previous-year revision questions. Review the explanation and source before you practise the collection.</p>
+<section class="panel" aria-label="Question search filters">
+<form id="filters">
+<div class="grid">
+<div><label for="query">Question keyword / கேள்வியைத் தேடுக</label><input id="query" type="search" autocomplete="off" placeholder="Try: constitution, women, அறிவியல்"></div>
+<div><label for="exam">Exam source</label><select id="exam"><option value="">All exam sources</option><option value="General studies">General studies · multi-exam</option><option value="TNPSC Group IV">TNPSC Group IV</option><option value="TNPSC Group II/IIA">TNPSC Group II/IIA</option><option value="UPSC Civil Services Prelims">UPSC Civil Services Prelims</option></select></div>
+<div><label for="subject">Subject</label><select id="subject"><option value="">All subjects</option></select></div>
+<div><label for="collection">Collection</label><select id="collection"><option value="">All collections</option><option value="Firsts">Firsts</option><option value="Fathers">Fathers</option><option value="PYQ">Reviewed PYQs</option></select></div>
+<div><label for="language">Language</label><select id="language"><option value="en">English</option><option value="ta">தமிழ்</option><option value="both">English + தமிழ்</option></select></div>
+<div><label for="difficulty">Difficulty</label><select id="difficulty"><option value="">All difficulty levels</option><option value="unrated">Not yet rated</option></select></div>
+</div>
+<p class="filter-help">Difficulty is not classified in these source banks; reviewed Easy / Medium / Hard filters will appear when the editorial ratings exist. General-studies questions are not claimed as official PYQs for any particular exam.</p>
+<div class="actions"><button type="submit" id="searchButton">Find questions</button><span class="note">Question data is loaded only when you search, to reduce initial mobile data usage.</span></div>
+</form>
+</section>
+<p class="status" id="status" role="status" aria-live="polite">Enter a keyword or choose filters, then select “Find questions”.</p>
+<section id="results" aria-label="Matching questions"></section>
+<div class="actions"><button type="button" id="more" hidden>Show 20 more</button></div>
+<p class="note">Questions are curated or adapted learning material. Original question wording, answer verification and source-page coverage vary by collection. Confirm consequential facts using the linked primary source.</p>
+</main>
+<footer><div class="wrap">© 2026 ClearExams · Source-aware preparation</div></footer>
+<script>
+(() => {
+'use strict';
+const files=[
+  {collection:'Firsts',path:'data/special-quizzes/firsts.json'},
+  {collection:'Fathers',path:'data/special-quizzes/fathers.json'},
+  {collection:'PYQ',path:'data/quizzes/verified-pyqs.json'}
+];
+const $=id=>document.getElementById(id);
+const form=$('filters'),status=$('status'),result=$('results'),more=$('more'),button=$('searchButton');
+const qs=['query','exam','subject','collection','language','difficulty'];
+let all=null,matching=[],visible=0,failed=[];
+const subjects={women:'Women pioneers',history:'History',science:'Science & technology',society:'Civics & society'};
+function cleanUrl(raw){
+  try{const u=new URL(String(raw||''));return u.protocol==='https:'?u.href:null}catch{return null}
+}
+function normalize(q,collection){
+  if(collection==='PYQ'){
+    if(String(q.Active).toUpperCase()==='FALSE')return null;
+    const answerLetter=String(q.CorrectAnswer||'').trim().toUpperCase();
+    const answerIndex='ABCD'.indexOf(answerLetter);
+    const hasTamil=!!(q.QuestionTamil&&q.OptionATamil&&q.OptionBTamil&&q.OptionCTamil&&q.OptionDTamil);
+    return {
+      id:String(q.ID),collection,exam:String(q.SourceExam||'Unknown exam'),subject:String(q.PYQSubject||'Mixed past papers'),
+      en:String(q.Question||''),ta:hasTamil?String(q.QuestionTamil):'',
+      optsEn:['A','B','C','D'].map(x=>String(q['Option'+x]||'')),
+      optsTa:hasTamil?['A','B','C','D'].map(x=>String(q['Option'+x+'Tamil']||'')):[],
+      answerIndex,expEn:answerIndex>=0?String(q['Explanation'+answerLetter]||''):'',
+      expTa:hasTamil&&answerIndex>=0?String(q['Explanation'+answerLetter+'Tamil']||''):'',
+      sourceName:String(q.SourceExam||'PYQ')+' '+String(q.SourceYear||'')+' · Question '+String(q.SourceQuestion||''),
+      source:cleanUrl(q.SourceURL),answerKey:cleanUrl(q.AnswerKeyURL),page:null,
+      detail:String(q.AnswerVerification||q.SourceType||'Source attribution pending'),difficulty:'unrated',year:String(q.SourceYear||''),
+      link:'pyq-hub.html'
+    };
+  }
+  return {
+    id:String(q.id),collection,exam:'General studies',subject:subjects[q.category]||'General studies',
+    en:String(q.q_en||''),ta:String(q.q_ta||''),optsEn:Array.isArray(q.opts_en)?q.opts_en:[],optsTa:Array.isArray(q.opts_ta)?q.opts_ta:[],
+    answerIndex:Number(q.correct),expEn:String(q.exp_en||''),expTa:String(q.exp_ta||''),
+    sourceName:String(q.book_en||'School book'),source:cleanUrl(q.source_link),answerKey:null,
+    page:q.page==null?null:String(q.page),detail:String(q.review_status||'Source review pending'),difficulty:'unrated',
+    year:'',link:collection==='Firsts'?'textbook-firsts.html?topic='+encodeURIComponent(q.category||'all'):'textbook-fathers.html'
+  };
+}
+async function load(){
+  if(all!==null)return;
+  button.disabled=true;status.textContent='Loading question collections…';
+  try {
+    const requests=await Promise.allSettled(files.map(async f=>{
+      const res=await fetch(f.path,{cache:'default'});if(!res.ok)throw Error(f.collection+' HTTP '+res.status);
+      const data=await res.json(),questions=Array.isArray(data)?data:data.questions;
+      if(!Array.isArray(questions))throw Error(f.collection+' has no question array');
+      return questions.map(q=>normalize(q,f.collection)).filter(Boolean);
+    }));
+    all=[];failed=[];requests.forEach((r,i)=>{if(r.status==='fulfilled')all.push(...r.value);else failed.push(files[i].collection)});
+    if(!all.length)throw Error('No question banks available');
+    const select=$('subject');
+    const values=[...new Set(all.map(q=>q.subject))].sort((a,b)=>a.localeCompare(b));
+    values.forEach(v=>{const option=document.createElement('option');option.value=v;option.textContent=v;select.append(option)});
+  }catch(e){all=null;status.textContent='Could not load question banks. Check your connection and try again.';return}
+  finally{button.disabled=false}
+}
+function search(){
+  if(all===null)return;
+  const query=$('query').value.toLocaleLowerCase().trim(),terms=query.split(/\s+/).filter(Boolean);
+  const exam=$('exam').value,subject=$('subject').value,collection=$('collection').value;
+  const language=$('language').value,difficulty=$('difficulty').value;
+  matching=all.filter(q=>
+    (!exam||q.exam===exam)&&(!subject||q.subject===subject)&&(!collection||q.collection===collection)&&
+    (!difficulty||q.difficulty===difficulty)&&
+    (language==='en'?!!q.en:language==='ta'?!!q.ta:!!q.en&&!!q.ta)&&
+    terms.every(t=>(q.en+' '+q.ta+' '+q.subject+' '+q.sourceName+' '+q.optsEn.join(' ')+' '+q.optsTa.join(' ')).toLocaleLowerCase().includes(t))
+  );
+  result.replaceChildren();visible=0;
+  status.textContent=matching.length+' matching question'+(matching.length===1?'':'s')+' from '+all.length+' loaded records'+(failed.length?'; some collections unavailable: '+failed.join(', '):'')+'.';
+  if(!matching.length){
+    const empty=document.createElement('p');empty.className='empty';
+    empty.textContent='No matches. Try another keyword, exam source, subject or language.';result.append(empty);
+  }
+  showNext();
+}
+function element(tag,className,text){
+  const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;
+}
+function link(parent,title,raw){
+  const href=cleanUrl(raw);if(!href)return;
+  const a=element('a',null,title);a.href=href;a.target='_blank';a.rel='noopener noreferrer';parent.append(a);
+}
+function renderQuestion(q){
+  const lang=$('language').value;
+  const article=element('article','question');article.setAttribute('aria-label',q.collection+' '+q.id);
+  const tags=element('div','tags');
+  [q.collection,q.exam,q.subject,'Difficulty: not rated'].forEach(v=>tags.append(element('span','tag',v)));
+  article.append(tags);
+  const title=element('h3',null,q.en);article.append(title);
+  if(lang==='ta'){title.textContent=q.ta||q.en}
+  if(lang==='both'&&q.ta)article.append(element('p',null,q.ta));
+  const choices=element('ol','options');
+  const opts=lang==='ta'&&q.optsTa.length?q.optsTa:q.optsEn;
+  opts.forEach((v,i)=>{const li=element('li',null,v);choices.append(li)});
+  article.append(choices);
+  if(lang==='both'&&q.optsTa.length){
+    const ta=element('div',null,'தமிழ் விடைகள்');
+    const taOptions=element('ol','options');q.optsTa.forEach(v=>taOptions.append(element('li',null,v)));
+    ta.append(taOptions);article.append(ta);
+  }
+  const details=element('details');
+  const summary=element('summary',null,'Why this answer? · விளக்கம்');details.append(summary);
+  const answer=q.answerIndex>=0&&q.answerIndex<q.optsEn.length
+    ? String.fromCharCode(65+q.answerIndex)+'. '+(lang==='ta'&&q.optsTa.length?q.optsTa[q.answerIndex]:q.optsEn[q.answerIndex])
+    :'Answer not yet verified';
+  details.append(element('p','answer','Answer: '+answer));
+  details.append(element('p','explanation',lang==='ta'?(q.expTa||q.expEn):(q.expEn||'Explanation pending editorial review.')));
+  if(lang==='both'&&q.expTa)details.append(element('p','explanation',q.expTa));
+  const reference=element('p','reference',q.sourceName+(q.page?' · Page '+q.page:'')+' · ');
+  link(reference,'Source book / original paper',q.source);
+  if(q.answerKey){reference.append(document.createTextNode(' · '));link(reference,'Official answer key',q.answerKey)}
+  details.append(reference);
+  article.append(details);
+  const browse=element('p','reference');const a=element('a',null,'Open related quiz collection');a.href=q.link;browse.append(a);article.append(browse);
+  return article;
+}
+function showNext(){
+  const end=Math.min(visible+20,matching.length);
+  const frag=document.createDocumentFragment();
+  for(let i=visible;i<end;i++)frag.append(renderQuestion(matching[i]));
+  result.append(frag);visible=end;
+  more.hidden=visible>=matching.length;more.textContent='Show 20 more ('+visible+' of '+matching.length+' shown)';
+}
+form.addEventListener('submit',async e=>{e.preventDefault();await load();search()});
+more.addEventListener('click',showNext);
+form.addEventListener('change',()=>{if(all!==null)search()});
+const params=new URLSearchParams(location.search),initial=params.get('q');
+if(initial){$('query').value=initial;load().then(search)}
+})();
+</script>
+</body></html>

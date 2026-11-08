@@ -120,7 +120,8 @@ class CommercialReadinessTests(unittest.TestCase):
             card = re.search(r'<h3>[^<]*' + label + r'.*?</article>', home, re.S)
             self.assertIsNotNone(card)
             self.assertIn(f'{count} MCQs', card.group(0))
-        self.assertIn('Full textbook-page audit ongoing', home)
+        self.assertNotIn('Full textbook-page audit ongoing', home)
+        self.assertIn('Full textbook-page audit ongoing', content("textbook-fathers.html"))
         self.assertNotIn('37 distinct source-linked questions', home)
 
     def test_daily_quiz_mobile_accessibility_labels_and_contrast(self):

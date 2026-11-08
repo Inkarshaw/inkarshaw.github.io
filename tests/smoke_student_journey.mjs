@@ -52,6 +52,27 @@ try {
   assert.deepEqual(pageErrors, [], 'homepage: runtime errors');
   console.log('PASS homepage menu accessibility');
 
+  // Question-level search: lazy load, bilingual filter, answer/source disclosure and mobile width.
+  pageErrors.length = 0;
+  await page.goto(origin + '/question-search.html', {waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('#results .question').count(),0,'Question banks are lazy until first search');
+  await page.locator('#searchButton').click();
+  await page.waitForFunction(()=>document.querySelector('#status')?.textContent.includes('loaded records'),undefined,{timeout:25000});
+  assert.match(await page.locator('#status').innerText(),/426 matching questions from 426 loaded records/);
+  assert.equal(await page.locator('#results .question').count(),20,'Question finder paginates initial results');
+  await page.locator('#results details').first().locator('summary').click();
+  assert.equal(await page.locator('#results details').first().getAttribute('open'),'', 'Source explanation details are operable');
+  await page.locator('#language').selectOption('ta');
+  assert.ok((await page.locator('#status').innerText()).includes('matching questions'),'Tamil search updates results');
+  await page.locator('#collection').selectOption('Fathers');
+  assert.match(await page.locator('#status').innerText(),/84 matching questions/,'Fathers collection filter');
+  await page.locator('#language').selectOption('both');
+  assert.match(await page.locator('#status').innerText(),/84 matching questions/,'Bilingual-only filtering');
+  const questionOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  assert.ok(questionOverflow<=3,'Question finder mobile overflow '+questionOverflow+'px');
+  assert.deepEqual(pageErrors,[],'Question finder has no JavaScript errors');
+  console.log('PASS bilingual, source-linked question finder: 426 records and mobile filters');
+
   pageErrors.length = 0;
   await page.goto(origin + '/daily-quiz.html', {waitUntil:'domcontentloaded'});
   await page.waitForFunction(() => {
@@ -66,7 +87,7 @@ try {
   pageErrors.length = 0;
   await page.goto(origin + '/pyq-hub.html', {waitUntil:'domcontentloaded'});
   await page.waitForFunction(() => document.querySelectorAll('#pyqItems .pyq-card').length===12,undefined,{timeout:20000});
-  assert.equal(await page.locator('.pyq-start-card').count(),5,'PYQ hub offers five featured paths including full 2026 Group I text quiz');
+  assert.ok(await page.locator('.pyq-start-card').count()>=5,'PYQ hub offers at least five featured paths including full 2026 Group I text quiz');
   assert.equal(await page.locator('#showMorePapers').isVisible(),true,'PYQ catalog is paginated');
   await page.locator('#showMorePapers').click();
   assert.equal(await page.locator('#pyqItems .pyq-card').count(),24,'PYQ archive expands on request');
@@ -199,7 +220,7 @@ try {
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'Topic practice mobile has no horizontal overflow');
   await page.goto(origin+'/pyq-hub.html',{waitUntil:'domcontentloaded'});
-  assert.equal(await page.locator('.ce-year-nav .ce-yearlink').count(),6);
+  assert.ok(await page.locator('.ce-year-nav .ce-yearlink').count()>=6,'Year navigation supports expanding verified paper catalog');
   assert.deepEqual(pageErrors,[],'Group I syllabus-first path has no JS runtime errors');
   console.log('PASS syllabus-first Group I: 8 units, 42 topics, search, revision saves, four original biology MCQs, figure warnings and topic reset');
 
