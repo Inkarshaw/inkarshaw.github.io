@@ -23,7 +23,7 @@ for(const paper of data.papers){
   assert.deepEqual(paper.correctOptionLetters,['A','B','C','D']);
   if(paper.year!==2011)assert.equal(paper.unknownOption,'E');
   assert.equal(paper.transcriptionStatus,'not-transcribed');
-  assert.equal(paper.answerKeyStatus,paper.year===2011?'official-final-key-series-d':paper.year===2025?'official-final-key-mapped-subject-496':'official-pdf-only');
+  assert.equal(paper.answerKeyStatus,paper.year===2011?'official-final-key-series-d':paper.year===2025?'official-final-key-mapped-subject-496':paper.year===2022?'official-final-key-mapped-subject-003':'official-pdf-only');
   assert.equal(paper.copyrightClearance,'not-confirmed');
   assert.equal(paper.format,'official-pdf-answer-sheet');
   assert.match(paper.paperUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
