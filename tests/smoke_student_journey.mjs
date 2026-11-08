@@ -156,6 +156,8 @@ try {
   assert.match(await page.locator('#loadStatus').innerText(),/109 attemptable questions loaded/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2015/);
   assert.match(await page.locator('.note').first().innerText(),/provisional, non-officially verified answer table/);
+  await page.locator('details[aria-label="Withheld 2015 questions and reasons"] summary').click();
+  assert.equal(await page.locator('#sourceIssues li').count(),31,'Show every withheld source question and reason');
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
   assert.match(await page.locator('#questionTitle').innerText(),/மணநூல்/);
