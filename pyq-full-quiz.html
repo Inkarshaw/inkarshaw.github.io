@@ -114,6 +114,28 @@ button:disabled{opacity:.42;cursor:not-allowed}
 }
 @media(max-width:390px){#quizView .actions button{font-size:.81rem;padding:9px 6px}.option{gap:9px;padding:12px 10px}}
 
+
+/* 2024 Group IV guided practice, with transparent source status and immediate feedback. */
+.fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+.coverage-note{margin:12px 0 15px;color:#425a75;font-size:.87rem;line-height:1.5}
+.coverage-note a{font-weight:750}
+.source-audit{font-size:.79rem;line-height:1.5;color:#48617d;background:#f4f8fd;border:1px solid #dce7f4;border-radius:9px;padding:9px 11px;margin:11px 0 3px}
+.question-tools #checkBtn{min-height:45px;padding:10px 17px}
+.question-tools #checkBtn[hidden]{display:none}
+.option:disabled{opacity:1;cursor:default}
+.option.answer-correct{background:#e7f8ee;border-color:#44a77c;box-shadow:inset 0 0 0 1px #44a77c}
+.option.answer-correct strong{background:#176a48;color:#fff}
+.option.answer-wrong{background:#fff0f1;border-color:#d87e8e}
+.option.answer-wrong strong{background:#b84456;color:#fff}
+.answer-feedback{border:1px solid #b4d6c3;background:#f0faf5;border-radius:13px;padding:16px;margin:16px 0 2px;line-height:1.6}
+.answer-feedback.is-wrong{background:#fff9f4;border-color:#f0cfb3}
+.answer-feedback h4{margin:0 0 7px;font-size:1rem}
+.answer-feedback p{margin:7px 0;font-size:.9rem}
+.answer-feedback .source-links{margin:11px 0 0}
+.answer-feedback .verification{font-size:.8rem}
+.answer-feedback a{overflow-wrap:anywhere}
+@media(max-width:700px){.fields{grid-template-columns:1fr}.question-tools{gap:5px}.question-tools #checkBtn{flex:1 1 100%}.answer-feedback{padding:14px}}
+
 </style>
 </head>
 <body>
@@ -121,7 +143,7 @@ button:disabled{opacity:.42;cursor:not-allowed}
 <main class="wrap">
 <div class="eyebrow">Previous Year Questions · Practice</div>
 <h1>Previous Year Question Quiz</h1>
-<p class="intro">Choose your exam, year and quiz length. Answer one question at a time, then review explanations and official sources.</p>
+<p class="intro">Practise TNPSC Group IV 2024 by default. In Practice mode, check each answer and study the explanation immediately. Exam mode saves feedback for the result screen.</p>
 <details class="source-note"><summary>About these questions and original exam papers</summary><p>These are <strong>reviewed, adapted, source-attributed PYQs</strong>, not verbatim full-paper transcriptions. The real papers may contain additional questions. <a href="pyq-hub.html">Open original papers and official answer keys</a> or choose a PDF-linked full-paper answer sheet from the archive.</p></details>
 <p id="status" role="status">Loading verified previous-year questions…</p>
 <div class="language-switch"><label for="quizLanguage">Language</label><select id="quizLanguage" aria-label="Question language"><option value="en">English</option><option value="ta">தமிழ் (Tamil)</option></select><span class="muted">Tamil where verified; otherwise English.</span></div>
@@ -131,9 +153,11 @@ button:disabled{opacity:.42;cursor:not-allowed}
 <div class="field"><label for="examSelect">Examination</label><select id="examSelect"><option value="">Loading…</option></select></div>
 <div class="field"><label for="yearSelect">Exam year</label><select id="yearSelect"><option value="">All available years</option></select></div>
 <div class="field"><label for="lengthSelect">Questions</label><select id="lengthSelect"><option value="10">10 questions · quick practice</option><option value="20">20 questions</option><option value="all">All available questions</option></select></div>
+<div class="field"><label for="modeSelect">Quiz mode</label><select id="modeSelect"><option value="practice">Practice · explanations after checking</option><option value="exam">Exam · results at the end</option></select></div>
 </div>
-<label class="checkbox" for="timedCheck"><input type="checkbox" id="timedCheck"><span><strong>Use a timer</strong><span class="muted"> — 60 seconds per question; automatic submission when time ends.</span></span></label>
+<div id="timedSettings" hidden><label class="checkbox" for="timedCheck"><input type="checkbox" id="timedCheck"><span><strong>Use a timer in Exam mode</strong><span class="muted"> — 60 seconds per question; automatic submission when time ends.</span></span></label></div>
 <p id="preview" class="note" aria-live="polite">Checking available questions…</p>
+<div id="coverageNote" class="coverage-note" aria-live="polite"></div>
 <p class="muted" id="previousScore"></p>
 <button id="startBtn" type="button" class="primary start-cta" disabled>Start quiz →</button>
 </section>
@@ -142,9 +166,11 @@ button:disabled{opacity:.42;cursor:not-allowed}
 <p id="progressText" class="muted" aria-live="polite"></p><div class="progress" role="progressbar" aria-label="Answered questions progress"><div id="progressBar"></div></div>
 <details class="question-jump"><summary>Jump to question <span class="muted">· answered / marked</span></summary><nav id="palette" class="palette" aria-label="Jump between PYQ questions"></nav></details>
 <div class="topline"><strong id="questionNumber"></strong><span id="sourceLabel" class="muted"></span></div>
+<p id="sourceAudit" class="source-audit" aria-live="polite"></p>
 <h3 class="question" id="questionText"></h3>
 <div id="options" class="options" role="group" aria-label="Answer options"></div>
-<div class="question-tools"><button type="button" id="clearBtn">Clear choice</button><button type="button" id="markBtn">⚐ Review later</button></div>
+<div class="question-tools"><button type="button" id="checkBtn" class="primary" disabled>Check answer</button><button type="button" id="clearBtn">Clear choice</button><button type="button" id="markBtn">⚐ Review later</button></div>
+<div id="answerFeedback" class="answer-feedback" role="status" aria-live="polite" hidden></div>
 <div class="actions" aria-label="Question navigation">
 <button type="button" id="prevBtn">← Previous</button>
 <button type="button" id="nextBtn" class="primary">Next →</button>
