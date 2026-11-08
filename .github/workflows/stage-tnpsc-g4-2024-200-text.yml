@@ -1,0 +1,45 @@
+name: Stage TNPSC Group IV 2024 typed 200-question quiz bank
+on:
+  push:
+    branches: [feat/tnpsc-g4-2024-200-text-quiz-20261108]
+    paths:
+      - scripts/build_tnpsc_g4_2024_text_bank.py
+      - .github/workflows/stage-tnpsc-g4-2024-200-text.yml
+permissions:
+  contents: write
+jobs:
+  build:
+    name: Build and source-check all original 200 answer positions
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install HTML parsing dependency
+        run: pip install beautifulsoup4
+      - name: Build 200 text cards from typed source with official key alignment
+        run: python scripts/build_tnpsc_g4_2024_text_bank.py
+      - name: Validate original numbers, key mapping and complete text
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          bank=json.loads(Path("data/quizzes/tnpsc-g4-2024-text-quiz.json").read_text())
+          original=json.loads(Path("data/quizzes/tnpsc-g4-2024-original-questions.json").read_text())
+          assert len(bank['questions'])==200
+          for i,q in enumerate(bank['questions']):
+            assert q["number"]==i+1
+            assert q["finalKeyToken"]==original["questions"][i]["finalKeyToken"]
+            assert q["sourcePdfPage"]==original["questions"][i]["sourcePdfPage"]
+            assert q["question"] and all(q["options"][a] for a in "ABCDE")
+            assert not q["keyDisagreement"]
+          print("PASS: 200 complete text cards, official final-key tokens and page mapping matched")
+          PY
+      - name: Commit editorial question bank into current feature branch
+        run: |
+          git config user.name "ClearExams Editorial Import"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/quizzes/tnpsc-g4-2024-text-quiz.json
+          git commit -m "Stage complete 200-question text bank against official final key"
+          git fetch origin feat/tnpsc-g4-2024-200-text-quiz-20261108
+          git rebase origin/feat/tnpsc-g4-2024-200-text-quiz-20261108
+          git push origin HEAD:feat/tnpsc-g4-2024-200-text-quiz-20261108
