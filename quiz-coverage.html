@@ -167,9 +167,12 @@ try{
       ? total+' source-linked bilingual MCQs · '+setsFor.length+' sets · editorial source-page review pending'
       : 'No source-linked chapter sets yet · authoring required'));
    if(total){
-     const link=newEl('a','Open Class 10 Science practice');
-     link.href='ncert-school-book-quiz.html?class=10&subject=Science';
-     item.append(link);
+     for(const practiceSet of setsFor){
+       const link=newEl('a','Practise: '+practiceSet.topic);
+       link.href='ncert-school-book-quiz.html?class=10&subject=Science&set='+encodeURIComponent(practiceSet.id);
+       link.style.display='block';
+       item.append(link);
+     }
    }
    el('ncert10Chapters').append(item);
  }

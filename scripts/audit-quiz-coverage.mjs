@@ -97,7 +97,8 @@ for (const entry of scope.scertCatalogs) {
   }
 }
 let ncert={sets:0,questions:0,classes:[],englishOnlySets:0,bilingualSets:0,
-  chapterInventoryCertified:scope.ncertChapterInventoryCertified===true};
+  bilingualQuestions:0,editorialPendingSets:0,sourceLinkedClass10Chapters:[],
+  missingClass10Chapters:[],chapterInventoryCertified:scope.ncertChapterInventoryCertified===true};
 try {
   const bank=readJson(scope.ncertBank);
   if (!Array.isArray(bank.sets)) throw new Error('No sets array');
@@ -111,11 +112,24 @@ try {
     }
     ncert.sets++;
     ncert.questions+=set.questions.length;
-    if (set.language==='en-ta') ncert.bilingualSets++;
+    if (set.language==='en-ta') {ncert.bilingualSets++;ncert.bilingualQuestions+=set.questions.length;}
     else ncert.englishOnlySets++;
+    if(set.reviewStatus==='editorial-review-pending')ncert.editorialPendingSets++;
   }
   ncert.classes=[...classes].sort((a,b)=>a-b);
   for(let c=6;c<=12;c++) if(!classes.has(c)) errors.push('NCERT class absent: '+c);
+  const chapters=readJson('data/ncert/class10-science-chapter-inventory.json').chapters;
+  const covered=new Set(bank.sets.filter(s=>s.classLevel===10&&s.subject==='Science'&&
+    s.language==='en-ta'&&Number.isInteger(s.source?.chapter)&&s.questions.length)
+    .map(s=>s.source.chapter));
+  ncert.sourceLinkedClass10Chapters=[...covered].sort((a,b)=>a-b);
+  ncert.missingClass10Chapters=chapters.filter(ch=>!covered.has(ch.number))
+    .map(ch=>({number:ch.number,title:ch.title}));
+  for(const chapter of chapters)if(chapter.editorialCertified===true){
+    const sets=bank.sets.filter(s=>s.source?.chapter===chapter.number&&s.classLevel===10);
+    if(!sets.length||sets.some(s=>s.reviewStatus==='editorial-review-pending'))
+      errors.push('NCERT chapter falsely certified without completed set reviews: '+chapter.number);
+  }
 } catch(e) { errors.push('NCERT bank missing or invalid: '+e.message); }
 
 const missingSubjects=scope.scertAdditionalSubjectsNotCataloged.flatMap(x=>
@@ -127,6 +141,8 @@ if(totals.independentlyCertifiedUnits!==totals.units)
   blockers.push((totals.units-totals.independentlyCertifiedUnits)+' indexed SCERT units are not independently certified against current editions in both languages');
 if(!ncert.chapterInventoryCertified) blockers.push('NCERT 2026–27 book-by-book chapter inventory is not certified');
 if(ncert.englishOnlySets) blockers.push(ncert.englishOnlySets+' NCERT sets are English-only');
+if(ncert.missingClass10Chapters.length) blockers.push(ncert.missingClass10Chapters.length+' NCERT Class 10 Science chapters lack source-linked bilingual practice');
+if(ncert.editorialPendingSets) blockers.push(ncert.editorialPendingSets+' NCERT sets still require independent editorial review');
 if(errors.length) blockers.push(errors.length+' structural catalog errors');
 const report={asOf:scope.asOf,edition:scope.currentEdition,
   note:scope.meaningOfReady,scert:totals,byClass:[...byClass.values()].sort((a,b)=>a.classLevel-b.classLevel),

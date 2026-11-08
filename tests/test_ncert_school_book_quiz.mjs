@@ -18,8 +18,8 @@ for(const set of bank.sets){
   assert.ok(['en','en-ta'].includes(set.language));
   if(set.language==='en-ta'){
     assert.equal(set.source.edition,'2026–27');
-    assert.ok([1,2,3,4,5,6,7,8].includes(set.source.chapter));
-    assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79,6:100,7:113,8:128})[set.source.chapter]);
+    assert.ok([1,2,3,4,5,6,7,8,9].includes(set.source.chapter));
+    assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79,6:100,7:113,8:128,9:134})[set.source.chapter]);
     assert.equal(new URL(set.source.url).hostname,'ncert.nic.in');
   }
   assert.equal(set.questions.length,10,'A set must contain ten questions: '+set.id);
@@ -37,7 +37,7 @@ for(const set of bank.sets){
       assert.match(q.tamil.explanation,/[\u0B80-\u0BFF]/);
       assert.equal(q.tamil.options.length,4);
       assert.equal(new Set(q.tamil.options).size,4);
-      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112,7:127,8:133})[set.source.chapter]);
+      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112,7:127,8:133,9:160})[set.source.chapter]);
     }
   }
 }
@@ -91,7 +91,7 @@ assert.deepEqual(metalSets.map(s=>s.questions.map(q=>q.answer)),[
  [1,2,0,3,1,2,0,3,1,2]
 ]);
 const currentChapterCoverage=new Set(bank.sets.filter(s=>s.classLevel===10&&s.subject==='Science'&&s.source?.chapter).map(s=>s.source.chapter));
-assert.deepEqual([...currentChapterCoverage].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8]);
+assert.deepEqual([...currentChapterCoverage].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8,9]);
 const carbonIds=['c10-carbon-bonding-catenation','c10-carbon-homologous-naming','c10-carbon-reactions','c10-carbon-ethanol-acids-soaps'];
 const carbonSets=carbonIds.map(id=>bank.sets.find(s=>s.id===id));
 assert.ok(carbonSets.every(Boolean),'Four English–Tamil Carbon chapter sets required');
@@ -168,6 +168,29 @@ assert.deepEqual(hereditySets.map(s=>s.questions.map(q=>q.answer)),[
  [0,1,2,3,0,1,2,3,0,1],
  [2,3,0,1,2,3,0,1,2,3]
 ]);
+const lightIds=['c10-light-mirror-reasoning','c10-light-refraction-lenses'];
+const lightSets=lightIds.map(id=>bank.sets.find(s=>s.id===id));
+assert.ok(lightSets.every(Boolean),'Two Light chapter English–Tamil sets missing');
+assert.equal(lightSets.flatMap(s=>s.questions).length,20);
+assert.ok(lightSets.every(s=>s.source.chapter===9&&s.source.firstPage===134));
+assert.ok(lightSets.every(s=>s.reviewStatus==='editorial-review-pending'));
+assert.ok(lightSets.every(s=>s.source.url==='https://ncert.nic.in/textbook/pdf/jesc109.pdf'));
+assert.ok(lightSets.every(s=>s.source.pageReferenceEdition.includes('provisional')));
+assert.ok(lightSets.every(s=>!s.source.mirrorUrl),'Do not invent unsupported PDF mirrors');
+assert.ok(lightSets.every(s=>s.questions.every(q=>q.page>=134&&q.page<=160&&
+  /[\u0B80-\u0BFF]/.test(q.tamil.question)&&/[\u0B80-\u0BFF]/.test(q.tamil.explanation)&&
+  q.tamil.options.length===4&&new Set(q.tamil.options).size===4)));
+assert.deepEqual(lightSets.map(s=>s.questions.map(q=>q.answer)),[
+ [0,1,2,3,2,0,1,0,2,3],
+ [1,0,2,3,2,1,3,0,2,1]
+]);
+assert.match(js,/typeof set\.source\.mirrorUrl==='string'/,'Optional mirror check is required');
+const lightInventory=JSON.parse(get('data/ncert/class10-science-chapter-inventory.json'));
+const lightChapter=lightInventory.chapters.find(c=>c.number===9);
+assert.equal(lightChapter.editorialCertified,false);
+assert.match(lightChapter.sourceReview,/provisional|pending/i);
+assert.equal(lightChapter.sourcePdf,'https://ncert.nic.in/textbook/pdf/jesc109.pdf');
+
 for(const id of ['classPicker','subjectPicker','topicSearch','setGrid','quizSection','quizTitle','options','feedback','checkAnswer','nextQuestion','resultSection','resultScore','reviewList','retryQuiz','chooseAnother']){
  assert.match(html,new RegExp('id="'+id+'"'),id+' missing in UI');
 }
