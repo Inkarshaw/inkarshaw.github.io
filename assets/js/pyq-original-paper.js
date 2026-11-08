@@ -12,7 +12,38 @@
   };
   const allowedLetters=['A','B','C','D','E'];
   const url=new URLSearchParams(location.search);
-  let papers=[],currentPaper=null,answers=[],marked=[],index=0,deadline=0,timerHandle=null;
+  let papers=[],keyRecords=[],currentPaper=null,currentKey=null,answers=[],marked=[],index=0,deadline=0,timerHandle=null;
+  const keyToken=/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/;
+  function validFinalKey(k,p){
+    return k&&k.id===p.id&&k.paperVersion===p.paperVersion&&
+      k.questionCount===p.questionCount&&k.marksPerQuestion===p.marksPerQuestion&&
+      !!safe(k.sourceUrl)&&Array.isArray(k.answers)&&k.answers.length===p.questionCount&&
+      k.answers.every(answer=>typeof answer==='string'&&keyToken.test(answer)&&
+        (answer==='ALL'||new Set(answer.split('/')).size===answer.split('/').length));
+  }
+  // The literal ALL in the official key has no unambiguous blank/E scoring rule here.
+  // We exclude these questions from indicative marks rather than pretending a policy.
+  function gradeResponses(){
+    if(!currentPaper||!currentKey)return null;
+    const detail=currentKey.answers.map((token,i)=>{
+      const response=answers[i];
+      if(token==='ALL')return {status:'ungraded',response,accepted:token};
+      if(response===null)return {status:'blank',response,accepted:token};
+      return {status:token.split('/').includes(response)?'correct':'incorrect',response,accepted:token};
+    });
+    const count=status=>detail.filter(d=>d.status===status).length;
+    const correct=count('correct'),wrong=count('incorrect'),omitted=count('blank'),ungraded=count('ungraded');
+    return {detail,correct,wrong,omitted,ungraded,gradedCount:detail.length-ungraded,
+      marks:correct*currentPaper.marksPerQuestion,
+      maximum:(detail.length-ungraded)*currentPaper.marksPerQuestion};
+  }
+  function jumpPdfPage(page){
+    if(!currentPaper)return;
+    const n=Number(page);
+    if(!Number.isInteger(n)||n<1||n>500)return;
+    $('pdfPage').value=String(n);
+    $('paperFrame').src=(safe(currentPaper.paperUrl)||'about:blank')+'#page='+n;
+  }
   function switchView(view){
     const paper=view==='paper';
     $('quizWorkspace').classList.toggle('mobile-paper',paper);
@@ -83,10 +114,17 @@
     currentPaper=p;index=0;
     $('examTitle').textContent=p.board+' '+p.exam+' · '+p.year+' · '+p.paper;
     $('count').textContent=p.questionCount+' original numbered questions';
-    $('notice').textContent='Original full-length PDF-linked practice: '+p.questionCount+' numbered questions; A–D for an answer, E for Answer not known. The original question text is in the official PDF. Automatic scoring requires the audited version-matched final key and is not yet available.';
+    currentKey=keyRecords.find(k=>validFinalKey(k,p))||null;
+    $('notice').textContent='Original full-length official-PDF practice: '+p.questionCount+
+      ' numbered questions; A–D for an answer, E for Answer not known. '+
+      (currentKey?'Indicative scoring uses a Version A final key with special multi-answer rules; ALL entries remain ungraded.':
+        'Automatic marking is unavailable until a complete matching official final key is checked.');
     plainLink($('sourcePaper'),p.paperUrl,'Open original official question paper (PDF) ↗');
     plainLink($('sourceKey'),p.answerKeyUrl,'Open official final answer key (PDF) ↗');
     $('paperFrame').src=safe(p.paperUrl)||'about:blank';
+    $('scanWarning').hidden=!p.annotatedSource;
+    $('pdfPage').value='1';
+    $('firstQuestion').hidden=!Number.isInteger(p.firstQuestionPdfPage);
     $('paperFrame').title='TNPSC '+p.year+' official original question paper (PDF)';
     const adapted=new URLSearchParams({exam:'TNPSC Group IV',year:String(p.year)});
     $('adaptedQuizLink').href='pyq-full-quiz.html?'+adapted.toString();
@@ -107,10 +145,27 @@
     if(!expired&&attempted<answers.length&&!confirm((answers.length-attempted)+' answers are blank. Finish this answer-sheet attempt?'))return;
     deadline=0;startOrStopTimer();
     $('resultHeading').textContent=expired?'Time expired — original-paper responses saved':'Full-paper quiz submitted';
+    const grade=gradeResponses();
+    $('scoreSummary').textContent=grade?
+      'Indicative marks: '+grade.marks+' / '+grade.maximum+' ('+grade.correct+
+      ' correct · '+grade.wrong+' incorrect · '+grade.omitted+' blank · '+grade.ungraded+
+      ' official ALL entries excluded). This is not an official TNPSC score.':'';
+    $('scoreSummary').hidden=!grade;
     const unknown=answers.filter(a=>a==='E').length;
-    $('resultBody').textContent=attempted+'/'+answers.length+' OMR responses recorded ('+unknown+' E / Answer not known). Because the official final answer key has not been digitised and cross-checked for this paper version, this page does not calculate marks or identify correct answers. Compare your selections with the official answer-key PDF.';
+    $('resultBody').textContent=grade?
+      attempted+'/'+answers.length+' responses recorded ('+unknown+' E / Answer not known). '+
+      'Accepted multiple-choice alternatives are credited according to the linked official final key. '+
+      'The '+grade.ungraded+' ALL questions are not included in the shown marks because their handling for blank/E responses is unverified. Check the official key and scoring rules for final marks.':
+      attempted+'/'+answers.length+' OMR responses recorded ('+unknown+' E / Answer not known). Because the official final answer key has not been digitised and cross-checked for this paper version, this page does not calculate marks or identify correct answers. Compare your selections with the official answer-key PDF.';
     const rows=document.createElement('div');rows.className='answer-summary';
-    answers.forEach((v,i)=>{const s=document.createElement('span');s.textContent=(i+1)+': '+(v||'—');rows.append(s)});
+    answers.forEach((v,i)=>{
+      const item=document.createElement('span');
+      const outcome=grade?.detail[i];
+      item.textContent=(i+1)+': '+(v||'—')+(outcome?' · '+(outcome.status==='ungraded'?'ALL':outcome.status==='correct'?'✓':outcome.status==='incorrect'?'✕': 'blank'):'');
+      if(outcome)item.classList.add('grade-'+outcome.status);
+      item.title=outcome?'Final key: '+outcome.accepted+'; '+outcome.status:'No digitized key available';
+      rows.append(item);
+    });
     $('answerOverview').replaceChildren(rows);
     plainLink($('resultSource'),currentPaper.answerKeyUrl,'Open the official final answer key PDF ↗');
     $('result').hidden=false;$('answerSheet').hidden=true;window.scrollTo(0,0);write();
@@ -142,6 +197,11 @@
     if(event.key==='ArrowRight'&&index<answers.length-1){index++;write();render()}
     if(event.key==='ArrowLeft'&&index>0){index--;write();render()}
   });
+  $('readOriginal').addEventListener('click',()=>{switchView('paper')});
+  $('returnAnswers').addEventListener('click',()=>{switchView('questions')});
+  $('goPdfPage').addEventListener('click',()=>jumpPdfPage($('pdfPage').value));
+  $('pdfPage').addEventListener('keydown',event=>{if(event.key==='Enter')jumpPdfPage($('pdfPage').value)});
+  $('firstQuestion').addEventListener('click',()=>jumpPdfPage(currentPaper?.firstQuestionPdfPage));
   $('previous').addEventListener('click',()=>{if(index>0){index--;write();render()}});
   $('next').addEventListener('click',()=>{if(index<answers.length-1){index++;write();render()}});
   $('clear').addEventListener('click',()=>{answers[index]=null;write();render()});
@@ -156,9 +216,14 @@
     startOrStopTimer();write();
     $('answerSheet').hidden=false;$('result').hidden=true;render();
   });
-  fetch('data/quizzes/original-paper-practice.json',{cache:'no-store'})
-    .then(r=>{if(!r.ok)throw Error('Official paper index unavailable');return r.json()})
-    .then(data=>{
+  Promise.all([
+    fetch('data/quizzes/original-paper-practice.json',{cache:'no-store'})
+      .then(r=>{if(!r.ok)throw Error('Official paper index unavailable');return r.json()}),
+    fetch('data/quizzes/original-final-keys.json',{cache:'no-store'})
+      .then(r=>{if(!r.ok)throw Error('Official answer-key map unavailable');return r.json()})
+      .catch(()=>null)
+  ]).then(([data,keyData])=>{
+      keyRecords=keyData?.schemaVersion===1&&Array.isArray(keyData.papers)?keyData.papers:[];
       if(!data||data.schemaVersion!==1||!Array.isArray(data.papers))throw Error('Invalid paper index');
       papers=data.papers.filter(validPaper);
       $('papers').replaceChildren();
