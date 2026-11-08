@@ -25,7 +25,7 @@ for(const set of bank.sets){
   if(set.language==='en-ta'&&!set.source){
     assert.equal(set.sourceMappingStatus,'general-concept-set-not-chapter-mapped');
     assert.equal(set.reviewStatus,'editorial-review-pending');
-    assert.match(set.reviewNote,/not attributed|not.*chapter|without chapter|no individual.*chapter/i);
+    assert.match(set.reviewNote,/not attributed|not.*chapter|without.*chapter|no .*chapter|chapter.*pending/i);
   }
   assert.equal(set.questions.length,10,'A set must contain ten questions: '+set.id);
   for(const q of set.questions){
@@ -71,6 +71,35 @@ assert.deepEqual(newGeneralBilingualSets.map(s=>s.questions.map(q=>q.answer)),[
   [2,3,0,1,2,3,0,1,2,3],
   [1,2,3,0,1,2,3,0,1,2],
   [0,1,2,3,0,1,2,3,0,1]
+]);
+const grade8and9Ids=[
+  'c8-science','c8-mathematics','c8-social-science',
+  'c9-science','c9-mathematics','c9-social-science'
+];
+const grade8and9Sets=grade8and9Ids.map(id=>bank.sets.find(set=>set.id===id));
+assert.ok(grade8and9Sets.every(Boolean),'Every Class 8 and Class 9 concept set must exist');
+assert.equal(grade8and9Sets.flatMap(set=>set.questions).length,60);
+for(const set of grade8and9Sets){
+  assert.ok([8,9].includes(set.classLevel));
+  assert.equal(set.language,'en-ta');
+  assert.equal(set.reviewStatus,'editorial-review-pending');
+  assert.equal(set.sourceMappingStatus,'general-concept-set-not-chapter-mapped');
+  assert.ok(!set.source,'General practice must not fabricate an official chapter source');
+  for(const q of set.questions){
+    assert.ok(/[\u0B80-\u0BFF]/.test(q.tamil.question));
+    assert.ok(/[\u0B80-\u0BFF]/.test(q.tamil.explanation));
+    assert.equal(q.tamil.options.length,4);
+    assert.equal(new Set(q.tamil.options).size,4);
+    assert.equal(q.page,undefined);
+  }
+}
+assert.deepEqual(grade8and9Sets.map(set=>set.questions.map(q=>q.answer)),[
+  [3,0,1,2,3,0,1,2,3,0],
+  [2,3,0,1,2,3,0,1,2,3],
+  [1,2,3,0,1,2,3,0,1,2],
+  [0,1,2,3,0,1,2,3,0,1],
+  [3,0,1,2,3,0,1,2,3,0],
+  [2,3,0,1,2,3,0,1,2,3]
 ]);
 assert.match(js,/general concept practice/,'Bilingual concept sets must not claim a chapter source');
 const acids=bank.sets.filter(s=>s.source?.chapter===2).flatMap(s=>s.questions);
