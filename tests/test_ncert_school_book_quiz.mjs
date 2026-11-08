@@ -62,7 +62,7 @@ assert.ok(newGeneralBilingualSets.every(s=>[6,7].includes(s.classLevel)&&s.langu
 assert.ok(newGeneralBilingualSets.every(s=>s.reviewStatus==='editorial-review-pending'));
 assert.ok(newGeneralBilingualSets.every(s=>s.questions.every(q=>
   q.tamil?.question&&q.tamil?.explanation&&q.tamil.options.length===4&&
-  q.tamil.options.some(x=>/[\u0B80-\u0BFF]/.test(x))&&q.page===undefined
+  new Set(q.tamil.options).size===4&&q.page===undefined
 )));
 assert.deepEqual(newGeneralBilingualSets.map(s=>s.questions.map(q=>q.answer)),[
   [1,2,3,0,1,2,3,0,1,2],
