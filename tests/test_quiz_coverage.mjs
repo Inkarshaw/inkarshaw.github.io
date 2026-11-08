@@ -38,7 +38,8 @@ assert.equal(chapters.chapters[2].title,'Metals and Non-metals');
 assert.match(page,/ncert10Chapters/);
 const ncertBank=JSON.parse(get('data/ncert/quiz-bank.json'));
 const sourced=new Set(ncertBank.sets.filter(s=>s.classLevel===10&&s.source?.chapter).map(s=>s.source.chapter));
-assert.deepEqual([...sourced].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8]);
+assert.deepEqual([...sourced].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8,9]);
+assert.match(page,/&set='\+encodeURIComponent\(practiceSet\.id\)/,'Coverage cards should deep-link into the correct chapter quiz');
 assert.equal(audit.fullCoverageCertified,false,
  'Never claim complete SCERT/NCERT coverage before book-level bilingual review');
 console.log('Quiz coverage: '+audit.scert.readyUnits+'/'+audit.scert.units+
