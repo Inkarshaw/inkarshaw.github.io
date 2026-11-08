@@ -238,7 +238,7 @@
   $('dockNext').addEventListener('click',()=>{if(index<answers.length-1){index++;write();render()}});
   $('clear').addEventListener('click',()=>{answers[index]=null;write();render()});
   $('flag').addEventListener('click',()=>{marked[index]=!marked[index];write();render()});
-  $('finish').addEventListener('click',finish);
+  $('finish').addEventListener('click',()=>finish(false));
   $('changePaper').addEventListener('click',()=>{$('paperPicker').hidden=false;$('answerSheet').hidden=true;$('result').hidden=true;$('mobileAnswerDock').hidden=true});
   $('returnToSheet').addEventListener('click',()=>{$('answerSheet').hidden=false;$('result').hidden=true;$('mobileAnswerDock').hidden=false;render()});
   $('restart').addEventListener('click',()=>{
