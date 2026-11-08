@@ -30,10 +30,32 @@ for(const paper of data.papers){
   assert.match(paper.answerKeyUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
 }
 assert.equal(data.papers.reduce((n,p)=>n+p.questionCount,0),600);
+const paper2024=data.papers.find(p=>p.year===2024);
+assert.equal(paper2024.firstQuestionPdfPage,3,'First original question is on PDF page 3');
+assert.equal(paper2024.annotatedSource,true,'Annotated source scans warn candidates about visible ticks');
+const keyManifest=JSON.parse(read('data/quizzes/original-final-keys.json'));
+assert.equal(keyManifest.schemaVersion,1);
+assert.equal(keyManifest.papers.length,1);
+const officialKey=keyManifest.papers[0];
+assert.equal(officialKey.id,paper2024.id);
+assert.equal(officialKey.paperVersion,paper2024.paperVersion);
+assert.equal(officialKey.questionCount,200);
+assert.equal(officialKey.answers.length,200);
+assert.equal(officialKey.marksPerQuestion,1.5);
+assert.equal(officialKey.sourceUrl,paper2024.answerKeyUrl);
+assert.ok(officialKey.answers.every(x=>/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/.test(x)));
+const important={1:'A',2:'B',3:'D',10:'B',20:'B',28:'A/B',30:'B/C/D',63:'ALL',
+  72:'A/D',86:'ALL',88:'B/C',93:'ALL',134:'B',151:'B/C',154:'ALL',163:'A',200:'B'};
+for(const [number,answer] of Object.entries(important)){
+ assert.equal(officialKey.answers[Number(number)-1],answer,'Official key Q'+number);
+}
+assert.equal(officialKey.answers.filter(x=>x==='ALL').length,4);
+assert.equal(officialKey.answers.filter(x=>x.includes('/')).length,5);
+assert.equal(officialKey.answers.length-officialKey.answers.filter(x=>x==='ALL').length,196);
 assert.equal(bank.filter(q=>q.SourceExam==='TNPSC Group IV'&&q.SourceYear==='2024').length,30,'Adapted questions remain separate');
 assert.ok(!data.papers.some(x=>x.transcriptionStatus==='verified-full'));
-assert.match(html,/Paper text is not transcribed/);
-assert.match(html,/Automatic marking is disabled/);
+assert.match(html,/The paper is not copied or transcribed into ClearExams/);
+assert.match(html,/Indicative marks appear only where a separately checked, matching official final key is available/);
 assert.match(html,/pyq-original-paper\.js/);
 assert.match(html,/id="paperFrame"/,'Official PDF has an inline viewer');
 assert.match(html,/id="showQuestions"/,'Mobile quiz tab available');
@@ -47,6 +69,15 @@ assert.match(html,/aria-label="Select OMR option A, B, C, D or E"/);
 assert.match(js,/switchView\('questions'\)/);
 assert.match(js,/switchView\('paper'\)/);
 assert.match(js,/paperFrame'\)\.src=safe\(p\.paperUrl\)/,'Embed only a validated official paper URL');
+assert.match(js,/gradeResponses\(\)/,'Grade only where source-key map is available');
+assert.match(js,/currentKey\.answers/,'Check against original official key option mappings');
+assert.match(js,/token==='ALL'/,'Do not silently score ALL entries');
+assert.match(js,/safe\(currentPaper\.paperUrl\)/,'Page navigation stays on verified official source');
+assert.match(html,/id="goPdfPage"/);
+assert.match(html,/id="readOriginal"/);
+assert.match(html,/id="returnAnswers"/);
+assert.match(html,/id="scoreSummary"/);
+assert.match(html,/id="scanWarning"/);
 assert.match(js,/aria-pressed/,'Mobile view buttons and answers communicate state');
 assert.match(js,/new URLSearchParams\(\{exam:'TNPSC Group IV',year:String\(p\.year\)\}\)/);
 assert.ok(!js.includes('innerHTML'),'Do not insert paper URLs, text or answers as untrusted HTML');
@@ -73,4 +104,4 @@ assert.match(adapted,/All Available Adapted PYQs/);
 assert.match(adapted,/Not a complete original paper/);
 assert.match(read('sitemap.xml'),/pyq-original-paper\.html/);
 new vm.Script(js,{filename:'assets/js/pyq-original-paper.js'});
-console.log('Three split-screen original-PDF quiz setups: 600 A–E answer slots, mobile paper/quiz tabs, saved progress and official sources.');
+console.log('Three original-PDF quiz sessions, 600 A–E slots, 2024 Version A 200-position key map, multi-answer exceptions and mobile source navigation validated.');
