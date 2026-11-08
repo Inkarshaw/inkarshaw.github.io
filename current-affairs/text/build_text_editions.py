@@ -137,7 +137,8 @@ def render(payload):
     }, ensure_ascii=False).replace("<", "\\u003c")
     label = "Initial / partial edition" if status == "partial" else "Verified daily edition"
     return f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6387860082173244" crossorigin="anonymous"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{text(heading)} | ClearExams</title>
 <meta name="description" content="{text(description)}">
 <meta name="theme-color" content="#071c33">
