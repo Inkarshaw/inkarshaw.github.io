@@ -148,6 +148,58 @@ try {
   assert.deepEqual(pageErrors,[],'Original 200-question sessions have no runtime errors');
   console.log('PASS 200 original questions: source PDF, matching numbered responses, save/resume and year switch');
 
+  // TNUSRB SI 2015 bilingual PYQ with original 140 positions and no invented visuals/keys.
+  pageErrors.length=0;
+  await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#loadStatus').innerText(),/109 attemptable questions loaded/);
+  assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2015/);
+  assert.match(await page.locator('.note').first().innerText(),/provisional, non-officially verified answer table/);
+  await page.locator('details[aria-label="Withheld 2015 questions and reasons"] summary').click();
+  assert.equal(await page.locator('#sourceIssues li').count(),31,'Show every withheld source question and reason');
+  await page.locator('#start').click();
+  assert.match(await page.locator('#position').innerText(),/Original Q1/);
+  assert.match(await page.locator('#questionTitle').innerText(),/மணநூல்/);
+  assert.equal(await page.locator('#options button').count(),4);
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/secondary answer-table entry: C/);
+  assert.equal(await page.locator('#options button').nth(2).isDisabled(),true);
+  await page.locator('#quiz .palette-details summary').click();
+  const si2015Nums=await page.locator('#palette button').allTextContents();
+  assert.equal(si2015Nums.length,109,'Only 109 source-readable/key-consistent entries are playable');
+  for(const missing of [8,9,14,21,27,29,30,34,45,60,65,66,73,80,84,90,92,93,95,99,100,101,102,103,104,109,119,120,127,129]){
+    assert.equal(si2015Nums.includes(String(missing)),false,'Do not silently grade disputed source Q'+missing);
+  }
+  await page.locator('#palette button').filter({hasText:/^132$/}).click();
+  assert.match(await page.locator('#position').innerText(),/Original Q132/);
+  assert.equal(await page.locator('#passage').isVisible(),true,'Q132–Q134 shared passage is visible');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#start').innerText(),/Resume 109-question/);
+  await page.locator('#start').click();
+  assert.match(await page.locator('#position').innerText(),/Original Q132/);
+  await page.locator('#quiz .palette-details summary').click();
+  assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,'SI 2015 390px mobile layout');
+  await page.locator('#palette button').filter({hasText:/^140$/}).click();
+  page.once('dialog',dialog=>dialog.accept());
+  await page.locator('#finish').click();
+  assert.match(await page.locator('#score').innerText(),/\/ 54\.5 provisional marks/);
+  assert.equal(await page.locator('#result').isVisible(),true);
+  await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  await page.locator('#mode').selectOption('exam');
+  await page.locator('#start').click();
+  await page.locator('#options button').first().click();
+  assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides provisional answer feedback');
+  assert.equal(await page.locator('#feedback').isVisible(),false);
+  assert.deepEqual(pageErrors,[],'TNUSRB SI 2015 mobile JavaScript runtime clean');
+  console.log('PASS TNUSRB SI 2015: 109 original-numbered bilingual items, exclusions, key disclosure, save/resume and exam mode');
+
   // TNUSRB SI 2020 (2019 recruitment, Series C) from user-supplied transcription.
   pageErrors.length = 0;
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
