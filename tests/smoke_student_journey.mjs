@@ -157,7 +157,7 @@ try {
   assert.equal(await page.locator('#sourceIssueList li').count(),7,'Seven OCR/figure source caveats visible in the interface');
   assert.match(await page.locator('#loadStatus').innerText(),/All 200 numbered questions loaded/);
   await page.locator('#start').click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 1 of 200/);
+  assert.match(await page.locator('#position').innerText(),/Original Question 1 of 200/i);
   assert.match(await page.locator('#questionText').innerText(),/Commensalism/);
   assert.equal(await page.locator('#options button').count(),5,'A-E answer options preserved');
   await page.locator('#options button').nth(2).click();
@@ -166,13 +166,13 @@ try {
   await page.locator('#paletteDetails summary').click();
   assert.equal(await page.locator('#palette .palette-btn').count(),200);
   await page.locator('#palette .palette-btn').nth(12).click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 13 of 200/);
-  assert.match(await page.locator('#sourceWarning').innerText(),/matching-pair town names/);
+  assert.match(await page.locator('#position').innerText(),/Original Question 13 of 200/i);
+  assert.match(await page.locator('#sourceWarning').innerText(),/matching-pair town names/i);
   await page.locator('#options button').nth(4).click();
   await page.locator('#flag').click();
   await page.locator('#palette .palette-btn').nth(199).click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/);
-  assert.match(await page.locator('#sourceWarning').innerText(),/dice illustrations/);
+  assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/i);
+  assert.match(await page.locator('#sourceWarning').innerText(),/dice illustrations/i);
   assert.match(await page.locator('#options button').first().innerText(),/\[Image A\]/,'Missing diagrams are not invented');
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     '2026 text quiz fits mobile width without overflow');
@@ -181,7 +181,7 @@ try {
     undefined,{timeout:20000});
   assert.match(await page.locator('#start').innerText(),/Resume 200-question/);
   await page.locator('#start').click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/);
+  assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/i);
   assert.match(await page.locator('#status').innerText(),/2 of 200 answered · 1 flagged/);
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
