@@ -29,14 +29,17 @@ function addChapterSource(element,set,question){
   const link=document.createElement('a');
   link.href=set.source.url+'#page='+pdfPage;
   link.textContent='NCERT '+set.source.edition+' · Ch. '+set.source.chapter+' · English p. '+question.page+(set.reviewStatus==='editorial-review-pending'?' · edition/page cross-check pending':'');
-  const mirror=document.createElement('a');
-  mirror.href=set.source.mirrorUrl+'#page='+pdfPage;
-  mirror.textContent=set.source.mirrorEdition?'Earlier textbook reprint ('+set.source.mirrorEdition+')':'Textbook mirror';
-  for(const a of [link,mirror]){
-    a.target='_blank';
-    a.rel='noopener noreferrer';
+  link.target='_blank';link.rel='noopener noreferrer';
+  note.append(link);
+  // Some newly authored chapters have only a canonical NCERT source.
+  // Never generate a broken "undefined#page=" mirror link.
+  if(typeof set.source.mirrorUrl==='string'&&/^https:\/\//.test(set.source.mirrorUrl)){
+    const mirror=document.createElement('a');
+    mirror.href=set.source.mirrorUrl+'#page='+pdfPage;
+    mirror.textContent=set.source.mirrorEdition?'Earlier textbook reprint ('+set.source.mirrorEdition+')':'Textbook mirror';
+    mirror.target='_blank';mirror.rel='noopener noreferrer';
+    note.append(' · ',mirror);
   }
-  note.append(link,' · ',mirror);
   element.append(note);
 }
 function renderCatalog(){if(!state.bank)return;show('catalog');classes();subjects();const available=state.bank.sets.filter(x=>x.classLevel===state.cls && (state.subject==='all'||x.subject===state.subject)).filter(x=>{const q=state.query.trim().toLowerCase();return !q||[x.topic,x.subject,'class '+x.classLevel].join(' ').toLowerCase().includes(q)});$('bankCount').textContent=state.bank.sets.length+' topics · '+state.bank.sets.reduce((n,x)=>n+x.questions.length,0)+' questions';$('setListTitle').textContent='Class '+state.cls+' practice';$('setSubtitle').textContent=state.subject==='all'?'Choose from available subjects and topics.':state.subject+' · original concept practice';setMessage(available.length+' quiz set'+(available.length===1?'':'s')+' available for this selection.');const grid=$('setGrid');grid.replaceChildren();for(const set of available){const card=document.createElement('article');card.className='set';const meta=document.createElement('span');meta.className='meta';meta.textContent='Class '+set.classLevel+' · '+set.subject;const title=document.createElement('h3');title.textContent=set.topic;const p=document.createElement('p');p.textContent=set.questions.length+' original questions · '+(set.language==='en-ta'?'English + Tamil · chapter source':'English · score review')+(set.reviewStatus==='editorial-review-pending'?' · editorial verification pending':'');const actions=document.createElement('div');actions.className='actions';const start=document.createElement('button');start.type='button';start.className='primary';start.textContent='Start quiz';start.setAttribute('aria-label','Start '+set.topic+' quiz');start.addEventListener('click',()=>begin(set,true));actions.append(start);const best=getBest(set.id);if(best!==null){const score=document.createElement('span');score.className='best';score.textContent='Best '+best+'/'+set.questions.length;actions.append(score)}card.append(meta,title,p,actions);grid.append(card)}if(!available.length){const p=document.createElement('p');p.className='panel';p.textContent='No topics match this selection. Choose another subject or clear the search.';grid.append(p)}}
