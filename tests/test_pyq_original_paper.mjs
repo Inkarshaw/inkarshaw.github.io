@@ -50,7 +50,8 @@ assert.equal(paper2024.firstQuestionPdfPage,3,'First original question is on PDF
 assert.equal(paper2024.annotatedSource,true,'Annotated source scans warn candidates about visible ticks');
 const keyManifest=JSON.parse(read('data/quizzes/original-final-keys.json'));
 assert.equal(keyManifest.schemaVersion,1);
-assert.equal(keyManifest.papers.length,3);
+assert.equal(keyManifest.papers.length,4,'Final-key index includes 2011, 2022, 2024 and 2025 papers');
+assert.deepEqual(keyManifest.papers.map(p=>p.id.match(/20\d{2}/)?.[0]).sort(),['2011','2022','2024','2025']);
 const officialKey=keyManifest.papers.find(p=>p.id===paper2024.id);
 assert.equal(officialKey.id,paper2024.id);
 assert.equal(officialKey.paperVersion,paper2024.paperVersion);
