@@ -1,6 +1,6 @@
 /* Source-linked original-paper practice.
    Displays the official question paper alongside an interactive quiz panel and a saved
-   A–E answer sheet, including the printed E (Answer not known) response. This deliberately does not claim a verbatim transcription
+   A–D or A–E source-paper response sheet, selected from the official booklet's printed choices. It does not claim verbatim transcription
    or score a paper without an audited complete original answer key. */
 (() => {
   'use strict';
@@ -75,9 +75,9 @@
     return p&&/^[a-z0-9-]+$/.test(String(p.id||''))&&
       Number.isInteger(p.questionCount)&&p.questionCount>=1&&p.questionCount<=300&&
       p.format==='official-pdf-answer-sheet'&&p.transcriptionStatus==='not-transcribed'&&
-      ['official-pdf-only','official-final-key-mapped-subject-496'].includes(p.answerKeyStatus)&&
+      ['official-pdf-only','official-final-key-mapped-subject-496','official-final-key-series-d'].includes(p.answerKeyStatus)&&
       !!safe(p.paperUrl)&&!!safe(p.answerKeyUrl)&&
-      Array.isArray(p.optionLetters)&&p.optionLetters.join(',')==='A,B,C,D,E'&&
+      Array.isArray(p.optionLetters)&&['A,B,C,D','A,B,C,D,E'].includes(p.optionLetters.join(','))&&
       Number.isInteger(p.durationMinutes)&&p.durationMinutes>=30&&p.durationMinutes<=240;
   }
   function updateStatus(){
@@ -144,8 +144,8 @@
     $('count').textContent=p.questionCount+' original numbered questions';
     currentKey=keyRecords.find(k=>validFinalKey(k,p))||null;
     $('notice').textContent='Original full-length official-PDF practice: '+p.questionCount+
-      ' numbered questions; A–D for an answer, E for Answer not known. '+
-      (currentKey?'Indicative scoring uses a Version A final key with special multi-answer rules; ALL entries remain ungraded.':
+      ' numbered questions; '+(p.optionLetters.includes('E')?'A–D for an answer, E for Answer not known. ':'choose A, B, C or D. ')+
+      (currentKey?'Indicative scoring uses the matching paper-series final key; ALL entries remain ungraded.':
         'Automatic marking is unavailable until a complete matching official final key is checked.');
     plainLink($('sourcePaper'),p.paperUrl,'Open original official question paper (PDF) ↗');
     plainLink($('sourceKey'),p.answerKeyUrl,'Open official final answer key (PDF) ↗');
@@ -154,12 +154,16 @@
     $('pdfPage').value='1';
     $('firstQuestion').hidden=!Number.isInteger(p.firstQuestionPdfPage);
     $('paperFrame').title='TNPSC '+p.year+' official original question paper (PDF)';
-    const adapted=new URLSearchParams({exam:'TNPSC Group IV',year:String(p.year)});
-    $('adaptedQuizLink').href='pyq-full-quiz.html?'+adapted.toString();
+    const isGroupIV=p.exam==='Group IV';
+    $('adaptedQuizLink').hidden=!isGroupIV;
+    if(isGroupIV){
+      const adapted=new URLSearchParams({exam:'TNPSC Group IV',year:String(p.year)});
+      $('adaptedQuizLink').href='pyq-full-quiz.html?'+adapted.toString();
+    }
     switchView('both');
     const saved=read(p.id);
     if(saved&&(saved.version===1||saved.version===2)&&Array.isArray(saved.answers)&&saved.answers.length===p.questionCount&&
-       saved.answers.every(a=>a===null||allowedLetters.includes(a))&&Array.isArray(saved.marked)&&saved.marked.length===p.questionCount){
+       saved.answers.every(a=>a===null||p.optionLetters.includes(a))&&Array.isArray(saved.marked)&&saved.marked.length===p.questionCount){
       answers=saved.answers;marked=saved.marked.map(Boolean);
       index=Number.isInteger(saved.index)?Math.max(0,Math.min(saved.index,p.questionCount-1)):0;
       deadline=Number.isFinite(saved.deadline)&&saved.deadline>0?saved.deadline:0;
@@ -181,11 +185,14 @@
       ' official ALL entries excluded). This is not an official TNPSC score.':'';
     $('scoreSummary').hidden=!grade;
     const unknown=answers.filter(a=>a==='E').length;
+    const responseStatus=currentPaper.optionLetters.includes('E')?
+      ' responses recorded ('+unknown+' E / Answer not known). ':' responses recorded (A–D only). ';
     $('resultBody').textContent=grade?
-      attempted+'/'+answers.length+' responses recorded ('+unknown+' E / Answer not known). '+
-      'Accepted multiple-choice alternatives are credited according to the linked official final key. '+
-      'The '+grade.ungraded+' ALL questions are not included in the shown marks because their handling for blank/E responses is unverified. Check the official key and scoring rules for final marks.':
-      attempted+'/'+answers.length+' OMR responses recorded ('+unknown+' E / Answer not known). Because the official final answer key has not been digitised and cross-checked for this paper version, this page does not calculate marks or identify correct answers. Compare your selections with the official answer-key PDF.';
+      attempted+'/'+answers.length+responseStatus+
+      'Accepted alternative answers are credited using the official final key. '+
+      'The '+grade.ungraded+' ALL entries are excluded from indicative marks until treatment of blank responses is clarified.':
+      attempted+'/'+answers.length+' OMR'+responseStatus+
+      'Automatic marking requires a complete matching official key; compare your answers with the official PDF.';
     const rows=document.createElement('div');rows.className='answer-summary';
     answers.forEach((v,i)=>{
       const item=document.createElement('span');
