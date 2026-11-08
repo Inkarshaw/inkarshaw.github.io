@@ -120,7 +120,7 @@ try {
   pageErrors.length = 0;
   await page.goto(origin+'/pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies',{waitUntil:'domcontentloaded'});
   await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
-  assert.equal(await page.locator('#papers .paper-choice').count(),3,'All 2022/2024/2025 original-paper modes load');
+  assert.equal(await page.locator('#papers .paper-choice').count(),4,'Group I 2011 and Group IV 2022/2024/2025 original paper modes load');
   assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
   assert.equal(await page.locator('#showBoth').getAttribute('aria-pressed'),'true','Source and answers are combined by default');
   assert.equal(await page.locator('#paperPanel').isVisible(),true,'Official original PDF visible');
@@ -147,6 +147,34 @@ try {
   assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
   assert.deepEqual(pageErrors,[],'Original 200-question sessions have no runtime errors');
   console.log('PASS 200 original questions: source PDF, matching numbered responses, save/resume and year switch');
+
+  // TNPSC Group I 2011: actual original Series D PDF, not the uploaded Group II transcription.
+  pageErrors.length=0;
+  await page.goto(origin+'/pyq-original-paper.html?paper=tnpsc-group-i-2011-preliminary-general-knowledge-d',{waitUntil:'domcontentloaded'});
+  await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
+  assert.match(await page.locator('#examTitle').innerText(),/Group I.*2011.*Series D/);
+  assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
+  assert.match(await page.locator('#sourcePaper').getAttribute('href'),/\/IDPC\.pdf$/);
+  assert.match(await page.locator('#sourceKey').getAttribute('href'),/05_06_2011_g1_gk\.pdf$/);
+  assert.equal(await page.locator('#dockChoices button').count(),4,'Historical Group I paper has A–D, no invented E choice');
+  assert.equal(await page.locator('#answerChoices button').count(),4);
+  assert.equal(await page.locator('#adaptedQuizLink').isVisible(),false,'Do not link to unrelated Group IV adapted quiz');
+  await page.locator('#dockChoices button').nth(1).click();
+  assert.match(await page.locator('#status').innerText(),/1\/200 answered/);
+  await page.locator('#paletteDetails summary').click();
+  await page.locator('#palette button').nth(199).click();
+  assert.match(await page.locator('#number').innerText(),/Question 200 of 200/);
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
+  assert.match(await page.locator('#number').innerText(),/Question 200 of 200/);
+  assert.match(await page.locator('#status').innerText(),/1\/200 answered/,'2011 paper responses persist after reload');
+  page.once('dialog',dialog=>dialog.accept());
+  await page.locator('#finish').click();
+  assert.match(await page.locator('#scoreSummary').innerText(),/Indicative marks: 1\.5 \/ 288/,'Series D final-key score excludes eight ALL entries');
+  assert.match(await page.locator('#resultBody').innerText(),/A–D only/);
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,'2011 Group I responsive original paper layout');
+  assert.deepEqual(pageErrors,[],'2011 original-paper quiz does not raise runtime JavaScript errors');
+  console.log('PASS TNPSC Group I 2011: correct official Series D paper, 4 choices, key, saved progress, 200 positions and indicative score');
 
   // TNUSRB SI 2015 bilingual PYQ with original 140 positions and no invented visuals/keys.
   pageErrors.length=0;
