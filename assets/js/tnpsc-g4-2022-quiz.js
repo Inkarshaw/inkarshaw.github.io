@@ -76,6 +76,12 @@
     $('questionStatus').textContent = status(q);
     $('questionText').textContent = q.question;
     $('questionText').lang = q.number <= 100 ? 'ta' : 'en';
+    const figure = $('questionFigure'); figure.replaceChildren();
+    if (q.visual && ['assets/pyq-original/tnpsc-g4-2022-q172.svg','assets/pyq-original/tnpsc-g4-2022-q173.svg'].includes(q.visual.src)) {
+      const img = document.createElement('img'); img.src = q.visual.src;
+      img.alt = q.visual.alt || ('Question ' + q.number + ' figure');
+      img.loading = 'lazy'; figure.append(img);
+    }
     $('questionWarning').hidden = !missing;
     if (missing) $('questionWarning').textContent =
       'This question has missing, damaged or suspect source content. Read the TNPSC original PDF before answering. This question will not affect the indicative score.';
