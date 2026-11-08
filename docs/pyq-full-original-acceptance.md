@@ -5,7 +5,7 @@
 ## Three distinct student modes
 
 - `pyq-original-paper.html`: original **official PDF** and a locally saved numbered answer sheet; no copied question text or automatic grading. First grounded example: TNPSC Group IV 2024 General Tamil and General Studies, 200 questions.
-- `pyq-full-quiz.html`: all available **adapted** source-attributed PYQs (currently 150); not full original paper transcriptions.
+- `pyq-full-quiz.html`: all available **adapted** source-attributed PYQs (currently 160); not full original paper transcriptions.
 - `pyq-original-digital.html`: **exact full original** digital paper; published only when a record in `verified-full-original-papers.json` passes the independent structural gate and editorial sign-off.
 
 ## Acceptance criteria for a digital original paper

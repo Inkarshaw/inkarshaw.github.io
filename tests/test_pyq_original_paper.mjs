@@ -30,7 +30,7 @@ for(const paper of data.papers){
   assert.match(paper.answerKeyUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
 }
 assert.equal(data.papers.reduce((n,p)=>n+p.questionCount,0),600);
-assert.equal(bank.filter(q=>q.SourceExam==='TNPSC Group IV'&&q.SourceYear==='2024').length,20,'Adapted questions remain separate');
+assert.equal(bank.filter(q=>q.SourceExam==='TNPSC Group IV'&&q.SourceYear==='2024').length,30,'Adapted questions remain separate');
 assert.ok(!data.papers.some(x=>x.transcriptionStatus==='verified-full'));
 assert.match(html,/Paper text is not transcribed/);
 assert.match(html,/Automatic marking is disabled/);
