@@ -28,7 +28,7 @@ def fetch_page(page: int) -> BeautifulSoup:
     return BeautifulSoup(raw, "html.parser")
 
 def text_content(element) -> str:
-    return re.sub(r"\\s+", " ", element.get_text(" ", strip=True)).strip()
+    return re.sub(r"\s+", " ", element.get_text(" ", strip=True)).strip()
 
 def parse_page(page: int) -> list[dict]:
     soup = fetch_page(page)
@@ -56,7 +56,7 @@ def parse_page(page: int) -> list[dict]:
         published_answer = None
         if details:
             answer_text = text_content(details)
-            match = re.search(r"Correct answer\\s*:\\s*([A-D])\\s*[.]",answer_text)
+            match = re.search(r"Correct answer\s*:\s*([A-D])\s*[.]",answer_text)
             if match:
                 published_answer = match.group(1)
         entries.append({"number": number,"question": question,"options": options,
@@ -127,7 +127,7 @@ def main() -> None:
         "notes": "All 200 items have text and A-E choices; answer letters are from TNPSC's official final key. Text is an editorial transcription aided by a public typed index, not yet manually checked line-by-line against the scanned question booklet. Special ALL final-key entries are ungraded.",
         "questions": output,
     }
-    OUT.write_text(json.dumps(bank,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    OUT.write_text(json.dumps(bank,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("WROTE",OUT,"count",len(output),"all options populated",
           sum(all(q["options"].get(k) for k in ALPHABET) for q in output))
     print("Official final key mismatches:",len(disagreements))
