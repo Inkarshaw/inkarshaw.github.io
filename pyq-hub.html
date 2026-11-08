@@ -163,6 +163,13 @@ function render(){
     const a=document.createElement("a");a.href=doc.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=doc.label+" ↗";links.append(a);
    }
   }
+  if(count>=10){
+   const sourceRows=quizzes.filter(q=>q.SourceExam===expectedSourceExam(x)&&Number(q.SourceYear)===x.year&&q.Active!=="FALSE");
+   const mappingPending=sourceRows.some(q=>String(q.SourceQuestion||"").startsWith("GS-index-"));
+   const finalKeyReconciled=sourceRows.every(q=>/Matched to official TNPSC final key|Answer matches TNPSC 2022 final key/i.test(String(q.AnswerVerification||"")));
+   const auditLabel=mappingPending?"Original paper question-number check pending":finalKeyReconciled?"Official final answer key reconciled":"Official final-key check incomplete or not documented";
+   const audit=document.createElement("p");audit.className="pyq-warning";audit.textContent="Source verification: "+auditLabel;links.append(audit);
+  }
   const archive=document.createElement("a");archive.href=x.url;archive.target="_blank";archive.rel="noopener noreferrer";
   archive.textContent=x.access==="login-or-limited"?"Official candidate-access page ↗":"Official examination archive ↗";links.append(archive);
   docs.append(summary,links);
