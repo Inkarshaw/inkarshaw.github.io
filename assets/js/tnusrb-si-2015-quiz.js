@@ -207,6 +207,11 @@
   fetch('data/quizzes/tnusrb-si-2015-open.json',{cache:'no-store'})
     .then(response=>{if(!response.ok)throw Error('Quiz JSON unavailable');return response.json()})
     .then(data=>{questions=validate(data);bank=data;
+      const issues=$('sourceIssues');issues.replaceChildren();
+      data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
+        const li=document.createElement('li');li.textContent='Original Q'+q.number+': '+q.sourceIssue;
+        issues.append(li);
+      });
       $('loadStatus').textContent=questions.length+' attemptable questions loaded in original-number order. '+
         '109 readable questions have provisional secondary-key answers; 31 source-incomplete or disputed entries excluded.';
       updateStart();
