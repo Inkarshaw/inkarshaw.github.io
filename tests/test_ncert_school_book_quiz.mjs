@@ -109,6 +109,29 @@ assert.deepEqual(grade8and9Sets.map(set=>set.questions.map(q=>q.answer)),[
   [3,0,1,2,3,0,1,2,3,0],
   [2,3,0,1,2,3,0,1,2,3]
 ]);
+const class10GeneralIds=['c10-science','c10-mathematics','c10-social-science'];
+const class10GeneralSets=class10GeneralIds.map(id=>bank.sets.find(s=>s.id===id));
+assert.ok(class10GeneralSets.every(Boolean),'Every general Class 10 set is required');
+assert.equal(class10GeneralSets.flatMap(s=>s.questions).length,30);
+for(const set of class10GeneralSets){
+  assert.equal(set.classLevel,10);
+  assert.equal(set.language,'en-ta');
+  assert.equal(set.reviewStatus,'editorial-review-pending');
+  assert.equal(set.sourceMappingStatus,'general-concept-set-not-chapter-mapped');
+  assert.equal(set.source,undefined,'General practice must not fabricate chapter references');
+  for(const q of set.questions){
+    assert.ok(/[\u0B80-\u0BFF]/.test(q.tamil.question));
+    assert.ok(/[\u0B80-\u0BFF]/.test(q.tamil.explanation));
+    assert.equal(q.tamil.options.length,4);
+    assert.equal(new Set(q.tamil.options).size,4);
+    assert.equal(q.page,undefined);
+  }
+}
+assert.deepEqual(class10GeneralSets.map(s=>s.questions.map(q=>q.answer)),[
+  [1,2,3,0,1,2,3,0,1,2],
+  [0,1,2,3,0,1,2,3,0,1],
+  [3,0,1,2,3,0,1,2,3,0]
+]);
 assert.match(js,/general concept practice/,'Bilingual concept sets must not claim a chapter source');
 const acids=bank.sets.filter(s=>s.source?.chapter===2).flatMap(s=>s.questions);
 assert.equal(acids.length,40);
