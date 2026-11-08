@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071c33">
 <meta name="description" content="Practise every numbered question in an original TNPSC previous-year paper using the official PDF and an answer sheet. No unofficial transcriptions.">
-<title>Full-Paper PYQ Quiz Practice | ClearExams</title>
+<title>200 Original TNPSC Group IV Questions by Year | ClearExams</title>
 <link rel="canonical" href="https://clearexams.ink/pyq-original-paper.html">
 <style>
 :root{--navy:#071c33;--blue:#1463ff;--line:#d8e4ef;--ink:#152d45;--muted:#5c6d81;--bg:#f5f8fc}
@@ -97,13 +97,36 @@ button:disabled{opacity:.4}
 }
 @media(min-width:851px){.view-toggle{display:none}.pdf-panel{position:sticky;top:10px}}
 @media(max-width:420px){.view-toggle button{padding:7px;font-size:.8rem}.answer-panel .palette{grid-template-columns:repeat(6,minmax(0,1fr))}}
+
+/* The 200-position official-PDF quiz keeps the original paper and OMR together on phones. */
+.mobile-answer-dock{display:none}
+@media(max-width:850px){
+ .quiz-workspace.mobile-both #paperPanel,.quiz-workspace.mobile-both #questionPanel{display:block}
+ .quiz-workspace.mobile-both{display:flex;flex-direction:column;gap:12px}
+ .quiz-workspace.mobile-both #paperPanel,.quiz-workspace.mobile-both #questionPanel{width:100%}
+ .quiz-workspace.mobile-both #paperFrame{height:55vh;min-height:320px}
+ .quiz-shell{padding-bottom:150px!important}
+ .mobile-answer-dock:not([hidden]){display:block;position:fixed;bottom:0;left:0;right:0;z-index:50;
+  padding:9px 12px calc(11px + env(safe-area-inset-bottom));border-top:1px solid #bed2e7;
+  background:#fff;box-shadow:0 -9px 24px rgba(8,38,79,.12)}
+ .mobile-answer-dock-header{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  max-width:650px;margin:0 auto 6px;color:#183d63;font-size:.8rem}
+ #dockSaved{color:#52738e;font-size:.7rem}
+ .mobile-answer-dock-controls{display:flex;gap:6px;max-width:650px;margin:auto}
+ .mobile-answer-dock-controls>button{width:38px;min-width:38px;padding:8px 4px;font-size:1.15rem}
+ .mobile-dock-choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;flex:1;min-width:0}
+ .mobile-dock-choices button{min-width:0;min-height:46px;padding:8px 2px;font-weight:850}
+ .mobile-dock-choices button[aria-pressed="true"]{background:#1463ff;color:#fff;border-color:#1463ff}
+}
+@media(max-width:420px){.view-toggle button{padding:7px 5px;font-size:.74rem}.mobile-dock-choices{gap:3px}}
+
 </style>
 </head>
 <body>
 <header><div class="wrap"><a class="brand" href="index.html">ClearExams.</a><a href="pyq-hub.html">← PYQ Archive</a></div></header>
 <main class="wrap">
-<h1>Full-Paper PYQ Quiz Practice</h1>
-<p class="lead">Choose a TNPSC exam year, read the original paper and answer questions A–E in a proper quiz interface. Navigate 200 questions, mark for review, and submit at the end.</p>
+<h1>200 Original Questions · Year-wise Quiz</h1>
+<p class="lead">Practise all 200 questions from the selected TNPSC Group IV year in their original sequence. The question text and printed choices remain in the official TNPSC PDF; answer each original question using the synchronized A–E controls.</p>
 <p class="note"><strong>Read the exact published paper.</strong> The official TNPSC PDF displays the original question wording, options and diagrams; the answer panel records your selections against the same original question numbers. The paper is not copied or transcribed into ClearExams. Indicative marks appear only where a separately checked, matching official final key is available; otherwise the page saves answers without scoring.</p>
 <section id="paperPicker" class="card"><h2>Choose an original paper</h2><p id="loading" role="status">Loading official papers…</p><div id="papers"></div></section>
 <section id="answerSheet" class="card quiz-shell" hidden>
@@ -113,7 +136,7 @@ button:disabled{opacity:.4}
   <div class="paper-source"><span id="sourcePaper"></span><span id="sourceKey"></span></div>
   <span class="clock" id="timer" role="timer" hidden></span>
 </div>
-<div class="topline toggle-row"><div class="view-toggle" role="group" aria-label="Choose paper or answer view"><button type="button" id="showQuestions" aria-pressed="true">Answer questions</button><button type="button" id="showPaper" aria-pressed="false">View original paper</button></div><label class="timer-setting"><input id="timed" type="checkbox"> Timed · 3 hours</label></div>
+<div class="topline toggle-row"><div class="view-toggle" role="group" aria-label="Choose paper or answer view"><button type="button" id="showBoth" aria-pressed="true">Paper + answers</button><button type="button" id="showQuestions" aria-pressed="false">Answers</button><button type="button" id="showPaper" aria-pressed="false">Paper</button></div><label class="timer-setting"><input id="timed" type="checkbox"> Timed · 3 hours</label></div>
 <div class="quiz-workspace" id="quizWorkspace">
 <section id="paperPanel" class="pdf-panel" aria-labelledby="paperPanelTitle">
 <div class="topline"><h3 id="paperPanelTitle">Original question-paper PDF</h3><span class="source-flag">Official TNPSC source</span></div>
@@ -130,7 +153,7 @@ button:disabled{opacity:.4}
 <div class="progress"><div id="fill"></div></div>
 <details id="paletteDetails"><summary><strong>Question palette</strong> · green answered · gold marked</summary><nav id="palette" class="palette" aria-label="All numbered original paper answers"></nav></details>
 <h3 id="number">Original question 1</h3>
-<p class="question-source">Read question <strong id="sourceQuestionNumber">1</strong> and the exact printed A–E options in the official source PDF, then select your answer below.</p>
+<p class="question-source">Original source Q<strong id="sourceQuestionNumber">1</strong> of 200. Read its exact wording and options in the TNPSC PDF above (or beside this answer sheet), then select A–E. Your answer is tied to that same original number.</p>
 <p id="paperQuestionPage" class="pdf-hint" aria-live="polite">Finding original question page…</p>
 <button type="button" id="readOriginal">Read original PDF / மூல வினாத்தாள்</button>
 <div id="answerChoices" class="answers" role="group" aria-label="Select OMR option A, B, C, D or E"></div>
@@ -143,6 +166,14 @@ button:disabled{opacity:.4}
 <p class="lead">Your choices save automatically on this device. You can return to the paper and resume later.</p>
 <button type="button" id="changePaper">← Change exam paper</button>
 </section>
+</div>
+<div id="mobileAnswerDock" class="mobile-answer-dock" hidden aria-label="Quick answer controls for original question">
+  <div class="mobile-answer-dock-header"><strong id="dockNumber">Original Q1 / 200</strong><span id="dockSaved">Saved on device</span></div>
+  <div class="mobile-answer-dock-controls">
+    <button type="button" id="dockPrevious" aria-label="Previous original question">←</button>
+    <div id="dockChoices" class="mobile-dock-choices" role="group" aria-label="Select original paper answer A B C D or E"></div>
+    <button type="button" id="dockNext" aria-label="Next original question">→</button>
+  </div>
 </div>
 </section>
 <section id="result" class="card" hidden>
