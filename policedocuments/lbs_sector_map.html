@@ -175,6 +175,59 @@ function parseMessage(text){
  }
  return count;
 }
+
+function splitCGI(x){
+ const parts=String(x||'').trim().split(/\s*-\s*/);
+ return parts.length===4&&parts.every(p=>/^\d+$/.test(p))?parts.map(p=>String(BigInt(p))):null;
+}
+function compatibleCGI(a,b){
+ const p=splitCGI(a),q=splitCGI(b);
+ return !!(p&&q&&p[0]===q[0]&&p[1]===q[1]&&p[3]===q[3]&&(p[2]===q[2]||p[2]==='0'||q[2]==='0'));
+}
+function parseCtraceReport(raw){
+ const field=key=>{
+  const label=key.replace(/[^A-Za-z0-9 ]/g,'\\$&');
+  const m=raw.match(new RegExp('^\\s*\\*?\\s*'+label+'\\s*\\*?\\s*:\\s*(.*?)\\s*$','im'));
+  return m?m[1].trim():'';
+ };
+ const coords=field('Lat/Lang').match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+ const az=Number(field('Azimuth'));
+ if(!coords||!field('Azimuth')||!Number.isFinite(az)||az<0||az>=360)throw Error('Report requires valid Lat/Lang and Azimuth.');
+ const lat=Number(coords[1]),lon=Number(coords[2]);
+ if(Math.abs(lat)>90||Math.abs(lon)>180)throw Error('Invalid tower coordinates.');
+ const req=field('Requested Cell ID'),resolved=field('Cell ID');
+ const distMatch=(raw.match(/^\s*\*?\s*Distance\s*\([^)]*\)\s*\*?\s*:\s*([0-9]+(?:\.[0-9]+)?)\s*km\b/im)||[])[1];
+ const distance=distMatch?Number(distMatch):null;
+ if(distance!==null&&(!Number.isFinite(distance)||distance<=0||distance>50))throw Error('Invalid approximate distance.');
+ return {lat,lon,az,req,resolved,address:field('Address'),provider:field('Provider')||field('Network Provider'),network:field('Network'),locationType:field('Location Type'),distance};
+}
+function loadCtraceReport(){
+ try{
+  const report=parseCtraceReport(val('ctraceText'));
+  const previous=val('cgi');
+  if(val('lat')&&val('lon')&&(!previous||!report.req||!compatibleCGI(previous,report.req))){
+   $('lat').value='';$('lon').value='';
+   $('status').textContent='Cleared unrelated previous LBS coordinate.';
+  }
+  $('cgi').value=report.req||report.resolved||val('cgi');
+  $('resolvedCgi').value=report.resolved;
+  $('towerLat').value=report.lat;$('towerLon').value=report.lon;
+  $('bearing').value=report.az;$('rotate').value=Math.round(report.az);
+  $('towerAddress').value=report.address;
+  $('network').value=(report.provider?report.provider+' / ':'')+report.network;
+  $('towerSource').value='Pasted C-Trace summary (not independently verified)';
+  if(report.locationType)$('lbs').value=report.locationType;
+  $('distanceKm').value=report.distance===null?'':report.distance;
+  if(report.distance!==null)$('radius').value=String(Math.round(report.distance*1000));
+  $('sectors').value='1';$('span').value='120';$('ctraceStyle').checked=true;
+  updateSectorOptions();$('view').value='all';
+  const g=draw(true);
+  $('ctraceStatus').textContent=(g?'Report plotted. ':'Report parsed; review inputs. ')+
+   (report.req&&report.resolved&&report.req!==report.resolved?(compatibleCGI(report.req,report.resolved)?'Requested and resolved CGI LAC/TAC differ; verify the cell site. ':'Requested and resolved CGI differ; independently check identity. '):'')+
+   '120° width is an illustrative assumption, not a confirmed beamwidth. Distance does not pinpoint the person.';
+ }catch(e){$('ctraceStatus').textContent='Cannot parse report: '+e.message;}
+}
+
 function readGeometry(){
  const reportedLat=n('lat'),reportedLon=n('lon'),hasTower=!!val('towerLat')||!!val('towerLon');
  const lat=hasTower?n('towerLat'):reportedLat,lon=hasTower?n('towerLon'):reportedLon;
