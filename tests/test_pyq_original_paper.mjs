@@ -10,26 +10,26 @@ const js=read('assets/js/pyq-original-paper.js');
 const hub=read('pyq-hub.html');
 const adapted=read('pyq-full-quiz.html');
 assert.equal(data.schemaVersion,1);
-assert.equal(data.papers.length,3,'Three official PDF companion quiz sessions');
-assert.deepEqual(data.papers.map(p=>p.year).sort((a,b)=>a-b),[2022,2024,2025]);
+assert.equal(data.papers.length,4,'Four official PDF companion quiz sessions');
+assert.deepEqual(data.papers.map(p=>p.year).sort((a,b)=>a-b),[2011,2022,2024,2025]);
 const ids=new Set();
 for(const paper of data.papers){
   assert.ok(!ids.has(paper.id),'Stable unique paper IDs');ids.add(paper.id);
   assert.ok(paper.id.includes(String(paper.year)));
-  assert.equal(paper.questionCount,200,'Each official Group IV booklet contains 200 questions');
+  assert.equal(paper.questionCount,200,'Every linked original TNPSC booklet contains 200 questions');
   assert.equal(paper.durationMinutes,180);
   assert.equal(paper.marksPerQuestion,1.5);
-  assert.deepEqual(paper.optionLetters,['A','B','C','D','E'],'A–E original OMR format');
+  assert.deepEqual(paper.optionLetters,paper.year===2011?['A','B','C','D']:['A','B','C','D','E'],'Correct original paper A–D or A–E options');
   assert.deepEqual(paper.correctOptionLetters,['A','B','C','D']);
-  assert.equal(paper.unknownOption,'E');
+  if(paper.year!==2011)assert.equal(paper.unknownOption,'E');
   assert.equal(paper.transcriptionStatus,'not-transcribed');
-  assert.equal(paper.answerKeyStatus,paper.year===2025?'official-final-key-mapped-subject-496':'official-pdf-only');
+  assert.equal(paper.answerKeyStatus,paper.year===2011?'official-final-key-series-d':paper.year===2025?'official-final-key-mapped-subject-496':'official-pdf-only');
   assert.equal(paper.copyrightClearance,'not-confirmed');
   assert.equal(paper.format,'official-pdf-answer-sheet');
   assert.match(paper.paperUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
   assert.match(paper.answerKeyUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
 }
-assert.equal(data.papers.reduce((n,p)=>n+p.questionCount,0),600);
+assert.equal(data.papers.reduce((n,p)=>n+p.questionCount,0),800);
 const sourcePages=JSON.parse(read('data/quizzes/tnpsc-g4-2024-original-page-index.json'));
 assert.equal(sourcePages.schemaVersion,1);
 assert.equal(sourcePages.questionCount,200);
@@ -50,7 +50,7 @@ assert.equal(paper2024.firstQuestionPdfPage,3,'First original question is on PDF
 assert.equal(paper2024.annotatedSource,true,'Annotated source scans warn candidates about visible ticks');
 const keyManifest=JSON.parse(read('data/quizzes/original-final-keys.json'));
 assert.equal(keyManifest.schemaVersion,1);
-assert.equal(keyManifest.papers.length,2);
+assert.equal(keyManifest.papers.length,3);
 const officialKey=keyManifest.papers.find(p=>p.id===paper2024.id);
 assert.equal(officialKey.id,paper2024.id);
 assert.equal(officialKey.paperVersion,paper2024.paperVersion);
@@ -101,6 +101,31 @@ for(const [n,key] of Object.entries({1:'C',6:'ALL',44:'C',56:'ALL',68:'A/B/C',74
 assert.equal(key2025.answers.filter(x=>x==='ALL').length,8);
 assert.equal(key2025.answers.filter(x=>x.includes('/')).length,5);
 assert.equal(key2025.answers.length-key2025.answers.filter(x=>x==='ALL').length,192);
+// 2011 Group I uses a different paper and final key from the uploaded 2011 Group II content.
+const g1=data.papers.find(p=>p.year===2011);
+const g1Key=keyManifest.papers.find(p=>p.id===g1.id);
+assert.equal(g1.id,'tnpsc-group-i-2011-preliminary-general-knowledge-d');
+assert.equal(g1.exam,'Group I (Preliminary)');
+assert.equal(g1.paperVersion,'IDPC/2011 · General Knowledge · Series D');
+assert.equal(g1.paperUrl,'https://www.tnpsc.gov.in/static_pdf/dptpreviousyearquestion/IDPC.pdf');
+assert.equal(g1.answerKeyUrl,'https://www.tnpsc.gov.in/static_pdf/anskeys/05_06_2011_g1_gk.pdf');
+assert.equal(g1.firstQuestionPdfPage,3);
+assert.deepEqual(g1.optionLetters,['A','B','C','D']);
+assert.equal(g1Key.paperVersion,g1.paperVersion);
+assert.equal(g1Key.sourceUrl,g1.answerKeyUrl);
+assert.equal(g1Key.questionCount,200);
+assert.equal(g1Key.answers.length,200);
+assert.equal(g1Key.marksPerQuestion,1.5);
+assert.ok(g1Key.answers.every(a=>/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/.test(a)));
+for(const [n,key] of Object.entries({1:'B',2:'A',3:'C',4:'ALL',5:'C',15:'A/B',17:'ALL',
+  51:'D',74:'A/C',77:'ALL',78:'ALL',101:'C',114:'ALL',128:'B/C',129:'A/B',
+  151:'A',152:'ALL',171:'ALL',185:'A/B',194:'ALL',200:'B'})){
+ assert.equal(g1Key.answers[Number(n)-1],key,'TNPSC 2011 Series D final key Q'+n);
+}
+assert.deepEqual(g1Key.answers.flatMap((a,i)=>a==='ALL'?[i+1]:[]),[4,17,77,78,114,152,171,194]);
+assert.deepEqual(g1Key.answers.flatMap((a,i)=>a.includes('/')?[i+1]:[]),[15,74,128,129,185]);
+assert.equal((g1Key.answers.length-8)*g1.marksPerQuestion,288);
+assert.match(hub,/Group I 2011 original-paper quiz/);
 assert.equal(bank.filter(q=>q.SourceExam==='TNPSC Group IV'&&q.SourceYear==='2024').length,30,'Adapted questions remain separate');
 assert.ok(!data.papers.some(x=>x.transcriptionStatus==='verified-full'));
 assert.match(html,/The paper is not copied or transcribed into ClearExams/);
@@ -115,7 +140,7 @@ assert.match(html,/id="sourceQuestionNumber"/,'Original source numbering is show
 assert.match(html,/id="questionPanel"/,'Inline answer card available');
 assert.match(html,/id="paperPanel"/,'Official question paper panel available');
 assert.match(html,/id="adaptedQuizLink"/,'Adapted text MCQs clearly distinguished');
-assert.match(html,/aria-label="Select OMR option A, B, C, D or E"/);
+assert.match(html,/aria-label="Select original-paper answer option"/);
 assert.match(html,/id="showBoth"/,'Mobile paper-plus-answer mode is present');
 assert.match(html,/id="mobileAnswerDock"/,'Mobile A–E dock is present');
 assert.match(html,/id="dockChoices"/,'Original-source answer choices remain interactive');
@@ -165,4 +190,4 @@ assert.match(adapted,/Previous Year Question Quiz/);
 assert.match(adapted,/not verbatim full-paper transcriptions/);
 assert.match(read('sitemap.xml'),/pyq-original-paper\.html/);
 new vm.Script(js,{filename:'assets/js/pyq-original-paper.js'});
-console.log('Three source-PDF quiz sessions; 2024+2025 final keys and all 400 original-source page positions reconciled; 2022 awaiting scoring.');
+console.log('Four official source-PDF sessions; Group I 2011 Series D plus Group IV 2024/2025 final keys verified by manifest; 2022 awaits scoring.');
