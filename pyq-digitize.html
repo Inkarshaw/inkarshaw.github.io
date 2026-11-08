@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071c33"><meta name="robots" content="noindex,nofollow">
+<title>Original PYQ Digitization Workbench | ClearExams</title>
+<meta name="description" content="Transcribe original paper questions one by one into a locally saved, reviewable English/Tamil JSON draft. This editor never publishes draft text.">
+<style>
+:root{--navy:#09243f;--blue:#175fd0;--ink:#142b45;--muted:#566a7e;--line:#d4e1ef;--bg:#f4f7fb;--good:#126a49;--amber:#95621a}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:var(--bg);font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+a{color:#1457b1}a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #92beff;outline-offset:2px}
+header{background:var(--navy);color:white}header .wrap{min-height:67px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+header a{color:#fff;text-decoration:none;font-weight:800}header a:first-child{font-size:1.14rem}
+.wrap{width:min(1240px,calc(100% - 28px));margin:0 auto}main{padding:25px 0 75px}
+h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:0 0 7px;line-height:1.2}h2{font-size:1.24rem;margin:0 0 10px}h3{font-size:1.04rem;margin:14px 0 8px}
+.lead{max-width:940px;color:var(--muted);margin:8px 0 18px}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;margin:14px 0}
+.note{background:#eff6ff;border:1px solid #c7ddfb;padding:12px 14px;border-radius:10px;color:#214566}
+.warning{background:#fff8e9;border:1px solid #ead7a9;padding:11px 14px;border-radius:10px;color:#735118}
+label{font-weight:750;display:block;margin-bottom:5px}
+input[type=number],input[type=text],input[type=url],select,textarea{font:inherit;color:var(--ink);border:1px solid #b8c8d8;background:#fff;border-radius:9px;padding:10px;width:100%;min-width:0}
+textarea{min-height:80px;resize:vertical;line-height:1.45}textarea.question-text{min-height:118px}
+button{font:inherit;font-weight:780;border:1px solid #b6c7dc;border-radius:9px;padding:10px 13px;background:#fff;color:var(--ink);cursor:pointer}button:disabled{opacity:.42;cursor:not-allowed}
+button.primary{background:var(--blue);border-color:var(--blue);color:white}button.good{background:#126a49;border-color:#126a49;color:white}
+.toolbar{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin-top:12px}.toolbar>*{min-width:0}.toolbar .wide{flex:1 1 280px}.toolbar .small{width:120px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}.stat{border:1px solid var(--line);border-radius:11px;padding:12px;background:#fafcff}.stat b{font-size:1.7rem;display:block}.stat span{font-size:.81rem;color:var(--muted)}
+.meter{height:9px;background:#e6ecf4;border-radius:9px;overflow:hidden}.meter div{height:100%;background:var(--blue);width:0}
+.workspace{display:grid;grid-template-columns:1fr 1.08fr;align-items:start;gap:16px}
+.source,.editor{min-width:0}.source{position:sticky;top:10px}.pdf-frame{width:100%;height:670px;border:1px solid var(--line);border-radius:8px;background:white}
+.controls{display:flex;gap:9px;flex-wrap:wrap;align-items:end}.controls>*{min-width:0}
+.controls .page{width:115px}.field{margin-bottom:12px}.choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.choice-grid label{font-size:.87rem}.choice-grid textarea{min-height:63px}.lang-group{padding:12px;border:1px solid var(--line);border-radius:11px;margin:10px 0;background:#fcfdff}
+.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.checks label,.lang-picks label{display:flex;align-items:center;gap:8px;font-weight:650;cursor:pointer;margin:0}
+.checks input,.lang-picks input{width:18px;height:18px;accent-color:var(--blue)}
+.lang-picks{display:flex;gap:18px;flex-wrap:wrap;margin:10px 0}.muted{color:var(--muted);font-size:.87rem}.toolbar-note{font-size:.82rem;color:var(--muted)}
+#recordStatus{font-size:.9rem;font-weight:700}#recordIssues{padding-left:20px;margin:8px 0;color:#85501a}
+.paste-tools textarea{min-height:80px}.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(39px,1fr));gap:5px;max-height:175px;overflow:auto}.palette button{padding:7px 2px;min-height:39px;font-size:.82rem}.palette button.captured{background:#e6f3fb;border-color:#77b2df}.palette button.reviewed{background:#e3f5e9;border-color:#91cea9}.palette button.current{outline:2px solid var(--blue)}
+.preview{background:#fbfdff;border:1px solid var(--line);border-radius:11px;padding:12px;margin-top:12px;overflow-wrap:anywhere;white-space:pre-wrap}
+.preview p{margin:7px 0}.preview b{color:var(--blue)}.preview .answer{padding:8px;border-bottom:1px solid var(--line)}.preview .key{font-weight:780;color:var(--good)}
+#messages{min-height:21px;font-size:.87rem;color:var(--good)}.small-link{font-size:.88rem;font-weight:650}
+@media(max-width:950px){.workspace{grid-template-columns:1fr}.source{position:static}.pdf-frame{height:50vh;min-height:340px}.panel{padding:14px}}
+@media(max-width:550px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat{padding:9px}.stat b{font-size:1.4rem}.choice-grid,.checks{grid-template-columns:1fr}.toolbar .small{width:105px}.pdf-frame{height:50vh}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a href="index.html">ClearExams.</a><a href="pyq-hub.html">← PYQ Archive</a></div></header>
+<main class="wrap">
+<h1>Original PYQ Digitization Workbench</h1>
+<p class="lead">Capture every original question and printed option <strong>exactly as shown</strong>, one by one. Tamil and English are separate only where both appear in the source. Use the official paper as the comparison reference; never replace its wording with adaptations.</p>
+<p class="note"><strong>Local draft only:</strong> This workbench saves text in your browser and exports a JSON file. No question text is sent to ClearExams or published automatically. Publishing complete verbatim papers requires a separately established legal basis and editorial approval.</p>
+<section class="panel">
+  <div class="toolbar">
+    <div class="wide"><label for="paperSelect">Original examination paper</label><select id="paperSelect"><option>Loading paper catalogue…</option></select></div>
+    <button id="exportJson" type="button" class="primary" disabled>Export transcription JSON</button>
+    <div><label for="importJson">Import my saved draft</label><input id="importJson" type="file" accept=".json,application/json"></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="totalCount">—</b><span>Numbered slots</span></div>
+    <div class="stat"><b id="capturedCount">0</b><span>Text captured</span></div>
+    <div class="stat"><b id="reviewedCount">0</b><span>Independently reviewed</span></div>
+  </div>
+  <div class="meter" aria-label="Captured original question records"><div id="coverageFill"></div></div>
+  <p id="messages" role="status" aria-live="polite"></p>
+  <details><summary><b>Jump to original question number</b> — blue = captured; green = reviewed</summary><nav id="questionPalette" class="palette" aria-label="Source question numbers"></nav></details>
+</section>
+<div class="workspace">
+  <section class="panel source" aria-labelledby="sourceTitle">
+    <h2 id="sourceTitle">Original paper reference</h2>
+    <p id="paperDescription" class="muted"></p>
+    <div class="controls">
+      <div class="page"><label for="pdfPage">PDF page</label><input id="pdfPage" type="number" min="1" max="500" value="1"></div>
+      <button id="showPage" type="button">Go to page</button>
+      <a id="sourceLink" class="small-link" target="_blank" rel="noopener noreferrer" href="https://www.tnpsc.gov.in/">Open official PDF</a>
+    </div>
+    <div class="field"><label for="localPdf">Or open a PDF from your device (never uploaded)</label><input id="localPdf" type="file" accept="application/pdf,.pdf"></div>
+    <iframe id="paperFrame" class="pdf-frame" title="Official original paper reference" referrerpolicy="no-referrer"></iframe>
+    <p class="toolbar-note">PDF pages are different from question numbers. For selectable PDFs, copy the original text from the PDF into the exact-text fields. Scanned images require careful manual transcription and proofing.</p>
+    <p class="warning">Some official PDFs contain marked answers. Compare against a clean original booklet where available.</p>
+  </section>
+  <section class="panel editor" aria-labelledby="editorTitle">
+    <div class="controls" style="justify-content:space-between"><h2 id="editorTitle">Question <span id="questionIndex">1</span></h2><span id="recordStatus">Draft</span></div>
+    <div class="controls" style="margin:10px 0">
+      <button id="previousQuestion" type="button">← Previous</button>
+      <button id="nextQuestion" type="button" class="primary">Save &amp; Next →</button>
+      <button id="nextIncomplete" type="button">Next missing</button>
+      <div class="page"><label for="jumpQuestion">Go to Q</label><input id="jumpQuestion" type="number" min="1" value="1"></div>
+      <button id="jumpToQuestion" type="button">Go</button>
+    </div>
+    <div class="controls">
+      <div class="page"><label for="sourcePage">Source PDF page</label><input id="sourcePage" type="number" min="1" max="500"></div>
+      <div class="wide"><label for="keyAnswer">Original final answer key</label><input id="keyAnswer" type="text" readonly aria-readonly="true" placeholder="Not indexed"></div>
+    </div>
+    <div class="field"><label>Original languages printed for this question</label><div class="lang-picks">
+      <label><input id="hasTamil" type="checkbox" checked> தமிழ்</label>
+      <label><input id="hasEnglish" type="checkbox"> English</label>
+    </div></div>
+    <div id="originalFields"></div>
+    <details class="paste-tools"><summary><b>Paste a whole printed question block</b> (assisted split into A–E)</summary>
+      <p class="muted">Only split labels if the PDF is text-selectable. The result still requires comparison with the original printed layout.</p>
+      <div class="field"><label for="pasteLang">Source language</label><select id="pasteLang"><option value="ta">தமிழ்</option><option value="en">English</option></select></div>
+      <div class="field"><label for="rawBlock">Copied original text</label><textarea id="rawBlock" placeholder="Paste the question and its printed (A) … (E) choices here"></textarea></div>
+      <button id="splitBlock" type="button">Split into stem and options (draft only)</button>
+    </details>
+    <div class="field"><label for="visualType">Does the printed original contain essential diagrams, charts or tables?</label>
+      <select id="visualType"><option value="unknown">Not reviewed</option><option value="no">No</option><option value="yes">Yes</option></select>
+    </div>
+    <div class="field"><label for="visualPath">Figure path for publication review (if any)</label><input id="visualPath" type="text" placeholder="assets/pyq-original/…"></div>
+    <div class="field"><label for="visualAlt">Figure description (if any)</label><input id="visualAlt" type="text"></div>
+    <div class="field"><label for="editorNotes">Transcription/review notes</label><textarea id="editorNotes" placeholder="Ambiguous scan, dropped Tamil diacritics, booklet version, question split, etc."></textarea></div>
+    <h3>Independent question-level checks</h3>
+    <p class="muted">Check these only after comparing against the printed booklet and matching final answer key. Editing source fields clears the related checks.</p>
+    <div class="checks">
+      <label><input id="reviewText" type="checkbox"> Exact stem verified</label>
+      <label><input id="reviewOptions" type="checkbox"> A–E options verified</label>
+      <label><input id="reviewSource" type="checkbox"> Source number/page verified</label>
+      <label><input id="reviewKey" type="checkbox"> Version A key checked</label>
+      <label><input id="reviewVisuals" type="checkbox"> Figures/tables checked</label>
+    </div>
+    <p id="issuesTitle" class="muted"></p><ul id="recordIssues"></ul>
+    <button id="previewQuestion" type="button">Preview this exact-text draft</button>
+    <div id="previewArea" class="preview" hidden></div>
+    <p class="toolbar-note">For quiz publication, import reviewed records into the separately validated full-original-paper manifest only after checking paper completeness and reuse rights. A local draft is never live exam content.</p>
+  </section>
+</div>
+<p class="muted">This page does not upload your files or draft text to a server. Avoid clearing browser storage before exporting your progress. <a href="pyq-original-digital.html">Verified full-original quiz publication status</a>.</p>
+</main>
+<script src="assets/js/pyq-draft-schema.js"></script>
+<script src="assets/js/pyq-digitize.js"></script>
+</body></html>
