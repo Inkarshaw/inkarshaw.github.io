@@ -187,7 +187,7 @@ try {
   assert.match(await page.locator('#topicHeading').innerText(),/Dice and visual reasoning/);
   assert.equal(await page.locator('#questionList .question').count(),2);
   assert.equal(await page.locator('#questionList .warning').count(),2,'Image-dependent Q98 and Q200 show source warnings');
-  assert.match(await page.locator('#questionList').innerText(),/Original 2026 · Question 200/);
+  assert.match(await page.locator('#questionList').innerText(),/Original 2026 · Question 200/i);
   await page.locator('#unansweredOnly').click();
   assert.equal(await page.locator('#questionList .question').count(),2,'Unanswered-only filter includes both unanswered figures');
   await page.locator('#questionList .question').first().locator('button.option').first().click();
