@@ -103,6 +103,12 @@
         ?pool.length+' adapted source-attributed questions currently available from the 200-question TNPSC Group IV 2024 paper. '+(pool.length-count)+' other adapted questions are outside this session. These are not verbatim original questions or the complete paper.'
         :pool.length+' adapted source-attributed questions available in the selected bank. This is not the complete original examination paper.';
       note.append(description);
+      if(exam==='TNPSC Group IV'&&['2022','2024','2025'].includes(String(year))){
+        const full=document.createElement('a');full.className='full-original-cta';
+        full.href='pyq-original-paper.html?paper=tnpsc-group-iv-'+year+'-general-tamil-general-studies';
+        full.textContent='Want the exact original 200 questions? Open the full official-PDF quiz →';
+        note.append(full);
+      }
       if(isGroupIV2024){
         const sources=document.createElement('div');sources.className='source-links';
         link(sources,pool[0].SourceURL,'TNPSC 2024 official question paper');
