@@ -1,0 +1,48 @@
+name: TNPSC Group IV 2024 original-paper JSON extraction (editorial draft)
+on:
+  push:
+    branches:
+      - fix/pyq-no-upload-student-flow-20261108
+    paths:
+      - scripts/extract_tnpsc_2024_original.py
+      - .github/workflows/tnpsc-2024-ocr-extract.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    name: Extract 200 original-question OCR candidates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Tamil and English OCR tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils libtiff-tools tesseract-ocr tesseract-ocr-tam tesseract-ocr-eng
+      - name: Extract TNPSC official scanned paper to 200 JSON records
+        run: |
+          python3 scripts/extract_tnpsc_2024_original.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('data/quizzes/tnpsc-g4-2024-original-questions.json')
+          data=json.loads(p.read_text(encoding='utf-8'))
+          assert len(data['questions'])==200
+          assert [x['number'] for x in data['questions']]==list(range(1,201))
+          assert all(x['sourcePdfPage'] for x in data['questions'])
+          assert all(x['finalKeyToken'] for x in data['questions'])
+          assert data['questionTextVerified']==0
+          print('200 official question positions and keys valid; OCR drafts never treated as verified.')
+          PY
+      - name: Commit staged JSON extraction to this feature branch
+        run: |
+          git config user.name "ClearExams OCR Editor"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/quizzes/tnpsc-g4-2024-original-questions.json data/quizzes/tnpsc-g4-2024-ocr-page-draft.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Stage TNPSC 2024 original Tamil/English question OCR candidates"
+            git push origin HEAD:fix/pyq-no-upload-student-flow-20261108
+          fi
