@@ -18,8 +18,8 @@ for(const set of bank.sets){
   assert.ok(['en','en-ta'].includes(set.language));
   if(set.language==='en-ta'){
     assert.equal(set.source.edition,'2026–27');
-    assert.ok([1,2,3,4,5,6,7,8,9,10].includes(set.source.chapter));
-    assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79,6:100,7:113,8:128,9:134,10:161})[set.source.chapter]);
+    assert.ok([1,2,3,4,5,6,7,8,9,10,11,12,13].includes(set.source.chapter));
+    assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79,6:100,7:113,8:128,9:134,10:161,11:171,12:195,13:208})[set.source.chapter]);
     assert.equal(new URL(set.source.url).hostname,'ncert.nic.in');
   }
   assert.equal(set.questions.length,10,'A set must contain ten questions: '+set.id);
@@ -37,11 +37,11 @@ for(const set of bank.sets){
       assert.match(q.tamil.explanation,/[\u0B80-\u0BFF]/);
       assert.equal(q.tamil.options.length,4);
       assert.equal(new Set(q.tamil.options).size,4);
-      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112,7:127,8:133,9:160,10:170})[set.source.chapter]);
+      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112,7:127,8:133,9:160,10:170,11:194,12:207,13:217})[set.source.chapter]);
     }
   }
 }
-assert.ok(count>=550);
+assert.ok(count>=610);
 const acids=bank.sets.filter(s=>s.source?.chapter===2).flatMap(s=>s.questions);
 assert.equal(acids.length,40);
 assert.deepEqual(acids.slice(0,20).map(q=>q.options[q.answer]),["Acidic and basic", "Dilute sodium hydroxide", "It burns with a pop near a flame.", "Sodium chloride, water and carbon dioxide", "Soluble calcium hydrogencarbonate forms.", "H⁺ and OH⁻ combine to form water.", "Copper(II) chloride", "The acid produces mobile ions in water, while dissolved glucose does not.", "Water enables formation of hydronium ions.", "The number of hydronium ions", "pH 2", "It helps neutralise acids made by mouth bacteria.", "A stronger acid", "Sodium sulphate and potassium sulphate", "Sodium carbonate", "Chlorine and hydrogen", "Bleaching powder forms.", "Carbon dioxide", "Ten waters of crystallisation per formula unit of sodium carbonate", "Gypsum"]);
@@ -91,7 +91,7 @@ assert.deepEqual(metalSets.map(s=>s.questions.map(q=>q.answer)),[
  [1,2,0,3,1,2,0,3,1,2]
 ]);
 const currentChapterCoverage=new Set(bank.sets.filter(s=>s.classLevel===10&&s.subject==='Science'&&s.source?.chapter).map(s=>s.source.chapter));
-assert.deepEqual([...currentChapterCoverage].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8,9,10]);
+assert.deepEqual([...currentChapterCoverage].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8,9,10,11,12,13]);
 const carbonIds=['c10-carbon-bonding-catenation','c10-carbon-homologous-naming','c10-carbon-reactions','c10-carbon-ethanol-acids-soaps'];
 const carbonSets=carbonIds.map(id=>bank.sets.find(s=>s.id===id));
 assert.ok(carbonSets.every(Boolean),'Four English–Tamil Carbon chapter sets required');
@@ -214,6 +214,45 @@ assert.equal(inventoryEye.editorialCertified,false);
 assert.equal(inventoryEye.sourcePdf,'https://ncert.nic.in/textbook/pdf/jesc110.pdf');
 assert.match(inventoryEye.sourceReview,/pending|provisional/);
 
+// The 2026–27 13-chapter catalogue now has chapter-linked playable sets
+// for every chapter. These content checks do not certify the textbook pages.
+const finalChapterSets={
+  11:['c10-electricity-current-ohms-law','c10-electricity-circuits-power'],
+  12:['c10-magnetism-field-solenoid','c10-magnetism-force-domestic-safety'],
+  13:['c10-environment-ecosystems-energy','c10-environment-ozone-waste']
+};
+const finalChapterPages={11:[171,194],12:[195,207],13:[208,217]};
+const finalChapterCorrect={
+  11:[[1,0,2,3,1,2,0,3,1,2],[0,2,1,3,2,0,2,1,3,2]],
+  12:[[0,1,2,3,0,1,0,1,2,3],[1,0,2,3,0,1,2,0,3,1]],
+  13:[[1,2,0,3,2,1,0,3,2,1],[2,0,1,3,2,1,0,3,2,1]]
+};
+const finalInventory=JSON.parse(get('data/ncert/class10-science-chapter-inventory.json'));
+for(const [number,ids] of Object.entries(finalChapterSets)){
+  const chapter=Number(number),sets=ids.map(id=>bank.sets.find(s=>s.id===id));
+  assert.ok(sets.every(Boolean),'Two bilingual sets missing in chapter '+number);
+  assert.equal(sets.flatMap(s=>s.questions).length,20);
+  assert.deepEqual(sets.map(s=>s.questions.map(q=>q.answer)),finalChapterCorrect[number]);
+  for(const set of sets){
+    assert.equal(set.language,'en-ta');
+    assert.equal(set.source.chapter,chapter);
+    assert.equal(set.source.firstPage,finalChapterPages[number][0]);
+    assert.equal(set.source.url,'https://ncert.nic.in/textbook/pdf/jesc1'+number+'.pdf');
+    assert.equal(set.reviewStatus,'editorial-review-pending');
+    assert.match(set.source.pageReferenceEdition,/pending/i);
+    assert.equal(set.questions.length,10);
+    for(const q of set.questions){
+      assert.ok(q.page>=finalChapterPages[number][0]&&q.page<=finalChapterPages[number][1]);
+      assert.match(q.tamil.question,/[\u0B80-\u0BFF]/);
+      assert.match(q.tamil.explanation,/[\u0B80-\u0BFF]/);
+      assert.equal(new Set(q.tamil.options).size,4);
+    }
+  }
+  const record=finalInventory.chapters.find(c=>c.number===chapter);
+  assert.equal(record.editorialCertified,false);
+  assert.match(record.sourceReview,/pending|remain/i);
+  assert.equal(record.sourcePdf,'https://ncert.nic.in/textbook/pdf/jesc1'+number+'.pdf');
+}
 for(const id of ['classPicker','subjectPicker','topicSearch','setGrid','quizSection','quizTitle','options','feedback','checkAnswer','nextQuestion','resultSection','resultScore','reviewList','retryQuiz','chooseAnother']){
  assert.match(html,new RegExp('id="'+id+'"'),id+' missing in UI');
 }
