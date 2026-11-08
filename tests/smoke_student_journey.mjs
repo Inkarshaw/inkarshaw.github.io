@@ -148,6 +148,61 @@ try {
   assert.deepEqual(pageErrors,[],'Original 200-question sessions have no runtime errors');
   console.log('PASS 200 original questions: source PDF, matching numbered responses, save/resume and year switch');
 
+  // Syllabus-first redesign: discover exam → Group I syllabus → topic MCQs → saved responses.
+  pageErrors.length=0;
+  await page.goto(origin+'/index.html',{waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('.ce-track-grid .ce-track').count(),4,'Homepage shows four exam-specific study tracks');
+  assert.equal(await page.locator('.ce-track-grid a[href="tnpsc-group1-syllabus.html"]').count(),1);
+  await page.goto(origin+'/tnpsc-group1-syllabus.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelectorAll('#unitList details.unit').length===8,
+    undefined,{timeout:20000});
+  assert.equal(await page.locator('#unitList .topic').count(),42,'42 searchable official syllabus-topic headings');
+  assert.match(await page.locator('#filterStatus').innerText(),/8 units.*42 topics/);
+  await page.locator('#topicSearch').fill('Panchayat');
+  assert.equal(await page.locator('#unitList .topic').count(),1,'Search filters to specific topic');
+  assert.match(await page.locator('#unitList').innerText(),/Panchayat Raj/);
+  await page.locator('#clearSearch').click();
+  assert.equal(await page.locator('#unitList .topic').count(),42);
+  await page.locator('#revision-biology').check();
+  assert.match(await page.locator('#doneCount').innerText(),/1 \/ 42/);
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelectorAll('#unitList details.unit').length===8,
+    undefined,{timeout:20000});
+  assert.equal(await page.locator('#revision-biology').isChecked(),true,'Revision progress persists after reload');
+  await page.goto(origin+'/tnpsc-group1-topic-practice.html?topic=biology',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelectorAll('#questionList .question').length===4,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#topicHeading').innerText(),/Life science/);
+  assert.equal(await page.locator('#questionList .question').count(),4);
+  assert.match(await page.locator('#questionList .question').first().innerText(),/Commensalism/);
+  assert.equal(await page.locator('#questionList .question').first().locator('button.option').count(),5);
+  await page.locator('#questionList .question').first().locator('button.option').nth(1).click();
+  assert.match(await page.locator('#progressSummary').innerText(),/1 of 4 topic questions answered/);
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelectorAll('#questionList .question').length===4,
+    undefined,{timeout:20000});
+  assert.equal(await page.locator('#questionList .question').first().locator('button.option').nth(1).getAttribute('aria-pressed'),'true',
+    'Topic answer survives reload');
+  await page.locator('#topicSelect').selectOption('dice-visual');
+  assert.match(await page.locator('#topicHeading').innerText(),/Dice and visual reasoning/);
+  assert.equal(await page.locator('#questionList .question').count(),2);
+  assert.equal(await page.locator('#questionList .warning').count(),2,'Image-dependent Q98 and Q200 show source warnings');
+  assert.match(await page.locator('#questionList').innerText(),/Original 2026 · Question 200/i);
+  await page.locator('#unansweredOnly').click();
+  assert.equal(await page.locator('#questionList .question').count(),2,'Unanswered-only filter includes both unanswered figures');
+  await page.locator('#questionList .question').first().locator('button.option').first().click();
+  assert.equal(await page.locator('#questionList .question').count(),1,'Answered item disappears in unanswered-only filter');
+  page.once('dialog',dialog=>dialog.accept());
+  await page.locator('#resetTopic').click();
+  assert.equal(await page.locator('#questionList .question').count(),2,'Reset clears selected topic only');
+  assert.match(await page.locator('#progressSummary').innerText(),/0 of 2 topic questions answered/);
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
+    'Topic practice mobile has no horizontal overflow');
+  await page.goto(origin+'/pyq-hub.html',{waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('.ce-year-nav .ce-yearlink').count(),6);
+  assert.deepEqual(pageErrors,[],'Group I syllabus-first path has no JS runtime errors');
+  console.log('PASS syllabus-first Group I: 8 units, 42 topics, search, revision saves, four original biology MCQs, figure warnings and topic reset');
+
   // TNPSC Group I 2026: all 200 user-extracted onscreen questions, with source review and no fabricated scoring.
   pageErrors.length=0;
   await page.goto(origin+'/tnpsc-g1-2026-quiz.html',{waitUntil:'domcontentloaded'});

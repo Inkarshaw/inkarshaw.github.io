@@ -4,6 +4,14 @@ on:
   pull_request:
     paths:
       - "pyq-hub.html"
+      - "tnpsc-group1-syllabus.html"
+      - "tnpsc-group1-topic-practice.html"
+      - "assets/css/clear-pathways.css"
+      - "assets/js/tnpsc-group1-syllabus.js"
+      - "assets/js/tnpsc-group1-topic-practice.js"
+      - "data/tnpsc/group1-prelims-topics.json"
+      - "tests/test_group1_syllabus_flow.mjs"
+      - "tnpsc.html"
       - "tnusrb-si-2010-quiz.html"
       - "tnusrb-si-2020-quiz.html"
       - "tnusrb-si-2015-quiz.html"
@@ -69,6 +77,14 @@ on:
     branches: [main]
     paths:
       - "pyq-hub.html"
+      - "tnpsc-group1-syllabus.html"
+      - "tnpsc-group1-topic-practice.html"
+      - "assets/css/clear-pathways.css"
+      - "assets/js/tnpsc-group1-syllabus.js"
+      - "assets/js/tnpsc-group1-topic-practice.js"
+      - "data/tnpsc/group1-prelims-topics.json"
+      - "tests/test_group1_syllabus_flow.mjs"
+      - "tnpsc.html"
       - "tnusrb-si-2010-quiz.html"
       - "tnusrb-si-2020-quiz.html"
       - "tnusrb-si-2015-quiz.html"
@@ -137,6 +153,8 @@ jobs:
         run: node tests/test_tnusrb_si_2015_quiz.mjs
       - name: Validate Group I 2026 200 user-extracted A–E text questions with no fabricated keys
         run: node tests/test_tnpsc_g1_2026_quiz.mjs
+      - name: Validate Group I syllabus-first unit, topic and previous-year-question routing
+        run: node tests/test_group1_syllabus_flow.mjs
       - name: Verify commercial navigation and publication trust
         run: python3 -m unittest discover -s tests -p 'test_commercial_readiness.py'
       - name: Test live Current Affairs publishing and source freshness guards
