@@ -27,6 +27,9 @@ textarea{resize:vertical;min-height:132px}input:focus,select:focus,textarea:focu
 .status{min-height:25px;font-size:.89rem;color:#c5ebff;margin:8px 0 0}
 .mapwrap{position:relative}#map{height:min(65vh,650px);min-height:390px;background:#102637;border-radius:10px;overflow:hidden}
 #map .leaflet-container{background:#102637}#map .leaflet-control-attribution{font-size:10px}
+.tower-pin{border:2px solid #fff;border-radius:50%;background:#163eff;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;width:37px;height:37px;box-shadow:0 1px 8px #0009}
+.leaflet-tooltip.sector-tooltip{background:#1532a6;color:white;border:1px solid #82a8ff;box-shadow:0 1px 8px #0008}
+.leaflet-tooltip.sector-tooltip:before{display:none}
 .maphead{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
 .maptag{font-size:.8rem;color:#ffe4a1;background:#40321a;border:1px solid #826635;padding:6px 10px;border-radius:100px}
 #mapFallback{display:none;padding:16px;background:#1a394f;border:1px solid var(--line);border-radius:10px}
@@ -54,6 +57,11 @@ kbd{font:inherit;color:#ffdb91}.meta{display:grid;grid-template-columns:repeat(2
 <textarea id="message" placeholder="Paste location message here. Example fields: MOB ..., CGI ..., Lat ..., Long ..."></textarea>
 <div class="row"><button type="button" class="btn" id="parse">Parse message</button><button type="button" class="btn alt" id="clear">Clear all</button></div>
 <div class="status" id="status" role="status" aria-live="polite">Ready to parse an LBS message.</div>
+<h3>Alternatively: paste a C-Trace result</h3>
+<p class="small">Use a copied C-Trace tower report containing <strong>Requested Cell ID</strong>, <strong>Cell ID</strong>, <strong>Lat/Lang</strong>, <strong>Azimuth</strong>, and the approximate distance. This accepts the text, not the map screenshot. Data is processed on this device.</p>
+<textarea id="ctraceText" placeholder="Paste the C-Trace tower result here"></textarea>
+<div class="row"><button class="btn" id="parseCtrace" type="button">Parse C-Trace result</button></div>
+<p class="status" id="ctraceStatus" aria-live="polite">No C-Trace result loaded.</p>
 </section>
 <section class="panel">
 <h2>2. Edit the reference details</h2>
@@ -75,9 +83,14 @@ kbd{font:inherit;color:#ffdb91}.meta{display:grid;grid-template-columns:repeat(2
 <div class="field"><label for="towerLat">Verified tower latitude</label><input id="towerLat" type="number" min="-90" max="90" step="any" placeholder="Tower latitude"></div>
 <div class="field"><label for="towerLon">Verified tower longitude</label><input id="towerLon" type="number" min="-180" max="180" step="any" placeholder="Tower longitude"></div>
 <div class="field full"><label for="towerSource">Tower source / provenance</label><input id="towerSource" type="text" placeholder="e.g. dated operator cell-site sheet"></div>
+<div class="field full"><label for="resolvedCgi">Resolved CGI from provider / C-Trace record</label><input id="resolvedCgi" type="text" placeholder="Full resolved CGI"></div>
+<div class="field"><label for="network">Network / provider</label><input id="network" type="text" placeholder="e.g. 4G / Airtel"></div>
+<div class="field"><label for="distanceKm">Approximate reported tower-to-person distance (km)</label><input id="distanceKm" type="number" min="0.01" max="50" step="any" placeholder="Optional, e.g. 1.59"></div>
+<div class="field full"><label for="towerAddress">Tower site reference / address (local only)</label><textarea id="towerAddress" rows="2" placeholder="Optional tower site details"></textarea></div>
+<div class="field full"><label class="check"><input type="checkbox" id="partialCgi"><span>Allow one manually reviewed partial CGI match when the requested LAC/TAC is 0 and MCC, MNC and Cell ID agree. An exact match is always preferred.</span></label></div>
 <div class="field full"><label for="towerCsv">Import authorised tower CSV (local only)</label><input id="towerCsv" type="file" accept=".csv,.tsv,.txt,text/csv"></div>
 </div>
-<p class="small">CSV columns: <code>cgi,latitude,longitude,azimuth,beamwidth,site_name</code>. The full CGI is matched exactly; no Cell ID direction is guessed. Where a unique CGI match is found, the sector bearing and site coordinates can be applied. Imported data stays on your device.</p>
+<p class="small">CSV columns: <code>cgi,latitude,longitude,azimuth,beamwidth,site_name</code>. Exact CGI matches are preferred. If the request has LAC/TAC 0, a unique MCC + MNC + Cell ID match may be used <strong>only after enabling the manual-review checkbox</strong>. Imported CSV data stays on your device.</p>
 <div class="row"><button type="button" class="btn alt" id="matchTower">Find CGI in CSV</button><button type="button" class="btn alt" id="resetTower">Clear tower data</button></div>
 <p class="small" id="towerStatus" aria-live="polite">No tower data loaded.</p>
 <h3>4. Sector diagram settings</h3>
@@ -87,9 +100,10 @@ kbd{font:inherit;color:#ffdb91}.meta{display:grid;grid-template-columns:repeat(2
 <div class="field"><label for="bearing">Sector A centre bearing (° true N)</label><input id="bearing" type="number" min="0" max="359.99" step="any" value="0"></div>
 <div class="field"><label for="span">Beam / wedge width (°)</label><input id="span" type="number" min="1" max="360" step="any" value="120"></div>
 <div class="field"><label for="radius">Illustrative radius (metres)</label><input id="radius" type="number" min="10" max="50000" step="10" value="1000"></div>
+<div class="field full"><label class="check"><input type="checkbox" id="ctraceStyle" checked><span>Display a blue directional wedge and tower marker, like C-Trace (still a diagram, not measured coverage)</span></label></div>
 <div class="field"><label for="rotate">Adjust centre bearing</label><input id="rotate" type="range" min="0" max="359" step="1" value="0"></div>
 </div>
-<p class="small">Sectors are spaced evenly around the anchor. Sector A is <strong>0° by default only as a drawing convention</strong>; the message supplies no bearing. Change this after independently confirming the operator's azimuth. Radius is illustrative, not a measured radio range.</p>
+<p class="small">Sectors are spaced evenly around the tower anchor. When a C-Trace report supplies only an azimuth (such as 160°), the <strong>120° wedge width remains a display assumption</strong>, not a carrier-confirmed beamwidth. A reported approximate distance can be used to set the illustrative wedge radius, but does not identify a unique handset position.</p>
 <div class="row"><button type="button" class="btn" id="draw">Draw / update map</button><button type="button" class="btn alt" id="fit">Fit sectors</button></div>
 </section>
 </div>
@@ -99,8 +113,9 @@ kbd{font:inherit;color:#ffdb91}.meta{display:grid;grid-template-columns:repeat(2
 <div class="maphead"><h2>Map and sector boundaries</h2><span class="maptag">⚠ Illustrative / not a verified handset fix</span></div>
 <div id="map" role="img" aria-label="Map of LBS reference point and illustrative sector wedges"></div>
 <div id="mapFallback">The interactive map library could not load. Use the PNG, GeoJSON or KML exports below; the geometry can still be generated if the main script is available.</div>
-<div class="row notePrint"><label class="check"><input type="checkbox" id="tiles"><span>Show OpenStreetMap street tiles (online). <strong>Turning on tiles sends map-area requests to an external tile provider.</strong> Raw phone/IMSI/CGI values are not sent by this tool.</span></label></div>
-<div class="legend" id="legend"></div>
+<div class="row notePrint"><div class="field" style="width:100%"><label for="mapStyle">Base map (choose to allow third-party tile requests)</label><select id="mapStyle"><option value="none">Private blank map — no map-area tile requests</option><option value="satellite">Satellite + place labels (Esri, online)</option><option value="imagery">Satellite imagery (Esri, online)</option><option value="streets">Street map (OpenStreetMap, online)</option></select></div></div>
+<p class="small notePrint">Online tile modes send the viewed map area and your IP address to the chosen mapping service; phone/IMSI/CGI are not sent by this page. For sensitive cases, use the blank map. The blue sector is hypothetical unless operator beamwidth is verified.</p>
+<div class="legend" id="legend"></div><div class="small" id="distanceNote">Distance is not enough to calculate a unique handset position.</div>
 <div class="small" id="coords">Paste a message or enter latitude and longitude.</div>
 </section>
 <section class="panel actionPanel">
@@ -112,7 +127,7 @@ kbd{font:inherit;color:#ffdb91}.meta{display:grid;grid-template-columns:repeat(2
 <button type="button" class="btn alt" id="print">Print / Save PDF</button>
 <a id="google" class="btn alt" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Open reference point in Google Maps</a>
 </div>
-<p class="small">PNG is a north-up local-coordinate sector diagram, not a street-map screenshot. GeoJSON and KML contain geometry and technical caveats, but omit mobile number, IMSI, VLR, and request ID. Printing may include the on-page details. Local browser processing; no storage or submission endpoint.</p>
+<p class="small">PNG is a north-up diagram (not a satellite screenshot). GeoJSON and KML contain sector geometry and caveats but omit mobile number, IMEI, IMSI, VLR, name, address and request ID. Printing may include on-page details. Imported data is processed locally; tile requests go to third-party mapping providers only when you select an online base map.</p>
 </section>
 <section class="panel">
 <h2>Parsed / calculated summary</h2>
