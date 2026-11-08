@@ -22,3 +22,5 @@ for tag in soup.find_all(["h2","h3","h4","strong"]):
         break
 else:
     print("No matching question heading",[(t.name,t.get_text(" ",strip=True)[:80]) for t in soup.find_all(["h2","h3","h4"])[:20]])
+
+# Editorial structure inspection only.
