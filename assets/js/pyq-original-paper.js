@@ -46,12 +46,15 @@
     lastShownPdfPage=n;
   }
   function switchView(view){
-    const paper=view==='paper';
+    const paper=view==='paper',questions=view==='questions',both=view==='both';
     $('quizWorkspace').classList.toggle('mobile-paper',paper);
-    $('quizWorkspace').classList.toggle('mobile-questions',!paper);
+    $('quizWorkspace').classList.toggle('mobile-questions',questions);
+    $('quizWorkspace').classList.toggle('mobile-both',both);
     $('showPaper').setAttribute('aria-pressed',String(paper));
-    $('showQuestions').setAttribute('aria-pressed',String(!paper));
+    $('showQuestions').setAttribute('aria-pressed',String(questions));
+    $('showBoth').setAttribute('aria-pressed',String(both));
   }
+  $('showBoth').addEventListener('click',()=>switchView('both'));
   $('showPaper').addEventListener('click',()=>switchView('paper'));
   $('showQuestions').addEventListener('click',()=>switchView('questions'));
 
@@ -72,7 +75,8 @@
     return p&&/^[a-z0-9-]+$/.test(String(p.id||''))&&
       Number.isInteger(p.questionCount)&&p.questionCount>=1&&p.questionCount<=300&&
       p.format==='official-pdf-answer-sheet'&&p.transcriptionStatus==='not-transcribed'&&
-      p.answerKeyStatus==='official-pdf-only'&&!!safe(p.paperUrl)&&!!safe(p.answerKeyUrl)&&
+      ['official-pdf-only','official-final-key-mapped-subject-496'].includes(p.answerKeyStatus)&&
+      !!safe(p.paperUrl)&&!!safe(p.answerKeyUrl)&&
       Array.isArray(p.optionLetters)&&p.optionLetters.join(',')==='A,B,C,D,E'&&
       Number.isInteger(p.durationMinutes)&&p.durationMinutes>=30&&p.durationMinutes<=240;
   }
@@ -90,6 +94,22 @@
       b.addEventListener('click',()=>{index=j;write();render()});
       wrap.append(b);
     }
+  }
+  function renderDock(){
+    if(!currentPaper||!answers.length)return;
+    $('dockNumber').textContent='Original Q'+(index+1)+' / '+answers.length;
+    $('dockSaved').textContent=answers.filter(Boolean).length+' answered · saved';
+    const dock=$('dockChoices');dock.replaceChildren();
+    for(const letter of currentPaper.optionLetters){
+      const button=document.createElement('button');button.type='button';
+      button.textContent=letter;
+      button.setAttribute('aria-pressed',String(answers[index]===letter));
+      button.title=letter==='E'?'Answer not known':('Select '+letter);
+      button.addEventListener('click',()=>{answers[index]=letter;write();render()});
+      dock.append(button);
+    }
+    $('dockPrevious').disabled=index===0;
+    $('dockNext').disabled=index===answers.length-1;
   }
   function render(){
     if(!currentPaper)return;
@@ -116,6 +136,7 @@
     $('next').disabled=index===answers.length-1;
     updateStatus();
     renderPalette();
+    renderDock();
   }
   function setPaper(p){
     currentPaper=p;index=0;lastShownPdfPage=0;
@@ -135,7 +156,7 @@
     $('paperFrame').title='TNPSC '+p.year+' official original question paper (PDF)';
     const adapted=new URLSearchParams({exam:'TNPSC Group IV',year:String(p.year)});
     $('adaptedQuizLink').href='pyq-full-quiz.html?'+adapted.toString();
-    switchView('questions');
+    switchView('both');
     const saved=read(p.id);
     if(saved&&(saved.version===1||saved.version===2)&&Array.isArray(saved.answers)&&saved.answers.length===p.questionCount&&
        saved.answers.every(a=>a===null||allowedLetters.includes(a))&&Array.isArray(saved.marked)&&saved.marked.length===p.questionCount){
@@ -145,7 +166,8 @@
     }else{answers=Array(p.questionCount).fill(null);marked=Array(p.questionCount).fill(false);deadline=0}
     $('timed').checked=deadline>0;
     startOrStopTimer();
-    $('paperPicker').hidden=true;$('answerSheet').hidden=false;$('result').hidden=true;render();
+    $('paperPicker').hidden=true;$('answerSheet').hidden=false;$('result').hidden=true;
+    $('mobileAnswerDock').hidden=false;render();
   }
   function finish(expired=false){
     const attempted=answers.filter(Boolean).length;
@@ -175,7 +197,8 @@
     });
     $('answerOverview').replaceChildren(rows);
     plainLink($('resultSource'),currentPaper.answerKeyUrl,'Open the official final answer key PDF ↗');
-    $('result').hidden=false;$('answerSheet').hidden=true;window.scrollTo(0,0);write();
+    $('result').hidden=false;$('answerSheet').hidden=true;$('mobileAnswerDock').hidden=true;
+    window.scrollTo(0,0);write();
   }
   function tick(){
     if(!currentPaper||!deadline||$('answerSheet').hidden)return;
@@ -211,17 +234,19 @@
   $('firstQuestion').addEventListener('click',()=>jumpPdfPage(currentPaper?.firstQuestionPdfPage));
   $('previous').addEventListener('click',()=>{if(index>0){index--;write();render()}});
   $('next').addEventListener('click',()=>{if(index<answers.length-1){index++;write();render()}});
+  $('dockPrevious').addEventListener('click',()=>{if(index>0){index--;write();render()}});
+  $('dockNext').addEventListener('click',()=>{if(index<answers.length-1){index++;write();render()}});
   $('clear').addEventListener('click',()=>{answers[index]=null;write();render()});
   $('flag').addEventListener('click',()=>{marked[index]=!marked[index];write();render()});
   $('finish').addEventListener('click',finish);
-  $('changePaper').addEventListener('click',()=>{$('paperPicker').hidden=false;$('answerSheet').hidden=true;$('result').hidden=true});
-  $('returnToSheet').addEventListener('click',()=>{$('answerSheet').hidden=false;$('result').hidden=true;render()});
+  $('changePaper').addEventListener('click',()=>{$('paperPicker').hidden=false;$('answerSheet').hidden=true;$('result').hidden=true;$('mobileAnswerDock').hidden=true});
+  $('returnToSheet').addEventListener('click',()=>{$('answerSheet').hidden=false;$('result').hidden=true;$('mobileAnswerDock').hidden=false;render()});
   $('restart').addEventListener('click',()=>{
     if(!confirm('Erase answers and start this paper again?'))return;
     answers=Array(currentPaper.questionCount).fill(null);marked=Array(currentPaper.questionCount).fill(false);index=0;
     deadline=$('timed').checked?Date.now()+currentPaper.durationMinutes*60*1000:0;
     startOrStopTimer();write();
-    $('answerSheet').hidden=false;$('result').hidden=true;render();
+    $('answerSheet').hidden=false;$('result').hidden=true;$('mobileAnswerDock').hidden=false;render();
   });
   Promise.all([
     fetch('data/quizzes/original-paper-practice.json',{cache:'no-store'})
@@ -270,7 +295,8 @@
         b.addEventListener('click',()=>setPaper(paper));$('papers').append(b);
       }
       $('loading').textContent='Choose an exam year. The original paper opens alongside a full quiz answer interface.';
-      const requested=papers.find(p=>p.id===url.get('paper'));
+      const requested=papers.find(p=>p.id===url.get('paper'))||
+        (!url.has('paper')?papers.find(p=>p.year===2024):null);
       if(requested)setPaper(requested);
     }).catch(err=>{$('loading').textContent=err.message});
 })();
