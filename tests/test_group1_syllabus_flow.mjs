@@ -54,7 +54,7 @@ assert.match(s,/searchable|Search topics/i);
 assert.match(s,/Official syllabus PDF/i);
 assert.match(s,/id="studyProgress"/);
 assert.match(s,/id="resumeTopic"/);
-assert.match(s,/tnpsc-group1-topic-practice\.html/);
+assert.match(sJS,/tnpsc-group1-topic-practice\.html/,'Topic practice links are generated from the syllabus index');
 assert.match(t,/Read\. Choose\. Review\./);
 assert.match(t,/Show unanswered only/);
 assert.match(t,/Reset topic responses/);
