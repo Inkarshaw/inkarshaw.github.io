@@ -148,6 +148,50 @@ try {
   assert.deepEqual(pageErrors,[],'Original 200-question sessions have no runtime errors');
   console.log('PASS 200 original questions: source PDF, matching numbered responses, save/resume and year switch');
 
+  // Full 2024 Group IV typed PYQ: 200 questions, five choices, original positions and official-key feedback.
+  pageErrors.length = 0;
+  await page.goto(origin+'/pyq-2024-text-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#startBtn')&&!document.querySelector('#startBtn').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#loadStatus').innerText(),/200\/200 numbered text questions/);
+  assert.equal(await page.locator('#mode').inputValue(),'practice','Source-ordered practice mode is default');
+  await page.locator('#startBtn').click();
+  assert.equal(await page.locator('#quiz').isVisible(),true);
+  assert.match(await page.locator('#position').innerText(),/Question 1 \/ 200/);
+  assert.match(await page.locator('#stem').innerText(),/வா/,'Tamil original first question has text');
+  assert.equal(await page.locator('#options button').count(),5,'Original text questions expose A–E choices');
+  await page.locator('#options button').first().click();
+  assert.equal(await page.locator('#checkBtn').isEnabled(),true);
+  await page.locator('#checkBtn').click();
+  assert.match(await page.locator('#feedback').innerText(),/Official final key: A/);
+  assert.equal(await page.locator('#options button').first().isDisabled(),true,'Checked answer is locked');
+  await page.locator('.palette-wrapper summary').click();
+  await page.locator('#palette button').last().click();
+  assert.match(await page.locator('#position').innerText(),/Question 200 \/ 200/);
+  assert.match(await page.locator('#stem').innerText(),/Sunday/,'Last original question has readable text');
+  const sourceHref=await page.locator('#originalPageLink').getAttribute('href');
+  assert.match(sourceHref,/#page=91$/,'Original Q200 source PDF page reference');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#startBtn')&&!document.querySelector('#startBtn').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#startBtn').innerText(),/Resume 200-question/);
+  await page.locator('#startBtn').click();
+  assert.match(await page.locator('#position').innerText(),/Question 200 \/ 200/);
+  const firstPaletteClass=await page.locator('#palette button').first().getAttribute('class');
+  assert.match(firstPaletteClass,/done/,'First completed question persists');
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
+    'Full text quiz does not horizontally overflow on 390px viewport');
+  await page.goto(origin+'/pyq-2024-text-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#startBtn')&&!document.querySelector('#startBtn').disabled,
+    undefined,{timeout:20000});
+  await page.locator('#mode').selectOption('exam');
+  await page.locator('#startBtn').click();
+  await page.locator('#options button').first().click();
+  assert.equal(await page.locator('#checkBtn').isVisible(),false,'Exam mode keeps answers hidden');
+  assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode offers no instant final-key feedback');
+  assert.deepEqual(pageErrors,[],'Full 200-question text quiz has no JS runtime errors');
+  console.log('PASS 2024 text quiz: 200 source-order questions, Tamil text, five options, final key, save/resume and exam mode');
+
   // Local-only original-PYQ staging: no paper text published without review.
   pageErrors.length = 0;
   const digitizeResponse=await page.goto(origin+'/pyq-digitize.html',{waitUntil:'domcontentloaded'});
