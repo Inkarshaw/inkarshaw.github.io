@@ -154,8 +154,8 @@ try {
   await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
   assert.match(await page.locator('#examTitle').innerText(),/Group I.*2011.*Series D/);
   assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
-  assert.match(await page.locator('#sourcePaper').getAttribute('href'),/\/IDPC\.pdf$/);
-  assert.match(await page.locator('#sourceKey').getAttribute('href'),/05_06_2011_g1_gk\.pdf$/);
+  assert.match(await page.locator('#sourcePaper a').getAttribute('href'),/\/IDPC\.pdf$/);
+  assert.match(await page.locator('#sourceKey a').getAttribute('href'),/05_06_2011_g1_gk\.pdf$/);
   assert.equal(await page.locator('#dockChoices button').count(),4,'Historical Group I paper has A–D, no invented E choice');
   assert.equal(await page.locator('#answerChoices button').count(),4);
   assert.equal(await page.locator('#adaptedQuizLink').isVisible(),false,'Do not link to unrelated Group IV adapted quiz');
