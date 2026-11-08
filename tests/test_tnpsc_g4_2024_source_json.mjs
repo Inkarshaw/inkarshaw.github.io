@@ -11,7 +11,7 @@ assert.equal(staged.questionTextVerified,0,'OCR candidates have no implied text 
 assert.ok(/draft|staging/.test(staged.sourceDigitization));
 const pages=Array(200).fill(0);
 for(const span of pageIndex.pageSpans)for(let i=span.firstQuestion;i<=span.lastQuestion;i++)pages[i-1]=span.pdfPage;
-const valid=['not_extracted','manual_source_inspection_pending_review','ocr_full_candidate_unverified','ocr_partial_candidate_unverified'];
+const valid=['not_extracted','manual_source_inspection_pending_review','ocr_full_candidate_unverified','ocr_partial_candidate_unverified','ocr_segment_candidate_unverified'];
 for(let i=0;i<200;i++){
  const q=staged.questions[i];
  assert.equal(q.number,i+1,'original order and serial number');
