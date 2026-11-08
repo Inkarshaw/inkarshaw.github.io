@@ -44,6 +44,9 @@ on:
       - "data/quizzes/verified-pyqs.json"
       - "tests/test_content_trust.mjs"
       - "tests/test_tnpsc_g4_2024_final_key.mjs"
+      - "data/quizzes/tnpsc-g4-2024-original-questions.json"
+      - "data/quizzes/tnpsc-g4-2024-ocr-page-draft.json"
+      - "tests/test_tnpsc_g4_2024_source_json.mjs"
       - "assets/js/tn-school-notes-data.js"
       - "scripts/audit_pyq_year_coverage.py"
   push:
@@ -76,6 +79,9 @@ on:
       - "data/quizzes/verified-pyqs.json"
       - "tests/test_content_trust.mjs"
       - "tests/test_tnpsc_g4_2024_final_key.mjs"
+      - "data/quizzes/tnpsc-g4-2024-original-questions.json"
+      - "data/quizzes/tnpsc-g4-2024-ocr-page-draft.json"
+      - "tests/test_tnpsc_g4_2024_source_json.mjs"
   workflow_dispatch:
 
 permissions:
@@ -99,6 +105,8 @@ jobs:
         run: node tests/test_textbook_topic_quiz.mjs
       - name: Reconcile new 2024 Group IV questions with official final key
         run: node tests/test_tnpsc_g4_2024_final_key.mjs
+      - name: Validate 200 extracted original-number JSON records without false verification
+        run: node tests/test_tnpsc_g4_2024_source_json.mjs
       - name: Validate full bilingual Group IIA notes
         run: node tests/test_group2a_text_notes.mjs
       - name: Enforce full original-paper license, completeness, sequence and final-key gate
