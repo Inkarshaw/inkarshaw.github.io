@@ -96,8 +96,8 @@
 <section class="pyq-hero"><p class="pyq-eyebrow">TNPSC · TNUSRB · UPSC and more</p><h1>Previous Year Questions</h1><p>Choose an exam and year, start a quiz, or open the original question paper.</p></section>
 <main class="pyq-wrap" id="content">
 <section class="pyq-start" aria-label="Start practising previous year questions">
-  <a class="pyq-start-card featured" href="pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies"><span>2024 · Full-paper session</span><strong>TNPSC Group IV · Original 200 Questions</strong><small>The same 200 numbered questions and choices from the official 2024 paper, shown in the PDF with synchronized A–E answers.</small><b>Start 200-question original-paper quiz →</b></a>
-  <a class="pyq-start-card" href="pyq-original-paper.html?paper=tnpsc-group-iv-2025-general-tamil-general-studies"><span>2025 · Full-paper session</span><strong>Group IV · 200 Original Questions</strong><small>Official 2025 paper and original-number answer sheet. Read each printed question and mark your answer.</small><b>Start 2025 paper →</b></a>
+  <a class="pyq-start-card featured" href="pyq-2024-text-quiz.html"><span>2024 · Text quiz</span><strong>TNPSC Group IV · 200 Text Questions</strong><small>Original Q1–Q200 order, four written choices plus E, Tamil and General Studies, instant checking and saved progress. Editorial transcription review ongoing.</small><b>Start 200-question text quiz →</b></a>
+  <a class="pyq-start-card" href="pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies"><span>2024 · Official PDF</span><strong>200 Original Printed Questions</strong><small>Compare the original TNPSC booklet with a saved A–E response sheet. No transcribed wording ambiguity.</small><b>Open official-paper quiz →</b></a>
   <a class="pyq-start-card" href="#resultsHeading"><span>Year-wise papers</span><strong>Select another exam year</strong><small>Browse available original-paper sessions, official source PDFs, and smaller adapted revision quizzes.</small><b>Browse all years ↓</b></a>
 </section>
 <section aria-labelledby="filterHeading"><h2 id="filterHeading" class="pyq-section-title">Find an exam and year</h2>
@@ -145,24 +145,29 @@ function render(){
   const card=document.createElement("article");card.className="pyq-card";
   const top=document.createElement("div");top.className="card-top";
   const year=document.createElement("strong");year.className="year-pill";year.textContent=x.year;
-  const kind=document.createElement("span");kind.className="source-kind";kind.textContent=original?"200 original Qs · PDF":count>=10?"Adapted quiz":"Official source";
+  const kind=document.createElement("span");kind.className="source-kind";kind.textContent=original?(x.year===2024?"200 text Qs + PDF":"200 original Qs · PDF"):count>=10?"Adapted quiz":"Official source";
   top.append(year,kind);
   const title=document.createElement("h3");title.textContent=x.category+" · "+x.exam;
   const paper=document.createElement("p");paper.textContent=x.paper;
   const actions=document.createElement("div");actions.className="pyq-actions";
   card.append(top,title,paper);
   if(original){
-   const a=document.createElement("a");a.className="paper";
+   if(x.year===2024){
+    const textQuiz=document.createElement("a");textQuiz.className="paper";
+    textQuiz.href="pyq-2024-text-quiz.html";
+    textQuiz.textContent="Start 200-question text quiz →";actions.append(textQuiz);
+   }
+   const a=document.createElement("a");a.className=x.year===2024?"quiz":"paper";
    a.href="pyq-original-paper.html?paper=tnpsc-group-iv-"+x.year+"-general-tamil-general-studies";
-   a.textContent="Start all 200 original questions →";actions.append(a);
+   a.textContent=x.year===2024?"Original 200-question PDF companion →":"Start all 200 original questions →";actions.append(a);
    const note=document.createElement("p");note.className="pyq-warning";
-   note.textContent="Exact published questions in the official PDF · 200 synchronized A–E answer positions; not a typed transcription.";
+   note.textContent=x.year===2024?"200 typed questions in original order (manual source-page text review pending) · official PDF available separately.":"Exact published questions in the official PDF · 200 synchronized A–E answer positions; not a typed transcription.";
    card.append(note);
   }
   if(count>=10){
    const a=document.createElement("a");a.className="quiz";
    a.href="pyq-full-quiz.html?exam="+encodeURIComponent(expectedSourceExam(x))+"&year="+x.year+"&count=10&start=1&mode=practice";
-   a.textContent=original?"Optional · 10 adapted questions →":"Start 10-question quiz →";
+   a.textContent=original?"Optional · 10 adapted revision questions →":"Start 10-question quiz →";
    actions.append(a);
    const note=document.createElement("p");note.className="pyq-warning";
    note.textContent=count+" adapted revision questions available separately; not the full original paper.";card.append(note);
