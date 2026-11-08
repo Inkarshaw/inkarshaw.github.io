@@ -42,6 +42,15 @@ button:disabled{opacity:.4}
 #count{font-size:.87rem;color:var(--muted)}
 .answer-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin:20px 0}
 .answer-summary span{border:1px solid var(--line);border-radius:8px;padding:6px;font-size:.85rem}
+.grade-correct{background:#e5f5e9;border-color:#abd8bd!important;color:#165b3f}
+.grade-incorrect{background:#ffedf0;border-color:#eac0c9!important;color:#8e2d3d}
+.grade-ungraded{background:#fff6dd;border-color:#e9d398!important;color:#765714}
+.grade-blank{color:#576879}
+.score-summary{font-size:1.3rem;font-weight:850;color:#125637;padding:14px 16px;border:1px solid #b5dfcb;border-radius:10px;background:#eaf8f0;margin:14px 0}
+.page-jump{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:9px 0}
+.page-jump input{width:76px;padding:8px;border:1px solid #b7c8db;border-radius:8px;font:inherit}
+.page-jump button{font-size:.85rem;padding:9px}
+.pdf-warning{background:#fff6e5;border:1px solid #eccb86;border-radius:8px;padding:9px 12px;font-size:.87rem;color:#765517}
 @media(max-width:550px){.card{padding:15px}.palette{grid-template-columns:repeat(6,1fr)}.answers button{flex:1}}
 
 .eyebrow,.section-label{display:block;font-size:.76rem;letter-spacing:.07em;font-weight:850;color:#1762b5;text-transform:uppercase}
@@ -95,7 +104,7 @@ button:disabled{opacity:.4}
 <main class="wrap">
 <h1>Full-Paper PYQ Quiz Practice</h1>
 <p class="lead">Choose a TNPSC exam year, read the original paper and answer questions A–E in a proper quiz interface. Navigate 200 questions, mark for review, and submit at the end.</p>
-<p class="note"><strong>Paper text is not transcribed.</strong> This offers all 200 original numbered answer positions for each available paper, but does not reproduce original paper text. Automatic marking is disabled until the complete answer key is verified for the specific paper version.</p>
+<p class="note"><strong>Read the exact published paper.</strong> The official TNPSC PDF displays the original question wording, options and diagrams; the answer panel records your selections against the same original question numbers. The paper is not copied or transcribed into ClearExams. Indicative marks appear only where a separately checked, matching official final key is available; otherwise the page saves answers without scoring.</p>
 <section id="paperPicker" class="card"><h2>Choose an original paper</h2><p id="loading" role="status">Loading official papers…</p><div id="papers"></div></section>
 <section id="answerSheet" class="card quiz-shell" hidden>
 <div class="topline"><div><span class="eyebrow">Full-paper quiz · Official-PDF companion</span><h2 id="examTitle">Original paper</h2></div><span id="count"></span></div>
@@ -108,17 +117,21 @@ button:disabled{opacity:.4}
 <div class="quiz-workspace" id="quizWorkspace">
 <section id="paperPanel" class="pdf-panel" aria-labelledby="paperPanelTitle">
 <div class="topline"><h3 id="paperPanelTitle">Original question-paper PDF</h3><span class="source-flag">Official TNPSC source</span></div>
-<p class="pdf-hint">Read the exact questions and options here. If the PDF is blocked by your browser, use the official paper link above to open it separately.</p>
+<p class="pdf-hint">Read the exact questions and options in the official paper below. This embedded scan preserves its original printing. If the PDF cannot load, use the official paper link above.</p>
+<p id="scanWarning" class="pdf-warning" hidden>The official scanned booklet contains handwritten ticks beside some choices, which may reveal answers during practice.</p>
+<div class="page-jump"><label for="pdfPage">PDF page (not question number)</label><input id="pdfPage" type="number" min="1" max="500" value="1" inputmode="numeric"><button id="goPdfPage" type="button">Go to PDF page</button><button id="firstQuestion" type="button" hidden>Jump to Q1 page</button></div>
 <iframe id="paperFrame" title="Original TNPSC question-paper PDF" loading="lazy" referrerpolicy="no-referrer" aria-describedby="paperFrameHelp"></iframe>
 <p id="paperFrameHelp" class="pdf-hint">The source is hosted on TNPSC, not ClearExams. The PDF may not display inside every mobile browser.</p>
-<p class="pdf-hint"><a id="adaptedQuizLink" href="pyq-full-quiz.html">Want questions displayed directly on screen? Try the smaller, adapted PYQ quiz (not the full original paper) →</a></p>
+<p class="pdf-hint"><button id="returnAnswers" type="button">Continue answering questions</button></p>
+<p class="pdf-hint"><a id="adaptedQuizLink" href="pyq-full-quiz.html">Optional: smaller adapted PYQ quiz (not an original-paper transcription) →</a></p>
 </section>
 <section id="questionPanel" class="answer-panel" aria-labelledby="number">
 <div class="topline"><span class="section-label">QUESTION & RESPONSE</span><span id="status" aria-live="polite"></span></div>
 <div class="progress"><div id="fill"></div></div>
 <details id="paletteDetails"><summary><strong>Question palette</strong> · green answered · gold marked</summary><nav id="palette" class="palette" aria-label="All numbered original paper answers"></nav></details>
 <h3 id="number">Original question 1</h3>
-<p class="question-source">Read question <strong id="sourceQuestionNumber">1</strong> and its printed options from the official PDF. Select your response here.</p>
+<p class="question-source">Read question <strong id="sourceQuestionNumber">1</strong> and the exact printed A–E options in the official source PDF, then select your answer below.</p>
+<button type="button" id="readOriginal">Read original PDF / மூல வினாத்தாள்</button>
 <div id="answerChoices" class="answers" role="group" aria-label="Select OMR option A, B, C, D or E"></div>
 <p class="lead">E = Answer not known (விடை தெரியவில்லை). This is a valid response, not a skipped question.</p>
 <div class="actions quiz-actions">
@@ -133,7 +146,8 @@ button:disabled{opacity:.4}
 </section>
 <section id="result" class="card" hidden>
 <h2 id="resultHeading">Original-paper answer sheet completed</h2>
-<p id="resultBody"></p><div class="paper-source"><span id="resultSource"></span></div>
+<p id="resultBody"></p><div id="scoreSummary" class="score-summary" hidden></div><div class="paper-source"><span id="resultSource"></span></div>
+<p class="lead">Green = accepted answer, red = not accepted, yellow = official ALL entry (excluded from indicative scoring). Tap a result to view the original key position.</p>
 <div id="answerOverview"></div>
 <div class="actions"><button type="button" id="returnToSheet">Review or edit answers</button><button type="button" id="restart">Start over</button></div>
 </section>
