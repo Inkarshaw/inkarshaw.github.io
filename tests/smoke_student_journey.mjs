@@ -148,6 +148,59 @@ try {
   assert.deepEqual(pageErrors,[],'Original 200-question sessions have no runtime errors');
   console.log('PASS 200 original questions: source PDF, matching numbered responses, save/resume and year switch');
 
+  // TNUSRB SI 2020 (2019 recruitment, Series C) from user-supplied transcription.
+  pageErrors.length = 0;
+  await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#loadStatus').innerText(),/114 attemptable questions loaded/);
+  assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2020/);
+  await page.locator('#start').click();
+  assert.match(await page.locator('#position').innerText(),/Original Q1/);
+  assert.match(await page.locator('#questionTitle').innerText(),/Sun.*skin.*heat/);
+  assert.equal(await page.locator('#options button').count(),4);
+  await page.locator('#options button').nth(1).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: B/);
+  assert.equal(await page.locator('#options button').nth(1).isDisabled(),true);
+  await page.locator('.palette-details summary').click();
+  const nums=await page.locator('#palette button').allTextContents();
+  assert.equal(nums.length,114,'2019 recruitment: do not present missing or garbled source questions');
+  for(const skip of [14,15,22,37,84,95,103,121]){
+    assert.equal(nums.includes(String(skip)),false,'Excluded original question '+skip);
+  }
+  assert.equal(nums.includes('1'),true);
+  assert.equal(nums.includes('140'),true);
+  await page.locator('#palette button').filter({hasText:/^89$/}).click();
+  assert.match(await page.locator('#position').innerText(),/Original Q89/);
+  assert.match(await page.locator('#questionTitle').innerText(),/Maths 90°/);
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#start').innerText(),/Resume 114-question/);
+  await page.locator('#start').click();
+  assert.match(await page.locator('#position').innerText(),/Original Q89/);
+  await page.locator('.palette-details summary').click();
+  assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
+  await page.locator('#palette button').filter({hasText:/^140$/}).click();
+  assert.match(await page.locator('#position').innerText(),/Original Q140/);
+  page.once('dialog',dialog=>dialog.accept());
+  await page.locator('#finish').click();
+  assert.match(await page.locator('#score').innerText(),/\/ 55\.5 marks/);
+  assert.equal(await page.locator('#result').isVisible(),true);
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
+    'TNUSRB SI 2020 has no mobile horizontal overflow');
+  await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  await page.locator('#mode').selectOption('exam');
+  await page.locator('#start').click();
+  await page.locator('#options button').first().click();
+  assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides Check Answer');
+  assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode conceals correct option');
+  assert.deepEqual(pageErrors,[],'TNUSRB SI 2020 has no runtime page errors');
+  console.log('PASS TNUSRB SI 2020: 114 playable, 111 scored, Series C key, source gaps, saved progress, exam mode');
+
   // TNUSRB SI 2010 user-supplied Type A: show only 116 readable original-number questions.
   pageErrors.length = 0;
   await page.goto(origin+'/tnusrb-si-2010-quiz.html',{waitUntil:'domcontentloaded'});
