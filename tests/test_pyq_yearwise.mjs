@@ -51,7 +51,7 @@ assert.equal(out.length,10);
 assert.ok(out.every(q=>q.SourceExam==="UPSC Civil Services Prelims"));
 ctx.pyqYearSelect.value="2024";
 out=ctx.yearFiltered(qs);
-assert.equal(out.length,40);
+assert.equal(out.length,50);
 assert.equal(out.filter(q=>q.SourceExam==="TNPSC Group IV").length,30);
 assert.equal(out.filter(q=>q.SourceExam==="TNPSC Group II/IIA").length,20);
 ctx.pyqYearSelect.value="";
