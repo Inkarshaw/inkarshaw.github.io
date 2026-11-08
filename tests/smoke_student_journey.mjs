@@ -166,7 +166,7 @@ try {
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/secondary answer-table entry: C/);
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true);
-  await page.locator('.palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').click();
   const si2015Nums=await page.locator('#palette button').allTextContents();
   assert.equal(si2015Nums.length,109,'Only 109 source-readable/key-consistent entries are playable');
   for(const missing of [8,9,14,21,27,29,30,34,45,60,65,66,73,80,84,90,92,93,95,99,100,101,102,103,104,109,119,120,127,129]){
@@ -181,7 +181,7 @@ try {
   assert.match(await page.locator('#start').innerText(),/Resume 109-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
-  await page.locator('.palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').click();
   assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,'SI 2015 390px mobile layout');
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
