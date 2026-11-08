@@ -62,6 +62,35 @@ try {
   assert.deepEqual(pageErrors, [], 'daily quiz: runtime errors');
   console.log('PASS daily quiz active question bank loaded');
 
+  // PYQ streamlined journey: one-tap deep link, option selection, navigation and resume.
+  pageErrors.length = 0;
+  await page.goto(origin + '/pyq-hub.html', {waitUntil:'domcontentloaded'});
+  await page.waitForFunction(() => document.querySelectorAll('#pyqItems .pyq-card').length===12,undefined,{timeout:20000});
+  assert.equal(await page.locator('.pyq-start-card').count(),3,'PYQ hub offers three clear paths');
+  assert.equal(await page.locator('#showMorePapers').isVisible(),true,'PYQ catalog is paginated');
+  await page.locator('#showMorePapers').click();
+  assert.equal(await page.locator('#pyqItems .pyq-card').count(),24,'PYQ archive expands on request');
+  const hubOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  assert.ok(hubOverflow<=3,'PYQ hub mobile overflow '+hubOverflow+'px');
+  await page.goto(origin+'/pyq-full-quiz.html?exam=TNPSC%20Group%20IV&year=2024&count=10&start=1',{waitUntil:'domcontentloaded'});
+  await page.locator('#quizView').waitFor({state:'visible',timeout:20000});
+  assert.equal(await page.locator('#options button').count(),4,'PYQ quiz has four answer choices');
+  assert.match(await page.locator('#quizTitle').innerText(),/TNPSC Group IV.*2024.*10 questions/);
+  await page.locator('#options button').first().click();
+  assert.match(await page.locator('#progressText').innerText(),/1 of 10 answered/);
+  assert.equal(await page.locator('#options button').first().getAttribute('aria-pressed'),'true');
+  await page.locator('#nextBtn').click();
+  assert.match(await page.locator('#questionNumber').innerText(),/Question 2 of 10/);
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.locator('#quizView').waitFor({state:'visible',timeout:20000});
+  assert.match(await page.locator('#questionNumber').innerText(),/Question 2 of 10/);
+  await page.locator('#prevBtn').click();
+  assert.equal(await page.locator('#options button.selected').count(),1,'PYQ answer remains selected after resume');
+  const quizOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  assert.ok(quizOverflow<=3,'PYQ quiz mobile overflow '+quizOverflow+'px');
+  assert.deepEqual(pageErrors,[],'PYQ quiz: no runtime errors');
+  console.log('PASS PYQ mobile journey: curated setup, direct launch, save/resume, navigation');
+
   // Local-only original-PYQ staging: no paper text published without review.
   pageErrors.length = 0;
   const digitizeResponse=await page.goto(origin+'/pyq-digitize.html',{waitUntil:'domcontentloaded'});
