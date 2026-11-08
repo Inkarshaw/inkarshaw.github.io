@@ -18,8 +18,8 @@ for(const set of bank.sets){
   assert.ok(['en','en-ta'].includes(set.language));
   if(set.language==='en-ta'){
     assert.equal(set.source.edition,'2026–27');
-    assert.ok([1,2,3,4,5,6,7,8,9].includes(set.source.chapter));
-    assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79,6:100,7:113,8:128,9:134})[set.source.chapter]);
+    assert.ok([1,2,3,4,5,6,7,8,9,10].includes(set.source.chapter));
+    assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79,6:100,7:113,8:128,9:134,10:161})[set.source.chapter]);
     assert.equal(new URL(set.source.url).hostname,'ncert.nic.in');
   }
   assert.equal(set.questions.length,10,'A set must contain ten questions: '+set.id);
@@ -37,11 +37,11 @@ for(const set of bank.sets){
       assert.match(q.tamil.explanation,/[\u0B80-\u0BFF]/);
       assert.equal(q.tamil.options.length,4);
       assert.equal(new Set(q.tamil.options).size,4);
-      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112,7:127,8:133,9:160})[set.source.chapter]);
+      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112,7:127,8:133,9:160,10:170})[set.source.chapter]);
     }
   }
 }
-assert.ok(count>=510);
+assert.ok(count>=550);
 const acids=bank.sets.filter(s=>s.source?.chapter===2).flatMap(s=>s.questions);
 assert.equal(acids.length,40);
 assert.deepEqual(acids.slice(0,20).map(q=>q.options[q.answer]),["Acidic and basic", "Dilute sodium hydroxide", "It burns with a pop near a flame.", "Sodium chloride, water and carbon dioxide", "Soluble calcium hydrogencarbonate forms.", "H⁺ and OH⁻ combine to form water.", "Copper(II) chloride", "The acid produces mobile ions in water, while dissolved glucose does not.", "Water enables formation of hydronium ions.", "The number of hydronium ions", "pH 2", "It helps neutralise acids made by mouth bacteria.", "A stronger acid", "Sodium sulphate and potassium sulphate", "Sodium carbonate", "Chlorine and hydrogen", "Bleaching powder forms.", "Carbon dioxide", "Ten waters of crystallisation per formula unit of sodium carbonate", "Gypsum"]);
@@ -91,7 +91,7 @@ assert.deepEqual(metalSets.map(s=>s.questions.map(q=>q.answer)),[
  [1,2,0,3,1,2,0,3,1,2]
 ]);
 const currentChapterCoverage=new Set(bank.sets.filter(s=>s.classLevel===10&&s.subject==='Science'&&s.source?.chapter).map(s=>s.source.chapter));
-assert.deepEqual([...currentChapterCoverage].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8,9]);
+assert.deepEqual([...currentChapterCoverage].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8,9,10]);
 const carbonIds=['c10-carbon-bonding-catenation','c10-carbon-homologous-naming','c10-carbon-reactions','c10-carbon-ethanol-acids-soaps'];
 const carbonSets=carbonIds.map(id=>bank.sets.find(s=>s.id===id));
 assert.ok(carbonSets.every(Boolean),'Four English–Tamil Carbon chapter sets required');
@@ -190,6 +190,29 @@ const lightChapter=lightInventory.chapters.find(c=>c.number===9);
 assert.equal(lightChapter.editorialCertified,false);
 assert.match(lightChapter.sourceReview,/provisional|pending/i);
 assert.equal(lightChapter.sourcePdf,'https://ncert.nic.in/textbook/pdf/jesc109.pdf');
+
+const humanEyeIds=['c10-human-eye-accommodation-vision','c10-human-eye-dispersion-scattering'];
+const humanEyeSets=humanEyeIds.map(id=>bank.sets.find(s=>s.id===id));
+assert.ok(humanEyeSets.every(Boolean),'Two chapter 10 bilingual sets required');
+assert.equal(humanEyeSets.flatMap(s=>s.questions).length,20);
+assert.ok(humanEyeSets.every(s=>s.language==='en-ta'&&s.source.chapter===10&&s.source.firstPage===161));
+assert.ok(humanEyeSets.every(s=>s.reviewStatus==='editorial-review-pending'));
+assert.ok(humanEyeSets.every(s=>s.source.pageReferenceEdition.includes('provisional')));
+assert.ok(humanEyeSets.every(s=>s.source.url==='https://ncert.nic.in/textbook/pdf/jesc110.pdf'));
+assert.ok(humanEyeSets.every(s=>s.questions.every(q=>
+  q.page>=161&&q.page<=170&&
+  /[\u0B80-\u0BFF]/.test(q.tamil.question)&&
+  /[\u0B80-\u0BFF]/.test(q.tamil.explanation)&&
+  q.tamil.options.length===4&&new Set(q.tamil.options).size===4
+)));
+assert.deepEqual(humanEyeSets.map(s=>s.questions.map(q=>q.answer)),[
+  [1,0,2,1,3,2,1,0,3,1],
+  [2,3,3,0,1,2,0,3,1,2]
+]);
+const inventoryEye=JSON.parse(get('data/ncert/class10-science-chapter-inventory.json')).chapters.find(c=>c.number===10);
+assert.equal(inventoryEye.editorialCertified,false);
+assert.equal(inventoryEye.sourcePdf,'https://ncert.nic.in/textbook/pdf/jesc110.pdf');
+assert.match(inventoryEye.sourceReview,/pending|provisional/);
 
 for(const id of ['classPicker','subjectPicker','topicSearch','setGrid','quizSection','quizTitle','options','feedback','checkAnswer','nextQuestion','resultSection','resultScore','reviewList','retryQuiz','chooseAnother']){
  assert.match(html,new RegExp('id="'+id+'"'),id+' missing in UI');
