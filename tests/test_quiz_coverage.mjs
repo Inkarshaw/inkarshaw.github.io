@@ -28,7 +28,11 @@ assert.ok(audit.scert.units>=288,'All 288 already-indexed units must remain trac
 assert.equal(audit.scert.readyUnits,audit.scert.units,'Every tracked canonical bank should be playable');
 assert.ok(audit.scert.indexedQuestions>=39000);
 assert.equal(audit.ncert.classes.length,7);
-assert.ok(audit.ncert.questions>=510);
+assert.ok(audit.ncert.questions>=530);
+assert.equal(audit.ncert.bilingualQuestions,280);
+assert.deepEqual(audit.ncert.sourceLinkedClass10Chapters,[1,2,3,4,5,6,7,8,9]);
+assert.deepEqual(audit.ncert.missingClass10Chapters.map(x=>x.number),[10,11,12,13]);
+assert.ok(audit.ncert.editorialPendingSets>=28);
 assert.ok(audit.missingScertSubjectAreas.length>0);
 const chapters=JSON.parse(get('data/ncert/class10-science-chapter-inventory.json'));
 assert.equal(chapters.chapterCount,13);
