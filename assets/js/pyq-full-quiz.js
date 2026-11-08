@@ -35,7 +35,9 @@
     });
   }
   const choose=(rows,exam,year)=>rows.filter(q=>(!exam||q.SourceExam===exam)&&(!year||safeText(q.SourceYear)===safeText(year)));
-  function getKey(exam,year){return SESSION_PREFIX+encodeURIComponent(exam||'all')+':'+(year||'all')}
+  function limitFor(pool){const count=$('lengthSelect').value;return count==='all'?pool.length:Math.min(pool.length,Number(count)||10)}
+  function shuffle(rows){const copy=rows.slice();for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
+  function getKey(exam,year){const base=SESSION_PREFIX+encodeURIComponent(exam||'all')+':'+(year||'all');return base+($('lengthSelect').value==='all'?'':':'+$('lengthSelect').value)}
   function storageRead(key){try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}}
   function storageWrite(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
   function link(parent,url,label){
@@ -57,27 +59,31 @@
     fillOptions($('yearSelect'),years,'All available years',preferred||'');
   }
   function currentSelection(){return choose(bank,$('examSelect').value,$('yearSelect').value)}
-  function validSaved(s,rows){
-    return s&&s.version===1&&Array.isArray(s.ids)&&s.ids.length===rows.length&&
-      rows.every((q,i)=>q.ID===s.ids[i])&&
-      Array.isArray(s.answers)&&s.answers.length===rows.length&&
-      Array.isArray(s.marked)&&s.marked.length===rows.length&&
+  function validSaved(s,pool){
+    if(!s||s.version!==1||!Array.isArray(s.ids)||s.ids.length!==limitFor(pool))return false;
+    const ids=new Set(pool.map(q=>q.ID));
+    return new Set(s.ids).size===s.ids.length&&s.ids.every(id=>ids.has(id))&&
+      Array.isArray(s.answers)&&s.answers.length===s.ids.length&&
+      Array.isArray(s.marked)&&s.marked.length===s.ids.length&&
+      s.marked.every(v=>typeof v==='boolean')&&
+      Number.isInteger(s.index)&&s.index>=0&&s.index<s.ids.length&&
       s.answers.every(v=>v===null||abc.includes(v));
   }
   function updatePreview(){
-    const selected=currentSelection();
-    const count=selected.length,exam=$('examSelect').value,year=$('yearSelect').value;
-    const saved=storageRead(getKey(exam,year));
-    const reusable=validSaved(saved,selected)&&!saved.finished;
+    const pool=currentSelection();
+    const count=limitFor(pool),exam=$('examSelect').value,year=$('yearSelect').value;
+    const key=getKey(exam,year);
+    const saved=storageRead(key);
+    const reusable=validSaved(saved,pool)&&!saved.finished;
     $('preview').textContent=count
-      ?count+' adapted PYQs ready · '+(exam||'All available exams')+' · '+(year||'All years')+
-        '. This is the complete available question set, not the complete official examination paper.'
+      ?count+' adapted questions · '+(exam||'Mixed exams')+' · '+(year||'All years')+
+        (pool.length>count?' · '+pool.length+' in the available bank.':' · Entire available bank.')
       :'No reviewed PYQs are available for this selection.';
     $('startBtn').disabled=!count;
-    $('startBtn').textContent=reusable?'Resume saved full quiz ('+selected.length+' questions)':'Start full available quiz ('+count+' questions)';
-    const hist=(storageRead(HISTORY)||[]);
-    const latest=Array.isArray(hist)?hist.find(h=>h.key===getKey(exam,year)):null;
-    $('previousScore').textContent=latest?'Last completed attempt: '+latest.correct+'/'+latest.total+' correct · '+latest.accuracy+'%':'';
+    $('startBtn').textContent=reusable?'Resume quiz ('+count+' questions)':'Start '+count+'-question quiz →';
+    const hist=storageRead(HISTORY)||[];
+    const latest=Array.isArray(hist)?hist.find(h=>h.key===key):null;
+    $('previousScore').textContent=latest?'Last attempt: '+latest.correct+'/'+latest.total+' correct · '+latest.accuracy+'%':'';
   }
   function save(){if(session&&activeKey)storageWrite(activeKey,session)}
   function show(which){
@@ -85,21 +91,24 @@
     window.scrollTo(0,0);
   }
   function start(){
-    qs=currentSelection();
-    if(!qs.length){setStatus('No questions available.');return}
+    const pool=currentSelection();
+    if(!pool.length){setStatus('No questions available.');return}
     activeKey=getKey($('examSelect').value,$('yearSelect').value);
     const saved=storageRead(activeKey);
-    if(validSaved(saved,qs)&&!saved.finished){
+    if(validSaved(saved,pool)&&!saved.finished){
       session=saved;
+      const lookup=new Map(pool.map(q=>[q.ID,q]));
+      qs=saved.ids.map(id=>lookup.get(id));
     }else{
+      qs=shuffle(pool).slice(0,limitFor(pool));
       session={version:1,ids:qs.map(q=>q.ID),answers:Array(qs.length).fill(null),marked:Array(qs.length).fill(false),
         index:0,timed:$('timedCheck').checked,deadline:$('timedCheck').checked?Date.now()+qs.length*60000:null,finished:false};
       save();
     }
     endTimer();timingHandle=setInterval(tick,1000);
-    $('quizTitle').textContent=(qs[0].SourceExam===qs[qs.length-1].SourceExam&&$('examSelect').value?$('examSelect').value:'Mixed exams')+
-      ' · '+($('yearSelect').value||'All years')+' · '+qs.length+' adapted PYQs';
-    show('quiz');renderQuestion();tick();
+    $('quizTitle').textContent=($('examSelect').value||'Mixed exams')+' · '+($('yearSelect').value||'All years')+
+      ' · '+qs.length+' questions';
+    show('quiz');renderQuestion(true);tick();
   }
   function answeredCount(){return session.answers.filter(Boolean).length}
   function renderPalette(){
@@ -110,10 +119,10 @@
       b.className='palette-item'+(session.answers[i]?' answered':'')+(session.marked[i]?' flagged':'')+(i===session.index?' current':'');
       b.setAttribute('aria-label','Go to question '+(i+1)+(session.answers[i]?', answered':'')+(session.marked[i]?', marked':''));
       if(i===session.index)b.setAttribute('aria-current','step');
-      b.addEventListener('click',()=>{session.index=i;save();renderQuestion()});grid.append(b);
+      b.addEventListener('click',()=>{session.index=i;save();renderQuestion(true)});grid.append(b);
     });
   }
-  function renderQuestion(){
+  function renderQuestion(scrollToQuestion=false){
     if(!session||session.finished)return;
     const i=session.index,q=qs[i];
     $('questionNumber').textContent='Question '+(i+1)+' of '+qs.length;
@@ -125,19 +134,38 @@
       const b=document.createElement('button');b.type='button';b.className='option';
       if(session.answers[i]===letter)b.classList.add('selected');
       b.setAttribute('aria-pressed',String(session.answers[i]===letter));
-      const lead=document.createElement('strong');lead.textContent=letter+'. ';
+      const lead=document.createElement('strong');lead.textContent=letter;
       b.append(lead,document.createTextNode(display(q,'Option'+letter)));
-      b.addEventListener('click',()=>{session.answers[i]=letter;save();renderQuestion()});
+      b.addEventListener('click',()=>{
+        session.answers[i]=letter;save();
+        options.querySelectorAll('button.option').forEach((choice,index)=>{
+          const picked=abc[index]===letter;choice.classList.toggle('selected',picked);
+          choice.setAttribute('aria-pressed',String(picked));
+        });
+        updateProgress();
+      });
       options.append(b);
     });
-    $('markBtn').textContent=session.marked[i]?'⚑ Marked for review':'⚐ Mark for review';
+    $('markBtn').textContent=session.marked[i]?'⚑ Marked for review':'⚐ Review later';
     $('clearBtn').disabled=!session.answers[i];
     $('prevBtn').disabled=i===0;
-    $('nextBtn').disabled=i===qs.length-1;
-    $('progressText').textContent=answeredCount()+' answered · '+session.marked.filter(Boolean).length+' marked · '+qs.length+' total';
-    $('progressBar').style.width=Math.round(100*answeredCount()/qs.length)+'%';
-    renderPalette();
+    const last=i===qs.length-1;
+    $('nextBtn').hidden=last;
+    $('submitBtn').textContent=last?'Finish & review':'Finish quiz';
+    $('quizView').querySelector('.actions').classList.toggle('on-last',last);
+    updateProgress();
+    if(scrollToQuestion)$('questionNumber').scrollIntoView({block:'start',behavior:'instant'});
     save();
+  }
+  function updateProgress(){
+    $('clearBtn').disabled=!session.answers[session.index];
+    const count=answeredCount();
+    $('progressText').textContent=count+' of '+qs.length+' answered · '+session.marked.filter(Boolean).length+' marked';
+    $('progressBar').style.width=Math.round(100*count/qs.length)+'%';
+    const track=$('progressBar').parentElement;
+    track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax',String(qs.length));
+    track.setAttribute('aria-valuenow',String(count));
+    renderPalette();
   }
   function tick(){
     if(!session||session.finished||!session.timed){$('clock').hidden=true;return}
@@ -151,7 +179,7 @@
   function finish(expired=false){
     if(!session||session.finished)return;
     const missing=qs.length-answeredCount();
-    if(!expired&&missing&&!confirm(missing+' questions are unanswered. Submit your full available PYQ quiz?'))return;
+    if(!expired&&missing&&!confirm(missing+' questions are unanswered. Finish this attempt anyway?'))return;
     endTimer();
     session.finished=true;save();
     const correct=qs.reduce((n,q,i)=>n+(session.answers[i]===q.CorrectAnswer?1:0),0);
@@ -205,9 +233,10 @@
   $('quizLanguage').addEventListener('change',()=>{if(session){if(session.finished)renderReview();else renderQuestion()}});
   $('examSelect').addEventListener('change',()=>{updateYears('');updatePreview()});
   $('yearSelect').addEventListener('change',updatePreview);
+  $('lengthSelect').addEventListener('change',updatePreview);
   $('startBtn').addEventListener('click',start);
-  $('prevBtn').addEventListener('click',()=>{if(session.index){session.index--;renderQuestion()}});
-  $('nextBtn').addEventListener('click',()=>{if(session.index<qs.length-1){session.index++;renderQuestion()}});
+  $('prevBtn').addEventListener('click',()=>{if(session.index){session.index--;renderQuestion(true)}});
+  $('nextBtn').addEventListener('click',()=>{if(session.index<qs.length-1){session.index++;renderQuestion(true)}});
   $('markBtn').addEventListener('click',()=>{session.marked[session.index]=!session.marked[session.index];renderQuestion()});
   $('clearBtn').addEventListener('click',()=>{session.answers[session.index]=null;renderQuestion()});
   $('submitBtn').addEventListener('click',()=>finish(false));
@@ -224,9 +253,13 @@
       bank=collect(data);
       if(!bank.length)throw Error('No eligible PYQs found');
       const exams=[...new Set(bank.map(q=>q.SourceExam))].sort();
-      fillOptions($('examSelect'),exams,'All available exams',urlParams.get('exam')||'');
+      fillOptions($('examSelect'),exams,'All exams (mixed practice)',urlParams.get('exam')||'');
       updateYears(urlParams.get('year')||'');
-      setStatus('Loaded '+bank.length+' source-attributed adapted PYQs.');
+      const requestedLength=urlParams.get('count');
+      $('lengthSelect').value=['10','20','all'].includes(requestedLength)?requestedLength:'10';
+      if(urlParams.get('lang')==='ta')$('quizLanguage').value='ta';
+      setStatus(bank.length+' reviewed adapted questions available.');
       updatePreview();
+      if(urlParams.get('start')==='1'&&!$('startBtn').disabled)start();
     }).catch(err=>{setStatus('Could not load PYQ quizzes: '+err.message);$('startBtn').disabled=true});
 })();
