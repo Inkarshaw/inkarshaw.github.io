@@ -66,7 +66,7 @@ try {
   pageErrors.length = 0;
   await page.goto(origin + '/pyq-hub.html', {waitUntil:'domcontentloaded'});
   await page.waitForFunction(() => document.querySelectorAll('#pyqItems .pyq-card').length===12,undefined,{timeout:20000});
-  assert.equal(await page.locator('.pyq-start-card').count(),3,'PYQ hub offers three clear paths');
+  assert.equal(await page.locator('.pyq-start-card').count(),4,'PYQ hub offers four clear paths including 2011 Group I');
   assert.equal(await page.locator('#showMorePapers').isVisible(),true,'PYQ catalog is paginated');
   await page.locator('#showMorePapers').click();
   assert.equal(await page.locator('#pyqItems .pyq-card').count(),24,'PYQ archive expands on request');
