@@ -21,8 +21,8 @@ PAGE_FILE = ROOT / "data/quizzes/tnpsc-g4-2024-ocr-page-draft.json"
 LETTERS = "ABCDE"
 SOURCE_PAGE_START = 3
 SOURCE_PAGE_END = 91
-NUMBER = re.compile(r"^\\s*([1-9]\\d{0,2})\\s*[.)]\\s*")
-OPTION = re.compile(r"(?<!\\w)\\(?([A-E])\\)\\s*[.:]?\\s*")
+NUMBER = re.compile(r"^\s*([1-9]\d{0,2})\s*[.)]\s*")
+OPTION = re.compile(r"(?<!\w)\(?([A-E])\)\s*[.:]?\s*")
 
 
 def download_paper(url: str, dest: Path) -> None:
@@ -64,7 +64,7 @@ def ocr_once(pdf: Path, work: Path) -> list[str]:
         "tesseract", str(multipage), str(output), "-l", "tam+eng", "--psm", "3", "txt"
     ], check=True, timeout=1800)
     raw = (work / "ocr.txt").read_text(encoding="utf-8", errors="replace")
-    pages = raw.split("\\f")
+    pages = raw.split("\f")
     while pages and not pages[-1].strip():
         pages.pop()
     if len(pages) != len(files):
@@ -143,7 +143,7 @@ def main() -> None:
         parsed = split_source_questions(page_text.splitlines(), expected)
         for number, block in parsed.items():
             q = rows[number - 1]
-            raw = "\\n".join(block).strip()
+            raw = "\n".join(block).strip()
             question, options = parse_options(raw)
             q["rawOcrCandidate"] = raw or None
             if q["textStatus"] == "manual_source_inspection_pending_review":
@@ -160,9 +160,9 @@ def main() -> None:
     data["questionTextVerified"] = 0
     data["sourceDigitization"] = "ocr_editorial_draft_not_live"
     data["notes"] = "OCR candidates from TNPSC official scan are UNVERIFIED; never publish as exact text without visual comparison. Original page/number and final-key tokens remain authoritative."
-    DATA.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    DATA.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     PAGE_FILE.write_text(json.dumps({"schemaVersion": 1, "paperId": data["paperId"], "pages": page_json,
-        "status": "unverified_machine_ocr"}, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        "status": "unverified_machine_ocr"}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"OCR candidate stems: {data['questionTextCoverage']}/200; complete A-D sets: {data['optionSetCoverage']}/200")
     print("Verified stems: 0; original source pages and official final keys retained for all 200.")
     print("All OCR results are editorial staging, not live quiz questions.")
