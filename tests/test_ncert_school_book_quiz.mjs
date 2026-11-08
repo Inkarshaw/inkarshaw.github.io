@@ -16,11 +16,16 @@ for(const set of bank.sets){
   assert.ok(/^c(?:6|7|8|9|10|11|12)-[a-z-]+$/.test(set.id),set.id);
   assert.ok(set.subject && set.topic && set.kind==='original-concept-practice');
   assert.ok(['en','en-ta'].includes(set.language));
-  if(set.language==='en-ta'){
+  if(set.language==='en-ta'&&set.source){
     assert.equal(set.source.edition,'2026–27');
     assert.ok([1,2,3,4,5,6,7,8,9,10,11,12,13].includes(set.source.chapter));
     assert.equal(set.source.firstPage??1,({1:1,2:17,3:37,4:58,5:79,6:100,7:113,8:128,9:134,10:161,11:171,12:195,13:208})[set.source.chapter]);
     assert.equal(new URL(set.source.url).hostname,'ncert.nic.in');
+  }
+  if(set.language==='en-ta'&&!set.source){
+    assert.equal(set.sourceMappingStatus,'general-concept-set-not-chapter-mapped');
+    assert.equal(set.reviewStatus,'editorial-review-pending');
+    assert.match(set.reviewNote,/not attributed|not.*chapter/i);
   }
   assert.equal(set.questions.length,10,'A set must contain ten questions: '+set.id);
   for(const q of set.questions){
@@ -37,11 +42,31 @@ for(const set of bank.sets){
       assert.match(q.tamil.explanation,/[\u0B80-\u0BFF]/);
       assert.equal(q.tamil.options.length,4);
       assert.equal(new Set(q.tamil.options).size,4);
-      assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112,7:127,8:133,9:160,10:170,11:194,12:207,13:217})[set.source.chapter]);
+      if(set.source){
+        assert.ok(Number.isInteger(q.page)&&q.page>=(set.source.firstPage??1)&&q.page<=({1:13,2:33,3:57,4:78,5:99,6:112,7:127,8:133,9:160,10:170,11:194,12:207,13:217})[set.source.chapter]);
+      }else{
+        assert.equal(q.page,undefined,'General concept questions must not imply certified textbook pages: '+q.id);
+      }
     }
   }
 }
 assert.ok(count>=610);
+const class6BilingualIds=['c6-science','c6-mathematics','c6-social-science'];
+const class6BilingualSets=class6BilingualIds.map(id=>bank.sets.find(s=>s.id===id));
+assert.ok(class6BilingualSets.every(Boolean),'Class 6 bilingual subjects are required');
+assert.equal(class6BilingualSets.flatMap(s=>s.questions).length,30);
+assert.ok(class6BilingualSets.every(s=>s.classLevel===6&&s.language==='en-ta'&&!s.source));
+assert.ok(class6BilingualSets.every(s=>s.reviewStatus==='editorial-review-pending'));
+assert.ok(class6BilingualSets.every(s=>s.questions.every(q=>
+  q.tamil?.question&&q.tamil?.explanation&&q.tamil.options.length===4&&
+  q.tamil.options.some(x=>/[\u0B80-\u0BFF]/.test(x))&&q.page===undefined
+)));
+assert.deepEqual(class6BilingualSets.map(s=>s.questions.map(q=>q.answer)),[
+  [1,2,3,0,1,2,3,0,1,2],
+  [0,1,2,3,0,1,2,3,0,1],
+  [3,0,1,2,3,0,1,2,3,0]
+]);
+assert.match(js,/general concept practice/,'Bilingual concept sets must not claim a chapter source');
 const acids=bank.sets.filter(s=>s.source?.chapter===2).flatMap(s=>s.questions);
 assert.equal(acids.length,40);
 assert.deepEqual(acids.slice(0,20).map(q=>q.options[q.answer]),["Acidic and basic", "Dilute sodium hydroxide", "It burns with a pop near a flame.", "Sodium chloride, water and carbon dioxide", "Soluble calcium hydrogencarbonate forms.", "H⁺ and OH⁻ combine to form water.", "Copper(II) chloride", "The acid produces mobile ions in water, while dissolved glucose does not.", "Water enables formation of hydronium ions.", "The number of hydronium ions", "pH 2", "It helps neutralise acids made by mouth bacteria.", "A stronger acid", "Sodium sulphate and potassium sulphate", "Sodium carbonate", "Chlorine and hydrogen", "Bleaching powder forms.", "Carbon dioxide", "Ten waters of crystallisation per formula unit of sodium carbonate", "Gypsum"]);
