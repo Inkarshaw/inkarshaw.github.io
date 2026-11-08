@@ -13,7 +13,7 @@ print("HTML_BYTES",len(body))
 soup=BeautifulSoup(body,"html.parser")
 for tag in soup.find_all(["h2","h3","h4","strong"]):
     s=tag.get_text(" ",strip=True)
-    if re.fullmatch(r"Question\\s+\\d+",s,re.I):
+    if s.startswith('Question ') and s[9:].strip().isdigit():
         print("QUESTION_HEADING",tag.name,repr(s))
         p=tag
         for i in range(4):
