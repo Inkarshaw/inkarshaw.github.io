@@ -53,12 +53,14 @@ for(const set of bank.sets){
 assert.ok(count>=610);
 const newGeneralBilingualIds=[
   'c6-science','c6-mathematics','c6-social-science',
-  'c7-science','c7-mathematics','c7-social-science'
+  'c7-science','c7-mathematics','c7-social-science',
+  'c8-science','c8-mathematics','c8-social-science',
+  'c9-science','c9-mathematics','c9-social-science'
 ];
 const newGeneralBilingualSets=newGeneralBilingualIds.map(id=>bank.sets.find(s=>s.id===id));
-assert.ok(newGeneralBilingualSets.every(Boolean),'Classes 6–7 bilingual subjects are required');
-assert.equal(newGeneralBilingualSets.flatMap(s=>s.questions).length,60);
-assert.ok(newGeneralBilingualSets.every(s=>[6,7].includes(s.classLevel)&&s.language==='en-ta'&&!s.source));
+assert.ok(newGeneralBilingualSets.every(Boolean),'Classes 6–9 bilingual subjects are required');
+assert.equal(newGeneralBilingualSets.flatMap(s=>s.questions).length,120);
+assert.ok(newGeneralBilingualSets.every(s=>[6,7,8,9].includes(s.classLevel)&&s.language==='en-ta'&&!s.source));
 assert.ok(newGeneralBilingualSets.every(s=>s.reviewStatus==='editorial-review-pending'));
 assert.ok(newGeneralBilingualSets.every(s=>s.questions.every(q=>
   q.tamil?.question&&q.tamil?.explanation&&q.tamil.options.length===4&&
@@ -70,7 +72,13 @@ assert.deepEqual(newGeneralBilingualSets.map(s=>s.questions.map(q=>q.answer)),[
   [3,0,1,2,3,0,1,2,3,0],
   [2,3,0,1,2,3,0,1,2,3],
   [1,2,3,0,1,2,3,0,1,2],
-  [0,1,2,3,0,1,2,3,0,1]
+  [0,1,2,3,0,1,2,3,0,1],
+  [3,0,1,2,3,0,1,2,3,0],
+  [2,3,0,1,2,3,0,1,2,3],
+  [1,2,3,0,1,2,3,0,1,2],
+  [0,1,2,3,0,1,2,3,0,1],
+  [3,0,1,2,3,0,1,2,3,0],
+  [2,3,0,1,2,3,0,1,2,3]
 ]);
 const grade8and9Ids=[
   'c8-science','c8-mathematics','c8-social-science',
