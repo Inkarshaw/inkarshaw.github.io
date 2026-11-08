@@ -384,22 +384,33 @@ function parseTowerCsv(data){
  })).filter(r=>r.cgi);
 }
 function findTowerMatch(){
- if(!towerRecords){$('towerStatus').textContent='Select a local CSV first.';return;}
- const normCGI=s=>String(s).replace(/[^0-9]/g,'');
- const target=normCGI(val('cgi'));if(!target){$('towerStatus').textContent='Paste the full CGI first.';return;}
- const matches=towerRecords.filter(r=>normCGI(r.cgi)===target);
- if(matches.length!==1){$('towerStatus').textContent=matches.length?'Found '+matches.length+' matching rows: ambiguous, not applied. Review sector/technology manually.':'No exact full-CGI match. No tower location inferred.';return;}
- const r=matches[0],lat=Number(r.lat),lon=Number(r.lon),bearing=Number(r.azimuth),beam=Number(r.beamwidth);
- if(!r.lat||!r.lon||!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180){$('towerStatus').textContent='CGI row has invalid tower coordinates; nothing applied.';return;}
- if(r.azimuth===''||!Number.isFinite(bearing)||bearing<0||bearing>=360){$('towerStatus').textContent='CGI row missing a valid azimuth; nothing applied. Provide verified antenna direction.';return;}
- $('towerLat').value=r.lat;$('towerLon').value=r.lon;
- $('towerSource').value='Local operator CSV'+(r.name?' · '+r.name:'')+' (source requires confirmation)';
- $('bearing').value=bearing;$('rotate').value=Math.round(bearing);
- if(r.beamwidth!==''&&Number.isFinite(beam)&&beam>0&&beam<=360)$('span').value=beam;
- $('sectors').value='1';updateSectorOptions();$('view').value='all';
- $('towerStatus').textContent='Matched one full CGI to '+(r.name||'tower row')+'. Review site, antenna azimuth, beamwidth and historical validity.';
+ if(!towerRecords){$('towerStatus').textContent='Select a local tower CSV first.';return;}
+ const requested=splitCGI(val('cgi'));
+ if(!requested){$('towerStatus').textContent='Enter a full four-part CGI: MCC-MNC-LAC/TAC-Cell ID.';return;}
+ const records=towerRecords.map(r=>({raw:r,parts:splitCGI(r.cgi)})).filter(z=>z.parts);
+ const exact=records.filter(z=>z.parts.every((p,i)=>p===requested[i]));
+ const sameRadio=records.filter(z=>z.parts[0]===requested[0]&&z.parts[1]===requested[1]&&z.parts[3]===requested[3]);
+ let matched=exact,partial=false;
+ if(exact.length===0&&requested[2]==='0'){
+  if(!$('partialCgi').checked){$('towerStatus').textContent=sameRadio.length?'No full CGI match. '+sameRadio.length+' MCC/MNC/Cell ID candidate(s) found with LAC/TAC 0. Review source and enable the partial-match checkbox to examine.':'No CGI or MCC/MNC/Cell ID match in local CSV.';return;}
+  matched=sameRadio;partial=true;
+ }
+ if(matched.length!==1){$('towerStatus').textContent=matched.length?'Ambiguous: '+matched.length+' potential site rows. Inspect tower data manually; nothing applied.':'No unique CGI match. No antenna direction was inferred.';return;}
+ const r=matched[0].raw,lat=Number(r.lat),lon=Number(r.lon),bearing=Number(r.azimuth),width=Number(r.beamwidth);
+ if(!r.lat||!r.lon||!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180){$('towerStatus').textContent='Matched row has invalid coordinates; no data applied.';return;}
+ if(r.azimuth===''||!Number.isFinite(bearing)||bearing<0||bearing>=360){$('towerStatus').textContent='Matched row has no valid azimuth; no data applied.';return;}
+ $('towerLat').value=String(lat);$('towerLon').value=String(lon);
+ $('resolvedCgi').value=r.cgi;
+ $('towerSource').value='User-supplied tower CSV'+(r.name?' · '+r.name:'')+' (verify with network operator)';
+ $('bearing').value=String(bearing);$('rotate').value=String(Math.round(bearing));
+ if(r.beamwidth!==''&&Number.isFinite(width)&&width>0&&width<=360)$('span').value=String(width);
+ $('distanceKm').value=''; // no distance is inferred from CGI
+ $('sectors').value='1';$('ctraceStyle').checked=true;updateSectorOptions();$('view').value='all';
+ $('towerStatus').textContent=(partial?'CAUTION: partial match on MCC/MNC/Cell ID only (requested LAC/TAC=0). ':'Matched exact CGI. ')+
+  'Use only after independent confirmation of serving site, date, sector and azimuth.';
  draw(true);
 }
+
 function updateSectorOptions(){
  const old=val('view'),count=Number(val('sectors'));$('view').innerHTML='<option value="all">All sectors</option>'+
  Array.from({length:count},(_,i)=>'<option value="'+i+'">Sector '+String.fromCharCode(65+i)+'</option>').join('');
