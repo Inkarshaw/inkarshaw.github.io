@@ -44,5 +44,7 @@ jobs:
           git add data/quizzes/tnpsc-g4-2024-original-questions.json data/quizzes/tnpsc-g4-2024-ocr-page-draft.json
           if ! git diff --cached --quiet; then
             git commit -m "Stage TNPSC 2024 original Tamil/English question OCR candidates"
+            git fetch origin fix/pyq-no-upload-student-flow-20261108
+            git rebase origin/fix/pyq-no-upload-student-flow-20261108
             git push origin HEAD:fix/pyq-no-upload-student-flow-20261108
           fi
