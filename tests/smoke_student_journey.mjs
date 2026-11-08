@@ -105,6 +105,7 @@ try {
     const ncert=document.querySelector('#ncertCount')?.textContent||'';
     return units==='288/288' && Number(ncert.replaceAll(',',''))  >=510;
   }, undefined, {timeout:20000});
+  await page.waitForFunction(() => document.querySelectorAll('#catalogs > article').length===25 && document.querySelectorAll('#ncert10Chapters > article').length===13, undefined, {timeout:20000});
   assert.equal(await page.locator('#catalogs > article').count(),25,'Coverage: indexed catalog cards');
   assert.equal(await page.locator('#ncert10Chapters > article').count(),13,'NCERT Class 10 chapter inventory');
   assert.match(await page.locator('#ncert10Status').innerText(),/13\/13 chapters/);
