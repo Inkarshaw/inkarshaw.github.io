@@ -29,12 +29,12 @@ assert.equal(audit.scert.readyUnits,audit.scert.units,'Every tracked canonical b
 assert.ok(audit.scert.indexedQuestions>=39000);
 assert.equal(audit.ncert.classes.length,7);
 assert.ok(audit.ncert.questions>=610);
-assert.equal(audit.ncert.bilingualQuestions,420);
+assert.equal(audit.ncert.bilingualQuestions,480);
 assert.deepEqual(audit.ncert.sourceLinkedClass10Chapters,[1,2,3,4,5,6,7,8,9,10,11,12,13]);
 assert.deepEqual(audit.ncert.missingClass10Chapters.map(x=>x.number),[]);
-assert.ok(audit.ncert.editorialPendingSets>=42);
-assert.equal(audit.ncert.englishOnlySets,19);
-assert.equal(audit.ncert.bilingualSets,42);
+assert.ok(audit.ncert.editorialPendingSets>=48);
+assert.equal(audit.ncert.englishOnlySets,13);
+assert.equal(audit.ncert.bilingualSets,48);
 assert.ok(audit.missingScertSubjectAreas.length>0);
 const chapters=JSON.parse(get('data/ncert/class10-science-chapter-inventory.json'));
 assert.equal(chapters.chapterCount,13);
