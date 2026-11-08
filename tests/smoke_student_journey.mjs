@@ -62,6 +62,31 @@ try {
   assert.deepEqual(pageErrors, [], 'daily quiz: runtime errors');
   console.log('PASS daily quiz active question bank loaded');
 
+  // Local-only original-PYQ staging: no paper text published without review.
+  pageErrors.length = 0;
+  const digitizeResponse=await page.goto(origin+'/pyq-digitize.html',{waitUntil:'domcontentloaded'});
+  assert.equal(digitizeResponse?.status(),200,'PYQ digitizer returns HTTP 200');
+  await page.waitForFunction(()=>document.querySelector('#paperSelect')?.options.length===3,undefined,{timeout:20000});
+  assert.equal(await page.locator('#totalCount').innerText(),'200','Every original question has its own staged slot');
+  assert.equal(await page.locator('#capturedCount').innerText(),'0','Empty draft is never counted as digitized');
+  const editorStems=page.locator('#originalFields textarea');
+  assert.equal(await editorStems.count(),6,'Tamil stem and original A–E fields');
+  await page.locator('#sourcePage').fill('3');
+  await page.locator('#visualType').selectOption('no');
+  await editorStems.nth(0).fill('LOCAL TEST FIXTURE — NOT EXAM CONTENT');
+  for(let i=1;i<=5;i++)await editorStems.nth(i).fill('TEST OPTION '+i);
+  assert.equal(await page.locator('#capturedCount').innerText(),'1','One complete local draft counted');
+  assert.equal(await page.locator('#reviewedCount').innerText(),'0','Draft cannot self-certify review');
+  const savedDraft=await page.evaluate(()=>localStorage.getItem('clearexamsOriginalTranscriptionDraftV1:tnpsc-group-iv-2024-general-tamil-general-studies'));
+  assert.ok(savedDraft&&JSON.parse(savedDraft).records['1'].text.ta.includes('LOCAL TEST FIXTURE'),'Local source text persists');
+  const pyqOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  assert.ok(pyqOverflow<=3,'PYQ digitizer mobile horizontal overflow '+pyqOverflow+'px');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#capturedCount')?.textContent==='1',undefined,{timeout:20000});
+  assert.ok((await page.locator('#originalFields textarea').first().inputValue()).includes('LOCAL TEST FIXTURE'),'Exact draft restores on reload');
+  assert.deepEqual(pageErrors,[],'PYQ original digitizer: no runtime JS errors');
+  console.log('PASS original PYQ digitizer: 200 local slots, A–E, Tamil, save/resume, no false publish claims');
+
   pageErrors.length = 0;
   await page.goto(origin + '/ncert-school-book-quiz.html', {waitUntil:'domcontentloaded'});
   await page.waitForFunction(() => {
