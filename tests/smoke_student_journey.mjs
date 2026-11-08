@@ -148,6 +148,56 @@ try {
   assert.deepEqual(pageErrors,[],'Original 200-question sessions have no runtime errors');
   console.log('PASS 200 original questions: source PDF, matching numbered responses, save/resume and year switch');
 
+  // TNUSRB SI 2010 user-supplied Type A: show only 116 readable original-number questions.
+  pageErrors.length = 0;
+  await page.goto(origin+'/tnusrb-si-2010-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#loadStatus').innerText(),/116 attemptable questions loaded/);
+  await page.locator('#start').click();
+  assert.match(await page.locator('#position').innerText(),/Original Q5/);
+  assert.match(await page.locator('#questionTitle').innerText(),/French Revolution/);
+  assert.equal(await page.locator('#options button').count(),4);
+  await page.locator('#options button').nth(1).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Type A final-key entry: B/);
+  assert.equal(await page.locator('#options button').nth(1).isDisabled(),true,'Checked answer is locked');
+  await page.locator('.palette-details summary').click();
+  const numbers=await page.locator('#palette button').allTextContents();
+  assert.equal(numbers.length,116,'Only 116 source-readable entries available');
+  assert.equal(numbers.includes('64'),false,'Malformed vector-determinant question excluded');
+  assert.equal(numbers.includes('86'),false,'Garbled fraction question excluded');
+  assert.equal(numbers.includes('106'),false,'Diagram-dependent question excluded');
+  assert.equal(numbers.includes('117'),true,'Passage questions retained');
+  await page.locator('#palette button').filter({hasText:/^117$/}).click();
+  assert.match(await page.locator('#position').innerText(),/Original Q117/);
+  assert.equal(await page.locator('#passage').isVisible(),true,'Gold-mines passage shown');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#start').innerText(),/Resume 116-question/);
+  await page.locator('#start').click();
+  assert.match(await page.locator('#position').innerText(),/Original Q117/);
+  await page.locator('.palette-details summary').click();
+  assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
+    '2010 SI mobile quiz has no horizontal overflow');
+  await page.locator('#palette button').filter({hasText:/^140$/}).click();
+  page.once('dialog',dialog=>dialog.accept());
+  await page.locator('#finish').click();
+  assert.match(await page.locator('#score').innerText(),/\/ 56\.0 marks/,'Indicative score excludes 4 ALL and 3 blocked questions');
+  assert.equal(await page.locator('#result').isVisible(),true);
+  await page.goto(origin+'/tnusrb-si-2010-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  await page.locator('#mode').selectOption('exam');
+  await page.locator('#start').click();
+  await page.locator('#options button').first().click();
+  assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides answer checking');
+  assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode hides instant answers');
+  assert.deepEqual(pageErrors,[],'TNUSRB SI 2010 quiz no runtime errors');
+  console.log('PASS TNUSRB SI 2010 Type A: 116 playable, verified source omissions, key checking, review, save/resume, exam mode');
+
   // Local-only original-PYQ staging: no paper text published without review.
   pageErrors.length = 0;
   const digitizeResponse=await page.goto(origin+'/pyq-digitize.html',{waitUntil:'domcontentloaded'});
