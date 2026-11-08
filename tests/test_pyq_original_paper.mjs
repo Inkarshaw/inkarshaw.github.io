@@ -30,6 +30,21 @@ for(const paper of data.papers){
   assert.match(paper.answerKeyUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
 }
 assert.equal(data.papers.reduce((n,p)=>n+p.questionCount,0),600);
+const sourcePages=JSON.parse(read('data/quizzes/tnpsc-g4-2024-original-page-index.json'));
+assert.equal(sourcePages.schemaVersion,1);
+assert.equal(sourcePages.questionCount,200);
+assert.equal(sourcePages.paperId,'tnpsc-group-iv-2024-general-tamil-general-studies');
+const perQuestion=Array(200).fill(null);
+for(const span of sourcePages.pageSpans){
+ assert.ok(Number.isInteger(span.pdfPage)&&span.pdfPage>=3&&span.pdfPage<=91);
+ assert.ok(span.firstQuestion>=1&&span.lastQuestion<=200&&span.lastQuestion>=span.firstQuestion);
+ for(let number=span.firstQuestion;number<=span.lastQuestion;number++){
+  assert.equal(perQuestion[number-1],null,'No duplicate original question '+number);
+  perQuestion[number-1]=span.pdfPage;
+ }
+}
+assert.ok(perQuestion.every(Number.isInteger),'Every original number mapped to source page');
+for(const [n,p] of [[1,3],[100,28],[101,29],[104,32],[150,61],[200,91]])assert.equal(perQuestion[n-1],p,'Question '+n+' source PDF page');
 const paper2024=data.papers.find(p=>p.year===2024);
 assert.equal(paper2024.firstQuestionPdfPage,3,'First original question is on PDF page 3');
 assert.equal(paper2024.annotatedSource,true,'Annotated source scans warn candidates about visible ticks');
@@ -58,6 +73,7 @@ assert.match(html,/The paper is not copied or transcribed into ClearExams/);
 assert.match(html,/Indicative marks appear only where a separately checked, matching official final key is available/);
 assert.match(html,/pyq-original-paper\.js/);
 assert.match(html,/id="paperFrame"/,'Official PDF has an inline viewer');
+assert.match(html,/id="paperQuestionPage"/,'Show source PDF page for each question');
 assert.match(html,/id="showQuestions"/,'Mobile quiz tab available');
 assert.match(html,/id="showPaper"/,'Mobile paper tab available');
 assert.match(html,/id="quizWorkspace"/,'Responsive quiz workspace available');
@@ -73,6 +89,8 @@ assert.match(js,/gradeResponses\(\)/,'Grade only where source-key map is availab
 assert.match(js,/currentKey\.answers/,'Check against original official key option mappings');
 assert.match(js,/token==='ALL'/,'Do not silently score ALL entries');
 assert.match(js,/safe\(currentPaper\.paperUrl\)/,'Page navigation stays on verified official source');
+assert.match(js,/tnpsc-g4-2024-original-page-index\.json/);
+assert.match(js,/lastShownPdfPage!==originalPage\)jumpPdfPage\(originalPage\)/,'Automatically synchronize PDF page to question');
 assert.match(html,/id="goPdfPage"/);
 assert.match(html,/id="readOriginal"/);
 assert.match(html,/id="returnAnswers"/);
