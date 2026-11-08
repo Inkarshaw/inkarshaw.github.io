@@ -11,7 +11,7 @@
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2015||data?.maxOriginalQuestions!==140||
        data?.providedQuestionCount!==140||!Array.isArray(data.questions)||data.questions.length!==140||
-       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==19||
+       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==31||
        !Array.isArray(data.answerKey?.answers)||data.answerKey.answers.length!==140)
        throw Error('TNUSRB SI 2015 source manifest incomplete');
     for(let i=0;i<140;i++){
@@ -28,7 +28,7 @@
         throw Error('Undisclosed incomplete Q'+q.number);
     }
     const playable=data.questions.filter(q=>q.scoringStatus==='provisional_secondary_key');
-    if(playable.length!==121||playable.length!==data.playableQuestionCount||
+    if(playable.length!==109||playable.length!==data.playableQuestionCount||
        playable.length!==data.provisionallyScoreableQuestionCount)
       throw Error('Expected 121 readable source questions');
     return playable;
@@ -153,7 +153,7 @@
     $('resultTitle').textContent=expired?'Time expired — submitted':'TNUSRB SI 2015 provisional result';
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(questions.length*0.5).toFixed(1)+' provisional marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
-      questions.length+' readable question records. Nineteen incomplete source items excluded. '+
+      questions.length+' readable question records. Thirty-one incomplete or disputed-key source items excluded. '+
       'This unofficial answer-table tally is not an official TNUSRB score.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
@@ -208,7 +208,7 @@
     .then(response=>{if(!response.ok)throw Error('Quiz JSON unavailable');return response.json()})
     .then(data=>{questions=validate(data);bank=data;
       $('loadStatus').textContent=questions.length+' attemptable questions loaded in original-number order. '+
-        '121 have provisional secondary-key answer letters; 19 source-incomplete records excluded.';
+        '109 readable questions have provisional secondary-key answers; 31 source-incomplete or disputed entries excluded.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
