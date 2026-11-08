@@ -66,7 +66,7 @@ try {
   pageErrors.length = 0;
   await page.goto(origin + '/pyq-hub.html', {waitUntil:'domcontentloaded'});
   await page.waitForFunction(() => document.querySelectorAll('#pyqItems .pyq-card').length===12,undefined,{timeout:20000});
-  assert.equal(await page.locator('.pyq-start-card').count(),4,'PYQ hub offers four clear paths including 2011 Group I');
+  assert.equal(await page.locator('.pyq-start-card').count(),5,'PYQ hub offers five featured paths including full 2026 Group I text quiz');
   assert.equal(await page.locator('#showMorePapers').isVisible(),true,'PYQ catalog is paginated');
   await page.locator('#showMorePapers').click();
   assert.equal(await page.locator('#pyqItems .pyq-card').count(),24,'PYQ archive expands on request');
@@ -147,6 +147,61 @@ try {
   assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
   assert.deepEqual(pageErrors,[],'Original 200-question sessions have no runtime errors');
   console.log('PASS 200 original questions: source PDF, matching numbered responses, save/resume and year switch');
+
+  // TNPSC Group I 2026: all 200 user-extracted onscreen questions, with source review and no fabricated scoring.
+  pageErrors.length=0;
+  await page.goto(origin+'/tnpsc-g1-2026-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('h1').innerText(),/2026 Group I.*200-question text quiz/);
+  assert.equal(await page.locator('#sourceIssueList li').count(),7,'Seven OCR/figure source caveats visible in the interface');
+  assert.match(await page.locator('#loadStatus').innerText(),/All 200 numbered questions loaded/);
+  await page.locator('#start').click();
+  assert.match(await page.locator('#position').innerText(),/Original Question 1 of 200/i);
+  assert.match(await page.locator('#questionText').innerText(),/Commensalism/);
+  assert.equal(await page.locator('#options button').count(),5,'A-E answer options preserved');
+  await page.locator('#options button').nth(2).click();
+  assert.match(await page.locator('#status').innerText(),/1 of 200 answered/);
+  assert.match(await page.locator('#selectedFeedback').innerText(),/No correct answer is shown/);
+  await page.locator('#paletteDetails summary').click();
+  assert.equal(await page.locator('#palette .palette-btn').count(),200);
+  await page.locator('#palette .palette-btn').nth(12).click();
+  assert.match(await page.locator('#position').innerText(),/Original Question 13 of 200/i);
+  assert.match(await page.locator('#sourceWarning').innerText(),/matching-pair town names/i);
+  await page.locator('#options button').nth(4).click();
+  await page.locator('#flag').click();
+  await page.locator('#palette .palette-btn').nth(199).click();
+  assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/i);
+  assert.match(await page.locator('#sourceWarning').innerText(),/dice illustrations/i);
+  assert.match(await page.locator('#options button').first().innerText(),/\[Image A\]/,'Missing diagrams are not invented');
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
+    '2026 text quiz fits mobile width without overflow');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#start').innerText(),/Resume 200-question/);
+  await page.locator('#start').click();
+  assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/i);
+  assert.match(await page.locator('#status').innerText(),/2 of 200 answered · 1 flagged/);
+  page.once('dialog',dialog=>dialog.accept());
+  await page.locator('#finish').click();
+  assert.equal(await page.locator('#result').isVisible(),true);
+  assert.equal(await page.locator('#answeredTotal').innerText(),'2');
+  assert.equal(await page.locator('#blankTotal').innerText(),'198');
+  assert.equal(await page.locator('#flagTotal').innerText(),'1');
+  await page.locator('#reviewFilter').selectOption('source');
+  assert.equal(await page.locator('#reviewList details').count(),7,'All seven source issues available for review');
+  await page.goto(origin+'/tnpsc-g1-2026-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#newAttempt')&&!document.querySelector('#newAttempt').disabled,
+    undefined,{timeout:20000});
+  page.once('dialog',dialog=>dialog.accept());
+  await page.locator('#newAttempt').click();
+  await page.locator('#mode').selectOption('exam');
+  await page.locator('#start').click();
+  await page.locator('#options button').last().click();
+  assert.match(await page.locator('#selectedFeedback').innerText(),/No correct answer is shown/);
+  assert.deepEqual(pageErrors,[],'TNPSC Group I 2026 text question interactions have no runtime errors');
+  console.log('PASS TNPSC Group I 2026: 200 textual Q1–200, A–E choices, 7 source warnings, saved progress, ungraded results and exam mode');
 
   // TNPSC Group I 2011: actual original Series D PDF, not the uploaded Group II transcription.
   pageErrors.length=0;
