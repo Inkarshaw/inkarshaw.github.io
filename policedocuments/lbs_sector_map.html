@@ -229,68 +229,80 @@ function loadCtraceReport(){
 }
 
 function readGeometry(){
- const reportedLat=n('lat'),reportedLon=n('lon'),hasTower=!!val('towerLat')||!!val('towerLon');
+ const hasReported=val('lat')!==''&&val('lon')!=='';
+ if((val('lat')!=='') !== (val('lon')!==''))throw Error('Both LBS coordinates are required or leave both blank.');
+ const hasTower=!!val('towerLat')||!!val('towerLon');
+ if(hasTower&&(!val('towerLat')||!val('towerLon')))throw Error('Enter both tower coordinates.');
+ if(!hasReported&&!hasTower)throw Error('Enter LBS coordinates or paste a C-Trace tower report.');
+ const reportedLat=hasReported?n('lat'):null,reportedLon=hasReported?n('lon'):null;
+ if(hasReported&&(!Number.isFinite(reportedLat)||!Number.isFinite(reportedLon)||Math.abs(reportedLat)>90||Math.abs(reportedLon)>180))throw Error('Invalid LBS coordinates.');
  const lat=hasTower?n('towerLat'):reportedLat,lon=hasTower?n('towerLon'):reportedLon;
  const count=Number(val('sectors')),radius=n('radius'),span=n('span'),bearing=n('bearing');
- if(!val('lat')||!val('lon')||![reportedLat,reportedLon].every(Number.isFinite)||Math.abs(reportedLat)>90||Math.abs(reportedLon)>180){throw new Error('Enter valid provider-reported latitude and longitude.');}
- if(hasTower&&(!val('towerLat')||!val('towerLon'))){throw new Error('Enter both tower coordinates for a separate tower location.');}
- if(![lat,lon,radius,span,bearing].every(Number.isFinite)||Math.abs(lat)>90||Math.abs(lon)>180||radius<10||radius>50000||bearing<0||bearing>=360||span<=0||span>360){throw new Error('Check tower coordinates, azimuth (0–359.99), wedge width (1–360), and illustrative radius (10–50,000 m).');}
- if(![1,2,3,4,6].includes(count)){throw new Error('Choose a valid sector count.');}
- const cells=Array.from({length:count},(_,i)=>{
-  const center=norm(bearing+i*360/count);
-  const steps=Math.max(12,Math.ceil(span/3));
-  const points=[[lat,lon]];
-  for(let j=0;j<=steps;j++)points.push(destination(lat,lon,center-span/2+span*j/steps,radius));
+ if(![lat,lon,radius,span,bearing].every(Number.isFinite)||Math.abs(lat)>90||Math.abs(lon)>180||radius<10||radius>50000||bearing<0||bearing>=360||span<=0||span>360)throw Error('Check coordinates, bearing (0–359.99°), width (1–360°), and radius (10–50,000 m).');
+ if(![1,2,3,4,6].includes(count))throw Error('Invalid sector count.');
+ const distanceKm=val('distanceKm')?n('distanceKm'):null;
+ if(distanceKm!==null&&(!Number.isFinite(distanceKm)||distanceKm<=0||distanceKm>50))throw Error('Invalid approximate tower-to-person distance.');
+ const cells=Array.from({length:count},(_,k)=>{
+  const center=norm(bearing+k*360/count),steps=Math.max(12,Math.ceil(span/3)),points=[[lat,lon]];
+  for(let m=0;m<=steps;m++)points.push(destination(lat,lon,center-span/2+span*m/steps,radius));
   points.push([lat,lon]);
-  return {index:i,name:'Sector '+String.fromCharCode(65+i),center,points,color:colors[i]};
+  return {index:k,name:count===1?'Serving sector':'Sector '+String.fromCharCode(65+k),center,points,color:$('ctraceStyle').checked?'#2345ff':colors[k]};
  });
- return {lat,lon,reportedLat,reportedLon,hasTower,towerSource:val('towerSource'),count,radius,span,bearing,cells,ref:val('reference')};
+ return {lat,lon,reportedLat,reportedLon,hasReported,hasTower,towerSource:val('towerSource'),count,radius,span,bearing,cells,ref:val('reference'),distanceKm};
 }
 function setupMap(){
- if(!window.L){$('mapFallback').style.display='block';$('status').textContent='Leaflet could not load; online interactive map unavailable.';return;}
+ if(!window.L){$('mapFallback').style.display='block';$('status').textContent='Map library unavailable; geometry exports may work.';return;}
  map=L.map('map',{zoomControl:true,attributionControl:true,worldCopyJump:false,preferCanvas:true}).setView([13.0827,80.2707],11);
  map.attributionControl.setPrefix(false);
  layer=L.featureGroup().addTo(map);
- map.on('click',e=>{$('coords').textContent='Clicked position: '+e.latlng.lat.toFixed(6)+', '+e.latlng.lng.toFixed(6)+' • Reference point and sectors remain unchanged.';});
+ map.on('click',e=>{$('coords').textContent='Clicked '+e.latlng.lat.toFixed(6)+', '+e.latlng.lng.toFixed(6)+' • reference values unchanged.';});
 }
 function draw(fit){
  try{
   const g=readGeometry();latest=g;
-  $('status').textContent='Sector geometry updated. Unverified assumptions are shown as illustrative.';
+  $('status').textContent='Directional sector drawn; source data and antenna beamwidth require verification.';
   $('status').style.color='#9be8d1';
-  $('google').href='https://maps.google.com/maps?q='+encodeURIComponent(g.reportedLat+','+g.reportedLon);
-  $('coords').textContent='LBS point: '+g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6)+' • Sector anchor: '+g.lat.toFixed(6)+', '+g.lon.toFixed(6)+(g.hasTower?' (entered tower record)':' (unverified LBS point)')+' • '+g.radius+' m illustrative radius';
-  $('legend').innerHTML=g.cells.map(s=>'<span><b style="background:'+s.color+'"></b>'+escapeHTML(s.name)+' '+s.center.toFixed(1)+'°</span>').join('')+'<span>● Reference coordinate</span>';
+  $('google').href='https://maps.google.com/maps?q='+encodeURIComponent(g.lat+','+g.lon);
+  $('google').textContent='Open sector anchor in Google Maps';
+  $('coords').textContent=(g.hasReported?'LBS point: '+g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6)+' • ':'No separate LBS-reported point • ')+'Sector centre: '+g.lat.toFixed(6)+', '+g.lon.toFixed(6)+(g.hasTower?' (tower record)':' (unverified assumed anchor)');
+  $('legend').innerHTML=g.cells.map(z=>'<span><b style="background:'+z.color+'"></b>'+escapeHTML(z.name)+' · '+z.center.toFixed(1)+'°</span>').join('')+'<span>📡 Tower/anchor</span>'+(g.hasReported&&g.hasTower?'<span>🟠 Separate LBS point</span>':'');
+  $('distanceNote').textContent=g.distanceKm!==null?'Reported approximate distance: '+g.distanceKm.toFixed(2)+' km. Distance alone cannot determine the person position.':'Wedge radius and beamwidth are diagram settings, not a calibrated location estimate.';
   if(map){
    layer.clearLayers();
-   const chosen=val('view');
-   const shown=g.cells.filter(s=>chosen==='all'||String(s.index)===chosen);
-   for(const s of shown){
-    const poly=L.polygon(s.points,{color:s.color,fillColor:s.color,fillOpacity:0.22,weight:2,dashArray:'6,5'}).bindTooltip(s.name+' • centre '+s.center.toFixed(1)+'° • assumed',{sticky:true});
-    layer.addLayer(poly);
-    layer.addLayer(L.polyline([[g.lat,g.lon],destination(g.lat,g.lon,s.center,g.radius)],{color:s.color,weight:3,opacity:0.85,dashArray:'8,6'}));
+   const shown=g.cells.filter(z=>val('view')==='all'||String(z.index)===val('view'));
+   for(const z of shown){
+    layer.addLayer(L.polygon(z.points,{color:z.color,fillColor:z.color,fillOpacity:$('ctraceStyle').checked?.27:.2,weight:3}).bindTooltip(z.name+' • azimuth '+z.center.toFixed(1)+'° • '+g.span+'° wedge width (verify)',{sticky:true,className:'sector-tooltip'}));
+    layer.addLayer(L.polyline([[g.lat,g.lon],destination(g.lat,g.lon,z.center,g.radius)],{color:z.color,weight:3.5}));
    }
-   layer.addLayer(L.circleMarker([g.lat,g.lon],{radius:9,color:'#ffffff',weight:2,fillColor:g.hasTower?'#4aafff':'#f59c37',fillOpacity:1}).bindPopup('<strong>'+(g.hasTower?'Entered tower site':'LBS coordinate used as assumed centre')+'</strong><br>'+g.lat.toFixed(6)+', '+g.lon.toFixed(6)+'<br>'+escapeHTML(g.hasTower?g.towerSource:g.ref)));
-   if(g.hasTower){layer.addLayer(L.circleMarker([g.reportedLat,g.reportedLon],{radius:8,color:'#ffffff',weight:2,fillColor:'#f59c37',fillOpacity:1}).bindPopup('<strong>Provider-reported LBS point</strong><br>'+g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6)+'<br>Location type and accuracy not confirmed'));
-    layer.addLayer(L.polyline([[g.lat,g.lon],[g.reportedLat,g.reportedLon]],{color:'#ffffff',weight:1.5,dashArray:'3,7'}));}
-   if(fit)map.fitBounds(L.latLngBounds([...g.cells.flatMap(c=>c.points),[g.reportedLat,g.reportedLon]]).pad(0.15),{maxZoom:15});
+   if(g.distanceKm!==null)layer.addLayer(L.circle([g.lat,g.lon],{radius:g.distanceKm*1000,color:'#fff098',fill:false,weight:2,dashArray:'5,7'}).bindTooltip('Approximate distance '+g.distanceKm+' km — not a handset fix'));
+   if(g.hasTower){
+    layer.addLayer(L.marker([g.lat,g.lon],{icon:L.divIcon({html:'<span class="tower-pin">📡</span>',className:'',iconSize:[37,37],iconAnchor:[18,18]})}).bindPopup('<strong>Entered tower site</strong><br>'+g.lat.toFixed(6)+', '+g.lon.toFixed(6)+'<br>'+escapeHTML(g.towerSource||'Not verified')));
+   }else{
+    layer.addLayer(L.circleMarker([g.lat,g.lon],{radius:9,color:'#fff',weight:2,fillColor:'#f59c37',fillOpacity:1}).bindPopup('LBS-reported point; antenna location not independently verified'));
+   }
+   if(g.hasReported&&g.hasTower){
+    layer.addLayer(L.circleMarker([g.reportedLat,g.reportedLon],{radius:8,color:'#fff',weight:2,fillColor:'#f59c37',fillOpacity:1}).bindPopup('<strong>Provider LBS point</strong><br>'+g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6)+'<br>Precision not established'));
+    layer.addLayer(L.polyline([[g.lat,g.lon],[g.reportedLat,g.reportedLon]],{color:'#fff',weight:1.5,dashArray:'3,7'}));
+   }
+   if(fit){const pts=g.cells.flatMap(z=>z.points);if(g.hasReported)pts.push([g.reportedLat,g.reportedLon]);map.fitBounds(L.latLngBounds(pts).pad(.15),{maxZoom:16});}
    setTimeout(()=>map.invalidateSize(),80);
   }
-  const summary=[
-    ['LBS reported point',g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6)],
-    ['Sector anchor',g.lat.toFixed(6)+', '+g.lon.toFixed(6)+(g.hasTower?' (separately entered tower)':' (assumed; no tower record)')],
-    ['Tower data provenance',g.hasTower?(g.towerSource||'Not specified'):'Not provided'],
-    ['CGI',val('cgi')||'—'],['LBS type',val('lbs')||'—'],
-    ['Last activity',val('activity')||'—'],
-    ['Angular configuration',g.count+' × '+g.span+'° wedges'],
-    ['Sector A azimuth',g.bearing+'° from north (assumed unless verified)'],
-    ['Diagram radius',g.radius+' metres (not actual coverage)'],
-    ['Coordinate classification',g.ref]
+  const fields=[
+   ['Sector anchor',g.lat.toFixed(6)+', '+g.lon.toFixed(6)+(g.hasTower?' (tower report)':' (unverified LBS point)')],
+   ['LBS-reported point',g.hasReported?g.reportedLat.toFixed(6)+', '+g.reportedLon.toFixed(6):'Not supplied'],
+   ['Requested CGI',val('cgi')||'—'],['Resolved CGI',val('resolvedCgi')||'Not supplied'],
+   ['Cell-ID comparison',val('cgi')&&val('resolvedCgi')?(compatibleCGI(val('cgi'),val('resolvedCgi'))?'MCC/MNC/Cell ID agree; LAC/TAC verification needed':'Mismatch — investigate'):'Not compared'],
+   ['Source',g.hasTower?(g.towerSource||'Not provided'):'Not provided'],
+   ['Network',val('network')||'Not provided'],['LBS type',val('lbs')||'Not provided'],
+   ['Azimuth',g.bearing+'° from north (as supplied)'],['Wedge width',g.span+'° (confirm beamwidth)'],
+   ['Approximate distance',g.distanceKm!==null?g.distanceKm+' km (not a handset fix)':'Not provided'],
+   ['Diagram radius',g.radius+' m (not RF coverage limit)'],['Last activity',val('activity')||'Not provided']
   ];
-  $('summary').innerHTML=summary.map(([a,b])=>'<div class="metaitem"><span>'+escapeHTML(a)+'</span>'+escapeHTML(b)+'</div>').join('');
+  $('summary').innerHTML=fields.map(([k,v])=>'<div class="metaitem"><span>'+escapeHTML(k)+'</span>'+escapeHTML(v)+'</div>').join('');
   return g;
  }catch(e){latest=null;$('status').textContent=e.message;$('status').style.color='#ffc1b4';return null;}
 }
+
 function featureCollection(g){
  const features=[{type:'Feature',geometry:{type:'Point',coordinates:[g.reportedLon,g.reportedLat]},properties:{name:'Provider-reported LBS point',reference:g.ref,warning:'Not necessarily tower or handset location'}}];
  if(g.hasTower)features.push({type:'Feature',geometry:{type:'Point',coordinates:[g.lon,g.lat]},properties:{name:'Entered tower site',towerSource:g.towerSource||'Not supplied',warning:'Subject to verification with carrier'}});
