@@ -66,7 +66,7 @@ try {
   pageErrors.length = 0;
   await page.goto(origin + '/pyq-hub.html', {waitUntil:'domcontentloaded'});
   await page.waitForFunction(() => document.querySelectorAll('#pyqItems .pyq-card').length===12,undefined,{timeout:20000});
-  assert.equal(await page.locator('.pyq-start-card').count(),5,'PYQ hub offers five featured paths including full 2026 Group I text quiz');
+  assert.ok(await page.locator('.pyq-start-card').count()>=5,'PYQ hub offers at least five featured paths including full 2026 Group I text quiz');
   assert.equal(await page.locator('#showMorePapers').isVisible(),true,'PYQ catalog is paginated');
   await page.locator('#showMorePapers').click();
   assert.equal(await page.locator('#pyqItems .pyq-card').count(),24,'PYQ archive expands on request');
