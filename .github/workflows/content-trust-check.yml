@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "pyq-hub.html"
+      - "tnusrb-si-2010-quiz.html"
+      - "assets/js/tnusrb-si-2010-quiz.js"
+      - "data/quizzes/tnusrb-si-2010-open-type-a.json"
+      - "tests/test_tnusrb_si_2010_quiz.mjs"
       - "pyq-original-paper.html"
       - "pyq-original-digital.html"
       - "pyq-digitize.html"
@@ -53,6 +57,10 @@ on:
     branches: [main]
     paths:
       - "pyq-hub.html"
+      - "tnusrb-si-2010-quiz.html"
+      - "assets/js/tnusrb-si-2010-quiz.js"
+      - "data/quizzes/tnusrb-si-2010-open-type-a.json"
+      - "tests/test_tnusrb_si_2010_quiz.mjs"
       - "pyq-original-paper.html"
       - "pyq-original-digital.html"
       - "pyq-digitize.html"
@@ -97,6 +105,8 @@ jobs:
           node-version: "22"
       - name: Test content quality and user interactions
         run: node tests/test_content_trust.mjs
+      - name: Validate TNUSRB SI 2010 user-supplied quiz and Type A source gaps
+        run: node tests/test_tnusrb_si_2010_quiz.mjs
       - name: Verify commercial navigation and publication trust
         run: python3 -m unittest discover -s tests -p 'test_commercial_readiness.py'
       - name: Test live Current Affairs publishing and source freshness guards
