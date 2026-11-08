@@ -12,7 +12,7 @@
   };
   const allowedLetters=['A','B','C','D','E'];
   const url=new URLSearchParams(location.search);
-  let papers=[],keyRecords=[],questionPageIndex=null,currentPaper=null,currentKey=null,answers=[],marked=[],index=0,deadline=0,timerHandle=null,lastShownPdfPage=0;
+  let papers=[],keyRecords=[],questionPageIndexes={},currentPaper=null,currentKey=null,answers=[],marked=[],index=0,deadline=0,timerHandle=null,lastShownPdfPage=0;
   const keyToken=/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/;
   function validFinalKey(k,p){
     return k&&k.id===p.id&&k.paperVersion===p.paperVersion&&
@@ -95,7 +95,7 @@
     if(!currentPaper)return;
     $('number').textContent='Question '+(index+1)+' of '+answers.length;
     $('sourceQuestionNumber').textContent=String(index+1);
-    const originalPage=currentPaper.id===questionPageIndex?.paperId?questionPageIndex.pageByQuestion[index]:null;
+    const originalPage=questionPageIndexes[currentPaper.id]?.pageByQuestion[index]??null;
     $('paperQuestionPage').textContent=Number.isInteger(originalPage)?
       'Original question '+(index+1)+' is on official PDF page '+originalPage+
       '. The PDF view follows your question automatically.':
@@ -228,17 +228,22 @@
       .then(r=>{if(!r.ok)throw Error('Official paper index unavailable');return r.json()}),
     fetch('data/quizzes/tnpsc-g4-2024-original-page-index.json',{cache:'no-store'})
       .then(r=>r.ok?r.json():null).catch(()=>null),
+    fetch('data/quizzes/tnpsc-g4-2025-original-page-index.json',{cache:'no-store'})
+      .then(r=>r.ok?r.json():null).catch(()=>null),
     fetch('data/quizzes/original-final-keys.json',{cache:'no-store'})
       .then(r=>{if(!r.ok)throw Error('Official answer-key map unavailable');return r.json()})
       .catch(()=>null)
-  ]).then(([data,pageData,keyData])=>{
-      questionPageIndex=null;
-      if(pageData?.schemaVersion===1&&pageData.paperId==='tnpsc-group-iv-2024-general-tamil-general-studies'&&
-         pageData.questionCount===200&&Array.isArray(pageData.pageSpans)){
+  ]).then(([data,page2024,page2025,keyData])=>{
+      questionPageIndexes={};
+      for(const sourceIndex of [page2024,page2025]){
+        const maxPage=sourceIndex?.paperId==='tnpsc-group-iv-2024-general-tamil-general-studies'?91:
+          sourceIndex?.paperId==='tnpsc-group-iv-2025-general-tamil-general-studies'?123:null;
+        if(!maxPage||sourceIndex?.schemaVersion!==1||sourceIndex.questionCount!==200||
+           !Array.isArray(sourceIndex.pageSpans))continue;
         const pages=Array(200).fill(null);
         let valid=true;
-        for(const span of pageData.pageSpans){
-          if(!Number.isInteger(span.pdfPage)||span.pdfPage<3||span.pdfPage>91||
+        for(const span of sourceIndex.pageSpans){
+          if(!Number.isInteger(span.pdfPage)||span.pdfPage<3||span.pdfPage>maxPage||
              !Number.isInteger(span.firstQuestion)||!Number.isInteger(span.lastQuestion)||
              span.firstQuestion<1||span.lastQuestion>200||span.firstQuestion>span.lastQuestion){valid=false;break}
           for(let n=span.firstQuestion;n<=span.lastQuestion;n++){
@@ -247,7 +252,9 @@
           }
           if(!valid)break;
         }
-        if(valid&&pages.every(Number.isInteger))questionPageIndex={paperId:pageData.paperId,pageByQuestion:pages};
+        if(valid&&pages.every(Number.isInteger)){
+          questionPageIndexes[sourceIndex.paperId]={paperId:sourceIndex.paperId,pageByQuestion:pages};
+        }
       }
       keyRecords=keyData?.schemaVersion===1&&Array.isArray(keyData.papers)?keyData.papers:[];
       if(!data||data.schemaVersion!==1||!Array.isArray(data.papers))throw Error('Invalid paper index');
