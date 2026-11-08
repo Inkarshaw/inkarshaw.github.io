@@ -281,7 +281,9 @@ Promise.all([
   fetch('data/quizzes/original-final-keys.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
 ]).then(([catalog,keyCatalog])=>{
   papers=(Array.isArray(catalog?.papers)?catalog.papers:[]).filter(p=>
-    Number.isInteger(p.questionCount)&&p.questionCount>0&&p.questionCount<=400&&official(p.paperUrl));
+    Number.isInteger(p.questionCount)&&p.questionCount>0&&p.questionCount<=400&&official(p.paperUrl)&&
+    // This A–E-only editor must not silently corrupt the four-option Group I 2011 booklet.
+    Array.isArray(p.optionLetters)&&p.optionLetters.join(',')==='A,B,C,D,E');
   keys=Array.isArray(keyCatalog?.papers)?keyCatalog.papers:[];
   const select=$('paperSelect');select.replaceChildren();
   for(const p of papers){
