@@ -52,6 +52,27 @@ try {
   assert.deepEqual(pageErrors, [], 'homepage: runtime errors');
   console.log('PASS homepage menu accessibility');
 
+  // Question-level search: lazy load, bilingual filter, answer/source disclosure and mobile width.
+  pageErrors.length = 0;
+  await page.goto(origin + '/question-search.html', {waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('#results .question').count(),0,'Question banks are lazy until first search');
+  await page.locator('#searchButton').click();
+  await page.waitForFunction(()=>document.querySelector('#status')?.textContent.includes('loaded records'),undefined,{timeout:25000});
+  assert.match(await page.locator('#status').innerText(),/426 matching questions from 426 loaded records/);
+  assert.equal(await page.locator('#results .question').count(),20,'Question finder paginates initial results');
+  await page.locator('#results details').first().locator('summary').click();
+  assert.equal(await page.locator('#results details').first().getAttribute('open'),'', 'Source explanation details are operable');
+  await page.locator('#language').selectOption('ta');
+  assert.ok((await page.locator('#status').innerText()).includes('matching questions'),'Tamil search updates results');
+  await page.locator('#collection').selectOption('Fathers');
+  assert.match(await page.locator('#status').innerText(),/84 matching questions/,'Fathers collection filter');
+  await page.locator('#language').selectOption('both');
+  assert.match(await page.locator('#status').innerText(),/84 matching questions/,'Bilingual-only filtering');
+  const questionOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  assert.ok(questionOverflow<=3,'Question finder mobile overflow '+questionOverflow+'px');
+  assert.deepEqual(pageErrors,[],'Question finder has no JavaScript errors');
+  console.log('PASS bilingual, source-linked question finder: 426 records and mobile filters');
+
   pageErrors.length = 0;
   await page.goto(origin + '/daily-quiz.html', {waitUntil:'domcontentloaded'});
   await page.waitForFunction(() => {
