@@ -407,17 +407,29 @@ function updateSectorOptions(){
 }
 function updateTiles(){
  if(!map)return;
- if($('tiles').checked){if(!tileLayer)tileLayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'});tileLayer.addTo(map);tileLayer.bringToBack();}
- else if(tileLayer&&map.hasLayer(tileLayer))map.removeLayer(tileLayer);
+ if(tileLayer){for(const t of tileLayer){if(map.hasLayer(t))map.removeLayer(t);}tileLayer=null;}
+ const mode=val('mapStyle');
+ if(mode==='none')return;
+ if(mode==='streets'){
+  tileLayer=[L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'})];
+ }else{
+  tileLayer=[L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri, Maxar, Earthstar Geographics and the GIS User Community'})];
+  if(mode==='satellite')tileLayer.push(L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Labels &copy; Esri'}));
+ }
+ for(const t of tileLayer)t.addTo(map);
+ if(tileLayer.length)tileLayer[0].bringToBack();
+ if(layer)layer.bringToFront();
 }
+
 $('parse').addEventListener('click',()=>{const ct=parseMessage(val('message'));if(!ct){$('status').textContent='No known LBS fields found. Please check message text.';return;}updateSectorOptions();draw(true);$('status').textContent='Parsed '+ct+' field(s). Check values and unverified assumptions.';});
 $('draw').addEventListener('click',()=>draw(true));$('fit').addEventListener('click',()=>draw(true));
-$('clear').addEventListener('click',()=>{keys.forEach(k=>$(k).value='');$('towerLat').value='';$('towerLon').value='';$('towerSource').value='';$('towerCsv').value='';towerRecords=null;$('towerStatus').textContent='No tower data loaded.';$('message').value='';$('reference').selectedIndex=0;$('bearing').value='0';$('rotate').value='0';$('span').value='120';$('radius').value='1000';$('sectors').value='3';updateSectorOptions();latest=null;if(layer)layer.clearLayers();$('summary').innerHTML='';$('coords').textContent='Enter coordinates to draw sectors.';$('legend').innerHTML='';$('status').textContent='Cleared. No private details are saved by this tool.';});
+$('clear').addEventListener('click',()=>{keys.forEach(k=>$(k).value='');['ctraceText','resolvedCgi','network','towerAddress','distanceKm'].forEach(k=>$(k).value='');$('ctraceStatus').textContent='No C-Trace result loaded.';$('partialCgi').checked=false;$('mapStyle').value='none';updateTiles();$('towerLat').value='';$('towerLon').value='';$('towerSource').value='';$('towerCsv').value='';towerRecords=null;$('towerStatus').textContent='No tower data loaded.';$('message').value='';$('reference').selectedIndex=0;$('bearing').value='0';$('rotate').value='0';$('span').value='120';$('radius').value='1000';$('sectors').value='3';updateSectorOptions();latest=null;if(layer)layer.clearLayers();$('summary').innerHTML='';$('coords').textContent='Enter coordinates to draw sectors.';$('legend').innerHTML='';$('status').textContent='Cleared. No private details are saved by this tool.';});
 $('sectors').addEventListener('change',()=>{updateSectorOptions();if(latest)draw(false);});
-for(const id of ['view','span','radius','reference'])$(id).addEventListener('change',()=>{if(latest)draw(false);});
+for(const id of ['view','span','radius','reference','ctraceStyle','towerLat','towerLon','distanceKm'])$(id).addEventListener('change',()=>{if(latest)draw(false);});
 $('bearing').addEventListener('input',()=>{$('rotate').value=String(Math.round(n('bearing')));if(latest)draw(false);});
 $('rotate').addEventListener('input',()=>{$('bearing').value=val('rotate');if(latest)draw(false);});
-$('tiles').addEventListener('change',updateTiles);
+$('mapStyle').addEventListener('change',updateTiles);
+$('parseCtrace').addEventListener('click',loadCtraceReport);
 $('matchTower').addEventListener('click',findTowerMatch);
 $('resetTower').addEventListener('click',()=>{$('towerLat').value='';$('towerLon').value='';$('towerSource').value='';$('towerCsv').value='';towerRecords=null;$('towerStatus').textContent='Tower data cleared; sector anchor will be unverified LBS coordinates.';if(latest)draw(true);});
 $('towerCsv').addEventListener('change',async()=>{
