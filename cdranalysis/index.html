@@ -477,6 +477,25 @@
           <div class="notice">Use this view when two or more subject CDRs are loaded. Shared contacts, same-tower timing, identifiers and network links are correlation leads that require independent verification.</div>
         </div>
         <div class="multi-number-stack">
+          <div class="panel" id="multiEventPanel">
+            <div class="panel-title"><h2>Compare two or more events</h2><span class="muted">Common contacts across multiple CDR subjects</span></div>
+            <p class="tiny">Select any two or more case incident, timeline or CDR event-type entries. Results include contacts appearing in <b>every</b> selected event and across <b>at least two</b> imported A-party numbers. A different CDR record must support each selected event. Timeline events use the adjustable ± time window; event types cover all imported dates. This comparison uses loaded CDR data (respecting the Raw / Unique analysis mode), independent of the global Subject, Event Type and date filters.</p>
+            <div class="subtoolbar no-print">
+              <div class="field" style="min-width:210px;flex:1"><label for="multiEventSearch">Find events</label><input type="search" id="multiEventSearch" placeholder="Search incidents, timeline or event types"></div>
+              <div class="field"><label for="multiEventWindow">Timeline window</label><select id="multiEventWindow"><option value="15">±15 minutes</option><option value="30">±30 minutes</option><option value="60" selected>±60 minutes</option><option value="120">±2 hours</option><option value="360">±6 hours</option><option value="1440">±24 hours</option></select></div>
+              <label class="check"><input type="checkbox" id="multiEventNumericOnly" checked> Numeric contacts only</label>
+              <button type="button" id="multiEventSelectVisible" class="btn secondary small">Select all visible</button>
+              <button type="button" id="multiEventClear" class="btn secondary small">Clear</button>
+              <button type="button" id="multiEventRefresh" class="btn secondary small">Refresh events</button>
+              <button type="button" id="multiEventExport" class="btn secondary small" disabled>Export CSV</button>
+            </div>
+            <div class="tiny" id="multiEventSelectionCount" aria-live="polite">0 selected</div>
+            <div id="multiEventChoices" class="checks" style="max-height:220px;overflow:auto;padding:8px 0"></div>
+            <div id="multiEventStatus" class="tiny" role="status" aria-live="polite"></div>
+            <div id="multiEventSummary" class="metric-row" style="margin:8px 0"></div>
+            <div class="tablewrap" style="max-height:520px;overflow:auto"><table class="table" id="multiEventTable"></table></div>
+            <p class="tiny">Shared contact or same-time activity is an investigative lead, not independent proof of association or presence. Click a contact to inspect the underlying CDR records.</p>
+          </div>
           <div class="panel"><div class="panel-title"><h2>Cross-CDR comparison</h2><span class="muted">Common contacts, towers, identifiers and possible same-cell time overlaps</span></div><div class="subtoolbar"><div class="field"><label>Same-cell time window (min)</label><input type="number" id="colocationMins" min="1" max="360" value="30" /></div><div class="field"><label>Episode break gap (min)</label><input type="number" id="episodeGapMins" min="1" max="1440" value="60" /></div><button class="btn secondary small" id="compareRefreshBtn">Refresh</button></div><div class="notice">A same-cell overlap means two loaded CDR subjects used the same recorded Cell ID within the selected time window. It is not proof that the devices or people were physically together.</div><div id="compareContent" class="empty">Load at least two different CDR / A Party numbers to compare them.</div></div>
           <div class="panel">
           <div class="panel-title"><h2>Communication network</h2><span class="muted">Loaded A-party numbers connected to frequent B-party contacts</span></div>
@@ -521,6 +540,7 @@
 <script src="/cdranalysis/js/ui.js?v=74"></script>
 <script src="/cdranalysis/js/app.js?v=77"></script>
 <script src="/cdranalysis/js/event-common-contacts.js?v=78"></script>
+<script src="/cdranalysis/js/multinumber-events.js?v=1"></script>
 <script src="/cdranalysis/js/relationship.js"></script>
 <script src="/cdranalysis/js/diagnostics.js"></script>
 <script src="/cdranalysis/js/investigation-leads.js"></script>
