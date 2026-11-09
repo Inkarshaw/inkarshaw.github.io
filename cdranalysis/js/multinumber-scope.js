@@ -7,6 +7,12 @@
   const selected = { subject: new Set(), event: new Set() };
   const applied = { subject: new Set(), event: new Set() };
   const options = { subject: [], event: [] };
+  // Cache the expensive filtered rows. A checkbox only updates the pending selection,
+  // so the displayed record count must remain the count of the APPLIED selection.
+  let cachedRows = null;
+  let choicesSource = null;
+  let choicesLength = -1;
+  function invalidate() { cachedRows = null; }
   const config = {
     subject: { choices: 'multiScopeSubjectChoices', search: 'multiScopeSubjectSearch',
       summary: 'multiScopeSubjectSummary', details: 'multiScopeSubjects',
@@ -103,18 +109,27 @@
     // Other tabs retain the normal single-value Subject and Event Type sidebar filters.
     // Here only these two sidebar criteria are bypassed; remaining filters and the
     // selected Raw / Unique analysis mode are preserved.
+    if (cachedRows) return cachedRows;
     const data = window.CDRApp?.getMultiNumberBaseRecords?.() || core.state.filtered || [];
     const subjects = applied.subject;
     const eventTypes = applied.event;
-    return data.filter(row =>
+    cachedRows = data.filter(row =>
       (!subjects.size || subjects.has(String(row.cdrNo || '').trim())) &&
       (!eventTypes.size || eventTypes.has(String(row.callType || '').trim()))
     );
+    return cachedRows;
   }
 
   function refreshChoices() {
-    options.subject = distinct('cdrNo');
-    options.event = distinct('callType');
+    const source = core.state.records || [];
+    const dataChanged = choicesSource !== source || choicesLength !== source.length;
+    if (dataChanged) {
+      choicesSource = source;
+      choicesLength = source.length;
+      options.subject = distinct('cdrNo');
+      options.event = distinct('callType');
+      invalidate();
+    }
     let changed = false;
     for (const kind of ['subject', 'event']) {
       const valid = new Set(options[kind]);
@@ -122,7 +137,7 @@
       for (const value of [...applied[kind]]) {
         if (!valid.has(value)) { applied[kind].delete(value); changed = true; }
       }
-      renderChoices(kind);
+      if (dataChanged) renderChoices(kind);
     }
     updateSummary();
     // If an imported CDR was removed, refresh results without the now-missing scope.
@@ -132,6 +147,7 @@
   function apply() {
     applied.subject = new Set(selected.subject);
     applied.event = new Set(selected.event);
+    invalidate();
     updateSummary();
     for (const kind of ['subject', 'event']) $(config[kind].details).open = false;
     window.CDRApp?.applyFilters?.();
@@ -190,6 +206,6 @@
     apply();
   });
   window.addEventListener('cdr:updated', refreshChoices);
-  window.CDRMultiScope = { getRows, refreshChoices };
+  window.CDRMultiScope = { getRows, refreshChoices, invalidate };
   refreshChoices();
 })();
