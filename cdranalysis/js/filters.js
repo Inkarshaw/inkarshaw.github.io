@@ -9,7 +9,7 @@
   }
   function installViewScopeToolbars(){
     document.querySelectorAll('.view').forEach(view=>{
-      if(view.id==='dashboard'||view.querySelector(':scope > .view-scope-toolbar'))return;
+      if(view.id==='dashboard'||view.id==='multinumber'||view.querySelector(':scope > .view-scope-toolbar'))return;
       const bar=document.createElement('div');
       bar.className='panel no-print view-scope-toolbar';
       bar.style.padding='10px 12px';
@@ -81,7 +81,7 @@
   }
   function updateFilterCount(){if($('activeFilterCount'))$('activeFilterCount').textContent=activeFilterCount();}
   function setFilterDrawer(open){$('filterSidebar')?.classList.toggle('open',open);$('filterBackdrop')?.classList.toggle('show',open);$('mobileFiltersBtn')?.setAttribute('aria-expanded',String(open));$('filterSidebar')?.setAttribute('aria-hidden',String(window.innerWidth<=1100?!open:false));}
-  function filterMatchingRecords(ignoreDateTime=false){
+  function filterMatchingRecords(ignoreDateTime=false,ignoreSubjectEvent=false){
     const f={q:normalize($('q').value),dateFrom:sourceDateBoundary($('dateFrom').value,false),dateTo:sourceDateBoundary($('dateTo').value,true),
       timeFrom:timeMins($('timeFrom').value),timeTo:timeMins($('timeTo').value),bparty:normalize($('bparty').value),durMin:$('durMin').value===''?null:+$('durMin').value,durMax:$('durMax').value===''?null:+$('durMax').value,
       callType:$('callType').value,callsOnly:$('callsOnly').checked,smsOnly:$('smsOnly').checked,nightOnly:$('nightOnly').checked,weekendOnly:$('weekendOnly').checked,excludeServiceSenders:$('excludeServiceSenders').checked,nightFrom:timeMins($('nightFrom').value),nightTo:timeMins($('nightTo').value),
@@ -90,15 +90,16 @@
       if(!ignoreDateTime&&state.exactIncidentRange&&(!r.dt||r.dt<state.exactIncidentRange.start||r.dt>state.exactIncidentRange.end))return false;
       if(f.q && !matchesSmartQuery(r,$('q').value,ignoreDateTime))return false; if(!ignoreDateTime&&f.dateFrom&&(!r.dt||r.dt<f.dateFrom))return false; if(!ignoreDateTime&&f.dateTo&&(!r.dt||r.dt>f.dateTo))return false;
       const mins=r.dt?window.CDRCore.sourceMinutes(r.dt):timeMins(r.time); if(!ignoreDateTime){if(f.timeFrom!==null&&f.timeTo!==null&&!withinNight(mins,f.timeFrom,f.timeTo))return false; else {if(f.timeFrom!==null&&f.timeTo===null&&mins<f.timeFrom)return false;if(f.timeTo!==null&&f.timeFrom===null&&mins>f.timeTo)return false;}}
-      if(f.bparty&&!normalize(r.bparty).includes(f.bparty))return false;if(f.durMin!==null&&r.duration<f.durMin)return false;if(f.durMax!==null&&r.duration>f.durMax)return false;if(f.callType&&r.callType!==f.callType)return false;
+      if(f.bparty&&!normalize(r.bparty).includes(f.bparty))return false;if(f.durMin!==null&&r.duration<f.durMin)return false;if(f.durMax!==null&&r.duration>f.durMax)return false;if(!ignoreSubjectEvent&&f.callType&&r.callType!==f.callType)return false;
       const typ=normalize(r.callType);if(f.callsOnly&&!typ.includes('call'))return false;if(f.smsOnly&&!typ.includes('sms'))return false;if(f.excludeServiceSenders&&isServiceSender(r.bparty))return false;if(!ignoreDateTime&&f.nightOnly&&!withinNight(mins,f.nightFrom,f.nightTo))return false;if(!ignoreDateTime&&f.weekendOnly&&(!r.dt||![0,6].includes(window.CDRCore.sourceWeekday(r.dt))))return false;
       if(f.cellId&&!normalize(`${r.firstCellId} ${r.lastCellId}`).includes(f.cellId))return false;if(f.tower&&!normalize(`${r.firstAddress} ${r.lastAddress}`).includes(f.tower))return false;if(f.city&&!normalize(r.mainCity).includes(f.city))return false;if(f.subcity&&!normalize(r.subCity).includes(f.subcity))return false;if(f.roaming&&!normalize(r.roaming).includes(f.roaming))return false;
-      if(f.imei&&!normalize(r.imei).includes(f.imei))return false;if(f.imsi&&!normalize(r.imsi).includes(f.imsi))return false;if(f.provider&&!normalize(r.provider).includes(f.provider))return false;if(f.operator&&!normalize(r.operator).includes(f.operator))return false;if(f.cdrNo&&r.cdrNo!==f.cdrNo)return false;if(f.sourceFile&&r.sourceFile!==f.sourceFile)return false;return true;
+      if(f.imei&&!normalize(r.imei).includes(f.imei))return false;if(f.imsi&&!normalize(r.imsi).includes(f.imsi))return false;if(f.provider&&!normalize(r.provider).includes(f.provider))return false;if(f.operator&&!normalize(r.operator).includes(f.operator))return false;if(!ignoreSubjectEvent&&f.cdrNo&&r.cdrNo!==f.cdrNo)return false;if(f.sourceFile&&r.sourceFile!==f.sourceFile)return false;return true;
     });
     return {base,rows};
   }
   // For the Contacts "First" column, retain non-temporal filters but scan all loaded dates/times.
   function recordsIgnoringDateTimeFilters(){return filterMatchingRecords(true).rows;}
+  function multiNumberBaseRecords(){return filterMatchingRecords(false,true).rows;}
   function applyFilters(){
     const {base,rows}=filterMatchingRecords();
     state.filtered=rows;
@@ -139,7 +140,7 @@
     return {
       subjectEventScopedRecords,installViewScopeToolbars,syncViewScopeControls,setSubjectEventScope,
       refreshSelectors,matchesSmartQuery,withinNight,activeFilterCount,updateFilterCount,
-      setFilterDrawer,applyFilters,recordsIgnoringDateTimeFilters,resetFilters,bind
+      setFilterDrawer,applyFilters,recordsIgnoringDateTimeFilters,multiNumberBaseRecords,resetFilters,bind
     };
   };
 })();
