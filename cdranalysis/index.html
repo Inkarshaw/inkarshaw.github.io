@@ -481,16 +481,28 @@
             <div class="panel-title"><h2>Compare two or more events</h2><span class="muted">Common contacts across multiple CDR subjects</span></div>
             <p class="tiny">Select any two or more case incident, timeline or CDR event-type entries. Results include contacts appearing in <b>every</b> selected event and across <b>at least two</b> imported A-party numbers. A different CDR record must support each selected event. Timeline events use the adjustable ± time window; event types cover all imported dates. This comparison uses loaded CDR data (respecting the Raw / Unique analysis mode), independent of the global Subject, Event Type and date filters.</p>
             <div class="subtoolbar no-print">
-              <div class="field" style="min-width:210px;flex:1"><label for="multiEventSearch">Find events</label><input type="search" id="multiEventSearch" placeholder="Search incidents, timeline or event types"></div>
+              <div class="field" style="min-width:260px;flex:1">
+                <label id="multiEventDropdownLabel">Event type (multiple selection)</label>
+                <details id="multiEventDropdown" style="position:relative;max-width:500px">
+                  <summary id="multiEventDropdownSummary" class="btn secondary" aria-labelledby="multiEventDropdownLabel multiEventDropdownSummary" style="display:block;list-style:none;cursor:pointer;user-select:none">Select two or more events ▾</summary>
+                  <div style="position:absolute;z-index:35;top:calc(100% + 5px);left:0;width:min(500px,calc(100vw - 50px));max-width:calc(100vw - 50px);background:var(--panel,#fff);border:1px solid var(--line,#dfe5ee);border-radius:10px;box-shadow:var(--shadow,0 8px 26px rgba(16,24,40,.15));padding:12px">
+                    <label for="multiEventSearch">Find events</label>
+                    <input type="search" id="multiEventSearch" placeholder="Search event types, incident or timeline" style="width:100%;margin:4px 0 10px">
+                    <div id="multiEventChoices" style="max-height:245px;overflow-y:auto;padding:4px 0"></div>
+                    <div class="subtoolbar" style="margin:10px 0 0">
+                      <button type="button" id="multiEventSelectVisible" class="btn secondary small">Select all visible</button>
+                      <button type="button" id="multiEventClear" class="btn secondary small">Clear selection</button>
+                    </div>
+                    <div class="tiny">Tick multiple events. Your selections stay active when you close this dropdown.</div>
+                  </div>
+                </details>
+              </div>
               <div class="field"><label for="multiEventWindow">Timeline window</label><select id="multiEventWindow"><option value="15">±15 minutes</option><option value="30">±30 minutes</option><option value="60" selected>±60 minutes</option><option value="120">±2 hours</option><option value="360">±6 hours</option><option value="1440">±24 hours</option></select></div>
               <label class="check"><input type="checkbox" id="multiEventNumericOnly" checked> Numeric contacts only</label>
-              <button type="button" id="multiEventSelectVisible" class="btn secondary small">Select all visible</button>
-              <button type="button" id="multiEventClear" class="btn secondary small">Clear</button>
               <button type="button" id="multiEventRefresh" class="btn secondary small">Refresh events</button>
               <button type="button" id="multiEventExport" class="btn secondary small" disabled>Export CSV</button>
             </div>
             <div class="tiny" id="multiEventSelectionCount" aria-live="polite">0 selected</div>
-            <div id="multiEventChoices" class="checks" style="max-height:220px;overflow:auto;padding:8px 0"></div>
             <div id="multiEventStatus" class="tiny" role="status" aria-live="polite"></div>
             <div id="multiEventSummary" class="metric-row" style="margin:8px 0"></div>
             <div class="tablewrap" style="max-height:520px;overflow:auto"><table class="table" id="multiEventTable"></table></div>
@@ -540,7 +552,7 @@
 <script src="/cdranalysis/js/ui.js?v=74"></script>
 <script src="/cdranalysis/js/app.js?v=77"></script>
 <script src="/cdranalysis/js/event-common-contacts.js?v=78"></script>
-<script src="/cdranalysis/js/multinumber-events.js?v=1"></script>
+<script src="/cdranalysis/js/multinumber-events.js?v=2"></script>
 <script src="/cdranalysis/js/relationship.js"></script>
 <script src="/cdranalysis/js/diagnostics.js"></script>
 <script src="/cdranalysis/js/investigation-leads.js"></script>
