@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="/cdranalysis/css/cdr-components.css?v=70" />
   <link rel="stylesheet" href="/cdranalysis/css/nexus-ui.css" />
   <link rel="stylesheet" href="/cdranalysis/css/multinumber-scope.css?v=1" />
+  <link rel="stylesheet" href="/cdranalysis/css/event-type-multiselect.css?v=1" />
 </head>
 <body>
 <div id="importLoadingOverlay" class="import-loading-overlay" hidden aria-live="polite" aria-busy="true">
@@ -42,7 +43,7 @@
 <div class="app">
   <header class="topbar">
     <div class="toprow">
-      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v75</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
+      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v76</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
       <div class="toolbar">
         <button class="btn ghost" id="printBtn">Print / Save PDF</button>
       </div>
@@ -96,7 +97,7 @@
         <div class="field"><label>Time from</label><input type="time" id="timeFrom" /></div>
         <div class="field"><label>Time to</label><input type="time" id="timeTo" /></div>
       </div>
-      <div class="field"><label>Event type</label><select id="callType"><option value="">All event types</option></select></div>
+      <div class="field"><label>Event type</label><div class="cdr-event-mount" data-event-scope="global"></div><select id="callType" hidden aria-hidden="true"><option value="">All event types</option></select></div>
       <div class="field"><label>IMEI</label><input id="imei" /></div>
       <div class="field"><label>IMSI</label><input id="imsi" /></div>
       <div class="checks">
@@ -157,7 +158,7 @@
         <div class="panel no-print" style="padding:10px 12px">
           <div class="subtoolbar" style="margin:0">
             <div class="field" style="min-width:260px"><label>Subject / MSISDN</label><select id="dashboardCdr"><option value="">All subjects</option></select></div>
-            <div class="field" style="min-width:220px"><label>Event type</label><select id="dashboardEventType"><option value="">All event types</option></select></div>
+            <div class="field cdr-event-field" style="min-width:220px;flex:1"><label>Event type</label><div class="cdr-event-mount" data-event-scope="global"></div><select id="dashboardEventType" hidden aria-hidden="true"><option value="">All event types</option></select></div>
             <div class="tiny" id="dashboardScopeText">Showing all subjects and event types within the current filters.</div>
           </div>
         </div>
@@ -197,7 +198,7 @@
             <div class="field" style="min-width:220px"><label>Focus subject</label><select id="linkSubject"><option value="">All loaded subjects</option></select></div>
             <div class="field"><label>From date</label><input type="date" id="linkFrom"></div>
             <div class="field"><label>To date</label><input type="date" id="linkTo"></div>
-            <div class="field" style="min-width:170px"><label>Event type</label><select id="linkEventType"><option value="">All event types</option></select></div>
+            <div class="field cdr-event-field" style="min-width:190px;flex:1"><label>Event type</label><div class="cdr-event-mount" data-event-scope="link"></div><select id="linkEventType" hidden aria-hidden="true"><option value="">All event types</option></select></div>
             <div class="field"><label>Top contacts</label><select id="linkTop"><option>20</option><option selected>40</option><option>75</option><option>120</option></select></div>
             <div class="field"><label>Minimum events</label><input type="number" id="linkMinEvents" min="1" value="1"></div>
             <label class="check"><input type="checkbox" id="linkMutualOnly"> Shared / mutual contacts only</label>
@@ -562,7 +563,7 @@
           <div class="network-wrap"><canvas id="networkCanvas"></canvas></div>
           <div id="networkLegend" class="metric-row" style="margin-top:10px"></div>
         </div>
-          <div class="panel"><div class="panel-title"><h2>Number Relationship Analysis</h2><span class="muted" id="relationshipScope">Select a pair to analyse.</span></div><div class="notice">This module summarizes communication metadata between two numbers and, when both are loaded CDR subjects, compares shared towers and identifiers. Treat these as review leads rather than proof of identity, exact location, association, or intent.</div><div class="subtoolbar no-print"><div class="field" style="min-width:220px"><label>Person A / Subject</label><select id="relationshipA"><option value="">Select subject</option></select></div><div class="field" style="min-width:220px"><label>Person B / Contact</label><input id="relationshipB" list="relationshipBOptions" placeholder="Enter or select number"><datalist id="relationshipBOptions"></datalist></div><div class="field"><label>From date</label><input type="date" id="relationshipFrom"></div><div class="field"><label>To date</label><input type="date" id="relationshipTo"></div><div class="field" style="min-width:190px"><label>Event type</label><select id="relationshipEvent"><option value="">All event types</option></select></div><label class="check"><input type="checkbox" id="relationshipNightOnly"> Night only</label><button class="btn secondary small" id="relationshipSwap">⇄ Swap</button><button class="btn small" id="relationshipAnalyse">Analyse</button><button class="btn secondary small" id="relationshipClear">Clear</button><button class="btn secondary small" id="relationshipExport">Export pair CSV</button><button class="btn secondary small" id="relationshipOpenARecords">Open A-side records</button><button class="btn secondary small" id="relationshipOpenBRecords">Open B-side records</button></div><div class="tiny" style="margin:6px 0 10px">Relationship date/event filters apply only inside this tab and do not change the analyzer-wide filters.</div><div id="relationshipSummary" class="empty">Enter Person B to find which loaded subjects contacted that number, or select a pair to analyse.</div><h3>Loaded subjects connected to Person B</h3><div class="tablewrap"><table class="table" id="relationshipSubjects"></table></div><h3 style="margin-top:18px">Communication timeline</h3><div class="tablewrap"><table class="table" id="relationshipTimeline"></table></div><h3 style="margin-top:18px">Common towers</h3><div class="tablewrap"><table class="table" id="relationshipTowers"></table></div><h3 style="margin-top:18px">Shared IMEI / IMSI</h3><div class="tablewrap"><table class="table" id="relationshipDevices"></table></div></div>
+          <div class="panel"><div class="panel-title"><h2>Number Relationship Analysis</h2><span class="muted" id="relationshipScope">Select a pair to analyse.</span></div><div class="notice">This module summarizes communication metadata between two numbers and, when both are loaded CDR subjects, compares shared towers and identifiers. Treat these as review leads rather than proof of identity, exact location, association, or intent.</div><div class="subtoolbar no-print"><div class="field" style="min-width:220px"><label>Person A / Subject</label><select id="relationshipA"><option value="">Select subject</option></select></div><div class="field" style="min-width:220px"><label>Person B / Contact</label><input id="relationshipB" list="relationshipBOptions" placeholder="Enter or select number"><datalist id="relationshipBOptions"></datalist></div><div class="field"><label>From date</label><input type="date" id="relationshipFrom"></div><div class="field"><label>To date</label><input type="date" id="relationshipTo"></div><div class="field cdr-event-field" style="min-width:190px;flex:1"><label>Event type</label><div class="cdr-event-mount" data-event-scope="relationship"></div><select id="relationshipEvent" hidden aria-hidden="true"><option value="">All event types</option></select></div><label class="check"><input type="checkbox" id="relationshipNightOnly"> Night only</label><button class="btn secondary small" id="relationshipSwap">⇄ Swap</button><button class="btn small" id="relationshipAnalyse">Analyse</button><button class="btn secondary small" id="relationshipClear">Clear</button><button class="btn secondary small" id="relationshipExport">Export pair CSV</button><button class="btn secondary small" id="relationshipOpenARecords">Open A-side records</button><button class="btn secondary small" id="relationshipOpenBRecords">Open B-side records</button></div><div class="tiny" style="margin:6px 0 10px">Relationship date/event filters apply only inside this tab and do not change the analyzer-wide filters.</div><div id="relationshipSummary" class="empty">Enter Person B to find which loaded subjects contacted that number, or select a pair to analyse.</div><h3>Loaded subjects connected to Person B</h3><div class="tablewrap"><table class="table" id="relationshipSubjects"></table></div><h3 style="margin-top:18px">Communication timeline</h3><div class="tablewrap"><table class="table" id="relationshipTimeline"></table></div><h3 style="margin-top:18px">Common towers</h3><div class="tablewrap"><table class="table" id="relationshipTowers"></table></div><h3 style="margin-top:18px">Shared IMEI / IMSI</h3><div class="tablewrap"><table class="table" id="relationshipDevices"></table></div></div>
         </div>
       </section>
 
@@ -572,10 +573,10 @@
   </div>
 </div>
 
-<script src="/cdranalysis/js/core.js?v=75"></script>
+<script src="/cdranalysis/js/core.js?v=76"></script>
 <script src="/cdranalysis/js/identity.js"></script>
 <script src="/cdranalysis/js/parser.js?v=73"></script>
-<script src="/cdranalysis/js/filters.js?v=76"></script>
+<script src="/cdranalysis/js/filters.js?v=77"></script>
 <script src="/cdranalysis/js/dashboard.js?v=71"></script>
 <script src="/cdranalysis/js/records.js"></script>
 <script src="/cdranalysis/js/excelview.js?v=68"></script>
@@ -586,7 +587,7 @@
 <script src="/cdranalysis/js/devices.js?v=70"></script>
 <script src="/cdranalysis/js/movement.js?v=74"></script>
 <script src="/cdranalysis/js/network.js?v=74"></script>
-<script src="/cdranalysis/js/linkanalysis.js?v=65"></script>
+<script src="/cdranalysis/js/linkanalysis.js?v=66"></script>
 <script src="/cdranalysis/js/analysis.js?v=69"></script>
 <script src="/cdranalysis/js/reports.js"></script>
 <script src="/cdranalysis/js/workspace.js"></script>
@@ -594,10 +595,11 @@
 <script src="/cdranalysis/js/router.js?v=65"></script>
 <script src="/cdranalysis/js/ui.js?v=74"></script>
 <script src="/cdranalysis/js/app.js?v=78"></script>
+<script src="/cdranalysis/js/event-type-multiselect.js?v=1"></script>
 <script src="/cdranalysis/js/event-common-contacts.js?v=78"></script>
 <script src="/cdranalysis/js/multinumber-scope.js?v=2"></script>
 <script src="/cdranalysis/js/multinumber-events.js?v=3"></script>
-<script src="/cdranalysis/js/relationship.js"></script>
+<script src="/cdranalysis/js/relationship.js?v=76"></script>
 <script src="/cdranalysis/js/diagnostics.js"></script>
 <script src="/cdranalysis/js/investigation-leads.js"></script>
 </body>
