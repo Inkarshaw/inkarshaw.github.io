@@ -48,6 +48,14 @@ button:focus-visible{outline:3px solid #86bfdf}
 .ref{font-size:10pt;margin:8px 0;white-space:pre-line}
 .placeholder{background:#fff2d8;padding:0 1px}
 .visually-hidden{position:absolute;left:-9999px}
+details{border:1px solid var(--line);border-radius:9px;margin:14px 0 8px;padding:0 12px 12px}
+details>summary{list-style:none;font-size:16px;color:#174c6a;font-weight:750;padding:12px 2px;cursor:pointer}
+details>summary::after{content:"＋";float:right}
+details[open]>summary::after{content:"－"}
+.quickbar{border:1px solid #c6e3ef;background:#f3fafe;padding:12px;border-radius:10px;margin:12px 0}
+.quickbar .actions{margin-top:8px}
+.quickbar button{padding:10px 13px}
+.office-summary{font-size:12px;color:#526979;overflow-wrap:anywhere}
 @media(max-width:1020px){.container{grid-template-columns:1fr}.previewbox{padding:9px}.paper{width:100%;min-height:auto;padding:24px 18px;font-size:12px}.previewhead{flex-wrap:wrap}}
 @media print{
  @page{size:A4;margin:0}
@@ -76,11 +84,23 @@ button:focus-visible{outline:3px solid #86bfdf}
 <option value="waste">குப்பைத் தொட்டி மற்றும் அகற்றுதல்</option>
 <option value="general">பொது குடியிருப்பு கடிதம்</option>
 </select>
-<p class="info">இந்தப் பக்கம் புகைப்படங்களில் உள்ள மாதிரிகளை அடிப்படையாகக் கொண்ட வரைவு உருவாக்கி. பெயர், குடியிருப்பு எண், தொகை, தேதி, சம்பவ விவரங்கள் ஆகியவற்றை சரிபார்த்த பின்னரே அதிகாரப்பூர்வமாக பயன்படுத்தவும்.</p>
-<h2>02 · பொதுவான விவரங்கள்</h2>
 <div class="grid2">
 <div><label for="date">கடித தேதி</label><input id="date" type="date"></div>
-<div><label for="fileNo">கோப்பு / Rc. No.</label><input id="fileNo" placeholder="Rc. No. / File No."></div>
+<div><label for="fileNo">கோப்பு / Rc. No. (விருப்பம்)</label><input id="fileNo" placeholder="Rc. No. / File No."></div>
+</div>
+<div class="quickbar">
+<strong>⚡ விரைவு கடிதம் / Quick create</strong>
+<div class="office-summary" id="officeSummary" role="status"></div>
+<div class="actions">
+<button id="quickPdf" type="button">📄 PDF</button>
+<button id="quickWord" class="word" type="button">📝 Word</button>
+<button id="editOffice" class="ghost" type="button">✎ Office</button>
+<button id="toggleDetails" class="ghost" type="button">Full edit</button>
+</div></div>
+<p class="info">இந்தப் பக்கம் புகைப்படங்களில் உள்ள மாதிரிகளை அடிப்படையாகக் கொண்ட வரைவு உருவாக்கி. பெயர், குடியிருப்பு எண், தொகை, தேதி, சம்பவ விவரங்கள் ஆகியவற்றை சரிபார்த்த பின்னரே அதிகாரப்பூர்வமாக பயன்படுத்தவும்.</p>
+<details id="officeDetails">
+<summary>02 · பொதுவான விவரங்கள் / Office details</summary>
+<div class="grid2">
 <div class="full"><label for="fromName">அனுப்புநர் (பதவி)</label><input id="fromName" value="காவல் ஆய்வாளர்"></div>
 <div class="full"><label for="fromAddress">அனுப்புநர் முகவரி</label><textarea id="fromAddress">சட்டம் மற்றும் ஒழுங்கு பிரிவு,
 ஜி-3 கீழ்ப்பாக்கம் காவல் நிலையம்,
@@ -91,9 +111,12 @@ button:focus-visible{outline:3px solid #86bfdf}
 <div class="full"><label for="subject">பொருள் (முழுமையாக மாற்றலாம்)</label><textarea id="subject"></textarea></div>
 <div class="full"><label for="reference">பார்வை / குறிப்பு (விருப்பம்)</label><textarea id="reference" placeholder="Order No., CPO No., Letter reference..."></textarea></div>
 </div>
+<div class="actions"><button id="saveOffice" type="button" class="word">Save office defaults</button><button id="forgetOffice" type="button" class="ghost">Forget office defaults</button></div>
+<p class="help">Save officer, station and signature once; these defaults are kept only in this browser, not sent to a server.</p>
+</details>
 <h2>03 · குடியிருப்பு / சிறப்பு விவரங்கள்</h2>
 <div id="specificFields" class="grid2"></div>
-<h2>04 · கடித உரை (Editable)</h2>
+<details id="letterDetails"><summary>04 · கடித உரை / Edit wording &amp; signature</summary>
 <label for="bodyText">முழு கடித உரை</label>
 <textarea id="bodyText" rows="13" spellcheck="true"></textarea>
 <p class="help">கடித உரையில் {{block}}, {{amount}} போன்ற மாறிகள் உள்ளன. கீழேயுள்ள விவரங்களை உள்ளிடும்போது அவை தானாக மாற்றப்படும். உரையை நேரடியாகவும் திருத்தலாம்.</p>
@@ -105,6 +128,7 @@ button:focus-visible{outline:3px solid #86bfdf}
 ஜி-3 கீழ்ப்பாக்கம் காவல் நிலையம்,
 சென்னை - 600 010.</textarea>
 <label for="enclosures">இணைப்புகள் (விருப்பம்)</label><textarea id="enclosures" placeholder="1. புகைப்படங்கள்&#10;2. குடியிருப்பு ஒதுக்கீட்டு ஆணை"></textarea>
+</details>
 <div id="missing" role="status" aria-live="polite"></div>
 <div class="actions">
 <button id="pdf" type="button">📄 PDF / Print</button>
@@ -229,6 +253,7 @@ function render(){
  [fieldValue('subject'),fieldValue('bodyText')].forEach(s=>s.replace(/\{\{([a-zA-Z][a-zA-Z0-9]*)\}\}/g,(m,k)=>{if(!fieldValue(k))unresolved.add(k);return m}));
  const coreMissing=['fromName','fromAddress','toName','toAddress','date','subject','signature'].filter(k=>!fieldValue(k));
  $('missing').textContent=(unresolved.size||coreMissing.length)?'குறிப்பு: நிரப்பப்படாத விவரங்கள்: '+[...unresolved,...coreMissing].join(', '):'✓ எல்லா குறிப்பிடப்பட்ட மாறிகளும் நிரப்பப்பட்டுள்ளன.';
+ $('officeSummary').textContent=[fieldValue('fromName'),fieldValue('station'),'→ '+fieldValue('toName')].filter(Boolean).join(' · ');
 }
 function docParagraph(s,bold,align){
  const prop='<w:pPr><w:spacing w:after="140" w:line="420" w:lineRule="auto"/>'+(align?'<w:jc w:val="'+align+'"/>':'')+'</w:pPr>';
@@ -298,14 +323,43 @@ function restoreDraft(){
  }catch(e){console.warn('Could not load local draft')}
 }
 function clearDraft(){if(!confirm('Clear the locally saved draft and reset fields?'))return;localStorage.removeItem('quartersLetterDraftV1');location.reload()}
+const officeKeys=['fromName','fromAddress','station','signature'];
+function saveOfficeDefaults(){
+ const saved={};officeKeys.forEach(k=>saved[k]=textValue(k));
+ try{localStorage.setItem('quartersOfficeDefaultsV1',JSON.stringify(saved));alert('Office defaults saved on this device.')}catch(e){alert('Browser storage is unavailable.')}
+}
+function loadOfficeDefaults(){
+ try{const saved=JSON.parse(localStorage.getItem('quartersOfficeDefaultsV1')||'null');if(!saved||typeof saved!=='object')return;
+ officeKeys.forEach(k=>{if(typeof saved[k]==='string'&&$(k))$(k).value=saved[k]});render();
+ }catch(e){console.warn('Could not load saved office details')}
+}
+function forgetOfficeDefaults(){
+ if(!confirm('Forget office defaults saved on this device?'))return;
+ try{localStorage.removeItem('quartersOfficeDefaultsV1');alert('Saved office defaults cleared. Current form unchanged.')}catch(e){alert('Browser storage is unavailable.')}
+}
+function openOffice(){
+ $('officeDetails').open=true;
+ $('officeDetails').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function toggleFullEdit(){
+ const show=!($('officeDetails').open&&$('letterDetails').open);
+ $('officeDetails').open=show;$('letterDetails').open=show;
+ $('toggleDetails').textContent=show?'Quick mode':'Full edit';
+}
 $('template').addEventListener('change',e=>loadTemplate(e.target.value));
 commons.forEach(k=>$(k).addEventListener('input',render));
 $('word').addEventListener('click',exportWord);
 $('pdf').addEventListener('click',pdfPrint);
+$('quickWord').addEventListener('click',exportWord);
+$('quickPdf').addEventListener('click',pdfPrint);
+$('editOffice').addEventListener('click',openOffice);
+$('toggleDetails').addEventListener('click',toggleFullEdit);
+$('saveOffice').addEventListener('click',saveOfficeDefaults);
+$('forgetOffice').addEventListener('click',forgetOfficeDefaults);
 $('save').addEventListener('click',saveDraft);
 $('clear').addEventListener('click',clearDraft);
 const d=new Date();$('date').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-loadTemplate('transfer');restoreDraft();
+loadTemplate('transfer');loadOfficeDefaults();restoreDraft();
 </script>
 </body>
 </html>
