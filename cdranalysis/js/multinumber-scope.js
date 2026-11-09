@@ -148,9 +148,11 @@
     applied.subject = new Set(selected.subject);
     applied.event = new Set(selected.event);
     invalidate();
-    updateSummary();
     for (const kind of ['subject', 'event']) $(config[kind].details).open = false;
+    // The filter pipeline refreshes the count once. Do not scan before AND
+    // after running it, as that doubles the work on large CDR datasets.
     window.CDRApp?.applyFilters?.();
+    updateSummary();
   }
 
   for (const kind of ['subject', 'event']) {
