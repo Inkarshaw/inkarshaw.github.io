@@ -41,7 +41,9 @@
     if (!raw) return null;
     const numeric = /^\+?[\d\s()\-]+$/.test(raw) && /\d/.test(raw);
     if ($('eventContactsNumericOnly').checked && (!numeric || raw.replace(/\D/g, '').length < 8)) return null;
-    return { key: String(r.bpartyKey || core.stableKey?.(raw) || raw.toLowerCase()).trim(), raw };
+    const digits = raw.replace(/\D/g, '');
+    const normalized = numeric && digits.length >= 10 ? digits.slice(-10) : raw.toLowerCase().replace(/\s+/g, '');
+    return { key: String(r.bpartyKey || normalized).trim(), raw };
   };
 
   function selectRecord(r, item, windowMs) {
