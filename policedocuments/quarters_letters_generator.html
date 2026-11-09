@@ -159,7 +159,7 @@ const $=id=>document.getElementById(id);
 const defaultRecipient='காவல் துணை ஆணையாளர் அவர்கள்';
 const defaultTo='குடியிருப்பு மற்றும் நலன்,\nசென்னை பெருநகர காவல்,\nவேப்பேரி, சென்னை - 7.';
 const fields={
- transfer:[['block','தற்போதைய பிளாக் / Block','C-6'],['oldDoor','தற்போதைய வீட்டு எண்','B-11'],['newBlock','மாற்றம் கோரும் பிளாக்','EE-15'],['newDoor','மாற்றம் கோரும் வீட்டு எண்','EE-02'],['officer','குடியிருப்பாளர் பெயர் / பதவி / எண்','WHC-58183'],['allotDate','ஒதுக்கீட்டு தேதி','01.09.2026'],['years','குடியிருப்பில் வசிக்கும் வருடங்கள்','45'],['reason','மாற்றம் கோரும் காரணம்','காரணம் / பராமரிப்பு விவரங்கள்','textarea']],
+ transfer:[['block','தற்போதைய பிளாக் / Block','C-6'],['oldDoor','தற்போதைய வீட்டு எண்','B-11'],['newBlock','மாற்றம் கோரும் பிளாக்','EE-15'],['newDoor','மாற்றம் கோரும் வீட்டு எண்','EE-02'],['occupantName','குடியிருப்பாளர் பெயர்','பெயர்'],['occupantRank','பதவி / Rank','','rankSelect'],['occupantNumber','காவலர் எண் / Number','58183','number'],['allotDate','ஒதுக்கீட்டு தேதி','01.09.2026'],['years','குடியிருப்பில் வசிக்கும் வருடங்கள்','45'],['reason','மாற்றம் கோரும் காரணம்','காரணம் / பராமரிப்பு விவரங்கள்','textarea']],
  vacant:[['block','பிளாக்','K'],['door','குடியிருப்பு எண்','K-46'],['cpo','CPO / ஆணை எண்','2063/2026'],['orderDate','ஆணை தேதி','17.07.2026'],['occupancy','தற்போதைய நிலை / குடியிருப்பாளர்','தற்போதைய நிலை','textarea']],
  guard:[['blocks','காவலர் குடியிருப்புகள்','G3 கீழ்ப்பாக்கம் எல்லைக்குட்பட்ட குடியிருப்புகள்','textarea'],['locations','இடங்கள் / முகவரிகள்','சாஸ்திரி நகர், புல்லாபுரம் ...','textarea'],['issues','பாதுகாப்பு தொடர்பான சம்பவங்கள் / காரணங்கள்','சம்பவங்களை உண்மைத் தகவலுடன் உள்ளிடவும்','textarea']],
  water:[['meter','Area / Depot / LML No.','08/103/90057/MOB/CMWSSB/VIII'],['period','கட்டண காலம்','செப்டம்பர் 2026'],['amount','குடிநீர் கட்டணத் தொகை (₹)','2,11,548'],['billRef','குடிநீர் வாரிய கடித / வாடகைக் குறிப்பு','கட்டண ரசீது எண்']],
@@ -218,7 +218,17 @@ let current='transfer';
 function textValue(id){return ($(id)&&$(id).value||'').trim()}
 function dateLabel(s){if(!s)return '';const p=s.split('-');return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:s}
 function htmlEscape(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function fieldValue(key){if(key==='date')return dateLabel(textValue('date'));return textValue(key)}
+function fieldValue(key){
+ if(key==='date')return dateLabel(textValue('date'));
+ if(key==='officer'){
+  const name=textValue('occupantName');
+  const rank=textValue('occupantRank');
+  const number=textValue('occupantNumber');
+  if(!name||!rank||!number)return '';
+  return name+' ('+rank+' '+number+')';
+ }
+ return textValue(key);
+}
 function resolved(s,plain){return String(s||'').replace(/\{\{([a-zA-Z][a-zA-Z0-9]*)\}\}/g,(m,key)=>{const v=fieldValue(key);return v|| (plain?'[ '+key+' ]':'［'+key+'］')})}
 function allData(){const x={};commons.concat(fields[current].map(f=>f[0])).forEach(k=>x[k]=fieldValue(k));return x}
 function addFields(key){
@@ -226,7 +236,20 @@ function addFields(key){
  fields[key].forEach(([id,name,ex,type])=>{
  const wrap=document.createElement('div');if(type==='textarea')wrap.className='full';
  const label=document.createElement('label');label.setAttribute('for',id);label.textContent=name;
- const input=document.createElement(type==='textarea'?'textarea':'input');input.id=id;input.placeholder=ex||'';
+ const input=document.createElement(type==='rankSelect'?'select':type==='textarea'?'textarea':'input');
+ input.id=id;
+ if(type==='rankSelect'){
+  const ranks=['PC','WPC','GrI','WGrI','HC','WHC','SI','WSI','Inspector','AC','DC'];
+  for(const rank of [''].concat(ranks)){
+   const option=document.createElement('option');
+   option.value=rank;option.textContent=rank||'-- பதவி தேர்ந்தெடுக்கவும் --';
+   input.appendChild(option);
+  }
+  input.addEventListener('change',render);
+ }else{
+  input.placeholder=ex||'';
+  if(type==='number')input.inputMode='numeric';
+ }
  input.addEventListener('input',render);wrap.append(label,input);host.appendChild(wrap);
  });
 }
@@ -319,7 +342,17 @@ function saveDraft(){
 function restoreDraft(){
  try{const x=JSON.parse(localStorage.getItem('quartersLetterDraftV1')||'null');if(!x||!templates[x.template])return;
   loadTemplate(x.template);for(const [k,v] of Object.entries(x.commons||{}))if($(k))$(k).value=v;
-  for(const [k,v] of Object.entries(x.specific||{}))if($(k))$(k).value=v;render();
+  for(const [k,v] of Object.entries(x.specific||{}))if($(k))$(k).value=v;
+  // Upgrade older saved transfer drafts that had a single officer/rank/number field.
+  if(x.template==='transfer'&&x.specific&&x.specific.officer&&!x.specific.occupantRank){
+   const old=String(x.specific.officer).trim();
+   const match=old.match(/^(PC|WPC|GrI|WGrI|HC|WHC|SI|WSI|Inspector|AC|DC)[-\s]+([A-Za-z0-9/]+)$/i);
+   if(match){
+    $('occupantRank').value=match[1];
+    $('occupantNumber').value=match[2];
+   }else $('occupantName').value=old;
+  }
+  render();
  }catch(e){console.warn('Could not load local draft')}
 }
 function clearDraft(){if(!confirm('Clear the locally saved draft and reset fields?'))return;localStorage.removeItem('quartersLetterDraftV1');location.reload()}
