@@ -13,6 +13,8 @@
   const draft = { global: new Set(core.state.globalEventTypes || []), link: new Set(), relationship: new Set() };
   const applied = { link: new Set(), relationship: new Set() };
   let options = [];
+  let choicesSource = null;
+  let choicesLength = -1;
 
   const appliedFor = scope => scope === 'global'
     ? (core.state.globalEventTypes || new Set())
@@ -90,8 +92,20 @@
   }
   function drawScope(scope, withChoices = true) {
     mounts(scope).forEach(mount => {
-      if (withChoices) drawChoices(mount);
+      if (withChoices || mount.dataset.eventChoicesReady !== '1') {
+        drawChoices(mount);
+        mount.dataset.eventChoicesReady = '1';
+      }
       drawSummary(mount);
+    });
+  }
+  // Keep existing checkbox DOM in place. Recreating it after each click makes
+  // Android browsers visibly stall and can interrupt rapid multi-selection.
+  function syncVisibleChecks(scope) {
+    mounts(scope).forEach(mount => {
+      mount.querySelectorAll('.cdr-event-checkbox').forEach(input => {
+        input.checked = draft[scope].has(input.value);
+      });
     });
   }
   function syncLegacy(scope) {
@@ -116,7 +130,7 @@
       const details = mount.querySelector('.cdr-event-picker');
       if (details) details.open = false;
     });
-    drawScope(scope);
+    drawScope(scope, false);
     if (opts.render === false) return;
     if (scope === 'global') window.CDRApp?.applyFilters?.();
     else if (scope === 'link') $('linkRefreshBtn')?.click();
@@ -134,21 +148,30 @@
     else applied[scope] = next;
     draft[scope] = new Set(next);
     syncLegacy(scope);
-    drawScope(scope);
+    syncVisibleChecks(scope);
+    drawScope(scope, false);
   }
   function refresh() {
-    options = availableTypes();
+    const rows = core.state.records || [];
+    const dataChanged = choicesSource !== rows || choicesLength !== rows.length;
+    if (dataChanged) {
+      choicesSource = rows;
+      choicesLength = rows.length;
+      options = availableTypes();
+    }
     ensureMounts();
     const valid = new Set(options);
     for (const scope of scopeNames) {
-      draft[scope] = new Set([...draft[scope]].filter(value => !options.length || valid.has(value)));
-      if (scope === 'global') {
-        core.state.globalEventTypes = new Set([...appliedFor(scope)].filter(value => !options.length || valid.has(value)));
-      } else {
-        applied[scope] = new Set([...appliedFor(scope)].filter(value => !options.length || valid.has(value)));
+      if (dataChanged) {
+        draft[scope] = new Set([...draft[scope]].filter(value => !options.length || valid.has(value)));
+        if (scope === 'global') {
+          core.state.globalEventTypes = new Set([...appliedFor(scope)].filter(value => !options.length || valid.has(value)));
+        } else {
+          applied[scope] = new Set([...appliedFor(scope)].filter(value => !options.length || valid.has(value)));
+        }
       }
       syncLegacy(scope);
-      drawScope(scope);
+      drawScope(scope, dataChanged);
     }
   }
 
@@ -160,7 +183,8 @@
     if (!validScope(scope) || !options.includes(input.value)) return;
     if (input.checked) draft[scope].add(input.value);
     else draft[scope].delete(input.value);
-    drawScope(scope);
+    syncVisibleChecks(scope);
+    drawScope(scope, false);
   });
   document.addEventListener('input', event => {
     if (!event.target.matches?.('.cdr-event-search')) return;
@@ -180,7 +204,8 @@
       filteredChoices(mount).forEach(value => draft[scope].add(value));
     } else if (action.dataset.eventAction === 'clear') draft[scope].clear();
     else if (action.dataset.eventAction === 'apply') { apply(scope); return; }
-    drawScope(scope);
+    syncVisibleChecks(scope);
+    drawScope(scope, false);
   });
   document.addEventListener('toggle', event => {
     if (!event.target.matches?.('.cdr-event-picker') || !event.target.open) return;
