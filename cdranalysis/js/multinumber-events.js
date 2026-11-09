@@ -141,7 +141,7 @@
     const summary = $('multiEventSummary');
     const exportBtn = $('multiEventExport');
     const items = choices.filter(item => selected.has(item.id));
-    const data = window.CDRApp?.getRecords?.() || core.state.records || [];
+    const data = window.CDRMultiScope?.getRows?.() || window.CDRApp?.getRecords?.() || core.state.records || [];
     const loadedSubjects = new Set(data.map(r => String(r.cdrNo || '').trim()).filter(Boolean));
     matches = [];
     table.innerHTML = '';

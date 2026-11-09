@@ -226,6 +226,7 @@
   window.CDRApp={
     getRecords:()=>analysisRecords(),
     getFilteredRecords:()=>state.filtered,
+    getMultiNumberBaseRecords:()=>filtersModule?.multiNumberBaseRecords?.()||state.filtered,
     currentSubject:()=>$('cdrNo')?.value||'',
     formatDateTime:dtFmt,
     formatDuration:fmtDur,
