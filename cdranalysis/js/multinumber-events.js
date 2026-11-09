@@ -47,11 +47,25 @@
   function drawChoices() {
     const visible = visibleEvents();
     const container = $('multiEventChoices');
+    const drawGroup = (label, items) => items.length
+      ? '<div class="tiny" style="font-weight:800;margin:8px 0 6px;color:var(--ink)">'
+        + esc(label) + '</div>' +
+        items.map(item => '<label class="check" style="padding:7px 5px;cursor:pointer;line-height:1.4">' +
+          '<input type="checkbox" class="multi-event-choice" data-event-id="' + attr(item.id) + '"' +
+          (selected.has(item.id) ? ' checked' : '') + '> ' + esc(item.label) + '</label>').join('')
+      : '';
+    const types = visible.filter(item => item.kind === 'type');
+    const timeline = visible.filter(item => item.kind === 'time');
     container.innerHTML = visible.length
-      ? visible.map(item => '<label class="check" style="margin:3px 8px 3px 0"><input type="checkbox" class="multi-event-choice" data-event-id="' +
-          attr(item.id) + '"' + (selected.has(item.id) ? ' checked' : '') + '> ' + esc(item.label) + '</label>').join('')
+      ? drawGroup('CDR event types', types) + drawGroup('Case incident and timeline events', timeline)
       : '<span class="tiny">No events match. Import CDR data, add a timeline event, or change your search.</span>';
+
+    const typeCount = choices.filter(item => item.kind === 'type' && selected.has(item.id)).length;
+    const timelineCount = choices.filter(item => item.kind === 'time' && selected.has(item.id)).length;
     $('multiEventSelectionCount').textContent = fmt(selected.size) + ' selected';
+    $('multiEventDropdownSummary').textContent = selected.size
+      ? 'Event types: ' + fmt(typeCount) + ' • Timeline: ' + fmt(timelineCount) + '  ▾'
+      : 'Select two or more events  ▾';
   }
 
   function refresh() {
@@ -235,6 +249,16 @@
     render();
   });
   $('multiEventSearch').addEventListener('input', drawChoices);
+  $('multiEventDropdown').addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      $('multiEventDropdown').open = false;
+      $('multiEventDropdownSummary').focus();
+    }
+  });
+  document.addEventListener('click', event => {
+    const dropdown = $('multiEventDropdown');
+    if (dropdown.open && !dropdown.contains(event.target)) dropdown.open = false;
+  });
   $('multiEventSelectVisible').addEventListener('click', () => {
     visibleEvents().forEach(item => selected.add(item.id));
     drawChoices();
