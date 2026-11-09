@@ -224,13 +224,21 @@ function fieldValue(key){
   const name=textValue('occupantName');
   const rank=textValue('occupantRank');
   const number=textValue('occupantNumber');
-  if(!name||!rank||!number)return '';
-  return name+' ('+rank+' '+number+')';
+  const senior=['Inspector','AC','DC'].includes(rank);
+  if(!name||!rank||(!senior&&!number))return '';
+  return name+' ('+rank+(senior?'':' '+number)+')';
  }
  return textValue(key);
 }
 function resolved(s,plain){return String(s||'').replace(/\{\{([a-zA-Z][a-zA-Z0-9]*)\}\}/g,(m,key)=>{const v=fieldValue(key);return v|| (plain?'[ '+key+' ]':'［'+key+'］')})}
 function allData(){const x={};commons.concat(fields[current].map(f=>f[0])).forEach(k=>x[k]=fieldValue(k));return x}
+function updateNumberVisibility(){
+ const field=$('occupantNumber');
+ if(!field)return;
+ const senior=['Inspector','AC','DC'].includes(textValue('occupantRank'));
+ field.parentElement.hidden=senior;
+ field.required=!senior;
+}
 function addFields(key){
  const host=$('specificFields');host.replaceChildren();
  fields[key].forEach(([id,name,ex,type])=>{
@@ -252,6 +260,7 @@ function addFields(key){
  }
  input.addEventListener('input',render);wrap.append(label,input);host.appendChild(wrap);
  });
+ updateNumberVisibility();
 }
 function loadTemplate(key){
  current=key;$('template').value=key;const t=templates[key];
@@ -263,6 +272,7 @@ function paraHtml(s){
  resolved(s).split(/\n\s*\n/).forEach(block=>{if(!block.trim())return;const p=document.createElement('p');p.className='para';p.textContent=block.trim();box.appendChild(p)});
 }
 function render(){
+ updateNumberVisibility();
  $('pFrom').textContent='அனுப்புநர்,\n'+fieldValue('fromName')+',\n'+fieldValue('fromAddress');
  $('pTo').textContent='பெறுநர்,\n'+fieldValue('toName')+',\n'+fieldValue('toAddress');
  $('pDate').textContent='நாள்: '+fieldValue('date');
@@ -275,6 +285,11 @@ function render(){
  const unresolved=new Set();
  [fieldValue('subject'),fieldValue('bodyText')].forEach(s=>s.replace(/\{\{([a-zA-Z][a-zA-Z0-9]*)\}\}/g,(m,k)=>{if(!fieldValue(k))unresolved.add(k);return m}));
  const coreMissing=['fromName','fromAddress','toName','toAddress','date','subject','signature'].filter(k=>!fieldValue(k));
+ if(current==='transfer'){
+  if(!fieldValue('occupantName'))coreMissing.push('occupantName');
+  if(!fieldValue('occupantRank'))coreMissing.push('occupantRank');
+  if(!['Inspector','AC','DC'].includes(fieldValue('occupantRank'))&&!fieldValue('occupantNumber'))coreMissing.push('occupantNumber');
+ }
  $('missing').textContent=(unresolved.size||coreMissing.length)?'குறிப்பு: நிரப்பப்படாத விவரங்கள்: '+[...unresolved,...coreMissing].join(', '):'✓ எல்லா குறிப்பிடப்பட்ட மாறிகளும் நிரப்பப்பட்டுள்ளன.';
  $('officeSummary').textContent=[fieldValue('fromName'),fieldValue('station'),'→ '+fieldValue('toName')].filter(Boolean).join(' · ');
 }
