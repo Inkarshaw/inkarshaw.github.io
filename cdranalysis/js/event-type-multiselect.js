@@ -129,7 +129,7 @@
   }
   function externalSet(scope, values) {
     if (!validScope(scope)) return;
-    const next = new Set([...values].filter(value => options.includes(value)));
+    const next = new Set([...values].filter(value => !options.length || options.includes(value)));
     if (scope === 'global') core.state.globalEventTypes = next;
     else applied[scope] = next;
     draft[scope] = new Set(next);
@@ -141,11 +141,11 @@
     ensureMounts();
     const valid = new Set(options);
     for (const scope of scopeNames) {
-      draft[scope] = new Set([...draft[scope]].filter(value => valid.has(value)));
+      draft[scope] = new Set([...draft[scope]].filter(value => !options.length || valid.has(value)));
       if (scope === 'global') {
-        core.state.globalEventTypes = new Set([...appliedFor(scope)].filter(value => valid.has(value)));
+        core.state.globalEventTypes = new Set([...appliedFor(scope)].filter(value => !options.length || valid.has(value)));
       } else {
-        applied[scope] = new Set([...appliedFor(scope)].filter(value => valid.has(value)));
+        applied[scope] = new Set([...appliedFor(scope)].filter(value => !options.length || valid.has(value)));
       }
       syncLegacy(scope);
       drawScope(scope);
