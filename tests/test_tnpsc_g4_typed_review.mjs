@@ -26,8 +26,8 @@ const ids=[...html.matchAll(/id="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(ids.length,new Set(ids).size,'Duplicate DOM ids');
 for(const r of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(r[1]),'Referenced id '+r[1]+' exists');
 for(const [year,expectedTyped,expectedNumbers] of [
-[2024,19,Array.from({length:19},(_,i)=>i+1)],
-[2025,18,[1,2,3,4,5,6,7,8,112,113,125,127,140,146,148,174,192,200]]
+[2024,32,Array.from({length:32},(_,i)=>i+1)],
+[2025,35,[...Array.from({length:25},(_,i)=>i+1),112,113,125,127,140,146,148,174,192,200]]
 ]){
 const d=JSON.parse(read('data/quizzes/tnpsc-g4-'+year+'-typed-review.json'));
 const sourceKeys=keybook.papers.find(p=>p.id===d.paperId);
@@ -63,4 +63,4 @@ assert.equal(q.sourceStatus,'source-pdf-required');
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2024/);
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2025/);
 assert.match(read('sitemap.xml'),/tnpsc-g4-typed-review\.html/);
-console.log('PASS Group IV 2024/2025 source-linked typed reviews: 19 and 18 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
+console.log('PASS Group IV 2024/2025 source-linked typed reviews: 32 and 35 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
