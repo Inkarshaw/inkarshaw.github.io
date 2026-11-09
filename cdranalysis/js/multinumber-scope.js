@@ -37,36 +37,66 @@
   }
 
   function renderChoices(kind) {
-    const configForKind = config[kind];
-    const list = matchingOptions(kind);
-    $(configForKind.choices).innerHTML = list.length
-      ? list.map(value => '<label class="check" style="padding:8px 6px;cursor:pointer;line-height:1.4">' +
-        '<input type="checkbox" class="multi-scope-choice" data-scope-kind="' + kind +
-        '" data-scope-value="' + escAttr(value) + '"' +
-        (selected[kind].has(value) ? ' checked' : '') +
-        '> ' + escape(value) + '</label>').join('')
-      : '<div class="tiny">No matching ' + escape(configForKind.label) + ' found.</div>';
+    const cfg = config[kind];
+    const items = matchingOptions(kind);
+    $(cfg.choices).innerHTML = items.length
+      ? items.map(value =>
+          '<label class="multi-scope-option">' +
+          '<input type="checkbox" class="multi-scope-choice" data-scope-kind="' + kind +
+          '" data-scope-value="' + escAttr(value) + '"' +
+          (selected[kind].has(value) ? ' checked' : '') +
+          '> <span>' + escape(value) + '</span></label>'
+        ).join('')
+      : '<p class="multi-scope-empty">No matching ' + escape(cfg.label) + ' found.</p>';
+  }
+
+  // Removable preview chips make a multi-selection easy to review on a phone.
+  // Only the first four are shown to avoid making the page excessively tall.
+  function renderTokens(kind) {
+    const container = $(kind === 'subject' ? 'multiScopeSubjectTokens' : 'multiScopeEventTokens');
+    const values = [...selected[kind]];
+    if (!values.length) {
+      container.innerHTML = '<span class="multi-scope-token-empty">Including all ' +
+        (kind === 'subject' ? 'loaded subjects' : 'event types') + '</span>';
+      return;
+    }
+    container.innerHTML = values.slice(0, 4).map(value =>
+      '<button type="button" class="multi-scope-token" data-scope-kind="' + kind +
+      '" data-scope-value="' + escAttr(value) + '" title="Remove ' + escAttr(value) +
+      '" aria-label="Remove ' + escAttr(value) + '">' +
+      '<span class="token-text">' + escape(value) + '</span>' +
+      '<span class="token-remove" aria-hidden="true">×</span></button>'
+    ).join('') +
+    (values.length > 4 ? '<span class="multi-scope-token-more">+' +
+      count(values.length - 4) + ' more selected</span>' : '');
   }
 
   function summaryLabel(kind) {
     const values = selected[kind];
-    if (!values.size) return kind === 'subject' ? 'All subjects ▾' : 'All event types ▾';
+    if (!values.size) return kind === 'subject' ? 'All subjects' : 'All event types';
     if (values.size === 1) {
       const item = [...values][0];
-      return (item.length > 26 ? item.slice(0, 26) + '…' : item) + ' ▾';
+      return item.length > 38 ? item.slice(0, 38) + '…' : item;
     }
-    return count(values.size) + ' ' + config[kind].label + ' selected ▾';
+    return count(values.size) + ' ' + config[kind].label + ' selected';
   }
 
   function updateSummary() {
     $('multiScopeSubjectSummary').textContent = summaryLabel('subject');
     $('multiScopeEventSummary').textContent = summaryLabel('event');
+    for (const kind of ['subject', 'event']) renderTokens(kind);
+
+    const isPending = pending();
+    $('multiScopeApply').disabled = !isPending;
+    const status = $('multiScopeStatus');
+    status.dataset.pending = String(isPending);
     const lines = [
       applied.subject.size ? count(applied.subject.size) + ' subjects' : 'All subjects',
       applied.event.size ? count(applied.event.size) + ' event types' : 'All event types',
       count(getRows().length) + ' matching records'
     ];
-    $('multiScopeStatus').textContent = (pending() ? 'Selection changes pending — tap Apply selection. Current results: ' : '') + lines.join(' • ');
+    status.textContent = (isPending ? 'Changes not applied yet. Tap Apply filters. Current results: ' :
+      'Showing: ') + lines.join(' • ');
   }
 
   function getRows() {
@@ -103,6 +133,7 @@
     applied.subject = new Set(selected.subject);
     applied.event = new Set(selected.event);
     updateSummary();
+    for (const kind of ['subject', 'event']) $(config[kind].details).open = false;
     window.CDRApp?.applyFilters?.();
   }
 
@@ -118,6 +149,21 @@
       updateSummary();
     });
     $(settings.search).addEventListener('input', () => renderChoices(kind));
+    const tokens = $(kind === 'subject' ? 'multiScopeSubjectTokens' : 'multiScopeEventTokens');
+    tokens.addEventListener('click', event => {
+      const chip = event.target.closest('.multi-scope-token');
+      if (!chip || chip.dataset.scopeKind !== kind) return;
+      selected[kind].delete(chip.dataset.scopeValue);
+      renderChoices(kind);
+      updateSummary();
+    });
+    $(settings.details).addEventListener('toggle', () => {
+      if ($(settings.details).open) {
+        for (const other of ['subject', 'event']) {
+          if (other !== kind) $(config[other].details).open = false;
+        }
+      }
+    });
     $(settings.all).addEventListener('click', () => {
       matchingOptions(kind).forEach(value => selected[kind].add(value));
       renderChoices(kind);
@@ -142,12 +188,6 @@
     selected.event.clear();
     for (const kind of ['subject', 'event']) renderChoices(kind);
     apply();
-  });
-  document.addEventListener('click', event => {
-    for (const kind of ['subject', 'event']) {
-      const dropdown = $(config[kind].details);
-      if (dropdown.open && !dropdown.contains(event.target)) dropdown.open = false;
-    }
   });
   window.addEventListener('cdr:updated', refreshChoices);
   window.CDRMultiScope = { getRows, refreshChoices };
