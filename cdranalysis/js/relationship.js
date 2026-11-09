@@ -49,14 +49,15 @@
     const parse=(v,end=false)=>{if(!v)return null;const [y,m,d]=String(v).split('-').map(Number);return window.CDRCore.dateFromSourceParts(y,m-1,d,end?23:0,end?59:0,end?59:0,window.CDRCore.state.sourceTimezone);};
     const from=parse($('relationshipFrom')?.value,false);
     const to=parse($('relationshipTo')?.value,true);
-    return {from,to,event:$('relationshipEvent')?.value||'',nightOnly:!!$('relationshipNightOnly')?.checked};
+    return {from,to,event:$('relationshipEvent')?.value||'',events:window.CDREventTypes?.getApplied?.('relationship')||new Set(),nightOnly:!!$('relationshipNightOnly')?.checked};
   }
   function scopedRows(data=records()){
     const f=relationshipFilters();
     return data.filter(r=>{
       if(f.from&&(!r.dt||r.dt<f.from))return false;
       if(f.to&&(!r.dt||r.dt>f.to))return false;
-      if(f.event&&r.callType!==f.event)return false;
+      if(f.events.size){if(!f.events.has(String(r.callType||'').trim()))return false;}
+      else if(f.event&&r.callType!==f.event)return false;
       if(f.nightOnly){
         if(!r.dt)return false;
         const h=window.CDRCore.sourceHour(r.dt);
@@ -198,7 +199,7 @@
     const hours=new Map();for(const r of rows){if(!r.dt)continue;const h=window.CDRCore.sourceHour(r.dt);hours.set(h,(hours.get(h)||0)+1);}
     const peak=[...hours.entries()].sort((x,y)=>y[1]-x[1]||x[0]-y[0])[0];
     const f=relationshipFilters();
-    const scope=[f.from?'From '+$('relationshipFrom').value:'',f.to?'To '+$('relationshipTo').value:'',f.event||'',f.nightOnly?'Night only':''].filter(Boolean).join(' • ');
+    const scope=[f.from?'From '+$('relationshipFrom').value:'',f.to?'To '+$('relationshipTo').value:'',(f.events.size?[...f.events].join(', '):f.event)||'',f.nightOnly?'Night only':''].filter(Boolean).join(' • ');
     $('relationshipSummary').innerHTML=`<div class="notice">This view summarizes CDR metadata for the selected pair. Communication direction depends on the loaded provider event labels, and shared towers/identifiers are correlation leads requiring independent verification.${scope?'<br><b>Relationship scope:</b> '+esc(scope):''}</div><div class="kpis"><div class="kpi"><div class="v">${fmtInt(rows.length)}</div><div class="l">Interactions</div><div class="s">${amb?fmtInt(amb)+' undirected':''}</div></div><div class="kpi"><div class="v">${fmtInt(ab)}</div><div class="l">A → B</div></div><div class="kpi"><div class="v">${fmtInt(ba)}</div><div class="l">B → A</div></div><div class="kpi"><div class="v">${fmtDur(dur)}</div><div class="l">Total duration</div></div><div class="kpi"><div class="v">${fmtInt(dates.size)}</div><div class="l">Active days</div></div><div class="kpi"><div class="v">${fmtInt(night)}</div><div class="l">Night events</div></div></div><div class="metric-row"><span class="metric-chip"><b>First:</b> ${esc(fmtDt(first)||'—')}</span><span class="metric-chip"><b>Last:</b> ${esc(fmtDt(last)||'—')}</span><span class="metric-chip"><b>Longest call:</b> ${esc(longest?fmtDur(longest):'—')}</span><span class="metric-chip"><b>Peak hour:</b> ${peak?String(peak[0]).padStart(2,'0')+':00–'+String((peak[0]+1)%24).padStart(2,'0')+':00 ('+fmtInt(peak[1])+')':'—'}</span><span class="metric-chip"><b>Common towers:</b> ${fmtInt(towers.length)}</span><span class="metric-chip"><b>Shared IMEI:</b> ${fmtInt(ids.imei.length)}</span><span class="metric-chip"><b>Shared IMSI:</b> ${fmtInt(ids.imsi.length)}</span></div>`;
     $('relationshipTimeline').innerHTML=rows.length?`<thead><tr><th>Date / Time</th><th>Direction</th><th>Event</th><th>Duration</th><th>Subject</th><th>Cell ID</th><th>Tower</th><th>IMEI</th><th>IMSI</th></tr></thead><tbody>${rows.slice(0,1000).map(r=>`<tr><td>${esc(fmtDt(r.dt))}</td><td>${esc(direction(r,a,b))}</td><td>${esc(r.callType||'—')}</td><td>${esc(fmtDur(r.duration))}</td><td>${esc(r.cdrNo||'—')}</td><td>${esc(r.firstCellId||'—')}</td><td class="details">${esc(r.firstAddress||'—')}</td><td>${esc(r.imei||'—')}</td><td>${esc(r.imsi||'—')}</td></tr>`).join('')}</tbody>`:'<tbody><tr><td>No direct communication records found.</td></tr></tbody>';
     $('relationshipTowers').innerHTML=towers.length?`<thead><tr><th>Operator</th><th>Cell ID</th><th>Tower</th><th>A Events</th><th>B Events</th><th>Closest Gap</th></tr></thead><tbody>${towers.slice(0,200).map(x=>`<tr><td>${esc(x.operator||'—')}</td><td>${esc(x.cell)}</td><td class="details">${esc(x.address||'—')}</td><td>${fmtInt(x.a.length)}</td><td>${fmtInt(x.b.length)}</td><td>${Number.isFinite(x.minGap)?x.minGap.toFixed(1)+' min':'—'}</td></tr>`).join('')}</tbody>`:'<tbody><tr><td>No common tower data. Both numbers must be loaded as CDR subjects for this comparison.</td></tr></tbody>';
@@ -229,7 +230,7 @@
     if(e.target.closest('#relationshipAnalyse')){render();return;}
     if(e.target.closest('#relationshipExport')){exportPair();return;}
     if(e.target.closest('#relationshipSwap')){const a=$('relationshipA').value,b=$('relationshipB').value;const subs=subjects();if(subs.includes(b))$('relationshipA').value=b;$('relationshipB').value=a;render();return;}
-    if(e.target.closest('#relationshipClear')){$('relationshipB').value='';if($('relationshipFrom'))$('relationshipFrom').value='';if($('relationshipTo'))$('relationshipTo').value='';if($('relationshipEvent'))$('relationshipEvent').value='';if($('relationshipNightOnly'))$('relationshipNightOnly').checked=false;if($('relationshipScope'))$('relationshipScope').textContent='Select a pair to analyse.';render();return;}
+    if(e.target.closest('#relationshipClear')){$('relationshipB').value='';if($('relationshipFrom'))$('relationshipFrom').value='';if($('relationshipTo'))$('relationshipTo').value='';if($('relationshipEvent'))$('relationshipEvent').value='';window.CDREventTypes?.reset?.('relationship',{render:false});if($('relationshipNightOnly'))$('relationshipNightOnly').checked=false;if($('relationshipScope'))$('relationshipScope').textContent='Select a pair to analyse.';render();return;}
     if(e.target.closest('#relationshipOpenARecords')){const a=$('relationshipA').value,b=$('relationshipB').value.trim();if(showPairValidation(a,b))return;if(a&&b)window.CDRApp?.openPairRecords?.(a,b);return;}
     if(e.target.closest('#relationshipOpenBRecords')){const a=$('relationshipA').value,b=$('relationshipB').value.trim();if(showPairValidation(a,b))return;if(a&&b&&subjects().some(x=>same(x,b)))window.CDRApp?.openPairRecords?.(b,a);return;}
   });

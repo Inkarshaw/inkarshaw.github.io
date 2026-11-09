@@ -8,11 +8,12 @@
     const dateKey=d=>d instanceof Date&&!isNaN(d)?[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'):'';
     function sourceRows(){
       let rows=state.filtered||state.records||[];
-      const subject=$('linkSubject')?.value||'',from=$('linkFrom')?.value||'',to=$('linkTo')?.value||'',event=$('linkEventType')?.value||'';
+      const subject=$('linkSubject')?.value||'',from=$('linkFrom')?.value||'',to=$('linkTo')?.value||'',event=$('linkEventType')?.value||'',events=window.CDREventTypes?.getApplied?.('link')||new Set();
       if(subject)rows=rows.filter(r=>key(r.cdrNo)===key(subject));
       if(from)rows=rows.filter(r=>r.dt&&dateKey(r.dt)>=from);
       if(to)rows=rows.filter(r=>r.dt&&dateKey(r.dt)<=to);
-      if(event)rows=rows.filter(r=>String(r.callType||'')===event);
+      if(events.size)rows=rows.filter(r=>events.has(String(r.callType||'').trim()));
+      else if(event)rows=rows.filter(r=>String(r.callType||'')===event);
       return rows.filter(r=>r.cdrNo&&r.bparty);
     }
     function refreshSelectors(){
@@ -89,6 +90,7 @@
     }
     function reset(){
       ['linkSubject','linkFrom','linkTo','linkEventType'].forEach(id=>{if($(id))$(id).value='';});
+      window.CDREventTypes?.reset?.('link',{render:false});
       if($('linkTop'))$('linkTop').value='40';if($('linkMinEvents'))$('linkMinEvents').value='1';if($('linkMutualOnly'))$('linkMutualOnly').checked=false;selectedId=null;render();
     }
     function bind(){

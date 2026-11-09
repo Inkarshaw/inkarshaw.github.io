@@ -1,0 +1,90 @@
+/* Shared mobile-friendly event type selector for all CDR Analyzer sections */
+.cdr-event-field { min-width: 0; }
+.cdr-event-mount { min-width: 0; width: 100%; max-width: 470px; }
+.cdr-event-picker { position: static; width: 100%; }
+.cdr-event-picker > summary {
+  position: relative; display: block; list-style: none; cursor: pointer;
+  min-height: 46px; padding: 11px 42px 11px 12px; border-radius: 9px;
+  background: #142e42; border: 1px solid #30607a; color: #e7faff;
+  font-size: 14px; font-weight: 750; line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.cdr-event-picker > summary::-webkit-details-marker { display: none; }
+.cdr-event-picker > summary::after {
+  content: "⌄"; position: absolute; right: 13px; top: 8px;
+  font-size: 23px; font-weight: normal; color: #7ce6fa;
+}
+.cdr-event-picker[open] > summary {
+  background: #193c52; border-color: #37c9eb;
+  box-shadow: 0 0 0 2px rgba(55, 201, 235, .12);
+}
+.cdr-event-picker[open] > summary::after { transform: rotate(180deg); }
+.cdr-event-menu {
+  position: static; display: block; margin-top: 8px;
+  width: 100%; max-width: 100%; padding: 11px;
+  border: 1px solid #27556d; border-radius: 10px;
+  color: #e9faff; background: #0e2233; /* opaque, avoids overlay issues */
+}
+.cdr-event-label { display: block; font-size: 12px; font-weight: 650; color: #bfe7f4; }
+.cdr-event-search {
+  width: 100%; min-height: 43px; margin: 7px 0 9px; padding: 9px 11px;
+  background: #071725 !important; border: 1px solid #3d667c !important;
+  border-radius: 8px; color: #ecfbff !important; font-size: 14px;
+}
+.cdr-event-search::placeholder { color: #8caebe; }
+.cdr-event-quick { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+.cdr-event-quick .btn { min-height: 35px; }
+.cdr-event-list {
+  display: flex; flex-direction: column; gap: 5px;
+  max-height: 240px; overflow-y: auto;
+}
+.cdr-event-option {
+  display: flex; align-items: center; gap: 10px; min-height: 46px;
+  cursor: pointer; padding: 9px; line-height: 1.4; font-size: 13px;
+  color: #e6f8ff; border: 1px solid #20465c; border-radius: 9px;
+  background: #102c3f; overflow-wrap: anywhere;
+}
+.cdr-event-option:has(input:checked) { border-color: #3dd3ef; background: #183d50; }
+.cdr-event-option input[type="checkbox"] {
+  flex: 0 0 19px; width: 19px; height: 19px;
+  margin: 0; accent-color: #36d7f1;
+}
+.cdr-event-hint, .cdr-event-empty { color: #a5c2d0; font-size: 11px; line-height: 1.5; }
+.cdr-event-hint { margin: 10px 0 0; }
+.cdr-event-empty { padding: 12px 0; }
+.cdr-event-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin: 7px 0; }
+.cdr-event-chip {
+  display: inline-flex; align-items: center; max-width: 100%; gap: 5px;
+  background: #113044; color: #b4eefb; border: 1px solid #245570;
+  border-radius: 100px; padding: 5px 9px; cursor: pointer;
+  font-family: inherit; font-size: 11px; font-weight: 650;
+}
+.cdr-event-chip span {
+  max-width: 195px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+}
+.cdr-event-chip b { font-size: 15px; line-height: 1; color: #eafaff; }
+.cdr-event-all, .cdr-event-more { font-size: 11px; color: #96b8ca; }
+.cdr-event-footer { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin-top: 6px; }
+.cdr-event-apply { min-height: 35px; }
+.cdr-event-apply:disabled {
+  opacity: .55; cursor: default; transform: none; box-shadow: none;
+}
+.cdr-event-pending { font-size: 11px; color: #a3c1ce; }
+.cdr-event-apply:not(:disabled) + .cdr-event-pending { color: #ffd39c; }
+.cdr-event-picker > summary:focus-visible,
+.cdr-event-chip:focus-visible {
+  outline: 2px solid #57e8ff; outline-offset: 2px;
+}
+/* Allow nested controls to reflow rather than overlap the following section. */
+.view-scope-toolbar .subtoolbar { align-items: flex-start; }
+.view-scope-toolbar .cdr-event-field { min-width: min(225px, 100%) !important; }
+#dashboard .cdr-event-mount,
+#filterSidebar .cdr-event-mount { max-width: 100%; }
+@media (max-width: 650px) {
+  .cdr-event-mount, .cdr-event-field, .cdr-event-picker { width: 100%; max-width: 100%; }
+  .cdr-event-field { flex: 1 1 100% !important; min-width: 0 !important; }
+  .view-scope-toolbar .subtoolbar > .field { width: 100%; }
+  .cdr-event-picker > summary { min-height: 50px; }
+  .cdr-event-apply { min-height: 42px; }
+}
+@media print { .cdr-event-mount { display: none; } }
