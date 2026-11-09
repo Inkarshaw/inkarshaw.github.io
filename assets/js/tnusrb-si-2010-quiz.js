@@ -217,7 +217,7 @@
     .then(response=>{if(!response.ok)throw Error('Quiz JSON unavailable');return response.json()})
     .then(data=>{questions=validate(data);bank=data;
       $('loadStatus').textContent=questions.length+' attemptable questions loaded in original-number order. '+
-        '112 carry provisional mirrored final-key scores; four ALL entries are ungraded.';
+        '116 carry provisional mirrored final-key scores; four ALL entries are ungraded.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
