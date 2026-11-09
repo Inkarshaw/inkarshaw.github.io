@@ -92,7 +92,7 @@ details[open]>summary::after{content:"－"}
 <strong>⚡ விரைவு கடிதம் / Quick create</strong>
 <div class="office-summary" id="officeSummary" role="status"></div>
 <div class="actions">
-<button id="quickPdf" type="button">📄 PDF</button>
+<button id="quickPdf" type="button">📄 Download PDF</button>
 <button id="quickWord" class="word" type="button">📝 Word</button>
 <button id="editOffice" class="ghost" type="button">✎ Office</button>
 <button id="toggleDetails" class="ghost" type="button">Full edit</button>
@@ -129,8 +129,10 @@ details[open]>summary::after{content:"－"}
 <label for="enclosures">இணைப்புகள் (விருப்பம்)</label><textarea id="enclosures" placeholder="1. புகைப்படங்கள்&#10;2. குடியிருப்பு ஒதுக்கீட்டு ஆணை"></textarea>
 </details>
 <div id="missing" role="status" aria-live="polite"></div>
+<div id="pdfStatus" class="help" role="status" aria-live="polite"></div>
 <div class="actions">
-<button id="pdf" type="button">📄 PDF / Print</button>
+<button id="pdf" type="button">📄 Download PDF</button>
+<button id="printPdf" class="ghost" type="button">🖨️ Print / Save PDF</button>
 <button id="word" class="word" type="button">📝 Word (.docx)</button>
 <button id="save" class="ghost" type="button">Save draft</button>
 <button id="clear" class="ghost" type="button">Clear saved draft</button>
@@ -345,6 +347,56 @@ function exportWord(){
  render();const blob=wordBlob(),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='Police_Quarters_'+current+'_'+(textValue('date')||'draft')+'.docx';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000);
 }
+let pdfLibraryPromise=null;
+function ensurePdfLibrary(){
+ if(typeof window.html2pdf==='function')return Promise.resolve(window.html2pdf);
+ if(pdfLibraryPromise)return pdfLibraryPromise;
+ pdfLibraryPromise=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');
+  script.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+  script.async=true;
+  script.onload=()=>typeof window.html2pdf==='function'?resolve(window.html2pdf):reject(new Error('PDF converter unavailable'));
+  script.onerror=()=>reject(new Error('PDF converter could not load'));
+  document.head.appendChild(script);
+ }).catch(error=>{pdfLibraryPromise=null;throw error});
+ return pdfLibraryPromise;
+}
+async function downloadPdf(){
+ const buttons=[$('pdf'),$('quickPdf')];
+ if(buttons.some(b=>b.disabled))return;
+ render();
+ buttons.forEach(b=>b.disabled=true);
+ $('pdfStatus').textContent='Preparing A4 PDF…';
+ let exportNode;
+ try{
+  const html2pdf=await ensurePdfLibrary();
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  exportNode=$('paper').cloneNode(true);
+  exportNode.removeAttribute('id');
+  // Force printed A4 dimensions even on mobile, without changing the live preview.
+  Object.assign(exportNode.style,{
+   width:'210mm',maxWidth:'none',minHeight:'297mm',height:'auto',
+   padding:'18mm 19mm 17mm',margin:'0',fontSize:'12pt',
+   lineHeight:'1.8',boxShadow:'none',background:'#ffffff'
+  });
+  const filename='Police_Quarters_'+current+'_'+(textValue('date')||'draft')+'.pdf';
+  await html2pdf().set({
+   margin:0,
+   filename,
+   image:{type:'jpeg',quality:0.98},
+   html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false},
+   jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+   pagebreak:{mode:['css','legacy'],avoid:['.letteraddress','.subject','.para','.sign']}
+  }).from(exportNode).save();
+  $('pdfStatus').textContent='PDF downloaded.';
+ }catch(error){
+  console.error('PDF generation failed:',error);
+  $('pdfStatus').textContent='PDF download failed. Use Print / Save PDF as an alternative.';
+ }finally{
+  buttons.forEach(b=>b.disabled=false);
+  if(exportNode&&exportNode.parentNode)exportNode.remove();
+ }
+}
 function pdfPrint(){render();window.print()}
 function saveDraft(){
  const data={template:current,commons:{},specific:{}};
@@ -395,9 +447,10 @@ function toggleFullEdit(){
 $('template').addEventListener('change',e=>loadTemplate(e.target.value));
 commons.forEach(k=>$(k).addEventListener('input',render));
 $('word').addEventListener('click',exportWord);
-$('pdf').addEventListener('click',pdfPrint);
+$('pdf').addEventListener('click',downloadPdf);
+$('printPdf').addEventListener('click',pdfPrint);
 $('quickWord').addEventListener('click',exportWord);
-$('quickPdf').addEventListener('click',pdfPrint);
+$('quickPdf').addEventListener('click',downloadPdf);
 $('editOffice').addEventListener('click',openOffice);
 $('toggleDetails').addEventListener('click',toggleFullEdit);
 $('saveOffice').addEventListener('click',saveOfficeDefaults);
