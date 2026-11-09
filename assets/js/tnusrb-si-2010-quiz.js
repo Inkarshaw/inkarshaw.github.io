@@ -11,9 +11,9 @@
   const save=()=>{if(attempt)try{localStorage.setItem(storeKey,JSON.stringify(attempt))}catch{}};
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2010||data?.bookletType!=='A'||
-      data?.originalPaperQuestionCount!==140||data?.providedQuestionCount!==119||
-      !Array.isArray(data.questions)||data.questions.length!==119||
-      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==21){
+      data?.originalPaperQuestionCount!==140||data?.providedQuestionCount!==123||
+      !Array.isArray(data.questions)||data.questions.length!==123||
+      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==17){
       throw Error('TNUSRB 2010 question-bank manifest is incomplete');
     }
     let previous=0;
@@ -28,8 +28,8 @@
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.availableForQuizCount||playable.length!==116||
-       playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==112){
+    if(playable.length!==data.availableForQuizCount||playable.length!==120||
+       playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==116){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
