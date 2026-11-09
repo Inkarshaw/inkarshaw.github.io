@@ -8,7 +8,7 @@ const cat=json('data/quizzes/typed-pyq-catalog.json'),html=read('pyq-typed-libra
 assert.equal(cat.schemaVersion,1);
 assert.equal(cat.entries.length,8);
 assert.equal(new Set(cat.entries.map(e=>e.id)).size,8);
-assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),1010);
+assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),1049);
 assert.equal(cat.entries.filter(e=>e.typed===e.total).length,3);
 const by=id=>{const e=cat.entries.find(x=>x.id===id);assert.ok(e,'Missing catalogue '+id);return e;};
 for(const e of cat.entries){assert.ok(['TNPSC','TNUSRB'].includes(e.exam));assert.ok(Number.isInteger(e.total)&&Number.isInteger(e.typed)&&Number.isInteger(e.scorable));assert.ok(e.typed<=e.total&&e.scorable<=e.typed);assert.ok(e.sourceStatus.length>16);assert.ok(existsSync(new URL('../'+e.link.split('?')[0],import.meta.url)),'Quiz route missing: '+e.link);}
