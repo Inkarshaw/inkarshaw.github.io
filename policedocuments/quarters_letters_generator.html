@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="generator-build" content="quarters-tamil-pdfmake-20261109-v2">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>Police Quarters Letters | காவலர் குடியிருப்பு கடிதங்கள்</title>
 <meta name="description" content="Create Tamil police quarters letters from editable forms. A4 PDF print and genuine editable Word DOCX download.">
 <style>
@@ -344,7 +347,7 @@ function wordBlob(){
  return new Blob(chunks,{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
 }
 function exportWord(){
- render();const blob=wordBlob(),url=URL.createObjectURL(blob),a=document.createElement('a');
+ render();if(!validateForExport())return;const blob=wordBlob(),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='Police_Quarters_'+current+'_'+(textValue('date')||'draft')+'.docx';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000);
 }
 // Use PDFMake's text layout and Tamil font shaping instead of html2canvas image capture.
@@ -408,7 +411,7 @@ function makePdfDefinition(){
  ];
  if(textValue('reference'))content.push({text:'பார்வை: '+textValue('reference'),margin:[0,0,0,10]});
  content.push({text:'அய்யா,',margin:[0,0,0,12]});
- body.forEach(para=>content.push({text:para.trim(),alignment:'justify',margin:[12,0,0,10],lineHeight:1.4}));
+ body.forEach(para=>content.push({text:para.trim(),alignment:'left',margin:[12,0,0,10],lineHeight:1.4}));
  if(textValue('closing'))content.push({text:textValue('closing'),margin:[0,3,0,12]});
  if(textValue('enclosures'))content.push({text:'இணைப்பு:\n'+textValue('enclosures'),margin:[0,5,0,8]});
  content.push({
@@ -432,7 +435,7 @@ async function downloadPdf(){
  $('pdfStatus').textContent='Preparing A4 Tamil PDF…';
  try{
   const pdfMake=await ensurePdfLibrary();
-  const base='https://raw.githubusercontent.com/notofonts/noto-fonts/main/hinted/ttf/NotoSansTamil/';
+  const base='https://cdn.jsdelivr.net/gh/notofonts/noto-fonts@main/hinted/ttf/NotoSansTamil/';
   pdfMake.fonts={
    NotoTamil:{
     normal:base+'NotoSansTamil-Regular.ttf',
