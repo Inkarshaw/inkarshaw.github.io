@@ -1,0 +1,307 @@
+/* CDR Analyzer v75 — accessible, mobile-first multi-number selection panels */
+#multiNumberScopePanel {
+  position: relative;
+  z-index: auto;
+  overflow: visible;
+}
+#multiNumberScopePanel .panel-title {
+  align-items: center;
+  flex-wrap: wrap;
+}
+#multiNumberScopePanel .panel-title .muted {
+  font-size: 12px;
+  color: #8eb1c3;
+}
+#multiNumberScopePanel .multi-scope-intro {
+  margin: 0 0 15px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a9cadb;
+}
+#multiNumberScopePanel .multi-scope-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+#multiNumberScopePanel .multi-scope-control {
+  min-width: 0;
+  background: #0a1725;
+  border: 1px solid #26475a;
+  border-radius: 12px;
+  padding: 12px;
+}
+#multiNumberScopePanel .multi-scope-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  margin-bottom: 9px;
+  color: #b6dce9;
+}
+#multiNumberScopePanel .multi-scope-details {
+  display: block;
+  position: static;
+  min-width: 0;
+  max-width: 100%;
+}
+#multiNumberScopePanel .multi-scope-details > summary {
+  display: block;
+  position: relative;
+  list-style: none;
+  border: 1px solid #30607a;
+  background: #142e42;
+  border-radius: 10px;
+  color: #f0fbff;
+  font-size: 16px;
+  font-weight: 720;
+  padding: 14px 44px 14px 14px;
+  min-height: 52px;
+  line-height: 23px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  -webkit-tap-highlight-color: transparent;
+}
+#multiNumberScopePanel .multi-scope-details > summary::-webkit-details-marker { display: none; }
+#multiNumberScopePanel .multi-scope-details > summary::after {
+  content: "⌄";
+  font-size: 25px;
+  font-weight: 400;
+  position: absolute;
+  right: 15px;
+  top: 12px;
+  color: #84e2f4;
+  transition: transform .16s ease;
+}
+#multiNumberScopePanel .multi-scope-details[open] > summary {
+  border-color: #37c9eb;
+  background: #193b51;
+  box-shadow: 0 0 0 2px rgba(55,201,235,.12);
+}
+#multiNumberScopePanel .multi-scope-details[open] > summary::after {
+  transform: rotate(180deg);
+}
+#multiNumberScopePanel .multi-scope-details > summary:focus-visible,
+#multiNumberScopePanel .multi-scope-token:focus-visible {
+  outline: 2px solid #57e8ff;
+  outline-offset: 3px;
+}
+#multiNumberScopePanel .multi-scope-menu {
+  position: static;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 9px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #25506a;
+  background: #0e2233; /* Fully opaque; never show content underneath */
+  color: #effaff;
+}
+#multiNumberScopePanel .multi-scope-search-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #c7e8f4;
+}
+#multiNumberScopePanel .multi-scope-menu input[type="search"] {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 45px;
+  border: 1px solid #3d667c;
+  border-radius: 9px;
+  background: #071725;
+  color: #eafaff;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+#multiNumberScopePanel .multi-scope-menu input[type="search"]::placeholder {
+  color: #8caebe;
+}
+#multiNumberScopePanel .multi-scope-quick {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+#multiNumberScopePanel .multi-scope-quick .btn {
+  min-height: 37px;
+  font-size: 12px;
+}
+#multiNumberScopePanel .multi-scope-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 265px;
+  overflow: auto;
+  padding: 2px 3px;
+  scrollbar-width: thin;
+}
+#multiNumberScopePanel .multi-scope-option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: #102c3f;
+  border: 1px solid #20445b;
+  border-radius: 9px;
+  min-height: 47px;
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #e4f7ff;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+#multiNumberScopePanel .multi-scope-option:has(input:checked) {
+  background: #173e51;
+  border-color: #39d5f3;
+}
+#multiNumberScopePanel .multi-scope-option > input[type="checkbox"] {
+  appearance: auto;
+  flex: 0 0 19px;
+  width: 19px;
+  height: 19px;
+  margin: 0;
+  accent-color: #36d7f1;
+}
+#multiNumberScopePanel .multi-scope-empty {
+  padding: 12px;
+  color: #b8d1de;
+  font-size: 13px;
+}
+#multiNumberScopePanel .multi-scope-help {
+  color: #8fb2c2;
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 11px 0 0;
+}
+#multiNumberScopePanel .multi-scope-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 9px;
+}
+#multiNumberScopePanel .multi-scope-token {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #245570;
+  background: #113044;
+  color: #a9e9f6;
+  border-radius: 100px;
+  font: 650 12px/1.4 inherit;
+  padding: 5px 9px;
+  cursor: pointer;
+}
+#multiNumberScopePanel .multi-scope-token .token-text {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#multiNumberScopePanel .multi-scope-token .token-remove {
+  font-size: 15px;
+  line-height: 1;
+  color: #eafaff;
+}
+#multiNumberScopePanel .multi-scope-token-more,
+#multiNumberScopePanel .multi-scope-token-empty {
+  color: #a2bdcc;
+  font-size: 12px;
+}
+#multiNumberScopePanel .multi-scope-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+#multiNumberScopePanel .multi-scope-actions .btn {
+  min-height: 46px;
+  padding: 11px 19px;
+  font-size: 14px;
+}
+#multiNumberScopePanel #multiScopeApply:disabled {
+  cursor: default;
+  opacity: .58;
+  box-shadow: none;
+  transform: none;
+}
+#multiNumberScopePanel .multi-scope-status {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid #244f65;
+  background: #0e2738;
+  color: #b7e9f4;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+#multiNumberScopePanel .multi-scope-status[data-pending="true"] {
+  color: #ffe0a6;
+  background: #312816;
+  border-color: #795e31;
+}
+#multiNumberScopePanel .multi-scope-note {
+  color: #93b1bf;
+  font-size: 11px;
+  line-height: 1.55;
+  margin: 10px 0 0;
+}
+/* Fix the second multi-event selector, which had the same translucent overlay problem. */
+#multinumber #multiEventDropdown {
+  max-width: 100% !important;
+  position: static !important;
+}
+#multinumber #multiEventDropdown > summary {
+  min-height: 44px;
+  background: #142e42;
+  border: 1px solid #30607a;
+  border-radius: 9px;
+  padding: 11px 13px;
+  color: #e5f9ff;
+}
+#multinumber #multiEventDropdown > div {
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: 9px;
+  background: #0e2233 !important;
+  border-color: #26526b !important;
+  box-shadow: none !important;
+  color: #eafaff;
+}
+#multinumber #multiEventChoices .check {
+  padding: 9px 7px !important;
+  min-height: 43px;
+  line-height: 1.4;
+  color: #dff5ff;
+  border-bottom: 1px solid #223f50;
+}
+#multinumber #multiEventChoices input[type="checkbox"] {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+}
+@media (max-width: 780px) {
+  #multiNumberScopePanel .multi-scope-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 11px;
+  }
+  #multiNumberScopePanel .panel-title h2 { font-size: 15px; }
+  #multiNumberScopePanel .multi-scope-control { padding: 10px; }
+  #multiNumberScopePanel .multi-scope-actions .btn { flex: 1 1 auto; }
+  #multiNumberScopePanel .multi-scope-actions #multiScopeApply { flex-grow: 2; }
+  #multinumber #multiEventDropdown > div {
+    margin-top: 8px;
+    max-width: 100% !important;
+  }
+}
+@media print {
+  #multiNumberScopePanel { display: none !important; }
+}
