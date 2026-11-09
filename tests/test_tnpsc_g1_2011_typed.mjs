@@ -19,7 +19,28 @@ assert.match(d.sourcePaperUrl,/tnpsc\.gov\.in\/static_pdf\/dptpreviousyearquesti
 assert.match(d.sourceKeyUrl,/tnpsc\.gov\.in\/static_pdf\/anskeys\/05_06_2011_g1_gk\.pdf/);
 assert.deepEqual(d.questions.map(q=>q.number),Array.from({length:200},(_,i)=>i+1));
 assert.equal(new Set(d.questions.map(q=>q.id)).size,200);
-const officialAnswers=`B A C ALL C D A B D C A C D C AB C ALL B C D B D C C A C D A D B C D B D B A C D A B C A A B B A B C D B D A B A C D B D B A D B D C A A D D B A D D C A D A D B B D A C D B C A B B B D A C D B B B D C C B C C B A A D B C C A C D B ALL B C A A C B A A B A C B A BC B B B C D B B D D C B D D A D D D B D A A A A ALL B C A A A A C D C A A D C C C C B A ALL C B B A C A B B D A D C C D C A C D B`.split(/\s+/);
+const officialAnswers=[
+  'B A C ALL C D A B D C',
+  'A C D C AB C ALL B C D',
+  'B D C C A C D A D B',
+  'C D B D B A C D A B',
+  'C A A B B A B C D B',
+  'D A B A C D B D B A',
+  'D B D C A A D D B A',
+  'D A D AC C A ALL ALL A A',
+  'D B C A C A B B B D',
+  'A C D B B B D C C B',
+  'C C B A A D B C C A',
+  'C D B ALL B C A A C B',
+  'A A B A C B A BC B B',
+  'B C D B B D D C B D',
+  'D A D D D B D A A A',
+  'A ALL B C A A A A A C',
+  'D C A A D C C C B A',
+  'ALL C B B A C A B B D',
+  'A D C C D C A B D B',
+  'C A A ALL D C A C D B'
+].join(' ').split(/\s+/);
 assert.equal(officialAnswers.length,200,'200 official D-series key entries');
 for(const q of d.questions){
   assert.ok(q.text.length>12,'Meaningful typed adaptation for Q'+q.number);
