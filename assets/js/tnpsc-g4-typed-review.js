@@ -10,7 +10,8 @@ const file='data/quizzes/tnpsc-g4-'+year+'-typed-review.json';
 const storage='clearexams-tnpsc-g4-'+year+'-typed-review-v1';
 let paper=null,current=1,answers={},onlyTyped=true;
 const src=q=>paper.sourcePaperUrl+(q?.sourcePdfPage?'#page='+q.sourcePdfPage:'');
-const available=q=>typeof q.text==='string'&&q.text.trim()&&q.options&&LETTERS.every(c=>typeof q.options[c]==='string'&&q.options[c].trim());
+const available=q=>q.sourceStatus==='typed-review-needed'&&q.textStatus==='editorial-draft-requires-source-proof'&&typeof q.text==='string'&&q.text.trim()&&q.options&&LETTERS.every(c=>typeof q.options[c]==='string'&&q.options[c].trim());
+const sourceMissing=q=>q.sourceStatus==='source-pdf-required';
 const get=n=>paper.questions[n-1];
 const chooseNumber=()=>paper.questions.filter(available).map(q=>q.number);
 function loadSaved(){try{const s=JSON.parse(localStorage.getItem(storage)||'null');if(s&&typeof s.answers==='object'){answers=Object.fromEntries(Object.entries(s.answers).filter(([n,v])=>Number.isInteger(+n)&&+n>=1&&+n<=200&&LETTERS.includes(v)));current=Math.min(200,Math.max(1,+s.current||1));onlyTyped=s.onlyTyped!==false;}}catch(_){}}
@@ -28,7 +29,7 @@ $('qMeta').textContent='Original question '+q.number+' / 200 · '+q.section;
 $('progress').style.width=(current/200*100)+'%';
 $('stem').textContent=ready?q.text:'Question '+q.number+' — text not yet source-verified';
 $('stem').lang=ready&&q.language==='ta'?'ta':'en';
-$('sourceFlag').textContent=ready?'English/Tamil OCR or user draft · pending human comparison with original PDF. '+(q.keyToken==='ALL'?'Official key accepts all options; ungraded.':'Official answer-key option mapping available.'):'Question '+q.number+' is image-only, incomplete OCR or otherwise not sufficiently reviewed to display as typed MCQ.';
+$('sourceFlag').textContent=ready?'English/Tamil OCR or user draft · pending human comparison with original PDF. '+(q.keyToken==='ALL'?'Official key accepts all options; ungraded.':'Official answer-key option mapping available.'):sourceMissing(q)?'Question '+q.number+' is image-only, incomplete OCR or otherwise not sufficiently reviewed to display as typed MCQ.':'Question '+q.number+' needs editorial source verification before it can be played.';
 $('unavailable').hidden=ready;
 $('pageLink').href=src(q);$('pageLink').textContent=q.sourcePdfPage?'Official PDF · page '+q.sourcePdfPage:'Read official PDF';
 const o=$('options');o.hidden=!ready;o.replaceChildren();if(ready){const legend=document.createElement('legend');legend.textContent='Select an answer';o.append(legend);
