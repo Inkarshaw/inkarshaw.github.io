@@ -1,0 +1,42 @@
+/* Source-of-truth coverage checks for the ClearExams typed PYQ library. */
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+import vm from 'node:vm';
+const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const json=p=>JSON.parse(read(p));
+const cat=json('data/quizzes/typed-pyq-catalog.json'),html=read('pyq-typed-library.html'),js=read('assets/js/typed-pyq-catalog.js');
+assert.equal(cat.schemaVersion,1);
+assert.equal(cat.entries.length,8);
+assert.equal(new Set(cat.entries.map(e=>e.id)).size,8);
+assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),952);
+assert.equal(cat.entries.filter(e=>e.typed===e.total).length,3);
+const by=id=>{const e=cat.entries.find(x=>x.id===id);assert.ok(e,'Missing catalogue '+id);return e;};
+for(const e of cat.entries){assert.ok(['TNPSC','TNUSRB'].includes(e.exam));assert.ok(Number.isInteger(e.total)&&Number.isInteger(e.typed)&&Number.isInteger(e.scorable));assert.ok(e.typed<=e.total&&e.scorable<=e.typed);assert.ok(e.sourceStatus.length>16);assert.ok(existsSync(new URL('../'+e.link.split('?')[0],import.meta.url)),'Quiz route missing: '+e.link);}
+const g2011=json('data/quizzes/tnpsc-g1-2011-series-d-typed.json');
+assert.equal(by('tnpsc-g1-2011').typed,g2011.questionCountInTypedSet);
+assert.equal(by('tnpsc-g1-2011').scorable,g2011.scorableQuestionCount);
+const g2026=json('data/quizzes/tnpsc-group-i-2026-prelims-text.json');
+assert.equal(by('tnpsc-g1-2026').typed,g2026.suppliedQuestionCount);
+assert.equal(by('tnpsc-g1-2026').scorable,0,'No guessed 2026 answer key');
+const ta=json('data/quizzes/tnpsc-g4-2022-user-transcription-tamil-draft.json');
+const en=json('data/quizzes/tnpsc-g4-2022-user-transcription-english-draft.json');
+assert.equal(by('tnpsc-g4-2022').typed,ta.questions.length+en.questions.length);
+for(const y of [2024,2025]){const d=json('data/quizzes/tnpsc-g4-'+y+'-typed-review.json');assert.equal(by('tnpsc-g4-'+y).typed,d.typedPlayableCount);assert.equal(by('tnpsc-g4-'+y).scorable,d.gradedQuestionCount);assert.equal(by('tnpsc-g4-'+y).type,'partial');}
+const s2010=json('data/quizzes/tnusrb-si-2010-open-type-a.json');
+assert.equal(by('tnusrb-si-2010').typed,s2010.availableForQuizCount);
+assert.equal(by('tnusrb-si-2010').scorable,s2010.scoredQuestionCount);
+const s2015=json('data/quizzes/tnusrb-si-2015-open.json');
+assert.equal(by('tnusrb-si-2015').typed,s2015.playableQuestionCount);
+assert.equal(by('tnusrb-si-2015').scorable,s2015.provisionallyScoreableQuestionCount);
+const s2020=json('data/quizzes/tnusrb-si-2020-series-c.json');
+assert.equal(by('tnusrb-si-2020').typed,s2020.playableQuestionCount);
+assert.equal(by('tnusrb-si-2020').scorable,s2020.scorableQuestionCount);
+assert.match(html,/Typed PYQ Quiz Library/);
+assert.match(html,/not independently certified verbatim reproduction/i);
+assert.match(js,/typed-pyq-catalog\.json/);
+assert.match(js,/textContent/);
+assert.ok(!js.includes('innerHTML'),'No untrusted source text injection');
+new vm.Script(js,{filename:'assets/js/typed-pyq-catalog.js'});
+assert.match(read('pyq-hub.html'),/href="pyq-typed-library\.html"/);
+assert.match(read('sitemap.xml'),/pyq-typed-library\.html/);
+console.log('PASS eight TNPSC/TNUSRB PYQ typed quiz coverage records; 952 readable practice positions, three full-numbered drafts; missing text explicitly labelled.');
