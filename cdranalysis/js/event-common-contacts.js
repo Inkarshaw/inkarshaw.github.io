@@ -79,7 +79,8 @@
     const windowMs = minutes * 60000;
     const map = new Map(), subjects = new Set();
     const data = window.CDRApp?.getRecords?.() || core.state.records || [];
-    for (const r of data) {
+    for (let i = 0; i < data.length; i++) {
+      const r = data[i];
       const info = keyFor(r);
       if (!info) continue;
       const inA = selectRecord(r, A, windowMs), inB = B ? selectRecord(r, B, windowMs) : false;
@@ -88,16 +89,17 @@
       if (subject) subjects.add(subject);
       let x = map.get(info.key);
       if (!x) {
-        x = { raw: info.raw, a: { count: 0, subjects: new Set() }, b: { count: 0, subjects: new Set() }, first: null, last: null };
+        x = { raw: info.raw, a: { count: 0, subjects: new Set(), ids: new Set() }, b: { count: 0, subjects: new Set(), ids: new Set() }, first: null, last: null };
         map.set(info.key, x);
       }
       const at = r.dt instanceof Date ? +r.dt : +new Date(r.dt);
       if (Number.isFinite(at)) { x.first = x.first === null ? at : Math.min(x.first, at); x.last = x.last === null ? at : Math.max(x.last, at); }
-      if (inA) { x.a.count++; if (subject) x.a.subjects.add(subject); }
-      if (inB) { x.b.count++; if (subject) x.b.subjects.add(subject); }
+      const recordId = String(r.id || i);
+      if (inA) { x.a.count++; x.a.ids.add(recordId); if (subject) x.a.subjects.add(subject); }
+      if (inB) { x.b.count++; x.b.ids.add(recordId); if (subject) x.b.subjects.add(subject); }
     }
     const minSubjects = subjects.size < 2 ? 1 : 2;
-    matches = [...map.values()].filter(x => B ? x.a.count > 0 && x.b.count > 0 : x.a.count > 0 && x.a.subjects.size >= minSubjects)
+    matches = [...map.values()].filter(x => B ? x.a.count > 0 && x.b.count > 0 && new Set([...x.a.ids, ...x.b.ids]).size >= 2 : x.a.count > 0 && x.a.subjects.size >= minSubjects)
       .sort((x, y) => (y.a.count + y.b.count) - (x.a.count + x.b.count) || x.raw.localeCompare(y.raw, undefined, { numeric: true }));
     status.textContent = B
       ? 'Only contacts observed in both selected events are listed.'
