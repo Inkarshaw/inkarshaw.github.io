@@ -71,7 +71,7 @@ let data=null, answers={}, index=0;
 const item=()=>data.questions[index];
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({answers,index}))}catch(_){}};
 const read=()=>{try{const prior=JSON.parse(localStorage.getItem(KEY)||'{}');if(prior&&prior.answers&&typeof prior.answers==='object'){answers=Object.fromEntries(Object.entries(prior.answers).filter(([k,v])=>/^\d+$/.test(k)&&LETTERS.includes(v)));index=Math.min(data.questions.length-1,Math.max(0,Number(prior.index)||0))}}catch(_){}};
-const show=view=>{for(const id of ['intro','quiz','results'])$(id).hidden=id!==view;window.scrollTo({top:0,behavior:'instant'})};
+const show=view=>{for(const id of ['intro','quiz','results'])$(id).hidden=id!==view;window.scrollTo(0,0)};
 const answered=()=>data.questions.filter(q=>LETTERS.includes(answers[q.number])).length;
 function render(){
 const q=item();$('qNumber').textContent='Original question '+q.number+' of '+data.questionCountInOfficialPaper;
@@ -92,6 +92,7 @@ const heading=document.createElement('summary');heading.textContent='Q'+q.number
 const stem=document.createElement('p');stem.textContent=q.text;detail.append(stem);
 const chosen=document.createElement('p');chosen.textContent='Your choice: '+(choice?choice+' — '+q.options[LETTERS.indexOf(choice)]:'Not answered');detail.append(chosen);
 const key=document.createElement('p');key.textContent='Official D-series key: '+(valid?q.accepted.join(' or '):'ALL / no scored answer');detail.append(key);
+const expl=document.createElement('p');expl.textContent='Explanation: '+(q.explanation||'See the source paper and official key.');detail.append(expl);
 const source=document.createElement('a');source.href=data.sourcePaperUrl+'#page='+q.sourcePdfPage;source.target='_blank';source.rel='noopener';source.textContent='Compare original PDF page '+q.sourcePdfPage;detail.append(source);out.append(detail)}
 $('score').textContent=correct+' / '+data.scorableQuestionCount;
 $('scoreSummary').textContent='Indicative marks: '+(correct*1.5)+' / '+(data.scorableQuestionCount*1.5)+' · '+wrong+' incorrect · '+blank+' unanswered · '+ungraded+' ungraded. Only the source-numbered typed set is included.';
