@@ -29,6 +29,7 @@
   <script src="/cdranalysis/vendor/leaflet-heat.js"></script>
   <link rel="stylesheet" href="/cdranalysis/css/cdr-components.css?v=70" />
   <link rel="stylesheet" href="/cdranalysis/css/nexus-ui.css" />
+  <link rel="stylesheet" href="/cdranalysis/css/multinumber-scope.css?v=1" />
 </head>
 <body>
 <div id="importLoadingOverlay" class="import-loading-overlay" hidden aria-live="polite" aria-busy="true">
@@ -41,7 +42,7 @@
 <div class="app">
   <header class="topbar">
     <div class="toprow">
-      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v74</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
+      <div class="brand">CDR Analyzer <span class="badge" id="appVersionBadge">v75</span><small>Local CDR analysis • XLSX / XLS / CSV</small></div>
       <div class="toolbar">
         <button class="btn ghost" id="printBtn">Print / Save PDF</button>
       </div>
@@ -472,44 +473,51 @@
       </section>
 
       <section id="multinumber" class="view hidden">
-        <div class="panel no-print" id="multiNumberScopePanel" style="position:relative;z-index:10">
-          <div class="panel-title"><h2>Compare selected subjects and event types</h2><span class="muted">Multi-select filters</span></div>
-          <div class="subtoolbar" style="align-items:flex-end;margin-bottom:8px">
-            <div class="field" style="min-width:220px;flex:1">
-              <label id="multiScopeSubjectLabel">Subject / MSISDN</label>
-              <details id="multiScopeSubjects" style="position:relative">
-                <summary id="multiScopeSubjectSummary" class="btn secondary" style="display:block;cursor:pointer;list-style:none;user-select:none">All subjects ▾</summary>
-                <div style="position:absolute;top:calc(100% + 4px);left:0;z-index:50;width:min(440px,calc(100vw - 52px));background:var(--panel,#fff);border:1px solid var(--line,#dfe5ee);border-radius:10px;padding:12px;box-shadow:0 10px 25px rgba(0,0,0,.25)">
-                  <label for="multiScopeSubjectSearch">Search subjects</label>
-                  <input id="multiScopeSubjectSearch" type="search" placeholder="Search mobile number" style="width:100%;margin:5px 0 9px">
-                  <div id="multiScopeSubjectChoices" style="max-height:240px;overflow:auto"></div>
-                  <div class="subtoolbar" style="margin:8px 0 0">
-                    <button type="button" id="multiScopeSubjectAll" class="btn secondary small">Select all visible</button>
+        <div class="panel no-print" id="multiNumberScopePanel">
+          <div class="panel-title"><h2>Multi-number filters</h2><span class="muted">Select &amp; compare</span></div>
+          <p class="multi-scope-intro">Choose the phone numbers and call/SMS event types to compare. You can select more than one in each field.</p>
+          <div class="multi-scope-grid">
+            <div class="multi-scope-control">
+              <label class="multi-scope-label" id="multiScopeSubjectLabel">Subject / MSISDN</label>
+              <details id="multiScopeSubjects" class="multi-scope-details">
+                <summary id="multiScopeSubjectSummary" aria-labelledby="multiScopeSubjectLabel multiScopeSubjectSummary">All subjects</summary>
+                <div class="multi-scope-menu">
+                  <label class="multi-scope-search-label" for="multiScopeSubjectSearch">Search mobile numbers</label>
+                  <input id="multiScopeSubjectSearch" type="search" placeholder="Type a mobile number" autocomplete="off">
+                  <div class="multi-scope-quick">
+                    <button type="button" id="multiScopeSubjectAll" class="btn secondary small">Select visible</button>
                     <button type="button" id="multiScopeSubjectClear" class="btn secondary small">Clear</button>
                   </div>
+                  <div id="multiScopeSubjectChoices" class="multi-scope-choices" role="group" aria-label="Subject mobile numbers"></div>
+                  <p class="multi-scope-help">No selection means all loaded subjects.</p>
                 </div>
               </details>
+              <div id="multiScopeSubjectTokens" class="multi-scope-tokens" aria-label="Selected subjects"></div>
             </div>
-            <div class="field" style="min-width:220px;flex:1">
-              <label id="multiScopeEventLabel">Event type</label>
-              <details id="multiScopeEvents" style="position:relative">
-                <summary id="multiScopeEventSummary" class="btn secondary" style="display:block;cursor:pointer;list-style:none;user-select:none">All event types ▾</summary>
-                <div style="position:absolute;top:calc(100% + 4px);left:0;z-index:50;width:min(440px,calc(100vw - 52px));background:var(--panel,#fff);border:1px solid var(--line,#dfe5ee);border-radius:10px;padding:12px;box-shadow:0 10px 25px rgba(0,0,0,.25)">
-                  <label for="multiScopeEventSearch">Search event types</label>
-                  <input id="multiScopeEventSearch" type="search" placeholder="Call, SMS or imported event type" style="width:100%;margin:5px 0 9px">
-                  <div id="multiScopeEventChoices" style="max-height:240px;overflow:auto"></div>
-                  <div class="subtoolbar" style="margin:8px 0 0">
-                    <button type="button" id="multiScopeEventAll" class="btn secondary small">Select all visible</button>
+            <div class="multi-scope-control">
+              <label class="multi-scope-label" id="multiScopeEventLabel">Event type</label>
+              <details id="multiScopeEvents" class="multi-scope-details">
+                <summary id="multiScopeEventSummary" aria-labelledby="multiScopeEventLabel multiScopeEventSummary">All event types</summary>
+                <div class="multi-scope-menu">
+                  <label class="multi-scope-search-label" for="multiScopeEventSearch">Search event types</label>
+                  <input id="multiScopeEventSearch" type="search" placeholder="Call, SMS, data…" autocomplete="off">
+                  <div class="multi-scope-quick">
+                    <button type="button" id="multiScopeEventAll" class="btn secondary small">Select visible</button>
                     <button type="button" id="multiScopeEventClear" class="btn secondary small">Clear</button>
                   </div>
+                  <div id="multiScopeEventChoices" class="multi-scope-choices" role="group" aria-label="CDR event types"></div>
+                  <p class="multi-scope-help">No selection means all imported event types.</p>
                 </div>
               </details>
+              <div id="multiScopeEventTokens" class="multi-scope-tokens" aria-label="Selected event types"></div>
             </div>
-            <button type="button" id="multiScopeApply" class="btn small">Apply selection</button>
-            <button type="button" id="multiScopeReset" class="btn secondary small">Reset both</button>
           </div>
-          <div class="tiny" id="multiScopeStatus" aria-live="polite">All subjects • All event types</div>
-          <p class="tiny" style="margin:5px 0 0">Select any number of subjects and event types, then tap Apply selection. Leaving a dropdown with nothing selected includes all values. Other tabs retain their own subject/event filters; the remaining sidebar filters still apply.</p>
+          <div class="multi-scope-actions">
+            <button type="button" id="multiScopeApply" class="btn">Apply filters</button>
+            <button type="button" id="multiScopeReset" class="btn secondary">Reset both</button>
+          </div>
+          <div class="multi-scope-status" id="multiScopeStatus" role="status" aria-live="polite">All subjects • All event types</div>
+          <p class="multi-scope-note">These selections affect only Multi-number Analysis. Other filters, including dates, still apply.</p>
         </div>
         <div class="panel" style="margin-bottom:14px">
           <div class="panel-title"><h2>Multi-number Analysis</h2><span class="muted">Shared contacts, locations, identifiers, network structure and direct pair relationships</span></div>
@@ -568,7 +576,7 @@
   </div>
 </div>
 
-<script src="/cdranalysis/js/core.js?v=74"></script>
+<script src="/cdranalysis/js/core.js?v=75"></script>
 <script src="/cdranalysis/js/identity.js"></script>
 <script src="/cdranalysis/js/parser.js?v=73"></script>
 <script src="/cdranalysis/js/filters.js?v=76"></script>
@@ -591,7 +599,7 @@
 <script src="/cdranalysis/js/ui.js?v=74"></script>
 <script src="/cdranalysis/js/app.js?v=78"></script>
 <script src="/cdranalysis/js/event-common-contacts.js?v=78"></script>
-<script src="/cdranalysis/js/multinumber-scope.js?v=1"></script>
+<script src="/cdranalysis/js/multinumber-scope.js?v=2"></script>
 <script src="/cdranalysis/js/multinumber-events.js?v=3"></script>
 <script src="/cdranalysis/js/relationship.js"></script>
 <script src="/cdranalysis/js/diagnostics.js"></script>
