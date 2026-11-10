@@ -138,6 +138,12 @@ body.print-all .letter-page{display:block}
 <p id="error" role="alert" hidden></p>
 <div id="info" class="note" style="margin-top:10px">Uses the November 2026 Excel arrangement; select the up-to-date worksheet when your register contains a historical sheet.</div>
 </section>
+<section class="panel no-print">
+ <div class="headrow"><div><h2>Saved register — full quarters roll</h2><div class="sub">View all quarters, including occupied units. This view uses the original Excel worksheet. The full register is available only in this browser.</div></div><span id="allCount" class="state">Upload Excel to view</span></div>
+ <div class="filters" style="grid-template-columns:1.5fr 1fr"><div><label for="allSearch">Find block, door, occupant or quarter type</label><input id="allSearch" placeholder="Search full quarters register"></div><div><label for="allStatus">Occupancy</label><select id="allStatus"><option value="">All records</option><option>Occupied</option><option>Vacant</option><option>Allotted not occupied</option><option>Damaged</option><option>Reserved / other</option><option>Unconfirmed</option></select></div></div>
+ <div class="scroller"><table class="worktable"><thead><tr><th>Excel row</th><th>Category</th><th>Block</th><th>Floor</th><th>Door No.</th><th>Occupant</th><th>Rank</th><th>Occupancy</th><th>Remarks</th></tr></thead><tbody id="allRecords"></tbody></table></div>
+ <p id="allHint" class="note">The first 200 matching quarters appear here; narrow the search to find other records.</p>
+</section>
 <div class="kpis no-print" id="stats">
 <div class="kpi"><strong id="statCount">—</strong><span>Report entries</span></div>
 <div class="kpi"><strong id="statVacant">—</strong><span>Vacant</span></div>
@@ -197,7 +203,7 @@ const $=id=>document.getElementById(id), GROUPS=[
 {id:"pu",label:"Pullapuram police quarters",reference:2,title:"G3 PS KILPAUK PULLAPURAM POLICE QUARTERS"}
 ], STATUS=["Vacant","Allotted not occupied","Damaged","Reserved / other"];
 let workbook=null, data=[], originals=[], activeSheet="", renderReady=false;
-let master=null;
+let master=null,allMasterRows=[];
 const QUARTERS_DB="clearexams-quarters-master-v1", MASTER_KEY="g3-quarters-master";
 function openMasterDB(){
  return new Promise((resolve,reject)=>{
@@ -292,6 +298,41 @@ function classify(raw){
  if(/ccb|boys club|police station/.test(lo))return "Reserved / other";
  return "";
 }
+function buildFullRegister(){
+ allMasterRows=[];
+ if(!workbook||!activeSheet)return;
+ const ws=workbook.Sheets[activeSheet];
+ const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:"",blankrows:true});
+ const headers=rows.find(r=>r.some(x=>/GPF\s*\/?\s*CPS/i.test(String(x)))&&r.some(x=>/Block/i.test(String(x))))||rows[1]||[];
+ const blockIdx=colIndex(headers,["Block"],11),floorIdx=colIndex(headers,["Floor"],12);
+ const doorIdx=colIndex(headers,["Quarters No","Door No"],13);
+ const nameIdx=colIndex(headers,["EMPLOYEE NAME"],1),rankIdx=colIndex(headers,["Rank No","Rank"],2);
+ const damageIdx=colIndex(headers,["damge","damage"],16);
+ let section="io";
+ rows.forEach((r,i)=>{
+  const next=detectSection(r,section);if(next!==section){section=next;return}
+  const type=desc(section);if(!type)return;
+  const block=clean(r[blockIdx]),floor=clean(r[floorIdx]),door=clean(r[doorIdx]);
+  if(!block||!floor||!door||/^(block|floor|quarters)/i.test(block+" "+floor+" "+door))return;
+  const first=clean(r[0]),rawName=clean(r[nameIdx]),rawRank=clean(r[rankIdx]);
+  const status=classify(first)||
+    (/(?:ccb|boys club|old police station|library|shop)/i.test(first)?"Reserved / other":
+      rawName&&rawName!=="NIL"&&!/^(vacant|nil|not occupied)$/i.test(rawName)?"Occupied":"Unconfirmed");
+  const occupant=status==="Occupied"?rawName:"";
+  allMasterRows.push({row:i+1,category:type[1],block,floor,door,occupant,rank:status==="Occupied"?rawRank:"",status,damage:clean(r[damageIdx])||"NIL"});
+ });
+ renderFullRegister();
+}
+function renderFullRegister(){
+ const q=norm($("allSearch").value),s=$("allStatus").value;
+ const found=allMasterRows.filter(r=>(!s||r.status===s)&&(!q||norm([r.category,r.block,r.floor,r.door,r.occupant,r.rank,r.status,r.damage].join(" ")).includes(q)));
+ $("allCount").textContent=found.length+" / "+allMasterRows.length+" quarters";
+ $("allRecords").innerHTML=found.slice(0,200).map(r=>
+ "<tr><td>"+r.row+"</td><td>"+esc(r.category)+"</td><td>"+esc(r.block)+"</td><td>"+esc(r.floor)+"</td><td>"+esc(r.door)+"</td><td>"+esc(r.occupant||"—")+"</td><td>"+esc(r.rank||"—")+"</td><td>"+esc(r.status)+"</td><td>"+esc(r.damage)+"</td></tr>").join("");
+ $("allHint").textContent=found.length>200?"Showing first 200 of "+found.length+" matching quarters. Search for a specific block or door.":found.length+" matching quarters shown.";
+}
+$("allSearch").addEventListener("input",renderFullRegister);
+$("allStatus").addEventListener("change",renderFullRegister);
 function parse(sheetName){
  const ws=workbook.Sheets[sheetName]; if(!ws)throw Error("Worksheet not found");
  const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:"",blankrows:true});
@@ -385,7 +426,7 @@ function loadSheet(name){
   data=parse(name);originals=data.map(x=>({...x}));activeSheet=name;
   $("fgroup").innerHTML='<option value="">All groups</option>'+GROUPS.map(g=>'<option value="'+g.id+'">'+esc(g.label)+'</option>').join("");
   $("fgroup").value="";$("fstatus").value="";$("search").value="";
-  setEnabled(true);refresh();makePreview();
+  setEnabled(true);refresh();buildFullRegister();makePreview();
   showInfo("Loaded "+name+" — "+data.length+" reportable row(s) detected. Rows needing correction are excluded until completed.");
   return true;
  }catch(e){setEnabled(false);error("Unable to read this sheet: "+e.message);return false}
@@ -418,7 +459,7 @@ $("savedDelete").onclick=async()=>{
  try{
   await removeMaster();master=null;workbook=null;data=[];originals=[];activeSheet="";
   $("excel").value="";$("sheet").disabled=true;$("sheet").innerHTML="<option>Upload Excel first</option>";
-  setEnabled(false);refresh();$("report").innerHTML='<p class="note no-print">Upload the register to start.</p>';
+  setEnabled(false);allMasterRows=[];renderFullRegister();refresh();$("report").innerHTML='<p class="note no-print">Upload the register to start.</p>';
   showMaster();showInfo("Saved master register removed from this browser.");
  }catch(e){error("Cannot remove saved register: "+e.message)}
 };
