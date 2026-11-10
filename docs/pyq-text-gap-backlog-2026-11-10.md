@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,129 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,150 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -27,6 +27,16 @@ As of 10 November 2026, the source-numbered Tamil/English draft set covers **110
 ### Group IV 2025 bilingual GS Q101–125 progress
 
 On 10 November 2026, added 22 numbered, **editorially adapted English stems and independent Tamil study translations** for 2025 Group IV GS positions Q101–125, without overwriting previously drafted Q112, Q113 or Q125. The set now has **132/200** locally playable text positions, **127** with provisional answer-key scoring, **68** source-text gaps and **zero** independently visually certified originals. Q107 is ALL/ungraded and Q122 accepts B/C. Primary booklet comparison and Tamil text proofreading remain outstanding.
+
+### Group IV 2025 primary-PDF Q126–150 batch
+
+As of 10 November 2026, the 2025 Group IV local text review holds **153/200** numbered practice items, of which **147** have provisional final-key scoring. **47** question numbers still lack local text; the source-verbatim count independently signed off remains **0**.
+
+This batch adds **21** English-paraphrased and Tamil-translated study items (Q126–150 excluding Q127, Q140, Q146 and Q148, which already existed). Those four existing English items were also given Tamil study translations. The source content was compared against the **official TNPSC 2025 question-booklet text layer** and its **Subject Code 496 final answer key**; the primary-page scans and translated Tamil wording have not received visual proofreading. Q126 accepts B or C in the final key. Q138 says ALL and is excluded from the graded denominator.
+
+Source booklet: https://tnpsc.gov.in/tentative/document/07_2025_GENEAL_TAMIL_GS.pdf
+
+Final key: https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/07_2025_CCSE_IV_FINAL_ANSWER_KEY.pdf
 
 ## Source-indexed years still requiring question text
 
