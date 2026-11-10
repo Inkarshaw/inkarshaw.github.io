@@ -32,6 +32,12 @@
       if(q.scoringStatus==='blocked_source_incomplete'&&!data.blockedNumbers.includes(q.number))
         throw Error('Undisclosed incomplete Q'+q.number);
     }
+    const reviewed=data.questions.filter(q=>q.secondaryBilingualSourceURL);
+    if(data.bilingualNumberedReaderReview?.reviewedOriginalNumbers?.length!==10||
+       reviewed.length!==10||reviewed.some(q=>q.number<11||q.number>20||
+         !q.questionTamil?.trim()||!LETTERS.every(k=>q.optionsTamil?.[k]?.trim())||
+         q.secondaryBilingualSourceURL!==data.bilingualNumberedReaderReview.sourceURL))
+      throw Error('SI 2015 numbered Open Candidates bilingual-review manifest is inconsistent');
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
     if(playable.length!==118||playable.length!==data.playableQuestionCount||
        playable.filter(q=>q.scoringStatus==='provisional_secondary_key').length!==109||
@@ -159,13 +165,25 @@
     $('passage').hidden=!q.passage;
     $('passage').textContent=q.passage||'';
     $('questionTitle').textContent=q.question;
+    $('questionTamil').hidden=!q.questionTamil;
+    $('questionTamil').textContent=q.questionTamil||'';
+    $('sourceReader').hidden=!q.secondaryBilingualSourceURL;
     const locked=attempt.mode==='practice'&&attempt.checked[i];
     $('options').replaceChildren();
     for(const letter of LETTERS){
       const b=document.createElement('button');b.type='button';b.className='option';
       b.setAttribute('aria-pressed',String(attempt.answers[i]===letter));
       const l=document.createElement('b');l.textContent=letter;
-      const content=document.createElement('span');content.textContent=q.options[letter];
+      const content=document.createElement('span');
+      content.className=q.optionsTamil?'bilingual-choice':'';
+      const english=document.createElement('span');english.textContent=q.options[letter];
+      content.append(english);
+      if(q.optionsTamil){
+        const tamil=document.createElement('span');
+        tamil.lang='ta';tamil.className='choice-tamil';
+        tamil.textContent=q.optionsTamil[letter];
+        content.append(tamil);
+      }
       b.append(l,content);
       if(locked&&q.scoringStatus==='provisional_secondary_key'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
       if(locked&&q.scoringStatus==='provisional_secondary_key'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
@@ -262,7 +280,8 @@
         ungradedList.append(li);
       });
       $('loadStatus').textContent=questions.length+' readable original-numbered practice questions loaded: '+
-        '109 provisionally scored, 9 source/key disputed and ungraded, 22 incomplete or diagram-dependent records held.';
+        '10 indexed bilingual Tamil/English study items Q11–20, 109 provisionally scored, '+
+        '9 source/key disputed and ungraded, 22 incomplete or diagram-dependent records held.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
