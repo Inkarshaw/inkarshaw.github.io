@@ -63,7 +63,7 @@ assert.match(html,/115 readable/);
 assert.match(html,/id="sourceGaps"/,'The unverified source holes must be shown to the learner');
 assert.match(html,/General Candidates paper/,'Link official-origin Open Candidates paper, not departmental source');
 assert.match(html,/Q22 has a readable question/);
-assert.match(html,/111 graded/);
+assert.match(html,/111 provisionally graded/);
 assert.match(html,/2019 Recruitment \(Exam 2020\)/);
 assert.match(html,/not an official 140-question TNUSRB score/);
 assert.match(js,/q\.answerKeyToken!==data\.answerKey\.answers\[q\.number-1\]/);
