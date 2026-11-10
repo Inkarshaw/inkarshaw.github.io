@@ -27,7 +27,7 @@ assert.equal(ids.length,new Set(ids).size,'Duplicate DOM ids');
 for(const r of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(r[1]),'Referenced id '+r[1]+' exists');
 for(const [year,expectedTyped,expectedNumbers] of [
 [2024,54,Array.from({length:54},(_,i)=>i+1)],
-[2025,52,[...Array.from({length:42},(_,i)=>i+1),112,113,125,127,140,146,148,174,192,200]]
+[2025,68,[...Array.from({length:58},(_,i)=>i+1),112,113,125,127,140,146,148,174,192,200]]
 ]){
 const d=JSON.parse(read('data/quizzes/tnpsc-g4-'+year+'-typed-review.json'));
 const sourceKeys=keybook.papers.find(p=>p.id===d.paperId);
@@ -39,6 +39,17 @@ assert.equal(d.originalQuestionCount,200);
 assert.equal(d.questions.length,200);
 assert.equal(d.status,'incomplete-unverified-typed-draft');
 assert.equal(d.verifiedQuestionCount,0,'No OCR falsely certified');
+if(year===2025){
+ for(let n=43;n<=58;n++){
+  const q=d.questions[n-1];
+  assert.match(q.transcriptionEvidence,/adapted Tamil draft|editorially adapted Tamil draft/i,'New Q'+n+' retains editorial attribution');
+  assert.match(q.sourceReviewStatus,/pending/,'New Q'+n+' is not asserted verbatim');
+  assert.match(q.referenceReadingURL,/^https:\/\/www\.tnpscguide\.com\/ta\/exams\/group-4\/papers\/group-4-2025-question-paper\/[67]$/);
+ }
+ assert.equal(d.questions[55].keyToken,'ALL','Q56 official ALL key is preserved');
+ assert.deepEqual(d.questions[55].accepted,[],'Q56 cannot be graded as a single correct answer');
+}
+
 assert.equal(d.typedPlayableCount,expectedTyped);
 assert.deepEqual(d.questions.map(q=>q.number),Array.from({length:200},(_,i)=>i+1));
 const hasText=q=>typeof q.text==='string'&&q.text.length>0;
@@ -63,4 +74,4 @@ assert.equal(q.sourceStatus,'source-pdf-required');
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2024/);
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2025/);
 assert.match(read('sitemap.xml'),/tnpsc-g4-typed-review\.html/);
-console.log('PASS Group IV 2024/2025 source-linked typed reviews: 54 and 52 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
+console.log('PASS Group IV 2024/2025 source-linked typed reviews: 54 and 68 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
