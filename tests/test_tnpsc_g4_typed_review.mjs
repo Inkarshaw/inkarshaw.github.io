@@ -27,7 +27,7 @@ assert.equal(ids.length,new Set(ids).size,'Duplicate DOM ids');
 for(const r of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(r[1]),'Referenced id '+r[1]+' exists');
 for(const [year,expectedTyped,expectedNumbers] of [
 [2024,54,Array.from({length:54},(_,i)=>i+1)],
-[2025,132,[...Array.from({length:125},(_,i)=>i+1),127,140,146,148,174,192,200]]
+[2025,153,[...Array.from({length:150},(_,i)=>i+1),174,192,200]]
 ]){
 const d=JSON.parse(read('data/quizzes/tnpsc-g4-'+year+'-typed-review.json'));
 const sourceKeys=keybook.papers.find(p=>p.id===d.paperId);
@@ -75,6 +75,26 @@ for(let n=101;n<=125;n++){
   const page=n<=101?14:n<=105?15:n<=110?16:n<=117?17:n<=122?18:19;
   assert.equal(q.referenceReadingURL,'https://www.tnpscguide.com/exams/group-4/papers/group-4-2025-question-paper/'+page);
 }
+
+const qAlreadyText=new Set([127,140,146,148]);
+if(year===2025){
+ for(let n=126;n<=150;n++){
+  const q=d.questions[n-1];
+  assert.ok(q.textTamil&&q.optionsTamil,'Missing bilingual text for Q'+n);
+  assert.ok(['A','B','C','D','E'].every(letter=>String(q.optionsTamil[letter]||'').trim()),'Missing Tamil option Q'+n);
+  assert.match(q.translationStatus,/not-verified/,'Tamil translation must be marked for review Q'+n);
+  if(qAlreadyText.has(n))continue;
+  assert.equal(q.primaryTextLayerReviewed,true,'Q'+n+' must have been checked against primary PDF text layer');
+  assert.equal(q.sourceReviewStatus,'source-pdf-visual-proof-pending','Q'+n+' image proof outstanding');
+  assert.match(q.transcriptionEvidence,/TNPSC's primary 2025 Group IV official PDF/);
+  const page=n<=128?19:n<=133?20:n<=139?21:n<=148?22:23;
+  assert.equal(q.referenceReadingURL,'https://www.tnpscguide.com/exams/group-4/papers/group-4-2025-question-paper/'+page);
+ }
+ assert.equal(d.questions[125].keyToken,'B/C');
+ assert.deepEqual(d.questions[125].accepted,['B','C'],'Q126 has two final-key accepted answers');
+ assert.equal(d.questions[137].keyToken,'ALL');
+ assert.deepEqual(d.questions[137].accepted,[],'Q138 must remain ungraded');
+}
 assert.equal(d.questions[106].keyToken,'ALL','Q107 official ALL answer exception');
 assert.deepEqual(d.questions[106].accepted,[],'Q107 is not scored');
 assert.equal(d.questions[121].keyToken,'B/C','Q122 official multiple accepted answer exception');
@@ -113,4 +133,4 @@ assert.equal(q.sourceStatus,'source-pdf-required');
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2024/);
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2025/);
 assert.match(read('sitemap.xml'),/tnpsc-g4-typed-review\.html/);
-console.log('PASS Group IV 2024/2025 source-linked typed reviews: 54 and 132 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
+console.log('PASS Group IV 2024/2025 source-linked typed reviews: 54 and 153 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
