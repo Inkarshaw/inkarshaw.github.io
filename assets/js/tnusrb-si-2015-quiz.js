@@ -46,10 +46,31 @@
     Array.isArray(s.checked)&&s.checked.length===questions.length&&s.checked.every(a=>typeof a==='boolean')&&
     Array.isArray(s.marked)&&s.marked.length===questions.length&&s.marked.every(a=>typeof a==='boolean')&&
     Number.isInteger(s.index)&&s.index>=0&&s.index<questions.length;
+  function resumeSaved(mode){
+    const saved=getSaved(storageKey());
+    if(validSaved(saved,mode))return saved;
+    // Preserve answers from the previous 109-item graded-only order, mapping by source question number.
+    const gradedIndices=questions.map((q,i)=>q.scoringStatus==='provisional_secondary_key'?i:-1).filter(i=>i>=0);
+    if(!saved||saved.finished||saved.version!==1||saved.mode!==mode||gradedIndices.length!==109||
+       !Array.isArray(saved.answers)||saved.answers.length!==109||
+       !Array.isArray(saved.checked)||saved.checked.length!==109||
+       !Array.isArray(saved.marked)||saved.marked.length!==109||
+       !Number.isInteger(saved.index)||saved.index<0||saved.index>=109)return null;
+    const restored={...saved,answers:Array(questions.length).fill(null),
+      checked:Array(questions.length).fill(false),marked:Array(questions.length).fill(false),
+      index:gradedIndices[saved.index]};
+    for(let j=0;j<gradedIndices.length;j++){
+      const k=gradedIndices[j];
+      restored.answers[k]=saved.answers[j];
+      restored.checked[k]=saved.checked[j];
+      restored.marked[k]=saved.marked[j];
+    }
+    return validSaved(restored,mode)?restored:null;
+  }
   function updateStart(){
     if(!questions.length)return;
-    const prior=getSaved(storageKey());
-    $('start').textContent=(validSaved(prior,$('mode').value)?'Resume':'Start')+' '+questions.length+'-question quiz →';
+    const prior=resumeSaved($('mode').value);
+    $('start').textContent=(prior?'Resume':'Start')+' '+questions.length+'-question quiz →';
     $('start').disabled=false;
   }
   function show(view){
@@ -69,8 +90,8 @@
   function start(){
     if(!questions.length)return;
     storeKey=storageKey();
-    const prior=getSaved(storeKey),mode=$('mode').value;
-    if(validSaved(prior,mode))attempt=prior;
+    const mode=$('mode').value,prior=resumeSaved(mode);
+    if(prior)attempt=prior;
     else {
       const minutes=Number($('timer').value);
       attempt={version:1,mode,answers:Array(questions.length).fill(null),
