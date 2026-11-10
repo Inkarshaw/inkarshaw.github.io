@@ -16,6 +16,24 @@ assert.equal(data.scoredQuestionCount,116);
 assert.deepEqual(data.missingNumbers,expectedMissing,'Keep unavailable source numbers visible as gaps');
 assert.deepEqual(data.blockedNumbers,[64,86,106],'Do not invent maths notation or missing Venn diagram');
 assert.equal(data.questions.length,123);
+assert.equal(data.bilingualPubliclyReviewedCount,10);
+assert.match(data.bilingualPublicReviewScope,/Q1–10 only/,'Bilingual source audit must identify limited scope');
+const openReader='https://civilserviceaspirants.in/Tnusrb/Question-Paper-with-Answer/Tnusrb-si/Tnusrb-si-2010-gk-open-1.php';
+const tamilQ1_10=data.questions.filter(q=>q.questionTamil&&q.optionsTamil);
+assert.deepEqual(tamilQ1_10.map(q=>q.number),Array.from({length:10},(_,i)=>i+1),'Only source-numbered public Q1–10 received reviewed Tamil');
+for(const q of tamilQ1_10){
+ assert.equal(q.secondaryBilingualSourceURL,openReader,'Review reference must be a real original-numbered Open Candidates source');
+ assert.match(q.textReviewStatus,/official-booklet-visual-proof-pending/,'Secondary website cannot certify official TNUSRB scanned original');
+ assert.match(q.tamilTranslationStatus,/not-officially-verified/);
+ assert.ok(q.questionTamil?.trim());
+ assert.ok(['A','B','C','D'].every(l=>q.optionsTamil[l]?.trim()),'Tamil options must preserve A–D positions for Q'+q.number);
+ assert.equal(q.scoringStatus,'provisional_mirrored_final_key','Add language without changing score/key Q'+q.number);
+}
+assert.equal(data.questions[0].optionsTamil.C,'சேக்கிழார்');
+assert.equal(data.questions[1].optionsTamil.C,'அலாவுதீன் கில்ஜி');
+assert.equal(data.questions[9].optionsTamil.B,'அமெரிக்க ஐக்கிய நாடுகள்');
+assert.deepEqual(data.missingNumbers,expectedMissing,'Adding translations must not invent question positions');
+
 assert.deepEqual(data.questions.map(q=>q.number),[...data.questions.map(q=>q.number)].sort((a,b)=>a-b));
 const idSet=new Set();
 for(const q of data.questions){
@@ -48,6 +66,14 @@ assert.match(js,/filter\(q=>q\.scoringStatus!=='blocked_source_incomplete'\)/);
 assert.match(js,/0\.5/);
 assert.match(js,/Array\(questions\.length\)\.fill\(null\)/);
 assert.match(js,/localStorage/);
+assert.match(js,/q\.optionsTamil/,'Render Tamil alternative for source-reviewed Q1–10');
+assert.match(js,/\$\('questionTamil'\)/,'Tamil question stem shown separately');
+assert.match(js,/\$\('sourceGaps'\)/,'Source-missing panel populated');
+assert.match(html,/id="questionTamil"/);
+assert.match(html,/id="sourceReader"/);
+assert.match(html,/id="sourceGaps"/);
+assert.match(html,/2010-gk-open-1\.php/,'Link publicly accessible original-numbered reader');
+assert.match(html,/not departmental papers/,'2010 reader restricted to Open Candidates');
 assert.ok(!js.includes('innerHTML'),'Do not render question text as HTML');
 const ids=[...html.matchAll(/id="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(ids.length,new Set(ids).size,'HTML IDs must be unique');
@@ -59,4 +85,4 @@ assert.match(hub,/tnusrb-si-2010-quiz\.html/);
 assert.match(tnusrb,/tnusrb-si-2010-quiz\.html/);
 assert.match(yearwise,/\.\.\/tnusrb-si-2010-quiz\.html/);
 assert.match(read('sitemap.xml'),/tnusrb-si-2010-quiz\.html/);
-console.log('PASS TNUSRB SI 2010 Type A: 123 source records, 120 attemptable, 116 scored, 17 missing, 3 blocked, four ALL.');
+console.log('PASS TNUSRB SI 2010 Type A: 123 source records, 120 attemptable, first ten bilingual, 116 scored, 17 missing, 3 blocked, four ALL.');

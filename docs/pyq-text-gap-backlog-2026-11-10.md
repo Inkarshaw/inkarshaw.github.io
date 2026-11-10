@@ -131,6 +131,14 @@ At the 10 November 2026 checkpoint, **2019 recruitment / exam 12 January 2020 Se
 
 The 2010 SI Open Candidates *140 question/70 mark* paper and answer key are distinct from the 2010 **departmental** *170 question/85 mark* paper. Never use a departmental question or key to fill a source gap for any Open Candidates paper. A historic open-quota link is cited by https://www.tnpscportal.in/2013/04/tnusrb-sub-inspector-si-selection-written-exam-2013-old-model-previous-year-question-papers.html ; the link itself is currently unavailable. The 2019 General Candidates original paper is linked at https://pyqsathi.com/papers/tnusrb-si-written-2019-question-paper-general-candidates/ and the published Series C key at https://img.freejobalert.com/uploads/2020/03/Final-Answer-Key-TNUSRB-Sub-Inspector-of-Police-Posts.pdf . Keep 2010's 17 missing, 2020's 18 missing, and 2015's 22 blocked source positions visible until genuine open-paper text/figures are found.
 
+### TNUSRB SI 2010 — first ten Open Candidates questions independently bilingual-indexed
+
+On 10 November 2026, verified that public secondary indexed **TNUSRB SI 2010 GK Open page 1/14** contains source numbers **Q1–10** and bilingual English/Tamil stems with all four A–D options: https://civilserviceaspirants.in/Tnusrb/Question-Paper-with-Answer/Tnusrb-si/Tnusrb-si-2010-gk-open-1.php . ClearExams now includes editorially normalized Tamil study text for all ten and exposes this reader source within the quiz. Q1–10 options match the source-numbered English order; score-key tokens were not altered.
+
+**No additional original question numbers were digitized**: the 2010 Open Candidates bank remains **120/140 readable, 116 provisionally scored, 17 missing (Q67–80 and Q114–116), and three source-blocked (Q64, Q86, Q106)**. Other pages of the indexed reader redirect to premium login and do not authorize guessing missing text. The original TNUSRB booklet and official-host answer key remain unverified. This work is a secondary-text corroboration, **not** original booklet visual proof, an official key confirmation or a departmental paper transcription.
+
+The 2015 and 2020 Open Candidates banks remain 118/140 and 115/140 readable respectively. The aggregate remains **1,353** numbered readable text positions across eight sets; bilingual quality improved without miscounting coverage.
+
 ## Source-indexed years still requiring question text
 
 ### TNPSC (6)

@@ -464,22 +464,32 @@ try {
   await page.goto(origin+'/tnusrb-si-2010-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/120 attemptable questions loaded/);
+  assert.match(await page.locator('#loadStatus').innerText(),/120 readable Open Candidates questions loaded/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
   assert.match(await page.locator('#questionTitle').innerText(),/Periyapuranam/);
   assert.equal(await page.locator('#options button').count(),4);
+  assert.match(await page.locator('#questionTamil').innerText(),/பெரியபுராணத்தை/,'Source-indexed Tamil is shown below English');
+  assert.match(await page.locator('#options button').nth(2).innerText(),/சேக்கிழார்/,'Option C Tamil retains original-numbered source position');
+  assert.equal(await page.locator('#sourceReader').isVisible(),true,'Source disclosure shown only for bilingual-reviewed questions');
   await page.locator('#options button').nth(2).click();
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Type A final-key entry: C/);
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true,'Checked answer is locked');
-  await page.locator('.palette-details summary').click();
+  await page.locator('details[aria-label="2010 Open Candidates source gaps"] summary').click();
+  assert.equal(await page.locator('#sourceGaps li').count(),20,'17 absent and three blocked original-number gaps disclosed');
+  await page.locator('#quiz .palette-details summary').click();
   const numbers=await page.locator('#palette button').allTextContents();
   assert.equal(numbers.length,120,'All 120 readable/marked practice entries available');
   assert.equal(numbers.includes('64'),false,'Malformed vector-determinant question excluded');
   assert.equal(numbers.includes('86'),false,'Garbled fraction question excluded');
   assert.equal(numbers.includes('106'),false,'Diagram-dependent question excluded');
   assert.equal(numbers.includes('117'),true,'Passage questions retained');
+  await page.locator('#palette button').filter({hasText:/^10$/}).click();
+  assert.match(await page.locator('#questionTamil').innerText(),/புவி தினம்/);
+  await page.locator('#palette button').filter({hasText:/^11$/}).click();
+  assert.equal(await page.locator('#questionTamil').isVisible(),false,'Do not fabricate Tamil translation for Q11');
+  assert.equal(await page.locator('#sourceReader').isVisible(),false);
   await page.locator('#palette button').filter({hasText:/^117$/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q117/);
   assert.equal(await page.locator('#passage').isVisible(),true,'Gold-mines passage shown');
@@ -489,7 +499,7 @@ try {
   assert.match(await page.locator('#start').innerText(),/Resume 120-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q117/);
-  await page.locator('.palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').click();
   assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     '2010 SI mobile quiz has no horizontal overflow');

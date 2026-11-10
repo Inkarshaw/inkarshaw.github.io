@@ -27,6 +27,11 @@
       if(q.keyToken==='ALL'&&q.scoringStatus!=='ungraded_all_correct')throw Error('Special key status mismatch');
       previous=q.number;
     }
+    const bilingual=data.questions.filter(q=>q.questionTamil&&q.optionsTamil);
+    if(data.bilingualPubliclyReviewedCount!==10||bilingual.length!==10||
+       bilingual.some(q=>q.number>10||!LETTERS.every(l=>q.optionsTamil[l]?.trim())||
+         !q.secondaryBilingualSourceURL?.startsWith('https://civilserviceaspirants.in/')))
+      throw Error('2010 Open Candidates secondary bilingual source review manifest changed');
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
     if(playable.length!==data.availableForQuizCount||playable.length!==120||
        playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==116){
@@ -128,13 +133,24 @@
     $('passage').hidden=!q.passage;
     $('passage').textContent=q.passage||'';
     $('questionTitle').textContent=q.question;
+    $('questionTamil').hidden=!q.questionTamil;
+    $('questionTamil').textContent=q.questionTamil||'';
+    $('sourceReader').hidden=!q.questionTamil;
     const locked=attempt.mode==='practice'&&attempt.checked[i];
     $('options').replaceChildren();
     for(const letter of LETTERS){
       const b=document.createElement('button');b.type='button';b.className='option';
       b.setAttribute('aria-pressed',String(attempt.answers[i]===letter));
       const l=document.createElement('b');l.textContent=letter;
-      const content=document.createElement('span');content.textContent=q.options[letter];
+      const content=document.createElement('span');
+      content.className=q.optionsTamil?'bilingual-choice':'';
+      const english=document.createElement('span');english.textContent=q.options[letter];
+      content.append(english);
+      if(q.optionsTamil){
+        const tamil=document.createElement('span');tamil.lang='ta';tamil.className='choice-tamil';
+        tamil.textContent=q.optionsTamil[letter];
+        content.append(tamil);
+      }
       b.append(l,content);
       if(locked&&q.keyToken!=='ALL'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
       if(locked&&q.keyToken!=='ALL'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
@@ -216,8 +232,18 @@
   fetch('data/quizzes/tnusrb-si-2010-open-type-a.json',{cache:'no-store'})
     .then(response=>{if(!response.ok)throw Error('Quiz JSON unavailable');return response.json()})
     .then(data=>{questions=validate(data);bank=data;
-      $('loadStatus').textContent=questions.length+' attemptable questions loaded in original-number order. '+
-        '116 carry provisional mirrored final-key scores; four ALL entries are ungraded.';
+      const gapList=$('sourceGaps');gapList.replaceChildren();
+      data.missingNumbers.forEach(n=>{
+        const li=document.createElement('li');li.textContent='Original Q'+n+': open-candidates question text not recovered';
+        gapList.append(li);
+      });
+      data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
+        const li=document.createElement('li');li.textContent='Original Q'+q.number+': '+(q.sourceIssue||'Original math/figure review required');
+        gapList.append(li);
+      });
+      $('loadStatus').textContent=questions.length+' readable Open Candidates questions loaded: '+
+        '10 public-source-indexed bilingual Tamil/English items, 116 provisional key scores, '+
+        '4 special ALL entries ungraded; 17 missing and 3 source-blocked.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
