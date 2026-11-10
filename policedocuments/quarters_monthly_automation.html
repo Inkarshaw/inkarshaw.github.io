@@ -29,8 +29,19 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
 .notice{border-left:3px solid #81afca;background:#edf5fa;border-radius:5px;padding:9px 12px;color:#35546e;font-size:12px}
 .notice.warning{border-left-color:#e3a451;background:#fff7e9;color:#805224}
-.saved-register{margin-top:12px;padding:13px 14px;background:#f8fbff;border:1px solid #cadeee;border-radius:11px}
-.saved-register strong{font-size:14px}
+.excel-grid{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0}
+.excel-grid th{position:sticky;top:0;z-index:2;background:#e9f1f7;white-space:nowrap}
+.excel-grid td,.excel-grid th{border-right:1px solid #dde6ed;white-space:nowrap}
+.excel-grid td:first-child,.excel-grid th:first-child{position:sticky;left:0;z-index:1;background:#f5f9fc;font-weight:700;min-width:80px}
+.excel-grid th:first-child{z-index:3;background:#e9f1f7}
+.excel-grid td input{min-width:100px;width:140px;padding:7px 8px;background:#fff;border:1px solid #d6e0e8;border-radius:5px;font-size:12px;color:#182b3c}
+.excel-grid td input.name-col{min-width:190px;width:210px}
+.excel-grid td input.dirty{border-color:#c68120;background:#fff7e6}
+.excel-grid td input:focus{outline:2px solid #2679b3;outline-offset:0}
+.excel-grid tr:hover td{background:#f6faff}
+.excel-grid td input[disabled]{background:#f5f6f8;color:#788794;cursor:not-allowed}
+.excel-grid .source-status{font-size:12px}
+
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
 .kpi{background:white;border:1px solid var(--line);border-radius:12px;padding:14px}
 .kpi strong{display:block;font-size:27px;font-weight:780;letter-spacing:-.8px}
@@ -119,30 +130,39 @@ body.print-all .letter-page{display:block}
 </header>
 <main>
 <section class="panel no-print">
-<h2>1. Import monthly register</h2>
+<h2>1. Open Excel register</h2>
 <div class="control-grid">
-<div><label for="excel">Monthly quarters Excel (.xlsx)</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="note">Upload once to save as your browser-local Quarters Master Register.</div></div>
-<div><label for="sheet">Worksheet</label><select id="sheet" disabled><option>Upload Excel first</option></select></div>
-<div><label for="month">Report month</label><input type="month" id="month" value="2026-11"></div>
-<div><label for="ps">Police station</label><input id="ps" value="G3 Kilpauk"></div>
+ <div><label for="excel">Quarters Excel (.xlsx / .xls)</label><input id="excel" type="file" accept=".xlsx,.xls"></div>
+ <div><label for="sheet">Worksheet</label><select id="sheet" disabled><option>Upload Excel first</option></select></div>
+ <div><label for="month">Report month</label><input type="month" id="month" value="2026-11"></div>
+ <div><label for="ps">Police station</label><input id="ps" value="G3 Kilpauk"></div>
 </div>
-<div class="saved-register" aria-live="polite">
-  <div class="headrow"><div><strong>Saved Quarters Master Register</strong><div id="savedStatus" class="note">Checking saved register…</div></div>
-  <div class="toolbar">
-    <button id="savedOpen" type="button" class="secondary" disabled>Open saved register</button>
-    <button id="savedDownload" type="button" class="secondary" disabled>Download Excel backup</button>
-    <button id="savedDelete" type="button" class="ghost" disabled>Remove saved register</button>
-  </div></div>
+<div class="headrow" style="margin-top:14px">
+ <div><strong id="editingFile">No Excel file uploaded</strong><div id="changesCount" class="note">0 unsaved changes</div></div>
+ <div class="toolbar">
+ <button id="downloadEdited" disabled type="button">Export Edited Excel (.xlsx)</button>
+ <button id="undoExcel" disabled type="button" class="secondary">Discard all edits</button>
+ </div>
 </div>
-<div class="notice" style="margin-top:12px">All workbook parsing, row edits and report generation happen in this browser. The source Excel is retained in IndexedDB on this browser only, not uploaded to a website server or public GitHub. Browser-site-data clearing removes it; download a backup for safekeeping. No employee names, phone numbers or dates of birth are copied into the vacancy report.</div>
+<div class="notice" style="margin-top:12px">Private session only: the uploaded workbook is processed in your browser, not saved in browser storage or on a server. The original file stays unchanged. Download the edited Excel before closing or reloading this page. The generated Excel may not retain advanced workbook features such as embedded graphics or macros.</div>
 <p id="error" role="alert" hidden></p>
-<div id="info" class="note" style="margin-top:10px">Uses the November 2026 Excel arrangement; select the up-to-date worksheet when your register contains a historical sheet.</div>
+<div id="info" class="note" style="margin-top:10px">Select an Excel file to display the full interactive quarters register.</div>
 </section>
 <section class="panel no-print">
- <div class="headrow"><div><h2>Saved register — full quarters roll</h2><div class="sub">View all quarters, including occupied units. This view uses the original Excel worksheet. The full register is available only in this browser.</div></div><span id="allCount" class="state">Upload Excel to view</span></div>
- <div class="filters" style="grid-template-columns:1.5fr 1fr"><div><label for="allSearch">Find block, door, occupant or quarter type</label><input id="allSearch" placeholder="Search full quarters register"></div><div><label for="allStatus">Occupancy</label><select id="allStatus"><option value="">All records</option><option>Occupied</option><option>Vacant</option><option>Allotted not occupied</option><option>Damaged</option><option>Reserved / other</option><option>Unconfirmed</option></select></div></div>
- <div class="scroller"><table class="worktable"><thead><tr><th>Excel row</th><th>Category</th><th>Block</th><th>Floor</th><th>Door No.</th><th>Occupant</th><th>Rank</th><th>Occupancy</th><th>Remarks</th></tr></thead><tbody id="allRecords"></tbody></table></div>
- <p id="allHint" class="note">The first 200 matching quarters appear here; narrow the search to find other records.</p>
+ <div class="headrow">
+  <div><h2>Interactive quarters register</h2><div class="sub">Edit cells directly, including occupied quarters. Every edited cell will be included in the downloaded Excel; changes do not overwrite the original.</div></div>
+  <span id="allCount" class="state">Upload Excel to view</span>
+ </div>
+ <div class="filters" style="grid-template-columns:1.6fr 1fr .7fr">
+  <div><label for="allSearch">Search any cell</label><input id="allSearch" placeholder="Name, block, rank, mobile number, door, remarks…"></div>
+  <div><label for="allStatus">Occupancy</label><select id="allStatus"><option value="">All records</option><option>Occupied</option><option>Vacant</option><option>Allotted not occupied</option><option>Damaged</option><option>Reserved / other</option><option>Unconfirmed</option></select></div>
+  <div><label for="allPageSize">Rows per page</label><select id="allPageSize"><option>20</option><option selected>50</option><option>100</option></select></div>
+ </div>
+ <div class="scroller" style="max-height:66vh"><table class="worktable excel-grid"><thead id="allHead"></thead><tbody id="allRecords"></tbody></table></div>
+ <div class="headrow" style="margin-top:12px">
+  <p id="allHint" class="note" style="margin:0">Upload Excel to begin editing.</p>
+  <div class="toolbar"><button id="allPrev" type="button" class="secondary" disabled>Previous</button><span id="allPageLabel" class="note">Page 0</span><button id="allNext" type="button" class="secondary" disabled>Next</button></div>
+ </div>
 </section>
 <div class="kpis no-print" id="stats">
 <div class="kpi"><strong id="statCount">—</strong><span>Report entries</span></div>
@@ -203,59 +223,56 @@ const $=id=>document.getElementById(id), GROUPS=[
 {id:"pu",label:"Pullapuram police quarters",reference:2,title:"G3 PS KILPAUK PULLAPURAM POLICE QUARTERS"}
 ], STATUS=["Vacant","Allotted not occupied","Damaged","Reserved / other"];
 let workbook=null, data=[], originals=[], activeSheet="", renderReady=false;
-let master=null,allMasterRows=[];
-const QUARTERS_DB="clearexams-quarters-master-v1", MASTER_KEY="g3-quarters-master";
-function openMasterDB(){
- return new Promise((resolve,reject)=>{
-  if(!window.indexedDB){reject(new Error("Browser storage is not supported"));return}
-  const req=indexedDB.open(QUARTERS_DB,1);
-  req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains("files"))req.result.createObjectStore("files",{keyPath:"key"})};
-  req.onsuccess=()=>resolve(req.result);
-  req.onerror=()=>reject(req.error||Error("Unable to open browser storage"));
-  req.onblocked=()=>reject(Error("Close other tabs of this site before retrying"));
- });
+let originalBytes=null,originalName="",allMasterRows=[],allHeaders=[],allColCount=0,allPage=0,allHeaderIndex=-1;
+const changedCells=new Map();
+function renderEditStatus(){
+ $("editingFile").textContent=originalName||"No Excel file uploaded";
+ $("changesCount").textContent=changedCells.size+" modified cell"+(changedCells.size===1?"":"s")+" · "+
+ (originalName?"download to keep changes":"upload Excel to begin");
+ $("downloadEdited").disabled=!workbook;
+ $("undoExcel").disabled=!workbook||changedCells.size===0;
 }
-async function masterOp(mode,action){
- const db=await openMasterDB();
- try{
-  return await new Promise((resolve,reject)=>{
-   const tx=db.transaction("files",mode);
-   const req=action(tx.objectStore("files"));
-   let result;
-   if(req)req.onsuccess=()=>result=req.result;
-   tx.oncomplete=()=>resolve(result);
-   tx.onerror=()=>reject(tx.error||Error("Storage transaction failed"));
-   tx.onabort=()=>reject(tx.error||Error("Storage transaction cancelled"));
-  });
- }finally{db.close()}
+function updateWorkbookCell(sheetName,rowNumber,colNumber,value){
+ const ws=workbook.Sheets[sheetName],addr=XLSX.utils.encode_cell({r:rowNumber-1,c:colNumber});
+ const next=String(value??"");
+ const existing=ws[addr]||{};
+ if(!next){
+  // Keep the existing style record when present, but remove any old value or formula.
+  if(ws[addr]){delete existing.v;delete existing.w;delete existing.f;existing.t="z"}
+ }else{
+  existing.t="s";existing.v=next;
+  delete existing.w;delete existing.f;
+  ws[addr]=existing;
+ }
+ const key=sheetName+"!"+addr;
+ let baseline="";
+ if(originalBytes){
+  // Original cell display values were captured while loading each worksheet.
+  baseline=originalCellText(sheetName,rowNumber,colNumber);
+ }
+ if(next===baseline)changedCells.delete(key);else changedCells.set(key,{rowNumber,colNumber,sheetName,value:next});
+ renderEditStatus();
 }
-function readMaster(){return masterOp("readonly",s=>s.get(MASTER_KEY))}
-function writeMaster(obj){return masterOp("readwrite",s=>s.put({key:MASTER_KEY,...obj}))}
-function removeMaster(){return masterOp("readwrite",s=>s.delete(MASTER_KEY))}
-function showMaster(){
- const yes=!!master;
- ["savedOpen","savedDownload","savedDelete"].forEach(id=>$(id).disabled=!yes);
- $("savedStatus").textContent=yes
-  ?master.name+" · "+(master.bytes.byteLength/1024).toFixed(0)+" KB · saved "+
-   new Date(master.savedAt).toLocaleString("en-IN")+" · this browser only"
-  :"Nothing saved on this browser yet. Upload Excel once; next time it will open automatically.";
+const originalCellCache=new Map();
+function originalCellText(sheetName,rowNumber,colNumber){
+ const key=sheetName+"!"+XLSX.utils.encode_cell({r:rowNumber-1,c:colNumber});
+ return originalCellCache.has(key)?originalCellCache.get(key):"";
 }
-async function openSavedMaster(){
- const saved=await readMaster();
- if(!saved){master=null;showMaster();return false}
- if(typeof XLSX==="undefined")throw Error("Excel reader did not load");
- const candidate=XLSX.read(new Uint8Array(saved.bytes),{type:"array",cellDates:false});
- workbook=candidate;
- if(!prepareSheets(saved.sheet))throw Error("Saved workbook no longer matches report format");
- master=saved;showMaster();
- showInfo("Opened saved master register: "+saved.name+"; worksheet: "+activeSheet);
- return true;
+function captureOriginalValues(){
+ originalCellCache.clear();
+ if(!workbook)return;
+ for(const name of workbook.SheetNames){
+  const ws=workbook.Sheets[name];const ref=ws["!ref"];if(!ref)continue;
+  const bounds=XLSX.utils.decode_range(ref);
+  for(let r=bounds.s.r;r<=bounds.e.r;r++){
+   for(let col=bounds.s.c;col<=Math.min(bounds.e.c,50);col++){
+    const cell=ws[XLSX.utils.encode_cell({r,c:col})];if(!cell)continue;
+    const display=cell.w!==undefined?String(cell.w):cell.v!==undefined?String(cell.v):"";
+    originalCellCache.set(name+"!"+XLSX.utils.encode_cell({r,c:col}),display);
+   }
+  }
+ }
 }
-async function storeUploadedMaster(bytes,name){
- const saved={name,bytes,savedAt:new Date().toISOString(),sheet:activeSheet};
- await writeMaster(saved);master=saved;showMaster();
-}
-
 const clean=x=>String(x===null||x===undefined?"":x).replace(/\s+/g," ").trim();
 const norm=x=>clean(x).toLowerCase().replace(/[\s._-]+/g," ");
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -298,41 +315,100 @@ function classify(raw){
  if(/ccb|boys club|police station/.test(lo))return "Reserved / other";
  return "";
 }
+function columnCountAndHeader(rows){
+ const idx=rows.findIndex(r=>r.some(x=>/GPF\s*\/?\s*CPS/i.test(String(x)))&&r.some(x=>/Block/i.test(String(x))));
+ const headerIndex=idx>=0?idx:Math.min(1,rows.length-1);
+ const h=rows[headerIndex]||[];
+ let maxLength=h.length;
+ for(const row of rows.slice(0,15))maxLength=Math.max(maxLength,row.length);
+ const count=Math.min(40,Math.max(1,maxLength));
+ return {headerIndex,headers:Array.from({length:count},(_,i)=>clean(h[i])||"Column "+XLSX.utils.encode_col(i)),count};
+}
+function rowOccupancy(vals,headers){
+ const first=clean(vals[0]),nameIndex=colIndex(headers,["EMPLOYEE NAME"],1);
+ const occupyIndex=colIndex(headers,["Date of Occupy"],15);
+ const allottedIndex=colIndex(headers,["Date of Allotment"],14);
+ const status=classify(first)||classify([vals[occupyIndex],vals[allottedIndex]].join(" "));
+ if(status)return status;
+ if(/\b(ccb|boys club|old police station|library|shop)\b/i.test(first))return "Reserved / other";
+ const person=clean(vals[nameIndex]);
+ return person&&!/^(nil|vacant|not occupied|damage)$/i.test(person)?"Occupied":"Unconfirmed";
+}
 function buildFullRegister(){
- allMasterRows=[];
- if(!workbook||!activeSheet)return;
+ allMasterRows=[];allHeaders=[];allColCount=0;allPage=0;
+ if(!workbook||!activeSheet){$("allHead").innerHTML="";renderFullRegister();return}
  const ws=workbook.Sheets[activeSheet];
  const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:"",blankrows:true});
- const headers=rows.find(r=>r.some(x=>/GPF\s*\/?\s*CPS/i.test(String(x)))&&r.some(x=>/Block/i.test(String(x))))||rows[1]||[];
- const blockIdx=colIndex(headers,["Block"],11),floorIdx=colIndex(headers,["Floor"],12);
- const doorIdx=colIndex(headers,["Quarters No","Door No"],13);
- const nameIdx=colIndex(headers,["EMPLOYEE NAME"],1),rankIdx=colIndex(headers,["Rank No","Rank"],2);
- const damageIdx=colIndex(headers,["damge","damage"],16);
+ const layout=columnCountAndHeader(rows);
+ allHeaders=layout.headers;allColCount=layout.count;allHeaderIndex=layout.headerIndex;
  let section="io";
  rows.forEach((r,i)=>{
-  const next=detectSection(r,section);if(next!==section){section=next;return}
-  const type=desc(section);if(!type)return;
-  const block=clean(r[blockIdx]),floor=clean(r[floorIdx]),door=clean(r[doorIdx]);
-  if(!block||!floor||!door||/^(block|floor|quarters)/i.test(block+" "+floor+" "+door))return;
-  const first=clean(r[0]),rawName=clean(r[nameIdx]),rawRank=clean(r[rankIdx]);
-  const status=classify(first)||
-    (/(?:ccb|boys club|old police station|library|shop)/i.test(first)?"Reserved / other":
-      rawName&&rawName!=="NIL"&&!/^(vacant|nil|not occupied)$/i.test(rawName)?"Occupied":"Unconfirmed");
-  const occupant=status==="Occupied"?rawName:"";
-  allMasterRows.push({row:i+1,category:type[1],block,floor,door,occupant,rank:status==="Occupied"?rawRank:"",status,damage:clean(r[damageIdx])||"NIL"});
+  section=detectSection(r,section);
+  if(i<=allHeaderIndex)return;
+  const values=Array.from({length:allColCount},(_,j)=>String(r[j]??""));
+  // Retain every non-empty row with at least one data value outside column A.
+  if(!values.slice(1).some(x=>x.trim()))return;
+  const d=desc(section),group=d?d[1]:"Other";
+  allMasterRows.push({row:i+1,values,group,status:rowOccupancy(values,allHeaders)});
  });
+ $("allHead").innerHTML="<tr><th>Excel row</th><th>Group</th><th>Occupancy</th>"+
+ allHeaders.map((h,i)=>"<th title='"+esc("Excel column "+XLSX.utils.encode_col(i))+"'>"+
+ esc(XLSX.utils.encode_col(i)+" · "+h)+"</th>").join("")+"</tr>";
  renderFullRegister();
 }
-function renderFullRegister(){
+function matchingFullRows(){
  const q=norm($("allSearch").value),s=$("allStatus").value;
- const found=allMasterRows.filter(r=>(!s||r.status===s)&&(!q||norm([r.category,r.block,r.floor,r.door,r.occupant,r.rank,r.status,r.damage].join(" ")).includes(q)));
- $("allCount").textContent=found.length+" / "+allMasterRows.length+" quarters";
- $("allRecords").innerHTML=found.slice(0,200).map(r=>
- "<tr><td>"+r.row+"</td><td>"+esc(r.category)+"</td><td>"+esc(r.block)+"</td><td>"+esc(r.floor)+"</td><td>"+esc(r.door)+"</td><td>"+esc(r.occupant||"—")+"</td><td>"+esc(r.rank||"—")+"</td><td>"+esc(r.status)+"</td><td>"+esc(r.damage)+"</td></tr>").join("");
- $("allHint").textContent=found.length>200?"Showing first 200 of "+found.length+" matching quarters. Search for a specific block or door.":found.length+" matching quarters shown.";
+ return allMasterRows.filter(r=>(!s||r.status===s)&&(!q||norm([r.row,r.group,r.status,...r.values].join(" ")).includes(q)));
 }
-$("allSearch").addEventListener("input",renderFullRegister);
-$("allStatus").addEventListener("change",renderFullRegister);
+function renderFullRegister(){
+ const found=matchingFullRows(),pageSize=Number($("allPageSize").value)||50;
+ const pages=Math.max(1,Math.ceil(found.length/pageSize));
+ allPage=Math.max(0,Math.min(allPage,pages-1));
+ const page=found.slice(allPage*pageSize,(allPage+1)*pageSize);
+ $("allCount").textContent=found.length+" / "+allMasterRows.length+" records";
+ $("allRecords").innerHTML=page.map(r=>{
+  return "<tr data-row='"+r.row+"'><td>"+r.row+"</td><td>"+esc(r.group)+"</td><td class='source-status'>"+esc(r.status)+"</td>"+
+  r.values.map((v,j)=>{
+   const key=activeSheet+"!"+XLSX.utils.encode_cell({r:r.row-1,c:j});
+   const dirty=changedCells.has(key);
+   const h=norm(allHeaders[j]||"");
+   const cls=/employee name|occupant|remarks|address/.test(h)?" name-col":"";
+   const inputClass=(dirty?"dirty":"")+cls;
+   return "<td><input type='text' class='"+inputClass.trim()+"' data-col='"+j+"' aria-label='"+esc(allHeaders[j]||"Column")+" Excel row "+r.row+"' value='"+esc(v)+"'></td>";
+  }).join("")+"</tr>";
+ }).join("");
+ $("allPrev").disabled=allPage===0||!found.length;
+ $("allNext").disabled=allPage>=pages-1||!found.length;
+ $("allPageLabel").textContent=found.length?"Page "+(allPage+1)+" of "+pages:"Page 0";
+ $("allHint").textContent=found.length?
+  "Showing records "+(allPage*pageSize+1)+"–"+Math.min((allPage+1)*pageSize,found.length)+
+  " of "+found.length+". Edit a cell, then use Export Edited Excel.":
+  "No matching records. Try a different search or occupancy filter.";
+}
+function onFullEdit(e){
+ const input=e.target;if(!(input instanceof HTMLInputElement)||!input.hasAttribute("data-col"))return;
+ const tr=input.closest("tr[data-row]");if(!tr)return;
+ const rowNumber=Number(tr.dataset.row),col=Number(input.dataset.col);
+ const item=allMasterRows.find(x=>x.row===rowNumber);if(!item)return;
+ const old=item.values[col],value=input.value;
+ if(old===value)return;
+ updateWorkbookCell(activeSheet,rowNumber,col,value);
+ item.values[col]=value;
+ item.status=rowOccupancy(item.values,allHeaders);
+ try{
+  const oldFlags=new Map(data.map(x=>[x.id,x.include]));
+  data=parse(activeSheet).map(x=>({...x,include:oldFlags.has(x.id)?oldFlags.get(x.id):x.include}));
+  originals=data.map(x=>({...x}));
+  refresh();makePreview();
+ }catch(err){$("exportError").textContent="Monthly report needs review: "+err.message}
+ renderFullRegister();
+}
+$("allRecords").addEventListener("change",onFullEdit);
+$("allSearch").addEventListener("input",()=>{allPage=0;renderFullRegister()});
+$("allStatus").addEventListener("change",()=>{allPage=0;renderFullRegister()});
+$("allPageSize").addEventListener("change",()=>{allPage=0;renderFullRegister()});
+$("allPrev").onclick=()=>{allPage--;renderFullRegister()};
+$("allNext").onclick=()=>{allPage++;renderFullRegister()};
 function parse(sheetName){
  const ws=workbook.Sheets[sheetName]; if(!ws)throw Error("Worksheet not found");
  const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:"",blankrows:true});
@@ -416,58 +492,58 @@ function prepareSheets(preferredSheet){
  $("sheet").innerHTML=list.map(s=>"<option>"+esc(s)+"</option>").join("");
  $("sheet").disabled=false;
  const preferred=(preferredSheet&&list.includes(preferredSheet)?preferredSheet:null)||list.find(s=>/pommi/i.test(s))||list[0];
- $("sheet").value=preferred;return loadSheet(preferred);
+ $("sheet").value=preferred;
+ loadSheet(preferred);
 }
 function loadSheet(name){
+ error("");activeSheet=name;
+ const title=clean((workbook.Sheets[name]&&workbook.Sheets[name].A1&&workbook.Sheets[name].A1.v)||"");
+ const sourceDate=title.match(/(\d{2})[.\/-](\d{2})[.\/-](\d{4})/);
+ if(sourceDate)$("month").value=sourceDate[3]+"-"+sourceDate[2];
+ buildFullRegister();
  try{
-  error("");const title=clean((workbook.Sheets[name]&&workbook.Sheets[name].A1&&workbook.Sheets[name].A1.v)||"");
-  const sourceDate=title.match(/(\d{2})[.\/-](\d{2})[.\/-](\d{4})/);
-  if(sourceDate)$("month").value=sourceDate[3]+"-"+sourceDate[2];
-  data=parse(name);originals=data.map(x=>({...x}));activeSheet=name;
+  data=parse(name);originals=data.map(x=>({...x}));
   $("fgroup").innerHTML='<option value="">All groups</option>'+GROUPS.map(g=>'<option value="'+g.id+'">'+esc(g.label)+'</option>').join("");
   $("fgroup").value="";$("fstatus").value="";$("search").value="";
-  setEnabled(true);refresh();buildFullRegister();makePreview();
-  showInfo("Loaded "+name+" — "+data.length+" reportable row(s) detected. Rows needing correction are excluded until completed.");
-  return true;
- }catch(e){setEnabled(false);error("Unable to read this sheet: "+e.message);return false}
+  setEnabled(true);refresh();makePreview();
+  showInfo("Loaded "+name+" — "+allMasterRows.length+" editable records; "+data.length+" reportable vacancy rows.");
+ }catch(e){
+  data=[];originals=[];setEnabled(false);refresh();
+  $("report").innerHTML="<p>Editing is available for this worksheet. Monthly report layout is not available: "+esc(e.message)+"</p>";
+  showInfo("Loaded "+name+" — "+allMasterRows.length+" editable records. The monthly report template does not match this sheet.");
+ }
+ renderEditStatus();
 }
 $("excel").addEventListener("change",async e=>{
- const f=e.target.files&&e.target.files[0]; if(!f)return;
+ const f=e.target.files&&e.target.files[0];if(!f)return;
  try{
-  if(typeof XLSX==="undefined")throw Error("Excel reader did not load. Check your internet connection and reload the page.");
+  if(typeof XLSX==="undefined")throw Error("Excel reader could not be loaded. Check internet access.");
   if(f.size>25*1024*1024)throw Error("File exceeds the 25 MB limit.");
-  error("");const bytes=await f.arrayBuffer();
-  workbook=XLSX.read(new Uint8Array(bytes),{type:"array",cellDates:false});
-  if(!prepareSheets())throw Error("Import failed; the saved register has not been replaced.");
-  try{
-   await storeUploadedMaster(bytes,f.name);
-   showInfo("Saved original Excel as Quarters Master Register: "+f.name+". Future visits on this browser open it automatically.");
-  }catch(e){$("savedStatus").textContent="Loaded Excel but unable to save: "+e.message}
- }catch(err){error(err.message);setEnabled(false)}
+  const bytes=new Uint8Array(await f.arrayBuffer());
+  const parsed=XLSX.read(bytes,{type:"array",cellDates:false,cellStyles:true});
+  workbook=parsed;originalBytes=bytes;originalName=f.name;
+  changedCells.clear();captureOriginalValues();prepareSheets();
+  renderEditStatus();
+ }catch(e){error("Excel import failed: "+e.message);workbook=null;originalBytes=null;renderEditStatus()}
 });
-$("sheet").addEventListener("change",async()=>{
- if(!loadSheet($("sheet").value))return;
- if(master){master.sheet=activeSheet;try{await writeMaster(master)}catch(e){$("savedStatus").textContent="Worksheet choice not saved: "+e.message}}
-});
-$("savedOpen").onclick=async()=>{try{error("");await openSavedMaster()}catch(e){error("Cannot open saved register: "+e.message)}};
-$("savedDownload").onclick=()=>{
- if(!master)return;
- download(master.name,new Blob([master.bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
-};
-$("savedDelete").onclick=async()=>{
- if(!master||!confirm("Remove saved quarters register from this browser? Download a backup first if needed."))return;
+$("sheet").addEventListener("change",()=>loadSheet($("sheet").value));
+$("downloadEdited").onclick=()=>{
+ if(!workbook)return;
  try{
-  await removeMaster();master=null;workbook=null;data=[];originals=[];activeSheet="";
-  $("excel").value="";$("sheet").disabled=true;$("sheet").innerHTML="<option>Upload Excel first</option>";
-  setEnabled(false);allMasterRows=[];renderFullRegister();refresh();$("report").innerHTML='<p class="note no-print">Upload the register to start.</p>';
-  showMaster();showInfo("Saved master register removed from this browser.");
- }catch(e){error("Cannot remove saved register: "+e.message)}
+  // Updates are applied in memory to original worksheet cells and all worksheets are retained.
+  const arr=XLSX.write(workbook,{bookType:"xlsx",type:"array",compression:true});
+  const base=originalName.replace(/\.(xlsx|xls)$/i,"").replace(/[^a-z0-9 _.-]/gi,"_")||"Quarters_Register";
+  download(base+"_edited.xlsx",new Blob([arr],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+  showInfo("Edited Excel downloaded: "+base+"_edited.xlsx ("+changedCells.size+" modified cells). The original is unchanged.");
+ }catch(e){error("Excel export failed: "+e.message)}
 };
-document.addEventListener("DOMContentLoaded",async()=>{
- try{await openSavedMaster()}
- catch(e){master=null;showMaster();$("savedStatus").textContent="Unable to restore saved register: "+e.message+". Re-upload Excel to replace it."}
-});
-
+$("undoExcel").onclick=()=>{
+ if(!originalBytes||!confirm("Discard all edits made in the uploaded workbook?"))return;
+ const current=activeSheet;
+ workbook=XLSX.read(originalBytes,{type:"array",cellDates:false,cellStyles:true});
+ changedCells.clear();prepareSheets(current);renderEditStatus();
+ showInfo("All edits discarded. The original uploaded workbook has been restored in this session.");
+};
 ["fgroup","fstatus"].forEach(id=>$(id).addEventListener("change",refreshRows));
 $("search").addEventListener("input",refreshRows);
 $("records").addEventListener("change",e=>{
