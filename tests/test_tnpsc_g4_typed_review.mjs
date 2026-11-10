@@ -26,7 +26,7 @@ const ids=[...html.matchAll(/id="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(ids.length,new Set(ids).size,'Duplicate DOM ids');
 for(const r of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(r[1]),'Referenced id '+r[1]+' exists');
 for(const [year,expectedTyped,expectedNumbers] of [
-[2024,114,Array.from({length:114},(_,i)=>i+1)],
+[2024,144,Array.from({length:144},(_,i)=>i+1)],
 [2025,200,Array.from({length:200},(_,i)=>i+1)]
 ]){
 const d=JSON.parse(read('data/quizzes/tnpsc-g4-'+year+'-typed-review.json'));
@@ -62,6 +62,28 @@ if(year===2024){
  assert.deepEqual(d.questions[87].accepted,['B','C'],'Q88 accepts both B and C');
  assert.equal(d.questions[84].options.C,'கவி காளமேகம்','Preserve cited option letter at Q85');
  assert.equal(d.questions[112].options.C,'Punjab and Haryana','Q113 keeps the original option position');
+for(let n=115;n<=144;n++){
+ const q=d.questions[n-1];
+ assert.equal(q.number,n);
+ assert.equal(q.language,'en');
+ assert.equal(q.sourceReviewStatus,'source-pdf-visual-proof-pending');
+ assert.equal(q.ocrCorroboratedWithIndexedSource,true);
+ assert.equal(q.translationStatus,'editorial-translation-not-verified-against-official-Tamil');
+ assert.ok(q.text?.trim()&&q.textTamil?.trim(),'Both language stems exist for Q'+n);
+ assert.ok(['A','B','C','D','E'].every(l=>q.options?.[l]?.trim()&&q.optionsTamil?.[l]?.trim()),'Bilingual five-option quiz position '+n);
+ assert.match(q.transcriptionEvidence,/NOT certified verbatim/,'Do not claim source visual proof for Q'+n);
+ const readerPage=n===115?13:n<=122?14:n<=131?15:n<=141?16:17;
+ assert.equal(q.referenceReadingURL,'https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/'+readerPage,'Numbered source link for Q'+n);
+ assert.deepEqual(q.accepted,[q.keyToken],'2024 Q115–144 key positions are single letter');
+}
+assert.deepEqual(d.questions.slice(114,144).map(q=>q.number),Array.from({length:30},(_,i)=>i+115));
+assert.match(d.questions[117].editorialCaveat,/Competition Act, 2002/,'Q118 historical MRTP nuance disclosed');
+assert.equal(d.questions[125].options.C,'₹13,230','Q126 compound interest verified with key C');
+assert.equal(d.questions[137].options.D,'3 : 5','Q138 ratio matches key D');
+assert.equal(d.questions[142].options.A,'2000 m³','Q143 cylinder matches key A');
+assert.equal(d.questions[143].options.A,'1 : 2','Q144 x:y matches key A');
+assert.equal(d.questions[135].options.A,'137.5 m','Q136 canvas length');
+assert.equal(d.verifiedQuestionCount,0,'Editorially adapted does not imply verbatim source review');
 for(let n=55;n<=84;n++){
   const q=d.questions[n-1];
   assert.equal(q.primaryScanViewed,true,'Source PDF page was inspected for Q'+n);
@@ -226,4 +248,4 @@ assert.equal(q.sourceStatus,'source-pdf-required');
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2024/);
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2025/);
 assert.match(read('sitemap.xml'),/tnpsc-g4-typed-review\.html/);
-console.log('PASS Group IV 2024/2025 source-linked typed reviews: 114 and 200 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
+console.log('PASS Group IV 2024/2025 source-linked typed reviews: 144 and 200 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
