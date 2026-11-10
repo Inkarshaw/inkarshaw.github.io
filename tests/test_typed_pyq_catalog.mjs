@@ -39,4 +39,14 @@ assert.ok(!js.includes('innerHTML'),'No untrusted source text injection');
 new vm.Script(js,{filename:'assets/js/typed-pyq-catalog.js'});
 assert.match(read('pyq-hub.html'),/href="pyq-typed-library\.html"/);
 assert.match(read('sitemap.xml'),/pyq-typed-library\.html/);
-console.log('PASS eight TNPSC/TNUSRB PYQ typed quiz coverage records; 1010 readable practice positions, three full-numbered drafts; missing text explicitly labelled.');
+assert.match(js,/verified-pyqs\.json/);
+assert.match(js,/collectAdapted/);
+assert.match(js,/URLSearchParams/);
+assert.match(html,/<option value="UPSC">UPSC<\/option>/);
+assert.match(html,/<option value="adapted">/);
+const adaptedRows=json('data/quizzes/verified-pyqs.json');
+const adaptedCounts=new Map();
+for(const q of adaptedRows){if(q.SourceType==='Adapted PYQ'&&q.Active!=='FALSE'){const key=q.SourceExam+'|'+q.SourceYear;adaptedCounts.set(key,(adaptedCounts.get(key)||0)+1)}}
+assert.equal(adaptedCounts.size,8);
+assert.equal([...adaptedCounts.values()].reduce((n,x)=>n+x,0),160);
+console.log('PASS 8 original-number PYQ draft sets (1049 text positions), 8 adapted exam-year sets (160 questions); all original text gaps remain flagged.');
