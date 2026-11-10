@@ -510,6 +510,10 @@ function onFullEdit(e){
  const old=item.values[col],value=input.value;
  if(old===value)return;
  updateWorkbookCell(activeSheet,rowNumber,col,value);
+ if(window.QuartersManager)window.QuartersManager.recordSourceEdit({
+  sheet:activeSheet,row:rowNumber,column:XLSX.utils.encode_col(col),header:allHeaders[col]||"Column",
+  oldValue:old,value:value
+ });
  item.values[col]=value;
  item.status=rowOccupancy(item.values,allHeaders);
  try{
@@ -653,8 +657,8 @@ $("downloadEdited").onclick=()=>{
   window.dispatchEvent(new CustomEvent("quarters:before-export"));
   const arr=XLSX.write(workbook,{bookType:"xlsx",type:"array",compression:true});
   const base=originalName.replace(/\.(xlsx|xls)$/i,"").replace(/[^a-z0-9 _.-]/gi,"_")||"Quarters_Register";
-  download(base+"_edited.xlsx",new Blob([arr],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
-  showInfo("Edited Excel downloaded: "+base+"_edited.xlsx ("+changedCells.size+" modified cells). The original is unchanged.");
+  download(base+"_managed.xlsx",new Blob([arr],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+  showInfo("Managed workbook downloaded: "+base+"_managed.xlsx. It contains the original worksheets plus the quarters management sheets, when applicable.");
  }catch(e){error("Excel export failed: "+e.message)}
 };
 $("undoExcel").onclick=()=>{
