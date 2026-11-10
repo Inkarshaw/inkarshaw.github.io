@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** â€
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,049 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,107 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -19,6 +19,10 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** â€
 4. Reconcile each question number against its matching official final key, handling ALL/multiple/withdrawn answers; do not infer answer positions.
 5. Have a human reviewer compare every question/options with the primary paper; label drafts and omissions honestly.
 6. Run tests and browser smoke checks before merging. Update the matching typed catalogue only after playable text is actually present.
+
+### Latest original-numbered TNPSC Group IV 2025 batch
+
+As of 10 November 2026, the source-numbered Tamil/English draft set covers **110/200** positions (**106** provisionally gradable; original text verification count **0**). Q76â€“100 is a new set of **25 adapted Tamil practice drafts**; Q77 and Q78 each accept C and D per the mapped official final key. **90** positions remain without local text. No draft should be described as an officially verified verbatim question paper.
 
 ## Source-indexed years still requiring question text
 
