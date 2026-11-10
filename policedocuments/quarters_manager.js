@@ -113,8 +113,16 @@ function showTab(tab){
  document.querySelectorAll("[data-qm-pane]").forEach(p=>p.hidden=p.dataset.qmPane!==tab);
 }
 function count(type){return unitEntries.filter(u=>effective(u)===type).length}
+function incompleteReportRows(){
+ const cc=core();if(!cc||!cc.getWorkbook())return [];
+ const mapped=new Set(unitEntries.map(u=>u.rowNumber));
+ return cc.getRows().filter(r=>!mapped.has(r.row)&&
+  ["Vacant","Allotted not occupied","Damaged","Reserved / other"].includes(r.status));
+}
 function currentAlerts(){
  const alerts=[],today=localDay();
+ for(const r of incompleteReportRows())alerts.push({unitId:"",excelRow:r.row,
+  reason:"Verify block / floor / door in Excel source row "+r.row,due:"",level:"Incomplete"});
  for(const u of unitEntries){
   const st=effective(u);
   if(st==="Allotted not occupied")alerts.push({unitId:u.id,reason:"Allotted but not occupied",due:"",level:"Review"});
@@ -141,12 +149,15 @@ function renderDashboard(){
   metric("Vacant",counts[1],"positive")+metric("Allotted / unused",counts[2],"attention")+
   metric("Repair / damage",counts[3]+counts[4]+counts[5],"attention")+
   metric("Open follow-ups",events.filter(e=>!["Closed","Completed"].includes(e.progress)).length)+
-  metric("Action alerts",lastAlerts.length,"attention");
+  metric("Action alerts",lastAlerts.length,"attention")+
+  metric("Incomplete vacancy rows",incompleteReportRows().length,"attention");
  byId("qmSummaryText").textContent=!managedFile?"Upload Excel to start the Quarters In-Charge dashboard.":
   unitEntries.length+" physical units mapped from "+str(core().getSheet())+". Manual status overrides and actions remain in memory until you export the edited Excel.";
  byId("qmAttentionBody").innerHTML=lastAlerts.slice(0,12).map(a=>{
   const u=unitEntries.find(x=>x.id===a.unitId);
-  return '<tr><td>'+esc(u?unitName(u):a.unitId)+'</td><td>'+esc(a.reason)+'</td><td>'+esc(a.due||"—")+'</td><td><button class="qm-link" data-qm-select="'+esc(a.unitId)+'">Open</button></td></tr>';
+  return '<tr><td>'+esc(u?unitName(u):a.excelRow?"Excel row "+a.excelRow:a.unitId)+'</td><td>'+esc(a.reason)+'</td><td>'+esc(a.due||"—")+'</td><td>'+
+  (a.unitId?'<button class="qm-link" data-qm-select="'+esc(a.unitId)+'">Open</button>':
+   '<a href="#excelRegister" class="qm-link">Review Excel</a>')+'</td></tr>';
  }).join("")||'<tr><td colspan="4">No alert records yet.</td></tr>';
  byId("qmAuditBody").innerHTML=audit.slice(-8).reverse().map(a=>
   '<tr><td>'+esc(a.at.slice(0,16).replace("T"," "))+'</td><td>'+esc(a.action)+'</td><td>'+esc(a.unitId)+'</td><td>'+esc(a.operator)+'</td></tr>').join("")||
@@ -203,6 +214,17 @@ function showUnit(id){
  selectedId=id;
  showTab("profile");renderProfile();
  byId("quarters-management").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function recordSourceEdit(change){
+ if(!managedFile)return;
+ const u=unitEntries.find(x=>x.rowNumber===change.row&&x.sourceSheet===change.sheet);
+ const id=u?u.id:change.sheet+"!"+change.row;
+ audit.push({at:now(),operator:actor()||"Operator not entered",unitId:id,
+  action:"Excel source "+change.header+" ("+change.column+")",
+  before:str(change.oldValue),after:str(change.value)});
+ edits++;
+ renderDashboard();
+ if(core())core().refreshEditStatus();
 }
 function addAudit(unitId,action,before,after){
  audit.push({at:now(),operator:actor(),unitId,action,before:str(before),after:str(after)});
@@ -290,7 +312,8 @@ function renderAlerts(){
  byId("qmAlertCount").textContent=lastAlerts.length+" alerts";
  byId("qmAlertRows").innerHTML=lastAlerts.slice(0,300).map(a=>{
   const u=unitEntries.find(x=>x.id===a.unitId);
-  return '<tr><td><button class="qm-link" data-qm-select="'+esc(a.unitId)+'">'+esc(u?unitName(u):a.unitId)+'</button></td>'+
+  return '<tr><td>'+(a.unitId?'<button class="qm-link" data-qm-select="'+esc(a.unitId)+'">'+esc(u?unitName(u):a.unitId)+'</button>':
+  '<a href="#excelRegister" class="qm-link">Excel row '+esc(a.excelRow)+'</a>')+'</td>'+
   '<td>'+esc(a.level)+'</td><td>'+esc(a.reason)+'</td><td>'+esc(a.due||"—")+'</td></tr>';
  }).join("")||'<tr><td colspan="4">No action alerts.</td></tr>';
 }
@@ -413,7 +436,7 @@ window.addEventListener("quarters:workbook-uploaded",()=>loadWorkbookRecords());
 window.addEventListener("quarters:change",()=>refreshFromCore());
 window.addEventListener("quarters:before-export",writeToExcel);
 window.addEventListener("quarters:reset",()=>{metadata.clear();events=[];audit=[];edits=0;selectedId="";managedFile=false});
-window.QuartersManager={changeCount:()=>edits,exportSheets:writeToExcel,refresh:refreshFromCore};
+window.QuartersManager={changeCount:()=>edits,exportSheets:writeToExcel,refresh:refreshFromCore,recordSourceEdit};
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
 else init();
 })();
