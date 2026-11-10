@@ -34,7 +34,7 @@ assert.equal(d.questions[13].scoringStatus,'ungraded_source_dispute','Q14 answer
 assert.deepEqual(d.questions[13].acceptedAnswers,[]);
 assert.equal(d.questions[13].answerKeyToken,'C','Keep secondary-source key token only as provenance');
 assert.match(d.questions[13].scoringReviewReason,/grammatically correct.*D/);
-assert.match(d.questions[13].sourceReviewEvidence,/marked answers must not override|secondary.*marks C/);
+assert.match(d.questions[13].sourceReviewEvidence,/reader marks C even though/,'Printed secondary key problem independently corroborated');
 assert.equal(d.questions[13].optionsTamil.D,'சாலை பழுது பார்க்கப்பட்டுக் கொண்டிருக்கிறது');
 
 assert.equal(d.blockedNumbers.length,22);
