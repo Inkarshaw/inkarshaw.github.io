@@ -83,6 +83,33 @@ try {
   assert.deepEqual(pageErrors, [], 'daily quiz: runtime errors');
   console.log('PASS daily quiz active question bank loaded');
 
+  // The universal typed library must distinguish playable questions from 58 source-only years.
+  pageErrors.length=0;
+  await page.goto(origin+'/pyq-typed-library.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#dataNotice')?.textContent.includes('loaded'),
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#stats').innerText(),/67 indexed exam-year sources/);
+  assert.match(await page.locator('#stats').innerText(),/160 questions/);
+  assert.equal(await page.locator('#showMore').isVisible(),true,'Missing-source cards are paginated');
+  await page.locator('#examFilter').selectOption('SSC');
+  assert.equal(await page.locator('#cards .card').count(),4,'All four SSC source-only years are discoverable');
+  assert.equal(await page.locator('#cards .card .archive-links').count(),4,'SSC archive-only records provide source access instead of invented MCQs');
+  await page.locator('#coverageFilter').selectOption('text');
+  assert.equal(await page.locator('#cards .card').count(),0,'No fake SSC text quizzes');
+  assert.equal(await page.locator('#empty').isVisible(),true,'Absent typed text is clearly identified');
+  await page.locator('#examFilter').selectOption('all');
+  await page.locator('#coverageFilter').selectOption('all');
+  await page.locator('#yearFilter').selectOption('2011');
+  assert.ok(await page.locator('#cards a[href="tnpsc-g1-2011-quiz.html"]').isVisible(),'Existing 2011 Group I typed quiz remains accessible');
+  await page.locator('#examFilter').selectOption('UPSC');
+  await page.locator('#yearFilter').selectOption('2023');
+  await page.locator('#coverageFilter').selectOption('adapted');
+  assert.equal(await page.locator('#cards a.play').count(),1,'UPSC CSE 2023 adapted text quiz is available');
+  const allYearsOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  assert.ok(allYearsOverflow<=3,'All-year PYQ mobile overflow '+allYearsOverflow+'px');
+  assert.deepEqual(pageErrors,[],'Universal PYQ text directory has no runtime JS errors');
+  console.log('PASS all-year PYQ mobile library: 67 source records, 160 adapted questions, SSC gaps, Group I 2011 and UPSC 2023 links');
+
   // PYQ streamlined journey: one-tap deep link, option selection, navigation and resume.
   pageErrors.length = 0;
   await page.goto(origin + '/pyq-hub.html', {waitUntil:'domcontentloaded'});
