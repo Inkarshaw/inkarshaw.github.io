@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,150 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,173 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -37,6 +37,16 @@ This batch adds **21** English-paraphrased and Tamil-translated study items (Q12
 Source booklet: https://tnpsc.gov.in/tentative/document/07_2025_GENEAL_TAMIL_GS.pdf
 
 Final key: https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/07_2025_CCSE_IV_FINAL_ANSWER_KEY.pdf
+
+### Group IV 2025 Q151–175 bilingual source-index batch
+
+As of 10 November 2026, **176/200** original-numbered source-linked study questions are locally playable (**168** provisionally scoreable), with **24** text/figure gaps and **zero** independently visually certified verbatim positions. This batch adds **23** newly adapted English stems with Tamil study translations for Q152–173 and Q175; Q174 was already playable in English and now has a Tamil study translation.
+
+**Q151 stays source-only.** It depends on four illustrated dice views; a secondary text description alone does not prove the original diagram geometry. Never score a fabricated or guessed dice illustration. The indexed question reference is https://www.tnpscguide.com/exams/group-4/papers/group-4-2025-question-paper/23 and the official scan page is 83.
+
+**Q161 and Q162** carry the official final key token **ALL**, which ClearExams excludes from the single-answer scored denominator. They remain readable as study questions but are not presented as having exactly one right option.
+
+Source citations: TNPSC final key, Subject Code 496, 17 November 2025 https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/07_2025_CCSE_IV_FINAL_ANSWER_KEY.pdf ; independent indexed study reference pages https://www.tnpscguide.com/exams/group-4/papers/group-4-2025-question-paper/23 through /28. All newly typed original-question prose is independently paraphrased and Tamil text translated; official-page visual comparison is pending.
 
 ## Source-indexed years still requiring question text
 
