@@ -339,11 +339,13 @@ try {
   await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/109 attemptable questions loaded/);
+  assert.match(await page.locator('#loadStatus').innerText(),/118 readable original-numbered practice questions loaded/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2015/);
-  assert.match(await page.locator('.note').first().innerText(),/provisional, non-officially verified answer table/);
+  assert.match(await page.locator('.note').first().innerText(),/non-officially verified secondary answer table/);
   await page.locator('details[aria-label="Withheld 2015 questions and reasons"] summary').click();
-  assert.equal(await page.locator('#sourceIssues li').count(),31,'Show every withheld source question and reason');
+  assert.equal(await page.locator('#sourceIssues li').count(),22,'Show every truly source-incomplete item');
+  await page.locator('details[aria-label="Ungraded 2015 review questions and reasons"] summary').click();
+  assert.equal(await page.locator('#ungradedIssues li').count(),9,'Disputed but readable questions need independent source-review disclosure');
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
   assert.match(await page.locator('#questionTitle').innerText(),/மணநூல்/);
@@ -354,17 +356,25 @@ try {
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true);
   await page.locator('#quiz .palette-details summary').click();
   const si2015Nums=await page.locator('#palette button').allTextContents();
-  assert.equal(si2015Nums.length,109,'Only 109 source-readable/key-consistent entries are playable');
-  for(const missing of [8,9,14,21,27,29,30,34,45,60,65,66,73,80,84,90,92,93,95,99,100,101,102,103,104,109,119,120,127,129]){
-    assert.equal(si2015Nums.includes(String(missing)),false,'Do not silently grade disputed source Q'+missing);
+  assert.equal(si2015Nums.length,118,'109 provisional-keyed + 9 safe readable ungraded items must be playable');
+  for(const sourceBlocked of [9,21,27,34,45,60,73,80,90,92,93,95,99,100,101,102,103,104,109,119,120,129]){
+    assert.equal(si2015Nums.includes(String(sourceBlocked)),false,'Do not invent unreadable source Q'+sourceBlocked);
   }
+  for(const ungraded of [8,14,29,30,33,65,66,84,127]){
+    assert.ok(si2015Nums.includes(String(ungraded)),'Readable source conflict must remain available for ungraded practice Q'+ungraded);
+  }
+  await page.locator('#palette button').filter({hasText:/^8$/}).click();
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded — source\/key review needed/);
+  assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Do not show disputed key as correct or incorrect');
   await page.locator('#palette button').filter({hasText:/^132$/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
   assert.equal(await page.locator('#passage').isVisible(),true,'Q132–Q134 shared passage is visible');
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 109-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 118-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
   await page.locator('#quiz .palette-details summary').click();
@@ -373,8 +383,10 @@ try {
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
-  assert.match(await page.locator('#score').innerText(),/\/ 54\.5 provisional marks/);
+  assert.match(await page.locator('#score').innerText(),/\/ 54\.5 provisional marks/,'Nine ungraded source disputes cannot alter provisional score denominator');
   assert.equal(await page.locator('#result').isVisible(),true);
+  await page.locator('#reviewFilter').selectOption('ungraded');
+  assert.equal(await page.locator('#reviewList .result-item').count(),9,'Ungraded filter shows all source-disputed readable questions');
   await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
@@ -384,7 +396,7 @@ try {
   assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides provisional answer feedback');
   assert.equal(await page.locator('#feedback').isVisible(),false);
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2015 mobile JavaScript runtime clean');
-  console.log('PASS TNUSRB SI 2015: 109 original-numbered bilingual items, exclusions, key disclosure, save/resume and exam mode');
+  console.log('PASS TNUSRB SI 2015: 118 readable (109 provisional, 9 ungraded), 22 held, neutral feedback and preserved answers');
 
   // TNUSRB SI 2020 (2019 recruitment, Series C) from user-supplied transcription.
   pageErrors.length = 0;
