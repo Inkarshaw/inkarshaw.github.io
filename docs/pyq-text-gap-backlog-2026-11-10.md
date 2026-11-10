@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** â€
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,107 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,129 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -23,6 +23,10 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** â€
 ### Latest original-numbered TNPSC Group IV 2025 batch
 
 As of 10 November 2026, the source-numbered Tamil/English draft set covers **110/200** positions (**106** provisionally gradable; original text verification count **0**). Q76â€“100 is a new set of **25 adapted Tamil practice drafts**; Q77 and Q78 each accept C and D per the mapped official final key. **90** positions remain without local text. No draft should be described as an officially verified verbatim question paper.
+
+### Group IV 2025 bilingual GS Q101â€“125 progress
+
+On 10 November 2026, added 22 numbered, **editorially adapted English stems and independent Tamil study translations** for 2025 Group IV GS positions Q101â€“125, without overwriting previously drafted Q112, Q113 or Q125. The set now has **132/200** locally playable text positions, **127** with provisional answer-key scoring, **68** source-text gaps and **zero** independently visually certified originals. Q107 is ALL/ungraded and Q122 accepts B/C. Primary booklet comparison and Tamil text proofreading remain outstanding.
 
 ## Source-indexed years still requiring question text
 
