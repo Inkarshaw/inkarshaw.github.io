@@ -30,6 +30,8 @@ assert.match(by('tnpsc-g4-2025').sourceStatus,/editorial study questions/,'Full 
 const s2010=json('data/quizzes/tnusrb-si-2010-open-type-a.json');
 assert.equal(by('tnusrb-si-2010').typed,s2010.availableForQuizCount);
 assert.equal(by('tnusrb-si-2010').scorable,s2010.scoredQuestionCount);
+assert.equal(s2010.bilingualPubliclyReviewedCount,10,'First ten Open Candidates questions have source-indexed bilingual texts');
+assert.match(by('tnusrb-si-2010').sourceStatus,/Q1–10.*bilingual/,'Catalogue must not claim full Tamil translation');
 const s2015=json('data/quizzes/tnusrb-si-2015-open.json');
 assert.equal(by('tnusrb-si-2015').typed,s2015.playableQuestionCount);
 assert.equal(by('tnusrb-si-2015').scorable,s2015.provisionallyScoreableQuestionCount);
