@@ -61,7 +61,7 @@ if(year===2024){
  assert.equal(d.questions[87].keyToken,'B/C','Q88 dual final-key answer');
  assert.deepEqual(d.questions[87].accepted,['B','C'],'Q88 accepts both B and C');
  assert.equal(d.questions[84].options.C,'கவி காளமேகம்','Preserve cited option letter at Q85');
- assert.equal(d.questions[112].options.C,'Punjab and Haryana','Q113 follows source's printed option position');
+ assert.equal(d.questions[112].options.C,'Punjab and Haryana','Q113 keeps the original option position');
 for(let n=55;n<=84;n++){
   const q=d.questions[n-1];
   assert.equal(q.primaryScanViewed,true,'Source PDF page was inspected for Q'+n);
