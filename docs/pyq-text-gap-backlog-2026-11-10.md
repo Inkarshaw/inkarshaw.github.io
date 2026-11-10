@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,257 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,287 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -90,6 +90,14 @@ Official original: https://www.tnpsc.gov.in/Tentative/Document/01_2024_GR_IV_GEN
 Official final key: https://tnpsc.gov.in/Document/Answerkeyfinalresult/01_2024_Final%20_Answer_Key_GT_GE.pdf
 
 Third-party numbered text reading pages: https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/10 through /13.
+
+### TNPSC Group IV 2024 — bilingual Q115–144
+
+Updated 10 November 2026. **30 English General Studies and Aptitude draft practice questions** with Tamil editorial translations have been added for original numbers **Q115–144**, increasing the 2024 coverage to **144/200 readable local question positions** and **141 provisionally gradable items**. **56** original-numbered questions remain without local question text.
+
+Sources: original CCSE4GT/2024 OCR data bundled in the repository, independently numbered reader pages https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/13 to /17, and the scanned official final key (Subject Code 003, Version A, 9 January 2025) at https://tnpsc.gov.in/Document/Answerkeyfinalresult/01_2024_Final%20_Answer_Key_GT_GE.pdf . **Q115–144 each have a single final key letter**, so all thirty can be provisionally graded. No new ALL or multiple-answer exception occurs in this batch.
+
+The 2024 original-paper PDF https://www.tnpsc.gov.in/Tentative/Document/01_2024_GR_IV_GENERAL_TAMIL.pdf timed out in the public web reader. The text drafts were checked against the separate indexed reading and original-PDF OCR, **not visually certified from original scan pages**. They remain editable editorial adaptations, not verbatim original-paper transcriptions. Q118 clarifies that 1991 Industrial Policy liberalised MRTP-era restrictions, whereas the MRTP Act itself was repealed later under the Competition Act, 2002.
 
 ## Source-indexed years still requiring question text
 
