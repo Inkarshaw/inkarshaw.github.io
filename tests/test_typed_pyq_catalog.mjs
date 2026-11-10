@@ -78,7 +78,7 @@ const typedKeys=new Set(cat.entries.map(e=>{
 assert.equal(new Set([...archiveKeys,...typedKeys,...adaptedKeys]).size,72,
  '67 archived exam years plus five unique typed-only years');
 const sourceOnly=[...archiveKeys].filter(k=>!adaptedKeys.has(k)&&!typedKeys.has(k));
-assert.equal(sourceOnly.length,59,'Exactly 59 indexed exam-year sources lack a local text quiz');
+assert.equal(sourceOnly.length,58,'Exactly 58 indexed exam-year sources lack a local text quiz');
 assert.ok(read('pyq-hub.html').includes('Explore all exams, years and text coverage'),'Universal coverage discoverable from main PYQ hub');
 
-console.log('PASS 72 distinct indexed exam-year records: 8 typed sets (1049 positions), 8 adapted sets (160 questions), and 59 archive-only exam-years honestly marked without question text.');
+console.log('PASS 72 distinct indexed exam-year records: 8 typed sets (1049 positions), 8 adapted sets (160 questions), and 58 archive-only exam-years honestly marked without question text.');
