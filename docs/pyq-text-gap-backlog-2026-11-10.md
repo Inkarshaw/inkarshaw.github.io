@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** â€
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,352 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,353 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -122,6 +122,14 @@ As at 10 November 2026, **118/140** original-numbered user-OCR items are readabl
 The source data deliberately retains each original secondary key token for review, but clears accepted-answer lists for all nine disputed items; the player now shows their stems and four alternatives **without correct/wrong highlights or adding points**. Pre-existing local attempts at the older 109-question version are mapped into the revised 118-question source-numbered sequence, preserving answers where possible.
 
 This changes the eight-set total to **1,352 readable practice positions**. It does NOT imply an official verified final answer key or any new source-verbatim certification. The 2015 subject-grouped study PDF at https://athiyamanteam.com/wp-content/uploads/2019/05/TN-Taluk-SI-2015-Question-Paper-140-Questions-Police-SI-Athiyaman-Team.pdf was examined for context, but its independent subject ordering means it must never be treated as a substitute for the original-numbered candidate booklet. The 2010 Departmental Type A PDF is likewise not applicable to the 2010 Open candidates' bank.
+
+### TNUSRB Open/General Candidates only â€” 2020 Q22 source-key dispute
+
+At the 10 November 2026 checkpoint, **2019 recruitment / exam 12 January 2020 Series C (General Candidates)** gains Q22 as one further readable, ungraded record. The exact count is **115/140 readable** (previously 114): **111 provisionally graded**, **three ALL special final-key positions**, **one ungraded source/key-disputed Q22**, **seven blocked OCR/diagram entries**, and **18 question numbers absent**. This increases the eight-set total to **1,353 readable practice positions**.
+
+**Q22** has a complete four-choice OCR transcription, but printed Series C key A corresponds to 'SAARC' in the supplied text, an international body. The local question is therefore offered for practice only. ClearExams deliberately removes accepted-answer scoring and right/wrong highlights for it while preserving the published source key *only as provenance* pending original-booklet visual review.
+
+The 2010 SI Open Candidates *140 question/70 mark* paper and answer key are distinct from the 2010 **departmental** *170 question/85 mark* paper. Never use a departmental question or key to fill a source gap for any Open Candidates paper. A historic open-quota link is cited by https://www.tnpscportal.in/2013/04/tnusrb-sub-inspector-si-selection-written-exam-2013-old-model-previous-year-question-papers.html ; the link itself is currently unavailable. The 2019 General Candidates original paper is linked at https://pyqsathi.com/papers/tnusrb-si-written-2019-question-paper-general-candidates/ and the published Series C key at https://img.freejobalert.com/uploads/2020/03/Final-Answer-Key-TNUSRB-Sub-Inspector-of-Police-Posts.pdf . Keep 2010's 17 missing, 2020's 18 missing, and 2015's 22 blocked source positions visible until genuine open-paper text/figures are found.
 
 ## Source-indexed years still requiring question text
 

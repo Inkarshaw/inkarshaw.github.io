@@ -14,7 +14,8 @@
       data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==122||
       !Array.isArray(data.questions)||data.questions.length!==122||
       !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==18||
-      !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==8||
+      !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==7||
+      data.ungradedSourceDisputeCount!==1||
       data?.answerKey?.answers?.length!==140){
       throw Error('TNUSRB SI 2020 Series C question-bank manifest is incomplete');
     }
@@ -25,14 +26,19 @@
          !q.options||!LETTERS.every(l=>typeof q.options[l]==='string'&&q.options[l].trim())||
          !/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/.test(q.answerKeyToken)||
          q.answerKeyToken!==data.answerKey.answers[q.number-1]||
-         !['scored_with_final_key','ungraded_all_correct','blocked_source_incomplete'].includes(q.scoringStatus))
+         !['scored_with_final_key','ungraded_all_correct','ungraded_source_dispute','blocked_source_incomplete'].includes(q.scoringStatus))
           throw Error('Incomplete entry at original question '+q.number);
       if(q.answerKeyToken==='ALL'&&q.scoringStatus!=='ungraded_all_correct'&&q.scoringStatus!=='blocked_source_incomplete')throw Error('Special key status mismatch');
+      if(q.scoringStatus==='ungraded_source_dispute'&&
+         (q.number!==22||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(22)))
+        throw Error('Disputed Q22 must not be graded or presented with an answer');
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.playableQuestionCount||playable.length!==114||
-       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==111){
+    if(playable.length!==data.playableQuestionCount||playable.length!==115||
+       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==111||
+       playable.filter(q=>q.scoringStatus==='ungraded_all_correct').length!==3||
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==1){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
@@ -43,10 +49,31 @@
     Array.isArray(s.checked)&&s.checked.length===questions.length&&s.checked.every(a=>typeof a==='boolean')&&
     Array.isArray(s.marked)&&s.marked.length===questions.length&&s.marked.every(a=>typeof a==='boolean')&&
     Number.isInteger(s.index)&&s.index>=0&&s.index<questions.length;
+  function migratedAttempt(mode){
+    const saved=getSaved(storageKey());
+    if(validSaved(saved,mode))return saved;
+    // Keep responses from the previous 114-item order, keyed by original question number.
+    const oldPositions=questions.map((q,i)=>q.number!==22?i:-1).filter(i=>i>=0);
+    if(!saved||saved.finished||saved.version!==1||saved.mode!==mode||oldPositions.length!==114||
+      !Array.isArray(saved.answers)||saved.answers.length!==114||
+      !Array.isArray(saved.checked)||saved.checked.length!==114||
+      !Array.isArray(saved.marked)||saved.marked.length!==114||
+      !Number.isInteger(saved.index)||saved.index<0||saved.index>=114)return null;
+    const restored={...saved,answers:Array(questions.length).fill(null),
+      checked:Array(questions.length).fill(false),marked:Array(questions.length).fill(false),
+      index:oldPositions[saved.index]};
+    for(let j=0;j<oldPositions.length;j++){
+      const k=oldPositions[j];
+      restored.answers[k]=saved.answers[j];
+      restored.checked[k]=saved.checked[j];
+      restored.marked[k]=saved.marked[j];
+    }
+    return validSaved(restored,mode)?restored:null;
+  }
   function updateStart(){
     if(!questions.length)return;
-    const prior=getSaved(storageKey());
-    $('start').textContent=(validSaved(prior,$('mode').value)?'Resume':'Start')+' '+questions.length+'-question quiz →';
+    const prior=migratedAttempt($('mode').value);
+    $('start').textContent=(prior?'Resume':'Start')+' '+questions.length+'-question quiz →';
     $('start').disabled=false;
   }
   function show(view){
@@ -66,8 +93,8 @@
   function start(){
     if(!questions.length)return;
     storeKey=storageKey();
-    const prior=getSaved(storeKey),mode=$('mode').value;
-    if(validSaved(prior,mode))attempt=prior;
+    const mode=$('mode').value,prior=migratedAttempt(mode);
+    if(prior)attempt=prior;
     else {
       const minutes=Number($('timer').value);
       attempt={version:1,mode,answers:Array(questions.length).fill(null),
@@ -95,33 +122,38 @@
   function feedback(q){
     const div=$('feedback');div.replaceChildren();
     const visible=attempt.mode==='practice'&&attempt.checked[attempt.index];
-    div.hidden=!visible;
-    if(!visible)return;
-    const choice=attempt.answers[attempt.index],special=q.answerKeyToken==='ALL';
-    const right=!special&&q.acceptedAnswers.includes(choice);
-    div.className=special?'issue':'';
+    div.hidden=!visible;if(!visible)return;
+    const disputed=q.scoringStatus==='ungraded_source_dispute';
+    const all=q.scoringStatus==='ungraded_all_correct';
+    const graded=q.scoringStatus==='scored_with_final_key';
+    const choice=attempt.answers[attempt.index],right=graded&&q.acceptedAnswers.includes(choice);
+    div.className=graded?(right?'':'issue'):'issue';
     const heading=document.createElement('strong');
-    heading.textContent=special?'Special key: ALL CORRECT · ungraded':right?'Correct answer':'Incorrect answer';
+    heading.textContent=disputed?'Ungraded — printed choice/key conflict':
+      all?'Final key: ALL · excluded from score':right?'Correct (published final key)':'Incorrect (published final key)';
     div.append(heading);
     const info=document.createElement('p');
-    info.textContent=special?
-      'TNUSRB’s published 2019 General Candidates final key (Series C) marks this “All Correct”; the item is excluded from indicative marks.':
+    info.textContent=disputed?
+      'Your answer: '+choice+'. No answer is marked right or wrong. '+q.answerReviewReason:
+      all?'Published Series C final key records ALL; this source item is excluded from indicative scoring.':
       'Series C final-key entry: '+q.answerKeyToken+'. Your answer: '+choice+'.';
     div.append(info);
-    if(!special){
-      const p=document.createElement('p');
-      p.textContent='Accepted: '+q.acceptedAnswers.map(letter=>letter+') '+q.options[letter]).join(' / ');
-      div.append(p);
+    if(graded){
+      const accepted=document.createElement('p');
+      accepted.textContent='Accepted: '+q.acceptedAnswers.map(letter=>letter+') '+q.options[letter]).join(' / ');
+      div.append(accepted);
     }
     const foot=document.createElement('p');
-    foot.textContent='Answer mapping: published TNUSRB final key for 2019 recruitment, General Candidates, booklet C. Question wording is from the supplied OCR.';
+    foot.textContent=disputed?
+      'The printed source key entry is kept for provenance only. Verify the original Open Candidates booklet before grading.':
+      'Answer mapping: the published TNUSRB final key for the 2019 General Candidates recruitment, Series C; user-supplied question OCR still needs visual source checks.';
     div.append(foot);
   }
   function render(scroll=false){
     if(!attempt||attempt.finished)return;
     const i=attempt.index,q=questions[i];
     $('position').textContent='Original Q'+q.number+' · '+(i+1)+' / '+questions.length;
-    $('section').textContent=q.section;
+    $('section').textContent=q.section+(q.scoringStatus==='ungraded_source_dispute'?' · Ungraded key review':'');
     $('status').textContent=answered()+' / '+questions.length+' answered · '+attempt.marked.filter(Boolean).length+' marked';
     $('progressFill').style.width=(100*answered()/questions.length).toFixed(1)+'%';
     $('progressBar').setAttribute('aria-valuemax',String(questions.length));
@@ -139,8 +171,8 @@
       const l=document.createElement('b');l.textContent=letter;
       const content=document.createElement('span');content.textContent=q.options[letter];
       b.append(l,content);
-      if(locked&&q.answerKeyToken!=='ALL'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
-      if(locked&&q.answerKeyToken!=='ALL'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
+      if(locked&&q.scoringStatus==='scored_with_final_key'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
+      if(locked&&q.scoringStatus==='scored_with_final_key'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
       b.disabled=locked;
       b.addEventListener('click',()=>{if(locked)return;attempt.answers[i]=letter;render()});
       $('options').append(b);
@@ -161,32 +193,41 @@
     const scored=questions.filter(q=>q.scoringStatus==='scored_with_final_key');
     const correct=questions.reduce((sum,q,i)=>sum+(q.scoringStatus==='scored_with_final_key'&&q.acceptedAnswers.includes(attempt.answers[i])?1:0),0);
     const wrong=questions.reduce((sum,q,i)=>sum+(q.scoringStatus==='scored_with_final_key'&&attempt.answers[i]&&!q.acceptedAnswers.includes(attempt.answers[i])?1:0),0);
-    const ungraded=questions.filter(q=>q.scoringStatus==='ungraded_all_correct').length;
+    const allEntries=questions.filter(q=>q.scoringStatus==='ungraded_all_correct').length;
+    const disputed=questions.filter(q=>q.scoringStatus==='ungraded_source_dispute').length;
     $('resultTitle').textContent=expired?'Time expired — answers submitted':'TNUSRB SI 2020 Series C practice result';
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scored.length*0.5).toFixed(1)+' marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
-      ungraded+' All Correct entries ungraded · '+questions.length+' source-readable questions available. '+
-      'Score excludes 18 absent and 8 source-incomplete questions and is not a full 140-question examination result.';
+      allEntries+' ALL entries and '+disputed+' disputed-key question ungraded · '+questions.length+' readable questions. '+
+      'Score excludes 18 absent source numbers and seven source-incomplete or missing-diagram items; not a full 140-question exam result.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
     const filter=$('reviewFilter').value;
     $('reviewList').replaceChildren();
     for(let i=0;i<questions.length;i++){
-      const q=questions[i],answer=attempt.answers[i],special=q.answerKeyToken==='ALL',
-        right=!special&&q.acceptedAnswers.includes(answer);
-      if(filter==='wrong'&&(!answer||special||right))continue;
+      const q=questions[i],answer=attempt.answers[i];
+      const graded=q.scoringStatus==='scored_with_final_key';
+      const all=q.scoringStatus==='ungraded_all_correct';
+      const disputed=q.scoringStatus==='ungraded_source_dispute';
+      const right=graded&&q.acceptedAnswers.includes(answer);
+      if(filter==='wrong'&&(!graded||!answer||right))continue;
       if(filter==='blank'&&answer)continue;
       if(filter==='marked'&&!attempt.marked[i])continue;
-      if(filter==='ungraded'&&!special)continue;
+      if(filter==='ungraded'&&graded)continue;
       const details=document.createElement('details');details.className='result-item';
       const summary=document.createElement('summary');
-      summary.textContent='Q'+q.number+' · '+q.question+' — '+(special?'ALL / ungraded':!answer?'Not answered':right?'Correct':'Incorrect');
+      summary.textContent='Q'+q.number+' · '+q.question+' — '+(disputed?'Key disputed / ungraded':
+        all?'ALL / ungraded':!answer?'Not answered':right?'Correct':'Incorrect');
       details.append(summary);
       const body=document.createElement('div');body.className='result-body';
       if(q.passage){const context=document.createElement('p');context.textContent=q.passage;body.append(context)}
-      const response=document.createElement('p');response.textContent='Your choice: '+(answer||'not answered')+
-        ' · TNUSRB final key Series C: '+q.answerKeyToken;body.append(response);
+      const response=document.createElement('p');
+      response.textContent='Your choice: '+(answer||'not answered')+
+        (graded?' · TNUSRB Series C key: '+q.answerKeyToken:
+         disputed?' · printed key disputed; no correct answer asserted':' · final-key special ALL entry');
+      body.append(response);
+      if(disputed){const note=document.createElement('p');note.textContent=q.answerReviewReason;body.append(note)}
       for(const letter of LETTERS){
         const p=document.createElement('p');p.textContent=letter+') '+q.options[letter];body.append(p);
       }
@@ -219,8 +260,13 @@
   fetch('data/quizzes/tnusrb-si-2020-series-c.json',{cache:'no-store'})
     .then(response=>{if(!response.ok)throw Error('Quiz JSON unavailable');return response.json()})
     .then(data=>{questions=validate(data);bank=data;
-      $('loadStatus').textContent=questions.length+' attemptable questions loaded in original-number order. '+
-        '111 use the TNUSRB Series C final key; three ALL entries are ungraded.';
+      const withheld=$('sourceGaps');withheld.replaceChildren();
+      data.missingNumbers.forEach(n=>{const li=document.createElement('li');li.textContent='Q'+n+': source transcription not yet available';withheld.append(li)});
+      data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
+        const li=document.createElement('li');li.textContent='Q'+q.number+': '+q.sourceIssue;withheld.append(li);
+      });
+      $('loadStatus').textContent=questions.length+' readable original-numbered questions: 111 provisionally scored, '+
+        '3 final-key ALL entries and Q22 key dispute ungraded; 7 blocked and 18 missing source positions.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;

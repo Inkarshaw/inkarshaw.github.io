@@ -8,7 +8,7 @@ const cat=json('data/quizzes/typed-pyq-catalog.json'),html=read('pyq-typed-libra
 assert.equal(cat.schemaVersion,1);
 assert.equal(cat.entries.length,8);
 assert.equal(new Set(cat.entries.map(e=>e.id)).size,8);
-assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),1352);
+assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),1353);
 assert.equal(cat.entries.filter(e=>e.typed===e.total).length,5);
 const by=id=>{const e=cat.entries.find(x=>x.id===id);assert.ok(e,'Missing catalogue '+id);return e;};
 for(const e of cat.entries){assert.ok(['TNPSC','TNUSRB'].includes(e.exam));assert.ok(Number.isInteger(e.total)&&Number.isInteger(e.typed)&&Number.isInteger(e.scorable));assert.ok(e.typed<=e.total&&e.scorable<=e.typed);assert.ok(e.sourceStatus.length>16);assert.ok(existsSync(new URL('../'+e.link.split('?')[0],import.meta.url)),'Quiz route missing: '+e.link);}
@@ -38,6 +38,8 @@ assert.equal(by('tnusrb-si-2015').typed-by('tnusrb-si-2015').scorable,9,'Nine 20
 const s2020=json('data/quizzes/tnusrb-si-2020-series-c.json');
 assert.equal(by('tnusrb-si-2020').typed,s2020.playableQuestionCount);
 assert.equal(by('tnusrb-si-2020').scorable,s2020.scoredQuestionCount);
+assert.equal(by('tnusrb-si-2020').typed,115,'Open Candidates Q22 readable but ungraded');
+assert.equal(by('tnusrb-si-2020').typed-by('tnusrb-si-2020').scorable,4,'Three ALL tokens and one disputed key are not scored');
 assert.match(html,/PYQ Text Quiz Library/);
 assert.match(html,/not independently certified verbatim reproduction/i);
 assert.match(js,/typed-pyq-catalog\.json/);
@@ -88,4 +90,4 @@ const sourceOnly=[...archiveKeys].filter(k=>!adaptedKeys.has(k)&&!typedKeys.has(
 assert.equal(sourceOnly.length,58,'Exactly 58 indexed exam-year sources lack a local text quiz');
 assert.ok(read('pyq-hub.html').includes('Explore all exams, years and text coverage'),'Universal coverage discoverable from main PYQ hub');
 
-console.log('PASS 72 distinct indexed exam-year records: 8 typed sets (1352 positions), 8 adapted sets (160 questions), and 58 archive-only exam-years honestly marked without question text.');
+console.log('PASS 72 distinct indexed exam-year records: 8 typed sets (1353 positions), 8 adapted sets (160 questions), and 58 archive-only exam-years honestly marked without question text.');
