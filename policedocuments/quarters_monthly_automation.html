@@ -316,7 +316,10 @@ function prepareSheets(){
 }
 function loadSheet(name){
  try{
-  error("");data=parse(name);originals=data.map(x=>({...x}));activeSheet=name;
+  error("");const title=clean((workbook.Sheets[name]&&workbook.Sheets[name].A1&&workbook.Sheets[name].A1.v)||"");
+  const sourceDate=title.match(/(\d{2})[.\/-](\d{2})[.\/-](\d{4})/);
+  if(sourceDate)$("month").value=sourceDate[3]+"-"+sourceDate[2];
+  data=parse(name);originals=data.map(x=>({...x}));activeSheet=name;
   $("fgroup").innerHTML='<option value="">All groups</option>'+GROUPS.map(g=>'<option value="'+g.id+'">'+esc(g.label)+'</option>').join("");
   $("fgroup").value="";$("fstatus").value="";$("search").value="";
   setEnabled(true);refresh();makePreview();
@@ -433,6 +436,8 @@ $("word").onclick=async()=>{
   download("Police_Quarters_Report_"+fileDate()+".docx",blob);
  }catch(e){label.textContent="Word export failed: "+e.message}
 };
+const dNow=new Date();const today=[dNow.getFullYear(),String(dNow.getMonth()+1).padStart(2,"0"),String(dNow.getDate()).padStart(2,"0")].join("-");
+$("month").value=today.slice(0,7);$("letterDate").value=today;
 ["month","ps","from","to","letterDate","refNumber","subject","intro"].forEach(id=>$(id).addEventListener("change",()=>{renderReady=false;if(data.length)makePreview()}));
 })();
 </script>
