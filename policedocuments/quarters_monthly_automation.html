@@ -29,6 +29,8 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
 .notice{border-left:3px solid #81afca;background:#edf5fa;border-radius:5px;padding:9px 12px;color:#35546e;font-size:12px}
 .notice.warning{border-left-color:#e3a451;background:#fff7e9;color:#805224}
+.saved-register{margin-top:12px;padding:13px 14px;background:#f8fbff;border:1px solid #cadeee;border-radius:11px}
+.saved-register strong{font-size:14px}
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
 .kpi{background:white;border:1px solid var(--line);border-radius:12px;padding:14px}
 .kpi strong{display:block;font-size:27px;font-weight:780;letter-spacing:-.8px}
@@ -119,12 +121,20 @@ body.print-all .letter-page{display:block}
 <section class="panel no-print">
 <h2>1. Import monthly register</h2>
 <div class="control-grid">
-<div><label for="excel">Monthly quarters Excel (.xlsx)</label><input id="excel" type="file" accept=".xlsx,.xls"></div>
+<div><label for="excel">Monthly quarters Excel (.xlsx)</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="note">Upload once to save as your browser-local Quarters Master Register.</div></div>
 <div><label for="sheet">Worksheet</label><select id="sheet" disabled><option>Upload Excel first</option></select></div>
 <div><label for="month">Report month</label><input type="month" id="month" value="2026-11"></div>
 <div><label for="ps">Police station</label><input id="ps" value="G3 Kilpauk"></div>
 </div>
-<div class="notice" style="margin-top:12px">All workbook parsing, row edits and report generation happen in this browser. The uploaded Excel file is not sent to this website's server. No employee names, phone numbers or dates of birth are copied into the vacancy report.</div>
+<div class="saved-register" aria-live="polite">
+  <div class="headrow"><div><strong>Saved Quarters Master Register</strong><div id="savedStatus" class="note">Checking saved register…</div></div>
+  <div class="toolbar">
+    <button id="savedOpen" type="button" class="secondary" disabled>Open saved register</button>
+    <button id="savedDownload" type="button" class="secondary" disabled>Download Excel backup</button>
+    <button id="savedDelete" type="button" class="ghost" disabled>Remove saved register</button>
+  </div></div>
+</div>
+<div class="notice" style="margin-top:12px">All workbook parsing, row edits and report generation happen in this browser. The source Excel is retained in IndexedDB on this browser only, not uploaded to a website server or public GitHub. Browser-site-data clearing removes it; download a backup for safekeeping. No employee names, phone numbers or dates of birth are copied into the vacancy report.</div>
 <p id="error" role="alert" hidden></p>
 <div id="info" class="note" style="margin-top:10px">Uses the November 2026 Excel arrangement; select the up-to-date worksheet when your register contains a historical sheet.</div>
 </section>
@@ -187,6 +197,59 @@ const $=id=>document.getElementById(id), GROUPS=[
 {id:"pu",label:"Pullapuram police quarters",reference:2,title:"G3 PS KILPAUK PULLAPURAM POLICE QUARTERS"}
 ], STATUS=["Vacant","Allotted not occupied","Damaged","Reserved / other"];
 let workbook=null, data=[], originals=[], activeSheet="", renderReady=false;
+let master=null;
+const QUARTERS_DB="clearexams-quarters-master-v1", MASTER_KEY="g3-quarters-master";
+function openMasterDB(){
+ return new Promise((resolve,reject)=>{
+  if(!window.indexedDB){reject(new Error("Browser storage is not supported"));return}
+  const req=indexedDB.open(QUARTERS_DB,1);
+  req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains("files"))req.result.createObjectStore("files",{keyPath:"key"})};
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error||Error("Unable to open browser storage"));
+  req.onblocked=()=>reject(Error("Close other tabs of this site before retrying"));
+ });
+}
+async function masterOp(mode,action){
+ const db=await openMasterDB();
+ try{
+  return await new Promise((resolve,reject)=>{
+   const tx=db.transaction("files",mode);
+   const req=action(tx.objectStore("files"));
+   let result;
+   if(req)req.onsuccess=()=>result=req.result;
+   tx.oncomplete=()=>resolve(result);
+   tx.onerror=()=>reject(tx.error||Error("Storage transaction failed"));
+   tx.onabort=()=>reject(tx.error||Error("Storage transaction cancelled"));
+  });
+ }finally{db.close()}
+}
+function readMaster(){return masterOp("readonly",s=>s.get(MASTER_KEY))}
+function writeMaster(obj){return masterOp("readwrite",s=>s.put({key:MASTER_KEY,...obj}))}
+function removeMaster(){return masterOp("readwrite",s=>s.delete(MASTER_KEY))}
+function showMaster(){
+ const yes=!!master;
+ ["savedOpen","savedDownload","savedDelete"].forEach(id=>$(id).disabled=!yes);
+ $("savedStatus").textContent=yes
+  ?master.name+" · "+(master.bytes.byteLength/1024).toFixed(0)+" KB · saved "+
+   new Date(master.savedAt).toLocaleString("en-IN")+" · this browser only"
+  :"Nothing saved on this browser yet. Upload Excel once; next time it will open automatically.";
+}
+async function openSavedMaster(){
+ const saved=await readMaster();
+ if(!saved){master=null;showMaster();return false}
+ if(typeof XLSX==="undefined")throw Error("Excel reader did not load");
+ const candidate=XLSX.read(new Uint8Array(saved.bytes),{type:"array",cellDates:false});
+ workbook=candidate;
+ if(!prepareSheets(saved.sheet))throw Error("Saved workbook no longer matches report format");
+ master=saved;showMaster();
+ showInfo("Opened saved master register: "+saved.name+"; worksheet: "+activeSheet);
+ return true;
+}
+async function storeUploadedMaster(bytes,name){
+ const saved={name,bytes,savedAt:new Date().toISOString(),sheet:activeSheet};
+ await writeMaster(saved);master=saved;showMaster();
+}
+
 const clean=x=>String(x===null||x===undefined?"":x).replace(/\s+/g," ").trim();
 const norm=x=>clean(x).toLowerCase().replace(/[\s._-]+/g," ");
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -307,12 +370,12 @@ function refreshRows(){
 function refresh(){refreshRows();refreshStats();renderReady=false}
 function recalcFlags(x){x.needsReview=!x.block||!x.floor||!x.door;if(x.needsReview)x.include=false}
 function setEnabled(value){["preview","word","pdf","letterPdf","csv","reset","includeVisible","excludeVisible"].forEach(id=>$(id).disabled=!value)}
-function prepareSheets(){
+function prepareSheets(preferredSheet){
  const list=workbook.SheetNames;
  $("sheet").innerHTML=list.map(s=>"<option>"+esc(s)+"</option>").join("");
  $("sheet").disabled=false;
- const preferred=list.find(s=>/pommi/i.test(s))||list[0];
- $("sheet").value=preferred;loadSheet(preferred);
+ const preferred=(preferredSheet&&list.includes(preferredSheet)?preferredSheet:null)||list.find(s=>/pommi/i.test(s))||list[0];
+ $("sheet").value=preferred;return loadSheet(preferred);
 }
 function loadSheet(name){
  try{
@@ -324,7 +387,8 @@ function loadSheet(name){
   $("fgroup").value="";$("fstatus").value="";$("search").value="";
   setEnabled(true);refresh();makePreview();
   showInfo("Loaded "+name+" — "+data.length+" reportable row(s) detected. Rows needing correction are excluded until completed.");
- }catch(e){setEnabled(false);error("Unable to read this sheet: "+e.message)}
+  return true;
+ }catch(e){setEnabled(false);error("Unable to read this sheet: "+e.message);return false}
 }
 $("excel").addEventListener("change",async e=>{
  const f=e.target.files&&e.target.files[0]; if(!f)return;
@@ -333,10 +397,36 @@ $("excel").addEventListener("change",async e=>{
   if(f.size>25*1024*1024)throw Error("File exceeds the 25 MB limit.");
   error("");const bytes=await f.arrayBuffer();
   workbook=XLSX.read(new Uint8Array(bytes),{type:"array",cellDates:false});
-  prepareSheets();
+  if(!prepareSheets())throw Error("Import failed; the saved register has not been replaced.");
+  try{
+   await storeUploadedMaster(bytes,f.name);
+   showInfo("Saved original Excel as Quarters Master Register: "+f.name+". Future visits on this browser open it automatically.");
+  }catch(e){$("savedStatus").textContent="Loaded Excel but unable to save: "+e.message}
  }catch(err){error(err.message);setEnabled(false)}
 });
-$("sheet").addEventListener("change",()=>loadSheet($("sheet").value));
+$("sheet").addEventListener("change",async()=>{
+ if(!loadSheet($("sheet").value))return;
+ if(master){master.sheet=activeSheet;try{await writeMaster(master)}catch(e){$("savedStatus").textContent="Worksheet choice not saved: "+e.message}}
+});
+$("savedOpen").onclick=async()=>{try{error("");await openSavedMaster()}catch(e){error("Cannot open saved register: "+e.message)}};
+$("savedDownload").onclick=()=>{
+ if(!master)return;
+ download(master.name,new Blob([master.bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+};
+$("savedDelete").onclick=async()=>{
+ if(!master||!confirm("Remove saved quarters register from this browser? Download a backup first if needed."))return;
+ try{
+  await removeMaster();master=null;workbook=null;data=[];originals=[];activeSheet="";
+  $("excel").value="";$("sheet").disabled=true;$("sheet").innerHTML="<option>Upload Excel first</option>";
+  setEnabled(false);refresh();$("report").innerHTML='<p class="note no-print">Upload the register to start.</p>';
+  showMaster();showInfo("Saved master register removed from this browser.");
+ }catch(e){error("Cannot remove saved register: "+e.message)}
+};
+document.addEventListener("DOMContentLoaded",async()=>{
+ try{await openSavedMaster()}
+ catch(e){master=null;showMaster();$("savedStatus").textContent="Unable to restore saved register: "+e.message+". Re-upload Excel to replace it."}
+});
+
 ["fgroup","fstatus"].forEach(id=>$(id).addEventListener("change",refreshRows));
 $("search").addEventListener("input",refreshRows);
 $("records").addEventListener("change",e=>{
