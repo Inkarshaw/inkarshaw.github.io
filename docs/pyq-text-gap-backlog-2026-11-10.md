@@ -125,7 +125,7 @@ This changes the eight-set total to **1,352 readable practice positions**. It do
 
 ### TNUSRB Open/General Candidates only — 2020 Q22 source-key dispute
 
-At the 10 November 2026 checkpoint, **2019 recruitment / exam 12 January 2020 Series C (General Candidates)** gains Q22 as a ninth-source-linked readable/ungraded record? No: the exact count is **115/140 readable** (previously 114): **111 provisionally graded**, **three ALL special final-key positions**, **one ungraded source/key-disputed Q22**, **seven blocked OCR/diagram entries**, and **18 question numbers absent**. This increases the eight-set total to **1,353 readable practice positions**.
+At the 10 November 2026 checkpoint, **2019 recruitment / exam 12 January 2020 Series C (General Candidates)** gains Q22 as one further readable, ungraded record. The exact count is **115/140 readable** (previously 114): **111 provisionally graded**, **three ALL special final-key positions**, **one ungraded source/key-disputed Q22**, **seven blocked OCR/diagram entries**, and **18 question numbers absent**. This increases the eight-set total to **1,353 readable practice positions**.
 
 **Q22** has a complete four-choice OCR transcription, but printed Series C key A corresponds to 'SAARC' in the supplied text, an international body. The local question is therefore offered for practice only. ClearExams deliberately removes accepted-answer scoring and right/wrong highlights for it while preserving the published source key *only as provenance* pending original-booklet visual review.
 
