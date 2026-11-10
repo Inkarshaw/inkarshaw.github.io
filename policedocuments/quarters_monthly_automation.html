@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Police Quarters Monthly Automation | G3 Kilpauk</title>
+<meta name="description" content="Local Excel-to-Word and PDF police quarters monthly vacancy reporting, with editable verification.">
+<style>
+:root{--ink:#14263a;--muted:#61758a;--blue:#17578a;--line:#dce5ed;--bg:#f4f7fb;--paper:#fff;--ok:#147d59;--warn:#b45d13}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+a{color:inherit}h1,h2,h3,p{margin-top:0}
+header{background:#112a43;color:#fff;padding:22px max(18px,calc((100% - 1400px)/2))}
+header h1{font-size:clamp(22px,3vw,31px);letter-spacing:-.7px;margin:5px 0}
+header p{color:#b8cee1;margin:0}
+header a{font-size:12px;color:#d1e4f3;text-decoration:none}
+main{max-width:1400px;margin:18px auto 45px;padding:0 18px}
+.panel{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:18px;box-shadow:0 5px 22px #1939560b;margin-bottom:16px}
+.panel h2{font-size:17px;margin-bottom:13px}
+.control-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:13px;align-items:end}
+label{font-weight:650;font-size:12px;color:#354d63;display:block;margin-bottom:5px}
+input,select,textarea{font:inherit;max-width:100%;width:100%;padding:10px 11px;border:1px solid #cbd8e3;border-radius:9px;color:#162d43;background:#fff}
+input[type=file]{padding:9px;font-size:12px}
+textarea{resize:vertical;min-height:80px}
+button{font:inherit;font-weight:700;border:1px solid transparent;border-radius:9px;cursor:pointer;background:#176596;color:white;padding:10px 15px}
+button:hover{filter:brightness(.96)}button.secondary{background:white;color:#184d70;border-color:#b8d0df}
+button.ghost{background:#e8f0f7;color:#244e69}
+button:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.notice{border-left:3px solid #81afca;background:#edf5fa;border-radius:5px;padding:9px 12px;color:#35546e;font-size:12px}
+.notice.warning{border-left-color:#e3a451;background:#fff7e9;color:#805224}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:white;border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi strong{display:block;font-size:27px;font-weight:780;letter-spacing:-.8px}
+.kpi span{color:var(--muted);font-size:12px}
+.kpi.warn strong{color:#b45d13}
+.headrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.headrow .sub{font-size:12px;color:var(--muted)}
+.filters{display:grid;grid-template-columns:1fr 1fr 1.7fr;gap:10px;margin:12px 0}
+.scroller{width:100%;overflow:auto;border:1px solid var(--line);border-radius:9px}
+table{border-collapse:collapse;width:100%}
+.worktable{min-width:1160px}
+th{font-weight:750;text-align:left;background:#eff4f8;color:#425b72;font-size:12px}
+th,td{border-bottom:1px solid #e7edf2;padding:9px 10px;vertical-align:middle}
+.worktable td{font-size:12px}
+.worktable td input:not([type=checkbox]),.worktable td select{padding:6px 7px;min-width:62px;border-radius:6px;font-size:12px}
+.worktable td select{min-width:150px}
+.worktable td .small{width:70px;min-width:55px}
+.worktable td .long{width:200px}
+tr.flag{background:#fff9ee}
+tr.flag td:first-child{border-left:3px solid #e6a64a}
+.mono{font-variant-numeric:tabular-nums}
+.state{font-size:12px;font-weight:750;border-radius:7px;background:#e8f3fb;color:#185779;padding:5px 8px;display:inline-block}
+.state.warn{background:#fff0d7;color:#925511}
+#empty,#error{margin:11px 0}
+#empty{color:var(--muted)}
+#error{color:#ad2424;font-weight:650}
+.subpanel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:12px 0}
+.summary td:first-child{font-weight:630}
+.summary td:not(:first-child),.summary th:not(:first-child){text-align:center}
+.summary td.diff{color:#a15d17}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+#report{font-family:Arial,"Noto Sans Tamil",Latha,sans-serif}
+.letter-page{border:1px solid #e2e9f1;margin-bottom:14px;padding:25px 35px;background:white}
+.letter-page h3{font-size:17px;text-align:center}
+.letter-page .address{white-space:pre-line;margin:6px 0 13px}
+.letter-page p{margin:12px 0;line-height:1.8}
+.letter-page .to{margin-left:20%}
+.letter-page .bodycopy{text-align:justify}
+.report-page{border:1px solid #e2e9f1;margin-bottom:14px;background:white;padding:16px}
+.report-page h3{font-size:14px;padding:0 0 9px;border-bottom:1px solid #d5dce5;margin:0 0 12px}
+.report-table{width:100%;font-size:10px;table-layout:fixed}
+.report-table th,.report-table td{padding:5px 4px;border:1px solid #ccd5dd;overflow-wrap:anywhere;vertical-align:top}
+.report-table th{background:#edf0f5;color:#111}
+.report-table th:nth-child(1){width:4%}
+.report-table th:nth-child(2),.report-table th:nth-child(3),.report-table th:nth-child(4){width:6%}
+.report-table th:nth-child(5){width:4%}
+.report-table th:nth-child(6){width:18%}
+.report-table th:nth-child(7){width:10%}
+.report-table th:nth-child(8){width:5%}
+.report-table th:nth-child(9){width:5%}
+.report-table th:nth-child(10){width:6%}
+.report-table th:nth-child(11){width:12%}
+.report-table th:nth-child(12){width:18%}
+.note{font-size:12px;color:var(--muted)}
+.switchline{display:flex;gap:12px;align-items:center}
+.switchline input{width:auto}
+@media(max-width:880px){.control-grid{grid-template-columns:1fr 1fr}.subpanel{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:550px){main{padding:0 10px}.panel{padding:12px}.control-grid,.filters{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.letter-page{padding:12px}.kpi strong{font-size:22px}}
+@page letterpage{size:A4 portrait;margin:18mm}
+@page reportpage{size:A4 landscape;margin:9mm}
+@media print{
+header,.no-print,.panel:not(.print-host),#empty,#error{display:none!important}
+body,main{background:white;margin:0;padding:0;max-width:none}
+.print-host{border:0;box-shadow:none;padding:0;margin:0}
+.letter-page{page:letterpage;border:0;padding:0;break-after:page;margin:0}
+.report-page{page:reportpage;border:0;margin:0;padding:0;break-before:page}
+.report-page h3{margin:0 0 8px}
+.report-table{font-size:8pt}
+.report-table th,.report-table td{padding:3px}
+.report-table thead{display:table-header-group}
+.report-table tr{break-inside:avoid}
+body.print-report .letter-page{display:none!important}
+body.print-letter .report-page{display:none!important}
+body.print-letter .letter-page{break-after:auto}
+body.print-all .letter-page{display:block}
+}
+</style>
+<script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.umd.cjs"></script>
+</head>
+<body>
+<header>
+<a href="/policedocuments/">← Police Documents</a>
+<h1>Police Quarters Monthly Automation</h1>
+<p>Excel register → verify vacancy entries → Tamil forwarding letter + category-wise Word / PDF report</p>
+</header>
+<main>
+<section class="panel no-print">
+<h2>1. Import monthly register</h2>
+<div class="control-grid">
+<div><label for="excel">Monthly quarters Excel (.xlsx)</label><input id="excel" type="file" accept=".xlsx,.xls"></div>
+<div><label for="sheet">Worksheet</label><select id="sheet" disabled><option>Upload Excel first</option></select></div>
+<div><label for="month">Report month</label><input type="month" id="month" value="2026-11"></div>
+<div><label for="ps">Police station</label><input id="ps" value="G3 Kilpauk"></div>
+</div>
+<div class="notice" style="margin-top:12px">All workbook parsing, row edits and report generation happen in this browser. The uploaded Excel file is not sent to this website's server. No employee names, phone numbers or dates of birth are copied into the vacancy report.</div>
+<p id="error" role="alert" hidden></p>
+<div id="info" class="note" style="margin-top:10px">Uses the November 2026 Excel arrangement; select the up-to-date worksheet when your register contains a historical sheet.</div>
+</section>
+<div class="kpis no-print" id="stats">
+<div class="kpi"><strong id="statCount">—</strong><span>Report entries</span></div>
+<div class="kpi"><strong id="statVacant">—</strong><span>Vacant</span></div>
+<div class="kpi"><strong id="statAllotted">—</strong><span>Allotted, not occupied</span></div>
+<div class="kpi"><strong id="statDamaged">—</strong><span>Damaged / reserved</span></div>
+<div class="kpi warn"><strong id="statReview">—</strong><span>Requires review</span></div>
+</div>
+<section class="panel no-print">
+<div class="headrow"><div><h2>2. Verify extracted quarters</h2><div class="sub">Only rows indicating vacancy, non-occupation, damage, or reserved quarters are extracted. Changes below affect this report only.</div></div><div class="toolbar"><button class="secondary" id="includeVisible" disabled>Include visible</button><button class="secondary" id="excludeVisible" disabled>Exclude visible</button><button class="ghost" id="reset" disabled>Reset edits</button></div></div>
+<div class="filters">
+<div><label for="fgroup">Group</label><select id="fgroup"><option value="">All groups</option></select></div>
+<div><label for="fstatus">Status</label><select id="fstatus"><option value="">All statuses</option><option>Vacant</option><option>Allotted not occupied</option><option>Damaged</option><option>Reserved / other</option></select></div>
+<div><label for="search">Search block, door, notes or source row</label><input id="search" placeholder="e.g. Block R, 16 or EB bill"></div>
+</div>
+<div class="scroller"><table class="worktable"><thead><tr><th>Use</th><th>Excel row</th><th>Group</th><th>Block</th><th>Floor</th><th>Door</th><th>Vacancy status</th><th>Damage / remarks</th><th>Check</th></tr></thead><tbody id="records"></tbody></table></div>
+<p id="empty">Import the Excel file to start.</p>
+</section>
+<section class="panel no-print">
+<div class="headrow"><h2>3. Report comparison</h2><span class="note">Reference counts are from the supplied November Word report, and are not proof of current vacancy.</span></div>
+<div class="scroller"><table class="summary"><thead><tr><th>Quarter group</th><th>Excel report</th><th>Word reference</th><th>Difference</th></tr></thead><tbody id="comparison"></tbody></table></div>
+<div class="notice warning" style="margin-top:12px" id="reviewNotice">Check allotments, transfers, new vacancies and damaged quarters against station records before submitting.</div>
+</section>
+<section class="panel no-print">
+<h2>4. Letter particulars</h2>
+<div class="subpanel">
+<div><label for="from">From</label><textarea id="from">காவல் ஆய்வாளர்,
+G3 கீழ்ப்பாக்கம் காவல் நிலையம்,
+சட்டம் மற்றும் ஒழுங்கு,
+கீழ்ப்பாக்கம், சென்னை - 10.</textarea></div>
+<div><label for="to">To</label><textarea id="to">காவல் உதவி ஆணையாளர் அவர்கள்,
+குடியிருப்பு மற்றும் நலன்,
+சென்னை பெருநகர காவல்,
+வேப்பேரி, சென்னை - 7.</textarea></div>
+<div><label for="letterDate">Letter date</label><input id="letterDate" type="date" value="2026-11-10"><label for="refNumber" style="margin-top:10px">Reference / Na.Ka.No.</label><input id="refNumber" value=""></div>
+</div>
+<label for="subject">Tamil subject</label>
+<textarea id="subject" rows="2">கீழ்ப்பாக்கம் சட்டம் மற்றும் ஒழுங்கு காவலர் குடியிருப்பில் காலியாக உள்ள வீடுகள் பற்றிய மாதாந்திர விவரம் தெரிவித்தல் - தொடர்பாக.</textarea>
+<label for="intro">Tamil letter body (editable)</label>
+<textarea id="intro" rows="4">மேற்படி காவல் நிலைய எல்லைக்குட்பட்ட கீழ்ப்பாக்கம் சட்டம் மற்றும் ஒழுங்கு மற்றும் லூதரல் கார்டன் காவலர் குடியிருப்புகளில் {{MONTH}} மாத தொடக்கத்தில் காலியாக உள்ள / ஒதுக்கீடு செய்யப்பட்டும் குடியேறாத / சேதமடைந்த குடியிருப்புகள் பற்றிய விவரங்கள் இணைப்பில் தெரிவிக்கப்பட்டுள்ளன. மேற்படி விவரங்களைத் தங்களின் மேலான பார்வைக்குப் பணிவுடன் சமர்ப்பிக்கிறேன்.</textarea>
+<div class="actions" style="margin-top:14px"><button id="preview" disabled>Generate preview</button><button id="word" disabled>Download Word (.docx)</button><button id="pdf" disabled class="secondary">Save report as PDF</button><button id="letterPdf" disabled class="secondary">Letter PDF</button><button id="csv" disabled class="ghost">Export checked rows (.csv)</button></div>
+<div id="exportError" role="alert" class="note" style="margin-top:10px"></div>
+</section>
+<section class="panel print-host">
+<div class="headrow no-print"><h2>Preview</h2><span class="note">A4 letter and landscape annexures. Print only after reviewing the list.</span></div>
+<div id="report"><p class="note no-print">Upload the register and select Generate preview.</p></div>
+</section>
+</main>
+<script>
+(() => {
+"use strict";
+const $=id=>document.getElementById(id), GROUPS=[
+{id:"ins",label:"Inspector quarters",reference:9,title:"G3 PS KILPAUK POLICE INSPECTOR QUARTERS VACANT LIST"},
+{id:"si",label:"Kilpauk SI quarters",reference:6,title:"SI QUARTERS KILPAUK TOTAL VACANT"},
+{id:"pc",label:"Kilpauk PC/HC old & new",reference:20,title:"PC/HC OLD/NEW QUARTERS KILPAUK TOTAL VACANT"},
+{id:"lg",label:"Lutheran Garden SI & PC/HC",reference:14,title:"LUTHERAL GARDEN SI QUARTERS & HC/PC"},
+{id:"gr",label:"Gengu Reddy SI quarters",reference:16,title:"24-SI QUARTERS GENGU REDDY"},
+{id:"pu",label:"Pullapuram police quarters",reference:2,title:"G3 PS KILPAUK PULLAPURAM POLICE QUARTERS"}
+], STATUS=["Vacant","Allotted not occupied","Damaged","Reserved / other"];
+let workbook=null, data=[], originals=[], activeSheet="", renderReady=false;
+const clean=x=>String(x===null||x===undefined?"":x).replace(/\s+/g," ").trim();
+const norm=x=>clean(x).toLowerCase().replace(/[\s._-]+/g," ");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const monthName=()=>{const v=$("month").value||"2026-11";return new Date(v+"-01T00:00:00").toLocaleString("en-IN",{month:"long",year:"numeric"});};
+const tamilMonth=()=>{const v=$("month").value||"2026-11";return new Date(v+"-01T00:00:00").toLocaleString("ta-IN",{month:"long",year:"numeric"});};
+function error(message){$("error").hidden=!message;$("error").textContent=message||""}
+function showInfo(message){$("info").textContent=message}
+function colIndex(head,names,fallback){for(const name of names){const i=head.findIndex(x=>norm(x)===norm(name));if(i>=0)return i;}return fallback}
+function detectSection(r,current){
+ const text=norm((r[0]||"")+" "+(r[1]||""));
+ if(text.includes("details of the occupied inspector")||text.includes("inspectors old quarters"))return "io";
+ if(text.includes("inspector new quarters"))return "in";
+ if(text.includes("sub inspector quarters")&&text.includes("kilpauk"))return "si";
+ if(text.includes("kilpauk old police quarters"))return "po";
+ if(text.includes("kilpauk police new quarters"))return "pn";
+ if(text.includes("pullapuram police quarters"))return "pu";
+ if(text.includes("lutharal garden si")||text.includes("lutheral garden si"))return "ls";
+ if(text.includes("lutharal garden hc")||text.includes("lutheral garden hc"))return "lp";
+ if(text.includes("gengu reddy 24 si")||text.includes("gangu reddy 24 si")||text.includes("24 si quarters gengu"))return "gr";
+ return current;
+}
+function desc(section){
+ const D={
+ io:["ins","OLD/INS","G3 Police Station Back Side"],
+ in:["ins","New/INS","Opposite Sangam Theatre"],
+ si:["si","SI","Near Police Housing Board"],
+ po:["pc","PC/HC-OLD","Opposite Sangam Theatre"],
+ pn:["pc","PC/HC-New","Opposite Sangam Theatre"],
+ pu:["pu","PC/HC-New","Opposite Sangam Theatre"],
+ ls:["lg","SI","Ega Theatre Back Side"],
+ lp:["lg","PC","Ega Theatre Back Side"],
+ gr:["gr","SI","Gengu Reddy Subway"]
+ };return D[section]||null;
+}
+function classify(raw){
+ const lo=norm(raw);
+ if(/allot|not occup|not occupe/.test(lo))return "Allotted not occupied";
+ if(/vacant/.test(lo))return "Vacant";
+ if(/damage|damag|demage/.test(lo))return "Damaged";
+ if(/ccb|boys club|police station/.test(lo))return "Reserved / other";
+ return "";
+}
+function parse(sheetName){
+ const ws=workbook.Sheets[sheetName]; if(!ws)throw Error("Worksheet not found");
+ const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:"",blankrows:true});
+ if(!rows.length)throw Error("The worksheet is empty.");
+ let h=rows.find(r=>r.some(c=>/GPF\s*\/?\s*CPS/i.test(String(c)))&&r.some(c=>/Block/i.test(String(c))))||rows[1]||[];
+ const block=colIndex(h,["Block"],11);
+ const floor=colIndex(h,["Floor"],12);
+ const door=colIndex(h,["Quarters No","Door No"],13);
+ const damage=colIndex(h,["damge","damage","Type Of Damage"],16);
+ const eb=colIndex(h,["EB Bill bending","EB Bill pending"],17);
+ const occupy=colIndex(h,["Date of Occupy"],15);
+ let section="io", out=[];
+ for(let i=0;i<rows.length;i++){
+  const r=rows[i]||[];const next=detectSection(r,section);
+  if(next!==section){section=next;continue}
+  if(i<2||!desc(section))continue;
+  if(norm(r[0]).includes("gpf/cps")||norm(r[1]).includes("name of the occupant"))continue;
+  const first=clean(r[0]), extra=clean(r[4]), vOcc=clean(r[occupy]);
+  // The Gengu Reddy sheet records vacancy in column E or Date of Occupy.
+  const special=section==="gr"&&(/vacant|tender/i.test(extra+" "+vOcc));
+  const explicit=classify(first) || (special?classify(extra+" "+vOcc):"");
+  if(!explicit)continue;
+  const [group,category,location]=desc(section);
+  const q=clean(r[door]),b=clean(r[block]),f=clean(r[floor]);
+  // Do not auto-infer a missing quarter number from nearby rows.
+  let dmg=clean(r[damage]);if(!dmg||norm(dmg)==="nil")dmg="";
+  if(/damage|damag|demage/i.test(first)&&!dmg)dmg="Damaged";
+  const ebStatus=clean(r[eb]);
+  if(ebStatus&&!/^(nil|no|0)$/i.test(ebStatus))dmg=(dmg?dmg+"; ":"")+"EB: "+ebStatus;
+  if(/suicide/i.test(first))dmg=(dmg?dmg+"; ":"")+"Suicide quarters";
+  if(/club|ccb/i.test(first))dmg=(dmg?dmg+"; ":"")+first;
+  const invalid=!b||!f||!q;
+  const status=classify(first)||classify(extra+" "+vOcc);
+  out.push({id:i+"-"+group,sourceRow:i+1,group,section,category,location,block:b,
+   floor:/^GG$/i.test(f)?"GF":f,door:q,status,statusRaw:first||extra||vOcc,
+   damage:dmg||"NIL",needsReview:invalid,include:!invalid});
+ }
+ // A changed XLSX layout needs human review rather than silent column guesses.
+ if(rows.length<100)throw Error("The worksheet has too few rows for the expected quarters register.");
+ return out;
+}
+function active(){return data.filter(x=>x.include)}
+function countGroup(g){return active().filter(x=>x.group===g).length}
+function refreshStats(){
+ const a=active();const n=s=>a.filter(x=>x.status===s).length;
+ $("statCount").textContent=a.length;$("statVacant").textContent=n("Vacant");
+ $("statAllotted").textContent=n("Allotted not occupied");
+ $("statDamaged").textContent=n("Damaged")+n("Reserved / other");
+ $("statReview").textContent=data.filter(x=>x.needsReview||(!x.block||!x.floor||!x.door)).length;
+ $("comparison").innerHTML=GROUPS.map(g=>{const cur=countGroup(g.id),delta=cur-g.reference;return "<tr><td>"+esc(g.label)+"</td><td>"+cur+"</td><td>"+g.reference+"</td><td class='"+(delta?"diff":"")+"'>"+(delta>0?"+":"")+delta+"</td></tr>"}).join("")+
+ "<tr><td><b>Total</b></td><td><b>"+a.length+"</b></td><td><b>"+GROUPS.reduce((s,g)=>s+g.reference,0)+"</b></td><td></td></tr>";
+ const missing=data.filter(x=>!x.block||!x.floor||!x.door);
+ $("reviewNotice").textContent=(missing.length?missing.length+" row(s) have missing block / floor / door details; fix them before including. ":"")+
+  "Reference Word figures may differ from updated Excel statuses. Verify with the quarters register and allotment records.";
+}
+function filtered(){
+ const g=$("fgroup").value,s=$("fstatus").value,q=norm($("search").value);
+ return data.filter(x=>(!g||x.group===g)&&(!s||x.status===s)&&(!q||norm([x.sourceRow,x.block,x.floor,x.door,x.status,x.damage,x.statusRaw,x.category].join(" ")).includes(q)));
+}
+function refreshRows(){
+ const list=filtered();
+ $("records").innerHTML=list.map(x=>{
+ const flag=x.needsReview||!x.block||!x.floor||!x.door;
+ return "<tr class='"+(flag?"flag":"")+"' data-id='"+esc(x.id)+"'>"+
+ "<td><input aria-label='Include row' type='checkbox' data-field='include' "+(x.include?"checked":"")+"></td>"+
+ "<td class='mono'>"+x.sourceRow+"</td><td>"+esc((GROUPS.find(g=>g.id===x.group)||{}).label||x.group)+"<div class='note'>"+esc(x.category)+"</div></td>"+
+ "<td><input class='small' data-field='block' value='"+esc(x.block)+"' aria-label='Block'></td>"+
+ "<td><input class='small' data-field='floor' value='"+esc(x.floor)+"' aria-label='Floor'></td>"+
+ "<td><input class='small' data-field='door' value='"+esc(x.door)+"' aria-label='Door'></td>"+
+ "<td><select data-field='status'>"+STATUS.map(s=>"<option "+(s===x.status?"selected":"")+">"+esc(s)+"</option>").join("")+"</select></td>"+
+ "<td><input class='long' data-field='damage' value='"+esc(x.damage)+"' aria-label='Damage or remarks'><div class='note'>Excel: "+esc(x.statusRaw)+"</div></td>"+
+ "<td><span class='state "+(flag?"warn":"")+"'>"+(flag?"Review":"Mapped")+"</span></td></tr>";
+ }).join("");
+ $("empty").hidden=!!list.length;$("empty").textContent=data.length?"No rows match your filter.":"Import the Excel file to start.";
+}
+function refresh(){refreshRows();refreshStats();renderReady=false}
+function recalcFlags(x){x.needsReview=!x.block||!x.floor||!x.door;if(x.needsReview)x.include=false}
+function setEnabled(value){["preview","word","pdf","letterPdf","csv","reset","includeVisible","excludeVisible"].forEach(id=>$(id).disabled=!value)}
+function prepareSheets(){
+ const list=workbook.SheetNames;
+ $("sheet").innerHTML=list.map(s=>"<option>"+esc(s)+"</option>").join("");
+ $("sheet").disabled=false;
+ const preferred=list.find(s=>/pommi/i.test(s))||list[0];
+ $("sheet").value=preferred;loadSheet(preferred);
+}
+function loadSheet(name){
+ try{
+  error("");data=parse(name);originals=data.map(x=>({...x}));activeSheet=name;
+  $("fgroup").innerHTML='<option value="">All groups</option>'+GROUPS.map(g=>'<option value="'+g.id+'">'+esc(g.label)+'</option>').join("");
+  $("fgroup").value="";$("fstatus").value="";$("search").value="";
+  setEnabled(true);refresh();makePreview();
+  showInfo("Loaded "+name+" — "+data.length+" reportable row(s) detected. Rows needing correction are excluded until completed.");
+ }catch(e){setEnabled(false);error("Unable to read this sheet: "+e.message)}
+}
+$("excel").addEventListener("change",async e=>{
+ const f=e.target.files&&e.target.files[0]; if(!f)return;
+ try{
+  if(typeof XLSX==="undefined")throw Error("Excel reader did not load. Check your internet connection and reload the page.");
+  if(f.size>25*1024*1024)throw Error("File exceeds the 25 MB limit.");
+  error("");const bytes=await f.arrayBuffer();
+  workbook=XLSX.read(new Uint8Array(bytes),{type:"array",cellDates:false});
+  prepareSheets();
+ }catch(err){error(err.message);setEnabled(false)}
+});
+$("sheet").addEventListener("change",()=>loadSheet($("sheet").value));
+["fgroup","fstatus"].forEach(id=>$(id).addEventListener("change",refreshRows));
+$("search").addEventListener("input",refreshRows);
+$("records").addEventListener("change",e=>{
+ const field=e.target?.dataset?.field, tr=e.target.closest("tr[data-id]");if(!field||!tr)return;
+ const x=data.find(r=>r.id===tr.dataset.id);if(!x)return;
+ x[field]=field==="include"?e.target.checked:e.target.value.trim();
+ if(["block","floor","door"].includes(field))recalcFlags(x);
+ refresh(); // retain filters; screen uses a small table, no private fields persisted
+});
+$("records").addEventListener("input",e=>{
+ if(!["block","floor","door","damage"].includes(e.target?.dataset?.field))return;
+ // Changes are recorded on blur/change to avoid rebuilding the row during typing.
+});
+$("includeVisible").onclick=()=>{filtered().forEach(x=>{recalcFlags(x);if(!x.needsReview)x.include=true});refresh()};
+$("excludeVisible").onclick=()=>{filtered().forEach(x=>x.include=false);refresh()};
+$("reset").onclick=()=>{data=originals.map(x=>({...x}));refresh();makePreview()};
+function makePreview(){
+ if(!data.length){$("report").innerHTML="<p>No report entries.</p>";return}
+ const a=active(),mo=monthName(),ps=clean($("ps").value)||"G3 Kilpauk";
+ const date=$("letterDate").value?$("letterDate").value.split("-").reverse().join("."):"";
+ const ref=clean($("refNumber").value);
+ const intro=$("intro").value.replaceAll("{{MONTH}}",tamilMonth());
+ let html='<article class="letter-page" lang="ta"><h3>காவல் குடியிருப்பு மாதாந்திர காலியிட அறிக்கை</h3>'+
+ '<p style="text-align:right">'+esc(ref?ref+" · ":"")+"நாள்: "+esc(date)+"</p>"+
+ '<div class="address"><b>அனுப்புநர்</b>\n'+esc($("from").value)+'</div>'+
+ '<div class="address to"><b>பெறுநர்</b>\n'+esc($("to").value)+'</div>'+
+ '<p><b>பொருள்:</b> '+esc($("subject").value)+'</p><p>ஐயா,</p>'+
+ '<p class="bodycopy">'+esc(intro)+'</p>'+
+ '<p>இணைப்பு: '+esc(mo)+" – "+a.length+" குடியிருப்புகள் பற்றிய விவரப்பட்டியல்.</p>"+
+ '<p style="text-align:right;margin-top:65px">தங்கள் உண்மையுள்ள,<br>காவல் ஆய்வாளர்<br>'+esc(ps)+'</p></article>';
+ for(const g of GROUPS){
+  const list=a.filter(x=>x.group===g.id);
+  if(!list.length)continue;
+  html+='<article class="report-page"><h3>'+esc(g.title)+' — '+list.length+' <span class="note">('+esc(mo)+')</span></h3>'+
+  '<table class="report-table"><thead><tr>'+["S.No","Zone","Range","District","PS","Location","Category","Block","Floor","Door No","Type of Damage","Type of Vacant"].map(h=>"<th>"+h+"</th>").join("")+"</tr></thead><tbody>";
+  list.forEach((r,i)=>{const values=[i+1,"Kilpauk","Kilpauk","Kilpauk",ps,r.location,r.category,r.block,r.floor,r.door,r.damage,r.status];
+   html+="<tr>"+values.map(v=>"<td>"+esc(v)+"</td>").join("")+"</tr>";
+  });
+  html+="</tbody></table></article>";
+ }
+ $("report").innerHTML=html;
+ renderReady=true;
+}
+$("preview").onclick=()=>{makePreview();$("report").scrollIntoView({behavior:"smooth",block:"start"})};
+function printable(kind){if(!renderReady)makePreview();document.body.classList.remove("print-report","print-letter","print-all");document.body.classList.add(kind);window.print()}
+window.addEventListener("afterprint",()=>document.body.classList.remove("print-report","print-letter","print-all"));
+$("pdf").onclick=()=>printable("print-report");
+$("letterPdf").onclick=()=>printable("print-letter");
+function download(name,blob){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+function fileDate(){return $("month").value||"2026-11"}
+function csvCell(v){const s=String(v??"");return '"'+s.replace(/"/g,'""')+'"'}
+$("csv").onclick=()=>{
+ const a=active(),headers=["S.No","Zone","Range","District","PS","Location","Category","Block","Floor","Door No","Type Of Damage","Type Of Vacant","Excel Row"];
+ const csv=[headers,...a.map((r,i)=>[i+1,"Kilpauk","Kilpauk","Kilpauk",$("ps").value,r.location,r.category,r.block,r.floor,r.door,r.damage,r.status,r.sourceRow])]
+ .map(row=>row.map(csvCell).join(",")).join("\r\n");
+ download("Police_Quarters_"+fileDate()+".csv",new Blob(["\uFEFF",csv],{type:"text/csv;charset=utf-8"}));
+};
+function textRun(v,bold=false,size=19){return new docx.TextRun({text:String(v??""),bold,size,font:"Arial"})}
+function paragraph(v,bold=false,alignment){return new docx.Paragraph({children:[textRun(v,bold)],alignment,spacing:{after:130}})}
+$("word").onclick=async()=>{
+ const label=$("exportError");label.textContent="";
+ if(!active().length){label.textContent="Select at least one complete record.";return}
+ try{
+  if(!window.docx)throw Error("Word generator library did not load. Check your connection and reload.");
+  const d=window.docx,ps=clean($("ps").value)||"G3 Kilpauk",mo=monthName();
+  const date=$("letterDate").value?$("letterDate").value.split("-").reverse().join("."):"";
+  const intro=$("intro").value.replaceAll("{{MONTH}}",tamilMonth());
+  const letter=[
+   new d.Paragraph({children:[textRun("காவல் குடியிருப்பு மாதாந்திர காலியிட அறிக்கை",true,27)],alignment:d.AlignmentType.CENTER,spacing:{after:400}}),
+   paragraph(($("refNumber").value?$("refNumber").value+" — ":"")+"நாள்: "+date),
+   paragraph("அனுப்புநர்:\n"+$("from").value),
+   paragraph("பெறுநர்:\n"+$("to").value),
+   paragraph("பொருள்: "+$("subject").value,true),
+   paragraph("ஐயா,"),paragraph(intro),
+   paragraph("இணைப்பு: "+mo+" – "+active().length+" குடியிருப்புகள் பற்றிய விவரப்பட்டியல்."),
+   paragraph("தங்கள் உண்மையுள்ள,\nகாவல் ஆய்வாளர்\n"+ps)
+  ];
+  const tborder={style:d.BorderStyle.SINGLE,size:4,color:"A9B5C0"};
+  const headings=["S.No","Zone","Range","District","PS","Location","Category","Block","Floor","Door No","Type of Damage","Type of Vacant"];
+  const report=[];
+  for(const g of GROUPS){
+   const list=active().filter(x=>x.group===g.id);if(!list.length)continue;
+   report.push(new d.Paragraph({children:[textRun(g.title+" — "+list.length+" ("+mo+")",true,20)],spacing:{before:230,after:130}}));
+   function cell(v,isHead){return new d.TableCell({borders:{top:tborder,bottom:tborder,left:tborder,right:tborder},margins:{top:80,bottom:80,left:65,right:65},
+       shading:isHead?{fill:"E6EDF3"}:undefined,children:[new d.Paragraph({children:[textRun(v,isHead,13)],spacing:{after:0}})]})}
+   const allrows=[new d.TableRow({tableHeader:true,cantSplit:true,children:headings.map(x=>cell(x,true))})];
+   list.forEach((r,i)=>allrows.push(new d.TableRow({cantSplit:true,children:[i+1,"Kilpauk","Kilpauk","Kilpauk",ps,r.location,r.category,r.block,r.floor,r.door,r.damage,r.status].map(x=>cell(x,false))})));
+   report.push(new d.Table({rows:allrows,width:{size:100,type:d.WidthType.PERCENTAGE},layout:d.TableLayoutType.FIXED}));
+   report.push(new d.Paragraph({text:"",spacing:{after:100}}));
+  }
+  const doc=new d.Document({creator:"Police Quarters Automation",title:"Police Quarters – "+mo,
+   sections:[
+    {properties:{page:{margin:{top:1100,right:1000,bottom:1000,left:1000}}},children:letter},
+    {properties:{page:{size:{orientation:d.PageOrientation.LANDSCAPE},margin:{top:520,right:500,bottom:500,left:500}}},children:report}
+   ]});
+  const blob=await d.Packer.toBlob(doc);
+  download("Police_Quarters_Report_"+fileDate()+".docx",blob);
+ }catch(e){label.textContent="Word export failed: "+e.message}
+};
+["month","ps","from","to","letterDate","refNumber","subject","intro"].forEach(id=>$(id).addEventListener("change",()=>{renderReady=false;if(data.length)makePreview()}));
+})();
+</script>
+</body>
+</html>
