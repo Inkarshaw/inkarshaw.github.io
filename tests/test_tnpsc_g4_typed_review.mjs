@@ -27,7 +27,7 @@ assert.equal(ids.length,new Set(ids).size,'Duplicate DOM ids');
 for(const r of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(r[1]),'Referenced id '+r[1]+' exists');
 for(const [year,expectedTyped,expectedNumbers] of [
 [2024,54,Array.from({length:54},(_,i)=>i+1)],
-[2025,153,[...Array.from({length:150},(_,i)=>i+1),174,192,200]]
+[2025,176,[...Array.from({length:150},(_,i)=>i+1),...Array.from({length:24},(_,i)=>i+152),192,200]]
 ]){
 const d=JSON.parse(read('data/quizzes/tnpsc-g4-'+year+'-typed-review.json'));
 const sourceKeys=keybook.papers.find(p=>p.id===d.paperId);
@@ -90,7 +90,28 @@ if(year===2025){
   const page=n<=128?19:n<=133?20:n<=139?21:n<=148?22:23;
   assert.equal(q.referenceReadingURL,'https://www.tnpscguide.com/exams/group-4/papers/group-4-2025-question-paper/'+page);
  }
- assert.equal(d.questions[125].keyToken,'B/C');
+ for(let n=151;n<=175;n++){
+  const q=d.questions[n-1];
+  if(n===151){
+   assert.equal(q.text,null,'Figure dependent Q151 must remain untyped');
+   assert.equal(q.options,null,'Do not reconstruct dice picture with guesses');
+   assert.match(q.sourceIssue,/original four-view diagram/);
+   assert.equal(q.diagramReviewStatus,'source-image-visual-comparison-required');
+   continue;
+  }
+  assert.ok(q.text&&q.options&&q.textTamil&&q.optionsTamil,'Missing bilingual options/stem at Q'+n);
+  assert.equal(q.translationStatus,'editorial-translation-not-verified-against-official-Tamil');
+  if(n===174)continue; // pre-existing 2025 English stem
+  assert.equal(q.sourceReviewStatus,'source-pdf-visual-proof-pending');
+  assert.match(q.transcriptionEvidence,/Independently written English study paraphrase/);
+  const srcPage=n<=154?23:n<=158?24:n<=164?25:n<=168?26:n<=174?27:28;
+  assert.equal(q.referenceReadingURL,'https://www.tnpscguide.com/exams/group-4/papers/group-4-2025-question-paper/'+srcPage);
+}
+for(const special of [161,162]){
+ assert.equal(d.questions[special-1].keyToken,'ALL','Original final-key ALL marker at '+special);
+ assert.deepEqual(d.questions[special-1].accepted,[],'ALL position excluded from provisional score');
+}
+assert.equal(d.questions[125].keyToken,'B/C');
  assert.deepEqual(d.questions[125].accepted,['B','C'],'Q126 has two final-key accepted answers');
  assert.equal(d.questions[137].keyToken,'ALL');
  assert.deepEqual(d.questions[137].accepted,[],'Q138 must remain ungraded');
@@ -101,6 +122,8 @@ assert.equal(d.questions[121].keyToken,'B/C','Q122 official multiple accepted an
 assert.deepEqual(d.questions[121].accepted,['B','C']);
 assert.match(html,/id="stemTamil"/,'Tamil separate stem display required');
 assert.match(js,/q\.optionsTamil/,'Tamil answer options should render for bilingual records');
+assert.match(js,/q\.sourceIssue/,'A figure-dependent question should disclose why text is withheld');
+assert.doesNotMatch(js,/ALL accepted/,'Special ALL key must not be casually described as all choices correct');
 assert.equal(d.questions[67].keyToken,'A/B/C','Multiple official answers preserved at Q68');
 assert.deepEqual(d.questions[67].accepted,['A','B','C']);
 assert.equal(d.questions[73].keyToken,'ALL','Q74 special official key preserved');
@@ -133,4 +156,4 @@ assert.equal(q.sourceStatus,'source-pdf-required');
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2024/);
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2025/);
 assert.match(read('sitemap.xml'),/tnpsc-g4-typed-review\.html/);
-console.log('PASS Group IV 2024/2025 source-linked typed reviews: 54 and 153 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
+console.log('PASS Group IV 2024/2025 source-linked typed reviews: 54 and 176 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
