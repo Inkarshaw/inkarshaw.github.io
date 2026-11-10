@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,317 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,343 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -106,6 +106,14 @@ Updated 10 November 2026. Added **30 original-numbered bilingual English/Tamil s
 Source provenance: original TNPSC 2024 booklet OCR records in the repository; the independently numbered text references https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/17 through /21, and TNPSC official final answer key Subject Code 003. The original scanned-booklet pages have **not** passed independent visual proof for these 30 drafts; they are editorially adapted and translated rather than verbatim source reproductions.
 
 Special cases: **Q151 accepts B and C**, while **Q154 has ALL** and is excluded from the provisional single-answer scoring denominator. The Q164 study paraphrase distinguishes an Article 249 permission to legislate on a State List subject from a permanent transfer to the Union List. Preserve the original question and official key reference for comparison.
+
+### TNPSC Group IV 2024 all 200 adapted study positions completed
+
+**Current status as at 10 November 2026:** all **200/200** question numbers in the 2024 General Tamil booklet now have readable *editorial adapted* study text. The 2024 set has **196 provisionally gradable positions** and four special official final-key **ALL** numbers (Q63, Q86, Q93, Q154) excluded from the single-answer denominator. For 2024 Q101–200, independent English and Tamil study stems and A–E choices are present. Across eight original-numbered practice sets, total locally playable text positions reach **1,343**.
+
+The final batch added bilingual Q175–200 and links to the original-numbered 2024 reading references pages 21–24 (https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/21 through /24); the original booklet OCR supports the subject matter and source numbers. **Zero** 2024 question texts have passed independent visual comparison and exact verbatim verification against the primary scanned PDF. Do not use a verified-original badge, claim exact source reproduction, or equate 200/200 editorial coverage with final transcription quality.
+
+Next mandatory QA: review original paper page by page, compare every printed choice and diagram, confirm original Tamil wording, evaluate editorial questions for ambiguous answers (particularly calculations and assertion/reason items), and determine lawful publication basis. Historical interim milestones further below are superseded by this current status.
 
 ## Source-indexed years still requiring question text
 
