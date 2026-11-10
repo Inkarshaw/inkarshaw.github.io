@@ -74,9 +74,9 @@ entries=d.entries;
 refreshStats();
 render();
 }).catch(e=>{$('showing').textContent='Typed quiz library could not load: '+e.message});
-})();
 /* This separate question bank supplies previously hidden, already-curated exam/year sets.
    Adaptations never contribute to original numbered transcription counts. */
 fetch('data/quizzes/verified-pyqs.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()})
 .then(rows=>{adapted=collectAdapted(rows);refreshStats();render()})
 .catch(()=>{if(entries.length)$('showing').textContent+=' · Adapted question bank temporarily unavailable.'});
+})();
