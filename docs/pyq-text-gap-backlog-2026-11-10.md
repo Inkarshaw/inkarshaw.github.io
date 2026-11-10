@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,343 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,352 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -114,6 +114,14 @@ Special cases: **Q151 accepts B and C**, while **Q154 has ALL** and is excluded 
 The final batch added bilingual Q175–200 and links to the original-numbered 2024 reading references pages 21–24 (https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/21 through /24); the original booklet OCR supports the subject matter and source numbers. **Zero** 2024 question texts have passed independent visual comparison and exact verbatim verification against the primary scanned PDF. Do not use a verified-original badge, claim exact source reproduction, or equate 200/200 editorial coverage with final transcription quality.
 
 Next mandatory QA: review original paper page by page, compare every printed choice and diagram, confirm original Tamil wording, evaluate editorial questions for ambiguous answers (particularly calculations and assertion/reason items), and determine lawful publication basis. Historical interim milestones further below are superseded by this current status.
+
+### TNUSRB SI 2015 — readable question recovery without false grading
+
+As at 10 November 2026, **118/140** original-numbered user-OCR items are readable enough for practice; **109** retain provisional secondary-key scoring, while **nine** additional complete question/option records — Q8, Q14, Q29, Q30, Q33, Q65, Q66, Q84, Q127 — are **ungraded** because their printed secondary answer-table token is missing or conflicts with the question. The remaining **22** are withheld for source-incomplete, damaged, ambiguous or missing-diagram records.
+
+The source data deliberately retains each original secondary key token for review, but clears accepted-answer lists for all nine disputed items; the player now shows their stems and four alternatives **without correct/wrong highlights or adding points**. Pre-existing local attempts at the older 109-question version are mapped into the revised 118-question source-numbered sequence, preserving answers where possible.
+
+This changes the eight-set total to **1,352 readable practice positions**. It does NOT imply an official verified final answer key or any new source-verbatim certification. The 2015 subject-grouped study PDF at https://athiyamanteam.com/wp-content/uploads/2019/05/TN-Taluk-SI-2015-Question-Paper-140-Questions-Police-SI-Athiyaman-Team.pdf was examined for context, but its independent subject ordering means it must never be treated as a substitute for the original-numbered candidate booklet. The 2010 Departmental Type A PDF is likewise not applicable to the 2010 Open candidates' bank.
 
 ## Source-indexed years still requiring question text
 
