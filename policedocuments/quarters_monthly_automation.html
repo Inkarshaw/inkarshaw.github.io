@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>Police Quarters Monthly Automation | G3 Kilpauk</title>
-<meta name="description" content="Local Excel-to-Word and PDF police quarters monthly vacancy reporting, with editable verification.">
+<title>Police Quarters In-Charge Management | G3 Kilpauk</title>
+<meta name="description" content="Browser-local police quarters management dashboard, master register, repairs, allotments, inspection history and monthly reports.">
 <style>
 :root{--ink:#14263a;--muted:#61758a;--blue:#17578a;--line:#dce5ed;--bg:#f4f7fb;--paper:#fff;--ok:#147d59;--warn:#b45d13}
 *{box-sizing:border-box}
@@ -100,6 +100,40 @@ tr.flag td:first-child{border-left:3px solid #e6a64a}
 .switchline input{width:auto}
 @media(max-width:880px){.control-grid{grid-template-columns:1fr 1fr}.subpanel{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:550px){main{padding:0 10px}.panel{padding:12px}.control-grid,.filters{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.letter-page{padding:12px}.kpi strong{font-size:22px}}
+.qm{border-top:4px solid #1d628c}
+.qm h2{font-size:20px;letter-spacing:-.3px}
+.qm-actor{display:grid;grid-template-columns:minmax(170px,270px) 1fr;gap:14px;align-items:end}
+.qm-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:17px 0}
+.qm-tabs button{background:#edf4f8;color:#285271;border-color:#cbdde8;padding:9px 13px}
+.qm-tabs button.is-active{background:#135784;color:white;border-color:#135784}
+.qm-pane[hidden],#qmAvailable[hidden],#qmOffline[hidden],#qmProfileWrap[hidden],#qmProfileEmpty[hidden]{display:none!important}
+.qm-metrics{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px;margin:14px 0 18px}
+.qm-metric{border:1px solid #dce6ed;background:#f8fbfd;border-radius:10px;padding:11px;min-height:86px}
+.qm-metric strong{font-size:23px;line-height:1.2;display:block;font-variant-numeric:tabular-nums}
+.qm-metric span{font-size:11px;color:#61758a;display:block;margin-top:5px}
+.qm-metric.positive strong{color:#187853}
+.qm-metric.attention strong{color:#a35416}
+.qm-headrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.qm-subheading{color:#476279;font-weight:750;font-size:15px;margin:16px 0 8px}
+.qm-scroll{overflow:auto;max-height:47vh;border:1px solid #dbe6ee;border-radius:9px}
+.qm-table{min-width:680px;width:100%}
+.qm-table th{position:sticky;top:0;background:#edf4f8}
+.qm-table th,.qm-table td{font-size:12px;vertical-align:top}
+.qm-table select{min-width:125px;padding:5px}
+.qm-link{background:#ebf4fa;color:#185882;border:1px solid #bdd5e4;padding:5px 10px;white-space:nowrap}
+.qm-searchrow{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin:12px 0}
+.qm-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.qm-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:12px 0}
+.qm-form .wide{grid-column:1/-1}
+.qm-form input,.qm-form select,.qm-form textarea{width:100%}
+.qm-profilehead{border-bottom:1px solid #e4eaf0;padding-bottom:10px}
+.qm-profilehead h3{font-size:19px;margin-bottom:3px}
+.qm-navnote{font-size:12px;color:#526d80}
+.qm-progressnote{margin:10px 0;background:#edf6fc;color:#235474;border-left:3px solid #5689a9;padding:10px;border-radius:6px}
+.qm-progressnote.warning{background:#fff3e6;color:#935b20;border-color:#d49a4b}
+@media(max-width:1250px){.qm-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:720px){.qm-actor,.qm-searchrow,.qm-cols{grid-template-columns:1fr}.qm-form{grid-template-columns:repeat(2,minmax(0,1fr))}.qm-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:480px){.qm-form{grid-template-columns:1fr}.qm-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.qm-metric{min-height:74px}.qm-metric strong{font-size:22px}.qm-tabs button{padding:7px 9px;font-size:12px}}
 @page letterpage{size:A4 portrait;margin:18mm}
 @page reportpage{size:A4 landscape;margin:9mm}
 @media print{
@@ -121,12 +155,13 @@ body.print-all .letter-page{display:block}
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.umd.cjs"></script>
+<script defer src="./quarters_manager.js?v=20261110-incharge"></script>
 </head>
 <body>
 <header>
 <a href="/policedocuments/">← Police Documents</a>
-<h1>Police Quarters Monthly Automation</h1>
-<p>Excel register → verify vacancy entries → Tamil forwarding letter + category-wise Word / PDF report</p>
+<h1>Police Quarters In-Charge Management</h1>
+<p>Upload Excel · Manage every unit · Track handovers, repairs, utilities and inspections · Export updated Excel</p>
 </header>
 <main>
 <section class="panel no-print">
@@ -164,6 +199,86 @@ body.print-all .letter-page{display:block}
   <div class="toolbar"><button id="allPrev" type="button" class="secondary" disabled>Previous</button><span id="allPageLabel" class="note">Page 0</span><button id="allNext" type="button" class="secondary" disabled>Next</button></div>
  </div>
 </section>
+<section class="panel no-print qm" id="quarters-management">
+ <div class="qm-headrow"><div><h2>Quarters In-Charge Dashboard</h2><p class="note">Manage individual unit histories, maintenance, allotment, vacation, EB/water, inspections and correspondence. All entries are saved to the Excel file you export.</p></div>
+ <a href="#excelRegister" class="state" style="text-decoration:none">Open full Excel editor ↓</a></div>
+ <p id="qmOffline" class="notice">Upload your latest quarters Excel above to activate the management dashboard.</p>
+ <div id="qmAvailable" hidden>
+  <div class="qm-actor"><div><label for="qmActor">Operator name / designation (required for changes)</label><input id="qmActor" placeholder="Example: Quarters In-Charge, G3"></div>
+  <p class="note">The name is entered manually, not verified by login. Use only on an authorised device and protect the exported workbook. An Excel activity log is editable and is not a tamper-proof audit system.</p></div>
+  <div id="qmMessage" class="qm-progressnote" role="status">Select a unit to begin. Export Edited Excel before leaving this page.</div>
+  <nav class="qm-tabs" aria-label="Quarters management sections">
+    <button type="button" id="qmTabdashboard" data-qm-tab="dashboard">Overview</button>
+    <button type="button" id="qmTabunits" data-qm-tab="units">Units</button>
+    <button type="button" id="qmTabprofile" data-qm-tab="profile">Unit profile</button>
+    <button type="button" id="qmTabactions" data-qm-tab="actions">Actions & registers</button>
+    <button type="button" id="qmTabalerts" data-qm-tab="alerts">Alerts</button>
+  </nav>
+  <section class="qm-pane" data-qm-pane="dashboard">
+   <div id="qmMetrics" class="qm-metrics"></div>
+   <p id="qmSummaryText" class="note"></p>
+   <div class="qm-cols">
+    <div><h3 class="qm-subheading">Needs attention</h3><div class="qm-scroll"><table class="qm-table"><thead><tr><th>Quarters</th><th>Issue</th><th>Due</th><th>View</th></tr></thead><tbody id="qmAttentionBody"></tbody></table></div></div>
+    <div><h3 class="qm-subheading">Recent updates</h3><div class="qm-scroll"><table class="qm-table"><thead><tr><th>Time</th><th>Change</th><th>Unit</th><th>By</th></tr></thead><tbody id="qmAuditBody"></tbody></table></div></div>
+   </div>
+  </section>
+  <section class="qm-pane" data-qm-pane="units" hidden>
+   <div class="qm-headrow"><h3 class="qm-subheading">Physical quarters register</h3><span id="qmUnitListCount" class="note"></span></div>
+   <div class="qm-searchrow"><div><label for="qmUnitSearch">Search quarters, block, door or occupant</label><input id="qmUnitSearch" placeholder="Block / door / person"></div>
+   <div><label for="qmUnitFilter">Current status</label><select id="qmUnitFilter"></select></div></div>
+   <div class="qm-scroll"><table class="qm-table"><thead><tr><th>Category</th><th>Block</th><th>Floor</th><th>Door</th><th>Occupant</th><th>Status</th><th>Action</th></tr></thead><tbody id="qmUnitRows"></tbody></table></div>
+   <p class="note" id="qmUnitLimit"></p>
+  </section>
+  <section class="qm-pane" data-qm-pane="profile" hidden>
+   <div id="qmProfileEmpty" class="notice">Select a unit from the Units tab.</div>
+   <div id="qmProfileWrap" hidden>
+    <div class="qm-profilehead"><p class="note" id="qmUnitId"></p><h3 id="qmUnitTitle"></h3><p id="qmUnitSource" class="qm-navnote"></p></div>
+    <h3 class="qm-subheading">Unit details and verified status</h3>
+    <div class="qm-form">
+     <div><label for="qmStatus">Verified status override</label><select id="qmStatus"></select></div>
+     <div><label for="qmPerson">Current occupant (override if changed)</label><input id="qmPerson" placeholder="Leave blank to use Excel name"></div>
+     <div><label for="qmRank">Rank / designation override</label><input id="qmRank" placeholder="Leave blank to use Excel rank"></div>
+     <div><label for="qmAllotment">Allotment order number</label><input id="qmAllotment"></div>
+     <div><label for="qmVerified">Last physical inspection / verification</label><input id="qmVerified" type="date"></div>
+     <div class="wide"><label for="qmUnitNotes">Quarters notes / fixture condition</label><textarea id="qmUnitNotes" rows="2"></textarea></div>
+    </div>
+    <div class="actions"><button type="button" id="qmProfileSave">Save unit changes</button><span class="note">The source worksheet remains available in the full Excel editor below. Manual overrides are kept separately in Q_Units.</span></div>
+    <h3 class="qm-subheading">Record an action or handover</h3>
+    <p class="note">This single form covers eight registers: allotment, occupation, vacation, transfer follow-up, maintenance, electricity/water, inspection and correspondence.</p>
+    <input id="qmEventUnit" type="hidden">
+    <div class="qm-form">
+     <div><label for="qmEventType">Register / action type</label><select id="qmEventType"></select></div>
+     <div><label for="qmEventDate">Event / inspection date</label><input id="qmEventDate" type="date"></div>
+     <div><label for="qmEventPerson">Person / occupant</label><input id="qmEventPerson" placeholder="Where applicable"></div>
+     <div><label for="qmEventReference">Order / letter / complaint reference</label><input id="qmEventReference"></div>
+     <div><label for="qmEventOwner">Assigned officer / engineer</label><input id="qmEventOwner"></div>
+     <div><label for="qmEventDue">Follow-up / due date</label><input id="qmEventDue" type="date"></div>
+     <div><label for="qmEventProgress">Progress</label><select id="qmEventProgress"></select></div>
+     <div><label for="qmEventPriority">Priority</label><select id="qmEventPriority"></select></div>
+     <div class="wide"><label for="qmEventDetails">Description / action details (required)</label><textarea id="qmEventDetails" placeholder="For example: order particulars, key handover, repair defect, EB service, meter reading, inspection findings" rows="3"></textarea></div>
+     <div class="wide"><label for="qmEventNotes">Supporting details / acknowledgement / remarks</label><textarea id="qmEventNotes" rows="2"></textarea></div>
+    </div>
+    <p class="note" id="qmEventTypeHint"></p>
+    <div class="actions"><label class="switchline"><input type="checkbox" id="qmAutoStatus"> Apply suggested unit status when this action is recorded</label><button type="button" id="qmEventSave">Record action</button></div>
+    <h3 class="qm-subheading">Individual quarters history <span id="qmHistoryCount" class="state"></span></h3>
+    <div class="qm-scroll"><table class="qm-table"><thead><tr><th>Date</th><th>Action</th><th>Reference</th><th>Details</th><th>Progress</th><th>Due date</th></tr></thead><tbody id="qmHistoryRows"></tbody></table></div>
+   </div>
+  </section>
+  <section class="qm-pane" data-qm-pane="actions" hidden>
+   <div class="qm-headrow"><h3 class="qm-subheading">Allotment · Transfer · Repairs · EB/Water · Inspection · Correspondence</h3><span id="qmActionCount" class="note"></span></div>
+   <div class="qm-searchrow"><div><label for="qmActionSearch">Search register entries</label><input id="qmActionSearch" placeholder="Unit / reference / issue / officer"></div><div><label for="qmActionTypeFilter">Register</label><select id="qmActionTypeFilter"></select></div></div>
+   <div class="qm-scroll"><table class="qm-table"><thead><tr><th>Unit</th><th>Date</th><th>Register</th><th>Details</th><th>Assigned to</th><th>Due</th><th>Progress (editable)</th></tr></thead><tbody id="qmActionRows"></tbody></table></div>
+   <div class="actions" style="margin-top:12px"><button type="button" id="qmExportActions" class="secondary">Export pending action list (.csv)</button><span class="note">The full history and changes are included in the edited Excel export above.</span></div>
+  </section>
+  <section class="qm-pane" data-qm-pane="alerts" hidden>
+   <div class="qm-headrow"><h3 class="qm-subheading">Action alerts</h3><span id="qmAlertCount" class="state"></span></div>
+   <p class="note">Alerts are based on entered statuses and follow-up dates, not on automatic statutory deadlines. Confirm the applicable orders and actual unit condition.</p>
+   <div class="qm-scroll"><table class="qm-table"><thead><tr><th>Quarters</th><th>Type</th><th>Issue</th><th>Due date</th></tr></thead><tbody id="qmAlertRows"></tbody></table></div>
+  </section>
+  <p class="notice warning" style="margin-top:13px">Session-only data. Nothing is automatically sent to ACP/DC, TNPHC or other authorities. Export and securely retain the Excel workbook after every update; PDF/Word reports below must be verified before submission.</p>
+ </div>
+</section>
+<div id="excelRegister"></div>
 <div class="kpis no-print" id="stats">
 <div class="kpi"><strong id="statCount">—</strong><span>Report entries</span></div>
 <div class="kpi"><strong id="statVacant">—</strong><span>Vacant</span></div>
@@ -227,10 +342,12 @@ let originalBytes=null,originalName="",allMasterRows=[],allHeaders=[],allColCoun
 const changedCells=new Map();
 function renderEditStatus(){
  $("editingFile").textContent=originalName||"No Excel file uploaded";
- $("changesCount").textContent=changedCells.size+" modified cell"+(changedCells.size===1?"":"s")+" · "+
+ const managed=window.QuartersManager?window.QuartersManager.changeCount():0;
+ const totalEdits=changedCells.size+managed;
+ $("changesCount").textContent=totalEdits+" change"+(totalEdits===1?"":"s")+" · "+
  (originalName?"download to keep changes":"upload Excel to begin");
  $("downloadEdited").disabled=!workbook;
- $("undoExcel").disabled=!workbook||changedCells.size===0;
+ $("undoExcel").disabled=!workbook||totalEdits===0;
 }
 function updateWorkbookCell(sheetName,rowNumber,colNumber,value){
  const ws=workbook.Sheets[sheetName],addr=XLSX.utils.encode_cell({r:rowNumber-1,c:colNumber});
@@ -349,7 +466,7 @@ function buildFullRegister(){
   // Retain every non-empty row with at least one data value outside column A.
   if(!values.slice(1).some(x=>x.trim()))return;
   const d=desc(section),group=d?d[1]:"Other";
-  allMasterRows.push({row:i+1,values,group,status:rowOccupancy(values,allHeaders)});
+  allMasterRows.push({row:i+1,values,group,section,mgmtGroup:d?d[0]:"",location:d?d[2]:"",status:rowOccupancy(values,allHeaders)});
  });
  $("allHead").innerHTML="<tr><th>Excel row</th><th>Group</th><th>Occupancy</th>"+
  allHeaders.map((h,i)=>"<th title='"+esc("Excel column "+XLSX.utils.encode_col(i))+"'>"+
@@ -402,6 +519,7 @@ function onFullEdit(e){
   refresh();makePreview();
  }catch(err){$("exportError").textContent="Monthly report needs review: "+err.message}
  renderFullRegister();
+ window.dispatchEvent(new CustomEvent("quarters:change"));
 }
 $("allRecords").addEventListener("change",onFullEdit);
 $("allSearch").addEventListener("input",()=>{allPage=0;renderFullRegister()});
@@ -488,7 +606,7 @@ function refresh(){refreshRows();refreshStats();renderReady=false}
 function recalcFlags(x){x.needsReview=!x.block||!x.floor||!x.door;if(x.needsReview)x.include=false}
 function setEnabled(value){["preview","word","pdf","letterPdf","csv","reset","includeVisible","excludeVisible"].forEach(id=>$(id).disabled=!value)}
 function prepareSheets(preferredSheet){
- const list=workbook.SheetNames;
+ const list=workbook.SheetNames.filter(n=>!["Q_Units","Q_Events","Q_Audit"].includes(n));
  $("sheet").innerHTML=list.map(s=>"<option>"+esc(s)+"</option>").join("");
  $("sheet").disabled=false;
  const preferred=(preferredSheet&&list.includes(preferredSheet)?preferredSheet:null)||list.find(s=>/pommi/i.test(s))||list[0];
@@ -507,6 +625,7 @@ function loadSheet(name){
   $("fgroup").value="";$("fstatus").value="";$("search").value="";
   setEnabled(true);refresh();makePreview();
   showInfo("Loaded "+name+" — "+allMasterRows.length+" editable records; "+data.length+" reportable vacancy rows.");
+  window.dispatchEvent(new CustomEvent("quarters:change"));
  }catch(e){
   data=[];originals=[];setEnabled(false);refresh();
   $("report").innerHTML="<p>Editing is available for this worksheet. Monthly report layout is not available: "+esc(e.message)+"</p>";
@@ -522,7 +641,7 @@ $("excel").addEventListener("change",async e=>{
   const bytes=new Uint8Array(await f.arrayBuffer());
   const parsed=XLSX.read(bytes,{type:"array",cellDates:false,cellStyles:true});
   workbook=parsed;originalBytes=bytes;originalName=f.name;
-  changedCells.clear();captureOriginalValues();prepareSheets();
+  changedCells.clear();captureOriginalValues();window.dispatchEvent(new CustomEvent("quarters:workbook-uploaded"));prepareSheets();
   renderEditStatus();
  }catch(e){error("Excel import failed: "+e.message);workbook=null;originalBytes=null;renderEditStatus()}
 });
@@ -531,6 +650,7 @@ $("downloadEdited").onclick=()=>{
  if(!workbook)return;
  try{
   // Updates are applied in memory to original worksheet cells and all worksheets are retained.
+  window.dispatchEvent(new CustomEvent("quarters:before-export"));
   const arr=XLSX.write(workbook,{bookType:"xlsx",type:"array",compression:true});
   const base=originalName.replace(/\.(xlsx|xls)$/i,"").replace(/[^a-z0-9 _.-]/gi,"_")||"Quarters_Register";
   download(base+"_edited.xlsx",new Blob([arr],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
@@ -540,8 +660,9 @@ $("downloadEdited").onclick=()=>{
 $("undoExcel").onclick=()=>{
  if(!originalBytes||!confirm("Discard all edits made in the uploaded workbook?"))return;
  const current=activeSheet;
+ window.dispatchEvent(new CustomEvent("quarters:reset"));
  workbook=XLSX.read(originalBytes,{type:"array",cellDates:false,cellStyles:true});
- changedCells.clear();prepareSheets(current);renderEditStatus();
+ changedCells.clear();window.dispatchEvent(new CustomEvent("quarters:workbook-uploaded"));prepareSheets(current);renderEditStatus();
  showInfo("All edits discarded. The original uploaded workbook has been restored in this session.");
 };
 ["fgroup","fstatus"].forEach(id=>$(id).addEventListener("change",refreshRows));
@@ -647,6 +768,12 @@ $("word").onclick=async()=>{
 try{if(window.indexedDB)window.indexedDB.deleteDatabase("clearexams-quarters-master-v1")}catch(e){}
 const dNow=new Date();const today=[dNow.getFullYear(),String(dNow.getMonth()+1).padStart(2,"0"),String(dNow.getDate()).padStart(2,"0")].join("-");
 $("month").value=today.slice(0,7);$("letterDate").value=today;
+window.QuartersCore={
+ getWorkbook:()=>workbook,getSheet:()=>activeSheet,getRows:()=>allMasterRows,getHeaders:()=>allHeaders,
+ getReport:()=>data,parseReport:()=>parse(activeSheet),
+ applyReport:rows=>{data=rows;refresh();makePreview()},
+ refreshEditStatus:renderEditStatus
+};
 ["month","ps","from","to","letterDate","refNumber","subject","intro"].forEach(id=>$(id).addEventListener("change",()=>{renderReady=false;if(data.length)makePreview()}));
 })();
 </script>
