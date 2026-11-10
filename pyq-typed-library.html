@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Typed PYQ Quiz Library | TNPSC & TNUSRB | ClearExams</title>
-<meta name="description" content="Choose source-numbered TNPSC and TNUSRB previous year text quizzes by exam and year. See actual typed coverage, key status and missing transcription count.">
+<title>All Years PYQ Text Quizzes | TNPSC, TNUSRB, UPSC, SSC & Railways | ClearExams</title>
+<meta name="description" content="Find every indexed exam-year across TNPSC, TNUSRB, UPSC, SSC and Railways, with playable text quizzes, source papers and honest missing-text coverage.">
 <link rel="canonical" href="https://clearexams.ink/pyq-typed-library.html">
 <link rel="icon" href="assets/clearexams-icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#08213d">
@@ -31,13 +31,23 @@ input,select{border:1px solid #b9cce0;background:#fff;padding:11px 12px;border-r
 .empty{background:#fff;border:1px dashed #c0d3e7;padding:23px;border-radius:13px}
 footer{background:#08213d;padding:23px;color:#d4e3f8;text-align:center;font-size:.88rem}footer a{color:#cde6ff}
 @media(max-width:750px){.filters{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.hero{padding:30px 0}}
+
+[hidden]{display:none!important}
+.filters{grid-template-columns:1.6fr 1fr 1.2fr 1fr}
+.archive-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:9px}
+a.source-action{display:inline-flex;align-items:center;border-radius:9px;padding:8px 10px;background:#edf4fe;color:#1b5593;font-size:.81rem;font-weight:750;text-decoration:none}
+.card .status{font-weight:800}.statusbar{font-size:.85rem;color:#546e87;margin:8px 0 12px}
+.load-more{font:inherit;font-weight:800;background:#fff;color:#1657a7;border:1px solid #bdd2ed;padding:12px 16px;border-radius:11px;cursor:pointer;display:block;margin:12px auto 28px}
+@media(max-width:900px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.filters{grid-template-columns:1fr}}
 </style></head><body>
 <header><nav class="wrap"><a class="brand" href="index.html">ClearExams.</a><a href="pyq-hub.html">All previous papers</a><a href="quiz-coverage.html">Textbook coverage</a><a href="index.html">Home</a></nav></header>
-<section class="hero"><div class="wrap"><div class="eyebrow">TNPSC · TNUSRB · Previous-year question practice</div><h1>Typed PYQ Quiz Library</h1><p>Find an exam and year to practise original-numbered question drafts or adapted source-attributed PYQs. Missing and unverified original-paper text remains clearly labelled.</p><div class="numbers" id="stats"><span>Loading quiz coverage…</span></div></div></section>
-<main class="wrap"><div class="disclaimer"><strong>Coverage transparency:</strong> All counts describe available practice text, not independently certified verbatim reproduction. Official paper PDFs and final answer keys remain the primary source. Some full-numbered drafts need human text review, and provisional scoring is not an official exam result. Adapted PYQ counts are separate from original-paper transcription coverage.</div>
-<div class="filters" role="search"><div><label for="search">Search exam or year</label><input type="search" id="search" placeholder="e.g., Group IV, 2024, SI, Group I" autocomplete="off"></div><div><label for="examFilter">Examination board</label><select id="examFilter"><option value="all">All boards</option><option value="TNPSC">TNPSC</option><option value="TNUSRB">TNUSRB</option><option value="UPSC">UPSC</option></select></div><div><label for="coverageFilter">Typed coverage</label><select id="coverageFilter"><option value="all">All statuses</option><option value="full-numbered-draft">All original numbers typed</option><option value="partial">Incomplete / under review</option><option value="adapted">Adapted question text</option></select></div></div>
-<p id="showing" role="status" aria-live="polite"></p><div class="cards" id="cards"></div><div class="empty" id="empty" hidden>No question-text set matches these filters. Clear the search or select a different board.</div>
-<p class="disclaimer">Need the complete paper when text is missing? The <a href="pyq-hub.html">PYQ hub</a> has official PDF links and full-number answer-sheet sessions for supported TNPSC papers.</p></main>
+<section class="hero"><div class="wrap"><div class="eyebrow">TNPSC · TNUSRB · UPSC · SSC · Railways</div><h1>PYQ Text Quiz Library · All Exams &amp; Years</h1><p>Browse the complete indexed year-wise archive. Start the available typed or adapted quizzes, and open official source papers where original question text has not yet been transcribed.</p><div class="numbers" id="stats"><span>Loading quiz coverage…</span></div></div></section>
+<main class="wrap"><div class="disclaimer"><strong>Coverage transparency:</strong> Indexed source-only exam years are not typed quizzes. Available practice-text counts are not independently certified verbatim reproduction. Official paper PDFs and final answer keys remain the primary source. Some full-numbered drafts need human text review, and provisional scoring is not an official exam result. Adapted PYQ counts are separate from original-paper transcription coverage.</div>
+<div class="filters" role="search"><div><label for="search">Search exam or year</label><input type="search" id="search" placeholder="e.g., Group IV, 2024, SI, Group I" autocomplete="off"></div><div><label for="examFilter">Examination board</label><select id="examFilter"><option value="all">All boards</option><option value="TNPSC">TNPSC</option><option value="TNUSRB">TNUSRB</option><option value="UPSC">UPSC</option><option value="SSC">SSC</option><option value="Railways">Railways</option></select></div><div><label for="coverageFilter">Typed coverage</label><select id="coverageFilter"><option value="all">All statuses</option><option value="full-numbered-draft">All original numbers typed</option><option value="partial">Incomplete / under review</option><option value="adapted">Adapted question text</option><option value="text">Any available question text</option><option value="source-only">Source only / text missing</option></select></div><div><label for="yearFilter">Examination year</label><select id="yearFilter"><option value="all">All years</option></select></div></div>
+<div class="statusbar"><span id="dataNotice">Loading archive…</span></div>
+<p id="showing" role="status" aria-live="polite"></p><div class="cards" id="cards"></div><button type="button" id="showMore" class="load-more" hidden>Show more exam years</button><div class="empty" id="empty" hidden>No exam-year record matches these filters. Search another year or change the coverage filter.</div>
+<p class="disclaimer">For source-only years, official question-paper links or candidate-access archives are provided instead of invented MCQs. <a href="pyq-hub.html">Original paper archive</a> · <a href="pyq-digitize.html">Local paper transcription workbench</a>.</p></main>
 <footer>ClearExams · <a href="pyq-hub.html">PYQ Hub</a> · Original source text remains authoritative.</footer>
 <script src="assets/js/typed-pyq-catalog.js" defer></script>
 </body></html>
