@@ -27,7 +27,7 @@ assert.equal(ids.length,new Set(ids).size,'Duplicate DOM ids');
 for(const r of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(r[1]),'Referenced id '+r[1]+' exists');
 for(const [year,expectedTyped,expectedNumbers] of [
 [2024,54,Array.from({length:54},(_,i)=>i+1)],
-[2025,85,[...Array.from({length:75},(_,i)=>i+1),112,113,125,127,140,146,148,174,192,200]]
+[2025,110,[...Array.from({length:100},(_,i)=>i+1),112,113,125,127,140,146,148,174,192,200]]
 ]){
 const d=JSON.parse(read('data/quizzes/tnpsc-g4-'+year+'-typed-review.json'));
 const sourceKeys=keybook.papers.find(p=>p.id===d.paperId);
@@ -51,6 +51,17 @@ if(year===2025){
   assert.equal(q.sourceReviewStatus,'source-pdf-visual-proof-pending','Q'+n+' needs scanned-PDF proofreading');
   assert.match(q.transcriptionEvidence,/adapted Tamil text/,'Q'+n+' must clearly identify adapted wording');
   assert.match(q.referenceReadingURL,/^https:\/\/www\.tnpscguide\.com\/ta\/exams\/group-4\/papers\/group-4-2025-question-paper\/[89]$/);
+}
+for(let n=76;n<=100;n++){
+  const q=d.questions[n-1];
+  assert.equal(q.sourceReviewStatus,'source-pdf-visual-proof-pending','Q'+n+' cannot be certified as exact booklet wording');
+  assert.match(q.transcriptionEvidence,/Editorial Tamil adaptation/,'Q'+n+' must disclose editorial rewriting');
+  const page=n<=83?10:n<=87?11:n<=91?12:n<=96?13:14;
+  assert.equal(q.referenceReadingURL,'https://www.tnpscguide.com/ta/exams/group-4/papers/group-4-2025-question-paper/'+page,'Q'+n+' source index pointer');
+}
+for(const n of [77,78]){
+ assert.equal(d.questions[n-1].keyToken,'C/D','Multi-answer token at Q'+n);
+ assert.deepEqual(d.questions[n-1].accepted,['C','D'],'Both final-key answers are valid at Q'+n);
 }
 assert.equal(d.questions[67].keyToken,'A/B/C','Multiple official answers preserved at Q68');
 assert.deepEqual(d.questions[67].accepted,['A','B','C']);
@@ -84,4 +95,4 @@ assert.equal(q.sourceStatus,'source-pdf-required');
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2024/);
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2025/);
 assert.match(read('sitemap.xml'),/tnpsc-g4-typed-review\.html/);
-console.log('PASS Group IV 2024/2025 source-linked typed reviews: 54 and 85 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
+console.log('PASS Group IV 2024/2025 source-linked typed reviews: 54 and 110 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
