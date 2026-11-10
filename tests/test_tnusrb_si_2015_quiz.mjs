@@ -64,7 +64,7 @@ assert.ok(blocked.has(90)&&blocked.has(99)&&blocked.has(120)&&blocked.has(129));
 assert.match(html,/118 readable practice questions/);
 assert.match(html,/9 ungraded · 22 held/);
 assert.match(html,/id="ungradedIssues"/);
-assert.match(html,/provisional, non-officially verified answer table/);
+assert.match(html,/non-officially verified secondary answer table/);
 assert.match(js,/provisional_secondary_key/);
 assert.match(js,/ungraded_source_dispute/,'Ungraded questions need distinct scoring status');
 assert.match(js,/const scored=q.scoringStatus==='provisional_secondary_key'/,'Feedback must be neutral for ungraded');
