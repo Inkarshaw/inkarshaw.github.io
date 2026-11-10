@@ -643,6 +643,8 @@ $("word").onclick=async()=>{
   download("Police_Quarters_Report_"+fileDate()+".docx",blob);
  }catch(e){label.textContent="Word export failed: "+e.message}
 };
+// Remove any master register left by an earlier release of this page.
+try{if(window.indexedDB)window.indexedDB.deleteDatabase("clearexams-quarters-master-v1")}catch(e){}
 const dNow=new Date();const today=[dNow.getFullYear(),String(dNow.getMonth()+1).padStart(2,"0"),String(dNow.getDate()).padStart(2,"0")].join("-");
 $("month").value=today.slice(0,7);$("letterDate").value=today;
 ["month","ps","from","to","letterDate","refNumber","subject","intro"].forEach(id=>$(id).addEventListener("change",()=>{renderReady=false;if(data.length)makePreview()}));
