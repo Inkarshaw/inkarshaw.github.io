@@ -1,5 +1,5 @@
 /* TNUSRB SI 2015 Open Quota — user-supplied bilingual OCR.
-   121 playable, 19 held for source verification. Answer table is provisional. */
+   118 readable: 109 provisional-keyed, 9 key-disputed ungraded; 22 held for missing source.  */
 (() => {
   'use strict';
   const $=id=>document.getElementById(id);
@@ -11,26 +11,33 @@
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2015||data?.maxOriginalQuestions!==140||
        data?.providedQuestionCount!==140||!Array.isArray(data.questions)||data.questions.length!==140||
-       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==31||
+       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==22||
+       data.ungradedReadableQuestionCount!==9||
        !Array.isArray(data.answerKey?.answers)||data.answerKey.answers.length!==140)
        throw Error('TNUSRB SI 2015 source manifest incomplete');
     for(let i=0;i<140;i++){
       const q=data.questions[i];
       if(q.number!==i+1||typeof q.question!=='string'||!q.options||
          q.answerKeyToken!==data.answerKey.answers[i]||
-         !['blocked_source_incomplete','provisional_secondary_key'].includes(q.scoringStatus))
+         !['blocked_source_incomplete','provisional_secondary_key','ungraded_source_dispute'].includes(q.scoringStatus))
         throw Error('Invalid source record Q'+(i+1));
       if(q.scoringStatus==='provisional_secondary_key'&&
          (!q.question.trim()||!LETTERS.includes(q.answerKeyToken)||
           !LETTERS.every(a=>typeof q.options[a]==='string'&&q.options[a].trim())))
         throw Error('Incomplete playable Q'+q.number);
+      if(q.scoringStatus==='ungraded_source_dispute'&&
+         (!q.question.trim()||!LETTERS.every(a=>typeof q.options[a]==='string'&&q.options[a].trim())||
+          q.acceptedAnswers.length!==0||!q.scoringReviewReason||data.blockedNumbers.includes(q.number)))
+        throw Error('Ungraded source-review record is incomplete Q'+q.number);
       if(q.scoringStatus==='blocked_source_incomplete'&&!data.blockedNumbers.includes(q.number))
         throw Error('Undisclosed incomplete Q'+q.number);
     }
-    const playable=data.questions.filter(q=>q.scoringStatus==='provisional_secondary_key');
-    if(playable.length!==109||playable.length!==data.playableQuestionCount||
-       playable.length!==data.provisionallyScoreableQuestionCount)
-      throw Error('Expected 121 readable source questions');
+    const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
+    if(playable.length!==118||playable.length!==data.playableQuestionCount||
+       playable.filter(q=>q.scoringStatus==='provisional_secondary_key').length!==109||
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==9||
+       data.provisionallyScoreableQuestionCount!==109)
+      throw Error('SI 2015 playback, graded and ungraded manifest totals disagree');
     return playable;
   }
   const storageKey=()=>STORAGE+$('mode').value;
@@ -92,26 +99,36 @@
     const div=$('feedback');div.replaceChildren();
     const visible=attempt.mode==='practice'&&attempt.checked[attempt.index];
     div.hidden=!visible;if(!visible)return;
-    const choice=attempt.answers[attempt.index],right=q.acceptedAnswers.includes(choice);
-    div.className=right?'':'issue';
+    const scored=q.scoringStatus==='provisional_secondary_key';
+    const choice=attempt.answers[attempt.index],right=scored&&q.acceptedAnswers.includes(choice);
+    div.className=scored?(right?'':'issue'):'issue';
     const heading=document.createElement('strong');
-    heading.textContent=right?'Correct per provisional key':'Incorrect per provisional key';
+    heading.textContent=scored?(right?'Correct per provisional key':'Incorrect per provisional key'):'Ungraded — source/key review needed';
     div.append(heading);
     const info=document.createElement('p');
-    info.textContent='2015 secondary answer-table entry: '+q.answerKeyToken+'. Your answer: '+choice+'.';
+    info.textContent=scored?'2015 secondary answer-table entry: '+q.answerKeyToken+'. Your answer: '+choice+'.':
+      'Your choice: '+choice+'. This question is excluded from all score calculations because the secondary key is disputed or missing.';
     div.append(info);
-    const p=document.createElement('p');
-    p.textContent='Provisional accepted choice: '+q.answerKeyToken+') '+q.options[q.answerKeyToken];
-    div.append(p);
+    if(scored){
+      const answer=document.createElement('p');
+      answer.textContent='Provisional accepted choice: '+q.answerKeyToken+') '+q.options[q.answerKeyToken];
+      div.append(answer);
+    }else{
+      const note=document.createElement('p');
+      note.textContent=q.scoringReviewReason||q.sourceIssue||'Original booklet or final answer key needs review.';
+      div.append(note);
+    }
     const foot=document.createElement('p');
-    foot.textContent='Unofficial secondary answer table. Question wording and TNUSRB official final key have not been independently fully verified.';
+    foot.textContent=scored?
+      'Unofficial secondary answer table. Original question and TNUSRB final key have not been independently fully verified.':
+      'Do not infer an official correct answer from the disputed secondary answer table.';
     div.append(foot);
   }
   function render(scroll=false){
     if(!attempt||attempt.finished)return;
     const i=attempt.index,q=questions[i];
     $('position').textContent='Original Q'+q.number+' · '+(i+1)+' / '+questions.length;
-    $('section').textContent=q.section;
+    $('section').textContent=q.section+(q.scoringStatus==='ungraded_source_dispute'?' · Ungraded source review':'');
     $('status').textContent=answered()+' / '+questions.length+' answered · '+attempt.marked.filter(Boolean).length+' marked';
     $('progressFill').style.width=(100*answered()/questions.length).toFixed(1)+'%';
     $('progressBar').setAttribute('aria-valuemax',String(questions.length));
@@ -129,8 +146,8 @@
       const l=document.createElement('b');l.textContent=letter;
       const content=document.createElement('span');content.textContent=q.options[letter];
       b.append(l,content);
-      if(locked&&q.answerKeyToken!=='ALL'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
-      if(locked&&q.answerKeyToken!=='ALL'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
+      if(locked&&q.scoringStatus==='provisional_secondary_key'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
+      if(locked&&q.scoringStatus==='provisional_secondary_key'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
       b.disabled=locked;
       b.addEventListener('click',()=>{if(locked)return;attempt.answers[i]=letter;render()});
       $('options').append(b);
@@ -148,33 +165,39 @@
     const blank=questions.length-answered();
     if(!expired&&blank&&!window.confirm(blank+' questions are unanswered. Submit and see results?'))return;
     attempt.finished=true;clearTimer();save();
-    const correct=questions.reduce((sum,q,i)=>sum+(q.acceptedAnswers.includes(attempt.answers[i])?1:0),0);
-    const wrong=questions.reduce((sum,q,i)=>sum+(attempt.answers[i]&&!q.acceptedAnswers.includes(attempt.answers[i])?1:0),0);
+    const scoreable=questions.filter(q=>q.scoringStatus==='provisional_secondary_key').length;
+    const ungraded=questions.length-scoreable;
+    const correct=questions.reduce((sum,q,i)=>sum+(q.scoringStatus==='provisional_secondary_key'&&q.acceptedAnswers.includes(attempt.answers[i])?1:0),0);
+    const wrong=questions.reduce((sum,q,i)=>sum+(q.scoringStatus==='provisional_secondary_key'&&attempt.answers[i]&&!q.acceptedAnswers.includes(attempt.answers[i])?1:0),0);
     $('resultTitle').textContent=expired?'Time expired — submitted':'TNUSRB SI 2015 provisional result';
-    $('score').textContent=(correct*0.5).toFixed(1)+' / '+(questions.length*0.5).toFixed(1)+' provisional marks';
-    $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
-      questions.length+' readable question records. Thirty-one incomplete or disputed-key source items excluded. '+
-      'This unofficial answer-table tally is not an official TNUSRB score.';
+    $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scoreable*0.5).toFixed(1)+' provisional marks';
+    $('scoreDetails').textContent=correct+' provisionally correct · '+wrong+' provisionally incorrect · '+blank+' unanswered · '+
+      ungraded+' readable questions ungraded · '+questions.length+' playable questions · 22 held for missing/incomplete sources. '+
+      'The secondary answer table is not an officially confirmed TNUSRB key.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
     const filter=$('reviewFilter').value;
     $('reviewList').replaceChildren();
     for(let i=0;i<questions.length;i++){
-      const q=questions[i],answer=attempt.answers[i],right=q.acceptedAnswers.includes(answer);
-      if(filter==='wrong'&&(!answer||right))continue;
+      const q=questions[i],answer=attempt.answers[i];
+      const scored=q.scoringStatus==='provisional_secondary_key';
+      const right=scored&&q.acceptedAnswers.includes(answer);
+      if(filter==='wrong'&&(!scored||!answer||right))continue;
       if(filter==='blank'&&answer)continue;
       if(filter==='marked'&&!attempt.marked[i])continue;
-      if(filter==='ungraded')continue;
+      if(filter==='ungraded'&&scored)continue;
       const details=document.createElement('details');details.className='result-item';
       const summary=document.createElement('summary');
-      summary.textContent='Q'+q.number+' · '+q.question+' — '+(!answer?'Not answered':right?'Correct (provisional)':'Incorrect (provisional)');
+      summary.textContent='Q'+q.number+' · '+q.question+' — '+(!scored?'Ungraded source/key issue':!answer?'Not answered':right?'Correct (provisional)':'Incorrect (provisional)');
       details.append(summary);
       const body=document.createElement('div');body.className='result-body';
       if(q.passage){const p=document.createElement('p');p.textContent=q.passage;body.append(p)}
       const response=document.createElement('p');
-      response.textContent='Your choice: '+(answer||'not answered')+' · secondary 2015 answer table: '+q.answerKeyToken;
+      response.textContent='Your choice: '+(answer||'not answered')+
+        (scored?' · provisional answer-table entry: '+q.answerKeyToken:' · ungraded: secondary key disputed or missing');
       body.append(response);
+      if(!scored){const issue=document.createElement('p');issue.textContent=q.scoringReviewReason||q.sourceIssue||'Source review pending';body.append(issue)}
       for(const letter of LETTERS){
         const p=document.createElement('p');p.textContent=letter+') '+q.options[letter];body.append(p);
       }
@@ -212,8 +235,13 @@
         const li=document.createElement('li');li.textContent='Original Q'+q.number+': '+q.sourceIssue;
         issues.append(li);
       });
-      $('loadStatus').textContent=questions.length+' attemptable questions loaded in original-number order. '+
-        '109 readable questions have provisional secondary-key answers; 31 source-incomplete or disputed entries excluded.';
+      const ungradedList=$('ungradedIssues');ungradedList.replaceChildren();
+      data.questions.filter(q=>q.scoringStatus==='ungraded_source_dispute').forEach(q=>{
+        const li=document.createElement('li');li.textContent='Original Q'+q.number+': '+q.scoringReviewReason;
+        ungradedList.append(li);
+      });
+      $('loadStatus').textContent=questions.length+' readable original-numbered practice questions loaded: '+
+        '109 provisionally scored, 9 source/key disputed and ungraded, 22 incomplete or diagram-dependent records held.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
