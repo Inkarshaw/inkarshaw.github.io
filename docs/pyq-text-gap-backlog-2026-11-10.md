@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,287 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,317 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -98,6 +98,14 @@ Updated 10 November 2026. **30 English General Studies and Aptitude draft practi
 Sources: original CCSE4GT/2024 OCR data bundled in the repository, independently numbered reader pages https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/13 to /17, and the scanned official final key (Subject Code 003, Version A, 9 January 2025) at https://tnpsc.gov.in/Document/Answerkeyfinalresult/01_2024_Final%20_Answer_Key_GT_GE.pdf . **Q115–144 each have a single final key letter**, so all thirty can be provisionally graded. No new ALL or multiple-answer exception occurs in this batch.
 
 The 2024 original-paper PDF https://www.tnpsc.gov.in/Tentative/Document/01_2024_GR_IV_GENERAL_TAMIL.pdf timed out in the public web reader. The text drafts were checked against the separate indexed reading and original-PDF OCR, **not visually certified from original scan pages**. They remain editable editorial adaptations, not verbatim original-paper transcriptions. Q118 clarifies that 1991 Industrial Policy liberalised MRTP-era restrictions, whereas the MRTP Act itself was repealed later under the Competition Act, 2002.
+
+### TNPSC Group IV 2024 Q145–174 editorial review batch
+
+Updated 10 November 2026. Added **30 original-numbered bilingual English/Tamil study texts** for Q145–174. 2024 now has **174/200** locally playable study positions, **170** with provisionally graded final-key answers, and **26** original-numbered text gaps. Across eight typed practice sets this is **1,317** numbered text positions.
+
+Source provenance: original TNPSC 2024 booklet OCR records in the repository; the independently numbered text references https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/17 through /21, and TNPSC official final answer key Subject Code 003. The original scanned-booklet pages have **not** passed independent visual proof for these 30 drafts; they are editorially adapted and translated rather than verbatim source reproductions.
+
+Special cases: **Q151 accepts B and C**, while **Q154 has ALL** and is excluded from the provisional single-answer scoring denominator. The Q164 study paraphrase distinguishes an Article 249 permission to legislate on a State List subject from a permanent transfer to the Union List. Preserve the original question and official key reference for comparison.
 
 ## Source-indexed years still requiring question text
 
