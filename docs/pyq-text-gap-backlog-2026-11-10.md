@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,197 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,227 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -66,6 +66,16 @@ As of 10 November 2026, **176/200** original-numbered source-linked study questi
 **Q161 and Q162** carry the official final key token **ALL**, which ClearExams excludes from the single-answer scored denominator. They remain readable as study questions but are not presented as having exactly one right option.
 
 Source citations: TNPSC final key, Subject Code 496, 17 November 2025 https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/07_2025_CCSE_IV_FINAL_ANSWER_KEY.pdf ; independent indexed study reference pages https://www.tnpscguide.com/exams/group-4/papers/group-4-2025-question-paper/23 through /28. All newly typed original-question prose is independently paraphrased and Tamil text translated; official-page visual comparison is pending.
+
+### TNPSC Group IV 2024 Tamil Q55–84 draft progress
+
+Updated 10 November 2026. The local 2024 source-numbered practice-text set now covers **84/200** question positions, of which **83** are provisionally scored against TNPSC's subject-code-003 final key. **116** question-numbered texts remain absent, and **0** are signed off by independent verbatim editorial certification.
+
+Thirty newly added Tamil study questions cover Q55–84. Their primary scanned-booklet pages 16–24 were visually consulted, with numbered secondary reading references at https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/6 through /9. Question stems were editorially adapted rather than guaranteed exact original wording. Q63 is ALL/ungraded, and Q72 has multiple final-key options A/D. Text, option and legal basis checks are still necessary before declaring a full original-verbatim reproduction.
+
+Primary paper: https://www.tnpsc.gov.in/Tentative/Document/01_2024_GR_IV_GENERAL_TAMIL.pdf
+
+Final key: https://tnpsc.gov.in/Document/Answerkeyfinalresult/01_2024_Final%20_Answer_Key_GT_GE.pdf
 
 ## Source-indexed years still requiring question text
 
