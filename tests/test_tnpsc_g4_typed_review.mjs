@@ -26,7 +26,7 @@ const ids=[...html.matchAll(/id="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(ids.length,new Set(ids).size,'Duplicate DOM ids');
 for(const r of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(r[1]),'Referenced id '+r[1]+' exists');
 for(const [year,expectedTyped,expectedNumbers] of [
-[2024,84,Array.from({length:84},(_,i)=>i+1)],
+[2024,114,Array.from({length:114},(_,i)=>i+1)],
 [2025,200,Array.from({length:200},(_,i)=>i+1)]
 ]){
 const d=JSON.parse(read('data/quizzes/tnpsc-g4-'+year+'-typed-review.json'));
@@ -40,7 +40,29 @@ assert.equal(d.questions.length,200);
 assert.equal(d.status,'incomplete-unverified-typed-draft');
 assert.equal(d.verifiedQuestionCount,0,'No OCR falsely certified');
 if(year===2024){
- for(let n=55;n<=84;n++){
+ for(let n=85;n<=114;n++){
+  const q=d.questions[n-1];
+  assert.equal(q.sourceReviewStatus,'source-pdf-visual-proof-pending','2024 Q'+n+' cannot be certified as original wording');
+  assert.equal(q.sourceStatus,'typed-review-needed','Q'+n+' remains an editable question draft');
+  assert.match(q.transcriptionEvidence,/original scanned booklet question wording.*NOT been independently visually verified/,'New 2024 content must disclose verification boundary');
+  assert.equal(q.referenceReadingURL,'https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/'+(n<=93?10:n<=101?11:n<=108?12:13));
+  assert.ok(q.options&&['A','B','C','D','E'].every(k=>q.options[k]?.trim()),'Full five-option local text Q'+n);
+  if(n>=101){
+   assert.equal(q.language,'en');
+   assert.ok(q.textTamil&&q.optionsTamil,'Bilingual General Studies question Q'+n);
+   assert.equal(q.translationStatus,'editorial-translation-not-verified-against-official-Tamil');
+   assert.ok(['A','B','C','D','E'].every(k=>q.optionsTamil[k]?.trim()),'Complete Tamil choices Q'+n);
+  }else assert.equal(q.language,'ta');
+ }
+ for(const special of [86,93]){
+  assert.equal(d.questions[special-1].keyToken,'ALL','Official key exception Q'+special);
+  assert.deepEqual(d.questions[special-1].accepted,[],'ALL special key not single-answer scored Q'+special);
+ }
+ assert.equal(d.questions[87].keyToken,'B/C','Q88 dual final-key answer');
+ assert.deepEqual(d.questions[87].accepted,['B','C'],'Q88 accepts both B and C');
+ assert.equal(d.questions[84].options.C,'கவி காளமேகம்','Preserve cited option letter at Q85');
+ assert.equal(d.questions[112].options.C,'Punjab and Haryana','Q113 follows source's printed option position');
+for(let n=55;n<=84;n++){
   const q=d.questions[n-1];
   assert.equal(q.primaryScanViewed,true,'Source PDF page was inspected for Q'+n);
   assert.equal(q.sourceReviewStatus,'source-pdf-visual-proof-pending','A scan consultation is not verbatim editorial certification');
@@ -204,4 +226,4 @@ assert.equal(q.sourceStatus,'source-pdf-required');
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2024/);
 assert.match(read('pyq-hub.html'),/tnpsc-g4-typed-review\.html\?year=2025/);
 assert.match(read('sitemap.xml'),/tnpsc-g4-typed-review\.html/);
-console.log('PASS Group IV 2024/2025 source-linked typed reviews: 84 and 200 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
+console.log('PASS Group IV 2024/2025 source-linked typed reviews: 114 and 200 draft questions, 200 externally readable original slots each, key-mapped without fabricated local text.');
