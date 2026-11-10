@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,173 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,197 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -27,6 +27,25 @@ As of 10 November 2026, the source-numbered Tamil/English draft set covers **110
 ### Group IV 2025 bilingual GS Q101–125 progress
 
 On 10 November 2026, added 22 numbered, **editorially adapted English stems and independent Tamil study translations** for 2025 Group IV GS positions Q101–125, without overwriting previously drafted Q112, Q113 or Q125. The set now has **132/200** locally playable text positions, **127** with provisional answer-key scoring, **68** source-text gaps and **zero** independently visually certified originals. Q107 is ALL/ungraded and Q122 accepts B/C. Primary booklet comparison and Tamil text proofreading remain outstanding.
+
+### Latest status: 2025 Group IV — all 200 practice texts, but NONE certified verbatim
+
+Updated 10 November 2026 after the final Q176–200 pass. The **2025** TNPSC Group IV source-numbered set now has **200/200 locally playable editorial study texts**; **192/200** have provisionally scorable final-key positions and **8 positions** have ALL special keys (excluded from the graded denominator). This raises the eight-set library to **1,197** numbered practice-text positions. **Zero 2025 question texts have passed independent original scanned-booklet visual verification.** These 200 are not reproduced verbatim or independently certified originals.
+
+- Completed editorial English question texts for previously missing Q176–199 (except Q192, which already existed). Added Tamil study translations to Q192, Q200, Q112, Q113 and Q125, so all Q101–200 General Studies/Aptitude items now have both study languages.
+- Q151 (dice) and Q189 (field-book geometry) are **explicitly marked figure-to-text equivalents**, reconstructed using a secondary source's numeric description and checked arithmetically. The original TNPSC figure scans have not been visually compared and the site warns learners.
+- Correct answer position references are retained from the 2025 **final key for Subject Code 496** (17 November 2025), including ALL entries at Q6, Q56, Q74, Q107, Q112, Q138, Q161 and Q162. These key mappings are not human certification of text wording.
+- Further mandatory work: original booklet **visual page-by-page** comparison, exact five-option audit, Tamil translation check against original Tamil, figure proof, editorial explanations and publication-rights determination. Do not describe as a fully verbatim paper or publish a 100% accuracy badge.
+
+Official question paper: https://tnpsc.gov.in/tentative/document/07_2025_GENEAL_TAMIL_GS.pdf
+
+Official final key: https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/07_2025_CCSE_IV_FINAL_ANSWER_KEY.pdf
+
+Secondary source-indexed reading pages: https://www.tnpscguide.com/exams/group-4/papers/group-4-2025-question-paper/28 through /32.
+
+#### Earlier coverage milestones (historical, superseded)
+
+The following interim records document earlier additions on 10 November 2026; their counts and Q151's former source-only status no longer reflect the latest 200/200 adapted-study set.
 
 ### Group IV 2025 primary-PDF Q126–150 batch
 
