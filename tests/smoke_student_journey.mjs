@@ -413,7 +413,7 @@ try {
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: B/);
   assert.equal(await page.locator('#options button').nth(1).isDisabled(),true);
-  await page.locator('.palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').click();
   const nums=await page.locator('#palette button').allTextContents();
   assert.equal(nums.length,115,'2020 Open Candidates: Q22 visible for ungraded practice while 25 source gaps held');
   for(const skip of [14,15,37,84,95,103,121]){
@@ -436,7 +436,7 @@ try {
   assert.match(await page.locator('#start').innerText(),/Resume 115-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q89/);
-  await page.locator('.palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').click();
   assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q140/);
