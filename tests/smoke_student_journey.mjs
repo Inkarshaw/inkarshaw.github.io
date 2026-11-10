@@ -368,6 +368,18 @@ try {
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Ungraded — source\/key review needed/);
   assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Do not show disputed key as correct or incorrect');
+  await page.locator('#palette button').filter({hasText:/^11$/}).click();
+  assert.match(await page.locator('#questionTamil').innerText(),/எந்த வகை வாக்கியம்/,'2015 Q11 editorial Tamil study stem shown');
+  assert.match(await page.locator('#options button').nth(2).innerText(),/உணர்ச்சி வாக்கியம்/,'2015 Q11 bilingual option C');
+  assert.equal(await page.locator('#sourceReader').isVisible(),true,'Indexed source review disclosed on bilingual questions');
+  await page.locator('#palette button').filter({hasText:/^14$/}).click();
+  assert.match(await page.locator('#questionTamil').innerText(),/செயப்பாட்டு வினை/,'Source disputed Q14 has Tamil text');
+  await page.locator('#options button').nth(3).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded — source\/key review needed/,'Question 14 must remain ungraded despite grammar');
+  assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Never highlight source-disputed key on Q14');
+  await page.locator('#palette button').filter({hasText:/^21$/}).count().then(n=>assert.equal(n,0,'Unreadable Q21 remains blocked'));
+
   await page.locator('#palette button').filter({hasText:/^132$/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
   assert.equal(await page.locator('#passage').isVisible(),true,'Q132–Q134 shared passage is visible');

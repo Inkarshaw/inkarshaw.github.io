@@ -16,6 +16,27 @@ assert.equal(d.answerKey.answers.length,140);
 assert.equal(d.answerKey.bookletSeries,'unconfirmed');
 assert.equal(d.answerKey.answers[29],null,'Secondary printed answer table lacks Q30');
 assert.equal(d.answerKey.type,'unverified_secondary_answer_table');
+const reader='https://civilserviceaspirants.in/Tnusrb/Question-Paper-with-Answer/Tnusrb-si/Tnusrb-si-2015-gk-open-2.php';
+assert.equal(d.bilingualNumberedReaderReview.sourceURL,reader);
+assert.deepEqual(d.bilingualNumberedReaderReview.reviewedOriginalNumbers,Array.from({length:10},(_,i)=>i+11));
+assert.match(d.bilingualNumberedReaderReview.status,/primary-TNUSRB-booklet-and-key-not-verified/);
+const bilingual2015=d.questions.filter(q=>q.secondaryBilingualSourceURL===reader);
+assert.deepEqual(bilingual2015.map(q=>q.number),Array.from({length:10},(_,i)=>i+11));
+for(const q of bilingual2015){
+ assert.equal(q.secondaryBilingualSourceURL,reader,'Indexed 2015 Open Candidates number-linked source');
+ assert.ok(q.questionTamil?.trim(),'Tamil study stem for Q'+q.number);
+ assert.ok(['A','B','C','D'].every(k=>q.optionsTamil?.[k]?.trim()),'Tamil A–D choice text for Q'+q.number);
+ assert.equal(q.translationStatus,'editorial-Tamil-translation-not-confirmed-with-original-TNUSRB-booklet');
+ assert.match(q.sourceReviewStatus,/not-original-booklet-verified/);
+ assert.match(q.sourceReviewEvidence,/not a certified original booklet transcription/);
+}
+assert.equal(d.questions[13].scoringStatus,'ungraded_source_dispute','Q14 answer conflict must not become gradable');
+assert.deepEqual(d.questions[13].acceptedAnswers,[]);
+assert.equal(d.questions[13].answerKeyToken,'C','Keep secondary-source key token only as provenance');
+assert.match(d.questions[13].scoringReviewReason,/grammatically correct.*D/);
+assert.match(d.questions[13].sourceReviewEvidence,/reader marks C even though/,'Printed secondary key problem independently corroborated');
+assert.equal(d.questions[13].optionsTamil.D,'சாலை பழுது பார்க்கப்பட்டுக் கொண்டிருக்கிறது');
+
 assert.equal(d.blockedNumbers.length,22);
 assert.equal(d.playableQuestionCount,118);
 assert.equal(d.ungradedReadableQuestionCount,9);
@@ -71,6 +92,12 @@ assert.match(js,/const scored=q.scoringStatus==='provisional_secondary_key'/,'Fe
 assert.match(js,/const scoreable=questions.filter/,'Score denominator excludes ungraded questions');
 assert.match(js,/if\(filter==='ungraded'&&scored\)continue/,'Review filter lists ungraded entries');
 assert.match(js,/gradedIndices\[saved.index\]/,'Previous 109-question attempts must be mapped into 118-question order');
+assert.match(js,/q\.optionsTamil/,'Tamil option text should render for indexed Open Candidates Q11–20');
+assert.match(js,/\$\('questionTamil'\)/);
+assert.match(js,/\$\('sourceReader'\)/);
+assert.match(html,/id="questionTamil"/);
+assert.match(html,/id="sourceReader"/);
+assert.match(html,/Tnusrb-si-2015-gk-open-2\.php/);
 assert.match(js,/clearexams:tnusrb:si:2015:open/);
 assert.ok(!js.includes('innerHTML'),'Source strings must never be injected as HTML');
 const ids=[...html.matchAll(/id="([^"]+)"/g)].map(x=>x[1]);

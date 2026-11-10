@@ -37,6 +37,8 @@ assert.equal(by('tnusrb-si-2015').typed,s2015.playableQuestionCount);
 assert.equal(by('tnusrb-si-2015').scorable,s2015.provisionallyScoreableQuestionCount);
 assert.equal(by('tnusrb-si-2015').typed,118,'Readable ungraded source-disputed text counts toward playable, not scorable');
 assert.equal(by('tnusrb-si-2015').typed-by('tnusrb-si-2015').scorable,9,'Nine 2015 questions must not receive provisional marks');
+assert.deepEqual(s2015.bilingualNumberedReaderReview.reviewedOriginalNumbers,Array.from({length:10},(_,i)=>i+11),'2015 Open Candidates bilingual source review scope');
+assert.match(by('tnusrb-si-2015').sourceStatus,/Q11–20.*Tamil/,'Do not exaggerate bilingual coverage');
 const s2020=json('data/quizzes/tnusrb-si-2020-series-c.json');
 assert.equal(by('tnusrb-si-2020').typed,s2020.playableQuestionCount);
 assert.equal(by('tnusrb-si-2020').scorable,s2020.scoredQuestionCount);
