@@ -5,7 +5,7 @@ This ledger covers **the 67 exam-year entries already indexed by ClearExams** �
 ## Current counted coverage
 
 - **67** official-source archive entries across five boards: TNPSC, TNUSRB, UPSC, SSC and Railways
-- **8** independently listed original-numbered text-practice sets (1,227 practice positions; source verification varies)
+- **8** independently listed original-numbered text-practice sets (1,257 practice positions; source verification varies)
 - **8** adapted exam-year question sets (160 source-attributed adaptation questions; not verbatim full papers)
 - **72** distinct indexed exam-year records after adding five typed-paper years absent from the archive list
 - **58** archive entries without any linked playable local question-text set
@@ -76,6 +76,20 @@ Thirty newly added Tamil study questions cover Q55–84. Their primary scanned-b
 Primary paper: https://www.tnpsc.gov.in/Tentative/Document/01_2024_GR_IV_GENERAL_TAMIL.pdf
 
 Final key: https://tnpsc.gov.in/Document/Answerkeyfinalresult/01_2024_Final%20_Answer_Key_GT_GE.pdf
+
+### TNPSC Group IV 2024 Q85–114: source-numbered editorial Tamil + bilingual GS
+
+Updated 10 November 2026. The 2024 typed practice set now covers **114/200** positions; **111** are provisionally gradable and **86** still lack local question text. No newly added source text is certified verbatim.
+
+**30 new questions** have been editorially adapted from the independently indexed source-numbered TNPSC Guide text pages 10–13, matched by question number with the **official final TNPSC 2024 General Tamil Subject Code 003** answer key (9 January 2025). Local questions Q85–100 are in Tamil; Q101–114 are English study texts with separately written Tamil translations and all A–E choices. Q86 and Q93 have official `ALL` entries and are **ungraded**; Q88 accepts both B and C.
+
+The official final-key PDF was visually inspected, but the source **original question booklet PDF timed out** in the current check. Thus the newly added question wording, printed options and Tamil study translations are **not represented as verified verbatim originals**. The final editorial QA remains to be done against scans.
+
+Official original: https://www.tnpsc.gov.in/Tentative/Document/01_2024_GR_IV_GENERAL_TAMIL.pdf
+
+Official final key: https://tnpsc.gov.in/Document/Answerkeyfinalresult/01_2024_Final%20_Answer_Key_GT_GE.pdf
+
+Third-party numbered text reading pages: https://www.tnpscguide.com/exams/group-4/papers/group-4-2024-question-paper/10 through /13.
 
 ## Source-indexed years still requiring question text
 
