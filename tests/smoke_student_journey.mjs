@@ -412,23 +412,23 @@ try {
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2020 has no runtime page errors');
   console.log('PASS TNUSRB SI 2020: 114 playable, 111 scored, Series C key, source gaps, saved progress, exam mode');
 
-  // TNUSRB SI 2010 user-supplied Type A: show only 116 readable original-number questions.
+  // TNUSRB SI 2010 Type A: 120 readable practice entries, of which 116 have provisional score mappings.
   pageErrors.length = 0;
   await page.goto(origin+'/tnusrb-si-2010-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/116 attemptable questions loaded/);
+  assert.match(await page.locator('#loadStatus').innerText(),/120 attemptable questions loaded/);
   await page.locator('#start').click();
-  assert.match(await page.locator('#position').innerText(),/Original Q5/);
-  assert.match(await page.locator('#questionTitle').innerText(),/French Revolution/);
+  assert.match(await page.locator('#position').innerText(),/Original Q1/);
+  assert.match(await page.locator('#questionTitle').innerText(),/Periyapuranam/);
   assert.equal(await page.locator('#options button').count(),4);
-  await page.locator('#options button').nth(1).click();
+  await page.locator('#options button').nth(2).click();
   await page.locator('#check').click();
-  assert.match(await page.locator('#feedback').innerText(),/Type A final-key entry: B/);
-  assert.equal(await page.locator('#options button').nth(1).isDisabled(),true,'Checked answer is locked');
+  assert.match(await page.locator('#feedback').innerText(),/Type A final-key entry: C/);
+  assert.equal(await page.locator('#options button').nth(2).isDisabled(),true,'Checked answer is locked');
   await page.locator('.palette-details summary').click();
   const numbers=await page.locator('#palette button').allTextContents();
-  assert.equal(numbers.length,116,'Only 116 source-readable entries available');
+  assert.equal(numbers.length,120,'All 120 readable/marked practice entries available');
   assert.equal(numbers.includes('64'),false,'Malformed vector-determinant question excluded');
   assert.equal(numbers.includes('86'),false,'Garbled fraction question excluded');
   assert.equal(numbers.includes('106'),false,'Diagram-dependent question excluded');
@@ -439,7 +439,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 116-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 120-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q117/);
   await page.locator('.palette-details summary').click();
@@ -449,7 +449,7 @@ try {
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
-  assert.match(await page.locator('#score').innerText(),/\/ 56\.0 marks/,'Indicative score excludes 4 ALL and 3 blocked questions');
+  assert.match(await page.locator('#score').innerText(),/\/ 58\.0 marks/,'Indicative score includes 116 provisionally scored answers and excludes four ALL entries');
   assert.equal(await page.locator('#result').isVisible(),true);
   await page.goto(origin+'/tnusrb-si-2010-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
@@ -460,7 +460,7 @@ try {
   assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides answer checking');
   assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode hides instant answers');
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2010 quiz no runtime errors');
-  console.log('PASS TNUSRB SI 2010 Type A: 116 playable, verified source omissions, key checking, review, save/resume, exam mode');
+  console.log('PASS TNUSRB SI 2010 Type A: 120 playable, 116 provisionally scored, source omissions, key checking, review, save/resume, exam mode');
 
   // Local-only original-PYQ staging: no paper text published without review.
   pageErrors.length = 0;
