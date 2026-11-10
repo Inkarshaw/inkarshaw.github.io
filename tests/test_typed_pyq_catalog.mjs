@@ -8,8 +8,8 @@ const cat=json('data/quizzes/typed-pyq-catalog.json'),html=read('pyq-typed-libra
 assert.equal(cat.schemaVersion,1);
 assert.equal(cat.entries.length,8);
 assert.equal(new Set(cat.entries.map(e=>e.id)).size,8);
-assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),1317);
-assert.equal(cat.entries.filter(e=>e.typed===e.total).length,4);
+assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),1343);
+assert.equal(cat.entries.filter(e=>e.typed===e.total).length,5);
 const by=id=>{const e=cat.entries.find(x=>x.id===id);assert.ok(e,'Missing catalogue '+id);return e;};
 for(const e of cat.entries){assert.ok(['TNPSC','TNUSRB'].includes(e.exam));assert.ok(Number.isInteger(e.total)&&Number.isInteger(e.typed)&&Number.isInteger(e.scorable));assert.ok(e.typed<=e.total&&e.scorable<=e.typed);assert.ok(e.sourceStatus.length>16);assert.ok(existsSync(new URL('../'+e.link.split('?')[0],import.meta.url)),'Quiz route missing: '+e.link);}
 const g2011=json('data/quizzes/tnpsc-g1-2011-series-d-typed.json');
@@ -21,9 +21,11 @@ assert.equal(by('tnpsc-g1-2026').scorable,0,'No guessed 2026 answer key');
 const ta=json('data/quizzes/tnpsc-g4-2022-user-transcription-tamil-draft.json');
 const en=json('data/quizzes/tnpsc-g4-2022-user-transcription-english-draft.json');
 assert.equal(by('tnpsc-g4-2022').typed,ta.questions.length+en.questions.length);
-for(const y of [2024,2025]){const d=json('data/quizzes/tnpsc-g4-'+y+'-typed-review.json');assert.equal(by('tnpsc-g4-'+y).typed,d.typedPlayableCount);assert.equal(by('tnpsc-g4-'+y).scorable,d.gradedQuestionCount);assert.equal(by('tnpsc-g4-'+y).type,y===2025?'full-numbered-draft':'partial');}
+for(const y of [2024,2025]){const d=json('data/quizzes/tnpsc-g4-'+y+'-typed-review.json');assert.equal(by('tnpsc-g4-'+y).typed,d.typedPlayableCount);assert.equal(by('tnpsc-g4-'+y).scorable,d.gradedQuestionCount);assert.equal(by('tnpsc-g4-'+y).type,'full-numbered-draft');}
 assert.equal(by('tnpsc-g4-2025').typed,200,'2025 has an adaptation at every original question number');
 assert.equal(by('tnpsc-g4-2025').scorable,192,'Eight special ALL final-key positions ungraded');
+assert.equal(by('tnpsc-g4-2024').scorable,196,'Four 2024 ALL final-key entries ungraded');
+assert.match(by('tnpsc-g4-2024').sourceStatus,/NOT independently visually verified verbatim/,'Full numbered adaptations are not certified originals');
 assert.match(by('tnpsc-g4-2025').sourceStatus,/editorial study questions/,'Full numbering does not mean verified verbatim');
 const s2010=json('data/quizzes/tnusrb-si-2010-open-type-a.json');
 assert.equal(by('tnusrb-si-2010').typed,s2010.availableForQuizCount);
@@ -84,4 +86,4 @@ const sourceOnly=[...archiveKeys].filter(k=>!adaptedKeys.has(k)&&!typedKeys.has(
 assert.equal(sourceOnly.length,58,'Exactly 58 indexed exam-year sources lack a local text quiz');
 assert.ok(read('pyq-hub.html').includes('Explore all exams, years and text coverage'),'Universal coverage discoverable from main PYQ hub');
 
-console.log('PASS 72 distinct indexed exam-year records: 8 typed sets (1317 positions), 8 adapted sets (160 questions), and 58 archive-only exam-years honestly marked without question text.');
+console.log('PASS 72 distinct indexed exam-year records: 8 typed sets (1343 positions), 8 adapted sets (160 questions), and 58 archive-only exam-years honestly marked without question text.');
