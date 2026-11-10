@@ -403,7 +403,7 @@ try {
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/114 attemptable questions loaded/);
+  assert.match(await page.locator('#loadStatus').innerText(),/115 readable original-numbered questions/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2020/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
@@ -415,10 +415,16 @@ try {
   assert.equal(await page.locator('#options button').nth(1).isDisabled(),true);
   await page.locator('.palette-details summary').click();
   const nums=await page.locator('#palette button').allTextContents();
-  assert.equal(nums.length,114,'2019 recruitment: do not present missing or garbled source questions');
-  for(const skip of [14,15,22,37,84,95,103,121]){
+  assert.equal(nums.length,115,'2020 Open Candidates: Q22 visible for ungraded practice while 25 source gaps held');
+  for(const skip of [14,15,37,84,95,103,121]){
     assert.equal(nums.includes(String(skip)),false,'Excluded original question '+skip);
   }
+  assert.equal(nums.includes('22'),true,'Readable disputed source Q22 appears as ungraded');
+  await page.locator('#palette button').filter({hasText:/^22$/}).click();
+  await page.locator('#options button').nth(0).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded — printed choice\/key conflict/);
+  assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Do not mark disputed key A as correct');
   assert.equal(nums.includes('1'),true);
   assert.equal(nums.includes('140'),true);
   await page.locator('#palette button').filter({hasText:/^89$/}).click();
@@ -427,7 +433,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 114-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 115-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q89/);
   await page.locator('.palette-details summary').click();
@@ -438,6 +444,8 @@ try {
   await page.locator('#finish').click();
   assert.match(await page.locator('#score').innerText(),/\/ 55\.5 marks/);
   assert.equal(await page.locator('#result').isVisible(),true);
+  await page.locator('#reviewFilter').selectOption('ungraded');
+  assert.equal(await page.locator('#reviewList .result-item').count(),4,'Three special ALL and Q22 all appear in ungraded review');
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'TNUSRB SI 2020 has no mobile horizontal overflow');
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
