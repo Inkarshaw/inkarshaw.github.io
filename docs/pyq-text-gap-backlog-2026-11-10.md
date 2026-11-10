@@ -139,6 +139,14 @@ On 10 November 2026, verified that public secondary indexed **TNUSRB SI 2010 GK 
 
 The 2015 and 2020 Open Candidates banks remain 118/140 and 115/140 readable respectively. The aggregate remains **1,353** numbered readable text positions across eight sets; bilingual quality improved without miscounting coverage.
 
+### TNUSRB SI 2015 Open Candidates — Q11–20 bilingual review
+
+10 November 2026: The independent numbered 2015 **GK Open**, page 2/14, at https://civilserviceaspirants.in/Tnusrb/Question-Paper-with-Answer/Tnusrb-si/Tnusrb-si-2015-gk-open-2.php was readable and compared with ClearExams original-numbered Q11–20. All ten stems and A–D original-order options are available; their English choices match the existing user-OCR records. Added editorial Tamil study translations and bilingual A–D choices for those ten, with explicit per-question secondary-reader source references. These are **not certified original Tamil booklet text**.
+
+**Q14 key conflict independently confirmed:** the sentence "They are mending the road" needs present-continuous passive "The road is being mended" (D). The source reader nevertheless displays C, consistent with the unverified secondary 2015 key. ClearExams leaves Q14 **ungraded**, with zero accepted answers and a prominent source discrepancy. Do not silently turn it into a scored question.
+
+No additional original question positions were completed: the 2015 set remains **118/140 readable**, **109 provisionally scoreable**, **nine readable but ungraded**, and **22 genuinely blocked**. Total across all eight original-numbered sets remains **1,353 readable positions**. Direct TNUSRB scanned-question verification and key review remain necessary. Only Open Candidates question sources are eligible; no departmental corpus is used.
+
 ## Source-indexed years still requiring question text
 
 ### TNPSC (6)
