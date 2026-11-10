@@ -31,7 +31,7 @@ assert.equal(by('tnusrb-si-2015').scorable,s2015.provisionallyScoreableQuestionC
 const s2020=json('data/quizzes/tnusrb-si-2020-series-c.json');
 assert.equal(by('tnusrb-si-2020').typed,s2020.playableQuestionCount);
 assert.equal(by('tnusrb-si-2020').scorable,s2020.scoredQuestionCount);
-assert.match(html,/Typed PYQ Quiz Library/);
+assert.match(html,/PYQ Text Quiz Library/);
 assert.match(html,/not independently certified verbatim reproduction/i);
 assert.match(js,/typed-pyq-catalog\.json/);
 assert.match(js,/textContent/);
