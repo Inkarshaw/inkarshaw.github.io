@@ -49,4 +49,36 @@ const adaptedCounts=new Map();
 for(const q of adaptedRows){if(q.SourceType==='Adapted PYQ'&&q.Active!=='FALSE'){const key=q.SourceExam+'|'+q.SourceYear;adaptedCounts.set(key,(adaptedCounts.get(key)||0)+1)}}
 assert.equal(adaptedCounts.size,8);
 assert.equal([...adaptedCounts.values()].reduce((n,x)=>n+x,0),160);
-console.log('PASS 8 original-number PYQ draft sets (1049 text positions), 8 adapted exam-year sets (160 questions); all original text gaps remain flagged.');
+
+const allYears=json('data/quizzes/pyq-yearwise-catalog.json');
+assert.equal(allYears.entries.length,67,'All 67 source-indexed exam-year papers must remain discoverable');
+assert.deepEqual(new Set(allYears.entries.map(x=>x.category)),new Set(['TNPSC','TNUSRB','UPSC','SSC','Railways']));
+assert.match(js,/pyq-yearwise-catalog\.json/,'Unified library fetches the all-year source index');
+assert.match(js,/hasTextFor/,'Source-only archive records must be separated from existing text');
+assert.match(js,/makeArchiveCard/,'Missing question text must be labelled rather than invented');
+assert.match(js,/source-only/,'Source-only records can be filtered');
+for(const field of ['yearFilter','showMore','dataNotice'])assert.ok(html.includes('id="'+field+'"'),'Missing archive UI control '+field);
+for(const board of ['SSC','Railways'])assert.ok(html.includes('value="'+board+'"'),'Missing exam board '+board);
+const archiveKeys=new Set(allYears.entries.map(x=>x.category+'|'+x.exam+'|'+x.year));
+assert.equal(archiveKeys.size,67,'Archive exam/year records must be unique');
+const adaptedKeys=new Set([...adaptedCounts.keys()].map(x=>{
+ const [exam,year]=x.split('|');
+ if(exam==='TNPSC Group IV')return 'TNPSC|Group IV|'+year;
+ if(exam==='TNPSC Group II/IIA')return 'TNPSC|Group II / IIA|'+year;
+ if(exam==='UPSC Civil Services Prelims')return 'UPSC|Civil Services Prelims|'+year;
+ throw Error('Unknown adapted source '+x);
+}));
+assert.ok([...adaptedKeys].every(x=>archiveKeys.has(x)),'All adapted exam/year sets should map to the archive');
+const typedKeys=new Set(cat.entries.map(e=>{
+ if(e.exam==='TNPSC'&&e.paper.startsWith('Group IV'))return 'TNPSC|Group IV|'+e.year;
+ if(e.exam==='TNPSC'&&e.paper.startsWith('Group I'))return 'TNPSC|Group I|'+e.year;
+ if(e.exam==='TNUSRB'&&e.paper.startsWith('SI Open'))return 'TNUSRB|SI (Open Candidates)|'+e.year;
+ return e.exam+'|'+e.paper+'|'+e.year;
+}));
+assert.equal(new Set([...archiveKeys,...typedKeys,...adaptedKeys]).size,72,
+ '67 archived exam years plus five unique typed-only years');
+const sourceOnly=[...archiveKeys].filter(k=>!adaptedKeys.has(k)&&!typedKeys.has(k));
+assert.equal(sourceOnly.length,59,'Exactly 59 indexed exam-year sources lack a local text quiz');
+assert.ok(read('pyq-hub.html').includes('Explore all exams, years and text coverage'),'Universal coverage discoverable from main PYQ hub');
+
+console.log('PASS 72 distinct indexed exam-year records: 8 typed sets (1049 positions), 8 adapted sets (160 questions), and 59 archive-only exam-years honestly marked without question text.');
