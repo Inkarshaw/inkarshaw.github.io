@@ -132,7 +132,7 @@ assert.match(html,/Q47.*ungraded/,'D-only matrix choice reconstruction cannot cl
 assert.match(html,/Q114–116/,'Original-numbered 114 to 116 still missing');
 
 assert.match(html,/General Candidates written paper/,'Link General Candidates primary paper, not departmental source');
-assert.match(html,/Q22's answer-key dispute/);
+assert.match(html,/Q15\/Q22\/Q37/,'Existing source-disputed keys are still clearly disclosed');
 assert.match(html,/127 provisionally scored/);
 assert.match(html,/2019 Recruitment \(Exam 2020\)/);
 assert.match(html,/not an official 140-question TNUSRB score/);
