@@ -37,16 +37,16 @@ assert.match(d.questions[13].scoringReviewReason,/grammatically correct.*D/);
 assert.match(d.questions[13].sourceReviewEvidence,/reader marks C even though/,'Printed secondary key problem independently corroborated');
 assert.equal(d.questions[13].optionsTamil.D,'சாலை பழுது பார்க்கப்பட்டுக் கொண்டிருக்கிறது');
 
-assert.equal(d.blockedNumbers.length,22);
-assert.equal(d.playableQuestionCount,118);
+assert.equal(d.blockedNumbers.length,21);
+assert.equal(d.playableQuestionCount,119);
 assert.equal(d.ungradedReadableQuestionCount,9);
-assert.equal(d.provisionallyScoreableQuestionCount,109);
+assert.equal(d.provisionallyScoreableQuestionCount,110);
 const blocked=new Set(d.blockedNumbers);
 const playable=d.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-assert.equal(playable.length,118);
-assert.equal(d.questions.filter(q=>q.scoringStatus==='provisional_secondary_key').length,109);
+assert.equal(playable.length,119);
+assert.equal(d.questions.filter(q=>q.scoringStatus==='provisional_secondary_key').length,110);
 assert.equal(d.questions.filter(q=>q.scoringStatus==='ungraded_source_dispute').length,9);
-assert.equal(d.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').length,22);
+assert.equal(d.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').length,21);
 const recovered=[8,14,29,30,33,65,66,84,127];
 assert.deepEqual(d.questions.filter(q=>q.scoringStatus==='ungraded_source_dispute').map(q=>q.number),recovered);
 for(const n of recovered){
@@ -79,11 +79,16 @@ assert.match(d.questions[79].options.D,/IHRC/,'Key-disputed Q80 source wording p
 assert.match(d.questions[80].question,/27 125 343/,'Psychology Tamil source preserved');
 assert.match(d.questions[131].passage,/Seven children/);
 assert.match(d.questions[133].passage,/two children/);
+assert.equal(d.questions[108].figureAsset,'assets/figures/tnusrb-si-2015-q109.svg');
+assert.equal(d.questions[108].scoringStatus,'provisional_secondary_key');
+assert.deepEqual([99,100,101,102,103,104].map(n=>d.questions[n-1].graphSourceEvidence.requiredProductionGraphPresent),[false,false,false,false,false,false]);
+assert.match(html,/id="graphRecovery"/);
+assert.match(html,/id="questionFigure"/);
 assert.equal(d.questions[119].number,120);
 assert.equal(d.questions[119].options.A,'','Missing Q120 option must not be invented');
 assert.ok(blocked.has(90)&&blocked.has(99)&&blocked.has(120)&&blocked.has(129));
-assert.match(html,/118 readable practice questions/);
-assert.match(html,/9 ungraded · 22 held/);
+assert.match(html,/119 readable practice questions/);
+assert.match(html,/9 ungraded · 21 held/);
 assert.match(html,/id="ungradedIssues"/);
 assert.match(html,/non-officially verified secondary answer table/);
 assert.match(js,/provisional_secondary_key/);
@@ -110,4 +115,4 @@ for(const other of ['2010','2020']){
  assert.match(read('tnusrb.html'),new RegExp('tnusrb-si-'+other+'-quiz\\.html'),'Retain '+other+' landing nav');
  assert.match(read('pyq-hub.html'),new RegExp('tnusrb-si-'+other+'-quiz\\.html'),'Retain '+other+' PYQ nav');
 }
-console.log('PASS SI 2015: 140 source-numbered user OCR records, 118 readable (109 graded, 9 ungraded), 22 blocked, non-official key clearly marked.');
+console.log('PASS SI 2015: 140 source-numbered OCR records, 119 readable (110 graded, 9 ungraded), 21 blocked; Q99–104 graph absent, Q109 traced.');
