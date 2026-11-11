@@ -11,9 +11,9 @@
   const save=()=>{if(attempt)try{localStorage.setItem(storeKey,JSON.stringify(attempt))}catch{}};
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2010||data?.bookletType!=='A'||
-      data?.originalPaperQuestionCount!==140||data?.providedQuestionCount!==123||
-      !Array.isArray(data.questions)||data.questions.length!==123||
-      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==17){
+      data?.originalPaperQuestionCount!==140||data?.providedQuestionCount!==140||
+      !Array.isArray(data.questions)||data.questions.length!==140||
+      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==0){
       throw Error('TNUSRB 2010 question-bank manifest is incomplete');
     }
     let previous=0;
@@ -33,8 +33,8 @@
          !q.secondaryBilingualSourceURL?.startsWith('https://civilserviceaspirants.in/')))
       throw Error('2010 Open Candidates secondary bilingual source review manifest changed');
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.availableForQuizCount||playable.length!==120||
-       playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==116){
+    if(playable.length!==data.availableForQuizCount||playable.length!==138||
+       playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==134){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
@@ -45,9 +45,25 @@
     Array.isArray(s.checked)&&s.checked.length===questions.length&&s.checked.every(a=>typeof a==='boolean')&&
     Array.isArray(s.marked)&&s.marked.length===questions.length&&s.marked.every(a=>typeof a==='boolean')&&
     Number.isInteger(s.index)&&s.index>=0&&s.index<questions.length;
+  function migratedAttempt(mode){
+    const saved=getSaved(storageKey());
+    if(validSaved(saved,mode))return saved;
+    const recoveredNumbers=new Set([67,68,69,70,71,72,73,74,75,76,77,78,79,80,86,114,115,116]);
+    const oldPositions=questions.map((q,i)=>recoveredNumbers.has(q.number)?-1:i).filter(i=>i>=0);
+    if(!saved||saved.finished||saved.version!==1||saved.mode!==mode||
+      oldPositions.length!==120||saved.answers?.length!==120||
+      saved.checked?.length!==120||saved.marked?.length!==120||
+      !Number.isInteger(saved.index)||saved.index<0||saved.index>=120)return null;
+    const updated={...saved,answers:Array(questions.length).fill(null),
+      checked:Array(questions.length).fill(false),marked:Array(questions.length).fill(false),
+      index:oldPositions[saved.index]};
+    oldPositions.forEach((index,j)=>{updated.answers[index]=saved.answers[j];
+      updated.checked[index]=saved.checked[j];updated.marked[index]=saved.marked[j]});
+    return validSaved(updated,mode)?updated:null;
+  }
   function updateStart(){
     if(!questions.length)return;
-    const prior=getSaved(storageKey());
+    const prior=migratedAttempt($('mode').value);
     $('start').textContent=(validSaved(prior,$('mode').value)?'Resume':'Start')+' '+questions.length+'-question quiz →';
     $('start').disabled=false;
   }
@@ -68,7 +84,7 @@
   function start(){
     if(!questions.length)return;
     storeKey=storageKey();
-    const prior=getSaved(storeKey),mode=$('mode').value;
+    const mode=$('mode').value,prior=migratedAttempt(mode);
     if(validSaved(prior,mode))attempt=prior;
     else {
       const minutes=Number($('timer').value);
@@ -242,8 +258,8 @@
         gapList.append(li);
       });
       $('loadStatus').textContent=questions.length+' readable Open Candidates questions loaded: '+
-        '10 public-source-indexed bilingual Tamil/English items, 116 provisional key scores, '+
-        '4 special ALL entries ungraded; 17 missing and 3 source-blocked.';
+        '10 bilingual source-reviewed Q1–10, 134 provisional key scores, '+
+        '4 ALL entries ungraded; all 17 missing numbers recovered, 2 source-blocked (Q64, Q106).';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
