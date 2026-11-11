@@ -9,7 +9,7 @@ assert.equal(cat.schemaVersion,1);
 assert.equal(cat.entries.length,8);
 assert.equal(new Set(cat.entries.map(e=>e.id)).size,8);
 assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),1389);
-assert.equal(cat.entries.filter(e=>e.typed===e.total).length,5);
+assert.equal(cat.entries.filter(e=>e.typed===e.total).length,6,'2010 Open Type A now has all 140 source-numbered readable items');
 const by=id=>{const e=cat.entries.find(x=>x.id===id);assert.ok(e,'Missing catalogue '+id);return e;};
 for(const e of cat.entries){assert.ok(['TNPSC','TNUSRB'].includes(e.exam));assert.ok(Number.isInteger(e.total)&&Number.isInteger(e.typed)&&Number.isInteger(e.scorable));assert.ok(e.typed<=e.total&&e.scorable<=e.typed);assert.ok(e.sourceStatus.length>16);assert.ok(existsSync(new URL('../'+e.link.split('?')[0],import.meta.url)),'Quiz route missing: '+e.link);}
 const g2011=json('data/quizzes/tnpsc-g1-2011-series-d-typed.json');
