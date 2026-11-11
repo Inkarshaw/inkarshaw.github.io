@@ -1,3 +1,11 @@
+## 11 November 2026 — third editorial Tamil study pass, 2020 SI Series C Q60–79
+
+- Added **20 Tamil study translations of original-numbered English questions Q60–79**, including all four A–D alternatives for each. This covers units and scientific notation (Q60), mineral compounds and genetics, botanical scientific names and classifications, biology, and history (Q74–79). Scientific notation, organism names and distinctive historical spellings remain linked to the source English. These translations are **ClearExams editorial study aids, not verified verbatim original-paper Tamil**.
+- Total editorial translations are now **60**, covering **Q1–14, Q16–21, Q23–27, Q43–46, Q48–57, Q59, and Q60–79**. Eight distinct source-numbered entries Q28–35 are already in Tamil but are not counted as translated English questions (60 + 8 different numbered positions). Original printed Tamil Series C booklet still has not been visually inspected.
+- Q76 original English option A spells the ruler `Outbuddin Aibak`. The Tamil study choice explicitly preserves this unusual source spelling; no silent correction of original paper text has been made. Do not misrepresent such a source spelling as independently verified.
+- Quiz functionality stays source-numbered, English/Tamil/Both, preserves option letters and existing saved progress; validation requires exactly 60 editorial translations and 8 already-Tamil source records, all with unresolved booklet-verbatim provenance.
+- **Scoring totals unchanged:** 137/140 readable 2020 Series C questions; 127 provisionally keyed, 10 ungraded, missing **Q114–116**. Across eight indexed typed PYQ sets, **1,411 readable practice positions**. 2015 P/Q vehicle-production Q99–104 remains blocked pending its authentic 1991–1996 graph. Departmental candidates' exams excluded.
+
 ## 11 November 2026 — second bilingual study pass for the 2020 Series C General Candidates paper
 
 - Extended from **20 to 40 ClearExams editorial Tamil study translations** without changing English source-numbered question stems, A–D answer order, source-key letters, scoring or saved attempts. Added Q23–27, Q43–46, Q48–57 and Q59, each with a Tamil stem and four Tamil alternatives. This is **not** an original-booklet Tamil transcription and should never be presented as official verbatim Tamil.
