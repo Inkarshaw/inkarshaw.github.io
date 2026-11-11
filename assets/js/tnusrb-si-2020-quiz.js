@@ -11,11 +11,11 @@
   const save=()=>{if(attempt)try{localStorage.setItem(storeKey,JSON.stringify(attempt))}catch{}};
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2020||data?.bookletSeries!=='C'||
-      data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==135||
-      !Array.isArray(data.questions)||data.questions.length!==135||
-      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==5||
-      !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==1||
-      data.ungradedSourceDisputeCount!==6||
+      data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==137||
+      !Array.isArray(data.questions)||data.questions.length!==137||
+      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==3||
+      !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==0||
+      data.ungradedSourceDisputeCount!==7||
       data?.answerKey?.answers?.length!==140){
       throw Error('TNUSRB SI 2020 Series C question-bank manifest is incomplete');
     }
@@ -30,15 +30,15 @@
           throw Error('Incomplete entry at original question '+q.number);
       if(q.answerKeyToken==='ALL'&&q.scoringStatus!=='ungraded_all_correct'&&q.scoringStatus!=='blocked_source_incomplete')throw Error('Special key status mismatch');
       if(q.scoringStatus==='ungraded_source_dispute'&&
-         (![15,22,37,84,95,103].includes(q.number)||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(q.number)))
+         (![15,22,37,47,84,95,103].includes(q.number)||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(q.number)))
         throw Error('Unverified reference-diagram question must not be graded or given an accepted answer');
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.playableQuestionCount||playable.length!==134||
-       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==125||
+    if(playable.length!==data.playableQuestionCount||playable.length!==137||
+       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==127||
        playable.filter(q=>q.scoringStatus==='ungraded_all_correct').length!==3||
-       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==6){
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==7){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
@@ -52,16 +52,18 @@
   function migratedAttempt(mode){
     const saved=getSaved(storageKey());
     if(validSaved(saved,mode))return saved;
-    // Historical saved responses map by original booklet question number, never by
-    // current playable ordinal; new reference-figure exercises must not shift answers.
+    // Old attempts had no Series C Q46/Q47 and withheld Q121: preserve
+    // response mapping by original paper number when restoring older sizes.
     const prior13=new Set([28,29,30,31,32,33,34,35,41,42,44,45,48]);
     const crossSeries3=new Set([14,15,37]);
     const newDiagrams=new Set([84,95,103]);
-    const old131=questions.map((q,i)=>newDiagrams.has(q.number)?-1:i).filter(i=>i>=0);
+    const newMath=new Set([46,47,121]);
+    const old134=questions.map((q,i)=>newMath.has(q.number)?-1:i).filter(i=>i>=0);
+    const old131=old134.filter(i=>!newDiagrams.has(questions[i].number));
     const old128=old131.filter(i=>!crossSeries3.has(questions[i].number));
     const old115=old128.filter(i=>!prior13.has(questions[i].number));
     const old114=old115.filter(i=>questions[i].number!==22);
-    const map={131:old131,128:old128,115:old115,114:old114};
+    const map={134:old134,131:old131,128:old128,115:old115,114:old114};
     const oldPositions=map[saved?.answers?.length];
     if(!saved||!oldPositions||saved.finished||saved.version!==1||saved.mode!==mode||
        saved.answers?.length!==oldPositions.length||
@@ -208,7 +210,7 @@
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scored.length*0.5).toFixed(1)+' marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
       allEntries+' ALL entries and '+disputed+' disputed source/key questions ungraded · '+questions.length+' readable questions. '+
-      'Score excludes five absent source numbers and the remaining one source-incomplete arithmetic item; three independently sourced comparison diagrams are available only for ungraded study. Not a full 140-question exam result.';
+      'Score excludes three still-absent Series C original numbers and the ungraded Series D comparison matrix Q47; all other source-review diagrams remain ungraded. Not a full 140-question exam result.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
@@ -276,21 +278,14 @@
       const withheld=$('sourceGaps');withheld.replaceChildren();
       data.missingNumbers.forEach(n=>{
         const li=document.createElement('li');
-        const evidence=data.missingSourceEvidence?.[String(n)];
-        if(n===46&&evidence){
-          li.textContent='Q46: a numbered secondary reader preserves A=45, B=35, C=25, D=15, but both mathematical expressions are missing. Not playable or scored. Original Series C booklet required.';
-        }else if(n===47&&evidence){
-          li.textContent='Q47: the reader says “The adjoint of the matrix is”, but the input matrix and all four answer matrices are absent. Not playable or scored.';
-        }else{
-          li.textContent='Q'+n+': no verified original Series C question text/options available; excluded from the quiz.';
-        }
+        li.textContent='Q'+n+': no verified original Series C question wording or A–D options recovered. This original-numbered entry remains absent from the quiz.';
         withheld.append(li);
       });
       data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
         const li=document.createElement('li');li.textContent='Q'+q.number+': '+q.sourceIssue;withheld.append(li);
       });
-      $('loadStatus').textContent=questions.length+' readable original-numbered questions: 125 provisionally scored, '+
-        '3 final-key ALL entries and Q15/Q22/Q37/Q84/Q95/Q103 source-review items ungraded; Q121 blocked and 5 source-numbered entries absent.';
+      $('loadStatus').textContent=questions.length+' readable original-numbered questions: 127 provisionally scored, '+
+        '3 ALL tokens and 7 source/wording review items ungraded; 3 missing original Series C numbers Q114–116.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
