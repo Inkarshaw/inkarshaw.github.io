@@ -368,7 +368,11 @@ try {
   assert.match(await page.locator('#questionFigure').getAttribute('alt'),/top 5.*question mark/);
   for(const recovered of [119,129]){
     assert.ok(si2015Nums.includes(String(recovered)),'Original SI 2015 figure question Q'+recovered+' recovered');
-    await page.locator('#palette button').filter({hasText:new RegExp('^'+recovered+'
+    await page.locator('#palette button').filter({hasText:new RegExp('^'+recovered+'$')}).click();
+    assert.equal(await page.locator('#questionFigure').isVisible(),true,'Figure visible for SI 2015 Q'+recovered);
+    assert.ok((await page.locator('#questionFigure').getAttribute('src')).endsWith('q'+recovered+'.svg'));
+    assert.equal(await page.locator('#options button').count(),4,'Q'+recovered+' retains A–D choices');
+  }
   for(const ungraded of [8,14,29,30,33,65,66,84,127]){
     assert.ok(si2015Nums.includes(String(ungraded)),'Readable source conflict must remain available for ungraded practice Q'+ungraded);
   }
