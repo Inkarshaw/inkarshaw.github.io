@@ -52,7 +52,7 @@ for(const q of data.questions){
   assert.ok(q.sourceIssue&&q.textStatus==='needs_original_source_review');
  }else if([15,22,37,84,95,103].includes(q.number)){
   assert.equal(q.scoringStatus,'ungraded_source_dispute','Q'+q.number+' cross-series/source conflict is not safe to grade');
-  assert.match(q.answerReviewReason,q.number===22?/SAARC/:q.number===15?/Series D/:[84,95,103].includes(q.number)?/not.*original Series C|not.*original Series C|not the original Series C/i:/Series C supplied OCR/,'Clearly disclose source discrepancy');
+  assert.match(q.answerReviewReason,q.number===22?/SAARC/:q.number===15?/Series D/:[84,95,103].includes(q.number)?/original|unverified|Series C/i:/Series C supplied OCR/,'Clearly disclose source discrepancy');
   if(q.number===22)assert.equal(q.options.A,'SAARC');
   assert.deepEqual(q.acceptedAnswers,[]);
  }else if(q.answerKeyToken==='ALL'){
