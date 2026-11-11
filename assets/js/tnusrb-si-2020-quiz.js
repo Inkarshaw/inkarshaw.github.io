@@ -21,7 +21,7 @@
     }
     const translatedNumbers=new Set(data.bilingualEditorialReview?.reviewedOriginalNumbers||[]);
     const sourceTamilNumbers=new Set(data.bilingualEditorialReview?.alreadySourceTamilNumberedOriginals||[]);
-    if(data.bilingualEditorialReview?.questionCount!==120||translatedNumbers.size!==120||
+    if(data.bilingualEditorialReview?.questionCount!==122||translatedNumbers.size!==122||
        sourceTamilNumbers.size!==8||
        data.bilingualEditorialReview?.originalTamilPrintVerified!==false||
        [...sourceTamilNumbers].some(n=>translatedNumbers.has(n))||
