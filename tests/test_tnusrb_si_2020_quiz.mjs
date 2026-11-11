@@ -122,7 +122,7 @@ assert.match(html,/id="questionFigure"/,'SVG rendering element is present');
 assert.match(html,/id="referenceNote"/,'Editorial drawing disclaimer appears on question screen');
 assert.ok(js.includes("$('questionFigure')"));
 assert.ok(js.includes("$('referenceNote')"));
-assert.ok(js.includes('const old131=questions.map'),'Historical 131-question attempt migration retained');
+assert.ok(js.includes('const old131=old134.filter'),'Historical 131-question attempt migration retained through original paper positions');
 assert.match(html,/137 readable/);
 assert.match(html,/id="sourceGaps"/,'The unverified source holes must be shown to the learner');
 assert.ok(html.includes('href="'+officialPdf+'"'),'Quiz links board-listed source PDF');
