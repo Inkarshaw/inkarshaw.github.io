@@ -91,10 +91,10 @@ assert.deepEqual(digit121.acceptedAnswers,['C']);
 assert.equal((210-34)/(23-1),8,'Q121 equation directly yields option C');
 assert.ok(js.includes('const old134=questions.map'),'Old 134-question attempts must map original question numbers');
 
-const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25,26,27,36,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59,...Array.from({length:40},(_,i)=>i+60),...Array.from({length:14},(_,i)=>i+100),...Array.from({length:24},(_,i)=>i+117)];
+const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25,26,27,36,38,43,44,45,46,48,49,50,51,52,53,54,55,56,57,58,59,...Array.from({length:40},(_,i)=>i+60),...Array.from({length:14},(_,i)=>i+100),...Array.from({length:24},(_,i)=>i+117)];
 assert.deepEqual(data.bilingualEditorialReview.reviewedOriginalNumbers,expectedTamil,'Only reviewed question numbers advertise Tamil study text');
-assert.equal(data.bilingualEditorialReview.questionCount,120);
-assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20,20,20,20],'Bilingual batch review history preserved');
+assert.equal(data.bilingualEditorialReview.questionCount,122);
+assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20,20,20,20,2],'Bilingual batch review history preserved');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[1].numbers,[23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59]);
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[2].numbers,Array.from({length:20},(_,i)=>60+i),'Third bilingual editorial batch exactly covers Q60–79');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[3].numbers,Array.from({length:20},(_,i)=>80+i),'Fourth bilingual editorial batch exactly covers Q80–99');
@@ -102,6 +102,10 @@ const fifth=[...Array.from({length:14},(_,i)=>i+100),...Array.from({length:6},(_
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[4].numbers,fifth,'Fifth batch covers exactly 20 readable and source-numbered questions, not missing Q114–116');
 const sixth=[22,36,...Array.from({length:18},(_,i)=>i+123)];
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[5].numbers,sixth,'Sixth batch restores Q22/Q36 and all Q123–140');
+assert.deepEqual(data.bilingualEditorialReview.batchHistory[6].numbers,[38,58],'Seventh closure batch leaves source-ambiguous positions untranslated');
+assert.deepEqual([38,58].map(n=>data.questions.find(q=>q.number===n).optionsTamil),[38,58].map(n=>data.questions.find(q=>q.number===n).options),'Source-precise grammatical/scientific alternatives retained');
+assert.equal(data.questions.find(q=>q.number===58).scoringStatus,'ungraded_all_correct','Q58 cannot become scored because it was translated');
+assert.deepEqual(data.questions.filter(q=>q.sourceTextLanguage!=='ta'&&q.questionTamil===undefined).map(q=>q.number),[15,37,39,40,41,42,47],'Only seven held English-source questions remain');
 const q137=data.questions.find(q=>q.number===137);
 assert.equal(q137.question,'The ______ of the state is efficient.','Missing printed blank restored');
 assert.equal(q137.sourceRecoveryEvidence.originalCBookletVisuallyVerified,false,'Secondary source recovery is not original booklet certification');
@@ -175,7 +179,7 @@ for(const n of originalTamil){
 }
 assert.match(js,/sourceTamilNumbers/,'Reader must distinguish original Tamil source from editorial translations');
 assert.match(js,/This original-numbered source transcription is already in Tamil/,'Language switch may not pretend English source exists');
-assert.match(html,/120 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
+assert.match(html,/122 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
 assert.match(html,/id="language"/,'Learners can switch languages without new attempt');
 assert.match(html,/value="ta"/,'Tamil-only mode available');
 assert.match(html,/value="both"/,'Side-by-side bilingual mode available');
