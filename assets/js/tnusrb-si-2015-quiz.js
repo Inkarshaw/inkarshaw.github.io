@@ -1,5 +1,5 @@
 /* TNUSRB SI 2015 Open Quota — user-supplied bilingual OCR.
-   119 readable: 110 provisional-keyed, 9 key-disputed ungraded; 21 held for missing source.  */
+   121 readable: 112 provisional-keyed, 9 key-disputed ungraded; 19 held for missing source.  */
 (() => {
   'use strict';
   const $=id=>document.getElementById(id);
@@ -11,7 +11,7 @@
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2015||data?.maxOriginalQuestions!==140||
        data?.providedQuestionCount!==140||!Array.isArray(data.questions)||data.questions.length!==140||
-       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==21||
+       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==19||
        data.ungradedReadableQuestionCount!==9||
        !Array.isArray(data.answerKey?.answers)||data.answerKey.answers.length!==140)
        throw Error('TNUSRB SI 2015 source manifest incomplete');
@@ -39,10 +39,10 @@
          q.secondaryBilingualSourceURL!==data.bilingualNumberedReaderReview.sourceURL))
       throw Error('SI 2015 numbered Open Candidates bilingual-review manifest is inconsistent');
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==119||playable.length!==data.playableQuestionCount||
-       playable.filter(q=>q.scoringStatus==='provisional_secondary_key').length!==110||
+    if(playable.length!==121||playable.length!==data.playableQuestionCount||
+       playable.filter(q=>q.scoringStatus==='provisional_secondary_key').length!==112||
        playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==9||
-       data.provisionallyScoreableQuestionCount!==110)
+       data.provisionallyScoreableQuestionCount!==112)
       throw Error('SI 2015 playback, graded and ungraded manifest totals disagree');
     return playable;
   }
@@ -55,34 +55,23 @@
   function resumeSaved(mode){
     const saved=getSaved(storageKey());
     if(validSaved(saved,mode))return saved;
-    // Preserve answers from the previous 109-item graded-only order, mapping by source question number.
-    const gradedIndices=questions.map((q,i)=>q.scoringStatus==='provisional_secondary_key'&&q.number!==109?i:-1).filter(i=>i>=0);
-    // Migrate previous 118-item attempts without shifting old source-number answers on new Q109.
-    const priorReadableIndices=questions.map((q,i)=>q.number===109?-1:i).filter(i=>i>=0);
-    if(saved?.version===1&&saved.mode===mode&&!saved.finished&&
-       saved.answers?.length===118&&saved.checked?.length===118&&saved.marked?.length===118&&
-       Number.isInteger(saved.index)&&saved.index>=0&&saved.index<118){
-      const updated={...saved,answers:Array(questions.length).fill(null),
-        checked:Array(questions.length).fill(false),marked:Array(questions.length).fill(false),
-        index:priorReadableIndices[saved.index]};
-      priorReadableIndices.forEach((index,j)=>{updated.answers[index]=saved.answers[j];
-        updated.checked[index]=saved.checked[j];updated.marked[index]=saved.marked[j]});
-      if(validSaved(updated,mode))return updated;
-    }
-    if(!saved||saved.finished||saved.version!==1||saved.mode!==mode||gradedIndices.length!==109||
-       !Array.isArray(saved.answers)||saved.answers.length!==109||
-       !Array.isArray(saved.checked)||saved.checked.length!==109||
-       !Array.isArray(saved.marked)||saved.marked.length!==109||
-       !Number.isInteger(saved.index)||saved.index<0||saved.index>=109)return null;
+    // Restore older 119- or 118-question attempt orders by original numbers,
+    // or the earlier 109 scored-only order, without shifting marked answers.
+    const newlyPlayable=new Set([109,119,129]);
+    const old119=questions.map((q,i)=>[119,129].includes(q.number)?-1:i).filter(i=>i>=0);
+    const old118=questions.map((q,i)=>newlyPlayable.has(q.number)?-1:i).filter(i=>i>=0);
+    const old109=questions.map((q,i)=>q.scoringStatus==='provisional_secondary_key'&&!newlyPlayable.has(q.number)?i:-1).filter(i=>i>=0);
+    const map={119:old119,118:old118,109:old109};
+    const indices=map[saved?.answers?.length];
+    if(!saved||!indices||saved.finished||saved.version!==1||saved.mode!==mode||
+       saved.answers?.length!==indices.length||saved.checked?.length!==indices.length||
+       saved.marked?.length!==indices.length||!Number.isInteger(saved.index)||
+       saved.index<0||saved.index>=indices.length)return null;
     const restored={...saved,answers:Array(questions.length).fill(null),
       checked:Array(questions.length).fill(false),marked:Array(questions.length).fill(false),
-      index:gradedIndices[saved.index]};
-    for(let j=0;j<gradedIndices.length;j++){
-      const k=gradedIndices[j];
-      restored.answers[k]=saved.answers[j];
-      restored.checked[k]=saved.checked[j];
-      restored.marked[k]=saved.marked[j];
-    }
+      index:indices[saved.index]};
+    indices.forEach((index,j)=>{restored.answers[index]=saved.answers[j];
+      restored.checked[index]=saved.checked[j];restored.marked[index]=saved.marked[j]});
     return validSaved(restored,mode)?restored:null;
   }
   function updateStart(){
@@ -226,7 +215,7 @@
     $('resultTitle').textContent=expired?'Time expired — submitted':'TNUSRB SI 2015 provisional result';
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scoreable*0.5).toFixed(1)+' provisional marks';
     $('scoreDetails').textContent=correct+' provisionally correct · '+wrong+' provisionally incorrect · '+blank+' unanswered · '+
-      ungraded+' readable questions ungraded · '+questions.length+' playable questions · 21 held for missing/incomplete sources. '+
+      ungraded+' readable questions ungraded · '+questions.length+' playable questions · 19 held for missing/incomplete sources. '+
       'The secondary answer table is not an officially confirmed TNUSRB key.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
@@ -302,7 +291,7 @@
       });
       $('loadStatus').textContent=questions.length+' readable original-numbered practice questions loaded: '+
         '10 indexed bilingual Tamil/English study items Q11–20, 110 provisionally scored, '+
-        '9 source/key disputed and ungraded, 21 incomplete or diagram-dependent records held.';
+        '9 source/key disputed and ungraded, 19 incomplete or diagram-dependent records held.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;

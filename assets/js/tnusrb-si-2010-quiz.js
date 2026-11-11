@@ -13,7 +13,7 @@
     if(data?.schemaVersion!==1||data?.year!==2010||data?.bookletType!=='A'||
       data?.originalPaperQuestionCount!==140||data?.providedQuestionCount!==140||
       !Array.isArray(data.questions)||data.questions.length!==140||
-      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==0){
+      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==0||data.blockedNumbers.length!==0){
       throw Error('TNUSRB 2010 question-bank manifest is incomplete');
     }
     let previous=0;
@@ -22,7 +22,7 @@
          typeof q.question!=='string'||!q.question.trim()||
          !q.options||!LETTERS.every(l=>typeof q.options[l]==='string'&&q.options[l].trim())||
          !/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/.test(q.keyToken)||
-         !['provisional_mirrored_final_key','ungraded_all_correct','blocked_source_incomplete'].includes(q.scoringStatus))
+         !['provisional_mirrored_final_key','ungraded_all_correct','ungraded_source_dispute','blocked_source_incomplete'].includes(q.scoringStatus))
           throw Error('Incomplete entry at original question '+q.number);
       if(q.keyToken==='ALL'&&q.scoringStatus!=='ungraded_all_correct')throw Error('Special key status mismatch');
       previous=q.number;
@@ -33,8 +33,9 @@
          !q.secondaryBilingualSourceURL?.startsWith('https://civilserviceaspirants.in/')))
       throw Error('2010 Open Candidates secondary bilingual source review manifest changed');
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.availableForQuizCount||playable.length!==138||
-       playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==134){
+    if(playable.length!==data.availableForQuizCount||playable.length!==140||
+       playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==135||
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==1){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
@@ -49,11 +50,14 @@
     const saved=getSaved(storageKey());
     if(validSaved(saved,mode))return saved;
     const recoveredNumbers=new Set([67,68,69,70,71,72,73,74,75,76,77,78,79,80,86,114,115,116]);
-    const oldPositions=questions.map((q,i)=>recoveredNumbers.has(q.number)?-1:i).filter(i=>i>=0);
+    const priorPlayable=questions.map((q,i)=>[64,106].includes(q.number)?-1:i).filter(i=>i>=0);
+    const oldPositions=saved?.answers?.length===138?priorPlayable:
+      priorPlayable.filter(i=>!recoveredNumbers.has(questions[i].number));
+    const oldLength=oldPositions.length;
     if(!saved||saved.finished||saved.version!==1||saved.mode!==mode||
-      oldPositions.length!==120||saved.answers?.length!==120||
-      saved.checked?.length!==120||saved.marked?.length!==120||
-      !Number.isInteger(saved.index)||saved.index<0||saved.index>=120)return null;
+      ![120,138].includes(oldLength)||saved.answers?.length!==oldLength||
+      saved.checked?.length!==oldLength||saved.marked?.length!==oldLength||
+      !Number.isInteger(saved.index)||saved.index<0||saved.index>=oldLength)return null;
     const updated={...saved,answers:Array(questions.length).fill(null),
       checked:Array(questions.length).fill(false),marked:Array(questions.length).fill(false),
       index:oldPositions[saved.index]};
@@ -115,18 +119,18 @@
     const visible=attempt.mode==='practice'&&attempt.checked[attempt.index];
     div.hidden=!visible;
     if(!visible)return;
-    const choice=attempt.answers[attempt.index],special=q.keyToken==='ALL';
-    const right=!special&&q.acceptedAnswers.includes(choice);
-    div.className=special?'issue':'';
+    const choice=attempt.answers[attempt.index],special=q.keyToken==='ALL',disputed=q.scoringStatus==='ungraded_source_dispute';
+    const right=!special&&!disputed&&q.acceptedAnswers.includes(choice);
+    div.className=special||disputed?'issue':'';
     const heading=document.createElement('strong');
-    heading.textContent=special?'Special key: ALL CORRECT · ungraded':right?'Correct answer':'Incorrect answer';
+    heading.textContent=disputed?'Ungraded — conflicting source keys':special?'Special key: ALL CORRECT · ungraded':right?'Correct answer':'Incorrect answer';
     div.append(heading);
     const info=document.createElement('p');
-    info.textContent=special?
+    info.textContent=disputed?'This item is not scored: '+q.scoringReviewReason+' Your selection: '+choice+'.':special?
       'The mirrored Type A final key lists “All Correct”; this item is not included in indicative marks.':
       'Type A final-key entry: '+q.keyToken+'. Your answer: '+choice+'.';
     div.append(info);
-    if(!special){
+    if(!special&&!disputed){
       const p=document.createElement('p');
       p.textContent='Accepted: '+q.acceptedAnswers.map(letter=>letter+') '+q.options[letter]).join(' / ');
       div.append(p);
@@ -149,6 +153,9 @@
     $('passage').hidden=!q.passage;
     $('passage').textContent=q.passage||'';
     $('questionTitle').textContent=q.question;
+    $('questionFigure').hidden=!q.figureAsset;
+    $('questionFigure').src=q.figureAsset||'';
+    $('questionFigure').alt=q.figureAlt||'';
     $('questionTamil').hidden=!q.questionTamil;
     $('questionTamil').textContent=q.questionTamil||'';
     $('sourceReader').hidden=!q.questionTamil;
@@ -168,8 +175,8 @@
         content.append(tamil);
       }
       b.append(l,content);
-      if(locked&&q.keyToken!=='ALL'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
-      if(locked&&q.keyToken!=='ALL'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
+      if(locked&&q.scoringStatus==='provisional_mirrored_final_key'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
+      if(locked&&q.scoringStatus==='provisional_mirrored_final_key'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
       b.disabled=locked;
       b.addEventListener('click',()=>{if(locked)return;attempt.answers[i]=letter;render()});
       $('options').append(b);
@@ -190,32 +197,33 @@
     const scored=questions.filter(q=>q.scoringStatus==='provisional_mirrored_final_key');
     const correct=questions.reduce((sum,q,i)=>sum+(q.scoringStatus==='provisional_mirrored_final_key'&&q.acceptedAnswers.includes(attempt.answers[i])?1:0),0);
     const wrong=questions.reduce((sum,q,i)=>sum+(q.scoringStatus==='provisional_mirrored_final_key'&&attempt.answers[i]&&!q.acceptedAnswers.includes(attempt.answers[i])?1:0),0);
-    const ungraded=questions.filter(q=>q.scoringStatus==='ungraded_all_correct').length;
+    const ungraded=questions.filter(q=>q.scoringStatus!=='provisional_mirrored_final_key').length;
     $('resultTitle').textContent=expired?'Time expired — answers submitted':'TNUSRB SI 2010 practice result';
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scored.length*0.5).toFixed(1)+' marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
-      ungraded+' All Correct entries ungraded · '+questions.length+' source-readable questions available. '+
-      'Score excludes absent/garbled questions and does not represent the full 140-question examination.';
+      ungraded+' ungraded (4 ALL plus Q64 source-key conflict) · '+questions.length+' source-readable questions available. '+
+      'All 140 questions are now readable; secondary source keys are not TNUSRB-certified.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
     const filter=$('reviewFilter').value;
     $('reviewList').replaceChildren();
     for(let i=0;i<questions.length;i++){
-      const q=questions[i],answer=attempt.answers[i],special=q.keyToken==='ALL',
-        right=!special&&q.acceptedAnswers.includes(answer);
-      if(filter==='wrong'&&(!answer||special||right))continue;
+      const q=questions[i],answer=attempt.answers[i],special=q.keyToken==='ALL',disputed=q.scoringStatus==='ungraded_source_dispute',
+        right=!special&&!disputed&&q.acceptedAnswers.includes(answer);
+      if(filter==='wrong'&&(!answer||special||disputed||right))continue;
       if(filter==='blank'&&answer)continue;
       if(filter==='marked'&&!attempt.marked[i])continue;
-      if(filter==='ungraded'&&!special)continue;
+      if(filter==='ungraded'&&!special&&!disputed)continue;
       const details=document.createElement('details');details.className='result-item';
       const summary=document.createElement('summary');
-      summary.textContent='Q'+q.number+' · '+q.question+' — '+(special?'ALL / ungraded':!answer?'Not answered':right?'Correct':'Incorrect');
+      summary.textContent='Q'+q.number+' · '+q.question+' — '+(disputed?'Source-key dispute / ungraded':special?'ALL / ungraded':!answer?'Not answered':right?'Correct':'Incorrect');
       details.append(summary);
       const body=document.createElement('div');body.className='result-body';
       if(q.passage){const context=document.createElement('p');context.textContent=q.passage;body.append(context)}
       const response=document.createElement('p');response.textContent='Your choice: '+(answer||'not answered')+
-        ' · mirrored final key: '+q.keyToken;body.append(response);
+        (disputed?' · source key conflict: no answer asserted':' · mirrored final key: '+q.keyToken);body.append(response);
+      if(disputed){const reason=document.createElement('p');reason.textContent=q.scoringReviewReason;body.append(reason)}
       for(const letter of LETTERS){
         const p=document.createElement('p');p.textContent=letter+') '+q.options[letter];body.append(p);
       }
@@ -253,13 +261,21 @@
         const li=document.createElement('li');li.textContent='Original Q'+n+': open-candidates question text not recovered';
         gapList.append(li);
       });
+      const q64=data.questions.find(q=>q.number===64);
+      const conflict=document.createElement('li');
+      conflict.textContent='Q64: original vector notation visible, but conflicting secondary answer keys — '+q64.scoringReviewReason;
+      gapList.append(conflict);
+      const q106=data.questions.find(q=>q.number===106);
+      const venn=document.createElement('li');
+      venn.textContent='Q106: diagram recovered from numbered coaching archive page 14; answer remains provisional (Type A key C).';
+      gapList.append(venn);
       data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
         const li=document.createElement('li');li.textContent='Original Q'+q.number+': '+(q.sourceIssue||'Original math/figure review required');
         gapList.append(li);
       });
       $('loadStatus').textContent=questions.length+' readable Open Candidates questions loaded: '+
         '10 bilingual source-reviewed Q1–10, 134 provisional key scores, '+
-        '4 ALL entries ungraded; all 17 missing numbers recovered, 2 source-blocked (Q64, Q106).';
+        '4 ALL entries and Q64 key dispute ungraded; 140 original-numbered source records, no blocked questions. Q106 Venn recovered.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
