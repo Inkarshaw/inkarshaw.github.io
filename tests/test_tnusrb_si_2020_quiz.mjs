@@ -91,11 +91,13 @@ assert.deepEqual(digit121.acceptedAnswers,['C']);
 assert.equal((210-34)/(23-1),8,'Q121 equation directly yields option C');
 assert.ok(js.includes('const old134=questions.map'),'Old 134-question attempts must map original question numbers');
 
-const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21];
+const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59];
 assert.deepEqual(data.bilingualEditorialReview.reviewedOriginalNumbers,expectedTamil,'Only reviewed question numbers advertise Tamil study text');
-assert.equal(data.bilingualEditorialReview.questionCount,20);
+assert.equal(data.bilingualEditorialReview.questionCount,40);
+assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20],'Bilingual batch review history preserved');
+assert.deepEqual(data.bilingualEditorialReview.batchHistory[1].numbers,[23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59]);
 assert.equal(data.bilingualEditorialReview.originalTamilPrintVerified,false,'Not a certified original-language reproduction');
-assert.deepEqual(data.bilingualEditorialReview.excludedOriginalNumbers,[15],'Ambiguous C Q15 must never be silently translated');
+assert.deepEqual(data.bilingualEditorialReview.excludedOriginalNumbers,[15,37,39,40,41,42,47],'Source ambiguity and English-only grammar/matrix alternatives must not be silently reinterpreted');
 for(const q of data.questions){
   const translated=expectedTamil.includes(q.number);
   if(translated){
@@ -106,6 +108,21 @@ for(const q of data.questions){
     assert.ok(Object.values(q.optionsTamil).every(x=>x.length>0),'All Tamil choices must be populated Q'+q.number);
   }else assert.equal(q.questionTamil,undefined,'Never imply unreviewed item has Tamil source text Q'+q.number);
 }
+const originalTamil=[28,29,30,31,32,33,34,35];
+assert.deepEqual(data.bilingualEditorialReview.alreadySourceTamilNumberedOriginals,originalTamil);
+assert.equal(originalTamil.filter(n=>expectedTamil.includes(n)).length,0,'Already Tamil C source transcriptions are NOT claimed as editorial English translations');
+for(const n of originalTamil){
+ const q=data.questions.find(q=>q.number===n);
+ assert.equal(q.sourceTextLanguage,'ta','Q'+n+' source transcription is in Tamil');
+ assert.equal(q.sourceLanguageStatus,'original_numbered_tamil_transcription_pending_primary_series_c_booklet');
+ assert.equal(q.originalTamilPaperTextVerified,false,'Printed original C Tamil scan is not certified');
+ assert.equal(q.questionTamil,undefined,'Do not duplicate already Tamil source as if it were translated');
+ assert.ok(/[\u0B80-\u0BFF]/u.test(q.question));
+ assert.ok(Object.values(q.options).every(v=>/[\u0B80-\u0BFF]/u.test(v)));
+}
+assert.match(js,/sourceTamilNumbers/,'Reader must distinguish original Tamil source from editorial translations');
+assert.match(js,/This original-numbered source transcription is already in Tamil/,'Language switch may not pretend English source exists');
+assert.match(html,/40 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
 assert.match(html,/id="language"/,'Learners can switch languages without new attempt');
 assert.match(html,/value="ta"/,'Tamil-only mode available');
 assert.match(html,/value="both"/,'Side-by-side bilingual mode available');
