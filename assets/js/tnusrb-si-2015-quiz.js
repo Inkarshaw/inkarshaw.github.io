@@ -1,5 +1,5 @@
 /* TNUSRB SI 2015 Open Quota — user-supplied bilingual OCR.
-   133 readable: 116 provisional-keyed, 17 ungraded source review; 7 held for missing source.  */
+   134 readable: 116 provisional-keyed, 18 ungraded source review; 6 held for missing source.  */
 (() => {
   'use strict';
   const $=id=>document.getElementById(id);
@@ -11,8 +11,8 @@
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2015||data?.maxOriginalQuestions!==140||
        data?.providedQuestionCount!==140||!Array.isArray(data.questions)||data.questions.length!==140||
-       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==7||
-       data.ungradedReadableQuestionCount!==17||
+       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==6||
+       data.ungradedReadableQuestionCount!==18||
        !Array.isArray(data.answerKey?.answers)||data.answerKey.answers.length!==140)
        throw Error('TNUSRB SI 2015 source manifest incomplete');
     for(let i=0;i<140;i++){
@@ -39,9 +39,9 @@
          q.secondaryBilingualSourceURL!==data.bilingualNumberedReaderReview.sourceURL))
       throw Error('SI 2015 numbered Open Candidates bilingual-review manifest is inconsistent');
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==133||playable.length!==data.playableQuestionCount||
+    if(playable.length!==134||playable.length!==data.playableQuestionCount||
        playable.filter(q=>q.scoringStatus==='provisional_secondary_key').length!==116||
-       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==17||
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==18||
        data.provisionallyScoreableQuestionCount!==116)
       throw Error('SI 2015 playback, graded and ungraded manifest totals disagree');
     return playable;
@@ -57,7 +57,8 @@
     if(validSaved(saved,mode))return saved;
     // Preserve the old original-number position order for all historical sizes.
     // Never regenerate prior 109-item positions using today's score-status flags.
-    const newlyReadable=new Set([21,27,34,45,60,73,80,90,92,93,95,120]);
+    const newlyReadable=new Set([9,21,27,34,45,60,73,80,90,92,93,95,120]);
+    const prior133=questions.map((q,i)=>q.number===9?-1:i).filter(i=>i>=0);
     const earlierFigureRecovery=new Set([119,129]);
     const originalFigureRecovery=new Set([109]);
     const initialUngraded=new Set([8,14,29,30,33,65,66,84,127]);
@@ -65,7 +66,7 @@
     const old119=old121.filter(i=>!earlierFigureRecovery.has(questions[i].number));
     const old118=old119.filter(i=>!originalFigureRecovery.has(questions[i].number));
     const old109=old118.filter(i=>!initialUngraded.has(questions[i].number));
-    const map={121:old121,119:old119,118:old118,109:old109};
+    const map={133:prior133,121:old121,119:old119,118:old118,109:old109};
     const indices=map[saved?.answers?.length];
     if(!saved||!indices||saved.finished||saved.version!==1||saved.mode!==mode||
        saved.answers?.length!==indices.length||saved.checked?.length!==indices.length||
@@ -219,7 +220,7 @@
     $('resultTitle').textContent=expired?'Time expired — submitted':'TNUSRB SI 2015 provisional result';
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scoreable*0.5).toFixed(1)+' provisional marks';
     $('scoreDetails').textContent=correct+' provisionally correct · '+wrong+' provisionally incorrect · '+blank+' unanswered · '+
-      ungraded+' readable questions ungraded · '+questions.length+' playable questions · 7 held for missing/incomplete sources. '+
+      ungraded+' readable questions ungraded · '+questions.length+' playable questions · 6 held for missing/incomplete sources. '+
       'The secondary answer table is not an officially confirmed TNUSRB key.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
@@ -295,7 +296,7 @@
       });
       $('loadStatus').textContent=questions.length+' readable original-numbered practice questions loaded: '+
         '10 indexed bilingual Tamil/English study items Q11–20, 116 provisionally scored, '+
-        '17 source/key disputed or source-instruction ungraded, 7 incomplete or graph-dependent records held.';
+        '18 source/key disputed or source-instruction ungraded, 6 graph-dependent records held.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
