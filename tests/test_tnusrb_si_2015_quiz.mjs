@@ -101,7 +101,7 @@ assert.match(js,/ungraded_source_dispute/,'Ungraded questions need distinct scor
 assert.match(js,/const scored=q.scoringStatus==='provisional_secondary_key'/,'Feedback must be neutral for ungraded');
 assert.match(js,/const scoreable=questions.filter/,'Score denominator excludes ungraded questions');
 assert.match(js,/if\(filter==='ungraded'&&scored\)continue/,'Review filter lists ungraded entries');
-assert.match(js,/gradedIndices\[saved.index\]/,'Previous 109-question attempts must be mapped into 118-question order');
+assert.match(js,/const old109=questions\.map/,'Previous 109-question attempts still restore by source-number order');
 assert.match(js,/q\.optionsTamil/,'Tamil option text should render for indexed Open Candidates Q11–20');
 assert.match(js,/\$\('questionTamil'\)/);
 assert.match(js,/\$\('sourceReader'\)/);
