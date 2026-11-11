@@ -204,11 +204,12 @@
       const content=document.createElement('span');
       content.textContent=onlyTamil?q.optionsTamil[letter]:q.options[letter];
       if(onlyTamil)content.setAttribute('lang','ta');
-      b.append(l,content);
+      const copy=document.createElement('span');copy.className='option-copy';copy.append(content);
       if(language==='both'&&hasTamil){
         const tamil=document.createElement('span');tamil.className='tamil-option';
-        tamil.lang='ta';tamil.textContent=q.optionsTamil[letter];b.append(tamil);
+        tamil.lang='ta';tamil.textContent=q.optionsTamil[letter];copy.append(tamil);
       }
+      b.append(l,copy);
       if(locked&&q.scoringStatus==='scored_with_final_key'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
       if(locked&&q.scoringStatus==='scored_with_final_key'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
       b.disabled=locked;
