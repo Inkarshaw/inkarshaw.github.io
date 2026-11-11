@@ -91,12 +91,16 @@ assert.deepEqual(digit121.acceptedAnswers,['C']);
 assert.equal((210-34)/(23-1),8,'Q121 equation directly yields option C');
 assert.ok(js.includes('const old134=questions.map'),'Old 134-question attempts must map original question numbers');
 
-const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59,...Array.from({length:20},(_,i)=>i+60)];
+const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59,...Array.from({length:40},(_,i)=>i+60)];
 assert.deepEqual(data.bilingualEditorialReview.reviewedOriginalNumbers,expectedTamil,'Only reviewed question numbers advertise Tamil study text');
-assert.equal(data.bilingualEditorialReview.questionCount,60);
-assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20],'Bilingual batch review history preserved');
+assert.equal(data.bilingualEditorialReview.questionCount,80);
+assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20,20],'Bilingual batch review history preserved');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[1].numbers,[23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59]);
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[2].numbers,Array.from({length:20},(_,i)=>60+i),'Third bilingual editorial batch exactly covers Q60–79');
+assert.deepEqual(data.bilingualEditorialReview.batchHistory[3].numbers,Array.from({length:20},(_,i)=>80+i),'Fourth bilingual editorial batch exactly covers Q80–99');
+for(const n of [84,95]){const q=data.questions.find(q=>q.number===n);assert.match(q.questionTamil,/மதிப்பெண் வழங்கப்படாது/,'Reference figure is explicitly ungraded in Tamil');assert.equal(q.originalCBookletDiagramVerified,false);}
+assert.match(data.questions.find(q=>q.number===82).questionTamil,/ABLMS \| QRLBA/,'Coding table cannot change when translating');
+assert.match(data.questions.find(q=>q.number===89).questionTamil,/கணிதம் 90°/,'Pie chart angles preserved in Tamil');
 for(const n of [60,63,64,68,70,76]){
  const q=data.questions.find(q=>q.number===n);
  assert.equal(q.translationStatus,'editorial_tamil_study_translation_not_verified_original_booklet');
@@ -140,7 +144,7 @@ for(const n of originalTamil){
 }
 assert.match(js,/sourceTamilNumbers/,'Reader must distinguish original Tamil source from editorial translations');
 assert.match(js,/This original-numbered source transcription is already in Tamil/,'Language switch may not pretend English source exists');
-assert.match(html,/60 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
+assert.match(html,/80 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
 assert.match(html,/id="language"/,'Learners can switch languages without new attempt');
 assert.match(html,/value="ta"/,'Tamil-only mode available');
 assert.match(html,/value="both"/,'Side-by-side bilingual mode available');
