@@ -80,11 +80,24 @@ assert.match(sample[107].question,/8¼/,'Q107 fraction rendered');
 assert.match(sample[122].question,/243/,'Q122 exponential expression present');
 for(const n of [84,95,103]){
  const q=sample[n];
- assert.equal(q.scoringStatus,'ungraded_source_dispute','Reference study figure cannot be graded as original Series C Q'+n);
+ assert.equal(q.scoringStatus,'ungraded_source_dispute','Reference cannot be graded as original Series C Q'+n);
  assert.equal(q.originalCBookletDiagramVerified,false);
  assert.equal(q.figureStatus,'editorial_comparison_reference_NOT_verbatim_original_series_c');
  assert.deepEqual(q.acceptedAnswers,[]);
- assert.match(q.figureAsset,new RegExp('^assets/figures/tnusrb-si-2020-q'+n+'-reference-ungraded\\.svg
+ assert.equal(q.figureAsset,'assets/figures/tnusrb-si-2020-q'+n+'-reference-ungraded.svg');
+ assert.ok(q.figureAlt.length>50);
+ const source=read(q.figureAsset);
+ assert.ok(source.includes('NOT')&&source.includes('Ungraded'),'SVG source must explicitly disclaim originality');
+ assert.ok(q.comparisonSourceURLs.length>=2,'Independent source comparison trail required');
+}
+assert.deepEqual(data.sourceRecoveryAudit.referenceDiagramRecovery.positions,[84,95,103]);
+assert.equal(data.sourceRecoveryAudit.referenceDiagramRecovery.allUngraded,true);
+assert.deepEqual(data.blockedNumbers,[121],'Only Q121 is now source-blocked');
+assert.match(html,/id="questionFigure"/,'SVG rendering element is present');
+assert.match(html,/id="referenceNote"/,'Editorial drawing disclaimer appears on question screen');
+assert.ok(js.includes("$('questionFigure')"));
+assert.ok(js.includes("$('referenceNote')"));
+assert.ok(js.includes('const old131=questions.map'),'Historical 131-question attempt migration retained');
 assert.match(html,/134 readable/);
 assert.match(html,/id="sourceGaps"/,'The unverified source holes must be shown to the learner');
 assert.ok(html.includes('href="'+officialPdf+'"'),'Quiz links board-listed source PDF');
