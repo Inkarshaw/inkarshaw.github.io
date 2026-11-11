@@ -91,11 +91,29 @@ assert.deepEqual(digit121.acceptedAnswers,['C']);
 assert.equal((210-34)/(23-1),8,'Q121 equation directly yields option C');
 assert.ok(js.includes('const old134=questions.map'),'Old 134-question attempts must map original question numbers');
 
-const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59];
+const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59,...Array.from({length:20},(_,i)=>i+60)];
 assert.deepEqual(data.bilingualEditorialReview.reviewedOriginalNumbers,expectedTamil,'Only reviewed question numbers advertise Tamil study text');
-assert.equal(data.bilingualEditorialReview.questionCount,40);
-assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20],'Bilingual batch review history preserved');
+assert.equal(data.bilingualEditorialReview.questionCount,60);
+assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20],'Bilingual batch review history preserved');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[1].numbers,[23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59]);
+assert.deepEqual(data.bilingualEditorialReview.batchHistory[2].numbers,Array.from({length:20},(_,i)=>60+i),'Third bilingual editorial batch exactly covers Q60–79');
+for(const n of [60,63,64,68,70,76]){
+ const q=data.questions.find(q=>q.number===n);
+ assert.equal(q.translationStatus,'editorial_tamil_study_translation_not_verified_original_booklet');
+ assert.equal(q.originalTamilPaperTextVerified,false);
+}
+const q60=data.questions.find(q=>q.number===60);
+assert.deepEqual(q60.optionsTamil,q60.options,'Physics scientific notation must remain exactly as in the original English transcription');
+const q64=data.questions.find(q=>q.number===64);
+assert.deepEqual(q64.optionsTamil,q64.options,'Latin organism names must not be altered in Tamil study edition');
+const q68=data.questions.find(q=>q.number===68);
+assert.deepEqual(q68.optionsTamil,q68.options,'Plasmodium species must preserve printed spellings');
+const q70=data.questions.find(q=>q.number===70);
+assert.deepEqual(q70.optionsTamil,q70.options,'Latin cholera pathogen choices must preserve English source spelling');
+const q76=data.questions.find(q=>q.number===76);
+assert.ok(q76.optionsTamil.A.includes(q76.options.A),'Unusual source option A name kept verbatim rather than silently corrected');
+assert.equal(q76.answerKeyToken,data.answerKey.answers[75],'Never modify 2020 C answer keys as part of translation');
+
 assert.equal(data.bilingualEditorialReview.originalTamilPrintVerified,false,'Not a certified original-language reproduction');
 assert.deepEqual(data.bilingualEditorialReview.excludedOriginalNumbers,[15,37,39,40,41,42,47],'Source ambiguity and English-only grammar/matrix alternatives must not be silently reinterpreted');
 for(const q of data.questions){
@@ -122,7 +140,7 @@ for(const n of originalTamil){
 }
 assert.match(js,/sourceTamilNumbers/,'Reader must distinguish original Tamil source from editorial translations');
 assert.match(js,/This original-numbered source transcription is already in Tamil/,'Language switch may not pretend English source exists');
-assert.match(html,/40 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
+assert.match(html,/60 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
 assert.match(html,/id="language"/,'Learners can switch languages without new attempt');
 assert.match(html,/value="ta"/,'Tamil-only mode available');
 assert.match(html,/value="both"/,'Side-by-side bilingual mode available');
