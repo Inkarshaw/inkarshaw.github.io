@@ -392,24 +392,6 @@ try {
   assert.match(await page.locator('#questionTamil').innerText(),/எந்த வகை வாக்கியம்/,'2015 Q11 editorial Tamil study stem shown');
   assert.match(await page.locator('#options button').nth(2).innerText(),/உணர்ச்சி வாக்கியம்/,'2015 Q11 bilingual option C');
   assert.equal(await page.locator('#sourceReader').isVisible(),true,'Indexed source review disclosed on bilingual questions');
-  await page.locator('#palette button').filter({hasText:/^46$/}).click();
-  assert.match(await page.locator('#questionTitle').innerText(),/13.*5.*60/,'Vector expressions visible for Q46');
-  assert.match(await page.locator('#instruction').innerText(),/Series D Q25/,'C original booklet is not claimed for vector notation');
-  await page.locator('#options button').nth(2).click();
-  await page.locator('#check').click();
-  assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: C/,'Q46 vector scored using published C final key');
-  await page.locator('#palette button').filter({hasText:/^47$/}).click();
-  assert.match(await page.locator('#questionTitle').innerText(),/adjoint.*matrix/i);
-  assert.match(await page.locator('#instruction').innerText(),/Series D Q26/,'Q47 matrix is source-comparison only');
-  await page.locator('#options button').nth(2).click();
-  await page.locator('#check').click();
-  assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q47 matrix options cannot count as C original');
-  assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'No matrix answer highlights until C original verified');
-  await page.locator('#palette button').filter({hasText:/^121$/}).click();
-  assert.match(await page.locator('#questionTitle').innerText(),/21\?/,'Q121 arithmetic transcription readable');
-  await page.locator('#options button').nth(2).click();
-  await page.locator('#check').click();
-  assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: C/,'Q121 arithmetic keyed by independent C final key');
   await page.locator('#palette button').filter({hasText:/^14$/}).click();
   assert.match(await page.locator('#questionTamil').innerText(),/செயப்பாட்டு வினை/,'Source disputed Q14 has Tamil text');
   await page.locator('#options button').nth(3).click();
@@ -436,7 +418,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 137-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 134-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
   await page.locator('#quiz .palette-details summary').click();
@@ -503,6 +485,25 @@ try {
     assert.equal(nums.includes(String(stillMissing)),false,'No fabricated Series C Q'+stillMissing);
   }
   for(const recovered of [46,47,121])assert.ok(nums.includes(String(recovered)),'Restored study question Q'+recovered);
+  await page.locator('#palette button').filter({hasText:/^46$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/13.*5.*60/,'Vector expressions visible for Q46');
+  assert.match(await page.locator('#instruction').innerText(),/Series D Q25/,'C original booklet is not claimed for vector notation');
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: C/,'Q46 vector scored using published C final key');
+  await page.locator('#palette button').filter({hasText:/^47$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/adjoint.*matrix/i);
+  assert.match(await page.locator('#instruction').innerText(),/Series D Q26/,'Q47 matrix is source-comparison only');
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q47 matrix options cannot count as C original');
+  assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'No matrix answer highlights until C original verified');
+  await page.locator('#palette button').filter({hasText:/^121$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/21\?/,'Q121 arithmetic transcription readable');
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: C/,'Q121 arithmetic keyed by independent C final key');
+
   assert.equal(nums.includes('22'),true,'Readable disputed source Q22 appears as ungraded');
   for(const recovered of [28,29,30,31,32,33,34,35,41,42,44,45,48])assert.ok(nums.includes(String(recovered)),'Recovered 2020 Series C original Q'+recovered);
   for(const sourceReadable of [14,15,37,84,95,103])assert.ok(nums.includes(String(sourceReadable)),'Cross-reviewed 2020 Series C Q'+sourceReadable+' now present');
@@ -541,7 +542,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 134-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 137-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q89/);
   await page.locator('#quiz .palette-details summary').click();
