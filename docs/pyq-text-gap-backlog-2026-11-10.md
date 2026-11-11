@@ -1,3 +1,12 @@
+## 11 November 2026 — second bilingual study pass for the 2020 Series C General Candidates paper
+
+- Extended from **20 to 40 ClearExams editorial Tamil study translations** without changing English source-numbered question stems, A–D answer order, source-key letters, scoring or saved attempts. Added Q23–27, Q43–46, Q48–57 and Q59, each with a Tamil stem and four Tamil alternatives. This is **not** an original-booklet Tamil transcription and should never be presented as official verbatim Tamil.
+- Separately labelled **Q28–35**, which are already preserved as source-numbered Tamil transcriptions. They are **not** counted among the 40 editorial translations. The inaccessible original Series C printed Tamil booklet remains unverified, and the UI does not falsely promise English source wording for these eight Tamil-only items.
+- **Deliberately excluded from new Tamil translation:** Q15 (source ambiguity), Q37 (conflicting duplicated English spelling), Q39 (damaged grammar), Q40–42 (English grammatical transformations requiring their exact English alternatives) and Q47 (Series D-only matrix choices). Tamil mode shows existing source text with an honest language-availability note rather than fabricating text or normalizing ambiguities.
+- Technical source-language controls: 40 editorial records and 8 Tamil-source records are separately validated; all four option letters remain the same, with `textContent` rendering and preserved local-storage keys. The language selector works in English, Tamil and English+Tamil mode and identifies original-numbered Tamil-only texts.
+- **Coverage still unchanged:** 2020 General Candidates Series C 137/140 readable, 127 provisionally scored, 10 ungraded, Q114–116 absent; eight typed question sets total **1,411 readable positions**. No departmental-candidate paper added.
+- Original 2015 six source-blocked vehicle-production questions Q99–104 still require the correct 1991–1996 graph; mismatched third-party graph years must never be used.
+
 ## 11 November 2026 — 2020 Series C first bilingual source-quality pass
 
 - Prepared **20 ClearExams editorial Tamil study translations** for existing English source-numbered 2020 C questions **Q1–14 and Q16–21**, including all 4 A–D alternatives; source English, booklet number, key, and all marks remain untouched.

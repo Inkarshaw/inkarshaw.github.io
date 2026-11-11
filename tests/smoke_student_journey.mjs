@@ -497,6 +497,31 @@ try {
   for(const stillMissing of [114,115,116]){
     assert.equal(nums.includes(String(stillMissing)),false,'No fabricated Series C Q'+stillMissing);
   }
+  await page.locator('#palette button').filter({hasText:/^23$/}).click();
+  await page.locator('#language').selectOption('ta');
+  assert.match(await page.locator('#questionTamil').innerText(),/Non-Elitist/,'Second Tamil batch Q23 displayed');
+  assert.match(await page.locator('#options button').first().innerText(),/கார்ல் மார்க்ஸ்/,'Q23 Tamil choices preserve A–D correspondence');
+  assert.match(await page.locator('#translationNotice').innerText(),/NOT independently verified/,'New Tamil study text not presented as official booklet');
+  await page.locator('#palette button').filter({hasText:/^43$/}).click();
+  await page.locator('#language').selectOption('both');
+  assert.match(await page.locator('#questionTamil').innerText(),/log₃5/,'Q43 mathematical symbols preserved in Tamil edition');
+  assert.match(await page.locator('#options button').nth(3).innerText(),/3\/2/,'Q43 option D retains math notation');
+  await page.locator('#palette button').filter({hasText:/^57$/}).click();
+  await page.locator('#language').selectOption('ta');
+  assert.match(await page.locator('#options button').nth(3).innerText(),/சீசியம் \(Cs\)/,'Q57 original chemical symbol preserved with Tamil term');
+  await page.locator('#palette button').filter({hasText:/^28$/}).click();
+  await page.locator('#language').selectOption('en');
+  assert.equal(await page.locator('#questionTitle').getAttribute('lang'),'ta','Already-Tamil original-numbered source correctly marked with Tamil lang');
+  assert.match(await page.locator('#questionTitle').innerText(),/ஏறு தழுவுதல்/,'No invented English text on original Tamil source Q28');
+  assert.match(await page.locator('#translationNotice').innerText(),/already in Tamil/,'English mode acknowledges absence of verified English source');
+  assert.equal(await page.locator('#questionTamil').isVisible(),false,'No redundant editorial translation for original Tamil source');
+  await page.locator('#language').selectOption('ta');
+  assert.match(await page.locator('#options button').nth(1).innerText(),/கலித்தொகை/,'Q28 original Tamil option B remains intact');
+  await page.locator('#palette button').filter({hasText:/^39$/}).click();
+  assert.equal(await page.locator('#questionTamil').isVisible(),false,'Malformed Q39 is intentionally not translated');
+  assert.match(await page.locator('#questionTitle').innerText(),/Shantha.*table/,'Q39 English source retained in Tamil mode');
+  assert.match(await page.locator('#translationNotice').innerText(),/not yet reviewed/,'Explicit fallback when source wording cannot be confidently translated');
+  await page.locator('#language').selectOption('both');
   for(const recovered of [46,47,121])assert.ok(nums.includes(String(recovered)),'Restored study question Q'+recovered);
   await page.locator('#palette button').filter({hasText:/^46$/}).click();
   assert.match(await page.locator('#questionTitle').innerText(),/13.*5.*60/,'Vector expressions visible for Q46');
