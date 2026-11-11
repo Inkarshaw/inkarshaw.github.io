@@ -370,7 +370,7 @@ try {
     assert.ok(si2015Nums.includes(String(recovered)),'Original SI 2015 figure question Q'+recovered+' recovered');
     await page.locator('#palette button').filter({hasText:new RegExp('^'+recovered+'$')}).click();
     assert.equal(await page.locator('#questionFigure').isVisible(),true,'Figure visible for SI 2015 Q'+recovered);
-    assert.ok((await page.locator('#questionFigure').getAttribute('src')).endsWith('q'+recovered+'.svg'));
+    assert.ok((await page.locator('#questionFigure').getAttribute('src')).endsWith(recovered===120?'q120-ungraded.svg':'q'+recovered+'.svg'));
     assert.equal(await page.locator('#options button').count(),4,'Q'+recovered+' retains A–D choices');
   }
   for(const ungraded of [8,14,21,27,29,30,33,60,65,66,73,80,84,90,95,120,127]){
