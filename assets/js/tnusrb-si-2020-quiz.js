@@ -20,9 +20,13 @@
       throw Error('TNUSRB SI 2020 Series C question-bank manifest is incomplete');
     }
     const translatedNumbers=new Set(data.bilingualEditorialReview?.reviewedOriginalNumbers||[]);
-    if(data.bilingualEditorialReview?.questionCount!==20||translatedNumbers.size!==20||
-       data.bilingualEditorialReview?.originalTamilPrintVerified!==false||translatedNumbers.has(15))
-      throw Error('Tamil study translation provenance is incomplete');
+    const sourceTamilNumbers=new Set(data.bilingualEditorialReview?.alreadySourceTamilNumberedOriginals||[]);
+    if(data.bilingualEditorialReview?.questionCount!==40||translatedNumbers.size!==40||
+       sourceTamilNumbers.size!==8||
+       data.bilingualEditorialReview?.originalTamilPrintVerified!==false||
+       [...sourceTamilNumbers].some(n=>translatedNumbers.has(n))||
+       [15,37,39,40,41,42,47].some(n=>translatedNumbers.has(n)))
+      throw Error('Tamil study/source-language provenance is incomplete');
     let previous=0;
     for(const q of data.questions){
       if(!Number.isInteger(q.number)||q.number<=previous||q.number>140||
@@ -43,6 +47,15 @@
            !LETTERS.every(l=>typeof q.optionsTamil[l]==='string'&&q.optionsTamil[l].trim()))
           throw Error('Unverified Tamil study option set '+q.number);
       }else if(translatedNumbers.has(q.number))throw Error('Missing scheduled Tamil translation '+q.number);
+      const sourceTamil=q.sourceTextLanguage==='ta';
+      if(sourceTamil){
+        if(!sourceTamilNumbers.has(q.number)||q.questionTamil||
+           q.sourceLanguageStatus!=='original_numbered_tamil_transcription_pending_primary_series_c_booklet'||
+           q.originalTamilPaperTextVerified!==false||
+           !/[\u0B80-\u0BFF]/u.test(q.question)||
+           !LETTERS.every(l=>/[\u0B80-\u0BFF]/u.test(q.options[l])))
+          throw Error('Incorrectly labelled Tamil-original-numbered transcription '+q.number);
+      }else if(sourceTamilNumbers.has(q.number))throw Error('Missing source Tamil label '+q.number);
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
@@ -181,14 +194,18 @@
     $('passage').textContent=q.passage||'';
     const language=$('language').value;
     const hasTamil=!!q.questionTamil&&!!q.optionsTamil;
+    const sourceTamil=q.sourceTextLanguage==='ta';
     const onlyTamil=language==='ta'&&hasTamil;
     $('questionTitle').hidden=onlyTamil;
     $('questionTitle').textContent=q.question;
+    $('questionTitle').lang=sourceTamil?'ta':'en';
     $('questionTamil').hidden=language==='en'||!hasTamil;
     $('questionTamil').textContent=q.questionTamil||'';
-    $('translationNotice').hidden=language==='en';
+    $('translationNotice').hidden=language==='en'&&!sourceTamil;
     $('translationNotice').textContent=hasTamil?
       'ClearExams editorial Tamil study translation — NOT independently verified as the original Series C Tamil booklet. English wording and answer-option letters remain the source reference.':
+      sourceTamil?
+      'This original-numbered source transcription is already in Tamil. No independently verified English version or printed original Tamil Series C page is available; its Tamil text is shown in every language mode.':
       'Tamil translation is not yet reviewed for this original question number. Showing the source-numbered English text instead.';
     $('questionFigure').hidden=!q.figureAsset;
     $('questionFigure').src=q.figureAsset||'';
@@ -203,7 +220,7 @@
       const l=document.createElement('b');l.textContent=letter;
       const content=document.createElement('span');
       content.textContent=onlyTamil?q.optionsTamil[letter]:q.options[letter];
-      if(onlyTamil)content.setAttribute('lang','ta');
+      if(onlyTamil||sourceTamil)content.setAttribute('lang','ta');
       const copy=document.createElement('span');copy.className='option-copy';copy.append(content);
       if(language==='both'&&hasTamil){
         const tamil=document.createElement('span');tamil.className='tamil-option';
@@ -273,7 +290,7 @@
         const tamil=q.optionsTamil?.[letter];
         p.textContent=letter+') '+(lang==='ta'&&tamil?tamil:q.options[letter])+
           (lang==='both'&&tamil?' / '+tamil:'');
-        if(lang==='ta'&&tamil)p.lang='ta';
+        if((lang==='ta'&&tamil)||q.sourceTextLanguage==='ta')p.lang='ta';
         body.append(p);
       }
       details.append(body);$('reviewList').append(details);
