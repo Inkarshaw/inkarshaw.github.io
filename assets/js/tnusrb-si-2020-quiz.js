@@ -52,22 +52,21 @@
   function migratedAttempt(mode){
     const saved=getSaved(storageKey());
     if(validSaved(saved,mode))return saved;
-    // Keep responses from the previous 114-item order, keyed by original question number.
-    const oldPositions=questions.map((q,i)=>q.number!==22?i:-1).filter(i=>i>=0);
-    if(!saved||saved.finished||saved.version!==1||saved.mode!==mode||oldPositions.length!==114||
-      !Array.isArray(saved.answers)||saved.answers.length!==114||
-      !Array.isArray(saved.checked)||saved.checked.length!==114||
-      !Array.isArray(saved.marked)||saved.marked.length!==114||
-      !Number.isInteger(saved.index)||saved.index<0||saved.index>=114)return null;
+    const recoveredNumbers=new Set([28,29,30,31,32,33,34,35,41,42,44,45,48]);
+    const earlierPositions=questions.map((q,i)=>recoveredNumbers.has(q.number)?-1:i).filter(i=>i>=0);
+    // Support both older 115-item and 114-item attempts keyed by original question number.
+    const oldPositions=saved?.answers?.length===114?
+      earlierPositions.filter(i=>questions[i].number!==22):earlierPositions;
+    const oldLength=oldPositions.length;
+    if(!saved||saved.finished||saved.version!==1||saved.mode!==mode||
+       ![114,115].includes(oldLength)||saved.answers?.length!==oldLength||
+       saved.checked?.length!==oldLength||saved.marked?.length!==oldLength||
+       !Number.isInteger(saved.index)||saved.index<0||saved.index>=oldLength)return null;
     const restored={...saved,answers:Array(questions.length).fill(null),
       checked:Array(questions.length).fill(false),marked:Array(questions.length).fill(false),
       index:oldPositions[saved.index]};
-    for(let j=0;j<oldPositions.length;j++){
-      const k=oldPositions[j];
-      restored.answers[k]=saved.answers[j];
-      restored.checked[k]=saved.checked[j];
-      restored.marked[k]=saved.marked[j];
-    }
+    oldPositions.forEach((index,j)=>{restored.answers[index]=saved.answers[j];
+      restored.checked[index]=saved.checked[j];restored.marked[index]=saved.marked[j]});
     return validSaved(restored,mode)?restored:null;
   }
   function updateStart(){
