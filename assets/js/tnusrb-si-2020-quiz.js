@@ -19,6 +19,10 @@
       data?.answerKey?.answers?.length!==140){
       throw Error('TNUSRB SI 2020 Series C question-bank manifest is incomplete');
     }
+    const translatedNumbers=new Set(data.bilingualEditorialReview?.reviewedOriginalNumbers||[]);
+    if(data.bilingualEditorialReview?.questionCount!==20||translatedNumbers.size!==20||
+       data.bilingualEditorialReview?.originalTamilPrintVerified!==false||translatedNumbers.has(15))
+      throw Error('Tamil study translation provenance is incomplete');
     let previous=0;
     for(const q of data.questions){
       if(!Number.isInteger(q.number)||q.number<=previous||q.number>140||
@@ -32,6 +36,13 @@
       if(q.scoringStatus==='ungraded_source_dispute'&&
          (![15,22,37,47,84,95,103].includes(q.number)||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(q.number)))
         throw Error('Unverified reference-diagram question must not be graded or given an accepted answer');
+      const hasTamil=typeof q.questionTamil==='string'&&q.questionTamil.trim();
+      if(hasTamil){
+        if(!translatedNumbers.has(q.number)||q.translationStatus!=='editorial_tamil_study_translation_not_verified_original_booklet'||
+           q.originalTamilPaperTextVerified!==false||!q.optionsTamil||
+           !LETTERS.every(l=>typeof q.optionsTamil[l]==='string'&&q.optionsTamil[l].trim()))
+          throw Error('Unverified Tamil study option set '+q.number);
+      }else if(translatedNumbers.has(q.number))throw Error('Missing scheduled Tamil translation '+q.number);
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
@@ -168,7 +179,17 @@
     $('instruction').textContent=q.instruction||'';
     $('passage').hidden=!q.passage;
     $('passage').textContent=q.passage||'';
+    const language=$('language').value;
+    const hasTamil=!!q.questionTamil&&!!q.optionsTamil;
+    const onlyTamil=language==='ta'&&hasTamil;
+    $('questionTitle').hidden=onlyTamil;
     $('questionTitle').textContent=q.question;
+    $('questionTamil').hidden=language==='en'||!hasTamil;
+    $('questionTamil').textContent=q.questionTamil||'';
+    $('translationNotice').hidden=language==='en';
+    $('translationNotice').textContent=hasTamil?
+      'ClearExams editorial Tamil study translation — NOT independently verified as the original Series C Tamil booklet. English wording and answer-option letters remain the source reference.':
+      'Tamil translation is not yet reviewed for this original question number. Showing the source-numbered English text instead.';
     $('questionFigure').hidden=!q.figureAsset;
     $('questionFigure').src=q.figureAsset||'';
     $('questionFigure').alt=q.figureAlt||'';
@@ -180,8 +201,15 @@
       const b=document.createElement('button');b.type='button';b.className='option';
       b.setAttribute('aria-pressed',String(attempt.answers[i]===letter));
       const l=document.createElement('b');l.textContent=letter;
-      const content=document.createElement('span');content.textContent=q.options[letter];
-      b.append(l,content);
+      const content=document.createElement('span');
+      content.textContent=onlyTamil?q.optionsTamil[letter]:q.options[letter];
+      if(onlyTamil)content.setAttribute('lang','ta');
+      const copy=document.createElement('span');copy.className='option-copy';copy.append(content);
+      if(language==='both'&&hasTamil){
+        const tamil=document.createElement('span');tamil.className='tamil-option';
+        tamil.lang='ta';tamil.textContent=q.optionsTamil[letter];copy.append(tamil);
+      }
+      b.append(l,copy);
       if(locked&&q.scoringStatus==='scored_with_final_key'&&q.acceptedAnswers.includes(letter))b.classList.add('right');
       if(locked&&q.scoringStatus==='scored_with_final_key'&&attempt.answers[i]===letter&&!q.acceptedAnswers.includes(letter))b.classList.add('wrong');
       b.disabled=locked;
@@ -228,7 +256,8 @@
       if(filter==='ungraded'&&graded)continue;
       const details=document.createElement('details');details.className='result-item';
       const summary=document.createElement('summary');
-      summary.textContent='Q'+q.number+' · '+q.question+' — '+(disputed?'Key disputed / ungraded':
+      const lang=$('language').value;
+      summary.textContent='Q'+q.number+' · '+(lang==='ta'&&q.questionTamil?q.questionTamil:q.question)+' — '+(disputed?'Key disputed / ungraded':
         all?'ALL / ungraded':!answer?'Not answered':right?'Correct':'Incorrect');
       details.append(summary);
       const body=document.createElement('div');body.className='result-body';
@@ -240,13 +269,22 @@
       body.append(response);
       if(disputed){const note=document.createElement('p');note.textContent=q.answerReviewReason;body.append(note)}
       for(const letter of LETTERS){
-        const p=document.createElement('p');p.textContent=letter+') '+q.options[letter];body.append(p);
+        const p=document.createElement('p');
+        const tamil=q.optionsTamil?.[letter];
+        p.textContent=letter+') '+(lang==='ta'&&tamil?tamil:q.options[letter])+
+          (lang==='both'&&tamil?' / '+tamil:'');
+        if(lang==='ta'&&tamil)p.lang='ta';
+        body.append(p);
       }
       details.append(body);$('reviewList').append(details);
     }
     if(!$('reviewList').childElementCount)$('reviewList').textContent='No questions match this filter.';
   }
   $('mode').addEventListener('change',updateStart);
+  $('language').addEventListener('change',()=>{
+    if(attempt&&!attempt.finished)render();
+    if(attempt?.finished)renderReview();
+  });
   $('start').addEventListener('click',start);
   $('check').addEventListener('click',()=>{
     const i=attempt.index;if(!attempt.answers[i]||attempt.checked[i]||attempt.mode!=='practice')return;

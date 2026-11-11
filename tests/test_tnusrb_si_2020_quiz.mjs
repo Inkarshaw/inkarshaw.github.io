@@ -91,6 +91,29 @@ assert.deepEqual(digit121.acceptedAnswers,['C']);
 assert.equal((210-34)/(23-1),8,'Q121 equation directly yields option C');
 assert.ok(js.includes('const old134=questions.map'),'Old 134-question attempts must map original question numbers');
 
+const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21];
+assert.deepEqual(data.bilingualEditorialReview.reviewedOriginalNumbers,expectedTamil,'Only reviewed question numbers advertise Tamil study text');
+assert.equal(data.bilingualEditorialReview.questionCount,20);
+assert.equal(data.bilingualEditorialReview.originalTamilPrintVerified,false,'Not a certified original-language reproduction');
+assert.deepEqual(data.bilingualEditorialReview.excludedOriginalNumbers,[15],'Ambiguous C Q15 must never be silently translated');
+for(const q of data.questions){
+  const translated=expectedTamil.includes(q.number);
+  if(translated){
+    assert.equal(q.translationStatus,'editorial_tamil_study_translation_not_verified_original_booklet');
+    assert.equal(q.originalTamilPaperTextVerified,false);
+    assert.ok(/\p{Script=Tamil}/u.test(q.questionTamil),'Tamil script required at Q'+q.number);
+    assert.deepEqual(Object.keys(q.optionsTamil),['A','B','C','D'],'Preserve exact A-D choice identities');
+    assert.ok(Object.values(q.optionsTamil).every(x=>x.length>0),'All Tamil choices must be populated Q'+q.number);
+  }else assert.equal(q.questionTamil,undefined,'Never imply unreviewed item has Tamil source text Q'+q.number);
+}
+assert.match(html,/id="language"/,'Learners can switch languages without new attempt');
+assert.match(html,/value="ta"/,'Tamil-only mode available');
+assert.match(html,/value="both"/,'Side-by-side bilingual mode available');
+assert.match(html,/id="questionTamil" lang="ta"/,'Semantically labelled Tamil stem');
+assert.match(html,/id="translationNotice"/,'Editorial translation source warning visible');
+assert.match(js,/const translatedNumbers=new Set/,'Tamil integrity validation in reader');
+assert.match(js,/Tamil translation is not yet reviewed/,'English fallback for untranslated source-numbered questions');
+assert.ok(!js.includes('innerHTML'),'Continue source-text injection protection');
 const sample=Object.fromEntries(data.questions.map(q=>[q.number,q]));
 for(const [n,key] of Object.entries({1:'B',2:'A',3:'A',4:'A',5:'B',6:'B',7:'D',10:'B',16:'A/D',36:'A',43:'D',52:'B',56:'A/B/D',58:'ALL',69:'A',81:'A/D',89:'A/C',90:'B',98:'D',111:'ALL',122:'A',125:'ALL',140:'B'})){
  assert.equal(sample[Number(n)].answerKeyToken,key,'Paper Series C special answer Q'+n);
