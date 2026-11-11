@@ -314,3 +314,10 @@ No additional original question positions were completed: the 2015 set remains *
 4. For SSC and Railways, use only legally accessible, shift-specific candidate papers; a notice or login portal alone is not a source-question transcript.
 
 The live student library is `pyq-typed-library.html`; source metadata is `data/quizzes/pyq-yearwise-catalog.json`. This backlog is an editorial queue, **not** a certificate that all question text has been published.
+
+### 2026-11-12 · SI 2020 Series C Tamil editorial batch 4
+
+- Published **20 more editorial Tamil study question stems and A–D choices at original Series C positions Q80–99**, bringing the labelled total to **80 editorial translations** plus eight independently source-numbered questions already transcribed in Tamil (Q28–35).
+- Preserved English source transcripts, numeric and letter puzzles (Q82, Q97, Q99), the Q83 marks table, Q89 chart angles, A–D option IDs, and all original provisional scoring flags. Q84 and Q95 comparison-figure Tamil descriptions explicitly say **ungraded**; the original Series C figures are *not* visually certified.
+- **No source-claim inflation:** Q114–116 remain absent from the 2020 C booklet; 2015 Open Q99–104 still need their shared original vehicle-production graph; 2010 Open Type A now has all 140 readable but official-original booklet proof still pending. No Departmental papers were substituted.
+- Official Series C paper link was retried on 12 November 2026 in the web reader and returned HTTP 502. An independently published Series D 2020 booklet is not an acceptable replacement for Series C original diagrams/options.
