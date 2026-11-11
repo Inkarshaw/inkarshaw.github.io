@@ -459,16 +459,16 @@ try {
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/131 readable original-numbered questions/);
+  assert.match(await page.locator('#loadStatus').innerText(),/134 readable original-numbered questions/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2020/);
   assert.match(await page.locator('a[href="https://www.tnusrb.tn.gov.in/pdfs/SI_2019_WT_QUESTION.pdf"]').innerText(),/TNUSRB 2019 General Candidates written paper/);
   await page.locator('details[aria-label="2020 open-candidates source transcription gaps"] summary').click();
-  assert.equal(await page.locator('#sourceGaps li').count(),9,'Five missing + four blocked without fabricated questions');
+  assert.equal(await page.locator('#sourceGaps li').count(),6,'Five missing + Q121 blocked; three comparison diagrams are now playable but ungraded');
   const incomplete=await page.locator('#sourceGaps li').allTextContents();
   assert.ok(incomplete.some(x=>/Q46:.*A=45.*both mathematical expressions are missing/.test(x)));
   assert.ok(incomplete.some(x=>/Q47:.*input matrix.*four answer matrices are absent/.test(x)));
   assert.ok(incomplete.some(x=>/Q114:.*no verified original Series C/.test(x)));
-  assert.ok(incomplete.some(x=>/Q84:.*diagram/i.test(x)));
+  assert.ok(incomplete.some(x=>/Q121:.*Column-aligned|Q121:.*arithmetic/i.test(x)));
 
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
@@ -480,13 +480,13 @@ try {
   assert.equal(await page.locator('#options button').nth(1).isDisabled(),true);
   await page.locator('#quiz .palette-details summary').click();
   const nums=await page.locator('#palette button').allTextContents();
-  assert.equal(nums.length,131,'2020 General Candidates: Q15, Q22, Q37 ungraded; nine genuine source gaps held');
-  for(const skip of [84,95,103,121]){
+  assert.equal(nums.length,134,'2020 General Candidates: six ungraded source-review items and six genuine gaps held');
+  for(const skip of [121]){
     assert.equal(nums.includes(String(skip)),false,'Excluded original question '+skip);
   }
   assert.equal(nums.includes('22'),true,'Readable disputed source Q22 appears as ungraded');
   for(const recovered of [28,29,30,31,32,33,34,35,41,42,44,45,48])assert.ok(nums.includes(String(recovered)),'Recovered 2020 Series C original Q'+recovered);
-  for(const sourceReadable of [14,15,37])assert.ok(nums.includes(String(sourceReadable)),'Cross-reviewed 2020 Series C Q'+sourceReadable+' now present');
+  for(const sourceReadable of [14,15,37,84,95,103])assert.ok(nums.includes(String(sourceReadable)),'Cross-reviewed 2020 Series C Q'+sourceReadable+' now present');
   await page.locator('#palette button').filter({hasText:/^14$/}).click();
   assert.match(await page.locator('#options button').nth(1).innerText(),/Ganga.*Brahmaputra/,'2020 Q14 option B independently cross-checked');
   await page.locator('#palette button').filter({hasText:/^15$/}).click();
@@ -499,6 +499,16 @@ try {
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'2020 Q37 cross-series spelling dispute ungraded');
   assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q37 duplicate alternative cannot show right/wrong status');
+  for(const n of [84,95,103]){
+    await page.locator('#palette button').filter({hasText:String(n)}).click();
+    assert.equal(await page.locator('#questionFigure').isVisible(),true,'Reference figure visible for Q'+n);
+    assert.ok((await page.locator('#questionFigure').getAttribute('src')).endsWith('q'+n+'-reference-ungraded.svg'));
+    assert.match(await page.locator('#referenceNote').innerText(),/NOT the verified 2020 Series C original figure/,'Explicit original source caveat');
+    await page.locator('#options button').first().click();
+    await page.locator('#check').click();
+    assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q'+n+' is ungraded');
+    assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q'+n+' cannot highlight answer');
+  }
   await page.locator('#palette button').filter({hasText:/^22$/}).click();
   await page.locator('#options button').nth(0).click();
   await page.locator('#check').click();
@@ -512,7 +522,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 131-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 134-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q89/);
   await page.locator('#quiz .palette-details summary').click();
@@ -524,7 +534,7 @@ try {
   assert.match(await page.locator('#score').innerText(),/\/ 62\.5 marks/);
   assert.equal(await page.locator('#result').isVisible(),true);
   await page.locator('#reviewFilter').selectOption('ungraded');
-  assert.equal(await page.locator('#reviewList .result-item').count(),6,'Three special ALL and Q15/Q22/Q37 appear in ungraded review');
+  assert.equal(await page.locator('#reviewList .result-item').count(),9,'Three ALL entries and six source-reviewed figures/key conflicts must appear as ungraded');
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'TNUSRB SI 2020 has no mobile horizontal overflow');
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
@@ -536,7 +546,7 @@ try {
   assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides Check Answer');
   assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode conceals correct option');
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2020 has no runtime page errors');
-  console.log('PASS TNUSRB SI 2020: 131 playable, 125 scored, Series C key, source gaps, saved progress, exam mode');
+  console.log('PASS TNUSRB SI 2020: 134 playable, 125 scored, Series C key, source gaps, saved progress, exam mode');
 
   // TNUSRB SI 2010 Type A: 140 readable practice entries, of which 135 have provisional score mappings.
   pageErrors.length = 0;

@@ -7,7 +7,7 @@ const data=JSON.parse(read('data/quizzes/tnusrb-si-2020-series-c.json'));
 const html=read('tnusrb-si-2020-quiz.html');
 const js=read('assets/js/tnusrb-si-2020-quiz.js');
 const missing=[46,47,114,115,116];
-const blocked=[84,95,103,121];
+const blocked=[121];
 assert.equal(data.schemaVersion,1);
 assert.equal(data.exam,'TNUSRB SI');
 assert.equal(data.year,2020);
@@ -18,8 +18,8 @@ assert.equal(data.suppliedQuestionCount,135);
 assert.equal(data.questions.length,135);
 assert.deepEqual(data.missingNumbers,missing,'Keep five genuinely unavailable source numbers explicit');
 assert.deepEqual(data.blockedNumbers,blocked,'Do not grade ambiguous scans, inferred options, missing diagrams or key conflicts');
-assert.equal(data.playableQuestionCount,131);
-assert.equal(data.ungradedSourceDisputeCount,3);
+assert.equal(data.playableQuestionCount,134);
+assert.equal(data.ungradedSourceDisputeCount,6);
 assert.equal(data.scoredQuestionCount,125);
 assert.equal(data.maximumIndicativeMarks,62.5);
 assert.deepEqual(data.specialKeyNumbers,[58,111,125]);
@@ -50,9 +50,9 @@ for(const q of data.questions){
  if(blocked.includes(q.number)){
   assert.equal(q.scoringStatus,'blocked_source_incomplete','Q'+q.number+' must stay outside live practice');
   assert.ok(q.sourceIssue&&q.textStatus==='needs_original_source_review');
- }else if([15,22,37].includes(q.number)){
+ }else if([15,22,37,84,95,103].includes(q.number)){
   assert.equal(q.scoringStatus,'ungraded_source_dispute','Q'+q.number+' cross-series/source conflict is not safe to grade');
-  assert.match(q.answerReviewReason,q.number===22?/SAARC/:q.number===15?/Series D/:/Series C supplied OCR/,'Clearly disclose source discrepancy');
+  assert.match(q.answerReviewReason,q.number===22?/SAARC/:q.number===15?/Series D/:[84,95,103].includes(q.number)?/original|unverified|Series C/i:/Series C supplied OCR/,'Clearly disclose source discrepancy');
   if(q.number===22)assert.equal(q.options.A,'SAARC');
   assert.deepEqual(q.acceptedAnswers,[]);
  }else if(q.answerKeyToken==='ALL'){
@@ -78,7 +78,27 @@ assert.match(sample[96].options.C,/two small circles/,'Q96 Venn choices in text'
 assert.match(sample[97].question,/466/,'Q97 arranged numbers preserved');
 assert.match(sample[107].question,/8¼/,'Q107 fraction rendered');
 assert.match(sample[122].question,/243/,'Q122 exponential expression present');
-assert.match(html,/131 readable/);
+for(const n of [84,95,103]){
+ const q=sample[n];
+ assert.equal(q.scoringStatus,'ungraded_source_dispute','Reference cannot be graded as original Series C Q'+n);
+ assert.equal(q.originalCBookletDiagramVerified,false);
+ assert.equal(q.figureStatus,'editorial_comparison_reference_NOT_verbatim_original_series_c');
+ assert.deepEqual(q.acceptedAnswers,[]);
+ assert.equal(q.figureAsset,'assets/figures/tnusrb-si-2020-q'+n+'-reference-ungraded.svg');
+ assert.ok(q.figureAlt.length>50);
+ const source=read(q.figureAsset);
+ assert.ok(source.includes('NOT')&&source.includes('Ungraded'),'SVG source must explicitly disclaim originality');
+ assert.ok(q.comparisonSourceURLs.length>=2,'Independent source comparison trail required');
+}
+assert.deepEqual(data.sourceRecoveryAudit.referenceDiagramRecovery.positions,[84,95,103]);
+assert.equal(data.sourceRecoveryAudit.referenceDiagramRecovery.allUngraded,true);
+assert.deepEqual(data.blockedNumbers,[121],'Only Q121 is now source-blocked');
+assert.match(html,/id="questionFigure"/,'SVG rendering element is present');
+assert.match(html,/id="referenceNote"/,'Editorial drawing disclaimer appears on question screen');
+assert.ok(js.includes("$('questionFigure')"));
+assert.ok(js.includes("$('referenceNote')"));
+assert.ok(js.includes('const old131=questions.map'),'Historical 131-question attempt migration retained');
+assert.match(html,/134 readable/);
 assert.match(html,/id="sourceGaps"/,'The unverified source holes must be shown to the learner');
 assert.ok(html.includes('href="'+officialPdf+'"'),'Quiz links board-listed source PDF');
 assert.match(html,/The board PDF timed out/,'Never imply unread booklet scan was examined');
@@ -119,4 +139,4 @@ assert.match(yearArchive,/SI_2019_WT_QUESTION\.pdf/,'2019 recruitment/2020 exam 
 assert.match(yearArchive,/2h 30m/,'Exam duration corrected for Series C');
 assert.match(yearArchive,/Total marks/,'Unverified cut-off percentages removed from 2019/2020 cards');
 
-console.log('PASS TNUSRB SI 2020 Series C: 135 numbered records; 131 readable (125 scored, 3 ALL and 3 disputed ungraded); 5 missing and 4 blocked.');
+console.log('PASS TNUSRB SI 2020 Series C: 135 numbered records; 134 readable (125 scored, 3 ALL and 6 source-reviewed ungraded); 5 missing and 1 blocked.');
