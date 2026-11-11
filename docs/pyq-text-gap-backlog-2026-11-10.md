@@ -1,3 +1,10 @@
+## 11 November 2026 — follow-up original-figure recovery
+
+- **2010 Open Candidates:** Reviewed the complete Muppadai PDF page 8 (vector notation) and page 14 (overlap diagram). Q64 original notation is legible: `[a⃗×b⃗, b⃗×c⃗, c⃗×a⃗]=64`; the archived printed key says A, but a separate Type A final-key mirror says B; the magnitude 8 identity also leaves sign unspecified. Thus Q64 is **readable, ungraded**, and the conflict is explicitly disclosed. Q106 source illustration has labelled E, F, C, A, B and D (arrow indicating square∩circle outside triangle); faithful SVG trace added and provisional Type A key C retained. **140/140 readable, 135 provisionally scored, four ALL and Q64 ungraded, zero blocked**. Archive URL: https://drive.google.com/file/d/1GmtGcefUfZUWa6xJOW20mlygHS4yRcgh/view
+- **2015 Open:** Reviewed coaching archive printed page 14 (Q119 four visible 3-face numbered dice) and page 16 (Q129 four Venn answer-option diagrams). Both are traced as accessible SVGs linked from the quiz with original A–D order. Q119 answer A and Q129 answer C are **provisional secondary table entries** (not certified official key). Q120 image/options appear on page 14, but the supplied transcription lacks an original prompt; remains held for original-paper verification. **121/140 playable, 112 provisionally scored, nine disputed ungraded, 19 blocked**. The 2015 P/Q vehicle-production graph for Q99–104 is still absent. Archive: https://drive.google.com/file/d/1aNIa3CXmbyAphWnPUynShuzldUJE4Dz_/view
+- **Eight typed PYQ sets total: 1,389 readable practice positions**, up from 1,385. Open Candidates and General Candidates sources only; no departmental keys were introduced.
+- Figures are traced from **secondary coaching archives**, not asserted to be original TNUSRB high-resolution scanned booklet assets. Original official visual comparison still needed.
+
 # ClearExams PYQ text-digitization backlog — updated 11 November 2026
 
 ## 11 November 2026 — verified secondary-archive source recovery (2010 / 2015 / 2020 Open Candidates)
