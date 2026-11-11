@@ -75,7 +75,7 @@ assert.equal(math46.crossSeriesSource.printedQuestionNumber,25);
 assert.equal(math46.crossSeriesSource.originalCBookletVerified,false);
 assert.equal((13*13*5*5-60*60)**0.5,25,'Q46 mathematically verified independent of answer-key letter');
 const matrix47=data.questions.find(q=>q.number===47);
-assert.equal(matrix47.answerKeyToken,'C','Do not override C's published key token');
+assert.equal(matrix47.answerKeyToken,'C','The C-series answer key remains a source field and is not used to grade Q47');
 assert.equal(matrix47.scoringStatus,'ungraded_source_dispute','C original matrix choices remain absent');
 assert.deepEqual(matrix47.acceptedAnswers,[]);
 assert.equal(matrix47.crossSeriesSource.choicesCrossMatched,false,'D-only choices cannot be described as C-original');
