@@ -14,8 +14,8 @@
       data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==135||
       !Array.isArray(data.questions)||data.questions.length!==135||
       !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==5||
-      !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==4||
-      data.ungradedSourceDisputeCount!==3||
+      !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==1||
+      data.ungradedSourceDisputeCount!==6||
       data?.answerKey?.answers?.length!==140){
       throw Error('TNUSRB SI 2020 Series C question-bank manifest is incomplete');
     }
@@ -30,15 +30,15 @@
           throw Error('Incomplete entry at original question '+q.number);
       if(q.answerKeyToken==='ALL'&&q.scoringStatus!=='ungraded_all_correct'&&q.scoringStatus!=='blocked_source_incomplete')throw Error('Special key status mismatch');
       if(q.scoringStatus==='ungraded_source_dispute'&&
-         (![15,22,37].includes(q.number)||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(22)))
-        throw Error('Disputed Q22 must not be graded or presented with an answer');
+         (![15,22,37,84,95,103].includes(q.number)||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(q.number)))
+        throw Error('Unverified reference-diagram question must not be graded or given an accepted answer');
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.playableQuestionCount||playable.length!==131||
+    if(playable.length!==data.playableQuestionCount||playable.length!==134||
        playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==125||
        playable.filter(q=>q.scoringStatus==='ungraded_all_correct').length!==3||
-       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==3){
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==6){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
@@ -52,12 +52,16 @@
   function migratedAttempt(mode){
     const saved=getSaved(storageKey());
     if(validSaved(saved,mode))return saved;
+    // Historical saved responses map by original booklet question number, never by
+    // current playable ordinal; new reference-figure exercises must not shift answers.
     const prior13=new Set([28,29,30,31,32,33,34,35,41,42,44,45,48]);
     const crossSeries3=new Set([14,15,37]);
-    const old128=questions.map((q,i)=>crossSeries3.has(q.number)?-1:i).filter(i=>i>=0);
+    const newDiagrams=new Set([84,95,103]);
+    const old131=questions.map((q,i)=>newDiagrams.has(q.number)?-1:i).filter(i=>i>=0);
+    const old128=old131.filter(i=>!crossSeries3.has(questions[i].number));
     const old115=old128.filter(i=>!prior13.has(questions[i].number));
     const old114=old115.filter(i=>questions[i].number!==22);
-    const map={128:old128,115:old115,114:old114};
+    const map={131:old131,128:old128,115:old115,114:old114};
     const oldPositions=map[saved?.answers?.length];
     if(!saved||!oldPositions||saved.finished||saved.version!==1||saved.mode!==mode||
        saved.answers?.length!==oldPositions.length||
@@ -163,6 +167,11 @@
     $('passage').hidden=!q.passage;
     $('passage').textContent=q.passage||'';
     $('questionTitle').textContent=q.question;
+    $('questionFigure').hidden=!q.figureAsset;
+    $('questionFigure').src=q.figureAsset||'';
+    $('questionFigure').alt=q.figureAlt||'';
+    $('referenceNote').hidden=!q.figureAsset;
+    $('referenceNote').textContent=q.figureAsset?'Illustrative reference redraw from independent matching reasoning examples, NOT the verified 2020 Series C original figure. Shown for learning without marks.':'';
     const locked=attempt.mode==='practice'&&attempt.checked[i];
     $('options').replaceChildren();
     for(const letter of LETTERS){
@@ -199,7 +208,7 @@
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scored.length*0.5).toFixed(1)+' marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
       allEntries+' ALL entries and '+disputed+' disputed source/key questions ungraded · '+questions.length+' readable questions. '+
-      'Score excludes five absent source numbers and four source-incomplete or missing-diagram items; not a full 140-question exam result.';
+      'Score excludes five absent source numbers and the remaining one source-incomplete arithmetic item; three independently sourced comparison diagrams are available only for ungraded study. Not a full 140-question exam result.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
@@ -281,7 +290,7 @@
         const li=document.createElement('li');li.textContent='Q'+q.number+': '+q.sourceIssue;withheld.append(li);
       });
       $('loadStatus').textContent=questions.length+' readable original-numbered questions: 125 provisionally scored, '+
-        '3 final-key ALL entries and Q15/Q22/Q37 source disputes ungraded; 4 blocked and 5 missing source positions.';
+        '3 final-key ALL entries and Q15/Q22/Q37/Q84/Q95/Q103 source-review items ungraded; Q121 blocked and 5 source-numbered entries absent.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
