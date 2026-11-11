@@ -91,13 +91,28 @@ assert.deepEqual(digit121.acceptedAnswers,['C']);
 assert.equal((210-34)/(23-1),8,'Q121 equation directly yields option C');
 assert.ok(js.includes('const old134=questions.map'),'Old 134-question attempts must map original question numbers');
 
-const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59,...Array.from({length:40},(_,i)=>i+60)];
+const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59,...Array.from({length:40},(_,i)=>i+60),...Array.from({length:14},(_,i)=>i+100),...Array.from({length:6},(_,i)=>i+117)];
 assert.deepEqual(data.bilingualEditorialReview.reviewedOriginalNumbers,expectedTamil,'Only reviewed question numbers advertise Tamil study text');
-assert.equal(data.bilingualEditorialReview.questionCount,80);
-assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20,20],'Bilingual batch review history preserved');
+assert.equal(data.bilingualEditorialReview.questionCount,100);
+assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20,20,20],'Bilingual batch review history preserved');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[1].numbers,[23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59]);
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[2].numbers,Array.from({length:20},(_,i)=>60+i),'Third bilingual editorial batch exactly covers Q60–79');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[3].numbers,Array.from({length:20},(_,i)=>80+i),'Fourth bilingual editorial batch exactly covers Q80–99');
+const fifth=[...Array.from({length:14},(_,i)=>i+100),...Array.from({length:6},(_,i)=>i+117)];
+assert.deepEqual(data.bilingualEditorialReview.batchHistory[4].numbers,fifth,'Fifth batch covers exactly 20 readable and source-numbered questions, not missing Q114–116');
+for(const n of [100,101,104,107,108,112,113,117,119,120,121,122]){
+ const q=data.questions.find(q=>q.number===n);
+ assert.ok(q?.questionTamil,'Source-numbered Tamil stem Q'+n);
+}
+const figure103=data.questions.find(q=>q.number===103);
+assert.equal(figure103.scoringStatus,'ungraded_source_dispute');
+assert.match(figure103.questionTamil,/மதிப்பெண் வழங்கப்படாது/,'Reference four-by-three circles must be marked ungraded in Tamil');
+assert.deepEqual(figure103.acceptedAnswers,[]);
+assert.equal(data.questions.find(q=>q.number===111).scoringStatus,'ungraded_all_correct');
+assert.match(data.questions.find(q=>q.number===111).questionTamil,/All correct/,'All-correct status preserved and disclosed');
+assert.match(data.questions.find(q=>q.number===121).questionTamil,/அசல் Series C/,'Digit question must disclose uncertified original layout');
+assert.equal(data.questions.find(q=>q.number===121).answerKeyToken,'C');
+assert.deepEqual(data.questions.find(q=>q.number===122).optionsTamil,data.questions.find(q=>q.number===122).options,'Scientific numeric alternatives preserve exact original text');
 for(const n of [84,95]){const q=data.questions.find(q=>q.number===n);assert.match(q.questionTamil,/மதிப்பெண் வழங்கப்படாது/,'Reference figure is explicitly ungraded in Tamil');assert.equal(q.originalCBookletDiagramVerified,false);}
 assert.match(data.questions.find(q=>q.number===82).questionTamil,/ABLMS \| QRLBA/,'Coding table cannot change when translating');
 assert.match(data.questions.find(q=>q.number===89).questionTamil,/கணிதம் 90°/,'Pie chart angles preserved in Tamil');
@@ -144,7 +159,7 @@ for(const n of originalTamil){
 }
 assert.match(js,/sourceTamilNumbers/,'Reader must distinguish original Tamil source from editorial translations');
 assert.match(js,/This original-numbered source transcription is already in Tamil/,'Language switch may not pretend English source exists');
-assert.match(html,/80 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
+assert.match(html,/100 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
 assert.match(html,/id="language"/,'Learners can switch languages without new attempt');
 assert.match(html,/value="ta"/,'Tamil-only mode available');
 assert.match(html,/value="both"/,'Side-by-side bilingual mode available');
