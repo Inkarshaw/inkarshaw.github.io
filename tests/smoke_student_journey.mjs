@@ -392,6 +392,24 @@ try {
   assert.match(await page.locator('#questionTamil').innerText(),/எந்த வகை வாக்கியம்/,'2015 Q11 editorial Tamil study stem shown');
   assert.match(await page.locator('#options button').nth(2).innerText(),/உணர்ச்சி வாக்கியம்/,'2015 Q11 bilingual option C');
   assert.equal(await page.locator('#sourceReader').isVisible(),true,'Indexed source review disclosed on bilingual questions');
+  await page.locator('#palette button').filter({hasText:/^46$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/13.*5.*60/,'Vector expressions visible for Q46');
+  assert.match(await page.locator('#instruction').innerText(),/Series D Q25/,'C original booklet is not claimed for vector notation');
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: C/,'Q46 vector scored using published C final key');
+  await page.locator('#palette button').filter({hasText:/^47$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/adjoint.*matrix/i);
+  assert.match(await page.locator('#instruction').innerText(),/Series D Q26/,'Q47 matrix is source-comparison only');
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q47 matrix options cannot count as C original');
+  assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'No matrix answer highlights until C original verified');
+  await page.locator('#palette button').filter({hasText:/^121$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/21\?/,'Q121 arithmetic transcription readable');
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: C/,'Q121 arithmetic keyed by independent C final key');
   await page.locator('#palette button').filter({hasText:/^14$/}).click();
   assert.match(await page.locator('#questionTamil').innerText(),/செயப்பாட்டு வினை/,'Source disputed Q14 has Tamil text');
   await page.locator('#options button').nth(3).click();
@@ -418,7 +436,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 134-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 137-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
   await page.locator('#quiz .palette-details summary').click();
@@ -459,16 +477,16 @@ try {
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/134 readable original-numbered questions/);
+  assert.match(await page.locator('#loadStatus').innerText(),/137 readable original-numbered questions/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2020/);
   assert.match(await page.locator('a[href="https://www.tnusrb.tn.gov.in/pdfs/SI_2019_WT_QUESTION.pdf"]').innerText(),/TNUSRB 2019 General Candidates written paper/);
   await page.locator('details[aria-label="2020 open-candidates source transcription gaps"] summary').click();
-  assert.equal(await page.locator('#sourceGaps li').count(),6,'Five missing + Q121 blocked; three comparison diagrams are now playable but ungraded');
+  assert.equal(await page.locator('#sourceGaps li').count(),3,'Only C original Q114–116 absent; Q46 Q47 Q121 study questions restored');
   const incomplete=await page.locator('#sourceGaps li').allTextContents();
-  assert.ok(incomplete.some(x=>/Q46:.*A=45.*both mathematical expressions are missing/.test(x)));
-  assert.ok(incomplete.some(x=>/Q47:.*input matrix.*four answer matrices are absent/.test(x)));
   assert.ok(incomplete.some(x=>/Q114:.*no verified original Series C/.test(x)));
-  assert.ok(incomplete.some(x=>/Q121:.*Column-aligned|Q121:.*arithmetic/i.test(x)));
+  assert.ok(incomplete.some(x=>/Q115:.*no verified original Series C/.test(x)));
+  assert.ok(incomplete.some(x=>/Q116:.*no verified original Series C/.test(x)));
+  assert.ok(!incomplete.some(x=>/Q46:|Q47:|Q121:/.test(x)),'Restored numbered questions no longer withheld');
 
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
@@ -480,10 +498,11 @@ try {
   assert.equal(await page.locator('#options button').nth(1).isDisabled(),true);
   await page.locator('#quiz .palette-details summary').click();
   const nums=await page.locator('#palette button').allTextContents();
-  assert.equal(nums.length,134,'2020 General Candidates: six ungraded source-review items and six genuine gaps held');
-  for(const skip of [121]){
-    assert.equal(nums.includes(String(skip)),false,'Excluded original question '+skip);
+  assert.equal(nums.length,137,'2020 General Candidates: seven source-review ungraded items and three original gaps held');
+  for(const stillMissing of [114,115,116]){
+    assert.equal(nums.includes(String(stillMissing)),false,'No fabricated Series C Q'+stillMissing);
   }
+  for(const recovered of [46,47,121])assert.ok(nums.includes(String(recovered)),'Restored study question Q'+recovered);
   assert.equal(nums.includes('22'),true,'Readable disputed source Q22 appears as ungraded');
   for(const recovered of [28,29,30,31,32,33,34,35,41,42,44,45,48])assert.ok(nums.includes(String(recovered)),'Recovered 2020 Series C original Q'+recovered);
   for(const sourceReadable of [14,15,37,84,95,103])assert.ok(nums.includes(String(sourceReadable)),'Cross-reviewed 2020 Series C Q'+sourceReadable+' now present');
@@ -531,10 +550,10 @@ try {
   assert.match(await page.locator('#position').innerText(),/Original Q140/);
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
-  assert.match(await page.locator('#score').innerText(),/\/ 62\.5 marks/);
+  assert.match(await page.locator('#score').innerText(),/\/ 63\.5 marks/);
   assert.equal(await page.locator('#result').isVisible(),true);
   await page.locator('#reviewFilter').selectOption('ungraded');
-  assert.equal(await page.locator('#reviewList .result-item').count(),9,'Three ALL entries and six source-reviewed figures/key conflicts must appear as ungraded');
+  assert.equal(await page.locator('#reviewList .result-item').count(),10,'Three ALL entries plus seven disputed/reference items appear in ungraded review');
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'TNUSRB SI 2020 has no mobile horizontal overflow');
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
@@ -546,7 +565,7 @@ try {
   assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides Check Answer');
   assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode conceals correct option');
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2020 has no runtime page errors');
-  console.log('PASS TNUSRB SI 2020: 134 playable, 125 scored, Series C key, source gaps, saved progress, exam mode');
+  console.log('PASS TNUSRB SI 2020: 137 playable, 127 scored, Series C key, source gaps, saved progress, exam mode');
 
   // TNUSRB SI 2010 Type A: 140 readable practice entries, of which 135 have provisional score mappings.
   pageErrors.length = 0;
