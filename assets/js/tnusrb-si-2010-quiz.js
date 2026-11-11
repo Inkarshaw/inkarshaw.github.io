@@ -11,9 +11,9 @@
   const save=()=>{if(attempt)try{localStorage.setItem(storeKey,JSON.stringify(attempt))}catch{}};
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2010||data?.bookletType!=='A'||
-      data?.originalPaperQuestionCount!==140||data?.providedQuestionCount!==123||
-      !Array.isArray(data.questions)||data.questions.length!==123||
-      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==17){
+      data?.originalPaperQuestionCount!==140||data?.providedQuestionCount!==140||
+      !Array.isArray(data.questions)||data.questions.length!==140||
+      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==0){
       throw Error('TNUSRB 2010 question-bank manifest is incomplete');
     }
     let previous=0;
@@ -33,8 +33,8 @@
          !q.secondaryBilingualSourceURL?.startsWith('https://civilserviceaspirants.in/')))
       throw Error('2010 Open Candidates secondary bilingual source review manifest changed');
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.availableForQuizCount||playable.length!==120||
-       playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==116){
+    if(playable.length!==data.availableForQuizCount||playable.length!==138||
+       playable.filter(q=>q.scoringStatus==='provisional_mirrored_final_key').length!==134){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
@@ -242,8 +242,8 @@
         gapList.append(li);
       });
       $('loadStatus').textContent=questions.length+' readable Open Candidates questions loaded: '+
-        '10 public-source-indexed bilingual Tamil/English items, 116 provisional key scores, '+
-        '4 special ALL entries ungraded; 17 missing and 3 source-blocked.';
+        '10 bilingual source-reviewed Q1–10, 134 provisional key scores, '+
+        '4 ALL entries ungraded; all 17 missing numbers recovered, 2 source-blocked (Q64, Q106).';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
