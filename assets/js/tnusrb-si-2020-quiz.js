@@ -260,8 +260,23 @@
   fetch('data/quizzes/tnusrb-si-2020-series-c.json',{cache:'no-store'})
     .then(response=>{if(!response.ok)throw Error('Quiz JSON unavailable');return response.json()})
     .then(data=>{questions=validate(data);bank=data;
+      if(!data.originalBookletAccess?.url?.includes('SI_2019_WT_QUESTION.pdf')||
+         data.originalBookletAccess?.originalBookletVerifiedByClearExams!==false||
+         data.missingNumbers.some(n=>!data.missingSourceEvidence?.[String(n)]))
+        throw Error('2020 SI source evidence manifest requires review');
       const withheld=$('sourceGaps');withheld.replaceChildren();
-      data.missingNumbers.forEach(n=>{const li=document.createElement('li');li.textContent='Q'+n+': source transcription not yet available';withheld.append(li)});
+      data.missingNumbers.forEach(n=>{
+        const li=document.createElement('li');
+        const evidence=data.missingSourceEvidence?.[String(n)];
+        if(n===46&&evidence){
+          li.textContent='Q46: a numbered secondary reader preserves A=45, B=35, C=25, D=15, but both mathematical expressions are missing. Not playable or scored. Original Series C booklet required.';
+        }else if(n===47&&evidence){
+          li.textContent='Q47: the reader says “The adjoint of the matrix is”, but the input matrix and all four answer matrices are absent. Not playable or scored.';
+        }else{
+          li.textContent='Q'+n+': no verified original Series C question text/options available; excluded from the quiz.';
+        }
+        withheld.append(li);
+      });
       data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
         const li=document.createElement('li');li.textContent='Q'+q.number+': '+q.sourceIssue;withheld.append(li);
       });

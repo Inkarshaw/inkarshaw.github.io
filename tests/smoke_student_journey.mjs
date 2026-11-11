@@ -442,6 +442,18 @@ try {
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2015 mobile JavaScript runtime clean');
   console.log('PASS TNUSRB SI 2015: 134 readable (116 provisional, 18 ungraded), 6 held, neutral feedback and preserved answers');
 
+  // TNUSRB year-page navigation previously had dead .html paths and fake PDF downloads.
+  pageErrors.length=0;
+  await page.goto(origin+'/tnusrb/previous_year_questions.html',{waitUntil:'domcontentloaded'});
+  const yearCardLinks=page.locator('a.card-btn.start-test[href="../tnusrb-si-2020-quiz.html"]');
+  assert.equal(await yearCardLinks.count(),2,'2019 recruitment and 2020 sitting both link to real Series C quiz');
+  const srcButton=page.locator('.card-btn.download[data-type="si"][data-year="2020"]');
+  assert.match(await srcButton.innerText(),/Open source PDF/,'Actual board-linked PDF replaces simulated download');
+  assert.match(await srcButton.getAttribute('title'),/board-listed question paper PDF/);
+  const bulkButton=page.locator('.download-btn').first();
+  assert.match(await bulkButton.innerText(),/Browse available papers/,'No phantom bulk ZIP download claims');
+  assert.deepEqual(pageErrors,[],'TNUSRB year archive navigation has no runtime errors');
+
   // TNUSRB SI 2020 (2019 recruitment, Series C) from user-supplied transcription.
   pageErrors.length = 0;
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
@@ -449,6 +461,15 @@ try {
     undefined,{timeout:20000});
   assert.match(await page.locator('#loadStatus').innerText(),/131 readable original-numbered questions/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2020/);
+  assert.match(await page.locator('a[href="https://www.tnusrb.tn.gov.in/pdfs/SI_2019_WT_QUESTION.pdf"]').innerText(),/TNUSRB 2019 General Candidates written paper/);
+  await page.locator('details[aria-label="2020 open-candidates source transcription gaps"] summary').click();
+  assert.equal(await page.locator('#sourceGaps li').count(),9,'Five missing + four blocked without fabricated questions');
+  const incomplete=await page.locator('#sourceGaps li').allTextContents();
+  assert.ok(incomplete.some(x=>/Q46:.*A=45.*both mathematical expressions are missing/.test(x)));
+  assert.ok(incomplete.some(x=>/Q47:.*input matrix.*four answer matrices are absent/.test(x)));
+  assert.ok(incomplete.some(x=>/Q114:.*no verified original Series C/.test(x)));
+  assert.ok(incomplete.some(x=>/Q84:.*diagram/i.test(x)));
+
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
   assert.match(await page.locator('#questionTitle').innerText(),/Sun.*skin.*heat/);

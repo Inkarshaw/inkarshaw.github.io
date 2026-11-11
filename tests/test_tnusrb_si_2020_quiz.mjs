@@ -25,6 +25,18 @@ assert.equal(data.maximumIndicativeMarks,62.5);
 assert.deepEqual(data.specialKeyNumbers,[58,111,125]);
 assert.equal(data.answerKey.answers.length,140,'Final key has all original positions');
 assert.match(data.answerKey.sourcePDF,/Final-Answer-Key-TNUSRB-Sub-Inspector-of-Police-Posts\.pdf$/);
+const officialPdf='https://www.tnusrb.tn.gov.in/pdfs/SI_2019_WT_QUESTION.pdf';
+assert.equal(data.originalBookletAccess.url,officialPdf);
+assert.equal(data.originalBookletAccess.originalBookletVerifiedByClearExams,false,'Source PDF timed out; never certify unseen booklet text');
+assert.equal(data.originalBookletAccess.departmentQuotaExcluded,true);
+assert.deepEqual(data.sourceRecoveryAudit.blockedOriginalNumbers,blocked,'Manifest must not retain stale 2019/2020 blocked positions');
+assert.deepEqual(data.sourceRecoveryAudit.remainingMissingNumbers,missing);
+assert.deepEqual(Object.keys(data.missingSourceEvidence).map(Number),missing);
+assert.deepEqual(data.missingSourceEvidence['46'].visibleOptions,{A:'45',B:'35',C:'25',D:'15'});
+assert.equal(data.missingSourceEvidence['46'].scoringAllowed,false);
+assert.equal(data.missingSourceEvidence['47'].visibleOptions.A,null,'Missing matrix option must never be fabricated');
+assert.equal(data.missingSourceEvidence['47'].scoringAllowed,false);
+
 const originalNums=data.questions.map(q=>q.number);
 assert.equal(new Set(originalNums).size,135);
 assert.deepEqual(originalNums,[...originalNums].sort((a,b)=>a-b),'Original order never re-sorted');
@@ -68,7 +80,13 @@ assert.match(sample[107].question,/8¼/,'Q107 fraction rendered');
 assert.match(sample[122].question,/243/,'Q122 exponential expression present');
 assert.match(html,/131 readable/);
 assert.match(html,/id="sourceGaps"/,'The unverified source holes must be shown to the learner');
-assert.match(html,/General Candidates paper/,'Link official-origin Open Candidates paper, not departmental source');
+assert.ok(html.includes('href="'+officialPdf+'"'),'Quiz links board-listed source PDF');
+assert.match(html,/The board PDF timed out/,'Never imply unread booklet scan was examined');
+assert.match(html,/Q46.*mathematical expressions/,'Partial surviving math question must be clearly disclosed');
+assert.match(js,/Q46: a numbered secondary reader preserves A=45/,'Reader Q46 options shown only as secondary source clues');
+assert.match(js,/Q47: the reader says/,'Matrix missing without invented matrices');
+
+assert.match(html,/General Candidates written paper/,'Link General Candidates primary paper, not departmental source');
 assert.match(html,/Q22's answer-key dispute/);
 assert.match(html,/125 provisionally scored/);
 assert.match(html,/2019 Recruitment \(Exam 2020\)/);
@@ -88,4 +106,17 @@ assert.match(read('pyq-hub.html'),/tnusrb-si-2020-quiz\.html/);
 assert.match(read('tnusrb.html'),/tnusrb-si-2020-quiz\.html/);
 assert.match(read('tnusrb/previous_year_questions.html'),/\.\.\/tnusrb-si-2020-quiz\.html/);
 assert.match(read('sitemap.xml'),/tnusrb-si-2020-quiz\.html/);
+const yearArchive=read('tnusrb/previous_year_questions.html');
+assert.equal((yearArchive.match(/href="\.\.\/tnusrb-si-2020-quiz\.html" class="card-btn start-test"/g)||[]).length,2,
+ '2019 recruitment and 2020 sitting cards both launch same real Series C quiz');
+assert.doesNotMatch(yearArchive,/clearexams\.ink\/tnusrb\/\d{4}_(?:si|pc)_question_paper\.html/,
+ 'No more dead legacy SI and PC paper routes');
+assert.doesNotMatch(yearArchive,/Download complete|would download a ZIP|actual implementation/i,
+ 'Never show fabricated download success or non-existent archive bundles');
+assert.match(yearArchive,/SI2022OPENQPANSKEY\.pdf/,'2022 Open candidates link must never point to Departmental source');
+assert.match(yearArchive,/JR_2023_Open_Qns\.pdf/,'2023 Open candidate paper retained');
+assert.match(yearArchive,/SI_2019_WT_QUESTION\.pdf/,'2019 recruitment/2020 exam board PDF used');
+assert.match(yearArchive,/2h 30m/,'Exam duration corrected for Series C');
+assert.match(yearArchive,/Total marks/,'Unverified cut-off percentages removed from 2019/2020 cards');
+
 console.log('PASS TNUSRB SI 2020 Series C: 135 numbered records; 131 readable (125 scored, 3 ALL and 3 disputed ungraded); 5 missing and 4 blocked.');
