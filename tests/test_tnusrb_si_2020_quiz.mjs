@@ -107,7 +107,7 @@ assert.match(read('tnusrb.html'),/tnusrb-si-2020-quiz\.html/);
 assert.match(read('tnusrb/previous_year_questions.html'),/\.\.\/tnusrb-si-2020-quiz\.html/);
 assert.match(read('sitemap.xml'),/tnusrb-si-2020-quiz\.html/);
 const yearArchive=read('tnusrb/previous_year_questions.html');
-assert.equal((yearArchive.match(/href="\.\.\/tnusrb-si-2020-quiz\.html"/g)||[]).length,2,
+assert.equal((yearArchive.match(/href="\.\.\/tnusrb-si-2020-quiz\.html" class="card-btn start-test"/g)||[]).length,2,
  '2019 recruitment and 2020 sitting cards both launch same real Series C quiz');
 assert.doesNotMatch(yearArchive,/clearexams\.ink\/tnusrb\/\d{4}_(?:si|pc)_question_paper\.html/,
  'No more dead legacy SI and PC paper routes');
