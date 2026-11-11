@@ -339,13 +339,13 @@ try {
   await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/121 readable original-numbered practice questions loaded/);
+  assert.match(await page.locator('#loadStatus').innerText(),/133 readable original-numbered practice questions loaded/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2015/);
   assert.match(await page.locator('.note').first().innerText(),/non-officially verified secondary answer table/);
   await page.locator('details[aria-label="Withheld 2015 questions and reasons"] summary').click();
-  assert.equal(await page.locator('#sourceIssues li').count(),19,'Show every truly source-incomplete item');
+  assert.equal(await page.locator('#sourceIssues li').count(),7,'Show every truly source-incomplete item');
   await page.locator('details[aria-label="Ungraded 2015 review questions and reasons"] summary').click();
-  assert.equal(await page.locator('#ungradedIssues li').count(),9,'Disputed but readable questions need independent source-review disclosure');
+  assert.equal(await page.locator('#ungradedIssues li').count(),17,'Disputed but readable questions need independent source-review disclosure');
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
   assert.match(await page.locator('#questionTitle').innerText(),/மணநூல்/);
@@ -356,8 +356,8 @@ try {
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true);
   await page.locator('#quiz .palette-details summary').click();
   const si2015Nums=await page.locator('#palette button').allTextContents();
-  assert.equal(si2015Nums.length,121,'112 provisional-keyed + 9 safe readable ungraded items must be playable');
-  for(const sourceBlocked of [9,21,27,34,45,60,73,80,90,92,93,95,99,100,101,102,103,104,120]){
+  assert.equal(si2015Nums.length,133,'116 provisional-keyed + 17 readable but neutral source-review items must be playable');
+  for(const sourceBlocked of [9,99,100,101,102,103,104]){
     assert.equal(si2015Nums.includes(String(sourceBlocked)),false,'Do not invent unreadable source Q'+sourceBlocked);
   }
   await page.locator('details[aria-label="Recovered 2015 graph questions without original graph"] summary').click();
@@ -366,14 +366,14 @@ try {
   await page.locator('#palette button').filter({hasText:/^109$/}).click();
   assert.equal(await page.locator('#questionFigure').isVisible(),true,'Q109 scanned-layout redraw visible');
   assert.match(await page.locator('#questionFigure').getAttribute('alt'),/top 5.*question mark/);
-  for(const recovered of [119,129]){
+  for(const recovered of [119,120,129]){
     assert.ok(si2015Nums.includes(String(recovered)),'Original SI 2015 figure question Q'+recovered+' recovered');
     await page.locator('#palette button').filter({hasText:new RegExp('^'+recovered+'$')}).click();
     assert.equal(await page.locator('#questionFigure').isVisible(),true,'Figure visible for SI 2015 Q'+recovered);
-    assert.ok((await page.locator('#questionFigure').getAttribute('src')).endsWith('q'+recovered+'.svg'));
+    assert.ok((await page.locator('#questionFigure').getAttribute('src')).endsWith(recovered===120?'q120-ungraded.svg':'q'+recovered+'.svg'));
     assert.equal(await page.locator('#options button').count(),4,'Q'+recovered+' retains A–D choices');
   }
-  for(const ungraded of [8,14,29,30,33,65,66,84,127]){
+  for(const ungraded of [8,14,21,27,29,30,33,60,65,66,73,80,84,90,95,120,127]){
     assert.ok(si2015Nums.includes(String(ungraded)),'Readable source conflict must remain available for ungraded practice Q'+ungraded);
   }
   await page.locator('#palette button').filter({hasText:/^8$/}).click();
@@ -391,7 +391,19 @@ try {
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Ungraded — source\/key review needed/,'Question 14 must remain ungraded despite grammar');
   assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Never highlight source-disputed key on Q14');
-  await page.locator('#palette button').filter({hasText:/^21$/}).count().then(n=>assert.equal(n,0,'Unreadable Q21 remains blocked'));
+  await page.locator('#palette button').filter({hasText:/^21$/}).count().then(n=>assert.equal(n,1,'Q21 matrix notation now source-readable ungraded'));
+  await page.locator('#palette button').filter({hasText:/^90$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/√\(176 \+ √2401\)/,'Q90 nested radical from source restored');
+  await page.locator('#options button').nth(1).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q90 conflicting answer key not scored');
+  assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q90 neutral feedback');
+  await page.locator('#palette button').filter({hasText:/^120$/}).click();
+  assert.equal(await page.locator('#questionFigure').isVisible(),true,'Q120 question mark source figure visible');
+  assert.match(await page.locator('#questionTitle').innerText(),/editorial prompt.*ungraded/,'Q120 source omits original instruction');
+  await page.locator('#options button').first().click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q120 figure choice cannot be scored as authentic question');
 
   await page.locator('#palette button').filter({hasText:/^132$/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
@@ -399,7 +411,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 121-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 133-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
   await page.locator('#quiz .palette-details summary').click();
@@ -408,10 +420,10 @@ try {
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
-  assert.match(await page.locator('#score').innerText(),/\/ 56\.0 provisional marks/,'Nine ungraded source disputes cannot alter provisional score denominator');
+  assert.match(await page.locator('#score').innerText(),/\/ 58\.0 provisional marks/,'Seventeen source-review items must not alter provisional score denominator');
   assert.equal(await page.locator('#result').isVisible(),true);
   await page.locator('#reviewFilter').selectOption('ungraded');
-  assert.equal(await page.locator('#reviewList .result-item').count(),9,'Ungraded filter shows all source-disputed readable questions');
+  assert.equal(await page.locator('#reviewList .result-item').count(),17,'Ungraded filter shows 17 source-disputed or source-instruction-missing readable questions');
   await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
@@ -421,7 +433,7 @@ try {
   assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides provisional answer feedback');
   assert.equal(await page.locator('#feedback').isVisible(),false);
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2015 mobile JavaScript runtime clean');
-  console.log('PASS TNUSRB SI 2015: 121 readable (112 provisional, 9 ungraded), 19 held, neutral feedback and preserved answers');
+  console.log('PASS TNUSRB SI 2015: 133 readable (116 provisional, 17 ungraded), 7 held, neutral feedback and preserved answers');
 
   // TNUSRB SI 2020 (2019 recruitment, Series C) from user-supplied transcription.
   pageErrors.length = 0;
