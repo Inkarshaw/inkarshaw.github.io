@@ -14,8 +14,8 @@
       data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==135||
       !Array.isArray(data.questions)||data.questions.length!==135||
       !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==5||
-      !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==7||
-      data.ungradedSourceDisputeCount!==1||
+      !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==4||
+      data.ungradedSourceDisputeCount!==3||
       data?.answerKey?.answers?.length!==140){
       throw Error('TNUSRB SI 2020 Series C question-bank manifest is incomplete');
     }
@@ -30,15 +30,15 @@
           throw Error('Incomplete entry at original question '+q.number);
       if(q.answerKeyToken==='ALL'&&q.scoringStatus!=='ungraded_all_correct'&&q.scoringStatus!=='blocked_source_incomplete')throw Error('Special key status mismatch');
       if(q.scoringStatus==='ungraded_source_dispute'&&
-         (q.number!==22||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(22)))
+         (![15,22,37].includes(q.number)||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(22)))
         throw Error('Disputed Q22 must not be graded or presented with an answer');
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.playableQuestionCount||playable.length!==128||
-       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==124||
+    if(playable.length!==data.playableQuestionCount||playable.length!==131||
+       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==125||
        playable.filter(q=>q.scoringStatus==='ungraded_all_correct').length!==3||
-       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==1){
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==3){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
@@ -52,16 +52,17 @@
   function migratedAttempt(mode){
     const saved=getSaved(storageKey());
     if(validSaved(saved,mode))return saved;
-    const recoveredNumbers=new Set([28,29,30,31,32,33,34,35,41,42,44,45,48]);
-    const earlierPositions=questions.map((q,i)=>recoveredNumbers.has(q.number)?-1:i).filter(i=>i>=0);
-    // Support both older 115-item and 114-item attempts keyed by original question number.
-    const oldPositions=saved?.answers?.length===114?
-      earlierPositions.filter(i=>questions[i].number!==22):earlierPositions;
-    const oldLength=oldPositions.length;
-    if(!saved||saved.finished||saved.version!==1||saved.mode!==mode||
-       ![114,115].includes(oldLength)||saved.answers?.length!==oldLength||
-       saved.checked?.length!==oldLength||saved.marked?.length!==oldLength||
-       !Number.isInteger(saved.index)||saved.index<0||saved.index>=oldLength)return null;
+    const prior13=new Set([28,29,30,31,32,33,34,35,41,42,44,45,48]);
+    const crossSeries3=new Set([14,15,37]);
+    const old128=questions.map((q,i)=>crossSeries3.has(q.number)?-1:i).filter(i=>i>=0);
+    const old115=old128.filter(i=>!prior13.has(questions[i].number));
+    const old114=old115.filter(i=>questions[i].number!==22);
+    const map={128:old128,115:old115,114:old114};
+    const oldPositions=map[saved?.answers?.length];
+    if(!saved||!oldPositions||saved.finished||saved.version!==1||saved.mode!==mode||
+       saved.answers?.length!==oldPositions.length||
+       saved.checked?.length!==oldPositions.length||saved.marked?.length!==oldPositions.length||
+       !Number.isInteger(saved.index)||saved.index<0||saved.index>=oldPositions.length)return null;
     const restored={...saved,answers:Array(questions.length).fill(null),
       checked:Array(questions.length).fill(false),marked:Array(questions.length).fill(false),
       index:oldPositions[saved.index]};
@@ -197,8 +198,8 @@
     $('resultTitle').textContent=expired?'Time expired — answers submitted':'TNUSRB SI 2020 Series C practice result';
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scored.length*0.5).toFixed(1)+' marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
-      allEntries+' ALL entries and '+disputed+' disputed-key question ungraded · '+questions.length+' readable questions. '+
-      'Score excludes five absent source numbers and seven source-incomplete or missing-diagram items; not a full 140-question exam result.';
+      allEntries+' ALL entries and '+disputed+' disputed source/key questions ungraded · '+questions.length+' readable questions. '+
+      'Score excludes five absent source numbers and four source-incomplete or missing-diagram items; not a full 140-question exam result.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
@@ -264,8 +265,8 @@
       data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
         const li=document.createElement('li');li.textContent='Q'+q.number+': '+q.sourceIssue;withheld.append(li);
       });
-      $('loadStatus').textContent=questions.length+' readable original-numbered questions: 124 provisionally scored, '+
-        '3 final-key ALL entries and Q22 key dispute ungraded; 7 blocked and 5 missing source positions.';
+      $('loadStatus').textContent=questions.length+' readable original-numbered questions: 125 provisionally scored, '+
+        '3 final-key ALL entries and Q15/Q22/Q37 source disputes ungraded; 4 blocked and 5 missing source positions.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
