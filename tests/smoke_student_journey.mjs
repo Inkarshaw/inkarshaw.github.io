@@ -500,7 +500,16 @@ try {
   assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'2020 Q37 cross-series spelling dispute ungraded');
   assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q37 duplicate alternative cannot show right/wrong status');
   for(const n of [84,95,103]){
-    await page.locator('#palette button').filter({hasText:new RegExp('^'+n+'
+    await page.locator('#palette button').filter({hasText:String(n)}).click();
+    assert.equal(await page.locator('#questionFigure').isVisible(),true,'Reference figure visible for Q'+n);
+    assert.ok((await page.locator('#questionFigure').getAttribute('src')).endsWith('q'+n+'-reference-ungraded.svg'));
+    assert.match(await page.locator('#referenceNote').innerText(),/NOT the verified 2020 Series C original figure/,'Explicit original source caveat');
+    await page.locator('#options button').first().click();
+    await page.locator('#check').click();
+    assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q'+n+' is ungraded');
+    assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q'+n+' cannot highlight answer');
+  }
+  await page.locator('#palette button').filter({hasText:/^22$/}).click();
   await page.locator('#options button').nth(0).click();
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Ungraded — printed choice\/key conflict/);
