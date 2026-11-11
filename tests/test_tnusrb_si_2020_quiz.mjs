@@ -86,7 +86,7 @@ assert.match(html,/Q46.*mathematical expressions/,'Partial surviving math questi
 assert.match(js,/Q46: a numbered secondary reader preserves A=45/,'Reader Q46 options shown only as secondary source clues');
 assert.match(js,/Q47: the reader says/,'Matrix missing without invented matrices');
 
-assert.match(html,/General Candidates paper/,'Link official-origin Open Candidates paper, not departmental source');
+assert.match(html,/General Candidates written paper/,'Link General Candidates primary paper, not departmental source');
 assert.match(html,/Q22's answer-key dispute/);
 assert.match(html,/125 provisionally scored/);
 assert.match(html,/2019 Recruitment \(Exam 2020\)/);
