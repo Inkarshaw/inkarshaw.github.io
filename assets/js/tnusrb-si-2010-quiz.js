@@ -261,6 +261,14 @@
         const li=document.createElement('li');li.textContent='Original Q'+n+': open-candidates question text not recovered';
         gapList.append(li);
       });
+      const q64=data.questions.find(q=>q.number===64);
+      const conflict=document.createElement('li');
+      conflict.textContent='Q64: original vector notation visible, but conflicting secondary answer keys — '+q64.scoringReviewReason;
+      gapList.append(conflict);
+      const q106=data.questions.find(q=>q.number===106);
+      const venn=document.createElement('li');
+      venn.textContent='Q106: diagram recovered from numbered coaching archive page 14; answer remains provisional (Type A key C).';
+      gapList.append(venn);
       data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
         const li=document.createElement('li');li.textContent='Original Q'+q.number+': '+(q.sourceIssue||'Original math/figure review required');
         gapList.append(li);
