@@ -11,9 +11,9 @@
   const save=()=>{if(attempt)try{localStorage.setItem(storeKey,JSON.stringify(attempt))}catch{}};
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2020||data?.bookletSeries!=='C'||
-      data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==122||
-      !Array.isArray(data.questions)||data.questions.length!==122||
-      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==18||
+      data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==135||
+      !Array.isArray(data.questions)||data.questions.length!==135||
+      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==5||
       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==7||
       data.ungradedSourceDisputeCount!==1||
       data?.answerKey?.answers?.length!==140){
@@ -35,8 +35,8 @@
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.playableQuestionCount||playable.length!==115||
-       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==111||
+    if(playable.length!==data.playableQuestionCount||playable.length!==128||
+       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==124||
        playable.filter(q=>q.scoringStatus==='ungraded_all_correct').length!==3||
        playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==1){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
@@ -199,7 +199,7 @@
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scored.length*0.5).toFixed(1)+' marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
       allEntries+' ALL entries and '+disputed+' disputed-key question ungraded · '+questions.length+' readable questions. '+
-      'Score excludes 18 absent source numbers and seven source-incomplete or missing-diagram items; not a full 140-question exam result.';
+      'Score excludes five absent source numbers and seven source-incomplete or missing-diagram items; not a full 140-question exam result.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
@@ -265,8 +265,8 @@
       data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
         const li=document.createElement('li');li.textContent='Q'+q.number+': '+q.sourceIssue;withheld.append(li);
       });
-      $('loadStatus').textContent=questions.length+' readable original-numbered questions: 111 provisionally scored, '+
-        '3 final-key ALL entries and Q22 key dispute ungraded; 7 blocked and 18 missing source positions.';
+      $('loadStatus').textContent=questions.length+' readable original-numbered questions: 124 provisionally scored, '+
+        '3 final-key ALL entries and Q22 key dispute ungraded; 7 blocked and 5 missing source positions.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
