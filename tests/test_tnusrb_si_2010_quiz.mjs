@@ -66,7 +66,7 @@ assert.match(html,/All 140 numbered Open Candidates questions are now readable/)
 assert.equal(data.questions.find(q=>q.number===106).figureAsset,'assets/figures/tnusrb-si-2010-q106.svg');
 assert.equal(data.questions.find(q=>q.number===64).coachingArchiveKeyToken,'A');
 assert.deepEqual(data.questions.find(q=>q.number===64).acceptedAnswers,[]);
-assert.match(data.questions.find(q=>q.number===64).scoringReviewReason,/conflict|disagree/i);
+assert.match(data.questions.find(q=>q.number===64).scoringReviewReason,/marks A.*marks B|dispute/i);
 assert.match(html,/earlier Type A mirror/);
 assert.match(html,/id="palette"/);
 assert.match(html,/id="score"/);
