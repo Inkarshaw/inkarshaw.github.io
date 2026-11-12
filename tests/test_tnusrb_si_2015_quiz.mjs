@@ -133,7 +133,10 @@ for(const n of [109,119,129])assert.match(d.questions[n-1].figureAsset,/\.svg$/)
 assert.match(html,/140 playable study questions/);
 assert.match(html,/24 ungraded · 0 blocked/);
 assert.match(html,/id="ungradedIssues"/);
-assert.match(html,/non-officially verified secondary answer table/);
+assert.match(html,/116 are provisionally scored<\/strong> from a secondary answer table/,'Provisional answers must not be represented as certified');
+assert.match(html,/not a verified original TNUSRB booklet figure/,'The source-warning for the six graph questions must remain visible');
+assert.match(html,/All 24 ungraded questions, including the six Q99–104 chart-comparison exercises, remain playable for study but receive no marks/,'Results must describe ungraded items accurately');
+assert.doesNotMatch(html,/six source-incomplete graph questions remain withheld/,'Do not repeat outdated chart-blocking claim');
 assert.match(js,/provisional_secondary_key/);
 assert.match(js,/ungraded_source_dispute/,'Ungraded questions need distinct scoring status');
 assert.match(js,/const scored=q.scoringStatus==='provisional_secondary_key'/,'Feedback must be neutral for ungraded');
