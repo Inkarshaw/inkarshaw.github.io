@@ -47,8 +47,8 @@ h1{font-size:clamp(1.8rem,4vw,2.55rem);line-height:1.2;margin:4px 0 13px}h2{font
 <div class="grid">
  <div class="review">
   <strong>2015 Open · production graph</strong>
-  <p id="missing2015">Six questions depend on an unavailable original graph. The source file will be checked on load.</p>
-  <p><span class="tag">Blocked · not graded</span></p>
+  <p id="missing2015">Six questions have an ungraded comparison tracing; the original TNUSRB booklet graph still requires verification.</p>
+  <p><span class="tag">Playable · comparison only · ungraded</span></p>
   <p><a href="tnusrb-si-2015-quiz.html">2015 Open Candidates quiz</a></p>
  </div>
  <div class="review">
@@ -60,7 +60,7 @@ h1{font-size:clamp(1.8rem,4vw,2.55rem);line-height:1.2;margin:4px 0 13px}h2{font
 </div>
 <h2>Other source checks still pending</h2>
 <ul class="list">
- <li><strong>2015 Q100:</strong> competing secondary copies disagree over option C: <strong>1996</strong> versus <strong>1995</strong>. The graph itself has not been verified. Do not use the answer letter to invent data.</li>
+ <li><strong>2015 Q100:</strong> competing secondary copies disagree over option C: <strong>1996</strong> versus <strong>1995</strong>. A nonofficial graph from the Athiyaman 2015 compilation is available, but the original TNUSRB booklet graph remains unverified. Do not infer exact data from keys.</li>
  <li><strong>2020 Q84, Q95 and Q103:</strong> on-site figures are labelled comparison-study redrawings, <strong>not certified original Series C diagrams</strong>; all remain ungraded.</li>
  <li><strong>2020 Q47:</strong> matrix options are a Series D comparison, not a verified Series C option layout; ungraded.</li>
  <li><strong>2010 Type A Q64:</strong> secondary answer-key disagreement. Readable for practice but ungraded until original source and key comparison.</li>
@@ -72,6 +72,7 @@ h1{font-size:clamp(1.8rem,4vw,2.55rem);line-height:1.2;margin:4px 0 13px}h2{font
  <li><a href="https://www.tnusrb.tn.gov.in/pdfs/SI_2019_WT_QUESTION.pdf">TNUSRB 2019 recruitment / 2020 examination General Candidates question paper</a> · official-hosted booklet; <strong>page images not independently checked</strong> (source fetch returned 502 on 12 November 2026).</li>
  <li><a href="https://www.tnusrb.tn.gov.in/archivesquestionpapers-tnusrb.php">TNUSRB question paper archive</a> · official directory; not itself proof of every transcription.</li>
  <li><a href="https://www.scribd.com/document/564036870/TNUSRB-SI-2015">2015 Open original-numbered coaching copy</a> · secondary text for Q99–104; it does not establish the missing graph.</li>
+ <li><a href="https://athiyamanteam.com/wp-content/uploads/2019/05/TN-Taluk-SI-2015-Question-Paper-140-Questions-Police-SI-Athiyaman-Team.pdf#page=25">2015 Athiyaman subject-grouped PDF, page 25</a> · contains a 1990–1995 P/Q graph for their Q84–89 corresponding to numbered Open Q99–104. Diagram on ClearExams is an approximate editorial tracing; original official booklet graph remains uncertified.</li>
  <li><a href="https://weshineacademy.com/wp-content/uploads/2019/03/TN-SUB-INSPECTOR-PREVIOUS-YEAR-QUESTION-PAPER-3.pdf">2015 We Shine Academy copy</a> · secondary PDF indexed with Q100 option C as 1995; no primary-paper visual proof.</li>
 </ul>
 <p>To close a gap, the original Open / General Candidates booklet page must visibly establish the full numbered question, all options, and any required graph or figure. Check the matching final key separately and preserve source differences in the audit.</p>
@@ -107,16 +108,18 @@ try{
     a.questions.length!==140||b.questions.length!==140||c.originalQuestionCount!==140||
     s2010!==a.availableForQuizCount||s2015!==b.playableQuestionCount||s2020!==c.playableQuestionCount||
     b.provisionallyScoreableQuestionCount!==116||c.scoredQuestionCount!==127||
-    blocked.join(',')!=='99,100,101,102,103,104'||missing.join(',')!=='114,115,116'||
+    blocked.length!==0||b.ungradedReadableQuestionCount!==24||missing.join(',')!=='114,115,116'||
     b.questions[99].graphSourceEvidence?.requiredProductionGraphPresent!==false||
+    b.questions[99].graphSourceEvidence?.athiyamanSubjectGroupedGraphFound!==true||
+    b.questions[99].graphSourceEvidence?.officialOriginalBookletGraphVerified!==false||
     c.originalBookletAccess?.originalBookletVerifiedByClearExams!==false)
       throw Error('Review required: source manifest changed; do not publish inferred counts');
  $('stat2010').textContent=s2010+'/140';
  $('stat2015').textContent=s2015+'/140';
  $('stat2020').textContent=s2020+'/140';
- $('missing2015').textContent='Q'+blocked.join(', Q')+' require the same missing original P/Q vehicle-production graph. Printed stems and choices alone cannot be scored.';
+ $('missing2015').textContent='Original Q99–104 are available as ungraded study exercises using a source-labelled secondary comparison chart. The original TNUSRB booklet chart, exact plotted values and conflicting answer choices remain unverified.';
  $('missing2020').textContent='Original Series C Q'+missing.join(', Q')+' are absent. The final key has answer letters but not their questions or options.';
- $('sourceCounts').textContent='2010: '+a.scoredQuestionCount+' provisional marks-bearing questions and '+(s2010-a.scoredQuestionCount)+' ungraded. 2015: '+b.provisionallyScoreableQuestionCount+' provisional, '+b.ungradedReadableQuestionCount+' ungraded, '+blocked.length+' blocked. 2020: '+c.scoredQuestionCount+' provisional, '+(s2020-c.scoredQuestionCount)+' ungraded, '+missing.length+' missing.';
+ $('sourceCounts').textContent='2010: '+a.scoredQuestionCount+' provisional marks-bearing questions and '+(s2010-a.scoredQuestionCount)+' ungraded. 2015: '+b.provisionallyScoreableQuestionCount+' provisional, '+b.ungradedReadableQuestionCount+' ungraded, '+blocked.length+' blocked (the six original-graph questions are ungraded). 2020: '+c.scoredQuestionCount+' provisional, '+(s2020-c.scoredQuestionCount)+' ungraded, '+missing.length+' missing.';
  $('status').textContent='Source-count integrity verified against the published JSON files.';
 }catch(error){
  $('status').textContent='Unable to verify live source counts. Please check the paper files before relying on any totals.';
