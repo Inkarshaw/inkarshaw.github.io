@@ -426,7 +426,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 134-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 140-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
   await page.locator('#quiz .palette-details summary').click();
@@ -448,7 +448,7 @@ try {
   assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides provisional answer feedback');
   assert.equal(await page.locator('#feedback').isVisible(),false);
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2015 mobile JavaScript runtime clean');
-  console.log('PASS TNUSRB SI 2015: 134 readable (116 provisional, 18 ungraded), 6 held, neutral feedback and preserved answers');
+  console.log('PASS TNUSRB SI 2015: 140 playable (116 provisional, 24 ungraded), six comparison-chart study items, neutral feedback and preserved answers');
 
   // TNUSRB year-page navigation previously had dead .html paths and fake PDF downloads.
   pageErrors.length=0;
