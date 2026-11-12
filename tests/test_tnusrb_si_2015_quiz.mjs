@@ -143,7 +143,7 @@ assert.match(js,/const scored=q.scoringStatus==='provisional_secondary_key'/,'Fe
 assert.match(js,/const scoreable=questions.filter/,'Score denominator excludes ungraded questions');
 assert.match(js,/if\(filter==='ungraded'&&scored\)continue/,'Review filter lists ungraded entries');
 assert.match(js,/const old109=old118\.filter/,'Previous 109-question attempts still restore via original-number positions');
-assert.match(js,/const prior133=questions\.map/,'Prior 133-question attempt position migration is supported');
+assert.match(js,/const prior133=old134\.filter\(i=>questions\[i\]\.number!==9\)/,'Prior 133-question attempt position migration preserves the original Q9 exclusion');
 assert.match(js,/const old121=questions\.map/,'Save data from earlier 121-question version can migrate safely');
 assert.match(js,/q\.optionsTamil/,'Tamil option text should render for indexed Open Candidates Q11–20');
 assert.match(js,/\$\('questionTamil'\)/);
