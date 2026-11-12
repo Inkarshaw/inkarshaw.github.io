@@ -339,13 +339,13 @@ try {
   await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/134 readable original-numbered practice questions loaded/);
+  assert.match(await page.locator('#loadStatus').innerText(),/140 readable original-numbered practice questions loaded/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2015/);
-  assert.match(await page.locator('.note').first().innerText(),/non-officially verified secondary answer table/);
-  await page.locator('details[aria-label="Withheld 2015 questions and reasons"] summary').click();
-  assert.equal(await page.locator('#sourceIssues li').count(),6,'Show every truly source-incomplete item');
+  assert.match(await page.locator('.note').first().innerText(),/secondary answer table/);
+  await page.locator('details[aria-label="Unverified original booklet graph and source reasons"] summary').click();
+  assert.equal(await page.locator('#sourceIssues li').count(),6,'Show all six original-graph verification exceptions');
   await page.locator('details[aria-label="Ungraded 2015 review questions and reasons"] summary').click();
-  assert.equal(await page.locator('#ungradedIssues li').count(),18,'Disputed but readable questions need independent source-review disclosure');
+  assert.equal(await page.locator('#ungradedIssues li').count(),24,'Disputed but readable questions need independent source-review disclosure');
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q1/);
   assert.match(await page.locator('#questionTitle').innerText(),/மணநூல்/);
@@ -356,12 +356,20 @@ try {
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true);
   await page.locator('#quiz .palette-details summary').click();
   const si2015Nums=await page.locator('#palette button').allTextContents();
-  assert.equal(si2015Nums.length,134,'116 provisional-keyed + 18 readable but neutral source-review items must be playable');
-  for(const sourceBlocked of [99,100,101,102,103,104]){
-    assert.equal(si2015Nums.includes(String(sourceBlocked)),false,'Do not invent unreadable source Q'+sourceBlocked);
+  assert.equal(si2015Nums.length,140,'116 provisional-keyed + 24 neutral ungraded study items must be playable');
+  for(const ungradedGraph of [99,100,101,102,103,104]){
+    assert.equal(si2015Nums.includes(String(ungradedGraph)),true,'Open study mode must now show original Q'+ungradedGraph);
   }
-  await page.locator('details[aria-label="Recovered 2015 graph questions without original graph"] summary').click();
-  assert.equal(await page.locator('#graphRecovery li').count(),6,'All six graph-based prompts readable but excluded from scoring');
+  await page.locator('#palette button').filter({hasText:/^99$/}).click();
+  assert.equal(await page.locator('#questionFigure').isVisible(),true,'Comparison-only P/Q chart is visible');
+  assert.match(await page.locator('#questionFigure').getAttribute('src'),/q99-104-comparison-ungraded\.svg/);
+  assert.match(await page.locator('#questionFigure').getAttribute('alt'),/NOT a verified original TNUSRB booklet/);
+  await page.locator('#options button').first().click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Nonofficial source graph never scores');
+  assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'No answer highlight for source-comparison figure');
+  await page.locator('details[aria-label="Source-comparison 2015 graph questions"] summary').click();
+  assert.equal(await page.locator('#graphRecovery li').count(),6,'All six graph prompts accessible but excluded from scoring');
   assert.ok(si2015Nums.includes('109'),'Visually recovered Q109 original-number position is playable');
   await page.locator('#palette button').filter({hasText:/^109$/}).click();
   assert.equal(await page.locator('#questionFigure').isVisible(),true,'Q109 scanned-layout redraw visible');
