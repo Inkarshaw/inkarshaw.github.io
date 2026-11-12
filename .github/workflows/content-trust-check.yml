@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "pyq-hub.html"
+      - "tnusrb-source-verification.html"
+      - "tests/test_tnusrb_source_verification.mjs"
       - "tnpsc-group1-syllabus.html"
       - "tnpsc-group1-topic-practice.html"
       - "assets/css/clear-pathways.css"
@@ -89,6 +91,8 @@ on:
     branches: [main]
     paths:
       - "pyq-hub.html"
+      - "tnusrb-source-verification.html"
+      - "tests/test_tnusrb_source_verification.mjs"
       - "tnpsc-group1-syllabus.html"
       - "tnpsc-group1-topic-practice.html"
       - "assets/css/clear-pathways.css"
@@ -175,6 +179,8 @@ jobs:
         run: node tests/test_tnusrb_si_2020_quiz.mjs
       - name: Validate TNUSRB SI 2015 bilingual OCR and disputed secondary keys
         run: node tests/test_tnusrb_si_2015_quiz.mjs
+      - name: Verify original source gaps cannot become graded or silently disappear
+        run: node tests/test_tnusrb_source_verification.mjs
       - name: Validate source-numbered Group I 2011 D-series typed quiz and exception-key scoring
         run: node tests/test_tnpsc_g1_2011_typed.mjs
       - name: Validate eight-paper typed PYQ catalogue and real source coverage
