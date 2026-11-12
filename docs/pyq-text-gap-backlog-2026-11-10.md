@@ -338,3 +338,10 @@ The live student library is `pyq-typed-library.html`; source metadata is `data/q
 
 - Added two further Tamil study prompts **Q38** (English prefix; keep A–D English words) and **Q58** (nuclear reactor moderator; preserve A–D scientific isotope notations exactly). Q58 remains explicitly ungraded under Series C key ALL.
 - Now **122 editorial Tamil study translations + eight already-Tamil original-numbered source transcriptions** = **130/137 readable SI 2020 items** with Tamil question text or Tamil study support. Seven readable positions deliberately remain without uncertified Tamil rewording: **Q15, Q37, Q39, Q40, Q41, Q42, Q47**. Missing original numbers **Q114–116** still not supplied, and original printed Series C source remains unverified.
+
+### 2026-11-12 · Open Candidates original-source verification and Q100 discrepancy
+
+- New public tracker `tnusrb-source-verification.html` reads the existing 2010 Type A, 2015 Open and 2020 General Candidates Series C quiz manifests to show readable/scored/ungraded/blocked original-numbered counts without guessing figure data. Linked from the PYQ hub and TNUSRB archive.
+- Additional secondary witness: We Shine Academy indexed PDF prints **Q100 option C=1995**, matching Athiyaman's subject compilation but contradicting source-numbered Muppadai/Scribd **C=1996**. Neither the referenced vehicle-production graph nor an authoritative original 2015 booklet page has been visually established; Q99–104 stay blocked.
+- Public Series C 2020 board PDF URL returned HTTP 502 on 12 November; official-source listing at PYQSathi is a link, not an inspected image. Q114–116 remain missing, and unverified redraws Q84/Q95/Q103 and matrix Q47 remain ungraded.
+- Added CI integrity test enforcing those gaps and verdicts, plus a corrected TNUSRB year-archive 2015 link label (134 playable rather than stale 137).
