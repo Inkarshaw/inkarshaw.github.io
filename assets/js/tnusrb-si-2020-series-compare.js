@@ -15,8 +15,8 @@
   function verify(matrix,seriesC,crosswalk){
     check(matrix?.schemaVersion===1&&matrix?.series?.join(',')==='A,B,C,D','Series label integrity failure');
     check(crosswalk?.schemaVersion===1&&crosswalk?.noAutomaticSeriesCOriginalSubstitution===true,'Crosswalk may not substitute C originals');
-    check(crosswalk?.psychologyMappings?.length===60&&crosswalk?.existingStemMatches===57,'All 60 Psychology positions required');
-    check(crosswalk?.candidateUnverifiedMappings===3&&crosswalk?.sourceSeriesDCandidateQuestions?.length===3,'Three study-only candidates required');
+    check(crosswalk?.psychologyMappings?.length===60&&crosswalk?.existingStemMatches===60,'All 60 Psychology positions required');
+    check(crosswalk?.candidateUnverifiedMappings===0&&crosswalk?.sourceSeriesDCandidateQuestions?.length===3,'Three recovered cross-series confirmations required');
     check(crosswalk?.sourceFinalKey===matrix.source,'Source provenance differs from verified final key');
     const uniqueC=new Set(),uniqueD=new Set();
     let verified=0,provisional=0;
@@ -26,17 +26,17 @@
       check(!uniqueC.has(c)&&!uniqueD.has(d),'Crosswalk positions must be bijective');
       uniqueC.add(c);uniqueD.add(d);
       check(matrix.positionKeys[c-1].C===matrix.positionKeys[d-1].D,'Crosswalk answer key disagreement for C '+c);
-      if(v==='stem_compared_against_existing_c_and_key_agrees'){
+      if(v==='stem_compared_against_existing_c_and_key_agrees'||v==='stem_compared_against_recovered_series_c_scan_and_key_agrees'){
         check(seriesC.questions.some(q=>q.number===c),'Claimed matched C stem not in original bank');
         verified++;
       }else{
-        check(v==='candidate_by_elimination_not_original_c'&&[114,115,116].includes(c),'Only original C gaps can be inferred');
+        check(false,'Unverified Psychology mapping remains at C '+c);
         provisional++;
       }
     }
-    check(verified===57&&provisional===3,'Psychology verification totals changed');
+    check(verified===60&&provisional===0,'Psychology verification totals changed');
     const candidates=crosswalk.sourceSeriesDCandidateQuestions;
-    check(candidates.every(x=>[114,115,116].includes(x.seriesCPositionHypothesis)&&[107,108,109].includes(x.seriesDPrintedNumber)&&!x.scoringAllowed&&!x.originalSeriesCStemVerified&&!x.originalSeriesCOptionsVerified),'Candidates may never be certified or graded');
+    check(candidates.every(x=>[114,115,116].includes(x.seriesCPositionHypothesis)&&[107,108,109].includes(x.seriesDPrintedNumber)&&x.scoringAllowed&&x.originalSeriesCStemVerified&&x.originalSeriesCOptionsVerified),'Recovered Series C matches must be visually confirmed before scoring');
     for(const x of candidates){
       const m=crosswalk.psychologyMappings.find(y=>y.seriesCNumber===x.seriesCPositionHypothesis);
       check(m?.seriesDNumber===x.seriesDPrintedNumber,'Candidate and crosswalk number mismatch');
@@ -45,8 +45,8 @@
     }
     check(matrix?.positionKeys?.length===140,'140 original key rows required');
     check(seriesC?.bookletSeries==='C'&&seriesC?.answerKey?.answers?.length===140,'Series C question bank incomplete');
-    check(matrix?.unresolvedSeriesCOriginalPositions?.join(',')==='114,115,116','C source holes changed');
-    check(seriesC?.missingNumbers?.join(',')==='114,115,116','Missing original C positions not in sync');
+    check(matrix?.unresolvedSeriesCOriginalPositions?.length===0,'C source holes changed');
+    check(seriesC?.missingNumbers?.length===0,'Missing original C positions not in sync');
     check(matrix.noOtherSeriesQuestionTextAutoSubstituted===true,'Cross-series option provenance unsafe');
     for(let i=0;i<140;i++){
       const r=matrix.positionKeys[i];
@@ -55,8 +55,9 @@
       check(r.C===seriesC.answerKey.answers[i],'Series C key mismatch at '+r.number);
     }
     for(const n of [114,115,116]){
-      check(!seriesC.questions.some(q=>q.number===n),'C printed question not yet recovered: '+n);
-      check(matrix.proofRows.some(r=>r.cNumber===n&&r.keyC===matrix.positionKeys[n-1].C),'C missing-key proof failed');
+      const q=seriesC.questions.find(item=>item.number===n);
+      check(q?.secondaryScanSource?.printedPage===26&&q.secondaryScanSource.bookletSeries==='C','Recovered C scan evidence missing: '+n);
+      check(matrix.proofRows.some(r=>r.cNumber===n&&r.keyC===matrix.positionKeys[n-1].C),'C recovered-key proof failed');
     }
     check(matrix.knownSeriesDToCMatches?.length===8,'Reviewed matching positions changed');
     const matched=new Set();
@@ -97,7 +98,7 @@
     for(const m of [...crosswalk.psychologyMappings].sort((a,b)=>a.seriesCNumber-b.seriesCNumber)){
       const tr=make('tr');
       tr.append(make('th','C Q'+m.seriesCNumber),make('td','D Q'+m.seriesDNumber));
-      tr.append(make('td',m.verification==='candidate_by_elimination_not_original_c'?'Inferred only · C original unverified':'Compared source stem + matching final key'));
+      tr.append(make('td',m.verification==='stem_compared_against_recovered_series_c_scan_and_key_agrees'?'Recovered C scan + D stem + matching final keys':'Compared source stem + matching final key'));
       body.append(tr);
     }
   }
@@ -105,12 +106,12 @@
     const root=$('candidateCards');root.replaceChildren();
     for(const x of crosswalk.sourceSeriesDCandidateQuestions){
       const article=make('article');article.className='candidate';
-      article.append(make('h3','Possible C Q'+x.seriesCPositionHypothesis+' ← printed Series D Q'+x.seriesDPrintedNumber));
+      article.append(make('h3','Confirmed C Q'+x.seriesCPositionHypothesis+' ↔ printed Series D Q'+x.seriesDPrintedNumber));
       article.append(make('p',x.seriesDSourceQuestion));
       const list=make('ul');
       for(const letter of ['A','B','C','D'])list.append(make('li',letter+'. '+x.seriesDSourceOptions[letter]));
       article.append(list);
-      article.append(make('p','Official final-key positions: Series C '+x.seriesCFinalKey+' / Series D '+x.seriesDFinalKey+'. UNGRADED: these are Series D source options, not certified Series C options.'));
+      article.append(make('p','Official final-key positions: Series C '+x.seriesCFinalKey+' / Series D '+x.seriesDFinalKey+'. The recovered Series C scan has the same stem and A–D choices; this Series C item is provisionally scored.'));
       const note=make('p',x.caution);note.className='small';article.append(note);
       root.append(article);
     }
@@ -120,7 +121,7 @@
     for(const gap of gaps){
       const card=make('div');card.className='gap';
       card.append(make('strong','Series C Q'+gap.cNumber));
-      card.append(make('p','Final-key C-series letter: '+gap.keyC+'. Original C question and options absent.'));
+      card.append(make('p','Final-key C-series letter: '+gap.keyC+'. Original-numbered C stem and options recovered from Series C scan page 26.'));
       card.append(make('p','Same numbered rows: A '+keyDisplay(gap.keyA)+' · B '+keyDisplay(gap.keyB)+' · D '+keyDisplay(gap.keyD)+'. These are different booklet questions.'));
       div.append(card);
     }
@@ -148,7 +149,7 @@
     renderGaps(matrix.proofRows);
     renderMatches(matrix.knownSeriesDToCMatches);
     renderKeys([114,115,116]);
-    $('status').textContent='140 booklet-position keys verified. In Psychology, 57 of 60 C↔D content matches also agree on final-key letters; three remaining D questions are study-only candidates, NOT verified original C text. C Q114–116 remain missing and ungraded.';
+    $('status').textContent='140 booklet-position keys verified. All 60 Psychology C↔D content matches agree on stems, options and final-key letters; Q114–116 are now confirmed from the visually reviewed Series C scan and provisionally scored.';
   }catch(error){
     $('status').textContent='Comparison could not be verified against the current Series C bank. Do not rely on these positions until the source files are checked.';
     $('selectionStatus').textContent=String(error.message||error);

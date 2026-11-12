@@ -52,8 +52,8 @@ h1{font-size:clamp(1.8rem,4vw,2.55rem);line-height:1.2;margin:4px 0 13px}h2{font
   <p><a href="tnusrb-si-2015-quiz.html">2015 Open Candidates quiz</a></p>
  </div>
  <div class="review">
-  <strong>2020 Series C · missing question text</strong>
-  <p id="missing2020">Three original-numbered questions are absent. The source file will be checked on load.</p>
+  <strong>2020 Series C · recovered source text</strong>
+  <p id="missing2020">Q114–116 have been recovered from a public Series C scan. The source file will be checked on load.</p>
   <p><span class="tag">Absent · not playable</span></p>
   <p><a href="tnusrb-si-2020-quiz.html">2020 Series C General Candidates quiz</a> · <a href="tnusrb-si-2020-series-compare.html">Compare Series A/B/C/D final-key positions</a></p>
  </div>
@@ -62,7 +62,7 @@ h1{font-size:clamp(1.8rem,4vw,2.55rem);line-height:1.2;margin:4px 0 13px}h2{font
 <ul class="list">
  <li><strong>2015 Q100:</strong> competing secondary copies disagree over option C: <strong>1996</strong> versus <strong>1995</strong>. A nonofficial graph from the Athiyaman 2015 compilation is available, but the original TNUSRB booklet graph remains unverified. Do not infer exact data from keys.</li>
  <li><strong>2020 Q84, Q95 and Q103:</strong> on-site figures are labelled comparison-study redrawings, <strong>not certified original Series C diagrams</strong>; all remain ungraded.</li>
- <li><strong>2020 A/B/C/D booklet series:</strong> the final key covers all four position-specific columns, but equal question numbers are not equivalent across series. <a href="tnusrb-si-2020-series-compare.html">Inspect the complete matrix and eight documented C↔D question-position matches</a>. C Q114–116 remain missing.</li>
+ <li><strong>2020 A/B/C/D booklet series:</strong> the final key covers all four position-specific columns, but equal question numbers are not equivalent across series. <a href="tnusrb-si-2020-series-compare.html">Inspect the complete matrix and eight documented C↔D question-position matches</a>. C Q114–116 were recovered from the Series C scan itself, not copied by matching numbers from another series.</li>
  <li><strong>2020 Q47:</strong> matrix options are a Series D comparison, not a verified Series C option layout; ungraded.</li>
  <li><strong>2010 Type A Q64:</strong> secondary answer-key disagreement. Readable for practice but ungraded until original source and key comparison.</li>
 </ul>
@@ -108,8 +108,8 @@ try{
  if(a.bookletType!=='A'||b.quota!=='Open'||c.bookletSeries!=='C'||
     a.questions.length!==140||b.questions.length!==140||c.originalQuestionCount!==140||
     s2010!==a.availableForQuizCount||s2015!==b.playableQuestionCount||s2020!==c.playableQuestionCount||
-    b.provisionallyScoreableQuestionCount!==116||c.scoredQuestionCount!==127||
-    blocked.length!==0||b.ungradedReadableQuestionCount!==24||missing.join(',')!=='114,115,116'||
+    b.provisionallyScoreableQuestionCount!==116||c.scoredQuestionCount!==130||
+    blocked.length!==0||b.ungradedReadableQuestionCount!==24||missing.length!==0||
     b.questions[99].graphSourceEvidence?.requiredProductionGraphPresent!==false||
     b.questions[99].graphSourceEvidence?.athiyamanSubjectGroupedGraphFound!==true||
     b.questions[99].graphSourceEvidence?.officialOriginalBookletGraphVerified!==false||
@@ -119,7 +119,7 @@ try{
  $('stat2015').textContent=s2015+'/140';
  $('stat2020').textContent=s2020+'/140';
  $('missing2015').textContent='Original Q99–104 are available as ungraded study exercises using a source-labelled secondary comparison chart. The original TNUSRB booklet chart, exact plotted values and conflicting answer choices remain unverified.';
- $('missing2020').textContent='Original Series C Q'+missing.join(', Q')+' are absent. The final key has answer letters but not their questions or options.';
+ $('missing2020').textContent='All 140 Series C positions are readable. Q114–116 were visually transcribed from the public Series C scan, printed page 26; TNUSRB-hosted original-PDF certification remains pending.';
  $('sourceCounts').textContent='2010: '+a.scoredQuestionCount+' provisional marks-bearing questions and '+(s2010-a.scoredQuestionCount)+' ungraded. 2015: '+b.provisionallyScoreableQuestionCount+' provisional, '+b.ungradedReadableQuestionCount+' ungraded, '+blocked.length+' blocked (the six original-graph questions are ungraded). 2020: '+c.scoredQuestionCount+' provisional, '+(s2020-c.scoredQuestionCount)+' ungraded, '+missing.length+' missing.';
  $('status').textContent='Source-count integrity verified against the published JSON files.';
 }catch(error){
