@@ -1,5 +1,5 @@
 /* TNUSRB SI 2015 Open Quota — user-supplied bilingual OCR.
-   134 readable: 116 provisional-keyed, 18 ungraded source review; 6 held for missing source.  */
+   140 practice items: 116 provisional-keyed, 24 ungraded; Q99–104 show a nonofficial comparison figure.  */
 (() => {
   'use strict';
   const $=id=>document.getElementById(id);
@@ -11,8 +11,8 @@
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2015||data?.maxOriginalQuestions!==140||
        data?.providedQuestionCount!==140||!Array.isArray(data.questions)||data.questions.length!==140||
-       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==6||
-       data.ungradedReadableQuestionCount!==18||
+       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==0||
+       data.ungradedReadableQuestionCount!==24||
        !Array.isArray(data.answerKey?.answers)||data.answerKey.answers.length!==140)
        throw Error('TNUSRB SI 2015 source manifest incomplete');
     for(let i=0;i<140;i++){
@@ -39,11 +39,20 @@
          q.secondaryBilingualSourceURL!==data.bilingualNumberedReaderReview.sourceURL))
       throw Error('SI 2015 numbered Open Candidates bilingual-review manifest is inconsistent');
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==134||playable.length!==data.playableQuestionCount||
+    if(playable.length!==140||playable.length!==data.playableQuestionCount||
        playable.filter(q=>q.scoringStatus==='provisional_secondary_key').length!==116||
-       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==18||
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==24||
        data.provisionallyScoreableQuestionCount!==116)
       throw Error('SI 2015 playback, graded and ungraded manifest totals disagree');
+    for(let n=99;n<=104;n++){
+      const q=data.questions[n-1];
+      if(q.scoringStatus!=='ungraded_source_dispute'||q.acceptedAnswers.length||
+         q.figureAsset!=='assets/figures/tnusrb-si-2015-q99-104-comparison-ungraded.svg'||
+         q.graphSourceEvidence?.athiyamanSubjectGroupedGraphFound!==true||
+         q.graphSourceEvidence?.officialOriginalBookletGraphVerified!==false||
+         q.graphSourceEvidence?.scoringAllowed!==false)
+        throw Error('2015 source-comparison chart cannot be graded at original Q'+n);
+    }
     return playable;
   }
   const storageKey=()=>STORAGE+$('mode').value;
@@ -58,15 +67,16 @@
     // Preserve the old original-number position order for all historical sizes.
     // Never regenerate prior 109-item positions using today's score-status flags.
     const newlyReadable=new Set([9,21,27,34,45,60,73,80,90,92,93,95,120]);
-    const prior133=questions.map((q,i)=>q.number===9?-1:i).filter(i=>i>=0);
+    const old134=questions.map((q,i)=>q.number>=99&&q.number<=104?-1:i).filter(i=>i>=0);
+    const prior133=old134.filter(i=>questions[i].number!==9);
     const earlierFigureRecovery=new Set([119,129]);
     const originalFigureRecovery=new Set([109]);
     const initialUngraded=new Set([8,14,29,30,33,65,66,84,127]);
-    const old121=questions.map((q,i)=>newlyReadable.has(q.number)?-1:i).filter(i=>i>=0);
+    const old121=old134.filter(i=>!newlyReadable.has(questions[i].number));
     const old119=old121.filter(i=>!earlierFigureRecovery.has(questions[i].number));
     const old118=old119.filter(i=>!originalFigureRecovery.has(questions[i].number));
     const old109=old118.filter(i=>!initialUngraded.has(questions[i].number));
-    const map={133:prior133,121:old121,119:old119,118:old118,109:old109};
+    const map={134:old134,133:prior133,121:old121,119:old119,118:old118,109:old109};
     const indices=map[saved?.answers?.length];
     if(!saved||!indices||saved.finished||saved.version!==1||saved.mode!==mode||
        saved.answers?.length!==indices.length||saved.checked?.length!==indices.length||
@@ -220,7 +230,7 @@
     $('resultTitle').textContent=expired?'Time expired — submitted':'TNUSRB SI 2015 provisional result';
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scoreable*0.5).toFixed(1)+' provisional marks';
     $('scoreDetails').textContent=correct+' provisionally correct · '+wrong+' provisionally incorrect · '+blank+' unanswered · '+
-      ungraded+' readable questions ungraded · '+questions.length+' playable questions · 6 held for missing/incomplete sources. '+
+      ungraded+' readable questions ungraded · '+questions.length+' playable questions · zero blocked. '+
       'The secondary answer table is not an officially confirmed TNUSRB key.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
@@ -279,7 +289,7 @@
     .then(response=>{if(!response.ok)throw Error('Quiz JSON unavailable');return response.json()})
     .then(data=>{questions=validate(data);bank=data;
       const issues=$('sourceIssues');issues.replaceChildren();
-      data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
+      data.questions.filter(q=>q.number>=99&&q.number<=104).forEach(q=>{
         const li=document.createElement('li');li.textContent='Original Q'+q.number+': '+q.sourceIssue;
         issues.append(li);
       });
@@ -291,12 +301,12 @@
       const recoveredGraphText=$('graphRecovery');recoveredGraphText.replaceChildren();
       data.questions.filter(q=>q.graphSourceEvidence).forEach(q=>{
         const li=document.createElement('li');
-        li.textContent='Q'+q.number+' — '+q.question+' Choices: '+LETTERS.map(k=>k+') '+q.options[k]).join('; ')+'. Graph missing; not gradeable.';
+        li.textContent='Q'+q.number+' — '+q.question+' Choices: '+LETTERS.map(k=>k+') '+q.options[k]).join('; ')+'. Nonofficial comparison chart is available in the quiz; original booklet graph unverified and this question is ungraded.';
         recoveredGraphText.append(li);
       });
       $('loadStatus').textContent=questions.length+' readable original-numbered practice questions loaded: '+
         '10 indexed bilingual Tamil/English study items Q11–20, 116 provisionally scored, '+
-        '18 source/key disputed or source-instruction ungraded, 6 graph-dependent records held.';
+        '24 source/key disputed or source-instruction ungraded, including 6 with nonofficial comparison chart and no marks.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
