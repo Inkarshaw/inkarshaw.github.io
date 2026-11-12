@@ -6,7 +6,7 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const data=JSON.parse(read('data/quizzes/tnusrb-si-2020-series-c.json'));
 const html=read('tnusrb-si-2020-quiz.html');
 const js=read('assets/js/tnusrb-si-2020-quiz.js');
-const missing=[114,115,116];
+const missing=[];
 const blocked=[];
 assert.equal(data.schemaVersion,1);
 assert.equal(data.exam,'TNUSRB SI');
@@ -14,14 +14,14 @@ assert.equal(data.year,2020);
 assert.equal(data.recruitmentYear,2019,'2019 recruitment, 12 January 2020 exam');
 assert.equal(data.bookletSeries,'C');
 assert.equal(data.originalQuestionCount,140);
-assert.equal(data.suppliedQuestionCount,137);
-assert.equal(data.questions.length,137);
-assert.deepEqual(data.missingNumbers,missing,'Keep five genuinely unavailable source numbers explicit');
+assert.equal(data.suppliedQuestionCount,140);
+assert.equal(data.questions.length,140);
+assert.deepEqual(data.missingNumbers,missing,'Every original Series C number is now represented');
 assert.deepEqual(data.blockedNumbers,blocked,'Do not grade ambiguous scans, inferred options, missing diagrams or key conflicts');
-assert.equal(data.playableQuestionCount,137);
+assert.equal(data.playableQuestionCount,140);
 assert.equal(data.ungradedSourceDisputeCount,7);
-assert.equal(data.scoredQuestionCount,127);
-assert.equal(data.maximumIndicativeMarks,63.5);
+assert.equal(data.scoredQuestionCount,130);
+assert.equal(data.maximumIndicativeMarks,65);
 assert.deepEqual(data.specialKeyNumbers,[58,111,125]);
 assert.equal(data.answerKey.answers.length,140,'Final key has all original positions');
 assert.match(data.answerKey.sourcePDF,/Final-Answer-Key-TNUSRB-Sub-Inspector-of-Police-Posts\.pdf$/);
@@ -31,14 +31,14 @@ assert.equal(data.originalBookletAccess.originalBookletVerifiedByClearExams,fals
 assert.equal(data.originalBookletAccess.departmentQuotaExcluded,true);
 assert.deepEqual(data.sourceRecoveryAudit.blockedOriginalNumbers,blocked,'Manifest must not retain stale 2019/2020 blocked positions');
 assert.deepEqual(data.sourceRecoveryAudit.remainingMissingNumbers,missing);
-assert.deepEqual(Object.keys(data.missingSourceEvidence).map(Number),missing);
-assert.deepEqual(Object.keys(data.missingSourceEvidence),['114','115','116'],'Only three original Series C records remain absent');
+assert.deepEqual(Object.keys(data.missingSourceEvidence),[],'No original Series C question number remains absent');
+assert.deepEqual(data.originalBookletAccess.secondarySeriesCScanReview.reviewedOriginalNumbers,[114,115,116]);
 assert.equal(data.sourceRecoveryAudit.seriesDMathReview.originalCVisualScanNotVerified,true);
 assert.deepEqual(data.sourceRecoveryAudit.seriesDMathReview.addedProvisionalScores,[46,121]);
 assert.deepEqual(data.sourceRecoveryAudit.seriesDMathReview.addedUngraded,[47]);
 
 const originalNums=data.questions.map(q=>q.number);
-assert.equal(new Set(originalNums).size,137);
+assert.equal(new Set(originalNums).size,140);
 assert.deepEqual(originalNums,[...originalNums].sort((a,b)=>a-b),'Original order never re-sorted');
 assert.deepEqual(Array.from({length:140},(_,i)=>i+1).filter(n=>!originalNums.includes(n)),missing);
 for(const q of data.questions){
@@ -59,7 +59,15 @@ for(const q of data.questions){
   assert.equal(q.scoringStatus,'ungraded_all_correct');
  }else assert.equal(q.scoringStatus,'scored_with_final_key');
 }
-assert.deepEqual(data.recoveredOriginalNumbers,[28,29,30,31,32,33,34,35,41,42,44,45,46,47,48]);
+assert.deepEqual(data.recoveredOriginalNumbers,[28,29,30,31,32,33,34,35,41,42,44,45,46,47,48,114,115,116]);
+for(const [n,key,options] of [[114,'B',{A:'16',B:'160',C:'32',D:'None of these'}],[115,'C',{A:'4',B:'6',C:'8',D:'14'}],[116,'D',{A:'1210000',B:'11000',C:'100',D:'111000'}]]){
+ const q=data.questions.find(x=>x.number===n);
+ assert.equal(q.answerKeyToken,key,'Recovered Series C key position Q'+n);
+ assert.deepEqual(q.options,options,'Visually transcribed Series C choices Q'+n);
+ assert.equal(q.secondaryScanSource.printedPage,26);
+ assert.equal(q.secondaryScanSource.bookletSeries,'C');
+ assert.equal(q.originalTamilPaperTextVerified,false,'Secondary scan is not TNUSRB-host certification');
+}
 assert.equal(data.questions.find(q=>q.number===14).options.B,'Ganga–Brahmaputra');
 assert.equal(data.questions.find(q=>q.number===14).crossSeriesSource.bookletSeries,'D');
 assert.equal(data.questions.find(q=>q.number===14).scoringStatus,'scored_with_final_key');
@@ -89,12 +97,12 @@ assert.equal(digit121.scoringStatus,'scored_with_final_key');
 assert.equal(digit121.answerKeyToken,'C');
 assert.deepEqual(digit121.acceptedAnswers,['C']);
 assert.equal((210-34)/(23-1),8,'Q121 equation directly yields option C');
-assert.ok(js.includes('const old134=questions.map'),'Old 134-question attempts must map original question numbers');
+assert.ok(js.includes('const old137=questions.map'),'Old 137-question attempts must map original question numbers');
 
-const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25,26,27,36,38,43,44,45,46,48,49,50,51,52,53,54,55,56,57,58,59,...Array.from({length:40},(_,i)=>i+60),...Array.from({length:14},(_,i)=>i+100),...Array.from({length:24},(_,i)=>i+117)];
+const expectedTamil=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25,26,27,36,38,43,44,45,46,48,49,50,51,52,53,54,55,56,57,58,59,...Array.from({length:40},(_,i)=>i+60),...Array.from({length:17},(_,i)=>i+100),...Array.from({length:24},(_,i)=>i+117)];
 assert.deepEqual(data.bilingualEditorialReview.reviewedOriginalNumbers,expectedTamil,'Only reviewed question numbers advertise Tamil study text');
-assert.equal(data.bilingualEditorialReview.questionCount,122);
-assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20,20,20,20,2],'Bilingual batch review history preserved');
+assert.equal(data.bilingualEditorialReview.questionCount,125);
+assert.deepEqual(data.bilingualEditorialReview.batchHistory.map(b=>b.count),[20,20,20,20,20,20,2,3],'Bilingual batch review history preserved');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[1].numbers,[23,24,25,26,27,43,44,45,46,48,49,50,51,52,53,54,55,56,57,59]);
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[2].numbers,Array.from({length:20},(_,i)=>60+i),'Third bilingual editorial batch exactly covers Q60–79');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[3].numbers,Array.from({length:20},(_,i)=>80+i),'Fourth bilingual editorial batch exactly covers Q80–99');
@@ -103,6 +111,7 @@ assert.deepEqual(data.bilingualEditorialReview.batchHistory[4].numbers,fifth,'Fi
 const sixth=[22,36,...Array.from({length:18},(_,i)=>i+123)];
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[5].numbers,sixth,'Sixth batch restores Q22/Q36 and all Q123–140');
 assert.deepEqual(data.bilingualEditorialReview.batchHistory[6].numbers,[38,58],'Seventh closure batch leaves source-ambiguous positions untranslated');
+assert.deepEqual(data.bilingualEditorialReview.batchHistory[7].numbers,[114,115,116],'Eighth batch records the visually reviewed Series C scan recovery');
 assert.deepEqual([38,58].map(n=>data.questions.find(q=>q.number===n).optionsTamil),[38,58].map(n=>data.questions.find(q=>q.number===n).options),'Source-precise grammatical/scientific alternatives retained');
 assert.equal(data.questions.find(q=>q.number===58).scoringStatus,'ungraded_all_correct','Q58 cannot become scored because it was translated');
 assert.deepEqual(data.questions.filter(q=>q.sourceTextLanguage!=='ta'&&q.questionTamil===undefined).map(q=>q.number),[15,37,39,40,41,42,47],'Only seven held English-source questions remain');
@@ -158,7 +167,7 @@ assert.deepEqual(data.bilingualEditorialReview.excludedOriginalNumbers,[15,37,39
 for(const q of data.questions){
   const translated=expectedTamil.includes(q.number);
   if(translated){
-    assert.equal(q.translationStatus,'editorial_tamil_study_translation_not_verified_original_booklet');
+    assert.ok(['editorial_tamil_study_translation_not_verified_original_booklet','secondary_scan_checked_editorial_tamil_transcription_not_officially_certified'].includes(q.translationStatus));
     assert.equal(q.originalTamilPaperTextVerified,false);
     assert.ok(/\p{Script=Tamil}/u.test(q.questionTamil),'Tamil script required at Q'+q.number);
     assert.deepEqual(Object.keys(q.optionsTamil),['A','B','C','D'],'Preserve exact A-D choice identities');
@@ -179,7 +188,7 @@ for(const n of originalTamil){
 }
 assert.match(js,/sourceTamilNumbers/,'Reader must distinguish original Tamil source from editorial translations');
 assert.match(js,/This original-numbered source transcription is already in Tamil/,'Language switch may not pretend English source exists');
-assert.match(html,/122 questions have editorial Tamil study translations/,'Do not label this work official Tamil booklet text');
+assert.match(html,/125 questions have editorial or secondary-scan-reviewed Tamil study text/,'Do not label this work official Tamil booklet text');
 assert.match(html,/id="language"/,'Learners can switch languages without new attempt');
 assert.match(html,/value="ta"/,'Tamil-only mode available');
 assert.match(html,/value="both"/,'Side-by-side bilingual mode available');
@@ -220,19 +229,19 @@ assert.match(html,/id="referenceNote"/,'Editorial drawing disclaimer appears on 
 assert.ok(js.includes("$('questionFigure')"));
 assert.ok(js.includes("$('referenceNote')"));
 assert.ok(js.includes('const old131=old134.filter'),'Historical 131-question attempt migration retained through original paper positions');
-assert.match(html,/137 readable/);
-assert.match(html,/id="sourceGaps"/,'The unverified source holes must be shown to the learner');
+assert.match(html,/140 readable/);
+assert.match(html,/id="sourceGaps"/,'The recovered secondary-scan source note must be shown to the learner');
 assert.ok(html.includes('href="'+officialPdf+'"'),'Quiz links board-listed source PDF');
 assert.match(html,/The board PDF timed out/,'Never imply unread booklet scan was examined');
 assert.match(html,/Q46.*vector/,'Recovered Q46 vector expression is disclosed as sourced from D');
 assert.match(html,/Q47.*ungraded/,'D-only matrix choice reconstruction cannot claim C booklet veracity');
-assert.match(html,/Q114–116/,'Original-numbered 114 to 116 still missing');
+assert.match(html,/Q114–116/,'Recovered original-numbered 114 to 116 are disclosed');
 
 assert.match(html,/General Candidates written paper/,'Link General Candidates primary paper, not departmental source');
 assert.match(html,/Q15\/Q22\/Q37/,'Existing source-disputed keys are still clearly disclosed');
-assert.match(html,/127 provisionally scored/);
+assert.match(html,/130 provisionally scored/);
 assert.match(html,/2019 Recruitment \(Exam 2020\)/);
-assert.match(html,/not an official 140-question TNUSRB score/);
+assert.match(html,/not an official TNUSRB result/);
 assert.match(js,/q\.answerKeyToken!==data\.answerKey\.answers\[q\.number-1\]/);
 assert.match(js,/blocked_source_incomplete/);
 assert.match(js,/ungraded_source_dispute/);
@@ -261,4 +270,4 @@ assert.match(yearArchive,/SI_2019_WT_QUESTION\.pdf/,'2019 recruitment/2020 exam 
 assert.match(yearArchive,/2h 30m/,'Exam duration corrected for Series C');
 assert.match(yearArchive,/Total marks/,'Unverified cut-off percentages removed from 2019/2020 cards');
 
-console.log('PASS TNUSRB SI 2020 Series C: 137 numbered records; 137 readable (127 scored, 3 ALL and 7 source-reviewed ungraded); 3 missing and 0 blocked.');
+console.log('PASS TNUSRB SI 2020 Series C: 140/140 readable (130 scored, 3 ALL and 7 source-reviewed ungraded); 0 missing and 0 blocked.');

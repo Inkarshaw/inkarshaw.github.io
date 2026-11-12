@@ -71,7 +71,7 @@ const total=entries.reduce((n,e)=>n+e.typed,0),full=entries.filter(e=>e.typed===
 const sourceCount=adapted.reduce((n,e)=>n+e.count,0);
 const missing=archive.filter(e=>!hasTextFor(e)).length;
 $('stats').replaceChildren();
-for(const label of [archive.length+' indexed exam-year sources',entries.length+' numbered text sets · '+total+' positions',adapted.length+' adapted sets · '+sourceCount+' questions',missing+' archived years without local text'])$('stats').append(element('span','',label));
+for(const label of [full+' complete numbered text quizzes · '+total+' / '+total+' playable positions',archive.length+' indexed exam-year sources',adapted.length+' adapted sets · '+sourceCount+' questions',missing+' archived years without local text'])$('stats').append(element('span','',label));
 }
 
 function element(tag,className,txt){const el=document.createElement(tag);if(className)el.className=className;if(txt!==undefined)el.textContent=txt;return el}
@@ -91,7 +91,7 @@ const track=element('div','track');track.setAttribute('aria-label',e.typed+' of 
 const fill=element('span');fill.style.width=(100*e.typed/e.total).toFixed(1)+'%';track.append(fill);card.append(track);
 card.append(element('div','status',e.level+' · '+e.scorable+' question positions with provisional key scoring'));
 card.append(element('p','',e.sourceStatus));
-if(expectedLink.test(e.link)){const a=element('a','play',e.typed===e.total?'Open typed quiz':'Open available text');a.href=e.link;card.append(a)}
+if(expectedLink.test(e.link)){const a=element('a','play',e.typed===e.total?'Start full text quiz':'Open available text');a.href=e.link;card.append(a)}
 cards.append(card);
 }
 for(const e of selectedAdapted){

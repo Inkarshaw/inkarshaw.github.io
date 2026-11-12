@@ -11,9 +11,9 @@
   const save=()=>{if(attempt)try{localStorage.setItem(storeKey,JSON.stringify(attempt))}catch{}};
   function validate(data){
     if(data?.schemaVersion!==1||data?.year!==2020||data?.bookletSeries!=='C'||
-      data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==137||
-      !Array.isArray(data.questions)||data.questions.length!==137||
-      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==3||
+      data?.originalQuestionCount!==140||data?.suppliedQuestionCount!==140||
+      !Array.isArray(data.questions)||data.questions.length!==140||
+      !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==0||
       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==0||
       data.ungradedSourceDisputeCount!==7||
       data?.answerKey?.answers?.length!==140){
@@ -21,7 +21,7 @@
     }
     const translatedNumbers=new Set(data.bilingualEditorialReview?.reviewedOriginalNumbers||[]);
     const sourceTamilNumbers=new Set(data.bilingualEditorialReview?.alreadySourceTamilNumberedOriginals||[]);
-    if(data.bilingualEditorialReview?.questionCount!==122||translatedNumbers.size!==122||
+    if(data.bilingualEditorialReview?.questionCount!==125||translatedNumbers.size!==125||
        sourceTamilNumbers.size!==8||
        data.bilingualEditorialReview?.originalTamilPrintVerified!==false||
        [...sourceTamilNumbers].some(n=>translatedNumbers.has(n))||
@@ -42,7 +42,8 @@
         throw Error('Unverified reference-diagram question must not be graded or given an accepted answer');
       const hasTamil=typeof q.questionTamil==='string'&&q.questionTamil.trim();
       if(hasTamil){
-        if(!translatedNumbers.has(q.number)||q.translationStatus!=='editorial_tamil_study_translation_not_verified_original_booklet'||
+        if(!translatedNumbers.has(q.number)||
+           !['editorial_tamil_study_translation_not_verified_original_booklet','secondary_scan_checked_editorial_tamil_transcription_not_officially_certified'].includes(q.translationStatus)||
            q.originalTamilPaperTextVerified!==false||!q.optionsTamil||
            !LETTERS.every(l=>typeof q.optionsTamil[l]==='string'&&q.optionsTamil[l].trim()))
           throw Error('Unverified Tamil study option set '+q.number);
@@ -59,8 +60,8 @@
       previous=q.number;
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
-    if(playable.length!==data.playableQuestionCount||playable.length!==137||
-       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==127||
+    if(playable.length!==data.playableQuestionCount||playable.length!==140||
+       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==130||
        playable.filter(q=>q.scoringStatus==='ungraded_all_correct').length!==3||
        playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==7){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
@@ -76,18 +77,20 @@
   function migratedAttempt(mode){
     const saved=getSaved(storageKey());
     if(validSaved(saved,mode))return saved;
-    // Old attempts had no Series C Q46/Q47 and withheld Q121: preserve
+    // Older attempts predate recovered Series C Q114–116 and earlier source repairs: preserve
     // response mapping by original paper number when restoring older sizes.
     const prior13=new Set([28,29,30,31,32,33,34,35,41,42,44,45,48]);
     const crossSeries3=new Set([14,15,37]);
     const newDiagrams=new Set([84,95,103]);
     const newMath=new Set([46,47,121]);
-    const old134=questions.map((q,i)=>newMath.has(q.number)?-1:i).filter(i=>i>=0);
+    const scanRecovered=new Set([114,115,116]);
+    const old137=questions.map((q,i)=>scanRecovered.has(q.number)?-1:i).filter(i=>i>=0);
+    const old134=old137.filter(i=>!newMath.has(questions[i].number));
     const old131=old134.filter(i=>!newDiagrams.has(questions[i].number));
     const old128=old131.filter(i=>!crossSeries3.has(questions[i].number));
     const old115=old128.filter(i=>!prior13.has(questions[i].number));
     const old114=old115.filter(i=>questions[i].number!==22);
-    const map={134:old134,131:old131,128:old128,115:old115,114:old114};
+    const map={137:old137,134:old134,131:old131,128:old128,115:old115,114:old114};
     const oldPositions=map[saved?.answers?.length];
     if(!saved||!oldPositions||saved.finished||saved.version!==1||saved.mode!==mode||
        saved.answers?.length!==oldPositions.length||
@@ -328,9 +331,13 @@
     .then(data=>{questions=validate(data);bank=data;
       if(!data.originalBookletAccess?.url?.includes('SI_2019_WT_QUESTION.pdf')||
          data.originalBookletAccess?.originalBookletVerifiedByClearExams!==false||
-         data.missingNumbers.some(n=>!data.missingSourceEvidence?.[String(n)]))
+         data.missingNumbers.some(n=>!data.missingSourceEvidence?.[String(n)])||
+         data.originalBookletAccess?.secondarySeriesCScanReview?.reviewedOriginalNumbers?.join(',')!=='114,115,116')
         throw Error('2020 SI source evidence manifest requires review');
       const withheld=$('sourceGaps');withheld.replaceChildren();
+      const recovered=document.createElement('li');
+      recovered.textContent='Q114–116: visually transcribed from the public Series C scan, printed page 26; TNUSRB-hosted original-PDF certification remains pending.';
+      withheld.append(recovered);
       data.missingNumbers.forEach(n=>{
         const li=document.createElement('li');
         li.textContent='Q'+n+': no verified original Series C question wording or A–D options recovered. This original-numbered entry remains absent from the quiz.';
@@ -339,8 +346,8 @@
       data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
         const li=document.createElement('li');li.textContent='Q'+q.number+': '+q.sourceIssue;withheld.append(li);
       });
-      $('loadStatus').textContent=questions.length+' readable original-numbered questions: 127 provisionally scored, '+
-        '3 ALL tokens and 7 source/wording review items ungraded; 3 missing original Series C numbers Q114–116.';
+      $('loadStatus').textContent=questions.length+' / 140 readable original-numbered questions: 130 provisionally scored; '+
+        '3 ALL tokens and 7 source/wording review items ungraded; no missing question numbers.';
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
