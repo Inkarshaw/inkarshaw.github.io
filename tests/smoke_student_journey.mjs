@@ -293,7 +293,8 @@ try {
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
   assert.match(await page.locator('h1').innerText(),/2026 Group I.*200-question text quiz/);
-  assert.equal(await page.locator('#sourceIssueList li').count(),7,'Seven OCR/figure source caveats visible in the interface');
+  assert.equal(await page.locator('#sourceIssueList li').count(),2,'Only the two dice diagrams remain source blocked');
+  assert.equal(await page.locator('#secondaryReviewList li').count(),5,'Five source-disclosed study-text repairs are visible');
   assert.match(await page.locator('#loadStatus').innerText(),/All 200 numbered questions loaded/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Question 1 of 200/i);
@@ -306,7 +307,10 @@ try {
   assert.equal(await page.locator('#palette .palette-btn').count(),200);
   await page.locator('#palette .palette-btn').nth(12).click();
   assert.match(await page.locator('#position').innerText(),/Original Question 13 of 200/i);
-  assert.match(await page.locator('#sourceWarning').innerText(),/matching-pair town names/i);
+  assert.match(await page.locator('#secondarySourceNote').innerText(),/Q13 notation\/table restored for study/);
+  assert.match(await page.locator('#questionText').innerText(),/1\. Chennimalai/);
+  assert.match(await page.locator('#secondarySourceLink').getAttribute('href'),/#page=183$/);
+  assert.equal(await page.locator('#sourceWarning').isVisible(),false,'No missing graph is alleged for repaired Q13');
   await page.locator('#options button').nth(4).click();
   await page.locator('#flag').click();
   await page.locator('#palette .palette-btn').nth(199).click();
@@ -329,7 +333,7 @@ try {
   assert.equal(await page.locator('#blankTotal').innerText(),'198');
   assert.equal(await page.locator('#flagTotal').innerText(),'1');
   await page.locator('#reviewFilter').selectOption('source');
-  assert.equal(await page.locator('#reviewList details').count(),7,'All seven source issues available for review');
+  assert.equal(await page.locator('#reviewList details').count(),2,'The two still-missing dice figures remain reviewable');
   await page.goto(origin+'/tnpsc-g1-2026-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#newAttempt')&&!document.querySelector('#newAttempt').disabled,
     undefined,{timeout:20000});
@@ -340,7 +344,7 @@ try {
   await page.locator('#options button').last().click();
   assert.match(await page.locator('#selectedFeedback').innerText(),/No correct answer is shown/);
   assert.deepEqual(pageErrors,[],'TNPSC Group I 2026 text question interactions have no runtime errors');
-  console.log('PASS TNPSC Group I 2026: 200 textual Q1–200, A–E choices, 7 source warnings, saved progress, ungraded results and exam mode');
+  console.log('PASS TNPSC Group I 2026: 200 study slots, 5 source-labelled text repairs, 2 dice blockers, saved answers and zero unverified grades');
 
   // TNPSC Group I 2011: actual original Series D PDF, not the uploaded Group II transcription.
   pageErrors.length=0;
