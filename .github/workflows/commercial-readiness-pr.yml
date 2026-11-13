@@ -9,6 +9,10 @@ on:
       - "current-affairs/text/**"
       - "tests/test_commercial_readiness.py"
       - "tests/test_commercial_launch_foundations.py"
+      - "tests/test_pyq_scoring_review.mjs"
+      - "pyq-scoring-review.html"
+      - "pyq-typed-library.html"
+      - "data/quizzes/pyq-scoring-review.json"
       - "ads.txt"
       - "about.html"
       - "privacy.html"
@@ -34,5 +38,7 @@ jobs:
           python-version: "3.12"
       - name: Check navigation, content freshness and accessibility contracts
         run: python3 -m unittest discover -s tests -p 'test_commercial_readiness.py' -v
+      - name: Ensure PYQ scoring claims match source manifests
+        run: node tests/test_pyq_scoring_review.mjs
       - name: Check commercial disclosures, publisher ID and content honesty
         run: python3 -m unittest discover -s tests -p 'test_commercial_launch_foundations.py' -v

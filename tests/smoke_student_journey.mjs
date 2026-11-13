@@ -54,6 +54,25 @@ try {
   assert.deepEqual(pageErrors, [], 'homepage: runtime errors');
   console.log('PASS homepage menu accessibility');
 
+  // Commercial editorial audit: transparent scoring, exact ungraded numbers and mobile access.
+  pageErrors.length = 0;
+  const auditResponse = await page.goto(origin + '/pyq-scoring-review.html', {waitUntil:'domcontentloaded'});
+  assert.equal(auditResponse?.status(), 200, 'PYQ scoring review page');
+  await page.waitForFunction(() => document.querySelector('#paperSelect')?.options.length === 9,
+    undefined, {timeout:20000});
+  assert.match(await page.locator('#auditStatus').innerText(), /Audit loaded: 8 papers/);
+  assert.match(await page.locator('#selectedDetails').innerText(), /Q1–Q200/,'Group I key mapping not falsely scored');
+  await page.locator('#paperSelect').selectOption('tnusrb-si-2015');
+  assert.equal(await page.locator('#selectedDetails li').count(),24,'Exact 2015 source-review positions visible');
+  assert.match(await page.locator('#selectedDetails').innerText(),/Q99:/,'2015 original graph review number is visible');
+  await page.locator('#paperSelect').selectOption('tnpsc-g4-2022');
+  assert.equal(await page.locator('#selectedDetails li').count(),5,'Four ALL exclusions plus incomplete 2022 Q19');
+  assert.match(await page.locator('#selectedDetails').innerText(),/Q19:/);
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
+    'Scoring register has no 390px mobile horizontal overflow');
+  assert.deepEqual(pageErrors,[], 'PYQ scoring register JavaScript runs without runtime errors');
+  console.log('PASS PYQ scoring review: 8 papers, 264 classified exceptions, mobile overflow and exact 2022/2015 numbers');
+
   // Question-level search: lazy load, bilingual filter, answer/source disclosure and mobile width.
   pageErrors.length = 0;
   await page.goto(origin + '/question-search.html', {waitUntil:'domcontentloaded'});

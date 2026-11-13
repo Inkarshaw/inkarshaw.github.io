@@ -8,6 +8,11 @@ on:
       - "service-worker.js"
       - "tests/test_service_worker_cache.mjs"
       - "pyq-hub.html"
+      - "pyq-typed-library.html"
+      - "pyq-scoring-review.html"
+      - "assets/js/pyq-scoring-review.js"
+      - "data/quizzes/pyq-scoring-review.json"
+      - "data/quizzes/typed-pyq-catalog.json"
       - "data/quizzes/pyq-yearwise-catalog.json"
       - "data/quizzes/verified-pyqs.json"
       - "textbook-*.html"
@@ -120,6 +125,8 @@ jobs:
         run: node tests/test_textbook_page_provenance.mjs
       - name: Validate Class 10 Social Science subject-balanced bilingual mixed mock
         run: node tests/test_class10_social_mixed_mock.mjs
+      - name: Verify all scoring exclusions against eight PYQ source manifests
+        run: node tests/test_pyq_scoring_review.mjs
       - name: Validate year-wise paper catalog and PYQ year routing
         run: node tests/test_pyq_yearwise.mjs
       - name: Review TNPSC Group IV 2022 source-numbered PYQ bank
