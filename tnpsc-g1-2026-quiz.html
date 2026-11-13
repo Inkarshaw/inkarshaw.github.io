@@ -47,6 +47,7 @@ select{background:#fff;color:var(--ink);padding:11px;border:1px solid #a9bdce;bo
 .progress-track{height:10px;background:#e5ecf2;border-radius:20px;overflow:hidden;margin:15px 0}
 #progressBar{height:100%;width:0;background:#14828d;transition:width .15s}
 #questionText{font-size:1.1rem;line-height:1.66;white-space:pre-wrap;margin:15px 0 20px;font-weight:600;overflow-wrap:anywhere}
+#questionFigure img{display:block;max-width:100%;width:auto;height:auto;max-height:690px;margin:4px auto 11px;border:1px solid var(--line);border-radius:10px;background:white}#questionFigure p{margin:0 0 14px}#figureSource{margin:0 0 18px}
 .topic{font-weight:800;text-transform:uppercase;letter-spacing:.07em;font-size:.8rem;color:var(--teal)}
 .answers{display:grid;gap:9px}
 .answer{display:flex;gap:14px;align-items:start;text-align:left;width:100%;border:1px solid #ccd9e5;background:#fff;padding:14px;border-radius:12px;color:var(--ink)}
@@ -81,8 +82,8 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;color:var(--muted);f
 <section class="hero"><div class="wrap">
   <p class="eyebrow">TNPSC · Group I Services · Preliminary Examination · 27 September 2026</p>
   <h1>2026 Group I — Full 200-question text quiz</h1>
-  <p>Practise the complete set of <strong>200 numbered study positions</strong> with A–E choices and automatic save/resume. Five damaged matching/formula records now use separately labelled, unofficial study-text repairs; two dice questions still require their original figures.</p>
-  <div class="stats"><div class="stat"><strong>200</strong><span>question numbers</span></div><div class="stat"><strong>198</strong><span>readable study entries</span></div><div class="stat"><strong>5</strong><span>secondary repairs</span></div><div class="stat"><strong>2</strong><span>original figures missing</span></div><div class="stat"><strong>180 min</strong><span>optional timer</span></div></div>
+  <p>Practise the complete set of <strong>200 numbered study positions</strong> with A–E choices and automatic save/resume. Five damaged matching/formula records have unofficial study-text repairs; two dice questions now display attributed editorial comparison drawings but still require confirmation against TNPSC's official specimen.</p>
+  <div class="stats"><div class="stat"><strong>200</strong><span>question numbers</span></div><div class="stat"><strong>198</strong><span>readable study entries</span></div><div class="stat"><strong>5</strong><span>secondary repairs</span></div><div class="stat"><strong>2</strong><span>editorial study figures</span></div><div class="stat"><strong>180 min</strong><span>optional timer</span></div></div>
 </div></section>
 <main class="wrap">
 <section class="card" aria-labelledby="sourceHeading">
@@ -94,13 +95,13 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;color:var(--muted);f
     <a href="https://tnpsc.gov.in/web/examdashboard/index.aspx?notid=33aa5415-6205-4ae9-842e-212d62d088f1" target="_blank" rel="noopener noreferrer">Official 2026 Group I exam dashboard</a>
     <a href="tnpsc-g1-2026-key-review.html">Editorial-only specimen key comparison (local draft)</a>
   </div>
-  <details style="margin-top:17px"><summary>Two original diagrams still missing (Q98 and Q200)</summary><ol id="sourceIssueList" class="small"></ol></details>
+  <details style="margin-top:17px"><summary>Two diagrams provided for study, still requiring original TNPSC specimen verification (Q98, Q200)</summary><ol id="sourceIssueList" class="small"></ol></details>
   <details style="margin-top:12px"><summary>Five secondary study-text reconstructions — original wording still not certified</summary><ol id="secondaryReviewList" class="small"></ol></details>
   <p class="small"><a href="https://tnpscfactory.com/blog/tnpsc-factory-group-1-2026-answer-key.pdf" target="_blank" rel="noopener noreferrer">Third-party 2026 study-text comparison (unofficial PDF)</a>. Its answer explanations have not been mapped as official scoring keys.</p>
 </section>
 <section class="card" id="setup" aria-labelledby="setupHeading">
   <h2 id="setupHeading">Start your practice</h2>
-  <p class="small">All 200 transcription positions are shown in numbered order. Two image-dependent questions remain incomplete; five other former OCR gaps now have source-labelled, editorial study notation. None currently receives a correct-answer mark.</p>
+  <p class="small">All 200 transcription positions are shown in numbered order. Two image-dependent questions have secondary-source-based editorial diagrams, not certified original figures; five other OCR gaps have source-labelled editorial text. None currently receives a correct-answer mark.</p>
   <div class="controls">
     <label for="mode">Mode<select id="mode"><option value="practice">Practice · navigate freely</option><option value="exam">Exam · timed-style attempt</option></select></label>
     <label for="timerChoice">Timer<select id="timerChoice"><option value="none">No timer</option><option value="180">180 minutes</option></select></label>
@@ -117,6 +118,8 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;color:var(--muted);f
     <p class="note" id="secondarySourceNote" hidden></p>
     <p class="small"><a id="secondarySourceLink" href="https://tnpscfactory.com/blog/tnpsc-factory-group-1-2026-answer-key.pdf" target="_blank" rel="noopener noreferrer" hidden>View the cited third-party PDF page (unofficial)</a></p>
     <div id="questionText"></div>
+    <div id="questionFigure" class="question-figure"></div>
+    <p id="figureSource" class="small" hidden><a id="figureSourceLink" href="https://arivark.com/tnpsc-group-1-question-paper-2026" target="_blank" rel="noopener noreferrer">Compare the independent 2026 diagram source (third party, not TNPSC)</a>. TNPSC's original specimen remains authoritative.</p>
     <div id="options" class="answers" role="group" aria-label="Choose answer A, B, C, D or E"></div>
     <p class="small" id="selectedFeedback" role="status"></p>
     <div class="actions">
