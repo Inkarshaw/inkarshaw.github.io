@@ -29,6 +29,24 @@ assert.match(html,/TNPSC Factory study guide/);
 assert.match(html,/mandatory for Q98 and Q200/);
 assert.match(html,/Import saved JSON/);
 assert.match(html,/Export 200-position review JSON/);
+assert.match(html,/Select the downloaded specimen PDF/);
+assert.match(html,/the PDF is not included in exported JSON/);
+for(const id of ['specimenFile','specimenStatus','specimenJump','specimenOpen','specimenClose','specimenViewer','specimenFrame']){
+ assert.match(html,new RegExp('id="'+id+'"'),'Missing local PDF review control '+id);
+}
+assert.match(html,/type="file" id="specimenFile" accept="\.pdf,application\/pdf"/);
+assert.match(html,/referrerpolicy="no-referrer"/);
+assert.match(js,/PDF_MAX_BYTES=80\*1024\*1024/);
+assert.match(js,/PDF_HEADER='%PDF-'/);
+assert.match(js,/await file\.slice\(0,5\)\.arrayBuffer\(\)/);
+assert.match(js,/URL\.createObjectURL\(file\)/);
+assert.match(js,/URL\.revokeObjectURL\(localPdfObjectUrl\)/);
+assert.match(js,/specimenFrame/);
+assert.match(js,/localPdfObjectUrl\+'#page='\+page/);
+assert.match(js,/authenticity is NOT verified/,'Valid PDF header cannot establish TNPSC source authenticity');
+assert.ok(!/\.fetch\(|fetch\(.*specimenFile/.test(js),'Selected PDF is never transmitted by the review app');
+assert.ok(!js.includes('JSON.stringify(file)'),'Do not serialize local PDF into review export');
+
 assert.match(html,/tnpsc-g1-2026-key-review\.js/);
 assert.ok(read('pyq-scoring-review.html').includes('tnpsc-g1-2026-key-review.html'));
 assert.ok(read('tnpsc-g1-2026-quiz.html').includes('tnpsc-g1-2026-key-review.html'));
@@ -49,4 +67,4 @@ assert.ok(!js.includes('fetch(OFFICIAL'),'The workbench is not auto-scraping tic
 assert.ok(!js.includes('correctAnswer'),'No unverified public answer assignment');
 assert.ok(!js.includes('scoredQuestionCount'),'Editorial progress never changes student scoreable totals');
 new vm.Script(js,{filename:'assets/js/tnpsc-g1-2026-key-review.js'});
-console.log('PASS 2026 key workbench: 200 original slots, local evidence only, strict cross-edition mapping, unique specimen numbers and no public score mutation.');
+console.log('PASS 2026 key workbench: 200 slots, local 80MB PDF signature verification, revocable in-browser PDF previews and original-key safety; no public scores.');
