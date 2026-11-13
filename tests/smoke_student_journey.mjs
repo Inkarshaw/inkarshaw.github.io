@@ -455,7 +455,7 @@ try {
   await page.locator('#palette button').filter({hasText:/^99$/}).click();
   assert.equal(await page.locator('#questionFigure').isVisible(),true,'Comparison-only P/Q chart is visible');
   assert.equal(await page.locator('#graphStudyPanel').isVisible(),true,'Unscored bilingual graph method panel is available');
-  assert.match(await page.locator('#questionTamil').innerText(),/வாகனங்களின் மொத்த உற்பத்தி/);
+  assert.match(await page.locator('#questionTamil').innerText(),/இரு வகைகளின் மொத்த உற்பத்தி/);
   await page.locator('#graphStudyPanel summary').click();
   assert.match(await page.locator('#graphMethodEnglish').innerText(),/For each year, add P and Q production/);
   assert.match(await page.locator('#graphMethodTamil').innerText(),/ஒவ்வோர் ஆண்டிற்கும்/);
