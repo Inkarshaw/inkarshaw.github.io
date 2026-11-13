@@ -53,9 +53,9 @@ fetch('data/quizzes/pyq-scoring-review.json', {cache:'no-store'})
  .then(response => { if (!response.ok) throw Error('HTTP ' + response.status); return response.json(); })
  .then(data => {
   if (data.schemaVersion !== 1 || !Array.isArray(data.papers) || data.papers.length !== 8 ||
-      data.totals?.playable !== 1420 || data.totals?.provisionallyScorable !== 1156 ||
-      data.totals?.notScored !== 264 || data.totals?.specialAllExcluded !== 31 ||
-      data.totals?.sourceDisputes !== 33 || data.totals?.notMappedToQuestionText !== 200 ||
+      data.totals?.playable !== 1420 || data.totals?.provisionallyScorable !== 1157 ||
+      data.totals?.notScored !== 263 || data.totals?.specialAllExcluded !== 31 ||
+      data.totals?.sourceDisputes !== 32 || data.totals?.notMappedToQuestionText !== 200 ||
       data.papers.some(p => p.notScored !== p.notMappedToQuestionText + p.specialAllNumbers.length + p.sourceDisputes.length))
     throw Error('The scoring register does not reconcile with published paper totals');
   data.papers.forEach(p => {

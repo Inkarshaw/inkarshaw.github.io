@@ -22,6 +22,7 @@ const ta=json('data/quizzes/tnpsc-g4-2022-user-transcription-tamil-draft.json');
 const en=json('data/quizzes/tnpsc-g4-2022-user-transcription-english-draft.json');
 assert.equal(by('tnpsc-g4-2022').typed,ta.questions.length+en.questions.length);
 for(const y of [2024,2025]){const d=json('data/quizzes/tnpsc-g4-'+y+'-typed-review.json');assert.equal(by('tnpsc-g4-'+y).typed,d.typedPlayableCount);assert.equal(by('tnpsc-g4-'+y).scorable,d.gradedQuestionCount);assert.equal(by('tnpsc-g4-'+y).type,'full-numbered-draft');}
+assert.equal(by('tnpsc-g4-2022').scorable,196,'Restored Tamil-digit Q19 is provisionally scored from final key C');
 assert.equal(by('tnpsc-g4-2025').typed,200,'2025 has an adaptation at every original question number');
 assert.equal(by('tnpsc-g4-2025').scorable,192,'Eight special ALL final-key positions ungraded');
 assert.equal(by('tnpsc-g4-2024').scorable,196,'Four 2024 ALL final-key entries ungraded');

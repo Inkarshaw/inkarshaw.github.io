@@ -66,12 +66,27 @@ try {
   assert.equal(await page.locator('#selectedDetails li').count(),24,'Exact 2015 source-review positions visible');
   assert.match(await page.locator('#selectedDetails').innerText(),/Q99:/,'2015 original graph review number is visible');
   await page.locator('#paperSelect').selectOption('tnpsc-g4-2022');
-  assert.equal(await page.locator('#selectedDetails li').count(),5,'Four ALL exclusions plus incomplete 2022 Q19');
-  assert.match(await page.locator('#selectedDetails').innerText(),/Q19:/);
+  assert.equal(await page.locator('#selectedDetails li').count(),4,'Q19 Tamil numeral text is now repaired; only four official ALL keys remain ungraded');
+  assert.doesNotMatch(await page.locator('#selectedDetails').innerText(),/Q19:/,'Repaired Q19 must not remain in dispute queue');
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'Scoring register has no 390px mobile horizontal overflow');
   assert.deepEqual(pageErrors,[], 'PYQ scoring register JavaScript runs without runtime errors');
-  console.log('PASS PYQ scoring review: 8 papers, 264 classified exceptions, mobile overflow and exact 2022/2015 numbers');
+  console.log('PASS PYQ scoring review: 8 papers, 263 classified exceptions, mobile overflow and exact 2022/2015 numbers');
+
+  // Confirm the newly restored 2022 original-numbered Tamil-digit question in real mobile Chromium.
+  pageErrors.length=0;
+  await page.goto(origin+'/tnpsc-g4-2022-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,undefined,{timeout:20000});
+  assert.match(await page.locator('#sourceStats').innerText(),/0 flagged incomplete · 4 official ALL-key exceptions/);
+  await page.locator('#start').click();
+  await page.locator('#palette button').filter({hasText:/^19$/}).click();
+  assert.match(await page.locator('#questionNo').innerText(),/Question 19 of 200/);
+  assert.match(await page.locator('#questionText').innerText(),/௩௬௯/);
+  assert.match(await page.locator('#questionText').innerText(),/௮௭௬/);
+  assert.match(await page.locator('#questionStatus').innerText(),/Secondary source matched/);
+  assert.match(await page.locator('#questionWarning').innerText(),/original TNPSC-hosted printed-page certification is still pending/);
+  assert.deepEqual(pageErrors,[],'Restored 2022 Q19 mobile quiz has no JavaScript errors');
+  console.log('PASS TNPSC Group IV 2022 Q19: Tamil digit pairs, provisional key disclosure and mobile source caveat');
 
   // Question-level search: lazy load, bilingual filter, answer/source disclosure and mobile width.
   pageErrors.length = 0;
