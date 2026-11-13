@@ -446,7 +446,7 @@ try {
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/secondary answer-table entry: C/);
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true);
-  await page.locator('#quiz .palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').first().click();
   const si2015Nums=await page.locator('#palette button').allTextContents();
   assert.equal(si2015Nums.length,140,'116 provisional-keyed + 24 neutral ungraded study items must be playable');
   for(const ungradedGraph of [99,100,101,102,103,104]){
