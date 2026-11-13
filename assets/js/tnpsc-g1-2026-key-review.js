@@ -103,7 +103,7 @@ function view(){
   p.append(b,t);choices.append(p);
  }
  $('sourceContext').textContent=q.sourceStatus==='needs_source_review'?
-  'Original figure still missing: '+q.sourceIssue:
+  'Official figure still requires TNPSC specimen comparison: '+q.sourceIssue:
   q.sourceStatus==='secondary_source_text_cross_checked'?
   'Editorial study text repaired from unofficial guide Q'+q.sourceComparison.guideQuestionNumber+
   ' (page '+q.sourceComparison.pdfPage+'); original TNPSC wording not certified.':
