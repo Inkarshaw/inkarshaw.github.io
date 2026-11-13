@@ -10,7 +10,69 @@ const OFFICIAL='https://tnpsc.gov.in/Tentative/Document/05_2026_CCSEI-GS.pdf';
 const FIELDS=['specimenNumber','pdfPage','officialTick','typedChoice','printedChoice','stemChecked','choicesChecked','tickChecked','figureChecked','reviewNotes'];
 const CHECKS=['stemChecked','choicesChecked','tickChecked','figureChecked'];
 const LETTERS=['A','B','C','D','ALL'];
-let questions=[],records={},current=1,dirty=false;
+let questions=[],records={},current=1,dirty=false,localPdfObjectUrl=null;
+const PDF_MAX_BYTES=80*1024*1024;
+const PDF_HEADER='%PDF-';
+function validPage(n){return Number.isInteger(n)&&n>=1&&n<=300}
+function selectedPage(){
+ const page=Number($('pdfPage').value);
+ return validPage(page)?page:1;
+}
+function updatePdfPageLink(){
+ const page=selectedPage();
+ $('specimenJump').textContent='Show PDF page '+page;
+ if(localPdfObjectUrl)$('specimenOpen').href=localPdfObjectUrl+'#page='+page;
+}
+function closeLocalPDF(announce=true){
+ $('specimenFrame').src='about:blank';
+ $('specimenViewer').hidden=true;
+ $('specimenOpen').hidden=true;
+ $('specimenOpen').removeAttribute('href');
+ $('specimenJump').disabled=true;
+ $('specimenClose').disabled=true;
+ if(localPdfObjectUrl){URL.revokeObjectURL(localPdfObjectUrl);localPdfObjectUrl=null}
+ $('specimenFile').value='';
+ if(announce)$('specimenStatus').textContent='Local PDF closed and preview URL released; saved review notes were not changed.';
+}
+async function loadLocalPDF(file){
+ closeLocalPDF(false);
+ if(!file){$('specimenStatus').textContent='No local specimen PDF selected.';return}
+ if(file.size<100||file.size>PDF_MAX_BYTES){
+  $('specimenStatus').textContent='Rejected PDF size: select a 100-byte to 80-MB downloaded specimen file.';
+  return;
+ }
+ let header;
+ try{
+  const bytes=new Uint8Array(await file.slice(0,5).arrayBuffer());
+  header=Array.from(bytes,x=>String.fromCharCode(x)).join('');
+ }catch{
+  $('specimenStatus').textContent='Unable to read this local file; no PDF loaded.';
+  return;
+ }
+ if(header!==PDF_HEADER){
+  $('specimenStatus').textContent='Rejected: this file does not start with the PDF signature %PDF-.';
+  return;
+ }
+ try{
+  localPdfObjectUrl=URL.createObjectURL(file);
+ }catch{
+  $('specimenStatus').textContent='The browser could not open this PDF locally.';
+  return;
+ }
+ $('specimenOpen').hidden=false;
+ $('specimenJump').disabled=false;
+ $('specimenClose').disabled=false;
+ $('specimenStatus').textContent='Local PDF selected ('+(file.size/1024/1024).toFixed(1)+' MB). Only the file signature was checked; its TNPSC authenticity is NOT verified. No upload took place.';
+ updatePdfPageLink();
+}
+function showLocalPDFPage(){
+ if(!localPdfObjectUrl)return;
+ const page=selectedPage();
+ $('specimenFrame').src=localPdfObjectUrl+'#page='+page;
+ $('specimenViewer').hidden=false;
+ updatePdfPageLink();
+ $('specimenStatus').textContent='Displaying PDF page '+page+' from this device. Check TNPSC source identity, printed question number and tick manually. Embedded PDF support varies by browser.';
+}
 const int=n=>Number.isInteger(n)&&n>=1;
 const empty=()=>({specimenNumber:null,pdfPage:null,officialTick:'',typedChoice:'',
  printedChoice:'',stemChecked:false,choicesChecked:false,tickChecked:false,
@@ -54,6 +116,7 @@ function setForm(row){
  $('pdfPage').value=row.pdfPage??'';
  for(const k of ['officialTick','typedChoice','printedChoice','reviewNotes'])$(k).value=row[k];
  for(const k of CHECKS)$(k).checked=row[k];
+ updatePdfPageLink();
 }
 function hasData(r){return Boolean(r.specimenNumber||r.pdfPage||r.officialTick||r.typedChoice||
  r.printedChoice.trim()||r.reviewNotes.trim()||CHECKS.some(k=>r[k]));}
@@ -170,6 +233,13 @@ async function importFile(file){
  records=normalize(fresh);saveLocal();view();
  $('transferStatus').textContent='Imported '+Object.keys(records).length+' locally saved reviews; no scores or questions were published.';
 }
+$('specimenFile').addEventListener('change',e=>{
+ const file=e.target.files?.[0];
+ loadLocalPDF(file);
+});
+$('specimenJump').addEventListener('click',showLocalPDFPage);
+$('specimenClose').addEventListener('click',()=>closeLocalPDF());
+$('pdfPage').addEventListener('input',updatePdfPageLink);
 FIELDS.forEach(id=>$(id).addEventListener(id.endsWith('Checked')?'change':'input',()=>{
  if(!questions.length)return;dirty=true;status();
 }));
