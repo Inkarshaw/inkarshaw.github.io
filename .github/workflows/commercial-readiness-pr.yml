@@ -8,6 +8,13 @@ on:
       - "current-affairs/daily.html"
       - "current-affairs/text/**"
       - "tests/test_commercial_readiness.py"
+      - "tests/test_commercial_launch_foundations.py"
+      - "ads.txt"
+      - "about.html"
+      - "privacy.html"
+      - "terms.html"
+      - "support.html"
+      - "sitemap.xml"
       - "data/special-quizzes/firsts.json"
       - "data/special-quizzes/fathers.json"
       - ".github/workflows/commercial-readiness-pr.yml"
@@ -27,3 +34,5 @@ jobs:
           python-version: "3.12"
       - name: Check navigation, content freshness and accessibility contracts
         run: python3 -m unittest discover -s tests -p 'test_commercial_readiness.py' -v
+      - name: Check commercial disclosures, publisher ID and content honesty
+        run: python3 -m unittest discover -s tests -p 'test_commercial_launch_foundations.py' -v
