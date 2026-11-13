@@ -258,7 +258,7 @@
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scored.length*0.5).toFixed(1)+' marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
       allEntries+' ALL entries and '+disputed+' disputed source/key questions ungraded · '+questions.length+' readable questions. '+
-      'Score excludes three still-absent Series C original numbers and the ungraded Series D comparison matrix Q47; all other source-review diagrams remain ungraded. Not a full 140-question exam result.';
+      'All 140 source-numbered positions are available for study. Marks exclude the three ALL-key entries and seven unresolved source-review questions, including the Series D comparison matrix Q47 and unverified reference figures. This is provisional practice scoring, not an official TNUSRB exam result.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
