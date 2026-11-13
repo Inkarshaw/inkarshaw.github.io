@@ -454,6 +454,21 @@ try {
   }
   await page.locator('#palette button').filter({hasText:/^99$/}).click();
   assert.equal(await page.locator('#questionFigure').isVisible(),true,'Comparison-only P/Q chart is visible');
+  assert.equal(await page.locator('#graphStudyPanel').isVisible(),true,'Unscored bilingual graph method panel is available');
+  assert.match(await page.locator('#questionTamil').innerText(),/வாகனங்களின் மொத்த உற்பத்தி/);
+  await page.locator('#graphStudyPanel summary').click();
+  assert.match(await page.locator('#graphMethodEnglish').innerText(),/For each year, add P and Q production/);
+  assert.match(await page.locator('#graphMethodTamil').innerText(),/ஒவ்வோர் ஆண்டிற்கும்/);
+  assert.match(await page.locator('#graphFormula').innerText(),/P\(year\) \+ Q\(year\)/);
+  assert.match(await page.locator('#graphStudySource').getAttribute('href'),/#page=25$/);
+  assert.equal(await page.locator('#graphDispute').isVisible(),false,'Q99 has no false source-year dispute');
+  await page.locator('#palette button').filter({hasText:/^100$/}).click();
+  assert.match(await page.locator('#questionTamil').innerText(),/சரியாக 30%/);
+  assert.match(await page.locator('#graphDispute').innerText(),/1996.*1995/,'Show both conflicting Q100 option C years');
+  await page.locator('#graphStudyPanel summary').click();
+  assert.equal(await page.locator('#graphDispute').isVisible(),true);
+  assert.match(await page.locator('#graphStudySource').getAttribute('href'),/#page=26$/);
+  await page.locator('#palette button').filter({hasText:/^99$/}).click();
   assert.match(await page.locator('#questionFigure').getAttribute('src'),/q99-104-comparison-ungraded\.svg/);
   assert.match(await page.locator('#questionFigure').getAttribute('alt'),/NOT a verified original TNUSRB booklet/);
   await page.locator('#options button').first().click();
