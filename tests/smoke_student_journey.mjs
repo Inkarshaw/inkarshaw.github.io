@@ -465,8 +465,7 @@ try {
   await page.locator('#palette button').filter({hasText:/^100$/}).click();
   assert.match(await page.locator('#questionTamil').innerText(),/சரியாக 30%/);
   assert.match(await page.locator('#graphDispute').innerText(),/1996.*1995/,'Show both conflicting Q100 option C years');
-  await page.locator('#graphStudyPanel summary').click();
-  assert.equal(await page.locator('#graphDispute').isVisible(),true);
+  assert.equal(await page.locator('#graphDispute').isVisible(),true,'Source conflict remains expanded while moving from Q99 to Q100');
   assert.match(await page.locator('#graphStudySource').getAttribute('href'),/#page=26$/);
   await page.locator('#palette button').filter({hasText:/^99$/}).click();
   assert.match(await page.locator('#questionFigure').getAttribute('src'),/q99-104-comparison-ungraded\.svg/);
