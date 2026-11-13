@@ -364,6 +364,32 @@ try {
   await page.waitForFunction(()=>document.querySelector('#slot')?.options.length===200,
     undefined,{timeout:20000});
   assert.match(await page.locator('#loadStatus').innerText(),/official key mappings remain reviewer-only drafts/);
+  assert.equal(await page.locator('#specimenJump').isDisabled(),true,'No local specimen is inferred as authenticated');
+  const notPDF=Buffer.from('not-a-pdf'.repeat(30));
+  await page.locator('#specimenFile').setInputFiles({name:'fake-specimen.pdf',mimeType:'application/pdf',buffer:notPDF});
+  assert.match(await page.locator('#specimenStatus').innerText(),/does not start with the PDF signature/);
+  assert.equal(await page.locator('#specimenJump').isDisabled(),true,'Reject mislabeled non-PDF before preview');
+  let samplePdf='%PDF-1.4\n';
+  const objects=[
+    '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
+    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 400] /Resources << >> >>\nendobj\n'
+  ];
+  const offsets=[0];
+  for(const obj of objects){offsets.push(Buffer.byteLength(samplePdf));samplePdf+=obj;}
+  const xrefOffset=Buffer.byteLength(samplePdf);
+  samplePdf+='xref\n0 4\n0000000000 65535 f \n'+offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')+
+    'trailer\n<< /Root 1 0 R /Size 4 >>\nstartxref\n'+xrefOffset+'\n%%EOF\n';
+  await page.locator('#specimenFile').setInputFiles({name:'local-study.pdf',mimeType:'application/pdf',buffer:Buffer.from(samplePdf)});
+  assert.match(await page.locator('#specimenStatus').innerText(),/authenticity is NOT verified/);
+  assert.equal(await page.locator('#specimenJump').isEnabled(),true,'PDF signature enables manual inspection only');
+  assert.match(await page.locator('#specimenOpen').getAttribute('href'),/^blob:.*#page=1$/);
+  await page.locator('#specimenJump').click();
+  assert.equal(await page.locator('#specimenViewer').isVisible(),true,'Embedded PDF viewer exists in responsive workflow');
+  assert.match(await page.locator('#specimenFrame').getAttribute('src'),/^blob:.*#page=1$/);
+  await page.locator('#specimenClose').click();
+  assert.equal(await page.locator('#specimenViewer').isVisible(),false);
+  assert.equal(await page.locator('#specimenJump').isDisabled(),true,'Closing releases the local PDF reference');
   await page.locator('#slot').selectOption('13');
   assert.match(await page.locator('#sourceContext').innerText(),/editorial study text repaired|Editorial study text repaired/i);
   await page.locator('#specimenNumber').fill('154');
