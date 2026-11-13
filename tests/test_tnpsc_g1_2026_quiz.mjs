@@ -15,9 +15,11 @@ assert.equal(d.originalQuestionCount,200);
 assert.equal(d.suppliedQuestionCount,200);
 assert.equal(d.questions.length,200);
 assert.deepEqual(d.optionLetters,['A','B','C','D','E']);
-assert.equal(d.textReadyCount,193);
-assert.equal(d.needsReviewCount,7);
-assert.deepEqual(d.sourceReviewQuestionNumbers,[13,35,94,96,98,192,200]);
+assert.equal(d.textReadyCount,198);
+assert.equal(d.needsReviewCount,2);
+assert.equal(d.secondaryTextReviewCount,5);
+assert.deepEqual(d.secondaryTextReviewQuestionNumbers,[13,35,94,96,192]);
+assert.deepEqual(d.sourceReviewQuestionNumbers,[98,200]);
 assert.equal(d.keyedAnswerCount,0,'Never invent an official answer from a tick-marked source not mapped to this text');
 assert.equal(d.answerKeyStatus,'official_tentative_published_not_mapped_to_uploaded_text');
 assert.match(d.officialTentativeSource,/tnpsc\.gov\.in\/Tentative\/Document\/05_2026_CCSEI-GS\.pdf$/);
@@ -26,7 +28,8 @@ assert.match(d.finalKeyStatus,/not_published/);
 assert.deepEqual(d.questions.map(x=>x.number),Array.from({length:200},(_,i)=>i+1));
 const ids=d.questions.map(x=>x.id);
 assert.equal(new Set(ids).size,200);
-assert.equal(d.questions.filter(q=>q.sourceStatus==='needs_source_review').length,7);
+assert.equal(d.questions.filter(q=>q.sourceStatus==='needs_source_review').length,2);
+assert.equal(d.questions.filter(q=>q.sourceStatus==='secondary_source_text_cross_checked').length,5);
 for(const q of d.questions){
  assert.equal(q.id,'tnpsc-g1-2026-q'+String(q.number).padStart(3,'0'));
  assert.ok(q.question.trim(),'Question '+q.number+' has text');
@@ -36,6 +39,13 @@ for(const q of d.questions){
  assert.equal(q.answer,null,'Q'+q.number+' is deliberately unscored');
  assert.equal(q.sourceStatus==='needs_source_review',d.sourceReviewQuestionNumbers.includes(q.number));
  if(q.sourceStatus==='needs_source_review')assert.ok(q.sourceIssue&&q.sourceIssue.length>22);
+ if(q.sourceStatus==='secondary_source_text_cross_checked'){
+  assert.ok(d.secondaryTextReviewQuestionNumbers.includes(q.number));
+  assert.equal(q.sourceComparison.originalTNPSCSpecimenVerified,false);
+  assert.equal(q.sourceComparison.scope,'stem_options_not_official_key');
+  assert.match(q.sourceComparison.sourceUrl,/tnpsc-factory-group-1-2026-answer-key\.pdf/);
+  assert.ok(q.sourceComparison.pdfPage>0);
+ }
 }
 const q=n=>d.questions[n-1];
 assert.match(q(1).question,/Commensalism/);
@@ -46,13 +56,19 @@ assert.match(q(98).question,/dice/);
 assert.match(q(105).options.D,/Shubhanshu Shukla/);
 assert.match(q(156).question,/Union Budget 2026-27/);
 assert.match(q(166).question,/SHANTI Bill, 2025/);
-assert.match(q(192).question,/x3\+y3/);
+assert.match(q(192).question,/x³\+y³/);
+assert.equal(q(192).options.D,'133/117');
+assert.match(q(13).question,/1\. Chennimalai/);
+assert.match(q(35).question,/5\. Article 243H/);
+assert.match(q(94).question,/x\^\(a\+9\)/);
+assert.match(q(96).question,/F₁ = 1/);
 assert.equal(q(200).options.A,'[Image A]','Do not invent missing diagram images');
 assert.equal(q(200).options.D,'[Image D]');
 assert.match(html,/Full 200-question text quiz/);
 assert.match(html,/not yet scored|Not yet scored/);
 assert.match(html,/user-supplied English extracted text/);
-assert.match(html,/seven OCR/);
+assert.match(html,/Two original diagrams/);
+assert.match(html,/Five secondary study-text reconstructions/);
 assert.match(html,/tnpsc-g1-2026-quiz\.js/);
 assert.match(js,/fetch\('data\/quizzes\/tnpsc-group-i-2026-prelims-text\.json'/);
 assert.match(js,/localStorage/);
@@ -70,4 +86,4 @@ for(const x of new Set(refs))assert.ok(idsHtml.includes(x),'Referenced UI elemen
 new vm.Script(js,{filename:'assets/js/tnpsc-g1-2026-quiz.js'});
 for(const path of ['pyq-hub.html','tnpsc.html','sitemap.xml'])assert.match(read(path),/tnpsc-g1-2026-quiz\.html/);
 assert.match(read('pyq-hub.html'),/Group I 2011 original-paper quiz/,'Retain earlier Group I 2011 session');
-console.log('PASS TNPSC Group I 2026: 200 original-numbered A–E user-text questions; 193 text-ready, 7 source flagged; no invented scoring.');
+console.log('PASS TNPSC Group I 2026: 200 A–E study-text positions, 198 readable with 5 explicit secondary repairs, 2 missing dice figures; no invented grading.');
