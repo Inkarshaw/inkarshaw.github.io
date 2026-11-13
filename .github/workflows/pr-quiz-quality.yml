@@ -25,6 +25,8 @@ on:
       - "assets/js/textbook-*.js"
       - "assets/js/syllabus-reader.js"
       - "data/textbook/**"
+      - "data/quizzes/pyq-source-review-queue.csv"
+      - "scripts/build_pyq_scoring_queue.py"
       - "current-affairs/text/**"
       - "scripts/website_queue_runner.py"
       - ".github/workflows/website-queue-publisher.yml"
@@ -54,6 +56,8 @@ jobs:
         run: node tests/test_phase1_site_reliability.mjs
       - name: Verify Lighthouse lab-report integrity
         run: node tests/test_lighthouse_summary.mjs
+      - name: Verify PYQ question-by-question source queue is generated from current exceptions
+        run: python3 scripts/build_pyq_scoring_queue.py --check
       - name: Verify Current Affairs publication handoff and source checks
         run: python3 -m unittest discover -s tests -p 'test_ca_delivery_pipeline.py' -v
       - name: Run ClearExams regression tests
