@@ -313,10 +313,22 @@ try {
   assert.equal(await page.locator('#sourceWarning').isVisible(),false,'No missing graph is alleged for repaired Q13');
   await page.locator('#options button').nth(4).click();
   await page.locator('#flag').click();
+  await page.locator('#palette .palette-btn').nth(97).click();
+  assert.match(await page.locator('#position').innerText(),/Original Question 98 of 200/i);
+  assert.match(await page.locator('#options button').nth(1).innerText(),/^B\\s*4$/,'Q98 option B OCR corrected from 3 to 4');
+  assert.match(await page.locator('#questionFigure img').getAttribute('alt'),/Four diagrams/);
+  await page.locator('#questionFigure img').evaluate(img => img.decode());
+  assert.ok(await page.locator('#questionFigure img').evaluate(img=>img.naturalWidth>=900),'Q98 editorial SVG renders in Chromium');
+  assert.match(await page.locator('#figureSourceLink').getAttribute('href'),/arivark.*q98-dice\\.png/);
+  assert.match(await page.locator('#sourceWarning').innerText(),/original specimen image has not been independently compared/);
   await page.locator('#palette .palette-btn').nth(199).click();
   assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/i);
-  assert.match(await page.locator('#sourceWarning').innerText(),/dice illustrations/i);
-  assert.match(await page.locator('#options button').first().innerText(),/\[Image A\]/,'Missing diagrams are not invented');
+  assert.match(await page.locator('#options button').first().innerText(),/Figure \\(A\\)/,'Q200 candidate A has a readable figure label');
+  await page.locator('#questionFigure img').evaluate(img=>img.decode());
+  assert.ok(await page.locator('#questionFigure img').evaluate(img=>img.naturalWidth>=900),'Q200 editorial SVG renders in Chromium');
+  assert.match(await page.locator('#questionFigure img').getAttribute('alt'),/candidate nets A through D/);
+  assert.match(await page.locator('#figureSourceLink').getAttribute('href'),/arivark.*q200-dice-nets\\.png/);
+  assert.match(await page.locator('#sourceWarning').innerText(),/not been independently compared/,'Editorial diagram is not official specimen certification');
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     '2026 text quiz fits mobile width without overflow');
   await page.reload({waitUntil:'domcontentloaded'});
@@ -344,7 +356,7 @@ try {
   await page.locator('#options button').last().click();
   assert.match(await page.locator('#selectedFeedback').innerText(),/No correct answer is shown/);
   assert.deepEqual(pageErrors,[],'TNPSC Group I 2026 text question interactions have no runtime errors');
-  console.log('PASS TNPSC Group I 2026: 200 study slots, 5 source-labelled text repairs, 2 dice blockers, saved answers and zero unverified grades');
+  console.log('PASS TNPSC Group I 2026: source-labelled Q98/Q200 editor drawings, B=4, responsive mobile SVG loading, two official-image gaps, zero unverified grades');
 
   // Browser-only editorial reconciliation. A locally checked row must never turn on student scoring.
   pageErrors.length=0;
