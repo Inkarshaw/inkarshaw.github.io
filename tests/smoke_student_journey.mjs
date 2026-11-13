@@ -1,8 +1,10 @@
 /* Real Chromium smoke test: public ClearExams student journeys on a 390px phone. */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 
 const origin = process.env.CLEAREXAMS_TEST_ORIGIN || 'http://127.0.0.1:8765';
+const si2015Manifest = JSON.parse(readFileSync(new URL('../data/quizzes/tnusrb-si-2015-open.json', import.meta.url), 'utf8'));
 const paths = [
   ['start.html', 'Your complete preparation path.'],
   ['practice.html', 'Choose. Practise. Improve.'],
@@ -435,10 +437,10 @@ try {
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
-  assert.match(await page.locator('#score').innerText(),/\/ 58\.0 provisional marks/,'Seventeen source-review items must not alter provisional score denominator');
+  assert.match(await page.locator('#score').innerText(),/\/ 58\.0 provisional marks/,'Ungraded source-review items must not alter the current 116-question provisional score denominator');
   assert.equal(await page.locator('#result').isVisible(),true);
   await page.locator('#reviewFilter').selectOption('ungraded');
-  assert.equal(await page.locator('#reviewList .result-item').count(),18,'Ungraded filter shows 18 source-disputed or source-instruction-missing readable questions');
+  assert.equal(await page.locator('#reviewList .result-item').count(),si2015Manifest.ungradedReadableQuestionCount,'Ungraded filter matches the current source-reviewed, unscored question count');
   await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
@@ -467,15 +469,15 @@ try {
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#loadStatus').innerText(),/137 readable original-numbered questions/);
+  assert.match(await page.locator('#loadStatus').innerText(),/140 \/ 140 readable original-numbered questions/);
   assert.match(await page.locator('h1').innerText(),/TNUSRB SI 2020/);
   assert.match(await page.locator('a[href="https://www.tnusrb.tn.gov.in/pdfs/SI_2019_WT_QUESTION.pdf"]').innerText(),/TNUSRB 2019 General Candidates written paper/);
-  await page.locator('details[aria-label="2020 open-candidates source transcription gaps"] summary').click();
-  assert.equal(await page.locator('#sourceGaps li').count(),3,'Only C original Q114–116 absent; Q46 Q47 Q121 study questions restored');
+  await page.locator('details[aria-label="2020 open-candidates source review notes"] summary').click();
+  assert.equal(await page.locator('#sourceGaps li').count(),1,'Recovered 2020 C Q114–116 are disclosed as secondary-scan study text');
   const incomplete=await page.locator('#sourceGaps li').allTextContents();
-  assert.ok(incomplete.some(x=>/Q114:.*no verified original Series C/.test(x)));
-  assert.ok(incomplete.some(x=>/Q115:.*no verified original Series C/.test(x)));
-  assert.ok(incomplete.some(x=>/Q116:.*no verified original Series C/.test(x)));
+  assert.ok(incomplete.some(x=>/Q114–116:.*visually transcribed from the public Series C scan/.test(x)));
+  assert.ok(!incomplete.some(x=>/remains absent from the quiz/.test(x)),'Recovered C questions must not be labelled missing');
+  assert.ok(incomplete.every(x=>/TNUSRB-hosted original-PDF certification remains pending/.test(x)),'Source caveat is preserved');
   assert.ok(!incomplete.some(x=>/Q46:|Q47:|Q121:/.test(x)),'Restored numbered questions no longer withheld');
 
   await page.locator('#start').click();
@@ -501,9 +503,9 @@ try {
   await page.locator('#language').selectOption('both');
   await page.locator('#quiz .palette-details summary').click();
   const nums=await page.locator('#palette button').allTextContents();
-  assert.equal(nums.length,137,'2020 General Candidates: seven source-review ungraded items and three original gaps held');
+  assert.equal(nums.length,140,'2020 General Candidates: all 140 source-numbered study positions are available');
   for(const stillMissing of [114,115,116]){
-    assert.equal(nums.includes(String(stillMissing)),false,'No fabricated Series C Q'+stillMissing);
+    assert.equal(nums.includes(String(stillMissing)),true,'Secondary-scan recovered Series C Q'+stillMissing+' is playable and source-labelled');
   }
   await page.locator('#palette button').filter({hasText:/^23$/}).click();
   await page.locator('#language').selectOption('ta');
@@ -607,7 +609,7 @@ try {
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
-  assert.match(await page.locator('#start').innerText(),/Resume 137-question/);
+  assert.match(await page.locator('#start').innerText(),/Resume 140-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q89/);
   await page.locator('#quiz .palette-details summary').click();
@@ -616,7 +618,7 @@ try {
   assert.match(await page.locator('#position').innerText(),/Original Q140/);
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
-  assert.match(await page.locator('#score').innerText(),/\/ 63\.5 marks/);
+  assert.match(await page.locator('#score').innerText(),/\/ 65\.0 marks/);
   assert.equal(await page.locator('#result').isVisible(),true);
   await page.locator('#reviewFilter').selectOption('ungraded');
   assert.equal(await page.locator('#reviewList .result-item').count(),10,'Three ALL entries plus seven disputed/reference items appear in ungraded review');
@@ -631,7 +633,7 @@ try {
   assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides Check Answer');
   assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode conceals correct option');
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2020 has no runtime page errors');
-  console.log('PASS TNUSRB SI 2020: 137 playable, 127 scored, Series C key, source gaps, saved progress, exam mode');
+  console.log('PASS TNUSRB SI 2020: 140 playable, 130 provisional scores, recovered C Q114–116, source caveats and resume');
 
   // TNUSRB SI 2010 Type A: 140 readable practice entries, of which 135 have provisional score mappings.
   pageErrors.length = 0;
