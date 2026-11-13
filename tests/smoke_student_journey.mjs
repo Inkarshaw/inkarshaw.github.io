@@ -535,7 +535,7 @@ try {
   assert.match(await page.locator('#start').innerText(),/Resume 140-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
-  await page.locator('#quiz .palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').first().click();
   assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,'SI 2015 390px mobile layout');
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
