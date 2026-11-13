@@ -44,8 +44,23 @@
        playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==24||
        data.provisionallyScoreableQuestionCount!==116)
       throw Error('SI 2015 playback, graded and ungraded manifest totals disagree');
+    if(data.graphLearningStatus?.editorialTamilGuideCount!==6||
+       data.graphLearningStatus?.officialBookletVerified!==false||
+       data.graphLearningStatus?.gradedCount!==0||
+       data.graphLearningStatus?.guideQuestionNumbers?.join(',')!=='99,100,101,102,103,104')
+      throw Error('2015 graph reading study provenance not available');
     for(let n=99;n<=104;n++){
-      const q=data.questions[n-1];
+      const q=data.questions[n-1],guide=q.graphStudyGuide;
+      if(!q.questionTamil?.trim()||!guide||
+         guide.translationStatus!=='original_tamil_not_verified_editorial_study_translation'||
+         guide.originalTNUSRBBookletVerified!==false||
+         guide.exactPointValuesConfirmed!==false||
+         guide.gradingAllowed!==false||
+         guide.coachingQuestionNumber!==n-15||
+         guide.coachingPdfPage!==(n===99?25:26)||
+         guide.coachingPdf!==data.graphLearningStatus.studyGuideSource||
+         !guide.methodEnglish?.trim()||!guide.methodTamil?.trim()||!guide.formula?.trim())
+        throw Error('Graph study reading help lacks source safety Q'+n);
       if(q.scoringStatus!=='ungraded_source_dispute'||q.acceptedAnswers.length||
          q.figureAsset!=='assets/figures/tnusrb-si-2015-q99-104-comparison-ungraded.svg'||
          q.graphSourceEvidence?.athiyamanSubjectGroupedGraphFound!==true||
@@ -187,6 +202,22 @@
     $('questionTamil').hidden=!q.questionTamil;
     $('questionTamil').textContent=q.questionTamil||'';
     $('sourceReader').hidden=!q.secondaryBilingualSourceURL;
+    const help=q.graphStudyGuide;
+    $('graphStudyPanel').hidden=!help;
+    if(help){
+      $('graphMethodEnglish').textContent=help.methodEnglish;
+      $('graphMethodTamil').textContent=help.methodTamil;
+      $('graphFormula').textContent=help.formula;
+      $('graphStudySource').href=help.coachingPdf+'#page='+help.coachingPdfPage;
+      $('graphStudySource').textContent='Inspect independent 2015 graph, PDF page '+help.coachingPdfPage+' (compiled Q'+help.coachingQuestionNumber+')';
+      const collision=help.optionCConflict;
+      $('graphDispute').hidden=!collision;
+      if(collision){
+       $('graphDispute').textContent='Unresolved option C source conflict: original-numbered secondary archive '+collision.numberedArchive+
+        '; other published 2015 compilations '+collision.subjectGroupedCompilation+
+        '. The question keeps the original-numbered archive choice and is never graded. Official original question booklet required.';
+      }
+    }
     const locked=attempt.mode==='practice'&&attempt.checked[i];
     $('options').replaceChildren();
     for(const letter of LETTERS){
@@ -256,6 +287,12 @@
         (scored?' · provisional answer-table entry: '+q.answerKeyToken:' · ungraded: secondary key disputed or missing');
       body.append(response);
       if(!scored){const issue=document.createElement('p');issue.textContent=q.scoringReviewReason||q.sourceIssue||'Source review pending';body.append(issue)}
+      if(q.graphStudyGuide){
+        const method=document.createElement('p');
+        method.textContent='Study method (no key): '+q.graphStudyGuide.methodEnglish+' Formula: '+q.graphStudyGuide.formula+
+          '. The comparison chart and options are not certified original TNUSRB source data.';
+        body.append(method);
+      }
       for(const letter of LETTERS){
         const p=document.createElement('p');p.textContent=letter+') '+q.options[letter];body.append(p);
       }

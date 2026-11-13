@@ -100,6 +100,46 @@ for(const n of [99,100,101,102,103,104]){
  assert.ok(q.graphSourceEvidence.athiyamanPDF.endsWith('TN-Taluk-SI-2015-Question-Paper-140-Questions-Police-SI-Athiyaman-Team.pdf'));
  assert.match(q.question,/ungraded study-comparison chart/);
 }
+assert.equal(d.graphLearningStatus.editorialTamilGuideCount,6,'All six graph positions receive Tamil study guidance');
+assert.equal(d.graphLearningStatus.officialBookletVerified,false);
+assert.equal(d.graphLearningStatus.gradedCount,0,'Graph study methods may not add marks');
+assert.deepEqual(d.graphLearningStatus.guideQuestionNumbers,[99,100,101,102,103,104]);
+const expectedFormulas=[
+ 'P(ஆண்டு) + Q(ஆண்டு) / P(year) + Q(year)',
+ '(Qᵧ − Qᵧ₋₁) ÷ Qᵧ₋₁ × 100',
+ 'P(1992) ÷ Q(1992) × 100',
+ '|Q(1995) − Q(1994)| × 1,000',
+ '(P(1992) − P(1993)) ÷ P(1992) × 100',
+ '(P(1994) − P(1993)) × 1,000'
+];
+for(let n=99;n<=104;n++){
+ const q=d.questions[n-1],g=q.graphStudyGuide;
+ assert.ok(q.questionTamil?.length>45,'Tamil study text Q'+n);
+ assert.equal(g.translationStatus,'original_tamil_not_verified_editorial_study_translation');
+ assert.equal(g.originalTNUSRBBookletVerified,false);
+ assert.equal(g.exactPointValuesConfirmed,false);
+ assert.equal(g.gradingAllowed,false);
+ assert.equal(g.coachingQuestionNumber,n-15);
+ assert.equal(g.coachingPdfPage,n===99?25:26);
+ assert.match(g.coachingPdf,/athiyamanteam\.com\/wp-content/);
+ assert.equal(g.formula,expectedFormulas[n-99]);
+ assert.ok(g.methodEnglish.length>40 && g.methodTamil.length>45);
+ assert.deepEqual(q.acceptedAnswers,[],'Bilingual formula must never disclose a graded answer');
+ assert.equal(q.scoringStatus,'ungraded_source_dispute');
+}
+assert.equal(d.questions[99].options.C,'1996','Preserve numbered secondary option while original remains inaccessible');
+assert.equal(d.questions[99].graphStudyGuide.optionCConflict.subjectGroupedCompilation,'1995');
+assert.equal(d.questions[99].graphStudyGuide.optionCConflict.numberedArchive,'1996');
+assert.match(html,/id="graphStudyPanel"/);
+assert.match(html,/id="graphMethodTamil"/);
+assert.match(html,/id="graphMethodEnglish"/);
+assert.match(html,/id="graphFormula"/);
+assert.match(html,/id="graphDispute"/);
+assert.match(html,/id="graphStudySource"/);
+assert.match(html,/Six bilingual, answer-neutral graph-reading methods/);
+assert.match(js,/graphStudyPanel/);
+assert.match(js,/graphDispute/);
+assert.match(js,/guide\.gradingAllowed!==false/);
 assert.equal(d.visualSourceRecoveryAudit.graphRecovered,false,'Original-numbered official paper is still uncertified');
 assert.equal(d.visualSourceRecoveryAudit.ungradedComparisonFigureFound,true,'The secondary figure has been visually inspected');
 assert.equal(d.visualSourceRecoveryAudit.comparisonFigurePDFPageZeroIndexed,24);
@@ -163,4 +203,4 @@ for(const other of ['2010','2020']){
  assert.match(read('tnusrb.html'),new RegExp('tnusrb-si-'+other+'-quiz\\.html'),'Retain '+other+' landing nav');
  assert.match(read('pyq-hub.html'),new RegExp('tnusrb-si-'+other+'-quiz\\.html'),'Retain '+other+' PYQ nav');
 }
-console.log('PASS SI 2015: 140 playable records, 116 provisional-keyed, 24 ungraded, zero blocked; Q99–104 nonofficial comparison graph remains ungraded.');
+console.log('PASS SI 2015: 140 playable, 116 provisional-keyed, 24 ungraded; Q99–104 bilingual, method-only comparison chart with Q100 source-year conflict, no invented grades.');

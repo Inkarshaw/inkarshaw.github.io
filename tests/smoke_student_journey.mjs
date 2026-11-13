@@ -446,7 +446,7 @@ try {
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/secondary answer-table entry: C/);
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true);
-  await page.locator('#quiz .palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').first().click();
   const si2015Nums=await page.locator('#palette button').allTextContents();
   assert.equal(si2015Nums.length,140,'116 provisional-keyed + 24 neutral ungraded study items must be playable');
   for(const ungradedGraph of [99,100,101,102,103,104]){
@@ -454,6 +454,20 @@ try {
   }
   await page.locator('#palette button').filter({hasText:/^99$/}).click();
   assert.equal(await page.locator('#questionFigure').isVisible(),true,'Comparison-only P/Q chart is visible');
+  assert.equal(await page.locator('#graphStudyPanel').isVisible(),true,'Unscored bilingual graph method panel is available');
+  assert.match(await page.locator('#questionTamil').innerText(),/இரு வகைகளின் மொத்த உற்பத்தி/);
+  await page.locator('#graphStudyPanel summary').click();
+  assert.match(await page.locator('#graphMethodEnglish').innerText(),/For each year, add P and Q production/);
+  assert.match(await page.locator('#graphMethodTamil').innerText(),/ஒவ்வோர் ஆண்டிற்கும்/);
+  assert.match(await page.locator('#graphFormula').innerText(),/P\(year\) \+ Q\(year\)/);
+  assert.match(await page.locator('#graphStudySource').getAttribute('href'),/#page=25$/);
+  assert.equal(await page.locator('#graphDispute').isVisible(),false,'Q99 has no false source-year dispute');
+  await page.locator('#palette button').filter({hasText:/^100$/}).click();
+  assert.match(await page.locator('#questionTamil').innerText(),/சரியாக 30%/);
+  assert.match(await page.locator('#graphDispute').innerText(),/1996.*1995/,'Show both conflicting Q100 option C years');
+  assert.equal(await page.locator('#graphDispute').isVisible(),true,'Source conflict remains expanded while moving from Q99 to Q100');
+  assert.match(await page.locator('#graphStudySource').getAttribute('href'),/#page=26$/);
+  await page.locator('#palette button').filter({hasText:/^99$/}).click();
   assert.match(await page.locator('#questionFigure').getAttribute('src'),/q99-104-comparison-ungraded\.svg/);
   assert.match(await page.locator('#questionFigure').getAttribute('alt'),/NOT a verified original TNUSRB booklet/);
   await page.locator('#options button').first().click();
@@ -521,7 +535,7 @@ try {
   assert.match(await page.locator('#start').innerText(),/Resume 140-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q132/);
-  await page.locator('#quiz .palette-details summary').click();
+  await page.locator('#quiz .palette-details summary').first().click();
   assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,'SI 2015 390px mobile layout');
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
