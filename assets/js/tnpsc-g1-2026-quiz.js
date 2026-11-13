@@ -14,6 +14,7 @@ function validate(data){
  if(!data||data.schemaVersion!==1||data.year!==2026||data.originalQuestionCount!==200||
     data.suppliedQuestionCount!==200||data.keyedAnswerCount!==0||
     data.textReadyCount!==198||data.needsReviewCount!==2||data.secondaryTextReviewCount!==5||
+    data.diagramStudyReconstructionCount!==2||data.diagramStudyReconstructionQuestionNumbers?.join(',')!=='98,200'||
     !Array.isArray(data.questions)||data.questions.length!==200||
     !Array.isArray(data.sourceReviewQuestionNumbers)||data.sourceReviewQuestionNumbers.length!==2||
     !Array.isArray(data.secondaryTextReviewQuestionNumbers)||data.secondaryTextReviewQuestionNumbers.length!==5||
@@ -38,6 +39,18 @@ function validate(data){
      throw Error('Secondary source reconstruction needs specific provenance and a non-official status Q'+(i+1));
   }else if(data.secondaryTextReviewQuestionNumbers.includes(i+1))
    throw Error('Secondary source provenance missing Q'+(i+1));
+  if(i+1===98||i+1===200){
+   const visual=q.visual;
+   if(!visual||visual.kind!=='editorial_visual_reconstruction'||
+      visual.originalTNPSCSpecimenVerified!==false||
+      visual.src!=='assets/pyq-original/tnpsc-g1-2026-q'+String(i+1).padStart(3,'0')+'-editorial.svg'||
+      visual.sourceUrl!=='https://arivark.com/assets/img/pyq/g1-2026-q'+(i+1===98?'98-dice.png':'200-dice-nets.png')||
+      !visual.alt||!visual.caption)
+     throw Error('Missing attributed editorial diagram / original verification warning for Q'+(i+1));
+  }else if(q.visual)throw Error('Unapproved source illustration attached to Q'+(i+1));
+  if(i+1===98&&q.options.B!=='4')throw Error('Corrected 2026 Q98 printed option B must be four');
+  if(i+1===200&&LETTERS.slice(0,4).some(k=>!q.options[k].startsWith('Figure ('+k+')')))
+   throw Error('Q200 must have readable A–D figure labels');
   idSet.add(q.id);
  }
  return data.questions;
@@ -98,6 +111,19 @@ function render(){
  $('status').textContent=answered()+' of 200 answered · '+flagged()+' flagged · saved in this browser';
  $('progressBar').style.width=String(Math.round(100*answered()/200))+'%';
  $('questionText').textContent=q.question;
+ const illustration=$('questionFigure'), source=$('figureSourceLink');
+ illustration.replaceChildren();
+ $('figureSource').hidden=!q.visual;
+ if(q.visual){
+  const img=document.createElement('img');
+  img.src=q.visual.src;img.alt=q.visual.alt;img.loading='lazy';
+  img.decoding='async';
+  illustration.append(img);
+  const description=document.createElement('p');description.className='small';
+  description.textContent=q.visual.caption;
+  illustration.append(description);
+  source.href=q.visual.sourceUrl;
+ }
  const repair=q.sourceStatus==='secondary_source_text_cross_checked'?q.sourceComparison:null;
  $('secondarySourceNote').hidden=!repair;
  $('secondarySourceLink').hidden=!repair;
@@ -170,6 +196,11 @@ function renderReview(){
   const options=document.createElement('p');options.className='options';
   options.textContent=LETTERS.map(a=>a+') '+q.options[a]).join('\n');details.append(options);
   if(q.sourceIssue){const issue=document.createElement('p');issue.textContent='Source issue: '+q.sourceIssue;details.append(issue)}
+  if(q.visual){
+   const imageNote=document.createElement('p');
+   imageNote.textContent='A separately referenced editorial study illustration is available when you reopen Q'+q.number+'. Official original specimen illustration not independently verified. No official key or marks supplied.';
+   details.append(imageNote);
+  }
   if(q.sourceComparison){const note=document.createElement('p');note.textContent='Study-text recovery: Q'+q.sourceComparison.guideQuestionNumber+' on PDF page '+q.sourceComparison.pdfPage+' in a third-party 2026 guide. Original TNPSC specimen not verified; answers remain ungraded.';details.append(note)}
   holder.append(details);
  }
@@ -232,6 +263,6 @@ fetch('data/quizzes/tnpsc-group-i-2026-prelims-text.json',{cache:'no-store'})
   $('start').disabled=false;$('newAttempt').disabled=!saved;
   $('start').textContent=saved?(saved.finished?'Review saved 200-question attempt':'Resume 200-question attempt'):'Start all 200 questions';
   if(saved){$('mode').value=saved.mode;$('timerChoice').value=saved.timed?'180':'none'}
-  $('loadStatus').textContent='All 200 numbered questions loaded · 198 readable study entries (5 secondary-text repairs) · 2 missing original figures · correctness deliberately ungraded.';
+  $('loadStatus').textContent='All 200 numbered questions loaded · 198 readable text entries + 2 attributed editorial dice study diagrams · TNPSC original figure checks and answer-key mapping still pending; correctness ungraded.';
  }).catch(e=>{$('loadStatus').textContent='Quiz cannot start: '+e.message;$('start').disabled=true});
 })();

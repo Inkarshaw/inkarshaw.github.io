@@ -39,3 +39,11 @@ TNPSC's official dashboard confirms 27 September 2026 preliminary exam, Subject 
 The source register is `data/quizzes/pyq-scoring-review.json`. Run `python3 scripts/build_pyq_scoring_queue.py` to generate the exact 263-row `data/quizzes/pyq-source-review-queue.csv`; PR CI executes `--check` to reject stale reviews.
 
 For each candidate, capture the exact paper edition/series and printed Q number; verify the stem and all options; inspect source diagrams when applicable; compare the correct edition's official key; record the source URL and review conclusion; change data and score eligibility only after both content and key checks; update the derived register, catalog and public text; run Node/Chromium tests. Keep a disputed question ungraded when the underlying primary source cannot be reached or independently reconciled.
+
+## 13 November follow-up — Q98 and Q200 secondary visual recovery
+
+Q98 and Q200 now display **originally redrawn, source-attributed ClearExams study SVGs**, based on separately indexed illustrated 2026 question pages, not scanned TNPSC-hosted specimen images. Sources: [Q98 visual](https://arivark.com/assets/img/pyq/g1-2026-q98-dice.png) and [Q200 visual](https://arivark.com/assets/img/pyq/g1-2026-q200-dice-nets.png) under [2026 question page](https://arivark.com/tnpsc-group-1-question-paper-2026). Both figures remain **source-review warnings** and are *not* independently original-verified. Neither figure is supplied as an official correct answer.
+
+Q98 earlier OCR alternatives read `A=2, B=3, C=5, D=6`. The published indexed paper versions at ArivArk, GovtJobsNet and Athiyaman independently align on **`A=2, B=4, C=5, D=6`**; Q98 B was corrected to **4** and the source provenance is attached. Q200 A–D previously displayed meaningless `[Image A]` placeholders; they now show labelled candidate nets in the original editorial SVG and legible `Figure (A)` etc. Neither gets marks until the official TNPSC specimen and tick mark are checked.
+
+The 2026 Group I bank still records **198 independently readable text entries + 2 secondary visual study entries with original-source verification pending** and **zero scored answers**. Across all eight papers: **1,420 playable / 1,157 provisionally scorable / 263 ungraded**.
