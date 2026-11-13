@@ -320,7 +320,7 @@ try {
   await page.locator('#questionFigure img').evaluate(img => img.decode());
   assert.ok(await page.locator('#questionFigure img').evaluate(img=>img.naturalWidth>=900),'Q98 editorial SVG renders in Chromium');
   assert.match(await page.locator('#figureSourceLink').getAttribute('href'),/arivark.*q98-dice\.png/);
-  assert.match(await page.locator('#sourceWarning').innerText(),/original specimen image has not been independently compared/);
+  assert.match(await page.locator('#sourceWarning').innerText(),/official specimen image has not been independently compared/);
   await page.locator('#palette .palette-btn').nth(199).click();
   assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/i);
   assert.match(await page.locator('#options button').first().innerText(),/Figure \(A\)/,'Q200 candidate A has a readable figure label');
