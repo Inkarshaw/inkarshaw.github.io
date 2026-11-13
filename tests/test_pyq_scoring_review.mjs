@@ -45,6 +45,14 @@ const q22=[...json('data/quizzes/tnpsc-g4-2022-user-transcription-tamil-draft.js
 const missing22=q22.filter(q=>q.textStatus==='incomplete_user_transcription' ||
  ['A','B','C','D','E'].some(l=>/\[(?:not legible|not shown|missing)/i.test(q.options?.[l]||'')));
 match('tnpsc-g4-2022',key22.answers.flatMap((x,i)=>x==='ALL'?[i+1]:[]),missing22.map(q=>q.number));
+const repaired22=q22.find(q=>q.number===19);
+assert.equal(repaired22.textStatus,'secondary_source_text_cross_checked');
+assert.match(repaired22.question,/௩௬௯/);
+assert.match(repaired22.question,/௩௨௧/);
+assert.match(repaired22.question,/௫௪௩/);
+assert.match(repaired22.question,/௮௭௬/);
+assert.equal(key22.answers[18],'C','Q19 Tamil numeral conversion agrees with official Version A key');
+assert.equal(by('tnpsc-g4-2022').provisionallyScorable,196);
 const g11=json('data/quizzes/tnpsc-g1-2011-series-d-typed.json');
 match('tnpsc-g1-2011',g11.questions.filter(q=>q.keyStatus==='all-options-accepted-ungraded').map(q=>q.number),[]);
 const s20=json('data/quizzes/tnusrb-si-2020-series-c.json');
@@ -65,16 +73,16 @@ const totals=review.papers.reduce((a,p)=>({
 }),{papers:0,playable:0,provisionallyScorable:0,notScored:0,notMappedToQuestionText:0,specialAllExcluded:0,sourceDisputes:0});
 assert.deepEqual(totals,review.totals,'All 264 positions must reconcile with source manifests');
 assert.equal(totals.playable,1420);
-assert.equal(totals.provisionallyScorable,1156);
-assert.equal(totals.notScored,264);
+assert.equal(totals.provisionallyScorable,1157);
+assert.equal(totals.notScored,263);
 assert.equal(totals.notMappedToQuestionText,200);
 assert.equal(totals.specialAllExcluded,31);
-assert.equal(totals.sourceDisputes,33);
+assert.equal(totals.sourceDisputes,32);
 const html=read('pyq-scoring-review.html'),js=read('assets/js/pyq-scoring-review.js');
-for(const text of ['1,156 / 1,420','200','31','33','id="paperSelect"','id="selectedDetails"','pyq-scoring-review.js']){
+for(const text of ['1,157 / 1,420','200','31','32','id="paperSelect"','id="selectedDetails"','pyq-scoring-review.js']){
  assert.ok(html.includes(text),'Review page missing '+text);
 }
 assert.ok(!js.includes('innerHTML'),'Never insert source-review text as HTML');
 assert.ok(js.includes('cache:\'no-store\''),'Use fresh source-backed scoring register');
 assert.ok(read('pyq-typed-library.html').includes('pyq-scoring-review.html'),'Published library links scoring review');
-console.log('PASS scoring transparency: 1,420 playable; 1,156 provisional scores; 200 unmapped; 31 special ALL; 33 source disputes, all number lists source-backed.');
+console.log('PASS scoring transparency: 1,420 playable; 1,157 provisional scores; 200 unmapped; 31 special ALL; 32 source disputes, all number lists source-backed.');
