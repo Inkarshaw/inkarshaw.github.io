@@ -367,6 +367,7 @@ try {
   assert.equal(await page.locator('#specimenJump').isDisabled(),true,'No local specimen is inferred as authenticated');
   const notPDF=Buffer.from('not-a-pdf'.repeat(30));
   await page.locator('#specimenFile').setInputFiles({name:'fake-specimen.pdf',mimeType:'application/pdf',buffer:notPDF});
+  await page.waitForFunction(()=>document.querySelector('#specimenStatus')?.textContent?.includes('does not start with the PDF signature'));
   assert.match(await page.locator('#specimenStatus').innerText(),/does not start with the PDF signature/);
   assert.equal(await page.locator('#specimenJump').isDisabled(),true,'Reject mislabeled non-PDF before preview');
   let samplePdf='%PDF-1.4\n';
@@ -381,6 +382,7 @@ try {
   samplePdf+='xref\n0 4\n0000000000 65535 f \n'+offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')+
     'trailer\n<< /Root 1 0 R /Size 4 >>\nstartxref\n'+xrefOffset+'\n%%EOF\n';
   await page.locator('#specimenFile').setInputFiles({name:'local-study.pdf',mimeType:'application/pdf',buffer:Buffer.from(samplePdf)});
+  await page.waitForFunction(()=>document.querySelector('#specimenStatus')?.textContent?.includes('authenticity is NOT verified'));
   assert.match(await page.locator('#specimenStatus').innerText(),/authenticity is NOT verified/);
   assert.equal(await page.locator('#specimenJump').isEnabled(),true,'PDF signature enables manual inspection only');
   assert.match(await page.locator('#specimenOpen').getAttribute('href'),/^blob:.*#page=1$/);
