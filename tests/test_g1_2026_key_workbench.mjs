@@ -40,7 +40,7 @@ for(const id of ['slot','prev','next','question','choices','sourceContext','spec
 assert.equal([...html.matchAll(/id="([^"]+)"/g)].length,new Set([...html.matchAll(/id="([^"]+)"/g)].map(m=>m[1])).size,'Unique control IDs');
 assert.ok(!js.includes('innerHTML'),'Question text and imported evidence never inserted as HTML');
 assert.match(js,/localStorage\.setItem/);
-assert.match(js,/originalTNPSCSpecimenVerified/); // only documented as false in data; workbench does not publish keys
+assert.match(js,/secondary_source_text_cross_checked/,'Reviewer sees the secondary source status separately from official');
 assert.match(js,/duplicateSpecimen/,'Specimen number collision must be detected');
 assert.match(js,/r\.stemChecked&&r\.choicesChecked&&r\.tickChecked/,'Require all source checks');
 assert.match(js,/number!==98&&number!==200\|\|r\.figureChecked/,'Both incomplete dice questions require inspected original figures');
