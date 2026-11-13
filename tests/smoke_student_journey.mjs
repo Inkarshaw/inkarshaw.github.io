@@ -1,8 +1,10 @@
 /* Real Chromium smoke test: public ClearExams student journeys on a 390px phone. */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 
 const origin = process.env.CLEAREXAMS_TEST_ORIGIN || 'http://127.0.0.1:8765';
+const si2015Manifest = JSON.parse(readFileSync(new URL('../data/quizzes/tnusrb-si-2015-open.json', import.meta.url), 'utf8'));
 const paths = [
   ['start.html', 'Your complete preparation path.'],
   ['practice.html', 'Choose. Practise. Improve.'],
@@ -435,10 +437,10 @@ try {
   await page.locator('#palette button').filter({hasText:/^140$/}).click();
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
-  assert.match(await page.locator('#score').innerText(),/\/ 58\.0 provisional marks/,'Seventeen source-review items must not alter provisional score denominator');
+  assert.match(await page.locator('#score').innerText(),/\/ 58\.0 provisional marks/,'Ungraded source-review items must not alter the current 116-question provisional score denominator');
   assert.equal(await page.locator('#result').isVisible(),true);
   await page.locator('#reviewFilter').selectOption('ungraded');
-  assert.equal(await page.locator('#reviewList .result-item').count(),18,'Ungraded filter shows 18 source-disputed or source-instruction-missing readable questions');
+  assert.equal(await page.locator('#reviewList .result-item').count(),si2015Manifest.ungradedReadableQuestionCount,'Ungraded filter matches the current source-reviewed, unscored question count');
   await page.goto(origin+'/tnusrb-si-2015-quiz.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});
