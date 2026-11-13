@@ -346,6 +346,46 @@ try {
   assert.deepEqual(pageErrors,[],'TNPSC Group I 2026 text question interactions have no runtime errors');
   console.log('PASS TNPSC Group I 2026: 200 study slots, 5 source-labelled text repairs, 2 dice blockers, saved answers and zero unverified grades');
 
+  // Browser-only editorial reconciliation. A locally checked row must never turn on student scoring.
+  pageErrors.length=0;
+  await page.goto(origin+'/tnpsc-g1-2026-key-review.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#slot')?.options.length===200,
+    undefined,{timeout:20000});
+  assert.match(await page.locator('#loadStatus').innerText(),/official key mappings remain reviewer-only drafts/);
+  await page.locator('#slot').selectOption('13');
+  assert.match(await page.locator('#sourceContext').innerText(),/editorial study text repaired|Editorial study text repaired/i);
+  await page.locator('#specimenNumber').fill('154');
+  await page.locator('#pdfPage').fill('183');
+  await page.locator('#officialTick').selectOption('A');
+  await page.locator('#typedChoice').selectOption('A');
+  await page.locator('#printedChoice').fill('3 4 2 1');
+  assert.match(await page.locator('#recordStatus').innerText(),/Incomplete draft/);
+  await page.locator('#stemChecked').check();
+  await page.locator('#choicesChecked').check();
+  await page.locator('#tickChecked').check();
+  assert.match(await page.locator('#recordStatus').innerText(),/Locally checked/);
+  await page.locator('#save').click();
+  assert.equal(await page.locator('#reviewedCount').innerText(),'1');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#slot')?.options.length===200,
+    undefined,{timeout:20000});
+  await page.locator('#slot').selectOption('13');
+  assert.equal(await page.locator('#specimenNumber').inputValue(),'154','Local reviewer evidence survives refresh');
+  await page.locator('#slot').selectOption('98');
+  await page.locator('#specimenNumber').fill('98');
+  await page.locator('#pdfPage').fill('103');
+  await page.locator('#officialTick').selectOption('A');
+  await page.locator('#typedChoice').selectOption('A');
+  await page.locator('#printedChoice').fill('2 dots');
+  await page.locator('#stemChecked').check();
+  await page.locator('#choicesChecked').check();
+  await page.locator('#tickChecked').check();
+  assert.match(await page.locator('#recordStatus').innerText(),/Incomplete draft/,'Missing dice figure cannot be locally cleared');
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
+    '2026 reviewer workbench remains mobile width safe');
+  assert.deepEqual(pageErrors,[],'Editorial reviewer workbench has no runtime JavaScript errors');
+  console.log('PASS Group I 2026 source-key workbench: local draft, provenance fields, original dice gate and mobile access');
+
   // TNPSC Group I 2011: actual original Series D PDF, not the uploaded Group II transcription.
   pageErrors.length=0;
   await page.goto(origin+'/pyq-original-paper.html?paper=tnpsc-group-i-2011-preliminary-general-knowledge-d',{waitUntil:'domcontentloaded'});
