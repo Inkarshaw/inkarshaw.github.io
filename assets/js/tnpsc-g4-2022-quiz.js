@@ -66,7 +66,7 @@
       token.split('/').map(letter => letter + ') ' + q.options[letter]).join(' · ');
   }
   function status(q) {
-    return hasMissing(q) ? 'Text incomplete' : isSpecial(q) ? 'Official ALL key' : 'User transcription · review pending';
+    return hasMissing(q) ? 'Text incomplete' : isSpecial(q) ? 'Official ALL key' : q.textStatus === 'secondary_source_text_cross_checked' ? 'Secondary source matched · provisional score' : 'User transcription · review pending';
   }
   function render() {
     if (!state) return;
@@ -82,9 +82,12 @@
       img.alt = q.visual.alt || ('Question ' + q.number + ' figure');
       img.loading = 'lazy'; figure.append(img);
     }
-    $('questionWarning').hidden = !missing;
+    const sourceCrossChecked = q.textStatus === 'secondary_source_text_cross_checked';
+    $('questionWarning').hidden = !missing && !sourceCrossChecked;
     if (missing) $('questionWarning').textContent =
       'This question has missing, damaged or suspect source content. Read the TNPSC original PDF before answering. This question will not affect the indicative score.';
+    else if (sourceCrossChecked) $('questionWarning').textContent =
+      'Q' + q.number + ': restored from a secondary printed booklet copy and cross-checked with an independent indexed reading. Provisional marking uses the recorded TNPSC Version A key; original TNPSC-hosted printed-page certification is still pending.';
     const options = $('optionList'); options.replaceChildren();
     CHOICES.forEach(letter => {
       const b = document.createElement('button'); b.type = 'button';
