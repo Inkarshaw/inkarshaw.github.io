@@ -26,7 +26,7 @@ TNPSC's official dashboard confirms 27 September 2026 preliminary exam, Subject 
 
 **Critical numbering trap:** a separate 2026 coaching answer guide lists the diseases matching question (Minamata/Itai-Itai/Black foot/Blue baby) at its question 1, but ClearExams' supplied numbered text has that question at **Q4**. Its correct-choice letter `B` cannot be copied into original-numbered ClearExams Q1. Question-text and all A–E options must be matched to the official specimen; the coaching guide is *not* the TNPSC key.
 
-The seven corrupted/nontext-safe supplied questions remain **Q13, Q35, Q94, Q96, Q98, Q192 and Q200**. Source figures for Q98 and Q200 cannot be invented. Source 2026 Group I grading remains disabled until the complete specimen-number, printed choice and tick correspondence is independently verified.
+**13 November follow-up — five study-text repairs:** Compared the unofficial TNPSC Factory 2026 PDF by screenshot and reconstructed Q13 (person/place table; guide Q154/PDF p183), Q35 (243-series Article table; guide Q8/p10), Q94 (HCF exponents; guide Q174/p209), Q96 (Fibonacci formula; guide Q125/p149), Q192 (cube and fractions; guide Q97/p118). Each record stores its source URL, third-party guide number and PDF page. These are not visually certified original TNPSC booklet texts. Only **Q98 and Q200** still lack the authentic printed dice figures. The count improves from **193 to 198 readable study entries**; all 200 remain unscored because the TNPSC key's source-position correspondence has not been authenticated. Guide: https://tnpscfactory.com/blog/tnpsc-factory-group-1-2026-answer-key.pdf
 
 ## Remaining 63 exceptions outside the 2026 key mapping
 

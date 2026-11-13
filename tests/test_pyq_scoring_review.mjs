@@ -29,7 +29,10 @@ assert.deepEqual(new Set(review.papers.map(p=>p.id)),new Set(cat.entries.map(e=>
 const g26=json('data/quizzes/tnpsc-group-i-2026-prelims-text.json');
 assert.equal(g26.keyedAnswerCount,0,'Do not invent unmapped 2026 keys');
 assert.equal(g26.questions.filter(q=>q.answer!==null).length,0);
-assert.deepEqual(numbers(by('tnpsc-g1-2026').additionalTextWarnings),g26.sourceReviewQuestionNumbers);
+assert.deepEqual(numbers(by('tnpsc-g1-2026').additionalTextWarnings),[...g26.sourceReviewQuestionNumbers,...g26.secondaryTextReviewQuestionNumbers].sort((x,y)=>x-y));
+assert.equal(g26.textReadyCount,198);
+assert.equal(g26.needsReviewCount,2);
+assert.equal(g26.secondaryTextReviewCount,5);
 assert.match(g26.officialTentativeSource,/05_2026_CCSEI-GS\.pdf/);
 match('tnpsc-g1-2026',[],[],200);
 for(const y of [2024,2025]){
