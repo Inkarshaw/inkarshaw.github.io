@@ -265,7 +265,7 @@ $('specimenFile').addEventListener('change',e=>{
 $('specimenJump').addEventListener('click',showLocalPDFPage);
 $('specimenClose').addEventListener('click',()=>closeLocalPDF());
 $('pdfPage').addEventListener('input',updatePdfPageLink);
-FIELDS.forEach(id=>$(id).addEventListener(id.endsWith('Checked')?'change':'input',()=>{
+FIELDS.filter(id=>id!=='sourceSignature').forEach(id=>$(id).addEventListener(id.endsWith('Checked')?'change':'input',()=>{
  if(!questions.length)return;dirty=true;status();
 }));
 $('officialTick').addEventListener('change',()=>{dirty=true;status()});
