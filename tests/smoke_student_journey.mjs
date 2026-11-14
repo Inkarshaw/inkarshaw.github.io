@@ -894,11 +894,11 @@ try {
   assert.equal(await page.locator('#figureChecked').isChecked(),false,'Original figure check must be repeated');
   assert.match(await page.locator('#sourceNote').inputValue(),/Secondary print page 18/,'Review notes survive stale invalidation');
   await page.locator('#questionSelect').selectOption('95');
-  assert.match(await page.locator('#ocrEvidenceLevel').innerText(),/English stem and all four option values/,'Q95 wording and option pairs corroborated only as OCR');
+  assert.match(await page.locator('#ocrEvidenceLevel').textContent(),/English stem and all four option values/,'Q95 wording and option pairs corroborated only as OCR');
   await page.locator('#questionSelect').selectOption('103');
-  assert.match(await page.locator('#ocrEvidenceLevel').innerText(),/some OCR labels are uncertain/,'Q103 number labels not certified');
+  assert.match(await page.locator('#ocrEvidenceLevel').textContent(),/some OCR labels are uncertain/,'Q103 number labels not certified');
   await page.locator('#questionSelect').selectOption('47');
-  assert.match(await page.locator('#ocrEvidenceLevel').innerText(),/No original matrix or option layout/,'Q47 remains completely unavailable in OCR preview');
+  assert.match(await page.locator('#ocrEvidenceLevel').textContent(),/No original matrix or option layout/,'Q47 remains completely unavailable in OCR preview');
   assert.equal(await page.locator('#comparison').isVisible(),false,'Unverified Series D-only matrix Q47 has no counterfeit original image');
   assert.match(await page.locator('#sourceIssue').innerText(),/Series D/);
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
