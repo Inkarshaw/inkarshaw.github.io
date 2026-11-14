@@ -133,7 +133,7 @@ function render(){
  }
  $('sourceWarning').hidden=q.sourceStatus!=='needs_source_review';
  $('sourceWarning').textContent=q.sourceStatus==='needs_source_review'?
-   'Source review needed for transcription Q'+q.number+': +q.sourceIssue+' Consult the linked TNPSC specimen PDF before selecting an answer.':'';
+   'Source review needed for transcription Q'+q.number+': '+q.sourceIssue+' Consult the linked TNPSC specimen PDF before selecting an answer.':'';
  const options=$('options');options.replaceChildren();
  for(const letter of LETTERS){
   const b=document.createElement('button');b.type='button';
