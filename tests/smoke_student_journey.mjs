@@ -297,7 +297,7 @@ try {
   assert.equal(await page.locator('#secondaryReviewList li').count(),5,'Five source-disclosed study-text repairs are visible');
   assert.match(await page.locator('#loadStatus').innerText(),/All 200 numbered questions loaded/);
   await page.locator('#start').click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 1 of 200/i);
+  assert.match(await page.locator('#position').innerText(),/Transcription Question 1 of 200/i);
   assert.match(await page.locator('#questionText').innerText(),/Commensalism/);
   assert.equal(await page.locator('#options button').count(),5,'A-E answer options preserved');
   await page.locator('#options button').nth(2).click();
@@ -306,7 +306,7 @@ try {
   await page.locator('#paletteDetails summary').click();
   assert.equal(await page.locator('#palette .palette-btn').count(),200);
   await page.locator('#palette .palette-btn').nth(12).click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 13 of 200/i);
+  assert.match(await page.locator('#position').innerText(),/Transcription Question 13 of 200/i);
   assert.match(await page.locator('#secondarySourceNote').innerText(),/Q13 notation\/table restored for study/);
   assert.match(await page.locator('#questionText').innerText(),/1\. Chennimalai/);
   assert.match(await page.locator('#secondarySourceLink').getAttribute('href'),/#page=183$/);
@@ -314,7 +314,7 @@ try {
   await page.locator('#options button').nth(4).click();
   await page.locator('#flag').click();
   await page.locator('#palette .palette-btn').nth(97).click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 98 of 200/i);
+  assert.match(await page.locator('#position').innerText(),/Transcription Question 98 of 200/i);
   assert.match(await page.locator('#options button').nth(1).innerText(),/^B\s*4$/,'Q98 option B OCR corrected from 3 to 4');
   assert.match(await page.locator('#questionFigure img').getAttribute('alt'),/Four diagrams/);
   await page.locator('#questionFigure img').evaluate(img => img.decode());
@@ -322,7 +322,7 @@ try {
   assert.match(await page.locator('#figureSourceLink').getAttribute('href'),/arivark.*q98-dice\.png/);
   assert.match(await page.locator('#sourceWarning').innerText(),/official specimen image has not been independently compared/);
   await page.locator('#palette .palette-btn').nth(199).click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/i);
+  assert.match(await page.locator('#position').innerText(),/Transcription Question 200 of 200/i);
   assert.match(await page.locator('#options button').first().innerText(),/Figure \(A\)/,'Q200 candidate A has a readable figure label');
   await page.locator('#questionFigure img').evaluate(img=>img.decode());
   assert.ok(await page.locator('#questionFigure img').evaluate(img=>img.naturalWidth>=900),'Q200 editorial SVG renders in Chromium');
@@ -336,7 +336,7 @@ try {
     undefined,{timeout:20000});
   assert.match(await page.locator('#start').innerText(),/Resume 200-question/);
   await page.locator('#start').click();
-  assert.match(await page.locator('#position').innerText(),/Original Question 200 of 200/i);
+  assert.match(await page.locator('#position').innerText(),/Transcription Question 200 of 200/i);
   assert.match(await page.locator('#status').innerText(),/2 of 200 answered · 1 flagged/);
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
@@ -411,6 +411,30 @@ try {
     undefined,{timeout:20000});
   await page.locator('#slot').selectOption('13');
   assert.equal(await page.locator('#specimenNumber').inputValue(),'154','Local reviewer evidence survives refresh');
+  // A saved source attestation may not be reused after source wording or options change.
+  await page.evaluate(()=>{
+    const key='clearexams:editorial:tnpsc:g1:2026:specimen-mapping:v1';
+    const saved=JSON.parse(localStorage.getItem(key));
+    saved.records['13'].sourceSignature='outdated-source-version';
+    localStorage.setItem(key,JSON.stringify(saved));
+  });
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#slot')?.options.length===200,
+    undefined,{timeout:20000});
+  await page.locator('#slot').selectOption('13');
+  assert.equal(await page.locator('#reviewedCount').innerText(),'0','Changed question source removes old attested status');
+  assert.equal(await page.locator('#sourceRevisionWarning').isVisible(),true,'Stale review source warning is visible');
+  assert.equal(await page.locator('#stemChecked').isChecked(),false,'Old stem attestation is not trusted');
+  assert.equal(await page.locator('#choicesChecked').isChecked(),false,'Old option attestations are cleared');
+  assert.equal(await page.locator('#printedChoice').inputValue(),'3 4 2 1','Saved source notes are preserved');
+  await page.locator('#save').click();
+  assert.equal(await page.locator('#reviewedCount').innerText(),'0','Resaving without reviewing cannot restore trusted status');
+  await page.locator('#stemChecked').check();
+  await page.locator('#choicesChecked').check();
+  await page.locator('#tickChecked').check();
+  await page.locator('#save').click();
+  assert.equal(await page.locator('#reviewedCount').innerText(),'1','All source checks must be repeated after source change');
+  assert.equal(await page.locator('#sourceRevisionWarning').isVisible(),false,'Freshly rebound review clears stale warning');
   await page.locator('#slot').selectOption('98');
   await page.locator('#specimenNumber').fill('98');
   await page.locator('#pdfPage').fill('103');
