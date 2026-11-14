@@ -847,8 +847,8 @@ try {
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Ungraded — conflicting source keys/);
   assert.equal(await page.locator('#vectorStudyPanel').isVisible(),true,'Ungraded Q64 vector study explanation appears');
-  assert.match(await page.locator('#vectorStudyDeduction').innerText(),/\+8 or −8/,'Signed scalar product is not falsely declared unique');
   await page.locator('#vectorStudyPanel summary').click();
+  assert.match(await page.locator('#vectorStudyDeduction').innerText(),/\+8 or −8/,'Signed scalar product is not falsely declared unique');
   assert.match(await page.locator('#vectorStudyTamil').innerText(),/வெக்டர்/,'Tamil Q64 explanation is available');
   assert.match(await page.locator('#vectorStudyWarning').innerText(),/remains ungraded/);
   assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Do not grade Q64 contradictory source answers');
