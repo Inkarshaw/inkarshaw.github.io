@@ -122,6 +122,18 @@ assert.equal(q137.answerKeyToken,'A','Series C answer unaffected by text gap res
 assert.match(q137.questionTamil,/______/, 'English grammar blank remains visible in Tamil study text');
 const q22=data.questions.find(q=>q.number===22);
 assert.equal(q22.scoringStatus,'ungraded_source_dispute','Disputed international body options must remain ungraded');
+assert.match(q22.sourceIssue,/international.*regional|regional.*international/i,'Explain why SAARC option A is semantically ambiguous');
+assert.equal(q22.answerReviewReason,q22.sourceIssue,'Q22 review and source issue use same careful explanation');
+assert.equal(q22.externalStudyReferences.length,2,'Independent answer guide is separate from SAARC first-party source');
+assert.match(q22.externalStudyReferences[0].url,/saarc-sec\.org/);
+assert.match(q22.externalStudyReferences[1].url,/testbook\.com/);
+assert.deepEqual(q22.acceptedAnswers,[],'Conflicting Q22 meaning must not trigger right/wrong grading');
+assert.match(html,/id="sourceDisputeDesk"/,'Seven-item source review desk is visible before starting');
+assert.match(html,/id="sourceDisputeList"/,'Review desk receives actual source-disputed bank questions');
+assert.match(js,/function renderSourceDisputes\(/,'Use bank-driven, not invented, seven-question source-review content');
+assert.match(js,/questions\.filter\(q=>q\.scoringStatus==='ungraded_source_dispute'\)/,'Source desk dynamically uses all seven ungraded disputes');
+assert.match(js,/Study Q/,'Student can open a source-disputed question directly');
+assert.match(js,/renderSourceDisputes\(\)/,'Populate queue after successfully loading question bank');
 assert.match(q22.questionTamil,/மதிப்பெண் வழங்கப்படாது/,'Uncertainty warning visible in Tamil');
 const q125=data.questions.find(q=>q.number===125);
 assert.equal(q125.scoringStatus,'ungraded_all_correct','Final-key ALL must remain ungraded');
