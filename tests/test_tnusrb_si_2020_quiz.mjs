@@ -305,7 +305,7 @@ assert.match(auditHTML,/id="pdfFingerprint"/,'PDF file byte fingerprint displaye
 assert.match(auditHTML,/id="pdfBindingNotice"/,'Reviewer can tell when source evidence is detached');
 assert.match(auditJS,/pdfSHA256/,'Local review must bind to source PDF fingerprint');
 assert.match(auditJS,/activePDFSHA256.length===64&&r.pdfSHA256===activePDFSHA256/,'A saved assertion cannot count without same PDF currently loaded');
-assert.match(auditJS,/crypto.subtle.digest\('SHA-256',await file.arrayBuffer\(\)\)/,'Client-side SHA-256 only, no upload');
+assert.match(auditJS,/crypto.subtle.digest\('SHA-256',bytes\)/,'Client-side SHA-256 only, no upload');
 assert.match(auditJS,/normalized.signature='';CHECKS.forEach/,'Legacy unbound checkbox assertions must be invalidated');
 assert.match(auditJS,/if\(!r.pdfSHA256\)\{CHECKS.forEach/,'Importing old evidence must never retain unbound checks');
 assert.match(auditJS,/activePDFSHA256='';/,'Closing or changing PDF removes active fingerprint');
