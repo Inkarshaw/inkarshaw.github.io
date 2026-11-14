@@ -120,6 +120,15 @@ assert.match(mappingDesk,/sourceBinding:'exact-question-and-A-to-E-text-v1'/,'St
 assert.match(mappingDesk,/row\.questionSignature!==currentSig/,'Import rejects stale attestations');
 assert.match(mappingDesk,/for\(const k of CHECKS\)raw\[k\]=false/,'Old source verification marks are revoked');
 assert.match(mappingHTML,/id="sourceRevisionWarning"/,'Reviewers are warned about old text reviews');
+assert.match(mappingHTML,/id="editorialFigurePreview"/,'Review desk offers independently compared study figure preview');
+assert.match(mappingHTML,/id="editorialFigureImage"/);
+assert.match(mappingHTML,/id="editorialFigureSecond"/);
+assert.match(mappingHTML,/neither proves the TNPSC specimen figure or tick/i);
+assert.match(mappingDesk,/editorialFigurePreview/);
+assert.match(mappingDesk,/editorialFigureSecond/);
+assert.match(mappingDesk,/preview\.comparisonPdf/);
+assert.match(mappingDesk,/preview\?q\.visual\.src:''/,'Unrelated questions never show stale figure');
+
 assert.match(mappingHTML,/Source-version safety:/,'Reviewer UI discloses exact-source safety');
 assert.match(d.finalKeyStatus,/2026-11-14/,'As-of key-status date is current');
 
