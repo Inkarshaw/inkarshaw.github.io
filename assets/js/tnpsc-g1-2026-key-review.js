@@ -182,6 +182,15 @@ function view(){
   'Editorial study text repaired from unofficial guide Q'+q.sourceComparison.guideQuestionNumber+
   ' (page '+q.sourceComparison.pdfPage+'); original TNPSC wording not certified.':
   'User-supplied transcription; original TNPSC question wording still requires comparison.';
+ const preview=q.visual?.secondaryIllustrationCrossCheck;
+ $('editorialFigurePreview').hidden=!preview;
+ $('editorialFigureImage').src=preview?q.visual.src:'';
+ $('editorialFigureImage').alt=preview?q.visual.alt:'';
+ if(preview){
+  $('editorialFigureOriginal').href=q.visual.sourceUrl;
+  $('editorialFigureSecond').href=preview.comparisonPdf+'#page='+preview.thirdPartyPrintedPdfPages[0];
+  $('editorialFigureSecond').textContent='View second independent illustrated booklet (PDF pages '+preview.thirdPartyPrintedPdfPages.join('–')+')';
+ }
  const saved=records[current]||empty();
  $('sourceRevisionWarning').hidden=!(hasData(saved)&&!sourceMatches(saved,current));
  setForm(saved);
