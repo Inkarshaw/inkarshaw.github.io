@@ -304,6 +304,7 @@ assert.match(auditJS,/sourceSignature:signature\(q\)/,'Review export carries sou
 assert.match(auditHTML,/id="pdfFingerprint"/,'PDF file byte fingerprint displayed explicitly');
 assert.match(auditHTML,/id="pdfBindingNotice"/,'Reviewer can tell when source evidence is detached');
 assert.match(auditJS,/pdfSHA256/,'Local review must bind to source PDF fingerprint');
+assert.match(auditJS,/FIELDS\.filter\(k=>k!=='signature'&&k!=='pdfSHA256'\)/,'Internal source fingerprint is not a nonexistent editable DOM input');
 assert.match(auditJS,/activePDFSHA256.length===64&&r.pdfSHA256===activePDFSHA256/,'A saved assertion cannot count without same PDF currently loaded');
 assert.match(auditJS,/crypto.subtle.digest\('SHA-256',bytes\)/,'Client-side SHA-256 only, no upload');
 assert.match(auditJS,/normalized.signature='';CHECKS.forEach/,'Legacy unbound checkbox assertions must be invalidated');
