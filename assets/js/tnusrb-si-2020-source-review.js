@@ -220,22 +220,34 @@ function closePdf(announce=true){
  if(questions.length)status();
 }
 async function loadPdf(file){
- closePdf(false);
- if(!file){$('pdfStatus').textContent='No local PDF selected.';return}
- if(file.size<100||file.size>80*1024*1024){$('pdfStatus').textContent='Rejected PDF size; use a file between 100 bytes and 80 MB.';return}
- let header='';
- try{header=Array.from(new Uint8Array(await file.slice(0,5).arrayBuffer()),v=>String.fromCharCode(v)).join('')}
- catch{$('pdfStatus').textContent='Could not read this local file.';return}
- if(header!=='%PDF-'){$('pdfStatus').textContent='Rejected: selected file lacks the PDF signature %PDF-.';return}
+ if(!file){closePdf(false);$('pdfStatus').textContent='No local PDF selected.';return}
+ if(file.size<100||file.size>80*1024*1024){
+  closePdf(false);$('pdfStatus').textContent='Rejected PDF size; use a file between 100 bytes and 80 MB.';return
+ }
+ // Read the original selected File before clearing the input; detached browser File handles may fail later.
+ let bytes;
+ try{bytes=await file.arrayBuffer()}
+ catch(error){
+  closePdf(false);$('pdfStatus').textContent='Could not read this local file: '+error.message;return
+ }
+ const header=Array.from(new Uint8Array(bytes.slice(0,5)),v=>String.fromCharCode(v)).join('');
+ if(header!=='%PDF-'){
+  closePdf(false);$('pdfStatus').textContent='Rejected: selected file lacks the PDF signature %PDF-.';return
+ }
+ let fingerprint='';
  try{
   if(!crypto?.subtle)throw Error('WebCrypto unavailable');
-  const digest=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());
-  activePDFSHA256=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  fingerprint=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');
  }catch(error){
-  activePDFSHA256='';
   $('transferStatus').textContent='Could not fingerprint PDF: '+error.message+'. This file cannot support a locally checked review.';
  }
- try{pdfURL=URL.createObjectURL(file)}catch{$('pdfStatus').textContent='Unable to create local preview.';return}
+ closePdf(false);
+ activePDFSHA256=fingerprint;
+ try{pdfURL=URL.createObjectURL(file)}catch{
+  activePDFSHA256='';
+  $('pdfStatus').textContent='Unable to create local preview.';return
+ }
  if(questions.length){
   const saved=records[questions[current].number];
   if(saved?.pdfSHA256&&saved.pdfSHA256!==activePDFSHA256){
