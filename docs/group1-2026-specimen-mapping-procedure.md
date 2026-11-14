@@ -2,11 +2,11 @@
 
 > Editorial review procedure. This is **not** a TNPSC answer-key release, and no reviewer note may be treated as automatic scoring approval.
 
-## Current facts and caveats (checked 13 November 2026)
+## Current facts and caveats (checked 14 November 2026)
 
 - TNPSC Group I Services 2026 preliminary exam: **27 September 2026**; Notification **05/2026**, General Studies and Aptitude Subject Code **497**.
 - Tentative key hosted **6 October 2026**. TNPSC explicitly states that correct choices are ticked in the official specimen PDF and **specimen question numbers, not candidate booklet codes or third-party coaching numbers, govern challenges**.
-- As of 13 November 2026, the official answer-key index had not posted a **final** Group I 2026 key. Do not relabel a tentative tick as final.
+- As of 14 November 2026, the official answer-key index had not posted a **final** Group I 2026 key. Do not relabel a tentative tick as final.
 - ClearExams has 200 user-supplied typed study positions but **zero approved answer mappings**: 198 text-readable entries, including five source-labelled secondary text repairs; Q98 and Q200 include labelled editorial dice illustrations that are **not certified TNPSC originals**.
 
 Official sources:
@@ -24,6 +24,7 @@ Official sources:
 6. Mark the stem/options/tick review checkboxes **only after personal visual inspection**. The original figure checkbox is required on Q98/Q200.
 7. Save the browser-local draft. The workbench prevents a locally checked status when an official specimen number collides with one already used by another transcription slot; unfinished records remain drafts. This is **not source approval**.
 8. Export JSON for **separate editorial scrutiny**. The downloaded JSON contains metadata/reviewer judgments, **not the PDF bytes**, and does not change the deployed quiz. Review evidence is browser-local, except for this explicit export.
+9. **After any ClearExams text or option correction**, open the affected saved review again and compare the current stem, all options and the official printed specimen. The workbench binds each review to the exact currently displayed text, A–E alternatives and source status. Mismatched or legacy reviews keep their old notes but **lose prior verification checks**; they no longer count as locally checked until the editor verifies and rechecks the current question. Imported older JSON snapshots are deliberately downgraded to drafts. An exact source match is only an editor workflow safeguard, **not proof of TNPSC authenticity**.
 
 ## Publication gate — do not bypass
 
