@@ -53,6 +53,8 @@ textarea{resize:vertical;min-height:85px}
 <label for="pdfFile">Open a downloaded PDF locally (maximum 80 MB; never uploaded)</label>
 <input id="pdfFile" type="file" accept=".pdf,application/pdf" aria-describedby="pdfStatus">
 <p id="pdfStatus" role="status" class="muted">No local PDF loaded. A PDF signature check does not establish TNUSRB authenticity.</p>
+<p class="muted">Current locally selected PDF SHA-256: <code id="pdfFingerprint" style="overflow-wrap:anywhere">No PDF fingerprint recorded</code></p>
+<p id="pdfBindingNotice" role="status" class="notice">Load a source PDF before any locally checked review can be counted.</p>
 <div class="actions">
 <button type="button" id="pdfJump" disabled>Show selected source page</button>
 <a id="pdfExternal" hidden target="_blank" rel="noopener noreferrer">Open local PDF in a new tab</a>
@@ -111,11 +113,11 @@ textarea{resize:vertical;min-height:85px}
 </div>
 <p id="reviewStatus" class="status" role="status">No review saved.</p>
 <div class="actions"><button id="save" type="button" class="primary" disabled>Save local review</button><button id="clear" type="button" disabled>Clear this review</button></div>
-<p class="muted"><small>All checks must be true, the original booklet source must be selected and the printed number must match before this tool displays "locally checked". No change to answer-key publication occurs.</small></p>
+<p class="muted"><small>All checks must be true, the original booklet source selected, the exact printed number matched, and the <strong>same SHA-256 PDF currently reopened</strong> before this tool displays "locally checked". A PDF fingerprint proves byte identity only—not board authenticity. Closing or changing the PDF suspends local verification. No answer-key publication occurs.</small></p>
 </section>
 </div>
 <div class="panel"><h2>Export or import reviewer evidence</h2>
-<p>Export four source-bound records, retaining discrepancies and unverified states. An old or modified question version cannot inherit previous checkboxes. Import replaces only browser-local drafts after confirmation. No PDF bytes are included in the exported JSON.</p>
+<p>Export four source-bound records, retaining discrepancies and unverified states. An old or modified question version cannot inherit previous checkboxes. Import replaces only browser-local drafts after confirmation. No PDF bytes are included in the exported JSON. Old checks without a file fingerprint lose their checkboxes but retain the notes.</p>
 <div class="actions"><button id="export" class="primary" type="button" disabled>Export local JSON review</button><label for="importFile" style="margin:0">Import a saved review JSON<input type="file" id="importFile" accept=".json,application/json" disabled></label><button type="button" id="resetAll" disabled>Erase all local reviews</button></div>
 <p id="transferStatus" role="status" class="muted"></p>
 </div>
