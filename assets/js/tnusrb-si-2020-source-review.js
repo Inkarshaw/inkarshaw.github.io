@@ -189,7 +189,7 @@ async function importFile(file){
   const q=questions[i];
   if(row.number!==q.number||row.scoringStatus!==q.scoringStatus)throw Error('Wrong question slot at row '+i);
   const r={...empty()};
-  for(const k of FIELDS){r[k]=row[k]}
+  for(const k of FIELDS){if(Object.prototype.hasOwnProperty.call(row,k))r[k]=row[k]}
   if(!validRow(r))throw Error('Invalid field in Q'+q.number);
   if(!r.pdfSHA256){CHECKS.forEach(k=>r[k]=false);r.signature=''}
   if(row.sourceSignature!==signature(q)||!matches(r,q)){
