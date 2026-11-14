@@ -405,6 +405,7 @@ try {
   assert.equal(await page.locator('#specimenJump').isDisabled(),true,'Closing releases the local PDF reference');
   await page.locator('#slot').selectOption('13');
   assert.match(await page.locator('#sourceContext').innerText(),/editorial study text repaired|Editorial study text repaired/i);
+  assert.equal(await page.locator('#editorialFigurePreview').isVisible(),false,'Only the two illustrated questions receive secondary source previews');
   await page.locator('#specimenNumber').fill('154');
   await page.locator('#pdfPage').fill('183');
   await page.locator('#officialTick').selectOption('A');
@@ -447,6 +448,12 @@ try {
   assert.equal(await page.locator('#reviewedCount').innerText(),'1','All source checks must be repeated after source change');
   assert.equal(await page.locator('#sourceRevisionWarning').isVisible(),false,'Freshly rebound review clears stale warning');
   await page.locator('#slot').selectOption('98');
+  assert.equal(await page.locator('#editorialFigurePreview').isVisible(),true,'Q98 independent-source editorial figure preview available');
+  assert.match(await page.locator('#editorialFigureOriginal').getAttribute('href'),/q98-dice\.png/);
+  assert.match(await page.locator('#editorialFigureSecond').getAttribute('href'),/#page=44$/);
+  assert.equal(await page.locator('#figureChecked').isChecked(),false,'Neither secondary picture can validate TNPSC figure');
+  await page.locator('#editorialFigureImage').evaluate(img=>img.decode());
+  assert.ok(await page.locator('#editorialFigureImage').evaluate(img=>img.naturalWidth>=900));
   await page.locator('#specimenNumber').fill('98');
   await page.locator('#pdfPage').fill('103');
   await page.locator('#officialTick').selectOption('A');
@@ -456,6 +463,12 @@ try {
   await page.locator('#choicesChecked').check();
   await page.locator('#tickChecked').check();
   assert.match(await page.locator('#recordStatus').innerText(),/Incomplete draft/,'Missing dice figure cannot be locally cleared');
+  await page.locator('#slot').selectOption('200');
+  assert.equal(await page.locator('#editorialFigurePreview').isVisible(),true,'Q200 four candidate nets comparison visible');
+  assert.match(await page.locator('#editorialFigureSecond').getAttribute('href'),/#page=89$/);
+  assert.match(await page.locator('#editorialFigureSecond').innerText(),/89–90/);
+  assert.match(await page.locator('#editorialFigureImage').getAttribute('alt'),/candidate nets A through D/);
+  assert.equal(await page.locator('#figureChecked').isChecked(),false,'Q200 secondary net cannot clear TNPSC official specimen gate');
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     '2026 reviewer workbench remains mobile width safe');
   assert.deepEqual(pageErrors,[],'Editorial reviewer workbench has no runtime JavaScript errors');
