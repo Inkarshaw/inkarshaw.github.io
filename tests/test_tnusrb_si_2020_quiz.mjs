@@ -301,6 +301,16 @@ assert.match(auditJS,/sourceKind==='board_booklet'/,'Secondary source cannot be 
 assert.match(auditJS,/r\.printedNumber===q\.number/,'Exact printed Series C question number required');
 assert.match(auditJS,/CHECKS\.every\(k=>r\[k\]\)/,'All manual visual and key checks required');
 assert.match(auditJS,/sourceSignature:signature\(q\)/,'Review export carries source-text binding');
+assert.match(auditHTML,/id="pdfFingerprint"/,'PDF file byte fingerprint displayed explicitly');
+assert.match(auditHTML,/id="pdfBindingNotice"/,'Reviewer can tell when source evidence is detached');
+assert.match(auditJS,/pdfSHA256/,'Local review must bind to source PDF fingerprint');
+assert.match(auditJS,/activePDFSHA256.length===64&&r.pdfSHA256===activePDFSHA256/,'A saved assertion cannot count without same PDF currently loaded');
+assert.match(auditJS,/crypto.subtle.digest\('SHA-256',await file.arrayBuffer\(\)\)/,'Client-side SHA-256 only, no upload');
+assert.match(auditJS,/normalized.signature='';CHECKS.forEach/,'Legacy unbound checkbox assertions must be invalidated');
+assert.match(auditJS,/if\(!r.pdfSHA256\)\{CHECKS.forEach/,'Importing old evidence must never retain unbound checks');
+assert.match(auditJS,/activePDFSHA256='';/,'Closing or changing PDF removes active fingerprint');
+assert.match(auditJS,/file hash cannot prove TNUSRB authenticity/,'Hash identity is not official paper certification');
+
 assert.match(auditJS,/row\.sourceSignature!==signature\(q\)/,'Source-changed import loses old checkboxes');
 assert.match(auditJS,/data\.scoredQuestionCount!==130/,'Review tool refuses silently changed scoring bank');
 assert.match(auditJS,/data\.ungradedSourceDisputeCount!==7/,'All seven disputes remain ungraded');
