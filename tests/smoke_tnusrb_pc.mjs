@@ -28,6 +28,7 @@ try{
  await page.reload();
  await page.waitForSelector('#quiz:not([hidden])',{timeout:10000});
  assert.match(await page.locator('#position').innerText(),/Question 2/);
+ await page.locator('details.navpanel summary').click();
  await page.locator('#palette button').nth(16).click();
  assert.match(await page.locator('#position').innerText(),/Question 17/);
  await page.locator('#check').click();
