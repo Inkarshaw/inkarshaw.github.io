@@ -66,10 +66,31 @@ assert.equal(q(98).options.B,'4','Indexed 2026 paper comparisons independently a
 assert.equal(q(200).options.A,'Figure (A) — refer to the lettered study diagram');
 assert.equal(q(200).options.D,'Figure (D) — refer to the lettered study diagram');
 assert.deepEqual(d.diagramStudyReconstructionQuestionNumbers,[98,200]);
+assert.deepEqual(d.diagramSecondaryFigureCrossCheckQuestionNumbers,[98,200]);
+assert.equal(d.diagramSecondaryFigureCrossCheckCount,2);
+assert.deepEqual(d.bilingualEditorialStudyQuestionNumbers,[98,200]);
+assert.equal(d.bilingualEditorialStudyCount,2);
 assert.equal(d.diagramStudyReconstructionCount,2);
 for(const n of [98,200]){
  const v=q(n).visual;
  assert.equal(v.originalTNPSCSpecimenVerified,false,'Editorial visual does not certify official booklet');
+ const c=v.secondaryIllustrationCrossCheck;
+ assert.equal(c.status,'two_independent_third_party_illustrations_visual_compared_not_official_specimen');
+ assert.equal(c.independentlyTNPSCSpecimenVerified,false);
+ assert.equal(c.officialAnswerKeyMapped,false);
+ assert.equal(c.studyDiagramLayoutCrossChecked,true);
+ assert.equal(c.editorialTamilOnly,true);
+ assert.equal(c.visualQuestionAndOptionsMatch,true);
+ assert.equal(c.comparedQuestionNumber,n);
+ assert.equal(c.comparisonPdf,'https://athiyamanteam.com/wp-content/uploads/2026/09/tnpsc-group-1-prelims-question-paper-2026-ccsei-p26.pdf');
+ assert.deepEqual(c.thirdPartyPrintedPdfPages,n===98?[44]:[89,90]);
+ assert.equal(q(n).tamilStudyStatus,'editorial_tamil_study_translation_not_original_booklet_verified');
+ assert.ok(q(n).questionTamil?.trim().length>=35);
+ assert.deepEqual(Object.keys(q(n).optionsTamil),['A','B','C','D','E']);
+ assert.equal(q(n).optionsTamil.E,'விடை தெரியவில்லை');
+ for(const letter of 'ABCDE')assert.ok(q(n).optionsTamil[letter].trim());
+ assert.equal(q(n).answer,null,'Second published figure is never an official mapped answer');
+
  assert.equal(v.kind,'editorial_visual_reconstruction');
  assert.match(v.sourceUrl,/arivark\.com\/assets\/img\/pyq\//);
  assert.match(v.caption,/Editorial study redraw/);
@@ -102,7 +123,15 @@ assert.match(mappingHTML,/id="sourceRevisionWarning"/,'Reviewers are warned abou
 assert.match(mappingHTML,/Source-version safety:/,'Reviewer UI discloses exact-source safety');
 assert.match(d.finalKeyStatus,/2026-11-14/,'As-of key-status date is current');
 
-assert.match(html,/Two diagrams provided for study/);
+assert.match(html,/Two figures cross-checked against independent study sources/);
+assert.match(html,/id="figureCrossCheck"/);
+assert.match(html,/id="figureCrossCheckLink"/);
+assert.match(html,/id="questionTamil"/);
+assert.match(html,/not a TNPSC-hosted specimen/);
+assert.match(js,/diagramSecondaryFigureCrossCheckCount!==2/);
+assert.match(js,/figureCrossCheckLink/);
+assert.match(js,/q\.optionsTamil/);
+assert.match(js,/q\.questionTamil/);
 assert.match(html,/id="questionFigure"/);
 assert.match(html,/id="figureSourceLink"/);
 assert.match(html,/Five secondary study-text reconstructions/);
@@ -125,4 +154,4 @@ for(const x of new Set(refs))assert.ok(idsHtml.includes(x),'Referenced UI elemen
 new vm.Script(js,{filename:'assets/js/tnpsc-g1-2026-quiz.js'});
 for(const path of ['pyq-hub.html','tnpsc.html','sitemap.xml'])assert.match(read(path),/tnpsc-g1-2026-quiz\.html/);
 assert.match(read('pyq-hub.html'),/Group I 2011 original-paper quiz/,'Retain earlier Group I 2011 session');
-console.log('PASS TNPSC Group I 2026: 200 study positions; 5 secondary text repairs; 2 labelled source-unverified editorial dice SVGs; corrected Q98 B=4; no invented grading.');
+console.log('PASS TNPSC Group I 2026: 200 study positions, two independently illustrated secondary-checked figures and editorial Tamil readings, 0 official mapped answer keys.');
