@@ -7,9 +7,13 @@ const $=id=>document.getElementById(id);
 const STORAGE='clearexams:editorial:tnpsc:g1:2026:specimen-mapping:v1';
 const BANK_ID='tnpsc-group-i-2026-prelims-gs-aptitude-user-text';
 const OFFICIAL='https://tnpsc.gov.in/Tentative/Document/05_2026_CCSEI-GS.pdf';
-const FIELDS=['specimenNumber','pdfPage','officialTick','typedChoice','printedChoice','stemChecked','choicesChecked','tickChecked','figureChecked','reviewNotes'];
+const FIELDS=['specimenNumber','pdfPage','officialTick','typedChoice','printedChoice','stemChecked','choicesChecked','tickChecked','figureChecked','reviewNotes','sourceSignature'];
 const CHECKS=['stemChecked','choicesChecked','tickChecked','figureChecked'];
 const LETTERS=['A','B','C','D','ALL'];
+// Exact source-text binding, not a security checksum or proof of TNPSC authenticity.
+// Any change to the study question, option letters/text or source flag requires manual re-review.
+const sourceSignature=q=>JSON.stringify([q.id,q.question,q.options.A,q.options.B,q.options.C,q.options.D,q.options.E,q.sourceStatus]);
+const sourceMatches=(r,number)=>Boolean(r&&questions[number-1]&&r.sourceSignature===sourceSignature(questions[number-1]));
 let questions=[],records={},current=1,dirty=false,localPdfObjectUrl=null;
 const PDF_MAX_BYTES=80*1024*1024;
 const PDF_HEADER='%PDF-';
@@ -76,31 +80,33 @@ function showLocalPDFPage(){
 const int=n=>Number.isInteger(n)&&n>=1;
 const empty=()=>({specimenNumber:null,pdfPage:null,officialTick:'',typedChoice:'',
  printedChoice:'',stemChecked:false,choicesChecked:false,tickChecked:false,
- figureChecked:false,reviewNotes:''});
+ figureChecked:false,reviewNotes:'',sourceSignature:''});
 const validRow=r=>r&&typeof r==='object'&&!Array.isArray(r)&&
  (r.specimenNumber===null||(int(r.specimenNumber)&&r.specimenNumber<=200))&&
  (r.pdfPage===null||(int(r.pdfPage)&&r.pdfPage<=300))&&
  ['',...LETTERS].includes(r.officialTick)&&['',...LETTERS].includes(r.typedChoice)&&
  typeof r.printedChoice==='string'&&r.printedChoice.length<=2000&&
  typeof r.reviewNotes==='string'&&r.reviewNotes.length<=2500&&
+ typeof r.sourceSignature==='string'&&r.sourceSignature.length<=50000&&
  CHECKS.every(k=>typeof r[k]==='boolean');
 function normalize(obj){
  if(!obj||typeof obj!=='object'||Array.isArray(obj))throw Error('Missing review records');
  const next={};
  for(const [number,row] of Object.entries(obj)){
-  if(!/^(?:[1-9]|[1-9][0-9]|1[0-9][0-9]|200)$/.test(number)||!validRow(row))
+  const normalized={...empty(),...row};
+  if(!/^(?:[1-9]|[1-9][0-9]|1[0-9][0-9]|200)$/.test(number)||!validRow(normalized))
    throw Error('Invalid review at transcription position '+number);
-  next[number]={...empty(),...row};
+  next[number]=normalized;
  }
  return next;
 }
 function restore(){
  try{const x=JSON.parse(localStorage.getItem(STORAGE)||'null');
-  return x?.schemaVersion===1&&x?.bankId===BANK_ID?normalize(x.records):{};
+  return [1,2].includes(x?.schemaVersion)&&x?.bankId===BANK_ID?normalize(x.records):{};
  }catch{return {};}
 }
 function saveLocal(){
- try{localStorage.setItem(STORAGE,JSON.stringify({schemaVersion:1,bankId:BANK_ID,records}))}
+ try{localStorage.setItem(STORAGE,JSON.stringify({schemaVersion:2,bankId:BANK_ID,records}))}
  catch{throw Error('Local storage is unavailable; export your review JSON before closing this page')}
 }
 function readForm(){
@@ -109,13 +115,17 @@ function readForm(){
   officialTick:$('officialTick').value,typedChoice:$('typedChoice').value,
   printedChoice:$('printedChoice').value.slice(0,2000),reviewNotes:$('reviewNotes').value.slice(0,2500),
   stemChecked:$('stemChecked').checked,choicesChecked:$('choicesChecked').checked,
-  tickChecked:$('tickChecked').checked,figureChecked:$('figureChecked').checked};
+  tickChecked:$('tickChecked').checked,figureChecked:$('figureChecked').checked,
+  sourceSignature:sourceSignature(questions[current-1])};
 }
 function setForm(row){
  $('specimenNumber').value=row.specimenNumber??'';
  $('pdfPage').value=row.pdfPage??'';
  for(const k of ['officialTick','typedChoice','printedChoice','reviewNotes'])$(k).value=row[k];
- for(const k of CHECKS)$(k).checked=row[k];
+ // Preserve old notes, but never carry source attestation checkboxes forward
+ // from an older question text or legacy pre-binding review record.
+ const matches=sourceMatches(row,current);
+ for(const k of CHECKS)$(k).checked=matches&&row[k];
  updatePdfPageLink();
 }
 function hasData(r){return Boolean(r.specimenNumber||r.pdfPage||r.officialTick||r.typedChoice||
@@ -125,7 +135,7 @@ function duplicateSpecimen(r,number){
   x.specimenNumber===r.specimenNumber);
 }
 function localCheck(r,number){
- return validRow(r)&&int(r.specimenNumber)&&r.specimenNumber<=200&&
+ return validRow(r)&&sourceMatches(r,number)&&int(r.specimenNumber)&&r.specimenNumber<=200&&
   int(r.pdfPage)&&r.pdfPage<=300&&
   r.printedChoice.trim().length>=2&&
   r.stemChecked&&r.choicesChecked&&r.tickChecked&&
@@ -137,6 +147,7 @@ function localCheck(r,number){
 function stateLabel(r,number){
  if(!r||!hasData(r))return 'Not reviewed';
  if(!validRow(r))return 'Invalid or out-of-range field: check the printed number, page and text';
+ if(!sourceMatches(r,number))return 'Source version changed / legacy review · recheck every option and original page before marking verified';
  if(duplicateSpecimen(r,number))return 'Draft only · specimen question number is already assigned to another slot';
  return localCheck(r,number)?
   'Locally checked · exported for separate source audit only; student scores remain disabled':
@@ -171,7 +182,9 @@ function view(){
   'Editorial study text repaired from unofficial guide Q'+q.sourceComparison.guideQuestionNumber+
   ' (page '+q.sourceComparison.pdfPage+'); original TNPSC wording not certified.':
   'User-supplied transcription; original TNPSC question wording still requires comparison.';
- setForm(records[current]||empty());
+ const saved=records[current]||empty();
+ $('sourceRevisionWarning').hidden=!(hasData(saved)&&!sourceMatches(saved,current));
+ setForm(saved);
  dirty=false;status();
 }
 function status(){
@@ -190,7 +203,7 @@ function record(){
  if(!validRow(next)){$('recordStatus').textContent='Cannot save: invalid printed number, page or field';return;}
  if(hasData(next))records[current]=next;else delete records[current];
  try{saveLocal()}catch(e){$('recordStatus').textContent=e.message;return}
- dirty=false;status();$('transferStatus').textContent='Saved local review for Q'+current;
+ dirty=false;$('sourceRevisionWarning').hidden=true;status();$('transferStatus').textContent='Saved local review for Q'+current;
 }
 function resetOne(){
  if(!records[current])return;
@@ -203,9 +216,9 @@ function snapshot(){
   const r=records[q.number]||empty();
   return {transcriptionNumber:q.number,editorialReviewStatus:localCheck(r,q.number)?
     'local_source_attestation_pending_editorial_publication':hasData(r)?'draft':'not_reviewed',
-   sourceStatus:q.sourceStatus,...r};
+   sourceStatus:q.sourceStatus,questionSignature:sourceSignature(q),...r};
  });
- return {schemaVersion:1,bankId:BANK_ID,exam:'TNPSC Group I Services Prelims 2026',
+ return {schemaVersion:2,sourceBinding:'exact-question-and-A-to-E-text-v1',bankId:BANK_ID,exam:'TNPSC Group I Services Prelims 2026',
   officialTentativeSource:OFFICIAL,disclaimer:'Reviewer-only local comparison. Not an official answer key. No student scoring is authorized.',
   exportedAt:new Date().toISOString(),rows};
 }
@@ -219,19 +232,31 @@ function download(){
 async function importFile(file){
  if(!file||file.size>1250000)throw Error('Use a review JSON file smaller than 1.25 MB');
  const x=JSON.parse(await file.text());
- if(x.schemaVersion!==1||x.bankId!==BANK_ID||x.officialTentativeSource!==OFFICIAL||
+ if(![1,2].includes(x.schemaVersion)||x.bankId!==BANK_ID||x.officialTentativeSource!==OFFICIAL||
     !Array.isArray(x.rows)||x.rows.length!==200)throw Error('Wrong or incomplete 2026 Group I review file');
- const fresh={};
+ if(x.schemaVersion===2&&x.sourceBinding!=='exact-question-and-A-to-E-text-v1')
+  throw Error('Unknown source binding version; imported reviews cannot be trusted');
+ const fresh={};let older=0;
  x.rows.forEach((row,i)=>{
   if(row.transcriptionNumber!==i+1||row.sourceStatus!==questions[i].sourceStatus)
    throw Error('Mismatched question order/source status at slot '+(i+1));
   const raw={};for(const k of FIELDS)raw[k]=row[k];
+  raw.sourceSignature=typeof raw.sourceSignature==='string'?raw.sourceSignature:'';
   if(!validRow(raw))throw Error('Invalid review row '+(i+1));
+  const currentSig=sourceSignature(questions[i]);
+  if(x.schemaVersion===1||row.questionSignature!==currentSig||raw.sourceSignature!==currentSig){
+   // Keep the reviewer notes and printed choice as drafts, but strip prior
+   // checkmarks if the source text has changed or an old export lacks binding.
+   if(hasData(raw))older++;
+   for(const k of CHECKS)raw[k]=false;
+   raw.sourceSignature='';
+  }
   if(hasData(raw))fresh[i+1]=raw;
  });
  if(!window.confirm('Replace all browser-local reviews with this imported 200-position snapshot?'))return;
  records=normalize(fresh);saveLocal();view();
- $('transferStatus').textContent='Imported '+Object.keys(records).length+' locally saved reviews; no scores or questions were published.';
+ $('transferStatus').textContent='Imported '+Object.keys(records).length+
+  ' locally saved reviews; '+older+' legacy or source-changed records require fresh manual checks. No scores were published.';
 }
 $('specimenFile').addEventListener('change',e=>{
  const file=e.target.files?.[0];
@@ -240,7 +265,7 @@ $('specimenFile').addEventListener('change',e=>{
 $('specimenJump').addEventListener('click',showLocalPDFPage);
 $('specimenClose').addEventListener('click',()=>closeLocalPDF());
 $('pdfPage').addEventListener('input',updatePdfPageLink);
-FIELDS.forEach(id=>$(id).addEventListener(id.endsWith('Checked')?'change':'input',()=>{
+FIELDS.filter(id=>id!=='sourceSignature').forEach(id=>$(id).addEventListener(id.endsWith('Checked')?'change':'input',()=>{
  if(!questions.length)return;dirty=true;status();
 }));
 $('officialTick').addEventListener('change',()=>{dirty=true;status()});

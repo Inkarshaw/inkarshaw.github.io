@@ -1,4 +1,4 @@
-/* TNPSC Group I 2026: original-number user-supplied text, no guessed answer keys.
+/* TNPSC Group I 2026: user-transcribed study positions, NOT certified original TNPSC specimen numbers; no guessed keys.
    This app intentionally never computes "correct" / "wrong" from the unverified OCR. */
 (()=>{
 'use strict';
@@ -98,7 +98,7 @@ function drawPalette(){
  for(let i=0;i<200;i++){
   const b=document.createElement('button');b.type='button';
   b.className='palette-btn'+(attempt.answers[i]?' done':'')+(attempt.flagged[i]?' flagged':'')+(attempt.index===i?' active':'');
-  b.textContent=String(i+1);b.title='Original Q'+(i+1)+(attempt.answers[i]?' · answered':'')+(attempt.flagged[i]?' · flagged':'');
+  b.textContent=String(i+1);b.title='Transcription Q'+(i+1)+(attempt.answers[i]?' · answered':'')+(attempt.flagged[i]?' · flagged':'');
   b.setAttribute('aria-label',b.title);
   b.addEventListener('click',()=>jump(i));
   holder.append(b);
@@ -107,7 +107,7 @@ function drawPalette(){
 function render(){
  if(!attempt)return;
  const i=attempt.index,q=questions[i];
- $('position').textContent='Original Question '+q.number+' of 200 · '+(attempt.mode==='exam'?'Exam mode':'Practice mode');
+ $('position').textContent='Transcription Question '+q.number+' of 200 · '+(attempt.mode==='exam'?'Exam mode':'Practice mode');
  $('status').textContent=answered()+' of 200 answered · '+flagged()+' flagged · saved in this browser';
  $('progressBar').style.width=String(Math.round(100*answered()/200))+'%';
  $('questionText').textContent=q.question;
@@ -133,7 +133,7 @@ function render(){
  }
  $('sourceWarning').hidden=q.sourceStatus!=='needs_source_review';
  $('sourceWarning').textContent=q.sourceStatus==='needs_source_review'?
-   'Source review needed for original Q'+q.number+': '+q.sourceIssue+' Consult the linked TNPSC specimen PDF before selecting an answer.':'';
+   'Source review needed for transcription Q'+q.number+': '+q.sourceIssue+' Consult the linked TNPSC specimen PDF before selecting an answer.':'';
  const options=$('options');options.replaceChildren();
  for(const letter of LETTERS){
   const b=document.createElement('button');b.type='button';
