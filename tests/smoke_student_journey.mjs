@@ -840,6 +840,11 @@ try {
     undefined,{timeout:20000});
   assert.equal(await page.locator('#number').innerText(),'84','Deep link opens the requested Series C visual question');
   assert.equal(await page.locator('#comparisonImage').isVisible(),true,'Clearly labelled editorial figure is visible');
+  await page.locator('#ocrEvidencePanel summary').click();
+  assert.match(await page.locator('#ocrEvidenceLevel').innerText(),/English stem and all four option values/,'Q84 has independent OCR text corroboration only');
+  assert.match(await page.locator('#ocrEvidenceNext').innerText(),/Visually match original Series C/);
+  assert.match(await page.locator('#ocrEvidenceLink').getAttribute('href'),/scribd\.com\/document\/1014181296/);
+  assert.match(await page.locator('#ocrEvidencePanel').innerText(),/does not.*original PDF/i,'Indexed text is explicitly not original visual certification');
   assert.match(await page.locator('#comparison h2').innerText(),/NOT an original booklet image/);
   assert.match(await page.locator('#loadStatus').innerText(),/remains ungraded/);
   assert.equal(await page.locator('#checkedCount').innerText(),'0');
@@ -888,7 +893,12 @@ try {
   assert.equal(await page.locator('#staleWarning').isVisible(),true);
   assert.equal(await page.locator('#figureChecked').isChecked(),false,'Original figure check must be repeated');
   assert.match(await page.locator('#sourceNote').inputValue(),/Secondary print page 18/,'Review notes survive stale invalidation');
+  await page.locator('#questionSelect').selectOption('95');
+  assert.match(await page.locator('#ocrEvidenceLevel').innerText(),/English stem and all four option values/,'Q95 wording and option pairs corroborated only as OCR');
+  await page.locator('#questionSelect').selectOption('103');
+  assert.match(await page.locator('#ocrEvidenceLevel').innerText(),/some OCR labels are uncertain/,'Q103 number labels not certified');
   await page.locator('#questionSelect').selectOption('47');
+  assert.match(await page.locator('#ocrEvidenceLevel').innerText(),/No original matrix or option layout/,'Q47 remains completely unavailable in OCR preview');
   assert.equal(await page.locator('#comparison').isVisible(),false,'Unverified Series D-only matrix Q47 has no counterfeit original image');
   assert.match(await page.locator('#sourceIssue').innerText(),/Series D/);
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
