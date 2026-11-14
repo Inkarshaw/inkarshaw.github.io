@@ -813,6 +813,22 @@ try {
   await page.locator('#options button').first().click();
   assert.equal(await page.locator('#check').isVisible(),false,'Exam mode hides Check Answer');
   assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode conceals correct option');
+  // Source-disputed Series C questions are discoverable and directly playable without grades.
+  await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#sourceDisputeList')?.children.length===7,
+    undefined,{timeout:20000});
+  await page.locator('#sourceDisputeDesk summary').click();
+  assert.equal(await page.locator('#sourceDisputeList > li').count(),7,'Seven, and only seven, ungraded source disputes shown');
+  assert.match(await page.locator('#sourceDisputeList').innerText(),/Q22.*International versus regional terminology/s);
+  assert.equal(await page.locator('#sourceDisputeList a').count(),2,'First-party SAARC and secondary answer guide are separately linked');
+  await page.locator('#sourceDisputeList button').filter({hasText:/Study Q22/}).click();
+  assert.match(await page.locator('#position').innerText(),/Original Q22/,'Source queue launches disputed Q22 without altering order');
+  assert.equal(await page.locator('#quiz').isVisible(),true);
+  await page.locator('#options button').first().click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded/);
+  assert.match(await page.locator('#feedback').innerText(),/SAARC/);
+  assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Q22 source queue does not enable scoring');
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2020 has no runtime page errors');
   console.log('PASS TNUSRB SI 2020: 140 playable, 130 provisional scores, recovered C Q114–116, source caveats and resume');
 

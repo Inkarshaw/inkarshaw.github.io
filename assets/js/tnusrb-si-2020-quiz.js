@@ -140,6 +140,46 @@
     render(true);tick();
     if(attempt.deadline)interval=setInterval(tick,1000);
   }
+  function renderSourceDisputes(){
+    const holder=$('sourceDisputeList');holder.replaceChildren();
+    const disputed=questions.filter(q=>q.scoringStatus==='ungraded_source_dispute');
+    const topic={15:'Ambiguous printed wording',22:'International versus regional terminology',
+      37:'Duplicate OCR choice and Series D spelling',47:'C-series matrix choices not recovered',
+      84:'Original intersection diagram unverified',95:'Original crossed-shapes figure unverified',
+      103:'Original circle-grid figure unverified'};
+    for(const q of disputed){
+      const li=document.createElement('li');
+      const heading=document.createElement('strong');
+      heading.textContent='Q'+q.number+' · '+(topic[q.number]||'Original source unverified');
+      const stem=document.createElement('p');stem.className='small';
+      stem.textContent=q.question.slice(0,180);
+      const note=document.createElement('p');note.className='small';
+      note.textContent=q.answerReviewReason||q.sourceIssue;
+      const btn=document.createElement('button');btn.type='button';
+      btn.textContent='Study Q'+q.number+' (ungraded)';
+      btn.setAttribute('aria-label','Open ungraded question '+q.number+' in the selected practice mode');
+      btn.addEventListener('click',()=>{
+        const idx=questions.findIndex(item=>item.number===q.number);
+        if(idx<0)return;
+        start();
+        if(!attempt||attempt.finished)return;
+        attempt.index=idx;render(true);save();
+      });
+      li.append(heading,stem,note,btn);
+      if(Array.isArray(q.externalStudyReferences)){
+        const sources=document.createElement('p');sources.className='small';
+        sources.append(document.createTextNode('Context, not key certification: '));
+        q.externalStudyReferences.forEach((ref,i)=>{
+          if(i)sources.append(document.createTextNode(' · '));
+          const link=document.createElement('a');link.href=ref.url;
+          link.target='_blank';link.rel='noopener noreferrer';link.textContent=ref.label;
+          sources.append(link);
+        });
+        li.append(sources);
+      }
+      holder.append(li);
+    }
+  }
   function renderPalette(){
     const nav=$('palette');nav.replaceChildren();
     questions.forEach((q,i)=>{
@@ -348,6 +388,7 @@
       });
       $('loadStatus').textContent=questions.length+' / 140 readable original-numbered questions: 130 provisionally scored; '+
         '3 ALL tokens and 7 source/wording review items ungraded; no missing question numbers.';
+      renderSourceDisputes();
       updateStart();
     })
     .catch(err=>{$('loadStatus').textContent='Quiz could not load: '+err.message;
