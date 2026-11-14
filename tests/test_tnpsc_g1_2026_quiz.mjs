@@ -93,6 +93,7 @@ assert.doesNotMatch(js,/Original Question /,'Do not mislabel 2026 transcription 
 const mappingDesk=read('assets/js/tnpsc-g1-2026-key-review.js');
 const mappingHTML=read('tnpsc-g1-2026-key-review.html');
 assert.match(mappingDesk,/sourceSignature=q=>JSON\.stringify/,'Bind reviewer checks to exact question text and choices');
+assert.match(mappingDesk,/FIELDS\.filter\(id=>id!=='sourceSignature'\)/,'Serialized source version is not a DOM input');
 assert.match(mappingDesk,/sourceMatches\(r,number\)/,'Source-version requirement gates locally checked rows');
 assert.match(mappingDesk,/sourceBinding:'exact-question-and-A-to-E-text-v1'/,'Structured export declares source-bound format');
 assert.match(mappingDesk,/row\.questionSignature!==currentSig/,'Import rejects stale attestations');
