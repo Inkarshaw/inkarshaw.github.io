@@ -15,6 +15,8 @@ function validate(data){
     data.suppliedQuestionCount!==200||data.keyedAnswerCount!==0||
     data.textReadyCount!==198||data.needsReviewCount!==2||data.secondaryTextReviewCount!==5||
     data.diagramStudyReconstructionCount!==2||data.diagramStudyReconstructionQuestionNumbers?.join(',')!=='98,200'||
+    data.diagramSecondaryFigureCrossCheckCount!==2||data.diagramSecondaryFigureCrossCheckQuestionNumbers?.join(',')!=='98,200'||
+    data.bilingualEditorialStudyCount!==2||data.bilingualEditorialStudyQuestionNumbers?.join(',')!=='98,200'||
     !Array.isArray(data.questions)||data.questions.length!==200||
     !Array.isArray(data.sourceReviewQuestionNumbers)||data.sourceReviewQuestionNumbers.length!==2||
     !Array.isArray(data.secondaryTextReviewQuestionNumbers)||data.secondaryTextReviewQuestionNumbers.length!==5||
@@ -47,6 +49,17 @@ function validate(data){
       visual.sourceUrl!=='https://arivark.com/assets/img/pyq/g1-2026-q'+(i+1===98?'98-dice.png':'200-dice-nets.png')||
       !visual.alt||!visual.caption)
      throw Error('Missing attributed editorial diagram / original verification warning for Q'+(i+1));
+   const comparison=visual.secondaryIllustrationCrossCheck;
+   if(!comparison||comparison.status!=='two_independent_third_party_illustrations_visual_compared_not_official_specimen'||
+      comparison.independentlyTNPSCSpecimenVerified!==false||comparison.officialAnswerKeyMapped!==false||
+      comparison.studyDiagramLayoutCrossChecked!==true||comparison.editorialTamilOnly!==true||
+      comparison.comparisonPdf!=='https://athiyamanteam.com/wp-content/uploads/2026/09/tnpsc-group-1-prelims-question-paper-2026-ccsei-p26.pdf'||
+      comparison.comparedQuestionNumber!==i+1||
+      comparison.thirdPartyPrintedPdfPages?.join(',')!==(i+1===98?'44':'89,90')||
+      !q.questionTamil?.trim()||
+      q.tamilStudyStatus!=='editorial_tamil_study_translation_not_original_booklet_verified'||
+      LETTERS.some(k=>typeof q.optionsTamil?.[k]!=='string'||!q.optionsTamil[k].trim()))
+     throw Error('Secondary figure / Tamil study provenance is not safe at Q'+(i+1));
   }else if(q.visual)throw Error('Unapproved source illustration attached to Q'+(i+1));
   if(i+1===98&&q.options.B!=='4')throw Error('Corrected 2026 Q98 printed option B must be four');
   if(i+1===200&&LETTERS.slice(0,4).some(k=>!q.options[k].startsWith('Figure ('+k+')')))
@@ -111,6 +124,8 @@ function render(){
  $('status').textContent=answered()+' of 200 answered · '+flagged()+' flagged · saved in this browser';
  $('progressBar').style.width=String(Math.round(100*answered()/200))+'%';
  $('questionText').textContent=q.question;
+ $('questionTamil').hidden=!q.questionTamil;
+ $('questionTamil').textContent=q.questionTamil||'';
  const illustration=$('questionFigure'), source=$('figureSourceLink');
  illustration.replaceChildren();
  $('figureSource').hidden=!q.visual;
@@ -123,6 +138,13 @@ function render(){
   description.textContent=q.visual.caption;
   illustration.append(description);
   source.href=q.visual.sourceUrl;
+ }
+ const crossCheck=q.visual?.secondaryIllustrationCrossCheck;
+ $('figureCrossCheck').hidden=!crossCheck;
+ if(crossCheck){
+  const pages=crossCheck.thirdPartyPrintedPdfPages;
+  $('figureCrossCheckLink').href=crossCheck.comparisonPdf+'#page='+pages[0];
+  $('figureCrossCheckLink').textContent='See the independent bilingual coaching-paper scan (PDF '+(pages.length===1?'page ':'pages ')+pages.join('–')+')';
  }
  const repair=q.sourceStatus==='secondary_source_text_cross_checked'?q.sourceComparison:null;
  $('secondarySourceNote').hidden=!repair;
@@ -140,7 +162,13 @@ function render(){
   b.className='answer'+(attempt.answers[i]===letter?' selected':'');
   b.setAttribute('aria-pressed',String(attempt.answers[i]===letter));
   const symbol=document.createElement('span');symbol.className='letter';symbol.textContent=letter;
-  const body=document.createElement('span');body.textContent=q.options[letter];
+  const body=document.createElement('span');body.className=q.optionsTamil?'bilingual-answer':'';
+  const english=document.createElement('span');english.textContent=q.options[letter];
+  body.append(english);
+  if(q.optionsTamil){
+   const tamil=document.createElement('span');tamil.className='answer-tamil';
+   tamil.lang='ta';tamil.textContent=q.optionsTamil[letter];body.append(tamil);
+  }
   b.append(symbol,body);
   b.addEventListener('click',()=>{
     attempt.answers[i]=letter;write();render();
@@ -193,6 +221,11 @@ function renderReview(){
     (q.sourceStatus==='secondary_source_text_cross_checked'?' · secondary text repaired':'');
   details.append(summary);
   const stem=document.createElement('p');stem.textContent=q.question;details.append(stem);
+  if(q.questionTamil){
+   const t=document.createElement('p');t.lang='ta';
+   t.textContent='Editorial Tamil study translation (not verified original): '+q.questionTamil;
+   details.append(t);
+  }
   const options=document.createElement('p');options.className='options';
   options.textContent=LETTERS.map(a=>a+') '+q.options[a]).join('\n');details.append(options);
   if(q.sourceIssue){const issue=document.createElement('p');issue.textContent='Source issue: '+q.sourceIssue;details.append(issue)}
@@ -200,6 +233,13 @@ function renderReview(){
    const imageNote=document.createElement('p');
    imageNote.textContent='A separately referenced editorial study illustration is available when you reopen Q'+q.number+'. Official original specimen illustration not independently verified. No official key or marks supplied.';
    details.append(imageNote);
+   if(q.visual.secondaryIllustrationCrossCheck){
+    const evidence=document.createElement('p');
+    evidence.textContent='Secondary picture cross-check: compared with an independent 2026 published bilingual coaching booklet, PDF page '+
+      q.visual.secondaryIllustrationCrossCheck.thirdPartyPrintedPdfPages.join(', ') +
+      '. Official TNPSC specimen figure and answer key still unverified; no marks assigned.';
+    details.append(evidence);
+   }
   }
   if(q.sourceComparison){const note=document.createElement('p');note.textContent='Study-text recovery: Q'+q.sourceComparison.guideQuestionNumber+' on PDF page '+q.sourceComparison.pdfPage+' in a third-party 2026 guide. Original TNPSC specimen not verified; answers remain ungraded.';details.append(note)}
   holder.append(details);
