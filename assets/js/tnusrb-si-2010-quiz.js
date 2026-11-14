@@ -159,6 +159,15 @@
     $('questionTamil').hidden=!q.questionTamil;
     $('questionTamil').textContent=q.questionTamil||'';
     $('sourceReader').hidden=!q.questionTamil;
+    const guide=q.vectorStudyGuide;
+    $('vectorStudyPanel').hidden=!guide;
+    if(guide){
+      $('vectorStudyIdentity').textContent=guide.identity+'\nGiven: '+guide.given;
+      $('vectorStudyDeduction').textContent=guide.deduction;
+      $('vectorStudyTamil').textContent=guide.tamil;
+      $('vectorStudyWarning').textContent=guide.warning;
+      $('vectorStudySource').href=guide.sourceURL;
+    }
     const locked=attempt.mode==='practice'&&attempt.checked[i];
     $('options').replaceChildren();
     for(const letter of LETTERS){
@@ -223,7 +232,9 @@
       if(q.passage){const context=document.createElement('p');context.textContent=q.passage;body.append(context)}
       const response=document.createElement('p');response.textContent='Your choice: '+(answer||'not answered')+
         (disputed?' · source key conflict: no answer asserted':' · mirrored final key: '+q.keyToken);body.append(response);
-      if(disputed){const reason=document.createElement('p');reason.textContent=q.scoringReviewReason;body.append(reason)}
+      if(disputed){const reason=document.createElement('p');reason.textContent=q.scoringReviewReason;body.append(reason);
+        if(q.vectorStudyGuide){const study=document.createElement('p');study.textContent='Vector identity: '+q.vectorStudyGuide.identity+'. '+q.vectorStudyGuide.deduction+' '+q.vectorStudyGuide.warning;body.append(study)}
+      }
       for(const letter of LETTERS){
         const p=document.createElement('p');p.textContent=letter+') '+q.options[letter];body.append(p);
       }
@@ -274,7 +285,7 @@
         gapList.append(li);
       });
       $('loadStatus').textContent=questions.length+' readable Open Candidates questions loaded: '+
-        '10 bilingual source-reviewed Q1–10, 134 provisional key scores, '+
+        '10 bilingual source-reviewed Q1–10, 135 provisional key scores, '+
         '4 ALL entries and Q64 key dispute ungraded; 140 original-numbered source records, no blocked questions. Q106 Venn recovered.';
       updateStart();
     })
