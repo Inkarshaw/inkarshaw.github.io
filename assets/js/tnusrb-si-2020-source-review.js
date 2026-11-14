@@ -273,7 +273,7 @@ $('pdfFile').addEventListener('change',e=>loadPdf(e.target.files?.[0]));
 $('pdfJump').addEventListener('click',preview);
 $('pdfClose').addEventListener('click',()=>closePdf());
 $('pdfPage').addEventListener('input',updatePdfJump);
-FIELDS.filter(k=>k!=='signature').forEach(k=>$(k).addEventListener(CHECKS.includes(k)||k==='sourceKind'?'change':'input',()=>{
+FIELDS.filter(k=>k!=='signature'&&k!=='pdfSHA256').forEach(k=>$(k).addEventListener(CHECKS.includes(k)||k==='sourceKind'?'change':'input',()=>{
  if(!questions.length)return;dirty=true;status();
 }));
 $('questionSelect').addEventListener('change',()=>navigate(questions.findIndex(q=>q.number===Number($('questionSelect').value))));
