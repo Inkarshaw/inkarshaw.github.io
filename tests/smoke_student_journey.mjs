@@ -855,7 +855,9 @@ try {
   assert.equal(await page.locator('#pdfJump').isDisabled(),true,'A renamed non-PDF is not previewed');
   await page.locator('#pdfFile').setInputFiles({name:'local-series-c.pdf',mimeType:'application/pdf',
     buffer:Buffer.from(samplePdf)});
-  await page.waitForFunction(()=>/SHA-256 [a-f0-9]{64}/.test(document.querySelector('#pdfStatus')?.textContent||''));
+  await page.waitForFunction(()=>/PDF opened locally|Could not read this local file|Rejected:|Unable to create local preview/.test(document.querySelector('#pdfStatus')?.textContent||''),undefined,{timeout:10000});
+  assert.match(await page.locator('#pdfStatus').innerText(),/SHA-256 [a-f0-9]{64}/,
+    'PDF source hashing failed: '+await page.locator('#transferStatus').innerText());
   assert.match(await page.locator('#pdfStatus').innerText(),/file hash cannot prove TNUSRB authenticity/);
   assert.match(await page.locator('#pdfFingerprint').innerText(),/^[a-f0-9]{64}$/,'Original PDF byte identity shown without network upload');
   await page.locator('#pdfPage').fill('18');
@@ -885,7 +887,9 @@ try {
   assert.equal(await page.locator('#checkedCount').innerText(),'0','Page reload requires opening the exact document again');
   assert.match(await page.locator('#pdfBindingNotice').innerText(),/same PDF is reloaded/);
   await page.locator('#pdfFile').setInputFiles({name:'same-file.pdf',mimeType:'application/pdf',buffer:Buffer.from(samplePdf)});
-  await page.waitForFunction(()=>/SHA-256 [a-f0-9]{64}/.test(document.querySelector('#pdfStatus')?.textContent||''));
+  await page.waitForFunction(()=>/PDF opened locally|Could not read this local file|Rejected:|Unable to create local preview/.test(document.querySelector('#pdfStatus')?.textContent||''),undefined,{timeout:10000});
+  assert.match(await page.locator('#pdfStatus').innerText(),/SHA-256 [a-f0-9]{64}/,
+    'PDF source hashing failed: '+await page.locator('#transferStatus').innerText());
   assert.equal(await page.locator('#checkedCount').innerText(),'1','Same SHA-256 file restores a locally checked draft, not official certification');
   await page.evaluate(()=>{
     const key='clearexams:editorial:tnusrb:si:2020:series-c:visual-review:v1';
