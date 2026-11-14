@@ -166,6 +166,14 @@
         attempt.index=idx;render(true);save();
       });
       li.append(heading,stem,note,btn);
+      if([47,84,95,103].includes(q.number)){
+        const review=document.createElement('a');
+        review.href='tnusrb-si-2020-source-review.html?q='+q.number;
+        review.textContent=' Compare original booklet page (editorial review)';
+        review.setAttribute('aria-label','Open local original Series C verification for question '+q.number);
+        review.style.marginLeft='10px';
+        li.append(review);
+      }
       if(Array.isArray(q.externalStudyReferences)){
         const sources=document.createElement('p');sources.className='small';
         sources.append(document.createTextNode('Context, not key certification: '));
