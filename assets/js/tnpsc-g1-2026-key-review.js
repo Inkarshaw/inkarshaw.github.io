@@ -203,7 +203,7 @@ function record(){
  if(!validRow(next)){$('recordStatus').textContent='Cannot save: invalid printed number, page or field';return;}
  if(hasData(next))records[current]=next;else delete records[current];
  try{saveLocal()}catch(e){$('recordStatus').textContent=e.message;return}
- dirty=false;status();$('transferStatus').textContent='Saved local review for Q'+current;
+ dirty=false;$('sourceRevisionWarning').hidden=true;status();$('transferStatus').textContent='Saved local review for Q'+current;
 }
 function resetOne(){
  if(!records[current])return;
