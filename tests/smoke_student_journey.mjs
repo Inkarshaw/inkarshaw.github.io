@@ -820,7 +820,8 @@ try {
   await page.locator('#sourceDisputeDesk summary').click();
   assert.equal(await page.locator('#sourceDisputeList > li').count(),7,'Seven, and only seven, ungraded source disputes shown');
   assert.match(await page.locator('#sourceDisputeList').innerText(),/Q22.*International versus regional terminology/s);
-  assert.equal(await page.locator('#sourceDisputeList a').count(),2,'First-party SAARC and secondary answer guide are separately linked');
+  assert.equal(await page.locator('#sourceDisputeList a[href^="https://"]').count(),2,'First-party SAARC and secondary answer guide are separately linked');
+  assert.equal(await page.locator('#sourceDisputeList a[href^="tnusrb-si-2020-source-review.html?q="]').count(),4,'Four original-figure/matrix verification routes available');
   await page.locator('#sourceDisputeList button').filter({hasText:/Study Q22/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q22/,'Source queue launches disputed Q22 without altering order');
   assert.equal(await page.locator('#quiz').isVisible(),true);
