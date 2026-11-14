@@ -463,6 +463,7 @@ try {
   await page.locator('#choicesChecked').check();
   await page.locator('#tickChecked').check();
   assert.match(await page.locator('#recordStatus').innerText(),/Incomplete draft/,'Missing dice figure cannot be locally cleared');
+  page.once('dialog',dialog=>dialog.accept()); // Permit navigation away from unsaved Q98 source-review draft.
   await page.locator('#slot').selectOption('200');
   assert.equal(await page.locator('#editorialFigurePreview').isVisible(),true,'Q200 four candidate nets comparison visible');
   assert.match(await page.locator('#editorialFigureSecond').getAttribute('href'),/#page=89$/);
