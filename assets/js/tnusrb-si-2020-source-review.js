@@ -89,6 +89,16 @@ function view(){
  $('keyToken').textContent=q.answerKeyToken;
  $('stem').textContent=q.question;
  $('sourceIssue').textContent=q.sourceIssue||'Original source comparison is pending.';
+ const mirror=q.sameNamedBookletOCRAudit;
+ const scope={
+  not_readable_in_public_ocr_index:'No original matrix or option layout can be read from the public OCR index',
+  english_stem_and_four_option_values_corroborated_by_ocr:'Printed question number, English stem and all four option values appear in the independent OCR index',
+  english_stem_and_numeric_choices_partially_corroborated_by_ocr:'Printed stem and option numerals appear, but some OCR labels are uncertain'
+ };
+ $('ocrEvidenceLevel').textContent=scope[mirror?.evidenceLevel]||'No independent OCR comparison recorded';
+ $('ocrEvidenceDetails').textContent=mirror?.observedDetails||'Original image verification pending.';
+ $('ocrEvidenceNext').textContent='Still needed: '+(mirror?.requiredNext||'Original Series C source page.');
+ $('ocrEvidenceLink').href=mirror?.sourceURL||'https://www.scribd.com/document/1014181296/SI-2019-WT-QUESTION';
  const choices=$('choices');choices.replaceChildren();
  for(const letter of ['A','B','C','D']){
   const p=document.createElement('div');p.className='choice';
@@ -238,6 +248,13 @@ fetch('data/quizzes/tnusrb-si-2020-series-c.json',{cache:'no-store'})
   throw Error('Question bank no longer matches the expected unverified Series C source manifest');
  bank=data;
  questions=NUMBERS.map(n=>data.questions.find(q=>q.number===n));
+ if(!data.sourceRecoveryAudit?.sameNamedBookletOCRAudit||
+    data.sourceRecoveryAudit.sameNamedBookletOCRAudit.allRemainUngraded!==true||
+    data.sourceRecoveryAudit.sameNamedBookletOCRAudit.originalFigurePageImagesVerified!==false||
+    questions.some(q=>!q?.sameNamedBookletOCRAudit||
+      q.sameNamedBookletOCRAudit.visuallyVerifiedOriginalFigureOrMatrix!==false||
+      q.sameNamedBookletOCRAudit.originalBoardHostedPDFInspected!==false))
+   throw Error('Indexed booklet evidence must not imply any original visual certification');
  if(questions.some(q=>!q||q.scoringStatus!=='ungraded_source_dispute'||q.acceptedAnswers?.length!==0||
    !['A','B','C','D'].every(letter=>q.options?.[letter])))
    throw Error('Source-review question status changed; review cannot be loaded');

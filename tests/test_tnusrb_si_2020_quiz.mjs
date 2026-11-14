@@ -304,6 +304,41 @@ assert.match(auditJS,/sourceSignature:signature\(q\)/,'Review export carries sou
 assert.match(auditJS,/row\.sourceSignature!==signature\(q\)/,'Source-changed import loses old checkboxes');
 assert.match(auditJS,/data\.scoredQuestionCount!==130/,'Review tool refuses silently changed scoring bank');
 assert.match(auditJS,/data\.ungradedSourceDisputeCount!==7/,'All seven disputes remain ungraded');
+const sameNamed=data.sourceRecoveryAudit.sameNamedBookletOCRAudit;
+assert.equal(sameNamed.sourceURL,'https://www.scribd.com/document/1014181296/SI-2019-WT-QUESTION');
+assert.deepEqual(sameNamed.reviewedQuestionNumbers,[47,84,95,103]);
+assert.deepEqual(sameNamed.ocrCorroboratedStemAndAlternatives,[84,95]);
+assert.deepEqual(sameNamed.partiallyCorroboratedNumbers,[103]);
+assert.deepEqual(sameNamed.originalMatricesUnreadable,[47]);
+assert.equal(sameNamed.originalFigurePageImagesVerified,false,'Indexed OCR preview is never image proof');
+assert.equal(sameNamed.originalBoardHostedPDFInspected,false,'No successful TNUSRB original fetch');
+assert.equal(sameNamed.allRemainUngraded,true);
+for(const n of [47,84,95,103]){
+ const q=data.questions[n-1], ev=q.sameNamedBookletOCRAudit;
+ assert.equal(ev.questionNumber,n);
+ assert.equal(ev.sourceURL,sameNamed.sourceURL);
+ assert.equal(ev.sourceDate,'2026-11-14');
+ assert.equal(ev.visuallyVerifiedOriginalFigureOrMatrix,false,'Indexed OCR never authenticates Series C artwork');
+ assert.equal(ev.originalBoardHostedPDFInspected,false);
+ assert.equal(ev.corroboratesOfficialAnswerKey,false);
+ assert.equal(ev.scoringMustRemainDisabled,true);
+ assert.equal(q.scoringStatus,'ungraded_source_dispute');
+ assert.deepEqual(q.acceptedAnswers,[]);
+ assert.ok(ev.observedDetails.length>55);
+ assert.ok(ev.requiredNext.length>25);
+}
+assert.equal(data.questions[46].sameNamedBookletOCRAudit.evidenceLevel,'not_readable_in_public_ocr_index','Q47 matrix source still missing');
+assert.equal(data.questions[83].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_four_option_values_corroborated_by_ocr','Q84 separate OCR supports option values, not figure');
+assert.equal(data.questions[94].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_four_option_values_corroborated_by_ocr');
+assert.equal(data.questions[102].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_numeric_choices_partially_corroborated_by_ocr');
+assert.match(auditHTML,/id="ocrEvidencePanel"/,'Reviewer can compare evidence scope');
+assert.match(auditHTML,/id="ocrEvidenceDetails"/);
+assert.match(auditHTML,/id="ocrEvidenceLink"/);
+assert.match(auditJS,/sameNamedBookletOCRAudit/,'OCR evidence comes from versioned question bank');
+assert.match(auditJS,/originalFigurePageImagesVerified!==false/,'No unsupported visual certifications allowed');
+assert.match(auditJS,/ocrEvidenceLevel/);
+assert.match(read('docs/tnusrb-si-2020-original-visual-review-procedure.md'),/Scribd OCR/);
+
 assert.match(auditJS,/q\.acceptedAnswers\?\.length!==0/,'Visual source questions cannot gain answer keys unnoticed');
 assert.ok(!auditJS.includes('innerHTML'),'Reviewer source material only rendered safely as text');
 const auditIds=[...auditHTML.matchAll(/id="([^"]+)"/g)].map(x=>x[1]);
