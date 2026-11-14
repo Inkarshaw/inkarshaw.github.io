@@ -28,6 +28,15 @@ for(const meta of years){
  assert.ok(d.sourceNote.includes('not a visually certified verbatim original booklet'));
  assert.deepEqual(d.questions.map(q=>q.number),Array.from({length:meta.count},(_,i)=>i+1));
  assert.deepEqual(d.questions.filter(q=>q.figureRef).map(q=>q.number),meta.figures);
+ const disputed = meta.year===2019 ? [55,64,66,69,71,72] : meta.year===2020 ? [4,5,34] : [];
+ assert.deepEqual(d.questions.filter(q=>q.studyAnswerReliability==='disputed').map(q=>q.number),disputed,
+  'Contested workbook answers must be explicitly identified for '+meta.year);
+ for (const n of disputed) {
+  const item=d.questions[n-1];
+  assert.equal(item.scoringStatus,'ungraded_unverified_final_key');
+  assert.deepEqual(item.acceptedAnswers,[]);
+  assert.ok(item.editorialNote?.length>20,'Source dispute explanation required at Q'+n);
+ }
  assert.equal(d.questions.filter(q=>q.scoringStatus==='provisional_key').length,meta.scored);
  for(const q of d.questions){
   assert.ok(q.question.trim()&&q.source&&q.topic&&q.section,meta.year+' Q'+q.number+' text and source');
@@ -51,6 +60,11 @@ for(const meta of years){
  }
  all+=d.questionCount;scoredTotal+=d.provisionallyScorable;
 }
+const y20=json('data/quizzes/tnusrb-pc-2020.json');
+assert.match(y20.questions[3].question,/Thermometer/,
+ 'Retain the supplied Q4 transcription; never silently rewrite a contested original label');
+assert.match(y20.questions[3].editorialNote,/Hydrometer/,
+ 'Q4 must explain why Archimedes applies to a hydrometer, not a thermometer');
 const y22=json('data/quizzes/tnusrb-pc-2022.json');
 const q=n=>y22.questions[n-1];
 assert.deepEqual(q(17).acceptedAnswers,['A','B','C','D']);
@@ -68,6 +82,9 @@ for(const v of ["['2019', '2020', '2022']","q.scoringStatus === 'provisional_key
  assert.ok(js.includes(v),'Missing scoring / accessibility control '+v);
 }
 assert.ok(!js.includes('innerHTML'),'Question/source wording must be DOM text');
+for (const control of ["q.studyAnswerReliability === 'disputed'",'Option-by-option worked solutions are withheld',
+ 'Source limitation: ', 'Invalid disputed-answer review guard'])
+ assert.ok(js.includes(control),'Disputed answers and source cautions must be handled: '+control);
 const lib=read('assets/js/typed-pyq-catalog.js');
 assert.ok(lib.includes("fetchJSON('data/quizzes/tnusrb-pc-catalog.json')"));
 assert.ok(lib.includes("Police Constable"));

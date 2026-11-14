@@ -61,8 +61,11 @@ function setNotice() {
   ' figure-dependent entries without reproduced original artwork are ungraded. Tamil study text and tables are normalized, not certified as verbatim official wording.';
   $('sourceNote').classList.add('verified');
  } else {
+  const disputes = bank.questions.filter(q => q.studyAnswerReliability === 'disputed').length;
   $('sourceNote').textContent = year + ' Booklet ' + bank.bookletSeries +
-   ': all 80 questions can be answered, but the supplied workbook includes worked study answers rather than a verified official final key. No exam marks or correct/incorrect claims are made. Some original figures are not yet reproduced.';
+   ': all 80 questions can be answered, but study answers come from an unverified workbook, not an official final key. ' +
+   disputes + ' contested worked answers are withheld from answer review; those questions remain playable. ' +
+   'No exam marks or correct/incorrect claims are made. Some original figures are not yet reproduced.';
  }
 }
 function drawPalette() {
@@ -94,6 +97,10 @@ function drawQuestion() {
    (provisional(q) ? '' : 'This item is not graded.')));
  }
  if (q.editorialNote) $('questionSource').append(newElement('p', 'Editorial note: ' + q.editorialNote));
+ if (q.sourceCaution) $('questionSource').append(newElement('p', 'Source limitation: ' + q.sourceCaution));
+ if (q.studyAnswerReliability === 'disputed') {
+  $('questionSource').append(newElement('p', 'Source dispute: this worked answer is withheld from review and earns no marks. The original text and choices are preserved for comparison.'));
+ }
  if (q.figureRef && bank.sourcePaperUrl) {
   const page = /PDF p\.\s*(\d+)/i.exec(q.source);
   const link = newElement('a', 'Open externally hosted 2022 source PDF' + (page ? ' near page ' + page[1] : ''));
@@ -119,6 +126,9 @@ function drawQuestion() {
  drawPalette();
 }
 function explanationText(q) {
+ if (q.studyAnswerReliability === 'disputed') {
+  return 'Ungraded source dispute: the workbook answer is ambiguous, contradictory or insufficiently supported. No choice is endorsed and no marks are awarded.';
+ }
  if (q.scoringStatus === 'ungraded_unverified_final_key') {
   return 'Unofficial worked-study answer from the supplied workbook: ' +
    (q.studyAnswer.join(' / ') || 'not stated') +
@@ -143,6 +153,10 @@ function explain(q, target, includeReason) {
  target.append(newElement('p', explanationText(q)));
  if (!includeReason) return;
  if (q.editorialNote) target.append(newElement('p', 'Source caution: ' + q.editorialNote));
+ if (q.studyAnswerReliability === 'disputed') {
+  target.append(newElement('p', 'Option-by-option worked solutions are withheld until the source wording and key can be independently resolved. The question remains available to practise.'));
+  return;
+ }
  if (q.scoringStatus === 'ungraded_missing_original_figure') {
   target.append(newElement('p', 'Option explanations are withheld until the exact source figure is compared.')); return;
  }
@@ -166,7 +180,7 @@ function openResult() {
   const panel = newElement('details');
   const state = provisional(q) ? (
    answers[q.number] ? (q.acceptedAnswers.includes(answers[q.number]) ? 'Indicative correct' : 'Indicative incorrect') : 'Unanswered'
-  ) : 'Ungraded';
+  ) : (q.studyAnswerReliability === 'disputed' ? 'Ungraded · source dispute' : 'Ungraded');
   panel.append(newElement('summary', 'Q' + q.number + ' · ' + state +
    ' · Chosen: ' + (answers[q.number] || '—') + (flags[q.number] ? ' · flagged' : '')));
   const body = newElement('div', undefined, 'resultBody');
@@ -186,6 +200,11 @@ function validateBank(data) {
    !Array.isArray(q.acceptedAnswers) || !Array.isArray(q.studyAnswer) ||
    !q.optionExplanations || letters.some(letter=>!String(q.optionExplanations[letter]||'').trim())) {
    throw Error('Incomplete question Q' + (i+1));
+  }
+  if (q.studyAnswerReliability !== undefined &&
+      (q.studyAnswerReliability !== 'disputed' || year === '2022' ||
+       q.scoringStatus !== 'ungraded_unverified_final_key' || !String(q.editorialNote||'').trim())) {
+   throw Error('Invalid disputed-answer review guard Q'+q.number);
   }
   if (q.scoringStatus==='provisional_key') {
    if (year!=='2022' || q.figureRef || !q.acceptedAnswers.length ||
