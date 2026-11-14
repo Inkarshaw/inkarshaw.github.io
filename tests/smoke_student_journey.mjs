@@ -841,7 +841,7 @@ try {
   assert.equal(await page.locator('#number').innerText(),'84','Deep link opens the requested Series C visual question');
   assert.equal(await page.locator('#comparisonImage').isVisible(),true,'Clearly labelled editorial figure is visible');
   assert.match(await page.locator('#comparison h2').innerText(),/NOT an original booklet image/);
-  assert.match(await page.locator('#loadStatus').innerText(),/remain ungraded/);
+  assert.match(await page.locator('#loadStatus').innerText(),/remains ungraded/);
   assert.equal(await page.locator('#checkedCount').innerText(),'0');
   assert.equal(await page.locator('#pdfJump').isDisabled(),true);
   await page.locator('#pdfFile').setInputFiles({name:'wrong-source.pdf',mimeType:'application/pdf',
