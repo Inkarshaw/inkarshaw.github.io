@@ -282,4 +282,33 @@ assert.match(yearArchive,/SI_2019_WT_QUESTION\.pdf/,'2019 recruitment/2020 exam 
 assert.match(yearArchive,/2h 30m/,'Exam duration corrected for Series C');
 assert.match(yearArchive,/Total marks/,'Unverified cut-off percentages removed from 2019/2020 cards');
 
+const auditHTML=read('tnusrb-si-2020-source-review.html');
+const auditJS=read('assets/js/tnusrb-si-2020-source-review.js');
+assert.match(html,/tnusrb-si-2020-source-review\.html/,'Quiz page opens four-item source audit');
+assert.match(js,/tnusrb-si-2020-source-review\.html\?q=/,'All four disputed figures link to original-source review');
+assert.match(auditHTML,/name="robots" content="noindex,nofollow"/,'Editorial-only source review does not pretend to be an indexed public answer key');
+assert.match(auditHTML,/Q47, Q84, Q95 and Q103/,'Exact four original source visual positions identified');
+assert.match(auditHTML,/id="pdfFile"/,'Manual original booklet viewing never uploads source PDF');
+assert.match(auditHTML,/id="pdfFrame"/,'Locally selected PDF can be inspected page by page');
+assert.match(auditHTML,/id="comparisonImage"/,'Editorial reference art distinguished from original scanned specimen');
+assert.match(auditHTML,/id="figureChecked"/,'Original Series C matrix or diagram requires manual verification');
+assert.match(auditHTML,/id="sourceKind"/,'Original Series C and secondary scan must not be conflated');
+assert.match(auditHTML,/id="staleWarning"/,'Stale source changes are disclosed before rechecking');
+assert.match(auditHTML,/id="export"/,'Reviewer can transfer four notes without uploading scanned material');
+assert.match(auditJS,/const NUMBERS=\[47,84,95,103\]/,'Only the four originally unverified matrices/figures in visual audit');
+assert.match(auditJS,/const signature=q=>JSON\.stringify/,'Source audit bound to exact stem and alternatives');
+assert.match(auditJS,/sourceKind==='board_booklet'/,'Secondary source cannot be marked fully locally checked');
+assert.match(auditJS,/r\.printedNumber===q\.number/,'Exact printed Series C question number required');
+assert.match(auditJS,/CHECKS\.every\(k=>r\[k\]\)/,'All manual visual and key checks required');
+assert.match(auditJS,/sourceSignature:signature\(q\)/,'Review export carries source-text binding');
+assert.match(auditJS,/row\.sourceSignature!==signature\(q\)/,'Source-changed import loses old checkboxes');
+assert.match(auditJS,/data\.scoredQuestionCount!==130/,'Review tool refuses silently changed scoring bank');
+assert.match(auditJS,/data\.ungradedSourceDisputeCount!==7/,'All seven disputes remain ungraded');
+assert.match(auditJS,/q\.acceptedAnswers\?\.length!==0/,'Visual source questions cannot gain answer keys unnoticed');
+assert.ok(!auditJS.includes('innerHTML'),'Reviewer source material only rendered safely as text');
+const auditIds=[...auditHTML.matchAll(/id="([^"]+)"/g)].map(x=>x[1]);
+assert.equal(auditIds.length,new Set(auditIds).size,'No duplicate review controls');
+for(const m of auditJS.matchAll(/\$\('([^']+)'\)/g))assert.ok(auditIds.includes(m[1]),'Missing review control '+m[1]);
+new vm.Script(auditJS,{filename:'assets/js/tnusrb-si-2020-source-review.js'});
+
 console.log('PASS TNUSRB SI 2020 Series C: 140/140 readable (130 scored, 3 ALL and 7 source-reviewed ungraded); 0 missing and 0 blocked.');
