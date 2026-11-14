@@ -832,6 +832,69 @@ try {
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2020 has no runtime page errors');
   console.log('PASS TNUSRB SI 2020: 140 playable, 130 provisional scores, recovered C Q114–116, source caveats and resume');
 
+  // The 2020 visual-source desk is a local reviewer workflow, never a public grading route.
+  pageErrors.length=0;
+  await page.goto(origin+'/tnusrb-si-2020-source-review.html?q=84',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===4,
+    undefined,{timeout:20000});
+  assert.equal(await page.locator('#number').innerText(),'84','Deep link opens the requested Series C visual question');
+  assert.equal(await page.locator('#comparisonImage').isVisible(),true,'Clearly labelled editorial figure is visible');
+  assert.match(await page.locator('#comparison h2').innerText(),/NOT an original booklet image/);
+  assert.match(await page.locator('#loadStatus').innerText(),/remain ungraded/);
+  assert.equal(await page.locator('#checkedCount').innerText(),'0');
+  assert.equal(await page.locator('#pdfJump').isDisabled(),true);
+  await page.locator('#pdfFile').setInputFiles({name:'wrong-source.pdf',mimeType:'application/pdf',
+    buffer:Buffer.from('not-a-pdf'.repeat(30))});
+  await page.waitForFunction(()=>document.querySelector('#pdfStatus').textContent.includes('lacks the PDF signature'));
+  assert.equal(await page.locator('#pdfJump').isDisabled(),true,'A renamed non-PDF is not previewed');
+  await page.locator('#pdfFile').setInputFiles({name:'local-series-c.pdf',mimeType:'application/pdf',
+    buffer:Buffer.from(samplePdf)});
+  await page.waitForFunction(()=>document.querySelector('#pdfStatus').textContent.includes('File signature only'));
+  assert.match(await page.locator('#pdfStatus').innerText(),/authenticity and booklet series NOT verified/);
+  await page.locator('#pdfPage').fill('18');
+  await page.locator('#printedNumber').fill('84');
+  await page.locator('#sourceKind').selectOption('secondary_scan');
+  await page.locator('#sourceNote').fill('Secondary print page 18: original board-host provenance remains unavailable.');
+  for(const id of ['seriesChecked','stemChecked','optionsChecked','figureChecked','keyChecked'])
+    await page.locator('#'+id).check();
+  assert.match(await page.locator('#reviewStatus').innerText(),/Source comparison draft/,
+    'Secondary scan cannot certify the original question');
+  await page.locator('#save').click();
+  assert.equal(await page.locator('#checkedCount').innerText(),'0','Only a draft for secondary source');
+  assert.equal(await page.locator('#draftCount').innerText(),'1');
+  await page.locator('#sourceKind').selectOption('board_booklet');
+  assert.match(await page.locator('#reviewStatus').innerText(),/Locally checked draft/);
+  await page.locator('#save').click();
+  assert.equal(await page.locator('#checkedCount').innerText(),'1','Explicit manual assertion is locally checked, not grading');
+  await page.locator('#pdfJump').click();
+  assert.match(await page.locator('#pdfFrame').getAttribute('src'),/^blob:.*#page=18$/);
+  await page.locator('#pdfClose').click();
+  assert.equal(await page.locator('#pdfJump').isDisabled(),true,'Closing releases selected local PDF');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===4,
+    undefined,{timeout:20000});
+  assert.equal(await page.locator('#checkedCount').innerText(),'1','Source-bound reviewer record persists in browser');
+  await page.evaluate(()=>{
+    const key='clearexams:editorial:tnusrb:si:2020:series-c:visual-review:v1';
+    const saved=JSON.parse(localStorage.getItem(key));
+    saved.records['84'].signature='outdated-question-version';
+    localStorage.setItem(key,JSON.stringify(saved));
+  });
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===4,
+    undefined,{timeout:20000});
+  assert.equal(await page.locator('#checkedCount').innerText(),'0','Changed question source invalidates previously checked status');
+  assert.equal(await page.locator('#staleWarning').isVisible(),true);
+  assert.equal(await page.locator('#figureChecked').isChecked(),false,'Original figure check must be repeated');
+  assert.match(await page.locator('#sourceNote').inputValue(),/Secondary print page 18/,'Review notes survive stale invalidation');
+  await page.locator('#questionSelect').selectOption('47');
+  assert.equal(await page.locator('#comparison').isVisible(),false,'Unverified Series D-only matrix Q47 has no counterfeit original image');
+  assert.match(await page.locator('#sourceIssue').innerText(),/Series D/);
+  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
+    'Series C visual-review page fits mobile width');
+  assert.deepEqual(pageErrors,[],'SI 2020 visual source review has no runtime errors');
+  console.log('PASS TNUSRB SI 2020 Series C source-review desk: local PDF, four unresolved slots, stale-check invalidation and zero grading claims');
+
   // TNUSRB SI 2010 Type A: 140 readable practice entries, of which 135 have provisional score mappings.
   pageErrors.length = 0;
   await page.goto(origin+'/tnusrb-si-2010-quiz.html',{waitUntil:'domcontentloaded'});
