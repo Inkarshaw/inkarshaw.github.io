@@ -65,6 +65,16 @@ assert.ok(data.questions.filter(q=>q.instruction).map(q=>q.number).join(',')==='
 assert.match(html,/All 140 numbered Open Candidates questions are now readable/);
 assert.equal(data.questions.find(q=>q.number===106).figureAsset,'assets/figures/tnusrb-si-2010-q106.svg');
 assert.equal(data.questions.find(q=>q.number===64).coachingArchiveKeyToken,'A');
+const vector=data.questions.find(q=>q.number===64);
+assert.match(vector.vectorStudyGuide.identity,/\[a × b, b × c, c × a\] = \[a, b, c\]²/);
+assert.match(vector.vectorStudyGuide.deduction,/\+8 or −8/,'Scalar triple product sign remains undetermined');
+assert.match(vector.vectorStudyGuide.tamil,/வெக்டர்/,'Q64 bilingual editorial explanation');
+assert.match(vector.vectorStudyGuide.warning,/ungraded/);
+assert.match(vector.vectorStudyGuide.sourceURL,/drive\.google\.com/);
+assert.match(html,/id="vectorStudyPanel"/,'Bilingual study explanation is accessible at Q64');
+assert.match(html,/id="vectorStudyTamil" lang="ta"/);
+assert.match(js,/vectorStudyPanel/,'Show vector guide only at Q64');
+assert.match(js,/135 provisional key scores/,'Live loading status must match actual 135 provisionally scorable questions');
 assert.deepEqual(data.questions.find(q=>q.number===64).acceptedAnswers,[]);
 assert.match(data.questions.find(q=>q.number===64).scoringReviewReason,/marks A.*marks B|dispute/i);
 assert.match(html,/earlier Type A mirror/);

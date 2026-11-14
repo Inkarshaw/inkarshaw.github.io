@@ -835,7 +835,7 @@ try {
   assert.equal(await page.locator('#options button').nth(2).isDisabled(),true,'Checked answer is locked');
   await page.locator('details[aria-label="2010 Open Candidates source gaps"] summary').click();
   assert.equal(await page.locator('#sourceGaps li').count(),2,'Only two original-number source gaps disclosed');
-  await page.locator('#quiz .palette-details summary').click();
+  await page.locator('#quiz details.palette-details:not(#vectorStudyPanel) > summary').click();
   const numbers=await page.locator('#palette button').allTextContents();
   assert.equal(numbers.length,140,'All 120 readable/marked practice entries available');
   assert.equal(numbers.includes('64'),true,'Recovered Q64 source notation is visible but ungraded');
@@ -846,6 +846,11 @@ try {
   await page.locator('#options button').nth(1).click();
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Ungraded — conflicting source keys/);
+  assert.equal(await page.locator('#vectorStudyPanel').isVisible(),true,'Ungraded Q64 vector study explanation appears');
+  await page.locator('#vectorStudyPanel summary').click();
+  assert.match(await page.locator('#vectorStudyDeduction').innerText(),/\+8 or −8/,'Signed scalar product is not falsely declared unique');
+  assert.match(await page.locator('#vectorStudyTamil').innerText(),/வெக்டர்/,'Tamil Q64 explanation is available');
+  assert.match(await page.locator('#vectorStudyWarning').innerText(),/remains ungraded/);
   assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Do not grade Q64 contradictory source answers');
   await page.locator('#palette button').filter({hasText:/^106$/}).click();
   assert.equal(await page.locator('#questionFigure').isVisible(),true,'Q106 recovered Venn is visible');
@@ -864,7 +869,7 @@ try {
   assert.match(await page.locator('#start').innerText(),/Resume 140-question/);
   await page.locator('#start').click();
   assert.match(await page.locator('#position').innerText(),/Original Q117/);
-  await page.locator('#quiz .palette-details summary').click();
+  await page.locator('#quiz details.palette-details:not(#vectorStudyPanel) > summary').click();
   assert.match(await page.locator('#palette button').first().getAttribute('class'),/done/);
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     '2010 SI mobile quiz has no horizontal overflow');
