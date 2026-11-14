@@ -855,8 +855,11 @@ try {
   assert.equal(await page.locator('#pdfJump').isDisabled(),true,'A renamed non-PDF is not previewed');
   await page.locator('#pdfFile').setInputFiles({name:'local-series-c.pdf',mimeType:'application/pdf',
     buffer:Buffer.from(samplePdf)});
-  await page.waitForFunction(()=>document.querySelector('#pdfStatus').textContent.includes('File signature only'));
-  assert.match(await page.locator('#pdfStatus').innerText(),/authenticity and booklet series NOT verified/);
+  await page.waitForFunction(()=>/PDF opened locally|Could not read this local file|Rejected:|Unable to create local preview/.test(document.querySelector('#pdfStatus')?.textContent||''),undefined,{timeout:10000});
+  assert.match(await page.locator('#pdfStatus').innerText(),/SHA-256 [a-f0-9]{64}/,
+    'PDF source hashing failed: '+await page.locator('#transferStatus').innerText());
+  assert.match(await page.locator('#pdfStatus').innerText(),/file hash cannot prove TNUSRB authenticity/);
+  assert.match(await page.locator('#pdfFingerprint').innerText(),/^[a-f0-9]{64}$/,'Original PDF byte identity shown without network upload');
   await page.locator('#pdfPage').fill('18');
   await page.locator('#printedNumber').fill('84');
   await page.locator('#sourceKind').selectOption('secondary_scan');
@@ -876,10 +879,18 @@ try {
   assert.match(await page.locator('#pdfFrame').getAttribute('src'),/^blob:.*#page=18$/);
   await page.locator('#pdfClose').click();
   assert.equal(await page.locator('#pdfJump').isDisabled(),true,'Closing releases selected local PDF');
+  assert.equal(await page.locator('#checkedCount').innerText(),'0','Without the actual PDF in memory, a saved checkbox cannot count as verified');
+  assert.equal(await page.locator('#draftCount').innerText(),'1','Notes and source claims remain as incomplete drafts');
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===4,
     undefined,{timeout:20000});
-  assert.equal(await page.locator('#checkedCount').innerText(),'1','Source-bound reviewer record persists in browser');
+  assert.equal(await page.locator('#checkedCount').innerText(),'0','Page reload requires opening the exact document again');
+  assert.match(await page.locator('#pdfBindingNotice').innerText(),/same PDF is reloaded/);
+  await page.locator('#pdfFile').setInputFiles({name:'same-file.pdf',mimeType:'application/pdf',buffer:Buffer.from(samplePdf)});
+  await page.waitForFunction(()=>/PDF opened locally|Could not read this local file|Rejected:|Unable to create local preview/.test(document.querySelector('#pdfStatus')?.textContent||''),undefined,{timeout:10000});
+  assert.match(await page.locator('#pdfStatus').innerText(),/SHA-256 [a-f0-9]{64}/,
+    'PDF source hashing failed: '+await page.locator('#transferStatus').innerText());
+  assert.equal(await page.locator('#checkedCount').innerText(),'1','Same SHA-256 file restores a locally checked draft, not official certification');
   await page.evaluate(()=>{
     const key='clearexams:editorial:tnusrb:si:2020:series-c:visual-review:v1';
     const saved=JSON.parse(localStorage.getItem(key));
@@ -904,7 +915,7 @@ try {
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'Series C visual-review page fits mobile width');
   assert.deepEqual(pageErrors,[],'SI 2020 visual source review has no runtime errors');
-  console.log('PASS TNUSRB SI 2020 Series C source-review desk: local PDF, four unresolved slots, stale-check invalidation and zero grading claims');
+  console.log('PASS TNUSRB SI 2020 Series C source-review: SHA-256 PDF binding, reopen safety, four gaps, stale-check invalidation and zero grades');
 
   // TNUSRB SI 2010 Type A: 140 readable practice entries, of which 135 have provisional score mappings.
   pageErrors.length = 0;

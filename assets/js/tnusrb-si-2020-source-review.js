@@ -9,14 +9,14 @@ const BANK='tnusrb-si-2020-series-c';
 const ORIGINAL='https://www.tnusrb.tn.gov.in/pdfs/SI_2019_WT_QUESTION.pdf';
 const KEY='https://img.freejobalert.com/uploads/2020/03/Final-Answer-Key-TNUSRB-Sub-Inspector-of-Police-Posts.pdf';
 const CHECKS=['seriesChecked','stemChecked','optionsChecked','figureChecked','keyChecked'];
-const FIELDS=['pdfPage','printedNumber','sourceKind','sourceNote',...CHECKS,'signature'];
+const FIELDS=['pdfPage','printedNumber','sourceKind','sourceNote','pdfSHA256',...CHECKS,'signature'];
 const empty=()=>({pdfPage:null,printedNumber:null,sourceKind:'',sourceNote:'',
-  seriesChecked:false,stemChecked:false,optionsChecked:false,figureChecked:false,keyChecked:false,signature:''});
+  seriesChecked:false,stemChecked:false,optionsChecked:false,figureChecked:false,keyChecked:false,signature:'',pdfSHA256:''});
 const signature=q=>JSON.stringify([q.number,q.question,...['A','B','C','D'].map(k=>q.options[k]),
   q.scoringStatus,q.sourceIssue,q.answerKeyToken,q.figureAsset||'']);
 const inRange=(n,max)=>Number.isInteger(n)&&n>=1&&n<=max;
 const sourceKinds=['','board_booklet','secondary_scan','series_d_only'];
-let bank=null,questions=[],records={},current=0,dirty=false,pdfURL=null;
+let bank=null,questions=[],records={},current=0,dirty=false,pdfURL=null,activePDFSHA256='';
 function validRow(r){
  return !!r&&typeof r==='object'&&!Array.isArray(r)&&
  (r.pdfPage===null||inRange(r.pdfPage,300))&&
@@ -24,19 +24,25 @@ function validRow(r){
  sourceKinds.includes(r.sourceKind)&&
  typeof r.sourceNote==='string'&&r.sourceNote.length<=2200&&
  typeof r.signature==='string'&&r.signature.length<=10000&&
+ typeof r.pdfSHA256==='string'&&/^(?:|[a-f0-9]{64})$/.test(r.pdfSHA256)&&
  CHECKS.every(k=>typeof r[k]==='boolean');
 }
 function hasData(r){return !!r&&Boolean(r.pdfPage||r.printedNumber||r.sourceKind||r.sourceNote.trim()||CHECKS.some(k=>r[k]));}
 function matches(r,q){return !!r&&!!q&&r.signature===signature(q)}
 function checked(r,q){return validRow(r)&&matches(r,q)&&r.sourceKind==='board_booklet'&&
+ activePDFSHA256.length===64&&r.pdfSHA256===activePDFSHA256&&
  r.pdfPage!==null&&r.printedNumber===q.number&&r.sourceNote.trim().length>=10&&CHECKS.every(k=>r[k]);}
 function normalize(obj){
  if(!obj||typeof obj!=='object'||Array.isArray(obj))throw Error('Review rows missing');
  const next={};
  for(const [k,row] of Object.entries(obj)){
   const number=Number(k);
-  if(!NUMBERS.includes(number)||String(number)!==k||!validRow(row))throw Error('Invalid review record '+k);
-  if(hasData(row))next[k]={...empty(),...row};
+  if(!NUMBERS.includes(number)||String(number)!==k)throw Error('Invalid review record '+k);
+  const normalized={...empty(),...row};
+  // Legacy browser checkboxes were not bound to any file. Preserve notes but invalidate old attestations.
+  if(!normalized.pdfSHA256){normalized.signature='';CHECKS.forEach(c=>{normalized[c]=false})}
+  if(!validRow(normalized))throw Error('Invalid review record '+k);
+  if(hasData(normalized))next[k]=normalized;
  }
  return next;
 }
@@ -50,6 +56,7 @@ function form(){
  const intField=id=>{const raw=$(id).value.trim();return raw===''?null:Number(raw)};
  const r={pdfPage:intField('pdfPage'),printedNumber:intField('printedNumber'),
   sourceKind:$('sourceKind').value,sourceNote:$('sourceNote').value.slice(0,2200),
+  pdfSHA256:activePDFSHA256||records[questions[current].number]?.pdfSHA256||'',
   signature:signature(questions[current])};
  CHECKS.forEach(k=>{r[k]=$(k).checked});return r;
 }
@@ -58,7 +65,17 @@ function fill(r,q){
  $('sourceKind').value=r.sourceKind;$('sourceNote').value=r.sourceNote;
  const valid=matches(r,q);CHECKS.forEach(k=>{$(k).checked=valid&&r[k]});
  $('staleWarning').hidden=!(hasData(r)&&!valid);
- updatePdfJump();
+ updatePdfJump();updatePDFBinding(r);
+}
+function updatePDFBinding(r){
+ const hash=activePDFSHA256||r?.pdfSHA256||'';
+ $('pdfFingerprint').textContent=hash||'No PDF fingerprint recorded';
+ $('pdfBindingNotice').textContent=activePDFSHA256?
+  (r?.pdfSHA256&&r.pdfSHA256!==activePDFSHA256?
+   'A different PDF is loaded. Repeat all five question checks before saving this source.':
+   'SHA-256 identifies local file bytes, NOT TNUSRB authenticity or booklet series.'):
+  (r?.pdfSHA256?'Saved review is a draft until the same PDF is reloaded and its hash matches.':
+   'Load the exact source PDF before any locally checked review can be counted.');
 }
 function stats(){
  let done=0,draft=0;
@@ -74,12 +91,16 @@ function status(){
  const q=questions[current],r=form();
  $('reviewStatus').textContent=(dirty?'Unsaved edits · ':'')+
  (!validRow(r)?'Invalid page, question number or input field':
-  checked(r,q)?'Locally checked draft · not official certification; student scores unchanged':
+  checked(r,q)?'Locally checked draft · currently loaded PDF fingerprint bound; not official certification or student scoring':
+  CHECKS.every(k=>r[k])&&r.pdfSHA256&&!activePDFSHA256?
+   'Saved checklist draft · reopen exact PDF to re-confirm its SHA-256 fingerprint':
+  CHECKS.every(k=>r[k])&&activePDFSHA256&&r.pdfSHA256!==activePDFSHA256?
+   'Different PDF fingerprint · repeat every source question checkbox':
   r.sourceKind==='secondary_scan'||r.sourceKind==='series_d_only'?
    'Source comparison draft · original Series C certification pending':
   'Incomplete local draft · confirm original Series C, printed number, page, options, figure and key');
  $('clear').disabled=!records[q.number];
- stats();
+ updatePDFBinding(records[q.number]||r);stats();
 }
 function view(){
  const q=questions[current];if(!q)return;
@@ -168,8 +189,9 @@ async function importFile(file){
   const q=questions[i];
   if(row.number!==q.number||row.scoringStatus!==q.scoringStatus)throw Error('Wrong question slot at row '+i);
   const r={...empty()};
-  for(const k of FIELDS){r[k]=row[k]}
+  for(const k of FIELDS){if(Object.prototype.hasOwnProperty.call(row,k))r[k]=row[k]}
   if(!validRow(r))throw Error('Invalid field in Q'+q.number);
+  if(!r.pdfSHA256){CHECKS.forEach(k=>r[k]=false);r.signature=''}
   if(row.sourceSignature!==signature(q)||!matches(r,q)){
    if(hasData(r))stale++;
    CHECKS.forEach(k=>r[k]=false);r.signature='';
@@ -192,20 +214,52 @@ function closePdf(announce=true){
  $('pdfJump').disabled=true;$('pdfClose').disabled=true;
  $('pdfExternal').hidden=true;$('pdfExternal').removeAttribute('href');
  if(pdfURL){URL.revokeObjectURL(pdfURL);pdfURL=null}
+ activePDFSHA256='';
  $('pdfFile').value='';
- if(announce)$('pdfStatus').textContent='Local PDF reference released. Saved editorial notes remain.';
+ if(announce)$('pdfStatus').textContent='Local PDF reference released. Saved notes remain; local source review is suspended until the original PDF is reopened.';
+ if(questions.length)status();
 }
 async function loadPdf(file){
+ if(!file){closePdf(false);$('pdfStatus').textContent='No local PDF selected.';return}
+ if(file.size<100||file.size>80*1024*1024){
+  closePdf(false);$('pdfStatus').textContent='Rejected PDF size; use a file between 100 bytes and 80 MB.';return
+ }
+ // Read the original selected File before clearing the input; detached browser File handles may fail later.
+ let bytes;
+ try{bytes=await file.arrayBuffer()}
+ catch(error){
+  closePdf(false);$('pdfStatus').textContent='Could not read this local file: '+error.message;return
+ }
+ const header=Array.from(new Uint8Array(bytes.slice(0,5)),v=>String.fromCharCode(v)).join('');
+ if(header!=='%PDF-'){
+  closePdf(false);$('pdfStatus').textContent='Rejected: selected file lacks the PDF signature %PDF-.';return
+ }
+ let fingerprint='';
+ try{
+  if(!crypto?.subtle)throw Error('WebCrypto unavailable');
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  fingerprint=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');
+ }catch(error){
+  $('transferStatus').textContent='Could not fingerprint PDF: '+error.message+'. This file cannot support a locally checked review.';
+ }
  closePdf(false);
- if(!file){$('pdfStatus').textContent='No local PDF selected.';return}
- if(file.size<100||file.size>80*1024*1024){$('pdfStatus').textContent='Rejected PDF size; use a file between 100 bytes and 80 MB.';return}
- let header='';
- try{header=Array.from(new Uint8Array(await file.slice(0,5).arrayBuffer()),v=>String.fromCharCode(v)).join('')}
- catch{$('pdfStatus').textContent='Could not read this local file.';return}
- if(header!=='%PDF-'){$('pdfStatus').textContent='Rejected: selected file lacks the PDF signature %PDF-.';return}
- try{pdfURL=URL.createObjectURL(file)}catch{$('pdfStatus').textContent='Unable to create local preview.';return}
+ activePDFSHA256=fingerprint;
+ try{pdfURL=URL.createObjectURL(file)}catch{
+  activePDFSHA256='';
+  $('pdfStatus').textContent='Unable to create local preview.';return
+ }
+ if(questions.length){
+  const saved=records[questions[current].number];
+  if(saved?.pdfSHA256&&saved.pdfSHA256!==activePDFSHA256){
+   CHECKS.forEach(k=>{$(k).checked=false});dirty=true;
+   $('transferStatus').textContent='PDF fingerprint changed. Repeat the five source checks; notes are retained.';
+  }
+  status();
+ }
  $('pdfJump').disabled=false;$('pdfClose').disabled=false;$('pdfExternal').hidden=false;
- $('pdfStatus').textContent='PDF opened from your device ('+(file.size/1024/1024).toFixed(1)+' MB). File signature only: TNUSRB authenticity and booklet series NOT verified. No upload occurred.';
+ $('pdfStatus').textContent='PDF opened locally ('+(file.size/1024/1024).toFixed(1)+' MB). '+
+ (activePDFSHA256?'SHA-256 '+activePDFSHA256+'. ':'Fingerprint unavailable. ')+
+ 'A file hash cannot prove TNUSRB authenticity or booklet series. No upload occurred.';
  updatePdfJump();
 }
 function preview(){
@@ -213,13 +267,13 @@ function preview(){
  const n=Number($('pdfPage').value);const page=inRange(n,300)?n:1;
  $('pdfFrame').src=pdfURL+'#page='+page;
  $('pdfReader').hidden=false;updatePdfJump();
- $('pdfStatus').textContent='Displaying local PDF page '+page+'. Independently inspect printed question, all alternatives, diagram/matrix and Series C cover.';
+ $('pdfStatus').textContent='Displaying local PDF page '+page+'. The hash identifies only file bytes. Inspect the cover, all options, and original Series C figure or matrix.';
 }
 $('pdfFile').addEventListener('change',e=>loadPdf(e.target.files?.[0]));
 $('pdfJump').addEventListener('click',preview);
 $('pdfClose').addEventListener('click',()=>closePdf());
 $('pdfPage').addEventListener('input',updatePdfJump);
-FIELDS.filter(k=>k!=='signature').forEach(k=>$(k).addEventListener(CHECKS.includes(k)||k==='sourceKind'?'change':'input',()=>{
+FIELDS.filter(k=>k!=='signature'&&k!=='pdfSHA256').forEach(k=>$(k).addEventListener(CHECKS.includes(k)||k==='sourceKind'?'change':'input',()=>{
  if(!questions.length)return;dirty=true;status();
 }));
 $('questionSelect').addEventListener('change',()=>navigate(questions.findIndex(q=>q.number===Number($('questionSelect').value))));
