@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
-const expectedLink=/^(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20(?:24|25))?$/;
+const expectedLink=/^(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20(?:19|20|22|24|25))?$/;
 let entries=[];
 
 let adapted=[], archive=[]; let archiveVisible=16;
@@ -31,7 +31,8 @@ function archiveKey(e){return e.category+'|'+e.exam+'|'+e.year}
 function coveredByTyped(e){
 return entries.some(x=>x.exam===e.category&&x.year===e.year&&
  ((e.category==='TNPSC'&&e.exam==='Group IV'&&/^Group IV\b/.test(x.paper))||
- (e.category==='TNPSC'&&e.exam==='Group I'&&/^Group I\b/.test(x.paper))));
+ (e.category==='TNPSC'&&e.exam==='Group I'&&/^Group I\b/.test(x.paper))||
+ (e.category==='TNUSRB'&&/Police Constable/i.test(e.exam)&&/^Police Constable\b/.test(x.paper))));
 }
 function coveredByAdapted(e){
 const name=e.category==='TNPSC'&&e.exam==='Group IV'?'TNPSC Group IV':
@@ -121,7 +122,8 @@ const fetchJSON=url=>fetch(url,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error
 Promise.allSettled([
  fetchJSON('data/quizzes/typed-pyq-catalog.json'),
  fetchJSON('data/quizzes/verified-pyqs.json'),
- fetchJSON('data/quizzes/pyq-yearwise-catalog.json')
+ fetchJSON('data/quizzes/pyq-yearwise-catalog.json'),
+ fetchJSON('data/quizzes/tnusrb-pc-catalog.json')
 ]).then(results=>{
  if(results[0].status==='fulfilled'){
  const d=results[0].value;
@@ -142,6 +144,15 @@ Promise.allSettled([
  if(!e.category||!e.exam||!Number.isInteger(e.year)||!officialLink(e.url)||seen.has(k))return false;
  seen.add(k);return true;
  });
+ }
+ }
+ if(results[3].status==='fulfilled'){
+ const supplement=results[3].value;
+ if(supplement?.schemaVersion===1&&Array.isArray(supplement.entries)&&supplement.entries.length===3&&
+ !supplement.entries.some(e=>e.exam!=='TNUSRB'||!/^Police Constable/.test(e.paper)||
+ ![2019,2020,2022].includes(e.year)||!Number.isInteger(e.typed)||e.typed!==e.total||
+ !Number.isInteger(e.scorable)||e.scorable<0||e.scorable>e.typed||!expectedLink.test(e.link))){
+ entries=entries.concat(supplement.entries);
  }
  }
  if(!entries.length&&!adapted.length&&!archive.length)throw Error('All PYQ indexes unavailable');

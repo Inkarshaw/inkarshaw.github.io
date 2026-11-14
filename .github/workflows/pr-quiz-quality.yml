@@ -10,6 +10,10 @@ on:
       - "pyq-hub.html"
       - "assets/pyq-original/tnpsc-g1-2026-q*-editorial.svg"
       - "pyq-typed-library.html"
+      - "tnusrb-pc-quiz.html"
+      - "assets/js/tnusrb-pc-quiz.js"
+      - "data/quizzes/tnusrb-pc-*.json"
+      - "assets/js/typed-pyq-catalog.js"
       - "pyq-scoring-review.html"
       - "tnpsc-g1-2026-key-review.html"
       - "assets/js/tnpsc-g1-2026-key-review.js"
@@ -136,6 +140,8 @@ jobs:
         run: node tests/test_g1_2026_key_workbench.mjs
       - name: Verify all scoring exclusions against eight PYQ source manifests
         run: node tests/test_pyq_scoring_review.mjs
+      - name: Verify TNUSRB constable text PYQs and ungraded source controls
+        run: node tests/test_tnusrb_pc_pyq.mjs
       - name: Validate year-wise paper catalog and PYQ year routing
         run: node tests/test_pyq_yearwise.mjs
       - name: Review TNPSC Group IV 2022 source-numbered PYQ bank
