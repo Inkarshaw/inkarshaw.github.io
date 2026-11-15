@@ -331,7 +331,7 @@ assert.match(y21.questions[144].sourceCaution,/three members/,'2021 Q145 Rajaman
 assert.match(y21.questions[148].sourceCaution,/English option C.*Tamil option C/,'2021 Q149 bilingual alternatives disagree');
 assert.match(y21.questions[149].text,/Money Bill/,'2021 Q150 last source item in batch');
 assert.equal(y21.questions[149].secondaryPdfPage,53);
-assert.deepEqual(y21.questions.slice(125).map(q=>q.secondaryPdfPage),[43,44,44,45,45,45,46,46,46,48,48,48,49,49,50,50,50,51,51,51,52,52,53,53,53]);
+assert.deepEqual(y21.questions.slice(125,150).map(q=>q.secondaryPdfPage),[43,44,44,45,45,45,46,46,46,48,48,48,49,49,50,50,50,51,51,51,52,52,53,53,53]);
 assert.ok(y21.questions.slice(125).every(q=>q.sourceReference==='appolo-2021-tentative-study-transcription'&&q.reviewStatus==='numbered-secondary-bilingual-pdf-english-layer-reviewed'));
 assert.equal(y21.questions.filter(q=>q.keyStatus!=='unmapped'||q.accepted.length>0).length,0,'Zero scoring keys despite coloured tentative source labels');
 assert.deepEqual(y21.questions.slice(150).map(q=>q.number),Array.from({length:25},(_,i)=>i+151));
