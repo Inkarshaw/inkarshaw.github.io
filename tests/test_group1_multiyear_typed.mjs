@@ -71,7 +71,7 @@ assert.equal(y24.questions[57].sourcePdfPage,37);
 assert.equal(y24.questions[59].sourcePdfPage,38);
 assert.equal(y24.questions[42].formulaSourceProofNeeded,true);
 assert.equal(y24.questions[193].editorialPassageSummary,true);
-assert.match(js,/tnpsc-2024-prelims-question-paper\\.pdf/,'Secondary reader must have exact PDF-path whitelist');
+assert.match(js,/tnpsc-2024-prelims-question-paper\.pdf/,'Secondary reader must have exact PDF-path whitelist');
 const y25=typed.papers.find(p=>p.year===2025);
 assert.deepEqual(y25.questions.map(q=>q.number),Array.from({length:200},(_,i)=>i+1));
 assert.equal(y25.sourceNumberedSecondaryCheckedCount,200);
