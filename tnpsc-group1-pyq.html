@@ -68,7 +68,7 @@ function card(x){
  const date=document.createElement('p');date.className='date';date.textContent=x.examDate?'Prelims: '+new Date(x.examDate+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}):'Historical Group I paper index · date not confirmed';
  const desc=document.createElement('p');desc.className='desc';desc.textContent=x.note;
  const actions=document.createElement('div');actions.className='actions';
- if(x.typedUrl&&/^(?:(?:tnpsc-g1-2011|tnpsc-g1-2026)-quiz\.html|tnpsc-group1-typed-years\.html\?year=20(?:17|19|22|24|25))$/.test(x.typedUrl))actions.append(link('Start '+x.typedQuestionCount+' typed questions',x.typedUrl,true));
+ if(x.typedUrl&&/^(?:(?:tnpsc-g1-2011|tnpsc-g1-2026)-quiz\.html|tnpsc-group1-typed-years\.html\?year=20(?:15|17|19|21|22|24|25))$/.test(x.typedUrl))actions.append(link('Start '+x.typedQuestionCount+' typed questions',x.typedUrl,true));
  if(x.practicePaperId&&/^tnpsc-group-i-\d{4}-[a-z0-9-]+$/.test(x.practicePaperId))actions.append(link('Start 200-answer paper session','pyq-original-paper.html?paper='+encodeURIComponent(x.practicePaperId),!x.typedUrl));
  const paper=safeExternal(x.paperUrl);if(paper)actions.append(link('TNPSC original PDF',paper,false,true));
  const key=safeExternal(x.finalKeyUrl);if(key)actions.append(link('Official final key',key,false,true));
