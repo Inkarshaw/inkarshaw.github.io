@@ -4,6 +4,7 @@ const $=id=>document.getElementById(id);
 const STORAGE='clearexams:tnpsc:g1:multi-year-typed:v1:';
 const ALLOWED=['A','B','C','D','E'];
 const safeTnpsc=url=>{try{const u=new URL(url);return u.protocol==='https:'&&/^(?:www\.)?tnpsc\.gov\.in$/.test(u.hostname)?u.href:null}catch{return null}};
+const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf'?u.href:null}catch{return null}};
 const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&['arivark.com','www.unlockias.in','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)?u.href:null}catch{return null}};
 let bank=[],paper=null,index=0,responses={},savedAt=0;
 function stored(year){try{
@@ -53,6 +54,8 @@ function render(){
  $('previous').disabled=index===0;$('next').disabled=index===count-1;
  $('clearAnswer').disabled=!responses[String(q.number)];
  const original=safeTnpsc(paper.officialPdf);if(original){$('pdfLink').href=original+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('pdfLink').textContent=Number.isInteger(q.sourcePdfPage)?'TNPSC original booklet · PDF page '+q.sourcePdfPage:'Official TNPSC paper (PDF)';$('pdfLink').hidden=false}else $('pdfLink').hidden=true;
+ const mirror=safeMirrorPdf(paper.mirroredSourceUrl);
+ if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('mirrorPdfLink').textContent='Readable original booklet mirror · PDF page '+(q.sourcePdfPage||'');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
  const reader=safeReader(paper.secondaryReader);if(reader){$('compareLink').href=reader;$('compareLink').hidden=false}else $('compareLink').hidden=true;
  status();palette();
 }
@@ -78,7 +81,7 @@ function validate(d){
   years.add(p.year);
   if(p.originalQuestionCount!==200||p.grading!=='not-graded'||p.keyedAnswerCount!==0||
    !['ABCD','ABCDE'].includes(p.optionLetters.join(''))||!safeTnpsc(p.officialPdf)||
-   (p.secondaryReader!==null&&!safeReader(p.secondaryReader))||!Array.isArray(p.questions)||p.questions.length<1||p.questions.length>200)throw Error('Incomplete source metadata');
+   (p.secondaryReader!==null&&!safeReader(p.secondaryReader))||(p.mirroredSourceUrl!==undefined&&!safeMirrorPdf(p.mirroredSourceUrl))||!Array.isArray(p.questions)||p.questions.length<1||p.questions.length>200)throw Error('Incomplete source metadata');
   const ids=new Set();
   for(const q of p.questions){
    if(!Number.isInteger(q.number)||q.number<1||q.number>200||ids.has(q.number)||
