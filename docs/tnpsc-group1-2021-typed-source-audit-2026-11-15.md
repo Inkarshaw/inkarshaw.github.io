@@ -1,9 +1,9 @@
-# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q150
+# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q175
 
 **Audit date:** 15 November 2026  
 **Exam:** 3 January 2021, Group I, General Studies, 200 original questions, total 300 marks  
 **Booklet code:** `GR1P/21`  
-**Current typed coverage:** **150/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
+**Current typed coverage:** **175/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
 **Auto-grading:** **disabled**, `keyedAnswerCount=0`, `accepted=[]`, `keyStatus=unmapped`
 
 ## Primary and comparison sources
@@ -53,7 +53,7 @@ The printed official key reports **Q3=A**, while one coaching reader lists **Q3=
 2. All question stems are editorially adapted English study text, **not** certified verbatim reproduction or a separately proofread Tamil bilingual bank.
 3. Q12 GDP option B has inconsistent English wording in the reader; do not infer a corrected final answer from that site.
 4. Q46 Kalpana Chawla Award has a possible date inconsistency between the secondary English/Tamil descriptions. Historical wording needs direct original-booklet comparison.
-5. Q1–Q150 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
+5. Q1–Q175 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
 
 ## Next stages
 
@@ -148,3 +148,23 @@ The 50 new entries carry `secondaryPdfPage` (printed **17–34**, not invented o
 9. **Q150**: The source describes presidential 'approval' where the constitutional wording is 'prior recommendation' for introducing a Money Bill. The adaptation clarifies the distinction but still must be source-proofread.
 
 **Integrity controls:** all **150** Q1–Q150 entries have four A–D text options, keyStatus=unmapped, accepted=[], keyedAnswerCount=0, grading=not-graded, finalKeyVersionCrosswalk.verified=false. No fabricated scoring and no claim that these are verbatim-certified bilingual reproductions. **Next unfilled source positions: Q151–Q200.**
+
+## Q151–Q175 extension (15 November 2026)
+
+**Indexed positions:** 2021 paper **175/200** original-number-aligned adapted English practice MCQs; across Group I years **1,384** typed study positions (no new 2021 auto-scored items). The next remaining 2021 range is **Q176–Q200**.
+
+**Transcription and source:** Original Q151–Q175 checked against the numbered bilingual English/Tamil 2021 [Appolo Study Centre tentative-key PDF](https://winmeen.com/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf). Printed PDF pages **54–60**, with screenshots inspected on each page in the range. This PDF explicitly states that its choices/answer colours are *not an authentic final key*. Its option sequence is kept for adapted English study, but primary TNPSC GR1P/21 original PDF (32MB) and Version D key-to-booklet linkage remain unverified.
+
+**Question and page groups:** Q151–154 page 54 (executive offices, Articles 74/75/78, DPSPs, fundamental duties); Q155–157 page 55 (right to property, 86th amendment, parliamentary government); Q158–159 page 56 (India/Bharat, directive principle matching); Q160–162 page 57 (Preamble quotation matching, sum of cubes, powers of two); Q163–167 page 58 (numeric patterns, rearrangement cipher, die probability, ages); Q168–171 page 59 (work, worker-hours, factorization); Q172–175 page 60 (hemisphere volume and two-year interest).
+
+**Material source errors requiring prominent user-facing warnings:**
+
+- **Q159:** The coaching PDF's Article 39(b) matching column describes that Article as *abolishing hereditary property*, but Article 39(b) concerns distribution of material resources for the common good. Preserve source-aligned choices only for comparison; the original stem could be defective. Not graded.
+- **Q162:** The PDF prints A = 2^65 and B = 2^64 + 2^63 + 2^62 + 2^0. As literally written, A − B = 2^62 − 1; none of the four listed options fits. Its red-coloured selection presupposes an omitted geometric series, which is not printed. This is a **mathematically invalid source transcription**, not a valid answer key. Not graded.
+- **Q153/154:** Verify attributed 'life-giving' quote from independent historical source; evaluate listed false Article 51A claims rather than treating them as facts.
+- **Q160/165:** Writer's spelling normalized to K. M. Munshi; source coding options are visually similar, and both require exact booklet comparison.
+- **Q172:** The new hemisphere's radius is calculated from the carved-out two-thirds volume; 'remaining' hemisphere would differ. Original geometric context may need review.
+
+**UX safeguard:** Group I typed player now reveals `sourceCaution` in a visible, accessible warning note on individual affected questions (using `textContent` to prevent source text being parsed as HTML). This is particularly important for Q159 and Q162.
+
+**Grading safeguards:** Every Q1–Q175 has four A–D study options, accepted=[], keyStatus=unmapped. Paper keyedAnswerCount=0, grading=not-graded and finalKeyVersionCrosswalk.verified=false. No implication of certified verbatim English/Tamil transcription or verified final TNPSC answer keys.
