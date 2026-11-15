@@ -52,7 +52,7 @@ function render(){
  });
  $('previous').disabled=index===0;$('next').disabled=index===count-1;
  $('clearAnswer').disabled=!responses[String(q.number)];
- const original=safeTnpsc(paper.officialPdf);if(original){$('pdfLink').href=original;$('pdfLink').hidden=false}else $('pdfLink').hidden=true;
+ const original=safeTnpsc(paper.officialPdf);if(original){$('pdfLink').href=original+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('pdfLink').textContent=Number.isInteger(q.sourcePdfPage)?'TNPSC original booklet · PDF page '+q.sourcePdfPage:'Official TNPSC paper (PDF)';$('pdfLink').hidden=false}else $('pdfLink').hidden=true;
  const reader=safeReader(paper.secondaryReader);if(reader){$('compareLink').href=reader;$('compareLink').hidden=false}else $('compareLink').hidden=true;
  status();palette();
 }
@@ -78,7 +78,7 @@ function validate(d){
   years.add(p.year);
   if(p.originalQuestionCount!==200||p.grading!=='not-graded'||p.keyedAnswerCount!==0||
    !['ABCD','ABCDE'].includes(p.optionLetters.join(''))||!safeTnpsc(p.officialPdf)||
-   !safeReader(p.secondaryReader)||!Array.isArray(p.questions)||p.questions.length<1||p.questions.length>200)throw Error('Incomplete source metadata');
+   (p.secondaryReader!==null&&!safeReader(p.secondaryReader))||!Array.isArray(p.questions)||p.questions.length<1||p.questions.length>200)throw Error('Incomplete source metadata');
   const ids=new Set();
   for(const q of p.questions){
    if(!Number.isInteger(q.number)||q.number<1||q.number>200||ids.has(q.number)||
