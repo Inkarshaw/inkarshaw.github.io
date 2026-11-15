@@ -4,7 +4,7 @@ const $=id=>document.getElementById(id);
 const STORAGE='clearexams:tnpsc:g1:multi-year-typed:v1:';
 const ALLOWED=['A','B','C','D','E'];
 const safeTnpsc=url=>{try{const u=new URL(url);return u.protocol==='https:'&&/^(?:www\.)?tnpsc\.gov\.in$/.test(u.hostname)?u.href:null}catch{return null}};
-const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf')||(u.hostname==='cdn.govtjobsnet.com'&&u.pathname==='/previous-papers/tnpsc-group-1-prelims-2019-question-paper-with-answers.pdf'))?u.href:null}catch{return null}};
+const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf')||(u.hostname==='cdn.govtjobsnet.com'&&u.pathname==='/previous-papers/tnpsc-group-1-prelims-2019-question-paper-with-answers.pdf')||(u.hostname==='winmeen.com'&&u.pathname==='/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf'&&!u.search))?u.href:null}catch{return null}};
 const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&(['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(u.hostname==='www.unlockias.in'&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019'].includes(u.pathname))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2021-january-[1-5]\.php$/.test(u.pathname)&&!u.search))?u.href:null}catch{return null}};
 let bank=[],paper=null,index=0,responses={},savedAt=0;
 function stored(year){try{
@@ -56,7 +56,8 @@ function render(){
  const original=safeTnpsc(paper.officialPdf);if(original){$('pdfLink').href=original+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('pdfLink').textContent=Number.isInteger(q.sourcePdfPage)?'TNPSC original booklet · PDF page '+q.sourcePdfPage:'Official TNPSC paper (PDF)';$('pdfLink').hidden=false}else $('pdfLink').hidden=true;
  const finalKey=safeTnpsc(paper.finalKeyUrl);if(finalKey){$('finalKeyLink').href=finalKey;$('finalKeyLink').hidden=false}else $('finalKeyLink').hidden=true;
  const mirror=safeMirrorPdf(paper.mirroredSourceUrl);
- if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('mirrorPdfLink').textContent=(paper.year===2019?'Scanned 2019 GR1P booklet (hand-marked; not final key) · PDF page ':'Readable original booklet mirror · PDF page ')+(q.sourcePdfPage||'');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
+ const mirrorPage=paper.year===2021?q.secondaryPdfPage:q.sourcePdfPage;
+ if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(mirrorPage)?'#page='+mirrorPage:'');$('mirrorPdfLink').textContent=(paper.year===2019?'Scanned 2019 GR1P booklet (hand-marked; not final key) · PDF page ':paper.year===2021?'2021 secondary bilingual PDF (tentative, not official key) · page ':'Readable original booklet mirror · PDF page ')+(Number.isInteger(mirrorPage)?mirrorPage:'source pages');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
  const reader=safeReader(q.sourceReaderUrl)||safeReader(paper.secondaryReader);if(reader){$('compareLink').href=reader;$('compareLink').hidden=false}else $('compareLink').hidden=true;
  status();palette();
 }

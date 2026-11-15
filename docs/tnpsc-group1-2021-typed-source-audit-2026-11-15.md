@@ -1,9 +1,9 @@
-# TNPSC Group I Prelims 2021 — corrected 50-question English typed study draft
+# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q100
 
 **Audit date:** 15 November 2026  
 **Exam:** 3 January 2021, Group I, General Studies, 200 original questions, total 300 marks  
 **Booklet code:** `GR1P/21`  
-**Current typed coverage:** **50/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
+**Current typed coverage:** **100/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
 **Auto-grading:** **disabled**, `keyedAnswerCount=0`, `accepted=[]`, `keyStatus=unmapped`
 
 ## Primary and comparison sources
@@ -53,11 +53,46 @@ The printed official key reports **Q3=A**, while one coaching reader lists **Q3=
 2. All question stems are editorially adapted English study text, **not** certified verbatim reproduction or a separately proofread Tamil bilingual bank.
 3. Q12 GDP option B has inconsistent English wording in the reader; do not infer a corrected final answer from that site.
 4. Q46 Kalpana Chawla Award has a possible date inconsistency between the secondary English/Tamil descriptions. Historical wording needs direct original-booklet comparison.
-5. Q1–Q50 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
+5. Q1–Q100 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
 
 ## Next stages
 
-- Digitize **2021 Q51–Q200** only from reliably accessible source-numbered material; later Civil Service Aspirants pages become premium-gated after Q50, so do not fabricate the inaccessible questions.
+- Continue **2021 Q101–Q200** using a reliably numbered accessible source. Civil Service Aspirants' 2021 pages after Q50 are unavailable here, so cross-check a separate bilingual PDF carefully rather than inventing inaccessible entries.
 - Recover a readable compressed/public original GR1P/21 booklet or use original source PDF with proper page-review access; cross-verify A–D answer-order and all mathematical diagrams/wording.
 - Validate all final-key entries to the source version, including ALL and multi-accepted positions, and then explicitly design scoring with complete source confidence.
 - Continue 2017 and 2015 original PYQ coverage in parallel.
+
+## Q51–Q100 extension (15 November 2026)
+
+**New typed batch:** original-numbered Q51–Q100, 50 more adapted English selectable MCQs, A–D; E (Answer not known) is rendered by ClearExams.
+
+**Question source:** [Appolo Study Centre bilingual January 2021 study transcription](https://winmeen.com/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf), publicly hosted as a readable PDF. The printed numbers Q51–Q100 and four A–D choices were cross-checked against this source's accessible English PDF text on printed pages **17–34**. The PDF was also inspected via screenshots at selected pages (including printed 18 and 19, which contain Q53–Q54). The original **TNPSC** 32 MB booklet remains the primary source of truth but could not be independently inspected at this size. `verifiedSourceCount` remains **0** for official-PDF visual certification.
+
+**Correction against a coaching-site error:** A secondary web list inaccurately attaches a climate-change question to the Rajasthan monument choices at Q52 and shifts Q53/Q54. The numbered bilingual PDF and original-booklet text preview show:
+
+| Original question | Correct question theme |
+|---|---|
+| Q51 | Match sports (Polo/Rugby/Hockey/Baseball) with players |
+| Q52 | Which places are **not** located in Rajasthan? |
+| Q53 | Match Indian women achievers to their achievements |
+| Q54 | Match Hampi, Horsley Hills, Hogenakkal and Haridwar to states |
+| Q55 | Third Global Ministerial Conference on Road Safety (2020) |
+| Q56 | Meaning of biodiversity |
+| Q57 | Substances associated with kidney stones |
+| Q58 | Ripened fruit colour pigments |
+| Q59 | Single-cell eukaryotes and historical taxonomy |
+| Q60 | Haber-process catalyst |
+
+The 50 new entries carry `secondaryPdfPage` (printed **17–34**, not invented original TNPSC PDF pages) and `reviewStatus: numbered-secondary-bilingual-pdf-english-layer-reviewed`. The site points to that limited, separately whitelisted PDF with its own page deep links; it **does not** substitute the coaching transcription for the official booklet.
+
+**Safety and grading:** The Appolo PDF prominently states that it is **not an authentic key** and is for tentative study purposes. Its coloured choices and notes (including 'Key not sure' for Q62–Q63) must never be used for scoring. Every 2021 question still has `accepted: []`, `keyStatus: unmapped`, `keyedAnswerCount: 0`, `grading: not-graded`. The official TNPSC final key has Version D metadata already recorded for Q1–Q50, but exact option-text and version correspondence remains unverified. No unreviewed key entries are applied to Q51–Q100.
+
+**Editorial cautions:** The historical COVID-19 options in **Q66** reproduce misinformation as *choices to evaluate*; they are not medical advice. The assumption in **Q62** about a universal silicon-damage temperature is technically oversimplified and marked for rechecking; **Q63, Q64, Q76–77, Q82, Q89 and Q93** similarly retain source-context review flags. These English questions are independently written **study adaptations**, not verbatim-certified Tamil/English reproductions.
+
+**Library coverage following this change:** 2021 **100/200**; combined Group I original-numbered English adapted study positions **1,309**, including six complete 200-position years (2011, 2019, 2022, 2024, 2025, 2026), and partial 2015, 2017 and 2021. The total does **not** mean all 1,309 are certified or scorable.
+
+### Priorities
+
+1. Source-numbered adaptation **2021 Q101–Q200**, with original Tamil/English, figures and formula details double-checked before any certification.
+2. Confirm 2021 final key Version D vs original GR1P/21 full 200-item choice-order crosswalk and exceptional answers.
+3. Continue 2017 and 2015 paper transcription, then verify source fidelity and Tamil translations before commercial grading claims.
