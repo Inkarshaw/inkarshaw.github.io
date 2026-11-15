@@ -68,7 +68,7 @@ assert.equal(restored.text.ta,draft.text.ta,'Do not paraphrase Tamil question');
 assert.equal(restored.options.en.A,draft.options.en.A,'Do not rewrite English options');
 const tally=api.tally({'1':restored,'2':api.newRecord(2,'C')});
 assert.equal(tally.captured,1);assert.equal(tally.reviewed,1);
-const actual=paperCatalog.papers.find(p=>p.year===2024);
+const actual=paperCatalog.papers.find(p=>p.id==='tnpsc-group-iv-2024-general-tamil-general-studies');
 assert.ok(actual&&actual.questionCount===200);
 const key=finalKeys.papers.find(p=>p.id===actual.id);
 assert.equal(key.answers.length,200,'Source final key indexed for all original positions');

@@ -3,7 +3,21 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
-const data=JSON.parse(read('data/quizzes/original-paper-practice.json'));
+const allOriginalPapers=JSON.parse(read('data/quizzes/original-paper-practice.json'));
+const newGroupIPapers=allOriginalPapers.papers.filter(p=>p.exam==='Group I');
+assert.deepEqual(newGroupIPapers.map(p=>p.year).sort((a,b)=>a-b),
+ [2015,2017,2019,2021,2022,2024,2025,2026],
+ 'New Group I original-PDF companion sessions');
+for(const p of newGroupIPapers){
+ assert.equal(p.questionCount,200);
+ assert.equal(p.answerKeyStatus,'official-pdf-only','No unchecked Group I scoring claims');
+ assert.equal(p.transcriptionStatus,'not-transcribed');
+ assert.equal(p.optionLetters.length,p.year<=2019?4:5);
+ assert.match(p.paperUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
+ assert.ok(p.answerKeyUrl.startsWith('https://www.tnpsc.gov.in/'));
+}
+const data={...allOriginalPapers,
+ papers:allOriginalPapers.papers.filter(p=>p.exam!=='Group I')};
 const bank=JSON.parse(read('data/quizzes/verified-pyqs.json'));
 const html=read('pyq-original-paper.html');
 const js=read('assets/js/pyq-original-paper.js');
