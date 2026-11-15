@@ -1,9 +1,9 @@
-# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q100
+# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q125
 
 **Audit date:** 15 November 2026  
 **Exam:** 3 January 2021, Group I, General Studies, 200 original questions, total 300 marks  
 **Booklet code:** `GR1P/21`  
-**Current typed coverage:** **100/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
+**Current typed coverage:** **125/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
 **Auto-grading:** **disabled**, `keyedAnswerCount=0`, `accepted=[]`, `keyStatus=unmapped`
 
 ## Primary and comparison sources
@@ -53,11 +53,11 @@ The printed official key reports **Q3=A**, while one coaching reader lists **Q3=
 2. All question stems are editorially adapted English study text, **not** certified verbatim reproduction or a separately proofread Tamil bilingual bank.
 3. Q12 GDP option B has inconsistent English wording in the reader; do not infer a corrected final answer from that site.
 4. Q46 Kalpana Chawla Award has a possible date inconsistency between the secondary English/Tamil descriptions. Historical wording needs direct original-booklet comparison.
-5. Q1–Q100 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
+5. Q1–Q125 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
 
 ## Next stages
 
-- Continue **2021 Q101–Q200** using a reliably numbered accessible source. Civil Service Aspirants' 2021 pages after Q50 are unavailable here, so cross-check a separate bilingual PDF carefully rather than inventing inaccessible entries.
+- Continue **2021 Q126–Q200** using a reliably numbered accessible source. Civil Service Aspirants' 2021 pages after Q50 are unavailable here, so cross-check a separate bilingual PDF carefully rather than inventing inaccessible entries.
 - Recover a readable compressed/public original GR1P/21 booklet or use original source PDF with proper page-review access; cross-verify A–D answer-order and all mathematical diagrams/wording.
 - Validate all final-key entries to the source version, including ALL and multi-accepted positions, and then explicitly design scoring with complete source confidence.
 - Continue 2017 and 2015 original PYQ coverage in parallel.
@@ -93,6 +93,30 @@ The 50 new entries carry `secondaryPdfPage` (printed **17–34**, not invented o
 
 ### Priorities
 
-1. Source-numbered adaptation **2021 Q101–Q200**, with original Tamil/English, figures and formula details double-checked before any certification.
+1. Source-numbered adaptation **2021 Q126–Q200**, with original Tamil/English, figures and formula details double-checked before any certification.
 2. Confirm 2021 final key Version D vs original GR1P/21 full 200-item choice-order crosswalk and exceptional answers.
 3. Continue 2017 and 2015 paper transcription, then verify source fidelity and Tamil translations before commercial grading claims.
+
+
+## Q101–Q125 extension (15 November 2026)
+
+**Current typed study coverage:** original-position-aligned English Q1–Q125 (**125/200**); the new Q101–Q125 segment has 25 selectable four-option items, and E="Answer not known" comes from the player. **Combined indexed Group I positions: 1,334** across available typed years (not all certified or graded).
+
+**Source:** Appolo Study Centre's numbered 2021 bilingual [study PDF hosted at Winmeen](https://winmeen.com/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf), printed pages **34–43** (PDF page positions). English text and visible images for pages **35, 37, 41 and 43** were inspected, including the historically mistranscribed Q107 and the Q124–Q125 items. The source expressly calls its answer markings **tentative, not authentic**. Original official TNPSC GR1P/21 booklet has **not** been fully visual-certified.
+
+**Original-position milestones:**
+
+- Q101 Poosalar/Nayanmar mental temple; Q102 classical-language features; Q103 Perumpanarruppatai; Q104 MSP; Q105–106 economic measures and 2020 sector contractions
+- Q107 Mesolithic archaeology; Q108 waterways and navigation; Q109 bank mergers; Q110 Periyar quotation; Q111 constitutional fraternity; Q112 chronological nationalist movements
+- Q113–115 Abul Kalam Azad; Q116 Bipin Chandra Pal; Q117 Bharati; Q118 Kudi Arasu; Q119 Batukeshwar Dutt; Q120 Tagore renouncing knighthood
+- Q121 Subhas Chandra Bose; Q122 Poona Sarvajanik Sabha; Q123 Gokhale; **Q124 Thomas Roe and the Mughal court (correct original position, not Q1)**; Q125 title 'King of the Two Worlds'
+
+**Source quality warnings:**
+
+- Q107: the secondary PDF **English** says Mesolithic followed Palaeolithic and *Mesolithic*; its Tamil reads Palaeolithic and **Neolithic**. The study adaptation follows the Tamil sense, with an item-level caution. Compare official paper before certifying.
+- Q112: strict historical chronology of Ahmedabad and Kheda may differ from the textbook-derived answer sequence; left ungraded.
+- Q113: the secondary file repeats the printed label 'c' for fourth answer, even though there are four distinct options; study bank retains positional A–D order.
+- Q118: the secondary page describes Kudi Arasu as a *daily*, historically a *weekly*; the adaptation omits the publication-frequency claim.
+- Q116, Q121, Q123: historical terms, dates and quotations require comparison with the TNPSC original.
+
+**Answer protection:** keyedAnswerCount=0, grading=not-graded, finalKeyVersionCrosswalk.verified=false; all **125** answer arrays remain empty. The source's red colour labels are coaching selections only and are never used as official TNPSC grading keys. The required official 2021 **Version D** key-to-source crosswalk is still open. The next source-numbered batch is **Q126–Q200**.
