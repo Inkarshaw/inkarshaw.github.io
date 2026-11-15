@@ -1,9 +1,9 @@
-# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q175
+# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q200
 
-**Audit date:** 15 November 2026  
+**Audit updated:** 16 November 2026  
 **Exam:** 3 January 2021, Group I, General Studies, 200 original questions, total 300 marks  
 **Booklet code:** `GR1P/21`  
-**Current typed coverage:** **175/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
+**Current typed coverage:** **200/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
 **Auto-grading:** **disabled**, `keyedAnswerCount=0`, `accepted=[]`, `keyStatus=unmapped`
 
 ## Primary and comparison sources
@@ -53,11 +53,11 @@ The printed official key reports **Q3=A**, while one coaching reader lists **Q3=
 2. All question stems are editorially adapted English study text, **not** certified verbatim reproduction or a separately proofread Tamil bilingual bank.
 3. Q12 GDP option B has inconsistent English wording in the reader; do not infer a corrected final answer from that site.
 4. Q46 Kalpana Chawla Award has a possible date inconsistency between the secondary English/Tamil descriptions. Historical wording needs direct original-booklet comparison.
-5. Q1–Q175 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
+5. Q1–Q200 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
 
 ## Next stages
 
-- Continue **2021 Q126–Q200** using a reliably numbered accessible source. Civil Service Aspirants' 2021 pages after Q50 are unavailable here, so cross-check a separate bilingual PDF carefully rather than inventing inaccessible entries.
+- Perform primary-source visual proofing of **2021 Q1–Q200** using the original TNPSC GR1P/21 booklet, now that all 200 adapted positions exist. Civil Service Aspirants' 2021 pages after Q50 are unavailable here, so cross-check a separate bilingual PDF carefully rather than inventing inaccessible entries.
 - Recover a readable compressed/public original GR1P/21 booklet or use original source PDF with proper page-review access; cross-verify A–D answer-order and all mathematical diagrams/wording.
 - Validate all final-key entries to the source version, including ALL and multi-accepted positions, and then explicitly design scoring with complete source confidence.
 - Continue 2017 and 2015 original PYQ coverage in parallel.
@@ -93,7 +93,7 @@ The 50 new entries carry `secondaryPdfPage` (printed **17–34**, not invented o
 
 ### Priorities
 
-1. Source-numbered adaptation **2021 Q126–Q200**, with original Tamil/English, figures and formula details double-checked before any certification.
+1. Original-booklet and source-option verification of **2021 Q1–Q200**, with original Tamil/English, figures and formula details double-checked before any certification.
 2. Confirm 2021 final key Version D vs original GR1P/21 full 200-item choice-order crosswalk and exceptional answers.
 3. Continue 2017 and 2015 paper transcription, then verify source fidelity and Tamil translations before commercial grading claims.
 
@@ -168,3 +168,27 @@ The 50 new entries carry `secondaryPdfPage` (printed **17–34**, not invented o
 **UX safeguard:** Group I typed player now reveals `sourceCaution` in a visible, accessible warning note on individual affected questions (using `textContent` to prevent source text being parsed as HTML). This is particularly important for Q159 and Q162.
 
 **Grading safeguards:** Every Q1–Q175 has four A–D study options, accepted=[], keyStatus=unmapped. Paper keyedAnswerCount=0, grading=not-graded and finalKeyVersionCrosswalk.verified=false. No implication of certified verbatim English/Tamil transcription or verified final TNPSC answer keys.
+
+
+## 16 November 2026: Q176–Q200 finished — full study coverage
+
+**Current 2021 index:** **200/200** original question positions filled with English editorially adapted study prompts and source-ordered A–D options, plus browser-provided E = Answer not known. 2021 is therefore **fully typed as a study practice paper**, but **not certified verbatim bilingual** and **not scorable**. The aggregate Group I adapted typed study index now has **1,409** positions, including **seven** full 200-position years (2011, 2019, 2021, 2022, 2024, 2025, 2026) and **two** partial years (2015, 2017).
+
+**Source inspected for the new 25 positions:** [Appolo Study Centre's 2021 bilingual numbered study PDF (69 pages)](https://winmeen.com/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf), with per-question page screenshots on PDF printed pp**60–69**. The document itself prominently says **not an authentic key; tentative for aspirants**. It was used for numbers and English adapted-question context only. All marked/red coaching answer highlights were ignored. The large primary TNPSC 2021 GR1P/21 booklet is **not yet independently certified for every text or option**, and the official Version D key is **not yet crosswalked** to these adaptations.
+
+**PDF page positions for Q176–Q200:** Q176→60; Q177–Q180→61; Q181–Q185→62; Q186–Q188→63; Q189–Q191→64; Q192–Q194→66; Q195–Q196→67; Q197–Q199→68; Q200→69. The source includes a largely blank PDF page 65 containing the Tamil choices for Q191, hence the gap from p64 to p66.
+
+**Question themes:** Q176–180 simple interest, depreciation, ratio and profit/loss; Q181 hemispherical tank; Q182–183 algebraic LCM/HCF; Q184–185 fraction arithmetic; Q186 Darwinian evolution; Q187 AGRISNET; Q188 Periyar/communal representation; Q189 SDG Index rank; Q190 water droplet surface area; Q191 Athikadavu–Avinashi; Q192 Chennai's automobile industry; Q193 incremental capital–output ratio; Q194 2018 Ph.D. numbers; Q195–196 democracy/health assertions; Q197 MGNREGA disability employment; Q198 Rettamalai Srinivasan; Q199 2019 bank mergers; Q200 Post-Tsunami Sustainable Livelihood Programme.
+
+**Source discrepancies recorded in question-specific caution notes:**
+
+- **Q182:** A mathematical LCM alternative has mismatched parentheses in the secondary printing; normalized in editorial text and cautioned.
+- **Q184–Q185:** Formula layouts collapse in plaintext extraction. Both calculations, mixed-number symbols, division and negative product were checked against the page image, preserving the A–D position order. The original booklet must still be independently checked.
+- **Q186, Q188–Q190, Q194 and Q197:** 2021 scientific, legal or statistical historical framing is not treated as current fact or official answer-key validation.
+- **Q191:** 'well recharge' and 'groundwater recharge' answer choices overlap in meaning. No inferred grading.
+- **Q193 (high priority):** The secondary PDF's **English** list omits **IV**, describing I Static, II Allocative and III Technical while the printed alternatives use IV. Its **Tamil** version has **I Static; II Dynamic; III Allocative; IV Technical**. The English editorial study adaptation follows the Tamil four-part grouping and flags the discrepancy. The official TNPSC question and its option order must be checked before certification.
+- **Q195:** 'Expansion of democracy' and 'deepening of democracy' should not be inadvertently conflated when preparing an explanation.
+
+**Trust and grading invariant:** All **200** entries have four nonempty A–D options and original consecutive numbers, with empty accepted keys, `keyStatus=unmapped` and no inferred scoring. Paper settings: `keyedAnswerCount=0`, `grading=not-graded`, `finalKeyVersionCrosswalk.verified=false`. Do not claim 200 original TNPSC questions have been transcribed verbatim; the 200 positions are **edited English adaptations for practice**. Visible source-caution notes appear on flagged questions.
+
+**Remaining next-stage work:** (1) original TNPSC source and option-series proofreading; (2) official final-answer-key version-mapped validation; (3) exact Tamil reproduction/translation quality, diagrams where applicable; (4) 2015 and 2017 incomplete typed papers.
