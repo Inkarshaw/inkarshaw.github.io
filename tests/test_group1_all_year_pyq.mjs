@@ -9,7 +9,7 @@ const typed=JSON.parse(read('data/quizzes/typed-pyq-catalog.json'));
 const page=read('tnpsc-group1-pyq.html');
 const script=read('assets/js/pyq-original-paper.js');
 assert.equal(catalog.schemaVersion,1);
-assert.equal(catalog.updatedOn,'2026-11-15');
+assert.equal(catalog.updatedOn,'2026-11-16');
 const years=catalog.entries.map(e=>e.year);
 assert.deepEqual(years,[2026,2025,2024,2022,2021,2019,2017,2015,2014,2013,2011,2010,2009,2007]);
 assert.equal(new Set(years).size,years.length,'No duplicate indexed years');
@@ -31,8 +31,8 @@ for(const year of [2026,2025,2024,2022,2021,2019,2017,2015,2011]){
  assert.equal(e.paperUrl,p.paperUrl);
  if(year!==2011)assert.equal(p.answerKeyStatus,'official-pdf-only','Non-mapped keys must never auto-score');
 }
-assert.equal(catalog.entries.filter(x=>x.typedUrl).length,9,'Full 2011/2019/2022/2024/2025/2026 and three partial typed years');
-const typedStarterCounts=new Map([[2015,7],[2017,2],[2019,200],[2021,175],[2022,200],[2024,200],[2025,200]]);
+assert.equal(catalog.entries.filter(x=>x.typedUrl).length,9,'Full 2011/2019/2021/2022/2024/2025/2026 and two partial typed years');
+const typedStarterCounts=new Map([[2015,7],[2017,2],[2019,200],[2021,200],[2022,200],[2024,200],[2025,200]]);
 for(const [year,count] of typedStarterCounts){
  const e=keyByYear.get(year);
  assert.equal(e.typedQuestionCount,count,'Partial text count remains truthful: '+year);
@@ -64,7 +64,7 @@ assert.match(page,/tnpsc-group1-syllabus\.html/);
 assert.match(page,/descriptive-questions\.html/);
 assert.match(page,/not a digitized text quiz/i);
 assert.match(page,/Full 200-position typed practice/i);
-assert.match(page,/Three other years/i);
+assert.match(page,/Two other years/i);
 assert.match(page,/Source gaps/);
 assert.match(read('pyq-hub.html'),/href="tnpsc-group1-pyq\.html"/);
 assert.match(read('tnpsc-group1-syllabus.html'),/href="tnpsc-group1-pyq\.html"/);
