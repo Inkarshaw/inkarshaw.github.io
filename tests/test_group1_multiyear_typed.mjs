@@ -357,6 +357,9 @@ assert.match(js,/2021 secondary bilingual PDF \(tentative, not official key\)/);
 
 assert.match(js,/civilserviceaspirants\.in/);
 assert.match(js,/q\.sourceReaderUrl/);
+assert.match(js,/sourceCaution/,'Source review note must be displayed by typed quiz player');
+assert.match(html,/id="sourceCaution"/,'Question-specific source error warnings must be visible');
+assert.match(js,/caution\.textContent=q\.sourceCaution/,'Warnings rendered using textContent, not HTML');
 
 assert.match(html,/not certified verbatim TNPSC text/);
 assert.match(html,/No automatic scoring/);
