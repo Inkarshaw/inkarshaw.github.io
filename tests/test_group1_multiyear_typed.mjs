@@ -8,11 +8,11 @@ const allYears=JSON.parse(read('data/quizzes/tnpsc-group1-all-years.json'));
 const html=read('tnpsc-group1-typed-years.html');
 const js=read('assets/js/tnpsc-group1-typed-years.js');
 const hub=read('tnpsc-group1-pyq.html');
-const expected=new Map([[2025,100],[2024,10],[2022,200],[2021,2],[2019,9],[2017,2],[2015,7]]);
+const expected=new Map([[2025,200],[2024,10],[2022,200],[2021,2],[2019,9],[2017,2],[2015,7]]);
 assert.equal(typed.schemaVersion,1);
 assert.equal(typed.papers.length,7);
 assert.deepEqual(typed.papers.map(p=>p.year),[2025,2024,2022,2021,2019,2017,2015]);
-assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),330);
+assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),430);
 for(const paper of typed.papers){
  assert.equal(paper.originalQuestionCount,200);
  assert.equal(paper.grading,'not-graded');
@@ -39,8 +39,8 @@ for(const paper of typed.papers){
  }
 }
 const y25=typed.papers.find(p=>p.year===2025);
-assert.deepEqual(y25.questions.map(q=>q.number),Array.from({length:100},(_,i)=>i+1));
-assert.equal(y25.sourceNumberedSecondaryCheckedCount,100);
+assert.deepEqual(y25.questions.map(q=>q.number),Array.from({length:200},(_,i)=>i+1));
+assert.equal(y25.sourceNumberedSecondaryCheckedCount,200);
 assert.equal(y25.verifiedSourceCount,0,'Original booklet not visually certified');
 assert.equal(y25.grading,'not-graded');
 assert.equal(y25.keyedAnswerCount,0);
@@ -50,8 +50,8 @@ assert.ok(y25.questions.every(q=>q.keyStatus==='unmapped'&&q.accepted.length===0
 assert.equal(y25.finalKeyStatus,'official-original-numbered-497-found-editorial-option-verification-pending');
 assert.match(y25.finalKeyUrl,/04_2025_GR_I%20and%201A%20FAK\.pdf/);
 assert.deepEqual(y25.finalKeyExceptionSource.all,[6,50,90,171,199]);
-assert.deepEqual(y25.questions.filter(q=>q.officialFinalKeyExceptionReview).map(q=>q.number),[6,50,90]);
-assert.deepEqual(y25.questions.filter(q=>q.secondaryReaderOfficialKeyDiscrepancy).map(q=>q.number),[11,49,88]);
+assert.deepEqual(y25.questions.filter(q=>q.officialFinalKeyExceptionReview).map(q=>q.number),[6,50,90,171,199]);
+assert.deepEqual(y25.questions.filter(q=>q.secondaryReaderOfficialKeyDiscrepancy).map(q=>q.number),[11,49,88,112,175,199]);
 assert.deepEqual(y25.finalKeyExceptionSource.multipleAccepted,[121]);
 assert.equal(y25.finalKeyExceptionSource.scoringEnabled,false);
 assert.match(y25.questions[10].text,/rivers/i,'Q11 must be the river-origin matching question');
@@ -66,6 +66,28 @@ assert.match(y25.questions[89].text,/Thirukkural/i,'Q90 paper position must matc
 assert.match(y25.questions[94].text,/hours/i,'Q95 mathematics must be readable');
 assert.match(y25.questions[99].text,/pass mark/i,'Q100 is the original pass-mark calculation');
 assert.equal(y25.questions[94].calculationSourceReview,true);
+
+assert.equal(y25.officialBookletVisualCertification,'not-done-original-27mb-pdf-unavailable','2025 cannot be called original-page certified');
+assert.equal(y25.keyedAnswerCount,0,'No 2025 scores');
+assert.equal(y25.finalKeyExceptionSource.scoringEnabled,false);
+assert.equal(y25.questions[120].multipleAnswerFinalKeyReview,true,'2025 Q121 final key accepts A/B/D');
+assert.equal(y25.questions[156].secondarySourceWordingReview,true,'Q157 source repeats a district');
+assert.equal(y25.questions[174].secondaryReaderOfficialKeyDiscrepancy,true,'Q175 is not ALL per official key');
+assert.equal(y25.questions[193].formulaSourceProofNeeded,true,'Q194 nested fraction requires original PDF comparison');
+assert.equal(y25.questions[198].sourceOptionDispute,true,'Q199 D differs between sources');
+assert.equal(y25.questions[198].options[3],'481','Compressed specimen and independent reader show 481, not secondary 545');
+assert.equal(y25.questions[198].officialFinalKeyExceptionReview,true,'Q199 official ALL');
+assert.equal(y25.questions[199].editorialFigureText,true,'Q200 is a labelled reconstructed 4-cube text');
+assert.equal(y25.questions[199].sourceFigureTextReconstruction,true,'No original image certainty claim');
+assert.equal(y25.questions[199].questionFullySelfContained,true,'Q200 reconstructed view triples provided');
+assert.match(y25.questions[199].text,/I=\(5,4,6\)/);
+assert.match(y25.questions[199].text,/IV=\(4,1,5\)/);
+assert.deepEqual(y25.figureRecoveryPending,[]);
+assert.match(y25.questions[100].text,/576/,'Q101 starts aptitude section');
+assert.match(y25.questions[149].text,/elementary-education/,'Q150 historical education');
+assert.match(y25.questions[174].text,/Anjalai/,'Q175 numbered history');
+assert.match(y25.questions[187].text,/circles/,'Q188 circle region');
+
 
 const y15=typed.papers.find(p=>p.year===2015);
 assert.deepEqual(y15.questions.map(q=>q.number),[1,2,3,4,5,6,7]);
