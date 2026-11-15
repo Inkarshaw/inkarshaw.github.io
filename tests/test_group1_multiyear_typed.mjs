@@ -324,7 +324,7 @@ assert.equal(y21.questions[125].number,126);
 assert.match(y21.questions[125].text,/population density/i,'2021 original Q126 density definition');
 assert.equal(y21.questions[125].secondaryPdfPage,43);
 assert.match(y21.questions[126].text,/Chengalpattu/,'2021 Q127 Periyar inheritance resolution');
-assert.match(y21.questions[131].text,/Ryotwari/,'2021 Q132 land settlement');
+assert.match(y21.questions[131].options[0],/Ryotwari/,'2021 Q132 land settlement');
 assert.match(y21.questions[134].text,/fiscal-policy/,'2021 Q135 objective');
 assert.match(y21.questions[135].sourceCaution,/English calls.*objective factors.*Tamil.*subjective/,'2021 Q136 source-language mismatch retained');
 assert.match(y21.questions[144].sourceCaution,/three members/,'2021 Q145 Rajamannar committee two-member claim explicitly checked');
