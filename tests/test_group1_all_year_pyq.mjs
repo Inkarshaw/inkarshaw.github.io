@@ -31,8 +31,8 @@ for(const year of [2026,2025,2024,2022,2021,2019,2017,2015,2011]){
  assert.equal(e.paperUrl,p.paperUrl);
  if(year!==2011)assert.equal(p.answerKeyStatus,'official-pdf-only','Non-mapped keys must never auto-score');
 }
-assert.equal(catalog.entries.filter(x=>x.typedUrl).length,9,'Full 2011/2022/2025/2026 and five partial typed years');
-const typedStarterCounts=new Map([[2015,7],[2017,2],[2019,9],[2021,2],[2022,200],[2024,10],[2025,200]]);
+assert.equal(catalog.entries.filter(x=>x.typedUrl).length,9,'Full 2011/2022/2024/2025/2026 and four partial typed years');
+const typedStarterCounts=new Map([[2015,7],[2017,2],[2019,9],[2021,2],[2022,200],[2024,200],[2025,200]]);
 for(const [year,count] of typedStarterCounts){
  const e=keyByYear.get(year);
  assert.equal(e.typedQuestionCount,count,'Partial text count remains truthful: '+year);
@@ -46,6 +46,8 @@ for(const y of [2011,2026]){
  assert.ok(existsSync(new URL('../'+e.typedUrl,import.meta.url)));
  assert.ok(typed.entries.some(x=>x.year===y&&x.paper.includes('Group I')));
 }
+assert.equal(keyByYear.get(2024).provisionallyScorable,0);
+assert.match(keyByYear.get(2024).finalKeyUrl,/04_2024_GR_I_PRELIM_FAK\.pdf/);
 assert.equal(keyByYear.get(2022).provisionallyScorable,0);
 assert.match(keyByYear.get(2022).finalKeyUrl,/Gr_I_Ans_Key_19_11_22\.pdf/);
 assert.equal(keyByYear.get(2026).provisionallyScorable,0);
@@ -62,7 +64,7 @@ assert.match(page,/tnpsc-group1-syllabus\.html/);
 assert.match(page,/descriptive-questions\.html/);
 assert.match(page,/not a digitized text quiz/i);
 assert.match(page,/Full 200-position typed practice/i);
-assert.match(page,/Five other years/i);
+assert.match(page,/Four other years/i);
 assert.match(page,/Source gaps/);
 assert.match(read('pyq-hub.html'),/href="tnpsc-group1-pyq\.html"/);
 assert.match(read('tnpsc-group1-syllabus.html'),/href="tnpsc-group1-pyq\.html"/);
