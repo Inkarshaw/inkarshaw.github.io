@@ -57,7 +57,7 @@ function render(){
  const finalKey=safeTnpsc(paper.finalKeyUrl);if(finalKey){$('finalKeyLink').href=finalKey;$('finalKeyLink').hidden=false}else $('finalKeyLink').hidden=true;
  const mirror=safeMirrorPdf(paper.mirroredSourceUrl);
  const mirrorPage=paper.year===2021?q.secondaryPdfPage:q.sourcePdfPage;
- if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(mirrorPage)?'#page='+mirrorPage:'');$('mirrorPdfLink').textContent=(paper.year===2019?'Scanned 2019 GR1P booklet (hand-marked; not final key) · PDF page ':paper.year===2021?'2021 secondary bilingual PDF (tentative, not official key) · page ':'Readable original booklet mirror · PDF page ')+(mirrorPage||'');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
+ if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(mirrorPage)?'#page='+mirrorPage:'');$('mirrorPdfLink').textContent=(paper.year===2019?'Scanned 2019 GR1P booklet (hand-marked; not final key) · PDF page ':paper.year===2021?'2021 secondary bilingual PDF (tentative, not official key) · page ':'Readable original booklet mirror · PDF page ')+(Number.isInteger(mirrorPage)?mirrorPage:'source pages');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
  const reader=safeReader(q.sourceReaderUrl)||safeReader(paper.secondaryReader);if(reader){$('compareLink').href=reader;$('compareLink').hidden=false}else $('compareLink').hidden=true;
  status();palette();
 }
