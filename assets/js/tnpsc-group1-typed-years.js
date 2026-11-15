@@ -37,7 +37,7 @@ function render(){
  showReview(false);const q=paper.questions[index];const count=paper.questions.length;
  $('paperLabel').textContent='TNPSC Group I · '+paper.year+' · adapted English text';
  $('questionNumber').textContent='Original Q'+q.number;
- $('position').textContent='Typed item '+(index+1)+' of '+count+' · source-option ordering retained for comparison · automatic key checking unavailable';
+ $('position').textContent='Typed item '+(index+1)+' of '+count+' · source-option ordering retained · no automatic grading'+(q.editorialFigureText?' · Editorial text description of original diagram: check source PDF':q.editorialPassageSummary?' · Passage condensed for study: compare original PDF':q.specialFinalKeyReview?' · Final key marks this position as a special case (ALL): no grading':q.multipleAnswerFinalKeyReview?' · Final key has multiple accepted choices: no grading':q.historicClassificationCaution?' · Historical outdated classification term; not current scientific guidance':'');
  $('questionText').textContent=q.text;
  $('choices').replaceChildren();
  const legend=document.createElement('legend');legend.textContent='Choose an option from the original question-number series';$('choices').append(legend);
