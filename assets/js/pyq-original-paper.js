@@ -138,6 +138,13 @@
     renderPalette();
     renderDock();
   }
+  function answerReferenceLabel(p){
+    if(p.answerKeyUrl===p.paperUrl)return 'TNPSC tentative answer-marked question paper (PDF)';
+    if(/\.aspx(?:$|[?#])/i.test(p.answerKeyUrl))return 'Browse TNPSC answer-key archive';
+    return p.answerKeyStatus==='official-pdf-only'?
+      'TNPSC answer-key PDF (digital scoring not verified)':
+      'Open matched official final answer key (PDF)';
+  }
   function setPaper(p){
     currentPaper=p;index=0;lastShownPdfPage=0;
     $('examTitle').textContent=p.board+' '+p.exam+' · '+p.year+' · '+p.paper;
@@ -148,7 +155,7 @@
       (currentKey?'Indicative scoring uses the matching paper-series final key; ALL entries remain ungraded.':
         'Automatic marking is unavailable until a complete matching official final key is checked.');
     plainLink($('sourcePaper'),p.paperUrl,'Open original official question paper (PDF) ↗');
-    plainLink($('sourceKey'),p.answerKeyUrl,'Open official final answer key (PDF) ↗');
+    plainLink($('sourceKey'),p.answerKeyUrl,answerReferenceLabel(p));
     $('paperFrame').src=safe(p.paperUrl)||'about:blank';
     $('scanWarning').hidden=!p.annotatedSource;
     $('pdfPage').value='1';
@@ -205,7 +212,7 @@
       rows.append(item);
     });
     $('answerOverview').replaceChildren(rows);
-    plainLink($('resultSource'),currentPaper.answerKeyUrl,'Open the official final answer key PDF ↗');
+    plainLink($('resultSource'),currentPaper.answerKeyUrl,answerReferenceLabel(currentPaper));
     $('result').hidden=false;$('answerSheet').hidden=true;$('mobileAnswerDock').hidden=true;
     window.scrollTo(0,0);write();
   }
