@@ -8,11 +8,11 @@ const allYears=JSON.parse(read('data/quizzes/tnpsc-group1-all-years.json'));
 const html=read('tnpsc-group1-typed-years.html');
 const js=read('assets/js/tnpsc-group1-typed-years.js');
 const hub=read('tnpsc-group1-pyq.html');
-const expected=new Map([[2025,200],[2024,200],[2022,200],[2021,2],[2019,100],[2017,2],[2015,7]]);
+const expected=new Map([[2025,200],[2024,200],[2022,200],[2021,2],[2019,200],[2017,2],[2015,7]]);
 assert.equal(typed.schemaVersion,1);
 assert.equal(typed.papers.length,7);
 assert.deepEqual(typed.papers.map(p=>p.year),[2025,2024,2022,2021,2019,2017,2015]);
-assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),711);
+assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),811);
 for(const paper of typed.papers){
  assert.equal(paper.originalQuestionCount,200);
  assert.equal(paper.grading,'not-graded');
@@ -124,23 +124,23 @@ assert.match(y25.questions[187].text,/circles/,'Q188 circle region');
 
 
 const y19=typed.papers.find(p=>p.year===2019);
-assert.equal(y19.questions.length,100);
-assert.deepEqual(y19.questions.map(q=>q.number),Array.from({length:100},(_,i)=>i+1));
-assert.equal(y19.sourceNumberedCheckedCount,100);
-assert.equal(y19.verifiedSourceCount,69,'19 earlier + Q51–100 all individually visually inspected');
+assert.equal(y19.questions.length,200);
+assert.deepEqual(y19.questions.map(q=>q.number),Array.from({length:200},(_,i)=>i+1));
+assert.equal(y19.sourceNumberedCheckedCount,200);
+assert.equal(y19.verifiedSourceCount,169,'19 early image-checked plus Q51–200 all image-checked');
 assert.equal(y19.grading,'not-graded');
 assert.equal(y19.keyedAnswerCount,0);
 assert.ok(y19.questions.every(q=>q.keyStatus==='unmapped'&&q.accepted.length===0));
 assert.ok(y19.questions.every(q=>q.sourceBookletCode==='GR1P'));
-assert.ok(y19.questions.every(q=>Number.isInteger(q.sourcePdfPage)&&q.sourcePdfPage>=3&&q.sourcePdfPage<=41));
+assert.ok(y19.questions.every(q=>Number.isInteger(q.sourcePdfPage)&&q.sourcePdfPage>=3&&q.sourcePdfPage<=77));
 assert.equal(y19.questions[0].sourcePdfPage,3);
 assert.equal(y19.questions[4].sourcePdfPage,4);
 assert.equal(y19.questions[19].sourcePdfPage,9);
 assert.equal(y19.questions[36].sourcePdfPage,15);
 assert.equal(y19.questions[47].sourcePdfPage,19);
 assert.equal(y19.questions[49].sourcePdfPage,20);
-assert.deepEqual(y19.questions.slice(50).map(q=>q.sourcePdfPage),[21,21,22,22,22,23,23,23,24,24,24,25,25,25,26,26,27,27,28,28,28,29,29,29,30,30,30,31,31,31,32,32,33,33,34,34,35,35,36,36,36,37,37,38,39,39,40,40,40,41]);
-assert.equal(y19.questions.slice(50).filter(q=>q.reviewStatus==='source-pdf-page-visually-inspected').length,50,'Original Q51–100 images checked individually');
+assert.deepEqual(y19.questions.slice(50,100).map(q=>q.sourcePdfPage),[21,21,22,22,22,23,23,23,24,24,24,25,25,25,26,26,27,27,28,28,28,29,29,29,30,30,30,31,31,31,32,32,33,33,34,34,35,35,36,36,36,37,37,38,39,39,40,40,40,41]);
+assert.equal(y19.questions.slice(50,100).filter(q=>q.reviewStatus==='source-pdf-page-visually-inspected').length,50,'Original Q51–100 images checked individually');
 assert.match(y19.questions[50].text,/Communal Award/,'Q51 original chronological order');
 assert.match(y19.questions[51].text,/communal representation/,'Q52 year association');
 assert.match(y19.questions[65].text,/inequalities/,'Q66 numeric fractions');
@@ -148,11 +148,44 @@ assert.match(y19.questions[66].text,/Simplify/,'Q67 polynomial fraction');
 assert.match(y19.questions[77].text,/transgender clinic/,'Q78 source question');
 assert.match(y19.questions[81].text,/Namami Gange/,'Q82 final-key ALL position');
 assert.match(y19.questions[99].text,/oscilloscope/,'Q100 original topic');
-assert.deepEqual(y19.finalKeyExceptionsPendingCrosswalk.all,[18,26,40,82,85]);
+assert.deepEqual(y19.finalKeyExceptionsPendingCrosswalk.all,[18,26,40,82,85,122,128,129,143,182,184,194]);
 assert.deepEqual(y19.finalKeyExceptionsPendingCrosswalk.multipleAccepted[3],['A','B']);
 assert.deepEqual(y19.finalKeyExceptionsPendingCrosswalk.multipleAccepted[35],['A','B','C']);
 assert.deepEqual(y19.finalKeyExceptionsPendingCrosswalk.multipleAccepted[60],['A','C']);
 assert.deepEqual(y19.finalKeyExceptionsPendingCrosswalk.multipleAccepted[79],['A','B']);
+assert.deepEqual(y19.finalKeyExceptionsPendingCrosswalk.multipleAccepted[132],['A','D']);
+assert.deepEqual(y19.sourceReviewCounts,{visualOriginalPositions:169,textLayerOnly:31,originalNumberedPositions:200});
+assert.equal(y19.officialBookletVisualCertification,'mirrored-GR1P-PDF-all-Q51-200-visual-Q1-50-sampled-original-government-pdf-too-large');
+assert.equal(y19.questions.slice(100).filter(q=>q.reviewStatus==='source-pdf-page-visually-inspected').length,100,'Q101–200 all image checked');
+const y19PageSpans=[
+ [101,103,41],[104,107,42],[108,110,43],[111,113,44],[114,115,45],[116,118,46],
+ [119,121,47],[122,124,48],[125,127,49],[128,129,50],[130,133,51],[134,135,52],
+ [136,137,53],[138,139,54],[140,142,55],[143,145,56],[146,147,57],[148,150,58],
+ [151,153,59],[154,156,60],[157,159,61],[160,162,62],[163,165,63],[166,168,64],
+ [169,170,65],[171,173,66],[174,176,67],[177,179,68],[180,181,69],[182,183,70],
+ [184,185,71],[186,186,72],[187,190,73],[191,192,74],[193,194,75],[195,198,76],[199,200,77]
+];
+for(const [first,last,page] of y19PageSpans){
+ for(let number=first;number<=last;number++){
+  assert.equal(y19.questions[number-1].sourcePdfPage,page,'GR1P source page for Q'+number);
+ }
+}
+assert.deepEqual(y19.questions.filter(q=>q.officialFinalKeyExceptionReview).map(q=>q.number),[18,26,40,82,85,122,128,129,143,182,184,194]);
+assert.deepEqual(y19.questions.filter(q=>q.multipleAnswerFinalKeyReview).map(q=>q.number),[3,35,60,79,132]);
+assert.equal(y19.questions[100].text.includes('Havelock Island'),true,'Q101 original topic');
+assert.match(y19.questions[121].text,/Sivaji/,'Q122 version-A ALL');
+assert.equal(y19.questions[127].sourceHistoricalOrScientificCaution,true,'Q128 contradictory planetary density mapping labelled');
+assert.match(y19.questions[131].text,/judicial activism/i,'Q132 A/D version-A');
+assert.match(y19.questions[142].text,/NITI Aayog/i,'Q143 ALL');
+assert.match(y19.questions[149].text,/tomtom/i,'Q150 source');
+assert.match(y19.questions[163].text,/polynomial/i,'Q164 internal formula mismatch');
+assert.equal(y19.questions[163].originalQuestionSourceCaution,true,'Q164 mathematical inconsistency flagged');
+assert.match(y19.questions[181].text,/Atal New India Challenge/,'Q182 ALL');
+assert.match(y19.questions[183].text,/Jal Kranti/,'Q184 ALL');
+assert.match(y19.questions[193].text,/electrification/i,'Q194 ALL');
+assert.match(y19.questions[199].text,/Jagjit Singh/,'Original Q200');
+assert.match(js,/Scanned 2019 GR1P booklet \(hand-marked; not final key\)/,'Unverified handwritten ticks warned on source link');
+
 assert.equal(y19.finalKeyExceptionsPendingCrosswalk.verifiedSeriesCrosswalk,false);
 assert.equal(y19.finalKeyExceptionsPendingCrosswalk.gradingEnabled,false);
 assert.equal(y19.finalKeyVersionCrosswalk.verified,false);
