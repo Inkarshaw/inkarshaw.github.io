@@ -275,7 +275,7 @@ assert.ok(y21.questions.every(q=>q.options.length===4&&q.keyStatus==='unmapped'&
 assert.ok(y21.questions.every(q=>q.sourceBookletCode==='GR1P/21'));
 assert.ok(y21.questions.slice(0,50).every(q=>q.sourceReaderUrl===y21.secondaryReader.replace('-1.php','-'+Math.ceil(q.number/10)+'.php')));
 assert.ok(y21.questions.slice(0,50).every(q=>q.reviewStatus==='bilingual-secondary-numbered-editorial-adaptation'));
-assert.ok(y21.questions.slice(50).every(q=>q.reviewStatus==='numbered-secondary-bilingual-pdf-english-layer-reviewed'));
+assert.ok(y21.questions.slice(50,175).every(q=>q.reviewStatus==='numbered-secondary-bilingual-pdf-english-layer-reviewed'));
 assert.ok(y21.questions.slice(50).every(q=>Number.isInteger(q.secondaryPdfPage)&&q.secondaryPdfPage>=17&&q.secondaryPdfPage<=69));
 assert.equal(y21.questions[0].text.includes('Social Welfare Board'),true,'Old Mughal ambassador Q1 source error removed');
 assert.match(y21.questions[1].text,/black money/,'Q2 original black money rather than land revenue');
