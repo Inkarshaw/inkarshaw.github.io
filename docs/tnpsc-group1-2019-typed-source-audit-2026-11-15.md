@@ -1,9 +1,9 @@
-# TNPSC Group I prelims 2019 — source audit for typed questions Q1–Q50
+# TNPSC Group I prelims 2019 — source audit for typed questions Q1–Q100
 
 **Audit date:** 15 November 2026  
 **Exam date:** 3 March 2019  
 **Booklet code:** `GR1P`, bilingual English/Tamil  
-**Playable text coverage:** 50 of 200 source-number-aligned, English **editorial study adaptations**, 0 digitally scorable.
+**Playable text coverage:** 100 of 200 source-number-aligned, English **editorial study adaptations**, 0 digitally scorable.
 
 ## Source references
 
@@ -14,11 +14,11 @@
 
 ## Delivered
 
-1. The previous nine-question draft had Q1–Q4 and Q6–Q10; this branch fills missing Q5 and Q11–Q50. **All 50 positions are now consecutive Q1–Q50** with four A–D choices in booklet order.
+1. The earlier nine-question draft was expanded to Q1–Q50. The latest batch adds all of **Q51–Q100**, so **100 positions now run consecutively Q1–Q100** with four A–D choices in booklet order.
 2. Every question carries a `sourcePdfPage`, `sourceBookletCode: "GR1P"`, an explicit editorial review status, `accepted: []` and `keyStatus: unmapped`.
-3. The mapped original source pages are **3–20 inclusive**. **Six** distinct source pages were inspected as images: 3, 4, 5, 9, 15 and 19. These contain **19** numbered question positions. The other 31 positions were checked against the readable text layer, not individually certified from the image. A different third-party reader was used to cross-check numbering.
+3. The mapped original source pages now cover **3–41 inclusive**. For Q1–Q50, six sampled pages (3, 4, 5, 9, 15, 19) contained 19 visually checked questions and 31 positions checked from the text layer. For **Q51–Q100**, the 21 consecutive scanned pages 21–41 were all visually inspected and each of the 50 new questions checked against its page, bringing the visually checked position count to **69**. A different third-party reader was used to cross-check numbering.
 4. Original PDF pages can be opened directly from the quiz using `#page=N` links, and the safe PDF-host whitelist permits only the exact scanned 2019 source path. The original official TNPSC PDF remains the primary reference.
-5. Scanned markings are **not the official TNPSC final key**. None of the 50 entries auto-scores.
+5. Scanned markings are **not the official TNPSC final key**. None of the 100 entries auto-scores.
 
 ## Special source caveats
 
@@ -29,6 +29,30 @@
 
 ## Remaining work
 
-- Continue from **original Q51** through Q200; preserve text matching, tables/diagrams and printed numbering.
+- Continue from **original Q101** through Q200; preserve text matching, tables/diagrams and printed numbering.
 - Compare original question text and alternative wording with TNPSC's government-hosted booklet and the appropriate original booklet-series **final** key.
 - Add independently proofread Tamil study translations only after original Tamil text has been checked; do not call the existing English adapted text 'verbatim'.
+
+## Q51–Q100 extension and official final key (15 November 2026)
+
+The 50 new original-numbered items Q51–Q100 were read from the images on **pages 21–41** of the above bilingual GR1P scanned booklet. Page labels are stored on all fifty entries, and the question-order index now aligns chronologically across Q1–Q100. The scanned copy's handwritten checks are historical annotations, **not independently certified final choices**.
+
+The official TNPSC **2019 Group I final key** is now confirmed at [2019_GROUP_1_FINAL_ANSKEYS.pdf](https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/2019_GROUP_1_FINAL_ANSKEYS.pdf), with **four different key versions A, B, C, D** for subject code 003, QB code GR1P, exam 3 March 2019. Handwritten tick choices at Q1 and Q2 appear consistent with **Version A**; this alone is insufficient to certify the exact booklet version for all 200 positions.
+
+The following **provisional Version A exception positions** are recorded **for review only**:
+
+| Exception type | Original positions through Q100 |
+|---|---|
+| All choices credited | Q18, Q26, Q40, Q82, Q85 |
+| Two choices credited | Q3 A/B; Q60 A/C; Q79 A/B |
+| Three choices credited | Q35 A/B/C |
+
+The original quiz **remains completely ungraded** (`keyedAnswerCount=0`, `accepted=[]`, `keyStatus=unmapped`), irrespective of the final-key link. The player now warns that the 2019 version crosswalk remains unverified.
+
+Q66–Q68 are fraction and algebra questions; their displayed mathematics are linear text transcriptions, so the source page should be consulted for the layout of nested fractions. This is an English study adaptation, not a verbatim or officially certified bilingual transcription.
+
+### Remaining actions
+
+1. Continue **2019 Q101–Q200**, using scanned original paper pages and preserving figures and source-specific option order.
+2. Establish the exact original GR1P question-booklet version and comprehensive final-answer crosswalk, including special cases, before adding any marks.
+3. Independently proofread Tamil-original text, historical phrasing and algebra notation before making verbatim-publication claims.
