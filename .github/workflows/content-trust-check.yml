@@ -8,6 +8,10 @@ on:
       - "tests/test_tnusrb_source_verification.mjs"
       - "tnpsc-group1-syllabus.html"
       - "tnpsc-group1-pyq.html"
+      - "tnpsc-group1-typed-years.html"
+      - "assets/js/tnpsc-group1-typed-years.js"
+      - "data/quizzes/tnpsc-group1-multiyear-typed-draft.json"
+      - "tests/test_group1_multiyear_typed.mjs"
       - "data/quizzes/tnpsc-group1-all-years.json"
       - "tests/test_group1_all_year_pyq.mjs"
       - "tnpsc-group1-topic-practice.html"
@@ -224,6 +228,8 @@ jobs:
         run: node tests/test_pyq_original_paper.mjs
       - name: Validate Group I all-years source index, text status and full-paper sessions
         run: node tests/test_group1_all_year_pyq.mjs
+      - name: Validate Group I typed starter-years and no fabricated answer keys
+        run: node tests/test_group1_multiyear_typed.mjs
       - name: Validate local original-PYQ verbatim digitization workbench
         run: node tests/test_pyq_digitize_workbench.mjs
       - name: Validate year-wise PYQ routing
