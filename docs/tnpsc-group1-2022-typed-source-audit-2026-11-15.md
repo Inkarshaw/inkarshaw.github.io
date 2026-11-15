@@ -4,27 +4,27 @@
 - Official source: [TNPSC CCS1P/22 bilingual tentative-answer booklet](https://www.tnpsc.gov.in/Tentative/Document/2022_16_CCS1P_2022_TENTATIVE_ANSKEY.pdf).
 - Booklet series printed in the PDF: **β**. Printed Q1–Q60 were source-checked on PDF pages 3–40; Q61–Q100 were additionally aligned to the official searchable bilingual text and representative PDF screenshots on pages 41–66 (PDF page number, first cover counted as page 1).
 - Dataset: `data/quizzes/tnpsc-group1-multiyear-typed-draft.json`, entry `year: 2022`.
-- Editorial status: **130 adapted English study stems**, each with four A–D choices in the original booklet order. `E` is rendered by the quiz player as **Answer not known**.
+- Editorial status: **200 adapted English study stems**, each with four A–D choices in the original booklet order. `E` is rendered by the quiz player as **Answer not known**.
 - Text and options are **not certified verbatim copies**; Tamil source wording is viewable in the official PDF. No score is calculated while a matching final-key mapping remains incomplete.
 
 ## Problems fixed
-The earlier coaching-derived 2022 items were withdrawn when their numbering could not be trusted. Subsequent direct comparison with the TNPSC booklet **confirmed** that Q80 does in fact concern the 1929 Lahore Purna Swaraj declaration; it is now restored from the official source, rather than the coaching sequence. Q143 and Q154–Q157 remain excluded from this typed source-checked segment pending their own page audit.
+The earlier coaching-derived 2022 items were withdrawn when their numbering could not be trusted. Subsequent direct comparison with the TNPSC booklet **confirmed** that Q80 does in fact concern the 1929 Lahore Purna Swaraj declaration; it is now restored from the official source, rather than the coaching sequence. Q143 and Q154–Q157 have since been recovered and checked against the source booklet, and are now present at their actual positions.
 
-The original booklet places **cigar smoke at Q1**, the **upward-projected ball at Q2**, **DNA unwinding at Q4**, the **Great Trigonometrical Survey at Q22**, and **Tiruchirappalli Proclamation at Q35**. The typed sequence now follows the printed numbers throughout Q1–Q130, with stored `sourcePdfPage` on every item.
+The original booklet places **cigar smoke at Q1**, the **upward-projected ball at Q2**, **DNA unwinding at Q4**, the **Great Trigonometrical Survey at Q22**, and **Tiruchirappalli Proclamation at Q35**. The typed sequence now follows the printed numbers throughout Q1–Q200, with stored `sourcePdfPage` on every item.
 
 ## Illustrated item
 **Q54, PDF page 37** is a ring/sector diagram. It is presented as an **explicit text-only interpretation** listing the four relevant pairs and centre values; `editorialFigureText: true` is required. It must not be described as a verbatim original figure. The original PDF page is linked directly from the quiz.
 
 ## Quality gates
-1. Exactly 130 distinct, sequential original positions, Q1–Q130, and complete four-choice A–D alternatives.
-2. Stored source pages on all entries, PDF pages 3–88. The first sixty have earlier visual-review provenance; Q61–Q100 were checked against the official PDF text layer with visual samples on Q61–62, Q65–66, Q73, Q89 and Q99.
-3. All 130 remain `keyStatus: unmapped`, `accepted: []`, and `grading: not-graded`. The 2022 paper’s visible **tentative** tick marks are not a validated final-key mapping.
+1. Exactly 200 distinct, sequential original positions, Q1–Q200, and complete four-choice A–D alternatives.
+2. Stored source pages on all entries, PDF pages 3–139. The first sixty have earlier visual-review provenance; Q61–Q100 were checked against the official PDF text layer with visual samples on Q61–62, Q65–66, Q73, Q89 and Q99.
+3. All 200 remain `keyStatus: unmapped`, `accepted: []`, and `grading: not-graded`. The 2022 paper’s visible **tentative** tick marks are not a validated final-key mapping.
 4. No secondary-reader link is shown for 2022 because the earlier source reorders the numbered items.
-5. The year-wise catalogue shows **130/200**; the all-years paper also has separate official-PDF answer-sheet mode.
+5. The year-wise catalogue shows **200/200**; the all-years paper also has separate official-PDF answer-sheet mode.
 
 ## Remaining work
-- Examine TNPSC 2022 **Q131–Q200**, then certify Tamil study translations separately from the original source text.
-- Locate and audit the complete official final key **for this exact 2022 booklet/version**, including any deleted or multiple-accepted entries, before enabling scoring.
+- All 200 original-numbered English adapted positions are now present; independently proofread Tamil translations and exact source typography/figures against the original before claiming bilingual or verbatim certification.
+- Official final key has been located at https://tnpsc.gov.in/Document/Answerkeyfinalresult/Gr_I_Ans_Key_19_11_22.pdf, but it is labelled **VERSION A** and the mirrored booklet says **β**; verify the series crosswalk and exceptional answers before enabling scoring.
 - Continue the partial 2015, 2017, 2019, 2021, 2024 and 2025 typed banks, independently checking original numbering and figures rather than following a coaching-site question ordering.
 
 ## Follow-on batch: Q61–Q100
@@ -39,3 +39,17 @@ The original booklet places **cigar smoke at Q1**, the **upward-projected ball a
 - Q129 is an extended reading passage on agriculture, rainfall, inputs and cooperative credit. The quiz displays an **explicitly condensed study summary**, marked `editorialPassageSummary: true`; students can inspect the full passage on PDF page 87.
 - The multi-year player exposes two options for the 2022 source: the official TNPSC PDF URL and this independently hosted mirror with an exact `#page=N` deep link. Neither version is silently used as a **final** answer key.
 - The total Group I source-numbered *study* text count is now **570** positions, comprising 200 each in 2011 and 2026, 130 in 2022, and 40 in the other partial historical collections. No claim of 570 verbatim certified questions or 570 scoreable choices is made.
+
+## Completion batch: Q131–Q200 (15 November 2026)
+- Every Q131–Q200 position was reviewed against scanned pages **89–139** of a mirrored copy of the TNPSC **CCS1P/22 β** source booklet. Each item records its source PDF page, four A–D answer options, and original question number.
+- The source booklet includes a fifth response **E: Answer not known**, which the browser quiz renders independently. The question text and answer-option wording here are **editorially adapted English study text**, not certified verbatim transcriptions.
+- Figure questions **Q152** (number grid, PDF p105) and **Q153** (dice diagrams, PDF p106) have the explicit `editorialFigureText` flag and links to their official source pages. Earlier Q54 (p37) remains a text reconstruction. The complete original figure must be checked by users before relying on a drawing-based answer.
+- The official TNPSC **final answer key** for the 19 November 2022 Group I exam has been located: [VERSION A key](https://tnpsc.gov.in/Document/Answerkeyfinalresult/Gr_I_Ans_Key_19_11_22.pdf), subject code 003, CCS1P/22. It is **not yet validated against the β-series source booklet** shown for text.
+- **Provisional exception list from the official VERSION A final key**: Q157, Q158, Q183 and Q185 marked **ALL**; Q152 has **A or C**, and Q197 has **B or C**. All six items have protective flags in the typed bank; their series alignment and interpretation must be verified first. The list must not be treated as a completed grading map.
+- The full 200-question 2022 typed set remains **0 scorable** until all original 200 answers, multi-choice/ALL positions and the exact series mapping are audited. No grades are inferred from the booklet's *tentative* visible ticks.
+- The all-year index now has **640 original-numbered typed study positions** across 2011, 2022, 2026 (200 each) and other incomplete historical Group I series (40 combined). This does **not** mean 640 certified verbatim or automatically scorable questions.
+
+## Remaining audit priorities
+1. Complete a printed-series β ↔ key-version A crosswalk, including any deleted, ALL or multiple-accepted positions.
+2. Recheck the editorial English option renderings against exact Tamil/English original pages, including formulas and Q54/Q152/Q153 figures.
+3. Expand bilingual Tamil text where not yet supplied and continue completing 2015, 2017, 2019, 2021, 2024 and 2025 typed years.
