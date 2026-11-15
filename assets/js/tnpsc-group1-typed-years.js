@@ -5,7 +5,7 @@ const STORAGE='clearexams:tnpsc:g1:multi-year-typed:v1:';
 const ALLOWED=['A','B','C','D','E'];
 const safeTnpsc=url=>{try{const u=new URL(url);return u.protocol==='https:'&&/^(?:www\.)?tnpsc\.gov\.in$/.test(u.hostname)?u.href:null}catch{return null}};
 const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf')||(u.hostname==='cdn.govtjobsnet.com'&&u.pathname==='/previous-papers/tnpsc-group-1-prelims-2019-question-paper-with-answers.pdf'))?u.href:null}catch{return null}};
-const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&(['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(u.hostname==='www.unlockias.in'&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019'].includes(u.pathname)))?u.href:null}catch{return null}};
+const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&(['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(u.hostname==='www.unlockias.in'&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019'].includes(u.pathname))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2021-january-[1-5]\.php$/.test(u.pathname)&&!u.search))?u.href:null}catch{return null}};
 let bank=[],paper=null,index=0,responses={},savedAt=0;
 function stored(year){try{
  const d=JSON.parse(localStorage.getItem(STORAGE+year)||'null');
@@ -37,7 +37,7 @@ function render(){
  showReview(false);const q=paper.questions[index];const count=paper.questions.length;
  $('paperLabel').textContent='TNPSC Group I · '+paper.year+' · adapted English text';
  $('questionNumber').textContent='Original Q'+q.number;
- $('position').textContent='Typed item '+(index+1)+' of '+count+' · source-option ordering retained · no automatic grading'+(q.editorialFigureText?' · Editorial text description of original diagram: check source PDF':q.editorialPassageSummary?' · Passage condensed for study: compare original PDF':q.specialFinalKeyReview?' · Final key marks this position as a special case (ALL): no grading':q.multipleAnswerFinalKeyReview?' · Final key has multiple accepted choices: no grading':q.officialFinalKeyExceptionReview?' · Official final key has a special ALL decision; not graded':q.sourceOptionDispute?' · A–D wording conflicts between readers; cross-checked compressed paper, ungraded':q.secondaryReaderOfficialKeyDiscrepancy?' · Secondary answer label conflicts with official final key; not graded':q.historicClassificationCaution?' · Historical outdated classification term; not current scientific guidance':'')+(paper.finalKeyVersionCrosswalk&&paper.finalKeyVersionCrosswalk.verified===false?' · Final-key version crosswalk pending: do not infer scores':'');
+ $('position').textContent='Typed item '+(index+1)+' of '+count+' · source-option ordering retained · no automatic grading'+(q.editorialFigureText?' · Editorial text description of original diagram: check source PDF':q.editorialPassageSummary?' · Passage condensed for study: compare original PDF':q.specialFinalKeyReview?' · Final key marks this position as a special case (ALL): no grading':q.multipleAnswerFinalKeyReview?' · Final key has multiple accepted choices: no grading':q.officialFinalKeyExceptionReview?' · Official final key has a special ALL decision; not graded':q.sourceOptionDispute?' · A–D wording conflicts between readers; cross-checked compressed paper, ungraded':q.secondaryReaderOfficialKeyDiscrepancy?' · Secondary answer label conflicts with official final key; not graded':q.secondaryKeyConflict?' · Coaching answer disagrees with TNPSC final key; not graded':q.historicClassificationCaution?' · Historical outdated classification term; not current scientific guidance':'')+(paper.finalKeyVersionCrosswalk&&paper.finalKeyVersionCrosswalk.verified===false?' · Final-key version crosswalk pending: do not infer scores':'');
  $('questionText').textContent=q.text;
  $('choices').replaceChildren();
  const legend=document.createElement('legend');legend.textContent='Choose an option from the original question-number series';$('choices').append(legend);
@@ -57,7 +57,7 @@ function render(){
  const finalKey=safeTnpsc(paper.finalKeyUrl);if(finalKey){$('finalKeyLink').href=finalKey;$('finalKeyLink').hidden=false}else $('finalKeyLink').hidden=true;
  const mirror=safeMirrorPdf(paper.mirroredSourceUrl);
  if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('mirrorPdfLink').textContent=(paper.year===2019?'Scanned 2019 GR1P booklet (hand-marked; not final key) · PDF page ':'Readable original booklet mirror · PDF page ')+(q.sourcePdfPage||'');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
- const reader=safeReader(paper.secondaryReader);if(reader){$('compareLink').href=reader;$('compareLink').hidden=false}else $('compareLink').hidden=true;
+ const reader=safeReader(q.sourceReaderUrl)||safeReader(paper.secondaryReader);if(reader){$('compareLink').href=reader;$('compareLink').hidden=false}else $('compareLink').hidden=true;
  status();palette();
 }
 function setYear(year){
@@ -87,7 +87,7 @@ function validate(d){
   for(const q of p.questions){
    if(!Number.isInteger(q.number)||q.number<1||q.number>200||ids.has(q.number)||
       !q.text||q.text.length<18||!Array.isArray(q.options)||q.options.length!==4||
-      q.options.some(o=>typeof o!=='string'||!o.trim())||q.keyStatus!=='unmapped'||
+      q.options.some(o=>typeof o!=='string'||!o.trim())||(q.sourceReaderUrl!==undefined&&!safeReader(q.sourceReaderUrl))||q.keyStatus!=='unmapped'||
       (Array.isArray(q.accepted)&&q.accepted.length))throw Error('Bad typed item in '+p.year);
    ids.add(q.number);
   }
