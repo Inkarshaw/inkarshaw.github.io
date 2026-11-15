@@ -1,9 +1,9 @@
-# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q125
+# TNPSC Group I Prelims 2021 — source-numbered English adapted study Q1–Q150
 
 **Audit date:** 15 November 2026  
 **Exam:** 3 January 2021, Group I, General Studies, 200 original questions, total 300 marks  
 **Booklet code:** `GR1P/21`  
-**Current typed coverage:** **125/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
+**Current typed coverage:** **150/200 adapted English study questions** with 4 A–D choices and an E="Answer not known" browser choice  
 **Auto-grading:** **disabled**, `keyedAnswerCount=0`, `accepted=[]`, `keyStatus=unmapped`
 
 ## Primary and comparison sources
@@ -53,7 +53,7 @@ The printed official key reports **Q3=A**, while one coaching reader lists **Q3=
 2. All question stems are editorially adapted English study text, **not** certified verbatim reproduction or a separately proofread Tamil bilingual bank.
 3. Q12 GDP option B has inconsistent English wording in the reader; do not infer a corrected final answer from that site.
 4. Q46 Kalpana Chawla Award has a possible date inconsistency between the secondary English/Tamil descriptions. Historical wording needs direct original-booklet comparison.
-5. Q1–Q125 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
+5. Q1–Q150 are playable for practice **without marks**. E is rendered by the browser because the original 2021 booklet supplied a fifth "Answer not known" response.
 
 ## Next stages
 
@@ -120,3 +120,31 @@ The 50 new entries carry `secondaryPdfPage` (printed **17–34**, not invented o
 - Q116, Q121, Q123: historical terms, dates and quotations require comparison with the TNPSC original.
 
 **Answer protection:** keyedAnswerCount=0, grading=not-graded, finalKeyVersionCrosswalk.verified=false; all **125** answer arrays remain empty. The source's red colour labels are coaching selections only and are never used as official TNPSC grading keys. The required official 2021 **Version D** key-to-source crosswalk is still open. The next source-numbered batch is **Q126–Q200**.
+
+
+## Q126–Q150 extension (15 November 2026)
+
+**Coverage after this batch:** **150/200** original-position-aligned, editorially adapted English practice MCQs with four printed A–D choices; the browser adds E = Answer not known. This 25-question extension lifts the aggregate Group I library to **1,359 typed study positions** including the full 2011/2019/2022/2024/2025/2026 200-position years. None of the new positions has certified original-text or verified original-to-final-key mapping.
+
+**Source and page mapping:** The publicly hosted [Appolo Study Centre 2021 bilingual study transcription](https://winmeen.com/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf), printed PDF pages **43–53**, includes consecutively numbered Q126–Q150. English text was reviewed for all 25 question numbers; visible page screenshots were checked for printed pages **44, 48, 51 and 53**. The source self-identifies as a **tentative, non-authentic answer key**. Its red answer markings were not imported. The official 32 MB TNPSC GR1P/21 original PDF still needs authoritative visual comparison.
+
+**Original item themes:**
+
+- Q126 density per square kilometre; Q127 equal inheritance/property rights for women; Q128 Su. Venkatesan's Vel Pari; Q129 Pariyerum Perumal; Q130 edible-oil self-sufficiency; Q131 organic farming
+- Q132 Ryotwari landholding; Q133 COVID-era industry sectors; Q134 2019–20 GST trend; Q135 fiscal-policy objectives; Q136 consumption motives; Q137 direct and indirect taxes; Q138 Visvesvaraya's planning work
+- Q139 Indian demography and density formula; Q140 Treasury Bills; Q141 Periyar and self-respect; Q142 Attorney General appointment terms; Q143 anti-caste remark attributed to a Tamil Nadu Chief Minister
+- Q144 High Court contempt and writ jurisdiction; Q145 Rajamannar Committee; Q146 Eleventh Schedule; Q147 Governor appointment; Q148 State Legislative Council composition; Q149 President's veto/assent; Q150 Money Bill recommendation and Finance Commission
+
+**Unresolved wording and source problems that must not silently change grading:**
+
+1. **Q129**: Filmfare award-category wording requires external verification.
+2. **Q134 and Q139**: GST trends and state birth/death data are historical source claims; must not be represented as current statistics.
+3. **Q135**: Source lists 'unemployment' instead of 'reducing unemployment' as an objective of fiscal policy. Retain distinction.
+4. **Q136**: Secondary English calls consumption motives 'objective factors', but the corresponding Tamil calls them subjective. Item-level caution included.
+5. **Q140**: Treasury Bills have no periodic coupon; 'no interest' should not be interpreted as zero investment return. The RBI auctions bills for the central government.
+6. **Q145**: The stem's 'two-member Rajamannar Committee' claim is deliberately erroneous. Historical committee membership was three; the MCQ asks readers to identify false statements.
+7. **Q147**: Governor's formal constitutional appointment and political 'nominee' descriptions should not be conflated.
+8. **Q149**: The secondary PDF's **English choice C reads I, III, IV**; its **Tamil choice C reads I, II, IV**. English and Tamil differ. Preserve English A–D ordering in this English adaptation, but do not enable grading until original TNPSC booklet and its Version D key resolve the discrepancy.
+9. **Q150**: The source describes presidential 'approval' where the constitutional wording is 'prior recommendation' for introducing a Money Bill. The adaptation clarifies the distinction but still must be source-proofread.
+
+**Integrity controls:** all **150** Q1–Q150 entries have four A–D text options, keyStatus=unmapped, accepted=[], keyedAnswerCount=0, grading=not-graded, finalKeyVersionCrosswalk.verified=false. No fabricated scoring and no claim that these are verbatim-certified bilingual reproductions. **Next unfilled source positions: Q151–Q200.**
