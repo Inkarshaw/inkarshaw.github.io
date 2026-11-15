@@ -56,7 +56,7 @@ function render(){
  const original=safeTnpsc(paper.officialPdf);if(original){$('pdfLink').href=original+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('pdfLink').textContent=Number.isInteger(q.sourcePdfPage)?'TNPSC original booklet · PDF page '+q.sourcePdfPage:'Official TNPSC paper (PDF)';$('pdfLink').hidden=false}else $('pdfLink').hidden=true;
  const finalKey=safeTnpsc(paper.finalKeyUrl);if(finalKey){$('finalKeyLink').href=finalKey;$('finalKeyLink').hidden=false}else $('finalKeyLink').hidden=true;
  const mirror=safeMirrorPdf(paper.mirroredSourceUrl);
- if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('mirrorPdfLink').textContent='Readable original booklet mirror · PDF page '+(q.sourcePdfPage||'');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
+ if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('mirrorPdfLink').textContent=(paper.year===2019?'Scanned 2019 GR1P booklet (hand-marked; not final key) · PDF page ':'Readable original booklet mirror · PDF page ')+(q.sourcePdfPage||'');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
  const reader=safeReader(paper.secondaryReader);if(reader){$('compareLink').href=reader;$('compareLink').hidden=false}else $('compareLink').hidden=true;
  status();palette();
 }
