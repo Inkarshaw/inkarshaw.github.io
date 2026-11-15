@@ -50,13 +50,15 @@ assert.ok(y25.questions.every(q=>q.keyStatus==='unmapped'&&q.accepted.length===0
 assert.equal(y25.finalKeyStatus,'official-original-numbered-497-found-editorial-option-verification-pending');
 assert.match(y25.finalKeyUrl,/04_2025_GR_I%20and%201A%20FAK\.pdf/);
 assert.deepEqual(y25.finalKeyExceptionSource.all,[6,50,90,171,199]);
+assert.deepEqual(y25.questions.filter(q=>q.officialFinalKeyExceptionReview).map(q=>q.number),[6,50]);
+assert.deepEqual(y25.questions.filter(q=>q.secondaryReaderOfficialKeyDiscrepancy).map(q=>q.number),[11,49]);
 assert.deepEqual(y25.finalKeyExceptionSource.multipleAccepted,[121]);
 assert.equal(y25.finalKeyExceptionSource.scoringEnabled,false);
 assert.match(y25.questions[10].text,/rivers/i,'Q11 must be the river-origin matching question');
-assert.match(y25.questions[19].text,/anniversaries/,'Q30 source numbering');
+assert.match(y25.questions[29].text,/anniversaries/,'Q30 source numbering');
 assert.match(y25.questions[26].text,/Workplace/,'Q27 employment legislation');
 assert.match(y25.questions[49].text,/1962/,'Q50 source numbering');
-assert.equal(y25.questions[47].editorialPassageSummary,true,'Q58 condenses the printed passage');
+assert.equal(y25.questions[57].editorialPassageSummary,true,'Q58 condenses the printed passage');
 const y15=typed.papers.find(p=>p.year===2015);
 assert.deepEqual(y15.questions.map(q=>q.number),[1,2,3,4,5,6,7]);
 assert.equal(y15.verifiedSourceCount,7,'2015 Q1–7 visually checked against official original PDF');
