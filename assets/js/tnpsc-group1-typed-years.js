@@ -10,7 +10,7 @@ function stored(year){try{
  const d=JSON.parse(localStorage.getItem(STORAGE+year)||'null');
  if(!d||d.version!==1||typeof d.answers!=='object'||Array.isArray(d.answers))return {};
  const items={};
- for(const q of paper.questions){const letter=d.answers[String(q.number)];if(ALLOWED.includes(letter))items[String(q.number)]=letter}
+ for(const q of paper.questions){const letter=d.answers[String(q.number)];if(paper.optionLetters.includes(letter))items[String(q.number)]=letter}
  return items;
 }catch{return {}}}
 function save(){if(!paper)return;try{localStorage.setItem(STORAGE+paper.year,JSON.stringify({version:1,year:paper.year,answers:responses,updatedAt:Date.now()}))}catch{}}
