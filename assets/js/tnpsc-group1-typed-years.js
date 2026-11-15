@@ -37,7 +37,7 @@ function render(){
  showReview(false);const q=paper.questions[index];const count=paper.questions.length;
  $('paperLabel').textContent='TNPSC Group I · '+paper.year+' · adapted English text';
  $('questionNumber').textContent='Original Q'+q.number;
- $('position').textContent='Typed item '+(index+1)+' of '+count+' · source-option ordering retained · no automatic grading'+(q.editorialFigureText?' · Editorial text description of original diagram: check source PDF':q.editorialPassageSummary?' · Passage condensed for study: compare original PDF':q.specialFinalKeyReview?' · Final key marks this position as a special case (ALL): no grading':q.multipleAnswerFinalKeyReview?' · Final key has multiple accepted choices: no grading':q.historicClassificationCaution?' · Historical outdated classification term; not current scientific guidance':'');
+ $('position').textContent='Typed item '+(index+1)+' of '+count+' · source-option ordering retained · no automatic grading'+(q.editorialFigureText?' · Editorial text description of original diagram: check source PDF':q.editorialPassageSummary?' · Passage condensed for study: compare original PDF':q.specialFinalKeyReview?' · Final key marks this position as a special case (ALL): no grading':q.multipleAnswerFinalKeyReview?' · Final key has multiple accepted choices: no grading':q.officialFinalKeyExceptionReview?' · Official final key has a special ALL decision; not graded':q.secondaryReaderOfficialKeyDiscrepancy?' · Secondary answer label conflicts with official final key; not graded':q.historicClassificationCaution?' · Historical outdated classification term; not current scientific guidance':'');
  $('questionText').textContent=q.text;
  $('choices').replaceChildren();
  const legend=document.createElement('legend');legend.textContent='Choose an option from the original question-number series';$('choices').append(legend);
@@ -54,6 +54,7 @@ function render(){
  $('previous').disabled=index===0;$('next').disabled=index===count-1;
  $('clearAnswer').disabled=!responses[String(q.number)];
  const original=safeTnpsc(paper.officialPdf);if(original){$('pdfLink').href=original+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('pdfLink').textContent=Number.isInteger(q.sourcePdfPage)?'TNPSC original booklet · PDF page '+q.sourcePdfPage:'Official TNPSC paper (PDF)';$('pdfLink').hidden=false}else $('pdfLink').hidden=true;
+ const finalKey=safeTnpsc(paper.finalKeyUrl);if(finalKey){$('finalKeyLink').href=finalKey;$('finalKeyLink').hidden=false}else $('finalKeyLink').hidden=true;
  const mirror=safeMirrorPdf(paper.mirroredSourceUrl);
  if(mirror){$('mirrorPdfLink').href=mirror+(Number.isInteger(q.sourcePdfPage)?'#page='+q.sourcePdfPage:'');$('mirrorPdfLink').textContent='Readable original booklet mirror · PDF page '+(q.sourcePdfPage||'');$('mirrorPdfLink').hidden=false}else $('mirrorPdfLink').hidden=true;
  const reader=safeReader(paper.secondaryReader);if(reader){$('compareLink').href=reader;$('compareLink').hidden=false}else $('compareLink').hidden=true;
@@ -81,7 +82,7 @@ function validate(d){
   years.add(p.year);
   if(p.originalQuestionCount!==200||p.grading!=='not-graded'||p.keyedAnswerCount!==0||
    !['ABCD','ABCDE'].includes(p.optionLetters.join(''))||!safeTnpsc(p.officialPdf)||
-   (p.secondaryReader!==null&&!safeReader(p.secondaryReader))||(p.mirroredSourceUrl!==undefined&&!safeMirrorPdf(p.mirroredSourceUrl))||!Array.isArray(p.questions)||p.questions.length<1||p.questions.length>200)throw Error('Incomplete source metadata');
+   (p.secondaryReader!==null&&!safeReader(p.secondaryReader))||(p.mirroredSourceUrl!==undefined&&!safeMirrorPdf(p.mirroredSourceUrl))||(p.finalKeyUrl!==undefined&&!safeTnpsc(p.finalKeyUrl))||!Array.isArray(p.questions)||p.questions.length<1||p.questions.length>200)throw Error('Incomplete source metadata');
   const ids=new Set();
   for(const q of p.questions){
    if(!Number.isInteger(q.number)||q.number<1||q.number>200||ids.has(q.number)||
