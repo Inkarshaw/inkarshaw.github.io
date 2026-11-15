@@ -4,8 +4,8 @@ const $=id=>document.getElementById(id);
 const STORAGE='clearexams:tnpsc:g1:multi-year-typed:v1:';
 const ALLOWED=['A','B','C','D','E'];
 const safeTnpsc=url=>{try{const u=new URL(url);return u.protocol==='https:'&&/^(?:www\.)?tnpsc\.gov\.in$/.test(u.hostname)?u.href:null}catch{return null}};
-const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf'?u.href:null}catch{return null}};
-const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&(['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(u.hostname==='www.unlockias.in'&&u.pathname==='/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf'))?u.href:null}catch{return null}};
+const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf')||(u.hostname==='cdn.govtjobsnet.com'&&u.pathname==='/previous-papers/tnpsc-group-1-prelims-2019-question-paper-with-answers.pdf'))?u.href:null}catch{return null}};
+const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&(['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(u.hostname==='www.unlockias.in'&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019'].includes(u.pathname)))?u.href:null}catch{return null}};
 let bank=[],paper=null,index=0,responses={},savedAt=0;
 function stored(year){try{
  const d=JSON.parse(localStorage.getItem(STORAGE+year)||'null');
