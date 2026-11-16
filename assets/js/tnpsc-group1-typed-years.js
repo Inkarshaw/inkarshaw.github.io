@@ -5,7 +5,7 @@ const STORAGE='clearexams:tnpsc:g1:multi-year-typed:v1:';
 const ALLOWED=['A','B','C','D','E'];
 const safeTnpsc=url=>{try{const u=new URL(url);return u.protocol==='https:'&&/^(?:www\.)?tnpsc\.gov\.in$/.test(u.hostname)?u.href:null}catch{return null}};
 const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf')||(u.hostname==='cdn.govtjobsnet.com'&&u.pathname==='/previous-papers/tnpsc-group-1-prelims-2019-question-paper-with-answers.pdf')||(u.hostname==='winmeen.com'&&u.pathname==='/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf'&&!u.search))?u.href:null}catch{return null}};
-const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&(['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(u.hostname==='www.unlockias.in'&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019'].includes(u.pathname))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2021-january-[1-5]\.php$/.test(u.pathname)&&!u.search))?u.href:null}catch{return null}};
+const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&(['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(['www.unlockias.in','unlockias.in'].includes(u.hostname)&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019','/tnpsc-previous-year-questions/prelims/2017'].includes(u.pathname))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2021-january-[1-5]\.php$/.test(u.pathname)&&!u.search))?u.href:null}catch{return null}};
 let bank=[],paper=null,index=0,responses={},savedAt=0;
 function stored(year){try{
  const d=JSON.parse(localStorage.getItem(STORAGE+year)||'null');
@@ -112,9 +112,31 @@ document.addEventListener('keydown',event=>{
  if(event.key==='ArrowRight'&&index<paper.questions.length-1){index++;render()}
  if(event.key==='ArrowLeft'&&index>0){index--;render()}
 });
-fetch('data/quizzes/tnpsc-group1-multiyear-typed-draft.json',{cache:'no-store'})
- .then(r=>{if(!r.ok)throw Error('Could not load typed question bank');return r.json()})
- .then(data=>{
+// Q51–75 2017 are published as small source-audited files to avoid rewriting the large legacy bank.
+const SOURCE_2017_SEGMENTS=[
+ 'data/quizzes/tnpsc-group1-2017-q51-55.json',
+ 'data/quizzes/tnpsc-group1-2017-q56-60.json',
+ 'data/quizzes/tnpsc-group1-2017-q61-65.json',
+ 'data/quizzes/tnpsc-group1-2017-q66-70.json',
+ 'data/quizzes/tnpsc-group1-2017-q71-75.json'
+];
+const loadJson=path=>fetch(path,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Cannot load '+path);return r.json()});
+Promise.all([loadJson('data/quizzes/tnpsc-group1-multiyear-typed-draft.json'),...SOURCE_2017_SEGMENTS.map(loadJson)])
+ .then(([data,...segments])=>{
+  const p=data.papers.find(p=>p.year===2017);
+  if(!p||p.questions.length!==52||segments.length!==5)throw Error('Unexpected base for 2017 study extension');
+  const extra=segments.flatMap((part,i)=>{
+   if(part.schemaVersion!==1||part.year!==2017||!Array.isArray(part.questions)||part.questions.length!==5||
+     part.questions.some((q,j)=>q.number!==51+i*5+j||q.sourceBookletCode!=='GS1902'||q.keyStatus!=='unmapped'||!Array.isArray(q.accepted)||q.accepted.length))
+    throw Error('Invalid 2017 original-numbered source segment '+(i+1));
+   return part.questions;
+  });
+  if(p.questions.some(q=>q.number>=51&&q.number<=75))throw Error('Duplicate 2017 source positions');
+  p.questions=[...p.questions,...extra].sort((a,b)=>a.number-b.number);
+  p.verifiedSourceCount+=extra.length;
+  p.sourceStatus='partial-2017-GS1902-official-pdf-reviewed-77-original-positions';
+  p.sourceAudit+=' Q51–75 official PDF pages 22–30 image reviewed and added from modular source files; all answers remain unmapped.';
+
  bank=validate(data);
  const picker=$('yearPicker');picker.replaceChildren();
  bank.forEach(p=>{const opt=document.createElement('option');opt.value=String(p.year);
