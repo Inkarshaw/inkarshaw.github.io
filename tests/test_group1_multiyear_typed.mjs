@@ -293,7 +293,7 @@ assert.deepEqual(y17.questions[117].options,['October 1956','June 1956','Novembe
 assert.match(y17.questions[117].sourceCaution,/CRITICAL DATE AMBIGUITY/);
 assert.match(y17.questions[117].sourceCaution,/31 August 1956/);
 assert.match(y17.questions[117].sourceCaution,/1 November 1956/);
-assert.match(y17.questions[118].sourceCaution,/multiple/);
+assert.match(y17.questions[118].sourceCaution,/more than one imperfect pair/,'Q119 possibly multiple mismatches must not be auto-graded');
 assert.match(y17.questions[119].text,/Keezhadi/);
 assert.deepEqual(y17.questions[119].options,['4–3–1–2','3–4–1–2','1–3–2–4','2–1–3–4']);
 assert.match(y17.questions[120].text,/India Home Rule Society/);
