@@ -9,11 +9,11 @@ const allYears=JSON.parse(read('data/quizzes/tnpsc-group1-all-years.json'));
 const html=read('tnpsc-group1-typed-years.html');
 const js=read('assets/js/tnpsc-group1-typed-years.js');
 const hub=read('tnpsc-group1-pyq.html');
-const expected=new Map([[2025,200],[2024,200],[2022,200],[2021,200],[2019,200],[2017,125],[2015,7]]);
+const expected=new Map([[2025,200],[2024,200],[2022,200],[2021,200],[2019,200],[2017,200],[2015,7]]);
 assert.equal(typed.schemaVersion,1);
 assert.equal(typed.papers.length,7);
 assert.deepEqual(typed.papers.map(p=>p.year),[2025,2024,2022,2021,2019,2017,2015]);
-assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),1132);
+assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),1207);
 for(const paper of typed.papers){
  assert.equal(paper.originalQuestionCount,200);
  assert.equal(paper.grading,'not-graded');
@@ -210,12 +210,12 @@ assert.match(y19.mirroredSourceUrl,/cdn\.govtjobsnet\.com\/previous-papers\/tnps
 assert.match(js,/cdn\.govtjobsnet\.com/);
 assert.match(js,/\/tnpsc-previous-year-questions\/prelims\/2019/);
 const y17=typed.papers.find(p=>p.year===2017);
-assert.deepEqual(y17.questions.map(q=>q.number),[...Array.from({length:125},(_,i)=>i+1)],'Keep original numbering and honest gaps');
-assert.equal(y17.verifiedSourceCount,125,'2017 Q1–125 source pages visually inspected, NOT certified final answer keys');
+assert.deepEqual(y17.questions.map(q=>q.number),[...Array.from({length:200},(_,i)=>i+1)],'Keep original numbering and honest gaps');
+assert.equal(y17.verifiedSourceCount,200,'2017 Q1–200 source pages visually inspected, NOT certified final answer keys');
 assert.equal(y17.keyedAnswerCount,0);
 assert.equal(y17.grading,'not-graded');
-assert.equal(y17.questions.length,125);
-assert.deepEqual(y17.questions.map(q=>q.sourcePdfPage),[2,2,2,2,3,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,11,12,12,13,13,14,14,14,15,15,15,16,16,17,17,17,18,18,18,19,19,19,20,21,21,21,22,22,22,23,23,23,24,24,24,25,25,25,26,26,26,27,27,27,28,28,28,29,29,30,30,30,31,31,32,32,33,33,33,33,34,34,34,34,35,35,36,36,37,37,37,37,38,38,39,39,39,39,40,40,40,41,41,41,42,42,42,43,43,44,44,45,45,46,46,46,47,47,48,48,49,49]);
+assert.equal(y17.questions.length,200);
+assert.deepEqual(y17.questions.map(q=>q.sourcePdfPage),[2,2,2,2,3,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,11,12,12,13,13,14,14,14,15,15,15,16,16,17,17,17,18,18,18,19,19,19,20,21,21,21,22,22,22,23,23,23,24,24,24,25,25,25,26,26,26,27,27,27,28,28,28,29,29,30,30,30,31,31,32,32,33,33,33,33,34,34,34,34,35,35,36,36,37,37,37,37,38,38,39,39,39,39,40,40,40,41,41,41,42,42,42,43,43,44,44,45,45,46,46,46,47,47,48,48,49,49,50,50,51,51,52,52,52,53,53,53,54,54,54,55,55,55,56,56,56,57,57,58,58,59,59,59,60,60,60,61,61,61,62,62,62,63,63,63,64,64,64,65,65,65,66,66,67,67,68,68,69,69,69,70,70,71,71,71,71,72,72,72,72,73,73,73,73,74,74,74,75,75,76,76,76]);
 assert.ok(y17.questions.every(q=>q.reviewStatus==='official-tnpsc-pdf-page-visually-inspected-adaptation'&&q.sourceBookletCode==='GS1902'));
 assert.ok(y17.questions.every(q=>q.options.length===4&&q.options.every(v=>typeof v==='string'&&v.trim())&&q.keyStatus==='unmapped'&&q.accepted.length===0),'Handwritten ticks must not be used as final key');
 assert.match(y17.questions[0].text,/ISRO/);
@@ -316,6 +316,17 @@ assert.match(js,/tnpsc-previous-year-questions\/prelims\/2017/,'2017 reference U
 assert.match(y17.sourceAudit,/Q26–Q50 inspected/);
 assert.match(y17.questions[123].text,/Patna/);
 assert.match(y17.questions[124].text,/widow remarriage/);
+assert.equal(y17.questions[125].number,126);
+assert.match(y17.questions[125].text,/Wood's Despatch/);
+assert.equal(y17.questions[199].number,200);
+assert.match(y17.questions[199].text,/Akodara/);
+assert.ok(y17.questions.slice(125).every(q=>q.reviewStatus==='official-tnpsc-pdf-page-visually-inspected-adaptation'&&q.keyStatus==='unmapped'&&q.accepted.length===0),'2017 final 75 are official-source reviewed but never keyed');
+for(const n of [127,154,158,172])assert.ok(y17.questions[n-1].sourceCaution,'Critical source mismatch must be exposed for Q'+n);
+assert.match(y17.questions[126].sourceCaution,/STEM\/OPTIONS CONFLICT/);
+assert.match(y17.questions[157].sourceCaution,/divides by zero/);
+assert.match(y17.questions[171].sourceCaution,/DOMAIN ERROR/);
+assert.match(y17.sourceAudit,/Q126–Q200/);
+
 assert.match(y17.sourceAudit,/handwritten tick marks/);
 const y15=typed.papers.find(p=>p.year===2015);
 assert.deepEqual(y15.questions.map(q=>q.number),[1,2,3,4,5,6,7]);
