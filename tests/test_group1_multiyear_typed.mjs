@@ -9,15 +9,15 @@ const allYears=JSON.parse(read('data/quizzes/tnpsc-group1-all-years.json'));
 const html=read('tnpsc-group1-typed-years.html');
 const js=read('assets/js/tnpsc-group1-typed-years.js');
 const hub=read('tnpsc-group1-pyq.html');
-const expected=new Map([[2025,200],[2024,200],[2022,200],[2021,200],[2019,200],[2017,200],[2015,7]]);
+const expected=new Map([[2025,200],[2024,200],[2022,200],[2021,200],[2019,200],[2017,200],[2015,32]]);
 assert.equal(typed.schemaVersion,1);
 assert.equal(typed.papers.length,7);
 assert.deepEqual(typed.papers.map(p=>p.year),[2025,2024,2022,2021,2019,2017,2015]);
-assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),1207);
+assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),1232);
 for(const paper of typed.papers){
  assert.equal(paper.originalQuestionCount,200);
  assert.equal(paper.grading,[2015,2017].includes(paper.year)?'verified-partial':'not-graded');
- assert.equal(paper.keyedAnswerCount,paper.year===2017?189:paper.year===2015?7:0);
+ assert.equal(paper.keyedAnswerCount,paper.year===2017?189:paper.year===2015?29:0);
  assert.equal(paper.questions.length,expected.get(paper.year));
  assert.deepEqual(paper.optionLetters,paper.year<2021?['A','B','C','D']:['A','B','C','D','E']);
  assert.match(paper.officialPdf,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\//);
@@ -38,7 +38,7 @@ for(const paper of typed.papers){
   if(paper.year===2015||paper.year===2017){
    const verified=item.keyStatus.endsWith('-verified');
    assert.ok(['official-final-version-A-verified','official-final-GS0811-omega-verified','official-ALL-ungraded','source-dispute-ungraded'].includes(item.keyStatus));
-   assert.equal(item.accepted.length,verified?(paper.year===2017&&item.number===91?2:1):0);
+   assert.equal(item.accepted.length,verified?((paper.year===2017&&item.number===91)||(paper.year===2015&&item.number===20)?2:1):0);
   }else{
    assert.equal(item.keyStatus,'unmapped','Never provide unreviewed keys');
    assert.deepEqual(item.accepted,[],'No fabricated accepted-option sets');
@@ -347,13 +347,26 @@ assert.match(y17.sourceAudit,/Q126–Q200/);
 
 assert.match(y17.sourceAudit,/handwritten tick marks/);
 const y15=typed.papers.find(p=>p.year===2015);
-assert.deepEqual(y15.questions.map(q=>q.number),[1,2,3,4,5,6,7]);
-assert.equal(y15.verifiedSourceCount,7,'2015 Q1–7 visually checked against official original PDF');
+assert.deepEqual(y15.questions.map(q=>q.number),Array.from({length:32},(_,i)=>i+1));
+assert.equal(y15.verifiedSourceCount,32,'2015 Q1–32 visually checked against the official GS0811 original PDF');
 assert.equal(y15.grading,'verified-partial');
-assert.equal(y15.keyedAnswerCount,7);
+assert.equal(y15.keyedAnswerCount,29);
 assert.match(y15.finalKeyUrl,/GR_I_92K15_FIN_ANSKEY\.pdf/);
-assert.deepEqual(y15.questions.map(q=>q.accepted[0]),['A','B','D','A','C','A','D']);
+assert.deepEqual(y15.questions.slice(0,7).map(q=>q.accepted[0]),['A','B','D','A','C','A','D']);
 assert.match(y15.questions[3].sourceCaution,/hand-marked source/);
+assert.deepEqual(y15.questions.map(q=>q.sourcePdfPage),[2,3,3,4,4,4,4,5,5,6,6,6,6,7,7,7,8,8,8,9,9,10,11,11,12,12,12,13,13,14,15,15],'1-based scanned PDF page references retained');
+assert.deepEqual(y15.questions[19].accepted,['A','C'],'Official 2015 final key explicitly accepts A OR C for Q20');
+assert.deepEqual(y15.ungradedSourceDisputes,[21,22,26]);
+for(const n of y15.ungradedSourceDisputes){
+ assert.deepEqual(y15.questions[n-1].accepted,[],'Contradictory source-history Q'+n+' not scored');
+ assert.equal(y15.questions[n-1].keyStatus,'source-dispute-ungraded');
+ assert.match(y15.questions[n-1].sourceCaution,/HISTORICAL/);
+}
+assert.equal(y15.questions.filter(q=>q.accepted.length>0).length,29);
+assert.ok(y15.questions.every(q=>q.sourceBookletCode==='GS0811'||q.number<=7),'New 2015 positions tagged with source booklet code');
+assert.match(y15.questions[20].sourceCaution,/1928/,'Bardoli 1928 versus printed 1929');
+assert.match(y15.questions[21].sourceCaution,/Awadh/,'Shuja-ud-Daula never Nawab of Bengal');
+assert.match(y15.questions[25].sourceCaution,/Bardoli/,'Sardar title historical attribution exposed');
 const y22=typed.papers.find(p=>p.year===2022);
 assert.equal(y22.verifiedSourceCount,60);
 assert.equal(y22.secondaryReader,null,'Do not send users to misnumbered coaching-reader pages');
