@@ -1,11 +1,11 @@
-# TNPSC Group I Preliminary Examination 2017 — official-source visual audit, Q1–75 and Q124–125
+# TNPSC Group I Preliminary Examination 2017 — official-source visual audit, Q1–100 and Q124–125
 
 **Audit date:** 16 November 2026  
 **Exam date:** 19 February 2017  
 **Original booklet code:** GS1902/2017  
 **Official booklet:** https://www.tnpsc.gov.in/Tentative/Document/19_02_2017_ccs_i(grp_i)_prelim_gs.pdf (77 PDF pages)  
-**Current typed coverage:** 77/200 source-numbered English editorial study adaptations. Original questions Q1–Q75 and Q124–Q125 only; missing Q76–Q123 and Q126–Q200 are not silently fabricated.  
-**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 77 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
+**Current typed coverage:** 102/200 source-numbered English editorial study adaptations. Original questions Q1–Q100 and Q124–Q125 only; missing Q101–Q123 and Q126–Q200 are not silently fabricated.  
+**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 102 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
 
 ## Direct visual proofing
 
@@ -43,6 +43,15 @@ The bilingual primary TNPSC scan was opened and individual PDF pages were render
 | Q68–Q70 | 28 | LCM/HCF; compound interest; successive percentage changes |
 | Q71–Q72 | 29 | Journey speeds; paired fractional equations |
 | Q73–Q75 | 30 | Red River; earthquake waves; historical 'Bheels' tea gardens |
+| Q76–Q77 | 31 | Population rank of Indian states; planets and moons matching |
+| Q78–Q79 | 32 | Airport–city matching; longest inland waterway (historical name) |
+| Q80–Q83 | 33 | 2017 football World Cup scorer; wavelength; first Indian-American House member; Academy Awards |
+| Q84–Q87 | 34 | Civil nuclear agreement; Hyphoguard; proposed railway university; book authorship |
+| Q88–Q89 | 35 | Proposed Tamil Nadu transshipment port; August 2016 governors |
+| Q90–Q91 | 36 | July 2016 Union ministers; mutual inductance |
+| Q92–Q95 | 37 | Thiruvarur chess championship; Param-Ishan; **invalid Yoga Day date choices**; INS Arihant |
+| Q96–Q97 | 38 | 2016 solar power plant; directors and films |
+| Q98–Q100 | 39 | Combined optical power; radiation wavelengths; ozone absorption |
 | Q124–Q125 | 49 | 1934 Patna Socialist Conference; 1856 widow remarriage |
 
 The previous Q124 and Q125 secondary-reader entries were visually checked against the official page 49 and reclassified as officially visually reviewed, without implying answer-key certification.
@@ -58,9 +67,9 @@ The previous Q124 and Q125 secondary-reader entries were visually checked agains
 
 ## Integrity and next steps
 
-- New questions are aligned to consecutive Q1–Q75 with `sourcePdfPage` on each entry, including Q51–Q75 in five source-audited supplementary JSON files. Q124/Q125 retain original source numbers and now have PDF page 49 metadata.
+- New questions are aligned to consecutive Q1–Q100 with `sourcePdfPage` on each entry in the consolidated multi-year JSON. Q124/Q125 retain original source numbers and PDF page 49 metadata.
 - All are editorial English adapted study items, not certified verbatim English/Tamil reproduction.
-- Next 2017 segment: original source Q76–Q100, using the official scanned question booklet. Remaining gaps: Q101–Q123 and Q126–Q200.
+- Next 2017 segment: original source Q101–Q123 (23 questions), then Q126–Q200 (75 questions). Exactly 98 positions remain untyped.
 - 2015 remains Q1–Q7 of 200; extend with original TNPSC images. Do not enable scoring for either year without an independently authenticated final answer key matched to the booklet series.
 
 
@@ -99,3 +108,25 @@ The primary official TNPSC bilingual source was visually inspected with screensh
 - **Q75** uses the unusual local term 'Bheels' for tea gardens; the original spelling is preserved, while the historical terminology needs separate validation.
 
 All 25 new consolidated questions have four options, source page numbers, `reviewStatus=official-tnpsc-pdf-page-visually-inspected-adaptation`, `keyStatus=unmapped` and `accepted=[]`. The stored 2017 paper now contains 77 original-numbered, visually reviewed study positions directly. **No grading is provided**; primary source visual checks do not establish a matching official final-answer-key sequence.
+
+
+## Q76–Q100 extension — 16 November 2026
+
+**Added:** 25 numbered English editorial study adaptations from the primary scanned TNPSC GS1902 bilingual booklet, PDF **1-based pages 31–39** (0-based screen captures 30–38). Individual page images were reviewed for all questions and original A–D option order. All source printed marks are handwritten and **are not authenticated TNPSC final-answer-key choices**. Original number positions now Q1–Q100 plus Q124/Q125, giving **102/200** 2017 positions, with **98** untyped and no fabricated placeholders.
+
+**Page mapping:** Q76–77 page 31; Q78–79 page 32; Q80–83 page 33; Q84–87 page 34; Q88–89 page 35; Q90–91 page 36; Q92–95 page 37; Q96–97 page 38; Q98–100 page 39. The original source document is <https://www.tnpsc.gov.in/Tentative/Document/19_02_2017_ccs_i(grp_i)_prelim_gs.pdf>.
+
+**Critical original error — Q94 (Yoga Day):** The source asks for the **first** International Day of Yoga, but lists A 21 July 2016, B 21 June 2016, C 21 September 2016, D 21 August 2015. There is **no correct original answer**. The United Nations President of the General Assembly gave a statement at the **first** event on **21 June 2015** (<https://www.un.org/pga/69/210615_statement-day-of-yoga/>); India's Ministry of External Affairs' Common Yoga Protocol also confirms 21 June 2015 (<https://www.mea.gov.in/images/attach/Booklet_English_2017.pdf>). The manuscript tick beside choice B is therefore false for the source wording. The original flawed answer options have been preserved as source study data, flagged with `sourceCaution` and **left ungraded**. Do not silently correct B or invent a fifth answer choice in the original source options.
+
+**Other source and history cautions:**
+
+- Q76 historic pre-2017 population ranking, not present-day state population figures.
+- Q79 calls the Haldia–Allahabad inland-waterway route a *canal*, an imprecise historical name.
+- Q80 World Cup goal record explicitly applies as of January 2017.
+- Q82 Indian-American representative's and distractors' original name spellings are editorially normalised.
+- Q85 legacy program *Hyphoguard* and its claimed software origin need independent verification.
+- Q86 railway university and Q88 Enayam transshipment terminal are **2017 proposals**, not automatically present-day project statuses.
+- Q89 August 2016 governors, Q90 July 2016 ministers, Q92 sporting achievement and Q96 2016 largest-solar-plant claim are date-scoped.
+- Q97 filmmaker/title names from the English scan need exact bibliographic checking.
+
+**Quality invariants:** Original source Q1–100 + Q124–125 are the only typed 2017 positions. Every one has four nonblank A–D choices, `keyStatus=unmapped`, `accepted=[]`, `keyedAnswerCount=0` and `grading=not-graded`. For 2017 `verifiedSourceCount=102` records visual question-page review only, **not** certified bilingual verbatim reproduction or authenticated official key mapping. Across Group I years the adapted typed index is now **1,509** study positions including 2011/2026 standalone 200-position collections.
