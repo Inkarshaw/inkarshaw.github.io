@@ -112,31 +112,9 @@ document.addEventListener('keydown',event=>{
  if(event.key==='ArrowRight'&&index<paper.questions.length-1){index++;render()}
  if(event.key==='ArrowLeft'&&index>0){index--;render()}
 });
-// Q51–75 2017 are published as small source-audited files to avoid rewriting the large legacy bank.
-const SOURCE_2017_SEGMENTS=[
- 'data/quizzes/tnpsc-group1-2017-q51-55.json',
- 'data/quizzes/tnpsc-group1-2017-q56-60.json',
- 'data/quizzes/tnpsc-group1-2017-q61-65.json',
- 'data/quizzes/tnpsc-group1-2017-q66-70.json',
- 'data/quizzes/tnpsc-group1-2017-q71-75.json'
-];
-const loadJson=path=>fetch(path,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Cannot load '+path);return r.json()});
-Promise.all([loadJson('data/quizzes/tnpsc-group1-multiyear-typed-draft.json'),...SOURCE_2017_SEGMENTS.map(loadJson)])
- .then(([data,...segments])=>{
-  const p=data.papers.find(p=>p.year===2017);
-  if(!p||p.questions.length!==52||segments.length!==5)throw Error('Unexpected base for 2017 study extension');
-  const extra=segments.flatMap((part,i)=>{
-   if(part.schemaVersion!==1||part.year!==2017||!Array.isArray(part.questions)||part.questions.length!==5||
-     part.questions.some((q,j)=>q.number!==51+i*5+j||q.sourceBookletCode!=='GS1902'||q.keyStatus!=='unmapped'||!Array.isArray(q.accepted)||q.accepted.length))
-    throw Error('Invalid 2017 original-numbered source segment '+(i+1));
-   return part.questions;
-  });
-  if(p.questions.some(q=>q.number>=51&&q.number<=75))throw Error('Duplicate 2017 source positions');
-  p.questions=[...p.questions,...extra].sort((a,b)=>a.number-b.number);
-  p.verifiedSourceCount+=extra.length;
-  p.sourceStatus='partial-2017-GS1902-official-pdf-reviewed-77-original-positions';
-  p.sourceAudit+=' Q51–75 official PDF pages 22–30 image reviewed and added from modular source files; all answers remain unmapped.';
-
+fetch('data/quizzes/tnpsc-group1-multiyear-typed-draft.json',{cache:'no-store'})
+ .then(r=>{if(!r.ok)throw Error('Could not load typed question bank');return r.json()})
+ .then(data=>{
  bank=validate(data);
  const picker=$('yearPicker');picker.replaceChildren();
  bank.forEach(p=>{const opt=document.createElement('option');opt.value=String(p.year);
