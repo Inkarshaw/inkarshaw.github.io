@@ -1,11 +1,11 @@
-# TNPSC Group I Preliminary Examination 2017 — official-source visual audit, Q1–125
+# TNPSC Group I Preliminary Examination 2017 — official-source visual audit, Q1–200
 
 **Audit date:** 16 November 2026  
 **Exam date:** 19 February 2017  
 **Original booklet code:** GS1902/2017  
 **Official booklet:** https://www.tnpsc.gov.in/Tentative/Document/19_02_2017_ccs_i(grp_i)_prelim_gs.pdf (77 PDF pages)  
-**Current typed coverage:** 125/200 source-numbered English editorial study adaptations. Original questions Q1–Q125 consecutively; missing Q126–Q200 are not silently fabricated.  
-**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 125 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
+**Current typed coverage:** 200/200 source-numbered English editorial study adaptations, Q1–Q200 consecutive (not verbatim-certified bilingual originals).  
+**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 200 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
 
 ## Direct visual proofing
 
@@ -155,3 +155,27 @@ All 25 new consolidated questions have four options, source page numbers, `revie
 **Other visual/source cautions:** Q102 printed p-/n-block first-letter legibility requires an independently clean scan for exact verbatim certification; the indexed English adaptation uses the chemically meaningful p-block terminology supported by PDF text extraction. Q107 folic-acid deficiency is a historical exam item, not medical diagnosis guidance. Q109 source oversimplifies plant nodulation hormones. Q112 lists the uncommon choice wording "III and II" verbatim in option C. Q113 labels global population growth as *currently* exponential in a 2017 textbook framing, not current world demographics. Q114 preserves the original spelling "Anthracyclin". Q119 describes the Mir Bakshi simply as a military adviser, while the Kotwal is paired with revenue collector; both are arguably inaccurate or reductive. Q120's source "Khizhadi" is editorially standardised to Keezhadi/Keeladi, Madurai, with all original match codes retained. Q122 uses the historically simplified phrase "Reunion of Bengal". Q123 omits the exact relationship between Vanchinathan and Ashe in its abbreviated match list.
 
 **Next stage:** source-numbered Q126–Q150, then Q151–Q200; separately, official version-specific answer-key verification and Tamil/English original-text certification are still outstanding.
+
+
+## Final source-numbered expansion: Q126–Q200 (16 November 2026)
+
+After the earlier Q1–Q125 checkpoint, the final 75 questions were checked against the original TNPSC GS1902/2017 scanned bilingual PDF, one-based pages 50–76, and appended to the consolidated multi-year draft JSON in their original numbered positions. The original four A–D alternative positions have been preserved; concise question stems are **English editorial adaptations, not certified verbatim source text**. Historical statements are presented in their 2017 context.
+
+| Original question numbers | One-based official PDF pages | Content |
+| --- | --- | --- |
+| Q126–Q129 | 50–51 | Education reforms, newspapers, village panchayats, GDP |
+| Q130–Q135 | 52–53 | MSP, taxation, historic HDI, energy imports, tenancy, GATT |
+| Q136–Q141 | 54–55 | Constitutional law, emergencies, vigilance, Sarkaria, PIL |
+| Q142–Q148 | 56–58 | Polity, civil rights, constitutional appeals and amendments |
+| Q149–Q154 | 59–60 | Mensuration, coding, ratios, interest and numerical series |
+| Q155–Q160 | 61–62 | Primes, radicals, statistics, matrices, tangents |
+| Q161–Q166 | 63–64 | Distance, series of square areas, speed, work, volumes |
+| Q167–Q173 | 65–67 | Sphere and frustum volumes, rates of work, piecewise function, bangles |
+| Q174–Q180 | 68–70 | Planets, seismic gaps, rivers, sports and Nobel prizes |
+| Q181–Q188 | 71–72 | 2016–17 institutions, awards, defence and public appointments |
+| Q189–Q195 | 73–74 | 2017 election history, BRICS, books, digital literacy, sport |
+| Q196–Q200 | 75–76 | Elections abroad, authors, UN Secretary-General, digital village |
+
+**Source issues explicitly preserved without grading:** Q127 source stem asks for incorrect newspaper pairings while original alternatives say 'correct'; Q154 does not specify simple versus compound interest; Q158 divides by zero when computing coefficient of range; Q172 evaluates f(−3) in a missing interval and therefore is undefined as printed. Earlier Q94 and Q118 have previously recorded impossible original answer-choice/date issues. None of these is silently repaired or scored.
+
+**Post-expansion invariants:** Q1–Q200 consecutive; every source item has four nonempty A–D choices, original booklet code GS1902, official PDF page index, `accepted=[]`, `keyStatus=unmapped`; year `keyedAnswerCount=0` and `grading=not-graded`. Visual proofing of the scan validates **the existence and ordering of study-source items**, not official final-key grading or perfect verbatim text fidelity. The full Group I study bank now indexes **1,207** multi-year items plus 400 standalone (2011 and 2026) = **1,607** original-numbered study positions. Group I 2015, at 7/200, still needs further transcription, and all other outstanding papers/keys remain independent tasks.
