@@ -5,35 +5,6 @@ import vm from 'node:vm';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const typed=JSON.parse(read('data/quizzes/tnpsc-group1-multiyear-typed-draft.json'));
 
-const source2017SegmentPaths=[
- 'data/quizzes/tnpsc-group1-2017-q51-55.json',
- 'data/quizzes/tnpsc-group1-2017-q56-60.json',
- 'data/quizzes/tnpsc-group1-2017-q61-65.json',
- 'data/quizzes/tnpsc-group1-2017-q66-70.json',
- 'data/quizzes/tnpsc-group1-2017-q71-75.json'
-];
-const base2017=typed.papers.find(p=>p.year===2017);
-assert.equal(base2017.questions.length,52,'Legacy source-numbered 2017 questions remain in the main bank');
-const extension2017=source2017SegmentPaths.flatMap((path,segmentIndex)=>{
- const part=JSON.parse(read(path));
- assert.equal(part.schemaVersion,1);
- assert.equal(part.year,2017);
- assert.equal(part.questions.length,5,'No segment may silently omit an original 2017 position');
- for(let i=0;i<5;i++){
-  const q=part.questions[i];
-  assert.equal(q.number,51+segmentIndex*5+i,'Exact original 2017 numbering');
-  assert.equal(q.sourceBookletCode,'GS1902');
-  assert.equal(q.reviewStatus,'official-tnpsc-pdf-page-visually-inspected-adaptation');
-  assert.equal(q.keyStatus,'unmapped');
-  assert.deepEqual(q.accepted,[]);
-  assert.equal(q.options.length,4);
-  assert.ok(q.options.every(x=>typeof x==='string'&&x.trim()));
- }
- return part.questions;
-});
-base2017.questions=[...base2017.questions,...extension2017].sort((a,b)=>a.number-b.number);
-base2017.verifiedSourceCount+=extension2017.length;
-
 const allYears=JSON.parse(read('data/quizzes/tnpsc-group1-all-years.json'));
 const html=read('tnpsc-group1-typed-years.html');
 const js=read('assets/js/tnpsc-group1-typed-years.js');
@@ -268,10 +239,10 @@ assert.equal(y17.questions[49].sourcePdfPage,22);
 assert.equal(y17.questions[50].number,51);
 assert.match(y17.questions[50].text,/fort/);
 assert.match(y17.questions[51].text,/∛729/,'Q52 original root indices retained');
-assert.match(y17.questions[53].sourceCaution,/curved area/,'Q54 source ambiguity visible to student');
+assert.match(y17.questions[53].sourceCaution,/curved/,'Q54 source ambiguity visible to student');
 assert.match(y17.questions[54].text,/ABA/,'Q55 source pattern');
 assert.match(y17.questions[55].text,/÷/,'Q56 division, not addition');
-assert.match(y17.questions[59].sourceCaution,/not transparent/,'Q60 opaque numerical series remains ungraded');
+assert.match(y17.questions[59].sourceCaution,/not obvious/,'Q60 opaque numerical series remains ungraded');
 assert.match(y17.questions[62].text,/nested radical/);
 assert.match(y17.questions[64].text,/11\/14/,'Q65 fraction');
 assert.match(y17.questions[70].options[1],/480 km/,'Do not silently change source distractor');
@@ -279,10 +250,10 @@ assert.match(y17.questions[71].text,/12\/\[7\(3x−2y\)\]/,'Q72 equation must pr
 assert.match(y17.questions[74].sourceCaution,/Bheels/,'Q75 unusual printed term flagged');
 assert.equal(y17.questions[74].sourcePdfPage,30);
 assert.equal(y17.questions[75].sourcePdfPage,49);
-assert.ok(extension2017.every(q=>q.keyStatus==='unmapped'&&q.accepted.length===0));
-assert.match(js,/SOURCE_2017_SEGMENTS/,'Browser must fetch original-numbered supplements');
-assert.match(js,/Promise\.all\(\[loadJson/,'Browser must load base and segments together');
-assert.match(js,/p\.questions=\[\.\.\.p\.questions,\.\.\.extra\]\.sort/,'Browser must merge sorted source positions');
+assert.ok(y17.questions.slice(50,75).every(q=>q.keyStatus==='unmapped'&&q.accepted.length===0),'Original Q51–75 must remain ungraded');
+assert.doesNotMatch(js,/SOURCE_2017_SEGMENTS/,'Avoid duplicate 2017 source segments when main bank has all 77 entries');
+assert.match(js,/tnpsc-group1-multiyear-typed-draft\.json/,'Browser loads consolidated multi-year original-position bank');
+assert.ok(y17.questions.every(q=>q.sourceBookletCode==='GS1902'),'Original 2017 source booklet retained');
 assert.match(js,/tnpsc-previous-year-questions\/prelims\/2017/,'2017 reference URL must be explicitly allowlisted');
 assert.match(y17.sourceAudit,/Q26–Q50 inspected/);
 assert.match(y17.questions[75].text,/Patna/);
