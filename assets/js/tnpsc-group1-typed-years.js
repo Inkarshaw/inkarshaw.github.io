@@ -7,6 +7,9 @@ const safeTnpsc=url=>{try{const u=new URL(url);return u.protocol==='https:'&&/^(
 const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf')||(u.hostname==='cdn.govtjobsnet.com'&&u.pathname==='/previous-papers/tnpsc-group-1-prelims-2019-question-paper-with-answers.pdf')||(u.hostname==='winmeen.com'&&u.pathname==='/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf'&&!u.search))?u.href:null}catch{return null}};
 const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&(['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(['www.unlockias.in','unlockias.in'].includes(u.hostname)&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019','/tnpsc-previous-year-questions/prelims/2017'].includes(u.pathname))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2021-january-[1-5]\.php$/.test(u.pathname)&&!u.search))?u.href:null}catch{return null}};
 let bank=[],paper=null,index=0,responses={},savedAt=0;
+const VERIFIED_STATES=['official-final-version-A-verified','official-final-GS0811-omega-verified'];
+const UNGRADED_STATES=['unmapped','official-ALL-ungraded','source-dispute-ungraded'];
+const isVerified=q=>VERIFIED_STATES.includes(q.keyStatus)&&Array.isArray(q.accepted)&&q.accepted.length>0;
 function stored(year){try{
  const d=JSON.parse(localStorage.getItem(STORAGE+year)||'null');
  if(!d||d.version!==1||typeof d.answers!=='object'||Array.isArray(d.answers))return {};
@@ -18,7 +21,7 @@ function save(){if(!paper)return;try{localStorage.setItem(STORAGE+paper.year,JSO
 function showReview(yes){$('quizArea').hidden=yes;$('reviewPane').hidden=!yes}
 function status(){if(!paper)return;const count=paper.questions.length;
  const done=paper.questions.filter(q=>!!responses[String(q.number)]).length;
- $('coverage').textContent=paper.year+' · '+count+' / 200 typed · '+(200-count)+' not yet transcribed · 0 verified keys';
+ $('coverage').textContent=paper.year+' · '+count+' / 200 typed · '+(200-count)+' not yet transcribed · '+paper.keyedAnswerCount+' verified final-key grade positions';
  $('progressText').textContent=done+' of '+count+' available text questions answered; locally saved.';
  $('bar').style.width=String(Math.round(100*done/count))+'%';
 }
@@ -37,7 +40,7 @@ function render(){
  showReview(false);const q=paper.questions[index];const count=paper.questions.length;
  $('paperLabel').textContent='TNPSC Group I · '+paper.year+' · adapted English text';
  $('questionNumber').textContent='Original Q'+q.number;
- $('position').textContent='Typed item '+(index+1)+' of '+count+' · source-option ordering retained · no automatic grading'+(q.editorialFigureText?' · Editorial text description of original diagram: check source PDF':q.editorialPassageSummary?' · Passage condensed for study: compare original PDF':q.specialFinalKeyReview?' · Final key marks this position as a special case (ALL): no grading':q.multipleAnswerFinalKeyReview?' · Final key has multiple accepted choices: no grading':q.officialFinalKeyExceptionReview?' · Official final key has a special ALL decision; not graded':q.sourceOptionDispute?' · A–D wording conflicts between readers; cross-checked compressed paper, ungraded':q.secondaryReaderOfficialKeyDiscrepancy?' · Secondary answer label conflicts with official final key; not graded':q.secondaryKeyConflict?' · Coaching answer disagrees with TNPSC final key; not graded':q.historicClassificationCaution?' · Historical outdated classification term; not current scientific guidance':'')+(paper.finalKeyVersionCrosswalk&&paper.finalKeyVersionCrosswalk.verified===false?' · Final-key version crosswalk pending: do not infer scores':'');
+ $('position').textContent='Typed item '+(index+1)+' of '+count+' · original choice order retained · '+(isVerified(q)?'TNPSC official final-key score verified':'ungraded: source/key exception or no authenticated crosswalk')+(q.editorialFigureText?' · Editorial text description of original diagram: check source PDF':q.editorialPassageSummary?' · Passage condensed for study: compare original PDF':q.specialFinalKeyReview?' · Final key marks this position as a special case (ALL): no grading':q.multipleAnswerFinalKeyReview?' · Final key has multiple accepted choices: no grading':q.officialFinalKeyExceptionReview?' · Official final key has a special ALL decision; not graded':q.sourceOptionDispute?' · A–D wording conflicts between readers; cross-checked compressed paper, ungraded':q.secondaryReaderOfficialKeyDiscrepancy?' · Secondary answer label conflicts with official final key; not graded':q.secondaryKeyConflict?' · Coaching answer disagrees with TNPSC final key; not graded':q.historicClassificationCaution?' · Historical outdated classification term; not current scientific guidance':'')+(paper.finalKeyVersionCrosswalk&&paper.finalKeyVersionCrosswalk.verified===false?' · Final-key version crosswalk pending: do not infer scores':'');
  $('questionText').textContent=q.text;
  const caution=$('sourceCaution');if(caution){caution.hidden=!q.sourceCaution;caution.textContent=q.sourceCaution?'Source review note: '+q.sourceCaution:'';}
  $('choices').replaceChildren();
@@ -71,10 +74,21 @@ function review(){
  if(!paper)return;
  showReview(true);
  const n=paper.questions.filter(q=>responses[String(q.number)]).length;
+ const scorable=paper.questions.filter(isVerified);
+ const attempted=scorable.filter(q=>responses[String(q.number)]).length;
+ const correct=scorable.filter(q=>q.accepted.includes(responses[String(q.number)])).length;
  $('reviewSummary').textContent='Year '+paper.year+': '+n+' of '+paper.questions.length+
-   ' typed study items attempted. There are 200 numbered positions in the original paper. No marks or correct-answer judgments are issued for these unmapped study drafts.';
+   ' available study items attempted. '+(scorable.length?'Verified-key score: '+correct+' correct / '+attempted+' graded attempts ('+scorable.length+' available graded questions). ':'No mapped official final-key score for this paper. ')+
+   (paper.questions.length<200?'Only '+paper.questions.length+' of the original 200 positions are available. ':'')+
+   'Disputed, ALL-key and unmapped questions are excluded from marks. Adapted English wording is not certified verbatim.';
  const out=$('reviewList');out.replaceChildren();
- paper.questions.forEach(q=>{const span=document.createElement('span');span.textContent='Q'+q.number+': '+(responses[String(q.number)]||'not answered');out.append(span)});
+ paper.questions.forEach(q=>{
+  const response=responses[String(q.number)],span=document.createElement('span');
+  span.textContent='Q'+q.number+': '+(response||'not answered')+
+   (isVerified(q)&&response?(q.accepted.includes(response)?' · correct':' · incorrect (TNPSC final key: '+q.accepted.join(' or ')+')'):
+   !isVerified(q)?' · not graded':'');
+  out.append(span);
+ });
 }
 function validate(d){
  if(!d||d.schemaVersion!==1||!Array.isArray(d.papers)||!d.papers.length)throw Error('Typed source index is invalid');
@@ -82,17 +96,27 @@ function validate(d){
  for(const p of d.papers){
   if(!Number.isInteger(p.year)||years.has(p.year)||p.year<2011||p.year>2026)throw Error('Duplicate or invalid exam year');
   years.add(p.year);
-  if(p.originalQuestionCount!==200||p.grading!=='not-graded'||p.keyedAnswerCount!==0||
+  const eligibleYear=p.year===2015||p.year===2017;
+  if(p.originalQuestionCount!==200||p.grading!==(eligibleYear?'verified-partial':'not-graded')||
+   !Number.isInteger(p.keyedAnswerCount)||p.keyedAnswerCount<0||
    !['ABCD','ABCDE'].includes(p.optionLetters.join(''))||!safeTnpsc(p.officialPdf)||
+   (eligibleYear&&!safeTnpsc(p.finalKeyUrl))||
    (p.secondaryReader!==null&&!safeReader(p.secondaryReader))||(p.mirroredSourceUrl!==undefined&&!safeMirrorPdf(p.mirroredSourceUrl))||(p.finalKeyUrl!==undefined&&!safeTnpsc(p.finalKeyUrl))||!Array.isArray(p.questions)||p.questions.length<1||p.questions.length>200)throw Error('Incomplete source metadata');
+  if(eligibleYear&&(!p.finalKeyVersionCrosswalk||p.finalKeyVersionCrosswalk.verified!==true))throw Error('Unverified source-booklet key version');
   const ids=new Set();
+  let scored=0;
   for(const q of p.questions){
+   const verified=isVerified(q),ungraded=UNGRADED_STATES.includes(q.keyStatus);
    if(!Number.isInteger(q.number)||q.number<1||q.number>200||ids.has(q.number)||
       !q.text||q.text.length<18||!Array.isArray(q.options)||q.options.length!==4||
-      q.options.some(o=>typeof o!=='string'||!o.trim())||(q.sourceReaderUrl!==undefined&&!safeReader(q.sourceReaderUrl))||q.keyStatus!=='unmapped'||
-      (Array.isArray(q.accepted)&&q.accepted.length))throw Error('Bad typed item in '+p.year);
+      q.options.some(o=>typeof o!=='string'||!o.trim())||(q.sourceReaderUrl!==undefined&&!safeReader(q.sourceReaderUrl))||
+      !Array.isArray(q.accepted)||(!verified&&!ungraded)||
+      (verified&&(!eligibleYear||q.accepted.length<1||q.accepted.length>2||q.accepted.some(a=>!['A','B','C','D'].includes(a))))||
+      (!verified&&q.accepted.length))throw Error('Bad typed/scored item in '+p.year+' Q'+q.number);
+   if(verified)scored++;
    ids.add(q.number);
   }
+  if(p.keyedAnswerCount!==scored||(!eligibleYear&&scored!==0))throw Error('Final key/source grading count mismatch');
  }
  return d.papers.sort((a,b)=>b.year-a.year)
 }
