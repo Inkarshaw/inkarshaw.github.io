@@ -533,7 +533,7 @@ assert.match(js,/safeMirrorPdf/);
 assert.match(html,/id="mirrorPdfLink"/);
 assert.match(js,/originalQuestionCount!==200/);
 assert.match(js,/verified-partial/);
-assert.match(js,/keyedAnswerCount!==0/);
+assert.match(js,/p\.keyedAnswerCount!==scored/,'Only authentic mapped keys may determine the verified grade count');
 assert.match(js,/\bnew URLSearchParams\(location\.search\)/);
 assert.match(hub,/Start '\+x\.typedQuestionCount\+' typed questions/);
 assert.ok(!js.includes('innerHTML'),'Source text must be inserted as textContent');
