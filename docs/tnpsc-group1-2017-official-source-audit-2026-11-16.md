@@ -1,11 +1,11 @@
-# TNPSC Group I Preliminary Examination 2017 — official-source visual audit, Q1–50 and Q124–125
+# TNPSC Group I Preliminary Examination 2017 — official-source visual audit, Q1–75 and Q124–125
 
 **Audit date:** 16 November 2026  
 **Exam date:** 19 February 2017  
 **Original booklet code:** GS1902/2017  
 **Official booklet:** https://www.tnpsc.gov.in/Tentative/Document/19_02_2017_ccs_i(grp_i)_prelim_gs.pdf (77 PDF pages)  
-**Current typed coverage:** 52/200 source-numbered English editorial adaptations. Original questions Q1–Q50 and Q124–Q125 only; missing Q51–Q123 and Q126–Q200 are not silently fabricated.  
-**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 52 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
+**Current typed coverage:** 77/200 source-numbered English editorial study adaptations. Original questions Q1–Q75 and Q124–Q125 only; missing Q76–Q123 and Q126–Q200 are not silently fabricated.  
+**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 77 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
 
 ## Direct visual proofing
 
@@ -34,6 +34,15 @@ The bilingual primary TNPSC scan was opened and individual PDF pages were render
 | Q46 | 20 | Panchayati Raj committee/purpose matching |
 | Q47–Q49 | 21 | UPSC retirement age; arithmetic distance; number series |
 | Q50 | 22 | Two-worker job completion |
+| Q51–Q52 | 22 | Fort provisions; cube/fourth roots in fraction |
+| Q53–Q55 | 23 | Simple interest; hemisphere area; five-letter gap series |
+| Q56–Q58 | 24 | Rational-expression division; house profit; mixed arithmetic |
+| Q59–Q61 | 25 | Letter/number series; nth-term arithmetic progression |
+| Q62–Q64 | 26 | Harmonic progression; nested radical; family relationship |
+| Q65–Q67 | 27 | Two-condition fraction; folded cone; cylinders |
+| Q68–Q70 | 28 | LCM/HCF; compound interest; successive percentage changes |
+| Q71–Q72 | 29 | Journey speeds; paired fractional equations |
+| Q73–Q75 | 30 | Red River; earthquake waves; historical 'Bheels' tea gardens |
 | Q124–Q125 | 49 | 1934 Patna Socialist Conference; 1856 widow remarriage |
 
 The previous Q124 and Q125 secondary-reader entries were visually checked against the official page 49 and reclassified as officially visually reviewed, without implying answer-key certification.
@@ -49,9 +58,9 @@ The previous Q124 and Q125 secondary-reader entries were visually checked agains
 
 ## Integrity and next steps
 
-- New questions are aligned to consecutive Q1–Q50 with `sourcePdfPage` on each entry. Q124/Q125 retain original source numbers and now have PDF page 49 metadata.
+- New questions are aligned to consecutive Q1–Q75 with `sourcePdfPage` on each entry, including Q51–Q75 in five source-audited supplementary JSON files. Q124/Q125 retain original source numbers and now have PDF page 49 metadata.
 - All are editorial English adapted study items, not certified verbatim English/Tamil reproduction.
-- Next 2017 segment: original source Q51–Q75, using the direct official scanned question booklet with page-image inspection. Further missing positions: Q76–Q123 and Q126–Q200.
+- Next 2017 segment: original source Q76–Q100, using the official scanned question booklet. Remaining gaps: Q101–Q123 and Q126–Q200.
 - 2015 remains Q1–Q7 of 200; extend with original TNPSC images. Do not enable scoring for either year without an independently authenticated final answer key matched to the booklet series.
 
 
@@ -69,3 +78,24 @@ Twenty-five additional source-numbered English study adaptations, **Q26–Q50**,
 - **Q46:** The committee-matching labels 'revitalisation' and 'strengthening' Panchayati Raj overlap. This is a historical matching item; leave ungraded until committee-purpose phrasing is independently verified.
 
 **Integrity:** Q1–Q50 consecutive, Q124–Q125 retained, no placeholders for the two gaps. All 52 questions have `sourceBookletCode=GS1902` and 1-based `sourcePdfPage` links to official TNPSC PDF pages. Every question remains `accepted=[]`, `keyStatus=unmapped`, while `keyedAnswerCount=0` and `grading=not-graded`; these are **not verbatim-certified bilingual transcriptions** or authenticated official-key scored questions.
+
+
+## Q51–Q75 extension — 16 November 2026
+
+25 additional English editorial practice questions Q51–Q75 are placed in **five five-question supplementary JSON segments** under `data/quizzes/tnpsc-group1-2017-q51-55.json` through `tnpsc-group1-2017-q71-75.json`. This is necessary to avoid replacing the much larger shared multi-year JSON bank. The browser fetches all five supplements with the base bank, checks their original question numbering, rejects duplicated source numbers, sorts them into the original paper, and only then displays 77/200 available positions for 2017 (Q1–Q75, Q124–Q125). The all-years index reflects the assembled total. The original large base file deliberately retains its 52 entries for 2017; **do not mistake base-only counts for website coverage**. Full Group I adapted indexed positions are now **1,484** including 2011/2026 standalone 200 each.
+
+The primary official TNPSC bilingual source was visually inspected with screenshots of PDF **0-index pages 21–29**, equivalent to user-facing **1-based pages 22–30**. Those pages contain Q51–Q75, each with original A–D alternatives and handwritten marks. Original question numbering and option ordering are preserved in editorially adapted English; original handwritten answer ticks were **not** imported as verified official answer keys.
+
+**Visual and source cautions:**
+
+- **Q52** combines cube roots (729, 27, 512, 343), square root of 16 and fourth root of 256. The rendered page, not distorted text extraction, governs the adapted formula.
+- **Q54** gives 'surface area' for a hemisphere, then asks for total surface area. 'Curved surface area' is a clear **editorial interpretation** required for the listed answer values and is not the original wording.
+- **Q55 and Q59** letter series have five printed blanks; the spacing was checked visually.
+- **Q56** is a division of two rational algebraic expressions, a symbol that PDF extraction can confuse with plus.
+- **Q60** asks for the successor to 24, 536, 487, 703, 678; a convincing rule is not clear from the printed numbers. Do not suggest a verified solution simply because an answer is ticked on the scanned booklet.
+- **Q63** is an infinite nested radical, not independent multiplied radicals.
+- **Q71** prints an implausible 480 km school-distance answer choice. This original distractor was **not silently corrected**.
+- **Q72** two rational equations were checked directly from the page image; parentheses and denominator grouping matter.
+- **Q75** uses the unusual local term 'Bheels' for tea gardens; the original spelling is preserved, while the historical terminology needs separate validation.
+
+All 25 supplemented items have four options, source page numbers, `reviewStatus=official-tnpsc-pdf-page-visually-inspected-adaptation`, `keyStatus=unmapped` and `accepted=[]`. At browser assembly the year gains 25 visually checked positions, producing 77/200. **No grading is provided**; primary source visual checks do not establish a matching official final-answer-key sequence.
