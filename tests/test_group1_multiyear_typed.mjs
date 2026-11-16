@@ -1,4 +1,4 @@
-// TNPSC Group I typed starter-year audit: no invented positions, answers or score claims.
+// TNPSC Group I adapted year audit: only officially crosswalked options may be scored.
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import vm from 'node:vm';
@@ -16,8 +16,8 @@ assert.deepEqual(typed.papers.map(p=>p.year),[2025,2024,2022,2021,2019,2017,2015
 assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),1207);
 for(const paper of typed.papers){
  assert.equal(paper.originalQuestionCount,200);
- assert.equal(paper.grading,'not-graded');
- assert.equal(paper.keyedAnswerCount,0);
+ assert.equal(paper.grading,[2015,2017].includes(paper.year)?'verified-partial':'not-graded');
+ assert.equal(paper.keyedAnswerCount,paper.year===2017?189:paper.year===2015?7:0);
  assert.equal(paper.questions.length,expected.get(paper.year));
  assert.deepEqual(paper.optionLetters,paper.year<2021?['A','B','C','D']:['A','B','C','D','E']);
  assert.match(paper.officialPdf,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\//);
@@ -26,7 +26,7 @@ for(const paper of typed.papers){
  assert.ok(entry&&entry.paperUrl===paper.officialPdf);
  assert.equal(entry.typedUrl,'tnpsc-group1-typed-years.html?year='+paper.year);
  assert.equal(entry.typedQuestionCount,paper.questions.length);
- assert.equal(entry.provisionallyScorable,0);
+ assert.equal(entry.provisionallyScorable,paper.keyedAnswerCount);
  const seen=new Set();
  for(const item of paper.questions){
   assert.ok(Number.isInteger(item.number)&&item.number>=1&&item.number<=200);
@@ -35,8 +35,14 @@ for(const paper of typed.papers){
   assert.ok(item.text.length>=18);
   assert.equal(item.options.length,4,'Four A–D choices, E is answer not known where printed');
   assert.ok(item.options.every(x=>typeof x==='string'&&x.trim().length));
-  assert.equal(item.keyStatus,'unmapped','Never provide unreviewed keys');
-  assert.deepEqual(item.accepted,[],'No fabricated accepted-option sets');
+  if(paper.year===2015||paper.year===2017){
+   const verified=item.keyStatus.endsWith('-verified');
+   assert.ok(['official-final-version-A-verified','official-final-GS0811-omega-verified','official-ALL-ungraded','source-dispute-ungraded'].includes(item.keyStatus));
+   assert.equal(item.accepted.length,verified?(paper.year===2017&&item.number===91?2:1):0);
+  }else{
+   assert.equal(item.keyStatus,'unmapped','Never provide unreviewed keys');
+   assert.deepEqual(item.accepted,[],'No fabricated accepted-option sets');
+  }
  }
 }
 const y24=typed.papers.find(p=>p.year===2024);
@@ -212,12 +218,20 @@ assert.match(js,/\/tnpsc-previous-year-questions\/prelims\/2019/);
 const y17=typed.papers.find(p=>p.year===2017);
 assert.deepEqual(y17.questions.map(q=>q.number),[...Array.from({length:200},(_,i)=>i+1)],'Keep original numbering and honest gaps');
 assert.equal(y17.verifiedSourceCount,200,'2017 Q1–200 source pages visually inspected, NOT certified final answer keys');
-assert.equal(y17.keyedAnswerCount,0);
-assert.equal(y17.grading,'not-graded');
+assert.equal(y17.keyedAnswerCount,189);
+assert.equal(y17.grading,'verified-partial');
+assert.match(y17.finalKeyUrl,/2017_group1_finanskeys\.pdf/);
+assert.equal(y17.finalKeyVersionCrosswalk.series,'A');
+assert.equal(y17.finalKeyVersionCrosswalk.verified,true);
+assert.deepEqual(y17.officialFinalKeyAll,[85,94,118,133]);
+assert.deepEqual(y17.officialFinalKeyMultiple[91],['C','D']);
+assert.deepEqual(y17.questions[90].accepted,['C','D']);
+assert.equal(y17.questions.filter(q=>q.accepted.length>0).length,189);
+assert.equal(y17.questions.filter(q=>q.accepted.length===0).length,11);
 assert.equal(y17.questions.length,200);
 assert.deepEqual(y17.questions.map(q=>q.sourcePdfPage),[2,2,2,2,3,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,11,12,12,13,13,14,14,14,15,15,15,16,16,17,17,17,18,18,18,19,19,19,20,21,21,21,22,22,22,23,23,23,24,24,24,25,25,25,26,26,26,27,27,27,28,28,28,29,29,30,30,30,31,31,32,32,33,33,33,33,34,34,34,34,35,35,36,36,37,37,37,37,38,38,39,39,39,39,40,40,40,41,41,41,42,42,42,43,43,44,44,45,45,46,46,46,47,47,48,48,49,49,50,50,51,51,52,52,52,53,53,53,54,54,54,55,55,55,56,56,56,57,57,58,58,59,59,59,60,60,60,61,61,61,62,62,62,63,63,63,64,64,64,65,65,65,66,66,67,67,68,68,69,69,69,70,70,71,71,71,71,72,72,72,72,73,73,73,73,74,74,74,75,75,76,76,76]);
 assert.ok(y17.questions.every(q=>q.reviewStatus==='official-tnpsc-pdf-page-visually-inspected-adaptation'&&q.sourceBookletCode==='GS1902'));
-assert.ok(y17.questions.every(q=>q.options.length===4&&q.options.every(v=>typeof v==='string'&&v.trim())&&q.keyStatus==='unmapped'&&q.accepted.length===0),'Handwritten ticks must not be used as final key');
+assert.ok(y17.questions.every(q=>q.options.length===4&&q.options.every(v=>typeof v==='string'&&v.trim())&&q.accepted.every(a=>['A','B','C','D'].includes(a))),'Only mapped official Version A letters may be scored');
 assert.match(y17.questions[0].text,/ISRO/);
 assert.match(y17.questions[1].text,/germanium/);
 assert.match(y17.questions[8].text,/algal pigments/);
@@ -301,14 +315,14 @@ assert.match(y17.questions[121].text,/Surat split/);
 assert.match(y17.questions[122].text,/Sathyamurthy/);
 assert.deepEqual(y17.questions[122].options,['I','II','III','IV']);
 assert.equal(y17.questions[122].sourcePdfPage,48);
-assert.ok(y17.questions.slice(100,123).every(q=>q.keyStatus==='unmapped'&&q.accepted.length===0),'All Q101–Q123 ungraded');
+assert.ok(y17.questions.slice(100,123).every(q=>q.keyStatus.endsWith('verified')||q.keyStatus.endsWith('ungraded')),'Q101–Q123 official key alignment and the Q118 ALL exception');
 assert.match(y17.sourceAudit,/Q101–Q123/);
 
-assert.ok(y17.questions.slice(75,100).every(q=>q.keyStatus==='unmapped'&&q.accepted.length===0),'All new Q76–100 ungraded');
+assert.ok(y17.questions.slice(75,100).every(q=>q.keyStatus.endsWith('verified')||q.keyStatus.endsWith('ungraded')),'Q76–Q100 mapped with official special decisions');
 assert.match(y17.sourceAudit,/Q76–Q100 visually inspected/);
 
 assert.equal(y17.questions[123].sourcePdfPage,49);
-assert.ok(y17.questions.slice(50,75).every(q=>q.keyStatus==='unmapped'&&q.accepted.length===0),'Original Q51–75 must remain ungraded');
+assert.ok(y17.questions.slice(50,75).every(q=>q.keyStatus.endsWith('verified')||q.keyStatus.endsWith('ungraded')),'Q51–75 final-key crosswalk verified and Q60 exception');
 assert.doesNotMatch(js,/SOURCE_2017_SEGMENTS/,'Avoid duplicate 2017 source segments when main bank has all 77 entries');
 assert.match(js,/tnpsc-group1-multiyear-typed-draft\.json/,'Browser loads consolidated multi-year original-position bank');
 assert.ok(y17.questions.every(q=>q.sourceBookletCode==='GS1902'),'Original 2017 source booklet retained');
@@ -320,17 +334,26 @@ assert.equal(y17.questions[125].number,126);
 assert.match(y17.questions[125].text,/Wood's Despatch/);
 assert.equal(y17.questions[199].number,200);
 assert.match(y17.questions[199].text,/Akodara/);
-assert.ok(y17.questions.slice(125).every(q=>q.reviewStatus==='official-tnpsc-pdf-page-visually-inspected-adaptation'&&q.keyStatus==='unmapped'&&q.accepted.length===0),'2017 final 75 are official-source reviewed but never keyed');
+assert.ok(y17.questions.slice(125).every(q=>q.reviewStatus==='official-tnpsc-pdf-page-visually-inspected-adaptation'&&(q.keyStatus.endsWith('verified')||q.keyStatus.endsWith('ungraded'))),'2017 final 75 reviewed and key safeguards applied');
 for(const n of [127,154,158,172])assert.ok(y17.questions[n-1].sourceCaution,'Critical source mismatch must be exposed for Q'+n);
 assert.match(y17.questions[126].sourceCaution,/STEM\/OPTIONS CONFLICT/);
+for(const n of [41,60,85,94,118,119,127,133,154,158,175])assert.deepEqual(y17.questions[n-1].accepted,[],'Do not grade disputed original Q'+n);
 assert.match(y17.questions[157].sourceCaution,/divides by zero/);
-assert.match(y17.questions[171].sourceCaution,/DOMAIN ERROR/);
+assert.match(y17.questions[171].sourceCaution,/well-defined/);
+assert.deepEqual(y17.questions[171].accepted,['C']);
+assert.deepEqual(y17.questions[174].accepted,[]);
+assert.match(y17.questions[174].sourceCaution,/SOURCE-FINAL-KEY DISCREPANCY/);
 assert.match(y17.sourceAudit,/Q126–Q200/);
 
 assert.match(y17.sourceAudit,/handwritten tick marks/);
 const y15=typed.papers.find(p=>p.year===2015);
 assert.deepEqual(y15.questions.map(q=>q.number),[1,2,3,4,5,6,7]);
 assert.equal(y15.verifiedSourceCount,7,'2015 Q1–7 visually checked against official original PDF');
+assert.equal(y15.grading,'verified-partial');
+assert.equal(y15.keyedAnswerCount,7);
+assert.match(y15.finalKeyUrl,/GR_I_92K15_FIN_ANSKEY\.pdf/);
+assert.deepEqual(y15.questions.map(q=>q.accepted[0]),['A','B','D','A','C','A','D']);
+assert.match(y15.questions[3].sourceCaution,/hand-marked source/);
 const y22=typed.papers.find(p=>p.year===2022);
 assert.equal(y22.verifiedSourceCount,60);
 assert.equal(y22.secondaryReader,null,'Do not send users to misnumbered coaching-reader pages');
@@ -504,13 +527,13 @@ assert.match(html,/id="sourceCaution"/,'Question-specific source error warnings 
 assert.match(js,/caution\.textContent=q\.sourceCaution/,'Warnings rendered using textContent, not HTML');
 
 assert.match(html,/not certified verbatim TNPSC text/);
-assert.match(html,/No automatic scoring/);
+assert.match(html,/Verified automatic scoring/);
 assert.match(js,/localStorage/);
 assert.match(js,/safeMirrorPdf/);
 assert.match(html,/id="mirrorPdfLink"/);
 assert.match(js,/originalQuestionCount!==200/);
-assert.match(js,/grading!=='not-graded'/);
-assert.match(js,/keyedAnswerCount!==0/);
+assert.match(js,/verified-partial/);
+assert.match(js,/p\.keyedAnswerCount!==scored/,'Only authentic mapped keys may determine the verified grade count');
 assert.match(js,/\bnew URLSearchParams\(location\.search\)/);
 assert.match(hub,/Start '\+x\.typedQuestionCount\+' typed questions/);
 assert.ok(!js.includes('innerHTML'),'Source text must be inserted as textContent');
