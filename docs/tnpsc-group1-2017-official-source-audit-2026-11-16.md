@@ -1,11 +1,11 @@
-# TNPSC Group I Preliminary Examination 2017 — official-source visual audit, Q1–100 and Q124–125
+# TNPSC Group I Preliminary Examination 2017 — official-source visual audit, Q1–125
 
 **Audit date:** 16 November 2026  
 **Exam date:** 19 February 2017  
 **Original booklet code:** GS1902/2017  
 **Official booklet:** https://www.tnpsc.gov.in/Tentative/Document/19_02_2017_ccs_i(grp_i)_prelim_gs.pdf (77 PDF pages)  
-**Current typed coverage:** 102/200 source-numbered English editorial study adaptations. Original questions Q1–Q100 and Q124–Q125 only; missing Q101–Q123 and Q126–Q200 are not silently fabricated.  
-**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 102 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
+**Current typed coverage:** 125/200 source-numbered English editorial study adaptations. Original questions Q1–Q125 consecutively; missing Q126–Q200 are not silently fabricated.  
+**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 125 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
 
 ## Direct visual proofing
 
@@ -52,6 +52,16 @@ The bilingual primary TNPSC scan was opened and individual PDF pages were render
 | Q92–Q95 | 37 | Thiruvarur chess championship; Param-Ishan; **invalid Yoga Day date choices**; INS Arihant |
 | Q96–Q97 | 38 | 2016 solar power plant; directors and films |
 | Q98–Q100 | 39 | Combined optical power; radiation wavelengths; ozone absorption |
+| Q101 | 39 | Radioactive decay and half-life ratio |
+| Q102–Q104 | 40 | Hydrides, weak-acid salts, plant micronutrients |
+| Q105–Q107 | 41 | Casuarina and Frankia, acrosomes, folate deficiency |
+| Q108–Q110 | 42 | Nucleic acids, root-tip hormones, ergastic substances |
+| Q111–Q112 | 43 | Social insects; hormone and source matching |
+| Q113–Q114 | 44 | Historical population-growth framing; bacterial cell-wall antibiotics |
+| Q115–Q116 | 45 | Indus civilisation; Dr Muthulakshmi Reddy reform efforts |
+| Q117–Q119 | 46 | Third Carnatic War; disputed States Reorganisation Act date; Mughal officials |
+| Q120–Q121 | 47 | Ancient archaeological sites, including Keezhadi; India Home Rule Society |
+| Q122–Q123 | 48 | Bengal partition chronology; Rajaji/Vanchinathan/Kamaraj/Sathyamurthy |
 | Q124–Q125 | 49 | 1934 Patna Socialist Conference; 1856 widow remarriage |
 
 The previous Q124 and Q125 secondary-reader entries were visually checked against the official page 49 and reclassified as officially visually reviewed, without implying answer-key certification.
@@ -67,9 +77,9 @@ The previous Q124 and Q125 secondary-reader entries were visually checked agains
 
 ## Integrity and next steps
 
-- New questions are aligned to consecutive Q1–Q100 with `sourcePdfPage` on each entry in the consolidated multi-year JSON. Q124/Q125 retain original source numbers and PDF page 49 metadata.
+- Questions Q1–Q125 now have consecutive original numbers and each has `sourcePdfPage` metadata in the consolidated multi-year JSON; previous Q124/Q125 entries retain PDF page 49 metadata.
 - All are editorial English adapted study items, not certified verbatim English/Tamil reproduction.
-- Next 2017 segment: original source Q101–Q123 (23 questions), then Q126–Q200 (75 questions). Exactly 98 positions remain untyped.
+- Next 2017 segment: original source Q126–Q150 (25 questions), followed by Q151–Q200 (50 questions). Exactly 75 positions remain untyped.
 - 2015 remains Q1–Q7 of 200; extend with original TNPSC images. Do not enable scoring for either year without an independently authenticated final answer key matched to the booklet series.
 
 
@@ -130,3 +140,18 @@ All 25 new consolidated questions have four options, source page numbers, `revie
 - Q97 filmmaker/title names from the English scan need exact bibliographic checking.
 
 **Quality invariants:** Original source Q1–100 + Q124–125 are the only typed 2017 positions. Every one has four nonblank A–D choices, `keyStatus=unmapped`, `accepted=[]`, `keyedAnswerCount=0` and `grading=not-graded`. For 2017 `verifiedSourceCount=102` records visual question-page review only, **not** certified bilingual verbatim reproduction or authenticated official key mapping. Across Group I years the adapted typed index is now **1,509** study positions including 2011/2026 standalone 200-position collections.
+
+
+## Q101–Q123 extension — 16 November 2026
+
+**Added:** 23 original-numbered English editorial study questions from the scanned **official 2017 TNPSC GS1902 bilingual question booklet**, using page-image review across **1-based PDF pages 39–48**, corresponding to zero-index pages 38–47. These are question-text and A–D option-order reviews, **not official final answer-key certification**.
+
+**Full 2017 coverage is now 125/200 consecutive Q1–Q125, with Q126–Q200 still absent.** The multi-year typed study count is **1,132**, plus 2011 and 2026 standalone 200 each, yielding **1,532** Group I original-numbered adapted study positions. All 2017 items have exactly four nonempty alternatives, `keyStatus=unmapped`, `accepted=[]`, `keyedAnswerCount=0`, `grading=not-graded` and a source page link to the official bilingual booklet. Handwritten ticks are not imported or displayed as authoritative answers.
+
+**Question-by-question PDF page map:** Q101→39, Q102–104→40, Q105–107→41, Q108–110→42, Q111–112→43, Q113–114→44, Q115–116→45, Q117–119→46, Q120–121→47, Q122–123→48.
+
+**High-priority source problem: Q118 (States Reorganisation Act of 1956).** The original English question asks which month the *Act was passed*, and lists October, June, November and July 1956. Its handwritten tick is on November 1956. However, [the official India Code Act 37 of 1956](https://www.indiacode.nic.in/bitstream/123456789/1680/1/a1956-37.pdf) dates the Act **31 August 1956** and defines the "appointed day" for state reorganisation as **1 November 1956**. A Government of India parliamentary history [notes](https://eparlib.sansad.in/bitstream/123456789/63/1/Constitution_Amendment_India_LS_2008.pdf) that the Bill passed in August 1956. **None of the four printed options is a defensible answer to the question's literal enactment/passage wording.** Preserve all four options in the study transcription, show a per-question `sourceCaution`, and prohibit grading until official final-key discrepancy treatment is determined.
+
+**Other visual/source cautions:** Q102 printed p-/n-block first-letter legibility requires an independently clean scan for exact verbatim certification; the indexed English adaptation uses the chemically meaningful p-block terminology supported by PDF text extraction. Q107 folic-acid deficiency is a historical exam item, not medical diagnosis guidance. Q109 source oversimplifies plant nodulation hormones. Q112 lists the uncommon choice wording "III and II" verbatim in option C. Q113 labels global population growth as *currently* exponential in a 2017 textbook framing, not current world demographics. Q114 preserves the original spelling "Anthracyclin". Q119 describes the Mir Bakshi simply as a military adviser, while the Kotwal is paired with revenue collector; both are arguably inaccurate or reductive. Q120's source "Khizhadi" is editorially standardised to Keezhadi/Keeladi, Madurai, with all original match codes retained. Q122 uses the historically simplified phrase "Reunion of Bengal". Q123 omits the exact relationship between Vanchinathan and Ashe in its abbreviated match list.
+
+**Next stage:** source-numbered Q126–Q150, then Q151–Q200; separately, official version-specific answer-key verification and Tamil/English original-text certification are still outstanding.
