@@ -5,7 +5,7 @@
 **Original booklet code:** GS1902/2017  
 **Official booklet:** https://www.tnpsc.gov.in/Tentative/Document/19_02_2017_ccs_i(grp_i)_prelim_gs.pdf (77 PDF pages)  
 **Current typed coverage:** 200/200 source-numbered English editorial study adaptations, Q1–Q200 consecutive (not verbatim-certified bilingual originals).  
-**Grading:** disabled. The official scan has handwritten check marks, which are **not the authenticated final TNPSC answer key**. All 200 have keyStatus=unmapped, accepted=[], keyedAnswerCount=0 and grading=not-graded.
+**Grading (after final-key alignment):** The official TNPSC 2017 subject-code 003 final-key PDF was verified. Version **A** matches this source's alternative order on multiple independent checks and TNPSC's *ALL* rulings on flawed Q94/Q118. **189 of 200** original positions now have official-key study scores; 11 official ALL/source-disputed items remain ungraded. Handwritten source ticks are not used as final answers. English stems remain editorial adaptations.
 
 ## Direct visual proofing
 
@@ -179,3 +179,12 @@ After the earlier Q1–Q125 checkpoint, the final 75 questions were checked agai
 **Source issues explicitly preserved without grading:** Q127 source stem asks for incorrect newspaper pairings while original alternatives say 'correct'; Q154 does not specify simple versus compound interest; Q158 divides by zero when computing coefficient of range; Q172 evaluates f(−3) in a missing interval and therefore is undefined as printed. Earlier Q94 and Q118 have previously recorded impossible original answer-choice/date issues. None of these is silently repaired or scored.
 
 **Post-expansion invariants:** Q1–Q200 consecutive; every source item has four nonempty A–D choices, original booklet code GS1902, official PDF page index, `accepted=[]`, `keyStatus=unmapped`; year `keyedAnswerCount=0` and `grading=not-graded`. Visual proofing of the scan validates **the existence and ordering of study-source items**, not official final-key grading or perfect verbatim text fidelity. The full Group I study bank now indexes **1,207** multi-year items plus 400 standalone (2011 and 2026) = **1,607** original-numbered study positions. Group I 2015, at 7/200, still needs further transcription, and all other outstanding papers/keys remain independent tasks.
+
+
+## Official TNPSC Version A final key crosswalk, 16 November 2026
+
+Official final key PDF: https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/2017_group1_finanskeys.pdf (2017 Group I, Subject Code 003, first page Version A; additional pages show B/C/D). Source booklet: GS1902 official bilingual scan.
+
+Independent original option-alignment checks: Q124 Acharya Narendra Deva B, Q125 Hindu Widows' Remarriage Act 1856 B, Q128 directive principles C, Q129 GDP expenditure A, Q137 1962 emergency B, Q144 Maternity Benefit Act 1961 A, Q149 curved cylinder-area ratio 7:3 D. Moreover Q94 and Q118 both have original printed errors and are **ALL** in the official Version A final key; alternative-version alignment would not produce this distinctive two-position agreement.
+
+Original Version A key special rulings: **Q85 ALL, Q91 C/D, Q94 ALL, Q118 ALL and Q133 ALL**. Q91 accepts C or D. The four ALL items are excluded rather than counted as ordinary graded answers. Adapted-text source-disputed Q41, Q60, Q119, Q127, Q154, Q158 and Q172 are also excluded. **200−4−7=189 verified score-eligible study items**. This is a verified-option practice score, not an official exam mark out of 300 or a claim of verbatim original wording. The official final key is linked in the quiz.
