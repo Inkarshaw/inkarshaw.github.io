@@ -337,9 +337,12 @@ assert.match(y17.questions[199].text,/Akodara/);
 assert.ok(y17.questions.slice(125).every(q=>q.reviewStatus==='official-tnpsc-pdf-page-visually-inspected-adaptation'&&(q.keyStatus.endsWith('verified')||q.keyStatus.endsWith('ungraded'))),'2017 final 75 reviewed and key safeguards applied');
 for(const n of [127,154,158,172])assert.ok(y17.questions[n-1].sourceCaution,'Critical source mismatch must be exposed for Q'+n);
 assert.match(y17.questions[126].sourceCaution,/STEM\/OPTIONS CONFLICT/);
-for(const n of [41,60,85,94,118,119,127,133,154,158,172])assert.deepEqual(y17.questions[n-1].accepted,[],'Do not grade disputed original Q'+n);
+for(const n of [41,60,85,94,118,119,127,133,154,158,175])assert.deepEqual(y17.questions[n-1].accepted,[],'Do not grade disputed original Q'+n);
 assert.match(y17.questions[157].sourceCaution,/divides by zero/);
-assert.match(y17.questions[171].sourceCaution,/DOMAIN ERROR/);
+assert.match(y17.questions[171].sourceCaution,/well-defined/);
+assert.deepEqual(y17.questions[171].accepted,['C']);
+assert.deepEqual(y17.questions[174].accepted,[]);
+assert.match(y17.questions[174].sourceCaution,/SOURCE-FINAL-KEY DISCREPANCY/);
 assert.match(y17.sourceAudit,/Q126–Q200/);
 
 assert.match(y17.sourceAudit,/handwritten tick marks/);
