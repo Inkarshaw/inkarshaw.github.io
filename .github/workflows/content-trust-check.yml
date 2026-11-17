@@ -63,6 +63,7 @@ on:
       - "data/quizzes/verified-full-original-papers.json"
       - "tests/test_pyq_original_full_gate.mjs"
       - "pyq-full-quiz.html"
+      - "tests/test_pyq_adapted_scoring.mjs"
       - "data/quizzes/original-paper-practice.json"
       - "tests/test_pyq_original_paper.mjs"
       - "daily-quiz.html"
@@ -155,6 +156,7 @@ on:
       - "data/quizzes/verified-full-original-papers.json"
       - "tests/test_pyq_original_full_gate.mjs"
       - "pyq-full-quiz.html"
+      - "tests/test_pyq_adapted_scoring.mjs"
       - "data/quizzes/original-paper-practice.json"
       - "tests/test_pyq_original_paper.mjs"
       - "daily-quiz.html"
@@ -222,6 +224,8 @@ jobs:
         run: node tests/test_tnpsc_g4_2024_source_json.mjs
       - name: Validate full bilingual Group IIA notes
         run: node tests/test_group2a_text_notes.mjs
+      - name: Prevent unverified adapted PYQ answers from being scored
+        run: node tests/test_pyq_adapted_scoring.mjs
       - name: Enforce full original-paper license, completeness, sequence and final-key gate
         run: node tests/test_pyq_original_full_gate.mjs
       - name: Validate original full-paper PDF companion without transcription claims
