@@ -70,3 +70,14 @@ The one-page TNPSC GS0811 ω final-key table was transcribed across all eight 25
 - **Original typed questions remain only 32/200**; **168 questions are not yet transcribed**. The graded 200-position mode is explicitly a **PDF companion**, not a full original on-screen text quiz.
 
 The independent complete key-regression fixture in `tests/test_tnpsc_g1_2015_key_mapping.mjs` protects the official published question-to-answer sequence, while `tests/test_pyq_original_paper.mjs` checks paper/version agreement and score eligibility.
+
+
+## 17 November 2026 — secondary source Q33–Q50 adapted aptitude study intake
+
+**Newly available:** Q33–Q50 have been authored as **18 English editorial study adaptations** preserving original examination numbering and the two secondary transcriptions' A–D option sequence. Source comparison: <https://civilserviceaspirants.in/Tnpsc/Question-Paper-with-Answer/Group-1/Group-1-prelims-2015-november-4.php>, <https://civilserviceaspirants.in/Tnpsc/Question-Paper-with-Answer/Group-1/Group-1-prelims-2015-november-5.php> and the bilingual Radian 2015 facsimile at <https://radiannews.pbworks.com/f/103174930/2015-GROUP-1-ACTUAL-PAPER-WITH-KEYS.pdf>.
+
+The PDF from TNPSC is linked as the primary authority but **could not be visually rendered for these new pages in this pass**. Therefore these Q33–50 entries have `keyStatus: official-final-key-awaiting-original-image-review`, **no `accepted` grading letters**, and remain **study-only** despite the separately recorded official 200-position answer key.
+
+**Q38 source discrepancy:** one CivilServiceAspirants indexed stem says first ratio `7:3` but its own A option and the separate Radian transcribed stem both say `7:13`. The ClearExams adapted item uses `7:13` and prominently warns about the source inconsistency. The original scan must decide the certified text; no silent correction or marks.
+
+**State:** 50/200 readable adapted question entries; 32 previously source-image reviewed, 18 newly dual-secondary-numbered, 29 automatically graded, 21 ungraded. **Q51–Q200 (150 items) still missing** from the adapted typed question bank. The separate 200-position official-PDF answer-sheet mode remains unchanged (197 indicatively scorable, three ALL excluded). No unverifiable question text has been invented.
