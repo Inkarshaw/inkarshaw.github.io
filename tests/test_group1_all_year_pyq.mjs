@@ -63,7 +63,7 @@ assert.match(page,/data\/quizzes\/tnpsc-group1-all-years\.json/);
 assert.match(page,/tnpsc-group1-syllabus\.html/);
 assert.match(page,/descriptive-questions\.html/);
 assert.match(page,/not a digitized text quiz/i);
-assert.match(page,/Full 200-position typed practice/i);
+assert.match(page,/Full 200-position original-number-aligned typed practice/i);
 assert.match(page,/2015 text set now has all 200 original-numbered English adaptations/i);
 assert.match(page,/Source gaps/);
 assert.match(read('pyq-hub.html'),/href="tnpsc-group1-pyq\.html"/);
