@@ -52,3 +52,6 @@ These five are corrected in the branch's `data/quizzes/original-final-keys.json`
 - `unresolved-questions.csv` (400 distinct original positions, each with review flags)
 
 **Outcome**: 400/400 original-numbered positions packaged; 200 source-text drafts and 200 scanned-PDF-linked positions; all key fields present; five wrong 2022 website key entries corrected on the review branch; no fabricated missing text, question figures or page numbers.
+
+## 17 Nov 2026 addendum
+2011 now incorporates 200 English adapted source-page-inspected questions from the current main quiz; not a certified verbatim original transcript. Q129 and Q185 have typed-answer versus final-key-manifest disagreement and are ungraded, leaving 190 eligible. The new 2015 GS0811 ω paper has 200 official-key positions (32 adapted typed, 168 source-only) and separate 600-position bundle. See validation-report-600.md.
