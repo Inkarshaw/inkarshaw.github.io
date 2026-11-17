@@ -10,7 +10,7 @@ assert.deepEqual(newGroupIPapers.map(p=>p.year).sort((a,b)=>a-b),
  'New Group I original-PDF companion sessions');
 for(const p of newGroupIPapers){
  assert.equal(p.questionCount,200);
- assert.equal(p.answerKeyStatus,'official-pdf-only','No unchecked Group I scoring claims');
+ assert.equal(p.answerKeyStatus,p.year===2015?'official-final-key-GS0811-omega':'official-pdf-only','Only 2015 Group I has an authenticated companion key');
  assert.equal(p.transcriptionStatus,'not-transcribed');
  assert.equal(p.optionLetters.length,p.year<=2019?4:5);
  assert.match(p.paperUrl,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\/.*\.pdf$/i);
@@ -64,8 +64,8 @@ assert.equal(paper2024.firstQuestionPdfPage,3,'First original question is on PDF
 assert.equal(paper2024.annotatedSource,true,'Annotated source scans warn candidates about visible ticks');
 const keyManifest=JSON.parse(read('data/quizzes/original-final-keys.json'));
 assert.equal(keyManifest.schemaVersion,1);
-assert.equal(keyManifest.papers.length,4,'Final-key index includes 2011, 2022, 2024 and 2025 papers');
-assert.deepEqual(keyManifest.papers.map(p=>p.id.match(/20\d{2}/)?.[0]).sort(),['2011','2022','2024','2025']);
+assert.equal(keyManifest.papers.length,5,'2015 Group I plus existing 2011/2022/2024/2025 keys');
+assert.deepEqual(keyManifest.papers.map(p=>p.id.match(/20\d{2}/)?.[0]).sort(),['2011','2015','2022','2024','2025']);
 const officialKey=keyManifest.papers.find(p=>p.id===paper2024.id);
 assert.equal(officialKey.id,paper2024.id);
 assert.equal(officialKey.paperVersion,paper2024.paperVersion);
@@ -116,6 +116,30 @@ for(const [n,key] of Object.entries({1:'C',6:'ALL',44:'C',56:'ALL',68:'A/B/C',74
 assert.equal(key2025.answers.filter(x=>x==='ALL').length,8);
 assert.equal(key2025.answers.filter(x=>x.includes('/')).length,5);
 assert.equal(key2025.answers.length-key2025.answers.filter(x=>x==='ALL').length,192);
+// 2015 Group I: same-series GS0811 omega full PDF companion, distinct from typed-text coverage.
+const g2015=newGroupIPapers.find(p=>p.year===2015);
+const k2015=keyManifest.papers.find(k=>k.id===g2015.id);
+assert.ok(k2015,'2015 Group I PDF companion key');
+assert.equal(g2015.paperVersion,'GS0811/2015 · General Studies · ω booklet');
+assert.equal(g2015.answerKeyStatus,'official-final-key-GS0811-omega');
+assert.equal(g2015.firstQuestionPdfPage,3);
+assert.equal(g2015.answerKeyUrl,'https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf');
+assert.equal(k2015.sourceUrl,g2015.answerKeyUrl);
+assert.equal(k2015.paperVersion,g2015.paperVersion);
+assert.equal(k2015.questionCount,200);
+assert.equal(k2015.marksPerQuestion,1.5);
+assert.equal(k2015.answers.length,200);
+assert.ok(k2015.answers.every(a=>/^(?:[ABCD](?:\\/[ABCD]){0,3}|ALL)$/.test(a)));
+for(const [n,key] of Object.entries({1:'A',4:'A',20:'A/C',21:'C',30:'C',33:'B',59:'ALL',76:'B',92:'ALL',101:'D',126:'A',150:'A',170:'A/B',175:'B',189:'ALL',200:'C'})){
+ assert.equal(k2015.answers[Number(n)-1],key,'2015 official GS0811 omega Q'+n);
+}
+assert.deepEqual(k2015.answers.flatMap((a,i)=>a==='ALL'?[i+1]:[]),[59,92,189]);
+assert.deepEqual(k2015.answers.flatMap((a,i)=>a.includes('/')?[i+1]:[]),[20,170]);
+assert.equal(k2015.answers.filter(a=>a!=='ALL').length,197);
+assert.equal((200-3)*g2015.marksPerQuestion,295.5);
+assert.equal(g2015.transcriptionStatus,'not-transcribed','Official PDF companion is not a complete on-screen typed paper');
+assert.match(js,/official-final-key-GS0811-omega/,'Client accepts 2015 series key');
+
 // 2011 Group I uses a different paper and final key from the uploaded 2011 Group II content.
 const g1=data.papers.find(p=>p.year===2011);
 const g1Key=keyManifest.papers.find(p=>p.id===g1.id);
