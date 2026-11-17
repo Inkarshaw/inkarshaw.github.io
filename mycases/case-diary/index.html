@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Case Diary | My Cases</title>
+<style>
+:root{--navy:#091c32;--blue:#1762e8;--line:#d7e1ec;--soft:#f4f7fb;--ink:#122438;--muted:#60738a;--danger:#ae293d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Tamil",Latha,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.top{background:var(--navy);color:white}.wrap{max-width:1120px;margin:auto;padding:0 16px}
+.top-inner{display:flex;align-items:center;gap:10px;min-height:65px}.brand{font-weight:900;font-size:1.15rem}.brand small{display:block;font-weight:400;color:#b8d0eb;font-size:.72rem}
+.spacer{flex:1}.top a{color:white;text-decoration:none;border:1px solid #586b81;padding:8px 12px;border-radius:8px}
+main.wrap{padding-top:20px;padding-bottom:80px}
+.panel{background:white;border:1px solid var(--line);border-radius:15px;margin-bottom:14px;overflow:hidden;box-shadow:0 8px 22px rgba(9,28,50,.04)}
+.panel-head{padding:16px 18px;border-bottom:1px solid var(--line)}.panel-head h1,.panel-head h2{margin:0;font-size:1.2rem}.panel-head p{font-size:.83rem;color:var(--muted);margin:5px 0 0}
+.pad{padding:17px 18px}.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.toolbar select{min-width:220px;flex:1}
+.btn{border:1px solid #c6d4e3;background:white;color:#1d3551;padding:9px 13px;border-radius:9px;font-weight:760;min-height:40px}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{color:var(--danger);border-color:#e8bec4}.btn:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{display:grid;gap:5px}.field.wide{grid-column:1/-1}.field label{font-size:.78rem;font-weight:750;color:#37506a}
+.field input,.field textarea,.field select,.toolbar select{width:100%;min-height:42px;border:1px solid #b9c9d9;border-radius:8px;background:white;padding:9px 10px;color:var(--ink)}.field textarea{min-height:140px;resize:vertical;line-height:1.7}.field textarea.narrative{min-height:290px;font-size:1.02rem}
+.field-group{margin:18px 0 12px;border-top:1px solid var(--line);padding-top:16px}.field-group h3{font-size:.94rem;margin:0 0 12px}
+.work{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1.4fr) auto;gap:7px;align-items:center;margin-bottom:8px}.work input[type=text]{width:100%;border:1px solid #b9c9d9;border-radius:8px;padding:8px;min-height:38px}.work input[type=checkbox]{width:19px;height:19px}.work button{border:0;background:#fff2f4;color:var(--danger);border-radius:8px;padding:8px}.work-col{color:var(--muted);font-size:.72rem}
+.note{font-size:.78rem;color:var(--muted);line-height:1.6}.notice{margin-top:8px;font-size:.82rem;color:#23527e}.status{margin-left:auto;font-size:.78rem;color:#356f54;font-weight:750}
+#caseTitle{font-weight:800}
+#missing{display:none;background:#fff7ea;border:1px solid #deb97f;border-radius:11px;padding:14px;margin:14px 0}
+#printPreview{display:none;background:#d8dfe7;padding:12px}
+#printPreview.open{display:block}
+.print-page{width:100%;background:white;color:#101010;padding:20px;margin:0 auto 14px;max-width:850px;font-family:"Noto Sans Tamil",Latha,"Tamil Sangam MN",Arial,sans-serif;font-size:12pt;line-height:1.65}
+.print-page h1{text-align:center;font-size:17pt;letter-spacing:1px;margin:0 0 3px}.print-page .department{text-align:center;font-weight:700;font-size:10pt}
+.print-page .case-num{text-align:center;font-weight:700;margin:0 0 18px}
+.print-info{width:100%;border-collapse:collapse}.print-info th{width:31%;text-align:left;vertical-align:top;font-weight:650;padding:5px 9px 5px 0}.print-info td{vertical-align:top;padding:5px 0}
+.print-rule{border-top:1px solid #222;margin:11px 0}.print-section{font-weight:800;letter-spacing:.5px;margin:17px 0 9px}
+.print-work{padding-left:20px;margin:0}.print-work li{padding:2px 0}
+.print-content{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.85}
+.print-footer{margin-top:35px;text-align:right;page-break-inside:avoid}.print-footer small{display:block}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.field.wide{grid-column:auto}.work{grid-template-columns:auto minmax(0,1fr) auto}.work .details{grid-column:2/-1}.toolbar select{flex-basis:100%}.top-inner{flex-wrap:wrap;padding:12px 0}}
+@page{size:A4 portrait;margin:13mm}
+@media print{
+ body{background:white}.top,main,#missing{display:none!important}
+ #printPreview{display:block!important;background:white!important;padding:0!important;margin:0!important}
+ .print-page{max-width:none!important;width:auto!important;min-height:269mm;padding:0!important;margin:0!important;box-shadow:none!important;font-size:11pt}
+ .print-page.first{break-after:page;page-break-after:always}
+ .print-page.second{min-height:0}
+ .print-page h1{font-size:16pt}
+ .print-content{font-size:12pt}
+}
+</style>
+<script defer src="/mycases/core.js?v=4"></script>
+<script defer src="/mycases/case-diary/diary.js?v=1"></script>
+</head>
+<body>
+<header class="top"><div class="wrap top-inner"><div class="brand">My Cases<small>Case Diary Register</small></div><div class="spacer"></div><a id="editorLink" href="/mycases/">← Case Editor</a><a href="/mycases/">Dashboard</a></div></header>
+<main class="wrap">
+<div id="missing">This case could not be loaded. Open a saved case from <a href="/mycases/">My Cases</a> first.</div>
+<section class="panel">
+ <div class="panel-head"><h1>Case Diary · <span id="caseTitle">Loading case…</span></h1><p>One diary entry per date/report. Save entries against the selected case. Check all facts before producing the diary to court.</p></div>
+ <div class="pad">
+  <div class="toolbar"><select id="entrySelect" aria-label="Select saved case diary entry"></select><button class="btn" id="newEntry" type="button">＋ New CD</button><button class="btn primary" id="saveEntry" type="button">Save</button><button class="btn" id="previewEntry" type="button">Preview</button><button class="btn" id="printEntry" type="button">Print / PDF</button><button class="btn danger" id="deleteEntry" type="button">Delete</button></div>
+  <div class="notice" id="saveMessage" role="status">Stored locally; cloud sync available when connected.</div>
+ </div>
+</section>
+<form id="diaryForm" autocomplete="off" class="panel">
+ <div class="panel-head"><h2>Case Diary — Identification</h2><p>Follows the supplied Tamil Nadu Police case diary format.</p></div>
+ <div class="pad">
+ <div class="grid">
+  <div class="field"><label>Police Station</label><input data-diary="policeStation"></div>
+  <div class="field"><label>District</label><input data-diary="district"></div>
+  <div class="field"><label>Crime No. / Year</label><input data-diary="crimeReference"></div>
+  <div class="field"><label>Date &amp; Time of Occurrence</label><input data-diary="occurrenceDateTime" placeholder="DD-MM-YYYY - HH:MM"></div>
+  <div class="field wide"><label>Place of Occurrence</label><input data-diary="placeOccurrence"></div>
+  <div class="field wide"><label>Section of Law</label><input data-diary="sections"></div>
+  <div class="field"><label>Date of CD</label><input type="date" data-diary="cdDate"></div>
+  <div class="field"><label>Date &amp; Time of Report</label><input data-diary="reportDateTime" placeholder="DD-MM-YYYY - HH:MM"></div>
+  <div class="field wide"><label>1. Complainant</label><textarea data-diary="complainant" rows="2" style="min-height:65px"></textarea></div>
+  <div class="field wide"><label>2. Accused</label><textarea data-diary="accused" rows="2" style="min-height:65px"></textarea></div>
+  <div class="field"><label>4. Total Property Stolen</label><input data-diary="propertyStolen"></div>
+  <div class="field"><label>5. Total Property Recovered / Seized</label><input data-diary="propertyRecovered"></div>
+  <div class="field"><label>6. Last CD Date</label><input type="date" data-diary="lastCdDate"></div>
+  <div class="field"><label>7. Stage</label><input data-diary="stage" placeholder="Under Investigation"></div>
+ </div>
+ <div class="field-group"><h3>Performance for the Day</h3><p class="note">Tick only work actually performed. Edit each description and enter a reference, witness names or notes where appropriate.</p>
+ <div class="work work-col"><span>✓</span><span>Work performed</span><span>Particulars / reference</span><span></span></div><div id="performanceList"></div>
+ <button class="btn" id="addWork" type="button">＋ Add work performed</button>
+ </div>
+ <div class="field-group"><h3>Brief Content of Case Diary</h3><div class="field"><label>Detailed investigation narrative (Tamil / English)</label><textarea class="narrative" lang="ta" data-diary="briefContent" placeholder="Record events, statements, visits, enquiries and investigation steps in chronological order."></textarea></div></div>
+ <div class="field-group"><h3>Reason for UI / Further Investigation</h3><div class="field"><textarea data-diary="reasonUI" placeholder="Example: To trace / arrest the accused, to examine witnesses…"></textarea></div></div>
+ <div class="field-group"><h3>Investigating Officer</h3><div class="grid">
+  <div class="field"><label>IO Name</label><input data-diary="ioName"></div>
+  <div class="field"><label>Rank</label><input data-diary="ioRank" placeholder="Sub Inspector of Police"></div>
+  <div class="field"><label>Police No.</label><input data-diary="ioNumber"></div>
+  <div class="field"><label>Signature / Date (for print)</label><input data-diary="signatureNote" placeholder="Leave blank for handwritten signature"></div>
+ </div></div>
+ <p class="note">The site does not invent facts, signatures or investigation steps. Review all entries, particularly names, dates, sections and property values, before signing or submitting.</p>
+ </div>
+</form>
+<section class="panel"><div class="pad toolbar"><button type="button" class="btn primary" id="saveBottom">Save Case Diary</button><button type="button" class="btn" id="printBottom">Print / Save as PDF</button><span class="status" id="saveStatus">Not changed</span></div></section>
+</main>
+<div id="printPreview" aria-label="Case diary print layout"></div>
+</body>
+</html>
