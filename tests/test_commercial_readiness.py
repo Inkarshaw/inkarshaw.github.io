@@ -86,7 +86,7 @@ class CommercialReadinessTests(unittest.TestCase):
         self.assertIn('a:focus-visible,button:focus-visible,select:focus-visible', home)
         self.assertIn('@media(prefers-reduced-motion:reduce)', home)
         self.assertIn('Latest Available Current Affairs', home)
-        self.assertIn('href="current-affairs/text/">Revise →</a>', home)
+        self.assertIn('href="current-affairs/text/"><strong>Current Affairs</strong>', home)
         self.assertNotIn('Current-affairs compilations and weak areas.', home)
         self.assertNotIn('href="current-affairs/compilations.html">Revise →</a>', home)
 
@@ -104,25 +104,24 @@ class CommercialReadinessTests(unittest.TestCase):
         self.assertIn('href="text/"', page)
         self.assertNotIn("rebuilt automatically as new daily Current Affairs PDFs are published", page)
 
-    def test_home_featured_quiz_counts_match_current_banks(self):
-        """Never advertise an old count or confuse mapped books with certified volumes."""
+    def test_home_resource_directory_matches_current_quiz_banks(self):
+        """The compact homepage must link to real banks without inventing counts."""
         firsts = json.loads(content("data/special-quizzes/firsts.json"))
         fathers = json.loads(content("data/special-quizzes/fathers.json"))
         home = content("index.html")
-        self.assertIn(f'Start {len(firsts["questions"])} MCQs', home)
-        self.assertIn(f'{len(fathers["questions"])} MCQs mapped to {len(fathers["books"])} source books', home)
-        for category, label in (
-            ("women", "First Women"),
-            ("history", "Historical Firsts"),
-            ("science", "Science Firsts"),
+        count = len(firsts["questions"]) + len(fathers["questions"])
+        self.assertIn(f'{count} curated Firsts &amp; Fathers MCQs', home)
+        for href in (
+            "textbook-quiz.html", "ncert-school-book-quiz.html",
+            "pyq-hub.html", "daily-quiz.html", "current-affairs/text/",
+            "syllabus.html", "textbook-firsts.html", "textbook-fathers.html",
+            "exam-posts.html",
         ):
-            count = sum(1 for question in firsts["questions"] if question["category"] == category)
-            card = re.search(r'<h3>[^<]*' + label + r'.*?</article>', home, re.S)
-            self.assertIsNotNone(card)
-            self.assertIn(f'{count} MCQs', card.group(0))
-        self.assertNotIn('Full textbook-page audit ongoing', home)
-        self.assertIn('Full textbook-page audit ongoing', content("textbook-fathers.html"))
-        self.assertNotIn('37 distinct source-linked questions', home)
+            with self.subTest(href=href):
+                self.assertIn(f'href="{href}"', home)
+        self.assertEqual(home.count('class="quickgrid"'), 1)
+        self.assertNotIn('id="firstsHeading"', home)
+        self.assertNotIn('id="journeyQuizLink"', home)
 
     def test_daily_quiz_mobile_accessibility_labels_and_contrast(self):
         page = content("daily-quiz.html")

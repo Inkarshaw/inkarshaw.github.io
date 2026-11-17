@@ -13,7 +13,7 @@ This GitHub Pages repository is organised by responsibility so public pages, cod
 - `resources/syllabus/text/` contains syllabus text used by the reader.
 - `tnpsc/mocks/` contains the TNPSC Group IV mock-test series.
 - `exam/`, `tnpsc/`, `tnusrb/` and `upsc/` contain subject/exam pages.
-- `current-affairs/` contains daily current-affairs PDFs and publishing metadata.
+- `current-affairs/text/` contains searchable daily current-affairs editions and publishing metadata. Older PDFs remain in the historical archive under `current-affairs/`.
 - `policedocuments/`, `policepassportgenerator/` and `mycases/` are kept as separate application areas.
 - `scripts/` contains repository automation scripts.
 - `.github/workflows/` contains GitHub Actions workflows.
