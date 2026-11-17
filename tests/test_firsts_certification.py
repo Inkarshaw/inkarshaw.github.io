@@ -87,14 +87,12 @@ class FirstsCertificationTests(unittest.TestCase):
         self.assertEqual(self.by_id["F019"]["source_conflict"]["status"],
                          "open_requires_original_edition_comparison")
 
-    def test_homepage_counts_consistent(self):
-        for category, phrase in [
-            ("women", "other pioneers · 27 MCQs."),
-            ("history", "major events · 113 MCQs."),
-            ("science", "discoveries · 42 MCQs."),
-        ]:
-            with self.subTest(category=category):
-                self.assertIn(phrase, self.home)
+    def test_homepage_keeps_curated_bank_access(self):
+        fathers = json.loads((ROOT / "data/special-quizzes/fathers.json").read_text(encoding="utf-8"))
+        total = len(self.questions) + len(fathers["questions"])
+        self.assertIn(f"{total} curated Firsts &amp; Fathers MCQs", self.home)
+        self.assertIn('href="textbook-firsts.html"', self.home)
+        self.assertIn('href="textbook-fathers.html"', self.home)
 
     def test_player_supports_short_default_skip_unanswered_and_restore(self):
         for fragment in [
