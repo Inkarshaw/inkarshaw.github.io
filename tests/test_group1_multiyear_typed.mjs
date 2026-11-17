@@ -387,7 +387,7 @@ assert.deepEqual(y15.questions.slice(50,56).map(q=>q.number),[51,52,53,54,55,56]
 
 const new2015=[...Array.from({length:17},(_,i)=>i+57),...Array.from({length:5},(_,i)=>i+80),...Array.from({length:9},(_,i)=>i+88)];
 const new2015pages={57:22,58:22,59:22,60:23,61:23,62:23,63:24,64:24,65:24,66:25,67:25,68:25,69:25,70:26,71:26,72:26,73:26,80:29,81:29,82:29,83:30,84:30,88:32,89:32,90:33,91:33,92:34,93:35,94:36,95:36,96:37};
-assert.deepEqual(y15.questions.slice(56,87).map(q=>q.number),new2015);
+assert.deepEqual(new2015.map(number=>y15.questions[number-1].number),new2015,'Previously sampled Q57–96 retain original numbering after gap recovery');
 for(const number of new2015){
  const q=y15.questions.find(x=>x.number===number);
  assert.equal(q.sourcePdfPage,new2015pages[number],'Verified 2015 official PDF page for original Q'+number);
