@@ -129,7 +129,7 @@ assert.equal(k2015.paperVersion,g2015.paperVersion);
 assert.equal(k2015.questionCount,200);
 assert.equal(k2015.marksPerQuestion,1.5);
 assert.equal(k2015.answers.length,200);
-assert.ok(k2015.answers.every(a=>/^(?:[ABCD](?:\\/[ABCD]){0,3}|ALL)$/.test(a)));
+assert.ok(k2015.answers.every(a=>/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/.test(a)));
 for(const [n,key] of Object.entries({1:'A',4:'A',20:'A/C',21:'C',30:'C',33:'B',59:'ALL',76:'B',92:'ALL',101:'D',126:'A',150:'A',170:'A/B',175:'B',189:'ALL',200:'C'})){
  assert.equal(k2015.answers[Number(n)-1],key,'2015 official GS0811 omega Q'+n);
 }
