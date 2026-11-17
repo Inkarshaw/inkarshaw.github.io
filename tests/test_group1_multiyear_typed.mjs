@@ -9,15 +9,15 @@ const allYears=JSON.parse(read('data/quizzes/tnpsc-group1-all-years.json'));
 const html=read('tnpsc-group1-typed-years.html');
 const js=read('assets/js/tnpsc-group1-typed-years.js');
 const hub=read('tnpsc-group1-pyq.html');
-const expected=new Map([[2025,200],[2024,200],[2022,200],[2021,200],[2019,200],[2017,200],[2015,104]]);
+const expected=new Map([[2025,200],[2024,200],[2022,200],[2021,200],[2019,200],[2017,200],[2015,200]]);
 assert.equal(typed.schemaVersion,1);
 assert.equal(typed.papers.length,7);
 assert.deepEqual(typed.papers.map(p=>p.year),[2025,2024,2022,2021,2019,2017,2015]);
-assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),1304);
+assert.equal(typed.papers.reduce((sum,p)=>sum+p.questions.length,0),1400);
 for(const paper of typed.papers){
  assert.equal(paper.originalQuestionCount,200);
  assert.equal(paper.grading,[2015,2017].includes(paper.year)?'verified-partial':'not-graded');
- assert.equal(paper.keyedAnswerCount,paper.year===2017?189:paper.year===2015?92:0);
+ assert.equal(paper.keyedAnswerCount,paper.year===2017?189:paper.year===2015?186:0);
  assert.equal(paper.questions.length,expected.get(paper.year));
  assert.deepEqual(paper.optionLetters,paper.year<2021?['A','B','C','D']:['A','B','C','D','E']);
  assert.match(paper.officialPdf,/^https:\/\/(?:www\.)?tnpsc\.gov\.in\//);
@@ -38,7 +38,7 @@ for(const paper of typed.papers){
   if(paper.year===2015||paper.year===2017){
    const verified=item.keyStatus.endsWith('-verified');
    assert.ok(['official-final-version-A-verified','official-final-GS0811-omega-verified','official-ALL-ungraded','source-dispute-ungraded','official-final-key-awaiting-original-image-review'].includes(item.keyStatus));
-   assert.equal(item.accepted.length,verified?((paper.year===2017&&item.number===91)||(paper.year===2015&&item.number===20)?2:1):0);
+   assert.equal(item.accepted.length,verified?((paper.year===2017&&item.number===91)||(paper.year===2015&&[20,170].includes(item.number))?2:1):0);
   }else{
    assert.equal(item.keyStatus,'unmapped','Never provide unreviewed keys');
    assert.deepEqual(item.accepted,[],'No fabricated accepted-option sets');
@@ -347,22 +347,22 @@ assert.match(y17.sourceAudit,/Q126–Q200/);
 
 assert.match(y17.sourceAudit,/handwritten tick marks/);
 const y15=typed.papers.find(p=>p.year===2015);
-assert.deepEqual(y15.questions.map(q=>q.number),[...Array.from({length:73},(_,i)=>i+1),...Array.from({length:5},(_,i)=>i+80),...Array.from({length:26},(_,i)=>i+88)],'Verified scan images preserved original question numbers, without inventing Q74–79 or Q85–87');
-assert.equal(y15.verifiedSourceCount,98,'Original TNPSC images checked for 98 source-numbered 2015 question positions');
+assert.deepEqual(y15.questions.map(q=>q.number),Array.from({length:200},(_,i)=>i+1),'All original 2015 numbers Q1–200 now have on-screen English adapted study positions');
+assert.equal(y15.verifiedSourceCount,194,'Official 2015 TNPSC booklet visually checked for 194 positions; six secondary Q38–43 remain pending');
 assert.equal(y15.grading,'verified-partial');
-assert.equal(y15.keyedAnswerCount,92);
+assert.equal(y15.keyedAnswerCount,186);
 assert.match(y15.finalKeyUrl,/GR_I_92K15_FIN_ANSKEY\.pdf/);
 assert.deepEqual(y15.questions.slice(0,7).map(q=>q.accepted[0]),['A','B','D','A','C','A','D']);
 assert.match(y15.questions[3].sourceCaution,/hand-marked source/);
 assert.deepEqual(y15.questions.slice(0,32).map(q=>q.sourcePdfPage),[2,3,3,4,4,4,4,5,5,6,6,6,6,7,7,7,8,8,8,9,9,10,11,11,12,12,12,13,13,14,15,15],'Q1–Q32 original TNPSC PDF page map retained');
 assert.deepEqual(y15.questions[19].accepted,['A','C'],'Official 2015 final key explicitly accepts A OR C for Q20');
-assert.deepEqual(y15.ungradedSourceDisputes,[21,22,26]);
+assert.deepEqual(y15.ungradedSourceDisputes,[21,22,26,84,119]);
 for(const n of y15.ungradedSourceDisputes){
  assert.deepEqual(y15.questions[n-1].accepted,[],'Contradictory source-history Q'+n+' not scored');
  assert.equal(y15.questions[n-1].keyStatus,'source-dispute-ungraded');
- assert.match(y15.questions[n-1].sourceCaution,/HISTORICAL/);
+ assert.match(y15.questions[n-1].sourceCaution,/HISTORICAL|DISPUTE/);
 }
-assert.equal(y15.questions.filter(q=>q.accepted.length>0).length,92,'Only directly reviewed source-image text receives study marks');
+assert.equal(y15.questions.filter(q=>q.accepted.length>0).length,186,'No secondary pending, ALL-key or disputed questions enter typed study marks');
 assert.deepEqual(y15.questions.slice(32,56).map(q=>q.number),Array.from({length:24},(_,i)=>i+33),'2015 original-numbered Q33–Q56');
 assert.equal(y15.secondaryNumberedStudyCount,6);
 assert.deepEqual(y15.questions.slice(37,43).map(q=>q.number),[38,39,40,41,42,43]);
@@ -399,7 +399,7 @@ for(const number of new2015){
 }
 assert.match(y15.questions.find(q=>q.number===84).sourceCaution,/HISTORICAL SOURCE CAUTION/);
 const source977113={97:38,98:39,99:39,100:40,101:40,102:41,103:41,104:41,105:42,106:42,107:42,108:43,109:43,110:43,111:44,112:44,113:44};
-assert.deepEqual(y15.questions.slice(87).map(q=>q.number),Array.from({length:17},(_,i)=>i+97));
+assert.deepEqual(y15.questions.slice(96,113).map(q=>q.number),Array.from({length:17},(_,i)=>i+97));
 for(const [numberText,page] of Object.entries(source977113)){
  const number=Number(numberText),q=y15.questions.find(item=>item.number===number);
  assert.equal(q.sourcePdfPage,page,'2015 original TNPSC PDF page Q'+number);
@@ -409,10 +409,30 @@ for(const [numberText,page] of Object.entries(source977113)){
 }
 assert.match(y15.questions.find(q=>q.number===99).sourceCaution,/historical taxonomic/i,'Outdated 2015 Thallophyta grouping flagged');
 
-assert.equal(y15.questions.length,104);
-assert.equal(y15.questions.filter(q=>q.accepted.length).length,92);
+assert.equal(y15.questions.filter(q=>q.keyStatus==='official-final-key-awaiting-original-image-review').length,6);
+assert.equal(y15.questions.filter(q=>q.reviewStatus==='official-tnpsc-pdf-page-visually-inspected-adaptation').length,187,'Original scan reviewed status includes Q8–Q200; Q1–7 separately reviewed');
+assert.deepEqual(y15.questions.filter(q=>q.keyStatus==='official-ALL-ungraded').map(q=>q.number),[59,92,189]);
+assert.deepEqual(y15.questions.filter(q=>q.keyStatus==='source-dispute-ungraded').map(q=>q.number),[21,22,26,84,119]);
+assert.deepEqual(y15.questions[169].accepted,['A','B'],'Q170 official same-series key accepts both choices');
+assert.deepEqual(y15.questions[19].accepted,['A','C'],'Q20 official dual answer');
+assert.equal(y15.questions[188].accepted.length,0,'Q189 official ALL excluded, despite handwritten 2002 tick');
+assert.match(y15.questions[188].sourceCaution,/2000.*absent/,'NCRWC 2000 missing from original answer options');
+for(const [number,page] of Object.entries({74:27,75:27,76:27,77:28,78:28,79:28,85:31,86:31,87:31,114:45,118:45,119:46,120:46,121:47,124:48,126:49,129:50,130:50,131:51,132:51,133:52,134:53,137:53,138:54,142:54,143:55,147:55,148:56,151:56,152:57,155:57,156:58,158:58,159:59,160:59,161:60,163:60,164:61,167:61,168:62,169:62,170:63,171:63,172:64,174:64,175:65,177:65,178:66,179:66,180:67,181:67,182:68,185:68,186:69,189:69,190:70,191:71,192:71,193:72,194:73,195:74,196:74,197:75,198:75,199:76,200:76})){
+ const q=y15.questions[Number(number)-1];
+ assert.equal(q.sourcePdfPage,page,'2015 TNPSC original source page Q'+number);
+ assert.equal(q.reviewStatus,'official-tnpsc-pdf-page-visually-inspected-adaptation');
+}
+const all2015Final=JSON.parse(read('data/quizzes/original-final-keys.json')).papers.find(p=>p.id===y15.paperId).answers;
+for(const q of y15.questions){
+ if(q.accepted.length)assert.deepEqual(q.accepted,all2015Final[q.number-1].split('/'),'Same-series final key option map Q'+q.number);
+ if(!q.accepted.length)assert.ok(['source-dispute-ungraded','official-ALL-ungraded','official-final-key-awaiting-original-image-review'].includes(q.keyStatus),'Only sourced exceptions stay ungraded');
+}
 
-assert.equal(y15.questions.filter(q=>q.accepted.length>0).length,92,'Six secondary, three original historical disputes, two ALL and Q84 remain ungraded');
+
+assert.equal(y15.questions.length,200);
+assert.equal(y15.questions.filter(q=>q.accepted.length).length,186);
+
+assert.equal(y15.questions.filter(q=>q.accepted.length>0).length,186,'Six secondary Q38–43, five source disputes and three ALL positions remain ungraded');
 
 assert.ok(y15.questions.every(q=>q.sourceBookletCode==='GS0811'||q.number<=7),'New 2015 positions tagged with source booklet code');
 assert.match(y15.questions[20].sourceCaution,/1928/,'Bardoli 1928 versus printed 1929');
