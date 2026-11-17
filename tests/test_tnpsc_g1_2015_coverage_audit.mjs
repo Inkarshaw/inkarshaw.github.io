@@ -33,14 +33,16 @@ const counts={
  typedUngraded:manifest.records.filter(x=>x.typed&&!x.typedStudyScoreEligible).length,
  secondaryPending:manifest.records.filter(x=>x.typedStatus==='original-image-review-pending-ungraded').length,
  historicalDisputes:manifest.records.filter(x=>x.typedStatus==='historical-source-dispute-ungraded').length,
+ allKeyUngraded:manifest.records.filter(x=>x.typedStatus==='official-ALL-key-ungraded').length,
  pdfCompanionScorable:manifest.records.filter(x=>x.pdfCompanionIndicativelyScorable).length
 };
 assert.deepEqual(counts,manifest.summary,'Manifest must match current question-level data');
-assert.deepEqual(counts,{totalOriginal:200,typed:56,missingTyped:144,sourceImageReviewed:50,typedScorable:47,typedUngraded:9,secondaryPending:6,historicalDisputes:3,pdfCompanionScorable:197});
-assert.deepEqual(manifest.records.filter(x=>!x.typed).map(x=>x.number),Array.from({length:144},(_,i)=>i+57));
+assert.deepEqual(counts,{totalOriginal:200,typed:87,missingTyped:113,sourceImageReviewed:81,typedScorable:75,typedUngraded:12,secondaryPending:6,historicalDisputes:4,allKeyUngraded:2,pdfCompanionScorable:197});
+assert.deepEqual(manifest.records.filter(x=>!x.typed).map(x=>x.number),[...Array.from({length:6},(_,i)=>i+74),...Array.from({length:3},(_,i)=>i+85),...Array.from({length:104},(_,i)=>i+97)]);
 assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='original-image-review-pending-ungraded').map(x=>x.number),[38,39,40,41,42,43]);
-assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='historical-source-dispute-ungraded').map(x=>x.number),[21,22,26]);
+assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='historical-source-dispute-ungraded').map(x=>x.number),[21,22,26,84]);
+assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='official-ALL-key-ungraded').map(x=>x.number),[59,92]);
 assert.deepEqual(manifest.records.filter(x=>x.officialKeyToken==='ALL').map(x=>x.number),[59,92,189]);
 assert.deepEqual(manifest.unresolvedNumbers,manifest.records.filter(x=>!x.typedStudyScoreEligible).map(x=>x.number));
-assert.equal(manifest.unresolvedNumbers.length,153);
-console.log('2015 Group I 200-position audit: 56 typed, 50 official images checked, 47 graded, 9 typed ungraded, 144 missing text; no synthetic questions.');
+assert.equal(manifest.unresolvedNumbers.length,125);
+console.log('2015 Group I 200-position audit: 87 typed, 81 original images checked, 75 scored, 12 typed ungraded, 113 missing text; no synthetic questions.');
