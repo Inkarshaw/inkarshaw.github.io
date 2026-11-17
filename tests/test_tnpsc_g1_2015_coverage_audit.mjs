@@ -37,12 +37,13 @@ const counts={
  pdfCompanionScorable:manifest.records.filter(x=>x.pdfCompanionIndicativelyScorable).length
 };
 assert.deepEqual(counts,manifest.summary,'Manifest must match current question-level data');
-assert.deepEqual(counts,{totalOriginal:200,typed:104,missingTyped:96,sourceImageReviewed:98,typedScorable:92,typedUngraded:12,secondaryPending:6,historicalDisputes:4,allKeyUngraded:2,pdfCompanionScorable:197});
-assert.deepEqual(manifest.records.filter(x=>!x.typed).map(x=>x.number),[...Array.from({length:6},(_,i)=>i+74),...Array.from({length:3},(_,i)=>i+85),...Array.from({length:87},(_,i)=>i+114)]);
+assert.deepEqual(counts,{totalOriginal:200,typed:200,missingTyped:0,sourceImageReviewed:194,typedScorable:186,typedUngraded:14,secondaryPending:6,historicalDisputes:5,allKeyUngraded:3,pdfCompanionScorable:197});
+assert.deepEqual(manifest.records.filter(x=>!x.typed).map(x=>x.number),[],'No original-numbered adapted study position is absent');
 assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='original-image-review-pending-ungraded').map(x=>x.number),[38,39,40,41,42,43]);
-assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='historical-source-dispute-ungraded').map(x=>x.number),[21,22,26,84]);
-assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='official-ALL-key-ungraded').map(x=>x.number),[59,92]);
+assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='historical-source-dispute-ungraded').map(x=>x.number),[21,22,26,84,119]);
+assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='official-ALL-key-ungraded').map(x=>x.number),[59,92,189]);
 assert.deepEqual(manifest.records.filter(x=>x.officialKeyToken==='ALL').map(x=>x.number),[59,92,189]);
 assert.deepEqual(manifest.unresolvedNumbers,manifest.records.filter(x=>!x.typedStudyScoreEligible).map(x=>x.number));
-assert.equal(manifest.unresolvedNumbers.length,108);
-console.log('2015 Group I 200-position audit: 104 typed, 98 original images checked, 92 scored, 12 typed ungraded, 96 missing; no synthetic questions.');
+assert.equal(manifest.unresolvedNumbers.length,14);
+assert.deepEqual(manifest.unresolvedNumbers,[21,22,26,38,39,40,41,42,43,59,84,92,119,189]);
+console.log('2015 Group I: 200 numbered adapted study texts, 194 source-image checked, 186 scored, 14 study-only, zero missing; not certified verbatim bilingual.');
