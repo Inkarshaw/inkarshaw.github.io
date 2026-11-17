@@ -37,12 +37,12 @@ const counts={
  pdfCompanionScorable:manifest.records.filter(x=>x.pdfCompanionIndicativelyScorable).length
 };
 assert.deepEqual(counts,manifest.summary,'Manifest must match current question-level data');
-assert.deepEqual(counts,{totalOriginal:200,typed:87,missingTyped:113,sourceImageReviewed:81,typedScorable:75,typedUngraded:12,secondaryPending:6,historicalDisputes:4,allKeyUngraded:2,pdfCompanionScorable:197});
-assert.deepEqual(manifest.records.filter(x=>!x.typed).map(x=>x.number),[...Array.from({length:6},(_,i)=>i+74),...Array.from({length:3},(_,i)=>i+85),...Array.from({length:104},(_,i)=>i+97)]);
+assert.deepEqual(counts,{totalOriginal:200,typed:104,missingTyped:96,sourceImageReviewed:98,typedScorable:92,typedUngraded:12,secondaryPending:6,historicalDisputes:4,allKeyUngraded:2,pdfCompanionScorable:197});
+assert.deepEqual(manifest.records.filter(x=>!x.typed).map(x=>x.number),[...Array.from({length:6},(_,i)=>i+74),...Array.from({length:3},(_,i)=>i+85),...Array.from({length:87},(_,i)=>i+114)]);
 assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='original-image-review-pending-ungraded').map(x=>x.number),[38,39,40,41,42,43]);
 assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='historical-source-dispute-ungraded').map(x=>x.number),[21,22,26,84]);
 assert.deepEqual(manifest.records.filter(x=>x.typedStatus==='official-ALL-key-ungraded').map(x=>x.number),[59,92]);
 assert.deepEqual(manifest.records.filter(x=>x.officialKeyToken==='ALL').map(x=>x.number),[59,92,189]);
 assert.deepEqual(manifest.unresolvedNumbers,manifest.records.filter(x=>!x.typedStudyScoreEligible).map(x=>x.number));
-assert.equal(manifest.unresolvedNumbers.length,125);
-console.log('2015 Group I 200-position audit: 87 typed, 81 original images checked, 75 scored, 12 typed ungraded, 113 missing text; no synthetic questions.');
+assert.equal(manifest.unresolvedNumbers.length,108);
+console.log('2015 Group I 200-position audit: 104 typed, 98 original images checked, 92 scored, 12 typed ungraded, 96 missing; no synthetic questions.');
