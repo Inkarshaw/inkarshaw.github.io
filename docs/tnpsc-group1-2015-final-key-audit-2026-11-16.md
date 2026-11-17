@@ -110,3 +110,17 @@ Direct official TNPSC GS0811 ω scanned image review allowed 31 more source-numb
 **New status: 87/200 source-numbered English adapted playable items, 81 original-image reviewed, 75 approved study-score positions, 12 ungraded typed items, 113 missing typed texts.** The existing original-PDF companion still has all 200 A–D answer positions and 197 indicatively scorable from the same official final-key series. No current-affairs statements from the 2015 paper are treated as present-day facts.
 
 Primary question source: <https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf>. Official final key: <https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf>.
+
+
+## 17 November 2026 — original booklet Q97–Q113 visually reviewed
+
+Q97–Q113 were individually reviewed using the authentic TNPSC GS0811 ω source images (original PDF pages **38–44**, one-based). The original question numbers, four-option ordering, matching official-final-key letters and bilingual source context were checked. The published quiz uses **English editorial paraphrases**, not a representation of verified verbatim reproduction.
+
+- Q97 page 38; Q98–Q99 page 39; Q100–Q101 page 40; Q102–Q104 page 41; Q105–Q107 page 42; Q108–Q110 page 43; Q111–Q113 page 44.
+- All **17** newly reviewed questions have standard official GS0811 ω A–D single accepted answer entries and were enabled for indicative typed-text grading.
+- Q99 contains pre-modern plant taxonomy labels such as `Thallophyta`; a historical classification caution accompanies the question.
+- Official TNPSC PDF: <https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf>; matching final key: <https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf>.
+
+**Current aggregate:** **104/200 typed playable English editorial study questions**, **98 source-image checked**, **92 typed questions graded by matching official final key**, **12 typed study-only/ungraded**, and **96 original-numbered questions still lacking typed text**. The 200-question original TNPSC PDF companion retains 197 provisionally scorable positions. The separate machine-readable `data/quizzes/tnpsc-group1-2015-coverage-audit.json` lists all **108 typed-unresolved positions** (96 not yet typed + 12 typed but ungraded).
+
+**Next source gaps:** Q74–79 (official image pages 27–28), Q85–87 (image page 31) and Q114–200 (remaining original paper pages). The former three source page screenshots did not reliably load during this pass, so this library does not invent their content or silently backfill wrong-numbered secondary material.
