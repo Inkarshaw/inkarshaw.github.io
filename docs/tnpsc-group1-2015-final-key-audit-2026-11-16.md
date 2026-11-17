@@ -94,3 +94,19 @@ The scanned GS0811 ω original booklet was directly visually inspected for sourc
 - The separate 200-number official-PDF response sheet remains a distinct mode with 197 indicatively scored positions and three ALL exceptions.
 
 Original source: <https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf>; matching final key: <https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf>.
+
+
+## 17 November 2026 — direct original scan review of Q57–Q73, Q80–Q84, Q88–Q96
+
+Direct official TNPSC GS0811 ω scanned image review allowed 31 more source-numbered A–D option sets to be adapted into English practice, while preserving official source reference pages and same-series answer mapping.
+
+- **Q57–Q59:** official PDF page 22. Q59 has final key **ALL**, so its printed options are retained for study without assigning a grade.
+- **Q60–Q62:** page 23; **Q63–Q65:** page 24; **Q66–Q69:** page 25; **Q70–Q73:** page 26.
+- **Q80–Q82:** page 29; **Q83–Q84:** page 30.
+- **Q88–Q89:** page 32; **Q90–Q91:** page 33; **Q92:** page 34 (final-key **ALL**, ungraded); **Q93:** page 35; **Q94–Q95:** page 36; **Q96:** page 37.
+- **Q84 source-history issue:** the exam calls the 2015 Australian prime-minister replacement a federal election, whereas the event was an internal Liberal leadership change. The published key **C** is retained as metadata but adapted-text grading is disabled pending source/historical adjudication.
+- **Missing images:** original PDF pages 27–28 and 31 repeatedly failed to render in this session; **Q74–Q79 and Q85–Q87** are *not* created from secondary guesses.
+
+**New status: 87/200 source-numbered English adapted playable items, 81 original-image reviewed, 75 approved study-score positions, 12 ungraded typed items, 113 missing typed texts.** The existing original-PDF companion still has all 200 A–D answer positions and 197 indicatively scorable from the same official final-key series. No current-affairs statements from the 2015 paper are treated as present-day facts.
+
+Primary question source: <https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf>. Official final key: <https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf>.
