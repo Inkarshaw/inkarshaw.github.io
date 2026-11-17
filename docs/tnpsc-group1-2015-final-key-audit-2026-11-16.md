@@ -81,3 +81,16 @@ The PDF from TNPSC is linked as the primary authority but **could not be visuall
 **Q38 source discrepancy:** one CivilServiceAspirants indexed stem says first ratio `7:3` but its own A option and the separate Radian transcribed stem both say `7:13`. The ClearExams adapted item uses `7:13` and prominently warns about the source inconsistency. The original scan must decide the certified text; no silent correction or marks.
 
 **State:** 50/200 readable adapted question entries; 32 previously source-image reviewed, 18 newly dual-secondary-numbered, 29 automatically graded, 21 ungraded. **Q51–Q200 (150 items) still missing** from the adapted typed question bank. The separate 200-position official-PDF answer-sheet mode remains unchanged (197 indicatively scorable, three ALL excluded). No unverifiable question text has been invented.
+
+
+## 17 November 2026 — TNPSC original scan re-verification (Q33–37, Q44–56)
+
+The scanned GS0811 ω original booklet was directly visually inspected for source numbers **Q33–Q37 (1-based PDF page 16), Q44–Q48 (page 18), Q49–Q52 (page 19), Q53–Q54 (page 20), and Q55–Q56 (page 21)**. Each inspected item has A–D alternatives in the original order, verified against the final-key metadata. This is source-image verification of **18 additional items**, **not certification of exact English verbatim wording**.
+
+- **Q33–Q37 and Q44–Q50** were previously secondary-only, and now use `official-final-GS0811-omega-verified` with their original PDF page references.
+- **Q51–Q56** have been added as source-numbered editorial English study adaptations, each linked to its reviewed PDF page and the same-booklet official final-key position.
+- The exact source image for **Q38–Q43** was not successfully inspected in this session. These six retain empty `accepted` arrays and remain ungraded. The Q38 ratio discrepancy (7:3 versus 7:13) remains explicitly disclosed, without asserting the original printed answer.
+- Net 2015 typed coverage: **56/200 playable**, **50 source-image reviewed**, **47 officially-keyed for indicative adapted-text scoring**, **9 ungraded**, **144 typed question positions still unavailable**.
+- The separate 200-number official-PDF response sheet remains a distinct mode with 197 indicatively scored positions and three ALL exceptions.
+
+Original source: <https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf>; matching final key: <https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf>.
