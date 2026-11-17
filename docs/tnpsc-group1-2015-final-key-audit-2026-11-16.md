@@ -22,7 +22,7 @@ The published TNPSC one-page final-answer table explicitly labels its exam date,
 
 **Q1–Q32 of Q1–Q200** now have original-numbered readable English editorial study text. The source and final key align on 29 safely scored positions; **Q33–Q200 (168 positions) remain untranscribed**. Three historically inconsistent source questions are available for study but excluded from marks. A study score on 29 questions is **not a full-paper result**. No synthetic placeholders are used.
 
-The final key has exception entries at other positions; **Q20 A (or) C** is now independently aligned to the reviewed original question and both answers are accepted. Other exceptions outside the 32 reviewed questions remain unavailable for grading.
+The original 32-item typed practice still grades only its 29 source-safe reviewed positions, including both accepted options at **Q20 A (or) C**. Separately, the 200-position official-PDF response sheet now has a complete final-key mapping for the same GS0811 ω booklet, without claiming the missing original questions have been typed.
 
 **Source review date:** 16 November 2026.
 
@@ -56,3 +56,17 @@ The final key has exception entries at other positions; **Q20 A (or) C** is now 
 **Additional historical framing:** Q12 used the 2015 binary meaning of a terabyte (2⁴⁰ bytes), distinguished today as a tebibyte under IEC terminology. Q18's Shompen population is explicitly a *2011 Census* claim, not contemporary population data. Q20 accepts both A and C exactly as specified in the authenticated TNPSC key.
 
 **Updated coverage:** 32/200 source-numbered original positions typed, 29 source-safe officially keyed study positions, 3 disputed ungraded, **168 untyped**. 2015 is still a partial paper. The final key does not by itself supply question text for the missing 168 positions.
+
+
+## 17 November 2026 — complete 200-position official final-key PDF companion
+
+The one-page TNPSC GS0811 ω final-key table was transcribed across all eight 25-number columns and independently checked again in its printed row-by-row layout against all **200** answer positions. The same official GS0811 ω source-booklet identifiers were checked against the linked source PDF. Source: <https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf>. Original source PDF: <https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf>.
+
+- Original-answer slots: **Q1–Q200**, read against the separate original bilingual TNPSC PDF, A–D choices in the original order.
+- Indicatively scorable with the *published final key*: **197/200**; the exact score ceiling for these positions is **295.5 marks** at 1.5 marks each, excluding three exceptional ALL entries.
+- Official **ALL**: **Q59, Q92, Q189**, intentionally ungraded because ClearExams cannot yet confirm TNPSC's treatment of all-options, blank, and candidate-marked cases.
+- Official alternate accepted choices: **Q20 A/C** and **Q170 A/B**, retained in the keyed 200-position answer sheet.
+- Handwritten ticks in the source question PDF are not substituted for the same-series official final answer key.
+- **Original typed questions remain only 32/200**; **168 questions are not yet transcribed**. The graded 200-position mode is explicitly a **PDF companion**, not a full original on-screen text quiz.
+
+The independent complete key-regression fixture in `tests/test_tnpsc_g1_2015_key_mapping.mjs` protects the official published question-to-answer sequence, while `tests/test_pyq_original_paper.mjs` checks paper/version agreement and score eligibility.
