@@ -20,7 +20,7 @@
     'sceneOfCrime','sections','complainant','accused','ioName','priority','court','courtCaseNo',
     'stage','nextHearing','nextAction','notes','createdAt','updatedAt','accusedPersons',
     'investigationChecklist','tasks','hearings','timeline','attachments','propertyItems','courtComplex',
-    'courtCaseType','accusedPresentDetails','nbwStatus','fsStatus','finalResult'
+    'courtCaseType','accusedPresentDetails','nbwStatus','fsStatus','finalResult','caseDiaryEntries'
   ];
 
   const clone=v=>JSON.parse(JSON.stringify(v??null));
@@ -78,7 +78,7 @@
     c.id=String(c.id||uid());
     c.createdAt=c.createdAt||now();
     c.updatedAt=c.updatedAt||c.createdAt;
-    ['accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments','propertyItems'].forEach(k=>{
+    ['accusedPersons','investigationChecklist','tasks','hearings','timeline','attachments','propertyItems','caseDiaryEntries'].forEach(k=>{
       if(!Array.isArray(c[k]))c[k]=[];
     });
     if(!c.priority)c.priority='Medium';
