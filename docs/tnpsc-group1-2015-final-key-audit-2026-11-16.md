@@ -124,3 +124,32 @@ Q97–Q113 were individually reviewed using the authentic TNPSC GS0811 ω source
 **Current aggregate:** **104/200 typed playable English editorial study questions**, **98 source-image checked**, **92 typed questions graded by matching official final key**, **12 typed study-only/ungraded**, and **96 original-numbered questions still lacking typed text**. The 200-question original TNPSC PDF companion retains 197 provisionally scorable positions. The separate machine-readable `data/quizzes/tnpsc-group1-2015-coverage-audit.json` lists all **108 typed-unresolved positions** (96 not yet typed + 12 typed but ungraded).
 
 **Next source gaps:** Q74–79 (official image pages 27–28), Q85–87 (image page 31) and Q114–200 (remaining original paper pages). The former three source page screenshots did not reliably load during this pass, so this library does not invent their content or silently backfill wrong-numbered secondary material.
+
+
+## 17 November 2026 — all 200 original-numbered English adapted study questions playable
+
+**Current authoritative coverage snapshot (supersedes earlier counts above):** The official TNPSC GS0811 ω bilingual booklet images were read and compared to the same-series official final key for source number alignment and A–D option order. Q74–Q79 (1-based PDF pages 27–28) and Q85–Q87 (page 31), previously unavailable, were successfully recovered; Q114–Q200 were also added as readable *English editorial adaptations*, with the original PDF retained as the only source of exact bilingual question wording.
+
+| Status | Count |
+| --- | ---: |
+| Original-numbered adapted text questions, Q1–Q200 | **200** |
+| Visually reviewed against TNPSC GS0811 ω source PDF | **194** |
+| Secondary-indexed study-only Q38–Q43 awaiting original image | **6** |
+| Eligible for indicative typed-study grades | **186** |
+| Ungraded with documented exception | **14** |
+| Missing original-numbered adapted English text positions | **0** |
+| Separate official-PDF answer sheet provisionally scorable | **197** |
+
+**Exact unresolved typed questions (14):** Q21, Q22, Q26, Q38, Q39, Q40, Q41, Q42, Q43, Q59, Q84, Q92, Q119, Q189.
+
+- **Source-image pending (six):** Q38–Q43, including the independently indexed Q38 ratio discrepancy (7:3 versus 7:13). Do not claim certified original-image verification and do not grade.
+- **Source content disputes (five):** Q21, Q22, Q26, Q84, Q119. In particular Q119's assertion that palaeography concerns ancient writing is true but the official answer A excludes statement IV; do not grade the adapted text until adjudicated.
+- **Official all-options cases (three):** Q59, Q92 and Q189 have TNPSC final-key `ALL`. Q189's four printed year options omit **2000**, when the National Commission to Review the Working of the Constitution was established. Hand-marked ticks in the booklet are not the final authority.
+- **Multiple accepted options:** Q20 `A/C` and Q170 `A/B` in the authenticated official key, both preserved for adapted-study grades.
+- **Historical qualifiers:** Date-specific 2015 questions, including the 2020 Olympics venue (actual Games held 2021), are contextualised as historical questions. They are not represented as current events.
+
+**Files:** `data/quizzes/tnpsc-group1-2015-typed-playable.json` (standalone ClearExams player-compatible schema), `data/quizzes/tnpsc-group1-2015-coverage-audit.json` (200-position validation), `data/quizzes/tnpsc-group1-2015-unresolved.json` (14 review exceptions). A matching-year version is also present in `data/quizzes/tnpsc-group1-multiyear-typed-draft.json` and directly playable at `tnpsc-group1-typed-years.html?year=2015`.
+
+**Certification caveat:** All 200 original-numbered *English editorial adaptations* are present and usable; the original English/Tamil PDF is linked, but a complete **verbatim bilingual transcription has not been certified**, and this source index must not be relabelled as an authenticated verbatim digital original-paper publication.
+
+Primary paper: <https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf>; official same-series final key: <https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf>.
