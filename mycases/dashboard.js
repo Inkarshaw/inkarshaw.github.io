@@ -131,7 +131,7 @@
     if(b.dataset.view)renderView(Core.getCase(b.dataset.view));
     else if(b.dataset.edit)openEditor(b.dataset.edit);
     else if(b.dataset.docs)openDocs(b.dataset.docs);
-    else if(b.dataset.cd){const c=Core.getCase(b.dataset.cd);if(c){Core.setHandoff(c);location.href='/mycases/case-diary/?id='+encodeURIComponent(c.id)}};
+    else if(b.dataset.cd){const c=Core.getCase(b.dataset.cd);if(c){Core.setHandoff(c);location.href='/mycases/case-diary/?id='+encodeURIComponent(c.id)}}
     else if(b.dataset.delete){
       const c=Core.getCase(b.dataset.delete);if(c&&confirm('Delete '+(c.caseType||'Case')+' '+(c.crimeNo||'')+'?\n\nIt can be restored later.')){
         Core.softDelete(c.id);renderList();Core.processQueue();
