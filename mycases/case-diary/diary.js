@@ -248,6 +248,7 @@
     if(show)$('#printPreview').scrollIntoView({behavior:'smooth'});
    }
   });
+  window.addEventListener('beforeprint',()=>{if(current())preview()});
   window.addEventListener('pagehide',()=>{if(dirty)saveCurrent(false)});
   window.addEventListener('mycases:sync',()=>{if(!dirty&&Core.pendingCount()===0&&Core.token())$('#saveMessage').textContent='Saved locally and cloud sync completed.'});
  }
