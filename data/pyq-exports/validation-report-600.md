@@ -37,3 +37,11 @@
 Use `complete-600.json` for multi-year catalogue import with strict UI flags. `tnpsc-g1-2015-complete-source-linked.json` is the new 2015 standalone resource. A playable HTML with all three banks can be used offline for answer selection but source-linked questions require the original PDF.
 
 **Publication gate**: Do not describe these records as fully digitized verbatim original papers; do not give special ALL, disputed key, or missing-figure positions unconditional grades.
+
+## 17 Nov 2026: 2015 secondary-text source crosswalk and risks
+
+A public study index splits 2015 GS0811 into six General Studies pages (positions 1–155) and two Aptitude pages (positions 156–200). Links are now attached to all 200 2015 positions. The English General Studies part-3 URL was inferred from its site's link pattern but not independently confirmed. The final Aptitude study page is indexed in Tamil; English page access was not verified.
+
+**Critical booklet-code mismatch risk:** On the indexed General Studies part-6 page, the secondary publication gives Q126=C, Q128=D, Q129=B, while TNPSC's authenticated GS0811 ω official final key gives Q126=A, Q128=C, Q129=A. This is a three-question observed answer-letter discrepancy; it is not proof that the text itself is wrong. Original ω option order or secondary mistakes must be reviewed before reusing secondary choices. Do **not** auto-import third-party A–D option sequences and mark them using ω final keys without a booklet crosswalk. These fields are kept explicitly unverified. No new 2015 question text or options have been invented or silently copied.
+
+Original answer key: https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf . Secondary part-6: https://gktamil.com/tnpsc-group-1/2015/english/general-studies/part-6 .
