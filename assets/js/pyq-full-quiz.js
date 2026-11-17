@@ -42,11 +42,17 @@
     const base=SESSION_PREFIX+encodeURIComponent(exam||'all')+':'+(year||'all')+($('lengthSelect').value==='all'?'':':'+$('lengthSelect').value);
     return base+(mode()==='practice'?':practice':'');
   }
-  function answerAudit(q){
+  // Editorial answer letters must not be awarded marks before an official final-key match.
+  function isKeyMatched(q){
     const verification=safeText(q.AnswerVerification);
-    if(/pending|incomplete|unverified/i.test(verification))return 'Final-key verification pending';
-    if(/Matched to official TNPSC final key|Official TNPSC Group IV 2024 final answer key|Answer matches TNPSC 2022 final key/i.test(verification))return 'Official final-key match documented in the question record';
-    return 'Source attribution recorded; check the official paper and key';
+    return !!safeSource(q.AnswerKeyURL)&&
+      /^(?:Matched to official TNPSC final key\b|Official TNPSC Group IV 2024 final answer key\b|Answer matches TNPSC 2022 final key\b)/i.test(verification)&&
+      !/\b(?:pending|incomplete|unverified)\b/i.test(verification);
+  }
+  function answerAudit(q){
+    return isKeyMatched(q)
+      ?'Official final-key match documented; provisional practice scoring'
+      :'Final-key matching pending; study-only and ungraded';
   }
   function storageRead(key){try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}}
   function storageWrite(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
@@ -102,6 +108,7 @@
       description.textContent=isGroupIV2024
         ?pool.length+' adapted source-attributed questions currently available from the 200-question TNPSC Group IV 2024 paper. '+(pool.length-count)+' other adapted questions are outside this session. These are not verbatim original questions or the complete paper.'
         :pool.length+' adapted source-attributed questions available in the selected bank. This is not the complete original examination paper.';
+      description.textContent+=' Key-matched for provisional scoring: '+pool.filter(isKeyMatched).length+'/'+pool.length+'. Other answers are study-only and ungraded.';
       note.append(description);
       if(exam==='TNPSC Group IV'&&['2022','2024','2025'].includes(String(year))){
         const full=document.createElement('a');full.className='full-original-cta';
@@ -118,7 +125,9 @@
     }
     const hist=storageRead(HISTORY)||[];
     const latest=Array.isArray(hist)?hist.find(h=>h.key===key):null;
-    $('previousScore').textContent=latest?'Last attempt: '+latest.correct+'/'+latest.total+' correct · '+latest.accuracy+'%':'';
+    $('previousScore').textContent=!latest?'':latest.scoringPolicy===2
+      ?'Last key-matched attempt: '+latest.correct+'/'+latest.graded+' correct · '+(latest.accuracy===null?'no graded questions':latest.accuracy+'%')
+      :'Previous attempt used indicative scoring. Restart for verified-only grades.';
   }
   function save(){if(session&&activeKey)storageWrite(activeKey,session)}
   function show(which){
@@ -174,8 +183,8 @@
     abc.forEach(letter=>{
       const b=document.createElement('button');b.type='button';b.className='option';
       if(session.answers[i]===letter)b.classList.add('selected');
-      if(checked&&letter===q.CorrectAnswer)b.classList.add('answer-correct');
-      if(checked&&session.answers[i]===letter&&letter!==q.CorrectAnswer)b.classList.add('answer-wrong');
+      if(checked&&isKeyMatched(q)&&letter===q.CorrectAnswer)b.classList.add('answer-correct');
+      if(checked&&isKeyMatched(q)&&session.answers[i]===letter&&letter!==q.CorrectAnswer)b.classList.add('answer-wrong');
       b.setAttribute('aria-pressed',String(session.answers[i]===letter));
       b.disabled=checked;
       const lead=document.createElement('strong');lead.textContent=letter;
@@ -209,10 +218,13 @@
     const area=$('answerFeedback');area.replaceChildren();area.hidden=!q;
     if(!q)return;
     const chosen=session.answers[session.index],correct=chosen===q.CorrectAnswer;
-    area.classList.toggle('is-wrong',!correct);
-    const heading=document.createElement('h4');heading.textContent=correct?'Correct answer':'Incorrect answer';area.append(heading);
+    const graded=isKeyMatched(q);
+    area.classList.toggle('is-wrong',graded&&!correct);
+    const heading=document.createElement('h4');
+    heading.textContent=graded?(correct?'Correct answer':'Incorrect answer'):'Suggested study answer · ungraded';
+    area.append(heading);
     const solution=document.createElement('p');
-    solution.textContent='Correct: '+q.CorrectAnswer+'. '+display(q,'Option'+q.CorrectAnswer);
+    solution.textContent=(graded?'Correct: ':'Editorial suggestion (unverified): ')+q.CorrectAnswer+'. '+display(q,'Option'+q.CorrectAnswer);
     area.append(solution);
     if(!correct){
       const your=document.createElement('p');
@@ -268,14 +280,17 @@
     if(!expired&&missing&&!confirm(missing+' questions are unanswered. Finish this attempt anyway?'))return;
     endTimer();
     session.finished=true;save();
-    const correct=qs.reduce((n,q,i)=>n+(session.answers[i]===q.CorrectAnswer?1:0),0);
-    const attempted=answeredCount(),wrong=attempted-correct,accuracy=Math.round(correct/qs.length*100);
+    const graded=qs.filter(isKeyMatched).length;
+    const gradedAttempted=qs.reduce((n,q,i)=>n+(isKeyMatched(q)&&session.answers[i]!==null?1:0),0);
+    const correct=qs.reduce((n,q,i)=>n+(isKeyMatched(q)&&session.answers[i]===q.CorrectAnswer?1:0),0);
+    const attempted=answeredCount(),wrong=gradedAttempted-correct;
+    const accuracy=graded?Math.round(correct/graded*100):null;
     $('resultHeading').textContent=expired?'Time expired — quiz submitted':(session.mode==='practice'?'Practice completed':'Exam completed');
-    $('resultSummary').textContent=qs.length+' available adapted questions · '+correct+' correct · '+wrong+' incorrect · '+(qs.length-attempted)+' unattempted · '+accuracy+'% of total';
-    $('score').textContent=correct+' / '+qs.length;
+    $('resultSummary').textContent=qs.length+' adapted questions · '+graded+' key-matched for scoring · '+(qs.length-graded)+' study-only, ungraded · '+correct+' correct · '+wrong+' incorrect · '+(graded-gradedAttempted)+' graded questions unattempted · '+(qs.length-attempted)+' total unattempted.';
+    $('score').textContent=graded?correct+' / '+graded:'No graded questions';
     const history=storageRead(HISTORY);
     const items=Array.isArray(history)?history.filter(x=>x&&x.key!==activeKey):[];
-    items.unshift({key:activeKey,total:qs.length,correct,accuracy,ts:new Date().toISOString()});
+    items.unshift({key:activeKey,total:qs.length,graded,correct,accuracy,scoringPolicy:2,ts:new Date().toISOString()});
     storageWrite(HISTORY,items.slice(0,30));
     $('reviewFilter').value='all';renderReview();
     show('results');
@@ -285,25 +300,27 @@
     if(!session)return;
     const filter=$('reviewFilter').value;
     qs.forEach((q,i)=>{
-      const answer=session.answers[i],right=answer===q.CorrectAnswer;
-      if(filter==='wrong'&&(answer===null||right))return;
+      const answer=session.answers[i],graded=isKeyMatched(q),right=graded&&answer===q.CorrectAnswer;
+      if(filter==='wrong'&&(!graded||answer===null||right))return;
       if(filter==='unanswered'&&answer!==null)return;
       if(filter==='review'&&!session.marked[i])return;
+      if(filter==='ungraded'&&graded)return;
       const item=document.createElement('details');item.className='review-item';
-      const head=document.createElement('summary');head.textContent=(i+1)+'. '+display(q,'Question')+' — '+(answer===null?'Unattempted':right?'Correct':'Incorrect');
+      const verdict=!graded?'Ungraded · key pending':answer===null?'Unattempted':right?'Correct':'Incorrect';
+      const head=document.createElement('summary');head.textContent=(i+1)+'. '+display(q,'Question')+' — '+verdict;
       item.append(head);
       const caption=document.createElement('p');caption.textContent=q.SourceExam+' · '+q.SourceYear+
         (q.SourceQuestion?' · original question '+q.SourceQuestion:'');
       item.append(caption);
-      const result=document.createElement('p');result.className=right?'correct-text':'wrong-text';
+      const result=document.createElement('p');result.className=graded?(right?'correct-text':'wrong-text'):'verification';
       result.textContent='Your answer: '+(answer?answer+'. '+display(q,'Option'+answer):'Not answered')+
-        ' | Correct: '+q.CorrectAnswer+'. '+display(q,'Option'+q.CorrectAnswer);
+        ' | '+(graded?'Correct: ':'Editorial suggestion (unverified): ')+q.CorrectAnswer+'. '+display(q,'Option'+q.CorrectAnswer);
       item.append(result);
       const options=document.createElement('div');options.className='review-options';
       abc.forEach(letter=>{
         const block=document.createElement('p');const text=letter+'. '+display(q,'Option'+letter);
         block.textContent=text+' — '+(display(q,'Explanation'+letter)||'Explanation not recorded');
-        if(letter===q.CorrectAnswer)block.classList.add('correct-text');
+        if(graded&&letter===q.CorrectAnswer)block.classList.add('correct-text');
         options.append(block);
       });
       item.append(options);
@@ -349,7 +366,7 @@
       $('lengthSelect').value=['10','20','all'].includes(requestedLength)?requestedLength:'10';
       $('modeSelect').value=urlParams.get('mode')==='exam'?'exam':'practice';
       if(urlParams.get('lang')==='ta')$('quizLanguage').value='ta';
-      setStatus(bank.length+' source-attributed adapted PYQs indexed.');
+      setStatus(bank.length+' adapted PYQs indexed · '+bank.filter(isKeyMatched).length+' key-matched · '+bank.filter(q=>!isKeyMatched(q)).length+' study-only, ungraded.');
       updatePreview();
       if(urlParams.get('start')==='1'&&!$('startBtn').disabled)start();
     }).catch(err=>{setStatus('Could not load PYQ quizzes: '+err.message);$('startBtn').disabled=true});
