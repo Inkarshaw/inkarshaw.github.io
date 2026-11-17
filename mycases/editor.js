@@ -376,6 +376,11 @@
     $('#saveBtn').addEventListener('click',()=>explicitSave(false));
     $('#saveDocsBtn').addEventListener('click',()=>explicitSave(true));
     $('#dashboardBtn').addEventListener('click',leave);
+    $('#caseDiaryBtn').addEventListener('click',async()=>{
+      if(!await explicitSave(false))return;
+      Core.setHandoff(state);
+      location.href='/mycases/case-diary/?id='+encodeURIComponent(state.id);
+    });
     $('#addProperty').addEventListener('click',()=>{
       const step=state.investigationChecklist.find(x=>String(x.label||'').toLowerCase()==='property seized');
       if(step){step.done=true;if(!step.date)step.date=new Date().toISOString().slice(0,10)}
