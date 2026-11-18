@@ -9,7 +9,7 @@ const typed=JSON.parse(read('data/quizzes/typed-pyq-catalog.json'));
 const page=read('tnpsc-group1-pyq.html');
 const script=read('assets/js/pyq-original-paper.js');
 assert.equal(catalog.schemaVersion,1);
-assert.equal(catalog.updatedOn,'2026-11-17');
+assert.equal(catalog.updatedOn,'2026-11-18');
 const years=catalog.entries.map(e=>e.year);
 assert.deepEqual(years,[2026,2025,2024,2022,2021,2019,2017,2015,2014,2013,2011,2010,2009,2007]);
 assert.equal(new Set(years).size,years.length,'No duplicate indexed years');
@@ -37,7 +37,7 @@ for(const [year,count] of typedStarterCounts){
  const e=keyByYear.get(year);
  assert.equal(e.typedQuestionCount,count,'Partial text count remains truthful: '+year);
  assert.equal(e.typedUrl,'tnpsc-group1-typed-years.html?year='+year);
- assert.equal(e.provisionallyScorable,year===2017?189:year===2015?186:0);
+ assert.equal(e.provisionallyScorable,year===2017?189:year===2015?192:0);
 }
 
 for(const y of [2011,2026]){
