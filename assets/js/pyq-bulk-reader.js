@@ -186,7 +186,12 @@ function buildPublishedCards(entries){
  for(const entry of entries){
   const row=textNode('article','published-card','');
   row.append(textNode('strong','',entry.exam+' · '+entry.year));
-  row.append(textNode('span','muted',entry.paperName+' · '+entry.textPages+' readable PDF pages'));
+  const source=bank.get(entry.id);
+  const recovered=source?.questions?.filter(q=>q.textRecovered).length||0;
+  const complete=source?.questions?.filter(q=>q.complete).length||0;
+  row.append(textNode('span','muted',
+    recovered+' / '+(source?.questions?.length||100)+' question stems recovered · '+
+    complete+' provisional A–D text sets · '+entry.textPages+' PDF text pages · ungraded'));
   const a=textNode('a','published-link','Read typewritten page text');
   a.href='pyq-bulk-reader.html?paper='+encodeURIComponent(entry.id);
   a.addEventListener('click',event=>{
