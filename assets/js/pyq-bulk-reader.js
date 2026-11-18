@@ -40,8 +40,10 @@ function normalize(raw){
  const name=[clean(raw.exam)||'Unknown exam',raw.year||'Unknown year',clean(raw.sourceFilename)||clean(raw.id)].join(' · ');
  const source=validURL(raw.sourcePdf);
  return {id:clean(raw.id)||name,name,year:raw.year,source,questions,
-  pages:raw.pages.map(p=>({pdfPage:p.pdfPage,text:asText(p.text),method:asText(p.method)})),
-  stats:raw.stats||{}, fileStatus:raw.sourceTextKind||'unverified',pageOnly};
+  pages:raw.pages.map(p=>({pdfPage:p.pdfPage,text:asText(p.text),method:asText(p.method),
+   ocrAlternateText:asText(p.ocrAlternateText),machineOcrUnverified:p.machineOcrUnverified===true})),
+  stats:raw.stats||{}, fileStatus:raw.sourceTextKind||'unverified',
+  ocrRecovery:raw.ocrRecovery||null,pageOnly};
 }
 function saveLocal(){
  if(!active)return;
@@ -65,7 +67,8 @@ function setPaper(id){
   active.pages.length+' extracted source pages (question numbers could not be parsed) · no answer scoring':
   active.questions.length+' original-numbered question positions · '+counts.recovered+
    ' stems machine-recovered · '+counts.complete+' apparently complete A–D option sets · '+
-   (active.questions.length-counts.complete)+' need source corrections · all ungraded';
+   (active.questions.length-counts.complete)+' need source corrections · all ungraded'+
+   (active.ocrRecovery?' · '+active.ocrRecovery.added+' OCR page additions, '+active.ocrRecovery.alternative+' alternate OCR pages (unverified)':'');
  loadLocal();current=0;$('search').value='';$('filter').value='all';filterQuestions();
  say('Opened '+active.name+'. Text is unverified. Responses are saved only in this browser.');
 }
@@ -75,6 +78,7 @@ function filterQuestions(){
  shown=active.questions.map((q,i)=>({q,i})).filter(({q})=>{
   if(f==='complete'&&!q.complete)return false;
   if(f==='incomplete'&&q.complete)return false;
+  if(f==='missing-stem'&&q.textRecovered)return false;
   if(f==='unanswered'&&responses[q.number])return false;
   return !query||String(q.number)===query||[q.text,...letters.map(l=>q.options[l])].join(' ').toLocaleLowerCase().includes(query);
  }).map(x=>x.i);
@@ -97,7 +101,10 @@ function render(){
  }
  $('reader').hidden=false;
  $('position').textContent=(active.pageOnly?'PDF page ':'Question ')+q.number+' · '+(current+1)+' of '+active.questions.length;
- $('sourceMeta').textContent=q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage:'Source page unknown';
+ const selectedPage=active.pages.find(p=>p.pdfPage===q.sourcePdfPage);
+ $('sourceMeta').textContent=q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage+(selectedPage?.machineOcrUnverified?' · machine OCR, unverified':''):'Source page unknown';
+ $('questionPdfLink').href=active.source&&q.sourcePdfPage?active.source+'#page='+q.sourcePdfPage:active.source||'pyq-hub.html';
+ $('questionPdfLink').textContent=q.sourcePdfPage?'View official PDF page '+q.sourcePdfPage:'View original official PDF';
  $('stem').textContent=q.text||'[Question text unreadable — use original source]';
  const opt=$('options');opt.replaceChildren();
  const paperLetters=/group-iv-2016/.test(active.id)?letters.slice(0,4):letters;
@@ -122,7 +129,8 @@ function render(){
   'Machine-separated question and A–D alternatives. Text is unverified and ungraded. '+details:
   'Partial question from scanned PDF. Missing labelled options: '+(missing.length?missing.join(', '):'uncertain split')+'. Source inspection is needed; no answers are inferred. '+details;
  const page=active.pages.find(p=>p.pdfPage===q.sourcePdfPage);
- $('sourcePage').textContent=page?.text||q.rawBlock||'No source text extracted for this question';
+ $('sourcePage').textContent=(page?.text||q.rawBlock||'No source text extracted for this question')+
+   (page?.ocrAlternateText?'\n\n--- UNVERIFIED ALTERNATE OCR OF SAME SOURCE PAGE ---\n'+page.ocrAlternateText:'');
  const total=active.questions.length;
  const answered=active.questions.filter(x=>!!responses[x.number]).length;
  $('meter').style.width=(100*answered/total).toFixed(1)+'%';
@@ -217,7 +225,12 @@ async function loadSiteDrafts(){
    const raw=await r.json();
    if(raw.id!==entry.id||raw.draftOnly!==true||raw.grading!=='disabled'||raw.officialFinalKeyMapped!==false)
     throw Error('Unverified source metadata mismatch');
-   return {entry,paper:normalize(raw)};
+   let recovered=raw;
+   try{
+    const extra=await fetch('data/quizzes/pyq-reader-drafts/ocr-recovery/'+entry.file,{cache:'no-store'});
+    if(extra.ok){const overlay=await extra.json();recovered=window.ClearExamsPYQOcrOverlay?.merge(raw,overlay)||raw}
+   }catch{ /* Missing or unreadable OCR is never grounds to suppress the original paper */ }
+   return {entry,paper:normalize(recovered)};
   }));
   const loaded=[];
   for(const file of files){
