@@ -27,6 +27,19 @@ function numberMarker(line,c,page){
    return {number:Number(inline[1]),stem:inline[2].trim(),
     normalized:'Question number appeared after previous maths on same OCR line; visual review required'};
  }
+ if(!m&&c.from===101){
+  // Printed text is present, but OCR split these specific source headers.
+  // Retain audit notes; do not apply a broad numeric guess to other lines.
+  const spaced174=page===39&&trimmed.match(/^17\s+4\.\s+(Which of these describes.{10,})$/i);
+  if(spaced174)return {number:174,stem:spaced174[1].trim(),
+   normalized:'Printed 174 was extracted as 17 4.; source-image review pending'};
+  const letter183=page===43&&trimmed.match(/^[lI]\s*83\.\s+(Who remarked.{10,})$/i);
+  if(letter183)return {number:183,stem:letter183[1].trim(),
+   normalized:'Printed 183 was extracted as l 83.; source-image review pending'};
+  const formula145=page===24&&trimmed.match(/^.{14,170}?\s+145\.\s+(Th,e va ue o.{5,})$/i);
+  if(formula145)return {number:145,stem:formula145[1].trim(),
+   normalized:'Printed 145 follows an OCR-displaced mathematical expression; stem is incomplete; inspect PDF'};
+ }
  if(!m)return null;
  const n=Number(m[1]);
  if(n<c.from||n>c.to)return null;
