@@ -84,6 +84,32 @@ for(const [id,guards] of Object.entries({
  }
 }
 
+// Recovered two full numbered CDS I 2018/2019 paper transcriptions.
+// All 240 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-i-2018-gk','cds-i-2019-gk']){
+ const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
+ const status=idx.paperStatuses.find(e=>e.id===id);
+ assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+ assert.equal(p.unresolvedQuestionNumbers.length,0);
+ assert.equal(status.textStems,120);assert.equal(status.provisionalFourOptionSets,120);assert.equal(status.unresolvedPositions,0);
+ assert.ok(p.questions.every(q=>q.text.trim()&&'ABCD'.split('').every(l=>q.options[l].trim())));
+ assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+ assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
+}
+const source2018=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2018-gk.json'),'utf8'));
+assert.match(source2018.questions[11].text,/sinkhole/);
+assert.match(source2018.questions[33].text,/horizon/);
+assert.match(source2018.questions[34].text,/Cloud/);
+assert.match(source2018.questions[76].text,/World Soil Day/);
+assert.match(source2018.questions[85].text,/Sikkim/);
+assert.match(source2018.questions[113].text,/Kharoshthi/);
+assert.deepEqual(source2018.questions[11].options,source2018.questions[17].options,'Original Q12–18 share the printed answer code');
+const source2019=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2019-gk.json'),'utf8'));
+assert.match(source2019.questions[61].text,/vectors/);
+assert.match(source2019.questions[61].options.B,/>/);
+assert.match(source2019.questions[61].options.C,/</);
+assert.match(source2019.questions[61].options.D,/−/);
+
 assert.match(fs.readFileSync(path.join(root,'pyq-cds.html'),'utf8'),/120 numbered positions per paper/);
 const js=fs.readFileSync(path.join(root,'assets','js','pyq-cds.js'),'utf8');
 assert.match(js,/correctAnswer!==null/);assert.match(js,/scoreEligible!==false/);
