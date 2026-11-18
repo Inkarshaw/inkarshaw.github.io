@@ -58,6 +58,9 @@ on:
       - "scripts/pyq_targeted_ocr_recovery.py"
       - "tests/test_pyq_source_ocr_overlay.mjs"
       - "tests/test_pyq_targeted_ocr_recovery.py"
+      - "pyq-cds.html"
+      - "data/quizzes/cds-gk/**"
+      - "tests/test_cds_gk_source.mjs"
       - "pyq-bulk-reader.html"
       - "assets/js/pyq-bulk-reader.js"
       - "assets/js/pyq-source-text-splitter.js"
@@ -165,6 +168,9 @@ on:
       - "scripts/pyq_targeted_ocr_recovery.py"
       - "tests/test_pyq_source_ocr_overlay.mjs"
       - "tests/test_pyq_targeted_ocr_recovery.py"
+      - "pyq-cds.html"
+      - "data/quizzes/cds-gk/**"
+      - "tests/test_cds_gk_source.mjs"
       - "pyq-bulk-reader.html"
       - "assets/js/pyq-bulk-reader.js"
       - "assets/js/pyq-source-text-splitter.js"
@@ -276,6 +282,8 @@ jobs:
         run: node tests/test_pyq_bulk_reader.mjs
       - name: Validate numbered TNPSC PDF-page text quiz splitting
         run: node tests/test_pyq_source_text_splitter.mjs
+      - name: Verify all 16 CDS source-text quizzes and never grade machine drafts
+        run: node tests/test_cds_gk_source.mjs
       - name: Verify recovered PDF OCR pages do not overwrite source text or add scoring
         run: node tests/test_pyq_source_ocr_overlay.mjs
       - name: Verify focused source OCR only accepts official TNPSC pages
