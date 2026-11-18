@@ -3,6 +3,7 @@ name: ClearExams bulk paper typing drafts
 on:
   push:
     branches:
+      - main
       - pyq-fast-typed-first-bulk-20261118
     paths:
       - scripts/pyq_bulk_pdf_to_drafts.py
@@ -37,7 +38,7 @@ jobs:
         run: python tests/test_pyq_bulk_pdf_to_drafts.py
       - name: Type all paper PDFs without inferred answers
         env:
-          OCR_INPUT: ${{ github.event.inputs.ocr || 'false' }}
+          OCR_INPUT: ${{ github.event.inputs.ocr || 'true' }}
         shell: bash
         run: |
           FLAGS=""
