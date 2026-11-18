@@ -25,12 +25,19 @@ function normalize(raw){
   complete:q.fourOptionsDetected===true,
   sourceStatus:'unverified-machine-extracted',rawBlock:asText(q.rawBlock)
  })).sort((a,b)=>a.number-b.number);
- if(!questions.length)throw Error('No numbered question candidates. View source pages in a PDF reader instead');
+ const pageOnly=!questions.length;
+ if(pageOnly&&(!raw.pages.length||!raw.pages.some(p=>clean(p.text))))throw Error('This PDF has no readable text. Re-run extraction with Tamil/English OCR.');
+ if(pageOnly){
+  for(const p of raw.pages){
+   questions.push({number:p.pdfPage,text:asText(p.text)||'[Unrecognized image-only page]',options:Object.fromEntries(letters.map(l=>[l,''])),
+    sourcePdfPage:p.pdfPage,complete:false,sourceStatus:'unverified-pdf-page-text',rawBlock:asText(p.text),recordType:'page-text'});
+  }
+ }
  const name=[clean(raw.exam)||'Unknown exam',raw.year||'Unknown year',clean(raw.sourceFilename)||clean(raw.id)].join(' · ');
  const source=validURL(raw.sourcePdf);
  return {id:clean(raw.id)||name,name,year:raw.year,source,questions,
   pages:raw.pages.map(p=>({pdfPage:p.pdfPage,text:asText(p.text),method:asText(p.method)})),
-  stats:raw.stats||{}, fileStatus:raw.sourceTextKind||'unverified'};
+  stats:raw.stats||{}, fileStatus:raw.sourceTextKind||'unverified',pageOnly};
 }
 function saveLocal(){
  if(!active)return;
@@ -48,9 +55,11 @@ function setPaper(id){
  if(!active)return;
  $('paperHeading').textContent=active.name;
  const counts=active.questions.reduce((o,q)=>(o.complete+=q.complete?1:0,o),{complete:0});
- $('paperStats').textContent=active.questions.length+' numbered candidates · '+counts.complete+
- ' apparently complete A–D alternatives · '+(active.questions.length-counts.complete)+
- ' incomplete · '+active.pages.length+' PDF source pages · no final-key scoring';
+ $('paperStats').textContent=active.pageOnly?
+  active.pages.length+' extracted source pages (question numbers could not be parsed) · no answer scoring':
+  active.questions.length+' numbered candidates · '+counts.complete+
+   ' apparently complete A–D alternatives · '+(active.questions.length-counts.complete)+
+   ' incomplete · '+active.pages.length+' PDF source pages · no final-key scoring';
  loadLocal();current=0;$('search').value='';$('filter').value='all';filterQuestions();
  say('Opened '+active.name+'. Text is unverified. Responses are saved only in this browser.');
 }
@@ -63,7 +72,7 @@ function filterQuestions(){
   if(f==='unanswered'&&responses[q.number])return false;
   return !query||String(q.number)===query||[q.text,...letters.map(l=>q.options[l])].join(' ').toLocaleLowerCase().includes(query);
  }).map(x=>x.i);
- $('filtered').textContent=shown.length+' questions match this view; missing numbered positions are not invented';
+ $('filtered').textContent=shown.length+(active.pageOnly?' extracted source pages':' detected question candidates')+' match this view; missing question numbers are not invented';
  if(shown.length&&!shown.includes(current))current=shown[0];
  render();
 }
@@ -81,7 +90,7 @@ function render(){
   $('meter').style.width='0%';return;
  }
  $('reader').hidden=false;
- $('position').textContent='Question '+q.number+' · '+(current+1)+' of '+active.questions.length;
+ $('position').textContent=(active.pageOnly?'PDF page ':'Question ')+q.number+' · '+(current+1)+' of '+active.questions.length;
  $('sourceMeta').textContent=q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage:'Source page unknown';
  $('stem').textContent=q.text||'[Question text unreadable — use original source]';
  const opt=$('options');opt.replaceChildren();
@@ -95,7 +104,9 @@ function render(){
   opt.append(b);
  }
  const missing=letters.slice(0,4).filter(l=>!clean(q.options[l]));
- $('questionCaution').textContent=q.complete&&missing.length===0?
+ $('questionCaution').textContent=active.pageOnly?
+  'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
+  q.complete&&missing.length===0?
   'Ungraded question: original scan, mathematical notation, option ordering and figures require review.':
   'Incomplete machine text. Missing options: '+(missing.length?missing.join(', '):'unreliable OCR block')+'. You may inspect the original PDF; no answers are inferred.';
  const page=active.pages.find(p=>p.pdfPage===q.sourcePdfPage);
@@ -103,14 +114,14 @@ function render(){
  const total=active.questions.length;
  const answered=active.questions.filter(x=>!!responses[x.number]).length;
  $('meter').style.width=(100*answered/total).toFixed(1)+'%';
- $('answerProgress').textContent=answered+' of '+total+' detected questions answered · ungraded';
+ $('answerProgress').textContent=active.pageOnly?total+' source pages available · no question scoring':answered+' of '+total+' detected questions answered · ungraded';
  $('prev').disabled=shown.indexOf(current)<=0;
  $('next').disabled=shown.indexOf(current)>=shown.length-1;
  const nav=$('palette');nav.replaceChildren();const frag=document.createDocumentFragment();
  for(const i of shown){
   const item=active.questions[i],b=textNode('button',(item.complete?'':'incomplete')+
     (responses[item.number]?' answered':'')+(i===current?' active':''),String(item.number));
-  b.type='button';b.title='Question '+item.number+(item.complete?'':' · source incomplete');
+  b.type='button';b.title=(active.pageOnly?'PDF page ':'Question ')+item.number+(item.complete?'':' · source incomplete');
   b.addEventListener('click',()=>{current=i;render()});frag.append(b);
  }
  nav.append(frag);
