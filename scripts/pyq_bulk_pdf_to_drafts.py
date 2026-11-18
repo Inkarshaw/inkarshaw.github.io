@@ -18,7 +18,7 @@ from urllib.parse import urlparse, unquote
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-HOSTS = {"tnpsc.gov.in", "www.tnpsc.gov.in", "tnusrb.tn.gov.in", "www.tnusrb.tn.gov.in"}
+HOSTS = {"tnpsc.gov.in", "www.tnpsc.gov.in", "tnusrb.tn.gov.in", "www.tnusrb.tn.gov.in", "upsc.gov.in", "www.upsc.gov.in"}
 TAMIL_DIGITS = str.maketrans("௦௧௨௩௪௫௬௭௮௯", "0123456789")
 TAMIL_OPTIONS = {"அ": "A", "ஆ": "B", "இ": "C", "ஈ": "D", "உ": "E"}
 QSTART = re.compile(r"^\s*(?:Q(?:uestion)?\.?\s*(?:No\.?)?\s*[:.]?\s*)?([0-9]{1,3})\s*[).:]\s*(.*)$", re.I)

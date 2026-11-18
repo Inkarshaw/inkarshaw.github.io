@@ -1,0 +1,30 @@
+// A machine-text draft can be read immediately, but not silently scored or called verified.
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const html=read('pyq-bulk-reader.html'),js=read('assets/js/pyq-bulk-reader.js');
+new vm.Script(js,{filename:'pyq-bulk-reader.js'});
+assert.match(html,/Whole-paper typed text reader/);
+assert.match(html,/noindex,nofollow/);
+assert.match(html,/assets\/js\/pyq-bulk-reader\.js/);
+assert.match(html,/actions\/workflows\/pyq-bulk-typing\.yml/);
+assert.match(html,/no scoring of unverified source text/i);
+for(const id of ['files','paper','paperPanel','reader','sourcePage','palette','filter','jump','options','questionCaution','save']){
+ assert.match(html,new RegExp('id="'+id+'"'),'Missing reader field: '+id);
+}
+assert.match(js,/Array\.isArray\(raw\.questionCandidates\)/);
+assert.match(js,/raw\.pages/);
+assert.match(js,/pageOnly/,'Raw page fallback must be available when MCQ splitting fails');
+assert.match(js,/unverified-pdf-page-text/);
+assert.match(js,/grading:'disabled'/,'Exported responses must never be scored');
+assert.match(js,/score:null/,'No invented grade');
+assert.ok(!js.includes('innerHTML'),'External source text must never be interpreted as HTML');
+assert.ok(!js.includes("method:'POST'")&&!js.includes('XMLHttpRequest'),'Local drafts must never be uploaded');
+assert.match(read('pyq-typed-library.html'),/href="pyq-bulk-reader\.html"/);
+assert.match(read('pyq-hub.html'),/href="pyq-bulk-reader\.html"/);
+const index=JSON.parse(read('data/quizzes/pyq-yearwise-catalog.json'));
+const upsc=index.entries.find(e=>e.category==='UPSC'&&e.exam==='Civil Services Prelims'&&e.year===2026);
+assert.equal(upsc.documents.filter(d=>d.type==='paper').length,2);
+assert.ok(upsc.documents.every(d=>/^https:\/\/www\.upsc\.gov\.in\/sites\/default\/files\/QP_CSP_2026_GENERAL_STUDIES_PAPER-I{1,2}_25052026\.pdf$/.test(d.url)));
+console.log('Bulk PYQ OCR reader: entire local paper, safe options, raw-page fallback, no fabricated marks, UPSC 2026 direct sources.');

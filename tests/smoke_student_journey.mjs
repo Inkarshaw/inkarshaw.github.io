@@ -204,7 +204,7 @@ try {
   pageErrors.length = 0;
   await page.goto(origin+'/pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies',{waitUntil:'domcontentloaded'});
   await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
-  assert.equal(await page.locator('#papers .paper-choice').count(),4,'Group I 2011 and Group IV 2022/2024/2025 original paper modes load');
+  assert.equal(await page.locator('#papers .paper-choice').count(),12,'All indexed Group I and Group IV original-PDF companion modes load');
   assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
   assert.equal(await page.locator('#showBoth').getAttribute('aria-pressed'),'true','Source and answers are combined by default');
   assert.equal(await page.locator('#paperPanel').isVisible(),true,'Official original PDF visible');
@@ -994,7 +994,7 @@ try {
   pageErrors.length = 0;
   const digitizeResponse=await page.goto(origin+'/pyq-digitize.html',{waitUntil:'domcontentloaded'});
   assert.equal(digitizeResponse?.status(),200,'PYQ digitizer returns HTTP 200');
-  await page.waitForFunction(()=>document.querySelector('#paperSelect')?.options.length===3,undefined,{timeout:20000});
+  await page.waitForFunction(()=>document.querySelector('#paperSelect')?.options.length===8,undefined,{timeout:20000});
   assert.equal(await page.locator('#totalCount').innerText(),'200','Every original question has its own staged slot');
   assert.equal(await page.locator('#capturedCount').innerText(),'0','Empty draft is never counted as digitized');
   const editorStems=page.locator('#originalFields textarea');
