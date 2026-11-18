@@ -21,6 +21,31 @@ permissions:
   contents: read
 
 jobs:
+  fast-text:
+    name: Extract every selectable PDF page first (fast draft)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install fast PDF text extractor
+        run: python -m pip install --quiet pymupdf
+      - name: Validate all source links
+        run: python tests/test_pyq_bulk_pdf_to_drafts.py
+      - name: Read all PDF text layers without slow OCR
+        run: |
+          python scripts/pyq_bulk_pdf_to_drafts.py --workers 5 --timeout 40 --output data/quizzes/pyq-fast-drafts
+      - name: Upload immediate machine-text drafts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clear-exams-fast-pdf-text-drafts
+          path: data/quizzes/pyq-fast-drafts/*.json
+          retention-days: 30
+          if-no-files-found: warn
+
   extract:
     name: Convert all linked exam PDFs in one batch
     runs-on: ubuntu-latest
