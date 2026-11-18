@@ -196,7 +196,6 @@ function bulkImportText(){
  const blocked=eligible.filter(q=>!overwrite&&(records[String(q.number)].text[lang].trim()||
   ['A','B','C','D','E'].some(k=>records[String(q.number)].options[lang][k].trim()))).length;
  if(!eligible.length){$('bulkStatus').textContent='No numbered stems detected. Check for Q1. / 1) / 1. prefixes. No drafts changed.';return;}
- if(overwrite&&blocked===0&&!confirm('Replace existing '+lang+' typed text where present? This cannot be undone except from an exported backup.'))return;
  if(overwrite&&!confirm('Replace existing '+lang+' text for up to '+eligible.length+' numbered questions? Export a backup first.'))return;
  let imported=0,full=0,partial=0;
  for(const item of eligible){
