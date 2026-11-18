@@ -15,6 +15,11 @@ for(const id of ['files','paper','paperPanel','reader','sourcePage','palette','f
 }
 assert.match(js,/Array\.isArray\(raw\.questionCandidates\)/);
 assert.match(js,/ClearExamsPYQSourceSplitter/);
+assert.match(js,/ClearExamsPYQOcrOverlay/);
+assert.match(js,/ocr-recovery\//);
+assert.match(html,/pyq-source-ocr-overlay\.js/);
+assert.match(html,/id="questionPdfLink"/);
+assert.match(html,/value="missing-stem"/);
 assert.match(js,/exportQuestionDraft/);
 assert.match(js,/Printed option text not recovered/);
 assert.match(js,/provisional A.D text sets/);
