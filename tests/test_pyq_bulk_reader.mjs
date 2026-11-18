@@ -15,10 +15,15 @@ for(const id of ['files','paper','paperPanel','reader','sourcePage','palette','f
 }
 assert.match(js,/Array\.isArray\(raw\.questionCandidates\)/);
 assert.match(js,/ClearExamsPYQSourceSplitter/);
+assert.match(js,/ClearExamsPYQOcrOverlay/);
+assert.match(js,/ocr-recovery\//);
+assert.match(html,/pyq-source-ocr-overlay\.js/);
+assert.match(html,/id="questionPdfLink"/);
+assert.match(html,/value="missing-stem"/);
 assert.match(js,/exportQuestionDraft/);
 assert.match(js,/Printed option text not recovered/);
 assert.match(js,/provisional A.D text sets/);
-assert.match(read('pyq-typed-library.html'),/269 recovered question stems/);
+assert.match(read('pyq-typed-library.html'),/272 recovered question stems/);
 assert.match(js,/missing-option/);
 assert.match(js,/correctAnswer:null/);
 assert.match(html,/id="exportQuestions"/);
@@ -29,7 +34,7 @@ assert.match(js,/pyq-reader-drafts\/index\.json/);
 assert.match(js,/fetch\('data\/quizzes\/pyq-reader-drafts\//);
 assert.match(js,/raw\.grading!=='disabled'/);
 assert.match(html,/id="publishedPapers"/);
-assert.match(read('pyq-typed-library.html'),/269 recovered question stems/);
+assert.match(read('pyq-typed-library.html'),/272 recovered question stems/);
 assert.match(js,/raw\.pages/);
 assert.match(js,/pageOnly/,'Raw page fallback must be available when MCQ splitting fails');
 assert.match(js,/unverified-pdf-page-text/);
