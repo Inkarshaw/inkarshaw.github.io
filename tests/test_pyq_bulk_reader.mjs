@@ -14,6 +14,12 @@ for(const id of ['files','paper','paperPanel','reader','sourcePage','palette','f
  assert.match(html,new RegExp('id="'+id+'"'),'Missing reader field: '+id);
 }
 assert.match(js,/Array\.isArray\(raw\.questionCandidates\)/);
+assert.match(js,/loadSiteDrafts/);
+assert.match(js,/pyq-reader-drafts\/index\.json/);
+assert.match(js,/fetch\('data\/quizzes\/pyq-reader-drafts\//);
+assert.match(js,/raw\.grading!=='disabled'/);
+assert.match(html,/id="publishedPapers"/);
+assert.match(read('pyq-typed-library.html'),/typewritten PDF-page drafts available/);
 assert.match(js,/raw\.pages/);
 assert.match(js,/pageOnly/,'Raw page fallback must be available when MCQ splitting fails');
 assert.match(js,/unverified-pdf-page-text/);
