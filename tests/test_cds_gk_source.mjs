@@ -55,6 +55,18 @@ assert.equal(reviewed.stats.textStems,61);
 assert.equal(reviewed.unresolvedQuestionNumbers.length,87);
 assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,33);
 
+const repaired2019=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2019-gk.json'),'utf8'));
+assert.equal(repaired2019.stats.textStems,120);
+assert.equal(repaired2019.stats.provisionalFourOptionSets,119);
+assert.deepEqual(repaired2019.unresolvedQuestionNumbers,[62]);
+assert.match(repaired2019.questions[2].text,/Damin-i-Koh/,'Column-order repair must not replace Q3 with Q46');
+assert.match(repaired2019.questions[45].text,/United Nations multidimensional peace keeping/,'Q46 must remain correctly numbered');
+assert.ok(repaired2019.questions[8].text.includes('amending powers of the Parliament'),'Q9 must retain numbered statement text');
+assert.deepEqual(repaired2019.questions[69].options,{A:'Colombia',B:'Venezuela',C:'Brazil',D:'Guyana'});
+assert.equal(repaired2019.questions[61].extraction,'incomplete-source-visual','Do not invent unreadable vector notation in Q62');
+assert.ok('ABCD'.split('').every(l=>repaired2019.questions[61].options[l]===''));
+assert.ok(repaired2019.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+
 assert.match(fs.readFileSync(path.join(root,'pyq-cds.html'),'utf8'),/120 numbered positions per paper/);
 const js=fs.readFileSync(path.join(root,'assets','js','pyq-cds.js'),'utf8');
 assert.match(js,/correctAnswer!==null/);assert.match(js,/scoreEligible!==false/);
