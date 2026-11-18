@@ -15,7 +15,8 @@ function say(message,error=false){$('status').textContent=message;$('status').st
 function key(id){return 'ce-pyq-bulk-answers-v1:'+id}
 function normalize(raw){
  if(!raw||raw.schemaVersion!==1||!Array.isArray(raw.questionCandidates)||!Array.isArray(raw.pages))throw Error('Not a ClearExams PDF-extraction draft');
- const candidate=raw.questionCandidates;
+ const segmented=raw.questionCandidates.length?null:window.ClearExamsPYQSourceSplitter?.parse(raw);
+ const candidate=raw.questionCandidates.length?raw.questionCandidates:(segmented?.questions||[]);
  if(candidate.length>400||raw.pages.length>500)throw Error('Unusually large paper structure');
  const seen=new Set();
  const questions=candidate.filter(q=>{
@@ -25,7 +26,8 @@ function normalize(raw){
   number:q.number,text:asText(q.text),options:Object.fromEntries(letters.map(a=>[a,asText(q.options?.[a])])),
   sourcePdfPage:Number.isInteger(q.sourcePdfPage)?q.sourcePdfPage:null,
   complete:q.fourOptionsDetected===true,
-  sourceStatus:'unverified-machine-extracted',rawBlock:asText(q.rawBlock)
+  sourceStatus:asText(q.textStatus)||'unverified-machine-extracted',rawBlock:asText(q.rawBlock),
+  textRecovered:q.textRecovered!==false,issues:Array.isArray(q.issues)?q.issues.slice(0,5):[]
  })).sort((a,b)=>a.number-b.number);
  const pageOnly=!questions.length;
  if(pageOnly&&(!raw.pages.length||!raw.pages.some(p=>clean(p.text))))throw Error('This PDF has no readable text. Re-run extraction with Tamil/English OCR.');
@@ -53,15 +55,17 @@ function loadLocal(){
 function setPaper(id){
  active=bank.get(id)||null;
  $('paperPanel').hidden=!active;$('reader').hidden=!active;
- $('save').disabled=!active;$('clear').disabled=!active;
+ $('save').disabled=!active;$('clear').disabled=!active;$('exportQuestions').disabled=!active;
  if(!active)return;
  $('paperHeading').textContent=active.name;
- const counts=active.questions.reduce((o,q)=>(o.complete+=q.complete?1:0,o),{complete:0});
+ $('originalPdfLink').href=active.source||'pyq-hub.html';
+ $('originalPdfLink').textContent=active.source?'Open original official paper PDF':'See source-paper archive';
+ const counts=active.questions.reduce((o,q)=>(o.complete+=q.complete?1:0,o.recovered+=q.textRecovered?1:0,o),{complete:0,recovered:0});
  $('paperStats').textContent=active.pageOnly?
   active.pages.length+' extracted source pages (question numbers could not be parsed) · no answer scoring':
-  active.questions.length+' numbered candidates · '+counts.complete+
-   ' apparently complete A–D alternatives · '+(active.questions.length-counts.complete)+
-   ' incomplete · '+active.pages.length+' PDF source pages · no final-key scoring';
+  active.questions.length+' original-numbered question positions · '+counts.recovered+
+   ' stems machine-recovered · '+counts.complete+' apparently complete A–D option sets · '+
+   (active.questions.length-counts.complete)+' need source corrections · all ungraded';
  loadLocal();current=0;$('search').value='';$('filter').value='all';filterQuestions();
  say('Opened '+active.name+'. Text is unverified. Responses are saved only in this browser.');
 }
@@ -108,9 +112,11 @@ function render(){
  const missing=letters.slice(0,4).filter(l=>!clean(q.options[l]));
  $('questionCaution').textContent=active.pageOnly?
   'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
+  !q.textRecovered?
+  'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
   q.complete&&missing.length===0?
-  'Ungraded question: original scan, mathematical notation, option ordering and figures require review.':
-  'Incomplete machine text. Missing options: '+(missing.length?missing.join(', '):'unreliable OCR block')+'. You may inspect the original PDF; no answers are inferred.';
+  'Machine-separated question and A–D alternatives. The source wording, answer and diagrams are NOT verified or graded.':
+  'Partial question from scanned PDF. Missing labelled options: '+(missing.length?missing.join(', '):'uncertain split')+'. Source inspection is needed; no answers are inferred.';
  const page=active.pages.find(p=>p.pdfPage===q.sourcePdfPage);
  $('sourcePage').textContent=page?.text||q.rawBlock||'No source text extracted for this question';
  const total=active.questions.length;
@@ -131,6 +137,24 @@ function render(){
 function move(steps){
  const pos=shown.indexOf(current),newPos=Math.min(shown.length-1,Math.max(0,pos+steps));
  if(newPos>=0&&shown[newPos]!==undefined){current=shown[newPos];render()}
+}
+function exportQuestionDraft(){
+ if(!active)return;
+ const payload={schemaVersion:1,kind:'clearexams-numbered-machine-text-questions',
+  paperId:active.id,exam:active.name,year:active.year,officialPaperUrl:active.source,
+  verifiedOriginalText:false,officialFinalKeyMapped:false,grading:'disabled',
+  questionCount:active.questions.length,
+  questionTextRecovered:active.questions.filter(q=>q.textRecovered).length,
+  questions:active.questions.map(q=>({
+   number:q.number,question:q.text,options:q.options,sourcePdfPage:q.sourcePdfPage,
+   fourOptionsDetected:q.complete,textStatus:q.sourceStatus,
+   sourceReviewRequired:true,scoreEligible:false,correctAnswer:null,issues:q.issues||[]
+  }))};
+ const blob=new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'});
+ const url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download='clearexams-ungraded-numbered-'+active.id.replace(/[^a-z0-9-]/gi,'-')+'.json';
+ document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1200);
 }
 function exportSession(){
  if(!active)return;
@@ -234,6 +258,7 @@ $('skip').addEventListener('click',()=>{
  if(i>=0){$('filter').value='all';$('search').value='';current=i;filterQuestions()}
  else say('No later source-incomplete detected question. You can inspect the unparsed PDF pages.',false);
 });
+$('exportQuestions').addEventListener('click',exportQuestionDraft);
 $('save').addEventListener('click',exportSession);
 $('clear').addEventListener('click',()=>{
  if(!active||!confirm('Clear locally saved responses for this paper?'))return;
