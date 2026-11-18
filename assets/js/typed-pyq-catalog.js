@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
-const expectedLink=/^(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20(?:19|20|22|24|25))?$/;
+const expectedLink=/^(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20\d{2})?$/;
 let entries=[];
 
 let adapted=[], archive=[]; let archiveVisible=16;
