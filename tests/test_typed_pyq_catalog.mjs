@@ -7,7 +7,7 @@ const json=p=>JSON.parse(read(p));
 const cat=json('data/quizzes/typed-pyq-catalog.json'),html=read('pyq-typed-library.html'),js=read('assets/js/typed-pyq-catalog.js');
 assert.equal(cat.schemaVersion,1);
 assert.equal(cat.entries.length,15);
-assert.equal(new Set(cat.entries.map(e=>e.id)).size,8);
+assert.equal(new Set(cat.entries.map(e=>e.id)).size,15);
 assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),2820);
 assert.equal(cat.entries.filter(e=>e.typed===e.total).length,15,'Every published numbered text set now covers all original positions');
 const by=id=>{const e=cat.entries.find(x=>x.id===id);assert.ok(e,'Missing catalogue '+id);return e;};
