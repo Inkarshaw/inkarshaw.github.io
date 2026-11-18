@@ -153,3 +153,19 @@ Q97–Q113 were individually reviewed using the authentic TNPSC GS0811 ω source
 **Certification caveat:** All 200 original-numbered *English editorial adaptations* are present and usable; the original English/Tamil PDF is linked, but a complete **verbatim bilingual transcription has not been certified**, and this source index must not be relabelled as an authenticated verbatim digital original-paper publication.
 
 Primary paper: <https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf>; official same-series final key: <https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf>.
+
+
+## 18 November 2026 — source image recovered for all six pending Q38–Q43
+
+18 Nov 2026: official source GS0811 ω PDF page 17 (one-based; printed page 18) visually checked for Q38–Q43. All six original A–D answer-choice positions match adapted items and official final key C,D,D,B,C,A. Q38 originally says 7:13 (not 7:3 in a secondary index). Q43 text adapts rounding of 0.7353 to closest answer 0.74. All 200 source images checked; 192 typed study positions grade eligible, eight ungraded. No certified verbatim bilingual claim.
+
+| Q | Printed/source check | Final key | Status |
+| --- | --- | :---: | --- |
+| 38 | 7:13, 17:25, 7:15, 15:23 | C | Scored |
+| 39 | 60 litres milk:water = 2:1; additional water | D | Scored |
+| 40 | 3:5, subtract 9, new ratio 12:23 | D | Scored |
+| 41 | Squares sum 608; ratio 2:3:5 | B | Scored |
+| 42 | 30% A = 0.25 B = one-fifth C | C | Scored |
+| 43 | Third proportional of 0.34, 0.50; approximate 0.74 | A | Scored with rounding caution |
+
+**Current snapshot supersedes historical counts above:** 200/200 English original-numbered study adaptations; 200/200 original images inspected, 192 scores enabled and eight study-only. Unresolved Q21, Q22, Q26, Q59, Q84, Q92, Q119, Q189. No complete verbatim bilingual transcription certification. [Original TNPSC PDF, page 17](https://www.tnpsc.gov.in/Tentative/Document/08_11_2015_gk.pdf#page=17) · [Official series-matched key](https://www.tnpsc.gov.in/Document/Answerkeyfinalresult/GR_I_92K15_FIN_ANSKEY.pdf).
