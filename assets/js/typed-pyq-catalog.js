@@ -64,6 +64,7 @@ if(e.access==='login-or-limited')card.append(element('p','','Candidate login or 
 const sources=element('div','archive-links');
 for(const d of e.documents||[]){if(['paper','key'].includes(d.type))external(sources,d.url,d.label,'source-action')}
 external(sources,e.url,e.access==='login-or-limited'?'Official candidate-access notices':'Official paper archive','source-action');
+if((e.documents||[]).some(d=>d.type==='paper')){const reader=element('a','source-action','Read machine-extracted text (import JSON)');reader.href='pyq-bulk-reader.html';sources.append(reader)}
 card.append(sources);return card;
 }
 
