@@ -17,6 +17,8 @@ assert.match(js,/Array\.isArray\(raw\.questionCandidates\)/);
 assert.match(js,/ClearExamsPYQSourceSplitter/);
 assert.match(js,/exportQuestionDraft/);
 assert.match(js,/Printed option text not recovered/);
+assert.match(js,/provisional A.D text sets/);
+assert.match(read('pyq-typed-library.html'),/269 recovered question stems/);
 assert.match(js,/missing-option/);
 assert.match(js,/correctAnswer:null/);
 assert.match(html,/id="exportQuestions"/);
