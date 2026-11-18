@@ -100,23 +100,27 @@ function render(){
  $('sourceMeta').textContent=q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage:'Source page unknown';
  $('stem').textContent=q.text||'[Question text unreadable — use original source]';
  const opt=$('options');opt.replaceChildren();
- for(const l of letters){
-  const val=q.options[l];
-  if(!clean(val))continue;
-  const b=textNode('button','option','');
+ const paperLetters=/group-iv-2016/.test(active.id)?letters.slice(0,4):letters;
+ for(const l of paperLetters){
+  const val=q.options[l],readable=!!clean(val);
+  // Allow exam-style selection even if one printed alternative was lost in
+  // extraction. The button says so: it never invents its missing wording.
+  const b=textNode('button','option'+(readable?'':' missing-option'),'');
   b.type='button';b.setAttribute('aria-pressed',String(responses[q.number]===l));
-  b.append(textNode('b','',l),textNode('span','',val));
+  b.append(textNode('b','',l),textNode('span','',
+   readable?val:'[Printed option text not recovered — check official PDF]'));
   b.addEventListener('click',()=>choice(q,l));
   opt.append(b);
  }
  const missing=letters.slice(0,4).filter(l=>!clean(q.options[l]));
+ const details=q.issues?.slice(0,2).join(' ')||'';
  $('questionCaution').textContent=active.pageOnly?
   'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
   !q.textRecovered?
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
   q.complete&&missing.length===0?
-  'Machine-separated question and A–D alternatives. The source wording, answer and diagrams are NOT verified or graded.':
-  'Partial question from scanned PDF. Missing labelled options: '+(missing.length?missing.join(', '):'uncertain split')+'. Source inspection is needed; no answers are inferred.';
+  'Machine-separated question and A–D alternatives. Text is unverified and ungraded. '+details:
+  'Partial question from scanned PDF. Missing labelled options: '+(missing.length?missing.join(', '):'uncertain split')+'. Source inspection is needed; no answers are inferred. '+details;
  const page=active.pages.find(p=>p.pdfPage===q.sourcePdfPage);
  $('sourcePage').textContent=page?.text||q.rawBlock||'No source text extracted for this question';
  const total=active.questions.length;
@@ -182,7 +186,12 @@ function buildPublishedCards(entries){
  for(const entry of entries){
   const row=textNode('article','published-card','');
   row.append(textNode('strong','',entry.exam+' · '+entry.year));
-  row.append(textNode('span','muted',entry.paperName+' · '+entry.textPages+' readable PDF pages'));
+  const source=bank.get(entry.id);
+  const recovered=source?.questions?.filter(q=>q.textRecovered).length||0;
+  const complete=source?.questions?.filter(q=>q.complete).length||0;
+  row.append(textNode('span','muted',
+    recovered+' / '+(source?.questions?.length||100)+' question stems recovered · '+
+    complete+' provisional A–D text sets · '+entry.textPages+' PDF text pages · ungraded'));
   const a=textNode('a','published-link','Read typewritten page text');
   a.href='pyq-bulk-reader.html?paper='+encodeURIComponent(entry.id);
   a.addEventListener('click',event=>{

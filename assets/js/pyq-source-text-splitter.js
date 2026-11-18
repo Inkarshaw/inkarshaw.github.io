@@ -12,63 +12,94 @@ function rule(id){
  return CONFIG.find(c=>c.pattern.test(String(id||'')))||null;
 }
 function numberMarker(line,c,page){
- const trimmed=String(line||'').replace(/^[\s•·*~'-]+/u,'').trimStart();
- let m=trimmed.match(/^[.]?\s*(\d{1,3})\s*[.]\s+(.{5,})$/);
+ // Original paper question prefixes sometimes have double dots, apostrophes,
+ // commas, or backtick-like marks. Missing numbers are never invented.
+ const trimmed=String(line||'').replace(/^[\s•·*~'\x60.,-]+/u,'').trimStart();
+ let m=trimmed.match(/^(\d{1,3})\s*[.,'\x60·:]{1,3}\s*(.{5,})$/);
  if(!m&&page===1&&c.from===101){
-  m=trimmed.match(/^IO\s*1\s*[.]\s+(.{5,})$/i);
-  if(m)return {number:101,stem:m[1].trim(),normalized:'IO 1. -> 101. (OCR suspected)'};
+  m=trimmed.match(/^IO\s*1\s*[.]\s*(.{5,})$/i);
+  if(m)return {number:101,stem:m[1].trim(),normalized:'IO 1. -> 101. (OCR-number normalization)'};
+ }
+ if(!m&&c.from===101){
+  // A maths expression can precede the next printed question on one PDF text line.
+  const inline=trimmed.match(/^.{8,140}?\s{3,}(\d{3})\s*[.]\s+(.{8,})$/);
+  if(inline&&/[\d)\/%^+\-=]/.test(trimmed.slice(0,trimmed.indexOf(inline[1]))))
+   return {number:Number(inline[1]),stem:inline[2].trim(),
+    normalized:'Question number appeared after previous maths on same OCR line; visual review required'};
  }
  if(!m)return null;
  const n=Number(m[1]);
  if(n<c.from||n>c.to)return null;
  return {number:n,stem:m[2].trim()};
 }
+function optionMarkers(text){
+ // Detect explicitly printed A-E alternatives. Some source scans print B as 8.
+ // Never infer other obscured option labels from a guessed ordering.
+ const regex=/(?:^[ \t]*|[ \t]{2,})(?:\(([A-Ea-e8])\)|([A-Ea-e])[).])(?:[ \t]+|(?=\S))/gm;
+ const result=[];
+ for(const match of text.matchAll(regex)){
+  const raw=(match[1]||match[2]),letter=raw==='8'?'B':raw.toUpperCase();
+  result.push({letter,start:match.index,end:match.index+match[0].length,
+   normalized:raw==='8',original:raw});
+ }
+ return result;
+}
 function optionsAndStem(lines){
- const stem=[],options={A:'',B:'',C:'',D:'',E:''};
- const issues=[],found=new Set();
- let active=null,stopped=false;
- function append(target,part){
-  const value=String(part||'').trim();
-  if(!value)return;
-  if(target&&options[target])options[target]+='\n'+value;
-  else if(target)options[target]=value;
-  else stem.push(value);
- }
- for(const original of lines){
-  if(stopped)break;
-  const line=String(original||'').replace(/\r/g,'').trim();
-  if(!line)continue;
-  if(/^CCS2E\/2022|^GRFT3\b|SPACE FOR ROUGH WORK/i.test(line)&&active)break;
-  // An OCR scan that reads (B) as (8) is not corrected.
-  const regex=/(?:^|[\s])(?:\(([A-E])\)|([A-E])\s*[).])(?:[ \t]+|(?=\S))/g;
-  const markers=[...line.matchAll(regex)].map(m=>({
-   letter:m[1]||m[2],start:m.index,after:m.index+m[0].length
-  }));
-  if(!markers.length){
-   if(active){
-    if(/^[§©®\u0b80-\u0bff]/u.test(line)&&found.has('D'))break;
-    append(active,line);
-   }else stem.push(line);
-   continue;
+ const raw=lines.join('\n').replace(/\r/g,'');
+ const marks=optionMarkers(raw);
+ const empty={A:'',B:'',C:'',D:'',E:''};
+ if(!marks.length)return {text:raw.trim().slice(0,2400),options:empty,
+  fourOptionsDetected:false,detectedOptions:[],normalizedLabels:[],
+  alternativeGroups:0,issues:['No printed option labels were machine-detected.']};
+ const groups=[];
+ let group=null;
+ const flush=()=>{if(group&&group.marks.length)groups.push(group);group=null};
+ for(const mark of marks){
+  if(!group)group={marks:[],letters:new Set()};
+  // Original Tamil/English documents repeat A-E in translated answer rows.
+  // Avoid concatenating multiple alternate language copies as one set.
+  if(group.letters.has(mark.letter)||
+     (mark.letter==='A'&&group.marks.length>=2&&group.letters.has('C'))||
+     (group.letters.has('E')&&mark.letter!=='E')){
+   flush();group={marks:[],letters:new Set()};
   }
-  if(markers[0].start>0)append(active,line.slice(0,markers[0].start));
-  for(let i=0;i<markers.length;i++){
-   const marker=markers[i],letter=marker.letter;
-   if(found.has(letter)){
-    issues.push('Repeated printed '+letter+' option label, possibly bilingual text or OCR.');
-    stopped=true;break;
+  group.marks.push(mark);group.letters.add(mark.letter);
+ }
+ flush();
+ function pack(group){
+  const options={A:'',B:'',C:'',D:'',E:''};
+  const normalized=[];
+  for(let i=0;i<group.marks.length;i++){
+   const marker=group.marks[i],after=group.marks[i+1]?.start??raw.length;
+   let value=raw.slice(marker.end,after).trim()
+    .replace(/\n[ \t]*(?:CCS2E\/2022|GRFT3|SPACE FOR ROUGH WORK)[^\n]*/i,'')
+    .trim();
+   if(marker.letter==='E'){
+    const match=value.match(/^.{0,120}?\banswer\s*(?:not\s*)?(?:known|kno|finown|knotwn)[^\n]*/i);
+    if(match)value=match[0];
    }
-   found.add(letter);active=letter;
-   const right=i+1<markers.length?markers[i+1].start:line.length;
-   append(letter,line.slice(marker.after,right));
+   options[marker.letter]=value.slice(0,900);
+   if(marker.normalized)normalized.push(marker.letter);
   }
-  if(found.has('E')&&/answer\s+not\s+(?:known|kno)/i.test(options.E))break;
+  const coverage='ABCD'.split('').filter(l=>options[l].length>=2).length;
+  const english=Object.values(options).join(' ').match(/[a-zA-Z]{3,}/g)?.length||0;
+  // Earlier groups often present English before the Tamil translation.
+  const score=coverage*30+Math.min(english,20)-group.marks[0].start/raw.length*12;
+  return {options,normalized,coverage,score};
  }
- const question=stem.join('\n').trim().slice(0,2400);
- for(const l of LETTERS)options[l]=options[l].trim().slice(0,900);
- const hasFour=question.length>=8&&LETTERS.slice(0,4).every(x=>options[x].length>=2)&&!issues.length;
- return {text:question,options,fourOptionsDetected:hasFour,
-  detectedOptions:LETTERS.filter(l=>!!options[l]),issues};
+ const variants=groups.map(pack);
+ const best=variants.reduce((prev,cur)=>!prev||cur.score>prev.score?cur:prev,null);
+ let stem=raw.slice(0,marks[0].start).trim();
+ stem=stem.replace(/[ \t]{5,}/g,' ').slice(0,2400).trim();
+ const issues=[];
+ if(best.normalized.length)issues.push('OCR printed option "(8)" mapped to "(B)"; check original PDF');
+ if(variants.length>1)issues.push('Multiple English/Tamil option groups found; a source group was selected');
+ const all=LETTERS.filter(l=>best.options[l].length>=2);
+ const complete=stem.length>=8&&'ABCD'.split('').every(l=>all.includes(l));
+ if(!complete)issues.push('One or more printed A-D alternatives were not recoverable');
+ return {text:stem,options:best.options,
+  fourOptionsDetected:complete,detectedOptions:all,
+  normalizedLabels:best.normalized,alternativeGroups:variants.length-1,issues};
 }
 function parse(draft){
  if(!draft||!Array.isArray(draft.pages))return null;
