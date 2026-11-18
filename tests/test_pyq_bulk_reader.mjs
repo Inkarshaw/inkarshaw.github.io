@@ -29,7 +29,7 @@ assert.match(js,/pyq-reader-drafts\/index\.json/);
 assert.match(js,/fetch\('data\/quizzes\/pyq-reader-drafts\//);
 assert.match(js,/raw\.grading!=='disabled'/);
 assert.match(html,/id="publishedPapers"/);
-assert.match(read('pyq-typed-library.html'),/typewritten PDF-page drafts available/);
+assert.match(read('pyq-typed-library.html'),/269 recovered question stems/);
 assert.match(js,/raw\.pages/);
 assert.match(js,/pageOnly/,'Raw page fallback must be available when MCQ splitting fails');
 assert.match(js,/unverified-pdf-page-text/);
