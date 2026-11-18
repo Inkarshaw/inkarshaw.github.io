@@ -204,7 +204,7 @@ try {
   pageErrors.length = 0;
   await page.goto(origin+'/pyq-original-paper.html?paper=tnpsc-group-iv-2024-general-tamil-general-studies',{waitUntil:'domcontentloaded'});
   await page.locator('#answerSheet').waitFor({state:'visible',timeout:20000});
-  assert.equal(await page.locator('#papers .paper-choice').count(),4,'Group I 2011 and Group IV 2022/2024/2025 original paper modes load');
+  assert.equal(await page.locator('#papers .paper-choice').count(),12,'All indexed Group I and Group IV original-PDF companion modes load');
   assert.match(await page.locator('#count').innerText(),/200 original numbered questions/);
   assert.equal(await page.locator('#showBoth').getAttribute('aria-pressed'),'true','Source and answers are combined by default');
   assert.equal(await page.locator('#paperPanel').isVisible(),true,'Official original PDF visible');
