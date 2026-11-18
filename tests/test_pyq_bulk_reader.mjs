@@ -14,6 +14,12 @@ for(const id of ['files','paper','paperPanel','reader','sourcePage','palette','f
  assert.match(html,new RegExp('id="'+id+'"'),'Missing reader field: '+id);
 }
 assert.match(js,/Array\.isArray\(raw\.questionCandidates\)/);
+assert.match(js,/ClearExamsPYQSourceSplitter/);
+assert.match(js,/exportQuestionDraft/);
+assert.match(js,/correctAnswer:null/);
+assert.match(html,/id="exportQuestions"/);
+assert.match(html,/pyq-source-text-splitter\.js/);
+assert.match(html,/id="originalPdfLink"/);
 assert.match(js,/loadSiteDrafts/);
 assert.match(js,/pyq-reader-drafts\/index\.json/);
 assert.match(js,/fetch\('data\/quizzes\/pyq-reader-drafts\//);
