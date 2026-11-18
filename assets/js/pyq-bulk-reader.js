@@ -5,6 +5,8 @@ const $=id=>document.getElementById(id);
 const MAX_FILE=45*1024*1024;
 const letters=['A','B','C','D','E'];
 const bank=new Map();
+const published=new Map();
+let selectedPublished='';
 let active=null,current=0,shown=[],responses={};
 const asText=x=>typeof x==='string'?x:'';
 const clean=x=>asText(x).trim();
@@ -141,6 +143,68 @@ function exportSession(){
  a.download='pyq-ungraded-responses-'+active.id.replace(/[^a-z0-9-]/gi,'-')+'.json';
  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
+
+function populateSelect(preferred=''){
+ const sel=$('paper');sel.replaceChildren();
+ if(!bank.size){const opt=document.createElement('option');opt.value='';opt.textContent='No papers loaded';sel.append(opt);return}
+ for(const p of bank.values()){
+  const opt=document.createElement('option');opt.value=p.id;opt.textContent=p.name;sel.append(opt);
+ }
+ if(preferred&&bank.has(preferred))sel.value=preferred;
+}
+function buildPublishedCards(entries){
+ const box=$('publishedPapers');box.replaceChildren();
+ if(!entries.length){box.append(textNode('p','muted','No preloaded text papers are available. You can import a JSON file.'));return}
+ for(const entry of entries){
+  const row=textNode('article','published-card','');
+  row.append(textNode('strong','',entry.exam+' · '+entry.year));
+  row.append(textNode('span','muted',entry.paperName+' · '+entry.textPages+' readable PDF pages'));
+  const a=textNode('a','published-link','Read typewritten page text');
+  a.href='pyq-bulk-reader.html?paper='+encodeURIComponent(entry.id);
+  a.addEventListener('click',event=>{
+   if(!bank.has(entry.id))return;
+   event.preventDefault();$('paper').value=entry.id;setPaper(entry.id);
+   history.replaceState(null,'','?paper='+encodeURIComponent(entry.id));
+  });
+  row.append(a);box.append(row);
+ }
+}
+async function loadSiteDrafts(){
+ try{
+  const response=await fetch('data/quizzes/pyq-reader-drafts/index.json',{cache:'no-store'});
+  if(!response.ok)throw Error('Published source-text drafts not uploaded yet');
+  const index=await response.json();
+  if(index?.schemaVersion!==1||index.draftOnly!==true||index.gradingEnabled!==false||!Array.isArray(index.entries))
+   throw Error('Published source index has incorrect provenance');
+  const valid=index.entries.filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
+    typeof e.file==='string'&&e.file===e.id+'.json'&&Number.isInteger(e.textPages)&&e.textPages>0).slice(0,30);
+  const files=await Promise.allSettled(valid.map(async entry=>{
+   const r=await fetch('data/quizzes/pyq-reader-drafts/'+entry.file,{cache:'no-store'});
+   if(!r.ok)throw Error('Missing text source '+entry.file);
+   const raw=await r.json();
+   if(raw.id!==entry.id||raw.draftOnly!==true||raw.grading!=='disabled'||raw.officialFinalKeyMapped!==false)
+    throw Error('Unverified source metadata mismatch');
+   return {entry,paper:normalize(raw)};
+  }));
+  const loaded=[];
+  for(const file of files){
+   if(file.status!=='fulfilled')continue;
+   bank.set(file.value.paper.id,file.value.paper);
+   published.set(file.value.paper.id,file.value.entry);
+   loaded.push(file.value.entry);
+  }
+  buildPublishedCards(loaded);
+  const requested=new URLSearchParams(location.search).get('paper')||'';
+  const keep=bank.has(requested)?requested:bank.keys().next().value;
+  populateSelect(keep);
+  if(keep)setPaper(keep);
+  say(loaded.length+' ungraded typewritten paper drafts loaded directly from ClearExams. No file upload is required.');
+ }catch(error){
+  buildPublishedCards([]);
+  say('Published paper text is not available yet. Use the JSON file importer or an existing playable PYQ quiz. '+error.message,true);
+ }
+}
+
 $('files').addEventListener('change',async e=>{
  let loaded=0,failed=0;
  for(const file of [...e.target.files].slice(0,80)){
@@ -148,9 +212,9 @@ $('files').addEventListener('change',async e=>{
   try{const d=normalize(JSON.parse(await file.text()));bank.set(d.id,d);loaded++}
   catch{failed++}
  }
- const select=$('paper');select.replaceChildren();
- for(const p of bank.values()){const opt=document.createElement('option');opt.value=p.id;opt.textContent=p.name;select.append(opt)}
- if(bank.size){setPaper(select.value||bank.keys().next().value)}
+ const currentId=active?.id;
+ populateSelect(currentId||bank.keys().next().value);
+ if(bank.size){setPaper($('paper').value||bank.keys().next().value)}
  say(loaded+' paper text drafts imported locally. '+failed+' files rejected. No questions were uploaded or graded.',failed>0);
  e.target.value='';
 });
@@ -175,4 +239,5 @@ $('clear').addEventListener('click',()=>{
  if(!active||!confirm('Clear locally saved responses for this paper?'))return;
  responses={};saveLocal();filterQuestions();
 });
+loadSiteDrafts();
 })();

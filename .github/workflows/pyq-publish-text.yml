@@ -1,0 +1,63 @@
+name: Publish extracted PYQ text drafts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/build_pyq_fast_reader_drafts.py
+      - .github/workflows/pyq-publish-text.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  publish:
+    name: Load recovered typewritten PYQ source text into ClearExams
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download recovered source PDF text from completed extraction artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p /tmp/pyq-fast-drafts
+          gh run download 44250158513 --repo "$GITHUB_REPOSITORY" --name clear-exams-fast-pdf-text-drafts --dir /tmp/pyq-fast-drafts
+          test -s /tmp/pyq-fast-drafts/index.json
+      - name: Publish every sufficiently readable paper as ungraded selectable page text
+        run: |
+          python tests/test_pyq_fast_reader_drafts.py
+          python scripts/build_pyq_fast_reader_drafts.py --input /tmp/pyq-fast-drafts --output data/quizzes/pyq-reader-drafts --min-readable-pages 10
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          idx=json.loads(Path('data/quizzes/pyq-reader-drafts/index.json').read_text())
+          assert idx['availablePapers']>=3, f"Only {idx['availablePapers']} readable papers found"
+          assert all(x['status']=='machine-extracted-page-text-unverified' for x in idx['entries'])
+          print('Ready to load onto the site:', [(x['exam'],x['year'],x['textPages']) for x in idx['entries']])
+          PY
+      - name: Commit recovered page-text JSONs to public ClearExams site
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f data/quizzes/pyq-reader-drafts/index.json data/quizzes/pyq-reader-drafts/*.json
+          if git diff --cached --quiet; then
+            echo "No changes to machine-extracted source drafts"
+          else
+            git commit -m 'Load TNPSC 2022 Group II and 2016 Group IV ungraded typewritten papers [skip ci]'
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
+      - name: Deploy newly loaded typewritten pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run jekyll-gh-pages.yml --repo "$GITHUB_REPOSITORY" --ref main

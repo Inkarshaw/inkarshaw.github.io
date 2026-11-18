@@ -53,6 +53,10 @@ summary{cursor:pointer;font-weight:720}
 pre{font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;padding:14px;border:1px solid var(--line);background:#f8fafc;border-radius:9px}
 .answer-count{font-weight:720;color:#155d76}
 #status{min-height:25px}
+.published-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:10px}
+.published-card{border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:6px;background:#fafcff}
+.published-card .muted{display:block}
+.published-link{display:inline-flex;align-self:start;margin-top:6px;background:#195bd3;color:#fff;text-decoration:none;padding:9px 12px;border-radius:9px;font-weight:760;font-size:.89rem}
 @media(max-width:860px){.layout{grid-template-columns:1fr}.side{order:-1}.palette{max-height:115px;grid-template-columns:repeat(10,minmax(0,1fr))}.panel{padding:14px}}
 </style>
 </head>
@@ -66,9 +70,14 @@ pre{font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow
 <section class="hero"><div class="wrap"><h1>Whole-paper typed text reader</h1>
 <p>Open every question from a PDF-extraction JSON in a single selectable text session. No batches of 25 questions, no made-up answers, and no scoring of unverified source text.</p></div></section>
 <main class="wrap">
+<section class="panel" aria-labelledby="publishedHeading">
+<h2 id="publishedHeading">Ready to read on ClearExams</h2>
+<p class="muted">These are machine-extracted typewritten PDF-page drafts. Choose a paper below to read its available text directly on the site. Some page layouts, question numbers, Tamil text and diagrams need correction; this is not a verified full MCQ paper.</p>
+<div id="publishedPapers" class="published-grid" aria-live="polite"><p class="muted">Loading available typewritten papers…</p></div>
+</section>
 <section class="panel" aria-labelledby="importHeading">
 <h2 id="importHeading">Open bulk-extracted exam papers</h2>
-<p class="muted">Download <a href="https://github.com/Inkarshaw/inkarshaw.github.io/actions/workflows/pyq-bulk-typing.yml" target="_blank" rel="noopener noreferrer">the latest bulk-extraction artifact from GitHub Actions</a>, unzip it, and select its paper JSON files here. Files are read only in your browser; no questions or answers are uploaded.</p>
+<p class="muted">Papers loaded above open directly from ClearExams. To add another extracted paper, you may also <a href="https://github.com/Inkarshaw/inkarshaw.github.io/actions/workflows/pyq-bulk-typing.yml" target="_blank" rel="noopener noreferrer">download the bulk-extraction artifact from GitHub Actions</a>, unzip it and select its JSON files here. Manually imported files remain local to your browser.</p>
 <div class="toolbar">
 <div style="flex:2 1 280px"><label for="files">Select paper JSON files (multiple allowed)</label><input id="files" type="file" accept=".json,application/json" multiple></div>
 <div><label for="paper">Exam paper</label><select id="paper"><option value="">Choose imported paper</option></select></div>
