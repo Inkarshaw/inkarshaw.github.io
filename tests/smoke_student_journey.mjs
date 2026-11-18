@@ -994,7 +994,7 @@ try {
   pageErrors.length = 0;
   const digitizeResponse=await page.goto(origin+'/pyq-digitize.html',{waitUntil:'domcontentloaded'});
   assert.equal(digitizeResponse?.status(),200,'PYQ digitizer returns HTTP 200');
-  await page.waitForFunction(()=>document.querySelector('#paperSelect')?.options.length===3,undefined,{timeout:20000});
+  await page.waitForFunction(()=>document.querySelector('#paperSelect')?.options.length===8,undefined,{timeout:20000});
   assert.equal(await page.locator('#totalCount').innerText(),'200','Every original question has its own staged slot');
   assert.equal(await page.locator('#capturedCount').innerText(),'0','Empty draft is never counted as digitized');
   const editorStems=page.locator('#originalFields textarea');
