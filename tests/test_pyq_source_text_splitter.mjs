@@ -51,11 +51,12 @@ assert.equal(result.grading,'disabled');
 assert.equal(result.verifiedOriginalText,false);
 assert.equal(api.parse({id:'unrecognized',pages:[]}),null);
 const sources=[
- ['tnpsc-group-ii-iia-2022-general-english-ccs2e-2022-answer-key-opt-a4ab2eb8',1,100,45],
- ['tnpsc-group-ii-iia-2022-general-studies-ccs2e-2022-answer-key-opt-5aaa9a34',101,200,55],
- ['tnpsc-group-iv-2016-06-11-2016-g4-gs-3a616959',101,200,65]
+ ['tnpsc-group-ii-iia-2022-general-english-ccs2e-2022-answer-key-opt-a4ab2eb8',1,100,80,1,70],
+ ['tnpsc-group-ii-iia-2022-general-studies-ccs2e-2022-answer-key-opt-5aaa9a34',101,200,93,25,90],
+ ['tnpsc-group-iv-2016-06-11-2016-g4-gs-3a616959',101,200,96,59,95]
 ];
-for(const [id,from,to,minRecovered] of sources){
+let totals={stems:0,complete:0,optionPairs:0};
+for(const [id,from,to,minRecovered,minComplete,minPairs] of sources){
  const original=JSON.parse(read('data/quizzes/pyq-reader-drafts/'+id+'.json'));
  const parsed=api.parse(original);
  assert.ok(parsed,'Expected exact source paper '+id);
@@ -64,6 +65,11 @@ for(const [id,from,to,minRecovered] of sources){
  assert.equal(parsed.questions[99].number,to);
  assert.ok(parsed.stats.recoveredStems>=minRecovered,id+' recovers too few question stems: '+parsed.stats.recoveredStems);
  assert.ok(parsed.stats.recoveredStems<=100);
+ assert.ok(parsed.stats.aToDOptionSets>=minComplete,id+' complete printed option sets dropped');
+ assert.ok(parsed.stats.atLeastTwoOptions>=minPairs,id+' at-least-two printed options dropped');
+ totals.stems+=parsed.stats.recoveredStems;
+ totals.complete+=parsed.stats.aToDOptionSets;
+ totals.optionPairs+=parsed.stats.atLeastTwoOptions;
  assert.ok(parsed.stats.aToDOptionSets<=parsed.stats.recoveredStems);
  assert.equal(parsed.stats.numberedPositions,100);
  assert.equal(parsed.stats.recoveredStems+parsed.stats.missingStems.length,100);
@@ -71,4 +77,7 @@ for(const [id,from,to,minRecovered] of sources){
  assert.ok(parsed.questions.every(q=>q.options&&Object.keys(q.options).join(',')==='A,B,C,D,E'));
  console.log(id, 'stems',parsed.stats.recoveredStems,'complete A-D',parsed.stats.aToDOptionSets,'at least 2 options',parsed.stats.atLeastTwoOptions);
 }
+assert.equal(totals.stems,269,'All real-data recovered stems must be reported accurately');
+assert.equal(totals.complete,85,'Provisional A–D labelled sets must not be misstated');
+assert.equal(totals.optionPairs,259,'Detected printed alternative pairs must not be misstated');
 console.log('PASS: 300 original-numbered question slots, explicit missing text, no inferred keys, ungraded structured export.');
