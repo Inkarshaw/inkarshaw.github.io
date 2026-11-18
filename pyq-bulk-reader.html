@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#08213d">
+<title>Bulk PYQ Typed Draft Reader | ClearExams</title>
+<meta name="description" content="Read whole-paper PDF text extraction drafts as selectable, ungraded MCQs; keep source uncertainty visible.">
+<style>
+:root{--navy:#092440;--blue:#195bd3;--ink:#172d43;--sub:#526b80;--bg:#f4f7fc;--line:#d7e3f1;--warn:#98620c}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+a{color:#1754aa}
+button,input,select{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #87b5fc;outline-offset:3px}
+header{background:var(--navy);color:white}
+.wrap{width:min(1150px,calc(100% - 28px));margin:0 auto}
+header .wrap{display:flex;gap:19px;align-items:center;flex-wrap:wrap;min-height:68px;padding:10px 0}
+header a{color:white;font-weight:730;text-decoration:none;font-size:.9rem}
+header a.brand{font-size:1.22rem;font-weight:900;margin-right:auto}
+.hero{background:linear-gradient(110deg,#092440,#205f9b);padding:34px 0;color:white}
+.hero h1{font-size:clamp(1.85rem,4.4vw,2.8rem);margin:0 0 9px}
+.hero p{margin:0;max-width:850px;color:#e0edfe}
+main{padding:20px 0 65px}
+.panel{background:#fff;border:1px solid var(--line);padding:19px;border-radius:15px;margin-bottom:16px}
+label{display:block;font-size:.84rem;font-weight:780;margin:0 0 5px}
+input[type=file],input[type=search],input[type=number],select{background:white;border:1px solid #b9c9dd;border-radius:9px;padding:10px;min-width:0;max-width:100%;width:100%;color:var(--ink)}
+button,.action{background:#fff;color:#164f9d;border:1px solid #bdd2ed;padding:10px 13px;border-radius:9px;font-weight:740;cursor:pointer}
+button.primary{background:var(--blue);border-color:var(--blue);color:white}
+button:disabled{opacity:.4;cursor:default}
+.toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.toolbar>*{min-width:0;flex:1 1 150px}
+.toolbar .actions{display:flex;gap:7px;flex:0 1 auto}
+.notice{font-size:.87rem;color:#6c4c16;background:#fff9ed;border:1px solid #efd49e;padding:11px 13px;border-radius:10px;margin:12px 0}
+.muted{font-size:.86rem;color:var(--sub)}
+.layout{display:grid;grid-template-columns:1fr 290px;gap:14px;align-items:start}
+.question{font-size:1.12rem;white-space:pre-wrap;overflow-wrap:anywhere;margin:17px 0}
+.option{display:flex;gap:12px;width:100%;text-align:left;align-items:start;background:#fff;border:1px solid #bed0e5;padding:13px;margin:8px 0;cursor:pointer}
+.option b{color:#1558a6;flex:0 0 20px}
+.option[aria-pressed=true]{background:#e8f1ff;border-color:#1a65db;box-shadow:inset 0 0 0 1px #1a65db}
+.option:disabled{opacity:.6}
+.progress{height:8px;border-radius:10px;overflow:hidden;background:#e5ecf5;margin:10px 0}
+.progress>div{height:100%;width:0;background:#2376bd}
+.palette{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;max-height:410px;overflow:auto}
+.palette button{padding:8px 2px;min-width:0;font-size:.83rem}
+.palette button.active{outline:2px solid #1c6dd8}
+.palette button.answered{background:#e4f5ec;color:#156c49}
+.palette button.incomplete{border-color:#d6aa58;color:#7e561d}
+details{margin-top:16px}
+summary{cursor:pointer;font-weight:720}
+pre{font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;padding:14px;border:1px solid var(--line);background:#f8fafc;border-radius:9px}
+.answer-count{font-weight:720;color:#155d76}
+#status{min-height:25px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.side{order:-1}.palette{max-height:115px;grid-template-columns:repeat(10,minmax(0,1fr))}.panel{padding:14px}}
+</style>
+</head>
+<body>
+<header><nav class="wrap" aria-label="Main navigation">
+<a class="brand" href="index.html">ClearExams.</a>
+<a href="pyq-typed-library.html">PYQ text library</a>
+<a href="pyq-digitize.html">Bulk transcription editor</a>
+<a href="pyq-hub.html">PYQ archive</a>
+</nav></header>
+<section class="hero"><div class="wrap"><h1>Whole-paper typed text reader</h1>
+<p>Open every question from a PDF-extraction JSON in a single selectable text session. No batches of 25 questions, no made-up answers, and no scoring of unverified source text.</p></div></section>
+<main class="wrap">
+<section class="panel" aria-labelledby="importHeading">
+<h2 id="importHeading">Open bulk-extracted exam papers</h2>
+<p class="muted">Download <a href="https://github.com/Inkarshaw/inkarshaw.github.io/actions/workflows/pyq-bulk-typing.yml" target="_blank" rel="noopener noreferrer">the latest bulk-extraction artifact from GitHub Actions</a>, unzip it, and select its paper JSON files here. Files are read only in your browser; no questions or answers are uploaded.</p>
+<div class="toolbar">
+<div style="flex:2 1 280px"><label for="files">Select paper JSON files (multiple allowed)</label><input id="files" type="file" accept=".json,application/json" multiple></div>
+<div><label for="paper">Exam paper</label><select id="paper"><option value="">Choose imported paper</option></select></div>
+<div class="actions"><button type="button" id="save" disabled>Export responses</button><button type="button" id="clear" disabled>Clear responses</button></div>
+</div>
+<p id="status" role="status" aria-live="polite" class="muted">No machine-text drafts loaded. Existing published text quizzes are available in the PYQ library.</p>
+<div class="notice"><strong>Source review pending:</strong> OCR or PDF text extraction may misread Tamil, English, mathematical expressions, option order, or figures. Blank and incomplete questions remain visible and are not treated as answered correctly. This is a private study reader, not a verified verbatim paper.</div>
+</section>
+<section class="panel" id="paperPanel" hidden>
+<h2 id="paperHeading">Paper details</h2>
+<p id="paperStats" class="muted"></p>
+<div class="toolbar">
+<div><label for="filter">Question filter</label><select id="filter"><option value="all">All detected questions</option><option value="complete">Complete A–D detected</option><option value="incomplete">Needs transcription</option><option value="unanswered">Not answered yet</option></select></div>
+<div style="flex:2 1 280px"><label for="search">Search this paper</label><input id="search" type="search" placeholder="Find text or question number"></div>
+<div><label for="jump">Jump to question number</label><input id="jump" type="number" min="1" max="400" placeholder="Q number"></div>
+<div class="actions"><button type="button" id="go">Go</button></div>
+</div>
+<p id="filtered" class="muted" aria-live="polite"></p>
+<div class="progress"><div id="meter"></div></div>
+</section>
+<div class="layout" id="reader" hidden>
+<section class="panel">
+<div class="toolbar"><strong id="position">Question</strong><span class="muted" id="sourceMeta"></span></div>
+<div class="question" id="stem"></div>
+<div id="options" role="group" aria-label="Select your response"></div>
+<p id="questionCaution" class="notice"></p>
+<div class="toolbar" style="margin-top:14px"><div class="actions"><button id="prev" type="button">Previous</button><button id="next" type="button" class="primary">Next</button><button id="skip" type="button">Next incomplete</button></div><span id="answerProgress" class="muted"></span></div>
+<details><summary>Source page text (including unparsed lines)</summary>
+<p class="muted">Preserved text is displayed for comparison; original PDF should be consulted for exact diagrams and layouts.</p><pre id="sourcePage"></pre></details>
+</section>
+<aside class="panel side"><h2 style="margin-top:0">Question palette</h2><p class="muted">Green = answered, gold = incomplete source.</p><div class="palette" id="palette"></div></aside>
+</div>
+</main>
+<script src="assets/js/pyq-bulk-reader.js"></script>
+</body></html>
