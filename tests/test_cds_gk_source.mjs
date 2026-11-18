@@ -29,6 +29,32 @@ for(const entry of idx.paperStatuses){
  stems+=entry.textStems;options+=entry.provisionalFourOptionSets;
 }
 assert.equal(scans,7);assert.equal(idx.paperStatuses.length-scans,9);
+const reviewed=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2019-gk.json'),'utf8'));
+assert.deepEqual(reviewed.questions.slice(0,27).map(q=>q.number),Array.from({length:27},(_,i)=>i+1));
+for(const q of reviewed.questions.slice(0,27)){
+ assert.equal(q.extraction,'provisional-four-options','Source-checked question should have all four printed alternatives');
+ assert.equal(q.sourceMethod,'manual-uploaded-scan-transcription-unverified');
+ assert.ok(q.text.length>17);
+ assert.equal(q.correctAnswer,null);
+ assert.equal(q.scoreEligible,false);
+ assert.equal(q.ungraded,true);
+ assert.equal(q.issues.some(x=>/answer key/i.test(x)),true);
+ assert.equal(q.sourcePages.length,1);
+ assert.equal(q.sourcePages[0],q.number<=7?3:q.number<=13?5:q.number<=20?7:9);
+ assert.ok('ABCD'.split('').every(l=>q.options[l].trim().length>0));
+}
+assert.match(reviewed.questions[0].text,/motto of NCC/);
+assert.equal(reviewed.questions[0].options.A,'Unity and Discipline');
+assert.match(reviewed.questions[7].text,/National Institute of Ayurveda/,'Matching alternatives must retain list definitions');
+assert.match(reviewed.questions[8].text,/National Investment Promotion and Facilitation Agency/);
+assert.match(reviewed.questions[12].text,/Italian Open Women/);
+assert.match(reviewed.questions[20].text,/Vernacular Press Act/);
+assert.match(reviewed.questions[26].text,/Mediterranean climate/);
+assert.equal(reviewed.stats.provisionalFourOptionSets,33);
+assert.equal(reviewed.stats.textStems,61);
+assert.equal(reviewed.unresolvedQuestionNumbers.length,87);
+assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,33);
+
 assert.match(fs.readFileSync(path.join(root,'pyq-cds.html'),'utf8'),/120 numbered positions per paper/);
 const js=fs.readFileSync(path.join(root,'assets','js','pyq-cds.js'),'utf8');
 assert.match(js,/correctAnswer!==null/);assert.match(js,/scoreEligible!==false/);
