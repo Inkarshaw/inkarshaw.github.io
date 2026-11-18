@@ -340,6 +340,7 @@ Promise.all([
   if(!papers.length)throw Error('No supported source papers found');
   const requested=new URLSearchParams(location.search).get('paper');
   select.value=papers.some(p=>p.id===requested)?requested:
+    papers.some(p=>p.id==='tnpsc-group-iv-2024-general-tamil-general-studies')?'tnpsc-group-iv-2024-general-tamil-general-studies':
     papers.some(p=>p.year===2024)?papers.find(p=>p.year===2024).id:papers[0].id;
   paperChanged();
 }).catch(err=>notice('Workbench cannot load source metadata: '+err.message,true));
