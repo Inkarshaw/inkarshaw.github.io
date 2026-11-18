@@ -24,6 +24,7 @@ permissions:
 
 jobs:
   fast-text:
+    if: github.event_name == 'workflow_dispatch'
     name: Extract and publish readable PDF text drafts
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -78,6 +79,7 @@ jobs:
           if-no-files-found: warn
 
   extract:
+    if: github.event_name == 'workflow_dispatch' && inputs.ocr == true
     name: Convert all linked exam PDFs in one batch
     runs-on: ubuntu-latest
     timeout-minutes: 120
