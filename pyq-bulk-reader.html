@@ -68,11 +68,11 @@ pre{font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow
 <a href="pyq-hub.html">PYQ archive</a>
 </nav></header>
 <section class="hero"><div class="wrap"><h1>Whole-paper typed text reader</h1>
-<p>Open every question from a PDF-extraction JSON in a single selectable text session. No batches of 25 questions, no made-up answers, and no scoring of unverified source text.</p></div></section>
+<p>Browse all original-numbered question positions in the three recovered TNPSC papers, with machine-separated stems and available A–D options. Unreadable text stays flagged; answers remain ungraded.</p></div></section>
 <main class="wrap">
 <section class="panel" aria-labelledby="publishedHeading">
 <h2 id="publishedHeading">Ready to read on ClearExams</h2>
-<p class="muted">These are machine-extracted typewritten PDF-page drafts. Choose a paper below to read its available text directly on the site. Some page layouts, question numbers, Tamil text and diagrams need correction; this is not a verified full MCQ paper.</p>
+<p class="muted">Open a paper directly for original-numbered selectable text questions. Machine-recovered options are clickable where detected; missing wording and diagrams remain visibly flagged. Answer verification and scoring will be handled separately.</p>
 <div id="publishedPapers" class="published-grid" aria-live="polite"><p class="muted">Loading available typewritten papers…</p></div>
 </section>
 <section class="panel" aria-labelledby="importHeading">
@@ -81,7 +81,7 @@ pre{font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow
 <div class="toolbar">
 <div style="flex:2 1 280px"><label for="files">Select paper JSON files (multiple allowed)</label><input id="files" type="file" accept=".json,application/json" multiple></div>
 <div><label for="paper">Exam paper</label><select id="paper"><option value="">Choose imported paper</option></select></div>
-<div class="actions"><button type="button" id="save" disabled>Export responses</button><button type="button" id="clear" disabled>Clear responses</button></div>
+<div class="actions"><button type="button" id="exportQuestions" disabled>Download structured question JSON</button><button type="button" id="save" disabled>Export responses</button><button type="button" id="clear" disabled>Clear responses</button></div>
 </div>
 <p id="status" role="status" aria-live="polite" class="muted">No machine-text drafts loaded. Existing published text quizzes are available in the PYQ library.</p>
 <div class="notice"><strong>Source review pending:</strong> OCR or PDF text extraction may misread Tamil, English, mathematical expressions, option order, or figures. Blank and incomplete questions remain visible and are not treated as answered correctly. This is a private study reader, not a verified verbatim paper.</div>
@@ -89,8 +89,9 @@ pre{font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow
 <section class="panel" id="paperPanel" hidden>
 <h2 id="paperHeading">Paper details</h2>
 <p id="paperStats" class="muted"></p>
+<p><a id="originalPdfLink" href="pyq-hub.html" target="_blank" rel="noopener noreferrer">Open official original booklet</a></p>
 <div class="toolbar">
-<div><label for="filter">Question filter</label><select id="filter"><option value="all">All detected questions</option><option value="complete">Complete A–D detected</option><option value="incomplete">Needs transcription</option><option value="unanswered">Not answered yet</option></select></div>
+<div><label for="filter">Question filter</label><select id="filter"><option value="all">All original-numbered questions</option><option value="complete">A–D options detected</option><option value="incomplete">Needs transcription</option><option value="unanswered">Not answered yet</option></select></div>
 <div style="flex:2 1 280px"><label for="search">Search this paper</label><input id="search" type="search" placeholder="Find text or question number"></div>
 <div><label for="jump">Jump to question number</label><input id="jump" type="number" min="1" max="400" placeholder="Q number"></div>
 <div class="actions"><button type="button" id="go">Go</button></div>
@@ -111,5 +112,6 @@ pre{font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow
 <aside class="panel side"><h2 style="margin-top:0">Question palette</h2><p class="muted">Green = answered, gold = incomplete source.</p><div class="palette" id="palette"></div></aside>
 </div>
 </main>
-<script src="assets/js/pyq-bulk-reader.js"></script>
+<script src="assets/js/pyq-source-text-splitter.js?v=20261118"></script>
+<script src="assets/js/pyq-bulk-reader.js?v=20261118"></script>
 </body></html>
