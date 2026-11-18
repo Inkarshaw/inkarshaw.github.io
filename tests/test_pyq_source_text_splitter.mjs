@@ -24,6 +24,28 @@ assert.equal(result.questions[1].sourcePdfPage,null);
 assert.equal(result.questions[1].options.A,'');
 assert.equal(result.questions[2].number,103);
 assert.equal(result.questions[2].options.D,'Qux');
+const damaged=api.optionsAndStem([
+ 'What is the answer?',
+ '     (A)  First              (8)   Second',
+ '     (C)  Third              (D)   Fourth',
+ '     (E)  Answer not known',
+ '     (A)  local Tamil copy',
+ '     (8)  translated second',
+ '     (C)  local third',
+ '     (D)  local fourth'
+]);
+assert.equal(damaged.options.A,'First');
+assert.equal(damaged.options.B,'Second');
+assert.equal(damaged.options.C,'Third');
+assert.equal(damaged.options.D,'Fourth');
+assert.ok(damaged.normalizedLabels.includes('B'),'Confusable B labels must be visibly flagged');
+assert.equal(damaged.fourOptionsDetected,true,'OCR-distorted B label should retain selectable alternatives');
+assert.ok(damaged.alternativeGroups>0,'Translated rows should not be silently merged with English labels');
+const damagedNumber=api.numberMarker('  105\'. Buddhist poet Asvaghosa wrote a language.',{from:101,to:200},6);
+assert.equal(damagedNumber.number,105,'Stray apostrophes must not hide whole questions');
+const damagedDouble=api.numberMarker('   14.. Choose the meaning of a word.',{from:1,to:100},6);
+assert.equal(damagedDouble.number,14,'Duplicate punctuation must not hide questions');
+
 assert.ok(result.questions.every(q=>q.scoreEligible===false&&q.acceptedAnswers.length===0));
 assert.equal(result.grading,'disabled');
 assert.equal(result.verifiedOriginalText,false);
