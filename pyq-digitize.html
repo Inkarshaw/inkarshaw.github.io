@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071c33"><meta name="robots" content="noindex,nofollow">
 <title>Original PYQ Digitization Workbench | ClearExams</title>
-<meta name="description" content="Transcribe original paper questions one by one into a locally saved, reviewable English/Tamil JSON draft. This editor never publishes draft text.">
+<meta name="description" content="Convert whole-paper text to a single locally saved English/Tamil JSON draft in one operation; verify answer keys later. This editor never publishes draft text.">
 <style>
 :root{--navy:#09243f;--blue:#175fd0;--ink:#142b45;--muted:#566a7e;--line:#d4e1ef;--bg:#f4f7fb;--good:#126a49;--amber:#95621a}
 *{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:var(--bg);font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
@@ -45,7 +45,7 @@ button.primary{background:var(--blue);border-color:var(--blue);color:white}butto
 <header><div class="wrap"><a href="index.html">ClearExams.</a><a href="pyq-hub.html">← PYQ Archive</a></div></header>
 <main class="wrap">
 <h1>Original PYQ Digitization Workbench</h1>
-<p class="lead">Capture every original question and printed option <strong>exactly as shown</strong>, one by one. Tamil and English are separate only where both appear in the source. Use the official paper as the comparison reference; never replace its wording with adaptations.</p>
+<p class="lead">Paste and split an entire paper into numbered English/Tamil text questions in one operation, then review any unclear original wording later. Exact original text must ultimately be checked <strong>exactly as shown</strong> in the source. Tamil and English are separate only where both appear in the source. Use the official paper as the comparison reference; never replace its wording with adaptations.</p>
 <p class="note"><strong>Local draft only:</strong> This workbench saves text in your browser and exports a JSON file. No question text is sent to ClearExams or published automatically. Publishing complete verbatim papers requires a separately established legal basis and editorial approval.</p>
 <section class="panel">
   <div class="toolbar">
@@ -61,6 +61,22 @@ button.primary{background:var(--blue);border-color:var(--blue);color:white}butto
   <div class="meter" aria-label="Captured original question records"><div id="coverageFill"></div></div>
   <p id="messages" role="status" aria-live="polite"></p>
   <details><summary><b>Jump to original question number</b> — blue = captured; green = reviewed</summary><nav id="questionPalette" class="palette" aria-label="Source question numbers"></nav></details>
+</section>
+<section class="panel" id="bulkTranscription" aria-labelledby="bulkTitle">
+  <h2 id="bulkTitle">Fast whole-paper typing — all questions in one operation</h2>
+  <p class="muted">Paste the entire question paper, or choose a UTF-8 .txt transcription. The numbered stems and printed A–D/E choices will be split into local editable draft records together, without checking answers. No fabricated text or automatic grading.</p>
+  <div class="toolbar">
+    <div class="wide"><label for="bulkTextFile">Full-paper text file (optional)</label><input id="bulkTextFile" type="file" accept=".txt,text/plain"></div>
+    <div><label for="bulkLang">Text language</label><select id="bulkLang"><option value="en">English</option><option value="ta">தமிழ்</option></select></div>
+    <label><input id="bulkOverwrite" type="checkbox"> Replace existing typed drafts</label>
+  </div>
+  <label for="bulkSourceText">Whole paper text · Q1 to final question · no 25-question batches</label>
+  <textarea id="bulkSourceText" rows="9" placeholder="1. Original question text&#10;(A) First choice&#10;(B) Second choice&#10;(C) Third choice&#10;(D) Fourth choice&#10;2. Next question …"></textarea>
+  <div class="toolbar">
+    <button class="primary" type="button" id="bulkImport">Split entire paper into text questions</button>
+    <button type="button" id="bulkExport">Export all draft questions as JSON</button>
+  </div>
+  <p id="bulkStatus" class="muted" role="status" aria-live="polite">Select a source paper above, then paste its full text. Question numbers, options, Tamil/English text and source warnings are kept for later review.</p>
 </section>
 <div class="workspace">
   <section class="panel source" aria-labelledby="sourceTitle">
@@ -124,5 +140,6 @@ button.primary{background:var(--blue);border-color:var(--blue);color:white}butto
 <p class="muted">This page does not upload your files or draft text to a server. Avoid clearing browser storage before exporting your progress. <a href="pyq-original-digital.html">Verified full-original quiz publication status</a>.</p>
 </main>
 <script src="assets/js/pyq-draft-schema.js"></script>
+<script src="assets/js/pyq-bulk-parser.js"></script>
 <script src="assets/js/pyq-digitize.js"></script>
 </body></html>

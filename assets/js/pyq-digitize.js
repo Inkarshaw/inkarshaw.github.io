@@ -38,12 +38,13 @@ function persist(){
 function progress(){
   if(!paper)return;
   const tally=api.tally(records);
+  const typedCount=Object.values(records).filter(hasTypedText).length;
   $('totalCount').textContent=String(paper.questionCount);
-  $('capturedCount').textContent=String(tally.captured);
+  $('capturedCount').textContent=String(typedCount);
   $('reviewedCount').textContent=String(tally.reviewed);
-  $('coverageFill').style.width=(100*tally.captured/paper.questionCount).toFixed(1)+'%';
+  $('coverageFill').style.width=(100*typedCount/paper.questionCount).toFixed(1)+'%';
   const r=api.examine(currentRecord());
-  $('recordStatus').textContent=r.reviewed?'Reviewed locally':r.captured?'Text captured · review pending':'Incomplete transcription';
+  $('recordStatus').textContent=r.reviewed?'Reviewed locally':hasTypedText(currentRecord())?'Text typed · review pending':'Incomplete transcription';
   $('recordStatus').style.color=r.reviewed?'#126a49':r.captured?'#1457b1':'#925d11';
   const box=$('recordIssues');box.replaceChildren();
   r.errors.slice(0,7).forEach(m=>{const li=document.createElement('li');li.textContent=m;box.append(li)});
@@ -56,8 +57,8 @@ function paintPalette(){
   for(let i=1;i<=paper.questionCount;i++){
     const state=api.examine(records[String(i)]);
     const b=document.createElement('button');b.type='button';b.textContent=i;
-    b.className=(state.reviewed?'reviewed':state.captured?'captured':'')+(i===current?' current':'');
-    b.title='Original question '+i+(state.reviewed?' · reviewed':state.captured?' · captured':' · missing');
+    b.className=(state.reviewed?'reviewed':hasTypedText(records[String(i)])?'captured':'')+(i===current?' current':'');
+    b.title='Original question '+i+(state.reviewed?' · reviewed':hasTypedText(records[String(i)])?' · text typed, unverified':' · missing');
     b.addEventListener('click',()=>goQuestion(i));frag.append(b);
   }
   panel.append(frag);
@@ -66,7 +67,7 @@ function updateCurrentPalette(){
   const buttons=$('questionPalette').children;
   for(let i=0;i<buttons.length;i++){
     const state=api.examine(records[String(i+1)]),b=buttons[i];
-    b.className=(state.reviewed?'reviewed':state.captured?'captured':'')+(i+1===current?' current':'');
+    b.className=(state.reviewed?'reviewed':hasTypedText(records[String(i+1)])?'captured':'')+(i+1===current?' current':'');
   }
 }
 function emitChange(resetChecks=[]){
@@ -181,6 +182,53 @@ function splitBlock(){
   emitChange(['text','options']);drawOriginalFields();
   notice('A–E labels were split into draft fields. Compare every line and symbol with the printed source.');
 }
+
+function hasTypedText(q){
+ return q.originalLanguages.some(lang=>q.text[lang].trim()&&['A','B','C','D'].every(k=>q.options[lang][k].trim()));
+}
+function bulkImportText(){
+ if(!paper){notice('Choose an examination paper before importing.',true);return;}
+ const raw=$('bulkSourceText').value;
+ if(!raw.trim()){notice('Paste a whole-paper text transcription or choose a .txt file.',true);return;}
+ const parsed=window.ClearExamsBulkPYQ.parse(raw,paper.questionCount);
+ const lang=$('bulkLang').value,overwrite=$('bulkOverwrite').checked;
+ const eligible=parsed.questions.filter(q=>q.text&&q.text.length>=8);
+ const blocked=eligible.filter(q=>!overwrite&&(records[String(q.number)].text[lang].trim()||
+  ['A','B','C','D','E'].some(k=>records[String(q.number)].options[lang][k].trim()))).length;
+ if(!eligible.length){$('bulkStatus').textContent='No numbered stems detected. Check for Q1. / 1) / 1. prefixes. No drafts changed.';return;}
+ if(overwrite&&!confirm('Replace existing '+lang+' text for up to '+eligible.length+' numbered questions? Export a backup first.'))return;
+ let imported=0,full=0,partial=0;
+ for(const item of eligible){
+  const q=records[String(item.number)];
+  const hasExisting=q.text[lang].trim()||['A','B','C','D','E'].some(k=>q.options[lang][k].trim());
+  if(hasExisting&&!overwrite)continue;
+  q.text[lang]=item.text;
+  for(const letter of ['A','B','C','D','E'])q.options[lang][letter]=item.options[letter]||'';
+  q.originalLanguages=['ta','en'].filter(l=>l===lang||q.text[l].trim()||
+    ['A','B','C','D','E'].some(k=>q.options[l][k].trim()));
+  for(const field of Object.keys(q.review))q.review[field]=false;
+  q.updatedAt=new Date().toISOString();
+  q.notes=(q.notes?q.notes+'\n':'')+'Bulk text split: needs source-page, numbering, diagrams and original-options review. No answer or final-key verification inferred.';
+  imported++;
+  if(item.complete)full++;else partial++;
+ }
+ persist();paintPalette();showQuestion();
+ const msg='Bulk source scan: '+parsed.found+' numbered blocks found; '+imported+' imported ('+
+  full+' with A–D options, '+partial+' partial); '+blocked+' existing records protected; '+
+  parsed.missingNumbers.length+' original numbers not detected. No automatic marks or source certification.';
+ $('bulkStatus').textContent=msg;notice(msg);
+}
+$('bulkImport').addEventListener('click',bulkImportText);
+$('bulkExport').addEventListener('click',exportDraft);
+$('bulkTextFile').addEventListener('change',async event=>{
+ const file=event.target.files?.[0];if(!file)return;
+ if(!/\.txt$/i.test(file.name)&&file.type!=='text/plain'){notice('Choose a plain-text UTF-8 .txt file.',true);return;}
+ if(file.size>5000000){notice('Whole-paper text file exceeds 5 MB; split the source file.',true);return;}
+ $('bulkSourceText').value=await file.text();
+ $('bulkStatus').textContent='Loaded '+file.name+' locally. Click Split entire paper to parse all numbered questions in one operation.';
+ event.target.value='';
+});
+
 function preview(){
   const q=currentRecord(),view=$('previewArea');view.replaceChildren();
   const title=document.createElement('h3');title.textContent='Local text preview · Original question '+q.number;view.append(title);
@@ -249,7 +297,7 @@ $('nextIncomplete').addEventListener('click',()=>{
   if(!paper)return;
   for(let step=1;step<=paper.questionCount;step++){
     const n=((current-1+step)%paper.questionCount)+1;
-    if(!api.examine(records[String(n)]).captured){goQuestion(n);return}
+    if(!hasTypedText(records[String(n)])){goQuestion(n);return}
   }
   notice('All numbered questions have draft text; independent reviews may still be incomplete.');
 });
