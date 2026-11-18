@@ -67,6 +67,23 @@ assert.equal(repaired2019.questions[61].extraction,'incomplete-source-visual','D
 assert.ok('ABCD'.split('').every(l=>repaired2019.questions[61].options[l]===''));
 assert.ok(repaired2019.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
 
+// Guard against two-column source mixing that previously replaced question stems
+// with unrelated questions from other pages or columns.
+for(const [id,guards] of Object.entries({
+ 'cds-i-2018-gk':[[1,/atomic clocks/],[2,/water content of the blood/],[3,/gases dissolves in water/],[4,/formation of chlorophyll/]],
+ 'cds-i-2017-gk':[[2,/DNA into RNA/]],
+ 'cds-ii-2016-gk':[[1,/released mostly from landfills/],[2,/sensitive to environmental change/],[3,/largest source of electricity/],[4,/weakens the immunity/]],
+ 'cds-ii-2017-gk':[[1,/‘Blue Mountains’/],[2,/primate city/],[3,/islands is the largest/],[4,/Tiger Reserves/]]
+})){
+ const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
+ for(const [n,expected] of guards){
+  const q=p.questions[n-1];assert.match(q.text,expected,id+' Q'+n+' source-order text changed');
+  assert.ok('ABCD'.split('').every(c=>q.options[c].trim().length>1),id+' Q'+n+' printed choices missing');
+  assert.equal(q.correctAnswer,null);
+  assert.equal(q.scoreEligible,false);
+ }
+}
+
 assert.match(fs.readFileSync(path.join(root,'pyq-cds.html'),'utf8'),/120 numbered positions per paper/);
 const js=fs.readFileSync(path.join(root,'assets','js','pyq-cds.js'),'utf8');
 assert.match(js,/correctAnswer!==null/);assert.match(js,/scoreEligible!==false/);
