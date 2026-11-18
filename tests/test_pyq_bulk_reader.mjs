@@ -16,6 +16,8 @@ for(const id of ['files','paper','paperPanel','reader','sourcePage','palette','f
 assert.match(js,/Array\.isArray\(raw\.questionCandidates\)/);
 assert.match(js,/ClearExamsPYQSourceSplitter/);
 assert.match(js,/exportQuestionDraft/);
+assert.match(js,/Printed option text not recovered/);
+assert.match(js,/missing-option/);
 assert.match(js,/correctAnswer:null/);
 assert.match(html,/id="exportQuestions"/);
 assert.match(html,/pyq-source-text-splitter\.js/);
