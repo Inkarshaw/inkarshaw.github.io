@@ -47,7 +47,7 @@ class CommercialLaunchFoundationsTests(unittest.TestCase):
 
     def test_pyq_drafts_are_not_misrepresented_as_official_certified(self):
         catalog = json.loads(read("data/quizzes/typed-pyq-catalog.json"))
-        self.assertEqual(len(catalog["entries"]), 8)
+        self.assertEqual(len(catalog["entries"]), 15)
         self.assertTrue(any(e["scorable"] < e["typed"] for e in catalog["entries"]))
         page = read("pyq-typed-library.html")
         self.assertIn("not independently certified verbatim", page)
