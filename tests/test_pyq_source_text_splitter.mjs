@@ -83,7 +83,7 @@ for(const [id,from,to,minRecovered,minComplete,minPairs] of sources){
  assert.ok(parsed.questions.every(q=>q.options&&Object.keys(q.options).join(',')==='A,B,C,D,E'));
  console.log(id, 'stems',parsed.stats.recoveredStems,'complete A-D',parsed.stats.aToDOptionSets,'at least 2 options',parsed.stats.atLeastTwoOptions);
 }
-assert.ok(totals.stems>=271 && totals.stems<=275,'Real-data question stems must increase without inventing absent scans');
-assert.ok(totals.complete>=85 && totals.complete<=90,'Source-split option counts must stay conservative');
-assert.ok(totals.optionPairs>=259 && totals.optionPairs<=265,'Printed alternative pairs must match source ranges');
+assert.equal(totals.stems,272,'New stem count must match all three machine-extracted paper sources');
+assert.equal(totals.complete,86,'A-D option set count must match observed machine labels');
+assert.equal(totals.optionPairs,262,'Two-or-more option label count must match source data');
 console.log('PASS: 300 original-numbered question slots, explicit missing text, no inferred keys, ungraded structured export.');
