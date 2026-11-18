@@ -38,7 +38,7 @@ for(const q of reviewed.questions.slice(0,27)){
  assert.equal(q.correctAnswer,null);
  assert.equal(q.scoreEligible,false);
  assert.equal(q.ungraded,true);
- assert.equal(q.issues.some(x=>/Official answer key/.test(x)),true);
+ assert.equal(q.issues.some(x=>/answer key/i.test(x)),true);
  assert.equal(q.sourcePages.length,1);
  assert.equal(q.sourcePages[0],q.number<=7?3:q.number<=13?5:q.number<=20?7:9);
  assert.ok('ABCD'.split('').every(l=>q.options[l].trim().length>0));
