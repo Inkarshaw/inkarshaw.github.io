@@ -19,7 +19,7 @@ function drawCards(){if(!index)return;const year=$('yearFilter').value,session=$
  if(!filtered.length)root.append(el('p','No papers match these filters.'));
 }
 function cacheKey(){return 'clearexams:cds-gk:ungraded:'+active.id;}
-function restore(){responses={};try{const saved=JSON.parse(localStorage.getItem(cacheKey())||'{}');if(saved&&typeof saved==='object'){for(const [n,l] of Object.entries(saved)){if(Number(n)>=1&&Number(n)<=120&&choices.includes(l))responses[n]=l;}}}catch{}}
+function restore(){responses={};try{const saved=JSON.parse(localStorage.getItem(cacheKey())||'{}');if(saved&&typeof saved==='object'){for(const [n,l] of Object.entries(saved)){if(Number(n)>=1&&Number(n)<=120&&choices.includes(l)&&active.questions[Number(n)-1]?.diagramStatus!=='unresolved-original-figure')responses[n]=l;}}}catch{}}
 function persist(){try{localStorage.setItem(cacheKey(),JSON.stringify(responses));}catch{}}
 function answered(){return Object.keys(responses).length;}
 async function openPaper(id){try{
