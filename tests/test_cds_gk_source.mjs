@@ -53,10 +53,10 @@ assert.match(reviewed.questions[8].text,/National Investment Promotion and Facil
 assert.match(reviewed.questions[12].text,/Italian Open Women/);
 assert.match(reviewed.questions[20].text,/Vernacular Press Act/);
 assert.match(reviewed.questions[26].text,/Mediterranean climate/);
-assert.equal(reviewed.stats.provisionalFourOptionSets,102);
-assert.equal(reviewed.stats.textStems,112);
-assert.equal(reviewed.unresolvedQuestionNumbers.length,18);
-assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,102);
+assert.equal(reviewed.stats.provisionalFourOptionSets,120);
+assert.equal(reviewed.stats.textStems,120);
+assert.equal(reviewed.unresolvedQuestionNumbers.length,0);
+assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,120);
 
 const repaired2019=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2019-gk.json'),'utf8'));
 assert.equal(repaired2019.stats.textStems,120);
@@ -390,3 +390,14 @@ for(let n=90;n<=97;n++){
  assert.ok('ABCD'.split('').every(l=>q.options[l].trim()));
  assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
 }
+
+// CDS II 2019 is now structurally complete in English (not official-key certified).
+assert.deepEqual(reviewed.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+assert.deepEqual(reviewed.unresolvedQuestionNumbers,[]);
+for(const n of [66,98,99,102,103,104,105,107,108,109,110,111,112,114,117,118,119,120]){
+ const q=reviewed.questions[n-1];
+ assert.equal(q.extraction,'provisional-four-options',`CDS II 2019 Q${n} must be recovered`);
+ assert.ok(q.text.trim());assert.ok('ABCD'.split('').every(l=>q.options[l].trim()));
+ assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);assert.equal(q.ungraded,true);
+}
+for(let n=107;n<=110;n++)assert.match(reviewed.questions[n-1].options.A,/Statement II is the correct explanation/);
