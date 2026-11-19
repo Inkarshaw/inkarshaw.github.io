@@ -404,9 +404,9 @@ for(let n=107;n<=110;n++)assert.match(reviewed.questions[n-1].options.A,/Stateme
 
 // CDS I 2020 opening scan pages: answer marks are not treated as an official key.
 const c2020=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2020-gk.json'),'utf8'));
-assert.equal(c2020.stats.textStems,116);
-assert.equal(c2020.stats.provisionalFourOptionSets,65);
-assert.equal(c2020.unresolvedQuestionNumbers.length,55);
+assert.equal(c2020.stats.textStems,120);
+assert.equal(c2020.stats.provisionalFourOptionSets,120);
+assert.equal(c2020.unresolvedQuestionNumbers.length,0);
 for(const [start,end,page] of [[1,5,3],[7,7,3],[8,8,5],[10,14,5],[16,16,5],[17,20,7],[22,22,7]]){
  for(let n=start;n<=end;n++){
   const q=c2020.questions[n-1];
@@ -426,4 +426,16 @@ for(const [start,end,page] of [[23,23,9],[25,26,9],[28,29,9],[34,36,11],[37,42,1
   assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
  }
 }
-assert.ok(c2020.unresolvedQuestionNumbers.includes(24)&&c2020.unresolvedQuestionNumbers.includes(27));
+assert.equal(c2020.questions[23].options.B,'x = 273 + y');
+assert.match(c2020.questions[26].text,/path of urine flow/);
+
+// All sixteen CDS GK papers now have 120 provisional English A-D text positions.
+assert.ok(idx.paperStatuses.every(e=>e.textStems===120&&e.provisionalFourOptionSets===120&&e.unresolvedPositions===0));
+assert.equal(idx.paperStatuses.length*120,1920);
+assert.deepEqual(c2020.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+for(let n=1;n<=120;n++){
+ const q=c2020.questions[n-1];
+ assert.equal(q.extraction,'provisional-four-options',`CDS I 2020 Q${n} missing A-D`);
+ assert.ok(q.text.trim());assert.ok('ABCD'.split('').every(l=>q.options[l].trim()));
+ assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
+}
