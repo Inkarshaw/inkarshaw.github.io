@@ -47,7 +47,7 @@ function render(){if(!active)return;const q=active.questions[selected],available
  $('attemptText').textContent=p+' / 120 answers selected locally · ungraded';
  if(!available){status('No questions match the filter. Clear the search or select All questions.');return;}
  $('position').textContent='Question '+q.number+' of 120';
- $('sourcePage').textContent=q.sourcePages.length?'Source PDF page '+q.sourcePages.join(', '):'Question not recovered from source';
+ $('sourcePage').textContent=q.sourcePages.length?'Source PDF page '+q.sourcePages.join(', '):q.text?.trim()?'Source PDF page not yet mapped':'Question text not recovered';
  $('questionText').textContent=q.text||'[Original question text not extracted — do not assume its wording]';
  const missingFigure=q.diagramStatus==='unresolved-original-figure';const group=$('choices');group.replaceChildren();for(const l of choices){const content=q.options[l],btn=el('button','','choice'+(content&&!missingFigure?'':' source-missing'));btn.type='button';btn.disabled=missingFigure;btn.setAttribute('aria-pressed',String(responses[q.number]===l));btn.append(el('span',l,'letter'));btn.append(el('span',content||'[Printed option wording not recovered — consult uploaded paper]'));btn.addEventListener('click',()=>{responses[q.number]=l;persist();render();});group.append(btn);}
  const issues=q.issues||[];$('questionWarning').textContent=(missingFigure?'Original numbered map is missing; answer selection is disabled until the source figure is recovered. ':q.extraction==='provisional-four-options'?'Provisional source text (not officially checked). ':'Incomplete source extraction — verify the original booklet. ')+issues.join(' · ');
