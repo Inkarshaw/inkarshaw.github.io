@@ -377,7 +377,7 @@ for(const [start,end,page] of [[55,60,20],[61,65,22],[67,73,24],[74,80,26],[81,8
   const q=reviewed.questions[n-1];
   assert.equal(q.extraction,'provisional-four-options',`Q${n} needs the four A-D options`);
   assert.equal(q.sourcePages[0],page);
-  assert.ok(q.text.length>15);
+  assert.ok(q.text.trim().length>0,'Source short stems are valid when A–D choices are present');
   assert.ok('ABCD'.split('').every(l=>q.options[l].trim().length));
   assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
  }
