@@ -56,3 +56,13 @@ Current status: **106 recovered stems; 94 complete provisional A–D question se
 Outstanding position numbers: **66, 90–99, 102–105, 107–112, 114, 117–120**.
 
 This later update supersedes the earlier progress counts and gap list above. It does not change the official-verification warning.
+
+## Final update this pass — page 30
+
+- Q90–97 (8 more English items) were transcribed from scanned page 30 and added as source-provisional A–D records.
+- Latest index: **112 stems**, **102 complete provisional four-choice items**, **18 incomplete positions**.
+- Remaining question numbers: **66, 98, 99, 102–105, 107–112, 114, 117–120**.
+- Some later PDF pages are Hindi-language counterparts and require a separate bilingual source review; no translation has been invented.
+- All answer fields remain null. Official final answer-key validation and deployed reader tests are outstanding.
+
+The counts in this final section supersede all previous counts in this report.
