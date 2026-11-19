@@ -356,3 +356,7 @@ assert.match(js,/diagramStatus==='unresolved-original-figure'/,'Missing maps mus
 assert.match(js,/btn.disabled=missingFigure/,'Undigitized source maps should not be answerable');
 assert.match(js,/Source PDF page not yet mapped/,'Retyped source pages without precise map must not be called missing text');
 console.log(`PASS: ${idx.paperStatuses.length} CDS source papers, ${stems} machine-recovered stems, ${options} provisional A-D blocks, 0 official keys and no scores`);
+// Incomplete OCR positions must not count as attempted answers in the reader.
+const cdsReader=fs.readFileSync(path.join(root,'assets','js','pyq-cds.js'),'utf8');
+assert.ok(cdsReader.includes("btn.disabled=missingFigure||needsSourceReview(q)||!content.trim();"),'Reader must disable answers for incomplete text or missing alternatives');
+assert.ok(cdsReader.includes("active.questions[Number(n)-1]?.extraction==='provisional-four-options'"),'Reader must discard locally saved answers for incomplete source positions');
