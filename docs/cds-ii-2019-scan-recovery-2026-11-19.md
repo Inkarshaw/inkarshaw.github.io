@@ -39,3 +39,20 @@ Total: 60 positions.
 - [ ] Execute CI tests and verify live page behavior after deployment.
 
 This report records transcription progress only; it does **not** claim official completeness or scoring accuracy.
+
+## Additional English scan recovery — pages 20–28
+
+- Q55–60: source PDF page 20.
+- Q61–65: source PDF page 22.
+- Q66: **not recovered**; printed matching-list code requires closer inspection, and must not be invented.
+- Q67–73: source PDF page 24.
+- Q74–80: source PDF page 26.
+- Q81–89: source PDF page 28.
+
+Newly added: **34 numbered full A–D transcriptions**, English only; every answer remains null/ungraded.
+
+Current status: **106 recovered stems; 94 complete provisional A–D question sets; 26 incomplete positions** among 120.
+
+Outstanding position numbers: **66, 90–99, 102–105, 107–112, 114, 117–120**.
+
+This later update supersedes the earlier progress counts and gap list above. It does not change the official-verification warning.
