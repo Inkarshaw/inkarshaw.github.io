@@ -382,7 +382,7 @@ for(const [start,end,page] of [[55,60,20],[61,65,22],[67,73,24],[74,80,26],[81,8
   assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
  }
 }
-assert.ok(reviewed.unresolvedQuestionNumbers.includes(66),'Uncertain matching code Q66 must remain unresolved');
+assert.equal(reviewed.questions[65].extraction,'provisional-four-options','Recovered Q66 matching code should now be complete');
 
 for(let n=90;n<=97;n++){
  const q=reviewed.questions[n-1];
