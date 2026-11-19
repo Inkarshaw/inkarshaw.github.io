@@ -87,9 +87,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered eight fully numbered CDS 2012 II, 2013 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 960 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered nine fully numbered CDS 2011 II, 2012 II, 2013 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 1080 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -99,6 +99,26 @@ for(const id of ['cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceII2011=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2011-gk.json'),'utf8'));
+assert.equal(sourceII2011.questions.length,120);
+assert.deepEqual(sourceII2011.unresolvedQuestionNumbers,[]);
+assert.equal(sourceII2011.stats.provisionalFourOptionSets,120);
+assert.deepEqual(sourceII2011.transcribedLanguages,['English']);
+assert.deepEqual(sourceII2011.unresolvedSourceLanguages,['Hindi'],'Bilingual scanned source has untranslated Hindi portion');
+assert.deepEqual(idx.paperStatuses.find(x=>x.id==='cds-ii-2011-gk').unresolvedSourceLanguages,['Hindi']);
+assert.match(sourceII2011.questions[0].text,/El Nino/,'Q1 must reflect original scan rather than cross-column CCTNS text');
+assert.match(sourceII2011.questions[1].text,/Anticyclone/);
+assert.deepEqual(sourceII2011.questions.slice(0,7).map(q=>q.options),Array(7).fill(sourceII2011.questions[0].options),'Q1–7 original shared Assertion–Reason code');
+assert.deepEqual(sourceII2011.questions[8].options,{A:'321 km',B:'211 km',C:'111 km',D:'91 km'},'Q9 latitude alternatives');
+assert.match(sourceII2011.questions[26].text,/Chinook/,'Q27 list mappings');
+assert.match(sourceII2011.questions[62].text,/drain theory/,'Q63 previously misassigned text must be restored to its source number');
+assert.match(sourceII2011.questions[89].text,/Crime and Criminal Tracking Network System/,'Q90 CCTNS originally mixed into Q1');
+assert.deepEqual(sourceII2011.questions[91].options,{A:'1 2 4 3',B:'1 4 2 3',C:'3 2 4 1',D:'3 4 2 1'},'Q92 plan matching codes');
+assert.match(sourceII2011.questions[109].text,/Lactic acid/,'Q110 matching tables preserved');
+assert.match(sourceII2011.questions[119].text,/HIV\/AIDS/,'Q120 original last position');
+assert.equal(sourceII2011.grading,'disabled');
+assert.ok(sourceII2011.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+
 const sourceII2012=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2012-gk.json'),'utf8'));
 assert.equal(sourceII2012.questions.length,120);
 assert.deepEqual(sourceII2012.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
