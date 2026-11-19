@@ -66,3 +66,16 @@ This later update supersedes the earlier progress counts and gap list above. It 
 - All answer fields remain null. Official final answer-key validation and deployed reader tests are outstanding.
 
 The counts in this final section supersede all previous counts in this report.
+
+## Completed English transcription — 19 November 2026 (latest status)
+
+- Inspected source image pages **22, 33, 35 and 37** for the final 18 unresolved question positions.
+- Restored the remaining matching codes in Q66 and Q103, the numbered constitutional statements in Q99, and full printed assertion–reason statements with shared option legend in Q107–110.
+- Restored English printed Q98–99, Q102–105, Q107–112, Q114 and Q117–120.
+- **Current paper totals: 120 numbered questions, 120 provisionally complete English stems and A–D option sets, 0 missing/partial English positions.**
+- **Official original comparison: pending. Official answer-key series: pending. Grading: disabled.**
+- Original Hindi text has not been separately transcribed. The paper remains a source-provisional English practice draft, not a verified official reproduction.
+- Machine-readable page text in the upload consists largely of watermarks; recovered text comes from direct visual reading of scan pages.
+- Regression-test assertions were updated, but the CI run and deployed webpage still require confirmation.
+
+This latest status supersedes earlier remaining-position lists in this report.
