@@ -84,9 +84,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered six fully numbered CDS 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 720 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered seven fully numbered CDS 2013 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 840 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -96,6 +96,29 @@ for(const id of ['cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-g
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceII2013=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2013-gk.json'),'utf8'));
+assert.equal(sourceII2013.questions.length,120,'CDS II 2013 must retain all 120 original-numbered positions');
+assert.deepEqual(sourceII2013.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+assert.deepEqual(sourceII2013.unresolvedSourceVisualNumbers,[42],'CDS II 2013 Q42 map remains unresolved');
+assert.deepEqual(idx.paperStatuses.find(x=>x.id==='cds-ii-2013-gk').unresolvedSourceVisualNumbers,[42]);
+assert.match(sourceII2013.questions[0].text,/Typical laterite soils/);
+assert.deepEqual(sourceII2013.questions.slice(0,7).map(q=>q.options),Array(7).fill(sourceII2013.questions[0].options),'Q1–7 original shared Assertion–Reason choices');
+assert.match(sourceII2013.questions[37].text,/Brassware/,'Q38 printed matching list should remain in the question');
+assert.match(sourceII2013.questions[41].text,/Nagarjuna Sagar/);
+assert.equal(sourceII2013.questions[41].diagramRequired,true);
+assert.equal(sourceII2013.questions[41].diagramStatus,'unresolved-original-figure');
+assert.equal(sourceII2013.questions[41].sourceVisualVerified,false);
+assert.deepEqual(sourceII2013.questions[41].options,{A:'3 4 1 2',B:'3 1 4 2',C:'2 1 4 3',D:'2 4 1 3'});
+assert.match(sourceII2013.questions[69].text,/decontrol the sugar industry/,'Q70 damaged OCR must be repaired');
+assert.match(sourceII2013.questions[87].text,/Khasi and Jaintia/,'Q88 original numbered statements must remain');
+assert.match(sourceII2013.questions[110].text,/Sachar Committee/,'Q111 committee matching lists recovered');
+assert.match(sourceII2013.questions[119].text,/Nadal/,'Q120 final position recovered');
+assert.equal(sourceII2013.questions[119].options.D,'Neither 1 nor 2');
+assert.ok(sourceII2013.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true),'No study-source key used for scoring');
+assert.equal(sourceII2013.grading,'disabled');
+assert.equal(sourceII2013.officialAnswerKeyChecked,false);
+assert.equal(sourceII2013.officialOriginalConfirmed,false);
+
 const sourceII2016=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2016-gk.json'),'utf8'));
 assert.deepEqual(sourceII2016.questions[5].options,{A:'1 only',B:'2 only',C:'2 and 3 only',D:'1, 2 and 3'},'Q6 original enumeration must be preserved');
 assert.match(sourceII2016.questions[13].text,/hypocentre/,'Q14 four earthquake statements must remain in the stem');
@@ -169,4 +192,5 @@ assert.match(js,/cacheKey/);assert.match(js,/exportResponses/);
 assert.match(js,/officialAnswerKeyChecked!==false/);
 assert.match(js,/diagramStatus==='unresolved-original-figure'/,'Missing maps must block answer selection');
 assert.match(js,/btn.disabled=missingFigure/,'Undigitized source maps should not be answerable');
+assert.match(js,/Source PDF page not yet mapped/,'Retyped source pages without precise map must not be called missing text');
 console.log(`PASS: ${idx.paperStatuses.length} CDS source papers, ${stems} machine-recovered stems, ${options} provisional A-D blocks, 0 official keys and no scores`);
