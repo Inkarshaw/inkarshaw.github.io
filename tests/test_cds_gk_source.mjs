@@ -57,14 +57,14 @@ assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOption
 
 const repaired2019=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2019-gk.json'),'utf8'));
 assert.equal(repaired2019.stats.textStems,120);
-assert.equal(repaired2019.stats.provisionalFourOptionSets,119);
-assert.deepEqual(repaired2019.unresolvedQuestionNumbers,[62]);
+assert.equal(repaired2019.stats.provisionalFourOptionSets,120);
+assert.deepEqual(repaired2019.unresolvedQuestionNumbers,[]);
 assert.match(repaired2019.questions[2].text,/Damin-i-Koh/,'Column-order repair must not replace Q3 with Q46');
 assert.match(repaired2019.questions[45].text,/United Nations multidimensional peace keeping/,'Q46 must remain correctly numbered');
 assert.ok(repaired2019.questions[8].text.includes('amending powers of the Parliament'),'Q9 must retain numbered statement text');
 assert.deepEqual(repaired2019.questions[69].options,{A:'Colombia',B:'Venezuela',C:'Brazil',D:'Guyana'});
-assert.equal(repaired2019.questions[61].extraction,'incomplete-source-visual','Do not invent unreadable vector notation in Q62');
-assert.ok('ABCD'.split('').every(l=>repaired2019.questions[61].options[l]===''));
+assert.equal(repaired2019.questions[61].extraction,'provisional-four-options','Q62 mathematical source transcription must be present but ungraded');
+assert.ok('ABCD'.split('').every(l=>repaired2019.questions[61].options[l].trim()),'Q62 mathematical options must be present');
 assert.ok(repaired2019.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
 
 // Guard against two-column source mixing that previously replaced question stems
@@ -84,9 +84,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered two full numbered CDS I 2018/2019 paper transcriptions.
-// All 240 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-i-2018-gk','cds-i-2019-gk']){
+// Recovered three fully numbered CDS 2018 I/II and 2019 I provisional paper transcriptions.
+// All 360 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -104,6 +104,15 @@ assert.match(source2018.questions[76].text,/World Soil Day/);
 assert.match(source2018.questions[85].text,/Sikkim/);
 assert.match(source2018.questions[113].text,/Kharoshthi/);
 assert.deepEqual(source2018.questions[11].options,source2018.questions[17].options,'Original Q12–18 share the printed answer code');
+const sourceII2018=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2018-gk.json'),'utf8'));
+assert.match(sourceII2018.questions[1].text,/How many moles of CO/,'CDS II 2018 Q2 must be correctly numbered');
+assert.match(sourceII2018.questions[7].text,/two miscible liquids/);
+assert.match(sourceII2018.questions[7].options.B,/ρ1/);
+assert.deepEqual(sourceII2018.questions[71].options,sourceII2018.questions[74].options,'Shared printed directions must apply to Q72–75');
+assert.deepEqual(sourceII2018.questions[70].options,{A:'Jowar (Hybrid)',B:'Bajra',C:'Maize',D:'Soya bean'},'Q71 must not absorb the next four questions directions');
+assert.match(sourceII2018.questions[113].text,/SWAYAM/);
+assert.match(sourceII2018.questions[119].text,/Haridwar Kumbh Mela/);
+assert.ok(sourceII2018.questions[1].issues.some(x=>/CH3/.test(x)),'Unverified scanned chemical formula must remain flagged');
 const source2019=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2019-gk.json'),'utf8'));
 assert.match(source2019.questions[61].text,/vectors/);
 assert.match(source2019.questions[61].options.B,/>/);
