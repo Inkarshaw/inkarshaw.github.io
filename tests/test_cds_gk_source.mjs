@@ -87,9 +87,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered nine fully numbered CDS 2011 II, 2012 II, 2013 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 1080 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered ten fully numbered CDS 2010–13 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 1200 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -99,6 +99,30 @@ for(const id of ['cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceII2010=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2010-gk.json'),'utf8'));
+assert.equal(sourceII2010.questions.length,120);
+assert.deepEqual(sourceII2010.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+assert.deepEqual(sourceII2010.unresolvedQuestionNumbers,[]);
+assert.deepEqual(sourceII2010.transcribedLanguages,['English']);
+assert.deepEqual(sourceII2010.unresolvedSourceLanguages,['Hindi'],'Original scanned booklet Hindi remains untyped');
+assert.deepEqual(idx.paperStatuses.find(x=>x.id==='cds-ii-2010-gk').unresolvedSourceLanguages,['Hindi']);
+assert.match(sourceII2010.questions[0].text,/Mauritius/,'Q1 original source order must not be replaced by later cloud computing item');
+assert.match(sourceII2010.questions[1].text,/Super phosphate of lime/,'Q2 original Statement I and Statement II');
+assert.deepEqual(sourceII2010.questions.slice(0,6).map(q=>q.options),Array(6).fill(sourceII2010.questions[0].options),'Original Q1–6 share same Statement I/II code');
+assert.match(sourceII2010.questions[6].text,/Armed Forces \(Special Powers\) Act/,'Q7 original source question');
+assert.match(sourceII2010.questions[15].text,/cartoon character/,'Q16 source passage');
+assert.match(sourceII2010.questions[19].options.D,/internet-based service/,'Q20 cloud computing should be numbered correctly');
+assert.match(sourceII2010.questions[40].text,/Cellulose/,'Q41 sugar matching table');
+assert.deepEqual(sourceII2010.questions[40].options,{A:'3 1 4 2',B:'3 4 1 2',C:'2 1 4 3',D:'2 4 1 3'});
+for(const n of [58,59,60,64,65,66])assert.ok(sourceII2010.questions[n-1].text.length>700,'Original shared source passage must be present on Q'+n);
+assert.match(sourceII2010.questions[77].text,/Inter-State Council/,'Q78 Council question belongs here, not Q2');
+assert.match(sourceII2010.questions[92].text,/Santhal rebellion/,'Q93 chronology source number');
+assert.match(sourceII2010.questions[95].text,/Selvas/,'Q96 matching list');
+assert.match(sourceII2010.questions[103].text,/Industrial policy/,'Q104 source table');
+assert.match(sourceII2010.questions[119].text,/Russian revolutionaries/,'Q120 final source position');
+assert.ok(sourceII2010.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true),'No official key inferred for CDS II 2010');
+assert.equal(sourceII2010.grading,'disabled');assert.equal(sourceII2010.officialOriginalConfirmed,false);assert.equal(sourceII2010.officialAnswerKeyChecked,false);
+
 const sourceII2011=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2011-gk.json'),'utf8'));
 assert.equal(sourceII2011.questions.length,120);
 assert.deepEqual(sourceII2011.unresolvedQuestionNumbers,[]);
