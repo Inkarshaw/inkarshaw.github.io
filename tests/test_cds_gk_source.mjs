@@ -53,10 +53,10 @@ assert.match(reviewed.questions[8].text,/National Investment Promotion and Facil
 assert.match(reviewed.questions[12].text,/Italian Open Women/);
 assert.match(reviewed.questions[20].text,/Vernacular Press Act/);
 assert.match(reviewed.questions[26].text,/Mediterranean climate/);
-assert.equal(reviewed.stats.provisionalFourOptionSets,94);
-assert.equal(reviewed.stats.textStems,106);
-assert.equal(reviewed.unresolvedQuestionNumbers.length,26);
-assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,94);
+assert.equal(reviewed.stats.provisionalFourOptionSets,102);
+assert.equal(reviewed.stats.textStems,112);
+assert.equal(reviewed.unresolvedQuestionNumbers.length,18);
+assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,102);
 
 const repaired2019=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2019-gk.json'),'utf8'));
 assert.equal(repaired2019.stats.textStems,120);
@@ -383,3 +383,10 @@ for(const [start,end,page] of [[55,60,20],[61,65,22],[67,73,24],[74,80,26],[81,8
  }
 }
 assert.ok(reviewed.unresolvedQuestionNumbers.includes(66),'Uncertain matching code Q66 must remain unresolved');
+
+for(let n=90;n<=97;n++){
+ const q=reviewed.questions[n-1];
+ assert.equal(q.extraction,'provisional-four-options');assert.equal(q.sourcePages[0],30);
+ assert.ok('ABCD'.split('').every(l=>q.options[l].trim()));
+ assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
+}
