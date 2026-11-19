@@ -84,9 +84,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered four fully numbered CDS 2017 I, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 480 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-i-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered five fully numbered CDS 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 600 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -96,6 +96,26 @@ for(const id of ['cds-i-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceII2017=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2017-gk.json'),'utf8'));
+assert.deepEqual(sourceII2017.unresolvedSourceVisualNumbers,[82,101],'Undigitized source maps must stay explicitly flagged');
+assert.deepEqual(idx.paperStatuses.find(p=>p.id===sourceII2017.id).unresolvedSourceVisualNumbers,[82,101]);
+assert.match(sourceII2017.questions[15].text,/frictionless horizontal ground/,'Q16 misprinted source number must be restored');
+assert.equal(sourceII2017.questions[15].sourcePages[0],3);
+assert.deepEqual(sourceII2017.questions.slice(31,36).map(q=>q.options),Array(5).fill(sourceII2017.questions[31].options),'Q32–36 share original assertion-reason answer code');
+assert.match(sourceII2017.questions[51].text,/NH-2/,'Q52 matching lists must not be lost to OCR');
+assert.match(sourceII2017.questions[6].text,/Mitochondria/,'Q7 matching list must remain in stem');
+assert.deepEqual(sourceII2017.questions[81].options,{A:'4 2 1 3',B:'3 1 2 4',C:'3 2 1 4',D:'4 1 2 3'});
+for(const n of [82,101]){
+ const q=sourceII2017.questions[n-1];
+ assert.equal(q.diagramRequired,true);
+ assert.equal(q.diagramStatus,'unresolved-original-figure');
+ assert.equal(q.sourceVisualVerified,false);
+ assert.ok(q.issues.some(x=>/map/i.test(x)));
+ assert.ok(q.text.includes('original numbered map not digitized'));
+ assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
+}
+assert.match(sourceII2017.questions[57].options.A,/ferromagnetic/);
+assert.equal(sourceII2017.questions[57].options.A,sourceII2017.questions[57].options.B,'Do not silently rewrite duplicate options in an unverified study PDF');
 const sourceI2017=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2017-gk.json'),'utf8'));
 assert.match(sourceI2017.questions[1].text,/DNA into RNA/);
 assert.equal(sourceI2017.questions[10].options.B,'C/7','Q11 capacitor fraction recovered from printed source');
@@ -134,4 +154,6 @@ const js=fs.readFileSync(path.join(root,'assets','js','pyq-cds.js'),'utf8');
 assert.match(js,/correctAnswer!==null/);assert.match(js,/scoreEligible!==false/);
 assert.match(js,/cacheKey/);assert.match(js,/exportResponses/);
 assert.match(js,/officialAnswerKeyChecked!==false/);
+assert.match(js,/diagramStatus==='unresolved-original-figure'/,'Missing maps must block answer selection');
+assert.match(js,/btn.disabled=missingFigure/,'Undigitized source maps should not be answerable');
 console.log(`PASS: ${idx.paperStatuses.length} CDS source papers, ${stems} machine-recovered stems, ${options} provisional A-D blocks, 0 official keys and no scores`);
