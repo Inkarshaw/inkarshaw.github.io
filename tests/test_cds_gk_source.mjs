@@ -115,7 +115,7 @@ assert.deepEqual(sourceI2010.questions[52].options,{A:'4 3 2 1',B:'1 2 3 4',C:'4
 assert.match(sourceI2010.questions[77].text,/Cotton|crops/,'Q78 source order');
 assert.match(sourceI2010.questions[96].text,/year 2008/,'Q97 source correction from 2020 PDF reprint error');
 assert.ok(!sourceI2010.questions[96].text.includes('Rohit Sharma'));
-assert.match(sourceI2010.questions[99].text,/INS/,'Q100 original aircraft-carrier item restored');
+assert.match(sourceI2010.questions[99].text,/aircraft carrier/,'Q100 original aircraft-carrier item restored');
 assert.match(sourceI2010.questions[109].text,/organic farming/,'Q110 original true-false table');
 assert.match(sourceI2010.questions[110].text,/CFL lamp/,'Q111 full source table');
 assert.match(sourceI2010.questions[113].text,/Solder/,'Q114 alloys table');
