@@ -53,10 +53,10 @@ assert.match(reviewed.questions[8].text,/National Investment Promotion and Facil
 assert.match(reviewed.questions[12].text,/Italian Open Women/);
 assert.match(reviewed.questions[20].text,/Vernacular Press Act/);
 assert.match(reviewed.questions[26].text,/Mediterranean climate/);
-assert.equal(reviewed.stats.provisionalFourOptionSets,60);
-assert.equal(reviewed.stats.textStems,84);
-assert.equal(reviewed.unresolvedQuestionNumbers.length,60);
-assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,60);
+assert.equal(reviewed.stats.provisionalFourOptionSets,94);
+assert.equal(reviewed.stats.textStems,106);
+assert.equal(reviewed.unresolvedQuestionNumbers.length,26);
+assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,94);
 
 const repaired2019=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2019-gk.json'),'utf8'));
 assert.equal(repaired2019.stats.textStems,120);
@@ -370,3 +370,16 @@ for(let n=28;n<=54;n++){
  assert.equal(q.sourcePages[0],n<=34?12:n<=40?14:n<=47?16:18);
  assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
 }
+
+// Further English scan recovery: pages 20–28, preserving Q66 as unresolved.
+for(const [start,end,page] of [[55,60,20],[61,65,22],[67,73,24],[74,80,26],[81,89,28]]){
+ for(let n=start;n<=end;n++){
+  const q=reviewed.questions[n-1];
+  assert.equal(q.extraction,'provisional-four-options',`Q${n} needs the four A-D options`);
+  assert.equal(q.sourcePages[0],page);
+  assert.ok(q.text.length>15);
+  assert.ok('ABCD'.split('').every(l=>q.options[l].trim().length));
+  assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
+ }
+}
+assert.ok(reviewed.unresolvedQuestionNumbers.includes(66),'Uncertain matching code Q66 must remain unresolved');
