@@ -53,10 +53,10 @@ assert.match(reviewed.questions[8].text,/National Investment Promotion and Facil
 assert.match(reviewed.questions[12].text,/Italian Open Women/);
 assert.match(reviewed.questions[20].text,/Vernacular Press Act/);
 assert.match(reviewed.questions[26].text,/Mediterranean climate/);
-assert.equal(reviewed.stats.provisionalFourOptionSets,33);
-assert.equal(reviewed.stats.textStems,61);
-assert.equal(reviewed.unresolvedQuestionNumbers.length,87);
-assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,33);
+assert.equal(reviewed.stats.provisionalFourOptionSets,60);
+assert.equal(reviewed.stats.textStems,84);
+assert.equal(reviewed.unresolvedQuestionNumbers.length,60);
+assert.equal(idx.paperStatuses.find(x=>x.id===reviewed.id).provisionalFourOptionSets,60);
 
 const repaired2019=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2019-gk.json'),'utf8'));
 assert.equal(repaired2019.stats.textStems,120);
@@ -360,3 +360,13 @@ console.log(`PASS: ${idx.paperStatuses.length} CDS source papers, ${stems} machi
 const cdsReader=fs.readFileSync(path.join(root,'assets','js','pyq-cds.js'),'utf8');
 assert.ok(cdsReader.includes("btn.disabled=missingFigure||needsSourceReview(q)||!content.trim();"),'Reader must disable answers for incomplete text or missing alternatives');
 assert.ok(cdsReader.includes("active.questions[Number(n)-1]?.extraction==='provisional-four-options'"),'Reader must discard locally saved answers for incomplete source positions');
+
+// English scanned pages 12–18 of CDS II 2019 recovered Q28–54 in printed sequence.
+for(let n=28;n<=54;n++){
+ const q=reviewed.questions[n-1];
+ assert.equal(q.extraction,'provisional-four-options',`Q${n} must have complete provisional choices`);
+ assert.ok(q.text.trim().length>12);
+ assert.ok('ABCD'.split('').every(l=>q.options[l].trim()));
+ assert.equal(q.sourcePages[0],n<=34?12:n<=40?14:n<=47?16:18);
+ assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
+}
