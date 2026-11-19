@@ -87,9 +87,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered eleven fully numbered CDS 2010 I/II, 2011–13 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 1320 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered twelve fully numbered CDS 2008 II, 2010 I/II, 2011–13 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 1440 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-ii-2008-gk','cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -99,6 +99,27 @@ for(const id of ['cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceII2008=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2008-gk.json'),'utf8'));
+assert.equal(sourceII2008.questions.length,120);
+assert.deepEqual(sourceII2008.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+assert.deepEqual(sourceII2008.unresolvedQuestionNumbers,[]);
+assert.equal(sourceII2008.grading,'disabled');assert.equal(sourceII2008.officialOriginalConfirmed,false);assert.equal(sourceII2008.officialAnswerKeyChecked,false);
+assert.ok(sourceII2008.questions.every((q,i)=>q.number===i+1&&q.text?.trim()&&'ABCD'.split('').every(k=>q.options[k]?.trim())&&q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+assert.match(sourceII2008.questions[0].text,/DNA fingerprint/,'Q1 original source stem');
+assert.deepEqual(sourceII2008.questions[0].options,{A:'ELISA',B:'RIA',C:'Northern Blotting',D:'Southern Blotting'},'Q1 original third/fourth reprint labels were duplicated');
+assert.deepEqual(sourceII2008.questions[4].options,{A:'Red Phosphorus',B:'White Phosphorus',C:'Phosphorus Trioxide (PP3)',D:'Black Phosphorus'},'Q5 malformed printed fourth label');
+assert.match(sourceII2008.questions[8].text,/Sarkaria Commission/,'Q9 missing source question restored');
+assert.equal(sourceII2008.questions[7].options.D,'Density','Q8 previously had Q9 stem mixed into option D');
+assert.match(sourceII2008.questions[17].text,/Jeev Milkha Singh/,'Q18 sports matching-list definition');
+for(const n of [41,42,43,44,45])assert.deepEqual(sourceII2008.questions[n-1].options,sourceII2008.questions[40].options,'Assertion–Reason code shared by Q41–45');
+assert.equal(sourceII2008.questions[39].options.B,'Non-Cooperation Movement—Civil Disobedience Movement—Quit India Movement','Q40 shared directions must not bleed into options');
+assert.match(sourceII2008.questions[40].text,/Equatorial regions bulge/,'Q41 full assertion should be in text, not option A');
+assert.equal(sourceII2008.questions[75].options.D,'Neither 1 nor 2','Q76 source annotations must not override choices');
+assert.match(sourceII2008.questions[98].text,/Ranganathittu/,'Q99 independent source original position');
+assert.match(sourceII2008.questions[100].text,/Aurangabad/,'Q101 matching-list definitions');
+assert.match(sourceII2008.questions[119].text,/Treaty of Amritsar/,'Q120 last numbered question, exclude source answer sheet');
+assert.deepEqual(sourceII2008.questions[119].options,{A:'Lord Cornwallis',B:'Lord Dalhousie',C:'Lord Hastings',D:'Lord Minto'});
+
 const sourceI2010=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2010-gk.json'),'utf8'));
 assert.equal(sourceI2010.questions.length,120);
 assert.deepEqual(sourceI2010.unresolvedQuestionNumbers,[]);
