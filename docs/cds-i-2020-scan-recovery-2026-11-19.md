@@ -33,3 +33,15 @@ The previous CDS II 2019 source draft now contains 120 English question-and-opti
 - GitHub content files, catalog status and test expectations updated; CI execution and live deployment not verified.
 
 The latest counts here supersede the earlier progress numbers.
+
+## Final English-source structural completion — 19 November 2026
+
+- Inspected English source image pages 19, 21, 23, 25, 27, 29, 31, 33 and 35, then rechecked page 9 for Q24 and Q27.
+- Added source-numbered English A–D transcriptions for Q59–91 where incomplete (27 records), and Q93–120 where incomplete (26 records), then restored Q24 and Q27 (2 records).
+- **Latest results: 120 recovered question stems; 120 complete provisional four-option positions; zero incomplete positions.**
+- All 16 CDS GK JSON papers now have a full 120-position English source text and four choices: **1,920 structurally complete, provisional source transcriptions**.
+- The PDF source is a marked-up/annotated third-party copy. Source-to-official-verbatim matching, precise scientific typography, original diagrams, Hindi-language versions and official final key series mapping still need independent review.
+- `correctAnswer` remains null; `scoreEligible` false; `grading` disabled for all positions. A provisional A–D set is not a claim that a question is officially verified.
+- Catalog and regression-test expectations updated; automated CI result and deployed site QA remain unconfirmed.
+
+This final section supersedes prior incomplete-position counts in the same document.
