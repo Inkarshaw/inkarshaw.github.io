@@ -404,9 +404,9 @@ for(let n=107;n<=110;n++)assert.match(reviewed.questions[n-1].options.A,/Stateme
 
 // CDS I 2020 opening scan pages: answer marks are not treated as an official key.
 const c2020=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2020-gk.json'),'utf8'));
-assert.equal(c2020.stats.textStems,110);
-assert.equal(c2020.stats.provisionalFourOptionSets,39);
-assert.equal(c2020.unresolvedQuestionNumbers.length,81);
+assert.equal(c2020.stats.textStems,116);
+assert.equal(c2020.stats.provisionalFourOptionSets,65);
+assert.equal(c2020.unresolvedQuestionNumbers.length,55);
 for(const [start,end,page] of [[1,5,3],[7,7,3],[8,8,5],[10,14,5],[16,16,5],[17,20,7],[22,22,7]]){
  for(let n=start;n<=end;n++){
   const q=c2020.questions[n-1];
@@ -415,3 +415,15 @@ for(const [start,end,page] of [[1,5,3],[7,7,3],[8,8,5],[10,14,5],[16,16,5],[17,2
   assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
  }
 }
+
+// CDS I 2020 source scan pages 9–17; avoid hallucinating Q24 and Q27.
+for(const [start,end,page] of [[23,23,9],[25,26,9],[28,29,9],[34,36,11],[37,42,13],[45,46,15],[48,50,15],[51,57,17]]){
+ for(let n=start;n<=end;n++){
+  const q=c2020.questions[n-1];
+  assert.equal(q.extraction,'provisional-four-options',`Q${n} source needs four options`);
+  assert.equal(q.sourcePages[0],page);
+  assert.ok(q.text.trim());assert.ok('ABCD'.split('').every(l=>q.options[l].trim()));
+  assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
+ }
+}
+assert.ok(c2020.unresolvedQuestionNumbers.includes(24)&&c2020.unresolvedQuestionNumbers.includes(27));
