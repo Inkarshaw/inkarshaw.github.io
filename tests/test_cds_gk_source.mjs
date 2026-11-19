@@ -87,9 +87,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered ten fully numbered CDS 2010–13 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 1200 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered eleven fully numbered CDS 2010 I/II, 2011–13 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 1320 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -99,6 +99,31 @@ for(const id of ['cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceI2010=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2010-gk.json'),'utf8'));
+assert.equal(sourceI2010.questions.length,120);
+assert.deepEqual(sourceI2010.unresolvedQuestionNumbers,[]);
+assert.deepEqual(sourceI2010.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+assert.deepEqual(sourceI2010.unresolvedSourceVisualNumbers,[92]);
+assert.deepEqual(idx.paperStatuses.find(x=>x.id==='cds-i-2010-gk').unresolvedSourceVisualNumbers,[92]);
+assert.equal(sourceI2010.questions[91].diagramRequired,true);
+assert.equal(sourceI2010.questions[91].diagramStatus,'unresolved-original-figure');
+assert.equal(sourceI2010.questions[91].sourceVisualVerified,false);
+assert.match(sourceI2010.questions[3].text,/coil in a heater/,'Q4 must retain original source question not corrupted Tata Steel Q80');
+assert.match(sourceI2010.questions[20].text,/current global economic crisis/,'Q21 must contain full original statements');
+assert.match(sourceI2010.questions[41].text,/Hydrosphere/,'Q42 source matching table must remain in the stem');
+assert.deepEqual(sourceI2010.questions[52].options,{A:'4 3 2 1',B:'1 2 3 4',C:'4 2 3 1',D:'1 3 2 4'},'Q53 original code alternatives');
+assert.match(sourceI2010.questions[77].text,/Cotton|crops/,'Q78 source order');
+assert.match(sourceI2010.questions[96].text,/year 2008/,'Q97 source correction from 2020 PDF reprint error');
+assert.ok(!sourceI2010.questions[96].text.includes('Rohit Sharma'));
+assert.match(sourceI2010.questions[99].text,/INS/,'Q100 original aircraft-carrier item restored');
+assert.match(sourceI2010.questions[109].text,/organic farming/,'Q110 original true-false table');
+assert.match(sourceI2010.questions[110].text,/CFL lamp/,'Q111 full source table');
+assert.match(sourceI2010.questions[113].text,/Solder/,'Q114 alloys table');
+assert.equal(sourceI2010.questions[119].options.C,'45°');
+assert.ok(sourceI2010.questions.every(q=>q.text.trim()&&'ABCD'.split('').every(k=>q.options[k].trim())));
+assert.ok(sourceI2010.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+assert.equal(sourceI2010.grading,'disabled');assert.equal(sourceI2010.officialOriginalConfirmed,false);assert.equal(sourceI2010.officialAnswerKeyChecked,false);
+
 const sourceII2010=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2010-gk.json'),'utf8'));
 assert.equal(sourceII2010.questions.length,120);
 assert.deepEqual(sourceII2010.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
