@@ -21,6 +21,9 @@ for(const entry of idx.paperStatuses){
  assert.equal(p.originalQuestionCountExpected,120);assert.equal(p.questions.length,120);
  assert.equal(p.stats.textStems,entry.textStems);assert.equal(p.stats.provisionalFourOptionSets,entry.provisionalFourOptionSets);
  assert.equal(p.unresolvedQuestionNumbers.length,entry.unresolvedPositions);
+ assert.equal(entry.textStems,p.questions.filter(q=>q.text.trim()).length,entry.id+' actual recovered stems must match index');
+ assert.equal(entry.provisionalFourOptionSets,p.questions.filter(q=>q.extraction==='provisional-four-options').length,entry.id+' actual complete text sets must match index');
+ assert.equal(entry.unresolvedPositions,p.questions.filter(q=>q.extraction!=='provisional-four-options').length,entry.id+' actual unresolved positions must match index');
  for(let n=1;n<=120;n++){
   const q=p.questions[n-1];assert.equal(q.number,n);assert.equal(q.scoreEligible,false);assert.equal(q.correctAnswer,null);assert.equal(q.ungraded,true);
   for(const L of 'ABCD')assert.equal(typeof q.options[L],'string');
