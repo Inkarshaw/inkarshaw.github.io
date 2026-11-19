@@ -21,3 +21,15 @@ Date: 19 November 2026
 - Execute regression tests and verify live website after deployment.
 
 The previous CDS II 2019 source draft now contains 120 English question-and-option sets, but it likewise remains officially unverified and ungraded.
+
+## Subsequent recovery from English scan pages 9–17
+
+- Visually inspected original English scanned pages 9, 11, 13, 15 and 17 (paired with Hindi pages).
+- Added **26 further provisionally complete source-numbered questions**: Q23, Q25–26, Q28–29, Q34–36, Q37–42, Q45–46, Q48–50 and Q51–57.
+- Existing already complete items Q30–33, Q43–44 and Q47 were preserved.
+- Q24 (formula notation) and Q27 (ordering/options) remain incomplete pending higher-confidence visual inspection.
+- **Latest totals:** 116 nonblank question stems, **65 complete provisional A–D positions**, **55 incomplete positions** of 120.
+- Official key still unmapped; every record remains ungraded, with no official-verbatim claim.
+- GitHub content files, catalog status and test expectations updated; CI execution and live deployment not verified.
+
+The latest counts here supersede the earlier progress numbers.
