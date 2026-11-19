@@ -1,0 +1,37 @@
+name: CDS GK paper integrity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/quizzes/cds-gk/**'
+      - 'assets/js/pyq-cds.js'
+      - 'pyq-cds.html'
+      - 'tests/test_cds_gk_source.mjs'
+      - '.github/workflows/cds-gk-integrity.yml'
+  pull_request:
+    paths:
+      - 'data/quizzes/cds-gk/**'
+      - 'assets/js/pyq-cds.js'
+      - 'pyq-cds.html'
+      - 'tests/test_cds_gk_source.mjs'
+      - '.github/workflows/cds-gk-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    name: Verify 16 ungraded CDS GK text papers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate 1920 source-numbered questions and disabled scoring
+        run: node tests/test_cds_gk_source.mjs
+      - name: Validate CDS reader JavaScript syntax
+        run: node --check assets/js/pyq-cds.js
