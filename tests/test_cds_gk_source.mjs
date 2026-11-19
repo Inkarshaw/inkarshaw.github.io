@@ -87,9 +87,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered twelve fully numbered CDS 2008 II, 2010 I/II, 2011–13 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 1440 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-ii-2008-gk','cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered thirteen fully numbered CDS 2008 I/II, 2010 I/II, 2011–13 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 1560 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-i-2008-gk','cds-ii-2008-gk','cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -99,6 +99,29 @@ for(const id of ['cds-ii-2008-gk','cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceI2008=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2008-gk.json'),'utf8'));
+assert.equal(sourceI2008.questions.length,120);
+assert.deepEqual(sourceI2008.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+assert.deepEqual(sourceI2008.unresolvedQuestionNumbers,[]);
+assert.equal(sourceI2008.grading,'disabled');assert.equal(sourceI2008.officialOriginalConfirmed,false);assert.equal(sourceI2008.officialAnswerKeyChecked,false);
+assert.ok(sourceI2008.questions.every((q,i)=>q.number===i+1&&q.text?.trim()&&'ABCD'.split('').every(k=>q.options[k]?.trim())&&q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+assert.match(sourceI2008.questions[1].text,/peaks is the highest/,'Q2 must reflect uploaded source rather than Parliament committee text');
+assert.match(sourceI2008.questions[3].text,/pairs is correctly matched/,'Q4 original country-currency question');
+assert.match(sourceI2008.questions[6].text,/South-West Monsoon/,'Q7 numbered statements must remain');
+assert.equal(sourceI2008.questions[6].options.C,'1 and 3','Q7 source coded choices recovered');
+assert.match(sourceI2008.questions[10].text,/Jallianwala Bagh Massacre/,'Q11 original events and four chronological codes');
+assert.deepEqual(sourceI2008.questions[16].options,{A:'1',B:'6',C:'7',D:'10'});
+assert.equal(sourceI2008.questions[20].options.B,'Rays of light are scattered by the fog droplets','Q21 directions must not bleed into options');
+for(const n of [22,23,24,25])assert.deepEqual(sourceI2008.questions[n-1].options,sourceI2008.questions[21].options,'Q22-25 original shared Assertion-Reason choices');
+assert.match(sourceI2008.questions[24].text,/before any court/,'Q25 source-copy restoration recorded');
+assert.match(sourceI2008.questions[41].text,/Bhortal Nritya/,'Q42 printed matching list');
+assert.match(sourceI2008.questions[43].text,/National Institute of Siddha/,'Q44 printed list definitions must be separate');
+assert.match(sourceI2008.questions[89].text,/Ninth Schedule/,'Q90 constitutional schedule table remains present');
+assert.match(sourceI2008.questions[97].text,/Conjunctivitis/,'Q98 disease/body-part matching list');
+assert.equal(sourceI2008.questions[113].options.C,'Both 1 and 2','Q114 study-source printing anomaly recorded');
+assert.match(sourceI2008.questions[119].text,/easily digestible source of protein/,'Q120 original final question');
+assert.ok(!sourceI2008.questions[119].text.includes('ANSWERS'),'Printed study-paper answer table must not be attached to last question');
+
 const sourceII2008=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2008-gk.json'),'utf8'));
 assert.equal(sourceII2008.questions.length,120);
 assert.deepEqual(sourceII2008.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
