@@ -84,9 +84,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered five fully numbered CDS 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 600 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered six fully numbered CDS 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 720 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -96,6 +96,19 @@ for(const id of ['cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-g
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceII2016=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2016-gk.json'),'utf8'));
+assert.deepEqual(sourceII2016.questions[5].options,{A:'1 only',B:'2 only',C:'2 and 3 only',D:'1, 2 and 3'},'Q6 original enumeration must be preserved');
+assert.match(sourceII2016.questions[13].text,/hypocentre/,'Q14 four earthquake statements must remain in the stem');
+assert.match(sourceII2016.questions[25].text,/Mg/,'Q26 matching-list definitions must remain present');
+assert.deepEqual(sourceII2016.questions[28].options,{A:'C > O > H > N',B:'O > C > H > N',C:'N > C > H > O',D:'N > C > O > H'},'Q29 damaged study-PDF options must stay source-corrected');
+assert.equal(sourceII2016.questions[33].options.A,'4 2 3 1','Q34 matching-code correction');
+assert.deepEqual(sourceII2016.questions[50].options,sourceII2016.questions[52].options,'Q51–53 use same shared Assertion–Reason code');
+assert.deepEqual(sourceII2016.questions[75].options,{A:'1 only',B:'1 and 3',C:'2 and 4 only',D:'1, 2 and 4'},'Q76 source-truncated D option restored');
+assert.equal(sourceII2016.questions[95].options.C,'1, 3 and 4','Q96 study PDF duplicated option; retain alternative print comparison');
+assert.deepEqual(sourceII2016.questions[107].options,{A:'CRISIL',B:'CARE',C:'ICRA',D:'All of the above'});
+assert.match(sourceII2016.questions[115].text,/Kurinchi/,'Q116 matching-list definitions must remain present');
+assert.ok(sourceII2016.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+
 const sourceII2017=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2017-gk.json'),'utf8'));
 assert.deepEqual(sourceII2017.unresolvedSourceVisualNumbers,[82,101],'Undigitized source maps must stay explicitly flagged');
 assert.deepEqual(idx.paperStatuses.find(p=>p.id===sourceII2017.id).unresolvedSourceVisualNumbers,[82,101]);
