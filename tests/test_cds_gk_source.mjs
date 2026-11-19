@@ -84,9 +84,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered seven fully numbered CDS 2013 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 840 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered eight fully numbered CDS 2012 II, 2013 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 960 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -96,6 +96,26 @@ for(const id of ['cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceII2012=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2012-gk.json'),'utf8'));
+assert.equal(sourceII2012.questions.length,120);
+assert.deepEqual(sourceII2012.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+assert.deepEqual(sourceII2012.unresolvedQuestionNumbers,[]);
+assert.deepEqual(sourceII2012.unresolvedSourceVisualNumbers,[26,107,116],'Original scanned 2012 booklet has three map/diagram questions without embedded figures');
+assert.deepEqual(idx.paperStatuses.find(p=>p.id==='cds-ii-2012-gk').unresolvedSourceVisualNumbers,[26,107,116]);
+assert.match(sourceII2012.questions[0].text,/planet Neptune appears blue/,'Q1 must follow the uploaded original booklet, not misnumbered bus-speed text');
+assert.match(sourceII2012.questions[1].text,/Comets revolve round the Sun/,'Q2 original source order');
+assert.match(sourceII2012.questions[46].text,/A bus travels at a speed of 50/,'Q47 source-number recovery');
+assert.match(sourceII2012.questions[102].text,/Indian Councils Act, 1892/,'Q103 original matching lists');
+assert.match(sourceII2012.questions[106].text,/Copper/,'Q107 map-linked mineral codes');
+assert.deepEqual(sourceII2012.questions[0].options,sourceII2012.questions[6].options,'Q1–7 printed Statement I/II answer code must be the same');
+assert.equal(sourceII2012.questions[25].diagramStatus,'unresolved-original-figure');
+assert.equal(sourceII2012.questions[106].diagramStatus,'unresolved-original-figure');
+assert.equal(sourceII2012.questions[115].diagramStatus,'unresolved-original-figure');
+assert.equal(sourceII2012.questions[106].sourceVisualVerified,false);
+assert.ok(sourceII2012.questions.every(q=>q.text.trim()&&'ABCD'.split('').every(l=>q.options[l].trim())));
+assert.ok(sourceII2012.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+assert.equal(sourceII2012.grading,'disabled');assert.equal(sourceII2012.officialOriginalConfirmed,false);assert.equal(sourceII2012.officialAnswerKeyChecked,false);
+
 const sourceII2013=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2013-gk.json'),'utf8'));
 assert.equal(sourceII2013.questions.length,120,'CDS II 2013 must retain all 120 original-numbered positions');
 assert.deepEqual(sourceII2013.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
