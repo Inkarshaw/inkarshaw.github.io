@@ -84,9 +84,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered three fully numbered CDS 2018 I/II and 2019 I provisional paper transcriptions.
-// All 360 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered four fully numbered CDS 2017 I, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 480 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-i-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -96,6 +96,16 @@ for(const id of ['cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
  assert.equal(p.grading,'disabled');assert.equal(p.officialOriginalConfirmed,false);assert.equal(p.officialAnswerKeyChecked,false);
 }
+const sourceI2017=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2017-gk.json'),'utf8'));
+assert.match(sourceI2017.questions[1].text,/DNA into RNA/);
+assert.equal(sourceI2017.questions[10].options.B,'C/7','Q11 capacitor fraction recovered from printed source');
+assert.equal(sourceI2017.questions[27].options.D,'R/5','Q28 parallel-wire printed fraction must remain readable');
+assert.match(sourceI2017.questions[80].text,/Rowlatt Act/,'Q81 matching-list definitions must remain inside stem');
+assert.deepEqual(sourceI2017.questions[110].options,sourceI2017.questions[111].options,'Q111–112 shared Assertion–Reason options');
+assert.match(sourceI2017.questions[112].options.B,/Dr\. B\. R\. Ambedkar/,'Q113 initials must not split the option');
+assert.equal(sourceI2017.questions[119].options.A,'The Supreme Court of India');
+assert.ok(sourceI2017.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+
 const source2018=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2018-gk.json'),'utf8'));
 assert.match(source2018.questions[11].text,/sinkhole/);
 assert.match(source2018.questions[33].text,/horizon/);
