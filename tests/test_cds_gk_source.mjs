@@ -28,7 +28,7 @@ for(const entry of idx.paperStatuses){
   const q=p.questions[n-1];assert.equal(q.number,n);assert.equal(q.scoreEligible,false);assert.equal(q.correctAnswer,null);assert.equal(q.ungraded,true);
   for(const L of 'ABCD')assert.equal(typeof q.options[L],'string');
  }
- if(p.textExtractionMethod.includes('scan-ocr'))scans++;
+ if(/scan/i.test(p.textExtractionMethod))scans++;
  stems+=entry.textStems;options+=entry.provisionalFourOptionSets;
 }
 assert.equal(scans,7);assert.equal(idx.paperStatuses.length-scans,9);
@@ -87,9 +87,9 @@ for(const [id,guards] of Object.entries({
  }
 }
 
-// Recovered thirteen fully numbered CDS 2008 I/II, 2010 I/II, 2011–13 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
-// All 1560 A-D positions are still ungraded source drafts, NOT official certifications.
-for(const id of ['cds-i-2008-gk','cds-ii-2008-gk','cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
+// Recovered fourteen fully numbered CDS 2008 I/II, 2010 I/II, 2011 II, 2012 I/II, 2013 II, 2016 II, 2017 I/II, 2018 I/II and 2019 I provisional paper transcriptions.
+// All 1680 A-D positions are still ungraded source drafts, NOT official certifications.
+for(const id of ['cds-i-2008-gk','cds-ii-2008-gk','cds-i-2010-gk','cds-ii-2010-gk','cds-ii-2011-gk','cds-i-2012-gk','cds-ii-2012-gk','cds-ii-2013-gk','cds-ii-2016-gk','cds-i-2017-gk','cds-ii-2017-gk','cds-i-2018-gk','cds-ii-2018-gk','cds-i-2019-gk']){
  const p=JSON.parse(fs.readFileSync(path.join(base,id+'.json'),'utf8'));
  const status=idx.paperStatuses.find(e=>e.id===id);
  assert.deepEqual(p.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
@@ -211,6 +211,32 @@ assert.match(sourceII2011.questions[109].text,/Lactic acid/,'Q110 matching table
 assert.match(sourceII2011.questions[119].text,/HIV\/AIDS/,'Q120 original last position');
 assert.equal(sourceII2011.grading,'disabled');
 assert.ok(sourceII2011.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true));
+
+const sourceI2012=JSON.parse(fs.readFileSync(path.join(base,'cds-i-2012-gk.json'),'utf8'));
+assert.deepEqual(sourceI2012.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
+assert.equal(sourceI2012.questions.length,120);
+assert.deepEqual(sourceI2012.unresolvedQuestionNumbers,[]);
+assert.equal(sourceI2012.grading,'disabled');assert.equal(sourceI2012.officialOriginalConfirmed,false);assert.equal(sourceI2012.officialAnswerKeyChecked,false);
+assert.ok(sourceI2012.questions.every((q,i)=>q.number===i+1&&q.text.trim()&&'ABCD'.split('').every(l=>q.options[l].trim())&&q.correctAnswer===null&&q.ungraded===true&&q.scoreEligible===false));
+assert.match(sourceI2012.questions[0].text,/Lack of atmosphere around the Moon/,'Q1 from uploaded original paper, not misassigned Q57 Kalinga text');
+assert.match(sourceI2012.questions[3].text,/piano wires/,'Q4 must have correct stem, not legacy Q114 Kanishka material');
+assert.match(sourceI2012.questions[6].text,/inflationary pressures/,'Q7 multiple-statements recovered');
+assert.deepEqual(sourceI2012.questions[7].options,{A:'Maastricht Treaty',B:'Treaty of Paris',C:'Treaty of Rome',D:'Treaty of Lisbon'});
+assert.deepEqual(sourceI2012.questions[22].options,{A:'4.5–5.5',B:'5.5–6.5',C:'7.5–8.0',D:'8.5–9.0'});
+assert.match(sourceI2012.questions[35].text,/NIFTY/,'Q36 three numbered statements recovered');
+assert.equal(sourceI2012.questions[43].options.B,'Bangladesh','Q44 longest-border source number and option order');
+assert.match(sourceI2012.questions[56].text,/Kalinga Prize/,'Q57 earlier misplaced in Q1');
+assert.match(sourceI2012.questions[58].text,/Bharathipura/,'Q59 original matching book list recovered');
+assert.deepEqual(sourceI2012.questions[58].options,{A:'4 2 3 1',B:'1 2 3 4',C:'4 3 2 1',D:'1 3 2 4'});
+assert.match(sourceI2012.questions[64].text,/Indravati/,'Q65 original Tiger Reserve list');
+assert.match(sourceI2012.questions[68].text,/Third Carnatic War/,'Q69 original battle/treaty codes');
+assert.match(sourceI2012.questions[72].text,/Permanent Settlement/,'Q73 four original statements');
+assert.match(sourceI2012.questions[97].text,/Konkan/,'Q98 naval exercise matching lists');
+assert.match(sourceI2012.questions[103].text,/Coriolis/,'Q104 original four numbered statements');
+assert.match(sourceI2012.questions[110].text,/Iyothee Thass/,'Q111 original source matching list');
+assert.deepEqual(sourceI2012.questions[110].options,{A:'4 2 1 3',B:'4 3 2 1',C:'4 1 2 3',D:'3 2 1 4'});
+assert.equal(sourceI2012.questions[114].options.B,'reptiles','Q115 source copy dropped option B in text layer');
+assert.match(sourceI2012.questions[119].text,/PRAHAR/,'Q120 correctly numbered final question');
 
 const sourceII2012=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2012-gk.json'),'utf8'));
 assert.equal(sourceII2012.questions.length,120);
