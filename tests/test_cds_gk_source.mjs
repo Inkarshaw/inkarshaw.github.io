@@ -468,11 +468,29 @@ for(const [id,series,anchorOptions] of [
  assert.ok(v);
  assert.equal(v.candidateBookletSeries,series);
  assert.equal(v.seriesMatchStatus,'candidate-matched-not-officially-authenticated');
- assert.deepEqual(v.seriesMatchEvidence.map(a=>a.question),[1,2,3,4,5]);
- assert.equal(v.seriesMatchEvidence.map(a=>a.option).join(','),anchorOptions);
+ assert.deepEqual(v.seriesMatchEvidence.slice(0,5).map(a=>a.question),[1,2,3,4,5]);
+ assert.equal(v.seriesMatchEvidence.slice(0,5).map(a=>a.option).join(','),anchorOptions);
  assert.equal(v.officialQuestionPaperMatched,false);
  assert.equal(v.officialFinalAnswerKeyMatched,false);
  assert.equal(v.officiallyScoreEligibleQuestions,0);
  assert.match(v.candidateKeyMirror,/^https:\/\//);
 }
 assert.deepEqual(verification.papers.find(p=>p.id==='cds-ii-2019-gk').candidateSeriesDroppedQuestionNumbers,[53]);
+
+// Separately archived UPSC-hosted Series B key is not an authorization to grade the text transcription.
+const key2019=JSON.parse(fs.readFileSync(path.join(base,'official-key-candidates','cds-ii-2019-series-b.json'),'utf8'));
+assert.equal(key2019.keySourceAuthenticated,true);
+assert.equal(key2019.enabledForScoring,false);
+assert.equal(key2019.scoreEligibleCount,0);
+assert.equal(key2019.series,'B');
+assert.equal(key2019.answers.length,120);
+assert.deepEqual(key2019.answers.map(x=>x.number),Array.from({length:120},(_,i)=>i+1));
+assert.ok(key2019.answers.every(x=>/^[ABCDX]$/.test(x.answer)));
+assert.deepEqual(key2019.answers.filter(x=>x.answer==='X').map(x=>x.number),[53]);
+for(const [n,a] of [[1,'A'],[2,'D'],[3,'A'],[4,'C'],[5,'D'],[46,'C'],[83,'C'],[98,'C'],[120,'A']])
+ assert.equal(key2019.answers[n-1].answer,a);
+const status2019=verification.papers.find(x=>x.id==='cds-ii-2019-gk');
+assert.equal(status2019.officialFinalAnswerKeySourceAuthenticated,true);
+assert.equal(status2019.officialFinalAnswerKeyMatched,false);
+assert.equal(status2019.officiallyScoreEligibleQuestions,0);
+assert.equal(status2019.officialSeriesBKeyTranscription,'data/quizzes/cds-gk/official-key-candidates/cds-ii-2019-series-b.json');
