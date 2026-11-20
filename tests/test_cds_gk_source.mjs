@@ -458,3 +458,21 @@ for(const item of verification.papers){
  assert.equal(item.officiallyScoreEligibleQuestions,0);
  assert.equal(item.reviewStatus,'not-officially-verified');
 }
+
+// Candidate series matching is evidence only, never an authorization to score.
+for(const [id,series,anchorOptions] of [
+ ['cds-i-2020-gk','A','C,D,C,B,D'],
+ ['cds-ii-2019-gk','B','A,D,A,C,D']
+]){
+ const v=verification.papers.find(p=>p.id===id);
+ assert.ok(v);
+ assert.equal(v.candidateBookletSeries,series);
+ assert.equal(v.seriesMatchStatus,'candidate-matched-not-officially-authenticated');
+ assert.deepEqual(v.seriesMatchEvidence.map(a=>a.question),[1,2,3,4,5]);
+ assert.equal(v.seriesMatchEvidence.map(a=>a.option).join(','),anchorOptions);
+ assert.equal(v.officialQuestionPaperMatched,false);
+ assert.equal(v.officialFinalAnswerKeyMatched,false);
+ assert.equal(v.officiallyScoreEligibleQuestions,0);
+ assert.match(v.candidateKeyMirror,/^https:\/\//);
+}
+assert.deepEqual(verification.papers.find(p=>p.id==='cds-ii-2019-gk').candidateSeriesDroppedQuestionNumbers,[53]);
