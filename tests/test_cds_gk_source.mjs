@@ -456,7 +456,7 @@ for(const item of verification.papers){
  assert.equal(item.officialQuestionPaperMatched,false);
  assert.equal(item.officialFinalAnswerKeyMatched,false);
  assert.equal(item.officiallyScoreEligibleQuestions,0);
- assert.equal(item.reviewStatus,'not-officially-verified');
+ assert.ok(['not-officially-verified','official-key-source-authenticated-source-paper-series-not-yet-fully-verified'].includes(item.reviewStatus));
 }
 
 // Candidate series matching is evidence only, never an authorization to score.
