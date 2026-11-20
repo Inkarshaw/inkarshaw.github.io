@@ -432,6 +432,8 @@ assert.equal(c2020.questions[1].options.B,'¹₁H and ²₁H');
 assert.equal(c2020.questions[1].options.C,'¹²₆C and ¹⁴₆C');
 assert.equal(c2020.questions[10].options.B,'⁹⁄₄ × 10⁸ m/s');
 assert.equal(c2020.questions[10].options.C,'³⁄₂ × 10⁸ m/s');
+assert.equal(c2020.questions[12].options.A,'N·m');
+assert.equal(c2020.questions[12].options.B,'N/m');
 assert.equal(c2020.questions[21].options.A,'2');
 assert.equal(c2020.questions[24].options.D,'ohm·cm²');
 assert.match(c2020.questions[86].text,/82 mining areas/);
