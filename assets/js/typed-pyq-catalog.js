@@ -32,7 +32,8 @@ function coveredByTyped(e){
 return entries.some(x=>x.exam===e.category&&x.year===e.year&&
  ((e.category==='TNPSC'&&e.exam==='Group IV'&&/^Group IV\b/.test(x.paper))||
  (e.category==='TNPSC'&&e.exam==='Group I'&&/^Group I\b/.test(x.paper))||
- (e.category==='TNUSRB'&&/Police Constable/i.test(e.exam)&&/^Police Constable\b/.test(x.paper))));
+ (e.category==='TNUSRB'&&/Police Constable/i.test(e.exam)&&/^Police Constable\b/.test(x.paper))||
+ (e.category==='UPSC'&&e.exam==='Combined Defence Services'&&/^CDS (?:I|II) · General Knowledge$/.test(x.paper))));
 }
 function coveredByAdapted(e){
 const name=e.category==='TNPSC'&&e.exam==='Group IV'?'TNPSC Group IV':
