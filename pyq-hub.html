@@ -190,6 +190,10 @@ function render(){
    note.textContent=x.year===2022?"Typed transcription · review pending, with official final key; original PDF companion also available.":"Exact published questions in the official PDF · 200 synchronized A–E answer positions; not a typed transcription.";
    card.append(note);
   }
+  if(x.category==="UPSC"&&x.exam==="Combined Defence Services"&&x.year>=2008&&x.year<=2020){
+   const a=document.createElement("a");a.className="quiz";a.href="pyq-cds.html";a.textContent="View available CDS I / II text quizzes →";actions.append(a);
+   const note=document.createElement("p");note.className="pyq-warning";note.textContent="16 General Knowledge text papers indexed across 2008–2020, with some years/sessions absent. Provisional English text, ungraded.";card.append(note);
+  }
   if(count>=10){
    const a=document.createElement("a");a.className="quiz";
    a.href="pyq-full-quiz.html?exam="+encodeURIComponent(expectedSourceExam(x))+"&year="+x.year+"&count=10&start=1&mode=practice";
