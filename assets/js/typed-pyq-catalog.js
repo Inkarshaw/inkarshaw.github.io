@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
-const expectedLink=/^(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20\d{2})?$/;
+const expectedLink=/^(?:(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20\d{2})?|pyq-cds\.html\?paper=cds-(?:i|ii)-20\d{2}-gk)$/;
 let entries=[];
 
 let adapted=[], archive=[]; let archiveVisible=16;
@@ -73,7 +73,7 @@ const total=entries.reduce((n,e)=>n+e.typed,0),full=entries.filter(e=>e.typed===
 const sourceCount=adapted.reduce((n,e)=>n+e.count,0);
 const missing=archive.filter(e=>!hasTextFor(e)).length;
 $('stats').replaceChildren();
-for(const label of [full+' complete numbered text quizzes · '+total+' / '+total+' playable positions',archive.length+' indexed exam-year sources',adapted.length+' adapted sets · '+sourceCount+' questions',missing+' archived years without local text'])$('stats').append(element('span','',label));
+for(const label of [full+' complete numbered text quizzes · '+total+' typed question positions',archive.length+' indexed exam-year sources',adapted.length+' adapted sets · '+sourceCount+' questions',missing+' archived years without local text'])$('stats').append(element('span','',label));
 }
 
 function element(tag,className,txt){const el=document.createElement(tag);if(className)el.className=className;if(txt!==undefined)el.textContent=txt;return el}
@@ -91,7 +91,7 @@ const title=element('h2','',e.paper);card.append(title);
 const metrics=element('div','metrics');const large=element('strong','',String(e.typed));const small=element('span','', 'of '+e.total+' original question positions available as text');metrics.append(large,small);card.append(metrics);
 const track=element('div','track');track.setAttribute('aria-label',e.typed+' of '+e.total+' positions typed');
 const fill=element('span');fill.style.width=(100*e.typed/e.total).toFixed(1)+'%';track.append(fill);card.append(track);
-card.append(element('div','status',e.level+' · '+e.scorable+' question positions with provisional key scoring'));
+card.append(element('div','status',e.level+' · '+(e.scorable?e.scorable+' positions with provisional key scoring':'Scoring disabled / not verified')));
 card.append(element('p','',e.sourceStatus));
 if(expectedLink.test(e.link)){const a=element('a','play',e.typed===e.total?'Start full text quiz':'Open available text');a.href=e.link;card.append(a)}
 cards.append(card);
@@ -124,7 +124,8 @@ Promise.allSettled([
  fetchJSON('data/quizzes/typed-pyq-catalog.json'),
  fetchJSON('data/quizzes/verified-pyqs.json'),
  fetchJSON('data/quizzes/pyq-yearwise-catalog.json'),
- fetchJSON('data/quizzes/tnusrb-pc-catalog.json')
+ fetchJSON('data/quizzes/tnusrb-pc-catalog.json'),
+ fetchJSON('data/quizzes/cds-gk/index.json')
 ]).then(results=>{
  if(results[0].status==='fulfilled'){
  const d=results[0].value;
@@ -155,6 +156,13 @@ Promise.allSettled([
  !Number.isInteger(e.scorable)||e.scorable<0||e.scorable>e.typed||!expectedLink.test(e.link))){
  entries=entries.concat(supplement.entries);
  }
+ }
+ if(results[4].status==='fulfilled'){
+  const cds=results[4].value;
+  if(cds?.schemaVersion===1&&cds.exam==='UPSC CDS'&&cds.gradingEnabled===false&&Array.isArray(cds.paperStatuses)){
+   const papers=cds.paperStatuses.filter(e=>/^cds-(?:i|ii)-20\\d{2}-gk$/.test(e.id)&&Number.isInteger(e.year)&&["I","II"].includes(e.session)&&Number.isInteger(e.provisionalFourOptionSets)&&Number.isInteger(e.unresolvedPositions)&&e.provisionalFourOptionSets+e.unresolvedPositions===120);
+   entries.push(...papers.map(e=>({id:e.id,exam:'UPSC',paper:'CDS '+e.session+' · General Knowledge',year:e.year,total:120,typed:e.provisionalFourOptionSets,scorable:0,level:'Provisional original-numbered English text · ungraded',sourceStatus:'Full question-numbered study text; exact booklet wording and official answer-key alignment await verification. No scoring.',link:'pyq-cds.html?paper='+e.id,type:'full-numbered-draft'})));
+  }
  }
  if(!entries.length&&!adapted.length&&!archive.length)throw Error('All PYQ indexes unavailable');
  refreshYears();refreshStats();render();
