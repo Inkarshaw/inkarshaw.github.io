@@ -466,7 +466,7 @@ for(const item of verification.papers){
  assert.equal(item.officialQuestionPaperMatched,false);
  assert.equal(item.officialFinalAnswerKeyMatched,false);
  assert.equal(item.officiallyScoreEligibleQuestions,0);
- assert.ok(['not-officially-verified','official-key-source-authenticated-source-paper-series-not-yet-fully-verified'].includes(item.reviewStatus));
+ assert.ok(['not-officially-verified','official-key-source-authenticated-source-paper-series-not-yet-fully-verified','candidate-full-series-a-key-unverified-two-source-conflicts'].includes(item.reviewStatus));
 }
 
 // Candidate series matching is evidence only, never an authorization to score.
@@ -528,3 +528,23 @@ for(const id of ['cds-ii-2019-gk','cds-i-2020-gk']){
  const e=idx.paperStatuses.find(x=>x.id===id);
  assert.ok(e.sourceMode.includes('scan'));
 }
+
+// CDS I 2020 Series A third-party table must remain isolated from scored questions.
+// Official UPSC answer-key URL was not retrievable; mirror conflicts are unresolved.
+const key2020=JSON.parse(fs.readFileSync(path.join(base,'official-key-candidates','cds-i-2020-series-a-third-party.json'),'utf8'));
+assert.equal(key2020.series,'A');
+assert.equal(key2020.sourceStatus,'third-party-mirrored-answer-table-not-independently-authenticated');
+assert.equal(key2020.officialUPSCSourceAccessible,false);
+assert.equal(key2020.enabledForScoring,false);assert.equal(key2020.scoreEligibleCount,0);
+assert.equal(key2020.answers.length,120);
+assert.deepEqual(key2020.answers.map(q=>q.number),Array.from({length:120},(_,i)=>i+1));
+assert.ok(key2020.answers.every(q=>/^[ABCD]$/.test(q.answer)));
+assert.deepEqual(key2020.discrepancyReviewRequired.map(q=>q.number),[10,87]);
+assert.equal(key2020.answers[9].answer,'D'); // candidate mirror, NOT an adjudicated correct answer
+assert.equal(key2020.answers[86].answer,'D'); // candidate mirror, NOT an adjudicated correct answer
+const status2020=verification.papers.find(p=>p.id==='cds-i-2020-gk');
+assert.equal(status2020.candidateSeriesAAnswerEntries,120);
+assert.equal(status2020.officialFinalAnswerKeySourceAuthenticated,false);
+assert.equal(status2020.officialFinalAnswerKeyMatched,false);
+assert.equal(status2020.officiallyScoreEligibleQuestions,0);
+assert.deepEqual(status2020.candidateKeyConflicts.map(q=>q.number),[10,87]);
