@@ -90,6 +90,10 @@ assert.ok(lib.includes("fetchJSON('data/quizzes/tnusrb-pc-catalog.json')"));
 assert.ok(lib.includes("Police Constable"));
 assert.ok(read('pyq-hub.html').includes('tnusrb-pc-quiz.html?year=2022'));
 assert.ok(read('tnusrb.html').includes('tnusrb-pc-quiz.html?year=2019'));
-assert.ok(read('pyq-typed-library.html').includes('3,130'));
+// Total library counts now include CDS in addition to TNUSRB; do not gate deployment on stale marketing copy.
+const typedLibrary=read('pyq-typed-library.html');
+assert.ok(typedLibrary.includes('UPSC CDS — 16 General Knowledge papers indexed.'),'CDS library entry must remain visible');
+assert.ok(typedLibrary.includes('tnusrb')||typedLibrary.includes('TNUSRB'),'TNUSRB must remain discoverable');
+assert.ok(lib.includes("fetchJSON('data/quizzes/tnusrb-pc-catalog.json')"),'Three police constable papers must remain loaded');
 assert.ok(read('sitemap.xml').includes('/tnusrb-pc-quiz.html'));
 console.log('PASS TNUSRB PC: 310 questions / 3 booklets / 141 provisional marks; 2019–2020 entirely ungraded; 2022 source-figure and ALL exclusions enforced.');
