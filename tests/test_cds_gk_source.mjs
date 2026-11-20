@@ -548,3 +548,19 @@ assert.equal(status2020.officialFinalAnswerKeySourceAuthenticated,false);
 assert.equal(status2020.officialFinalAnswerKeyMatched,false);
 assert.equal(status2020.officiallyScoreEligibleQuestions,0);
 assert.deepEqual(status2020.candidateKeyConflicts.map(q=>q.number),[10,87]);
+
+// CDS discoverability regression: main PYQ entry, searchable typed library, per-paper routes.
+const hub=fs.readFileSync(path.join(root,'pyq-hub.html'),'utf8');
+const typedLibrary=fs.readFileSync(path.join(root,'pyq-typed-library.html'),'utf8');
+const typedCatalogJS=fs.readFileSync(path.join(root,'assets','js','typed-pyq-catalog.js'),'utf8');
+assert.match(hub,/<a class="pyq-start-card" href="pyq-cds\\.html">[\\s\\S]*?UPSC CDS General Knowledge/);
+assert.match(hub,/UPSC CDS I &amp; II/);
+assert.match(hub,/View available CDS I \\/ II text quizzes/);
+assert.match(typedLibrary,/UPSC CDS — 16 General Knowledge papers indexed/);
+assert.match(typedLibrary,/value="UPSC"/);
+assert.match(typedCatalogJS,/fetchJSON\\('data\\/quizzes\\/cds-gk\\/index\\.json'\\)/);
+assert.match(typedCatalogJS,/paper:'CDS '\\+e\\.session\\+' · General Knowledge'/);
+assert.match(typedCatalogJS,/link:'pyq-cds\\.html\\?paper='\\+e\\.id/);
+assert.match(typedCatalogJS,/scorable:0/);
+assert.match(typedCatalogJS,/e\\.exam==='Combined Defence Services'/);
+assert.ok(idx.paperStatuses.every(p=>fs.existsSync(path.join(root,'data','quizzes','cds-gk',p.output))));
