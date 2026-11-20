@@ -494,3 +494,19 @@ assert.equal(status2019.officialFinalAnswerKeySourceAuthenticated,true);
 assert.equal(status2019.officialFinalAnswerKeyMatched,false);
 assert.equal(status2019.officiallyScoreEligibleQuestions,0);
 assert.equal(status2019.officialSeriesBKeyTranscription,'data/quizzes/cds-gk/official-key-candidates/cds-ii-2019-series-b.json');
+
+// Separate 15-row-by-8-series-column re-entry from published CDS II 2019 Series B
+// key table (mirrored by Prepp); ensures the archived candidate key was not
+// silently changed or misaligned by column-group order. This alone does not
+// establish official question-booklet series alignment.
+const seriesBPublishedRows=[
+ 'ABACBCCD','DAACBCCB','ABCCCAAB','CACDDBBD','DDBCCABB',
+ 'BADBCBBA','CAACDDAD','CDDXDCCB','CCADCBDB','CBDDCADA',
+ 'BDABACCA','CBABCBCB','ADDCBABB','BDBCBCBD','DCBACCDA'
+];
+assert.equal(seriesBPublishedRows.length,15);
+assert.ok(seriesBPublishedRows.every(r=>/^[ABCDX]{8}$/.test(r)));
+const seriesBSecondPass=Array.from({length:120},(_,i)=>seriesBPublishedRows[i%15][Math.floor(i/15)]);
+assert.deepEqual(key2019.answers.map(e=>e.answer),seriesBSecondPass,
+ 'All 120 Series B answers must match independently entered published table');
+assert.deepEqual(seriesBSecondPass.flatMap((v,i)=>v==='X'?[i+1]:[]),[53]);
