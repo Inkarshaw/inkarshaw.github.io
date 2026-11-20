@@ -439,3 +439,22 @@ for(let n=1;n<=120;n++){
  assert.ok(q.text.trim());assert.ok('ABCD'.split('').every(l=>q.options[l].trim()));
  assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);
 }
+
+// Official-source review is independent of OCR/transcription structural completeness.
+const verification=JSON.parse(fs.readFileSync(path.join(base,'official-verification-status.json'),'utf8'));
+assert.equal(verification.schemaVersion,1);
+assert.equal(verification.gradingEnabled,false);
+assert.equal(verification.paperCount,16);
+assert.equal(verification.expectedQuestions,1920);
+assert.equal(verification.papers.length,idx.paperStatuses.length);
+for(const item of verification.papers){
+ const paper=idx.paperStatuses.find(e=>e.id===item.id);
+ assert.ok(paper,'Official-review manifest references unindexed source: '+item.id);
+ assert.equal(item.sourceJson,'data/quizzes/cds-gk/'+paper.output);
+ assert.equal(item.numberedPositions,120);
+ assert.equal(item.provisionalFourOptionSets,paper.provisionalFourOptionSets);
+ assert.equal(item.officialQuestionPaperMatched,false);
+ assert.equal(item.officialFinalAnswerKeyMatched,false);
+ assert.equal(item.officiallyScoreEligibleQuestions,0);
+ assert.equal(item.reviewStatus,'not-officially-verified');
+}
