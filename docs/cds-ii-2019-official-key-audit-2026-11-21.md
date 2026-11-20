@@ -45,3 +45,20 @@ The earlier referenced UPSC source `https://www.upsc.gov.in/sites/default/files/
 2. Independent double-entry comparison of all 120 stored Series B answer characters with the UPSC PDF.
 3. Obtain a verifiably commission-published CDS I 2020 GK key.
 4. Review legal/source presentation, user-visible dropped-question treatment and score formula before unlocking scoring.
+
+## Independent 120-cell answer-key cross-check (21 November 2026)
+
+- Re-read the 15 rows × 8 item/answer column groups on the publicly mirrored **Series B** key page (Prepp mirror of 2019 commission-style document).
+- Entered the complete table a second time, in its printed row order, independently of the existing stored 120-answer JSON.
+- Reconstructed the 120 item-order keys by each vertical 15-row column group and compared them with `official-key-candidates/cds-ii-2019-series-b.json`.
+- Result: **120/120 identical entries, 0 mismatches**, including the **Q53 X/drop** marker.
+- New `tests/test_cds_gk_source.mjs` regression assertion preserves this comparison and rejects accidental edits/column shifts.
+- Mirror inspected: https://cdn-images.prepp.in/public/image/CDS_2_2019_GENERAL_KNOWLEDGE_SEPTEMBER_08_2019_PAPER_2_ANSWER_KEY_bb70f0a28c3e710135bc1b0c29a2935d.pdf
+- The direct UPSC URL was not retrievable during this fresh session; this pass confirms consistency with a scanned public mirror, **not** independent reauthentication of the primary PDF.
+- **Still unresolved:** all-question matching of the original Series B booklet to the source-provisional typed questions. The 2019 quiz remains ungraded.
+
+## 2020 official-key retrieval status
+
+- UPSC question-paper archive lists CDS I 2020 General Knowledge, confirming an official question paper exists; this is **not** its final answer key.
+- Search returned an externally mirrored CDS I 2020 key at Testbook, but no newly retrievable commission-hosted final GK key could be authenticated in this pass.
+- Do not import third-party answers into scoring fields on the basis of availability alone.
