@@ -160,7 +160,7 @@ Promise.allSettled([
  if(results[4].status==='fulfilled'){
   const cds=results[4].value;
   if(cds?.schemaVersion===1&&cds.exam==='UPSC CDS'&&cds.gradingEnabled===false&&Array.isArray(cds.paperStatuses)){
-   const papers=cds.paperStatuses.filter(e=>/^cds-(?:i|ii)-20\\d{2}-gk$/.test(e.id)&&Number.isInteger(e.year)&&["I","II"].includes(e.session)&&Number.isInteger(e.provisionalFourOptionSets)&&Number.isInteger(e.unresolvedPositions)&&e.provisionalFourOptionSets+e.unresolvedPositions===120);
+   const papers=cds.paperStatuses.filter(e=>/^cds-(?:i|ii)-20\d{2}-gk$/.test(e.id)&&Number.isInteger(e.year)&&["I","II"].includes(e.session)&&Number.isInteger(e.provisionalFourOptionSets)&&Number.isInteger(e.unresolvedPositions)&&e.provisionalFourOptionSets+e.unresolvedPositions===120);
    entries.push(...papers.map(e=>({id:e.id,exam:'UPSC',paper:'CDS '+e.session+' · General Knowledge',year:e.year,total:120,typed:e.provisionalFourOptionSets,scorable:0,level:'Provisional original-numbered English text · ungraded',sourceStatus:'Full question-numbered study text; exact booklet wording and official answer-key alignment await verification. No scoring.',link:'pyq-cds.html?paper='+e.id,type:'full-numbered-draft'})));
   }
  }
