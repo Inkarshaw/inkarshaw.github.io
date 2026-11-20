@@ -510,3 +510,11 @@ const seriesBSecondPass=Array.from({length:120},(_,i)=>seriesBPublishedRows[i%15
 assert.deepEqual(key2019.answers.map(e=>e.answer),seriesBSecondPass,
  'All 120 Series B answers must match independently entered published table');
 assert.deepEqual(seriesBSecondPass.flatMap((v,i)=>v==='X'?[i+1]:[]),[53]);
+
+// Source filter must include manually transcribed scan items as well as OCR scans.
+assert.ok(js.includes("source==='scan'?p.sourceMode.includes('scan'):p.sourceMode.includes('pdf-text')"));
+assert.ok(js.includes("Manually transcribed English scan (not officially verified)"));
+for(const id of ['cds-ii-2019-gk','cds-i-2020-gk']){
+ const e=idx.paperStatuses.find(x=>x.id===id);
+ assert.ok(e.sourceMode.includes('scan'));
+}
