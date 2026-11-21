@@ -558,9 +558,9 @@ assert.ok(hub.includes('UPSC CDS General Knowledge'));
 assert.ok(hub.includes('UPSC CDS I &amp; II'));
 assert.ok(hub.includes('a.href="pyq-cds.html?year="+x.year'),'Archive CDS links must open the selected year');
 assert.ok(hub.includes('availableCDSYears.has(x.year)'),'Only uploaded CDS years may advertise text quizzes');
-const cdsYearsFromHub=hub.match(/availableCDSYears=new Set\\(\\[([0-9,]+)\\]\\)/);
+const cdsYearsFromHub=hub.split('availableCDSYears=new Set([')[1]?.split('])')[0];
 assert.ok(cdsYearsFromHub,'Hub must declare the set of available CDS years');
-assert.deepEqual(cdsYearsFromHub[1].split(',').map(Number).sort((a,b)=>a-b),
+assert.deepEqual(cdsYearsFromHub.split(',').map(Number).sort((a,b)=>a-b),
  [...new Set(idx.paperStatuses.map(p=>p.year))].sort((a,b)=>a-b));
 assert.ok(js.includes("const year=params.get('year'),session=params.get('session')"),'CDS reader must accept year/session deep links');
 assert.ok(js.includes("if(linked){$('yearFilter').value=String(linked.year);$('sessionFilter').value=linked.session;}"),'Direct paper links must focus the correct year and session');
