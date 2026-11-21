@@ -81,7 +81,7 @@ function element(tag,className,txt){const el=document.createElement(tag);if(clas
 function render(){
 const q=$('search').value.trim().toLowerCase(),board=$('examFilter').value,coverage=$('coverageFilter').value,year=$('yearFilter').value;
 const yearOK=e=>year==='all'||String(e.year)===year;
-const selected=entries.filter(e=>(board==='all'||board===e.exam)&&yearOK(e)&&(coverage==='all'||coverage===e.type||coverage==='text')&&(!q||[e.exam,e.paper,String(e.year),e.level].join(' ').toLowerCase().includes(q)));
+const selected=entries.filter(e=>(board==='all'||board===e.exam)&&yearOK(e)&&(coverage==='all'||coverage===e.type||coverage==='text')&&(!q||[e.exam,e.paper,String(e.year),e.level].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.year-a.year||a.exam.localeCompare(b.exam)||a.paper.localeCompare(b.paper));
 const selectedAdapted=adapted.filter(e=>(board==='all'||board===e.exam)&&yearOK(e)&&(coverage==='all'||coverage==='adapted'||coverage==='text')&&(!q||[e.exam,e.paper,String(e.year),'adapted'].join(' ').toLowerCase().includes(q)));
 const selectedArchive=archive.filter(e=>!hasTextFor(e)&&(board==='all'||board===e.category)&&yearOK(e)&&(coverage==='all'||coverage==='source-only')&&(!q||[e.category,e.exam,e.paper,String(e.year)].join(' ').toLowerCase().includes(q)));
 const cards=$('cards');cards.replaceChildren();
