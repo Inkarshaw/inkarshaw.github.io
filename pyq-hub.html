@@ -156,6 +156,7 @@
 "use strict";
 const $=id=>document.getElementById(id),filters={search:$("pyqSearch"),family:$("pyqFamily"),exam:$("pyqExam"),year:$("pyqYear")};
 let catalog=[],quizzes=[];
+ const availableCDSYears=new Set([2008,2010,2011,2012,2013,2016,2017,2018,2019,2020]); // Checked against the indexed CDS GK papers by tests.
 const initial=new URLSearchParams(location.search);
 function addOption(select,value,label){const opt=document.createElement("option");opt.value=String(value);opt.textContent=label;select.appendChild(opt)}
 function fillSelector(select,choices,label,preferred){select.replaceChildren();addOption(select,"",label);choices.forEach(x=>addOption(select,x,x));select.value=choices.includes(preferred)?preferred:""}
@@ -190,9 +191,9 @@ function render(){
    note.textContent=x.year===2022?"Typed transcription · review pending, with official final key; original PDF companion also available.":"Exact published questions in the official PDF · 200 synchronized A–E answer positions; not a typed transcription.";
    card.append(note);
   }
-  if(x.category==="UPSC"&&x.exam==="Combined Defence Services"&&x.year>=2008&&x.year<=2020){
-   const a=document.createElement("a");a.className="quiz";a.href="pyq-cds.html";a.textContent="View available CDS I / II text quizzes →";actions.append(a);
-   const note=document.createElement("p");note.className="pyq-warning";note.textContent="16 General Knowledge text papers indexed across 2008–2020, with some years/sessions absent. Provisional English text, ungraded.";card.append(note);
+  if(x.category==="UPSC"&&x.exam==="Combined Defence Services"&&availableCDSYears.has(x.year)){
+   const a=document.createElement("a");a.className="quiz";a.href="pyq-cds.html?year="+x.year;a.textContent="Open "+x.year+" CDS GK text papers →";actions.append(a);
+   const note=document.createElement("p");note.className="pyq-warning";note.textContent="Open available CDS I / II General Knowledge sessions for "+x.year+". Provisional English study text; scoring disabled pending official source verification.";card.append(note);
   }
   if(count>=10){
    const a=document.createElement("a");a.className="quiz";
