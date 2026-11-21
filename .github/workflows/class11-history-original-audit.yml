@@ -1,0 +1,28 @@
+name: Audit Class 11 History original bilingual volumes
+on:
+  pull_request:
+    paths:
+      - scripts/audit_class11_history_originals.py
+      - .github/workflows/class11-history-original-audit.yml
+  workflow_dispatch:
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pymupdf
+      - name: Verify Class 11 History English and Tamil source PDFs
+        run: python scripts/audit_class11_history_originals.py
+      - name: Retain source provenance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class11-history-original-inventory
+          path: data/textbook/class11-history-original-inventory-2026-11-02.json
+          if-no-files-found: warn
