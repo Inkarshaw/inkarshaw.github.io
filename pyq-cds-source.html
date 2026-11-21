@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CDS Original PDF + Ungraded Answer Sheet | ClearExams</title>
+<meta name="description" content="Read original UPSC CDS source paper and mark 120 locally saved A-D responses. Source-PDF practice only, not a typed or scored quiz.">
+<link rel="icon" href="assets/clearexams-icon.svg" type="image/svg+xml">
+<style>
+:root{--ink:#143352;--blue:#175fbb;--line:#cfdeed;--bg:#f3f7fb}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:var(--bg);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:#155eb4}button,input{font:inherit}
+button{cursor:pointer}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #8dbaf0;outline-offset:3px}
+nav{background:#fff;border-bottom:1px solid var(--line);padding:14px max(16px,calc((100vw - 1120px)/2));display:flex;gap:20px;flex-wrap:wrap}
+nav a{font-weight:700;text-decoration:none}
+.wrap{max-width:1120px;margin:auto;padding:20px 16px 60px}
+h1{font-size:clamp(1.5rem,3.8vw,2.25rem);margin:.15rem 0 .5rem}
+h2{font-size:1.22rem;margin:.2rem 0 1rem}
+p{margin:.4rem 0 .95rem}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin:16px 0}
+.note{background:#fff8ee;border-left:4px solid #b38130;padding:13px;border-radius:7px}
+.muted{color:#536b84;font-size:.91rem}
+.source{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:15px 0}
+.primary,.secondary{border:1px solid var(--blue);border-radius:9px;padding:10px 15px;font-weight:800;text-decoration:none}
+.primary{background:var(--blue);color:#fff}.secondary{background:#fff;color:var(--blue)}
+.pdf{width:100%;height:min(70vh,760px);border:1px solid var(--line);border-radius:8px;background:#e9f0f7}
+.practice{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px}
+.choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:20px 0}
+.choices button{border:1px solid #9cb8d7;background:#fff;border-radius:12px;min-height:62px;font-size:1.25rem;font-weight:850;color:var(--ink)}
+.choices button[aria-pressed="true"]{background:#d9ebff;border:2px solid #1968bc}
+.controls{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.controls button{border:1px solid #b0c9df;background:#fff;color:var(--ink);border-radius:8px;padding:9px 13px}
+.controls button:disabled{opacity:.4}
+#jump{width:95px;padding:9px;border:1px solid var(--line);border-radius:8px}
+.palette{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.palette button{min-height:35px;border-radius:7px;border:1px solid #bfd0e1;background:#fff;color:#193753;font-weight:700}
+.palette button.done{background:#d9f2e5;border-color:#8acbaa}
+.palette button.current{outline:2px solid var(--blue);outline-offset:1px}
+#attemptCount{font-variant-numeric:tabular-nums;font-weight:800}
+#status[role="alert"]{color:#b91c1c}
+[hidden]{display:none!important}
+@media(max-width:820px){.practice{grid-template-columns:1fr}.pdf{height:430px}.palette{grid-template-columns:repeat(10,minmax(0,1fr))}}
+@media(max-width:470px){.panel{padding:13px}.palette{grid-template-columns:repeat(8,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<nav aria-label="Site navigation"><a href="index.html">ClearExams.</a><a href="pyq-cds.html">CDS GK library</a><a href="pyq-hub.html">All PYQs</a></nav>
+<main class="wrap">
+<h1 id="paperTitle">CDS original-paper response sheet</h1>
+<p class="muted" id="paperMeta">Loading original-paper reference…</p>
+<div class="note"><strong>Source-only practice — not a typed quiz.</strong> Read every question from the original UPSC PDF, then record A, B, C or D against the printed question number. This page contains no transcribed question text, official answer-key mappings, grades or marks. Your choices are stored only in this browser.</div>
+<section class="panel" aria-labelledby="sourceHeading">
+<h2 id="sourceHeading">Original UPSC question paper</h2>
+<div class="source">
+<a id="officialPdf" class="primary" href="https://www.upsc.gov.in/examinations/previous-question-papers/archives" target="_blank" rel="noopener noreferrer">Open original PDF in a new tab</a>
+<span class="muted">If the embedded PDF does not load, use the direct link.</span>
+</div>
+<details open><summary>Show original paper</summary><iframe id="pdfFrame" class="pdf" title="Official UPSC question paper PDF" loading="lazy"></iframe></details>
+</section>
+<section class="practice" id="practice" hidden>
+<div class="panel">
+<h2 id="currentQuestion">Question 1 of 120</h2>
+<p class="muted">Select the choice printed in the original paper. No answer is marked correct or incorrect.</p>
+<div id="choices" class="choices" role="group" aria-label="Select a response"></div>
+<p id="attemptCount" aria-live="polite">0 / 120 responses recorded</p>
+<div class="controls">
+<button id="previous" type="button">Previous</button>
+<button id="next" type="button">Next</button>
+<input id="jump" type="number" inputmode="numeric" min="1" max="120" aria-label="Question number" placeholder="1–120">
+<button id="jumpButton" type="button">Go to question</button>
+</div>
+<div class="controls" style="margin-top:18px">
+<button id="exportAnswers" type="button">Export ungraded responses (JSON)</button>
+<button id="clearAnswers" type="button">Clear saved responses</button>
+</div>
+</div>
+<aside class="panel"><h2>Question numbers</h2><p class="muted">Green numbers have a saved choice. No marks are calculated.</p><div id="palette" class="palette"></div></aside>
+</section>
+<p id="status" role="status" aria-live="polite"></p>
+</main>
+<script src="assets/js/pyq-cds-source.js?v=20261122a" defer></script>
+</body></html>
