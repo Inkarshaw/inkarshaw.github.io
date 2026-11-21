@@ -556,7 +556,14 @@ const typedCatalogJS=fs.readFileSync(path.join(root,'assets','js','typed-pyq-cat
 assert.ok(hub.includes('class="pyq-start-card" href="pyq-cds.html"'));
 assert.ok(hub.includes('UPSC CDS General Knowledge'));
 assert.ok(hub.includes('UPSC CDS I &amp; II'));
-assert.ok(hub.includes('View available CDS I / II text quizzes'));
+assert.ok(hub.includes('a.href="pyq-cds.html?year="+x.year'),'Archive CDS links must open the selected year');
+assert.ok(hub.includes('availableCDSYears.has(x.year)'),'Only uploaded CDS years may advertise text quizzes');
+const cdsYearsFromHub=hub.match(/availableCDSYears=new Set\\(\\[([0-9,]+)\\]\\)/);
+assert.ok(cdsYearsFromHub,'Hub must declare the set of available CDS years');
+assert.deepEqual(cdsYearsFromHub[1].split(',').map(Number).sort((a,b)=>a-b),
+ [...new Set(idx.paperStatuses.map(p=>p.year))].sort((a,b)=>a-b));
+assert.ok(js.includes("const year=params.get('year'),session=params.get('session')"),'CDS reader must accept year/session deep links');
+assert.ok(js.includes("if(linked){$('yearFilter').value=String(linked.year);$('sessionFilter').value=linked.session;}"),'Direct paper links must focus the correct year and session');
 assert.ok(typedLibrary.includes('UPSC CDS — 16 General Knowledge papers indexed'));
 assert.ok(typedLibrary.includes('value="UPSC"'));
 assert.ok(typedCatalogJS.includes("fetchJSON('data/quizzes/cds-gk/index.json')"));
@@ -564,4 +571,5 @@ assert.ok(typedCatalogJS.includes("paper:'CDS '+e.session+' · General Knowledge
 assert.ok(typedCatalogJS.includes("link:'pyq-cds.html?paper='+e.id"));
 assert.ok(typedCatalogJS.includes("scorable:0"));
 assert.ok(typedCatalogJS.includes("e.exam==='Combined Defence Services'"));
+assert.ok(typedCatalogJS.includes("sort((a,b)=>b.year-a.year"),'Recent CDS papers should not be buried beneath older entries');
 assert.ok(idx.paperStatuses.every(p=>fs.existsSync(path.join(root,'data','quizzes','cds-gk',p.output))));
