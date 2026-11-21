@@ -8,6 +8,10 @@ on:
       - 'assets/js/pyq-cds.js'
       - 'pyq-cds.html'
       - 'tests/test_cds_gk_source.mjs'
+      - 'tests/test_cds_pyq_discovery.mjs'
+      - 'assets/js/typed-pyq-catalog.js'
+      - 'pyq-typed-library.html'
+      - 'pyq-hub.html'
       - '.github/workflows/cds-gk-integrity.yml'
   pull_request:
     paths:
@@ -15,6 +19,10 @@ on:
       - 'assets/js/pyq-cds.js'
       - 'pyq-cds.html'
       - 'tests/test_cds_gk_source.mjs'
+      - 'tests/test_cds_pyq_discovery.mjs'
+      - 'assets/js/typed-pyq-catalog.js'
+      - 'pyq-typed-library.html'
+      - 'pyq-hub.html'
       - '.github/workflows/cds-gk-integrity.yml'
   workflow_dispatch:
 
@@ -33,5 +41,7 @@ jobs:
           node-version: '22'
       - name: Validate 1920 source-numbered questions and disabled scoring
         run: node tests/test_cds_gk_source.mjs
+      - name: Smoke-test CDS PYQ library cards and filters
+        run: node tests/test_cds_pyq_discovery.mjs
       - name: Validate CDS reader JavaScript syntax
         run: node --check assets/js/pyq-cds.js
