@@ -573,3 +573,30 @@ assert.ok(typedCatalogJS.includes("scorable:0"));
 assert.ok(typedCatalogJS.includes("e.exam==='Combined Defence Services'"));
 assert.ok(typedCatalogJS.includes("sort((a,b)=>b.year-a.year"),'Recent CDS papers should not be buried beneath older entries');
 assert.ok(idx.paperStatuses.every(p=>fs.existsSync(path.join(root,'data','quizzes','cds-gk',p.output))));
+
+// Coverage inventory may not advertise source-missing CDS GK sittings as playable.
+const coverage=JSON.parse(fs.readFileSync(path.join(base,'coverage-gaps-2008-2020.json'),'utf8'));
+assert.equal(coverage.schemaVersion,1);
+assert.equal(coverage.totalPossibleSessions,26);
+assert.equal(coverage.locallyIndexedSessionPapers,16);
+assert.equal(coverage.missingLocalSessionPapers,10);
+assert.equal(coverage.slots.length,26);
+const availableSlots=coverage.slots.filter(x=>x.status==='provisional-english-text-available');
+const unavailableSlots=coverage.slots.filter(x=>x.status==='no-local-text-paper');
+assert.equal(availableSlots.length,16);assert.equal(unavailableSlots.length,10);
+assert.deepEqual(availableSlots.map(x=>x.paperId).sort(),idx.paperStatuses.map(x=>x.id).sort());
+assert.ok(availableSlots.every(x=>x.quizUrl==='pyq-cds.html?paper='+x.paperId&&x.questionPositions===120&&!x.scoringEnabled));
+assert.ok(unavailableSlots.every(x=>x.paperId===null&&x.quizUrl===null&&x.questionPositions===0&&!x.scoringEnabled));
+assert.deepEqual(coverage.missingSessionLabels,[
+ 'CDS I 2009','CDS II 2009','CDS I 2011','CDS I 2013',
+ 'CDS I 2014','CDS II 2014','CDS I 2015','CDS II 2015',
+ 'CDS I 2016','CDS II 2020'
+]);
+const readerHtml=fs.readFileSync(path.join(root,'pyq-cds.html'),'utf8');
+assert.ok(readerHtml.includes('16 of the 26 CDS I/II General Knowledge sittings'));
+assert.ok(readerHtml.includes('Ten sessions in that period are not yet available locally.'));
+const institutional2020=verification.papers.find(p=>p.id==='cds-i-2020-gk').institutionalQuestionPaperListing;
+assert.match(institutional2020.url,/ndl\.iitkgp\.ac\.in/);
+assert.equal(institutional2020.questionPaperPdfInspected,false);
+assert.equal(institutional2020.finalAnswerKeyAuthenticated,false);
+assert.equal(verification.gradingEnabled,false);
