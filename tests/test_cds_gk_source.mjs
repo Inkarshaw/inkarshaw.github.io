@@ -466,7 +466,7 @@ for(const item of verification.papers){
  assert.equal(item.officialQuestionPaperMatched,false);
  assert.equal(item.officialFinalAnswerKeyMatched,false);
  assert.equal(item.officiallyScoreEligibleQuestions,0);
- assert.ok(['not-officially-verified','official-key-source-authenticated-source-paper-series-not-yet-fully-verified','candidate-full-series-a-key-unverified-two-source-conflicts'].includes(item.reviewStatus));
+ assert.ok(['not-officially-verified','official-key-source-authenticated-source-paper-series-not-yet-fully-verified','candidate-full-series-a-key-unverified-two-source-conflicts','complete-third-party-english-typeset-120-questions-awaits-original-series-a-proofing'].includes(item.reviewStatus));
 }
 
 // Candidate series matching is evidence only, never an authorization to score.
