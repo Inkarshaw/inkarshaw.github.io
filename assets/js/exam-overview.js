@@ -32,7 +32,7 @@ function officialHref(href){
 const resourceOptions={
  'defence':[
   ['NCERT basics','Shared geography, science and history foundations.','ncert-school-book-quiz.html'],
-  ['UPSC original question-paper portal','Select the actual examination and paper year on the commission site.','https://www.upsc.gov.in/examinations/previous-question-papers']
+  ['Current affairs','Shared daily competitive-exam current affairs, not a dedicated defence mock.','current-affairs/text/']
  ],
  'teaching':[
   ['NCERT school chapters','School-level concepts and related subject quizzes; not a TET/NET paper.','ncert-school-book-quiz.html'],
