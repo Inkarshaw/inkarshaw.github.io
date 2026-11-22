@@ -1,0 +1,54 @@
+name: CDS II 2020 full paper English source recovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/cds_2020_full_extract.py
+      - .github/workflows/cds-2020-full-extract.yml
+
+permissions:
+  contents: write
+
+jobs:
+  source-extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install HTML reader
+        run: python -m pip install -q requests beautifulsoup4
+      - name: Extract 120 English source-numbered A-D sets with explicit ungraded safeguard
+        run: python scripts/cds_2020_full_extract.py
+      - name: Check strict source structure and no answer leakage
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('data/quizzes/cds-gk/source-recovery/cds-ii-2020-gk-provisional.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          qs=d['questions']
+          assert len(qs)==120 and [q['number'] for q in qs]==list(range(1,121))
+          assert all(q['correctAnswer'] is None and not q['scoreEligible'] and q['ungraded'] for q in qs)
+          assert all(set(q['options'])==set('ABCD') and all(q['options'][c] for c in 'ABCD') for q in qs)
+          assert d['grading']=='disabled' and d['officialOriginalConfirmed'] is False and d['officialAnswerKeyChecked'] is False
+          assert p.stat().st_size>40_000
+          print('PASS 120 complete A-D draft records, zero scoring or official-key claims')
+          PY
+      - name: Commit source draft only, not playable-index enrollment
+        run: |
+          git config user.name "ClearExams CDS Source Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/quizzes/cds-gk/source-recovery/cds-ii-2020-gk-provisional.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Recover full CDS II 2020 GK 120-question provisional source text"
+            git push origin HEAD:main
+          else
+            echo 'No source draft change'
+          fi
