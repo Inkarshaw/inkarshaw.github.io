@@ -91,5 +91,19 @@ for(const privatePath of ['/mycases/?crime=42','/policedocuments/?name=private']
 }
 const pdf=await request('/current-affairs/2026-09-21.pdf');
 assert.equal(pdf.intercepted,false,'PDFs are not cached by the shell');
-assert.match(source,/clearexams-shell-v9-group4-diagnostic/);
+assert.match(source,/clearexams-shell-v10-group4-offline-mocks/);
+const requiredMockShell=[
+  '/tnpsc/mocks/index.html',
+  '/tnpsc/mocks/mock-1.html','/tnpsc/mocks/mock-2.html',
+  '/tnpsc/mocks/mock-3.html','/tnpsc/mocks/mock-4.html',
+  '/tnpsc/mocks/full-mock-1.html',
+  '/assets/js/mock-offline.js','/assets/js/group4-short-mock.js',
+  '/assets/js/group4-full-mock.js','/assets/js/mock-subject-results.js',
+  '/data/quizzes/tnpsc-group4-full-mock-1.json',
+  ...[1,2,3,4].map(n=>'/data/quizzes/tnpsc-group4-mock-'+n+'.json')
+];
+for(const path of requiredMockShell){
+  assert.ok(source.includes("'"+path+"'"),path+' must be pre-cached for first-visit offline use');
+}
+
 console.log('PASS: fresh public quiz data and assets, offline fallback, 5xx/404 handling and private-page exclusion');
