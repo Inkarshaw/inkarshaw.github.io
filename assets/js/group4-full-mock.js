@@ -158,6 +158,17 @@ function render(){
   $('answeredCount').textContent=answered;
   $('unansweredCount').textContent=questions.length-answered;
   $('markedCount').textContent=marked.filter(Boolean).length;
+  for(const [id,start,stop,label] of [
+    ['jumpTamil',0,100,'Tamil'],
+    ['jumpGS',100,175,'General Studies'],
+    ['jumpApt',175,200,'Aptitude']
+  ]){
+    const button=$(id);
+    if(!button)continue;
+    const count=answers.slice(start,stop).filter(a=>a!==null).length;
+    button.textContent=label+' · '+count+' / '+(stop-start)+' answered';
+    button.setAttribute('aria-pressed',String(current>=start&&current<stop));
+  }
   const palette=$('palette');palette.replaceChildren();
   for(let i=0;i<questions.length;i++){
     const b=document.createElement('button');b.type='button';b.textContent=String(i+1);b.dataset.i=String(i);
@@ -239,6 +250,17 @@ function finish(automatic,restoring=false){
   window.scrollTo?.({top:0,behavior:'smooth'});
 }
 
+for(const id of ['jumpTamil','jumpGS','jumpApt']){
+  const button=$(id);
+  if(!button)continue;
+  button.addEventListener('click',()=>{
+    if(!active||submitted||!questions.length)return;
+    const target=Number(button.dataset.sectionIndex);
+    if(!Number.isInteger(target)||target<0||target>=questions.length)return;
+    current=target;save();render();
+    $('question').scrollIntoView?.({behavior:'auto',block:'start'});
+  });
+}
 $('startBtn').disabled=true;
 $('startBtn').addEventListener('click',()=>{if(bank.length)newAttempt()});
 $('prevBtn').addEventListener('click',()=>{if(current>0){current--;save();render()}});
