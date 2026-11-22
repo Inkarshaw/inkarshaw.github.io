@@ -78,9 +78,11 @@
     }catch{}
   };
   mocks.forEach(shortActive);
+  let hasFullActive=false;
   try{
     const s=JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4FullMockSessionV1')||'null');
     if(s&&s.version===2&&Number.isFinite(s.deadline)){
+      hasFullActive=true;
       document.getElementById('statusFull').textContent='In progress';
       document.getElementById('statusFull').classList.add('done');
       document.querySelector('[data-full-mock]').textContent='Resume full-length mock →';
@@ -89,12 +91,12 @@
       document.querySelector('#scoreFull span').textContent='Saved question '+(Number(s.current)+1)+'. The original three-hour deadline is preserved.';
     }
   }catch{}
-  if(completedFull){
+  if(completedFull&&!hasFullActive){
     document.getElementById('statusFull').textContent='Completed';
     document.getElementById('statusFull').classList.add('done');
     const recent=fullHistory.filter(x=>x&&x.mock==='full-1').slice(-1)[0];
     if(recent){
-      document.querySelector('#scoreFull strong').textContent='Latest: '+(Number(recent.score)*1.5).toFixed(1)+' indicative marks';
+      document.querySelector('#scoreFull strong').textContent=recent.tamilQualified===false?'Previous attempt: Tamil qualifying threshold not met':'Latest: '+(Number(recent.evaluatedMarks??Number(recent.score)*1.5)).toFixed(1)+' indicative marks';
       document.querySelector('#scoreFull span').textContent='Review your previous result and start another attempt when ready.';
     }
   }
