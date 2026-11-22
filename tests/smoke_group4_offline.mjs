@@ -90,6 +90,23 @@ try{
   assert.equal(final.answers[1],1);
   assert.equal(final.marked[0],true);
   console.log('PASS offline browser restart: full-length mock and all answers resume intact');
+  await page.locator('#jumpGS').click();
+  assert.match(await page.locator('#qnum').innerText(),/Question 101 of 200/);
+  assert.equal(await page.locator('#jumpGS').getAttribute('aria-pressed'),'true');
+  await page.locator('#options button').first().click();
+  assert.match(await page.locator('#jumpGS').innerText(),/1 \/ 75 answered/);
+  await page.locator('#jumpApt').click();
+  assert.match(await page.locator('#qnum').innerText(),/Question 176 of 200/);
+  const beforeSectionReload=await keyValue(page,key);
+  assert.equal(beforeSectionReload.current,175,'Aptitude jump saves the correct zero-based index');
+  await page.reload({waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForFunction(()=>document.querySelector('#qnum')?.textContent.includes('Question 176 of 200'),
+    undefined,{timeout:15000});
+  const afterSectionReload=await keyValue(page,key);
+  assert.equal(afterSectionReload.deadline,initial.deadline,'Section navigation does not extend timer');
+  assert.equal(afterSectionReload.answers[100],0,'General Studies answer survived offline navigation and refresh');
+  assert.equal(await page.locator('#jumpApt').getAttribute('aria-pressed'),'true');
+  console.log('PASS offline section jumps: Tamil / GS / Aptitude preserve question, answer and deadline');
   assert.deepEqual(errors,[],'No runtime errors during online/offline transition');
 }finally{
   if(browserContext)await browserContext.close();
