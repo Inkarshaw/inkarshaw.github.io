@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071c33"><meta name="robots" content="noindex,follow">
+<meta name="description" content="See what ClearExams currently offers for your selected competitive exam: shared foundation quizzes, syllabus resources and official paper links, with transparent availability.">
+<title>Exam Resource Overview | ClearExams</title>
+<link rel="canonical" href="https://clearexams.ink/exam-overview.html">
+<link rel="icon" href="assets/clearexams-icon.svg" type="image/svg+xml">
+<script src="assets/js/pwa.js" defer></script>
+<script src="assets/js/exam-overview.js" defer></script>
+<style>
+:root{--bg:#f4f7fc;--ink:#122e4a;--muted:#526a84;--line:#d2e0ee;--blue:#135eb6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--blue)}
+a:focus-visible{outline:3px solid #2273df;outline-offset:3px}
+header{background:#fff;border-bottom:1px solid var(--line)}
+.nav{max-width:1050px;margin:auto;padding:12px 18px;min-height:64px;display:flex;align-items:center;flex-wrap:wrap;gap:16px}
+.brand{font-size:1.18rem;font-weight:900;color:#102b4b;text-decoration:none;margin-right:auto}
+.nav a:not(.brand){font-size:.88rem;font-weight:800;text-decoration:none}
+main{max-width:1050px;margin:auto;padding:24px 18px 82px}
+.breadcrumb{display:flex;gap:8px;flex-wrap:wrap;font-size:.83rem;color:var(--muted);margin:0 0 16px}
+.hero{padding:26px;border-radius:17px;background:linear-gradient(125deg,#0c2742,#174e81);color:#fff}
+.hero h1{margin:5px 0 9px;font-size:clamp(1.7rem,5vw,2.75rem);line-height:1.16}
+.hero .eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:850;color:#b7ddff}
+.hero p{margin:6px 0;color:#e0eaf5;max-width:780px}
+.status{display:inline-block;border-radius:18px;background:#ffffff24;padding:6px 12px;color:#fff;font-size:.8rem;font-weight:800;margin-top:10px}
+.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(230px,1fr);gap:16px;margin-top:17px}
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:19px;margin-bottom:15px}
+.card h2{margin:0 0 10px;font-size:1.2rem;color:#143556}
+.card p{margin:5px 0 12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:11px}
+.resource{border:1px solid var(--line);border-radius:12px;padding:15px}
+.resource h3{margin:0 0 6px;font-size:.99rem;color:#133960}
+.resource p{font-size:.84rem;margin:0 0 10px}
+.resource a{font-size:.88rem;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.actions a{display:inline-flex;align-items:center;justify-content:center;min-height:45px;padding:10px 14px;border-radius:10px;border:1px solid #b6cee8;font-size:.88rem;font-weight:800;text-decoration:none}
+.actions .primary{background:var(--blue);border-color:var(--blue);color:white}
+.checks{margin:7px 0 0;padding-left:20px;color:#4b617a}
+.checks li{padding:4px 0}
+.note{font-size:.82rem;color:#587087}
+#loadStatus{min-height:23px}
+html[data-ce-theme="dark"] .card,html[data-ce-theme="dark"] .resource{background:#0f2030;border-color:#294157}
+html[data-ce-theme="dark"] .card h2,html[data-ce-theme="dark"] .resource h3{color:#dbe9fc}
+html[data-ce-theme="dark"] .card p,html[data-ce-theme="dark"] .resource p,html[data-ce-theme="dark"] .checks{color:#b5c6d9}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.hero{padding:20px}.card{padding:16px}}
+@media(max-width:430px){.actions a{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<a href="#main" style="position:absolute;left:-9999px" onfocus="this.style.left='12px'" onblur="this.style.left='-9999px'">Skip to exam overview</a>
+<header><nav class="nav" aria-label="Page navigation"><a class="brand" href="index.html">ClearExams.</a><a href="start.html#exam-directory">All exams</a><a href="practice.html">Practice</a><a href="pyq-hub.html">PYQs</a></nav></header>
+<main id="main">
+<nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">/</span><a href="start.html#exam-directory">All exams</a><span aria-hidden="true">/</span><span id="breadExam">Exam resources</span></nav>
+<div id="loadStatus" role="status" aria-live="polite">Loading the selected examination…</div>
+<section id="examBody" hidden>
+<section class="hero" aria-labelledby="examName"><span class="eyebrow" id="examCategory"></span><h1 id="examName"></h1><p id="examSummary"></p><span class="status" id="examCoverage"></span></section>
+<div class="layout">
+<div>
+<section class="card"><h2>Available on ClearExams</h2><p id="availableIntro"></p><div class="actions"><a class="primary" id="mainResource" href="start.html#exam-directory">Open shared study resource</a><a href="start.html#exam-directory">Choose another exam</a></div><div id="resourceCards" class="cards" style="margin-top:15px"></div></section>
+<section class="card"><h2>What is not available yet</h2><ul class="checks" id="missingItems"></ul><p class="note">ClearExams does not assign official marks or claim a verified original paper without independent question and answer-key checks.</p></section>
+</div>
+<aside>
+<section class="card"><h2>Check original information</h2><p>Eligibility, pattern, dates, fees and recruitment conditions may change. Always use the current notification from the responsible authority.</p><div id="officialArea" class="actions"></div></section>
+<section class="card"><h2>Next study action</h2><p>Build fundamentals first. Use published material, record weak topics, then confirm the official exam-specific syllabus and original question paper.</p><div class="actions"><a href="dashboard.html">My dashboard</a><a href="current-affairs/text/">Current affairs</a></div></section>
+</aside>
+</div>
+</section>
+</main>
+</body>
+</html>

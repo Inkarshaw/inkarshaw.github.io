@@ -66,8 +66,17 @@ function renderExams(category,term){
   appendText(card,'h3',exam.name);
   appendText(card,'span',levelNames[exam.level]+' · '+group.title,'ce-exam-status');
   if(exam.note)appendText(card,'p',exam.note);
-  const a=appendText(card,'a',({practice:'Open practice',pyq:'Open PYQs',guide:'Open exam guide',foundation:'Open shared resources'})[exam.level]+' →');
-  a.href=exam.href;
+  if(exam.level==='foundation'){
+    const a=appendText(card,'a','See '+exam.name+' resources →');
+    a.href='exam-overview.html?exam='+encodeURIComponent(exam.id);
+    a.className='ce-exam-overview-link';
+    const shared=appendText(card,'a','Go straight to shared study material');
+    shared.href=exam.href;
+    shared.className='ce-exam-shared-link';
+  }else{
+    const a=appendText(card,'a',({practice:'Open practice',pyq:'Open PYQs',guide:'Open exam guide'})[exam.level]+' →');
+    a.href=exam.href;
+  }
   grid.append(card);results++;
  }
  if(results)root.append(grid);
