@@ -53,9 +53,9 @@ async function init(){
   const data=await r.json();
   if(data.schemaVersion!==1||!Array.isArray(data.slots))throw Error('Unexpected coverage data');
   paper=data.slots.find(p=>p.sourcePaperId===wanted);
-  if(!paper||paper.status!=='no-local-text-paper'||paper.paperId!==null||paper.questionPositions!==0||paper.responseSheetPositions!==120||paper.officialFinalAnswerKeyVerified!==false||paper.scoringEnabled!==false||paper.officialSourceInspected!==true||!/^https:\/\/(?:www\.)?upsc\.gov\.in\/sites\/default\/files\/[A-Za-z0-9._-]+\.pdf$/.test(paper.officialSourcePdf))throw Error('This original paper is not available for PDF-backed practice');
+  if(!paper||paper.status!=='provisional-english-text-available'||paper.paperId!==wanted||paper.questionPositions!==120||paper.responseSheetPositions!==120||paper.officialFinalAnswerKeyVerified!==false||paper.scoringEnabled!==false||paper.officialSourceInspected!==true||!/^https:\/\/(?:www\.)?upsc\.gov\.in\/sites\/default\/files\/[A-Za-z0-9._-]+\.pdf$/.test(paper.officialSourcePdf))throw Error('This original paper is not available for PDF-backed practice');
   $('paperTitle').textContent='CDS '+paper.session+' '+paper.year+' · General Knowledge';
-  $('paperMeta').textContent='Original UPSC Series '+paper.officialBookletSeries+' PDF · 120 response positions · source-only ungraded practice';
+  $('paperMeta').textContent='Original UPSC Series '+paper.officialBookletSeries+' PDF · 120 response positions · PDF companion · ungraded responses';
   $('officialPdf').href=paper.officialSourcePdf;
   $('pdfFrame').src=paper.officialSourcePdf;
   $('practice').hidden=false;
