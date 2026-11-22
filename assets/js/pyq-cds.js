@@ -29,7 +29,7 @@ async function openPaper(id){try{
  active=p;restore();selected=0;visible=Array.from({length:active.questions.length},(_,i)=>i);$('quizLayout').hidden=false;
  const summary=index.paperStatuses.find(x=>x.id===id);
  $('paperName').textContent=`CDS ${p.session} ${p.year} — General Knowledge`;
- $('paperStats').textContent=`120 numbered positions · ${summary.textStems} stems extracted · ${summary.provisionalFourOptionSets} provisional A–D sets · ${summary.unresolvedPositions} missing text/choices · ${(summary.unresolvedSourceVisualNumbers||[]).length} unresolved source maps · ${(summary.unresolvedSourceLanguages||[]).length?`missing ${summary.unresolvedSourceLanguages.join(', ')} transcription · `:''}no scoring`;
+ $('paperStats').textContent='120 questions · No official scoring · responses saved on this device';
  history.replaceState(null,'',paperURL(id));render();
  $('quizLayout').scrollIntoView({behavior:'smooth',block:'start'});status('Opened full CDS GK paper. Questions and selected answers remain ungraded.');
  }catch(err){status('Unable to open paper: '+err.message,true);}}
