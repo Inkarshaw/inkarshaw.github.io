@@ -12,6 +12,9 @@
   };
   const allowedLetters=['A','B','C','D','E'];
   const url=new URLSearchParams(location.search);
+  const DIAGNOSTIC_PAPER='tnpsc-group-iv-2024-general-tamil-general-studies';
+  const diagnosticMode=url.get('diagnostic')==='group4';
+  const isDiagnosticPaper=()=>diagnosticMode&&currentPaper?.id===DIAGNOSTIC_PAPER;
   let papers=[],keyRecords=[],questionPageIndexes={},currentPaper=null,currentKey=null,answers=[],marked=[],index=0,deadline=0,timerHandle=null,lastShownPdfPage=0;
   const keyToken=/^(?:[ABCD](?:\/[ABCD]){0,3}|ALL)$/;
   function validFinalKey(k,p){
@@ -60,6 +63,9 @@
 
   function write(){
     if(!currentPaper)return;
+    if(isDiagnosticPaper()&&answers.some(Boolean)&&!window.ceGroup4Diagnostic?.getState()){
+      window.ceGroup4Diagnostic?.start('quiz_first_answer',false);
+    }
     try{localStorage.setItem(STORE+currentPaper.id,JSON.stringify({version:2,answers,marked,index,deadline,updatedAt:Date.now()}))}catch{}
   }
   function read(id){
@@ -145,8 +151,49 @@
       'TNPSC answer-key PDF (digital scoring not verified)':
       'Open matched official final answer key (PDF)';
   }
+  function renderDiagnosticInsights(grade){
+    const root=$('diagnosticInsights');
+    root.replaceChildren();
+    if(!isDiagnosticPaper()||!grade){root.hidden=true;return}
+    root.hidden=false;
+    const title=document.createElement('h3');
+    title.textContent='Your Group IV diagnostic overview';
+    const hint=document.createElement('p');
+    hint.textContent='Use these two original-paper sections to decide where to revise first. Figures are indicative, based on scorable key positions; blanks count as zero.';
+    const grid=document.createElement('div');
+    grid.className='section-breakdown';
+    const sections=[
+      {name:'General Tamil',from:0,to:100},
+      {name:'General Studies + Aptitude',from:100,to:200}
+    ];
+    const scores=sections.map(section=>{
+      const details=grade.detail.slice(section.from,section.to);
+      const graded=details.filter(item=>item.status!=='ungraded').length;
+      const correct=details.filter(item=>item.status==='correct').length;
+      const answered=details.filter(item=>item.response!==null).length;
+      const pct=graded?Math.round(100*correct/graded):0;
+      const card=document.createElement('div');
+      const label=document.createElement('strong');label.textContent=section.name;
+      const progress=document.createElement('span');
+      progress.textContent=correct+'/'+graded+' scorable correct · '+answered+'/'+details.length+' answered · '+pct+'% of possible marks';
+      card.append(label,progress);grid.append(card);
+      return {name:section.name,pct};
+    });
+    const priority=scores.slice().sort((a,b)=>a.pct-b.pct)[0];
+    const next=document.createElement('p');
+    next.textContent='Suggested first revision: '+priority.name+'. Practise this section, then try the full paper again after reviewing the missed questions.';
+    const caution=document.createElement('p');
+    caution.textContent='This is an indicative practice result, not an official TNPSC score or rank. The scanned source may contain handwritten answer ticks.';
+    root.append(title,hint,grid,next,caution);
+  }
+
   function setPaper(p){
     currentPaper=p;index=0;lastShownPdfPage=0;
+    if(isDiagnosticPaper()){
+      document.title='Free Group IV Diagnostic · 200 Questions | ClearExams';
+      const heading=document.querySelector('main h1');
+      if(heading)heading.textContent='TNPSC Group IV · Free Full-Length Diagnostic';
+    }
     $('examTitle').textContent=p.board+' '+p.exam+' · '+p.year+' · '+p.paper;
     $('count').textContent=p.questionCount+' original numbered questions';
     currentKey=keyRecords.find(k=>validFinalKey(k,p))||null;
@@ -176,7 +223,11 @@
       answers=saved.answers;marked=saved.marked.map(Boolean);
       index=Number.isInteger(saved.index)?Math.max(0,Math.min(saved.index,p.questionCount-1)):0;
       deadline=Number.isFinite(saved.deadline)&&saved.deadline>0?saved.deadline:0;
-    }else{answers=Array(p.questionCount).fill(null);marked=Array(p.questionCount).fill(false);deadline=0}
+    }else{
+      answers=Array(p.questionCount).fill(null);
+      marked=Array(p.questionCount).fill(false);
+      deadline=isDiagnosticPaper()?Date.now()+p.durationMinutes*60000:0;
+    }
     $('timed').checked=deadline>0;
     startOrStopTimer();
     $('paperPicker').hidden=true;$('answerSheet').hidden=false;$('result').hidden=true;
@@ -214,6 +265,15 @@
     $('answerOverview').replaceChildren(rows);
     plainLink($('resultSource'),currentPaper.answerKeyUrl,answerReferenceLabel(currentPaper));
     $('result').hidden=false;$('answerSheet').hidden=true;$('mobileAnswerDock').hidden=true;
+    renderDiagnosticInsights(grade);
+    if(isDiagnosticPaper()&&attempted>0){
+      const analytics=window.ceGroup4Diagnostic;
+      if(analytics&&!analytics.getState()?.attempt_completed){
+        if(!analytics.hasActiveAttempt())analytics.start('quiz_submit',false);
+        analytics.complete({answered:attempted,graded:grade?.gradedCount||0,correct:grade?.correct||0,
+          accuracy:grade?.gradedCount?Math.round(grade.correct/grade.gradedCount*100):0,autoSubmit:expired});
+      }
+    }
     window.scrollTo(0,0);write();
   }
   function tick(){
