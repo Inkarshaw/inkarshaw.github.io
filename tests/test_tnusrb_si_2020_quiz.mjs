@@ -382,4 +382,38 @@ for(const n of [114,115,116])assert.equal(data.questions[n-1].textStatus,'second
 assert.match(data.questions[116].newOCRComparison.status,/English-only supplied/,'Q117 was not supplied in Tamil');
 assert.match(data.questions[119].questionTamil,/48, 24, 72, 36, 108/,'Q120 numeric pattern remains legible');
 
+// User-supplied source-numbered Q92–100, received 2026-11-23, reconciled in the
+// existing January 2020 Series C quiz rather than creating a second 2019 paper.
+for(let n=92;n<=100;n++){
+ const item=data.questions[n-1],audit=item.newOCRComparison;
+ assert.equal(item.number,n,'Q92–100 original question position preserved');
+ assert.equal(audit?.date,'2026-11-23','Q'+n+' user-supplied source recorded');
+ assert.equal(audit?.originalSeriesCBookletVisuallyVerified,false,'Q'+n+' not certified against TNUSRB booklet images');
+ assert.deepEqual(Object.keys(item.options),['A','B','C','D']);
+ assert.deepEqual(Object.keys(item.optionsTamil),['A','B','C','D']);
+}
+const supplied92=data.questions[91];
+assert.equal(supplied92.newOCRComparison.basketArithmetic.result,11,'Q92 fruit count');
+assert.equal(supplied92.answerKeyToken,'B','Q92 correct key stays B');
+assert.match(supplied92.questionTamil,/12332142314223314113234/,'Q92 exact 23-digit command sequence retained');
+assert.match(supplied92.questionTamil,/பையில்/,'Q92 user Tamil bag wording retained separately from English basket');
+assert.equal(data.questions[92].answerKeyToken,'A','Q93 middle flags still India and Australia');
+assert.equal(data.questions[93].options.A,'NCPQJG','Q94 alternating letter code preserves first choice');
+const supplied95=data.questions[94];
+assert.equal(supplied95.scoringStatus,'ungraded_source_dispute','Q95 no verified original diagram, so cannot be graded');
+assert.deepEqual(supplied95.acceptedAnswers,[]);
+assert.equal(supplied95.newOCRComparison.originalFigureSupplied,false);
+assert.equal(supplied95.originalCBookletDiagramVerified,false);
+assert.match(supplied95.questionTamil,/மதிப்பெண் வழங்கப்படாது/,'Q95 source caution visible in Tamil');
+const supplied96=data.questions[95];
+assert.equal(supplied96.newOCRComparison.originalFourDiagramImagesSupplied,false);
+assert.deepEqual(supplied96.newOCRComparison.rawSuppliedOptionLabels,{A:'Diagram A',B:'Diagram B',C:'Diagram C',D:'Diagram D'});
+assert.match(supplied96.instruction,/editorial study descriptions/,'Q96 never misrepresents verbal alternatives as printed diagrams');
+assert.match(supplied96.options.C,/two small circles/,'Keep existing accessible textual study alternative');
+assert.equal(data.questions[96].newOCRComparison.layoutUnverified,true,'Q97 numeric placement must not be guessed from flattened OCR');
+assert.match(data.questions[96].newOCRComparison.rawSuppliedNumberLine,/466, 398, 341, 282, 250, \?/);
+assert.equal(data.questions[97].answerKeyToken,'D','Q98 directional key retained');
+assert.equal(data.questions[98].answerKeyToken,'B','Q99 wrong-number key retained');
+assert.equal(data.questions[99].newOCRComparison.status,'English_only_supplied_editorial_Tamil_retained','Q100 supplied no original Tamil text');
+
 console.log('PASS TNUSRB SI 2020 Series C: 140/140 readable (130 scored, 3 ALL and 7 source-reviewed ungraded); 0 missing and 0 blocked.');
