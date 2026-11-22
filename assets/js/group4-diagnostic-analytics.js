@@ -15,8 +15,8 @@
     }catch{return null}
   }
   function send(name,params){
-    if(typeof window.gtag!=='function')return;
-    try{window.gtag('event',name,Object.assign({exam_name:'TNPSC Group IV',paper_year:2024,question_count:200,diagnostic_format:'official_pdf_companion',transport_type:'beacon'},params||{}))}catch{}
+    if(typeof window.gtag!=='function')return false;
+    try{window.gtag('event',name,Object.assign({exam_name:'TNPSC Group IV',paper_year:2024,question_count:200,diagnostic_format:'official_pdf_companion',transport_type:'beacon'},params||{}));return true}catch{return false}
   }
   function start(entryPoint,deferred){
     const now=Date.now(),old=read()||{};
@@ -64,13 +64,14 @@
     const state=read(),now=Date.now();
     if(!state||!state.first_started_at||state.returned_at)return;
     const age=now-state.first_started_at;
-    if(age<RETURN_GAP||age>WEEK||state.launch_session===sessionToken())return;
-    state.returned_at=now;
-    save(state);
-    send('g4_diagnostic_return_7d',{
+    const currentSession=sessionToken();
+    if(age<RETURN_GAP||age>WEEK||(currentSession&&state.launch_session===currentSession))return;
+    if(!send('g4_diagnostic_return_7d',{
       days_since_first_start:Math.floor(age/DAY),
       completed_before_return:!!state.attempt_completed
-    });
+    }))return;
+    state.returned_at=now;
+    save(state);
   }
   window.ceGroup4Diagnostic={
     paperId:PAPER_ID,
@@ -82,4 +83,5 @@
   };
   flushStart();
   checkReturn();
+  window.addEventListener('load',checkReturn,{once:true});
 })();
