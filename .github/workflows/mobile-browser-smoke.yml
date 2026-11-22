@@ -48,6 +48,11 @@ on:
       - "assets/js/pyq-full-quiz.js"
       - "assets/css/mobile-navigation.css"
       - "tests/smoke_student_journey.mjs"
+      - "tests/smoke_group4_mocks.mjs"
+      - "tnpsc/mocks/**"
+      - "assets/js/group4-short-mock.js"
+      - "assets/js/group4-full-mock.js"
+      - "data/quizzes/tnpsc-group4-full-mock-1.json"
       - ".github/workflows/mobile-browser-smoke.yml"
 
 permissions:
@@ -81,5 +86,7 @@ jobs:
           exit 1
       - name: Exercise student journeys in mobile Chromium
         run: node tests/smoke_student_journey.mjs
+      - name: Verify Group IV timed mocks survive refresh and Android-like browser restart
+        run: node tests/smoke_group4_mocks.mjs
       - name: Verify mobile Police Constable three-paper practice and ungraded safeguards
         run: node tests/smoke_tnusrb_pc.mjs
