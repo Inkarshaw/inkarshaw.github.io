@@ -12,6 +12,8 @@ const byId=id=>document.querySelectorAll('#'+id);
 let bank=[],questions=[],indices=[],answers=[],marked=[],current=0,deadline=0,timer=null,active=false,retry=false,submitted=false,signature='',storageWorking=true,fingerprints=[],changedCount=0;
 const track=(event,detail)=>{try{window.gtag?.('event',event,Object.assign({exam:'TNPSC Group IV',mock:'Full Mock 1',practice_source:'unverified_2022_draft'},detail||{}))}catch{}};
 const isCorrect=(q,response)=>Number.isInteger(response)&&q.acceptedAnswers.includes(response);
+const isNotKnown=(q,response)=>Array.isArray(q.options)&&q.options.length===5&&response===4;
+const isUnscored=(q,response)=>response===null||isNotKnown(q,response);
 const validQuestions=qs=>Array.isArray(qs)&&qs.length===200&&qs.every(q=>
  q&&typeof q.section==='string'&&typeof q.question==='string'&&q.question.trim()&&
  Array.isArray(q.options)&&q.options.length>=4&&q.options.length<=5&&
@@ -142,6 +144,10 @@ function render(){
   const q=questions[current];
   $('subject').textContent=q.subject;$('qnum').textContent='Question '+(current+1)+' of '+questions.length;
   $('question').textContent=q.question;
+  $('sourceNote').textContent=Number.isInteger(q.originalQuestionNumber)?
+    '2022 Group IV editorial transcription · Source question '+q.originalQuestionNumber+
+    ' · Independent proofreading pending':
+    'ClearExams original practice question · Not a TNPSC source-paper transcription';
   const choices=$('options');choices.replaceChildren();
   q.options.forEach((o,i)=>{const button=document.createElement('button');option(button,o,i);choices.append(button)});
   $('clearBtn').disabled=answers[current]===null;
@@ -163,8 +169,8 @@ function render(){
 function review(){
   const filter=$('reviewFilter').value,root=$('review');root.replaceChildren();
   const rows=questions.map((q,i)=>({q,i})).filter(({q,i})=>{
-    if(filter==='wrong')return answers[i]!==null&&!isCorrect(q,answers[i]);
-    if(filter==='unanswered')return answers[i]===null;
+    if(filter==='wrong')return !isUnscored(q,answers[i])&&!isCorrect(q,answers[i]);
+    if(filter==='unanswered')return isUnscored(q,answers[i]);
     if(filter==='correct')return isCorrect(q,answers[i]);
     return true;
   });
@@ -174,7 +180,7 @@ function review(){
     const article=document.createElement('article');article.className='review-item';
     const h=document.createElement('h3');h.textContent=(i+1)+'. '+q.question;
     const ans=document.createElement('p');const correct=document.createElement('p'),explain=document.createElement('p');
-    ans.textContent='Your answer: '+(answers[i]===null?'Not answered':q.options[answers[i]]);
+    ans.textContent='Your answer: '+(answers[i]===null?'Not answered':(isNotKnown(q,answers[i])?'E · Answer not known':q.options[answers[i]]));
     correct.textContent='Accepted answer'+(q.acceptedAnswers.length>1?'s':'')+': '+q.acceptedAnswers.map(j=>String.fromCharCode(65+j)+'. '+q.options[j]).join(' / ');
     explain.className='explanation';explain.textContent=q.explanation||'';
     article.append(h,ans,correct,explain);root.append(article);
@@ -182,7 +188,7 @@ function review(){
 }
 function finish(automatic,restoring=false){
   if(submitted||!active)return;
-  const left=answers.filter(a=>a===null).length;
+  const left=answers.filter((a,i)=>isUnscored(questions[i],a)).length;
   if(!automatic&&!confirm((questions.length-left)+' of '+questions.length+' answered; '+left+' unanswered. Submit this attempt?'))return;
   submitted=true;active=false;pauseClock();
   try{localStorage.removeItem(STORE)}catch{}
@@ -194,7 +200,7 @@ function finish(automatic,restoring=false){
   const tamilMarks=tamilCorrect*1.5;
   const tamilEligible=tamilMarks>=60;
   const correctCount=sum(0,questions.length);
-  const wrongCount=questions.reduce((v,q,i)=>v+(answers[i]!==null&&!correct(q,i)?1:0),0);
+  const wrongCount=questions.reduce((v,q,i)=>v+(!isUnscored(q,answers[i])&&!correct(q,i)?1:0),0);
   const mark=correctCount*1.5,percent=Math.round(correctCount/questions.length*100);
   if(retry){
     $('subjectResults').replaceChildren();
@@ -219,11 +225,12 @@ function finish(automatic,restoring=false){
       'Tamil qualifying rule NOT satisfied: '+tamilMarks.toFixed(1)+'/150 (minimum 60). General Studies and Aptitude scores have not been evaluated.';
     $('score').textContent=tamilEligible?mark.toFixed(1)+' / 300':tamilMarks.toFixed(1)+' / 150 (Tamil only)';
     $('correct').textContent=tamilEligible?correctCount:tamilCorrect;
-    $('wrong').textContent=tamilEligible?wrongCount:answers.slice(0,100).filter((v,i)=>v!==null&&!correct(questions[i],i)).length;
+    $('wrong').textContent=tamilEligible?wrongCount:answers.slice(0,100).filter((v,i)=>!isUnscored(questions[i],v)&&!correct(questions[i],i)).length;
     $('accuracy').textContent=tamilEligible?percent+'%':Math.round(tamilCorrect)+'% Tamil';
     $('scoringPolicy').textContent='Practice-only indicative scoring. Part A gate: 60/150. Total minimum: 90/300 (only after Part A passes). All answers use 1.5 marks per correct answer; an unverified editorial 2022 transcription is used for 193 questions. OMR blank-response penalties and official ranking rules are NOT simulated.';
   }
-  $('unanswered').textContent=left;
+  $('unanswered').textContent=tamilEligible||retry?left:answers.slice(0,100).filter((v,i)=>isUnscored(questions[i],v)).length;
+  $('unansweredLabel').textContent=tamilEligible||retry?'Blank / Not known':'Tamil blank / Not known';
   if(!restoring&&!retry)history(correctCount,wrongCount,left,tamilMarks,tamilEligible);
   if(retry&&!restoring)$('saveStatus').textContent='Retry completed; your full-length history was not replaced.';
   $('reviewFilter').value='all';review();
