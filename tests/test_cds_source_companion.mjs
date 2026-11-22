@@ -7,9 +7,9 @@ const root=path.resolve(import.meta.dirname,'..');
 const read=p=>readFileSync(path.join(root,p),'utf8');
 const coverage=JSON.parse(read('data/quizzes/cds-gk/coverage-gaps-2008-2020.json'));
 const source=coverage.slots.find(p=>p.year===2020&&p.session==='II');
-assert.equal(source.status,'no-local-text-paper');
-assert.equal(source.paperId,null);
-assert.equal(source.questionPositions,0);
+assert.equal(source.status,'provisional-english-text-available');
+assert.equal(source.paperId,'cds-ii-2020-gk');
+assert.equal(source.questionPositions,120);
 assert.equal(source.responseSheetPositions,120);
 assert.equal(source.sourcePaperId,'cds-ii-2020-gk');
 assert.equal(source.officialBookletSeries,'A');
@@ -22,7 +22,7 @@ const html=read('pyq-cds-source.html'), js=read('assets/js/pyq-cds-source.js'),l
 for(const v of ['id="paperTitle"','id="officialPdf"','id="pdfFrame"','id="practice"','id="choices"','id="palette"','id="exportAnswers"','id="clearAnswers"','id="attemptCount"'])
  assert.ok(html.includes(v),'Original-source practice UI is missing '+v);
 assert.ok(library.includes('href="pyq-cds-source.html?paper=cds-ii-2020-gk"'));
-assert.ok(library.includes('The question text is not yet digitized into ClearExams'));
+assert.ok(library.includes('All 120 English question stems and A–D options have now been imported'));
 assert.ok(html.includes('not a typed or scored quiz'));
 assert.ok(!js.includes('innerHTML'),'PDF source and stored answers must not be injected as HTML');
 new vm.Script(js,{filename:'assets/js/pyq-cds-source.js'});
