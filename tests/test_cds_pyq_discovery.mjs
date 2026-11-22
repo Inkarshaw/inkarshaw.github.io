@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const root=path.resolve(import.meta.dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const cds=JSON.parse(read('data/quizzes/cds-gk/index.json'));
-assert.equal(cds.paperStatuses.length,16);
+assert.equal(cds.paperStatuses.length,17);
 
 class Element {
  constructor(tag='div',id=''){
@@ -46,14 +46,14 @@ function cdsCards(){
  return nodes.cards.children.filter(card=>card.children.some(child=>child.tagName==='h2'&&/^CDS (?:I|II) · General Knowledge$/.test(child.textContent)));
 }
 function links(card){return card.children.filter(child=>child.tagName==='a').map(child=>child.href);}
-assert.equal(cdsCards().length,16,'All 16 CDS paper cards must load on the initial PYQ library screen');
-assert.ok(nodes.stats.textContent.includes('5050'),'Complete numbered positions must combine 3130 existing and 1920 CDS');
+assert.equal(cdsCards().length,17,'All 17 CDS paper cards must load on the initial PYQ library screen');
+assert.ok(nodes.stats.textContent.includes('5170'),'Complete numbered positions must combine 3130 existing and 2040 CDS');
 const expected=cds.paperStatuses.map(x=>'pyq-cds.html?paper='+x.id).sort();
 assert.deepEqual(cdsCards().flatMap(links).sort(),expected,'Every CDS card must deep-link to its own question paper');
 assert.ok(cdsCards().every(card=>card.textContent.includes('Scoring disabled / not verified')),'No CDS card may claim scoring');
 
 nodes.examFilter.value='UPSC';nodes.examFilter.dispatch('change');
-assert.equal(cdsCards().length,16,'UPSC board filter must show all 16 CDS papers');
+assert.equal(cdsCards().length,17,'UPSC board filter must show all 17 CDS papers');
 
 nodes.yearFilter.value='2019';nodes.yearFilter.dispatch('change');
 assert.deepEqual(cdsCards().map(x=>x.children.find(y=>y.tagName==='h2').textContent).sort(),
@@ -62,16 +62,16 @@ assert.deepEqual(cdsCards().flatMap(links).sort(),
  ['pyq-cds.html?paper=cds-i-2019-gk','pyq-cds.html?paper=cds-ii-2019-gk']);
 
 nodes.yearFilter.value='2020';nodes.yearFilter.dispatch('change');
-assert.deepEqual(cdsCards().flatMap(links),['pyq-cds.html?paper=cds-i-2020-gk']);
+assert.deepEqual(cdsCards().flatMap(links).sort(),['pyq-cds.html?paper=cds-i-2020-gk','pyq-cds.html?paper=cds-ii-2020-gk']);
 
 nodes.yearFilter.value='all';nodes.yearFilter.dispatch('change');
 nodes.search.value='CDS';nodes.search.dispatch('input');
-assert.equal(cdsCards().length,16,'Searching CDS must display all CDS paper cards');
+assert.equal(cdsCards().length,17,'Searching CDS must display all CDS paper cards');
 
 nodes.coverageFilter.value='source-only';nodes.coverageFilter.dispatch('change');
 assert.equal(cdsCards().length,0,'CDS text papers must not be mislabelled source-only');
 
 nodes.coverageFilter.value='full-numbered-draft';nodes.coverageFilter.dispatch('change');
-assert.equal(cdsCards().length,16,'All CDS text papers belong in complete-numbered draft coverage');
+assert.equal(cdsCards().length,17,'All CDS text papers belong in complete-numbered draft coverage');
 
-console.log('PASS CDS discoverability: 16 selectable full-paper cards, UPSC/year/search/coverage filters and safe deep links.');
+console.log('PASS CDS discoverability: 17 selectable full-paper cards, UPSC/year/search/coverage filters and safe deep links.');
