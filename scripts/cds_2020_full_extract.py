@@ -48,8 +48,8 @@ def extract(html: str) -> list[dict]:
         for br in p.find_all("br"):
             br.replace_with("\n")
         stem = clean(p.get_text(" ", strip=True))
-        if len(stem) < 18:
-            raise ValueError(f"Q{number}: missing/short stem: {stem!r}")
+        if len(stem) < 5:
+            raise ValueError(f"Q{number}: empty/invalid stem: {stem!r}")
         options = {}
         lis = card.select("ul.mcqx-upsc-opts > li")
         for li in lis:
