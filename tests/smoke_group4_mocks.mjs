@@ -81,23 +81,36 @@ try{
  assert.ok(fullOverflow<=4,'Full mock Android width overflow '+fullOverflow);
  console.log('PASS full mock 200 questions: saved answer, review flag, position and 3h deadline');
  // Qualifying rule: 39 correct Tamil answers is below 60 marks. No Part B score is released.
- state=await page.evaluate(({key,answers})=>{
-   const s=JSON.parse(localStorage.getItem(key));s.answers=answers;localStorage.setItem(key,JSON.stringify(s));return s;
- },{key,answers:data.questions.map((q,i)=>i<39?q.acceptedAnswers[0]:null)});
+ await page.evaluate(targets=>{
+   targets.forEach((answer,i)=>{
+     if(answer===null)return;
+     document.querySelectorAll('#palette button')[i].click();
+     document.querySelectorAll('#options button')[answer].click();
+   });
+ },data.questions.map((q,i)=>i<39?q.acceptedAnswers[0]:null));
+ state=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),key);
+ assert.equal(state.answers.slice(0,39).filter(v=>v!==null).length,39,'39 Tamil answers saved via actual UI handlers');
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
  page.once('dialog',d=>d.accept());
  await page.locator('#submitBtn').click();
  await page.locator('#gateOutcome').waitFor({state:'visible'});
- assert.match(await page.locator('#gateOutcome').innerText(),/NOT satisfied/);
+ assert.match(await page.locator('#gateOutcome').innerText(),/NOT satisfied: 58\.5\/150/);
  assert.match(await page.locator('#subjectResults').innerText(),/not evaluated/);
  console.log('PASS full mock: Tamil gate blocks Part B below 60/150');
  // A fresh run with 40 Tamil + 20 GS key-matched answers reaches 90/300.
  await page.reload({waitUntil:'domcontentloaded'});
  await page.locator('#startBtn').click();
- await page.evaluate(({key,answers})=>{
-   const s=JSON.parse(localStorage.getItem(key));s.answers=answers;localStorage.setItem(key,JSON.stringify(s));
- },{key,answers:data.questions.map((q,i)=>i<40||(i>=100&&i<120)?q.acceptedAnswers[0]:null)});
+ await page.evaluate(targets=>{
+   targets.forEach((answer,i)=>{
+     if(answer===null)return;
+     document.querySelectorAll('#palette button')[i].click();
+     document.querySelectorAll('#options button')[answer].click();
+   });
+ },data.questions.map((q,i)=>i<40||(i>=100&&i<120)?q.acceptedAnswers[0]:null));
+ const ready=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),key);
+ assert.equal(ready.answers.slice(0,100).filter(v=>v!==null).length,40,'40 Tamil answers saved');
+ assert.equal(ready.answers.slice(100,175).filter(v=>v!==null).length,20,'20 GS answers saved');
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
  page.once('dialog',d=>d.accept());
