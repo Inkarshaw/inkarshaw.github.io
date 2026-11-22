@@ -6,7 +6,7 @@ const base=path.join(root,'data','quizzes','cds-gk');
 const idx=JSON.parse(fs.readFileSync(path.join(base,'index.json'),'utf8'));
 assert.equal(idx.schemaVersion,1);assert.equal(idx.exam,'UPSC CDS');
 assert.equal(idx.gradingEnabled,false);assert.equal(idx.officialAnswerKeyMapped,false);
-assert.equal(idx.sourceUploadedPapers,16);assert.equal(idx.paperStatuses.length,16);
+assert.equal(idx.sourceUploadedPapers,16);assert.equal(idx.paperStatuses.length,17);
 const seen=new Set();let stems=0,options=0,scans=0;
 for(const entry of idx.paperStatuses){
  assert.ok(!seen.has(entry.id),'Duplicate CDS source paper id');seen.add(entry.id);
@@ -31,7 +31,7 @@ for(const entry of idx.paperStatuses){
  if(/scan/i.test(p.textExtractionMethod))scans++;
  stems+=entry.textStems;options+=entry.provisionalFourOptionSets;
 }
-assert.equal(scans,7);assert.equal(idx.paperStatuses.length-scans,9);
+assert.equal(scans,7);assert.equal(idx.paperStatuses.length-scans,10);
 const reviewed=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2019-gk.json'),'utf8'));
 assert.deepEqual(reviewed.questions.slice(0,27).map(q=>q.number),Array.from({length:27},(_,i)=>i+1));
 for(const q of reviewed.questions.slice(0,27)){
@@ -441,7 +441,7 @@ assert.match(c2020.questions[86].text,/82 mining areas/);
 
 // All sixteen CDS GK papers now have 120 provisional English A-D text positions.
 assert.ok(idx.paperStatuses.every(e=>e.textStems===120&&e.provisionalFourOptionSets===120&&e.unresolvedPositions===0));
-assert.equal(idx.paperStatuses.length*120,1920);
+assert.equal(idx.paperStatuses.length*120,2040);
 assert.deepEqual(c2020.stats,{textStems:120,provisionalFourOptionSets:120,missingOrPartialPositions:0,numberedPositions:120});
 for(let n=1;n<=120;n++){
  const q=c2020.questions[n-1];
@@ -454,8 +454,8 @@ for(let n=1;n<=120;n++){
 const verification=JSON.parse(fs.readFileSync(path.join(base,'official-verification-status.json'),'utf8'));
 assert.equal(verification.schemaVersion,1);
 assert.equal(verification.gradingEnabled,false);
-assert.equal(verification.paperCount,16);
-assert.equal(verification.expectedQuestions,1920);
+assert.equal(verification.paperCount,17);
+assert.equal(verification.expectedQuestions,2040);
 assert.equal(verification.papers.length,idx.paperStatuses.length);
 for(const item of verification.papers){
  const paper=idx.paperStatuses.find(e=>e.id===item.id);
@@ -564,7 +564,7 @@ assert.deepEqual(cdsYearsFromHub.split(',').map(Number).sort((a,b)=>a-b),
  [...new Set(idx.paperStatuses.map(p=>p.year))].sort((a,b)=>a-b));
 assert.ok(js.includes("const year=params.get('year'),session=params.get('session')"),'CDS reader must accept year/session deep links');
 assert.ok(js.includes("if(linked){$('yearFilter').value=String(linked.year);$('sessionFilter').value=linked.session;}"),'Direct paper links must focus the correct year and session');
-assert.ok(typedLibrary.includes('UPSC CDS — 16 General Knowledge papers indexed'));
+assert.ok(typedLibrary.includes('UPSC CDS — 17 General Knowledge text papers indexed'));
 assert.ok(typedLibrary.includes('value="UPSC"'));
 assert.ok(typedCatalogJS.includes("fetchJSON('data/quizzes/cds-gk/index.json')"));
 assert.ok(typedCatalogJS.includes("paper:'CDS '+e.session+' · General Knowledge'"));
@@ -578,25 +578,40 @@ assert.ok(idx.paperStatuses.every(p=>fs.existsSync(path.join(root,'data','quizze
 const coverage=JSON.parse(fs.readFileSync(path.join(base,'coverage-gaps-2008-2020.json'),'utf8'));
 assert.equal(coverage.schemaVersion,1);
 assert.equal(coverage.totalPossibleSessions,26);
-assert.equal(coverage.locallyIndexedSessionPapers,16);
-assert.equal(coverage.missingLocalSessionPapers,10);
+assert.equal(coverage.locallyIndexedSessionPapers,17);
+assert.equal(coverage.missingLocalSessionPapers,9);
 assert.equal(coverage.slots.length,26);
 const availableSlots=coverage.slots.filter(x=>x.status==='provisional-english-text-available');
 const unavailableSlots=coverage.slots.filter(x=>x.status==='no-local-text-paper');
-assert.equal(availableSlots.length,16);assert.equal(unavailableSlots.length,10);
+assert.equal(availableSlots.length,17);assert.equal(unavailableSlots.length,9);
 assert.deepEqual(availableSlots.map(x=>x.paperId).sort(),idx.paperStatuses.map(x=>x.id).sort());
 assert.ok(availableSlots.every(x=>x.quizUrl==='pyq-cds.html?paper='+x.paperId&&x.questionPositions===120&&!x.scoringEnabled));
 assert.ok(unavailableSlots.every(x=>x.paperId===null&&x.quizUrl===null&&x.questionPositions===0&&!x.scoringEnabled));
 assert.deepEqual(coverage.missingSessionLabels,[
  'CDS I 2009','CDS II 2009','CDS I 2011','CDS I 2013',
  'CDS I 2014','CDS II 2014','CDS I 2015','CDS II 2015',
- 'CDS I 2016','CDS II 2020'
+ 'CDS I 2016'
 ]);
 const readerHtml=fs.readFileSync(path.join(root,'pyq-cds.html'),'utf8');
-assert.ok(readerHtml.includes('16 of the 26 CDS I/II General Knowledge sittings'));
-assert.ok(readerHtml.includes('Ten sessions in that period are not yet available locally.'));
+assert.ok(readerHtml.includes('17 of the 26 CDS I/II General Knowledge sittings'));
+assert.ok(readerHtml.includes('Nine sessions in that period are not yet available locally.'));
 const institutional2020=verification.papers.find(p=>p.id==='cds-i-2020-gk').institutionalQuestionPaperListing;
 assert.match(institutional2020.url,/ndl\.iitkgp\.ac\.in/);
 assert.equal(institutional2020.questionPaperPdfInspected,false);
 assert.equal(institutional2020.finalAnswerKeyAuthenticated,false);
 assert.equal(verification.gradingEnabled,false);
+
+const typedII2020=JSON.parse(fs.readFileSync(path.join(base,'cds-ii-2020-gk.json'),'utf8'));
+assert.equal(typedII2020.questions.length,120);
+assert.equal(typedII2020.grading,'disabled');
+assert.equal(typedII2020.officialAnswerKeyChecked,false);
+assert.equal(typedII2020.officialOriginalConfirmed,false);
+assert.equal(typedII2020.sourceType,'commission-hosted-original-pdf-reference-with-third-party-typed-text');
+assert.match(typedII2020.questions[0].text,/Budget Estimates of 2019-20/);
+assert.equal(typedII2020.questions[0].options.A,'1, 2, 3, 4');
+assert.equal(typedII2020.questions[81].text,'ASEEM is');
+assert.match(typedII2020.questions[101].text,/converging lens/);
+assert.match(typedII2020.questions[119].text,/environmental emergency/);
+assert.equal(typedII2020.questions[119].options.B,'Mauritius');
+assert.ok(typedII2020.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true&&q.extraction==='provisional-four-options'&&q.issues.length>=2));
+assert.ok(readerHtml.includes('Start all 120 CDS II 2020 text questions (ungraded)'));
