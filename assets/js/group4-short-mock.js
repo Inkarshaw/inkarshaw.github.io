@@ -149,6 +149,7 @@ function finish(automatic){
   track('mock_test_completed',{score,total,accuracy,auto_submit:automatic,retry});
   window.scrollTo?.({top:0,behavior:'smooth'});
 }
+$('startBtn').disabled=true;
 $('startBtn').addEventListener('click',()=>{if(bank.length)newAttempt()});
 $('prevBtn').addEventListener('click',()=>{if(current>0){current--;save();render()}});
 $('nextBtn').addEventListener('click',()=>{if(current<questions.length-1){current++;save();render()}});
@@ -168,6 +169,7 @@ window.addEventListener('pagehide',save);
 fetch(URL_DATA,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Mock data unavailable');return r.json()}).then(data=>{
   if(!validQuestions(data.questions))throw Error('Mock content is incomplete');
   bank=data.questions;signature=bank.length+':'+bank[0].question+':'+bank[bank.length-1].question;
+  $('startBtn').disabled=false;
   const saved=read();
   if(!restore(saved)){
     indicator('Progress will be saved to this device when you begin.',false);
