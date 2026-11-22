@@ -34,5 +34,6 @@ assert.match(script,/localHref\(exam\.href\)/,'Only safe local study routes');
 assert.match(script,/officialHref\(exam\.officialUrl\)/);
 assert.match(script,/No dedicated|not published|not available yet/i);
 assert.match(script,/source-verified original/);
+assert.doesNotMatch(script,/UPSC original question-paper portal/,'Non-UPSC military recruitment should not inherit UPSC original-paper links');
 assert.match(read('assets/js/pwa.js'),/\/exam-overview\.html/,'The mobile Exams tab must highlight on overview');
 console.log('PASS exam overview: 42 foundation-only entries, curated official links, no fake exam-specific mocks');
