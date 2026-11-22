@@ -91,5 +91,5 @@ for(const privatePath of ['/mycases/?crime=42','/policedocuments/?name=private']
 }
 const pdf=await request('/current-affairs/2026-09-21.pdf');
 assert.equal(pdf.intercepted,false,'PDFs are not cached by the shell');
-assert.match(source,/clearexams-shell-v8-fresh-content/);
+assert.match(source,/clearexams-shell-v9-group4-diagnostic/);
 console.log('PASS: fresh public quiz data and assets, offline fallback, 5xx/404 handling and private-page exclusion');

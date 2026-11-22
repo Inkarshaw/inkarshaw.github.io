@@ -1,6 +1,6 @@
 // Content and executable assets are network-first to avoid stale exam questions after a release.
-const CACHE='clearexams-shell-v8-fresh-content';
-const CORE=['/','/index.html','/start.html','/404.html','/daily-quiz.html','/current-affairs/','/exam-calendar.html','/exam-notifications.html','/pyq-hub.html','/dashboard.html','/search.html','/study-plan-30.html','/answer-writing.html','/exam-preparation.html','/exam-posts.html','/current-affairs/compilations.html','/syllabus.html','/tnpsc.html','/tnusrb.html','/upsc.html','/assets/css/exam-pages.css','/assets/js/pwa.js','/assets/clearexams-icon.svg','/manifest.webmanifest','/data/quizzes/daily-quiz.csv','/data/exams/exam-notifications.json','/current-affairs/text/','/current-affairs/text/editions.json'];
+const CACHE='clearexams-shell-v9-group4-diagnostic';
+const CORE=['/','/index.html','/start.html','/group4-diagnostic.html','/pyq-original-paper.html','/404.html','/daily-quiz.html','/current-affairs/','/exam-calendar.html','/exam-notifications.html','/pyq-hub.html','/dashboard.html','/search.html','/study-plan-30.html','/answer-writing.html','/exam-preparation.html','/exam-posts.html','/current-affairs/compilations.html','/syllabus.html','/tnpsc.html','/tnusrb.html','/upsc.html','/assets/css/exam-pages.css','/assets/js/pwa.js','/assets/js/group4-diagnostic-analytics.js','/assets/js/pyq-original-paper.js','/assets/clearexams-icon.svg','/manifest.webmanifest','/data/quizzes/daily-quiz.csv','/data/exams/exam-notifications.json','/current-affairs/text/','/current-affairs/text/editions.json'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(async cache=>{

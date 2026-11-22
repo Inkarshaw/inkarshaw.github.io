@@ -1,5 +1,13 @@
 (()=>{'use strict';
 if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/service-worker.js').catch(()=>{}))}
+/* Observe later-site visits by candidates who started the Group IV diagnostic.
+   Only a first-start timestamp and anonymous return flag are stored locally. */
+if(!document.querySelector('script[src*="group4-diagnostic-analytics.js"]')){
+  const diagnosticTracker=document.createElement('script');
+  diagnosticTracker.src='/assets/js/group4-diagnostic-analytics.js';
+  diagnosticTracker.defer=true;
+  document.head.appendChild(diagnosticTracker);
+}
 let promptEvent=null;const installButton=()=>document.getElementById('installApp');
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();promptEvent=e;document.querySelectorAll('#installApp,#ceInstallApp').forEach(b=>b.hidden=false)});
 window.addEventListener('appinstalled',()=>{promptEvent=null;document.querySelectorAll('#installApp,#ceInstallApp').forEach(b=>b.hidden=true);if(window.gtag)gtag('event','pwa_installed')});
