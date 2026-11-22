@@ -787,6 +787,15 @@ try {
   await page.locator('#palette button').filter({hasText:/^89$/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q89/);
   assert.match(await page.locator('#questionTitle').innerText(),/Maths 90°/);
+  assert.equal(await page.locator('#feedback').isVisible(),false,'Q89 bilingual key explanation is not leaked before answering');
+  await page.locator('#options button').first().click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: A\/C/,'Q89 official double key is intact');
+  assert.match(await page.locator('#feedback').innerText(),/105.*Hindi.*C/s,'Q89 English arithmetic interpretation explained post-check');
+  assert.match(await page.locator('#feedback').innerText(),/highest.*Maths.*A/s,'Q89 parallel Tamil highest-marks interpretation explained');
+  await page.locator('#language').selectOption('ta');
+  assert.match(await page.locator('#feedback').innerText(),/கணிதம்/,'Q89 Tamil explanation is available after checking');
+  await page.locator('#language').selectOption('both');
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#start')&&!document.querySelector('#start').disabled,
     undefined,{timeout:20000});

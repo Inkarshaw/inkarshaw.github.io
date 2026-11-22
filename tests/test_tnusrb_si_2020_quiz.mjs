@@ -416,4 +416,26 @@ assert.equal(data.questions[97].answerKeyToken,'D','Q98 directional key retained
 assert.equal(data.questions[98].answerKeyToken,'B','Q99 wrong-number key retained');
 assert.equal(data.questions[99].newOCRComparison.status,'English_only_supplied_editorial_Tamil_retained','Q100 supplied no original Tamil text');
 
+// Bilingual psychology solution audit Q82–91: no unsupported key rewrites.
+for(const n of [82,83,89,90,91]){
+ const q=data.questions[n-1];
+ assert.ok(q.answerExplanation.length>70,'Q'+n+' has substantive English editorial reasoning');
+ assert.match(q.answerExplanationTamil,/[\u0B80-\u0BFF]/u,'Q'+n+' has Tamil editorial reasoning');
+ assert.equal(q.explanationStatus,'editorial_mathematical_or_logic_derivation_not_original_board_solution');
+}
+const q89=data.questions[88];
+assert.deepEqual(q89.acceptedAnswers,['A','C'],'The published Series C final key accepts both A and C');
+assert.equal(q89.answerKeyToken,'A/C');
+assert.equal(q89.scoringStatus,'scored_with_final_key');
+assert.equal(q89.bilingualKeyReconciliation.sourceCBookletBilingualPageVisuallyVerified,false,'Never claim original Series C printed Tamil certification');
+assert.equal(q89.bilingualKeyReconciliation.officialBoardRationaleNotProven,true,'Do not claim official motive for dual key');
+assert.equal(q89.bilingualKeyReconciliation.englishAnswer,'C');
+assert.equal(q89.bilingualKeyReconciliation.sourceTamilParallelAnswer,'A');
+assert.equal(70/360*540,105,'Q89 Hindi corresponds to 105 marks');
+assert.equal(90/360*540,135,'Q89 Maths is the largest sector');
+assert.match(q89.answerExplanationTamil,/அதிக மதிப்பெண்கள்/,'Separate Tamil rendering explicitly explains highest-marks question');
+assert.match(js,/function appendStudyExplanation\(/,'Student quiz has post-answer bilingual explanation renderer');
+assert.match(js,/appendStudyExplanation\(div,q\)/,'Practice explanation appears after Check Answer only');
+assert.match(js,/appendStudyExplanation\(body,q\)/,'Results review includes bilingual explanation');
+
 console.log('PASS TNUSRB SI 2020 Series C: 140/140 readable (130 scored, 3 ALL and 7 source-reviewed ungraded); 0 missing and 0 blocked.');
