@@ -49,7 +49,7 @@ function primarySection(path){
   if(['/start.html','/exam-preparation.html','/tnpsc.html','/tnusrb.html','/upsc.html','/exam-posts.html','/syllabus.html'].includes(p))return 'exams';
   if(p==='/pyq-hub.html'||p.startsWith('/pyq-')||p.includes('-pyq')||p.includes('/previous_year_questions'))return 'pyqs';
   if(p==='/practice.html'||p==='/daily-quiz.html'||p==='/group4-diagnostic.html'||
-     p.startsWith('/tnpsc/mocks/')||p.includes('textbook')||p.includes('school-book-quiz')||p.endsWith('-quiz.html')||
+     (p==='/tnpsc/mocks'||p.startsWith('/tnpsc/mocks/'))||p==='/tnpsc-group4-mocks.html'||p.includes('textbook')||p.includes('school-book-quiz')||p.endsWith('-quiz.html')||
      p==='/wrong-answers.html')return 'practice';
   return 'more';
 }
