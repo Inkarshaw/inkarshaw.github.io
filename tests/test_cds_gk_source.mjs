@@ -615,3 +615,18 @@ assert.match(typedII2020.questions[119].text,/environmental emergency/);
 assert.equal(typedII2020.questions[119].options.B,'Mauritius');
 assert.ok(typedII2020.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false&&q.ungraded===true&&q.extraction==='provisional-four-options'&&q.issues.length>=2));
 assert.ok(readerHtml.includes('Start all 120 CDS II 2020 text questions (ungraded)'));
+
+const simplifiedReaderHTML=fs.readFileSync(path.join(root,'pyq-cds.html'),'utf8');
+const simplifiedReaderJS=fs.readFileSync(path.join(root,'assets/js/pyq-cds.js'),'utf8');
+for(const obsolete of ['quizHead','questionFilter','questionSearch','jumpNumber','jumpButton','attemptMeter']){
+ assert.doesNotMatch(simplifiedReaderHTML,new RegExp('id="'+obsolete+'"'),'CDS reader must not expose obsolete toolbar '+obsolete);
+ assert.doesNotMatch(simplifiedReaderJS,new RegExp('\\$\\(\\x27'+obsolete+'\\x27\\)'),'CDS JS must not require obsolete toolbar '+obsolete);
+}
+for(const retained of ['quizLayout','paperName','paperStats','palette','prev','next','nextIncomplete','attemptText','exportResponse','exportSource','clearResponse']){
+ assert.ok(simplifiedReaderHTML.includes('id="'+retained+'"'),'Keep playable reader element '+retained);
+}
+assert.match(simplifiedReaderHTML,/Next unanswered/);
+assert.match(simplifiedReaderHTML,/<details class="paper-tools">/);
+assert.match(simplifiedReaderJS,/visible=Array\.from\(\{length:active\.questions\.length\}/);
+assert.match(simplifiedReaderJS,/No official scoring/);
+assert.doesNotMatch(simplifiedReaderHTML,/Ungraded \/ source review pending/);
