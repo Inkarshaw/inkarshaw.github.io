@@ -132,7 +132,8 @@ try{
    });
  },data.questions.map((q,i)=>i<40||(i>=100&&i<120)?q.acceptedAnswers[0]:(i===40?4:null)));
  const ready=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),key);
- assert.equal(ready.answers.slice(0,100).filter(v=>v!==null).length,40,'40 Tamil answers saved');
+ assert.equal(ready.answers.slice(0,100).filter(v=>v!==null).length,41,'40 scored Tamil responses plus one E Answer not known');
+ assert.equal(ready.answers.slice(0,100).filter(v=>Number.isInteger(v)&&v<=3).length,40,'Only 40 scorable Tamil choices');
  assert.equal(ready.answers.slice(100,175).filter(v=>v!==null).length,20,'20 GS answers saved');
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
