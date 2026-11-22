@@ -200,6 +200,21 @@
     });
   }
   const answered=()=>attempt.answers.filter(Boolean).length;
+  function appendStudyExplanation(container,q){
+    if(!q.answerExplanation)return;
+    const language=$('language').value;
+    if(language!=='ta'){
+      const p=document.createElement('p');
+      p.textContent='Study explanation (editorial, not a board-issued solution): '+q.answerExplanation;
+      container.append(p);
+    }
+    if(language!=='en'&&q.answerExplanationTamil){
+      const p=document.createElement('p');
+      p.lang='ta';
+      p.textContent='விளக்கம் (ஆய்வு நோக்கத்திற்கானது; வாரியத்தின் அதிகாரப்பூர்வ விளக்கம் அல்ல): '+q.answerExplanationTamil;
+      container.append(p);
+    }
+  }
   function feedback(q){
     const div=$('feedback');div.replaceChildren();
     const visible=attempt.mode==='practice'&&attempt.checked[attempt.index];
@@ -224,6 +239,7 @@
       accepted.textContent='Accepted: '+q.acceptedAnswers.map(letter=>letter+') '+q.options[letter]).join(' / ');
       div.append(accepted);
     }
+    appendStudyExplanation(div,q);
     const foot=document.createElement('p');
     foot.textContent=disputed?
       'The printed source key entry is kept for provenance only. Verify the original Open Candidates booklet before grading.':
@@ -336,6 +352,7 @@
          disputed?' · printed key disputed; no correct answer asserted':' · final-key special ALL entry');
       body.append(response);
       if(disputed){const note=document.createElement('p');note.textContent=q.answerReviewReason;body.append(note)}
+      appendStudyExplanation(body,q);
       for(const letter of LETTERS){
         const p=document.createElement('p');
         const tamil=q.optionsTamil?.[letter];
