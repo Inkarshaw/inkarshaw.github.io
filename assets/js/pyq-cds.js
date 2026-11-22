@@ -26,26 +26,16 @@ async function openPaper(id){try{
  if(!/^[a-z0-9-]{10,55}$/.test(id)||!index.paperStatuses.some(x=>x.id===id))throw Error('Paper is not listed in the source catalog');
  status('Loading full question paper…');let p=paperCache.get(id);
  if(!p){const r=await fetch('data/quizzes/cds-gk/'+id+'.json',{cache:'no-store'});if(!r.ok)throw Error('Paper JSON is not published yet');p=validate(await r.json());paperCache.set(id,p);}
- active=p;restore();selected=0;$('quizHead').hidden=false;$('quizLayout').hidden=false;
+ active=p;restore();selected=0;visible=Array.from({length:active.questions.length},(_,i)=>i);$('quizLayout').hidden=false;
  const summary=index.paperStatuses.find(x=>x.id===id);
  $('paperName').textContent=`CDS ${p.session} ${p.year} — General Knowledge`;
- $('paperStats').textContent=`120 numbered positions · ${summary.textStems} stems extracted · ${summary.provisionalFourOptionSets} provisional A–D sets · ${summary.unresolvedPositions} missing text/choices · ${(summary.unresolvedSourceVisualNumbers||[]).length} unresolved source maps · ${(summary.unresolvedSourceLanguages||[]).length?`missing ${summary.unresolvedSourceLanguages.join(', ')} transcription · `:''}no scoring`;
- $('questionFilter').value='all';$('questionSearch').value='';$('jumpNumber').value='';history.replaceState(null,'',paperURL(id));applyFilters();
- $('quizHead').scrollIntoView({behavior:'smooth',block:'start'});status('Opened full CDS GK paper. Questions and selected answers remain ungraded.');
+ $('paperStats').textContent='120 questions · No official scoring · responses saved on this device';
+ history.replaceState(null,'',paperURL(id));render();
+ $('quizLayout').scrollIntoView({behavior:'smooth',block:'start'});status('Opened full CDS GK paper. Questions and selected answers remain ungraded.');
  }catch(err){status('Unable to open paper: '+err.message,true);}}
-function applyFilters(){if(!active)return;const filter=$('questionFilter').value,query=$('questionSearch').value.toLowerCase().trim();visible=active.questions.map((q,i)=>({q,i})).filter(({q})=>{
- if(filter==='complete'&&needsSourceReview(q))return false;
- if(filter==='missing'&&!needsSourceReview(q))return false;
- if(filter==='unanswered'&&responses[String(q.number)])return false;
- return !query||String(q.number)===query||(q.text+' '+choices.map(l=>q.options[l]).join(' ')).toLowerCase().includes(query);
- }).map(x=>x.i);
- if(visible.length&&!visible.includes(selected))selected=visible[0];render();}
 function showIndex(i){selected=i;render();}
-function render(){if(!active)return;const q=active.questions[selected],available=visible.length>0;
- $('quizLayout').hidden=!available;
- const p=answered();$('attemptMeter').style.width=(p/120*100).toFixed(1)+'%';
- $('attemptText').textContent=p+' / 120 answers selected locally · ungraded';
- if(!available){status('No questions match the filter. Clear the search or select All questions.');return;}
+function render(){if(!active)return;const q=active.questions[selected];
+ $('attemptText').textContent=answered()+' / 120 answers saved on this device · no scoring';
  $('position').textContent='Question '+q.number+' of 120';
  $('sourcePage').textContent=q.sourcePages.length?'Source PDF page '+q.sourcePages.join(', '):q.text?.trim()?'Source PDF page not yet mapped':'Question text not recovered';
  $('questionText').textContent=q.text||'[Original question text not extracted — do not assume its wording]';
@@ -58,13 +48,17 @@ function move(n){const i=visible.indexOf(selected),next=visible[Math.min(visible
 function download(name,data){const blob=new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);}
 function exportResponses(){if(!active)return;download(active.id+'-ungraded-responses.json',{schemaVersion:1,kind:'clearexams-cds-gk-local-answers',paperId:active.id,sourceFile:active.sourceFile,officialKeyMapped:false,score:null,grading:'disabled',responses:Object.entries(responses).sort((a,b)=>+a[0]- +b[0]).map(([n,l])=>({number:+n,selected:l}))});}
 function exportPaper(){if(!active)return;download(active.id+'-source-text-unverified.json',active);}
-function clearResponses(){if(!active||!window.confirm('Clear all 120 saved answers for this CDS paper?'))return;responses={};persist();applyFilters();status('Saved responses cleared for this paper only.');}
-function nextIncomplete(){if(!active)return;const i=active.questions.findIndex((q,i)=>i>selected&&needsSourceReview(q));const j=i>=0?i:active.questions.findIndex(needsSourceReview);if(j>=0){$('questionFilter').value='all';$('questionSearch').value='';applyFilters();selected=j;render();}}
+function clearResponses(){if(!active||!window.confirm('Clear all 120 saved answers for this CDS paper?'))return;responses={};persist();render();status('Saved responses cleared for this paper only.');}
+function nextIncomplete(){
+ if(!active)return;
+ const available=q=>!responses[q.number]&&!needsSourceReview(q);
+ let i=active.questions.findIndex((q,i)=>i>selected&&available(q));
+ if(i<0)i=active.questions.findIndex(available);
+ if(i<0){status('All playable questions have a saved response.');return;}
+ selected=i;render();
+}
 async function init(){try{const r=await fetch('data/quizzes/cds-gk/index.json',{cache:'no-store'});if(!r.ok)throw Error('CDS catalog is not available');const data=await r.json();if(data.schemaVersion!==1||data.exam!=='UPSC CDS'||data.gradingEnabled!==false||data.officialAnswerKeyMapped!==false||!Array.isArray(data.paperStatuses))throw Error('Invalid CDS metadata');index=data;fillYears();const params=new URLSearchParams(location.search),wanted=params.get('paper'),linked=index.paperStatuses.find(p=>p.id===wanted);const year=params.get('year'),session=params.get('session');if(linked){$('yearFilter').value=String(linked.year);$('sessionFilter').value=linked.session;}else{if(index.paperStatuses.some(p=>String(p.year)===year))$('yearFilter').value=year;if(session==='I'||session==='II')$('sessionFilter').value=session;}drawCards();if(wanted)await openPaper(wanted);else status('Select a CDS I or II paper to start.');}catch(err){status('CDS source library failed to load: '+err.message,true);$('catalogStats').textContent='Paper data unavailable';}}
 $('yearFilter').addEventListener('change',drawCards);$('sessionFilter').addEventListener('change',drawCards);$('sourceFilter').addEventListener('change',drawCards);
-$('questionFilter').addEventListener('change',applyFilters);$('questionSearch').addEventListener('input',applyFilters);
-$('jumpButton').addEventListener('click',()=>{const n=Number($('jumpNumber').value);if(!active||!Number.isInteger(n)||n<1||n>120){status('Enter a question number from 1 to 120.',true);return;}$('questionFilter').value='all';$('questionSearch').value='';applyFilters();selected=n-1;render();});
-$('jumpNumber').addEventListener('keydown',e=>{if(e.key==='Enter')$('jumpButton').click();});
 $('prev').addEventListener('click',()=>move(-1));$('next').addEventListener('click',()=>move(1));$('nextIncomplete').addEventListener('click',nextIncomplete);
 $('exportResponse').addEventListener('click',exportResponses);$('exportSource').addEventListener('click',exportPaper);$('clearResponse').addEventListener('click',clearResponses);
 init();
