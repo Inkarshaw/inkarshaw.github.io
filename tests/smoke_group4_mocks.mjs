@@ -149,15 +149,16 @@ try{
  assert.match(await page.locator('#score').innerText(),/90\.0 \/ 300/);
  console.log('PASS full mock Tamil gate, 90/300, E handling, and result persistence');
  // Simulate a single edited question in the bank. It must not reset any other response or the timer.
- await page.goto(origin+'/tnpsc/mocks/mock-4.html',{waitUntil:'domcontentloaded'});
- await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
+ await page.goto(origin+'/tnpsc/mocks/index.html',{waitUntil:'domcontentloaded'});
+ // Edit saved storage from a different page, so the mock page's pagehide handler
+ // cannot overwrite the simulated older-bank fingerprint.
  const oldMock4=await page.evaluate(()=>{
    const key='clearexamsTNPSCGroup4MockSessionV2:4';
    const s=JSON.parse(localStorage.getItem(key));
    s.fingerprints[0]='previous-version';
    localStorage.setItem(key,JSON.stringify(s));return s;
  });
- await page.reload({waitUntil:'domcontentloaded'});
+ await page.goto(origin+'/tnpsc/mocks/mock-4.html',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
  const changedMock4=await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockSessionV2:4')));
  assert.equal(changedMock4.answers[0],null,'Edited source answer cleared');
@@ -166,15 +167,15 @@ try{
  assert.match(await page.locator('#saveProgress').innerText(),/edited source question/);
  console.log('PASS question source edit resets only affected answer and preserves timer');
  // A deadline that elapsed while the browser was closed should submit once, not restart 30 minutes.
- await page.goto(origin+'/tnpsc/mocks/mock-2.html',{waitUntil:'domcontentloaded'});
- await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
+ await page.goto(origin+'/tnpsc/mocks/index.html',{waitUntil:'domcontentloaded'});
+ // Expiration is simulated with no active mock script writing back on pagehide.
  await page.evaluate(()=>{
    const key='clearexamsTNPSCGroup4MockSessionV2:2';
    const s=JSON.parse(localStorage.getItem(key));
    s.deadline=Date.now()-2000;
    localStorage.setItem(key,JSON.stringify(s));
  });
- await page.reload({waitUntil:'domcontentloaded'});
+ await page.goto(origin+'/tnpsc/mocks/mock-2.html',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
  const timeoutHistory=await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockHistoryV1')||'[]').filter(x=>x.mock===2).length);
  await page.reload({waitUntil:'domcontentloaded'});
