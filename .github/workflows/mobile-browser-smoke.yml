@@ -49,6 +49,9 @@ on:
       - "assets/css/mobile-navigation.css"
       - "tests/smoke_student_journey.mjs"
       - "tests/smoke_group4_mocks.mjs"
+      - "tests/smoke_group4_offline.mjs"
+      - "assets/js/mock-offline.js"
+      - "service-worker.js"
       - "tnpsc/mocks/**"
       - "assets/js/group4-short-mock.js"
       - "assets/js/group4-full-mock.js"
@@ -88,5 +91,7 @@ jobs:
         run: node tests/smoke_student_journey.mjs
       - name: Verify Group IV timed mocks survive refresh and Android-like browser restart
         run: node tests/smoke_group4_mocks.mjs
+      - name: Verify Group IV offline mock files, answers and timer through browser restart
+        run: node tests/smoke_group4_offline.mjs
       - name: Verify mobile Police Constable three-paper practice and ungraded safeguards
         run: node tests/smoke_tnusrb_pc.mjs
