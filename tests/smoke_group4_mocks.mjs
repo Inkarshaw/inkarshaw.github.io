@@ -164,6 +164,23 @@ try{
  assert.equal(changedMock4.deadline,oldMock4.deadline,'Original timer preserved');
  assert.match(await page.locator('#saveProgress').innerText(),/edited source question/);
  console.log('PASS question source edit resets only affected answer and preserves timer');
+ // A deadline that elapsed while the browser was closed should submit once, not restart 30 minutes.
+ await page.goto(origin+'/tnpsc/mocks/mock-2.html',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
+ await page.evaluate(()=>{
+   const key='clearexamsTNPSCGroup4MockSessionV2:2';
+   const s=JSON.parse(localStorage.getItem(key));
+   s.deadline=Date.now()-2000;
+   localStorage.setItem(key,JSON.stringify(s));
+ });
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
+ const timeoutHistory=await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockHistoryV1')||'[]').filter(x=>x.mock===2).length);
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockHistoryV1')||'[]').filter(x=>x.mock===2).length),timeoutHistory,'Expired attempt must submit only once');
+ console.log('PASS expired offline timer auto-submits exactly once after browser reopening');
+
 }finally{
  if(context)await context.close();
  fs.rmSync(temp,{recursive:true,force:true});
