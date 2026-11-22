@@ -62,7 +62,12 @@
     const box = document.getElementById('score' + n);
     box.querySelector('strong').textContent = 'Best: ' + best + ' / 25';
     box.querySelector('span').textContent = 'Latest: ' + latest.score + ' / 25 · ' + latest.accuracy + '% accuracy · ' + rows.length + (rows.length === 1 ? ' saved attempt' : ' saved attempts');
-    document.querySelector('[data-mock="' + n + '"]').textContent = 'Retake Mock Test ' + n;
+    let completedResult=false;
+    try{
+      const result=JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockSessionV2:'+n+':completedV1')||'null');
+      completedResult=!!(result&&result.submitted);
+    }catch{}
+    document.querySelector('[data-mock="' + n + '"]').textContent = completedResult ? 'Review latest Mock '+n+' result →' : 'Retake Mock Test ' + n;
     return true;
   }
   const shortCompleted = mocks.map(renderMock).filter(Boolean).length;
@@ -92,6 +97,10 @@
     }
   }catch{}
   if(completedFull&&!hasFullActive){
+    try{
+      const savedResult=JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4FullMockSessionV1:completedV1')||'null');
+      document.querySelector('[data-full-mock]').textContent=savedResult?.submitted?'Review latest full mock result →':'Start another full mock →';
+    }catch{}
     document.getElementById('statusFull').textContent='Completed';
     document.getElementById('statusFull').classList.add('done');
     const recent=fullHistory.filter(x=>x&&x.mock==='full-1').slice(-1)[0];
