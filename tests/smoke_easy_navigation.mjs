@@ -113,6 +113,7 @@ try{
  await page.locator('#ceExamSearch').fill('NEET');
  await page.waitForFunction(()=>document.querySelectorAll('.ce-exam-item').length===2,undefined,{timeout:15000});
  assert.equal(await page.locator('.ce-exam-item').count(),2);
+ await search.fill('');
  await select.selectOption('defence');
  const nda=page.locator('.ce-exam-item').filter({hasText:'UPSC NDA'});
  assert.equal(await nda.locator('a').first().getAttribute('href'),'exam-overview.html?exam=upsc-nda');
