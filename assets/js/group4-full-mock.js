@@ -158,6 +158,19 @@ function render(){
   $('answeredCount').textContent=answered;
   $('unansweredCount').textContent=questions.length-answered;
   $('markedCount').textContent=marked.filter(Boolean).length;
+  for(const [id,start,stop,label] of [
+    ['jumpTamil',0,100,'Tamil'],
+    ['jumpGS',100,175,'General Studies'],
+    ['jumpApt',175,200,'Aptitude']
+  ]){
+    const button=$(id);
+    if(!button)continue;
+    const partPositions=indices.map((original,i)=>({original,i})).filter(({original})=>original>=start&&original<stop);
+    const count=partPositions.filter(({i})=>answers[i]!==null).length;
+    button.textContent=label+' · '+count+' / '+partPositions.length+' answered';
+    button.disabled=partPositions.length===0;
+    button.setAttribute('aria-pressed',String(indices[current]>=start&&indices[current]<stop));
+  }
   const palette=$('palette');palette.replaceChildren();
   for(let i=0;i<questions.length;i++){
     const b=document.createElement('button');b.type='button';b.textContent=String(i+1);b.dataset.i=String(i);
@@ -239,6 +252,19 @@ function finish(automatic,restoring=false){
   window.scrollTo?.({top:0,behavior:'smooth'});
 }
 
+for(const id of ['jumpTamil','jumpGS','jumpApt']){
+  const button=$(id);
+  if(!button)continue;
+  button.addEventListener('click',()=>{
+    if(!active||submitted||!questions.length)return;
+    const sourceStart=Number(button.dataset.sectionIndex);
+    const sourceStop=sourceStart===0?100:sourceStart===100?175:200;
+    const target=indices.findIndex(i=>i>=sourceStart&&i<sourceStop);
+    if(target<0)return;
+    current=target;save();render();
+    $('question').scrollIntoView?.({behavior:'auto',block:'start'});
+  });
+}
 $('startBtn').disabled=true;
 $('startBtn').addEventListener('click',()=>{if(bank.length)newAttempt()});
 $('prevBtn').addEventListener('click',()=>{if(current>0){current--;save();render()}});
