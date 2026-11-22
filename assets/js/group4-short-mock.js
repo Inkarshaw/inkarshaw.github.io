@@ -6,6 +6,7 @@ const number=Number((location.pathname.match(/mock-(\d+)\.html$/)||[])[1]);
 if(!Number.isInteger(number)||number<1||number>4)return;
 const URL_DATA='../../data/quizzes/tnpsc-group4-mock-'+number+'.json';
 const STORE='clearexamsTNPSCGroup4MockSessionV2:'+number;
+const RESULT_STORE=STORE+':completedV1';
 const HISTORY='clearexamsTNPSCGroup4MockHistoryV1';
 const $=id=>document.getElementById(id);
 const byId=id=>document.querySelectorAll('#'+id);
@@ -27,6 +28,26 @@ function save(){
   }catch{
     storageWorking=false;indicator('This browser is blocking storage. Answers will be lost if you close or refresh it.',true);
   }
+}
+function readResult(){try{return JSON.parse(localStorage.getItem(RESULT_STORE)||'null')}catch{return null}}
+function saveResult(){
+  try{
+    localStorage.setItem(RESULT_STORE,JSON.stringify({
+      version:2,signature,indices,answers,marked,current,deadline,retry,
+      submitted:true,completedAt:Date.now()
+    }));
+  }catch{
+    const status=$('saveStatus');
+    if(status)status.textContent+=' Result details could not be stored on this device.';
+  }
+}
+function restoreResult(s){
+  if(!s||s.submitted!==true||!validateSession(s))return false;
+  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers;marked=s.marked;
+  current=s.current;deadline=s.deadline;retry=!!s.retry;active=true;submitted=false;
+  finish(true,true);
+  $('saveStatus').textContent='Completed attempt restored from this browser. Start a new attempt to reset.';
+  return true;
 }
 function history(score,wrong,unanswered){
   if(retry){$('saveStatus').textContent='Retry finished; original full-mock score unchanged.';return}
@@ -72,6 +93,7 @@ function restore(s){
   return true;
 }
 function newAttempt(chosen=null,retryMode=false){
+  try{localStorage.removeItem(RESULT_STORE)}catch{}
   indices=chosen||bank.map((_,i)=>i);
   questions=indices.map(i=>bank[i]);
   answers=Array(questions.length).fill(null);marked=Array(questions.length).fill(false);
@@ -130,23 +152,25 @@ function review(){
     article.append(h,ans,correct,explain);root.append(article);
   }
 }
-function finish(automatic){
+function finish(automatic,restoring=false){
   if(submitted||!active)return;
   const left=answers.filter(a=>a===null).length;
   if(!automatic&&!confirm((questions.length-left)+' of '+questions.length+' answered; '+left+' unanswered. Submit this attempt?'))return;
   submitted=true;active=false;pauseClock();
   try{localStorage.removeItem(STORE)}catch{}
   $('test').classList.add('hidden');$('result').classList.remove('hidden');
+  if(!restoring)saveResult();
   let score=0,wrong=0;
   questions.forEach((q,i)=>{if(answers[i]===q.answer)score++;else if(answers[i]!==null)wrong++});
   const total=questions.length,accuracy=Math.round(score/total*100);
   $('score').textContent=score+' / '+total;
   $('correct').textContent=score;$('wrong').textContent=wrong;
   $('unanswered').textContent=left;$('accuracy').textContent=accuracy+'%';
-  history(score,wrong,left);
+  if(!restoring)history(score,wrong,left);
   if(window.MockSubjectResults?.render)window.MockSubjectResults.render($('subjectResults'),questions,answers,retry);
   $('reviewFilter').value='all';review();
-  track('mock_test_completed',{score,total,accuracy,auto_submit:automatic,retry});
+  if(!restoring)track('mock_test_completed',{score,total,accuracy,auto_submit:automatic,retry});
+
   window.scrollTo?.({top:0,behavior:'smooth'});
 }
 $('startBtn').disabled=true;
@@ -157,7 +181,7 @@ $('clearBtn').addEventListener('click',()=>{answers[current]=null;save();render(
 $('markBtn').addEventListener('click',()=>{marked[current]=!marked[current];save();render()});
 $('submitBtn').addEventListener('click',()=>finish(false));
 $('reviewFilter').addEventListener('change',review);
-$('restart').addEventListener('click',()=>{if(confirm('Start a new mock attempt?'))location.reload()});
+$('restart').addEventListener('click',()=>{if(!confirm('Clear the completed result and begin a new mock attempt?'))return;try{localStorage.removeItem(RESULT_STORE);localStorage.removeItem(STORE)}catch{}location.reload()});
 $('retryWrong').addEventListener('click',()=>{
   const selected=indices.filter((_,i)=>answers[i]!==questions[i].answer);
   if(!selected.length){alert('No wrong or unanswered questions to retry.');return}
@@ -172,8 +196,10 @@ fetch(URL_DATA,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Mock data unav
   $('startBtn').disabled=false;
   const saved=read();
   if(!restore(saved)){
-    indicator('Progress will be saved to this device when you begin.',false);
     if(saved)try{localStorage.removeItem(STORE)}catch{}
+    if(!restoreResult(readResult())){
+      indicator('Progress will be saved to this device when you begin.',false);
+    }
   }
 }).catch(err=>{
   $('instructions').replaceChildren();
