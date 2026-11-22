@@ -165,9 +165,11 @@ function render(){
   ]){
     const button=$(id);
     if(!button)continue;
-    const count=answers.slice(start,stop).filter(a=>a!==null).length;
-    button.textContent=label+' · '+count+' / '+(stop-start)+' answered';
-    button.setAttribute('aria-pressed',String(current>=start&&current<stop));
+    const partPositions=indices.map((original,i)=>({original,i})).filter(({original})=>original>=start&&original<stop);
+    const count=partPositions.filter(({i})=>answers[i]!==null).length;
+    button.textContent=label+' · '+count+' / '+partPositions.length+' answered';
+    button.disabled=partPositions.length===0;
+    button.setAttribute('aria-pressed',String(indices[current]>=start&&indices[current]<stop));
   }
   const palette=$('palette');palette.replaceChildren();
   for(let i=0;i<questions.length;i++){
@@ -255,8 +257,10 @@ for(const id of ['jumpTamil','jumpGS','jumpApt']){
   if(!button)continue;
   button.addEventListener('click',()=>{
     if(!active||submitted||!questions.length)return;
-    const target=Number(button.dataset.sectionIndex);
-    if(!Number.isInteger(target)||target<0||target>=questions.length)return;
+    const sourceStart=Number(button.dataset.sectionIndex);
+    const sourceStop=sourceStart===0?100:sourceStart===100?175:200;
+    const target=indices.findIndex(i=>i>=sourceStart&&i<sourceStop);
+    if(target<0)return;
     current=target;save();render();
     $('question').scrollIntoView?.({behavior:'auto',block:'start'});
   });
