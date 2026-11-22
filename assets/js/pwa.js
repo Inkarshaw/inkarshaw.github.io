@@ -86,7 +86,7 @@ function initShell(){
     '<div class="ce-more-grid">'+
     '<a class="ce-more-feature" href="/dashboard.html"><span aria-hidden="true">▦</span><span><strong>My dashboard</strong><small>Progress and review</small></span></a>'+
     '<a class="ce-more-feature" href="/current-affairs/text/"><span aria-hidden="true">◫</span><span><strong>Current affairs</strong><small>Daily text editions</small></span></a>'+
-    '<a href="/search.html">⌕ Search</a><a href="/daily-quiz.html">✓ Daily Quiz</a>'+
+    '<a href="/start.html#exam-directory">▤ All exams</a><a href="/search.html">⌕ Search</a><a href="/daily-quiz.html">✓ Daily Quiz</a>'+
     '<a href="/textbook-quiz.html">▤ TN School Quiz</a><a href="/ncert-school-book-quiz.html">▤ NCERT Quiz</a>'+
     '<a href="/tnpsc/mocks/">◷ Group IV Mocks</a><a href="/pyq-cds.html">▣ CDS PYQs</a>'+
     '<a href="/syllabus.html">≡ Syllabus</a><a href="/exam-calendar.html">▦ Exam calendar</a>'+

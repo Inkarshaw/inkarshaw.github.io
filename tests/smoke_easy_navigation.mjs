@@ -76,6 +76,46 @@ try{
  assert.ok(new URL(page.url()).pathname==='/tnpsc.html');
  console.log('PASS CDS back to PYQs and chosen exam direct shortcut');
 
+ // Exam finder: visible from one-tap Exams with actual support levels and no broken route.
+ errors.length=0;
+ await page.goto(origin+'/start.html',{waitUntil:'domcontentloaded'});
+ await page.locator('.ce-exam-category').first().waitFor({state:'visible',timeout:15000});
+ assert.equal(await page.locator('.ce-exam-category').count(),12,'All twelve broad exam categories are discoverable');
+ assert.match(await page.locator('#ceExamSummary').innerText(),/90 exam routes/);
+ const select=page.locator('#ceExamCategory'),search=page.locator('#ceExamSearch');
+ await select.selectOption('defence');
+ assert.equal(await page.locator('.ce-exam-item').count(),8,'Defence covers CDS, NDA, CAPF and armed forces');
+ const cds=page.locator('.ce-exam-item').filter({hasText:'UPSC CDS'});
+ assert.equal(await cds.locator('a').getAttribute('href'),'pyq-cds.html');
+ assert.match(await cds.innerText(),/Provisional PYQ practice/);
+ await select.selectOption('all');
+ await search.fill('ctet');
+ assert.equal(await page.locator('.ce-exam-item').count(),1);
+ assert.match(await page.locator('.ce-exam-item').innerText(),/Shared foundation only/);
+ await search.fill('NEET');
+ assert.equal(await page.locator('.ce-exam-item').count(),2);
+ await search.fill('');
+ await select.selectOption('tnpsc');
+ const group4=page.locator('.ce-exam-item').filter({hasText:'TNPSC Group IV'});
+ assert.equal(await group4.locator('a').getAttribute('href'),'tnpsc/mocks/');
+ assert.match(await group4.innerText(),/Exam practice available/);
+ await select.selectOption('ssc');
+ const cgl=page.locator('.ce-exam-item').filter({hasText:'Combined Graduate Level'});
+ assert.equal(await cgl.locator('a').getAttribute('href'),'exam-preparation.html?exam=ssc-cgl');
+ await cgl.locator('a').click();
+ assert.equal(new URL(page.url()).searchParams.get('exam'),'ssc-cgl');
+ assert.equal(new URL(page.url()).pathname,'/exam-preparation.html');
+ console.log('PASS exam directory: 12 categories, 90 routes, search and honest practice status');
+ await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
+ const allExamsLink=page.locator('.exam-picker a[href="start.html#exam-directory"]');
+ await allExamsLink.click();
+ assert.equal(new URL(page.url()).hash,'#exam-directory');
+ await page.locator('#ceExamSearch').waitFor({state:'visible'});
+ const overflowFinder=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+ assert.ok(overflowFinder<=5,'Exam finder must not overflow phone screen');
+ assert.deepEqual(errors,[],'No navigation errors during exam discovery');
+ console.log('PASS homepage to exam directory in one tap, phone-sized view');
+ 
  // Desktop retains the ordinary page header, with no intrusive mobile navigation.
  await page.setViewportSize({width:1280,height:800});
  await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
