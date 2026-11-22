@@ -702,7 +702,7 @@ try {
   assert.match(await page.locator('#options button').nth(3).innerText(),/சீசியம் \(Cs\)/,'Q57 original chemical symbol preserved with Tamil term');
   await page.locator('#palette button').filter({hasText:/^60$/}).click();
   assert.match(await page.locator('#questionTamil').innerText(),/1 eV/,'Third Tamil batch begins at original C Q60');
-  assert.match(await page.locator('#options button').nth(2).innerText(),/1\.602 x 10-19 J/,'Q60 original numeric/scientific notation preserved');
+  assert.match(await page.locator('#options button').nth(2).innerText(),/1\.602×10⁻¹⁹ J/,'Q60 scientific exponent is legible in bilingual study view');
   assert.match(await page.locator('#translationNotice').innerText(),/NOT independently verified/,'New Tamil study wording is not certified original Series C');
   await page.locator('#palette button').filter({hasText:/^64$/}).click();
   assert.match(await page.locator('#questionTamil').innerText(),/டிக்கா/,'Botany Q64 translated without changing species options');
@@ -710,9 +710,9 @@ try {
   await page.locator('#palette button').filter({hasText:/^68$/}).click();
   assert.match(await page.locator('#options button').nth(1).innerText(),/Plasmodium falciparum/,'Species taxonomy preserved');
   await page.locator('#palette button').filter({hasText:/^69$/}).click();
-  assert.match(await page.locator('#questionTamil').innerText(),/இரவுக்குருட்டுத்தன்மை/,'Human biology translation available');
+  assert.match(await page.locator('#questionTamil').innerText(),/மாலைக் கண் நோய்/,'Q69 user-supplied Tamil study wording displayed');
   await page.locator('#palette button').filter({hasText:/^76$/}).click();
-  assert.match(await page.locator('#options button').first().innerText(),/Outbuddin Aibak/,'Anomalous original option spelling is disclosed rather than silently corrected');
+  assert.match(await page.locator('#options button').first().innerText(),/Qutbuddin Aibak/,'Q76 newly supplied OCR spelling is shown; printed Series C still unverified');
 
   await page.locator('#palette button').filter({hasText:/^28$/}).click();
   await page.locator('#language').selectOption('en');
