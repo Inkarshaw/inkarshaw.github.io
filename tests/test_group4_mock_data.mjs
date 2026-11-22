@@ -39,4 +39,24 @@ const fullHtml=fs.readFileSync('tnpsc/mocks/full-mock-1.html','utf8');
 assert.match(fullHtml,/assets\/js\/group4-full-mock\.js/);
 assert.match(fullHtml,/id="gateOutcome"/);
 assert.match(fs.readFileSync('tnpsc/mocks/index.html','utf8'),/full-mock-1\.html/);
+assert.equal(full.editorialReview.status,'provisional_unverified_original_transcription');
+assert.equal(full.editorialReview.verbatimVerifiedQuestionCount,0);
+assert.equal(full.editorialReview.remainingSourceTranscriptionsNeedingVerification,193);
+assert.equal(full.questions[0].options[3],'தன்னலமின்மை');
+assert.match(full.questions[1].question,/இப்பழமொழி/);
+assert.match(full.questions[84].question,/இணையில்லை/);
+assert.equal(fs.readFileSync('docs/group4-full-mock-editorial-review-queue.csv','utf8').trim().split('\n').length,201);
+const canonical=fs.readFileSync('tnpsc/mocks/full-mock-1.html','utf8');
+assert.match(canonical,/rel="canonical" href="https:\/\/clearexams\.ink\/tnpsc\/mocks\/full-mock-1\.html"/);
+assert.doesNotMatch(canonical,/30-minute timer/);
+assert.match(canonical,/id="sourceNote"/);
+const fullCode=fs.readFileSync('assets/js/group4-full-mock.js','utf8');
+const shortCode=fs.readFileSync('assets/js/group4-short-mock.js','utf8');
+for(const code of [fullCode,shortCode]){
+ assert.match(code,/RESULT_STORE/);
+ assert.match(code,/function restoreResult\(s\)/);
+ assert.match(code,/if\(!restoring\)saveResult\(\)/);
+ assert.match(code,/fingerprints=bank\.map\(questionFingerprint\)/);
+}
+assert.match(fullCode,/const isNotKnown=/);
 console.log('PASS Group IV four saved short mocks and 200-question timed mock structural checks');
