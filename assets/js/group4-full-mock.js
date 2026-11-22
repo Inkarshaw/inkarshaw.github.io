@@ -5,12 +5,15 @@
 const number='full-1';
 const URL_DATA='../../data/quizzes/tnpsc-group4-full-mock-1.json';
 const STORE='clearexamsTNPSCGroup4FullMockSessionV1';
+const RESULT_STORE=STORE+':completedV1';
 const HISTORY='clearexamsTNPSCGroup4FullMockHistoryV1';
 const $=id=>document.getElementById(id);
 const byId=id=>document.querySelectorAll('#'+id);
-let bank=[],questions=[],indices=[],answers=[],marked=[],current=0,deadline=0,timer=null,active=false,retry=false,submitted=false,signature='',storageWorking=true;
+let bank=[],questions=[],indices=[],answers=[],marked=[],current=0,deadline=0,timer=null,active=false,retry=false,submitted=false,signature='',storageWorking=true,fingerprints=[],changedCount=0;
 const track=(event,detail)=>{try{window.gtag?.('event',event,Object.assign({exam:'TNPSC Group IV',mock:'Full Mock 1',practice_source:'unverified_2022_draft'},detail||{}))}catch{}};
 const isCorrect=(q,response)=>Number.isInteger(response)&&q.acceptedAnswers.includes(response);
+const isNotKnown=(q,response)=>Array.isArray(q.options)&&q.options.length===5&&response===4;
+const isUnscored=(q,response)=>response===null||isNotKnown(q,response);
 const validQuestions=qs=>Array.isArray(qs)&&qs.length===200&&qs.every(q=>
  q&&typeof q.section==='string'&&typeof q.question==='string'&&q.question.trim()&&
  Array.isArray(q.options)&&q.options.length>=4&&q.options.length<=5&&
@@ -18,6 +21,14 @@ const validQuestions=qs=>Array.isArray(qs)&&qs.length===200&&qs.every(q=>
  Array.isArray(q.acceptedAnswers)&&q.acceptedAnswers.length>=1&&
  q.acceptedAnswers.every(a=>Number.isInteger(a)&&a>=0&&a<4));
 
+function questionFingerprint(q){
+  const raw=JSON.stringify([q.question,q.options,q.acceptedAnswers||[q.answer]]);
+  let hash=2166136261;
+  for(let i=0;i<raw.length;i++){
+    hash^=raw.charCodeAt(i);hash=Math.imul(hash,16777619);
+  }
+  return (hash>>>0).toString(16).padStart(8,'0');
+}
 const read=()=>{try{return JSON.parse(localStorage.getItem(STORE)||'null')}catch{return null}};
 const indicator=(message,bad)=>{
   const el=$('saveProgress');if(!el)return;
@@ -27,12 +38,32 @@ function save(){
   if(!active||submitted)return;
   try{
     localStorage.setItem(STORE,JSON.stringify({
-      version:2,signature,indices,answers,marked,current,deadline,retry,savedAt:Date.now()
+      version:2,signature,indices,answers,marked,current,deadline,retry,fingerprints,savedAt:Date.now()
     }));
     storageWorking=true;indicator('Saved on this device · Browser reopen will resume this attempt.',false);
   }catch{
     storageWorking=false;indicator('This browser is blocking storage. Answers will be lost if you close or refresh it.',true);
   }
+}
+function readResult(){try{return JSON.parse(localStorage.getItem(RESULT_STORE)||'null')}catch{return null}}
+function saveResult(){
+  try{
+    localStorage.setItem(RESULT_STORE,JSON.stringify({
+      version:2,signature,indices,answers,marked,current,deadline,retry,fingerprints,
+      submitted:true,completedAt:Date.now()
+    }));
+  }catch{
+    const status=$('saveStatus');
+    if(status)status.textContent+=' Result details could not be stored on this device.';
+  }
+}
+function restoreResult(s){
+  if(!s||s.submitted!==true||!validateSession(s))return false;
+  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers;marked=s.marked;
+  current=s.current;deadline=s.deadline;retry=!!s.retry;active=true;submitted=false;
+  finish(true,true);
+  $('saveStatus').textContent='Completed attempt restored from this browser. Start a new attempt to reset.';
+  return true;
 }
 function history(score,wrong,unanswered,tamilMarks,tamilQualified){
   if(retry){$('saveStatus').textContent='Retry finished; original full-mock score unchanged.';return}
@@ -71,13 +102,28 @@ function validateSession(s){
 }
 function restore(s){
   if(!validateSession(s))return false;
-  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers;marked=s.marked;
+  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers.slice();marked=s.marked.slice();
   current=s.current;deadline=s.deadline;retry=!!s.retry;active=true;submitted=false;
+  const oldPrints=Array.isArray(s.fingerprints)&&s.fingerprints.length===bank.length?s.fingerprints:null;
+  // Older active sessions predate question fingerprints. Only these specific
+  // source-numbered positions were corrected after the previous deployment.
+  const changed=indices.filter((pos,i)=>oldPrints?
+    oldPrints[pos]!==fingerprints[pos]:(!retry&&[0,1,84].includes(pos)));
+  for(const pos of changed){
+    const i=indices.indexOf(pos);
+    answers[i]=null;marked[i]=false;
+  }
+  changedCount=changed.length;
   showTest();render();startClock();
-  indicator('Restored from this browser · Timer continues from your original start time.',false);
+  if(changedCount){
+    save();
+    indicator('Restored '+(answers.length-changedCount)+' unchanged positions. '+changedCount+
+      ' edited source question'+(changedCount===1?'':'s')+' must be answered again; original timer preserved.',false);
+  }else indicator('Restored from this browser · Timer continues from your original start time.',false);
   return true;
 }
 function newAttempt(chosen=null,retryMode=false){
+  try{localStorage.removeItem(RESULT_STORE)}catch{}
   indices=chosen||bank.map((_,i)=>i);
   questions=indices.map(i=>bank[i]);
   answers=Array(questions.length).fill(null);marked=Array(questions.length).fill(false);
@@ -98,6 +144,10 @@ function render(){
   const q=questions[current];
   $('subject').textContent=q.subject;$('qnum').textContent='Question '+(current+1)+' of '+questions.length;
   $('question').textContent=q.question;
+  $('sourceNote').textContent=Number.isInteger(q.originalQuestionNumber)?
+    '2022 Group IV editorial transcription · Source question '+q.originalQuestionNumber+
+    ' · Independent proofreading pending':
+    'ClearExams original practice question · Not a TNPSC source-paper transcription';
   const choices=$('options');choices.replaceChildren();
   q.options.forEach((o,i)=>{const button=document.createElement('button');option(button,o,i);choices.append(button)});
   $('clearBtn').disabled=answers[current]===null;
@@ -119,8 +169,8 @@ function render(){
 function review(){
   const filter=$('reviewFilter').value,root=$('review');root.replaceChildren();
   const rows=questions.map((q,i)=>({q,i})).filter(({q,i})=>{
-    if(filter==='wrong')return answers[i]!==null&&!isCorrect(q,answers[i]);
-    if(filter==='unanswered')return answers[i]===null;
+    if(filter==='wrong')return !isUnscored(q,answers[i])&&!isCorrect(q,answers[i]);
+    if(filter==='unanswered')return isUnscored(q,answers[i]);
     if(filter==='correct')return isCorrect(q,answers[i]);
     return true;
   });
@@ -130,26 +180,27 @@ function review(){
     const article=document.createElement('article');article.className='review-item';
     const h=document.createElement('h3');h.textContent=(i+1)+'. '+q.question;
     const ans=document.createElement('p');const correct=document.createElement('p'),explain=document.createElement('p');
-    ans.textContent='Your answer: '+(answers[i]===null?'Not answered':q.options[answers[i]]);
+    ans.textContent='Your answer: '+(answers[i]===null?'Not answered':(isNotKnown(q,answers[i])?'E · Answer not known':q.options[answers[i]]));
     correct.textContent='Accepted answer'+(q.acceptedAnswers.length>1?'s':'')+': '+q.acceptedAnswers.map(j=>String.fromCharCode(65+j)+'. '+q.options[j]).join(' / ');
     explain.className='explanation';explain.textContent=q.explanation||'';
     article.append(h,ans,correct,explain);root.append(article);
   }
 }
-function finish(automatic){
+function finish(automatic,restoring=false){
   if(submitted||!active)return;
-  const left=answers.filter(a=>a===null).length;
+  const left=answers.filter((a,i)=>isUnscored(questions[i],a)).length;
   if(!automatic&&!confirm((questions.length-left)+' of '+questions.length+' answered; '+left+' unanswered. Submit this attempt?'))return;
   submitted=true;active=false;pauseClock();
   try{localStorage.removeItem(STORE)}catch{}
   $('test').classList.add('hidden');$('result').classList.remove('hidden');
+  if(!restoring)saveResult();
   const correct=(q,i)=>isCorrect(q,answers[i]);
   const sum=(from,to)=>questions.slice(from,to).reduce((v,q,j)=>v+(correct(q,from+j)?1:0),0);
   const tamilCorrect=retry?0:sum(0,100);
   const tamilMarks=tamilCorrect*1.5;
   const tamilEligible=tamilMarks>=60;
   const correctCount=sum(0,questions.length);
-  const wrongCount=questions.reduce((v,q,i)=>v+(answers[i]!==null&&!correct(q,i)?1:0),0);
+  const wrongCount=questions.reduce((v,q,i)=>v+(!isUnscored(q,answers[i])&&!correct(q,i)?1:0),0);
   const mark=correctCount*1.5,percent=Math.round(correctCount/questions.length*100);
   if(retry){
     $('subjectResults').replaceChildren();
@@ -174,15 +225,17 @@ function finish(automatic){
       'Tamil qualifying rule NOT satisfied: '+tamilMarks.toFixed(1)+'/150 (minimum 60). General Studies and Aptitude scores have not been evaluated.';
     $('score').textContent=tamilEligible?mark.toFixed(1)+' / 300':tamilMarks.toFixed(1)+' / 150 (Tamil only)';
     $('correct').textContent=tamilEligible?correctCount:tamilCorrect;
-    $('wrong').textContent=tamilEligible?wrongCount:answers.slice(0,100).filter((v,i)=>v!==null&&!correct(questions[i],i)).length;
+    $('wrong').textContent=tamilEligible?wrongCount:answers.slice(0,100).filter((v,i)=>!isUnscored(questions[i],v)&&!correct(questions[i],i)).length;
     $('accuracy').textContent=tamilEligible?percent+'%':Math.round(tamilCorrect)+'% Tamil';
     $('scoringPolicy').textContent='Practice-only indicative scoring. Part A gate: 60/150. Total minimum: 90/300 (only after Part A passes). All answers use 1.5 marks per correct answer; an unverified editorial 2022 transcription is used for 193 questions. OMR blank-response penalties and official ranking rules are NOT simulated.';
   }
-  $('unanswered').textContent=left;
-  if(!retry)history(correctCount,wrongCount,left,tamilMarks,tamilEligible);
-  if(retry)$('saveStatus').textContent='Retry completed; your full-length history was not replaced.';
+  $('unanswered').textContent=tamilEligible||retry?left:answers.slice(0,100).filter((v,i)=>isUnscored(questions[i],v)).length;
+  $('unansweredLabel').textContent=tamilEligible||retry?'Blank / Not known':'Tamil blank / Not known';
+  if(!restoring&&!retry)history(correctCount,wrongCount,left,tamilMarks,tamilEligible);
+  if(retry&&!restoring)$('saveStatus').textContent='Retry completed; your full-length history was not replaced.';
   $('reviewFilter').value='all';review();
-  track('mock_test_completed',{score:correctCount,total:questions.length,accuracy:percent,auto_submit:automatic,retry,tamil_marks:tamilMarks,tamil_qualified:tamilEligible});
+  if(!restoring)track('mock_test_completed',{score:correctCount,total:questions.length,accuracy:percent,auto_submit:automatic,retry,tamil_marks:tamilMarks,tamil_qualified:tamilEligible});
+
   window.scrollTo?.({top:0,behavior:'smooth'});
 }
 
@@ -194,7 +247,7 @@ $('clearBtn').addEventListener('click',()=>{answers[current]=null;save();render(
 $('markBtn').addEventListener('click',()=>{marked[current]=!marked[current];save();render()});
 $('submitBtn').addEventListener('click',()=>finish(false));
 $('reviewFilter').addEventListener('change',review);
-$('restart').addEventListener('click',()=>{if(confirm('Start a new mock attempt?'))location.reload()});
+$('restart').addEventListener('click',()=>{if(!confirm('Clear the completed result and begin a new mock attempt?'))return;try{localStorage.removeItem(RESULT_STORE);localStorage.removeItem(STORE)}catch{}location.reload()});
 $('retryWrong').addEventListener('click',()=>{
   const selected=indices.filter((_,i)=>!isCorrect(questions[i],answers[i]));
   if(!selected.length){alert('No wrong or unanswered questions to retry.');return}
@@ -206,11 +259,14 @@ window.addEventListener('pagehide',save);
 fetch(URL_DATA,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Mock data unavailable');return r.json()}).then(data=>{
   if(!data||data.schemaVersion!==1||data.questionCount!==200||data.durationMinutes!==180||JSON.stringify(data.pattern)!==JSON.stringify({Tamil:100,'General Studies':75,Aptitude:25})||!validQuestions(data.questions))throw Error('Full mock content is incomplete');
   bank=data.questions;signature=bank.length+':'+bank[0].question+':'+bank[bank.length-1].question;
+  fingerprints=bank.map(questionFingerprint);
   $('startBtn').disabled=false;
   const saved=read();
   if(!restore(saved)){
-    indicator('Progress will be saved to this device when you begin.',false);
     if(saved)try{localStorage.removeItem(STORE)}catch{}
+    if(!restoreResult(readResult())){
+      indicator('Progress will be saved to this device when you begin.',false);
+    }
   }
 }).catch(err=>{
   $('instructions').replaceChildren();

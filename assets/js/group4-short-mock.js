@@ -6,12 +6,21 @@ const number=Number((location.pathname.match(/mock-(\d+)\.html$/)||[])[1]);
 if(!Number.isInteger(number)||number<1||number>4)return;
 const URL_DATA='../../data/quizzes/tnpsc-group4-mock-'+number+'.json';
 const STORE='clearexamsTNPSCGroup4MockSessionV2:'+number;
+const RESULT_STORE=STORE+':completedV1';
 const HISTORY='clearexamsTNPSCGroup4MockHistoryV1';
 const $=id=>document.getElementById(id);
 const byId=id=>document.querySelectorAll('#'+id);
-let bank=[],questions=[],indices=[],answers=[],marked=[],current=0,deadline=0,timer=null,active=false,retry=false,submitted=false,signature='',storageWorking=true;
+let bank=[],questions=[],indices=[],answers=[],marked=[],current=0,deadline=0,timer=null,active=false,retry=false,submitted=false,signature='',storageWorking=true,fingerprints=[],changedCount=0;
 const track=(event,detail)=>{try{window.gtag?.('event',event,Object.assign({exam:'TNPSC Group IV',mock:'Mock '+number},detail||{}))}catch{}};
 const validQuestions=qs=>Array.isArray(qs)&&qs.length===25&&qs.every(q=>q&&typeof q.subject==='string'&&typeof q.question==='string'&&q.question.trim()&&Array.isArray(q.options)&&q.options.length===4&&q.options.every(o=>typeof o==='string'&&o.trim())&&Number.isInteger(q.answer)&&q.answer>=0&&q.answer<4);
+function questionFingerprint(q){
+  const raw=JSON.stringify([q.question,q.options,q.acceptedAnswers||[q.answer]]);
+  let hash=2166136261;
+  for(let i=0;i<raw.length;i++){
+    hash^=raw.charCodeAt(i);hash=Math.imul(hash,16777619);
+  }
+  return (hash>>>0).toString(16).padStart(8,'0');
+}
 const read=()=>{try{return JSON.parse(localStorage.getItem(STORE)||'null')}catch{return null}};
 const indicator=(message,bad)=>{
   const el=$('saveProgress');if(!el)return;
@@ -21,12 +30,32 @@ function save(){
   if(!active||submitted)return;
   try{
     localStorage.setItem(STORE,JSON.stringify({
-      version:2,signature,indices,answers,marked,current,deadline,retry,savedAt:Date.now()
+      version:2,signature,indices,answers,marked,current,deadline,retry,fingerprints,savedAt:Date.now()
     }));
     storageWorking=true;indicator('Saved on this device · Browser reopen will resume this attempt.',false);
   }catch{
     storageWorking=false;indicator('This browser is blocking storage. Answers will be lost if you close or refresh it.',true);
   }
+}
+function readResult(){try{return JSON.parse(localStorage.getItem(RESULT_STORE)||'null')}catch{return null}}
+function saveResult(){
+  try{
+    localStorage.setItem(RESULT_STORE,JSON.stringify({
+      version:2,signature,indices,answers,marked,current,deadline,retry,fingerprints,
+      submitted:true,completedAt:Date.now()
+    }));
+  }catch{
+    const status=$('saveStatus');
+    if(status)status.textContent+=' Result details could not be stored on this device.';
+  }
+}
+function restoreResult(s){
+  if(!s||s.submitted!==true||!validateSession(s))return false;
+  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers;marked=s.marked;
+  current=s.current;deadline=s.deadline;retry=!!s.retry;active=true;submitted=false;
+  finish(true,true);
+  $('saveStatus').textContent='Completed attempt restored from this browser. Start a new attempt to reset.';
+  return true;
 }
 function history(score,wrong,unanswered){
   if(retry){$('saveStatus').textContent='Retry finished; original full-mock score unchanged.';return}
@@ -65,13 +94,28 @@ function validateSession(s){
 }
 function restore(s){
   if(!validateSession(s))return false;
-  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers;marked=s.marked;
+  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers.slice();marked=s.marked.slice();
   current=s.current;deadline=s.deadline;retry=!!s.retry;active=true;submitted=false;
+  const oldPrints=Array.isArray(s.fingerprints)&&s.fingerprints.length===bank.length?s.fingerprints:null;
+  // Older active sessions predate question fingerprints. Only these specific
+  // source-numbered positions were corrected after the previous deployment.
+  const changed=indices.filter((pos,i)=>oldPrints?
+    oldPrints[pos]!==fingerprints[pos]:false);
+  for(const pos of changed){
+    const i=indices.indexOf(pos);
+    answers[i]=null;marked[i]=false;
+  }
+  changedCount=changed.length;
   showTest();render();startClock();
-  indicator('Restored from this browser · Timer continues from your original start time.',false);
+  if(changedCount){
+    save();
+    indicator('Restored '+(answers.length-changedCount)+' unchanged positions. '+changedCount+
+      ' edited source question'+(changedCount===1?'':'s')+' must be answered again; original timer preserved.',false);
+  }else indicator('Restored from this browser · Timer continues from your original start time.',false);
   return true;
 }
 function newAttempt(chosen=null,retryMode=false){
+  try{localStorage.removeItem(RESULT_STORE)}catch{}
   indices=chosen||bank.map((_,i)=>i);
   questions=indices.map(i=>bank[i]);
   answers=Array(questions.length).fill(null);marked=Array(questions.length).fill(false);
@@ -130,23 +174,25 @@ function review(){
     article.append(h,ans,correct,explain);root.append(article);
   }
 }
-function finish(automatic){
+function finish(automatic,restoring=false){
   if(submitted||!active)return;
   const left=answers.filter(a=>a===null).length;
   if(!automatic&&!confirm((questions.length-left)+' of '+questions.length+' answered; '+left+' unanswered. Submit this attempt?'))return;
   submitted=true;active=false;pauseClock();
   try{localStorage.removeItem(STORE)}catch{}
   $('test').classList.add('hidden');$('result').classList.remove('hidden');
+  if(!restoring)saveResult();
   let score=0,wrong=0;
   questions.forEach((q,i)=>{if(answers[i]===q.answer)score++;else if(answers[i]!==null)wrong++});
   const total=questions.length,accuracy=Math.round(score/total*100);
   $('score').textContent=score+' / '+total;
   $('correct').textContent=score;$('wrong').textContent=wrong;
   $('unanswered').textContent=left;$('accuracy').textContent=accuracy+'%';
-  history(score,wrong,left);
+  if(!restoring)history(score,wrong,left);
   if(window.MockSubjectResults?.render)window.MockSubjectResults.render($('subjectResults'),questions,answers,retry);
   $('reviewFilter').value='all';review();
-  track('mock_test_completed',{score,total,accuracy,auto_submit:automatic,retry});
+  if(!restoring)track('mock_test_completed',{score,total,accuracy,auto_submit:automatic,retry});
+
   window.scrollTo?.({top:0,behavior:'smooth'});
 }
 $('startBtn').disabled=true;
@@ -157,7 +203,7 @@ $('clearBtn').addEventListener('click',()=>{answers[current]=null;save();render(
 $('markBtn').addEventListener('click',()=>{marked[current]=!marked[current];save();render()});
 $('submitBtn').addEventListener('click',()=>finish(false));
 $('reviewFilter').addEventListener('change',review);
-$('restart').addEventListener('click',()=>{if(confirm('Start a new mock attempt?'))location.reload()});
+$('restart').addEventListener('click',()=>{if(!confirm('Clear the completed result and begin a new mock attempt?'))return;try{localStorage.removeItem(RESULT_STORE);localStorage.removeItem(STORE)}catch{}location.reload()});
 $('retryWrong').addEventListener('click',()=>{
   const selected=indices.filter((_,i)=>answers[i]!==questions[i].answer);
   if(!selected.length){alert('No wrong or unanswered questions to retry.');return}
@@ -169,11 +215,14 @@ window.addEventListener('pagehide',save);
 fetch(URL_DATA,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Mock data unavailable');return r.json()}).then(data=>{
   if(!validQuestions(data.questions))throw Error('Mock content is incomplete');
   bank=data.questions;signature=bank.length+':'+bank[0].question+':'+bank[bank.length-1].question;
+  fingerprints=bank.map(questionFingerprint);
   $('startBtn').disabled=false;
   const saved=read();
   if(!restore(saved)){
-    indicator('Progress will be saved to this device when you begin.',false);
     if(saved)try{localStorage.removeItem(STORE)}catch{}
+    if(!restoreResult(readResult())){
+      indicator('Progress will be saved to this device when you begin.',false);
+    }
   }
 }).catch(err=>{
   $('instructions').replaceChildren();

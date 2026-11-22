@@ -61,6 +61,17 @@ try{
  assert.equal(again.marked[0],true);
  assert.equal(again.current,1);
  console.log('PASS mock browser process restart preserves saved attempt');
+ // Short-mock score and explanation review must survive refresh.
+ page.once('dialog',d=>d.accept());
+ await page.locator('#submitBtn').click();
+ await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
+ const shortScore=await page.locator('#score').innerText();
+ const shortHistory=await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockHistoryV1')||'[]').length);
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
+ assert.equal(await page.locator('#score').innerText(),shortScore,'Short-mock result restored');
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockHistoryV1')||'[]').length),shortHistory,'No duplicate short-mock history');
+ console.log('PASS submitted short mock review survives refresh without duplicate history');
  // Full-length mock uses the same deadline and resume semantics.
  await page.goto(origin+'/tnpsc/mocks/full-mock-1.html',{waitUntil:'domcontentloaded'});
  await page.locator('#startBtn').click();
@@ -98,8 +109,20 @@ try{
  assert.match(await page.locator('#gateOutcome').innerText(),/NOT satisfied: 58\.5\/150/);
  assert.match(await page.locator('#subjectResults').innerText(),/not evaluated/);
  console.log('PASS full mock: Tamil gate blocks Part B below 60/150');
+ const fullScore=await page.locator('#score').innerText();
+ const oldHistory=await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4FullMockHistoryV1')||'[]').length);
+ await context.close();
+ page=await openProfile();
+ await page.goto(origin+'/tnpsc/mocks/full-mock-1.html',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
+ assert.equal(await page.locator('#score').innerText(),fullScore,'Full mock result must restore after browser restart');
+ assert.match(await page.locator('#gateOutcome').innerText(),/NOT satisfied/);
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4FullMockHistoryV1')||'[]').length),oldHistory,'No duplicate full mock history');
+ console.log('PASS submitted full mock review survives browser restart');
  // A fresh run with 40 Tamil + 20 GS key-matched answers reaches 90/300.
- await page.reload({waitUntil:'domcontentloaded'});
+ page.once('dialog',d=>d.accept());
+ await page.locator('#restart').click();
+ await page.waitForFunction(()=>!document.querySelector('#instructions')?.classList.contains('hidden'));
  await page.locator('#startBtn').click();
  await page.evaluate(targets=>{
    targets.forEach((answer,i)=>{
@@ -107,9 +130,10 @@ try{
      document.querySelectorAll('#palette button')[i].click();
      document.querySelectorAll('#options button')[answer].click();
    });
- },data.questions.map((q,i)=>i<40||(i>=100&&i<120)?q.acceptedAnswers[0]:null));
+ },data.questions.map((q,i)=>i<40||(i>=100&&i<120)?q.acceptedAnswers[0]:(i===40?4:null)));
  const ready=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),key);
- assert.equal(ready.answers.slice(0,100).filter(v=>v!==null).length,40,'40 Tamil answers saved');
+ assert.equal(ready.answers.slice(0,100).filter(v=>v!==null).length,41,'40 scored Tamil responses plus one E Answer not known');
+ assert.equal(ready.answers.slice(0,100).filter(v=>Number.isInteger(v)&&v<=3).length,40,'Only 40 scorable Tamil choices');
  assert.equal(ready.answers.slice(100,175).filter(v=>v!==null).length,20,'20 GS answers saved');
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
@@ -118,7 +142,47 @@ try{
  assert.match(await page.locator('#gateOutcome').innerText(),/satisfied/);
  assert.match(await page.locator('#gateOutcome').innerText(),/90\/300 minimum/);
  assert.match(await page.locator('#score').innerText(),/90\.0 \/ 300/);
- console.log('PASS full mock: Tamil gate and 90/300 whole-paper minimum');
+ assert.equal(await page.locator('#wrong').innerText(),'0','E Answer not known must not count as wrong');
+ assert.equal(await page.locator('#unanswered').innerText(),'140','E Answer not known is counted with blanks');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
+ assert.match(await page.locator('#score').innerText(),/90\.0 \/ 300/);
+ console.log('PASS full mock Tamil gate, 90/300, E handling, and result persistence');
+ // Simulate a single edited question in the bank. It must not reset any other response or the timer.
+ await page.goto(origin+'/tnpsc/mocks/index.html',{waitUntil:'domcontentloaded'});
+ // Edit saved storage from a different page, so the mock page's pagehide handler
+ // cannot overwrite the simulated older-bank fingerprint.
+ const oldMock4=await page.evaluate(()=>{
+   const key='clearexamsTNPSCGroup4MockSessionV2:4';
+   const s=JSON.parse(localStorage.getItem(key));
+   s.fingerprints[0]='previous-version';
+   localStorage.setItem(key,JSON.stringify(s));return s;
+ });
+ await page.goto(origin+'/tnpsc/mocks/mock-4.html',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#test')?.classList.contains('hidden'));
+ const changedMock4=await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockSessionV2:4')));
+ assert.equal(changedMock4.answers[0],null,'Edited source answer cleared');
+ assert.equal(changedMock4.current,oldMock4.current,'Current question position kept');
+ assert.equal(changedMock4.deadline,oldMock4.deadline,'Original timer preserved');
+ assert.match(await page.locator('#saveProgress').innerText(),/edited source question/);
+ console.log('PASS question source edit resets only affected answer and preserves timer');
+ // A deadline that elapsed while the browser was closed should submit once, not restart 30 minutes.
+ await page.goto(origin+'/tnpsc/mocks/index.html',{waitUntil:'domcontentloaded'});
+ // Expiration is simulated with no active mock script writing back on pagehide.
+ await page.evaluate(()=>{
+   const key='clearexamsTNPSCGroup4MockSessionV2:2';
+   const s=JSON.parse(localStorage.getItem(key));
+   s.deadline=Date.now()-2000;
+   localStorage.setItem(key,JSON.stringify(s));
+ });
+ await page.goto(origin+'/tnpsc/mocks/mock-2.html',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
+ const timeoutHistory=await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockHistoryV1')||'[]').filter(x=>x.mock===2).length);
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('#result')?.classList.contains('hidden'));
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('clearexamsTNPSCGroup4MockHistoryV1')||'[]').filter(x=>x.mock===2).length),timeoutHistory,'Expired attempt must submit only once');
+ console.log('PASS expired offline timer auto-submits exactly once after browser reopening');
+
 }finally{
  if(context)await context.close();
  fs.rmSync(temp,{recursive:true,force:true});
