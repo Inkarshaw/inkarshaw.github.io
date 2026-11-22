@@ -9,7 +9,7 @@ const RESULT_STORE=STORE+':completedV1';
 const HISTORY='clearexamsTNPSCGroup4FullMockHistoryV1';
 const $=id=>document.getElementById(id);
 const byId=id=>document.querySelectorAll('#'+id);
-let bank=[],questions=[],indices=[],answers=[],marked=[],current=0,deadline=0,timer=null,active=false,retry=false,submitted=false,signature='',storageWorking=true;
+let bank=[],questions=[],indices=[],answers=[],marked=[],current=0,deadline=0,timer=null,active=false,retry=false,submitted=false,signature='',storageWorking=true,fingerprints=[],changedCount=0;
 const track=(event,detail)=>{try{window.gtag?.('event',event,Object.assign({exam:'TNPSC Group IV',mock:'Full Mock 1',practice_source:'unverified_2022_draft'},detail||{}))}catch{}};
 const isCorrect=(q,response)=>Number.isInteger(response)&&q.acceptedAnswers.includes(response);
 const validQuestions=qs=>Array.isArray(qs)&&qs.length===200&&qs.every(q=>
@@ -19,6 +19,14 @@ const validQuestions=qs=>Array.isArray(qs)&&qs.length===200&&qs.every(q=>
  Array.isArray(q.acceptedAnswers)&&q.acceptedAnswers.length>=1&&
  q.acceptedAnswers.every(a=>Number.isInteger(a)&&a>=0&&a<4));
 
+function questionFingerprint(q){
+  const raw=JSON.stringify([q.question,q.options,q.acceptedAnswers||[q.answer]]);
+  let hash=2166136261;
+  for(let i=0;i<raw.length;i++){
+    hash^=raw.charCodeAt(i);hash=Math.imul(hash,16777619);
+  }
+  return (hash>>>0).toString(16).padStart(8,'0');
+}
 const read=()=>{try{return JSON.parse(localStorage.getItem(STORE)||'null')}catch{return null}};
 const indicator=(message,bad)=>{
   const el=$('saveProgress');if(!el)return;
@@ -28,7 +36,7 @@ function save(){
   if(!active||submitted)return;
   try{
     localStorage.setItem(STORE,JSON.stringify({
-      version:2,signature,indices,answers,marked,current,deadline,retry,savedAt:Date.now()
+      version:2,signature,indices,answers,marked,current,deadline,retry,fingerprints,savedAt:Date.now()
     }));
     storageWorking=true;indicator('Saved on this device · Browser reopen will resume this attempt.',false);
   }catch{
@@ -39,7 +47,7 @@ function readResult(){try{return JSON.parse(localStorage.getItem(RESULT_STORE)||
 function saveResult(){
   try{
     localStorage.setItem(RESULT_STORE,JSON.stringify({
-      version:2,signature,indices,answers,marked,current,deadline,retry,
+      version:2,signature,indices,answers,marked,current,deadline,retry,fingerprints,
       submitted:true,completedAt:Date.now()
     }));
   }catch{
@@ -92,10 +100,24 @@ function validateSession(s){
 }
 function restore(s){
   if(!validateSession(s))return false;
-  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers;marked=s.marked;
+  indices=s.indices;questions=indices.map(i=>bank[i]);answers=s.answers.slice();marked=s.marked.slice();
   current=s.current;deadline=s.deadline;retry=!!s.retry;active=true;submitted=false;
+  const oldPrints=Array.isArray(s.fingerprints)&&s.fingerprints.length===bank.length?s.fingerprints:null;
+  // Older active sessions predate question fingerprints. Only these specific
+  // source-numbered positions were corrected after the previous deployment.
+  const changed=indices.filter((pos,i)=>oldPrints?
+    oldPrints[pos]!==fingerprints[pos]:(!retry&&[0,1,84].includes(pos)));
+  for(const pos of changed){
+    const i=indices.indexOf(pos);
+    answers[i]=null;marked[i]=false;
+  }
+  changedCount=changed.length;
   showTest();render();startClock();
-  indicator('Restored from this browser · Timer continues from your original start time.',false);
+  if(changedCount){
+    save();
+    indicator('Restored '+(answers.length-changedCount)+' unchanged positions. '+changedCount+
+      ' edited source question'+(changedCount===1?'':'s')+' must be answered again; original timer preserved.',false);
+  }else indicator('Restored from this browser · Timer continues from your original start time.',false);
   return true;
 }
 function newAttempt(chosen=null,retryMode=false){
@@ -230,6 +252,7 @@ window.addEventListener('pagehide',save);
 fetch(URL_DATA,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Mock data unavailable');return r.json()}).then(data=>{
   if(!data||data.schemaVersion!==1||data.questionCount!==200||data.durationMinutes!==180||JSON.stringify(data.pattern)!==JSON.stringify({Tamil:100,'General Studies':75,Aptitude:25})||!validQuestions(data.questions))throw Error('Full mock content is incomplete');
   bank=data.questions;signature=bank.length+':'+bank[0].question+':'+bank[bank.length-1].question;
+  fingerprints=bank.map(questionFingerprint);
   $('startBtn').disabled=false;
   const saved=read();
   if(!restore(saved)){
