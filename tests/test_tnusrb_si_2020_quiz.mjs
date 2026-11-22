@@ -419,7 +419,7 @@ assert.equal(data.questions[99].newOCRComparison.status,'English_only_supplied_e
 // Bilingual psychology solution audit Q82–91: no unsupported key rewrites.
 for(const n of [82,83,89,90,91]){
  const q=data.questions[n-1];
- assert.match(q.answerExplanation,/\S{15}/,'Q'+n+' has readable English editorial reasoning');
+ assert.ok(q.answerExplanation.length>70,'Q'+n+' has substantive English editorial reasoning');
  assert.match(q.answerExplanationTamil,/[\u0B80-\u0BFF]/u,'Q'+n+' has Tamil editorial reasoning');
  assert.equal(q.explanationStatus,'editorial_mathematical_or_logic_derivation_not_original_board_solution');
 }
