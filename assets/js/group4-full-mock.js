@@ -185,6 +185,7 @@ function finish(automatic){
   window.scrollTo?.({top:0,behavior:'smooth'});
 }
 
+$('startBtn').disabled=true;
 $('startBtn').addEventListener('click',()=>{if(bank.length)newAttempt()});
 $('prevBtn').addEventListener('click',()=>{if(current>0){current--;save();render()}});
 $('nextBtn').addEventListener('click',()=>{if(current<questions.length-1){current++;save();render()}});
@@ -204,6 +205,7 @@ window.addEventListener('pagehide',save);
 fetch(URL_DATA,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Mock data unavailable');return r.json()}).then(data=>{
   if(!data||data.schemaVersion!==1||data.questionCount!==200||data.durationMinutes!==180||JSON.stringify(data.pattern)!==JSON.stringify({Tamil:100,'General Studies':75,Aptitude:25})||!validQuestions(data.questions))throw Error('Full mock content is incomplete');
   bank=data.questions;signature=bank.length+':'+bank[0].question+':'+bank[bank.length-1].question;
+  $('startBtn').disabled=false;
   const saved=read();
   if(!restore(saved)){
     indicator('Progress will be saved to this device when you begin.',false);
