@@ -357,4 +357,29 @@ assert.equal(auditIds.length,new Set(auditIds).size,'No duplicate review control
 for(const m of auditJS.matchAll(/\$\('([^']+)'\)/g))assert.ok(auditIds.includes(m[1]),'Missing review control '+m[1]);
 new vm.Script(auditJS,{filename:'assets/js/tnusrb-si-2020-source-review.js'});
 
+// User-supplied original-numbered 2019 SI (held 2020, Series C) Q101–120:
+// bilingual text reconciliation does not create a duplicate paper or certify original-page visuals.
+for(let n=101;n<=120;n++){
+ const q=data.questions[n-1];
+ assert.equal(q.number,n,'Source-numbered question retained Q'+n);
+ assert.equal(q.newOCRComparison?.date,'2026-11-22','Q'+n+' transcribed user source provenance');
+ assert.equal(q.newOCRComparison?.originalSeriesCBookletVisuallyVerified,false,'Q'+n+' no unsupported original booklet certification');
+ assert.deepEqual(Object.keys(q.options),['A','B','C','D']);
+ assert.deepEqual(Object.keys(q.optionsTamil),['A','B','C','D']);
+}
+assert.deepEqual(data.questions[100].options,{A:'PRTVXZ',B:'CEGIKM',C:'MORTVX',D:'ZBDFHJ'},'Q101 anomalous letters do not change');
+assert.match(data.questions[101].questionTamil,/24 மற்றும் 27/,'Q102 original-numbered Tamil age data preserved');
+assert.match(data.questions[106].questionTamil,/8¼/,'Q107 fractional formula preserved in Tamil');
+assert.match(data.questions[107].questionTamil,/49\/\?/,'Q108 paired unknown symbol preserved');
+assert.match(data.questions[108].questionTamil,/₹38/,'Q109 price and sum retained');
+assert.match(data.questions[102].questionTamil,/மதிப்பெண் வழங்கப்படாது/,'Q103 unverified circles remain explicitly ungraded');
+assert.equal(data.questions[102].scoringStatus,'ungraded_source_dispute');
+assert.deepEqual(data.questions[102].acceptedAnswers,[]);
+assert.equal(data.questions[110].answerKeyToken,'ALL','Q111 all-correct key retained');
+assert.equal(data.questions[110].scoringStatus,'ungraded_all_correct');
+assert.match(data.questions[110].questionTamil,/All correct/,'Q111 translated source caveat remains visible');
+for(const n of [114,115,116])assert.equal(data.questions[n-1].textStatus,'secondary_series_c_scan_visually_transcribed','Q'+n+' independently sourced secondary scan evidence kept');
+assert.match(data.questions[116].newOCRComparison.status,/English-only supplied/,'Q117 was not supplied in Tamil');
+assert.match(data.questions[119].questionTamil,/48, 24, 72, 36, 108/,'Q120 numeric pattern remains legible');
+
 console.log('PASS TNUSRB SI 2020 Series C: 140/140 readable (130 scored, 3 ALL and 7 source-reviewed ungraded); 0 missing and 0 blocked.');
