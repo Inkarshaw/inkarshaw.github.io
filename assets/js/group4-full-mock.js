@@ -34,11 +34,11 @@ function save(){
     storageWorking=false;indicator('This browser is blocking storage. Answers will be lost if you close or refresh it.',true);
   }
 }
-function history(score,wrong,unanswered){
+function history(score,wrong,unanswered,tamilMarks,tamilQualified){
   if(retry){$('saveStatus').textContent='Retry finished; original full-mock score unchanged.';return}
   try{
     let rows=[];try{const v=JSON.parse(localStorage.getItem(HISTORY)||'[]');if(Array.isArray(v))rows=v}catch{}
-    rows.push({mock:number,score,total:questions.length,accuracy:Math.round(score/questions.length*100),wrong,unanswered,date:new Date().toISOString()});
+    rows.push({mock:number,score,tamilMarks,tamilQualified,evaluatedMarks:tamilQualified?score*1.5:null,total:questions.length,accuracy:Math.round(score/questions.length*100),wrong,unanswered,date:new Date().toISOString()});
     localStorage.setItem(HISTORY,JSON.stringify(rows.slice(-80)));
     $('saveStatus').textContent='Score saved on this device.';
   }catch{$('saveStatus').textContent='Score shown, but this browser could not save history.'}
@@ -152,6 +152,7 @@ function finish(automatic){
   const wrongCount=questions.reduce((v,q,i)=>v+(answers[i]!==null&&!correct(q,i)?1:0),0);
   const mark=correctCount*1.5,percent=Math.round(correctCount/questions.length*100);
   if(retry){
+    $('subjectResults').replaceChildren();
     $('gateOutcome').textContent='Focused retry practice · Tamil eligibility is assessed only on a complete 200-question attempt.';
     $('score').textContent=correctCount+' / '+questions.length;
     $('correct').textContent=correctCount;
@@ -178,7 +179,7 @@ function finish(automatic){
     $('scoringPolicy').textContent='Practice-only indicative scoring. Part A gate: 60/150. Total minimum: 90/300 (only after Part A passes). All answers use 1.5 marks per correct answer; an unverified editorial 2022 transcription is used for 193 questions. OMR blank-response penalties and official ranking rules are NOT simulated.';
   }
   $('unanswered').textContent=left;
-  if(!retry)history(correctCount,wrongCount,left);
+  if(!retry)history(correctCount,wrongCount,left,tamilMarks,tamilEligible);
   if(retry)$('saveStatus').textContent='Retry completed; your full-length history was not replaced.';
   $('reviewFilter').value='all';review();
   track('mock_test_completed',{score:correctCount,total:questions.length,accuracy:percent,auto_submit:automatic,retry,tamil_marks:tamilMarks,tamil_qualified:tamilEligible});
