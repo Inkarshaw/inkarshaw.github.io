@@ -19,9 +19,9 @@ assert.equal(data.questions.length,140);
 assert.deepEqual(data.missingNumbers,missing,'Every original Series C number is now represented');
 assert.deepEqual(data.blockedNumbers,blocked,'Do not grade ambiguous scans, inferred options, missing diagrams or key conflicts');
 assert.equal(data.playableQuestionCount,140);
-assert.equal(data.ungradedSourceDisputeCount,7);
-assert.equal(data.scoredQuestionCount,130);
-assert.equal(data.maximumIndicativeMarks,65);
+assert.equal(data.ungradedSourceDisputeCount,8);
+assert.equal(data.scoredQuestionCount,129);
+assert.equal(data.maximumIndicativeMarks,64.5);
 assert.deepEqual(data.specialKeyNumbers,[58,111,125]);
 assert.equal(data.answerKey.answers.length,140,'Final key has all original positions');
 assert.match(data.answerKey.sourcePDF,/Final-Answer-Key-TNUSRB-Sub-Inspector-of-Police-Posts\.pdf$/);
@@ -50,9 +50,9 @@ for(const q of data.questions){
  if(blocked.includes(q.number)){
   assert.equal(q.scoringStatus,'blocked_source_incomplete','Q'+q.number+' must stay outside live practice');
   assert.ok(q.sourceIssue&&q.textStatus==='needs_original_source_review');
- }else if([15,22,37,47,84,95,103].includes(q.number)){
+ }else if([15,22,37,47,84,95,96,103].includes(q.number)){
   assert.equal(q.scoringStatus,'ungraded_source_dispute','Q'+q.number+' cross-series/source conflict is not safe to grade');
-  assert.match(q.answerReviewReason,q.number===22?/SAARC/:q.number===15?/Series D/:q.number===47?/Series D/:[84,95,103].includes(q.number)?/original|unverified|Series C/i:/Series C supplied OCR/,'Clearly disclose source discrepancy');
+  assert.match(q.answerReviewReason,q.number===22?/SAARC/:q.number===15?/Series D/:q.number===47?/Series D/:[84,95,96,103].includes(q.number)?/original|unverified|Series C/i:/Series C supplied OCR/,'Clearly disclose source discrepancy');
   if(q.number===22)assert.equal(q.options.A,'SAARC');
   assert.deepEqual(q.acceptedAnswers,[]);
  }else if(q.answerKeyToken==='ALL'){
@@ -217,7 +217,7 @@ assert.match(sample[82].question,/ABLMS\s*\|/,'Q82 coding table preserved');
 assert.match(sample[83].question,/Paper VII/,'Q83 marks table preserved');
 assert.match(sample[89].question,/Maths 90°/,'Q89 chart angles preserved');
 assert.match(sample[91].question,/31–45/,'Q91 age percentage data preserved');
-assert.match(sample[96].options.C,/two small circles/,'Q96 Venn choices in text');
+assert.equal(sample[96].options.C,'Diagram C — original figure missing','Q96 original diagram missing; never present editorial option C as the authentic booklet artwork');
 assert.match(sample[97].question,/466/,'Q97 arranged numbers preserved');
 assert.match(sample[107].question,/8¼/,'Q107 fraction rendered');
 assert.match(sample[122].question,/243/,'Q122 exponential expression present');
@@ -251,7 +251,7 @@ assert.match(html,/Q114–116/,'Recovered original-numbered 114 to 116 are discl
 
 assert.match(html,/General Candidates written paper/,'Link General Candidates primary paper, not departmental source');
 assert.match(html,/Q15\/Q22\/Q37/,'Existing source-disputed keys are still clearly disclosed');
-assert.match(html,/130 provisionally scored/);
+assert.match(html,/129 provisionally scored/);
 assert.match(html,/2019 Recruitment \(Exam 2020\)/);
 assert.match(html,/not an official TNUSRB result/);
 assert.match(js,/q\.answerKeyToken!==data\.answerKey\.answers\[q\.number-1\]/);
@@ -284,18 +284,18 @@ assert.match(yearArchive,/Total marks/,'Unverified cut-off percentages removed f
 
 const auditHTML=read('tnusrb-si-2020-source-review.html');
 const auditJS=read('assets/js/tnusrb-si-2020-source-review.js');
-assert.match(html,/tnusrb-si-2020-source-review\.html/,'Quiz page opens four-item source audit');
-assert.match(js,/tnusrb-si-2020-source-review\.html\?q=/,'All four disputed figures link to original-source review');
+assert.match(html,/tnusrb-si-2020-source-review\.html/,'Quiz page opens five-item source audit');
+assert.match(js,/tnusrb-si-2020-source-review\.html\?q=/,'All five disputed visual questions link to original-source review');
 assert.match(auditHTML,/name="robots" content="noindex,nofollow"/,'Editorial-only source review does not pretend to be an indexed public answer key');
-assert.match(auditHTML,/Q47, Q84, Q95 and Q103/,'Exact four original source visual positions identified');
+assert.match(auditHTML,/Q47, Q84, Q95, Q96 and Q103/,'Five missing original-source visual positions identified');
 assert.match(auditHTML,/id="pdfFile"/,'Manual original booklet viewing never uploads source PDF');
 assert.match(auditHTML,/id="pdfFrame"/,'Locally selected PDF can be inspected page by page');
 assert.match(auditHTML,/id="comparisonImage"/,'Editorial reference art distinguished from original scanned specimen');
 assert.match(auditHTML,/id="figureChecked"/,'Original Series C matrix or diagram requires manual verification');
 assert.match(auditHTML,/id="sourceKind"/,'Original Series C and secondary scan must not be conflated');
 assert.match(auditHTML,/id="staleWarning"/,'Stale source changes are disclosed before rechecking');
-assert.match(auditHTML,/id="export"/,'Reviewer can transfer four notes without uploading scanned material');
-assert.match(auditJS,/const NUMBERS=\[47,84,95,103\]/,'Only the four originally unverified matrices/figures in visual audit');
+assert.match(auditHTML,/id="export"/,'Reviewer can transfer five notes without uploading scanned material');
+assert.match(auditJS,/const NUMBERS=\[47,84,95,96,103\]/,'Five original diagrams or matrices require visual audit');
 assert.match(auditJS,/const signature=q=>JSON\.stringify/,'Source audit bound to exact stem and alternatives');
 assert.match(auditJS,/sourceKind==='board_booklet'/,'Secondary source cannot be marked fully locally checked');
 assert.match(auditJS,/r\.printedNumber===q\.number/,'Exact printed Series C question number required');
@@ -316,8 +316,8 @@ assert.match(auditHTML,/Closing or changing the PDF clears all onscreen checkbox
 assert.match(auditJS,/file hash cannot prove TNUSRB authenticity/,'Hash identity is not official paper certification');
 
 assert.match(auditJS,/row\.sourceSignature!==signature\(q\)/,'Source-changed import loses old checkboxes');
-assert.match(auditJS,/data\.scoredQuestionCount!==130/,'Review tool refuses silently changed scoring bank');
-assert.match(auditJS,/data\.ungradedSourceDisputeCount!==7/,'All seven disputes remain ungraded');
+assert.match(auditJS,/data\.scoredQuestionCount!==129/,'Review tool refuses silently changed scoring bank');
+assert.match(auditJS,/data\.ungradedSourceDisputeCount!==8/,'All eight disputes remain ungraded');
 const sameNamed=data.sourceRecoveryAudit.sameNamedBookletOCRAudit;
 assert.equal(sameNamed.sourceURL,'https://www.scribd.com/document/1014181296/SI-2019-WT-QUESTION');
 assert.deepEqual(sameNamed.reviewedQuestionNumbers,[47,84,95,103]);
@@ -349,12 +349,12 @@ const visualFollowUp=data.sourceRecoveryAudit.primaryOriginalVisualRetrievalFoll
 assert.equal(visualFollowUp.date,'2026-11-23','Source retrieval attempts are dated');
 assert.equal(visualFollowUp.originalSeriesCQuestionPageImagesInspected,false,'No false certification of original printed booklet');
 assert.equal(visualFollowUp.diagramOrMatrixOptionLayoutsVerified,false,'No key-only diagram promotion');
-assert.equal(visualFollowUp.allRemainUngraded,true,'All four visual gaps remain ungraded');
+assert.equal(visualFollowUp.allRemainUngraded,true,'All originally recorded four key-only visual gaps remain ungraded');
 assert.deepEqual(visualFollowUp.seriesCKeyLetters.map(x=>[x.question,x.token]),[[47,'C'],[84,'B'],[95,'C'],[103,'C']],'Final key visually checked without attributing original diagrams');
 assert.match(visualFollowUp.officialPDFResult,/timed out/,'Unretrieved original PDF disclosed');
 assert.match(visualFollowUp.secondaryPDFResult,/403/,'Unavailable secondary scan does not count as source');
 assert.match(auditHTML,/Checked 23 November 2026/,'Visual reviewer sees last source acquisition status');
-assert.match(auditHTML,/none of the four printed question figures or matrix layouts was obtained/,'Answer-key letters are not image proof');
+assert.match(auditHTML,/none of those four printed question figures or matrix layouts was obtained/,'Answer-key letters are not image proof');
 assert.match(auditHTML,/id="ocrEvidencePanel"/,'Reviewer can compare evidence scope');
 assert.match(auditHTML,/id="ocrEvidenceDetails"/);
 assert.match(auditHTML,/id="ocrEvidenceLink"/);
@@ -421,8 +421,8 @@ assert.match(supplied95.questionTamil,/மதிப்பெண் வழங்�
 const supplied96=data.questions[95];
 assert.equal(supplied96.newOCRComparison.originalFourDiagramImagesSupplied,false);
 assert.deepEqual(supplied96.newOCRComparison.rawSuppliedOptionLabels,{A:'Diagram A',B:'Diagram B',C:'Diagram C',D:'Diagram D'});
-assert.match(supplied96.instruction,/editorial study descriptions/,'Q96 never misrepresents verbal alternatives as printed diagrams');
-assert.match(supplied96.options.C,/two small circles/,'Keep existing accessible textual study alternative');
+assert.match(supplied96.instruction,/original diagram-to-option mapping remains unverified/,'Q96 score never inferred from absent original diagrams');
+assert.match(supplied96.options.C,/Diagram C.*original figure missing/,'Q96 actual printed original figure C is unavailable');
 assert.equal(data.questions[96].newOCRComparison.layoutUnverified,true,'Q97 numeric placement must not be guessed from flattened OCR');
 assert.match(data.questions[96].newOCRComparison.rawSuppliedNumberLine,/466, 398, 341, 282, 250, \?/);
 assert.equal(data.questions[97].answerKeyToken,'D','Q98 directional key retained');
@@ -488,4 +488,24 @@ assert.match(data.questions[134].question,/TICRONÉU/,'Q135 unusual OCR token NO
 assert.equal(data.questions[134].explanationAudit?.nonstandardOCRGlyphStillUnverified,true);
 assert.match(data.questions[136].sourceIssue,/printed blank/i,'Q137 restored blank remains source-caveated');
 
-console.log('PASS TNUSRB SI 2020 Series C: 140/140 readable (130 scored, 3 ALL and 7 source-reviewed ungraded); 0 missing and 0 blocked.');
+assert.equal(data.questions[95].originalCBookletOptionMappingVerified,false,'Q96 original A-D Venn mapping cannot be claimed as verified');
+assert.equal(data.questions[95].scoringStatus,'ungraded_source_dispute','Missing authentic Series C Q96 image blocks marking');
+assert.equal(data.questions[95].answerKeyToken,'C','Published C key retained only for provenance');
+assert.deepEqual(data.questions[95].acceptedAnswers,[],'Q96 neutral no accepted option');
+assert.equal(data.questions[95].editorialReferenceChoices.originalSeriesCOptionsVisuallyInspected,false,'Cross-series study words are not C original images');
+assert.equal(data.questions[95].editorialReferenceChoices.independentlyReproducedSeriesDTextOptions.D,
+ 'Two concentric circles and one separate circle','Earlier editorial D wording disagreed with parallel Series D study representation');
+assert.match(data.questions[95].questionTamil,/மதிப்பெண் வழங்கப்படாது/,'Tamil Q96 tells learner no marks');
+assert.equal(data.questions[95].newOCRComparison.gradeDisabledUntilOriginalImages,true);
+assert.equal(data.questions[96].newOCRComparison.layoutCorroboratedByOtherBookletSeries,true,
+ 'Q97 3x2 arrangement is only corroborated by D series, not C original');
+assert.equal(data.questions[96].newOCRComparison.printedSeriesCLayoutVisuallyVerified,false);
+assert.deepEqual(data.sourceRecoveryAudit.primaryOriginalVisualRetrievalFollowUp.totalVisualQuestionsRequiringOriginalCPage,
+ [47,84,95,96,103]);
+assert.equal(data.sourceRecoveryAudit.additionalOriginalDiagramReview.excludedFromScore,true);
+assert.equal(data.questions[95].sameNamedBookletOCRAudit.evidenceLevel,'not_independently_verified_in_index',
+ 'No Scribd or original Series C visual claim may be invented for Q96');
+assert.match(auditJS,/expectedNumbers=obj.rows.length===4\?\[47,84,95,103\]:NUMBERS/,
+ 'Legacy four-item reviewer JSON import remains supported after adding Q96');
+
+console.log('PASS TNUSRB SI 2020 Series C: 140/140 playable (129 scored, 3 ALL and 8 source-reviewed ungraded); 0 missing and 0 blocked.');

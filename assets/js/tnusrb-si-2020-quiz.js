@@ -15,7 +15,7 @@
       !Array.isArray(data.questions)||data.questions.length!==140||
       !Array.isArray(data.missingNumbers)||data.missingNumbers.length!==0||
       !Array.isArray(data.blockedNumbers)||data.blockedNumbers.length!==0||
-      data.ungradedSourceDisputeCount!==7||
+      data.ungradedSourceDisputeCount!==8||
       data?.answerKey?.answers?.length!==140){
       throw Error('TNUSRB SI 2020 Series C question-bank manifest is incomplete');
     }
@@ -38,7 +38,7 @@
           throw Error('Incomplete entry at original question '+q.number);
       if(q.answerKeyToken==='ALL'&&q.scoringStatus!=='ungraded_all_correct'&&q.scoringStatus!=='blocked_source_incomplete')throw Error('Special key status mismatch');
       if(q.scoringStatus==='ungraded_source_dispute'&&
-         (![15,22,37,47,84,95,103].includes(q.number)||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(q.number)))
+         (![15,22,37,47,84,95,96,103].includes(q.number)||q.acceptedAnswers.length!==0||!q.answerReviewReason||data.blockedNumbers.includes(q.number)))
         throw Error('Unverified reference-diagram question must not be graded or given an accepted answer');
       const hasTamil=typeof q.questionTamil==='string'&&q.questionTamil.trim();
       if(hasTamil){
@@ -61,9 +61,9 @@
     }
     const playable=data.questions.filter(q=>q.scoringStatus!=='blocked_source_incomplete');
     if(playable.length!==data.playableQuestionCount||playable.length!==140||
-       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==130||
+       playable.filter(q=>q.scoringStatus==='scored_with_final_key').length!==129||
        playable.filter(q=>q.scoringStatus==='ungraded_all_correct').length!==3||
-       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==7){
+       playable.filter(q=>q.scoringStatus==='ungraded_source_dispute').length!==8){
       throw Error('Source exclusions or scoring coverage changed unexpectedly');
     }
     return playable;
@@ -145,7 +145,7 @@
     const disputed=questions.filter(q=>q.scoringStatus==='ungraded_source_dispute');
     const topic={15:'Ambiguous printed wording',22:'International versus regional terminology',
       37:'Duplicate OCR choice and Series D spelling',47:'C-series matrix choices not recovered',
-      84:'Original intersection diagram unverified',95:'Original crossed-shapes figure unverified',
+      84:'Original intersection diagram unverified',95:'Original crossed-shapes figure unverified',96:'Original four Venn options missing',
       103:'Original circle-grid figure unverified'};
     for(const q of disputed){
       const li=document.createElement('li');
@@ -166,7 +166,7 @@
         attempt.index=idx;render(true);save();
       });
       li.append(heading,stem,note,btn);
-      if([47,84,95,103].includes(q.number)){
+      if([47,84,95,96,103].includes(q.number)){
         const review=document.createElement('a');
         review.href='tnusrb-si-2020-source-review.html?q='+q.number;
         review.textContent=' Compare original booklet page (editorial review)';
@@ -322,7 +322,7 @@
     $('score').textContent=(correct*0.5).toFixed(1)+' / '+(scored.length*0.5).toFixed(1)+' marks';
     $('scoreDetails').textContent=correct+' correct · '+wrong+' incorrect · '+blank+' unanswered · '+
       allEntries+' ALL entries and '+disputed+' disputed source/key questions ungraded · '+questions.length+' readable questions. '+
-      'All 140 source-numbered positions are available for study. Marks exclude the three ALL-key entries and seven unresolved source-review questions, including the Series D comparison matrix Q47 and unverified reference figures. This is provisional practice scoring, not an official TNUSRB exam result.';
+      'All 140 source-numbered positions are available for study. Marks exclude the three ALL-key entries and eight unresolved source-review questions, including Q96 with missing original A–D Venn diagrams, the Series D comparison matrix Q47, and unverified reference figures. This is provisional practice scoring, not an official TNUSRB exam result.';
     $('reviewFilter').value='all';renderReview();show('result');
   }
   function renderReview(){
@@ -411,8 +411,8 @@
       data.questions.filter(q=>q.scoringStatus==='blocked_source_incomplete').forEach(q=>{
         const li=document.createElement('li');li.textContent='Q'+q.number+': '+q.sourceIssue;withheld.append(li);
       });
-      $('loadStatus').textContent=questions.length+' / 140 readable original-numbered questions: 130 provisionally scored; '+
-        '3 ALL tokens and 7 source/wording review items ungraded; no missing question numbers.';
+      $('loadStatus').textContent=questions.length+' / 140 readable original-numbered questions: 129 provisionally scored; '+
+        '3 ALL tokens and 8 source/wording review items ungraded; no missing question numbers.';
       renderSourceDisputes();
       updateStart();
     })

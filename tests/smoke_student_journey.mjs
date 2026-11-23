@@ -71,7 +71,7 @@ try {
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'Scoring register has no 390px mobile horizontal overflow');
   assert.deepEqual(pageErrors,[], 'PYQ scoring register JavaScript runs without runtime errors');
-  console.log('PASS PYQ scoring review: 8 papers, 263 classified exceptions, mobile overflow and exact 2022/2015 numbers');
+  console.log('PASS PYQ scoring review: 8 papers, 264 classified exceptions, mobile overflow and exact 2022/2015 numbers');
 
   // Confirm the newly restored 2022 original-numbered Tamil-digit question in real mobile Chromium.
   pageErrors.length=0;
@@ -794,6 +794,16 @@ try {
     assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q'+n+' is ungraded');
     assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q'+n+' cannot highlight answer');
   }
+  await page.locator('#palette button').filter({hasText:/^96$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/Vehicle, Car, Jeep/,'Q96 full original-numbered Venn prompt kept');
+  assert.match(await page.locator('#options button').nth(2).innerText(),/Diagram C.*original figure missing/,
+    'Q96 no longer impersonates the absent original printed figure C');
+  assert.match(await page.locator('#instruction').innerText(),/original diagram-to-option mapping remains unverified/,
+    'Q96 source-origin warning is readable in quiz');
+  await page.locator('#options button').nth(2).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Ungraded/,'Q96 missing Venn original diagrams never score');
+  assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q96 no provisional key highlighting');
   await page.locator('#palette button').filter({hasText:/^22$/}).click();
   await page.locator('#options button').nth(0).click();
   await page.locator('#check').click();
@@ -825,10 +835,10 @@ try {
   assert.match(await page.locator('#position').innerText(),/Original Q140/);
   page.once('dialog',dialog=>dialog.accept());
   await page.locator('#finish').click();
-  assert.match(await page.locator('#score').innerText(),/\/ 65\.0 marks/);
+  assert.match(await page.locator('#score').innerText(),/\/ 64\.5 marks/);
   assert.equal(await page.locator('#result').isVisible(),true);
   await page.locator('#reviewFilter').selectOption('ungraded');
-  assert.equal(await page.locator('#reviewList .result-item').count(),10,'Three ALL entries plus seven disputed/reference items appear in ungraded review');
+  assert.equal(await page.locator('#reviewList .result-item').count(),11,'Three ALL entries plus eight disputed/reference items appear in ungraded review');
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'TNUSRB SI 2020 has no mobile horizontal overflow');
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
@@ -841,13 +851,14 @@ try {
   assert.equal(await page.locator('#feedback').isVisible(),false,'Exam mode conceals correct option');
   // Source-disputed Series C questions are discoverable and directly playable without grades.
   await page.goto(origin+'/tnusrb-si-2020-quiz.html',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#sourceDisputeList')?.children.length===7,
+  await page.waitForFunction(()=>document.querySelector('#sourceDisputeList')?.children.length===8,
     undefined,{timeout:20000});
   await page.locator('#sourceDisputeDesk summary').click();
-  assert.equal(await page.locator('#sourceDisputeList > li').count(),7,'Seven, and only seven, ungraded source disputes shown');
+  assert.equal(await page.locator('#sourceDisputeList > li').count(),8,'Eight ungraded source disputes shown');
   assert.match(await page.locator('#sourceDisputeList').innerText(),/Q22.*International versus regional terminology/s);
+  assert.match(await page.locator('#sourceDisputeList').innerText(),/Q96.*Original four Venn options missing/s,'Q96 appears in the neutral source review queue');
   assert.equal(await page.locator('#sourceDisputeList a[href^="https://"]').count(),2,'First-party SAARC and secondary answer guide are separately linked');
-  assert.equal(await page.locator('#sourceDisputeList a[href^="tnusrb-si-2020-source-review.html?q="]').count(),4,'Four original-figure/matrix verification routes available');
+  assert.equal(await page.locator('#sourceDisputeList a[href^="tnusrb-si-2020-source-review.html?q="]').count(),5,'Five original-figure/matrix verification routes available');
   await page.locator('#sourceDisputeList button').filter({hasText:/Study Q22/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q22/,'Source queue launches disputed Q22 without altering order');
   assert.equal(await page.locator('#quiz').isVisible(),true);
@@ -857,12 +868,12 @@ try {
   assert.match(await page.locator('#feedback').innerText(),/SAARC/);
   assert.equal(await page.locator('#options .right, #options .wrong').count(),0,'Q22 source queue does not enable scoring');
   assert.deepEqual(pageErrors,[],'TNUSRB SI 2020 has no runtime page errors');
-  console.log('PASS TNUSRB SI 2020: 140 playable, 130 provisional scores, recovered C Q114–116, source caveats and resume');
+  console.log('PASS TNUSRB SI 2020: 140 playable, 129 provisional scores, recovered C Q114–116, source caveats and resume');
 
   // The 2020 visual-source desk is a local reviewer workflow, never a public grading route.
   pageErrors.length=0;
   await page.goto(origin+'/tnusrb-si-2020-source-review.html?q=84',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===4,
+  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===5,
     undefined,{timeout:20000});
   assert.equal(await page.locator('#number').innerText(),'84','Deep link opens the requested Series C visual question');
   assert.equal(await page.locator('#comparisonImage').isVisible(),true,'Clearly labelled editorial figure is visible');
@@ -936,7 +947,7 @@ try {
   assert.equal(await page.locator('#checkedCount').innerText(),'0','Without the actual PDF in memory, a saved checkbox cannot count as verified');
   assert.equal(await page.locator('#draftCount').innerText(),'1','Notes and source claims remain as incomplete drafts');
   await page.reload({waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===4,
+  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===5,
     undefined,{timeout:20000});
   assert.equal(await page.locator('#checkedCount').innerText(),'0','Page reload requires opening the exact document again');
   assert.match(await page.locator('#pdfBindingNotice').innerText(),/same PDF is reloaded/);
@@ -952,7 +963,7 @@ try {
     localStorage.setItem(key,JSON.stringify(saved));
   });
   await page.reload({waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===4,
+  await page.waitForFunction(()=>document.querySelector('#questionSelect')?.options.length===5,
     undefined,{timeout:20000});
   assert.equal(await page.locator('#checkedCount').innerText(),'0','Changed question source invalidates previously checked status');
   assert.equal(await page.locator('#staleWarning').isVisible(),true);
@@ -962,6 +973,10 @@ try {
   assert.match(await page.locator('#ocrEvidenceLevel').textContent(),/English stem and all four option values/,'Q95 wording and option pairs corroborated only as OCR');
   await page.locator('#questionSelect').selectOption('103');
   assert.match(await page.locator('#ocrEvidenceLevel').textContent(),/some OCR labels are uncertain/,'Q103 number labels not certified');
+  await page.locator('#questionSelect').selectOption('96');
+  assert.match(await page.locator('#loadStatus').innerText(),/ungraded/);
+  assert.equal(await page.locator('#comparison').isVisible(),false,'Q96 original option drawings absent and no fake comparison SVG is shown');
+  assert.match(await page.locator('#sourceIssue').innerText(),/Q96 is a four-diagram Venn selection/i,'Q96 missing original figure explanation displayed in reviewer workbench');
   await page.locator('#questionSelect').selectOption('47');
   assert.match(await page.locator('#ocrEvidenceLevel').textContent(),/No original matrix or option layout/,'Q47 remains completely unavailable in OCR preview');
   assert.equal(await page.locator('#comparison').isVisible(),false,'Unverified Series D-only matrix Q47 has no counterfeit original image');
@@ -969,7 +984,7 @@ try {
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'Series C visual-review page fits mobile width');
   assert.deepEqual(pageErrors,[],'SI 2020 visual source review has no runtime errors');
-  console.log('PASS TNUSRB SI 2020 Series C source-review: SHA-256 PDF binding, reopen safety, four gaps, stale-check invalidation and zero grades');
+  console.log('PASS TNUSRB SI 2020 Series C source-review: SHA-256 PDF binding, reopen safety, five gaps, stale-check invalidation and zero grades');
 
   // TNUSRB SI 2010 Type A: 140 readable practice entries, of which 135 have provisional score mappings.
   pageErrors.length = 0;

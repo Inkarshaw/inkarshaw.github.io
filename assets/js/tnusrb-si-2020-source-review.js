@@ -3,7 +3,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
-const NUMBERS=[47,84,95,103];
+const NUMBERS=[47,84,95,96,103];
 const STORAGE='clearexams:editorial:tnusrb:si:2020:series-c:visual-review:v1';
 const BANK='tnusrb-si-2020-series-c';
 const ORIGINAL='https://www.tnusrb.tn.gov.in/pdfs/SI_2019_WT_QUESTION.pdf';
@@ -176,17 +176,20 @@ function download(){
  const url=URL.createObjectURL(blob),link=document.createElement('a');
  link.href=url;link.download='tnusrb-si-2020-series-c-visual-source-review.json';link.click();
  setTimeout(()=>URL.revokeObjectURL(url),1000);
- $('transferStatus').textContent='Four source-bound rows exported. Nothing was sent to the site.';
+ $('transferStatus').textContent='Five source-bound rows exported. Nothing was sent to the site.';
 }
 async function importFile(file){
  if(!file||file.size>180000)throw Error('Use a local source review JSON file under 180 KB');
  const obj=JSON.parse(await file.text());
  if(obj.schemaVersion!==1||obj.bankId!==BANK||obj.originalBookletURL!==ORIGINAL||
-    obj.finalKeyMirrorURL!==KEY||!Array.isArray(obj.rows)||obj.rows.length!==4)
-   throw Error('This is not a complete Series C 2020 visual-source audit export');
+    obj.finalKeyMirrorURL!==KEY||!Array.isArray(obj.rows)||![4,5].includes(obj.rows.length))
+   throw Error('This is not a supported Series C 2020 visual-source audit export');
  const next={};let stale=0;
+ // Backward-compatible import: old four-question exports predate missing-diagram Q96.
+ // The original four source-bound rows retain their own recorded question numbers.
+ const expectedNumbers=obj.rows.length===4?[47,84,95,103]:NUMBERS;
  obj.rows.forEach((row,i)=>{
-  const q=questions[i];
+  const q=questions.find(item=>item.number===expectedNumbers[i]);
   if(row.number!==q.number||row.scoringStatus!==q.scoringStatus)throw Error('Wrong question slot at row '+i);
   const r={...empty()};
   for(const k of FIELDS){if(Object.prototype.hasOwnProperty.call(row,k))r[k]=row[k]}
@@ -296,7 +299,7 @@ $('importFile').addEventListener('change',async e=>{
  e.target.value='';
 });
 $('resetAll').addEventListener('click',()=>{
- if(!window.confirm('Delete all four browser-local Series C figure/matrix reviews?'))return;
+ if(!window.confirm('Delete all five browser-local Series C figure/matrix reviews?'))return;
  try{localStorage.removeItem(STORAGE)}catch{$('transferStatus').textContent='Could not clear local storage';return}
  records={};view();$('transferStatus').textContent='All local evidence drafts cleared. Public questions unchanged.';
 });
@@ -305,7 +308,7 @@ fetch('data/quizzes/tnusrb-si-2020-series-c.json',{cache:'no-store'})
 .then(r=>{if(!r.ok)throw Error('Question bank HTTP '+r.status);return r.json()})
 .then(data=>{
  if(data.year!==2020||data.bookletSeries!=='C'||data.playableQuestionCount!==140||
-    data.scoredQuestionCount!==130||data.ungradedSourceDisputeCount!==7||
+    data.scoredQuestionCount!==129||data.ungradedSourceDisputeCount!==8||
     data.originalBookletAccess?.url!==ORIGINAL||
     data.originalBookletAccess?.originalBookletVerifiedByClearExams!==false)
   throw Error('Question bank no longer matches the expected unverified Series C source manifest');
@@ -331,7 +334,7 @@ fetch('data/quizzes/tnusrb-si-2020-series-c.json',{cache:'no-store'})
  for(const id of ['questionSelect','save','clear','export','importFile','resetAll'])$(id).disabled=false;
  const initial=Number(new URLSearchParams(location.search).get('q'));
  if(NUMBERS.includes(initial))current=NUMBERS.indexOf(initial);
- $('loadStatus').textContent='Four source-disputed items loaded. Any locally checked draft remains ungraded on the public quiz.';
+ $('loadStatus').textContent='Five source-disputed visual items loaded. Any locally checked draft remains ungraded on the public quiz.';
  view();
 })
 .catch(err=>{$('loadStatus').textContent='Cannot initialize editorial review: '+err.message});
