@@ -35,10 +35,12 @@ for(const entry of index.entries){
   }))};
  totalBefore+=paper.questions.filter(x=>x.textRecovered).length;
  completeBefore+=paper.questions.filter(x=>x.complete).length;
+ const before191=paper.questions.find(q=>q.number===191);
+ if(raw.id.includes('group-iv-2016'))console.log('Diagnostic Q191 baseline:',JSON.stringify({page:before191.sourcePdfPage,stem:before191.text,complete:before191.complete,textRecovered:before191.textRecovered,options:before191.options}).slice(0,900));
  const r=recovery.apply(paper,overlay);
  assert.equal(r.paper,paper);
  assert.equal(r.added,(expected[raw.id]||[]).length);
- assert.equal(paper.visualStudyRecoveries,r.added);
+ assert.equal(paper.visualStudyRecoveries||0,r.added);
  added+=r.added;
  for(const n of expected[raw.id]||[]){
   const q=paper.questions.find(x=>x.number===n);
