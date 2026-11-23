@@ -451,4 +451,41 @@ assert.match(js,/function appendStudyExplanation\(/,'Student quiz has post-answe
 assert.match(js,/appendStudyExplanation\(div,q\)/,'Practice explanation appears after Check Answer only');
 assert.match(js,/appendStudyExplanation\(body,q\)/,'Results review includes bilingual explanation');
 
+// Final twenty original-numbered Series C items: editorial worked solutions, not board solutions.
+for(let n=121;n<=140;n++){
+ const q=data.questions[n-1];
+ assert.equal(q.number,n,'End-of-booklet numbering Q'+n);
+ assert.ok(q.answerExplanation?.length>70,'Q'+n+' needs a substantive English worked solution');
+ assert.match(q.answerExplanationTamil,/\p{Script=Tamil}/u,'Q'+n+' has Tamil reasoning');
+ assert.equal(q.explanationStatus,'editorial_mathematical_or_logic_derivation_not_original_board_solution');
+ assert.equal(q.explanationAudit?.reviewedAt,'2026-11-23');
+ assert.equal(q.explanationAudit?.verifiedAsBoardIssuedExplanation,false,'No official solution falsely asserted');
+ assert.equal(q.explanationAudit?.printedSeriesCBookletVisuallyVerified,false,'No unexamined original booklet authenticated');
+ assert.deepEqual(Object.keys(q.options),['A','B','C','D'],'No source alternatives reordered');
+}
+assert.equal(data.questions[120].answerKeyToken,'C','Q121 digit remains C (8)');
+assert.equal(8+(10+8)+(20+8)+(10*8+3)+(10*8+1),210+8,'Q121 arithmetic checked independently');
+assert.ok(Math.abs(Math.pow(243,0.2)/
+ (Math.pow(7,.25)*Math.pow(49,.075)*Math.pow(343,.2))-3/7)<1e-12,'Q122 exponential fraction 3/7');
+assert.equal(17*3-6,45,'Q123 operator replacement valid');
+assert.equal((4*3+5*4)/(5*3-2*4),32/7,'Q124 ratio value');
+const q125end=data.questions[124];
+assert.equal(q125end.answerKeyToken,'ALL','Q125 retains official special key');
+assert.equal(q125end.scoringStatus,'ungraded_all_correct','Q125 must remain ungraded');
+assert.deepEqual(q125end.acceptedAnswers,[],'Do not award key position for Q125');
+assert.equal(q125end.explanationAudit?.specialAllKey,true);
+assert.match(q125end.answerExplanation,/29\.5666/,'Q125 displayed calculation not equal to printed alternatives');
+assert.equal((35.7-(3+1/3)-(2+2/(2+1/2))).toFixed(3),'29.567');
+assert.match(q125end.answerExplanation,/does not establish why the board/,'Printed key provenance and explanation distinguished');
+assert.equal(data.questions[128].answerKeyToken,'C','Q129 counted twenty digits');
+assert.equal(Array.from({length:100},(_,i)=>i+1).reduce((sum,x)=>sum+String(x).split('3').length-1,0),20);
+assert.equal(data.questions[130].answerKeyToken,'C','Q131 reverse alphabet code yields 57');
+assert.equal([3,1,20].reduce((sum,x)=>sum+27-x,0),57);
+assert.equal(data.questions[131].options.B,'2451','Q132 digit-wise subtraction matches B');
+assert.equal(19+19-1,37,'Q134 ranking logic');
+assert.equal(data.questions[134].options.B,'TICCHOPSY','Q135 word block output preserved');
+assert.match(data.questions[134].question,/TICRONÉU/,'Q135 unusual OCR token NOT silently corrected');
+assert.equal(data.questions[134].explanationAudit?.nonstandardOCRGlyphStillUnverified,true);
+assert.match(data.questions[136].sourceIssue,/printed blank/i,'Q137 restored blank remains source-caveated');
+
 console.log('PASS TNUSRB SI 2020 Series C: 140/140 readable (130 scored, 3 ALL and 7 source-reviewed ungraded); 0 missing and 0 blocked.');
