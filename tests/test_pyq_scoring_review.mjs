@@ -83,18 +83,18 @@ const totals=review.papers.reduce((a,p)=>({
  specialAllExcluded:a.specialAllExcluded+p.specialAllNumbers.length,
  sourceDisputes:a.sourceDisputes+p.sourceDisputes.length
 }),{papers:0,playable:0,provisionallyScorable:0,notScored:0,notMappedToQuestionText:0,specialAllExcluded:0,sourceDisputes:0});
-assert.deepEqual(totals,review.totals,'All 264 positions must reconcile with source manifests');
+assert.deepEqual(totals,review.totals,'All 264 unscored positions must reconcile with source manifests');
 assert.equal(totals.playable,1420);
-assert.equal(totals.provisionallyScorable,1157);
-assert.equal(totals.notScored,263);
+assert.equal(totals.provisionallyScorable,1156);
+assert.equal(totals.notScored,264);
 assert.equal(totals.notMappedToQuestionText,200);
 assert.equal(totals.specialAllExcluded,31);
-assert.equal(totals.sourceDisputes,32);
+assert.equal(totals.sourceDisputes,33);
 const html=read('pyq-scoring-review.html'),js=read('assets/js/pyq-scoring-review.js');
-for(const text of ['1,157 / 1,420','200','31','32','id="paperSelect"','id="selectedDetails"','pyq-scoring-review.js']){
+for(const text of ['1,156 / 1,420','200','31','32','id="paperSelect"','id="selectedDetails"','pyq-scoring-review.js']){
  assert.ok(html.includes(text),'Review page missing '+text);
 }
 assert.ok(!js.includes('innerHTML'),'Never insert source-review text as HTML');
 assert.ok(js.includes('cache:\'no-store\''),'Use fresh source-backed scoring register');
 assert.ok(read('pyq-typed-library.html').includes('pyq-scoring-review.html'),'Published library links scoring review');
-console.log('PASS scoring transparency: 1,420 playable; 1,157 provisional scores; 200 unmapped; 31 special ALL; 32 source disputes, all number lists source-backed.');
+console.log('PASS scoring transparency: 1,420 playable; 1,156 provisional scores; 200 unmapped; 31 special ALL; 33 source disputes, all number lists source-backed.');
