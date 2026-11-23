@@ -345,6 +345,16 @@ assert.equal(data.questions[46].sameNamedBookletOCRAudit.evidenceLevel,'not_read
 assert.equal(data.questions[83].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_four_option_values_corroborated_by_ocr','Q84 separate OCR supports option values, not figure');
 assert.equal(data.questions[94].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_four_option_values_corroborated_by_ocr');
 assert.equal(data.questions[102].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_numeric_choices_partially_corroborated_by_ocr');
+const visualFollowUp=data.sourceRecoveryAudit.primaryOriginalVisualRetrievalFollowUp;
+assert.equal(visualFollowUp.date,'2026-11-23','Source retrieval attempts are dated');
+assert.equal(visualFollowUp.originalSeriesCQuestionPageImagesInspected,false,'No false certification of original printed booklet');
+assert.equal(visualFollowUp.diagramOrMatrixOptionLayoutsVerified,false,'No key-only diagram promotion');
+assert.equal(visualFollowUp.allRemainUngraded,true,'All four visual gaps remain ungraded');
+assert.deepEqual(visualFollowUp.seriesCKeyLetters.map(x=>[x.question,x.token]),[[47,'C'],[84,'B'],[95,'C'],[103,'C']],'Final key visually checked without attributing original diagrams');
+assert.match(visualFollowUp.officialPDFResult,/timed out/,'Unretrieved original PDF disclosed');
+assert.match(visualFollowUp.secondaryPDFResult,/403/,'Unavailable secondary scan does not count as source');
+assert.match(auditHTML,/Checked 23 November 2026/,'Visual reviewer sees last source acquisition status');
+assert.match(auditHTML,/none of the four printed question figures or matrix layouts was obtained/,'Answer-key letters are not image proof');
 assert.match(auditHTML,/id="ocrEvidencePanel"/,'Reviewer can compare evidence scope');
 assert.match(auditHTML,/id="ocrEvidenceDetails"/);
 assert.match(auditHTML,/id="ocrEvidenceLink"/);
