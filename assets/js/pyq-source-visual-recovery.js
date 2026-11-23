@@ -28,8 +28,13 @@ function apply(paper,overlay){
      typeof recovery.note!=='string'||recovery.note.trim().length<20)continue;
   seen.add(recovery.number);
   const q=paper.questions.find(x=>x.number===recovery.number);
-  if(!q||q.textRecovered!==false||q.complete!==false||
-     (q.sourcePdfPage!==null&&q.sourcePdfPage!==recovery.sourcePdfPage))continue;
+  const sourceMissing=q&&q.textRecovered===false&&q.complete===false&&
+   (q.sourcePdfPage===null||q.sourcePdfPage===recovery.sourcePdfPage);
+  const sourceCorrupt=q&&recovery.replaceDamagedText===true&&q.textRecovered===true&&
+   q.complete===false&&q.sourcePdfPage===recovery.sourcePdfPage&&
+   typeof recovery.expectedBrokenStart==='string'&&recovery.expectedBrokenStart.length>=20&&
+   typeof q.text==='string'&&q.text.startsWith(recovery.expectedBrokenStart);
+  if(!sourceMissing&&!sourceCorrupt)continue;
   q.text=recovery.text;
   q.options=Object.fromEntries(LETTERS.map(l=>[l,recovery.options[l]]));
   q.textRecovered=true;
