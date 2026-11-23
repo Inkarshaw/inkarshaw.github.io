@@ -36,7 +36,11 @@ for(const entry of index.entries){
  totalBefore+=paper.questions.filter(x=>x.textRecovered).length;
  completeBefore+=paper.questions.filter(x=>x.complete).length;
  const before191=paper.questions.find(q=>q.number===191);
- if(raw.id.includes('group-iv-2016'))console.log('Diagnostic Q191 baseline:',JSON.stringify({page:before191.sourcePdfPage,stem:before191.text,complete:before191.complete,textRecovered:before191.textRecovered,options:before191.options}).slice(0,900));
+ if(raw.id.includes('group-iv-2016')){
+  assert.equal(before191.textRecovered,true);
+  assert.equal(before191.complete,false);
+  assert.match(before191.text,/If x = ; then the/);
+ }
  const r=recovery.apply(paper,overlay);
  assert.equal(r.paper,paper);
  assert.equal(r.added,(expected[raw.id]||[]).length);
@@ -64,8 +68,8 @@ for(const entry of index.entries){
 }
 assert.equal(totalBefore,272,'Unedited PDF text extraction baseline shifted');
 assert.equal(completeBefore,86,'Unedited source A–D machine split baseline shifted');
-assert.equal(added,8,'Only the eight officially inspected missed positions are restored');
-assert.equal(totalAfter,280);
+assert.equal(added,8,'Seven missing stems and one source-corrupt equation repaired');
+assert.equal(totalAfter,279);
 assert.equal(completeAfter,94);
 const g4=json('data/quizzes/pyq-reader-drafts/tnpsc-group-iv-2016-06-11-2016-g4-gs-3a616959.json');
 const q130=overlay.papers[0].questions.find(q=>q.number===130);
@@ -93,4 +97,4 @@ assert.match(reader,/visual-study-recovery-2026-11-23\.json/);
 assert.match(reader,/EDITORIAL ENGLISH STUDY ADAPTATION/);
 assert.match(read('pyq-typed-library.html'),/280 readable study question stems/);
 assert.ok(!reader.includes('innerHTML'),'Unverified content must be inserted as text only');
-console.log('PASS: 8 official-PDF-image-inspected, ungraded study retypes; 280/300 readable stems and 94 provisional A-D option sets. No key or verbatim certification.');
+console.log('PASS: 7 new stems + 1 damaged mathematical question repaired from official page image; 279/300 readable stems, 94 provisional A-D option sets, zero grades.');
