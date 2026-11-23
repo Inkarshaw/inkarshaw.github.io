@@ -215,6 +215,9 @@ function closePdf(announce=true){
  $('pdfExternal').hidden=true;$('pdfExternal').removeAttribute('href');
  if(pdfURL){URL.revokeObjectURL(pdfURL);pdfURL=null}
  activePDFSHA256='';
+ // File-specific manual attestations must not carry over to the next PDF.
+ // Saved matching-fingerprint reviews are restored only after that file has been rehashed.
+ CHECKS.forEach(k=>{$(k).checked=false});
  $('pdfFile').value='';
  if(announce)$('pdfStatus').textContent='Local PDF reference released. Saved notes remain; local source review is suspended until the original PDF is reopened.';
  if(questions.length)status();
@@ -250,9 +253,15 @@ async function loadPdf(file){
  }
  if(questions.length){
   const saved=records[questions[current].number];
-  if(saved?.pdfSHA256&&saved.pdfSHA256!==activePDFSHA256){
-   CHECKS.forEach(k=>{$(k).checked=false});dirty=true;
+  if(saved?.pdfSHA256&&saved.pdfSHA256===activePDFSHA256&&matches(saved,questions[current])){
+   // Only a persisted, unchanged question AND an exact byte-for-byte PDF match
+   // may restore an earlier checklist. Unsaved checks are never transferred.
+   CHECKS.forEach(k=>{$(k).checked=saved[k]});
+  }else if(saved?.pdfSHA256&&saved.pdfSHA256!==activePDFSHA256){
+   dirty=true;
    $('transferStatus').textContent='PDF fingerprint changed. Repeat the five source checks; notes are retained.';
+  }else{
+   $('transferStatus').textContent='New PDF selected. All five source checks start unchecked; notes remain.';
   }
   status();
  }
