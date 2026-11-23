@@ -16,7 +16,7 @@ assert.deepEqual(matrix.unresolvedSeriesCOriginalPositions,[]);
 assert.deepEqual(matrix.unresolvedSeriesCOriginalPositions,c.missingNumbers);
 assert.equal(matrix.source,c.answerKey.sourcePDF,'All-series key and C source share exact printed final-key PDF');
 assert.equal(c.questions.length,140,'All original Series C positions are readable');
-assert.equal(c.scoredQuestionCount,130,'Recovered scan questions use their audited Series C key positions');
+assert.equal(c.scoredQuestionCount,129,'Missing Q96 source diagrams must be excluded from otherwise audited provisional positions');
 assert.equal(c.playableQuestionCount,140,'Cross-series checks corroborate, but do not create, original Series C questions');
 assert.equal(c.originalBookletAccess.originalBookletVerifiedByClearExams,false);
 for(let i=0;i<140;i++){
