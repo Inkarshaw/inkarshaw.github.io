@@ -746,6 +746,23 @@ try {
   await page.locator('#options button').nth(2).click();
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Series C final-key entry: C/,'Q121 arithmetic keyed by independent C final key');
+  assert.match(await page.locator('#feedback').innerText(),/22x=176/,'Q121 worked algebra is visible only after check');
+  await page.locator('#palette button').filter({hasText:/^125$/}).click();
+  assert.equal(await page.locator('#feedback').isVisible(),false,'Q125 ALL-key explanation is not exposed before checking');
+  await page.locator('#options button').first().click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/Final key: ALL/,'Q125 published ALL entry excluded from marks');
+  assert.match(await page.locator('#feedback').innerText(),/29\\.5666|29\\.5666/,'Q125 calculation is displayed post-check');
+  assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q125 no answer grade or highlight');
+  await page.locator('#palette button').filter({hasText:/^135$/}).click();
+  assert.match(await page.locator('#questionTitle').innerText(),/TICRONÉU/,'Q135 original anomalous glyph remains unchanged');
+  assert.equal(await page.locator('#feedback').isVisible(),false,'Q135 encoding solution hidden before checking');
+  await page.locator('#options button').nth(1).click();
+  await page.locator('#check').click();
+  assert.match(await page.locator('#feedback').innerText(),/TICCHOPSY/,'Q135 block decoding explanation shown post-check');
+  await page.locator('#language').selectOption('ta');
+  assert.match(await page.locator('#feedback').innerText(),/எழுத்துகளை/,'Tamil Q135 explanation shown in Tamil language mode');
+  await page.locator('#language').selectOption('both');
 
   assert.equal(nums.includes('22'),true,'Readable disputed source Q22 appears as ungraded');
   for(const recovered of [28,29,30,31,32,33,34,35,41,42,44,45,48])assert.ok(nums.includes(String(recovered)),'Recovered 2020 Series C original Q'+recovered);
