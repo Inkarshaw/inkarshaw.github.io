@@ -66,8 +66,9 @@ function setPaper(id){
  $('paperStats').textContent=active.pageOnly?
   active.pages.length+' extracted source pages (question numbers could not be parsed) · no answer scoring':
   active.questions.length+' original-numbered question positions · '+counts.recovered+
-   ' stems machine-recovered · '+counts.complete+' apparently complete A–D option sets · '+
+   ' stems available for study · '+counts.complete+' provisional A–D text sets · '+
    (active.questions.length-counts.complete)+' need source corrections · all ungraded'+
+   (active.visualStudyRecoveries?' · '+active.visualStudyRecoveries+' official-PDF-page editorial study retypes (not verbatim)':'')+
    (active.ocrRecovery?' · '+active.ocrRecovery.added+' OCR page additions, '+active.ocrRecovery.alternative+' alternate OCR pages (unverified)':'');
  loadLocal();current=0;$('search').value='';$('filter').value='all';filterQuestions();
  say('Opened '+active.name+'. Text is unverified. Responses are saved only in this browser.');
@@ -125,6 +126,8 @@ function render(){
   'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
   !q.textRecovered?
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
+  q.sourceStatus==='visual-source-editorial-study-not-verbatim'?
+  'Official PDF page visually inspected; this is an EDITORIAL ENGLISH STUDY ADAPTATION, not certified verbatim original wording. Answer-key verification and scoring remain disabled. '+details:
   q.complete&&missing.length===0?
   'Machine-separated question and A–D alternatives. Text is unverified and ungraded. '+details:
   'Partial question from scanned PDF. Missing labelled options: '+(missing.length?missing.join(', '):'uncertain split')+'. Source inspection is needed; no answers are inferred. '+details;
@@ -199,7 +202,7 @@ function buildPublishedCards(entries){
   const complete=source?.questions?.filter(q=>q.complete).length||0;
   row.append(textNode('span','muted',
     recovered+' / '+(source?.questions?.length||100)+' question stems recovered · '+
-    complete+' provisional A–D text sets · '+entry.textPages+' PDF text pages · ungraded'));
+    complete+' provisional A–D text sets · '+(source?.visualStudyRecoveries||0)+' visually reviewed editorial retypes · '+entry.textPages+' PDF text pages · ungraded'));
   const a=textNode('a','published-link','Read typewritten page text');
   a.href='pyq-bulk-reader.html?paper='+encodeURIComponent(entry.id);
   a.addEventListener('click',event=>{
@@ -217,6 +220,11 @@ async function loadSiteDrafts(){
   const index=await response.json();
   if(index?.schemaVersion!==1||index.draftOnly!==true||index.gradingEnabled!==false||!Array.isArray(index.entries))
    throw Error('Published source index has incorrect provenance');
+  let visualStudy=null;
+  try{
+   const visual=await fetch('data/quizzes/pyq-reader-drafts/visual-study-recovery-2026-11-23.json',{cache:'no-store'});
+   if(visual.ok)visualStudy=await visual.json();
+  }catch{ /* Optional visual retypes must not suppress the original reader */ }
   const valid=index.entries.filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
     typeof e.file==='string'&&e.file===e.id+'.json'&&Number.isInteger(e.textPages)&&e.textPages>0).slice(0,30);
   const files=await Promise.allSettled(valid.map(async entry=>{
@@ -230,7 +238,9 @@ async function loadSiteDrafts(){
     const extra=await fetch('data/quizzes/pyq-reader-drafts/ocr-recovery/'+entry.file,{cache:'no-store'});
     if(extra.ok){const overlay=await extra.json();recovered=window.ClearExamsPYQOcrOverlay?.merge(raw,overlay)||raw}
    }catch{ /* Missing or unreadable OCR is never grounds to suppress the original paper */ }
-   return {entry,paper:normalize(recovered)};
+   const paper=normalize(recovered);
+   if(visualStudy)window.ClearExamsPYQVisualRecovery?.apply(paper,visualStudy);
+   return {entry,paper};
   }));
   const loaded=[];
   for(const file of files){
