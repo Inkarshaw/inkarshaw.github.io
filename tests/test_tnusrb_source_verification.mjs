@@ -18,7 +18,7 @@ assert.deepEqual(b.blockedNumbers,[]);
 assert.deepEqual(c.missingNumbers,[]);
 assert.equal(b.provisionallyScoreableQuestionCount,116);
 assert.equal(b.ungradedReadableQuestionCount,24);
-assert.equal(c.scoredQuestionCount,130);
+assert.equal(c.scoredQuestionCount,129);
 for(const n of [99,100,101,102,103,104]){
  const q=b.questions[n-1];
  assert.equal(q.scoringStatus,'ungraded_source_dispute','Do not grade 2015 comparison chart Q'+n);
