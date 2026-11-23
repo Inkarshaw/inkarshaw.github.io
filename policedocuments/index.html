@@ -123,6 +123,25 @@
             transform: translateY(-5px);
         }
 
+        /* SOP references: usable catalogue even before the original PDFs are hosted. */
+        #sopsCard { grid-column: span 2; }
+        #sopsCard .document-item { gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+        #sopsCard .doc-info { min-width: 200px; flex: 1 1 250px; }
+        #sopsCard .doc-actions { flex-wrap: wrap; }
+        #sopsCard .sop-pdf-pending {
+            display: inline-block;
+            padding: 8px 11px;
+            border: 1px solid #887048;
+            border-radius: 6px;
+            background: rgba(95, 75, 42, 0.4);
+            color: #f4dcac;
+            font-size: .82rem;
+            font-weight: 600;
+        }
+        #sopsCard .sop-unpublished { background: #b89757; }
+        #sopsCard .sop-page-count { white-space: nowrap; }
+        @media (max-width: 600px) { #sopsCard { grid-column: span 1; } }
+
         .card h2 {
             color: #a0c4e0;
             margin-bottom: 20px;
@@ -2141,21 +2160,21 @@
                 <ul class="document-list" id="sopsList">
                     <li class="document-item" data-title="NDPS Act — Disposal of Seized Conveyances" data-desc="Government SOP dated 04.07.2025; forwarded through TN Police circulars. Includes inventory, custody, disposal and prescribed forms.">
                         <div class="doc-info">
-                            <div class="doc-title"><span class="status-indicator status-active"></span>NDPS Act — Disposal of Seized Conveyances</div>
+                            <div class="doc-title"><span class="status-indicator sop-unpublished"></span>NDPS Act — Disposal of Seized Conveyances</div>
                             <div class="doc-desc">Government SOP dated 04.07.2025; forwarded through TN Police circulars. Includes inventory, custody, disposal and prescribed forms. <span class="sop-page-count">(22 pages)</span></div>
                         </div>
                         <div class="doc-actions"><span class="sop-pdf-pending" data-sop-file="/policedocuments/sops/SOP_NDPS_Disposal_of_Seized_Conveyances_2025.pdf" role="status">PDF upload pending</span></div>
                     </li>
                     <li class="document-item" data-title="Withdrawal of Prosecution — Foreign Nationals" data-desc="Tamil Nadu G.O. (2D) No. 390 dated 26.10.2026; screening committees and model procedure for withdrawal under Section 360 BNSS.">
                         <div class="doc-info">
-                            <div class="doc-title"><span class="status-indicator status-active"></span>Withdrawal of Prosecution — Foreign Nationals</div>
+                            <div class="doc-title"><span class="status-indicator sop-unpublished"></span>Withdrawal of Prosecution — Foreign Nationals</div>
                             <div class="doc-desc">Tamil Nadu G.O. (2D) No. 390 dated 26.10.2026; screening committees and model procedure for withdrawal under Section 360 BNSS. <span class="sop-page-count">(15 pages)</span></div>
                         </div>
                         <div class="doc-actions"><span class="sop-pdf-pending" data-sop-file="/policedocuments/sops/SOP_Withdrawal_of_Prosecution_Foreign_Nationals_GO_390_2026.pdf" role="status">PDF upload pending</span></div>
                     </li>
                     <li class="document-item" data-title="Identification of Unidentified Dead Bodies" data-desc="MHA SOP circulated in 2026; identification steps including forensic methods and the Aadhaar framework subject to legal safeguards.">
                         <div class="doc-info">
-                            <div class="doc-title"><span class="status-indicator status-active"></span>Identification of Unidentified Dead Bodies</div>
+                            <div class="doc-title"><span class="status-indicator sop-unpublished"></span>Identification of Unidentified Dead Bodies</div>
                             <div class="doc-desc">MHA SOP circulated in 2026; identification steps including forensic methods and the Aadhaar framework subject to legal safeguards. <span class="sop-page-count">(8 pages)</span></div>
                         </div>
                         <div class="doc-actions"><span class="sop-pdf-pending" data-sop-file="/policedocuments/sops/SOP_Identification_of_Unidentified_Dead_Bodies_Aadhaar_2026.pdf" role="status">PDF upload pending</span></div>
@@ -2805,6 +2824,11 @@
                         }
                     });
                     placeholder.replaceWith(link);
+                    const statusDot = link.closest('.document-item')?.querySelector('.sop-unpublished');
+                    if (statusDot) {
+                        statusDot.classList.remove('sop-unpublished');
+                        statusDot.classList.add('status-active');
+                    }
                 } catch (_error) {
                     // Missing or inaccessible PDF: keep an accurate non-clickable status.
                 }
