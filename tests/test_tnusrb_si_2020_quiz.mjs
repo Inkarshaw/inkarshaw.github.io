@@ -421,7 +421,7 @@ assert.match(supplied95.questionTamil,/மதிப்பெண் வழங்�
 const supplied96=data.questions[95];
 assert.equal(supplied96.newOCRComparison.originalFourDiagramImagesSupplied,false);
 assert.deepEqual(supplied96.newOCRComparison.rawSuppliedOptionLabels,{A:'Diagram A',B:'Diagram B',C:'Diagram C',D:'Diagram D'});
-assert.match(supplied96.instruction,/original Series C diagram-to-option mapping remains unverified/,'Q96 score never inferred from absent original diagrams');
+assert.match(supplied96.instruction,/original diagram-to-option mapping remains unverified/,'Q96 score never inferred from absent original diagrams');
 assert.match(supplied96.options.C,/Diagram C.*original figure missing/,'Q96 actual printed original figure C is unavailable');
 assert.equal(data.questions[96].newOCRComparison.layoutUnverified,true,'Q97 numeric placement must not be guessed from flattened OCR');
 assert.match(data.questions[96].newOCRComparison.rawSuppliedNumberLine,/466, 398, 341, 282, 250, \?/);
