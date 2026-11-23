@@ -71,7 +71,7 @@ try {
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'Scoring register has no 390px mobile horizontal overflow');
   assert.deepEqual(pageErrors,[], 'PYQ scoring register JavaScript runs without runtime errors');
-  console.log('PASS PYQ scoring review: 8 papers, 263 classified exceptions, mobile overflow and exact 2022/2015 numbers');
+  console.log('PASS PYQ scoring review: 8 papers, 264 classified exceptions, mobile overflow and exact 2022/2015 numbers');
 
   // Confirm the newly restored 2022 original-numbered Tamil-digit question in real mobile Chromium.
   pageErrors.length=0;
