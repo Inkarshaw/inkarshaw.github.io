@@ -310,6 +310,9 @@ assert.match(auditJS,/crypto.subtle.digest\('SHA-256',bytes\)/,'Client-side SHA-
 assert.match(auditJS,/normalized.signature='';CHECKS.forEach/,'Legacy unbound checkbox assertions must be invalidated');
 assert.match(auditJS,/if\(!r.pdfSHA256\)\{CHECKS.forEach/,'Importing old evidence must never retain unbound checks');
 assert.match(auditJS,/activePDFSHA256='';/,'Closing or changing PDF removes active fingerprint');
+assert.match(auditJS,/CHECKS\.forEach\(k=>\{\$\(k\)\.checked=false\}\)/,'All unsaved visual attestations must be invalidated whenever local PDF closes or switches');
+assert.match(auditJS,/saved\?\.pdfSHA256&&saved\.pdfSHA256===activePDFSHA256&&matches\(saved,questions\[current\]\)/,'Only persisted exact PDF and source signatures restore a checked local review');
+assert.match(auditHTML,/Closing or changing the PDF clears all onscreen checkboxes/,'Explain PDF-switch checklist reset in reviewer instructions');
 assert.match(auditJS,/file hash cannot prove TNUSRB authenticity/,'Hash identity is not official paper certification');
 
 assert.match(auditJS,/row\.sourceSignature!==signature\(q\)/,'Source-changed import loses old checkboxes');
@@ -342,6 +345,16 @@ assert.equal(data.questions[46].sameNamedBookletOCRAudit.evidenceLevel,'not_read
 assert.equal(data.questions[83].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_four_option_values_corroborated_by_ocr','Q84 separate OCR supports option values, not figure');
 assert.equal(data.questions[94].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_four_option_values_corroborated_by_ocr');
 assert.equal(data.questions[102].sameNamedBookletOCRAudit.evidenceLevel,'english_stem_and_numeric_choices_partially_corroborated_by_ocr');
+const visualFollowUp=data.sourceRecoveryAudit.primaryOriginalVisualRetrievalFollowUp;
+assert.equal(visualFollowUp.date,'2026-11-23','Source retrieval attempts are dated');
+assert.equal(visualFollowUp.originalSeriesCQuestionPageImagesInspected,false,'No false certification of original printed booklet');
+assert.equal(visualFollowUp.diagramOrMatrixOptionLayoutsVerified,false,'No key-only diagram promotion');
+assert.equal(visualFollowUp.allRemainUngraded,true,'All four visual gaps remain ungraded');
+assert.deepEqual(visualFollowUp.seriesCKeyLetters.map(x=>[x.question,x.token]),[[47,'C'],[84,'B'],[95,'C'],[103,'C']],'Final key visually checked without attributing original diagrams');
+assert.match(visualFollowUp.officialPDFResult,/timed out/,'Unretrieved original PDF disclosed');
+assert.match(visualFollowUp.secondaryPDFResult,/403/,'Unavailable secondary scan does not count as source');
+assert.match(auditHTML,/Checked 23 November 2026/,'Visual reviewer sees last source acquisition status');
+assert.match(auditHTML,/none of the four printed question figures or matrix layouts was obtained/,'Answer-key letters are not image proof');
 assert.match(auditHTML,/id="ocrEvidencePanel"/,'Reviewer can compare evidence scope');
 assert.match(auditHTML,/id="ocrEvidenceDetails"/);
 assert.match(auditHTML,/id="ocrEvidenceLink"/);
