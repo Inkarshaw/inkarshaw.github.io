@@ -2066,6 +2066,11 @@
                     <span class="category-name">Forms &amp; Service</span>
                     <span class="category-hint">Downloadable departmental forms</span>
                 </button>
+                <button type="button" class="category-tile" data-target="sopsList">
+                    <span class="category-icon">📘</span>
+                    <span class="category-name">SOPs</span>
+                    <span class="category-hint">Standard Operating Procedures</span>
+                </button>
                 <button type="button" class="category-tile" data-target="miscList">
                     <span class="category-icon">📚</span>
                     <span class="category-name">Reference &amp; Misc</span>
@@ -2129,6 +2134,35 @@
         </section>
 
         <div class="content">
+            <!-- Standard Operating Procedures: PDF actions activate only after files are hosted. -->
+            <div class="card" id="sopsCard">
+                <h2><i>📘</i> SOPs</h2>
+                <div class="search-info" id="sopsInfo"></div>
+                <ul class="document-list" id="sopsList">
+                    <li class="document-item" data-title="NDPS Act — Disposal of Seized Conveyances" data-desc="Government SOP dated 04.07.2025; forwarded through TN Police circulars. Includes inventory, custody, disposal and prescribed forms.">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>NDPS Act — Disposal of Seized Conveyances</div>
+                            <div class="doc-desc">Government SOP dated 04.07.2025; forwarded through TN Police circulars. Includes inventory, custody, disposal and prescribed forms. <span class="sop-page-count">(22 pages)</span></div>
+                        </div>
+                        <div class="doc-actions"><span class="sop-pdf-pending" data-sop-file="/policedocuments/sops/SOP_NDPS_Disposal_of_Seized_Conveyances_2025.pdf" role="status">PDF upload pending</span></div>
+                    </li>
+                    <li class="document-item" data-title="Withdrawal of Prosecution — Foreign Nationals" data-desc="Tamil Nadu G.O. (2D) No. 390 dated 26.10.2026; screening committees and model procedure for withdrawal under Section 360 BNSS.">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Withdrawal of Prosecution — Foreign Nationals</div>
+                            <div class="doc-desc">Tamil Nadu G.O. (2D) No. 390 dated 26.10.2026; screening committees and model procedure for withdrawal under Section 360 BNSS. <span class="sop-page-count">(15 pages)</span></div>
+                        </div>
+                        <div class="doc-actions"><span class="sop-pdf-pending" data-sop-file="/policedocuments/sops/SOP_Withdrawal_of_Prosecution_Foreign_Nationals_GO_390_2026.pdf" role="status">PDF upload pending</span></div>
+                    </li>
+                    <li class="document-item" data-title="Identification of Unidentified Dead Bodies" data-desc="MHA SOP circulated in 2026; identification steps including forensic methods and the Aadhaar framework subject to legal safeguards.">
+                        <div class="doc-info">
+                            <div class="doc-title"><span class="status-indicator status-active"></span>Identification of Unidentified Dead Bodies</div>
+                            <div class="doc-desc">MHA SOP circulated in 2026; identification steps including forensic methods and the Aadhaar framework subject to legal safeguards. <span class="sop-page-count">(8 pages)</span></div>
+                        </div>
+                        <div class="doc-actions"><span class="sop-pdf-pending" data-sop-file="/policedocuments/sops/SOP_Identification_of_Unidentified_Dead_Bodies_Aadhaar_2026.pdf" role="status">PDF upload pending</span></div>
+                    </li>
+                </ul>
+            </div>
+
             <!-- Download Forms Card -->
             <div class="card">
                 <h2><i>📋</i> Download Forms</h2>
@@ -2742,6 +2776,41 @@
 
     <script>
 
+        // Activate direct PDF links only after their corresponding static files exist.
+        async function activateHostedSopLinks() {
+            const placeholders = Array.from(document.querySelectorAll('.sop-pdf-pending[data-sop-file]'));
+            await Promise.all(placeholders.map(async placeholder => {
+                const url = placeholder.dataset.sopFile;
+                if (!url || !url.startsWith('/policedocuments/sops/')) return;
+                try {
+                    const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+                    if (!response.ok) return;
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.rel = 'noopener';
+                    link.className = 'btn btn-pdf';
+                    link.textContent = '📄 View / Download';
+                    link.setAttribute('aria-label', 'View or download SOP PDF');
+                    link.addEventListener('click', () => {
+                        const item = link.closest('.document-item');
+                        const title = item?.getAttribute('data-title') || 'SOP';
+                        recordRecent(title, url);
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'document_access', {
+                                event_category: 'document',
+                                event_label: title,
+                                document_type: 'pdf'
+                            });
+                        }
+                    });
+                    placeholder.replaceWith(link);
+                } catch (_error) {
+                    // Missing or inaccessible PDF: keep an accurate non-clickable status.
+                }
+            }));
+        }
+
         let activeDashboardCategory = 'all';
 
         function applyDashboardCategory(target, shouldScroll = true) {
@@ -2893,6 +2962,7 @@
 
             document.body.classList.toggle('search-results-mode', isTextSearching);
             const sections = [
+                { listId: 'sopsList', infoId: 'sopsInfo' },
                 { listId: 'downloadFormsList', infoId: 'downloadFormsInfo' },
                 { listId: 'generatePDFsList', infoId: 'generatePDFsInfo' },
                 { listId: 'bnss194List', infoId: 'bnss194Info' },
@@ -3333,6 +3403,7 @@
             setupDashboardNavigation();
             setupDocumentFilters();
             setupQuickTools();
+            activateHostedSopLinks();
             setupWorkflowBundles();
             applyDashboardCategory('all', false);
 
