@@ -54,7 +54,7 @@ const a=element('a',css||'official-link',label);
 a.href=url;a.target='_blank';a.rel='noopener noreferrer';card.append(a);
 }
 function refreshYears(){
-const selector=$('yearFilter'),old=selector.value,years=[...new Set([...entries.map(x=>x.year),...adapted.map(x=>x.year),...machineDrafts.map(x=>x.year),...archive.map(x=>x.year])].sort((a,b)=>b-a);
+const selector=$('yearFilter'),old=selector.value,years=[...new Set([...entries.map(x=>x.year),...adapted.map(x=>x.year),...machineDrafts.map(x=>x.year),...archive.map(x=>x.year)])].sort((a,b)=>b-a);
 selector.replaceChildren();const empty=element('option','','All years');empty.value='all';selector.append(empty);
 for(const y of years){const option=element('option','',String(y));option.value=String(y);selector.append(option)}
 selector.value=years.includes(Number(old))?old:'all';
