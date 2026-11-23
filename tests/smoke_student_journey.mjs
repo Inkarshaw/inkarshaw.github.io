@@ -858,7 +858,7 @@ try {
   assert.match(await page.locator('#sourceDisputeList').innerText(),/Q22.*International versus regional terminology/s);
   assert.match(await page.locator('#sourceDisputeList').innerText(),/Q96.*Original four Venn options missing/s,'Q96 appears in the neutral source review queue');
   assert.equal(await page.locator('#sourceDisputeList a[href^="https://"]').count(),2,'First-party SAARC and secondary answer guide are separately linked');
-  assert.equal(await page.locator('#sourceDisputeList a[href^="tnusrb-si-2020-source-review.html?q="]').count(),4,'Four original-figure/matrix verification routes available');
+  assert.equal(await page.locator('#sourceDisputeList a[href^="tnusrb-si-2020-source-review.html?q="]').count(),5,'Five original-figure/matrix verification routes available');
   await page.locator('#sourceDisputeList button').filter({hasText:/Study Q22/}).click();
   assert.match(await page.locator('#position').innerText(),/Original Q22/,'Source queue launches disputed Q22 without altering order');
   assert.equal(await page.locator('#quiz').isVisible(),true);
@@ -976,7 +976,7 @@ try {
   await page.locator('#questionSelect').selectOption('96');
   assert.match(await page.locator('#loadStatus').innerText(),/ungraded/);
   assert.equal(await page.locator('#comparison').isVisible(),false,'Q96 original option drawings absent and no fake comparison SVG is shown');
-  assert.match(await page.locator('#sourceIssue').innerText(),/original Series C Q96/i,'Q96 missing original figure explanation displayed in reviewer workbench');
+  assert.match(await page.locator('#sourceIssue').innerText(),/Q96 is a four-diagram Venn selection/i,'Q96 missing original figure explanation displayed in reviewer workbench');
   await page.locator('#questionSelect').selectOption('47');
   assert.match(await page.locator('#ocrEvidenceLevel').textContent(),/No original matrix or option layout/,'Q47 remains completely unavailable in OCR preview');
   assert.equal(await page.locator('#comparison').isVisible(),false,'Unverified Series D-only matrix Q47 has no counterfeit original image');
@@ -984,7 +984,7 @@ try {
   assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=3,
     'Series C visual-review page fits mobile width');
   assert.deepEqual(pageErrors,[],'SI 2020 visual source review has no runtime errors');
-  console.log('PASS TNUSRB SI 2020 Series C source-review: SHA-256 PDF binding, reopen safety, four gaps, stale-check invalidation and zero grades');
+  console.log('PASS TNUSRB SI 2020 Series C source-review: SHA-256 PDF binding, reopen safety, five gaps, stale-check invalidation and zero grades');
 
   // TNUSRB SI 2010 Type A: 140 readable practice entries, of which 135 have provisional score mappings.
   pageErrors.length = 0;
