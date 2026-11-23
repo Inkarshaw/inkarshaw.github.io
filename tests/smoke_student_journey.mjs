@@ -873,6 +873,18 @@ try {
   await page.locator('#printedNumber').fill('84');
   await page.locator('#sourceKind').selectOption('secondary_scan');
   await page.locator('#sourceNote').fill('Secondary print page 18: original board-host provenance remains unavailable.');
+  // An unsaved visual-source assertion can never survive switching to a different PDF.
+  await page.locator('#seriesChecked').check();
+  await page.locator('#stemChecked').check();
+  await page.locator('#pdfFile').setInputFiles({name:'unrelated-source.pdf',mimeType:'application/pdf',
+    buffer:Buffer.from(samplePdf+'\n% intentionally different PDF bytes\n')});
+  await page.waitForFunction(()=>document.querySelector('#pdfStatus').textContent.includes('PDF opened locally'));
+  assert.equal(await page.locator('#seriesChecked').isChecked(),false,'Unsaved cover check reset when PDF changes');
+  assert.equal(await page.locator('#stemChecked').isChecked(),false,'Unsaved stem check reset when PDF changes');
+  assert.equal(await page.locator('#checkedCount').innerText(),'0','Different PDF cannot inherit any locally checked assertion');
+  await page.locator('#pdfFile').setInputFiles({name:'local-series-c.pdf',mimeType:'application/pdf',
+    buffer:Buffer.from(samplePdf)});
+  await page.waitForFunction(()=>document.querySelector('#pdfStatus').textContent.includes('PDF opened locally'));
   for(const id of ['seriesChecked','stemChecked','optionsChecked','figureChecked','keyChecked'])
     await page.locator('#'+id).check();
   assert.match(await page.locator('#reviewStatus').innerText(),/Source comparison draft/,
@@ -884,6 +896,17 @@ try {
   assert.match(await page.locator('#reviewStatus').innerText(),/Locally checked draft/);
   await page.locator('#save').click();
   assert.equal(await page.locator('#checkedCount').innerText(),'1','Explicit manual assertion is locally checked, not grading');
+  await page.locator('#pdfFile').setInputFiles({name:'different-series.pdf',mimeType:'application/pdf',
+    buffer:Buffer.from(samplePdf+'\n% different-file-fingerprint\n')});
+  await page.waitForFunction(()=>document.querySelector('#pdfStatus').textContent.includes('PDF opened locally'));
+  assert.equal(await page.locator('#checkedCount').innerText(),'0','A saved attestation must suspend on a different PDF');
+  assert.equal(await page.locator('#seriesChecked').isChecked(),false,'Saved cover checkbox cannot carry to different PDF');
+  assert.equal(await page.locator('#figureChecked').isChecked(),false,'Saved figure checkbox cannot carry to different PDF');
+  await page.locator('#pdfFile').setInputFiles({name:'original-byte-identical.pdf',mimeType:'application/pdf',
+    buffer:Buffer.from(samplePdf)});
+  await page.waitForFunction(()=>document.querySelector('#pdfStatus').textContent.includes('PDF opened locally'));
+  assert.equal(await page.locator('#checkedCount').innerText(),'1','Byte-identical saved source restores a local draft');
+  assert.equal(await page.locator('#figureChecked').isChecked(),true,'Only exact source fingerprint restores saved figure assertion');
   await page.locator('#pdfJump').click();
   assert.match(await page.locator('#pdfFrame').getAttribute('src'),/^blob:.*#page=18$/);
   await page.locator('#pdfClose').click();
