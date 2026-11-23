@@ -74,6 +74,24 @@ assert.match(js,/pyq-yearwise-catalog\.json/,'Unified library fetches the all-ye
 assert.match(js,/hasTextFor/,'Source-only archive records must be separated from existing text');
 assert.match(js,/makeArchiveCard/,'Missing question text must be labelled rather than invented');
 assert.match(js,/source-only/,'Source-only records can be filtered');
+assert.match(js,/pyq-reader-drafts\/index\.json/,'Published partial machine-text papers must be discoverable in the library');
+assert.match(js,/coveredByDraft/,'Indexed years with partial source text should not be called text-absent');
+assert.match(js,/coverage==='partial'/,'Partial source readers must respect the existing coverage filter');
+assert.match(js,/pyq-bulk-reader\.html\?paper=/,'Every machine draft must deep-link to its numbered reader');
+const draftIndex=json('data/quizzes/pyq-reader-drafts/index.json');
+assert.equal(draftIndex.draftOnly,true);
+assert.equal(draftIndex.gradingEnabled,false);
+assert.equal(draftIndex.entries.length,3);
+for(const e of draftIndex.entries){
+ assert.equal(e.ungraded,true);
+ assert.equal(e.file,e.id+'.json');
+ assert.ok(existsSync(new URL('../data/quizzes/pyq-reader-drafts/'+e.file,import.meta.url)),'Missing PDF-text source: '+e.file);
+ const d=json('data/quizzes/pyq-reader-drafts/'+e.file);
+ assert.equal(d.officialFinalKeyMapped,false);
+ assert.equal(d.grading,'disabled');
+ assert.equal(d.questionCandidates.length,0,'OCR page drafts must not falsely assert verified MCQs');
+}
+
 for(const field of ['yearFilter','showMore','dataNotice'])assert.ok(html.includes('id="'+field+'"'),'Missing archive UI control '+field);
 for(const board of ['SSC','Railways'])assert.ok(html.includes('value="'+board+'"'),'Missing exam board '+board);
 const archiveKeys=new Set(allYears.entries.map(x=>x.category+'|'+x.exam+'|'+x.year));
