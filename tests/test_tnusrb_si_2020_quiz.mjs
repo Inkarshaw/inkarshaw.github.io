@@ -310,6 +310,9 @@ assert.match(auditJS,/crypto.subtle.digest\('SHA-256',bytes\)/,'Client-side SHA-
 assert.match(auditJS,/normalized.signature='';CHECKS.forEach/,'Legacy unbound checkbox assertions must be invalidated');
 assert.match(auditJS,/if\(!r.pdfSHA256\)\{CHECKS.forEach/,'Importing old evidence must never retain unbound checks');
 assert.match(auditJS,/activePDFSHA256='';/,'Closing or changing PDF removes active fingerprint');
+assert.match(auditJS,/CHECKS\.forEach\(k=>\{\$\(k\)\.checked=false\}\)/,'All unsaved visual attestations must be invalidated whenever local PDF closes or switches');
+assert.match(auditJS,/saved\?\.pdfSHA256&&saved\.pdfSHA256===activePDFSHA256&&matches\(saved,questions\[current\]\)/,'Only persisted exact PDF and source signatures restore a checked local review');
+assert.match(auditHTML,/Closing or changing the PDF clears all onscreen checkboxes/,'Explain PDF-switch checklist reset in reviewer instructions');
 assert.match(auditJS,/file hash cannot prove TNUSRB authenticity/,'Hash identity is not official paper certification');
 
 assert.match(auditJS,/row\.sourceSignature!==signature\(q\)/,'Source-changed import loses old checkboxes');
