@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id);
 const expectedLink=/^(?:(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20\d{2})?|pyq-cds\.html\?paper=cds-(?:i|ii)-20\d{2}-gk)$/;
 let entries=[];
 
-let adapted=[], archive=[]; let archiveVisible=16;
+let adapted=[], archive=[], machineDrafts=[]; let archiveVisible=16;
 function isReadyAdapted(q){
 return q&&q.ID&&q.Question&&q.SourceType==='Adapted PYQ'&&String(q.Active||'').toUpperCase()!=='FALSE'&&
   /^(?:TNPSC|UPSC) /.test(q.SourceExam||'')&&/^20\d{2}$/.test(String(q.SourceYear))&&
@@ -41,7 +41,12 @@ e.category==='TNPSC'&&e.exam==='Group II / IIA'?'TNPSC Group II/IIA':
 e.category==='UPSC'&&e.exam==='Civil Services Prelims'?'UPSC Civil Services Prelims':'';
 return name&&adapted.some(x=>x.paper===name&&x.year===e.year);
 }
-function hasTextFor(e){return coveredByTyped(e)||coveredByAdapted(e)}
+function coveredByDraft(e){
+return machineDrafts.some(d=>e.category==='TNPSC'&&d.year===e.year&&
+ ((e.exam==='Group II / IIA'&&d.exam==='TNPSC Group II / IIA')||
+  (e.exam==='Group IV'&&d.exam==='TNPSC Group IV')));
+}
+function hasTextFor(e){return coveredByTyped(e)||coveredByAdapted(e)||coveredByDraft(e)}
 function officialLink(value){return /^https:\/\/(?:www\.)?(?:tnpsc\.gov\.in|tnusrb\.tn\.gov\.in|upsc\.gov\.in|ssc\.gov\.in|rrbcdg\.gov\.in)\//i.test(String(value||''))}
 function external(card,url,label,css){
 if(!officialLink(url))return;
@@ -49,7 +54,7 @@ const a=element('a',css||'official-link',label);
 a.href=url;a.target='_blank';a.rel='noopener noreferrer';card.append(a);
 }
 function refreshYears(){
-const selector=$('yearFilter'),old=selector.value,years=[...new Set([...entries.map(x=>x.year),...adapted.map(x=>x.year),...archive.map(x=>x.year)])].sort((a,b)=>b-a);
+const selector=$('yearFilter'),old=selector.value,years=[...new Set([...entries.map(x=>x.year),...adapted.map(x=>x.year),...machineDrafts.map(x=>x.year),...archive.map(x=>x.year])].sort((a,b)=>b-a);
 selector.replaceChildren();const empty=element('option','','All years');empty.value='all';selector.append(empty);
 for(const y of years){const option=element('option','',String(y));option.value=String(y);selector.append(option)}
 selector.value=years.includes(Number(old))?old:'all';
@@ -74,7 +79,7 @@ const total=entries.reduce((n,e)=>n+e.typed,0),full=entries.filter(e=>e.typed===
 const sourceCount=adapted.reduce((n,e)=>n+e.count,0);
 const missing=archive.filter(e=>!hasTextFor(e)).length;
 $('stats').replaceChildren();
-for(const label of [full+' complete numbered text quizzes · '+total+' typed question positions',archive.length+' indexed exam-year sources',adapted.length+' adapted sets · '+sourceCount+' questions',missing+' archived years without local text'])$('stats').append(element('span','',label));
+for(const label of [full+' complete numbered text quizzes · '+total+' typed question positions',archive.length+' indexed exam-year sources',adapted.length+' adapted sets · '+sourceCount+' questions',machineDrafts.length+' incomplete machine-text paper readers',missing+' archived years without local text'])$('stats').append(element('span','',label));
 }
 
 function element(tag,className,txt){const el=document.createElement(tag);if(className)el.className=className;if(txt!==undefined)el.textContent=txt;return el}
@@ -83,6 +88,9 @@ const q=$('search').value.trim().toLowerCase(),board=$('examFilter').value,cover
 const yearOK=e=>year==='all'||String(e.year)===year;
 const selected=entries.filter(e=>(board==='all'||board===e.exam)&&yearOK(e)&&(coverage==='all'||coverage===e.type||coverage==='text')&&(!q||[e.exam,e.paper,String(e.year),e.level].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.year-a.year||a.exam.localeCompare(b.exam)||a.paper.localeCompare(b.paper));
 const selectedAdapted=adapted.filter(e=>(board==='all'||board===e.exam)&&yearOK(e)&&(coverage==='all'||coverage==='adapted'||coverage==='text')&&(!q||[e.exam,e.paper,String(e.year),'adapted'].join(' ').toLowerCase().includes(q)));
+const selectedDrafts=machineDrafts.filter(e=>(board==='all'||board===e.category)&&yearOK(e)&&
+ (coverage==='all'||coverage==='partial'||coverage==='text')&&
+ (!q||[e.exam,e.paperName,String(e.year),'machine extracted incomplete ungraded'].join(' ').toLowerCase().includes(q)));
 const selectedArchive=archive.filter(e=>!hasTextFor(e)&&(board==='all'||board===e.category)&&yearOK(e)&&(coverage==='all'||coverage==='source-only')&&(!q||[e.category,e.exam,e.paper,String(e.year)].join(' ').toLowerCase().includes(q)));
 const cards=$('cards');cards.replaceChildren();
 for(const e of selected){
@@ -110,9 +118,19 @@ const a=element('a','play','Practise '+e.count+' adapted PYQs');
 a.href='pyq-full-quiz.html?'+new URLSearchParams({exam:e.paper,year:String(e.year),count:'all'}).toString();
 card.append(a);cards.append(card);
 }
+for(const e of selectedDrafts){
+const card=element('article','card');
+card.append(element('div','cat',e.category+' · '+e.year+' · Incomplete source-text draft'));
+card.append(element('h2','',e.exam+' · '+(e.id.includes('general-english')?'General English Q1–100':e.id.includes('group-iv-2016')?'General Studies Q101–200':'General Studies Q101–200')));
+card.append(element('div','status','100 original-numbered positions · machine-extracted · ungraded'));
+card.append(element('p','',e.paperName+' · '+e.textPages+' pages with extracted text. Some question stems, A–E alternatives, figures and Tamil/English wording are missing or OCR-damaged. This is not a certified full original paper.'));
+const a=element('a','play','Open ungraded text reader');
+a.href='pyq-bulk-reader.html?paper='+encodeURIComponent(e.id);
+card.append(a);cards.append(card);
+}
 for(const e of selectedArchive.slice(0,archiveVisible))cards.append(makeArchiveCard(e));
-$('showing').textContent='Showing '+selected.length+' numbered text sets, '+selectedAdapted.length+' adapted quiz sets and '+Math.min(selectedArchive.length,archiveVisible)+' of '+selectedArchive.length+' source-only years';
-$('empty').hidden=selected.length+selectedAdapted.length+selectedArchive.length>0;
+$('showing').textContent='Showing '+selected.length+' numbered text sets, '+selectedAdapted.length+' adapted quiz sets, '+selectedDrafts.length+' partial PDF-text readers and '+Math.min(selectedArchive.length,archiveVisible)+' of '+selectedArchive.length+' source-only years';
+$('empty').hidden=selected.length+selectedAdapted.length+selectedDrafts.length+selectedArchive.length>0;
 $('showMore').hidden=selectedArchive.length<=archiveVisible;
 $('showMore').textContent='Show more source-only exam years ('+(selectedArchive.length-archiveVisible)+' remaining)';
 }
@@ -126,7 +144,8 @@ Promise.allSettled([
  fetchJSON('data/quizzes/verified-pyqs.json'),
  fetchJSON('data/quizzes/pyq-yearwise-catalog.json'),
  fetchJSON('data/quizzes/tnusrb-pc-catalog.json'),
- fetchJSON('data/quizzes/cds-gk/index.json')
+ fetchJSON('data/quizzes/cds-gk/index.json'),
+ fetchJSON('data/quizzes/pyq-reader-drafts/index.json')
 ]).then(results=>{
  if(results[0].status==='fulfilled'){
  const d=results[0].value;
@@ -165,7 +184,20 @@ Promise.allSettled([
    entries.push(...papers.map(e=>({id:e.id,exam:'UPSC',paper:'CDS '+e.session+' · General Knowledge',year:e.year,total:120,typed:e.provisionalFourOptionSets,scorable:0,level:'Provisional original-numbered English text · ungraded',sourceStatus:'Full question-numbered study text; exact booklet wording and official answer-key alignment await verification. No scoring.',link:'pyq-cds.html?paper='+e.id,type:'full-numbered-draft'})));
   }
  }
- if(!entries.length&&!adapted.length&&!archive.length)throw Error('All PYQ indexes unavailable');
+ if(results[5].status==='fulfilled'){
+ const drafts=results[5].value;
+ if(drafts?.schemaVersion===1&&drafts.draftOnly===true&&drafts.gradingEnabled===false&&Array.isArray(drafts.entries)){
+  const unique=new Set();
+  machineDrafts=drafts.entries.filter(e=>e&&e.category==='TNPSC'&&
+   ['TNPSC Group II / IIA','TNPSC Group IV'].includes(e.exam)&&
+   Number.isInteger(e.year)&&e.year>=2000&&e.year<=2026&&
+   typeof e.id==='string'&&/^[a-z0-9-]{10,120}$/.test(e.id)&&
+   e.file===e.id+'.json'&&typeof e.paperName==='string'&&
+   Number.isInteger(e.textPages)&&e.textPages>0&&
+   e.ungraded===true&&!unique.has(e.id)&&unique.add(e.id));
+ }
+}
+if(!entries.length&&!adapted.length&&!archive.length&&!machineDrafts.length)throw Error('All PYQ indexes unavailable');
  refreshYears();refreshStats();render();
  const failed=results.filter(x=>x.status==='rejected').length;
  $('dataNotice').textContent=failed?'Some PYQ feeds could not be loaded; available records are still shown.':'All indexed examination years loaded.';
