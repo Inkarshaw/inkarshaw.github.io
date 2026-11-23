@@ -752,7 +752,7 @@ try {
   await page.locator('#options button').first().click();
   await page.locator('#check').click();
   assert.match(await page.locator('#feedback').innerText(),/Final key: ALL/,'Q125 published ALL entry excluded from marks');
-  assert.match(await page.locator('#feedback').innerText(),/29\\.5666|29\\.5666/,'Q125 calculation is displayed post-check');
+  assert.match(await page.locator('#feedback').innerText(),/29\.5666/,'Q125 calculation is displayed post-check');
   assert.equal(await page.locator('#options .right,#options .wrong').count(),0,'Q125 no answer grade or highlight');
   await page.locator('#palette button').filter({hasText:/^135$/}).click();
   assert.match(await page.locator('#questionTitle').innerText(),/TICRONÉU/,'Q135 original anomalous glyph remains unchanged');
