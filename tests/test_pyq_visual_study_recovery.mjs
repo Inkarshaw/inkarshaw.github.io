@@ -95,6 +95,6 @@ const html=read('pyq-bulk-reader.html'),reader=read('assets/js/pyq-bulk-reader.j
 assert.match(html,/pyq-source-visual-recovery\.js/);
 assert.match(reader,/visual-study-recovery-2026-11-23\.json/);
 assert.match(reader,/EDITORIAL ENGLISH STUDY ADAPTATION/);
-assert.match(read('pyq-typed-library.html'),/280 readable study question stems/);
+assert.match(read('pyq-typed-library.html'),/All 300 original-numbered positions now have readable English study stems/);
 assert.ok(!reader.includes('innerHTML'),'Unverified content must be inserted as text only');
 console.log('PASS: 7 new stems + 1 damaged mathematical question repaired from official page image; 279/300 readable stems, 94 provisional A-D option sets, zero grades.');
