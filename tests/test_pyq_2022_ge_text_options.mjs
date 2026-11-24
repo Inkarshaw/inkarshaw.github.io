@@ -95,8 +95,8 @@ assert.match(reader,/text-study-recovery-2026-11-24-ge-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-24-ge-b\.json/);
 const html=read('pyq-typed-library.html');
 assert.match(html,/70 of 100 provisionally readable A–D sets/);
-assert.match(html,/266 of 300 A–D option sets/);
-assert.match(html,/remaining 34 option sets still need source cleanup/);
+assert.match(html,/270 of 300 A–D option sets/);
+assert.match(html,/remaining 30 option sets still need source cleanup/);
 console.log('PASS: 49 source-text-only English option recoveries, 70/100 GE, 232/300 combined; visually inspected status and grading remain unchanged.');
 
 const g4Entry=json(dir+'index.json').entries.find(e=>e.year===2016);
@@ -125,5 +125,15 @@ assert.deepEqual(Array.from(g4Paper.questions.filter(q=>!q.complete),q=>q.number
 for(const o of g4Overlays)assert.equal(apply(g4Paper,o).added,0);
 assert.match(reader,/text-study-recovery-2026-11-25-g4-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-25-g4-b\.json/);
-assert.match(html,/96 of 100 provisionally readable A–D sets/);
+assert.match(html,/100 of 100 provisionally readable A–D sets/);
 console.log('PASS: 34 Group IV 2016 stored-text option recoveries, 96/100; all ungraded.');
+
+const g4Math=json(dir+'visual-study-recovery-2026-11-25-g4-math.json');
+assert.equal(apply(g4Paper,g4Math).added,4);
+assert.equal(g4Paper.questions.filter(q=>q.complete).length,100);
+assert.equal(g4Paper.questions.filter(q=>q.scoreEligible===true).length,0);
+assert.match(g4Paper.questions.find(q=>q.number===142).text,/√\(609 \+ √\(248/);
+assert.match(g4Paper.questions.find(q=>q.number===195).issues.join(' '),/Standard precedence/);
+assert.equal(apply(g4Paper,g4Math).added,0);
+assert.match(reader,/visual-study-recovery-2026-11-25-g4-math\.json/);
+console.log('PASS: 100/100 2016 GS A–D sets; mathematics ambiguity preserved and ungraded.');
