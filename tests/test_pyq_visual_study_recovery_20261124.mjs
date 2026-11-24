@@ -101,7 +101,7 @@ badSource.source='https://example.invalid/not-the-original.pdf';
 assert.equal(apply(badSource,latest).added,0,'The exact original official PDF is required');
 const lib=read('pyq-typed-library.html');
 assert.match(lib,/All 300 original-numbered positions now have readable English study stems/);
-assert.match(lib,/139 of 300 A–D option sets/);
+assert.match(lib,/152 of 300 A–D option sets/);
 const reader=read('assets/js/pyq-bulk-reader.js');
 assert.match(reader,/visual-study-recovery-2026-11-24\.json/);
 assert.match(reader,/for\(const review of studyReviews\)/);
