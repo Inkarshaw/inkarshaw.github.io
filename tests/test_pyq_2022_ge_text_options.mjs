@@ -95,6 +95,6 @@ assert.match(reader,/text-study-recovery-2026-11-24-ge-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-24-ge-b\.json/);
 const html=read('pyq-typed-library.html');
 assert.match(html,/70 of 100 provisionally readable A–D sets/);
-assert.match(html,/232 of 300 A–D option sets/);
-assert.match(html,/remaining 68 option sets still need source cleanup/);
+assert.match(html,/266 of 300 A–D option sets/);
+assert.match(html,/remaining 34 option sets still need source cleanup/);
 console.log('PASS: 49 source-text-only English option recoveries, 70/100 GE, 232/300 combined; visually inspected status and grading remain unchanged.');
