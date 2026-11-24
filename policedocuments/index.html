@@ -128,7 +128,7 @@
         #sopsCard .document-item { gap: 12px; flex-wrap: wrap; align-items: flex-start; }
         #sopsCard .doc-info { min-width: 200px; flex: 1 1 250px; }
         #sopsCard .doc-actions { flex-wrap: wrap; }
-        #sopsCard .sop-pdf-pending {
+        #sopsCard .sop-pdf-pending, #downloadFormsList .sop-pdf-pending {
             display: inline-block;
             padding: 8px 11px;
             border: 1px solid #887048;
@@ -138,7 +138,7 @@
             font-size: .82rem;
             font-weight: 600;
         }
-        #sopsCard .sop-unpublished { background: #b89757; }
+        #sopsCard .sop-unpublished, #downloadFormsList .sop-unpublished { background: #b89757; }
         #sopsCard .sop-page-count { white-space: nowrap; }
         @media (max-width: 600px) { #sopsCard { grid-column: span 1; } }
 
@@ -2187,6 +2187,10 @@
                 <h2><i>📋</i> Download Forms</h2>
                 <div class="search-info" id="downloadFormsInfo"></div>
                 <ul class="document-list" id="downloadFormsList">
+                    <li class="document-item" data-title="MCU Enrollment – Biometric Profiling Request Form" data-desc="Tamil Nadu Measurement Collection Unit Chennai City II blank biometric enrollment form under the Criminal Procedure (Identification) Act, 2022">
+                        <div class="doc-info"><div class="doc-title"><span class="status-indicator sop-unpublished"></span>MCU Enrollment – Biometric Profiling Request Form</div><div class="doc-desc">Original blank two-page MCU enrollment request form.</div></div>
+                        <div class="doc-actions"><span class="sop-pdf-pending" data-sop-file="/policedocuments/mcu_enrollment.pdf" role="status">PDF upload pending</span></div>
+                    </li>
                     <li class="document-item" data-title="Anti-Sabotage Check Performa" data-desc="Blank A4 fillable ASC check form with 11 details and two signature spaces">
                         <div class="doc-info"><div class="doc-title"><span class="status-indicator status-active"></span>Anti-Sabotage Check Performa</div><div class="doc-desc">Blank, printable and fillable ASC form for VVIP/PP route and premises checks.</div></div>
                         <div class="doc-actions"><a href="/policedocuments/anti_sabotage_check_blank_form.pdf" target="_blank" rel="noopener" class="btn btn-pdf">📄 PDF</a></div>
@@ -2800,17 +2804,18 @@
             const placeholders = Array.from(document.querySelectorAll('.sop-pdf-pending[data-sop-file]'));
             await Promise.all(placeholders.map(async placeholder => {
                 const url = placeholder.dataset.sopFile;
-                if (!url || !url.startsWith('/policedocuments/sops/')) return;
+                if (!url || (!url.startsWith('/policedocuments/sops/') && url !== '/policedocuments/mcu_enrollment.pdf')) return;
                 try {
                     const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
                     if (!response.ok) return;
+                    if (url === '/policedocuments/mcu_enrollment.pdf' && !(response.headers.get('content-type') || '').toLowerCase().includes('application/pdf')) return;
                     const link = document.createElement('a');
                     link.href = url;
                     link.target = '_blank';
                     link.rel = 'noopener';
                     link.className = 'btn btn-pdf';
                     link.textContent = '📄 View / Download';
-                    link.setAttribute('aria-label', 'View or download SOP PDF');
+                    link.setAttribute('aria-label', url === '/policedocuments/mcu_enrollment.pdf' ? 'View or download MCU Enrollment PDF' : 'View or download SOP PDF');
                     link.addEventListener('click', () => {
                         const item = link.closest('.document-item');
                         const title = item?.getAttribute('data-title') || 'SOP';
