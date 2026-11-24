@@ -1044,7 +1044,8 @@ Chennai – 600010.</p>
                     yPosition += 10;
                     
                     // Subject with indentation
-                    doc.text('Sub: Request -- CDR and SDR of Cell number -- Regarding', leftMargin + indentAmount, yPosition);
+                    const numberLabel = data.mobileNumbers.length === 1 ? 'number' : 'numbers';
+                    doc.text(`Sub: Request -- CDR and SDR of Cell ${numberLabel} -- Regarding`, leftMargin + indentAmount, yPosition);
                     yPosition += 10;
                     
                     // Reference with indentation
@@ -1053,7 +1054,7 @@ Chennai – 600010.</p>
                     
                     // Body text - Only the first line indented
                     const bodyText = [
-                        "It is kindly submitted that the above reference cited, please provide the Call Detail Records of the following Cell number for investigation purpose."
+                        `It is kindly submitted that the above reference cited, please provide the Call Detail Records of the following ${numberLabel} for investigation purpose.`
                     ];
                     
                     // Split text into lines that fit within content width
