@@ -42,10 +42,13 @@ function apply(paper,overlay){
    q.sourcePdfPage===recovery.sourcePdfPage&&
    typeof recovery.expectedBrokenStart==='string'&&recovery.expectedBrokenStart.length>=20&&
    typeof q.text==='string'&&q.text.startsWith(recovery.expectedBrokenStart)&&
-   typeof recovery.expectedExistingOptionAPrefix==='string'&&
-   recovery.expectedExistingOptionAPrefix.length>=8&&
    typeof q.options?.A==='string'&&
-   q.options.A.startsWith(recovery.expectedExistingOptionAPrefix);
+   ((typeof recovery.expectedExistingOptionAPrefix==='string'&&
+     recovery.expectedExistingOptionAPrefix.length>=8&&
+     q.options.A.startsWith(recovery.expectedExistingOptionAPrefix))||
+    (typeof recovery.expectedExistingOptionA==='string'&&
+     recovery.expectedExistingOptionA.length>=2&&
+     q.options.A===recovery.expectedExistingOptionA));
   if(!sourceMissing&&!sourceCorrupt&&!sourceMisclassifiedComplete)continue;
   q.text=recovery.text;
   q.options=Object.fromEntries(LETTERS.map(l=>[l,recovery.options[l]]));

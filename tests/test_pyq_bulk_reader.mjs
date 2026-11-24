@@ -27,6 +27,7 @@ assert.match(js,/visual-study-recovery-2026-11-24-gs-101-122\.json/);
 assert.match(js,/visual-study-recovery-2026-11-24-gs-123-137\.json/);
 assert.match(js,/visual-study-recovery-2026-11-24-gs-142-160\.json/);
 assert.match(js,/visual-study-recovery-2026-11-24-gs-161-180\.json/);
+assert.match(js,/visual-study-recovery-2026-11-24-gs-final\.json/);
 assert.match(js,/EDITORIAL ENGLISH STUDY ADAPTATION/);
 assert.match(html,/id="questionPdfLink"/);
 assert.match(html,/value="missing-stem"/);

@@ -136,8 +136,8 @@ const mismatched={
 };
 assert.equal(apply(mismatched,current).added,0,'Exact source PDF link required');
 const lib=read('pyq-typed-library.html');
-assert.match(lib,/167 of 300 A–D option sets/);
-assert.match(lib,/remaining 133 option sets still need source cleanup/);
+assert.match(lib,/183 of 300 A–D option sets/);
+assert.match(lib,/remaining 117 option sets still need source cleanup/);
 const reader=read('assets/js/pyq-bulk-reader.js');
 assert.match(reader,/visual-study-recovery-2026-11-24-gs-123-137\.json/);
 assert.ok(!reader.includes('innerHTML'),'Source text must be inserted as text, never injected as HTML');
