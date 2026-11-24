@@ -24,6 +24,50 @@
       }
     }
 
+
+    // Airtel raw report CSV: retain source strings and physical row numbers.
+    const AIRTEL_MAP={cdrNo:'Target No',bparty:'B Party No',date:'Date',time:'Time',duration:'Dur(s)',callType:'Call Type',firstCellId:'First CGI',lastCellId:'Last CGI',latlong:'First CGI Lat/Long',imei:'IMEI',imsi:'IMSI',roaming:'Roam Nw',provider:'LRN TSP-LSA',lrn:'LRN No',callForward:'Call Fow No'};
+    const AIRTEL_EVENTS={'IN':'Incoming Call','OUT':'Outgoing Call','SMT':'Incoming SMS','SMO':'Outgoing SMS','VDO-IN':'Incoming Video Call','VDO-OUT':'Outgoing Video Call'};
+    function cleanAirtel(v){
+      const t=String(v??'').trim(),u=t.startsWith("'")&&t.endsWith("'")?t.slice(1,-1).trim():t;
+      return u==='-'?'':u;
+    }
+    function inspectAirtelCsv(buffer){
+      const text=new TextDecoder('utf-8').decode(buffer).replace(/^\uFEFF/,'');
+      if(!/bharti airtel limited/i.test(text.slice(0,256)))return null;
+      const records=[];let row=[],field='',quoted=false,line=1,rowLine=1;
+      const endRow=()=>{row.push(field);records.push({values:row,line:rowLine});row=[];field='';rowLine=line+1;};
+      for(let i=0;i<text.length;i++){
+        const c=text[i];
+        if(c==='"'){
+          if(quoted&&text[i+1]==='"'){field+='"';i++;}
+          else if(quoted||field==='')quoted=!quoted;
+          else field+=c;
+        }else if(c===','&&!quoted){row.push(field);field='';}
+        else if(c==='\n'||c==='\r'){
+          const crlf=c==='\r'&&text[i+1]==='\n';
+          if(quoted)field+=crlf?'\r\n':c;else endRow();
+          if(crlf)i++;line++;
+        }else field+=c;
+      }
+      if(quoted)throw new Error('Malformed quoted Airtel CSV');
+      if(row.length||field)endRow();
+      const header=records.find(x=>['Target No','B Party No','Call Type','Date','Time','Dur(s)','First CGI'].every(h=>x.values.map(v=>v.trim()).includes(h)));
+      if(!header)return null;
+      const headers=header.values.map(v=>v.trim()),rows=[],rowNumbers=[];
+      let skipped=0;
+      for(const x of records){
+        if(x.line<=header.line||!x.values.some(v=>v.trim()))continue;
+        if(x.values.length===1&&/^this is system generated report/i.test(x.values[0].trim()))continue;
+        if(x.values.length!==headers.length){skipped++;continue;}
+        const r=Object.fromEntries(headers.map((h,i)=>[h,x.values[i]]));
+        if(!cleanAirtel(r['Target No'])||!cleanAirtel(r['Date'])||!cleanAirtel(r['Call Type'])){skipped++;continue;}
+        rows.push(r);rowNumbers.push(x.line);
+      }
+      const name='Airtel raw CSV',headerRow=header.line-1;
+      return {sheets:[{name,rowCount:rows.length,headerRow,headers,preview:rows.slice(0,8),airtel:true}],parsedSheets:[{sheetName:name,headerRow,rows,rowNumbers,airtel:true,skipped}]};
+    }
+
     function parseDuration(v){
       if(v==null||v==='')return 0;if(typeof v==='number'&&Number.isFinite(v))return v<1&&v>0?Math.round(v*86400):Math.max(0,v);
       const s=String(v).trim();if(!s)return 0;
@@ -196,12 +240,13 @@
       const file=importQueue.shift();showImportLoading(file);showStatus('Reading '+file.name+' once and detecting CDR tabs…','');
       try{
         const buffer=await file.arrayBuffer(),hashCopy=buffer.slice(0);
-        const [fast,sha256]=await Promise.all([workerCall(file,'inspectParseCdr',[],{},buffer),hashBuffer(hashCopy)]);
+        const airtel=/\.csv$/i.test(file.name)?inspectAirtelCsv(buffer):null;
+        const [fast,sha256]=await Promise.all([airtel||workerCall(file,'inspectParseCdr',[],{},buffer),hashBuffer(hashCopy)]);
         const sheets=fast.sheets||[],parsedSheets=fast.parsedSheets||[];
         if(!sheets.length)throw new Error('No worksheets found');
         if(!parsedSheets.length)throw new Error('No CDR-compatible worksheet found');
         const parsedNames=new Set(parsedSheets.map(s=>s.sheetName)),mappings={};
-        for(const s of sheets)if(parsedNames.has(s.name))mappings[s.name]=savedMapping(s.headers)||mapHeaders(s.headers);
+        for(const s of sheets)if(parsedNames.has(s.name))mappings[s.name]=s.airtel?{...AIRTEL_MAP}:savedMapping(s.headers)||mapHeaders(s.headers);
         state.pendingImport={file,sha256,sheets,parsedSheets,selected:parsedNames,mappings,inspectedAt:new Date().toISOString(),autoAll:true,fastPath:true};
         hideSheetPicker();
         const skipped=Math.max(0,sheets.length-parsedSheets.length),derivedSkipped=sheets.filter(s=>isDerivedReportSheet(s.name)).length;
@@ -232,15 +277,17 @@
             continue;
           }
           const fileId=++state.fileSeq,inferredCdr=inferCdrFromFilename(p.file.name);let added=0;
-          rows.forEach((r,idx)=>{
-            const sourceRow=idx+(Number.isInteger(sh.headerRow)?sh.headerRow:0)+2;
-            const rawDate=val(r,map,'date'),rawTime=val(r,map,'time'),dt=parseDateTime(rawDate,rawTime,timezone),loc=parseLatLong(val(r,map,'latlong'),val(r,map,'location')),deviceMeta=parseCdrDeviceMetadata(val(r,map,'manufacturer'),val(r,map,'deviceType'));
+          if(sh.skipped)audit('Malformed Airtel rows skipped',String(sh.skipped)+' row(s)');
+          rows.forEach((raw,idx)=>{
+            const r=sh.airtel?Object.fromEntries(Object.entries(raw).map(([k,v])=>[k,cleanAirtel(v)])):raw;
+            const sourceRow=sh.rowNumbers?.[idx]??(idx+(Number.isInteger(sh.headerRow)?sh.headerRow:0)+2);
+            const rawDate=val(r,map,'date'),rawTime=val(r,map,'time'),dt=parseDateTime(rawDate,rawTime,timezone),loc=parseLatLong(sh.airtel?String(val(r,map,'latlong')||'').replace('/',','):val(r,map,'latlong'),val(r,map,'location')),deviceMeta=parseCdrDeviceMetadata(val(r,map,'manufacturer'),val(r,map,'deviceType'));
             const sigSubject=String(val(r,map,'cdrNo')??'').trim()||inferredCdr,sigParty=String(val(r,map,'bparty')??'').trim(),sigType=String(val(r,map,'callType')??'').trim(),sigCell=String(val(r,map,'firstCellId')??'').trim(),sigDuration=parseDuration(val(r,map,'duration'));
             const sig=[sigSubject,sigParty,dt instanceof Date&&!isNaN(dt)?dt.getTime():String(rawDate)+'|'+String(rawTime),sigDuration,sigType,sigCell].join('|');
             const seenSheet=crossSheetSeen.get(sig);
             if(seenSheet&&seenSheet!==sh.sheetName){crossSheetDuplicates++;return;}
             if(!seenSheet)crossSheetSeen.set(sig,sh.sheetName);
-            const rec={id:`${fileId}:${sourceRow}`,fileId,sourceFile:p.file.name,sourceSheet:sh.sheetName,rowNumber:sourceRow,sourceHash:p.sha256,sourceTimezone:timezone,rawRow:r,rawDate,rawTime,cdrNo:sigSubject,bparty:sigParty,date:rawDate,time:rawTime,dt,duration:sigDuration,callType:sigType,firstCellId:sigCell,firstAddress:String(val(r,map,'firstAddress')??'').trim(),lastCellId:String(val(r,map,'lastCellId')??'').trim(),lastAddress:String(val(r,map,'lastAddress')??'').trim(),imei:String(val(r,map,'imei')??'').trim(),manufacturer:deviceMeta.manufacturer,model:deviceMeta.model,deviceType:deviceMeta.deviceType,os:deviceMeta.os,imsi:String(val(r,map,'imsi')??'').trim(),roaming:String(val(r,map,'roaming')??'').trim(),provider:String(val(r,map,'provider')??'').trim(),mainCity:String(val(r,map,'mainCity')??'').trim(),subCity:String(val(r,map,'subCity')??'').trim(),latlong:String(val(r,map,'latlong')??'').trim(),lat:loc?.lat??null,lng:loc?.lng??null,azimuth:loc?.az??'',caseName:String(val(r,map,'caseName')??'').trim(),circle:String(val(r,map,'circle')??'').trim(),operator:String(val(r,map,'operator')??'').trim(),lrn:String(val(r,map,'lrn')??'').trim(),callForward:String(val(r,map,'callForward')??'').trim(),location:String(val(r,map,'location')??'').trim()};
+            const rec={id:`${fileId}:${sourceRow}`,fileId,sourceFile:p.file.name,sourceSheet:sh.sheetName,rowNumber:sourceRow,sourceHash:p.sha256,sourceTimezone:timezone,rawRow:raw,rawDate,rawTime,cdrNo:sigSubject,bparty:sigParty,date:rawDate,time:rawTime,dt,duration:sigDuration,callType:sh.airtel?(AIRTEL_EVENTS[sigType]||sigType):sigType,firstCellId:sigCell,firstAddress:String(val(r,map,'firstAddress')??'').trim(),lastCellId:String(val(r,map,'lastCellId')??'').trim(),lastAddress:String(val(r,map,'lastAddress')??'').trim(),imei:String(val(r,map,'imei')??'').trim(),manufacturer:deviceMeta.manufacturer,model:deviceMeta.model,deviceType:deviceMeta.deviceType,os:deviceMeta.os,imsi:String(val(r,map,'imsi')??'').trim(),roaming:String(val(r,map,'roaming')??'').trim(),provider:String(val(r,map,'provider')??'').trim(),mainCity:String(val(r,map,'mainCity')??'').trim(),subCity:String(val(r,map,'subCity')??'').trim(),latlong:String(val(r,map,'latlong')??'').trim(),lat:loc?.lat??null,lng:loc?.lng??null,azimuth:loc?.az??'',caseName:String(val(r,map,'caseName')??'').trim(),circle:String(val(r,map,'circle')??'').trim(),operator:sh.airtel?'Airtel':String(val(r,map,'operator')??'').trim(),lrn:String(val(r,map,'lrn')??'').trim(),callForward:String(val(r,map,'callForward')??'').trim(),location:String(val(r,map,'location')??'').trim()};
             rec.cdrKey=phoneKey(rec.cdrNo);rec.bpartyKey=phoneKey(rec.bparty);rec.search=normalize([rec.cdrNo,rec.bparty,rec.callType,rec.firstCellId,rec.firstAddress,rec.lastCellId,rec.lastAddress,rec.imei,rec.imsi,rec.manufacturer,rec.model,rec.deviceType,rec.os,rec.roaming,rec.provider,rec.mainCity,rec.subCity,rec.operator,rec.sourceFile].join(' | '));state.records.push(rec);added++;
           });
           const info=p.sheets.find(x=>x.name===sh.sheetName)||{};
@@ -294,6 +341,6 @@
       });
     }
 
-    return {parseDuration,inferCdrFromFilename,parseDateTime,parseTime,timeMins,mapHeaders,parseLatLong,detectSheet,parseFileOnMain,parseFileInWorker,hashFile,hashBuffer,loadFiles,confirmImport,cancelImport,bind};
+    return {inspectAirtelCsv,parseDuration,inferCdrFromFilename,parseDateTime,parseTime,timeMins,mapHeaders,parseLatLong,detectSheet,parseFileOnMain,parseFileInWorker,hashFile,hashBuffer,loadFiles,confirmImport,cancelImport,bind};
   };
 })();
