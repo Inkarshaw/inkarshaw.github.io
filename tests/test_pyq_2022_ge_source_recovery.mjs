@@ -119,6 +119,6 @@ assert.equal(apply(wrongSource,ge).added,0);
 const reader=read('assets/js/pyq-bulk-reader.js');
 assert.match(reader,/visual-study-recovery-2026-11-24-general-english\.json/);
 assert.match(read('pyq-typed-library.html'),/All 300 original-numbered positions now have readable English study stems/);
-assert.match(read('pyq-typed-library.html'),/116 A–D option sets/);
+assert.match(read('pyq-typed-library.html'),/130 A–D option sets/);
 assert.ok(!reader.includes('innerHTML'));
 console.log('PASS: all 20 missing 2022 General English study questions restored; total 300/300 stems, 116 A-D study option sets; no verified marks.');
