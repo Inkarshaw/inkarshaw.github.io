@@ -153,6 +153,6 @@ const reader=read('assets/js/pyq-bulk-reader.js');
 assert.match(reader,/visual-study-recovery-2026-11-24-gs-142-160\.json/);
 assert.ok(!reader.includes('innerHTML'));
 const html=read('pyq-typed-library.html');
-assert.match(html,/152 of 300 A–D option sets/);
-assert.match(html,/remaining 148 option sets still need source cleanup/);
+assert.match(html,/167 of 300 A–D option sets/);
+assert.match(html,/remaining 133 option sets still need source cleanup/);
 console.log('PASS: TNPSC GS Q142–160: 13 partial option repairs, 2 misleading complete entries fixed, 152/300 readable sets, all 300 stems, zero graded.');
