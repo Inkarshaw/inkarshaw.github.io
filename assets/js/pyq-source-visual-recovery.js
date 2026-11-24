@@ -34,7 +34,19 @@ function apply(paper,overlay){
    q.complete===false&&q.sourcePdfPage===recovery.sourcePdfPage&&
    typeof recovery.expectedBrokenStart==='string'&&recovery.expectedBrokenStart.length>=20&&
    typeof q.text==='string'&&q.text.startsWith(recovery.expectedBrokenStart);
-  if(!sourceMissing&&!sourceCorrupt)continue;
+  // A few source PDF English alternatives were mistakenly represented by the
+  // Tamil OCR option group. Replace only when exact old source content matches.
+  const sourceMisclassifiedComplete=q&&recovery.replaceMachineComplete===true&&
+   q.textRecovered===true&&q.complete===true&&
+   q.sourceStatus==='machine-split-complete-unverified'&&
+   q.sourcePdfPage===recovery.sourcePdfPage&&
+   typeof recovery.expectedBrokenStart==='string'&&recovery.expectedBrokenStart.length>=20&&
+   typeof q.text==='string'&&q.text.startsWith(recovery.expectedBrokenStart)&&
+   typeof recovery.expectedExistingOptionAPrefix==='string'&&
+   recovery.expectedExistingOptionAPrefix.length>=12&&
+   typeof q.options?.A==='string'&&
+   q.options.A.startsWith(recovery.expectedExistingOptionAPrefix);
+  if(!sourceMissing&&!sourceCorrupt&&!sourceMisclassifiedComplete)continue;
   q.text=recovery.text;
   q.options=Object.fromEntries(LETTERS.map(l=>[l,recovery.options[l]]));
   q.textRecovered=true;
