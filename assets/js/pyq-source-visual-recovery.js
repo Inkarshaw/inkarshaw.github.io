@@ -43,7 +43,7 @@ function apply(paper,overlay){
    typeof recovery.expectedBrokenStart==='string'&&recovery.expectedBrokenStart.length>=20&&
    typeof q.text==='string'&&q.text.startsWith(recovery.expectedBrokenStart)&&
    typeof recovery.expectedExistingOptionAPrefix==='string'&&
-   recovery.expectedExistingOptionAPrefix.length>=12&&
+   recovery.expectedExistingOptionAPrefix.length>=8&&
    typeof q.options?.A==='string'&&
    q.options.A.startsWith(recovery.expectedExistingOptionAPrefix);
   if(!sourceMissing&&!sourceCorrupt&&!sourceMisclassifiedComplete)continue;
