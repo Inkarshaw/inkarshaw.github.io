@@ -87,7 +87,7 @@ assert.equal(afterOldStems,279);
 assert.equal(afterOldSets,94);
 assert.equal(latestCount,2);
 assert.equal(afterStems,280);
-assert.equal(afterSets,95);
+assert.equal(afterSets,96);
 const bad=JSON.parse(JSON.stringify(latest));
 bad.gradingEnabled=true;
 const raw=json('data/quizzes/pyq-reader-drafts/tnpsc-group-ii-iia-2022-general-studies-ccs2e-2022-answer-key-opt-5aaa9a34.json');
