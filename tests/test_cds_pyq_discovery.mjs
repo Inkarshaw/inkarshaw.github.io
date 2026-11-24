@@ -47,7 +47,7 @@ function cdsCards(){
 }
 function links(card){return card.children.filter(child=>child.tagName==='a').map(child=>child.href);}
 assert.equal(cdsCards().length,17,'All 17 CDS paper cards must load on the initial PYQ library screen');
-assert.ok(nodes.stats.textContent.includes('5170'),'Complete numbered positions must combine 3130 existing and 2040 CDS');
+assert.ok(nodes.stats.textContent.includes('5350'),'Complete numbered positions must combine 3310 existing and 2040 CDS');
 const expected=cds.paperStatuses.map(x=>'pyq-cds.html?paper='+x.id).sort();
 assert.deepEqual(cdsCards().flatMap(links).sort(),expected,'Every CDS card must deep-link to its own question paper');
 assert.ok(cdsCards().every(card=>card.textContent.includes('Scoring disabled / not verified')),'No CDS card may claim scoring');
@@ -55,6 +55,11 @@ assert.ok(cdsCards().every(card=>card.textContent.includes('Scoring disabled / n
 nodes.examFilter.value='UPSC';nodes.examFilter.dispatch('change');
 assert.equal(cdsCards().length,17,'UPSC board filter must show all 17 CDS papers');
 
+nodes.yearFilter.value='2026';nodes.yearFilter.dispatch('change');
+const upsc2026=nodes.cards.children.filter(card=>card.children.some(child=>child.tagName==='h2'&&/^Civil Services Prelims · /.test(child.textContent)));
+assert.equal(upsc2026.length,2,'Both UPSC 2026 full papers must be discoverable');
+assert.deepEqual(upsc2026.flatMap(links).sort(),['pyq-upsc-2026-csat.html','pyq-upsc-2026-gs1.html']);
+assert.ok(upsc2026.every(card=>card.textContent.includes('Scoring disabled / not verified')));
 nodes.yearFilter.value='2019';nodes.yearFilter.dispatch('change');
 assert.deepEqual(cdsCards().map(x=>x.children.find(y=>y.tagName==='h2').textContent).sort(),
  ['CDS I · General Knowledge','CDS II · General Knowledge']);

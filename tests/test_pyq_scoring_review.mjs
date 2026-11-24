@@ -28,9 +28,16 @@ assert.equal(new Set(review.papers.map(p=>p.id)).size,8);
 const previouslyAudited=new Set(review.papers.map(p=>p.id));
 assert.ok([...previouslyAudited].every(id=>cat.entries.some(e=>e.id===id)), 'Retain the original eight-paper scoring audit without silently broadening its scope');
 const newTyped=cat.entries.filter(e=>!previouslyAudited.has(e.id));
-assert.deepEqual(newTyped.map(e=>e.id).sort(),[2015,2017,2019,2021,2022,2024,2025].map(y=>'tnpsc-g1-'+y).sort());
+assert.deepEqual(newTyped.map(e=>e.id).sort(),[...[2015,2017,2019,2021,2022,2024,2025].map(y=>'tnpsc-g1-'+y),'upsc-cse-2026-csat','upsc-cse-2026-gs1'].sort());
 const group1Years=json('data/quizzes/tnpsc-group1-all-years.json');
 for(const entry of newTyped){
+ if(entry.exam==='UPSC'){
+  const p=json('data/quizzes/'+entry.id+'.json');
+  assert.equal(entry.scorable,0,'No UPSC provisional marks before key mapping');
+  assert.equal(p.grading,'disabled');assert.equal(p.questions.length,entry.typed);
+  assert.ok(p.questions.every(q=>q.correctAnswer===null&&q.scoreEligible===false));
+  continue;
+ }
  const matching=group1Years.entries.find(x=>x.year===entry.year);
  assert.ok(matching&&matching.typedQuestionCount===entry.typed);
  assert.equal(matching.provisionallyScorable,entry.scorable,'Newly listed typed year gets its separately maintained key status');

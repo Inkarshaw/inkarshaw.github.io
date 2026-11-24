@@ -6,12 +6,12 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const json=p=>JSON.parse(read(p));
 const cat=json('data/quizzes/typed-pyq-catalog.json'),html=read('pyq-typed-library.html'),js=read('assets/js/typed-pyq-catalog.js');
 assert.equal(cat.schemaVersion,1);
-assert.equal(cat.entries.length,15);
-assert.equal(new Set(cat.entries.map(e=>e.id)).size,15);
-assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),2820);
-assert.equal(cat.entries.filter(e=>e.typed===e.total).length,15,'Every published numbered text set now covers all original positions');
+assert.equal(cat.entries.length,17);
+assert.equal(new Set(cat.entries.map(e=>e.id)).size,17);
+assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),3000);
+assert.equal(cat.entries.filter(e=>e.typed===e.total).length,17,'Every published numbered text set now covers all original positions');
 const by=id=>{const e=cat.entries.find(x=>x.id===id);assert.ok(e,'Missing catalogue '+id);return e;};
-for(const e of cat.entries){assert.ok(['TNPSC','TNUSRB'].includes(e.exam));assert.ok(Number.isInteger(e.total)&&Number.isInteger(e.typed)&&Number.isInteger(e.scorable));assert.ok(e.typed<=e.total&&e.scorable<=e.typed);assert.ok(e.sourceStatus.length>16);assert.ok(existsSync(new URL('../'+e.link.split('?')[0],import.meta.url)),'Quiz route missing: '+e.link);}
+for(const e of cat.entries){assert.ok(['TNPSC','TNUSRB','UPSC'].includes(e.exam));assert.ok(Number.isInteger(e.total)&&Number.isInteger(e.typed)&&Number.isInteger(e.scorable));assert.ok(e.typed<=e.total&&e.scorable<=e.typed);assert.ok(e.sourceStatus.length>16);assert.ok(existsSync(new URL('../'+e.link.split('?')[0],import.meta.url)),'Quiz route missing: '+e.link);}
 for(const year of [2015,2017,2019,2021,2022,2024,2025]){const entry=by('tnpsc-g1-'+year);assert.equal(entry.typed,200);assert.equal(entry.scorable,year===2015?192:year===2017?189:0);assert.equal(entry.link,'tnpsc-group1-typed-years.html?year='+year);}
 const g2011=json('data/quizzes/tnpsc-g1-2011-series-d-typed.json');
 assert.equal(by('tnpsc-g1-2011').typed,g2011.questionCountInTypedSet);
@@ -108,12 +108,16 @@ const typedKeys=new Set(cat.entries.map(e=>{
  if(e.exam==='TNPSC'&&e.paper.startsWith('Group IV'))return 'TNPSC|Group IV|'+e.year;
  if(e.exam==='TNPSC'&&e.paper.startsWith('Group I'))return 'TNPSC|Group I|'+e.year;
  if(e.exam==='TNUSRB'&&e.paper.startsWith('SI Open'))return 'TNUSRB|SI (Open Candidates)|'+e.year;
+ if(e.exam==='UPSC'&&e.paper.startsWith('Civil Services Prelims'))return 'UPSC|Civil Services Prelims|'+e.year;
  return e.exam+'|'+e.paper+'|'+e.year;
 }));
 assert.equal(new Set([...archiveKeys,...typedKeys,...adaptedKeys]).size,75,
  '67 archived exam years plus eight unique typed-only years');
 const sourceOnly=[...archiveKeys].filter(k=>!adaptedKeys.has(k)&&!typedKeys.has(k));
-assert.equal(sourceOnly.length,54,'Exactly 58 indexed exam-year sources lack a local text quiz');
+assert.equal(sourceOnly.length,53,'Exactly 53 indexed exam-year sources lack a local text quiz');
 assert.ok(read('pyq-hub.html').includes('Explore all exams, years and text coverage'),'Universal coverage discoverable from main PYQ hub');
 
-console.log('PASS 75 distinct indexed exam-year records: 15 typed sets (2820 positions), 8 adapted sets (160 questions), and 54 archive-only exam-years honestly marked without question text.');
+console.log('PASS 75 distinct indexed exam-year records: 17 typed sets (3000 positions), 8 adapted sets (160 questions), and 53 archive-only exam-years honestly marked without question text.');
+
+for(const [short,n] of [['gs1',100],['csat',80]]){const id='upsc-cse-2026-'+short,p=json('data/quizzes/'+id+'.json');assert.equal(by(id).typed,n);assert.equal(by(id).scorable,0);assert.equal(p.questions.length,n);assert.equal(p.grading,'disabled');assert.equal(p.bookletSeries,'A');for(const [i,q] of p.questions.entries()){assert.equal(q.number,i+1);assert.ok(q.text.trim());assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);assert.ok(['A','B','C','D'].every(k=>q.options[k].trim()));assert.ok(q.sourcePages.length)}assert.ok(read(by(id).link).includes('data-paper="'+short+'"'));}
+new vm.Script(read('assets/js/upsc-2026-pyq-data.js'));new vm.Script(read('assets/js/upsc-2026-pyq.js'));
