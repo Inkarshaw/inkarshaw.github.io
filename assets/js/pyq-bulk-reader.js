@@ -220,11 +220,19 @@ async function loadSiteDrafts(){
   const index=await response.json();
   if(index?.schemaVersion!==1||index.draftOnly!==true||index.gradingEnabled!==false||!Array.isArray(index.entries))
    throw Error('Published source index has incorrect provenance');
-  let visualStudy=null;
-  try{
-   const visual=await fetch('data/quizzes/pyq-reader-drafts/visual-study-recovery-2026-11-23.json',{cache:'no-store'});
-   if(visual.ok)visualStudy=await visual.json();
-  }catch{ /* Optional visual retypes must not suppress the original reader */ }
+  // Only these two repository-controlled, date-stamped study-review files are loaded.
+  // Missing/rejected review overlays never block the original PDF text reader.
+  const studyReviewPaths=[
+   'visual-study-recovery-2026-11-23.json',
+   'visual-study-recovery-2026-11-24.json'
+  ];
+  const studyReviews=[];
+  for(const name of studyReviewPaths){
+   try{
+    const visual=await fetch('data/quizzes/pyq-reader-drafts/'+name,{cache:'no-store'});
+    if(visual.ok)studyReviews.push(await visual.json());
+   }catch{ /* Optional study review unavailable; original page source is retained */ }
+  }
   const valid=index.entries.filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
     typeof e.file==='string'&&e.file===e.id+'.json'&&Number.isInteger(e.textPages)&&e.textPages>0).slice(0,30);
   const files=await Promise.allSettled(valid.map(async entry=>{
@@ -239,7 +247,7 @@ async function loadSiteDrafts(){
     if(extra.ok){const overlay=await extra.json();recovered=window.ClearExamsPYQOcrOverlay?.merge(raw,overlay)||raw}
    }catch{ /* Missing or unreadable OCR is never grounds to suppress the original paper */ }
    const paper=normalize(recovered);
-   if(visualStudy)window.ClearExamsPYQVisualRecovery?.apply(paper,visualStudy);
+   for(const review of studyReviews)window.ClearExamsPYQVisualRecovery?.apply(paper,review);
    return {entry,paper};
   }));
   const loaded=[];
