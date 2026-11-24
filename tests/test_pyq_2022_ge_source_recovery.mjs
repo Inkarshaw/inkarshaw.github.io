@@ -38,7 +38,7 @@ for(const q of ge.papers[0].questions){
  assert.ok(['A','B','C','D','E'].every(l=>typeof q.options[l]==='string'&&q.options[l].length>0));
  assert.ok(q.note.includes(String(q.number))&&q.note.includes('official PDF'));
 }
-assert.match(ge.papers[0].questions.find(q=>q.number===100).text,/Column A:[\\s\\S]*Column B:/);
+assert.match(ge.papers[0].questions.find(q=>q.number===100).text,/Column A:[\s\S]*Column B:/);
 assert.deepEqual(['A','B','C','D'].map(l=>ge.papers[0].questions.find(q=>q.number===100).options[l]),
  ['4, 2, 3, 1','3, 4, 1, 2','1, 2, 4, 3','3, 1, 4, 2']);
 const buildPaper=(raw)=>{
@@ -117,7 +117,7 @@ const wrongSource=buildPaper(original);
 wrongSource.source='https://example.invalid/counterfeit-paper.pdf';
 assert.equal(apply(wrongSource,ge).added,0);
 const reader=read('assets/js/pyq-bulk-reader.js');
-assert.match(reader,/visual-study-recovery-2026-11-24-general-english\\.json/);
+assert.match(reader,/visual-study-recovery-2026-11-24-general-english\.json/);
 assert.match(read('pyq-typed-library.html'),/All 300 original-numbered positions now have readable English study stems/);
 assert.match(read('pyq-typed-library.html'),/116 A–D option sets/);
 assert.ok(!reader.includes('innerHTML'));
