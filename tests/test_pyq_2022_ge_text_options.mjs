@@ -95,6 +95,35 @@ assert.match(reader,/text-study-recovery-2026-11-24-ge-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-24-ge-b\.json/);
 const html=read('pyq-typed-library.html');
 assert.match(html,/70 of 100 provisionally readable A–D sets/);
-assert.match(html,/232 of 300 A–D option sets/);
-assert.match(html,/remaining 68 option sets still need source cleanup/);
+assert.match(html,/266 of 300 A–D option sets/);
+assert.match(html,/remaining 34 option sets still need source cleanup/);
 console.log('PASS: 49 source-text-only English option recoveries, 70/100 GE, 232/300 combined; visually inspected status and grading remain unchanged.');
+
+const g4Entry=json(dir+'index.json').entries.find(e=>e.year===2016);
+const g4Raw=json(dir+g4Entry.file);
+const g4Paper=make(g4Raw,merge(g4Raw,json(dir+'ocr-recovery/'+g4Entry.file)));
+for(const o of earlier)apply(g4Paper,o);
+assert.equal(g4Paper.questions.filter(q=>q.complete).length,62);
+const g4Overlays=['text-study-recovery-2026-11-25-g4-a.json','text-study-recovery-2026-11-25-g4-b.json'].map(n=>json(dir+n));
+let g4Added=0;
+for(const o of g4Overlays){
+ assert.equal(o.gradingEnabled,false);
+ assert.equal(o.officialFinalKeyMapped,false);
+ assert.equal(o.verifiedOriginalWording,false);
+ g4Added+=apply(g4Paper,o).added;
+ for(const spec of o.papers[0].questions){
+  const q=g4Paper.questions.find(x=>x.number===spec.number);
+  assert.equal(q.sourceStatus,'text-source-editorial-study-not-verbatim');
+  assert.equal(q.correctAnswer,null);
+  assert.equal(q.scoreEligible,false);
+  assert.equal(q.options.E,'');
+ }
+}
+assert.equal(g4Added,34);
+assert.equal(g4Paper.questions.filter(q=>q.complete).length,96);
+assert.deepEqual(Array.from(g4Paper.questions.filter(q=>!q.complete),q=>q.number),[136,142,145,195]);
+for(const o of g4Overlays)assert.equal(apply(g4Paper,o).added,0);
+assert.match(reader,/text-study-recovery-2026-11-25-g4-a\.json/);
+assert.match(reader,/text-study-recovery-2026-11-25-g4-b\.json/);
+assert.match(html,/96 of 100 provisionally readable A–D sets/);
+console.log('PASS: 34 Group IV 2016 stored-text option recoveries, 96/100; all ungraded.');

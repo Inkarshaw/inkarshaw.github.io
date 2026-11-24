@@ -235,7 +235,9 @@ async function loadSiteDrafts(){
    'visual-study-recovery-2026-11-24-gs-161-180.json',
    'visual-study-recovery-2026-11-24-gs-final.json',
    'text-study-recovery-2026-11-24-ge-a.json',
-   'text-study-recovery-2026-11-24-ge-b.json'
+   'text-study-recovery-2026-11-24-ge-b.json',
+   'text-study-recovery-2026-11-25-g4-a.json',
+   'text-study-recovery-2026-11-25-g4-b.json'
   ];
   const studyReviews=[];
   for(const name of studyReviewPaths){
