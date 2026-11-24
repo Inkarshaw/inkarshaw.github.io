@@ -46,7 +46,7 @@ function apply(paper,overlay){
   q.issues=['Source-image-inspected English study adaptation, NOT verbatim. No verified key or score.',recovery.note];
   added++;
  }
- paper.visualStudyRecoveries=added;
+ paper.visualStudyRecoveries=(paper.visualStudyRecoveries||0)+added;
  return {paper,added};
 }
 root.ClearExamsPYQVisualRecovery={apply,SOURCE_STATUS};
