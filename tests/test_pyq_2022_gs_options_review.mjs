@@ -123,8 +123,8 @@ changedStem.questions.find(q=>q.number===101).sourceStatus='machine-split-partia
 assert.equal(apply(changedStem,reviewed).added,0,
  'A reviewed overlay must never overwrite arbitrary nonmatching text');
 const lib=read('pyq-typed-library.html');
-assert.match(lib,/183 of 300 A–D option sets/);
-assert.match(lib,/remaining 117 option sets still need source cleanup/);
+assert.match(lib,/232 of 300 A–D option sets/);
+assert.match(lib,/remaining 68 option sets still need source cleanup/);
 const reader=read('assets/js/pyq-bulk-reader.js');
 assert.match(reader,/visual-study-recovery-2026-11-24-gs-101-122\.json/);
 assert.ok(!reader.includes('innerHTML'),'Source text must never be HTML-injected');

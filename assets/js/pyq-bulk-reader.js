@@ -69,6 +69,7 @@ function setPaper(id){
    ' stems available for study · '+counts.complete+' provisional A–D text sets · '+
    (active.questions.length-counts.complete)+' need source corrections · all ungraded'+
    (active.visualStudyRecoveries?' · '+active.visualStudyRecoveries+' official-PDF-page editorial study retypes (not verbatim)':'')+
+   (active.textStudyRecoveries?' · '+active.textStudyRecoveries+' stored-text-only study retypes (scan review pending)':'')+
    (active.ocrRecovery?' · '+active.ocrRecovery.added+' OCR page additions, '+active.ocrRecovery.alternative+' alternate OCR pages (unverified)':'');
  loadLocal();current=0;$('search').value='';$('filter').value='all';filterQuestions();
  say('Opened '+active.name+'. Text is unverified. Responses are saved only in this browser.');
@@ -128,6 +129,8 @@ function render(){
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
   q.sourceStatus==='visual-source-editorial-study-not-verbatim'?
   'Official PDF page visually inspected; this is an EDITORIAL ENGLISH STUDY ADAPTATION, not certified verbatim original wording. Answer-key verification and scoring remain disabled. '+details:
+  q.sourceStatus==='text-source-editorial-study-not-verbatim'?
+  'Stored official-paper text extraction reviewed; scan review pending. EDITORIAL ENGLISH STUDY ADAPTATION. Option wording and order provisional; no verified key or scoring. '+details:
   q.complete&&missing.length===0?
   'Machine-separated question and A–D alternatives. Text is unverified and ungraded. '+details:
   'Partial question from scanned PDF. Missing labelled options: '+(missing.length?missing.join(', '):'uncertain split')+'. Source inspection is needed; no answers are inferred. '+details;
@@ -202,7 +205,7 @@ function buildPublishedCards(entries){
   const complete=source?.questions?.filter(q=>q.complete).length||0;
   row.append(textNode('span','muted',
     recovered+' / '+(source?.questions?.length||100)+' question stems recovered · '+
-    complete+' provisional A–D text sets · '+(source?.visualStudyRecoveries||0)+' visually reviewed editorial retypes · '+entry.textPages+' PDF text pages · ungraded'));
+    complete+' provisional A–D text sets · '+(source?.visualStudyRecoveries||0)+' visually reviewed editorial retypes · '+(source?.textStudyRecoveries||0)+' stored-text-only retypes (scan review pending) · '+entry.textPages+' PDF text pages · ungraded'));
   const a=textNode('a','published-link','Read typewritten page text');
   a.href='pyq-bulk-reader.html?paper='+encodeURIComponent(entry.id);
   a.addEventListener('click',event=>{
@@ -220,7 +223,7 @@ async function loadSiteDrafts(){
   const index=await response.json();
   if(index?.schemaVersion!==1||index.draftOnly!==true||index.gradingEnabled!==false||!Array.isArray(index.entries))
    throw Error('Published source index has incorrect provenance');
-  // Only these two repository-controlled, date-stamped study-review files are loaded.
+  // Load only repository-controlled, date-stamped study-review files.
   // Missing/rejected review overlays never block the original PDF text reader.
   const studyReviewPaths=[
    'visual-study-recovery-2026-11-23.json',
@@ -230,7 +233,9 @@ async function loadSiteDrafts(){
    'visual-study-recovery-2026-11-24-gs-123-137.json',
    'visual-study-recovery-2026-11-24-gs-142-160.json',
    'visual-study-recovery-2026-11-24-gs-161-180.json',
-   'visual-study-recovery-2026-11-24-gs-final.json'
+   'visual-study-recovery-2026-11-24-gs-final.json',
+   'text-study-recovery-2026-11-24-ge-a.json',
+   'text-study-recovery-2026-11-24-ge-b.json'
   ];
   const studyReviews=[];
   for(const name of studyReviewPaths){

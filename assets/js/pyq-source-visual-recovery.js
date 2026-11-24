@@ -4,13 +4,15 @@
 'use strict';
 const LETTERS=['A','B','C','D','E'];
 const SOURCE_STATUS='visual-source-editorial-study-not-verbatim';
+const TEXT_STATUS='text-source-editorial-study-not-verbatim';
 const safeSource=x=>typeof x==='string'&&/^https:\/\/www\.tnpsc\.gov\.in\/Tentative\/Document\//i.test(x);
 function apply(paper,overlay){
  let added=0;
+ const textBased=overlay?.status==='stored-source-text-editorial-study-adaptations-not-verbatim';
  if(!paper||paper.pageOnly||!Array.isArray(paper.questions)||paper.questions.length!==100||
     !overlay||overlay.schemaVersion!==1||overlay.gradingEnabled!==false||
     overlay.officialFinalKeyMapped!==false||overlay.verifiedOriginalWording!==false||
-    overlay.status!=='visually-inspected-editorial-study-adaptations-not-verbatim'||
+    (!textBased&&overlay.status!=='visually-inspected-editorial-study-adaptations-not-verbatim')||
     !Array.isArray(overlay.papers))return {paper,added};
  const record=overlay.papers.find(x=>x&&x.paperId===paper.id&&x.sourcePdf===paper.source);
  if(!record||!safeSource(record.sourcePdf)||!Number.isInteger(record.totalPdfPages)||
@@ -49,19 +51,22 @@ function apply(paper,overlay){
     (typeof recovery.expectedExistingOptionA==='string'&&
      recovery.expectedExistingOptionA.length>=2&&
      q.options.A===recovery.expectedExistingOptionA));
-  if(!sourceMissing&&!sourceCorrupt&&!sourceMisclassifiedComplete)continue;
+  // Stored-text-only recoveries may only fill a damaged existing machine-split item.
+  // They cannot replace visually reviewed text, complete machine options, or absent stems.
+  if(textBased?!sourceCorrupt:(!sourceMissing&&!sourceCorrupt&&!sourceMisclassifiedComplete))continue;
   q.text=recovery.text;
   q.options=Object.fromEntries(LETTERS.map(l=>[l,recovery.options[l]]));
   q.textRecovered=true;
   q.complete=true;
   q.sourcePdfPage=recovery.sourcePdfPage;
-  q.sourceStatus=SOURCE_STATUS;
+  q.sourceStatus=textBased?TEXT_STATUS:SOURCE_STATUS;
   q.scoreEligible=false;
   q.correctAnswer=null;
-  q.issues=['Source-image-inspected English study adaptation, NOT verbatim. No verified key or score.',recovery.note];
+  q.issues=[textBased?'Stored-source-text editorial study adaptation, NOT visually verified or verbatim. Option wording/order provisional; no verified key or score.':'Source-image-inspected English study adaptation, NOT verbatim. No verified key or score.',recovery.note];
   added++;
  }
- paper.visualStudyRecoveries=(paper.visualStudyRecoveries||0)+added;
+ if(textBased)paper.textStudyRecoveries=(paper.textStudyRecoveries||0)+added;
+ else paper.visualStudyRecoveries=(paper.visualStudyRecoveries||0)+added;
  return {paper,added};
 }
 root.ClearExamsPYQVisualRecovery={apply,SOURCE_STATUS};
