@@ -94,9 +94,9 @@ assert.match(reader,/stored-text-only/);
 assert.match(reader,/text-study-recovery-2026-11-24-ge-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-24-ge-b\.json/);
 const html=read('pyq-typed-library.html');
-assert.match(html,/99 of 100 provisionally readable A–D sets/);
-assert.match(html,/295 of 300 A–D option sets/);
-assert.match(html,/remaining 5 option sets still need source cleanup/);
+assert.match(html,/100 of 100 provisionally readable A–D sets/);
+assert.match(html,/300 of 300 A–D option sets/);
+assert.match(html,/Q40 General English retains an unusual sentence/);
 console.log('PASS: 49 source-text-only English option recoveries, 70/100 GE, 232/300 combined; visually inspected status and grading remain unchanged.');
 
 const g4Entry=json(dir+'index.json').entries.find(e=>e.year===2016);
@@ -125,7 +125,7 @@ assert.deepEqual(Array.from(g4Paper.questions.filter(q=>!q.complete),q=>q.number
 for(const o of g4Overlays)assert.equal(apply(g4Paper,o).added,0);
 assert.match(reader,/text-study-recovery-2026-11-25-g4-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-25-g4-b\.json/);
-assert.match(html,/96 of 100 provisionally readable A–D sets/);
+assert.match(html,/100 of 100 provisionally readable A–D sets/);
 console.log('PASS: 34 Group IV 2016 stored-text option recoveries, 96/100; all ungraded.');
 
 const geEntry=json(dir+'index.json').entries.find(e=>e.id.includes('general-english'));
@@ -155,3 +155,16 @@ for(const o of geNext)assert.equal(apply(gePaper,o).added,0);
 assert.match(reader,/text-study-recovery-2026-11-25-ge-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-25-ge-b\.json/);
 console.log('PASS: 29 further English recoveries, 99/100 A–D options, Q40 unresolved, no grading.');
+
+const geFinal=json(dir+'text-study-recovery-2026-11-25-ge-final.json');
+const g4Math=json(dir+'visual-study-recovery-2026-11-25-g4-math.json');
+assert.equal(apply(gePaper,geFinal).added,1);
+assert.equal(apply(g4Paper,g4Math).added,4);
+assert.equal(gePaper.questions.filter(q=>q.complete).length,100);
+assert.equal(g4Paper.questions.filter(q=>q.complete).length,100);
+assert.ok([...gePaper.questions,...g4Paper.questions].every(q=>q.scoreEligible!==true));
+assert.equal(apply(gePaper,geFinal).added,0);
+assert.equal(apply(g4Paper,g4Math).added,0);
+assert.match(reader,/text-study-recovery-2026-11-25-ge-final\.json/);
+assert.match(reader,/visual-study-recovery-2026-11-25-g4-math\.json/);
+console.log('PASS: final five option sets; both readers 100/100, no scores.');
