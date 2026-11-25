@@ -94,9 +94,9 @@ assert.match(reader,/stored-text-only/);
 assert.match(reader,/text-study-recovery-2026-11-24-ge-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-24-ge-b\.json/);
 const html=read('pyq-typed-library.html');
-assert.match(html,/70 of 100 provisionally readable A–D sets/);
-assert.match(html,/266 of 300 A–D option sets/);
-assert.match(html,/remaining 34 option sets still need source cleanup/);
+assert.match(html,/99 of 100 provisionally readable A–D sets/);
+assert.match(html,/295 of 300 A–D option sets/);
+assert.match(html,/remaining 5 option sets still need source cleanup/);
 console.log('PASS: 49 source-text-only English option recoveries, 70/100 GE, 232/300 combined; visually inspected status and grading remain unchanged.');
 
 const g4Entry=json(dir+'index.json').entries.find(e=>e.year===2016);
@@ -127,3 +127,31 @@ assert.match(reader,/text-study-recovery-2026-11-25-g4-a\.json/);
 assert.match(reader,/text-study-recovery-2026-11-25-g4-b\.json/);
 assert.match(html,/96 of 100 provisionally readable A–D sets/);
 console.log('PASS: 34 Group IV 2016 stored-text option recoveries, 96/100; all ungraded.');
+
+const geEntry=json(dir+'index.json').entries.find(e=>e.id.includes('general-english'));
+const geRaw=json(dir+geEntry.file);
+const gePaper=make(geRaw,merge(geRaw,json(dir+'ocr-recovery/'+geEntry.file)));
+for(const o of [...earlier,...latest])apply(gePaper,o);
+assert.equal(gePaper.questions.filter(q=>q.complete).length,70);
+const geNext=['text-study-recovery-2026-11-25-ge-a.json','text-study-recovery-2026-11-25-ge-b.json'].map(n=>json(dir+n));
+let geAdded=0;
+for(const o of geNext){
+ assert.equal(o.gradingEnabled,false);
+ assert.equal(o.verifiedOriginalWording,false);
+ assert.equal(o.officialFinalKeyMapped,false);
+ geAdded+=apply(gePaper,o).added;
+ for(const spec of o.papers[0].questions){
+  const q=gePaper.questions.find(q=>q.number===spec.number);
+  assert.equal(q.sourceStatus,'text-source-editorial-study-not-verbatim');
+  assert.equal(q.scoreEligible,false);
+  assert.equal(q.correctAnswer,null);
+  assert.equal(q.options.E,'Answer not known');
+ }
+}
+assert.equal(geAdded,29);
+assert.equal(gePaper.questions.filter(q=>q.complete).length,99);
+assert.deepEqual(Array.from(gePaper.questions.filter(q=>!q.complete),q=>q.number),[40]);
+for(const o of geNext)assert.equal(apply(gePaper,o).added,0);
+assert.match(reader,/text-study-recovery-2026-11-25-ge-a\.json/);
+assert.match(reader,/text-study-recovery-2026-11-25-ge-b\.json/);
+console.log('PASS: 29 further English recoveries, 99/100 A–D options, Q40 unresolved, no grading.');
