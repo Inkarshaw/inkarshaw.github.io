@@ -10,7 +10,7 @@ let selectedPublished='';
 let active=null,current=0,shown=[],responses={};
 const asText=x=>typeof x==='string'?x:'';
 const clean=x=>asText(x).trim();
-const validURL=x=>{try{const u=new URL(x);return u.protocol==='https:'&&/^(?:www\.)?(?:tnpsc\.gov\.in|tnusrb\.tn\.gov\.in|upsc\.gov\.in)$/i.test(u.hostname)?u.href:null}catch{return null}};
+const validURL=x=>{try{const u=new URL(x);return u.protocol==='https:'&&/^(?:www\.)?(?:tnpsc\.gov\.in|tnusrb\.tn\.gov\.in|upsc\.gov\.in|tamilnaducareerservices\.tn\.gov\.in)$/i.test(u.hostname)?u.href:null}catch{return null}};
 function say(message,error=false){$('status').textContent=message;$('status').style.color=error?'#a23b38':'#425e75'}
 function key(id){return 'ce-pyq-bulk-answers-v1:'+id}
 function normalize(raw){
@@ -109,13 +109,13 @@ function render(){
  $('questionPdfLink').textContent=q.sourcePdfPage?'View official PDF page '+q.sourcePdfPage:'View original official PDF';
  $('stem').textContent=q.text||'[Question text unreadable — use original source]';
  const opt=$('options');opt.replaceChildren();
- const paperLetters=/group-iv-2016/.test(active.id)?letters.slice(0,4):letters;
+ const paperLetters=/group-iv-(?:2016|2019)/.test(active.id)?letters.slice(0,4):letters;
  for(const l of paperLetters){
   const val=q.options[l],readable=!!clean(val);
   // Allow exam-style selection even if one printed alternative was lost in
   // extraction. The button says so: it never invents its missing wording.
   const b=textNode('button','option'+(readable?'':' missing-option'),'');
-  b.type='button';b.setAttribute('aria-pressed',String(responses[q.number]===l));
+  b.type='button';if(active.id.startsWith('tnpsc-group-iv-2019-')&&!readable)b.disabled=true;b.setAttribute('aria-pressed',String(responses[q.number]===l));
   b.append(textNode('b','',l),textNode('span','',
    readable?val:'[Printed option text not recovered — check official PDF]'));
   b.addEventListener('click',()=>choice(q,l));
@@ -127,6 +127,8 @@ function render(){
   'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
   !q.textRecovered?
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
+  q.sourceStatus==='2019-government-scan-editorial-study'?
+  'Government-hosted original scan inspected; study adaptation, not certified verbatim. No scoring. '+details:
   q.sourceStatus==='visual-source-editorial-study-not-verbatim'?
   'Official PDF page visually inspected; this is an EDITORIAL ENGLISH STUDY ADAPTATION, not certified verbatim original wording. Answer-key verification and scoring remain disabled. '+details:
   q.sourceStatus==='text-source-editorial-study-not-verbatim'?
@@ -199,7 +201,7 @@ function buildPublishedCards(entries){
  if(!entries.length){box.append(textNode('p','muted','No preloaded text papers are available. You can import a JSON file.'));return}
  for(const entry of entries){
   const row=textNode('article','published-card','');
-  row.append(textNode('strong','',entry.exam+' · '+entry.year));
+  row.append(textNode('strong','',entry.exam+' · '+entry.year+(entry.id.includes('2019-')?' · '+entry.paperName.replace('.pdf','').replace('_',' '):'')));
   const source=bank.get(entry.id);
   const recovered=source?.questions?.filter(q=>q.textRecovered).length||0;
   const complete=source?.questions?.filter(q=>q.complete).length||0;
@@ -250,10 +252,16 @@ async function loadSiteDrafts(){
     if(visual.ok)studyReviews.push(await visual.json());
    }catch{ /* Optional study review unavailable; original page source is retained */ }
   }
-  const valid=index.entries.filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
+  let supplemental=[];
+  try{
+   const response=await fetch('data/quizzes/pyq-reader-drafts/2019/index.json',{cache:'no-store'});
+   if(response.ok){const d=await response.json();if(d.schemaVersion===1&&d.draftOnly===true&&d.gradingEnabled===false&&Array.isArray(d.entries))supplemental=d.entries.filter(e=>/^tnpsc-group-iv-2019-general-(?:tamil|studies)-reviewed$/.test(e.id));}
+  }catch{ /* Optional 2019 sections do not block existing papers */ }
+  const valid=index.entries.concat(supplemental).filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
     typeof e.file==='string'&&e.file===e.id+'.json'&&Number.isInteger(e.textPages)&&e.textPages>0).slice(0,30);
   const files=await Promise.allSettled(valid.map(async entry=>{
-   const r=await fetch('data/quizzes/pyq-reader-drafts/'+entry.file,{cache:'no-store'});
+   const folder=supplemental.includes(entry)?'2019/':'';
+   const r=await fetch('data/quizzes/pyq-reader-drafts/'+folder+entry.file,{cache:'no-store'});
    if(!r.ok)throw Error('Missing text source '+entry.file);
    const raw=await r.json();
    if(raw.id!==entry.id||raw.draftOnly!==true||raw.grading!=='disabled'||raw.officialFinalKeyMapped!==false)
