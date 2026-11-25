@@ -107,17 +107,18 @@ function render(){
  $('sourceMeta').textContent=q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage+(selectedPage?.machineOcrUnverified?' · machine OCR, unverified':''):'Source page unknown';
  $('questionPdfLink').href=active.source&&q.sourcePdfPage?active.source+'#page='+q.sourcePdfPage:active.source||'pyq-hub.html';
  $('questionPdfLink').textContent=q.sourcePdfPage?'View official PDF page '+q.sourcePdfPage:'View original official PDF';
- $('stem').textContent=q.text||'[Question text unreadable — use original source]';
+ $('stem').textContent=q.text||(q.sourceStatus==='2018-original-page-linked'?'Read original question '+q.number+' using the PDF page link above.':'[Question text unreadable — use original source]');
  const opt=$('options');opt.replaceChildren();
  const paperLetters=/group-iv-(?:2016|2018|2019)/.test(active.id)?letters.slice(0,4):letters;
  for(const l of paperLetters){
   const val=q.options[l],readable=!!clean(val);
+  const pageLinked=q.sourceStatus==='2018-original-page-linked';
   // Allow exam-style selection even if one printed alternative was lost in
   // extraction. The button says so: it never invents its missing wording.
   const b=textNode('button','option'+(readable?'':' missing-option'),'');
-  b.type='button';if(/^tnpsc-group-iv-(?:2018|2019)-/.test(active.id)&&!readable)b.disabled=true;b.setAttribute('aria-pressed',String(responses[q.number]===l));
+  b.type='button';if(/^tnpsc-group-iv-(?:2018|2019)-/.test(active.id)&&!readable&&!pageLinked)b.disabled=true;b.setAttribute('aria-pressed',String(responses[q.number]===l));
   b.append(textNode('b','',l),textNode('span','',
-   readable?val:'[Printed option text not recovered — check official PDF]'));
+   readable?val:pageLinked?'Choose printed option '+l+' (see original PDF)':'[Printed option text not recovered — check official PDF]'));
   b.addEventListener('click',()=>choice(q,l));
   opt.append(b);
  }
@@ -125,6 +126,8 @@ function render(){
  const details=q.issues?.slice(0,2).join(' ')||'';
  $('questionCaution').textContent=active.pageOnly?
   'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
+  q.sourceStatus==='2018-original-page-linked'?
+  'Original PDF page located; text not transcribed. Read printed alternatives in the source and select a letter below. No scoring. '+details:
   !q.textRecovered?
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
   q.sourceStatus==='2019-secondary-index-editorial-study'?
