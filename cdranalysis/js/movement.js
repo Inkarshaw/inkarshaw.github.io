@@ -4,6 +4,7 @@
     const {$,state,localDateKey,haversineKm,fmtInt,fmtDur,dtFmt,dateFmt,escapeHtml,escAttr,mapLink,incidentDateTime,contactLabel,showStatus,timeMins,withinNight}=ctx;
     let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null;
     let movementArrowLayer=null, movementArrowSegments=[];
+    let movementTowerCounts=[];
     let movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null, movementBounds=null;
     let movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null;
     const validCoords=p=>Number.isFinite(p?.lat)&&Number.isFinite(p?.lng)&&Math.abs(Number(p.lat))<=90&&Math.abs(Number(p.lng))<=180&&!(Number(p.lat)===0&&Number(p.lng)===0);
@@ -66,6 +67,14 @@
     L.polyline(chevrons,{...style,weight:2.5,color:'#67e8f9'}).addTo(movementArrowLayer);
   }
 
+  function redrawMovementTowerCounts(){
+    const visible=$('movementShowCounts')?.checked!==false;
+    for(const {marker,events,visits} of movementTowerCounts){
+      marker.unbindTooltip();
+      if(visible)marker.bindTooltip('<strong>'+fmtInt(events)+'</strong>',{permanent:true,direction:'bottom',offset:[0,12],opacity:1,interactive:false,className:'movement-tower-count-label'});
+    }
+  }
+
   function renderMovementMap(rows,attempt=0){
     const el=$('movementMap');if(!el)return;
     const rect=el.getBoundingClientRect();
@@ -73,7 +82,7 @@
     stopMovementPlayback();
     if(movementPlaybackMarker&&movementMap){try{movementMap.removeLayer(movementPlaybackMarker)}catch{}}
     movementPlaybackMarkers=[];movementPlaybackMarker=null;movementPlaybackIndex=0;
-    movementArrowSegments=[];movementArrowLayer=null;
+    movementArrowSegments=[];movementArrowLayer=null;movementTowerCounts=[];
     state.mapPrivacyMode=!!$('mapPrivacyMode')?.checked;
     const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180&&!(p.x.lat===0&&p.x.lng===0));
     movementPlaybackRows=pts.map(p=>p.x);
@@ -167,9 +176,10 @@
     pts.forEach(({x,i},j)=>{
       const k=`${Number(x.lat).toFixed(4)},${Number(x.lng).toFixed(4)}`; // group co-located towers
       let t=towerGroups.get(k);
-      if(!t)t={key:k,lat:x.lat,lng:x.lng,cellId:x.cellId,address:x.address,segments:0,events:0,first:x.start,last:x.end,contacts:new Set(),visits:[]};
+      if(!t)t={key:k,lat:x.lat,lng:x.lng,cellId:x.cellId,address:x.address,segments:0,events:0,first:x.start,last:x.end,contacts:new Set(),visits:[],cellEvents:new Map()};
       const visit={x,i,j,seq:j+1};
       t.visits.push(visit);t.segments++;t.events+=x.events||0;
+      const cell=x.cellId||x.address||'Unknown cell';t.cellEvents.set(cell,(t.cellEvents.get(cell)||0)+(x.events||0));
       if(x.start<t.first)t.first=x.start;if(x.end>t.last)t.last=x.end;
       for(const n of x.contacts||[])t.contacts.add(n);
       towerGroups.set(k,t);
@@ -179,10 +189,14 @@
     // Small radius circle markers remain readable when tower coordinates are close.
     for(const t of towerGroups.values()){
       const marker=L.circleMarker([t.lat,t.lng],{pane:'movementTowerPane',renderer:movementCanvasRenderer,radius:Math.min(7,4+Math.log2(1+t.segments)*.6),color:'#d9fbff',weight:1.2,fillColor:'#17c9e8',fillOpacity:.85}).addTo(movementLayer);
+      movementTowerCounts.push({marker,events:t.events,visits:t.segments});
       for(const v of t.visits)movementPlaybackMarkers[v.j]=marker;
       const visits=t.visits.slice(0,15).map(v=>`#${v.seq} ${escapeHtml(dtFmt(v.x.start))}`).join('<br>');
-      marker.bindPopup(`<div class="movement-popup"><div class="movement-popup-title">${escapeHtml(t.cellId||'Tower')} • ${fmtInt(t.visits.length)} visits</div><div><b>Address:</b> ${escapeHtml(t.address||'—')}</div><div><b>Events:</b> ${fmtInt(t.events)} • <b>First:</b> ${escapeHtml(dtFmt(t.first))} • <b>Last:</b> ${escapeHtml(dtFmt(t.last))}</div><div><b>Coordinates:</b> ${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}</div><div class="movement-popup-visits">${visits}${t.visits.length>15?'<br>+ '+fmtInt(t.visits.length-15)+' more visits':''}</div></div>`);
+      const cells=[...t.cellEvents.entries()].sort((a,b)=>b[1]-a[1]);
+      const breakdown=cells.length>1?`<div><b>Grouped cells:</b><br>${cells.slice(0,15).map(([id,n])=>`${escapeHtml(id)}: ${fmtInt(n)} events`).join('<br>')}${cells.length>15?'<br>+ '+fmtInt(cells.length-15)+' more cells':''}</div>`:'';
+      marker.bindPopup(`<div class="movement-popup"><div class="movement-popup-title">${escapeHtml(cells.length>1?'Grouped tower location':t.cellId||'Tower')}</div><div><b>Address:</b> ${escapeHtml(t.address||'—')}</div><div><b>CDR events:</b> ${fmtInt(t.events)} • <b>Grouped visits:</b> ${fmtInt(t.segments)}</div>${breakdown}<div><b>First:</b> ${escapeHtml(dtFmt(t.first))} • <b>Last:</b> ${escapeHtml(dtFmt(t.last))}</div><div><b>Coordinates:</b> ${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}</div><div class="movement-popup-visits">${visits}${t.visits.length>15?'<br>+ '+fmtInt(t.visits.length-15)+' more visits':''}</div></div>`);
     }
+    redrawMovementTowerCounts();
     const firstPt=pts[0]?.x,lastPt=pts[pts.length-1]?.x;
     const sameEndpoint=firstPt&&lastPt&&Math.abs(firstPt.lat-lastPt.lat)<1e-7&&Math.abs(firstPt.lng-lastPt.lng)<1e-7;
     if(firstPt&&sameEndpoint){
@@ -363,6 +377,7 @@
       $('movementDateTo').onchange=()=>{stopMovementPlayback();renderMovement();};
       $('movementHeatMode').onchange=renderMovement;
       if($('movementShowArrows'))$('movementShowArrows').onchange=redrawMovementArrows;
+      if($('movementShowCounts'))$('movementShowCounts').onchange=redrawMovementTowerCounts;
       if($('mapPrivacyMode')){$('mapPrivacyMode').checked=!!state.mapPrivacyMode;$('mapPrivacyMode').onchange=e=>{state.mapPrivacyMode=!!e.target.checked;renderMovement();};}
       $('movementPlayBtn').onclick=toggleMovementPlayback;
       $('movementPrevBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex-1,true,true);};
