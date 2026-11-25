@@ -109,13 +109,13 @@ function render(){
  $('questionPdfLink').textContent=q.sourcePdfPage?'View official PDF page '+q.sourcePdfPage:'View original official PDF';
  $('stem').textContent=q.text||'[Question text unreadable — use original source]';
  const opt=$('options');opt.replaceChildren();
- const paperLetters=/group-iv-(?:2016|2019)/.test(active.id)?letters.slice(0,4):letters;
+ const paperLetters=/group-iv-(?:2016|2018|2019)/.test(active.id)?letters.slice(0,4):letters;
  for(const l of paperLetters){
   const val=q.options[l],readable=!!clean(val);
   // Allow exam-style selection even if one printed alternative was lost in
   // extraction. The button says so: it never invents its missing wording.
   const b=textNode('button','option'+(readable?'':' missing-option'),'');
-  b.type='button';if(active.id.startsWith('tnpsc-group-iv-2019-')&&!readable)b.disabled=true;b.setAttribute('aria-pressed',String(responses[q.number]===l));
+  b.type='button';if(/^tnpsc-group-iv-(?:2018|2019)-/.test(active.id)&&!readable)b.disabled=true;b.setAttribute('aria-pressed',String(responses[q.number]===l));
   b.append(textNode('b','',l),textNode('span','',
    readable?val:'[Printed option text not recovered — check official PDF]'));
   b.addEventListener('click',()=>choice(q,l));
@@ -129,7 +129,7 @@ function render(){
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
   q.sourceStatus==='2019-secondary-index-editorial-study'?
   'Secondary indexed paper text used; original scan and option order await verification. Editorial study adaptation; no scoring. '+details:
-  q.sourceStatus==='2019-government-scan-editorial-study'?
+  /^(?:2018|2019)-government-scan-editorial-study$/.test(q.sourceStatus)?
   'Government-hosted original scan inspected; study adaptation, not certified verbatim. No scoring. '+details:
   q.sourceStatus==='visual-source-editorial-study-not-verbatim'?
   'Official PDF page visually inspected; this is an EDITORIAL ENGLISH STUDY ADAPTATION, not certified verbatim original wording. Answer-key verification and scoring remain disabled. '+details:
@@ -203,7 +203,7 @@ function buildPublishedCards(entries){
  if(!entries.length){box.append(textNode('p','muted','No preloaded text papers are available. You can import a JSON file.'));return}
  for(const entry of entries){
   const row=textNode('article','published-card','');
-  row.append(textNode('strong','',entry.exam+' · '+entry.year+(entry.id.includes('2019-')?' · '+entry.paperName.replace('.pdf','').replace('_',' '):'')));
+  row.append(textNode('strong','',entry.exam+' · '+entry.year+(/^tnpsc-group-iv-(?:2018|2019)-/.test(entry.id)?' · '+entry.paperName.replace('.pdf','').replace('_',' '):'')));
   const source=bank.get(entry.id);
   const recovered=source?.questions?.filter(q=>q.textRecovered).length||0;
   const complete=source?.questions?.filter(q=>q.complete).length||0;
@@ -254,15 +254,18 @@ async function loadSiteDrafts(){
     if(visual.ok)studyReviews.push(await visual.json());
    }catch{ /* Optional study review unavailable; original page source is retained */ }
   }
-  let supplemental=[];
+  const supplemental=[];
+  const supplementalFolders=new Map();
+  for(const year of [2019,2018]){
   try{
-   const response=await fetch('data/quizzes/pyq-reader-drafts/2019/index.json',{cache:'no-store'});
-   if(response.ok){const d=await response.json();if(d.schemaVersion===1&&d.draftOnly===true&&d.gradingEnabled===false&&Array.isArray(d.entries))supplemental=d.entries.filter(e=>/^tnpsc-group-iv-2019-general-(?:tamil|studies)-reviewed$/.test(e.id));}
-  }catch{ /* Optional 2019 sections do not block existing papers */ }
+   const response=await fetch('data/quizzes/pyq-reader-drafts/'+year+'/index.json',{cache:'no-store'});
+   if(response.ok){const d=await response.json();if(d.schemaVersion===1&&d.draftOnly===true&&d.gradingEnabled===false&&Array.isArray(d.entries))for(const e of d.entries){if(e&&e.year===year&&['tamil','studies'].some(s=>e.id==='tnpsc-group-iv-'+year+'-general-'+s+'-reviewed')){supplemental.push(e);supplementalFolders.set(e,year+'/');}}}
+  }catch{ /* Optional year sections do not block existing papers */ }
+  }
   const valid=index.entries.concat(supplemental).filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
     typeof e.file==='string'&&e.file===e.id+'.json'&&Number.isInteger(e.textPages)&&e.textPages>0).slice(0,30);
   const files=await Promise.allSettled(valid.map(async entry=>{
-   const folder=supplemental.includes(entry)?'2019/':'';
+   const folder=supplementalFolders.get(entry)||'';
    const r=await fetch('data/quizzes/pyq-reader-drafts/'+folder+entry.file,{cache:'no-store'});
    if(!r.ok)throw Error('Missing text source '+entry.file);
    const raw=await r.json();
