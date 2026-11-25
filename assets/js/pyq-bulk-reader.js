@@ -127,6 +127,8 @@ function render(){
   'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
   !q.textRecovered?
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
+  q.sourceStatus==='2019-secondary-index-editorial-study'?
+  'Secondary indexed paper text used; original scan and option order await verification. Editorial study adaptation; no scoring. '+details:
   q.sourceStatus==='2019-government-scan-editorial-study'?
   'Government-hosted original scan inspected; study adaptation, not certified verbatim. No scoring. '+details:
   q.sourceStatus==='visual-source-editorial-study-not-verbatim'?
