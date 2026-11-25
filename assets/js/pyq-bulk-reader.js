@@ -130,7 +130,7 @@ function render(){
   'Original PDF page located; text not transcribed. Read printed alternatives in the source and select a letter below. No scoring. '+details:
   !q.textRecovered?
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
-  q.sourceStatus==='2019-secondary-index-editorial-study'?
+  /^(?:2018|2019)-secondary-index-editorial-study$/.test(q.sourceStatus)?
   'Secondary indexed paper text used; original scan and option order await verification. Editorial study adaptation; no scoring. '+details:
   /^(?:2018|2019)-government-scan-editorial-study$/.test(q.sourceStatus)?
   'Government-hosted original scan inspected; study adaptation, not certified verbatim. No scoring. '+details:
