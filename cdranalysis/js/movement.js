@@ -3,9 +3,10 @@
   window.CDRMovementFactory = function(ctx){
     const {$,state,localDateKey,haversineKm,fmtInt,fmtDur,dtFmt,dateFmt,escapeHtml,escAttr,mapLink,incidentDateTime,contactLabel,showStatus,timeMins,withinNight}=ctx;
     let movementMap=null, movementLayer=null, movementHeatLayer=null, movementTileLayer=null, movementCanvasRenderer=null;
+    let movementArrowLayer=null, movementArrowSegments=[];
     let movementPlaybackMarker=null, movementStartMarker=null, movementEndMarker=null, movementBounds=null;
     let movementPlaybackRows=[], movementPlaybackMarkers=[], movementPlaybackIndex=0, movementPlaybackTimer=null;
-    const validCoords=p=>Number.isFinite(Number(p?.lat))&&Number.isFinite(Number(p?.lng))&&Math.abs(Number(p.lat))<=90&&Math.abs(Number(p.lng))<=180&&!(Number(p.lat)===0&&Number(p.lng)===0);
+    const validCoords=p=>Number.isFinite(p?.lat)&&Number.isFinite(p?.lng)&&Math.abs(Number(p.lat))<=90&&Math.abs(Number(p.lng))<=180&&!(Number(p.lat)===0&&Number(p.lng)===0);
     const linkTowers=(a,b)=>{const gap=+b.start-+a.end,km=haversineKm(a,b);return validCoords(a)&&validCoords(b)&&Number.isFinite(gap)&&gap>=0&&gap<=12*3600000&&Number.isFinite(km)&&(km<.05||(gap>0&&km/(gap/3600000)<=250));};
 
   function movementDateRange(){
@@ -44,6 +45,27 @@
     wireTiles(movementTileLayer);movementTileLayer.addTo(movementMap);
   }
 
+  // Draw screen-sized chevrons on accepted chronological tower links.
+  // Reproject on zoom so arrows stay readable; no new network requests.
+  function redrawMovementArrows(){
+    if(!movementMap||!movementArrowLayer)return;
+    movementArrowLayer.clearLayers();
+    if($('movementShowArrows')?.checked===false||!movementArrowSegments.length)return;
+    const chevrons=[];
+    for(const [from,to] of movementArrowSegments){
+      const a=movementMap.latLngToLayerPoint(from),b=movementMap.latLngToLayerPoint(to);
+      const dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);
+      if(length<36)continue; // Avoid covering nearby tower markers; zoom in to reveal.
+      const ux=dx/length,uy=dy/length,tx=a.x+dx*.62,ty=a.y+dy*.62;
+      const wing=side=>movementMap.layerPointToLatLng(L.point(tx-ux*9-side*uy*5.5,ty-uy*9+side*ux*5.5));
+      chevrons.push([wing(1),movementMap.layerPointToLatLng(L.point(tx,ty)),wing(-1)]);
+    }
+    if(!chevrons.length)return;
+    const style={pane:'movementRoutePane',interactive:false,lineCap:'round',lineJoin:'round',opacity:1};
+    L.polyline(chevrons,{...style,weight:5,color:'#083344'}).addTo(movementArrowLayer);
+    L.polyline(chevrons,{...style,weight:2.5,color:'#67e8f9'}).addTo(movementArrowLayer);
+  }
+
   function renderMovementMap(rows,attempt=0){
     const el=$('movementMap');if(!el)return;
     const rect=el.getBoundingClientRect();
@@ -51,6 +73,7 @@
     stopMovementPlayback();
     if(movementPlaybackMarker&&movementMap){try{movementMap.removeLayer(movementPlaybackMarker)}catch{}}
     movementPlaybackMarkers=[];movementPlaybackMarker=null;movementPlaybackIndex=0;
+    movementArrowSegments=[];movementArrowLayer=null;
     state.mapPrivacyMode=!!$('mapPrivacyMode')?.checked;
     const pts=rows.map((x,i)=>({x,i})).filter(p=>Number.isFinite(p.x.lat)&&Number.isFinite(p.x.lng)&&Math.abs(p.x.lat)<=90&&Math.abs(p.x.lng)<=180&&!(p.x.lat===0&&p.x.lng===0));
     movementPlaybackRows=pts.map(p=>p.x);
@@ -69,6 +92,7 @@
         if(!state.mapPrivacyMode)addMovementTiles();
 
         movementLayer=L.layerGroup().addTo(movementMap);
+        movementMap.on('zoomend',redrawMovementArrows);
         movementMap.invalidateSize({pan:false});
       }catch(err){
         try{movementMap?.remove()}catch{}
@@ -110,14 +134,32 @@
     // Straight lines represent tower coordinate associations, never a road route.
     // Do not connect missing coordinates, gaps over 12h, or implausible jumps.
     let track=[],breaks=0;
+    // Do not imply a single direction of travel across different subjects.
+    const selectedSubject=$('movementCdr')?.value||'';
+    const subjects=new Set(state.filtered.filter(r=>r.dt&&(r.firstCellId||r.firstAddress)&&movementDateMatch(r)).map(r=>r.cdrNo||''));
+    const showSubjectDirection=!!selectedSubject||(subjects.size===1&&!subjects.has(''));
+    const seenDirections=new Set();
+    movementArrowLayer=L.layerGroup().addTo(movementLayer);
     const flushTrack=()=>{if(track.length>1)L.polyline(track,{pane:'movementRoutePane',weight:2.5,opacity:.7,dashArray:'5,7',color:'#18d9ff',interactive:false}).addTo(movementLayer);track=[];};
     for(let i=0;i<rows.length;i++){
       const current=rows[i];
       if(!validCoords(current)){flushTrack();continue;}
-      if(i>0&&!linkTowers(rows[i-1],current)){flushTrack();breaks++;}
+      if(i>0){
+        const previous=rows[i-1];
+        if(!linkTowers(previous,current)){flushTrack();breaks++;}
+        else if(showSubjectDirection&&+current.start>+previous.end){
+          const from=[previous.lat,previous.lng],to=[current.lat,current.lng];
+          const key=from.join(',')+'>'+to.join(',');
+          if((from[0]!==to[0]||from[1]!==to[1])&&!seenDirections.has(key)){
+            seenDirections.add(key);movementArrowSegments.push([from,to]);
+          }
+        }
+      }
       track.push([Number(current.lat),Number(current.lng)]);
     }
     flushTrack();
+    redrawMovementArrows();
+    if(!showSubjectDirection&&$('movementMapStatus'))$('movementMapStatus').innerHTML+='<span class="metric-chip">Select a single subject to show direction arrows</span>';
     if(breaks&&$('movementMapStatus'))$('movementMapStatus').innerHTML+=`<span class="metric-chip warntext">${fmtInt(breaks)} uncertain connections hidden</span>`;
 
     // Group repeated visits at the same tower so markers remain readable.
@@ -320,6 +362,7 @@
       $('movementDateFrom').onchange=()=>{stopMovementPlayback();renderMovement();};
       $('movementDateTo').onchange=()=>{stopMovementPlayback();renderMovement();};
       $('movementHeatMode').onchange=renderMovement;
+      if($('movementShowArrows'))$('movementShowArrows').onchange=redrawMovementArrows;
       if($('mapPrivacyMode')){$('mapPrivacyMode').checked=!!state.mapPrivacyMode;$('mapPrivacyMode').onchange=e=>{state.mapPrivacyMode=!!e.target.checked;renderMovement();};}
       $('movementPlayBtn').onclick=toggleMovementPlayback;
       $('movementPrevBtn').onclick=()=>{stopMovementPlayback();updateMovementPlayback(movementPlaybackIndex-1,true,true);};
