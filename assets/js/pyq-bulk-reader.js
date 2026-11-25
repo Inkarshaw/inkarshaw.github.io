@@ -107,16 +107,16 @@ function render(){
  $('sourceMeta').textContent=q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage+(selectedPage?.machineOcrUnverified?' · machine OCR, unverified':''):'Source page unknown';
  $('questionPdfLink').href=active.source&&q.sourcePdfPage?active.source+'#page='+q.sourcePdfPage:active.source||'pyq-hub.html';
  $('questionPdfLink').textContent=q.sourcePdfPage?'View official PDF page '+q.sourcePdfPage:'View original official PDF';
- $('stem').textContent=q.text||(q.sourceStatus==='2018-original-page-linked'?'Read original question '+q.number+' using the PDF page link above.':'[Question text unreadable — use original source]');
+ $('stem').textContent=q.text||(/^(?:2016|2018)-original-page-linked$/.test(q.sourceStatus)?'Read original question '+q.number+' using the PDF page link above.':'[Question text unreadable — use original source]');
  const opt=$('options');opt.replaceChildren();
  const paperLetters=/group-iv-(?:2016|2018|2019)/.test(active.id)?letters.slice(0,4):letters;
  for(const l of paperLetters){
   const val=q.options[l],readable=!!clean(val);
-  const pageLinked=q.sourceStatus==='2018-original-page-linked';
+  const pageLinked=/^(?:2016|2018)-original-page-linked$/.test(q.sourceStatus);
   // Allow exam-style selection even if one printed alternative was lost in
   // extraction. The button says so: it never invents its missing wording.
   const b=textNode('button','option'+(readable?'':' missing-option'),'');
-  b.type='button';if(/^tnpsc-group-iv-(?:2018|2019)-/.test(active.id)&&!readable&&!pageLinked)b.disabled=true;b.setAttribute('aria-pressed',String(responses[q.number]===l));
+  b.type='button';if(/^tnpsc-group-iv-(?:2016|2018|2019)-/.test(active.id)&&!readable&&!pageLinked)b.disabled=true;b.setAttribute('aria-pressed',String(responses[q.number]===l));
   b.append(textNode('b','',l),textNode('span','',
    readable?val:pageLinked?'Choose printed option '+l+' (see original PDF)':'[Printed option text not recovered — check official PDF]'));
   b.addEventListener('click',()=>choice(q,l));
@@ -126,13 +126,13 @@ function render(){
  const details=q.issues?.slice(0,2).join(' ')||'';
  $('questionCaution').textContent=active.pageOnly?
   'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
-  q.sourceStatus==='2018-original-page-linked'?
+  /^(?:2016|2018)-original-page-linked$/.test(q.sourceStatus)?
   'Original PDF page located; text not transcribed. Read printed alternatives in the source and select a letter below. No scoring. '+details:
   !q.textRecovered?
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
-  /^(?:2018|2019)-secondary-index-editorial-study$/.test(q.sourceStatus)?
+  /^(?:2016|2018|2019)-secondary-index-editorial-study$/.test(q.sourceStatus)?
   'Secondary indexed paper text used; original scan and option order await verification. Editorial study adaptation; no scoring. '+details:
-  /^(?:2018|2019)-government-scan-editorial-study$/.test(q.sourceStatus)?
+  /^(?:2016|2018|2019)-government-scan-editorial-study$/.test(q.sourceStatus)?
   'Government-hosted original scan inspected; study adaptation, not certified verbatim. No scoring. '+details:
   q.sourceStatus==='visual-source-editorial-study-not-verbatim'?
   'Official PDF page visually inspected; this is an EDITORIAL ENGLISH STUDY ADAPTATION, not certified verbatim original wording. Answer-key verification and scoring remain disabled. '+details:
@@ -206,7 +206,7 @@ function buildPublishedCards(entries){
  if(!entries.length){box.append(textNode('p','muted','No preloaded text papers are available. You can import a JSON file.'));return}
  for(const entry of entries){
   const row=textNode('article','published-card','');
-  row.append(textNode('strong','',entry.exam+' · '+entry.year+(/^tnpsc-group-iv-(?:2018|2019)-/.test(entry.id)?' · '+entry.paperName.replace('.pdf','').replace('_',' '):'')));
+  row.append(textNode('strong','',entry.exam+' · '+entry.year+(/^tnpsc-group-iv-(?:2016|2018|2019)-/.test(entry.id)?' · '+entry.paperName.replace('.pdf','').replace('_',' '):'')));
   const source=bank.get(entry.id);
   const recovered=source?.questions?.filter(q=>q.textRecovered).length||0;
   const complete=source?.questions?.filter(q=>q.complete).length||0;
@@ -259,7 +259,7 @@ async function loadSiteDrafts(){
   }
   const supplemental=[];
   const supplementalFolders=new Map();
-  for(const year of [2019,2018]){
+  for(const year of [2019,2018,2016]){
   try{
    const response=await fetch('data/quizzes/pyq-reader-drafts/'+year+'/index.json',{cache:'no-store'});
    if(response.ok){const d=await response.json();if(d.schemaVersion===1&&d.draftOnly===true&&d.gradingEnabled===false&&Array.isArray(d.entries))for(const e of d.entries){if(e&&e.year===year&&['tamil','studies'].some(s=>e.id==='tnpsc-group-iv-'+year+'-general-'+s+'-reviewed')){supplemental.push(e);supplementalFolders.set(e,year+'/');}}}
