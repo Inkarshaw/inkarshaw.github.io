@@ -29,3 +29,8 @@ with TemporaryDirectory() as td:
   {"type":"paper","url":"https://evil.invalid/papers/other.pdf"}]}]}))
  assert len(module.source_papers(p))==1
 print("Bulk official PDF importer: source list, Tamil options, no answers invented.")
+
+# Both 2019 source scans must be enumerated independently, with distinct IDs.
+mirrors=[p for p in sources if p['year']==2019 and p['exam']=='Group IV' and p['url'].startswith('https://tamilnaducareerservices.tn.gov.in/')]
+assert {p['filename'] for p in mirrors}=={'General_Tamil.pdf','General_Studies.pdf'}
+assert len({p['id'] for p in mirrors})==2

@@ -1,0 +1,58 @@
+name: Digitize TNPSC Group IV 2019 source scans
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pyq-group-iv-2019.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Tamil and English OCR
+        run: |
+          python -m pip install --quiet pymupdf
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-tam tesseract-ocr-eng
+      - name: Select only government-hosted 2019 Group IV papers
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('data/quizzes/pyq-yearwise-catalog.json').read_text())
+          entry=next(x for x in data['entries'] if x['category']=='TNPSC' and x['exam']=='Group IV' and x['year']==2019)
+          entry['documents']=[d for d in entry['documents'] if d['type']=='paper' and d['url'].startswith('https://tamilnaducareerservices.tn.gov.in/')]
+          assert len(entry['documents'])==2
+          Path('/tmp/group-iv-2019-catalog.json').write_text(json.dumps({'entries':[entry]}))
+          PY
+      - name: Extract all pages and number candidates without scoring
+        run: |
+          python scripts/pyq_bulk_pdf_to_drafts.py --catalog /tmp/group-iv-2019-catalog.json --output /tmp/group-iv-2019-drafts --ocr --workers 2 --timeout 90
+      - name: Report actual extraction results
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/group-iv-2019-drafts/index.json').read_text())
+          for p in d['papers']:
+              print(p['id'],p['status'],p['textPages'],'text pages',p['fourOptionCandidates'],'four-option candidates')
+          assert d['sourcePapersExtracted']==2, 'One or both government PDF sources could not be extracted'
+          PY
+      - name: Retain raw drafts and unresolved report for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tnpsc-group-iv-2019-unverified-transcription
+          path: /tmp/group-iv-2019-drafts/*.json
+          if-no-files-found: warn
+          retention-days: 30
