@@ -35,7 +35,7 @@ footer{font-size:.82rem;color:#678096;padding:18px 0 34px}
 <header><nav class="wrap"><a class="brand" href="index.html">ClearExams.</a><a href="tnpsc.html">TNPSC</a><a href="tnpsc-group1-syllabus.html">Group I syllabus</a><a href="pyq-hub.html">All PYQs</a></nav></header>
 <section class="hero"><div class="wrap"><div class="eyebrow">Tamil Nadu Public Service Commission · Combined Civil Services I</div>
 <h1>Group I previous-year papers, all available years</h1>
-<p>Practise from TNPSC's original bilingual papers, mark answers in a 200-question timed session, or attempt source-labelled text quizzes where available. The 2015 GS0811 ω official PDF companion now supports indicative scoring from the matched 200-position TNPSC final key (197 scored; three ALL exceptions). Find the Mains descriptive archive below.</p>
+<p>Practise from TNPSC's original bilingual papers, mark answers in a 200-question timed session, or attempt source-labelled text quizzes where available. The 2015 GS0811 ω official PDF companion now supports indicative scoring from the matched 200-position TNPSC final key (197 scored; three ALL exceptions). The 2013 and 2014 final keys are now linked separately; their original question booklets still require recovery. Find the Mains descriptive archive below.</p>
 <div class="stats"><span id="years">Checking year index…</span><span id="papers">Official PDFs</span><span id="typed">Typed quizzes</span></div></div></section>
 <main class="wrap">
 <section class="notice" aria-label="Question source transparency"><strong>What “available” means:</strong> An <strong>official-PDF answer sheet</strong> lets you read the exact original questions in TNPSC's PDF and choose their printed A–D or A–E options; it is not a digitized text quiz. <strong>Full 200-position original-number-aligned typed practice</strong> exists for 2011, 2015, 2017, 2019, 2021, 2022, 2024, 2025 and 2026. The 2015 text set now has all 200 original-numbered English adaptations (200 original-PDF image reviewed, 192 typed positions eligible for grades, eight study-only), while its separate official-PDF companion has 200 original answer slots with 197 indicatively scorable from the matching GS0811 ω final key. None of the text sets are certified verbatim original-paper transcriptions. Verified study grades currently cover 189 original-numbered 2017 questions and 192 of 200 adapted 2015 questions from TNPSC official final keys. Other years, ALL-key exceptions, and source-disputed positions stay ungraded. Some original TNPSC PDFs contain tentative-answer ticks.</section>
@@ -60,13 +60,14 @@ footer{font-size:.82rem;color:#678096;padding:18px 0 34px}
 (()=>{'use strict';
 const $=id=>document.getElementById(id),cards=$('cards'),status=$('results'),buttons=[...document.querySelectorAll('[data-filter]')];
 let entries=[],filter='all';
+const safeLead=url=>{try{const u=new URL(url);return u.protocol==="https:"&&["www.tamilanjobs.com","indianexaminations.blogspot.com"].includes(u.hostname)?u.href:null}catch{return null}};
 const safeExternal=url=>{try{const u=new URL(url);return u.protocol==='https:'&&/^(?:www\.)?tnpsc\.gov\.in$/.test(u.hostname)?u.href:null}catch{return null}};
 function link(text,url,primary=false,external=false){const a=document.createElement('a');a.textContent=text;a.href=url;if(primary)a.classList.add('primary');if(external){a.target='_blank';a.rel='noopener noreferrer'}return a}
 function card(x){
  const article=document.createElement('article');article.className='card';
  const head=document.createElement('div');head.className='card-head';const title=document.createElement('h2');title.textContent=String(x.year);
  const tag=document.createElement('span');tag.className='tag '+(x.typedUrl?'text':x.practicePaperId?'':'pending');
- tag.textContent=x.typedUrl?'Text + PDF':x.practicePaperId?'Official PDF':'Source review';head.append(title,tag);
+ tag.textContent=x.typedUrl?'Text + PDF':x.practicePaperId?'Official PDF':x.finalKeyUrl?'Final key only':'Source review';head.append(title,tag);
  const date=document.createElement('p');date.className='date';date.textContent=x.examDate?'Prelims: '+new Date(x.examDate+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}):'Historical Group I paper index · date not confirmed';
  const desc=document.createElement('p');desc.className='desc';desc.textContent=x.note;
  const actions=document.createElement('div');actions.className='actions';
@@ -74,14 +75,14 @@ function card(x){
  if(x.practicePaperId&&/^tnpsc-group-i-\d{4}-[a-z0-9-]+$/.test(x.practicePaperId))actions.append(link('Start 200-answer paper session','pyq-original-paper.html?paper='+encodeURIComponent(x.practicePaperId),!x.typedUrl));
  const paper=safeExternal(x.paperUrl);if(paper)actions.append(link('TNPSC original PDF',paper,false,true));
  const key=safeExternal(x.finalKeyUrl);if(key)actions.append(link('Official final key',key,false,true));
- if(!paper){const archive=safeExternal(x.officialArchiveUrl);if(archive)actions.append(link('Find in TNPSC archive',archive,false,true))}
+ if(!paper){const archive=safeExternal(x.officialArchiveUrl);if(archive)actions.append(link('TNPSC archive entry',archive,false,true));const lead=safeLead(x.sourceLeadUrl);if(lead)actions.append(link('External source lead (unverified booklet)',lead,false,true))}
  article.append(head,date,desc,actions);return article
 }
 function show(){
  buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===filter)));
- const visible=entries.filter(x=>filter==='all'||filter==='typed'&&!!x.typedUrl||filter==='pdf'&&!!x.practicePaperId||filter==='pending'&&!x.practicePaperId);
+ const visible=entries.filter(x=>filter==='all'||filter==='typed'&&!!x.typedUrl||filter==='pdf'&&!!x.practicePaperId||filter==='pending'&&!x.typedUrl);
  cards.replaceChildren(...visible.map(card));
- status.textContent=visible.length+' year'+(visible.length===1?'':'s')+' displayed'+(filter==='pending'?' · booklet transcription or source verification still needed':'');
+ status.textContent=visible.length+' year'+(visible.length===1?'':'s')+' displayed'+(filter==='pending'?' · typed questions still missing; final keys alone do not count as playable papers':'');
  if(!visible.length){const p=document.createElement('p');p.className='empty';p.textContent='No papers match this filter.';cards.append(p)}
 }
 buttons.forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.filter;show()}));
