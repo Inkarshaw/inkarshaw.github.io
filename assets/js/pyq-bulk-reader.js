@@ -107,12 +107,12 @@ function render(){
  $('sourceMeta').textContent=q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage+(selectedPage?.machineOcrUnverified?' · machine OCR, unverified':''):'Source page unknown';
  $('questionPdfLink').href=active.source&&q.sourcePdfPage?active.source+'#page='+q.sourcePdfPage:active.source||'pyq-hub.html';
  $('questionPdfLink').textContent=q.sourcePdfPage?'View source PDF page '+q.sourcePdfPage:'View source PDF';
- $('stem').textContent=q.text||(/^(?:2012|2016|2018)-original-page-linked$/.test(q.sourceStatus)?'Read original question '+q.number+' using the PDF page link above.':'[Question text unreadable — use original source]');
+ $('stem').textContent=q.text||(/^(?:2012|2013|2016|2018)-original-page-linked$/.test(q.sourceStatus)?'Read original question '+q.number+' using the PDF page link above.':'[Question text unreadable — use original source]');
  const opt=$('options');opt.replaceChildren();
  const paperLetters=/group-iv-(?:2012|2013|2014|2016|2018|2019)/.test(active.id)?letters.slice(0,4):letters;
  for(const l of paperLetters){
   const val=q.options[l],readable=!!clean(val);
-  const pageLinked=/^(?:2012|2016|2018)-original-page-linked$/.test(q.sourceStatus);
+  const pageLinked=/^(?:2012|2013|2016|2018)-original-page-linked$/.test(q.sourceStatus);
   // Allow exam-style selection even if one printed alternative was lost in
   // extraction. The button says so: it never invents its missing wording.
   const b=textNode('button','option'+(readable?'':' missing-option'),'');
@@ -126,7 +126,7 @@ function render(){
  const details=q.issues?.slice(0,2).join(' ')||'';
  $('questionCaution').textContent=active.pageOnly?
   'This is raw extracted PDF-page text, not a detected or numbered MCQ. No options or answers were invented.':
-  /^(?:2012|2016|2018)-original-page-linked$/.test(q.sourceStatus)?
+  /^(?:2012|2013|2016|2018)-original-page-linked$/.test(q.sourceStatus)?
   'Original PDF page located; text not transcribed. Read printed alternatives in the source and select a letter below. No scoring. '+details:
   !q.textRecovered?
   'Original question number '+q.number+' is indexed but its wording was not reliably recovered. Consult the original booklet; no text or options have been fabricated.':
