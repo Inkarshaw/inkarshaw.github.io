@@ -14,7 +14,7 @@ function stored(year){try{
  const d=JSON.parse(localStorage.getItem(STORAGE+year)||'null');
  if(!d||d.version!==1||typeof d.answers!=='object'||Array.isArray(d.answers))return {};
  const items={};
- const old2013=year===2013&&d.numberingRevision!=='20261126-v2';
+ const old2013=year===2013&&paper.numberingRevision==='20261126-v2'&&d.numberingRevision!=='20261126-v2';
  const moves={44:43,57:58,58:59,59:57,68:69,69:76};
  const available=new Set(paper.questions.map(q=>q.number));
  for(const [old,letter] of Object.entries(d.answers)){const n=Number(old);const dest=old2013?(moves[n]||n):n;if(available.has(dest)&&paper.optionLetters.includes(letter))items[String(dest)]=letter}
