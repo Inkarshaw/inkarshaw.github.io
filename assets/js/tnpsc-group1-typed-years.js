@@ -5,7 +5,7 @@ const STORAGE='clearexams:tnpsc:g1:multi-year-typed:v1:';
 const ALLOWED=['A','B','C','D','E'];
 const safeTnpsc=url=>{try{const u=new URL(url);return u.protocol==='https:'&&/^(?:www\.)?tnpsc\.gov\.in$/.test(u.hostname)?u.href:null}catch{return null}};
 const safeMirrorPdf=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((u.hostname==='previousyearquestions.app'&&u.pathname==='/papers/tnpsc-group-1/2022/prelims-general-studies.pdf')||(u.hostname==='cdn.govtjobsnet.com'&&u.pathname==='/previous-papers/tnpsc-group-1-prelims-2019-question-paper-with-answers.pdf')||(u.hostname==='winmeen.com'&&u.pathname==='/wp-content/uploads/2021/01/TNPSC-GROUP-I-PRELIMINARY-EXAM-2020-TENTATIVE-ANSWER-KEYS.pdf'&&!u.search))?u.href:null}catch{return null}};
-const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(u.hostname==='gktamil.com'&&/^\/tnpsc-group-1\/2014\/english\/general-studies\/part-[12]$/.test(u.pathname)&&!u.search))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-(?:2014-july-[1-4]|2013-february-(?:[1-9]|1[0-9]|20))\.php$/.test(u.pathname)&&!u.search)||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2015-november-[45]\.php$/.test(u.pathname)&&!u.search)||(['www.unlockias.in','unlockias.in'].includes(u.hostname)&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019','/tnpsc-previous-year-questions/prelims/2017'].includes(u.pathname))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2021-january-[1-5]\.php$/.test(u.pathname)&&!u.search))?u.href:null}catch{return null}};
+const safeReader=url=>{try{const u=new URL(url);return u.protocol==='https:'&&((['arivark.com','superprep.io','appolosupport.com','tamiltest.in'].includes(u.hostname)||(u.hostname==='gktamil.com'&&/^\/tnpsc-group-1\/2014\/english\/general-studies\/part-[12]$/.test(u.pathname)&&!u.search))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-(?:2014-july-[1-4]|2013-february-(?:[1-9]|1[0-9]|20))\.php$/.test(u.pathname)&&!u.search)||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2015-november-[45]\.php$/.test(u.pathname)&&!u.search)||(['www.unlockias.in','unlockias.in'].includes(u.hostname)&&/^\/tnpsc-2013-prelims-question-paper\/q\d{1,3}-[a-z0-9-]+$/.test(u.pathname)&&!u.search)||(['www.unlockias.in','unlockias.in'].includes(u.hostname)&&['/pdfs/state-pcs/tnpsc-2024-prelims-question-paper.pdf','/tnpsc-previous-year-questions/prelims/2019','/tnpsc-previous-year-questions/prelims/2017'].includes(u.pathname))||(u.hostname==='civilserviceaspirants.in'&&/^\/Tnpsc\/Question-Paper-with-Answer\/Group-1\/Group-1-prelims-2021-january-[1-5]\.php$/.test(u.pathname)&&!u.search))?u.href:null}catch{return null}};
 let bank=[],paper=null,index=0,responses={},savedAt=0;
 const VERIFIED_STATES=['official-final-version-A-verified','official-final-GS0811-omega-verified'];
 const UNGRADED_STATES=['unmapped','official-ALL-ungraded','source-dispute-ungraded','official-final-key-awaiting-original-image-review'];
@@ -14,10 +14,14 @@ function stored(year){try{
  const d=JSON.parse(localStorage.getItem(STORAGE+year)||'null');
  if(!d||d.version!==1||typeof d.answers!=='object'||Array.isArray(d.answers))return {};
  const items={};
- for(const q of paper.questions){const letter=d.answers[String(q.number)];if(paper.optionLetters.includes(letter))items[String(q.number)]=letter}
+ const old2013=year===2013&&d.numberingRevision!=='20261126-v2';
+ const moves={44:43,57:58,58:59,59:57,68:69,69:76};
+ const available=new Set(paper.questions.map(q=>q.number));
+ for(const [old,letter] of Object.entries(d.answers)){const n=Number(old);const dest=old2013?(moves[n]||n):n;if(available.has(dest)&&paper.optionLetters.includes(letter))items[String(dest)]=letter}
+ if(old2013){try{localStorage.setItem(STORAGE+year,JSON.stringify({...d,answers:items,numberingRevision:'20261126-v2'}))}catch{}}
  return items;
 }catch{return {}}}
-function save(){if(!paper)return;try{localStorage.setItem(STORAGE+paper.year,JSON.stringify({version:1,year:paper.year,answers:responses,updatedAt:Date.now()}))}catch{}}
+function save(){if(!paper)return;try{localStorage.setItem(STORAGE+paper.year,JSON.stringify({version:1,year:paper.year,answers:responses,updatedAt:Date.now(),...(paper.year===2013?{numberingRevision:'20261126-v2'}:{})}))}catch{}}
 function showReview(yes){$('quizArea').hidden=yes;$('reviewPane').hidden=!yes}
 function status(){if(!paper)return;const count=paper.questions.length;
  const done=paper.questions.filter(q=>!!responses[String(q.number)]).length;
