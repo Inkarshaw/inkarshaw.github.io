@@ -67,12 +67,13 @@ function card(x){
  const article=document.createElement('article');article.className='card';
  const head=document.createElement('div');head.className='card-head';const title=document.createElement('h2');title.textContent=String(x.year);
  const tag=document.createElement('span');tag.className='tag '+(x.typedUrl&&x.typedQuestionCount===200?'text':x.practicePaperId?'':'pending');
- tag.textContent=x.typedUrl?(x.typedQuestionCount<200?'Partial text':x.practicePaperId?'Text + PDF':'Text'):x.practicePaperId?'Official PDF':x.finalKeyUrl?'Final key only':'Source review';head.append(title,tag);
+ tag.textContent=x.typedUrl?(x.typedQuestionCount<200?'Partial text':x.practicePaperId?'Text + PDF':'Text'):x.practicePaperId?'Official PDF':x.secondarySessionUrl?'PDF reproduction':x.finalKeyUrl?'Final key only':'Source review';head.append(title,tag);
  const date=document.createElement('p');date.className='date';date.textContent=x.examDate?'Prelims: '+new Date(x.examDate+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}):'Historical Group I paper index · date not confirmed';
  const desc=document.createElement('p');desc.className='desc';desc.textContent=x.note;
  const actions=document.createElement('div');actions.className='actions';
  if(x.typedUrl&&/^(?:(?:tnpsc-g1-2011|tnpsc-g1-2026)-quiz\.html|tnpsc-group1-typed-years\.html\?year=20(?:14|15|17|19|21|22|24|25))$/.test(x.typedUrl))actions.append(link('Start '+x.typedQuestionCount+' typed questions',x.typedUrl,true));
  if(x.practicePaperId&&/^tnpsc-group-i-\d{4}-[a-z0-9-]+$/.test(x.practicePaperId))actions.append(link('Start 200-answer paper session','pyq-original-paper.html?paper='+encodeURIComponent(x.practicePaperId),!x.typedUrl));
+ if(x.year===2010&&x.secondarySessionUrl==='tnpsc-group1-2010-paper.html')actions.append(link('Start 200-answer PDF practice (ungraded)',x.secondarySessionUrl,true));
  const paper=safeExternal(x.paperUrl);if(paper)actions.append(link('TNPSC original PDF',paper,false,true));
  const key=safeExternal(x.finalKeyUrl);if(key)actions.append(link('Official final key',key,false,true));
  if(!paper){const archive=safeExternal(x.officialArchiveUrl);if(archive)actions.append(link('TNPSC archive entry',archive,false,true));const lead=safeLead(x.sourceLeadUrl);if(lead)actions.append(link('External source reference',lead,false,true));const mirror=safeLead(x.sourceMirrorLeadUrl);if(mirror)actions.append(link('Candidate PDF mirror (not verified)',mirror,false,true))}
