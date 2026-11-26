@@ -268,7 +268,7 @@ async function loadSiteDrafts(){
   }catch{ /* Optional year sections do not block existing papers */ }
   }
   supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-studies-ccse2t-reviewed","exam":"TNPSC Group II / IIA · General Studies","year":2024,"category":"TNPSC","paperName":"CCSE2T/2024 General Studies","file":"tnpsc-group-ii-iia-2024-general-studies-ccse2t-reviewed.json","textPages":62,"totalPdfPages":96,"status":"official-scan-editorial-study-not-verbatim","ungraded":true});
-  supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed","exam":"TNPSC Group II / IIA · General Tamil","year":2024,"category":"TNPSC","paperName":"CCSE2T/2024 General Tamil","file":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed.json","textPages":14,"totalPdfPages":96,"status":"official-scan-editorial-tamil-study-not-verbatim","ungraded":true});
+  supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed","exam":"TNPSC Group II / IIA · General Tamil","year":2024,"category":"TNPSC","paperName":"CCSE2T/2024 General Tamil","file":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed.json","textPages":21,"totalPdfPages":96,"status":"official-scan-editorial-tamil-study-not-verbatim","ungraded":true});
   const valid=index.entries.concat(supplemental).filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
     typeof e.file==='string'&&e.file===e.id+'.json'&&Number.isInteger(e.textPages)&&e.textPages>0).slice(0,30);
   const files=await Promise.allSettled(valid.map(async entry=>{
