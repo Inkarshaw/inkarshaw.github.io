@@ -74,6 +74,7 @@ function card(x){
  if(x.typedUrl&&/^(?:(?:tnpsc-g1-2011|tnpsc-g1-2026)-quiz\.html|tnpsc-group1-typed-years\.html\?year=20(?:14|15|17|19|21|22|24|25))$/.test(x.typedUrl))actions.append(link('Start '+x.typedQuestionCount+' typed questions',x.typedUrl,true));
  if(x.practicePaperId&&/^tnpsc-group-i-\d{4}-[a-z0-9-]+$/.test(x.practicePaperId))actions.append(link('Start 200-answer paper session','pyq-original-paper.html?paper='+encodeURIComponent(x.practicePaperId),!x.typedUrl));
  if(x.year===2010&&x.secondarySessionUrl==='tnpsc-group1-2010-paper.html')actions.append(link('Start 200-answer PDF practice (ungraded)',x.secondarySessionUrl,true));
+ if(x.year===2009&&x.secondarySessionUrl==='tnpsc-group1-2009-paper.html')actions.append(link('Start partial 195-answer PDF practice (ungraded)',x.secondarySessionUrl,true));
  const paper=safeExternal(x.paperUrl);if(paper)actions.append(link('TNPSC original PDF',paper,false,true));
  const key=safeExternal(x.finalKeyUrl);if(key)actions.append(link('Official final key',key,false,true));
  if(!paper){const archive=safeExternal(x.officialArchiveUrl);if(archive)actions.append(link('TNPSC archive entry',archive,false,true));const lead=safeLead(x.sourceLeadUrl);if(lead)actions.append(link('External source reference',lead,false,true));const mirror=safeLead(x.sourceMirrorLeadUrl);if(mirror)actions.append(link('Candidate PDF mirror (not verified)',mirror,false,true))}
