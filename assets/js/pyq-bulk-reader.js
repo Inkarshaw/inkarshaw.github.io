@@ -26,6 +26,7 @@ function normalize(raw){
   number:q.number,text:asText(q.text),options:Object.fromEntries(letters.map(a=>[a,asText(q.options?.[a])])),
   sourcePdfPage:Number.isInteger(q.sourcePdfPage)?q.sourcePdfPage:null,
   printedBookletPage:Number.isInteger(q.printedBookletPage)?q.printedBookletPage:null,
+  sourcePdf:validURL(q.sourcePdf),
   complete:q.fourOptionsDetected===true,
   sourceStatus:asText(q.textStatus)||'unverified-machine-extracted',rawBlock:asText(q.rawBlock),
   textRecovered:q.textRecovered!==false,issues:Array.isArray(q.issues)?q.issues.slice(0,5):[]
@@ -105,9 +106,9 @@ function render(){
  $('reader').hidden=false;
  $('position').textContent=(active.pageOnly?'PDF page ':active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?'Secondary GS index ':'Question ')+q.number+' · '+(current+1)+' of '+active.questions.length;
  const selectedPage=active.pages.find(p=>p.pdfPage===q.sourcePdfPage);
- $('sourceMeta').textContent=active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?'Official PDF page NOT verified':q.sourcePdfPage?(active.id==='tnpsc-group-ii-iia-2025-gs-ccse2-2at-reviewed'?'Mirror PDF page '+q.sourcePdfPage+' · printed booklet page '+(q.printedBookletPage??'unverified'):'Source PDF page '+q.sourcePdfPage)+(selectedPage?.machineOcrUnverified?' · machine OCR, unverified':''):'Source page unknown';
- $('questionPdfLink').href=active.source&&q.sourcePdfPage?active.source+'#page='+q.sourcePdfPage:active.source||'pyq-hub.html';
- $('questionPdfLink').textContent=active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?'Open official PDF (question mapping unverified)':q.sourcePdfPage?'View source PDF page '+q.sourcePdfPage:'View source PDF';
+ $('sourceMeta').textContent=q.sourcePdf&&q.printedBookletPage?'Official PDF text · printed booklet page '+q.printedBookletPage+' · scan check pending':active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?'Official PDF page NOT verified':q.sourcePdfPage?(active.id==='tnpsc-group-ii-iia-2025-gs-ccse2-2at-reviewed'?'Mirror PDF page '+q.sourcePdfPage+' · printed booklet page '+(q.printedBookletPage??'unverified'):'Source PDF page '+q.sourcePdfPage)+(selectedPage?.machineOcrUnverified?' · machine OCR, unverified':''):'Source page unknown';
+ $('questionPdfLink').href=q.sourcePdf|| (active.source&&q.sourcePdfPage?active.source+'#page='+q.sourcePdfPage:active.source||'pyq-hub.html');
+ $('questionPdfLink').textContent=q.sourcePdf?'Open official booklet (printed page '+q.printedBookletPage+')':active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?'Open official PDF (question mapping unverified)':q.sourcePdfPage?'View source PDF page '+q.sourcePdfPage:'View source PDF';
  $('stem').textContent=q.text||(/^(?:2012|2013|2016|2018)-original-page-linked$/.test(q.sourceStatus)?'Read original question '+q.number+' using the PDF page link above.':'[Question text unreadable — use original source]');
  const opt=$('options');opt.replaceChildren();
  const paperLetters=/group-iv-(?:2012|2013|2014|2016|2018|2019)/.test(active.id)?letters.slice(0,4):letters;
@@ -137,6 +138,7 @@ function render(){
   'Government-hosted original scan inspected; study adaptation, not certified verbatim. No scoring. '+details:
   /^(?:2013|2014)-mirror-scan-editorial-study$/.test(q.sourceStatus)?
   'Third-party mirror of original exam booklet inspected; editorial study adaptation, not certified verbatim. No scoring. '+details:
+  q.sourceStatus==='official-pdf-text-editorial-study-not-verbatim'?'Official TNPSC PDF text reviewed; scan image not retrieved. Editorial English adaptation; tentative mark only, no final key or scoring. '+details:
   q.sourceStatus==='mirror-scan-editorial-study-not-verbatim'?'Mirrored TNPSC specimen scan visually inspected. Editorial English adaptation; no final-key verification or scoring. '+details:
   q.sourceStatus==='visual-source-editorial-study-not-verbatim'?
   'Official PDF page visually inspected; this is an EDITORIAL '+(active.id==='tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed'?'TAMIL':'ENGLISH')+' STUDY ADAPTATION, not certified verbatim original wording. Scoring remains disabled. '+details:
@@ -273,7 +275,7 @@ async function loadSiteDrafts(){
   supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed","exam":"TNPSC Group II / IIA · General Tamil","year":2024,"category":"TNPSC","paperName":"CCSE2T/2024 General Tamil","file":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed.json","textPages":27,"totalPdfPages":96,"status":"official-scan-editorial-tamil-study-not-verbatim","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-english-ccse2e-reviewed","exam":"TNPSC Group II / IIA · General English","year":2024,"category":"TNPSC","paperName":"CCSE2E/2024 General English","file":"tnpsc-group-ii-iia-2024-general-english-ccse2e-reviewed.json","textPages":27,"totalPdfPages":96,"status":"official-scan-editorial-study-not-verbatim","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2025-gs-secondary-index-study","exam":"TNPSC Group II / IIA · 2025 GS secondary-index practice","year":2025,"category":"TNPSC","paperName":"2025 · 20 adapted questions (secondary indices, not official numbering)","file":"tnpsc-group-ii-iia-2025-gs-secondary-index-study.json","textPages":0,"totalPdfPages":0,"status":"secondary-transcript-index-editorial-study-unmapped","ungraded":true});
-  supplemental.unshift({"id":"tnpsc-group-ii-iia-2025-gs-ccse2-2at-reviewed","exam":"TNPSC Group II / IIA · 2025 General Studies and Aptitude","year":2025,"category":"TNPSC","paperName":"CCSE2-2AT/2025 · 48 positions (Q140–151 missing)","file":"tnpsc-group-ii-iia-2025-gs-ccse2-2at-reviewed.json","textPages":44,"totalPdfPages":72,"status":"mirror-scan-editorial-study-not-verbatim","ungraded":true});
+  supplemental.unshift({"id":"tnpsc-group-ii-iia-2025-gs-ccse2-2at-reviewed","exam":"TNPSC Group II / IIA · 2025 General Studies and Aptitude","year":2025,"category":"TNPSC","paperName":"CCSE2-2AT/2025 · Q101–185 (mixed source review)","file":"tnpsc-group-ii-iia-2025-gs-ccse2-2at-reviewed.json","textPages":44,"totalPdfPages":72,"status":"mirror-scan-editorial-study-not-verbatim","ungraded":true});
   const valid=index.entries.concat(supplemental).filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
     typeof e.file==='string'&&e.file===e.id+'.json'&&Number.isInteger(e.textPages)&&(e.textPages>0||e.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study')).slice(0,30);
   const files=await Promise.allSettled(valid.map(async entry=>{
