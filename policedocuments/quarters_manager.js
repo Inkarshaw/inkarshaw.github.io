@@ -169,15 +169,38 @@ function unitMatches(u,q,s){
  if(!q)return true;
  return norm([u.id,u.group,u.location,u.block,u.floor,u.door,displayPerson(u),displayRank(u),effective(u)].join(" ")).includes(norm(q));
 }
+const UNIT_GROUPS=[["ls","Lutheral Garden SI Quarters"],["lp","Lutheral Garden PC and HC Quarters"],["gr","Gengu Reddy Subway SI Quarters"],["in","Kilpauk New Inspector Quarters"],["si","Kilpauk SI Quarters"],["po","Kilpauk Old PC and HC Quarters"],["pn","Kilpauk New PC and HC Quarters"],["pu","Pullapuram PC and HC Quarters"]];
 function renderUnits(){
  const q=byId("qmUnitSearch").value,s=byId("qmUnitFilter").value;
  const matched=unitEntries.filter(u=>unitMatches(u,q,s));
  byId("qmUnitListCount").textContent=matched.length+" / "+unitEntries.length+" mapped units";
- byId("qmUnitRows").innerHTML=matched.slice(0,350).map(u=>
-  '<tr><td>'+esc(u.group)+'</td><td>'+esc(u.block)+'</td><td>'+esc(u.floor)+'</td><td>'+esc(u.door)+'</td>'+
-  '<td>'+esc(displayPerson(u)||"—")+'</td><td>'+esc(effective(u))+'</td><td><button class="qm-link" data-qm-select="'+esc(u.id)+'">Manage</button></td></tr>'
- ).join("")||'<tr><td colspan="7">No matching units. Check the uploaded worksheet.</td></tr>';
- byId("qmUnitLimit").textContent=matched.length>350?"Showing first 350 matches. Narrow the search to find other quarters.":"";
+ let host=byId("qmUnitRows");
+ // Accept the previous HTML layout too (cached pages).
+ if(host.tagName==="TBODY"){
+  const wrapper=host.closest(".qm-scroll");
+  const replacement=document.createElement("div");
+  replacement.id="qmUnitRows";
+  wrapper.replaceWith(replacement);host=replacement;
+ }
+ const groups=UNIT_GROUPS.slice();
+ if(unitEntries.some(u=>u.section==="io"))groups.push(["io","Kilpauk Old Inspector Quarters"]);
+ const known=new Set(groups.map(g=>g[0]));
+ if(unitEntries.some(u=>!known.has(u.section)))groups.push(["","Other / unclassified quarters"]);
+ const belongs=(u,key)=>key?u.section===key:!known.has(u.section);
+ host.innerHTML=groups.map(([key,label])=>{
+  const all=unitEntries.filter(u=>belongs(u,key)),rows=matched.filter(u=>belongs(u,key));
+  const occupied=all.filter(u=>effective(u)==="Occupied").length;
+  const vacant=all.filter(u=>effective(u)==="Vacant").length;
+  const detail=all.length+" units · "+occupied+" occupied · "+vacant+" vacant · "+(all.length-occupied-vacant)+" other statuses";
+  return '<section aria-label="'+esc(label)+'" style="margin:18px 0 24px"><h3 class="qm-subheading">'+esc(label)+'</h3>'+
+   '<p class="note">'+esc(detail)+(q||s?' · '+rows.length+' matching':'')+'</p>'+
+   '<div class="qm-scroll"><table class="qm-table"><thead><tr><th>Block</th><th>Floor</th><th>Door</th><th>Occupant</th><th>Status</th><th>Action</th></tr></thead><tbody>'+
+   (rows.map(u=>'<tr><td>'+esc(u.block)+'</td><td>'+esc(u.floor)+'</td><td>'+esc(u.door)+'</td>'+
+    '<td>'+esc(displayPerson(u)||"—")+'</td><td>'+esc(effective(u))+'</td><td><button type="button" class="qm-link" data-qm-select="'+esc(u.id)+'">Manage</button></td></tr>').join("")||
+    '<tr><td colspan="6">'+(all.length?"No matching units.":"No mapped units in the uploaded worksheet.")+'</td></tr>')+
+   '</tbody></table></div></section>';
+ }).join("");
+ byId("qmUnitLimit").textContent="";
 }
 function renderProfile(){
  const u=unitEntries.find(x=>x.id===selectedId);
