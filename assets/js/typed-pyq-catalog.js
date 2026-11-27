@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
-const expectedLink=/^(?:(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20\d{2})?|pyq-cds\.html\?paper=cds-(?:i|ii)-20\d{2}-gk)$/;
+const expectedLink=/^(?:(?:tnpsc|tnusrb|pyq)-[a-z0-9-]+\.html(?:\?year=20\d{2})?|pyq-bulk-reader\.html\?paper=[a-z0-9-]+|pyq-cds\.html\?paper=cds-(?:i|ii)-20\d{2}-gk)$/;
 let entries=[];
 
 let adapted=[], archive=[], machineDrafts=[]; let archiveVisible=16;
@@ -30,7 +30,8 @@ return [...map.values()].sort((a,b)=>a.exam.localeCompare(b.exam)||b.year-a.year
 function archiveKey(e){return e.category+'|'+e.exam+'|'+e.year}
 function coveredByTyped(e){
 return entries.some(x=>x.exam===e.category&&x.year===e.year&&
- ((e.category==='TNPSC'&&e.exam==='Group IV'&&/^Group IV\b/.test(x.paper))||
+ ((e.category==='TNPSC'&&e.exam==='Group II / IIA'&&x.paper.startsWith('Group II / IIA · '))||
+ (e.category==='TNPSC'&&e.exam==='Group IV'&&/^Group IV\b/.test(x.paper))||
  (e.category==='TNPSC'&&e.exam==='Group I'&&/^Group I\b/.test(x.paper))||
  (e.category==='TNUSRB'&&/Police Constable/i.test(e.exam)&&/^Police Constable\b/.test(x.paper))||
  (e.category==='UPSC'&&e.exam==='Civil Services Prelims'&&/^Civil Services Prelims · /.test(x.paper))||

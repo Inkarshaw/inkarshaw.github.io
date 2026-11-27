@@ -28,9 +28,20 @@ assert.equal(new Set(review.papers.map(p=>p.id)).size,8);
 const previouslyAudited=new Set(review.papers.map(p=>p.id));
 assert.ok([...previouslyAudited].every(id=>cat.entries.some(e=>e.id===id)), 'Retain the original eight-paper scoring audit without silently broadening its scope');
 const newTyped=cat.entries.filter(e=>!previouslyAudited.has(e.id));
-assert.deepEqual(newTyped.map(e=>e.id).sort(),[...[2015,2017,2019,2021,2022,2024,2025].map(y=>'tnpsc-g1-'+y),'upsc-cse-2026-csat','upsc-cse-2026-gs1'].sort());
+const group2Readers = ['general-tamil-ccse2-2at', 'general-english-ccse2-2ae', 'gs-ccse2-2at']
+ .map(section => 'tnpsc-group-ii-iia-2025-' + section + '-reviewed');
+assert.deepEqual(newTyped.map(e=>e.id).sort(),[...group2Readers,...[2015,2017,2019,2021,2022,2024,2025].map(y=>'tnpsc-g1-'+y),'upsc-cse-2026-csat','upsc-cse-2026-gs1'].sort());
 const group1Years=json('data/quizzes/tnpsc-group1-all-years.json');
 for(const entry of newTyped){
+ if(group2Readers.includes(entry.id)){
+  const paper=json('data/quizzes/pyq-reader-drafts/'+entry.id+'.json');
+  assert.equal(entry.scorable,0,'TNPSC tentative marks must not award points');
+  assert.equal(paper.officialFinalKeyMapped,false);
+  assert.equal(paper.grading,'disabled');
+  assert.equal(paper.questionCandidates.length,entry.typed);
+  assert.ok(paper.questionCandidates.every(q=>q.correctAnswer===null&&q.scoreEligible===false));
+  continue;
+ }
  if(entry.exam==='UPSC'){
   const p=json('data/quizzes/'+entry.id+'.json');
   assert.equal(entry.scorable,0,'No UPSC provisional marks before key mapping');

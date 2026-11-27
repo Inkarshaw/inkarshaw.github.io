@@ -173,16 +173,20 @@ function render(){
  const container=$("pyqItems");container.replaceChildren();
  for(const x of shown.slice(0,visibleLimit)){
   const count=reviewedCount(x);
+  const sections=(x.documents||[]).filter(doc=>doc.type==="practice"&&/^pyq-bulk-reader\.html\?paper=[a-z0-9-]+-reviewed$/.test(doc.url));
   const original=x.category==="TNPSC"&&x.exam==="Group IV"&&[2022,2024,2025].includes(x.year);
   const card=document.createElement("article");card.className="pyq-card";
   const top=document.createElement("div");top.className="card-top";
   const year=document.createElement("strong");year.className="year-pill";year.textContent=x.year;
-  const kind=document.createElement("span");kind.className="source-kind";kind.textContent=original?"200 original Qs · PDF":count>=10?"Adapted quiz":"Official source";
+  const kind=document.createElement("span");kind.className="source-kind";kind.textContent=sections.length?"Numbered study sections":original?"200 original Qs · PDF":count>=10?"Adapted quiz":"Official source";
   top.append(year,kind);
   const title=document.createElement("h3");title.textContent=x.category+" · "+x.exam;
   const paper=document.createElement("p");paper.textContent=x.paper;
   const actions=document.createElement("div");actions.className="pyq-actions";
   card.append(top,title,paper);
+  for(const section of sections){
+   const a=document.createElement("a");a.className="paper";a.href=section.url;a.textContent=section.label;actions.append(a);
+  }
   if(original){
    const a=document.createElement("a");a.className="paper";
    a.href=x.year===2022?"tnpsc-g4-2022-quiz.html":"pyq-original-paper.html?paper=tnpsc-group-iv-"+x.year+"-general-tamil-general-studies";
@@ -199,7 +203,7 @@ function render(){
   if(count>=10){
    const a=document.createElement("a");a.className="quiz";
    a.href="pyq-full-quiz.html?exam="+encodeURIComponent(expectedSourceExam(x))+"&year="+x.year+"&count=10&start=1&mode=practice";
-   a.textContent=original?"Optional · 10 adapted questions →":"Start 10-question quiz →";
+   a.textContent=(original||sections.length)?"Optional · 10 adapted questions →":"Start 10-question quiz →";
    actions.append(a);
    const note=document.createElement("p");note.className="pyq-warning";
    note.textContent=count+" adapted revision questions available separately; not the full original paper.";card.append(note);

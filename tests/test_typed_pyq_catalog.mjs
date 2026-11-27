@@ -6,10 +6,10 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const json=p=>JSON.parse(read(p));
 const cat=json('data/quizzes/typed-pyq-catalog.json'),html=read('pyq-typed-library.html'),js=read('assets/js/typed-pyq-catalog.js');
 assert.equal(cat.schemaVersion,1);
-assert.equal(cat.entries.length,17);
-assert.equal(new Set(cat.entries.map(e=>e.id)).size,17);
-assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),3000);
-assert.equal(cat.entries.filter(e=>e.typed===e.total).length,17,'Every published numbered text set now covers all original positions');
+assert.equal(cat.entries.length,20);
+assert.equal(new Set(cat.entries.map(e=>e.id)).size,20);
+assert.equal(cat.entries.reduce((n,e)=>n+e.typed,0),3300);
+assert.equal(cat.entries.filter(e=>e.typed===e.total).length,20,'Every published numbered text set now covers all original positions');
 const by=id=>{const e=cat.entries.find(x=>x.id===id);assert.ok(e,'Missing catalogue '+id);return e;};
 for(const e of cat.entries){assert.ok(['TNPSC','TNUSRB','UPSC'].includes(e.exam));assert.ok(Number.isInteger(e.total)&&Number.isInteger(e.typed)&&Number.isInteger(e.scorable));assert.ok(e.typed<=e.total&&e.scorable<=e.typed);assert.ok(e.sourceStatus.length>16);assert.ok(existsSync(new URL('../'+e.link.split('?')[0],import.meta.url)),'Quiz route missing: '+e.link);}
 for(const year of [2015,2017,2019,2021,2022,2024,2025]){const entry=by('tnpsc-g1-'+year);assert.equal(entry.typed,200);assert.equal(entry.scorable,year===2015?192:year===2017?189:0);assert.equal(entry.link,'tnpsc-group1-typed-years.html?year='+year);}
@@ -68,7 +68,7 @@ assert.equal(adaptedCounts.size,8);
 assert.equal([...adaptedCounts.values()].reduce((n,x)=>n+x,0),160);
 
 const allYears=json('data/quizzes/pyq-yearwise-catalog.json');
-assert.equal(allYears.entries.length,67,'All 67 source-indexed exam-year papers must remain discoverable');
+assert.equal(allYears.entries.length,69,'All 69 source-indexed exam-year papers must remain discoverable');
 assert.deepEqual(new Set(allYears.entries.map(x=>x.category)),new Set(['TNPSC','TNUSRB','UPSC','SSC','Railways']));
 assert.match(js,/pyq-yearwise-catalog\.json/,'Unified library fetches the all-year source index');
 assert.match(js,/hasTextFor/,'Source-only archive records must be separated from existing text');
@@ -95,7 +95,7 @@ for(const e of draftIndex.entries){
 for(const field of ['yearFilter','showMore','dataNotice'])assert.ok(html.includes('id="'+field+'"'),'Missing archive UI control '+field);
 for(const board of ['SSC','Railways'])assert.ok(html.includes('value="'+board+'"'),'Missing exam board '+board);
 const archiveKeys=new Set(allYears.entries.map(x=>x.category+'|'+x.exam+'|'+x.year));
-assert.equal(archiveKeys.size,67,'Archive exam/year records must be unique');
+assert.equal(archiveKeys.size,allYears.entries.length,'Archive exam/year records must be unique');
 const adaptedKeys=new Set([...adaptedCounts.keys()].map(x=>{
  const [exam,year]=x.split('|');
  if(exam==='TNPSC Group IV')return 'TNPSC|Group IV|'+year;
@@ -105,19 +105,20 @@ const adaptedKeys=new Set([...adaptedCounts.keys()].map(x=>{
 }));
 assert.ok([...adaptedKeys].every(x=>archiveKeys.has(x)),'All adapted exam/year sets should map to the archive');
 const typedKeys=new Set(cat.entries.map(e=>{
+ if(e.exam==='TNPSC'&&e.paper.startsWith('Group II / IIA'))return 'TNPSC|Group II / IIA|'+e.year;
  if(e.exam==='TNPSC'&&e.paper.startsWith('Group IV'))return 'TNPSC|Group IV|'+e.year;
  if(e.exam==='TNPSC'&&e.paper.startsWith('Group I'))return 'TNPSC|Group I|'+e.year;
  if(e.exam==='TNUSRB'&&e.paper.startsWith('SI Open'))return 'TNUSRB|SI (Open Candidates)|'+e.year;
  if(e.exam==='UPSC'&&e.paper.startsWith('Civil Services Prelims'))return 'UPSC|Civil Services Prelims|'+e.year;
  return e.exam+'|'+e.paper+'|'+e.year;
 }));
-assert.equal(new Set([...archiveKeys,...typedKeys,...adaptedKeys]).size,75,
- '67 archived exam years plus eight unique typed-only years');
+assert.equal(new Set([...archiveKeys,...typedKeys,...adaptedKeys]).size,77,
+ '69 archived exam years plus eight unique typed-only years');
 const sourceOnly=[...archiveKeys].filter(k=>!adaptedKeys.has(k)&&!typedKeys.has(k));
-assert.equal(sourceOnly.length,53,'Exactly 53 indexed exam-year sources lack a local text quiz');
+assert.equal(sourceOnly.length,55,'Exactly 55 indexed exam-year sources lack a local text quiz');
 assert.ok(read('pyq-hub.html').includes('Explore all exams, years and text coverage'),'Universal coverage discoverable from main PYQ hub');
 
-console.log('PASS 75 distinct indexed exam-year records: 17 typed sets (3000 positions), 8 adapted sets (160 questions), and 53 archive-only exam-years honestly marked without question text.');
+console.log('PASS: 77 indexed exam years, 20 main-catalogue typed sections (3300 positions), and eight adapted sets.');
 
 for(const [short,n] of [['gs1',100],['csat',80]]){const id='upsc-cse-2026-'+short,p=json('data/quizzes/'+id+'.json');assert.equal(by(id).typed,n);assert.equal(by(id).scorable,0);assert.equal(p.questions.length,n);assert.equal(p.grading,'disabled');assert.equal(p.bookletSeries,'A');for(const [i,q] of p.questions.entries()){assert.equal(q.number,i+1);assert.ok(q.text.trim());assert.equal(q.correctAnswer,null);assert.equal(q.scoreEligible,false);assert.ok(['A','B','C','D'].every(k=>q.options[k].trim()));assert.ok(q.sourcePages.length)}assert.ok(read(by(id).link).includes('data-paper="'+short+'"'));}
 new vm.Script(read('assets/js/upsc-2026-pyq-data.js'));new vm.Script(read('assets/js/upsc-2026-pyq.js'));

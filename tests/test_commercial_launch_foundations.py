@@ -47,7 +47,11 @@ class CommercialLaunchFoundationsTests(unittest.TestCase):
 
     def test_pyq_drafts_are_not_misrepresented_as_official_certified(self):
         catalog = json.loads(read("data/quizzes/typed-pyq-catalog.json"))
-        self.assertEqual(len(catalog["entries"]), 17)
+        self.assertEqual(len(catalog["entries"]), 20)
+        group2 = [e for e in catalog["entries"] if e["id"].startswith("tnpsc-group-ii-iia-2025-")]
+        self.assertEqual(len(group2), 3)
+        self.assertTrue(all(e["typed"] == 100 and e["scorable"] == 0 for e in group2))
+        self.assertTrue(all(e["keyStatus"] == "tentative-only" for e in group2))
         upsc = [e for e in catalog["entries"] if e["id"] in ("upsc-cse-2026-gs1", "upsc-cse-2026-csat")]
         self.assertEqual(len(upsc), 2)
         self.assertEqual(sum(e["typed"] for e in upsc), 180)
