@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id);
 const MAX_FILE=45*1024*1024;
 const letters=['A','B','C','D','E'];
 const specimenStatus='official-specimen-study-text';
-const fourChoicePaper=id=>/group-iv-(?:2012|2013|2014|2016|2018|2019)|^tnpsc-group-ii-iia-2018-/.test(id);
+const fourChoicePaper=id=>/group-iv-(?:2012|2013|2014|2016|2018|2019)|^tnpsc-group-ii-iia-(?:2017|2018)-/.test(id);
 const bank=new Map();
 const published=new Map();
 let selectedPublished='';
@@ -288,6 +288,7 @@ async function loadSiteDrafts(){
    if(response.ok){const d=await response.json();if(d.schemaVersion===1&&d.draftOnly===true&&d.gradingEnabled===false&&Array.isArray(d.entries))for(const e of d.entries){if(e&&e.year===year&&['tamil','studies'].some(s=>e.id==='tnpsc-group-iv-'+year+'-general-'+s+'-reviewed')){supplemental.push(e);supplementalFolders.set(e,year+'/');}}}
   }catch{ /* Optional year sections do not block existing papers */ }
   }
+  supplemental.push({"id":"tnpsc-group-ii-iia-2017-general-studies-gr2at-reviewed","exam":"TNPSC Group IIA · General Studies","year":2017,"category":"TNPSC","paperName":"GR2AT/17 · General Studies Q101–115","file":"tnpsc-group-ii-iia-2017-general-studies-gr2at-reviewed.json","textPages":8,"totalPdfPages":53,"status":"official-specimen-study-text","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2018-general-english-ccs2e-reviewed","exam":"TNPSC Group II · General English","year":2018,"category":"TNPSC","paperName":"CCS2E/2018 · General English Q1–100","file":"tnpsc-group-ii-iia-2018-general-english-ccs2e-reviewed.json","textPages":25,"totalPdfPages":27,"status":"official-specimen-study-text","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2018-general-tamil-ccs2t-reviewed","exam":"TNPSC Group II · General Tamil","year":2018,"category":"TNPSC","paperName":"CCS2T/2018 · General Tamil Q1–100","file":"tnpsc-group-ii-iia-2018-general-tamil-ccs2t-reviewed.json","textPages":25,"totalPdfPages":27,"status":"official-specimen-study-text","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2018-general-studies-ccs2t-reviewed","exam":"TNPSC Group II · General Studies","year":2018,"category":"TNPSC","paperName":"CCS2T/2018 · General Studies Q101–200","file":"tnpsc-group-ii-iia-2018-general-studies-ccs2t-reviewed.json","textPages":50,"totalPdfPages":50,"status":"official-specimen-study-text","ungraded":true});
