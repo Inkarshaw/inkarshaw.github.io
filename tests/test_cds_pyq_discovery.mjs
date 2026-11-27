@@ -47,7 +47,13 @@ function cdsCards(){
 }
 function links(card){return card.children.filter(child=>child.tagName==='a').map(child=>child.href);}
 assert.equal(cdsCards().length,17,'All 17 CDS paper cards must load on the initial PYQ library screen');
-assert.ok(nodes.stats.textContent.includes('5350'),'Complete numbered positions must combine 3310 existing and 2040 CDS');
+const nonCds = ['typed-pyq-catalog', 'tnusrb-pc-catalog']
+ .flatMap(name => JSON.parse(read('data/quizzes/'+name+'.json')).entries)
+ .reduce((sum, entry) => sum + entry.typed, 0);
+const cdsPositions = cds.paperStatuses.reduce((sum, paper) => sum + paper.provisionalFourOptionSets, 0);
+assert.equal(cdsPositions,2040);
+assert.ok(nodes.stats.textContent.includes((nonCds+cdsPositions)+' typed question positions'),
+ 'Library totals must include every CDS and non-CDS typed position');
 const expected=cds.paperStatuses.map(x=>'pyq-cds.html?paper='+x.id).sort();
 assert.deepEqual(cdsCards().flatMap(links).sort(),expected,'Every CDS card must deep-link to its own question paper');
 assert.ok(cdsCards().every(card=>card.textContent.includes('Scoring disabled / not verified')),'No CDS card may claim scoring');
