@@ -65,7 +65,7 @@ function setPaper(id){
  const counts=active.questions.reduce((o,q)=>(o.complete+=q.complete?1:0,o.recovered+=q.textRecovered?1:0,o),{complete:0,recovered:0});
  $('paperStats').textContent=active.pageOnly?
   active.pages.length+' extracted source pages (question numbers could not be parsed) · no answer scoring':
-  active.questions.length+' original-numbered question positions · '+counts.recovered+
+  active.questions.length+(active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?' secondary-transcript-indexed practice positions (NOT official booklet numbering) · ':' original-numbered question positions · ')++counts.recovered+
    ' stems available for study · '+counts.complete+' provisional A–D text sets · '+
    (active.questions.length-counts.complete)+' need source corrections · all ungraded'+
    (active.visualStudyRecoveries?' · '+active.visualStudyRecoveries+' official-PDF-page editorial study retypes (not verbatim)':'')+
@@ -102,11 +102,11 @@ function render(){
   $('meter').style.width='0%';return;
  }
  $('reader').hidden=false;
- $('position').textContent=(active.pageOnly?'PDF page ':'Question ')+q.number+' · '+(current+1)+' of '+active.questions.length;
+ $('position').textContent=(active.pageOnly?'PDF page ':active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?'Secondary GS index ':'Question ')+q.number+' · '+(current+1)+' of '+active.questions.length;
  const selectedPage=active.pages.find(p=>p.pdfPage===q.sourcePdfPage);
- $('sourceMeta').textContent=q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage+(selectedPage?.machineOcrUnverified?' · machine OCR, unverified':''):'Source page unknown';
+ $('sourceMeta').textContent=active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?'Official PDF page NOT verified':q.sourcePdfPage?'Source PDF page '+q.sourcePdfPage+(selectedPage?.machineOcrUnverified?' · machine OCR, unverified':''):'Source page unknown';
  $('questionPdfLink').href=active.source&&q.sourcePdfPage?active.source+'#page='+q.sourcePdfPage:active.source||'pyq-hub.html';
- $('questionPdfLink').textContent=q.sourcePdfPage?'View source PDF page '+q.sourcePdfPage:'View source PDF';
+ $('questionPdfLink').textContent=active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?'Open official PDF (question mapping unverified)':q.sourcePdfPage?'View source PDF page '+q.sourcePdfPage:'View source PDF';
  $('stem').textContent=q.text||(/^(?:2012|2013|2016|2018)-original-page-linked$/.test(q.sourceStatus)?'Read original question '+q.number+' using the PDF page link above.':'[Question text unreadable — use original source]');
  const opt=$('options');opt.replaceChildren();
  const paperLetters=/group-iv-(?:2012|2013|2014|2016|2018|2019)/.test(active.id)?letters.slice(0,4):letters;
@@ -270,6 +270,7 @@ async function loadSiteDrafts(){
   supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-studies-ccse2t-reviewed","exam":"TNPSC Group II / IIA · General Studies","year":2024,"category":"TNPSC","paperName":"CCSE2T/2024 General Studies","file":"tnpsc-group-ii-iia-2024-general-studies-ccse2t-reviewed.json","textPages":62,"totalPdfPages":96,"status":"official-scan-editorial-study-not-verbatim","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed","exam":"TNPSC Group II / IIA · General Tamil","year":2024,"category":"TNPSC","paperName":"CCSE2T/2024 General Tamil","file":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed.json","textPages":27,"totalPdfPages":96,"status":"official-scan-editorial-tamil-study-not-verbatim","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-english-ccse2e-reviewed","exam":"TNPSC Group II / IIA · General English","year":2024,"category":"TNPSC","paperName":"CCSE2E/2024 General English","file":"tnpsc-group-ii-iia-2024-general-english-ccse2e-reviewed.json","textPages":27,"totalPdfPages":96,"status":"official-scan-editorial-study-not-verbatim","ungraded":true});
+  supplemental.push({"id":"tnpsc-group-ii-iia-2025-gs-secondary-index-study","exam":"TNPSC Group II / IIA · 2025 GS secondary-index practice","year":2025,"category":"TNPSC","paperName":"2025 · 20 adapted questions (secondary indices, not official numbering)","file":"tnpsc-group-ii-iia-2025-gs-secondary-index-study.json","textPages":0,"totalPdfPages":0,"status":"secondary-transcript-index-editorial-study-unmapped","ungraded":true});
   const valid=index.entries.concat(supplemental).filter(e=>e&&typeof e.id==='string'&&/^[a-z0-9-]{6,120}$/.test(e.id)&&
     typeof e.file==='string'&&e.file===e.id+'.json'&&Number.isInteger(e.textPages)&&e.textPages>0).slice(0,30);
   const files=await Promise.allSettled(valid.map(async entry=>{
