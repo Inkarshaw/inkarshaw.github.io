@@ -5,6 +5,7 @@ const $=id=>document.getElementById(id);
 const MAX_FILE=45*1024*1024;
 const letters=['A','B','C','D','E'];
 const specimenStatus='official-specimen-study-text';
+const fourChoicePaper=id=>/group-iv-(?:2012|2013|2014|2016|2018|2019)|^tnpsc-group-ii-iia-2018-/.test(id);
 const bank=new Map();
 const published=new Map();
 let selectedPublished='';
@@ -68,7 +69,7 @@ function setPaper(id){
  $('originalPdfLink').textContent=active.source?(active.fileStatus===specimenStatus?'Open official TNPSC specimen booklet':'Open original official paper PDF'):'See source-paper archive';
  const counts=active.questions.reduce((o,q)=>(o.complete+=q.complete?1:0,o.recovered+=q.textRecovered?1:0,o),{complete:0,recovered:0});
  $('paperStats').textContent=active.fileStatus===specimenStatus?
-  active.questions.length+' numbered study questions · five choices per question · ungraded':active.pageOnly?
+  active.questions.length+' numbered study questions · '+(fourChoicePaper(active.id)?'four':'five')+' choices per question · ungraded':active.pageOnly?
   active.pages.length+' extracted source pages (question numbers could not be parsed) · no answer scoring':
   active.questions.length+(active.id==='tnpsc-group-ii-iia-2025-gs-secondary-index-study'?' secondary-transcript-indexed practice positions (NOT official booklet numbering) · ':' original-numbered question positions · ')+counts.recovered+
    ' stems available for study · '+counts.complete+' provisional A–D text sets · '+
@@ -123,7 +124,7 @@ function render(){
  }
  $('stem').textContent=q.text||(/^(?:2012|2013|2016|2018)-original-page-linked$/.test(q.sourceStatus)?'Read original question '+q.number+' using the PDF page link above.':'[Question text unreadable — use original source]');
  const opt=$('options');opt.replaceChildren();
- const paperLetters=/group-iv-(?:2012|2013|2014|2016|2018|2019)/.test(active.id)?letters.slice(0,4):letters;
+ const paperLetters=fourChoicePaper(active.id)?letters.slice(0,4):letters;
  for(const l of paperLetters){
   const val=q.options[l],readable=!!clean(val);
   const pageLinked=/^(?:2012|2013|2016|2018)-original-page-linked$/.test(q.sourceStatus);
@@ -232,7 +233,7 @@ function buildPublishedCards(entries){
   const recovered=source?.questions?.filter(q=>q.textRecovered).length||0;
   const complete=source?.questions?.filter(q=>q.complete).length||0;
   row.append(textNode('span','muted',
-    source?.fileStatus===specimenStatus?source.questions.length+' numbered study questions · five choices each · ungraded':
+    source?.fileStatus===specimenStatus?source.questions.length+' numbered study questions · '+(fourChoicePaper(source.id)?'four':'five')+' choices each · ungraded':
     recovered+' / '+(source?.questions?.length||100)+' question stems recovered · '+
     complete+' provisional A–D text sets · '+(source?.visualStudyRecoveries||0)+' visually reviewed editorial retypes · '+(source?.textStudyRecoveries||0)+' stored-text-only retypes (scan review pending) · '+entry.textPages+' PDF text pages · ungraded'));
   const a=textNode('a','published-link','Read typewritten page text');
@@ -287,6 +288,7 @@ async function loadSiteDrafts(){
    if(response.ok){const d=await response.json();if(d.schemaVersion===1&&d.draftOnly===true&&d.gradingEnabled===false&&Array.isArray(d.entries))for(const e of d.entries){if(e&&e.year===year&&['tamil','studies'].some(s=>e.id==='tnpsc-group-iv-'+year+'-general-'+s+'-reviewed')){supplemental.push(e);supplementalFolders.set(e,year+'/');}}}
   }catch{ /* Optional year sections do not block existing papers */ }
   }
+  supplemental.push({"id":"tnpsc-group-ii-iia-2018-general-studies-ccs2t-reviewed","exam":"TNPSC Group II · General Studies","year":2018,"category":"TNPSC","paperName":"CCS2T/2018 · General Studies Q101–110","file":"tnpsc-group-ii-iia-2018-general-studies-ccs2t-reviewed.json","textPages":6,"totalPdfPages":50,"status":"official-specimen-study-text","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2022-general-tamil-ccs2t-reviewed","exam":"TNPSC Group II / IIA · General Tamil","year":2022,"category":"TNPSC","paperName":"CCS2T/2022 · General Tamil Q1–100","file":"tnpsc-group-ii-iia-2022-general-tamil-ccs2t-reviewed.json","textPages":24,"totalPdfPages":27,"status":"official-specimen-study-text","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-studies-ccse2t-reviewed","exam":"TNPSC Group II / IIA · General Studies","year":2024,"category":"TNPSC","paperName":"CCSE2T/2024 General Studies","file":"tnpsc-group-ii-iia-2024-general-studies-ccse2t-reviewed.json","textPages":62,"totalPdfPages":96,"status":"official-scan-editorial-study-not-verbatim","ungraded":true});
   supplemental.push({"id":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed","exam":"TNPSC Group II / IIA · General Tamil","year":2024,"category":"TNPSC","paperName":"CCSE2T/2024 General Tamil","file":"tnpsc-group-ii-iia-2024-general-tamil-ccse2t-reviewed.json","textPages":27,"totalPdfPages":96,"status":"official-scan-editorial-tamil-study-not-verbatim","ungraded":true});
